@@ -1,0 +1,21 @@
+{
+  "context_tokens": 8192,
+  "output_tokens": 1400,
+  "image_tokens": 1200,
+  "safety_tokens": 400,
+  "max_calls": 500,
+  "retries": 2,
+  "text_bytes": 1800,
+  "image_side": 1000,
+  "tile_points": 420,
+  "top_k": 4,
+  "min_score": 0.1,
+  "max_pairs": 1000,
+  "vision": true,
+  "verify_visuals": true,
+  "json_mode": false,
+  "aliases": {
+    "chw": "chilled water",
+    "duty pump": "primary pump"
+  }
+}

@@ -1,0 +1,85 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Semantic PDF comparison</title><style>
+:root{font-family:system-ui,sans-serif;color:#183047;background:#edf2f6}body{max-width:1200px;margin:32px auto;padding:0 24px}
+h1{font-size:36px;letter-spacing:-1px}h2{font-size:20px}h3{font-size:15px;color:#356783}.meta{color:#536879}
+article,header,details.coverage{background:white;border:1px solid #d7e1e8;border-radius:12px;padding:22px;margin:18px 0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}section{min-width:0;padding:12px;background:#f7f9fb;border-radius:8px}
+img{display:block;max-width:100%;max-height:500px;margin:14px auto}blockquote{border-left:3px solid #83a9bf;margin:14px 0;padding-left:12px}
+small{overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;border-bottom:1px solid #d7e1e8;padding:8px}
+select,input{padding:10px;border:1px solid #aac0cd;border-radius:6px;margin:8px}pre{white-space:pre-wrap}.warning{color:#854400}summary{cursor:pointer}
+@media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
+</style><header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1><p>Team A (synthetic evidence) ↔ Team B (synthetic evidence)</p><p>Mode: proposals</p><p>{&#x27;equivalent&#x27;: 2, &#x27;uncertain&#x27;: 1, &#x27;different&#x27;: 1}</p><p class='warning'>0 incomplete, failed or skipped source tasks. 3 claims lack a confirmed counterpart.</p><p>Model conclusions require review. “Complete” means the extractor reported no local issue, not proof of exhaustive coverage. Unmatched claims do not establish additions or deletions.</p><p>Revision mode treats A as the earlier version and B as the later version. Proposal mode treats both symmetrically; neither is ranked.</p><details><summary>Run metadata and limitations</summary><pre>{
+  &quot;mode&quot;: &quot;proposals&quot;,
+  &quot;retrieval&quot;: {
+    &quot;candidate_pairs&quot;: 4,
+    &quot;attempted_pairs&quot;: 4,
+    &quot;omitted_by_pair_limit&quot;: 0,
+    &quot;strategy&quot;: &quot;bidirectional sparse TF-IDF top-k union; lexical recall is not guaranteed&quot;
+  },
+  &quot;schema_version&quot;: 1,
+  &quot;fixture&quot;: true,
+  &quot;documents&quot;: {
+    &quot;A&quot;: {
+      &quot;name&quot;: &quot;Team A (synthetic evidence)&quot;
+    },
+    &quot;B&quot;: {
+      &quot;name&quot;: &quot;Team B (synthetic evidence)&quot;
+    }
+  },
+  &quot;note&quot;: &quot;HAND-AUTHORED FIXTURE: no PDF extraction or real model inference was used. This report demonstrates behavior, not measured accuracy.&quot;
+}</pre></details></header><label>Show <select id="filter"><option value="all">All relations</option><option>different</option><option>equivalent</option><option>complementary</option><option>uncertain</option><option>unrelated</option></select></label><input id="query" placeholder="Search findings" aria-label="Search findings"><main><article data-relation="equivalent"><h2>Equivalent</h2>
+        <p>The diagram connection and prose specify the same discharge destination.</p><div class="pair"><section><h3>A · page 1 · diagram</h3>
+        <b>primary pump — discharges to</b><p>heat exchanger </p>
+        <p>Conditions: design duty</p><blockquote>primary pump: discharges to heat exchanger  at design duty</blockquote>
+        <small>A-3 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section><section><h3>B · page 1 · text</h3>
+        <b>primary pump — discharges to</b><p>heat exchanger </p>
+        <p>Conditions: design duty</p><blockquote>primary pump: discharges to heat exchanger  at design duty</blockquote>
+        <small>B-3 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section></div>
+        <details><summary>Calculation and matching details</summary><p>Retrieval score 1.0; model confidence 0.95</p></details></article><article data-relation="uncertain"><h2>Uncertain</h2>
+        <p>Approximate visual value requires review. Chart readings suggest 35 m versus 32 m; both are approximate.</p><div class="pair"><section><h3>A · page 1 · chart</h3>
+        <b>pump — head at 20 L/s</b><p>35 m</p>
+        <p>Conditions: design duty</p><blockquote>pump: head at 20 L/s 35 m at design duty</blockquote>
+        <small>A-4 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section><section><h3>B · page 1 · chart</h3>
+        <b>pump — head at 20 L/s</b><p>32 m</p>
+        <p>Conditions: design duty</p><blockquote>pump: head at 20 L/s 32 m at design duty</blockquote>
+        <small>B-4 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section></div>
+        <details><summary>Calculation and matching details</summary><p>Retrieval score 0.9157; model confidence 0.95</p></details></article><article data-relation="different"><h2>Different</h2>
+        <p>At design duty, rated power increases from 10 kW to 12 kW (+20%).</p><div class="pair"><section><h3>A · page 1 · text</h3>
+        <b>primary pump — rated power</b><p>10 kW</p>
+        <p>Conditions: design duty</p><blockquote>primary pump: rated power 10 kW at design duty</blockquote>
+        <small>A-1 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section><section><h3>B · page 1 · table</h3>
+        <b>primary pump — rated power</b><p>12000 W</p>
+        <p>Conditions: design duty</p><blockquote>primary pump: rated power 12000 W at design duty</blockquote>
+        <small>B-1 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section></div>
+        <details><summary>Calculation and matching details</summary><pre>{
+  &quot;dimension&quot;: &quot;power&quot;,
+  &quot;a_base&quot;: &quot;10000&quot;,
+  &quot;b_base&quot;: &quot;12000&quot;,
+  &quot;delta_b_minus_a&quot;: &quot;2000&quot;,
+  &quot;equal&quot;: false,
+  &quot;relative_percent&quot;: &quot;20.0&quot;
+}</pre><p>Retrieval score 0.8654; model confidence 0.95</p></details></article><article data-relation="equivalent"><h2>Equivalent</h2>
+        <p>The table value 20 L/s equals the prose value 0.020 m3/s.</p><div class="pair"><section><h3>A · page 1 · table</h3>
+        <b>cooling circuit — design flow</b><p>20 L/s</p>
+        <p>Conditions: design duty</p><blockquote>cooling circuit: design flow 20 L/s at design duty</blockquote>
+        <small>A-2 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section><section><h3>B · page 1 · text</h3>
+        <b>cooling circuit — design flow</b><p>0.020 m3/s</p>
+        <p>Conditions: design duty</p><blockquote>cooling circuit: design flow 0.020 m3/s at design duty</blockquote>
+        <small>B-2 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section></div>
+        <details><summary>Calculation and matching details</summary><pre>{
+  &quot;dimension&quot;: &quot;flow&quot;,
+  &quot;a_base&quot;: &quot;0.020&quot;,
+  &quot;b_base&quot;: &quot;0.020&quot;,
+  &quot;delta_b_minus_a&quot;: &quot;0.000&quot;,
+  &quot;equal&quot;: true,
+  &quot;relative_percent&quot;: &quot;0&quot;
+}</pre><p>Retrieval score 0.8516; model confidence 0.95</p></details></article></main><details><summary>Unmatched evidence (3)</summary><article>No confirmed counterpart in retrieved evidence; this does not establish absence.<section><h3>A · page 1 · chart</h3>
+        <b>pump — head at 20 L/s</b><p>35 m</p>
+        <p>Conditions: design duty</p><blockquote>pump: head at 20 L/s 35 m at design duty</blockquote>
+        <small>A-4 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section></article><article>No confirmed counterpart in retrieved evidence; this does not establish absence.<section><h3>B · page 1 · chart</h3>
+        <b>pump — head at 20 L/s</b><p>32 m</p>
+        <p>Conditions: design duty</p><blockquote>pump: head at 20 L/s 32 m at design duty</blockquote>
+        <small>B-4 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section></article><article>No confirmed counterpart in retrieved evidence; this does not establish absence.<section><h3>B · page 1 · text</h3>
+        <b>firewall — audit log retention</b><p>90 days</p>
+        <p>Conditions: security policy</p><blockquote>firewall: audit log retention 90 days at security policy</blockquote>
+        <small>B-5 · PDF bbox (40.0, 40.0, 300.0, 140.0) · confidence 0.95</small></section></article></details><details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>PDF</th><th>Page</th><th>Source</th><th>Status</th><th>Issues</th></tr></thead><tbody></tbody></table></details><script>function filter(){const r=document.querySelector('#filter').value,q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;document.querySelector('#query').oninput=filter;</script></html>

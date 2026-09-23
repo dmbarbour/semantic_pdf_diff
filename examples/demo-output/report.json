@@ -1,0 +1,294 @@
+{
+  "mode": "proposals",
+  "findings": [
+    {
+      "a": "A-3",
+      "b": "B-3",
+      "retrieval_score": 1.0,
+      "relation": "equivalent",
+      "rationale": "The diagram connection and prose specify the same discharge destination.",
+      "confidence": 0.95,
+      "same_conditions": true,
+      "numeric": null
+    },
+    {
+      "a": "A-4",
+      "b": "B-4",
+      "retrieval_score": 0.9157,
+      "relation": "uncertain",
+      "rationale": "Approximate visual value requires review. Chart readings suggest 35 m versus 32 m; both are approximate.",
+      "confidence": 0.95,
+      "same_conditions": true,
+      "numeric": null
+    },
+    {
+      "a": "A-1",
+      "b": "B-1",
+      "retrieval_score": 0.8654,
+      "relation": "different",
+      "rationale": "At design duty, rated power increases from 10 kW to 12 kW (+20%).",
+      "confidence": 0.95,
+      "same_conditions": true,
+      "numeric": {
+        "dimension": "power",
+        "a_base": "10000",
+        "b_base": "12000",
+        "delta_b_minus_a": "2000",
+        "equal": false,
+        "relative_percent": "20.0"
+      }
+    },
+    {
+      "a": "A-2",
+      "b": "B-2",
+      "retrieval_score": 0.8516,
+      "relation": "equivalent",
+      "rationale": "The table value 20 L/s equals the prose value 0.020 m3/s.",
+      "confidence": 0.95,
+      "same_conditions": true,
+      "numeric": {
+        "dimension": "flow",
+        "a_base": "0.020",
+        "b_base": "0.020",
+        "delta_b_minus_a": "0.000",
+        "equal": true,
+        "relative_percent": "0"
+      }
+    }
+  ],
+  "unmatched": [
+    {
+      "id": "A-4",
+      "status": "no_confirmed_counterpart",
+      "note": "No confirmed counterpart in retrieved evidence; this does not establish absence."
+    },
+    {
+      "id": "B-4",
+      "status": "no_confirmed_counterpart",
+      "note": "No confirmed counterpart in retrieved evidence; this does not establish absence."
+    },
+    {
+      "id": "B-5",
+      "status": "not_compared",
+      "note": "No confirmed counterpart in retrieved evidence; this does not establish absence."
+    }
+  ],
+  "retrieval": {
+    "candidate_pairs": 4,
+    "attempted_pairs": 4,
+    "omitted_by_pair_limit": 0,
+    "strategy": "bidirectional sparse TF-IDF top-k union; lexical recall is not guaranteed"
+  },
+  "schema_version": 1,
+  "fixture": true,
+  "documents": {
+    "A": {
+      "name": "Team A (synthetic evidence)"
+    },
+    "B": {
+      "name": "Team B (synthetic evidence)"
+    }
+  },
+  "evidence": [
+    {
+      "entity": "primary pump",
+      "attribute": "rated power",
+      "value": "10",
+      "unit": "kW",
+      "conditions": "design duty",
+      "kind": "text",
+      "quote": "primary pump: rated power 10 kW at design duty",
+      "confidence": 0.95,
+      "approximate": false,
+      "id": "A-1",
+      "document": "A",
+      "page": 1,
+      "bbox": [
+        40.0,
+        40.0,
+        300.0,
+        140.0
+      ],
+      "source": "hand-authored fixture",
+      "image": null
+    },
+    {
+      "entity": "cooling circuit",
+      "attribute": "design flow",
+      "value": "20",
+      "unit": "L/s",
+      "conditions": "design duty",
+      "kind": "table",
+      "quote": "cooling circuit: design flow 20 L/s at design duty",
+      "confidence": 0.95,
+      "approximate": false,
+      "id": "A-2",
+      "document": "A",
+      "page": 1,
+      "bbox": [
+        40.0,
+        40.0,
+        300.0,
+        140.0
+      ],
+      "source": "hand-authored fixture",
+      "image": null
+    },
+    {
+      "entity": "primary pump",
+      "attribute": "discharges to",
+      "value": "heat exchanger",
+      "unit": "",
+      "conditions": "design duty",
+      "kind": "diagram",
+      "quote": "primary pump: discharges to heat exchanger  at design duty",
+      "confidence": 0.95,
+      "approximate": false,
+      "id": "A-3",
+      "document": "A",
+      "page": 1,
+      "bbox": [
+        40.0,
+        40.0,
+        300.0,
+        140.0
+      ],
+      "source": "hand-authored fixture",
+      "image": null
+    },
+    {
+      "entity": "pump",
+      "attribute": "head at 20 L/s",
+      "value": "35",
+      "unit": "m",
+      "conditions": "design duty",
+      "kind": "chart",
+      "quote": "pump: head at 20 L/s 35 m at design duty",
+      "confidence": 0.95,
+      "approximate": true,
+      "id": "A-4",
+      "document": "A",
+      "page": 1,
+      "bbox": [
+        40.0,
+        40.0,
+        300.0,
+        140.0
+      ],
+      "source": "hand-authored fixture",
+      "image": null
+    },
+    {
+      "entity": "primary pump",
+      "attribute": "rated power",
+      "value": "12000",
+      "unit": "W",
+      "conditions": "design duty",
+      "kind": "table",
+      "quote": "primary pump: rated power 12000 W at design duty",
+      "confidence": 0.95,
+      "approximate": false,
+      "id": "B-1",
+      "document": "B",
+      "page": 1,
+      "bbox": [
+        40.0,
+        40.0,
+        300.0,
+        140.0
+      ],
+      "source": "hand-authored fixture",
+      "image": null
+    },
+    {
+      "entity": "cooling circuit",
+      "attribute": "design flow",
+      "value": "0.020",
+      "unit": "m3/s",
+      "conditions": "design duty",
+      "kind": "text",
+      "quote": "cooling circuit: design flow 0.020 m3/s at design duty",
+      "confidence": 0.95,
+      "approximate": false,
+      "id": "B-2",
+      "document": "B",
+      "page": 1,
+      "bbox": [
+        40.0,
+        40.0,
+        300.0,
+        140.0
+      ],
+      "source": "hand-authored fixture",
+      "image": null
+    },
+    {
+      "entity": "primary pump",
+      "attribute": "discharges to",
+      "value": "heat exchanger",
+      "unit": "",
+      "conditions": "design duty",
+      "kind": "text",
+      "quote": "primary pump: discharges to heat exchanger  at design duty",
+      "confidence": 0.95,
+      "approximate": false,
+      "id": "B-3",
+      "document": "B",
+      "page": 1,
+      "bbox": [
+        40.0,
+        40.0,
+        300.0,
+        140.0
+      ],
+      "source": "hand-authored fixture",
+      "image": null
+    },
+    {
+      "entity": "pump",
+      "attribute": "head at 20 L/s",
+      "value": "32",
+      "unit": "m",
+      "conditions": "design duty",
+      "kind": "chart",
+      "quote": "pump: head at 20 L/s 32 m at design duty",
+      "confidence": 0.95,
+      "approximate": true,
+      "id": "B-4",
+      "document": "B",
+      "page": 1,
+      "bbox": [
+        40.0,
+        40.0,
+        300.0,
+        140.0
+      ],
+      "source": "hand-authored fixture",
+      "image": null
+    },
+    {
+      "entity": "firewall",
+      "attribute": "audit log retention",
+      "value": "90",
+      "unit": "days",
+      "conditions": "security policy",
+      "kind": "text",
+      "quote": "firewall: audit log retention 90 days at security policy",
+      "confidence": 0.95,
+      "approximate": false,
+      "id": "B-5",
+      "document": "B",
+      "page": 1,
+      "bbox": [
+        40.0,
+        40.0,
+        300.0,
+        140.0
+      ],
+      "source": "hand-authored fixture",
+      "image": null
+    }
+  ],
+  "coverage": [],
+  "note": "HAND-AUTHORED FIXTURE: no PDF extraction or real model inference was used. This report demonstrates behavior, not measured accuracy."
+}
