@@ -4,7 +4,7 @@ import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-import fitz
+import pymupdf
 from semantic_pdf_diff.models import Evidence, Settings, Extraction, Judgment
 from semantic_pdf_diff.llm import Client, BudgetExceeded, ModelFailure
 from semantic_pdf_diff.compare import candidates, numeric_check, compare
@@ -54,11 +54,11 @@ class Tests(unittest.TestCase):
         chunks = list(split_utf8(text,200))
         self.assertEqual(''.join(chunks),text)
         self.assertTrue(all(len(x.encode())<=200 for x in chunks))
-        rect = fitz.Rect(0,0,600,900)
+        rect = pymupdf.Rect(0,0,600,900)
         regions = list(tiles(rect,420))
         for y in range(0,900,10):
             for x in range(0,600,10):
-                self.assertTrue(any(r.contains(fitz.Point(x,y)) for r in regions))
+                self.assertTrue(any(r.contains(pymupdf.Point(x,y)) for r in regions))
 
     def test_api_retry_cache_truncation_and_budget(self):
         state = {'calls':0,'truncate':False}
@@ -98,7 +98,7 @@ class Tests(unittest.TestCase):
                 return Extraction(claims=[data],complete=True)
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/'test.pdf'
-            doc=fitz.open();page=doc.new_page();page.insert_text((40,40),'Pump rated power 10 kW');doc.save(path);doc.close()
+            doc=pymupdf.open();page=doc.new_page();page.insert_text((40,40),'Pump rated power 10 kW');doc.save(path);doc.close()
             evidence,coverage,digest=extract_pdf(path,'A',Path(d),Extractor(Settings(vision=False)))
             self.assertEqual(evidence,[])
             self.assertTrue(any(r['status']=='partial' for r in coverage))
@@ -133,10 +133,10 @@ class Tests(unittest.TestCase):
             with tempfile.TemporaryDirectory() as directory:
                 root=Path(directory)
                 for name in ['a','b']:
-                    doc=fitz.open();page=doc.new_page(width=300,height=300)
+                    doc=pymupdf.open();page=doc.new_page(width=300,height=300)
                     page.insert_text((40,40),'Pump rated power 10 kW at design load')
-                    page.draw_rect(fitz.Rect(40,80,120,120))
-                    page.draw_line(fitz.Point(120,100),fitz.Point(220,100))
+                    page.draw_rect(pymupdf.Rect(40,80,120,120))
+                    page.draw_line(pymupdf.Point(120,100),pymupdf.Point(220,100))
                     doc.save(root/(name+'.pdf'));doc.close()
                 config=root/'config.json'
                 config.write_text(json.dumps({'base_url':f'http://127.0.0.1:{server.server_port}/v1','retries':0}))
@@ -161,7 +161,7 @@ class Tests(unittest.TestCase):
                 return Extraction(claims=[],complete=False,issues=['Dense visual'])
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);path=root/'test.pdf'
-            doc=fitz.open();doc.new_page(width=500,height=500);doc.save(path);doc.close()
+            doc=pymupdf.open();doc.new_page(width=500,height=500);doc.save(path);doc.close()
             client=Extractor(Settings(refinement_depth=1))
             _,coverage,_=extract_pdf(path,'A',root,client)
             self.assertTrue(any('-r' in r['source'] for r in coverage))

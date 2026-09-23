@@ -12,9 +12,12 @@ def write_report(data, output):
     def card(eid):
         e = evidence[eid]
         image = ('<a href="'+esc(e['image'])+'"><img loading="lazy" src="'+esc(e['image'])+'" alt="Source crop"></a>') if e.get('image') else ''
+        verified = {True: '<p>Quote found in PDF text layer.</p>',
+                    False: '<p class="warning">Quote not found in the PDF text layer for this region; possible misread or raster-only label.</p>'
+                    }.get(e.get('quote_verified'), '')
         return f'''<section><h3>{esc(e['document'])} · page {e['page']} · {esc(e['kind'])}</h3>
         <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
-        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p><blockquote>{esc(e['quote'])}</blockquote>
+        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p><blockquote>{esc(e['quote'])}</blockquote>{verified}
         <small>{esc(eid)} · PDF bbox {esc(e['bbox'])} · confidence {e['confidence']:.2f}</small>{image}</section>'''
     counts = Counter(f['relation'] for f in data['findings'])
     issues = [r for r in data['coverage'] if r['status'] != 'complete']

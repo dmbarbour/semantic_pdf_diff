@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-import fitz
+import pymupdf
 from semantic_pdf_diff.models import Settings
 from semantic_pdf_diff.cli import main
 from semantic_pdf_diff.llm import Client
@@ -47,7 +47,7 @@ class ConfigurationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ,{'PDF_DIFF_MAX_CALLS':'13'},clear=True):
             root=Path(directory)
             pdf=root/'test.pdf'
-            doc=fitz.open();doc.new_page();doc.save(pdf);doc.close()
+            doc=pymupdf.open();doc.new_page();doc.save(pdf);doc.close()
             config=root/'config.json';config.write_text('{"max_calls": 17}')
             for extra,expected in [([],13),(['--config',str(config)],17),
                                    (['--config',str(config),'--max-calls','19'],19)]:

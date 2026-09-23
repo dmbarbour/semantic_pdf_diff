@@ -110,7 +110,8 @@
         140.0
       ],
       "source": "hand-authored fixture",
-      "image": null
+      "image": null,
+      "quote_verified": null
     },
     {
       "entity": "cooling circuit",
@@ -132,7 +133,8 @@
         140.0
       ],
       "source": "hand-authored fixture",
-      "image": null
+      "image": null,
+      "quote_verified": null
     },
     {
       "entity": "primary pump",
@@ -154,7 +156,8 @@
         140.0
       ],
       "source": "hand-authored fixture",
-      "image": null
+      "image": null,
+      "quote_verified": null
     },
     {
       "entity": "pump",
@@ -176,7 +179,8 @@
         140.0
       ],
       "source": "hand-authored fixture",
-      "image": null
+      "image": null,
+      "quote_verified": null
     },
     {
       "entity": "primary pump",
@@ -198,7 +202,8 @@
         140.0
       ],
       "source": "hand-authored fixture",
-      "image": null
+      "image": null,
+      "quote_verified": null
     },
     {
       "entity": "cooling circuit",
@@ -220,7 +225,8 @@
         140.0
       ],
       "source": "hand-authored fixture",
-      "image": null
+      "image": null,
+      "quote_verified": null
     },
     {
       "entity": "primary pump",
@@ -242,7 +248,8 @@
         140.0
       ],
       "source": "hand-authored fixture",
-      "image": null
+      "image": null,
+      "quote_verified": null
     },
     {
       "entity": "pump",
@@ -264,7 +271,8 @@
         140.0
       ],
       "source": "hand-authored fixture",
-      "image": null
+      "image": null,
+      "quote_verified": null
     },
     {
       "entity": "firewall",
@@ -286,7 +294,8 @@
         140.0
       ],
       "source": "hand-authored fixture",
-      "image": null
+      "image": null,
+      "quote_verified": null
     }
   ],
   "coverage": [],

@@ -1,4 +1,5 @@
 """Sparse retrieval is global; all model reasoning is restricted to a pair of claims."""
+import json
 import math
 import re
 from collections import Counter, defaultdict
@@ -8,16 +9,24 @@ from .llm import ModelFailure
 
 # Deliberately small, explicit dimensional conversions. Unknown units abstain.
 # No currency, affine temperature, ambiguous "ton", ranges or inequalities.
+# Keys are case-sensitive: SI prefixes differ by case (mW/MW, mPa/MPa) and so do
+# some symbols (s second vs S siemens, m metre vs M molar).
 UNITS = {
-    "w": ("power", "1"), "kw": ("power", "1000"), "mw": ("power", "1000000"),
-    "pa": ("pressure", "1"), "kpa": ("pressure", "1000"), "mpa": ("pressure", "1000000"),
+    "mW": ("power", ".001"), "W": ("power", "1"), "kW": ("power", "1000"), "MW": ("power", "1000000"),
+    "mPa": ("pressure", ".001"), "Pa": ("pressure", "1"), "kPa": ("pressure", "1000"), "MPa": ("pressure", "1000000"),
     "bar": ("pressure", "100000"), "m": ("length", "1"), "mm": ("length", ".001"),
     "cm": ("length", ".01"), "km": ("length", "1000"), "kg": ("mass", "1"), "g": ("mass", ".001"),
     "s": ("time", "1"), "min": ("time", "60"), "h": ("time", "3600"),
-    "l/s": ("flow", ".001"), "m3/s": ("flow", "1"), "m³/s": ("flow", "1"),
-    "l/min": ("flow", ".00001666666666666666666666666667"),
-    "%": ("percent", "1"), "hz": ("frequency", "1"), "khz": ("frequency", "1000"),
+    "L/s": ("flow", ".001"), "m3/s": ("flow", "1"), "m³/s": ("flow", "1"),
+    "L/min": ("flow", ".00001666666666666666666666666667"),
+    "%": ("percent", "1"), "Hz": ("frequency", "1"), "kHz": ("frequency", "1000"), "MHz": ("frequency", "1000000"),
 }
+# Case variants accepted only where no other unit folds to the same spelling.
+FOLDED = {k.casefold(): k for k in ("kW", "kPa", "bar", "km", "kg", "min", "L/s", "L/min", "m3/s", "m³/s", "Hz", "kHz")}
+
+def unit(text):
+    text = text.strip()
+    return UNITS.get(text) or UNITS.get(FOLDED.get(text.casefold(), ""))
 
 def numeric_check(a, b):
     """A supporting calculation, never independent evidence of semantic equivalence."""
@@ -26,7 +35,7 @@ def numeric_check(a, b):
     pattern = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
     if not re.fullmatch(pattern, a.value.strip()) or not re.fullmatch(pattern, b.value.strip()):
         return None
-    ua, ub = UNITS.get(a.unit.strip().lower()), UNITS.get(b.unit.strip().lower())
+    ua, ub = unit(a.unit), unit(b.unit)
     if not ua or not ub or ua[0] != ub[0]:
         return None
     try:
@@ -104,7 +113,6 @@ def compare(left, right, output, client, mode):
                 images.append(output / e.image)
             payload.append(p)
         calc = numeric_check(a,b)
-        import json
         prompt = COMPARE + "\nA=" + json.dumps(payload[0],ensure_ascii=False) + "\nB=" + json.dumps(payload[1],ensure_ascii=False)
         prompt += "\nNumeric check=" + json.dumps(calc)
         try:

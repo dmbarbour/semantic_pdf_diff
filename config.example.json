@@ -13,7 +13,8 @@
   "max_pairs": 1000,
   "vision": true,
   "verify_visuals": true,
-  "json_mode": false,
+  "response_format": "none",
+  "temperature": 0,
   "aliases": {
     "chw": "chilled water",
     "duty pump": "primary pump"

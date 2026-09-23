@@ -1,7 +1,9 @@
 import hashlib
 import json
+import math
+import re
 from pathlib import Path
-import fitz
+import pymupdf
 from .models import Evidence, Extraction
 from .llm import ModelFailure
 
@@ -18,6 +20,11 @@ Preserve negation, requirements versus proposed capabilities, ranges and inequal
 Extract evidence only, not commentary. Use a short canonical entity and attribute; keep numeric value separate from unit.
 '''
 
+# Text shorter than this is not split further during refinement.
+MIN_REFINE_BYTES = 400
+# Visual refinement stops at crops narrower than this (PDF points).
+MIN_REFINE_POINTS = 100
+
 def split_utf8(text, limit):
     """Bound all chunks without dropping characters, including non-ASCII PDF text."""
     chunk, size = [], 0
@@ -31,25 +38,49 @@ def split_utf8(text, limit):
     if chunk:
         yield "".join(chunk)
 
+def normalize(text):
+    return " ".join(text.split())
+
+def terms(text, fold=False):
+    return set(re.findall(r"\w+(?:[.,/]\w+)*", text.casefold() if fold else text))
+
+def quoted(quote, text):
+    """The quote appears verbatim in text, up to whitespace."""
+    return normalize(quote) in normalize(text)
+
+def covered(quote, text, fold=False):
+    """Every word of the quote occurs in text; tolerates quotes spanning table cells."""
+    words = terms(quote, fold)
+    return bool(words) and words <= terms(text, fold)
+
 def tiles(rect, side, overlap=0.18):
+    """Evenly spaced tiles covering rect; neighbours overlap by at least `overlap`."""
     def starts(lo, hi):
-        if hi - lo <= side:
+        span = hi - lo
+        if span <= side:
             return [lo]
-        result, x = [lo], lo
-        while x + side < hi:
-            x = min(x + side * (1 - overlap), hi - side)
-            if x == result[-1]:
-                break
-            result.append(x)
-        return result
+        n = math.ceil((span - side) / (side * (1 - overlap))) + 1
+        step = (span - side) / (n - 1)
+        return [lo + k * step for k in range(n)]
     for y in starts(rect.y0, rect.y1):
         for x in starts(rect.x0, rect.x1):
-            yield fitz.Rect(x, y, min(x + side, rect.x1), min(y + side, rect.y1))
+            yield pymupdf.Rect(x, y, min(x + side, rect.x1), min(y + side, rect.y1))
+
+def visual_regions(page, side):
+    """Tiles first so higher-resolution crops win de-duplication; overview last."""
+    regions = []
+    if max(page.rect.width, page.rect.height) > side:
+        regions = [(f"tile:{i}", r) for i, r in enumerate(tiles(page.rect, side))]
+    return regions + [("overview", page.rect)]
 
 def render(page, rect, target, max_side):
     # clip is in rotated page coordinates, as used by Page.get_pixmap.
     scale = min(2.5, max_side / max(rect.width, rect.height))
-    page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=rect, alpha=False).save(target)
+    page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=rect, alpha=False).save(target)
+
+def union(boxes):
+    boxes = list(boxes)
+    return (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
 
 def extract_pdf(path, label, output, client):
     s = client.s
@@ -59,99 +90,153 @@ def extract_pdf(path, label, output, client):
     assets.mkdir(exist_ok=True, parents=True)
     seen = set()
 
-    def consume(page_no, bbox, source, text, image=None, depth=0):
+    def consume(page_no, bbox, source, family, text, image=None, check=None, locate=None):
+        """Run one extraction task, record it in the ledger and return its status.
+
+        check(quote) -> bool | None. Native tasks reject claims failing it; visual tasks
+        only record the result. locate(quote) narrows a claim's bbox within the task.
+        Exact duplicate claims within one family (native or visual) on a page are kept once.
+        """
         row = {"document": label, "page": page_no, "bbox": list(bbox), "source": source,
                "image": image, "status": "complete", "issues": [], "claims": 0}
         images = [output / image] if image else []
-        prompt = EXTRACT + "\nSource type: " + source + "\nSOURCE DATA:\n" + text
+        prompt = EXTRACT + "\nSource type: " + source.split(":")[0] + "\nSOURCE DATA:\n" + text
         try:
             result = client.ask(prompt, Extraction, images)
             row["status"] = "complete" if result.complete else "partial"
-            row["issues"] = result.issues
+            row["issues"] = list(result.issues)
             for claim in result.claims:
-                # Native prose/table evidence must quote actual source text. Image labels
-                # cannot be deterministically checked and remain reviewable in the report.
-                if not image and " ".join(claim.quote.split()) not in " ".join(text.split()):
+                verified = check(claim.quote) if check else None
+                if not image and not verified:
                     row["status"] = "partial"
                     row["issues"].append("Rejected claim with unsupported literal quote")
                     continue
-                key = (page_no, source.split(":")[0], claim.entity.casefold(), claim.attribute.casefold(),
-                       claim.value, claim.unit, claim.conditions, claim.quote)
+                key = (page_no, family, claim.entity.casefold(), claim.attribute.casefold(),
+                       normalize(claim.value), claim.unit.strip(), normalize(claim.conditions), normalize(claim.quote))
                 if key in seen:
                     continue
                 seen.add(key)
-                eid = label + "-" + hashlib.sha256((digest + repr(key) + repr(tuple(bbox))).encode()).hexdigest()[:16]
+                where = tuple(locate(claim.quote) if locate else bbox)
+                eid = label + "-" + hashlib.sha256((digest + repr(key) + repr(where)).encode()).hexdigest()[:16]
                 evidence.append(Evidence(**claim.model_dump(), id=eid, document=label, page=page_no,
-                                         bbox=tuple(bbox), source=source, image=image))
+                                         bbox=where, source=source, image=image, quote_verified=verified))
                 row["claims"] += 1
         except ModelFailure as e:
             row.update(status="failed", issues=[str(e)])
         coverage.append(row)
-        if not image and row['status'] != 'complete' and depth < s.refinement_depth and len(text.encode()) > 400:
-            for i, part in enumerate(split_utf8(text, max(200, len(text.encode()) // 2))):
-                consume(page_no, bbox, source + f":refine{i}", part, depth=depth+1)
-        return row['status']
+        return row["status"]
 
-    with fitz.open(path) as doc:
+    def text_task(page_no, segments, source, depth=0):
+        """segments: [(bbox, text)] of consecutive blocks sent together."""
+        text = "\n\n".join(t for _, t in segments)
+        def locate(quote):
+            return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
+        status = consume(page_no, union(b for b, _ in segments), source, "native", text,
+                         check=lambda q: quoted(q, text), locate=locate)
+        if status == "complete" or depth >= s.refinement_depth:
+            return
+        if len(segments) > 1:
+            middle = len(segments) // 2
+            parts = [segments[:middle], segments[middle:]]
+        elif len(text.encode()) > MIN_REFINE_BYTES:
+            bbox = segments[0][0]
+            parts = [[(bbox, p)] for p in split_utf8(text, max(200, len(text.encode()) // 2))]
+        else:
+            return
+        for i, part in enumerate(parts):
+            text_task(page_no, part, f"{source}:r{i}", depth + 1)
+
+    def table_task(page_no, bbox, source, header, row, columns, depth=0):
+        """Send one table row with its header; split wide or partial rows by column.
+
+        Column 0 is kept in every split as the provisional row label.
+        """
+        pick = lambda cells: [cells[c] if c < len(cells) else None for c in columns]
+        head, cells = pick(header), pick(row)
+        text = "Header: " + json.dumps(head, ensure_ascii=False) + "\nRow: " + json.dumps(cells, ensure_ascii=False)
+        flat = " ".join(str(c) for c in head + cells if c not in (None, ""))
+        fits = len(text.encode()) <= s.text_bytes
+        splittable = len(columns) > 2
+        if not fits and not splittable:
+            coverage.append({"document": label, "page": page_no, "bbox": list(bbox), "source": source, "image": None,
+                             "status": "partial", "issues": ["Table row exceeds text budget; inspect visual tiles"], "claims": 0})
+            return
+        if fits:
+            status = consume(page_no, bbox, source, "native", text,
+                             check=lambda q: quoted(q, text) or covered(q, flat))
+            if status == "complete" or depth >= s.refinement_depth or not splittable:
+                return
+        rest = columns[1:]
+        middle = (len(rest) + 1) // 2
+        for i, part in enumerate([rest[:middle], rest[middle:]]):
+            # Budget-driven splits are mandatory; only quality-driven ones use depth.
+            table_task(page_no, bbox, f"{source}:c{i}", header, row, [columns[0], *part], depth + (1 if fits else 0))
+
+    def visual_task(page_no, page, tag, rect, depth=0):
+        name = f"{label}-p{page_no}-{tag.replace(':', '-')}.png"
+        render(page, rect, assets / name, s.image_side)
+        native = rect * page.derotation_matrix
+        layer = page.get_text("text", clip=native)
+        check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
+        status = consume(page_no, native, tag, "visual", "", "assets/" + name, check=check)
+        # Refine only local tiles; an overview may be incomplete because it spans
+        # many facts, and all overview areas already have tile coverage.
+        if (status == "complete" or tag == "overview" or depth >= s.refinement_depth
+                or min(rect.width, rect.height) < MIN_REFINE_POINTS):
+            return
+        if rect.width > rect.height:
+            mid = (rect.x0 + rect.x1) / 2
+            children = [pymupdf.Rect(rect.x0, rect.y0, mid + 12, rect.y1), pymupdf.Rect(mid - 12, rect.y0, rect.x1, rect.y1)]
+        else:
+            mid = (rect.y0 + rect.y1) / 2
+            children = [pymupdf.Rect(rect.x0, rect.y0, rect.x1, mid + 12), pymupdf.Rect(rect.x0, mid - 12, rect.x1, rect.y1)]
+        for i, child in enumerate(children):
+            visual_task(page_no, page, f"{tag}-r{i}", child, depth + 1)
+
+    with pymupdf.open(path) as doc:
         if doc.needs_pass:
             raise ValueError(f"{label}: encrypted PDF needs to be decrypted before comparison")
         if not doc.is_pdf or not len(doc):
             raise ValueError(f"{label}: expected a nonempty PDF")
         for number, page in enumerate(doc, 1):
-            # Native coordinates stay unrotated (PDF point coordinates).
+            # Native coordinates stay unrotated (PDF point coordinates). Consecutive
+            # blocks are grouped up to the byte budget; oversized blocks are split.
+            pieces = []
             for bi, block in enumerate(page.get_text("blocks", sort=True)):
                 if block[6] != 0:
                     continue
-                for ci, chunk in enumerate(split_utf8(block[4], s.text_bytes)):
+                for ci, chunk in enumerate(split_utf8(block[4].strip(), s.text_bytes)):
                     if chunk.strip():
-                        consume(number, block[:4], f"text:{bi}:{ci}", chunk)
+                        pieces.append((f"{bi}.{ci}", tuple(block[:4]), chunk))
+            group, size = [], 0
+            for piece in pieces + [None]:
+                extra = len(piece[2].encode()) + 2 if piece else 0
+                if group and (piece is None or size + extra > s.text_bytes):
+                    ids = group[0][0] + (f"-{group[-1][0]}" if len(group) > 1 else "")
+                    text_task(number, [(b, t) for _, b, t in group], f"text:{ids}")
+                    group, size = [], 0
+                if piece:
+                    group.append(piece)
+                    size += extra
             try:
-                tables = page.find_tables().tables
-                for ti, table in enumerate(tables):
-                    rows = table.extract()
-                    if not rows:
-                        continue
-                    header = json.dumps(rows[0], ensure_ascii=False)
-                    for ri, row in enumerate(rows[1:] or rows):
-                        text = "Header: " + header + "\nRow: " + json.dumps(row, ensure_ascii=False)
-                        if len(text.encode()) <= s.text_bytes:
-                            consume(number, table.bbox, f"table:{ti}:{ri}", text)
-                        else:
-                            coverage.append({"document":label,"page":number,"source":f"table:{ti}:{ri}",
-                                "status":"partial","issues":["Table row exceeds text budget; inspect visual tiles"],"claims":0})
-            except Exception as e:
-                coverage.append({"document":label,"page":number,"source":"table-detection", "status":"failed",
-                                 "issues":[type(e).__name__ + ": " + str(e)],"claims":0})
+                found = [(table.bbox, table.extract()) for table in page.find_tables().tables]
+            except Exception as e:  # PyMuPDF table detection raises assorted internal errors
+                found = []
+                coverage.append({"document": label, "page": number, "bbox": list(page.rect * page.derotation_matrix),
+                                 "source": "table-detection", "image": None, "status": "failed",
+                                 "issues": [type(e).__name__ + ": " + str(e)], "claims": 0})
+            for ti, (bbox, rows) in enumerate(found):
+                if not rows:
+                    continue
+                header = rows[0]
+                width = max(len(r) for r in rows)
+                for ri, row in enumerate(rows[1:] or rows):
+                    table_task(number, tuple(bbox), f"table:{ti}:{ri}", header, row, list(range(width)))
             if s.vision:
-                regions = [("overview", page.rect)]
-                if max(page.rect.width, page.rect.height) > s.tile_points:
-                    regions += [(f"tile:{i}", r) for i, r in enumerate(tiles(page.rect, s.tile_points))]
-                for kind, rect in regions:
-                    filename = f"{label}-p{number}-{kind.replace(':','-')}.png"
-                    render(page, rect, assets / filename, s.image_side)
-                    native_rect = rect * page.derotation_matrix
-                    status = consume(number, native_rect, kind, "", "assets/" + filename)
-                    # Refine only local tiles; an overview may be incomplete because it
-                    # spans many facts. All overview areas already have tile coverage.
-                    if status != "complete" and kind.startswith("tile:"):
-                        def refine(parent, depth, prefix):
-                            if depth > s.refinement_depth or min(parent.width,parent.height) < 100:
-                                return
-                            if parent.width > parent.height:
-                                mid = (parent.x0+parent.x1)/2
-                                children = [fitz.Rect(parent.x0,parent.y0,mid+12,parent.y1), fitz.Rect(mid-12,parent.y0,parent.x1,parent.y1)]
-                            else:
-                                mid = (parent.y0+parent.y1)/2
-                                children = [fitz.Rect(parent.x0,parent.y0,parent.x1,mid+12), fitz.Rect(parent.x0,mid-12,parent.x1,parent.y1)]
-                            for ci, child in enumerate(children):
-                                tag = prefix + f"-r{ci}"
-                                name = f"{label}-p{number}-{tag}.png"
-                                render(page,child,assets/name,s.image_side)
-                                state = consume(number, child*page.derotation_matrix, tag, "", "assets/"+name)
-                                if state != "complete":
-                                    refine(child,depth+1,tag)
-                        refine(rect,1,kind.replace(':','-'))
+                for tag, rect in visual_regions(page, s.tile_points):
+                    visual_task(number, page, tag, rect)
             else:
-                coverage.append({"document":label,"page":number,"source":"vision", "status":"skipped",
-                    "issues":["Visual extraction disabled; charts, diagrams and scans may be missed"],"claims":0})
+                coverage.append({"document": label, "page": number, "bbox": list(page.rect * page.derotation_matrix),
+                                 "source": "vision", "image": None, "status": "skipped",
+                                 "issues": ["Visual extraction disabled; charts, diagrams and scans may be missed"], "claims": 0})
     return evidence, coverage, digest
