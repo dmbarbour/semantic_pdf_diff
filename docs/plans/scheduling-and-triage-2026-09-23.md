@@ -95,12 +95,12 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 
 ## Open questions
 
-- What concurrency default works well in practice alongside other tools using the same server? Tune from real runs.
+None currently.
 
 ## Decisions (2026-09-23)
 
 - **Context window:** the gemma-4 deployment serves 262,144 tokens; configure `context_tokens` to match. Extraction chunk sizes (`text_bytes`, tile size) are separate settings and stay small so each extraction stays focused. Large requests are for section-level work (triage, "about" statements) and criterion-level comparison. How much of a section triage reads is part of the extraction interpreter, since it shapes what the model sees.
 - **Throughput limits:** 300k tokens/min in business hours, 500k outside; configurable by time of day, and expected to change.
-- **Concurrent requests:** assume the server caps them. Use a modest, configurable concurrency limit (single digits by default) and let adaptive backoff find the working level, leaving room for the user's other tools on the same server.
+- **Concurrent requests:** assume the server caps them. Use a modest, configurable concurrency limit (single digits by default) and let adaptive backoff find the working level, leaving room for the user's other tools on the same server. Tune the default from real runs.
 - **Time budgets:** none. Runs proceed unattended until done or stopped; preliminary reports cover the need to look early.
 - **Reviewer feedback:** stored as reusable annotations in the store, exportable and importable (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).

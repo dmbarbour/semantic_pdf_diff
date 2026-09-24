@@ -62,7 +62,7 @@ Implications:
 
 ## Open questions
 
-- Measured throughput of each in-house model on our hardware (to be measured in the benchmark).
+None currently.
 
 ## Decisions (2026-09-23)
 

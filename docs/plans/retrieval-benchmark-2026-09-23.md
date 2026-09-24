@@ -24,8 +24,9 @@ Glossary:
 2. **Extract claims (tool).** Run extraction to get evidence stores.
 3. **Propose candidate pairs (Claude).** Take a generous union of candidates from several methods (TF-IDF at high `k`, embeddings, keyword overlap), plus random pairs as controls. Casting a wide net matters: labelling only what TF-IDF finds would hide exactly the misses we want to measure.
 4. **Label (Claude drafts, you check).** A small labelling page shows each pair side by side with its source crops. Choices: *same topic*, *different topic*, *unsure*. Claude can pre-fill suggestions so you mostly confirm; aim for a few hundred pairs. Your judgement is the ground truth.
-5. **Score (tool).** A script that reports recall@k and precision for each method and setting, as a table and chart, split by claim kind (text/table/chart/diagram) and by within-source vs between-source pairs.
+5. **Score (tool).** A script that reports recall@k and precision for each method and setting, as a table and chart, split by claim kind (text/table/chart/diagram) and by within-source vs between-source pairs. It also measures each in-house embedding model's throughput on our hardware.
 6. **Keep it.** The answer key is versioned in the repo (or an in-house location) and rerun whenever retrieval changes, as a regression check.
+7. **Spot-check on real documents** inside the sandbox, to confirm that public-corpus results carry over to real documents.
 
 ## Methods to compare (first round)
 
@@ -43,6 +44,5 @@ Glossary:
 ## Open questions
 
 - Can labels for the public corpus live in this repo (they describe public documents), with labels for real documents kept only in the sandbox?
-- Do results on the public corpus predict results on real documents? A small in-sandbox spot check would tell.
 - Should the same labelling page also collect relation labels (equivalent / different / …) so we can later measure the comparison step, not just retrieval?
 - Criteria-first comparison adds a second retrieval task, claim to criterion. Should the benchmark also label "does this claim address this criterion?" once criteria exist?

@@ -202,7 +202,7 @@ report --store <dir> <comparison>
 1. **Schema v2:** content, file, source and interpreter model; content-relative locators; derivation chains; claim context fields (topic, basis, uncertainty, context, role) in the schema, filled by the prompt work in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md); migrate `compare` and `report` off A/B.
 2. **Store folder and SQLite:** WAL, single-writer lock, task queue with per-task transactions, response cache in the database, interpreter binding with rejection, selective `--reset` and `--dry-run`; resume after interruption (tested by killing a run midway).
 3. **Annotations core:** the annotation table and record format; source provenance at registration and in manifests; extracted provenance from PDFs (document properties, sections, comments as content with context); export and import of reviewer decisions; orphan re-attachment. Capture from reports comes with its first consumer (reviewer feedback in scheduling-and-triage); model-recognized disagreements come with `check`.
-4. **PDF sections:** outline → font-size headings → page ranges; heading path in prompts.
+4. **PDF sections:** outline → font-size headings → page ranges; heading path in prompts. Real documents are sensitive and won't be shared (the tool runs inside a multi-layer sandbox), so heuristics are developed against the public corpus (see [Samples](#samples)) and must fall back gracefully when there's no outline or consistent heading font.
 5. **Folder, zip and manifest sources;** duplicate occurrences in provenance.
 6. **Content-difference-first comparison** (shared / removed / added).
 7. **Views, `show` and the staged CLI,** with the current two-file command kept working; tests and docs.
@@ -223,7 +223,7 @@ report --store <dir> <comparison>
 
 ## Open questions
 
-- **What structure do real documents have?** Real documents are sensitive and won't be shared; the tool will run inside a multi-layer sandbox. Section heuristics are developed against the public corpus (see [Samples](#samples)), and must fall back gracefully when there's no outline or consistent heading font.
+None currently.
 
 ## Samples
 
