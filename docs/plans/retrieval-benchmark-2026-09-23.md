@@ -25,7 +25,7 @@ Glossary:
 3. **Propose candidate pairs (Claude).** Take a generous union of candidates from several methods (TF-IDF at high `k`, embeddings, keyword overlap), plus random pairs as controls. Casting a wide net matters: labelling only what TF-IDF finds would hide exactly the misses we want to measure.
 4. **Label (Claude drafts, you check).** A small labelling page shows each pair side by side with its source crops. Choices: *same topic*, *different topic*, *unsure*. Claude can pre-fill suggestions so you mostly confirm; aim for a few hundred pairs. Your judgement is the ground truth.
 5. **Score (tool).** A script that reports recall@k and precision for each method and setting, as a table and chart, split by claim kind (text/table/chart/diagram) and by within-source vs between-source pairs. It also measures each in-house embedding model's throughput on our hardware.
-6. **Keep it.** The answer key is versioned in the repo (or an in-house location) and rerun whenever retrieval changes, as a regression check.
+6. **Keep it.** Answer keys for the public corpus are committed to the repo as annotation export files (the same format as any exported reviewer decisions; see *Annotations* in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md)), editable by hand, and rerun whenever retrieval or comparison changes, as a regression check. Labels for real documents stay inside the sandbox.
 7. **Spot-check on real documents** inside the sandbox, to confirm that public-corpus results carry over to real documents.
 
 ## Methods to compare (first round)
@@ -37,12 +37,19 @@ Glossary:
 
 ## Deliverables
 
-- `benchmarks/retrieval/` with the answer key format, the labelling page and the scoring script
+- `benchmarks/retrieval/` with the labelling page, the scoring script, and the public-corpus answer keys as annotation export files
+- **reviewer-decision variants:** deliberately "good" and "bad" sets of reviewer decisions (aliases, criteria, forced table strategies) as export files, to measure how much those decisions move results, and to check that a bad set degrades them visibly rather than silently
 - a short results write-up recommending default retrieval settings
 - first real accuracy numbers for the project (the README currently has none)
 
+## Decisions (2026-09-24)
+
+- **Public-corpus labels live in the repo,** as annotation export files that can be edited by hand. Real-document labels stay in the sandbox.
+- **Reviewer-decision variants:** keep "good" and "bad" decision sets as export files to test that lever.
+- **Relation labels:** the labelling page also records how a same-topic pair relates (equivalent / different / complementary / unrelated), so the comparison step's judgments can be measured, not just whether retrieval found the pair.
+- **Claim-to-criterion labels:** once criteria exist, the benchmark also labels "does this claim address this criterion?", measuring the second retrieval task.
+- Anything else that makes testing and benchmarking convenient is welcome.
+
 ## Open questions
 
-- Can labels for the public corpus live in this repo (they describe public documents), with labels for real documents kept only in the sandbox?
-- Should the same labelling page also collect relation labels (equivalent / different / …) so we can later measure the comparison step, not just retrieval?
-- Criteria-first comparison adds a second retrieval task, claim to criterion. Should the benchmark also label "does this claim address this criterion?" once criteria exist?
+None currently.
