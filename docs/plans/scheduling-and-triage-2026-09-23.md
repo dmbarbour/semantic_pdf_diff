@@ -30,7 +30,7 @@ Score every section cheaply, then run detailed extraction in score order. Signal
 
 - **Signals needing no model:** density of numbers and units, tables present, density of vector drawings and images, whether a text layer exists, requirement language (`shall`, `must`).
 - **Boilerplate detection:** headers and footers repeated across pages, content identical across files, tables of contents, reference lists. Skip these or de-duplicate them.
-- **One model call per section** on its headings plus a text sample, returning the section type (specification, narrative, legal, appendix data) and estimated density.
+- **One model call per section** on its headings plus a text sample, returning the section type (specification, narrative, legal, appendix data), estimated density, keywords, and an **"about" statement**: a few sentences on the section's subject and scope that omit its specific values and decisions. The statement is used for section embeddings and alignment ([retrieval-recall](retrieval-recall-2026-09-23.md)). For very large sections, it is composed from subsections' statements.
 
 Triage decides *order*, never *exclusion*. Low-scoring sections are still extracted if throughput allows, and are never silently dropped.
 

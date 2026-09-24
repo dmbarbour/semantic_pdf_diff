@@ -43,7 +43,7 @@ Several in-house embedding models are available behind (or easily put behind) an
 
 Implications:
 
-- **Input limits don't constrain claims.** A claim topic (`entity | attribute | conditions`) is typically tens of tokens, well under every limit. They do constrain **sections**, which exceed all of them: embed a section's heading path plus a short digest, or embed chunks and pool the vectors. The benchmark should compare the two.
+- **Input limits don't constrain claims.** A claim topic (`entity | attribute | conditions`) is typically tens of tokens, well under every limit. They do constrain **sections**, which exceed all of them. The preferred approach is an **"about" statement**: a short model-written description of what the section is about (subject, scope, components and kinds of information covered) that deliberately omits its specific values and decisions. This mirrors embedding a claim's topic rather than its value: sections on chilled-water plant sizing should match even when one team chooses 2 × 500 kW chillers and the other 3 × 350 kW. It is produced by the section triage call ([scheduling-and-triage](scheduling-and-triage-2026-09-23.md)), kept to a few sentences so it fits every model's input limit, and built from subsections' statements for very large sections. Embedding chunks and pooling the vectors is the fallback to compare against in the benchmark.
 - **Prefixes are part of the interpreter.** E5 models expect `query: ` / `passage: ` prefixes (use `query: ` on both sides for symmetric claim-to-claim similarity). Check each model card for similar conventions. Whatever prefix is used gets recorded with the embedding interpreter, since changing it changes the vectors.
 - **Throughput isn't known yet;** measure it in the benchmark. Model size suggests MiniLM is several times faster than the others and e5-large the slowest. At our scale (thousands of short claim strings per store) even the slowest is probably fine, but section chunks could be much more numerous.
 - **All five are benchmark candidates.** Dimensions matter little for storage at this scale.
@@ -58,9 +58,9 @@ Implications:
 ## Open questions
 
 - Measured throughput of each in-house model on our hardware (to be measured in the benchmark).
-- Do sources include non-English text? If so, the multilingual E5 models matter more.
 
 ## Decisions (2026-09-23)
 
 - **Available models:** listed above.
+- **Language:** current sources are English, so English models are the default candidates. Keep the multilingual E5 models in the benchmark and as a configurable option, since future users may have other languages; don't assume English anywhere it is cheap not to (e.g. tokenization already uses Unicode word rules).
 - **Alias maps and other reviewer decisions:** every human QA judgment is **reusable data**. Accepting or rejecting a proposed alias, confirming a keyword merge, correcting an extraction or labelling a benchmark pair are all stored as annotations keyed by stable IDs. They survive report regeneration and store resets, can be exported as their own report and imported into another store, and, for alias decisions, can be exported as a configuration fragment (the `aliases` mapping). Aliases shape retrieval, which is recorded per comparison, so applying an updated alias map never needs a store reset. The annotation mechanism itself (storage, capture from reports, import and export) is shared with other plans and will be designed where it is first needed.
