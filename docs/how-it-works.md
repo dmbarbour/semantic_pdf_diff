@@ -8,7 +8,8 @@ All modalities become atomic claims with `entity`, `attribute`, `value`, `unit`,
 
 Provenance (schema v2):
 
-- Each input PDF is a **source** containing one **file**, which refers to **content**: the SHA-256 of its bytes plus its normalized extension (`sha256:…​.pdf`).
+- Each comparison object is a **source**: a name, provenance metadata and roots (files, folders, zip archives). Scanning its roots yields **files** (archive members as `bundle.zip!/inner.pdf`), each referring to **content**: the SHA-256 of its bytes plus its normalized extension (`sha256:…​.pdf`). Files without an extension get a bare hash and are never interpreted; only `.pdf` content is extracted so far.
+- Content present in both sources, or several times within one, is extracted once; reports list every occurrence.
 - Evidence attaches to content, never to paths. Each item has a **locator** within the content (one-based page, bounding box in unrotated PDF points, the extraction pass and task) and a **derivation** listing the steps from bytes to claim. Visual claims retain the exact PNG the model saw.
 - Evidence IDs derive from content, locator and claim, so they are stable across renames. The same PDF supplied as both sources is extracted once; its evidence is listed as *shared* and never sent for comparison.
 - `evidence.json` and `report.json` record the **interpreters**: the model, a hash of the prompts, the settings that affect output, and library versions.
@@ -42,6 +43,8 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `compare.py` | Retrieval, local reasoning and numeric checks |
 | `report.py` | Escaped HTML and JSON reports |
 | `provenance.py` | Content IDs, extension normalization, interpreter descriptions |
+| `scan.py` | Scanning a source's roots: folders, zip archives, hidden files, safety limits |
+| `manifest.py` | Source manifests: export and import |
 | `store.py` | SQLite evidence store: binding, per-task records, semantic response cache, comparisons |
 | `cli.py` | Orchestration, planning and exit semantics |
 

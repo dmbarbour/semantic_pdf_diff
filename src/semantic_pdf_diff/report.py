@@ -1,23 +1,27 @@
 import html
 import json
+import os
 from pathlib import Path
 from collections import Counter
 
-def write_report(data, output):
+def write_report(data, output, assets=None):
+    """Write report.json and report.html; assets is the folder holding rendered crops
+    (default: output/assets), linked relative to the report."""
     output = Path(output)
     output.mkdir(exist_ok=True, parents=True)
+    prefix = os.path.relpath(Path(assets), output).replace(os.sep, "/") + "/" if assets else "assets/"
+    link = lambda image: prefix + image.split("/", 1)[1] if image.startswith("assets/") else image
     (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     esc = lambda x: html.escape(str(x), quote=True)
     evidence = {e["id"]:e for e in data["evidence"]}
-    names = {x["id"]: x["name"] for x in data["sources"]}
     occurrences = {}
     for f in data["files"]:
-        occurrences.setdefault(f["content"], []).append(f"{names[f['source']]} / {f['path']}")
+        occurrences.setdefault(f["content"], []).append(f"{f['source']} / {f['path']}")
     where = lambda content: "; ".join(occurrences.get(content, ["unregistered content"]))
     headings = {(x["content"], x["id"]): " > ".join(x["heading_path"]) for x in data.get("sections", [])}
     def card(eid):
         e = evidence[eid]
-        image = ('<a href="'+esc(e['image'])+'"><img loading="lazy" src="'+esc(e['image'])+'" alt="Source crop"></a>') if e.get('image') else ''
+        image = ('<a href="'+esc(link(e['image']))+'"><img loading="lazy" src="'+esc(link(e['image']))+'" alt="Source crop"></a>') if e.get('image') else ''
         verified = {True: '<p>Quote found in PDF text layer.</p>',
                     False: '<p class="warning">Quote not found in the PDF text layer for this region; possible misread or raster-only label.</p>'
                     }.get(e.get('quote_verified'), '')
@@ -39,7 +43,8 @@ def write_report(data, output):
         <details><summary>Calculation and matching details</summary>{numeric}<p>Retrieval score {f['retrieval_score']}; model confidence {f['confidence']}</p></details></article>''')
     unmatched = ''.join('<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched'])
     shared = ''.join(card(eid) for eid in data.get('shared', []))
-    coverage = ''.join('<tr><td>'+esc(where(r['content']))+'</td><td>'+str(r['page'])+'</td><td>'+esc(r['task'])+'</td><td>'+esc(r['status'])+'</td><td>'+esc('; '.join(r['issues']))+'</td></tr>' for r in data['coverage'])
+    issues_found = ''.join('<tr><td>'+esc(i['source'])+'</td><td>'+esc(i['path'])+'</td><td>'+esc(i['reason'])+'</td></tr>' for i in data.get('scan_issues', []))
+    coverage = ''.join('<tr><td>'+esc(where(r['content']))+'</td><td>'+esc(r['page'] if r['page'] is not None else '')+'</td><td>'+esc(r['task'])+'</td><td>'+esc(r['status'])+'</td><td>'+esc('; '.join(r['issues']))+'</td></tr>' for r in data['coverage'])
     page = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Semantic PDF comparison</title><style>
 :root{font-family:system-ui,sans-serif;color:#183047;background:#edf2f6}body{max-width:1200px;margin:32px auto;padding:0 24px}
@@ -59,6 +64,7 @@ select,input{padding:10px;border:1px solid #aac0cd;border-radius:6px;margin:8px}
     page += '<label>Show <select id="filter"><option value="all">All relations</option>'+''.join('<option>'+r+'</option>' for r in ['different','equivalent','complementary','uncertain','unrelated'])+'</select></label><input id="query" placeholder="Search findings" aria-label="Search findings">'
     page += '<main>'+''.join(rows)+'</main><details><summary>Unmatched evidence ('+str(len(data['unmatched']))+')</summary>'+unmatched+'</details>'
     page += '<details><summary>Shared evidence ('+str(len(data.get('shared', [])))+'): identical content in both sources, not compared</summary>'+shared+'</details>'
+    page += '<details class="coverage"><summary>Files not scanned ('+str(len(data.get('scan_issues', [])))+'): hidden, unsafe or over limits</summary><table><thead><tr><th>Source</th><th>Path</th><th>Reason</th></tr></thead><tbody>'+issues_found+'</tbody></table></details>'
     page += '<details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>File</th><th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody>'+coverage+'</tbody></table></details>'
     page += '''<script>function filter(){const r=document.querySelector('#filter').value,q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;document.querySelector('#query').oninput=filter;</script></html>'''
     (output/'report.html').write_text(page,encoding='utf-8')

@@ -172,8 +172,8 @@ class Tests(unittest.TestCase):
         a,b=ev(entity='<script>alert(1)</script>'),ev('B-1')
         data=compare([a],[b],Path('.'),Fake(),'proposals')
         data.update(evidence=[a.model_dump(),b.model_dump()],coverage=[],
-            sources=[Source(id='s1',name='A.pdf',kind='file').model_dump(),Source(id='s2',name='B.pdf',kind='file').model_dump()],
-            files=[FileRef(source='s1',path='A.pdf',content=a.content).model_dump(),FileRef(source='s2',path='B.pdf',content=b.content).model_dump()])
+            sources=[Source(name='A').model_dump(),Source(name='B').model_dump()],
+            files=[FileRef(source='A',path='A.pdf',content=a.content).model_dump(),FileRef(source='B',path='B.pdf',content=b.content).model_dump()])
         with tempfile.TemporaryDirectory() as d:
             write_report(data,Path(d))
             html=(Path(d)/'report.html').read_text()

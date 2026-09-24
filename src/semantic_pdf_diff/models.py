@@ -74,11 +74,13 @@ class Extraction(Strict):
         return {"claims": claims, "complete": complete, "issues": [i[:500] for i in issues]}
 
 class Source(Strict):
-    """A comparison object: a folder, an archive, a single file or a manifest."""
-    id: str
-    name: str
-    kind: Literal["file", "folder", "zip", "manifest"]
+    """A comparison object declared in the store: a name, provenance metadata and the
+    roots (files, folders, zip archives) holding its content."""
+    name: str = Field(min_length=1, max_length=200, pattern=r"^[^\s@/][^@/]*$")
+    kind: Literal["declared", "shortcut", "manifest"] = "declared"
     metadata: dict[str, str] = Field(default_factory=dict)
+    roots: list[str] = Field(default_factory=list)
+    manifest: str | None = None
 
 class FileRef(Strict):
     """A path within a source that refers to content."""
@@ -171,6 +173,13 @@ class Settings(Strict):
     aliases: dict[str, str] = Field(default_factory=dict)
     # Debugging: verify that a semantic cache hit was recorded for a byte-identical request.
     cache_check: bool = False
+    # Sources: rescan roots on every run ("auto") or only on `source update` ("manual").
+    rescan: Literal["auto", "manual"] = "auto"
+    # Archive safety backstops: generous, and anything they stop is reported.
+    max_zip_depth: int = Field(default=8, ge=4)
+    max_source_bytes: int = Field(default=50 * 1024 ** 3, ge=1)
+    zip_ratio_limit: float = Field(default=1000.0, gt=1)
+    zip_ratio_min_bytes: int = Field(default=100 * 1024 ** 2, ge=0)
 
     @model_validator(mode="before")
     @classmethod

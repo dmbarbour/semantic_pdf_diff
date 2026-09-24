@@ -24,12 +24,23 @@ pdf-semantic-diff team-a.pdf team-b.pdf --out result
 
 Open `result/report.html`, keeping its `assets/` folder alongside it. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
 
-For revisions, supply the old PDF first. `--plan` estimates the work without calling the model:
+Either argument can also be a folder or a zip archive. For revisions, supply the old version first. `--plan` estimates the work without calling the model:
 
 ```bash
 pdf-semantic-diff old.pdf new.pdf --mode revisions --out revision-diff
-pdf-semantic-diff old.pdf new.pdf --plan
+pdf-semantic-diff team-a/ team-b.zip --plan
 ```
+
+For repeated work, declare **sources** in a store, each with a name, provenance metadata and one or more roots, and compare them by name. Sources are rescanned on every run, so edited, added or deleted files are picked up:
+
+```bash
+pdf-semantic-diff source add team-a --store work --path team-a/ --path addendum.pdf --meta organization="Team A" --meta revision=C
+pdf-semantic-diff source add team-b --store work --path team-b.zip
+pdf-semantic-diff compare --store work team-a team-b
+pdf-semantic-diff source export team-a --store work --output team-a.source.json --with-hashes
+```
+
+A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. Only PDFs are extracted so far; other files are listed as skipped.
 
 Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error.
 

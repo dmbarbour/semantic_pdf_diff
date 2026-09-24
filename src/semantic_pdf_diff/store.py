@@ -11,14 +11,15 @@ import sqlite3
 from pathlib import Path
 from .models import Evidence, FileRef, Interpreter, Section, Source
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-CREATE TABLE source (id TEXT PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL, metadata TEXT NOT NULL);
+CREATE TABLE source (name TEXT PRIMARY KEY, data TEXT NOT NULL, manifest_hash TEXT, issues TEXT NOT NULL DEFAULT '{}');
 CREATE TABLE content (id TEXT PRIMARY KEY, size INTEGER NOT NULL, extracted INTEGER NOT NULL DEFAULT 0);
-CREATE TABLE file (source TEXT NOT NULL REFERENCES source(id), path TEXT NOT NULL,
-                   content TEXT NOT NULL REFERENCES content(id), metadata TEXT NOT NULL, PRIMARY KEY (source, path));
+CREATE TABLE file (source TEXT NOT NULL REFERENCES source(name) ON DELETE CASCADE, path TEXT NOT NULL,
+                   content TEXT NOT NULL REFERENCES content(id), size INTEGER NOT NULL, origin TEXT NOT NULL,
+                   disk TEXT NOT NULL, disk_stat TEXT NOT NULL, metadata TEXT NOT NULL, PRIMARY KEY (source, path));
 CREATE TABLE interpreter (role TEXT PRIMARY KEY, description TEXT NOT NULL);
 CREATE TABLE section (content TEXT NOT NULL REFERENCES content(id), id TEXT NOT NULL, data TEXT NOT NULL,
                       PRIMARY KEY (content, id));
@@ -162,23 +163,81 @@ class Store:
         return counts
 
     # --- sources, files and content -------------------------------------------
-    def register(self, source: Source, files, sizes):
-        """Record a source and its files; sizes maps content ID to byte size."""
+    def save_source(self, source: Source, replace=False, manifest_hash=None):
+        """Declare a source, or update an existing one's definition when replace is set."""
+        exists = self.source(source.name) is not None
+        if exists and not replace:
+            raise StoreError(f"source {source.name!r} is already declared; use 'source update' or another name")
         with self.db:
-            self.db.execute("INSERT OR REPLACE INTO source VALUES (?, ?, ?, ?)",
-                            (source.id, source.name, source.kind, json.dumps(source.metadata)))
-            self.db.execute("DELETE FROM file WHERE source=?", (source.id,))
-            for f in files:
-                self.db.execute("INSERT OR IGNORE INTO content (id, size) VALUES (?, ?)", (f.content, sizes[f.content]))
-                self.db.execute("INSERT INTO file VALUES (?, ?, ?, ?)", (f.source, f.path, f.content, json.dumps(f.metadata)))
+            self.db.execute("INSERT INTO source (name, data, manifest_hash) VALUES (?, ?, ?) "
+                            "ON CONFLICT(name) DO UPDATE SET data=excluded.data, manifest_hash=excluded.manifest_hash",
+                            (source.name, source.model_dump_json(), manifest_hash))
+
+    def source(self, name):
+        row = self.db.execute("SELECT data FROM source WHERE name=?", (name,)).fetchone()
+        return Source.model_validate_json(row[0]) if row else None
+
+    def manifest_hash(self, name):
+        row = self.db.execute("SELECT manifest_hash FROM source WHERE name=?", (name,)).fetchone()
+        return row[0] if row else None
 
     def sources(self):
-        return [Source(id=i, name=n, kind=k, metadata=json.loads(m))
-                for i, n, k, m in self.db.execute("SELECT id, name, kind, metadata FROM source ORDER BY id")]
+        return [Source.model_validate_json(d) for (d,) in self.db.execute("SELECT data FROM source ORDER BY name")]
 
-    def files(self):
+    def remove_source(self, name):
+        """Unregister a source; its content stays until gc finds it orphaned."""
+        with self.db:
+            removed = self.db.execute("DELETE FROM source WHERE name=?", (name,)).rowcount
+        if not removed:
+            raise StoreError(f"no source named {name!r}")
+
+    def rescan(self, name, limits=None, describe=None):
+        """Rescan a source's roots and update its files in place. Returns a summary."""
+        from .scan import Limits, ScannedFile, scan
+        source = self.source(name)
+        if source is None:
+            raise StoreError(f"no source named {name!r}")
+        old, reuse = {}, {}
+        for path, content, size, origin, disk, stat, meta in self.db.execute(
+                "SELECT path, content, size, origin, disk, disk_stat, metadata FROM file WHERE source=?", (name,)):
+            item = ScannedFile(path, content, size, tuple(json.loads(origin)), tuple(json.loads(disk)),
+                               tuple(json.loads(stat)), json.loads(meta))
+            old[path] = content
+            reuse.setdefault(item.disk, [item.disk_stat, [], []])[1].append(item)
+        issues = json.loads(self.db.execute("SELECT issues FROM source WHERE name=?", (name,)).fetchone()[0])
+        for key, found in issues.items():  # root-level issues (key []) are recomputed by every scan
+            if tuple(json.loads(key)) in reuse:
+                reuse[tuple(json.loads(key))][2] = [tuple(i) for i in found]
+        result = scan(source.roots, limits or Limits(), reuse, describe)
+        with self.db:
+            self.db.execute("DELETE FROM file WHERE source=?", (name,))
+            for f in result.files:
+                self.db.execute("INSERT OR IGNORE INTO content (id, size) VALUES (?, ?)", (f.content, f.size))
+                self.db.execute("INSERT INTO file VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                                (name, f.path, f.content, f.size, json.dumps(f.origin), json.dumps(f.disk),
+                                 json.dumps(f.disk_stat), json.dumps(f.metadata)))
+            self.db.execute("UPDATE source SET issues=? WHERE name=?",
+                            (json.dumps({json.dumps(list(k)): v for k, v in result.disk_issues.items()}), name))
+        new = {f.path: f.content for f in result.files}
+        return {"files": len(new), "added": sorted(set(new) - set(old)), "removed": sorted(set(old) - set(new)),
+                "changed": sorted(p for p in set(new) & set(old) if new[p] != old[p]),
+                "reused_disk_files": result.reused, "issues": result.issues}
+
+    def files(self, source=None):
+        query = "SELECT source, path, content, metadata FROM file" + (" WHERE source=?" if source else "")
         return [FileRef(source=s, path=p, content=c, metadata=json.loads(m))
-                for s, p, c, m in self.db.execute("SELECT source, path, content, metadata FROM file ORDER BY source, path")]
+                for s, p, c, m in self.db.execute(query + " ORDER BY source, path", (source,) if source else ())]
+
+    def origin(self, source, path):
+        row = self.db.execute("SELECT origin FROM file WHERE source=? AND path=?", (source, path)).fetchone()
+        return tuple(json.loads(row[0])) if row else None
+
+    def issues(self, source):
+        row = self.db.execute("SELECT issues FROM source WHERE name=?", (source,)).fetchone()
+        return [tuple(i) for found in json.loads(row[0]).values() for i in found] if row else []
+
+    def orphaned_content(self):
+        return [c for (c,) in self.db.execute("SELECT id FROM content WHERE id NOT IN (SELECT content FROM file)")]
 
     def is_extracted(self, content):
         row = self.db.execute("SELECT extracted FROM content WHERE id=?", (content,)).fetchone()

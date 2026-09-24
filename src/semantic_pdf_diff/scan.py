@@ -27,13 +27,23 @@ class ScannedFile:
     path: str            # display path within the source, archive members as 'a.zip!/b.pdf'
     content: str         # 'sha256:<hex><ext>', or 'sha256:<hex>' when not interpretable
     size: int
-    origin: tuple        # (root, member, member, ...) to re-read the bytes later
+    origin: tuple        # (root, [relative path,] member, ...) to re-read the bytes later
+    disk: tuple = ()     # (root, [relative path]): the file on disk holding these bytes
+    disk_stat: tuple = ()  # (size, mtime_ns) of that file when scanned
+    metadata: dict = field(default_factory=dict)
 
 @dataclass
 class ScanResult:
     files: list = field(default_factory=list)
     issues: list = field(default_factory=list)   # (path, reason) for everything not scanned
+    disk_issues: dict = field(default_factory=dict)  # the same issues, keyed by disk file
     bytes_read: int = 0
+    reused: int = 0      # disk files whose earlier scan was reused unchanged
+
+    def issue(self, path, reason, disk=()):
+        """Record an issue under its disk file, or under () for root-level issues."""
+        self.issues.append((path, reason))
+        self.disk_issues.setdefault(disk, []).append((path, reason))
 
 def content_of(data, name):
     """Content ID; files without an extension get a bare hash and are never interpreted."""
@@ -47,8 +57,14 @@ def hidden(parts):
 def label(root):
     return Path(root).name or str(root)
 
-def scan(roots, limits=Limits()):
-    """Scan roots (absolute or relative paths) into files and content."""
+def scan(roots, limits=Limits(), reuse=None, describe=None):
+    """Scan roots (absolute or relative paths) into files and content.
+
+    reuse: {disk key: (disk_stat, files, issues)} from an earlier scan; a disk file
+    whose size and modification time are unchanged is reused without reading it.
+    describe(name, data) -> metadata for newly read files (e.g. document properties).
+    """
+    reuse = reuse or {}
     result = ScanResult()
     labels = {}
     for root in roots:
@@ -62,59 +78,74 @@ def scan(roots, limits=Limits()):
                 # Hidden folders are reported once and never descended into.
                 for name in sorted(subdirs):
                     if hidden([name]):
-                        result.issues.append((f"{prefix}/{(here / name).as_posix()}", "hidden"))
+                        result.issue(f"{prefix}/{(here / name).as_posix()}", "hidden")
                 subdirs[:] = sorted(d for d in subdirs if not hidden([d]))
                 for name in sorted(names):
                     relative = (here / name).as_posix()
                     if hidden([name]):
-                        result.issues.append((f"{prefix}/{relative}", "hidden"))
+                        result.issue(f"{prefix}/{relative}", "hidden")
                         continue
-                    path = Path(directory) / name
-                    _add(result, f"{prefix}/{relative}", path.read_bytes, (str(root), relative), limits, 0)
+                    _disk_file(result, f"{prefix}/{relative}", Path(directory) / name, (str(root), relative),
+                               limits, reuse, describe)
         elif root.is_file():
-            _add(result, prefix, root.read_bytes, (str(root),), limits, 0)
+            _disk_file(result, prefix, root, (str(root),), limits, reuse, describe)
         else:
-            result.issues.append((str(root), "not found"))
+            result.issue(str(root), "not found")
     return result
 
-def _add(result, display, read, origin, limits, depth):
+def _disk_file(result, display, path, disk, limits, reuse, describe):
+    stat = stat_key(path)
+    earlier = reuse.get(disk)
+    if earlier and tuple(earlier[0]) == stat:
+        for f in earlier[1]:
+            result.files.append(f)
+            result.bytes_read += f.size
+        for path_, reason in earlier[2]:
+            result.issue(path_, reason, disk)
+        result.reused += 1
+        return
+    _add(result, display, path.read_bytes, disk, limits, 0, disk, stat, describe)
+
+def _add(result, display, read, origin, limits, depth, disk, stat, describe):
     data = read()
     if result.bytes_read + len(data) > limits.max_source_bytes:
-        result.issues.append((display, f"skipped: source exceeds {limits.max_source_bytes} bytes"))
+        result.issue(display, f"skipped: source exceeds {limits.max_source_bytes} bytes", disk)
         return
     result.bytes_read += len(data)
-    result.files.append(ScannedFile(display, content_of(data, display), len(data), origin))
+    metadata = describe(display, data) if describe else {}
+    result.files.append(ScannedFile(display, content_of(data, display), len(data), origin, disk, stat, metadata))
     if normalized_extension(display) in ARCHIVES:
-        _archive(result, display, data, origin, limits, depth)
+        _archive(result, display, data, origin, limits, depth, disk, stat, describe)
 
-def _archive(result, display, data, origin, limits, depth):
+def _archive(result, display, data, origin, limits, depth, disk, stat, describe):
     if depth >= limits.max_depth:
-        result.issues.append((display, f"skipped: archive nested deeper than {limits.max_depth} levels"))
+        result.issue(display, f"skipped: archive nested deeper than {limits.max_depth} levels", disk)
         return
     try:
         archive = zipfile.ZipFile(io.BytesIO(data))
     except zipfile.BadZipFile as e:
-        result.issues.append((display, f"unreadable archive: {e}"))
+        result.issue(display, f"unreadable archive: {e}", disk)
         return
     for info in sorted(archive.infolist(), key=lambda i: i.filename):
         if info.is_dir():
             continue
         member = PurePosixPath(info.filename)
+        where = f"{display}!/{info.filename}"
         if member.is_absolute() or ".." in member.parts or info.filename.startswith(("/", "\\")):
-            result.issues.append((f"{display}!/{info.filename}", "rejected: unsafe path"))
+            result.issue(where, "rejected: unsafe path", disk)
             continue
         if hidden(member.parts):
-            result.issues.append((f"{display}!/{info.filename}", "hidden"))
+            result.issue(where, "hidden", disk)
             continue
         if info.flag_bits & 0x1:
-            result.issues.append((f"{display}!/{info.filename}", "skipped: encrypted"))
+            result.issue(where, "skipped: encrypted", disk)
             continue
         if (info.file_size >= limits.ratio_min_bytes and info.compress_size
                 and info.file_size / info.compress_size > limits.ratio_limit):
-            result.issues.append((f"{display}!/{info.filename}", "skipped: compression ratio exceeds limit"))
+            result.issue(where, "skipped: compression ratio exceeds limit", disk)
             continue
         _add(result, f"{display}!/{member.as_posix()}", lambda info=info: archive.read(info),
-             origin + (member.as_posix(),), limits, depth + 1)
+             origin + (member.as_posix(),), limits, depth + 1, disk, stat, describe)
 
 def read_origin(origin):
     """Re-read a scanned file's bytes from its origin (root, then archive members)."""

@@ -44,10 +44,10 @@ class FixtureClient:
 out=Path('examples/demo-output')
 data=compare(left,right,out,FixtureClient(),'proposals')
 data.update(schema_version=2,fixture=True,
-    sources=[Source(id='s1',name='Team A (synthetic evidence)',kind='file').model_dump(),
-             Source(id='s2',name='Team B (synthetic evidence)',kind='file').model_dump()],
-    files=[FileRef(source='s1',path='team-a.pdf',content=CONTENT['A']).model_dump(),
-           FileRef(source='s2',path='team-b.pdf',content=CONTENT['B']).model_dump()],
+    sources=[Source(name='Team A (synthetic evidence)').model_dump(),
+             Source(name='Team B (synthetic evidence)').model_dump()],
+    files=[FileRef(source='Team A (synthetic evidence)',path='team-a.pdf',content=CONTENT['A']).model_dump(),
+           FileRef(source='Team B (synthetic evidence)',path='team-b.pdf',content=CONTENT['B']).model_dump()],
     evidence=[e.model_dump() for e in left+right],coverage=[],
     note='HAND-AUTHORED FIXTURE: no PDF extraction or real model inference was used. This report demonstrates behavior, not measured accuracy.')
 write_report(data,out)

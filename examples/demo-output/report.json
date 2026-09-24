@@ -85,27 +85,29 @@
   "fixture": true,
   "sources": [
     {
-      "id": "s1",
       "name": "Team A (synthetic evidence)",
-      "kind": "file",
-      "metadata": {}
+      "kind": "declared",
+      "metadata": {},
+      "roots": [],
+      "manifest": null
     },
     {
-      "id": "s2",
       "name": "Team B (synthetic evidence)",
-      "kind": "file",
-      "metadata": {}
+      "kind": "declared",
+      "metadata": {},
+      "roots": [],
+      "manifest": null
     }
   ],
   "files": [
     {
-      "source": "s1",
+      "source": "Team A (synthetic evidence)",
       "path": "team-a.pdf",
       "content": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pdf",
       "metadata": {}
     },
     {
-      "source": "s2",
+      "source": "Team B (synthetic evidence)",
       "path": "team-b.pdf",
       "content": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.pdf",
       "metadata": {}
@@ -141,6 +143,7 @@
         "region": "text",
         "task": "hand-authored fixture"
       },
+      "section": "",
       "derivation": [],
       "image": null,
       "quote_verified": null
@@ -174,6 +177,7 @@
         "region": "text",
         "task": "hand-authored fixture"
       },
+      "section": "",
       "derivation": [],
       "image": null,
       "quote_verified": null
@@ -207,6 +211,7 @@
         "region": "text",
         "task": "hand-authored fixture"
       },
+      "section": "",
       "derivation": [],
       "image": null,
       "quote_verified": null
@@ -240,6 +245,7 @@
         "region": "text",
         "task": "hand-authored fixture"
       },
+      "section": "",
       "derivation": [],
       "image": null,
       "quote_verified": null
@@ -273,6 +279,7 @@
         "region": "text",
         "task": "hand-authored fixture"
       },
+      "section": "",
       "derivation": [],
       "image": null,
       "quote_verified": null
@@ -306,6 +313,7 @@
         "region": "text",
         "task": "hand-authored fixture"
       },
+      "section": "",
       "derivation": [],
       "image": null,
       "quote_verified": null
@@ -339,6 +347,7 @@
         "region": "text",
         "task": "hand-authored fixture"
       },
+      "section": "",
       "derivation": [],
       "image": null,
       "quote_verified": null
@@ -372,6 +381,7 @@
         "region": "text",
         "task": "hand-authored fixture"
       },
+      "section": "",
       "derivation": [],
       "image": null,
       "quote_verified": null
@@ -405,6 +415,7 @@
         "region": "text",
         "task": "hand-authored fixture"
       },
+      "section": "",
       "derivation": [],
       "image": null,
       "quote_verified": null

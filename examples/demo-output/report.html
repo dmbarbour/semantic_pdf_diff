@@ -22,27 +22,29 @@ select,input{padding:10px;border:1px solid #aac0cd;border-radius:6px;margin:8px}
   &quot;fixture&quot;: true,
   &quot;sources&quot;: [
     {
-      &quot;id&quot;: &quot;s1&quot;,
       &quot;name&quot;: &quot;Team A (synthetic evidence)&quot;,
-      &quot;kind&quot;: &quot;file&quot;,
-      &quot;metadata&quot;: {}
+      &quot;kind&quot;: &quot;declared&quot;,
+      &quot;metadata&quot;: {},
+      &quot;roots&quot;: [],
+      &quot;manifest&quot;: null
     },
     {
-      &quot;id&quot;: &quot;s2&quot;,
       &quot;name&quot;: &quot;Team B (synthetic evidence)&quot;,
-      &quot;kind&quot;: &quot;file&quot;,
-      &quot;metadata&quot;: {}
+      &quot;kind&quot;: &quot;declared&quot;,
+      &quot;metadata&quot;: {},
+      &quot;roots&quot;: [],
+      &quot;manifest&quot;: null
     }
   ],
   &quot;files&quot;: [
     {
-      &quot;source&quot;: &quot;s1&quot;,
+      &quot;source&quot;: &quot;Team A (synthetic evidence)&quot;,
       &quot;path&quot;: &quot;team-a.pdf&quot;,
       &quot;content&quot;: &quot;sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pdf&quot;,
       &quot;metadata&quot;: {}
     },
     {
-      &quot;source&quot;: &quot;s2&quot;,
+      &quot;source&quot;: &quot;Team B (synthetic evidence)&quot;,
       &quot;path&quot;: &quot;team-b.pdf&quot;,
       &quot;content&quot;: &quot;sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.pdf&quot;,
       &quot;metadata&quot;: {}
@@ -104,4 +106,4 @@ select,input{padding:10px;border:1px solid #aac0cd;border-radius:6px;margin:8px}
         <small>B-4 · text region, PDF bbox [40.0, 40.0, 300.0, 140.0] · confidence 0.95</small></section></article><article>No confirmed counterpart in retrieved evidence; this does not establish absence.<section><h3>Team B (synthetic evidence) / team-b.pdf · page 1 · text</h3>
         <b>firewall — audit log retention</b><p>90 days</p>
         <p>Conditions: security policy</p><blockquote>firewall: audit log retention 90 days at security policy</blockquote>
-        <small>B-5 · text region, PDF bbox [40.0, 40.0, 300.0, 140.0] · confidence 0.95</small></section></article></details><details><summary>Shared evidence (0): identical content in both sources, not compared</summary></details><details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>File</th><th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody></tbody></table></details><script>function filter(){const r=document.querySelector('#filter').value,q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;document.querySelector('#query').oninput=filter;</script></html>
+        <small>B-5 · text region, PDF bbox [40.0, 40.0, 300.0, 140.0] · confidence 0.95</small></section></article></details><details><summary>Shared evidence (0): identical content in both sources, not compared</summary></details><details class="coverage"><summary>Files not scanned (0): hidden, unsafe or over limits</summary><table><thead><tr><th>Source</th><th>Path</th><th>Reason</th></tr></thead><tbody></tbody></table></details><details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>File</th><th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody></tbody></table></details><script>function filter(){const r=document.querySelector('#filter').value,q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;document.querySelector('#query').oninput=filter;</script></html>

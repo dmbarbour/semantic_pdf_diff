@@ -135,9 +135,11 @@ class Provenance(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             a = make_pdf(Path(d) / 'a.pdf', ['x'], metadata={'title': 'PS-3  Design\nSummary', 'author': 'Team A'})
             b = make_pdf(Path(d) / 'b.pdf', ['y'])
-            _, files = cli.register_sources([a, b])
+            from semantic_pdf_diff.scan import scan
+            files = scan([a, b], describe=cli.document_properties).files
             self.assertEqual(files[0].metadata, {'title': 'PS-3 Design Summary', 'author': 'Team A'})
             self.assertEqual(files[1].metadata, {})
+            self.assertEqual(cli.document_properties('notes.md', b'# not a pdf'), {})
 
     def test_sections_survive_a_rerun_from_the_store(self):
         with tempfile.TemporaryDirectory() as d:

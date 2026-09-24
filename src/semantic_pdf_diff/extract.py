@@ -133,7 +133,9 @@ DERIVATION = {
 }
 
 def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
-    """Extract evidence from one PDF, identified by its content ID; returns (evidence, coverage).
+    """Extract evidence from one PDF (a path or its bytes), identified by its content ID.
+
+    Returns (evidence, coverage).
 
     on_task(row, evidence) is called as each task finishes, so a store can persist
     results task by task; on_sections(sections) is called once sections are known.
@@ -264,11 +266,13 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
         for i, child in enumerate(children):
             visual_task(page_no, page, f"{tag}-r{i}", child, depth + 1)
 
-    with pymupdf.open(path) as doc:
+    name = content if isinstance(path, (bytes, bytearray)) else Path(path).name
+    opened = pymupdf.open(stream=path, filetype="pdf") if isinstance(path, (bytes, bytearray)) else pymupdf.open(path)
+    with opened as doc:
         if doc.needs_pass:
-            raise ValueError(f"{Path(path).name}: encrypted PDF needs to be decrypted before comparison")
+            raise ValueError(f"{name}: encrypted PDF needs to be decrypted before comparison")
         if not doc.is_pdf or not len(doc):
-            raise ValueError(f"{Path(path).name}: expected a nonempty PDF")
+            raise ValueError(f"{name}: expected a nonempty PDF")
         sections, owner = pdf_sections(doc, s.section_depth, s.section_pages)
         page_section.update(owner)
         if on_sections:

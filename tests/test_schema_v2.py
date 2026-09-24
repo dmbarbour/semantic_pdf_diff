@@ -116,7 +116,8 @@ class CliTests(unittest.TestCase):
             evidence = json.loads((root / 'out/evidence.json').read_text())
             report = json.loads((root / 'out/report.json').read_text())
             self.assertEqual(evidence['schema_version'], 2)
-            self.assertEqual([s['id'] for s in evidence['sources']], ['s1', 's2'])
+            self.assertEqual([s['name'] for s in evidence['sources']], ['a.pdf', 'b.pdf'])
+            self.assertEqual({s['kind'] for s in evidence['sources']}, {'shortcut'})
             self.assertEqual(set(evidence['interpreters']), {'extract'})
             self.assertEqual(set(report['interpreters']), {'extract', 'compare'})
             self.assertFalse(any('document' in e for e in evidence['evidence']))
@@ -129,8 +130,8 @@ class CliTests(unittest.TestCase):
             a = make_pdf(root / 'x/report.pdf'); b = make_pdf(root / 'y/report.pdf', 'Pump rated power 12 kW')
             with contextlib.redirect_stdout(io.StringIO()) as out:
                 main([str(a), str(b), '--plan'])
-            names = [s['name'] for s in json.loads(out.getvalue())['sources']]
-            self.assertEqual(names, ['report.pdf [s1]', 'report.pdf [s2]'])
+            names = [s['source'] for s in json.loads(out.getvalue())['sources']]
+            self.assertEqual(names, ['report.pdf', 'report.pdf-2'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -15,7 +15,7 @@ import pymupdf
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.llm import CacheKeyMismatch, Client
 from semantic_pdf_diff.models import Claim, Extraction, Judgment, PdfLocator, Evidence, Settings
-from semantic_pdf_diff.provenance import extraction_interpreter
+from semantic_pdf_diff.provenance import content_id, extraction_interpreter
 from semantic_pdf_diff.store import InterpreterMismatch, Store, StoreError, StoreInUse
 
 EMPTY = {'claims': [], 'complete': True, 'issues': []}
@@ -158,9 +158,9 @@ class TaskIdentity(unittest.TestCase):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(Path(d) / 's') as store:
             path = make_pdf(Path(d) / 'two.pdf', ['Pump rated power 10 kW', 'Fan motor 3 kW'])
             cid = content_id(path.read_bytes(), path.name)
-            from semantic_pdf_diff.models import FileRef, Source
-            store.register(Source(id='s1', name='two', kind='file'), [FileRef(source='s1', path='two.pdf', content=cid)],
-                           {cid: path.stat().st_size})
+            from semantic_pdf_diff.models import Source
+            store.save_source(Source(name='two', roots=[str(path)]))
+            store.rescan('two')
             client = Client(Settings(base_url=url, retries=0, tile_points=200), store)
             evidence, coverage = extract_pdf(path, cid, store.folder, client, on_task=store.record_task)
             tasks = [r['task'] for r in coverage]
@@ -221,7 +221,7 @@ class ResumeAndReuse(unittest.TestCase):
             code, _ = self.run_cli(a, b, root / 'out', url, '--max-calls', '1')
             self.assertEqual(code, 2)
             with Store(root / 'out') as store:
-                self.assertFalse(store.is_extracted(cli.register_sources([a, b])[1][0].content))
+                self.assertFalse(store.is_extracted(content_id(a.read_bytes(), a.name)))
             code, _ = self.run_cli(a, b, root / 'out', url)
             report = json.loads((root / 'out/report.json').read_text())
             self.assertFalse(any(r['status'] == 'failed' for r in report['coverage']))
