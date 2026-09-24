@@ -14,7 +14,7 @@ Test the pipeline against **realistic model responses without calling a model**,
 2. **Answer** them with several responders, each stored as its own response table:
    - **Claude** (answering in a development session): a strong reference
    - **a weak local VLM** (e.g. a small Gemma via Ollama on CPU): exposes brittleness
-   - **gemma-4 in-house**, if the owner records the same public slice inside their environment: the most realistic table, and shareable because the documents are public
+   - **gemma-4 in-house:** the owner records the same public slice in an empty, non-sensitive sandbox with access to the in-house server. It's the most realistic table, and shareable because the documents are public.
    - **the existing stub server**: for failures (malformed JSON, truncation, 429s), which real responders rarely produce on demand
 3. **Replay:** tests run the real pipeline with a client that answers from a chosen table.
 
@@ -62,7 +62,16 @@ Tests use `replay`. Recording rounds use `collect`, answer the collected request
 
 - **Export collected requests** as a work list: prompt text plus the regenerated crop paths, for a responder to answer.
 - **Import answers** after validating them against the response schema, rejecting invalid ones, and storing them under the responder's name.
-- For Claude, a session reads the work list and images, writes answers in batches, and imports them. For local or in-house models, `replay-or-record` does it automatically.
+- For Claude, a session reads the work list and images, writes answers in batches, and imports them. For local models, `replay-or-record` does it automatically.
+
+### Recording kit for in-house gemma-4
+
+Recording in the owner's environment should be one command, not a project setup:
+
+- **Self-contained:** the kit holds the work list and the public source files for the curated slice (a few MB), so it needs no internet access or `fetch_samples.py` run. It needs only this tool installed and the in-house endpoint configured through the usual `OPENAI_*` variables.
+- **One command,** e.g. `pdf-semantic-diff fixtures record kit.zip --responder gemma-4-inhouse`. It answers every request in the work list, is resumable if interrupted, and respects the configured rate limits.
+- **One small output file** holding responses only (no documents, no credentials, endpoint redacted), to copy back and import.
+- **Rounds:** because recording happens in rounds, later rounds produce new, smaller kits. Keep the slice small enough that two or three trips cover it.
 
 ## Milestones
 
@@ -71,8 +80,12 @@ Tests use `replay`. Recording rounds use `collect`, answer the collected request
 3. Collection rounds on a curated slice of the sample corpus: export work lists, import answers.
 4. First tables: Claude on a small slice; the weak local VLM (Ollama, CPU) on the same slice.
 5. Integration tests that replay each table, with expected outcomes checked loosely (structure, coverage, provenance), since answers differ across responders.
-6. (Owner's choice) a gemma-4 table recorded in-house on the same public slice.
+6. **Recording kit** and a gemma-4 table recorded in-house on the same public slice.
+
+## Decisions (2026-09-24)
+
+- **gemma-4 table:** the owner will record one on the public slice, in an empty non-sensitive sandbox with in-house model access, using the recording kit.
 
 ## Open questions
 
-- Does the owner want to record a gemma-4 table on the public slice inside their environment? It would be the most realistic table available.
+None currently.
