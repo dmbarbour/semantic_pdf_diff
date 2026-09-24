@@ -126,12 +126,12 @@ When the model recognizes that claims disagree (within one source, such as an er
 - **target** by stable ID: source, file, content, section, evidence, a pair of evidence IDs (finding or benchmark pair), criterion, alias proposal, table interpretation, or comparison
 - **kind** and **value**, with an optional note
 - **context snapshot** for reviewer decisions: what the reviewer saw (quotes, values, paths), so the record reads on its own and can be re-attached
-- **author** (a configured reviewer name, falling back to the OS user name) and **time**
+- **time**, and optionally a **reviewer ID** (see *Decisions*)
 
 ### Behaviour
 
 - **Survives regeneration and resets.** Evidence IDs are content-based, so annotations survive report regeneration, renames and re-packaging. After a reset or model change, a reviewer decision whose target is gone is **orphaned, not deleted**. The tool tries to re-attach it via its context snapshot and lists what stays orphaned.
-- **Never part of an interpreter.** Adding or editing annotations never needs a reset. Configuration derived from reviewer decisions (alias maps, criteria, forced table strategies) is recorded per comparison, where it applies.
+- **Reviewer decisions are configuration**, and follow the same rule as any other configuration: a change that affects model derivations triggers the selective `--reset` or re-run of just what it affects, and a change that affects only final reports doesn't. For example, a forced table strategy changes that table's extraction (reset that table's evidence); edited criteria or aliases change comparisons (re-run the affected comparisons, which record their own settings); a usefulness mark changes only reports (nothing to re-run). Source provenance annotations affect only reports and exports.
 - **Visible, never destructive.** Reports show reviewer decisions and model-recognized disagreements next to the evidence they concern; evidence is never replaced or hidden.
 
 ### Capture
@@ -144,7 +144,7 @@ When the model recognizes that claims disagree (within one source, such as an er
 ### Export and import
 
 - **Export:** a machine-readable JSON file plus a readable report grouped by kind, with context snapshots.
-- **Import** merges reviewer decisions into any store. The same author replacing a decision is an update; different authors disagreeing are both kept and shown.
+- **Import** merges reviewer decisions into any store. Conflicts with existing decisions are listed, and the user chooses which to keep (or passes a flag preferring incoming or existing ones).
 - **Configuration fragments:** accepted aliases, criteria and forced table strategies can be exported as configuration for future runs.
 
 ### Decisions (2026-09-24)
@@ -154,7 +154,8 @@ When the model recognizes that claims disagree (within one source, such as an er
 - **Document versions:** always read documents as they currently are (for `.docx`, with tracked changes applied), never earlier versions within one file; anything else confuses people.
 - **Disagreements:** recognized by the model and recorded as derived claims with severity and a handling decision, which may lower confidence in the claims involved.
 - **External sources:** most sources are external, so nothing special; "external" is just a field in a source's provenance annotation if a user wants it.
-- **Authorship:** a configured reviewer name, falling back to the OS user name; no stronger attribution.
+- **Authorship:** not required, any more than for the rest of the configuration. If wanted, the tool asks once on first use and stores an e-mail address in `$XDG_CONFIG_HOME/<tool>/reviewer_id` (default `~/.config/<tool>/reviewer_id`), then stamps it on reviewer decisions.
+- **Configuration changes and resets:** reviewer decisions and other configuration force a (selective) reset or re-run only when they affect model derivations; changes that affect only final reports never do.
 - **Provider markings:** Markdown front matter. Provenance annotations can grow large, so exports relate content to them with short tags instead of repeating them (see *Provenance tags* in [single-source-outputs](single-source-outputs-2026-09-23.md)).
 
 ## Comparison consequences
