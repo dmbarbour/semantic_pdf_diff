@@ -15,7 +15,7 @@ Two claims can share a topic and still not be comparable. They may differ in:
 - **basis and context:** projected vs measured, initial vs final
 - **implications:** a 22 kW motor means something different in a two-pump design than in a three-pump design
 
-Projects that take different approaches toward the same end share their *ends*, not their mechanisms. And comparing every pair of claims across N sources costs roughly N² model calls. So proposals are compared **by criteria**.
+Projects that take different approaches toward the same end share their *ends*, not their mechanisms. So proposals are compared **by criteria**.
 
 ## Design
 
@@ -54,9 +54,15 @@ Within one source, for one criterion:
 - compute derived implications where the criterion needs them (e.g. total duty power = 2 × 22 kW), recorded in the derivation
 - apply statistics only when the model judges the claims to be samples of one quantity; that judgment is recorded, not assumed
 
-### 5. Cross-source comparison
+### 5. Cross-source comparison: describe the distribution
 
-Within each criterion, compare the sources' positions by the criterion's method: numeric where values and units allow (normalized if specified), otherwise qualitative, pairwise among *distinct* positions only. Identical positions are merged first, so cost stays near linear in typical cases. A cap with an explicit "not all pairs compared" note covers pathological cases.
+Within each criterion, **all sources' positions are compared together in one request**, not pairwise. Nine or even thirty positions with their context fit comfortably in gemma-4's context. The output is **descriptive, not a judgment**:
+
+- **Mechanical statistics first** where values and units allow (normalized if the criterion says so): range, median, spread, and how many sources fall where. These are computed, not generated, and are given to the model as input.
+- **The model then describes the distribution:** which sources agree (groups of equivalent positions), where they spread and by how much, outliers, and positions that differ in basis or context and so aren't directly comparable (e.g. three measured values and two projections). Qualitative positions are grouped the same way: which sources take the same approach, and how the others differ.
+- Every statement names the sources and cites their evidence. No source is framed as the reference, and nothing is ranked.
+
+Only if one criterion's positions exceed the context budget are they split into groups, described separately, then merged, and the report says so. Pairwise comparison is not the default anywhere in proposal mode.
 
 ### 6. Report
 
@@ -84,11 +90,12 @@ Revisions of one design are commensurable by default. They use claim-level compa
 1. Criteria records: provenance, annotations, export/import; extraction from reference documents and model recommendation.
 2. Source × criterion mapping with applicability outcomes.
 3. Per-source synthesis (context selection, derived implications, model-judged statistics).
-4. Cross-source comparison within criteria.
+4. Cross-source description within each criterion: mechanical statistics plus one model request per criterion describing agreement, spread, outliers and incomparable positions.
 5. Matrix report.
 6. Ordered revision series (claim-level, content-difference first).
 
 ## Open questions
 
 - What is a realistic N? The report design differs between 3 sources and 20.
+- What context window does the gemma-4 deployment actually serve? The current default budget (`context_tokens` 8,192) was chosen for small models. Extraction chunks should stay small for focus, but criterion-level requests can use far more.
 - Does two-way proposal comparison also move to criteria first, with today's claim-level comparison kept for revisions? Likely yes, once criteria exist.
