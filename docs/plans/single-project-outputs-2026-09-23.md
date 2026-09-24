@@ -28,7 +28,8 @@ The target RAG system is not ours to change. Its ingest tool accepts PDF, Markdo
 - **Tables inline, as small Markdown tables** with their headers and units, instead of separate CSV or `.xlsx` files the ingest tool would mangle. Large tables are split into chunks that each repeat the header and table identity.
 - **Diagrams and charts as text.** Claims from visual extraction (connections, operating points, axis readings, flagged approximations) are written out in words. That preserves exactly what the ingest tool would lose.
 - **Qualifiers kept with the facts:** conditions, basis (measured, projected, required…), stated uncertainty, derivation (direct read, model extraction, summary of summaries), quote-verification status and any issues or suspicions. Confidence appears as the qualifier it is, not as a bare number presented as truth.
-- **Stable file names** derived from content and section IDs, so re-exporting after a change replaces the same files and adds or removes only what changed.
+- **Unique file names.** Re-ingesting apparently aggregates rather than replaces, so every chunk file gets a unique name (derived from its content hash plus an export ID) and the user controls the corpus directly: ingest a fresh export into a new or reset corpus, or ingest a **delta export** containing only chunks not present in a named previous export. The delta's `index.md` also lists chunks that disappeared, for the user to act on.
+- **Discovery chunks alongside detail chunks.** Besides chunks that explain content (comprehension), the export includes chunks that help find it (discovery): tables of topics, an entity index, an index of diagrams and charts with what each shows, and section maps. Each entry names the detail chunks' citations, so a RAG query about "what covers pump redundancy?" can land on an index and then on the facts.
 - **An `index.md`** listing every chunk with its citation, plus a note on how the export was produced (tool version, interpreters, coverage summary including what wasn't reached or was skipped).
 
 Chunk granularity is selectable:
@@ -40,10 +41,18 @@ Chunk granularity is selectable:
 An example chunk:
 
 ```markdown
+---
+title: "Pump schedule — PS-3 design summary.pdf, p. 12"
+author: "Team A (PS-3 design consultant)"
+source: "PS-3"
+revision: "Rev C"
+---
 # Pump schedule — PS-3 design summary.pdf, p. 12
 
 Source: PS-3 (folder) / design/PS-3 design summary.pdf, page 12, Table 3 "Pump schedule".
 Section: 4 Mechanical > 4.2 Pumps. Content sha256:3f7ffce6….pdf.
+
+Pump schedule for the PS-3 station design: three identical pumps, two duty and one standby.
 
 | Tag | Duty | Flow (L/s) | Head (m) | Motor power (kW) |
 |---|---|---|---|---|
@@ -56,29 +65,38 @@ Section: 4 Mechanical > 4.2 Pumps. Content sha256:3f7ffce6….pdf.
 Cite as: PS-3 design summary.pdf, p. 12, Table 3.
 ```
 
-**Title and author.** The ingest tool is good at tracing content to a file's title and author, which it reads from PDF and `.docx` properties. Two ways to use that, to be compared in a trial:
+**Title and author.** The ingest tool is good at tracing content to a file's title and author, which it reads from PDF and `.docx` properties. The export format is a configuration choice:
 
-- Markdown chunks whose first heading is the citation and which open with YAML front matter (`title`, `author`/organization, `source`, `revision`). `markitdown` passes Markdown through largely as text, so the front matter at least remains readable in the chunk.
-- `.docx` chunks with the core `title` and `author` properties set from provenance, and the same body content. More work, but it plays to the tool's demonstrated strength.
+- **Markdown (the default):** the first heading is the citation, and the file opens with YAML front matter (`title`, `author`/organization, `source`, `revision`). `markitdown` passes Markdown through largely as text, so the front matter at least remains readable in the chunk.
+- **`.docx` (to try later):** the same body, with the core `title` and `author` properties set from provenance. More work, but it plays to the tool's demonstrated strength.
 
 A JSON rendering of the same records (an array, since JSONL isn't accepted) is a cheap secondary option for tools that want structure, but Markdown is the primary target.
 
+### Writing for people
+
+Applies to reports, fact sheets, summaries and export chunks alike:
+
+- **Just enough prose to situate the facts:** one to three sentences saying what this is, its scope, whose source and what basis. Not more; prose that buries numbers makes readers dig them out of word problems.
+- **Facts as terse bullets.** Fragments are fine. Each bullet leads with the subject and the value with its unit, then conditions, basis, uncertainty and citation.
+- **Tables when values are comparable** across rows, options or sources.
+- Qualifiers stay attached to the facts they qualify, never collected in a separate caveats paragraph.
+
 ### 3. Fact sheet, built without the model (first-tier overview)
 
-Claims grouped by entity and topic, showing values, conditions and provenance links. Nothing is generated, so there is nothing to hallucinate, which fits the project's evidence-first approach. Rendered as HTML alongside the existing report.
+Claims grouped by entity and topic, showing values, conditions and provenance links, written in the style above; its short situating lines come from section "about" statements and source metadata. Nothing else is generated, so there is nothing to hallucinate, which fits the project's evidence-first approach. Rendered as HTML alongside the existing report.
 
 ### 4. Cited summaries (second tier, tentative)
 
 A model-written overview for humans, produced by map-reduce within the small context window: section summaries, then topic summaries.
 
-- **Every sentence cites evidence IDs.** Citations are checked mechanically: the cited claims must exist, and any values stated must appear in them.
+- **Written in the style above, and every statement cites evidence IDs.** Citations are checked mechanically: the cited claims must exist, and any values stated must appear in them.
 - It is clearly labelled as generated and optional. It is the project's first *global* generated text, which the README currently avoids on purpose.
 - Build it only after the fact sheet shows what readers actually want.
 
 ## Milestones
 
 1. `check` subcommand and report view.
-2. `export` as Markdown chunks (per section first, then per topic and per finding), with `index.md`; optional JSON array.
+2. `export` as Markdown chunks with front matter (per section first, then per topic and per finding), discovery chunks, `index.md`, unique file names and delta exports; optional JSON array; `.docx` chunks as a later configuration option.
 3. HTML fact sheet.
 4. (Tentative) cited summaries with citation verification.
 
@@ -86,8 +104,11 @@ A model-written overview for humans, produced by map-reduce within the small con
 
 - **RAG target:** an external system with a fixed ingest tool (PDF, Markdown, text, `.docx`, `.pptx`, `.xlsx`, CSV, JSON; no JSONL; `--metadata` ignored; `markitdown` extraction; 512-token chunks with 128-token overlap by default; good at tracing file title and author). Export explicit, self-contained chunks with provenance (including provenance of sources), tables, qualifiers and notes written into the text, sized to fit one ingest chunk.
 
+- **Updates:** unique file names per export; the user manages RAG corpora (new, reset, or delta ingestion) rather than relying on replacement.
+- **Chunk format:** Markdown with YAML front matter first; `.docx` with title/author properties is a configuration option to try later.
+- **Discovery and comprehension:** export index-style chunks (topics, entities, diagrams, section maps) alongside detail chunks.
+- **Human readers:** some prose, enough to situate the facts but never burying them; facts as terse bullets and tables (see *Writing for people*).
+
 ## Open questions
 
-- **Does re-ingesting a file with the same name replace the old one,** or add a duplicate? This decides whether stable file names are enough for updates or whether exports need an explicit removal list.
-- **Which carries provenance better, Markdown with front matter or `.docx` with title/author properties?** Compare with a trial ingestion of both and a few queries; also check that in-text citations surface in answers.
-- Is a structured fact sheet enough for human readers, or is prose needed?
+None currently.
