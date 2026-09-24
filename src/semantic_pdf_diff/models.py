@@ -197,6 +197,17 @@ class Judgment(Strict):
             return {k: v for k, v in data.items() if k in cls.model_fields}
         return data
 
+class RateRule(Strict):
+    """A throughput ceiling, applying on the given days and hours (local time).
+
+    The first matching rule applies; a rule without days or hours always matches.
+    """
+    days: str | None = Field(default=None, pattern=r"^(mon|tue|wed|thu|fri|sat|sun)(-(mon|tue|wed|thu|fri|sat|sun))?"
+                                                    r"(,(mon|tue|wed|thu|fri|sat|sun)(-(mon|tue|wed|thu|fri|sat|sun))?)*$")
+    hours: str | None = Field(default=None, pattern=r"^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-4]):[0-5]\d$")
+    tokens_per_minute: int | None = Field(default=None, ge=1)
+    requests_per_minute: int | None = Field(default=None, ge=1)
+
 class Settings(Strict):
     model: str = "gemma-4"
     base_url: str = "http://localhost:8000/v1"
@@ -226,6 +237,9 @@ class Settings(Strict):
     aliases: dict[str, str] = Field(default_factory=dict)
     # Debugging: verify that a semantic cache hit was recorded for a byte-identical request.
     cache_check: bool = False
+    # Throughput: requests in flight at most (adaptive below this), and rate-limit rules.
+    concurrency: int = Field(default=4, ge=1, le=64)
+    rate_limits: list[RateRule] = Field(default_factory=list)
     # Sources: rescan roots on every run ("auto") or only on `source update` ("manual").
     rescan: Literal["auto", "manual"] = "auto"
     # Archive safety backstops: generous, and anything they stop is reported.
@@ -264,11 +278,12 @@ class Settings(Strict):
             raw = os.environ.get(name)
             if raw is None or not raw.strip():
                 continue
-            if field == "aliases":
+            if field in ("aliases", "rate_limits"):
                 try:
                     values[field] = json.loads(raw)
                 except ValueError as exc:
-                    raise ValueError(f"{name} must be a JSON object mapping aliases to canonical names") from exc
+                    shape = "object mapping aliases to canonical names" if field == "aliases" else "list of rate-limit rules"
+                    raise ValueError(f"{name} must be a JSON {shape}") from exc
             else:
                 values[field] = raw.strip()
         values.update(overrides)
