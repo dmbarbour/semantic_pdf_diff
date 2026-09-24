@@ -230,6 +230,9 @@ class ResumeAndReuse(unittest.TestCase):
             root = Path(d); a, b = self.pdfs(root)
             code, _ = self.run_cli(a, b, root / 'out', url, '--max-calls', '1')
             self.assertEqual(code, 2)
+            statuses = {r['status'] for r in json.loads((root / 'out/evidence.json').read_text())['coverage']}
+            self.assertIn('not_reached', statuses)  # cut off by the call limit, not failed
+            self.assertNotIn('failed', statuses)
             with Store(root / 'out') as store:
                 self.assertFalse(store.is_extracted(content_id(a.read_bytes(), a.name)))
             code, _ = self.run_cli(a, b, root / 'out', url)

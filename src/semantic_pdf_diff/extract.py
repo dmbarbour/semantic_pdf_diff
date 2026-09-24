@@ -1,12 +1,15 @@
 import contextlib
 import hashlib
 import json
+from collections import deque
+from dataclasses import dataclass, field
 import math
 import re
 from pathlib import Path
 import pymupdf
 from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, claim_id, merge_occurrences
 from .dispatch import Dispatcher
+from .llm import CallLimitReached
 from .progress import NoProgress, log
 
 # Bump when prompt assembly or task construction changes, not only the template text;
@@ -158,18 +161,89 @@ DERIVATION = {
     "overview": [DerivationStep(step="pdf-render", detail="whole page"), DerivationStep(step="model-extraction", detail="vision")],
 }
 
+@dataclass
+class Job:
+    """Extraction of one PDF content item, fed a page at a time by run_jobs."""
+    content: str
+    load: object                     # () -> path or bytes, called when the job starts
+    on_task: object = None           # (row, evidence) as each task finishes
+    on_sections: object = None       # (sections) once known
+    on_done: object = None           # (evidence, coverage) when the job is complete
+    state: dict = field(default_factory=lambda: {"pending": 0, "result": None})
+    steps: object = None
+
+def run_jobs(queues, output, client, dispatcher=None, progress=None):
+    """Run extraction jobs with fair share: one queue per source, pages fed round-robin
+    across sources so compared sources advance together.
+
+    Model requests run on the dispatcher's worker threads; everything else here. A job
+    whose pages are all fed keeps its document open until its own pending requests
+    (which may queue refinement) finish, while its source moves on to the next job.
+    """
+    own = dispatcher is None
+    dispatch = dispatcher or Dispatcher(client)
+    # Pages are fed only while few requests are pending, so prepared requests
+    # (which hold image data) stay bounded however large the documents.
+    bound = max(4, 2 * dispatch.workers)
+    queues = [deque(q) for q in queues]
+    active, draining = [None] * len(queues), []
+
+    def done(job):
+        if job.on_done:
+            job.on_done(*job.state["result"])
+
+    with (dispatch if own else contextlib.nullcontext()):
+        while True:
+            fed = False
+            for i, queue in enumerate(queues):
+                # Each source feeds one page per turn; a job that has run out of pages
+                # hands over to the source's next job within the same turn.
+                while True:
+                    if active[i] is None and queue:
+                        job = queue.popleft()
+                        job.steps = _pdf_job(job.load(), job, output, client, dispatch, progress or NoProgress())
+                        active[i] = job
+                    job = active[i]
+                    if job is None:
+                        break
+                    while dispatch.pending() >= bound:
+                        dispatch.wait_one()
+                    step = next(job.steps, "done")
+                    fed = True
+                    if step == "page":
+                        break
+                    active[i] = None
+                    if step == "waiting":
+                        draining.append(job)
+                    else:
+                        done(job)
+            for job in list(draining):
+                if job.state["pending"] == 0 and next(job.steps, "done") == "done":
+                    draining.remove(job)
+                    done(job)
+            if not fed:
+                if not draining and not any(queues) and not any(active):
+                    break
+                if not dispatch.pending():
+                    raise RuntimeError("extraction scheduler stalled: jobs wait on requests that aren't pending")
+                dispatch.wait_one()
+
 def extract_pdf(path, content, output, client, on_task=None, on_sections=None, dispatcher=None, progress=None):
     """Extract evidence from one PDF (a path or its bytes), identified by its content ID.
 
     Returns (evidence, coverage), both independent of the order in which tasks finish.
-
     on_task(row, evidence) is called as each task finishes, so a store can persist
     results task by task; on_sections(sections) is called once sections are known.
-    Model requests run on the dispatcher's worker threads (default: one dispatcher
-    sized by the `concurrency` setting); everything else runs on this thread.
     """
+    job = Job(content, lambda: path, on_task, on_sections)
+    run_jobs([[job]], output, client, dispatcher, progress)
+    return job.state["result"]
+
+def _pdf_job(path, job, output, client, dispatch, progress):
+    """Generator doing one PDF's extraction: yields "page" before feeding each page, then
+    "waiting" while its requests are pending; job.state["result"] is set at the end."""
+    content, on_task, on_sections, state = job.content, job.on_task, job.on_sections, job.state
     s = client.s
-    progress = progress or NoProgress()
     evidence, coverage = [], []
     stem = content.split(":", 1)[1][:12]
     assets = output / "assets"
@@ -201,8 +275,9 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
         key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
 
         def finish(result, error):
+            state["pending"] -= 1
             if error is not None:
-                row.update(status="failed", issues=[str(error)])
+                row.update(status="not_reached" if isinstance(error, CallLimitReached) else "failed", issues=[str(error)])
             else:
                 handle(result)
             evidence.extend(found)
@@ -232,6 +307,7 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
                 row["claims"] += 1
 
         progress.add()
+        state["pending"] += 1
         dispatch.submit(prompt, Extraction, images, key, finish)
 
     def text_task(page_no, segments, task, depth=0):
@@ -314,12 +390,7 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
 
     name = content if isinstance(path, (bytes, bytearray)) else Path(path).name
     opened = pymupdf.open(stream=path, filetype="pdf") if isinstance(path, (bytes, bytearray)) else pymupdf.open(path)
-    own = dispatcher is None
-    dispatch = dispatcher or Dispatcher(client)
-    # Pages are fed only while few requests are pending, so prepared requests
-    # (which hold image data) stay bounded however large the document.
-    bound = max(4, 2 * dispatch.workers)
-    with opened as doc, (dispatch if own else contextlib.nullcontext()):
+    with opened as doc:
         if doc.needs_pass:
             raise ValueError(f"{name}: encrypted PDF needs to be decrypted before comparison")
         if not doc.is_pdf or not len(doc):
@@ -331,8 +402,7 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
         # (header, width) of a table that ended near the bottom of the previous page
         carried = None
         for number, page in enumerate(doc, 1):
-            while dispatch.pending() >= bound:
-                dispatch.wait_one()
+            yield "page"
             # Native coordinates stay unrotated (PDF point coordinates). Consecutive
             # blocks are grouped up to the byte budget; oversized blocks are split.
             for ids, segments in text_groups(page, s.text_bytes):
@@ -384,6 +454,7 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
                 record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
                         "task": f"vision:p{number}", "image": None, "status": "skipped",
                         "issues": ["Visual extraction disabled; charts, diagrams and scans may be missed"], "claims": 0})
-        dispatch.drain()
+        while state["pending"]:  # refinement may still render crops from this document
+            yield "waiting"
     coverage.sort(key=lambda r: (r["page"] or 0, r["task"]))
-    return merge_occurrences(evidence), coverage
+    state["result"] = (merge_occurrences(evidence), coverage)

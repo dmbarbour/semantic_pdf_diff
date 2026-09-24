@@ -67,4 +67,4 @@ The `--out` folder is an evidence store: `store.sqlite` (sources, files, content
 - **Schema changes** during development aren't migrated: an older store refuses to open; use a new folder.
 - **`cache_check`** (off by default) is a debugging aid: a cache hit whose stored request bytes differ from the current request raises an error instead of being served.
 
-Exit codes: `0` processing complete (semantic uncertainty may remain); `2` incomplete source coverage, a comparison processing failure, no extracted claims on either side, or pair-limit truncation; `1` fatal input/configuration error. Inspect the JSON and coverage ledger regardless of exit code.
+Exit codes: `0` processing complete (semantic uncertainty may remain); `2` incomplete source coverage (including tasks `not_reached` because of `max_calls`), a comparison processing failure, no extracted claims on either side, or pair-limit truncation; `1` fatal input/configuration error. Inspect the JSON and coverage ledger regardless of exit code.

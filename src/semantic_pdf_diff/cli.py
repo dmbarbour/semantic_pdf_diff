@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from . import manifest
 from .compare import compare, file_difference
-from .extract import EXTRACT, extract_pdf, text_groups, visual_regions
+from .extract import EXTRACT, Job, run_jobs, text_groups, visual_regions
 from .llm import SYSTEM, Client, redact_url
 from .models import Settings, Source
 from .progress import Progress, log, setup_logging
@@ -224,12 +224,8 @@ def run(args, settings, store, names, out, force_rescan=False):
             log.info(f"Scanned {name}: {summary['files']} files" + (f", {changes}" if changes else ''))
     client = Client(settings, store)
     files = {name: store.files(name) for name in names}
-    by_content, coverage, sections = {}, [], {}
     progress = Progress('extract', client, heartbeat=settings.heartbeat_seconds)
-    for name in names:
-        for file in files[name]:
-            if file.content not in by_content:
-                by_content[file.content] = extract_content(store, client, name, file, coverage, sections, progress)
+    by_content, coverage, sections = extract_sources(store, client, names, files, progress)
     progress.close()
     evidence = [e for items in by_content.values() for e in items]
     source_data = [store.source(n).model_dump() for n in names]
@@ -262,35 +258,58 @@ def run(args, settings, store, names, out, force_rescan=False):
     # in the report even when all tasks completed successfully.
     return 2 if incomplete else 0
 
-def extract_content(store, client, source, file, coverage, sections, progress=None):
-    """Evidence for one piece of content: from the store, by extraction, or none if uninterpretable."""
-    extension = '.' + file.content.rsplit('.', 1)[1] if '.' in file.content else None
-    if extension in ARCHIVES:
-        return []  # an archive is a container; its members are files in their own right
-    if store.is_extracted(file.content):
-        log.info(f'Loaded from store: {file.path}')
-        coverage.extend(store.coverage(file.content))
-        sections[file.content] = store.sections(file.content)
-        return store.evidence(file.content)
-    if extension != '.pdf':
-        reason = f'No adapter for {extension} files yet' if extension else 'No file extension; not interpreted'
-        row = {'content': file.content, 'page': None, 'bbox': None, 'task': 'unsupported', 'image': None,
-               'status': 'skipped', 'issues': [reason], 'claims': 0}
-        store.record_task(row, [])
-        store.mark_extracted(file.content)
-        coverage.append(row)
-        return []
-    log.info(f'Extracting {file.path}')
+def extract_sources(store, client, names, files, progress):
+    """Evidence for every content item of the sources: loaded from the store, extracted
+    (all sources' PDFs in one fair-share queue), or none if uninterpretable.
+
+    Returns (evidence by content, coverage rows, sections by content).
+    """
+    by_content, coverage, sections = {}, [], {}
+    queues = []
+    for name in names:
+        queue = []
+        for file in files[name]:
+            if file.content in by_content:
+                continue
+            extension = '.' + file.content.rsplit('.', 1)[1] if '.' in file.content else None
+            if extension in ARCHIVES:
+                by_content[file.content] = []  # a container; its members are files in their own right
+            elif store.is_extracted(file.content):
+                log.info(f'Loaded from store: {file.path}')
+                by_content[file.content] = store.evidence(file.content)
+                coverage.extend(store.coverage(file.content))
+                sections[file.content] = store.sections(file.content)
+            elif extension != '.pdf':
+                reason = f'No adapter for {extension} files yet' if extension else 'No file extension; not interpreted'
+                row = {'content': file.content, 'page': None, 'bbox': None, 'task': 'unsupported', 'image': None,
+                       'status': 'skipped', 'issues': [reason], 'claims': 0}
+                store.record_task(row, [])
+                store.mark_extracted(file.content)
+                by_content[file.content] = []
+                coverage.append(row)
+            else:
+                by_content[file.content] = None  # claimed by this source's queue
+                queue.append(pdf_job(store, name, file, by_content, coverage, sections))
+        queues.append(queue)
+    if any(queues):
+        log.info(f"Extracting {sum(map(len, queues))} PDF(s): " + ', '.join(
+            f'{name} {len(q)}' for name, q in zip(names, queues)))
+        run_jobs(queues, store.folder, client, progress=progress)
+    coverage.sort(key=lambda r: (r['content'], r['page'] or 0, r['task']))  # independent of completion order
+    return by_content, coverage, sections
+
+def pdf_job(store, source, file, by_content, coverage, sections):
     def keep_sections(found):
         sections[file.content] = found
         store.record_sections(file.content, found)
-    evidence, ledger = extract_pdf(read_origin(store.origin(source, file.path)), file.content, store.folder, client,
-                                   on_task=store.record_task, on_sections=keep_sections, progress=progress)
-    # Failed tasks (e.g. the call limit) are retried on the next run; the rest replays from cache.
-    if not any(r['status'] == 'failed' for r in ledger):
-        store.mark_extracted(file.content)
-    coverage.extend(ledger)
-    return evidence
+    def done(evidence, ledger):
+        # Failed or unreached tasks (e.g. the call limit) are retried on the next run; the rest replays from cache.
+        if not any(r['status'] in ('failed', 'not_reached') for r in ledger):
+            store.mark_extracted(file.content)
+        by_content[file.content] = evidence
+        coverage.extend(ledger)
+        log.debug(f'Extracted {file.path}: {len(evidence)} claim(s)')
+    return Job(file.content, lambda: read_origin(store.origin(source, file.path)), store.record_task, keep_sections, done)
 
 # --- source management ---------------------------------------------------------------
 

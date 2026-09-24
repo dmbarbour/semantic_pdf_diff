@@ -31,6 +31,9 @@ class ModelFailure(RuntimeError):
 class BudgetExceeded(ModelFailure):
     pass
 
+class CallLimitReached(BudgetExceeded):
+    """max_calls was reached: the work wasn't attempted, as opposed to failing."""
+
 class CacheKeyMismatch(RuntimeError):
     """A semantic cache key matched a response recorded for a different request (debug check)."""
 
@@ -168,7 +171,7 @@ class Client:
         for attempt in range(self.s.retries + 1):
             with self.lock:
                 if self.calls >= self.s.max_calls:
-                    raise BudgetExceeded("API call limit reached; rerun with cache and a higher --max-calls")
+                    raise CallLimitReached("API call limit reached; rerun with cache and a higher --max-calls")
                 self.calls += 1
             wait = min(2 ** attempt, 8)
             http = urllib.request.Request(self.s.base_url.rstrip("/") + "/chat/completions", data=request.raw,
