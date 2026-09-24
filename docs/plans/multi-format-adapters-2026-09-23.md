@@ -49,6 +49,12 @@ This project **does not judge content produced by external tools**, including th
 
 One claim per cell is not right in general: adjacent cells often compose into one claim (value and uncertainty, value and unit, min/nominal/max, a condition column). And a very large sheet can't simply be sampled: if one column lists requirement names, every row matters. So each table gets a **model interpretation step**:
 
+0. **Find the tables first.** A sheet may hold several tables plopped down in different places, plus notes, titles and stray cells, and a CSV may carry preamble lines or blank-line-separated blocks. Detect candidate regions heuristically:
+   - use explicit structure when present: Excel defined tables and named ranges, merged header cells
+   - otherwise find blocks of non-empty cells separated by blank rows and columns, and look for header-like rows (text above numbers, or distinct styling)
+   - build a compact **sheet map** (each region's bounds, first rows and apparent header) to show the model
+
+   If a sheet has more than one region, or regions that are irregular or overlapping, the interpretation prompt **warns the model** that the sheet may contain several tables and includes the map. Confident regions are interpreted separately. Ambiguous layouts may be skipped for now, but never silently: the coverage record marks them as `skipped: ambiguous sheet layout` with the region map, so a reviewer can see what was left out. Better heuristics can come later without changing that contract.
 1. **Show the model enough of the table to judge:** headers, notes, and a spread of rows (first rows, some from the middle and end, and rows that look different, such as blank, merged or text-heavy ones), within the context budget.
 2. **The model returns a row-to-claims mapping:** which columns give the entity, attribute, value, unit, uncertainty, conditions and basis; which columns combine into one claim; and one or several claims per row.
 3. **And a processing strategy for the table:**
@@ -96,7 +102,7 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 2. `.docx`.
 3. `.pptx`, including chart XML.
 4. External converter interface, with LibreOffice as the first configured converter.
-5. `.csv` / `.xlsx` with model-guided table interpretation.
+5. `.csv` / `.xlsx`: table region detection and sheet maps, then model-guided table interpretation.
 6. Images.
 
 ## Decisions (2026-09-23)
