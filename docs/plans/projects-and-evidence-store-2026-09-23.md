@@ -38,7 +38,15 @@ Other plans say "project" informally; in store terms that means a **source**.
   - **configured external converters:** executable path, SHA-256, declared version and arguments. This is best effort only: a converter's own configuration files and dependencies can't be tracked, and **users are responsible** for resetting a store when they change them.
 
   Not included: timeouts, retries, call limits, concurrency and rate limits, credentials, and the endpoint URL. The model identifier must identify the weights; if a server swaps weights under the same name, that is also the user's responsibility (the README already advises versioned model names).
-- **A store is bound to its interpreters.** The first run records each role's interpreter in the store's manifest. A later run whose interpreter differs is **rejected**, with a message naming what differs. Mixing models breaks things in unpredictable ways; embeddings especially are only comparable within one model. The user either creates a new store or passes `--reset`, which deletes all derived data (evidence, tasks, embeddings, summaries, comparisons, response cache) but keeps the registered sources and content, so the same sources re-run under the new interpreters. Adding a role that wasn't configured before (e.g. embeddings later) is allowed; changing an existing one is not.
+- **A store is bound to its interpreters** (a default guideline, not a hard rule). The first run records each interpreter in the store's manifest. A later run whose interpreter differs is **rejected**, with a message naming what differs and what `--reset` would clear. Mixing models breaks things in unpredictable ways; embeddings especially are only comparable within one model. The user either creates a new store or passes `--reset`. Adding a role that wasn't configured before (e.g. embeddings later) is allowed without a reset.
+- **`--reset` is selective.** Interpreters are recorded as components scoped by role and, where it applies, by adapter or extension (PDF rendering settings affect only `.pdf` content; a converter affects only its extension). `--reset` diffs the new configuration against the recorded one and clears only the affected derived data plus everything downstream of it (extraction → evidence → embeddings, summaries, comparisons). Registered sources and content are always kept. Examples:
+  - a new embedding model clears embeddings and whatever was built from them, but keeps evidence
+  - a new summary model clears summaries only
+  - a changed PDF tile size clears visual evidence from PDF content only; text and spreadsheet evidence stay
+  - a changed extraction model or prompt version clears all extraction and everything downstream (the full reset)
+  - when the scope isn't obvious, clear more rather than less
+
+  `--reset --dry-run` reports what would be cleared, and the rejection message shows the same summary.
 
 Evidence IDs are derived from `content ID + locator + claim`, so they are stable across renames, moves and re-packaging. They don't need an interpreter component, since one store has one extraction interpreter.
 
@@ -126,7 +134,7 @@ report --store <dir> <comparison>
 ## Milestones
 
 1. Content, file, source and interpreter model; evidence schema v2 with content-relative locators; migrate `compare` and `report` off A/B.
-2. Store folder and SQLite schema: WAL, single-writer lock, task queue with per-task transactions, response cache in the database, interpreter binding with rejection and `--reset`; resume after interruption (tested by killing a run midway).
+2. Store folder and SQLite schema: WAL, single-writer lock, task queue with per-task transactions, response cache in the database, interpreter binding with rejection, selective `--reset` and `--dry-run`; resume after interruption (tested by killing a run midway).
 3. PDF section detection (outline → font-size headings → page ranges); heading path in prompts.
 4. Folder, zip and manifest sources; duplicate occurrences in provenance.
 5. Content-difference-first comparison (shared / removed / added).
@@ -141,13 +149,14 @@ report --store <dir> <comparison>
 - **Model or interpreter changes:** rejected; new store or explicit `--reset`.
 - **Store scope:** one local folder, shared at any scope the user chooses; typically a few revisions and a few teams per user.
 - **What affects output:** anything sent to a model, plus anything that shapes chunking or sections (see *Interpreter* above). External converters are tracked best-effort; their hidden configuration is the user's responsibility.
+- **Comparison settings** (retrieval options, aliases, comparison model) are recorded **per comparison**, not bound to the store. Each comparison is a self-contained record, so a user can re-run one with a larger `top_k` without any reset.
+- **Binding is a default guideline:** where a change obviously affects only part of the derived data, `--reset` clears just that part (see *Interpreter* above).
 - **Upgrades:** internal prompt versions and library versions are tracked and a change is rejected like any other interpreter change. That is acceptable because most users install once, spend a while on configuration, then use the same setup for a long time; upgrades are rare, deliberate events where a `--reset` or new store is expected.
 - **Future:** external converters (e.g. opening Cameo `.mdzip` models into recognized formats) are planned in [multi-format-adapters](multi-format-adapters-2026-09-23.md). They fit the content model: the converter and its version are part of the interpretation, and its outputs are derived content with provenance back to the original.
 
 ## Open questions
 
 - **What structure do real documents have?** Real documents are sensitive and won't be shared; the tool will run inside a multi-layer sandbox. Section heuristics are developed against the public corpus (see [Samples](#samples)), and must fall back gracefully when there's no outline or consistent heading font.
-- **Comparison settings:** retrieval options (`top_k`, `min_score`, aliases) and the comparison model shape comparisons, but each comparison is a self-contained record. Suggestion: record them per comparison instead of binding the store, so a user can re-run one comparison with a larger `top_k` without a reset. Nothing mixes across comparisons, so this avoids the unpredictable breakage the binding rule exists to prevent.
 
 ## Samples
 
