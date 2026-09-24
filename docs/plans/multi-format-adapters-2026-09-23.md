@@ -43,7 +43,7 @@ The public corpus (`scripts/fetch_samples.py`) covers the priority formats, all 
 
 Cameo `.mdzip` models are digested by a separate project whose output is a large folder of Markdown and some CSV, including its own model-written summaries, aimed mainly at RAG ingestion elsewhere. This project consumes that folder **as an ordinary source** through the `.md` and `.csv` adapters; no converter or importer is needed.
 
-Its summaries are **secondary material**: text written by another model, not by the model's authors. Claims extracted from them should be marked as coming from derived text, with lower reliability than claims from primary content, and reports should show that distinction.
+This project **does not judge content produced by external tools**, including the Cameo project's model-written summaries. Whether such content is weaker evidence is the provider's call: a provider may mark content with confidence levels or similar metadata, and this project passes that through to evidence and reports. The convention for such markings (e.g. Markdown front matter or a sidecar file) is settled when a provider first needs it.
 
 ### Extension policy
 
@@ -88,6 +88,5 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 
 ## Open questions
 
-- **Marking secondary material:** how should a source declare that some of its files are model-generated (e.g. the Cameo export's summaries), so claims from them carry lower reliability? Candidates: path globs in the source manifest, or a front-matter field in the Markdown itself.
 - How should a deterministic spreadsheet claim be marked (source kind, reliability) relative to model-extracted claims?
 - Should very large sheets get per-table sampling or summary statistics instead of one claim per cell?
