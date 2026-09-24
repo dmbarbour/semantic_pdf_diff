@@ -1,11 +1,12 @@
 """Sparse retrieval is global; all model reasoning is restricted to a pair of claims."""
+import contextlib
 import json
 import math
 import re
 from collections import Counter, defaultdict
 from decimal import Decimal, InvalidOperation
 from .models import Judgment
-from .llm import ModelFailure
+from .dispatch import Dispatcher
 from .provenance import comparison_interpreter, text_hash
 
 # Deliberately small, explicit dimensional conversions. Unknown units abstain.
@@ -145,7 +146,7 @@ def file_difference(files_a, files_b):
 # Provenance stays out of the model's view; it sees the claims and any source crops.
 PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences"}
 
-def compare(left, right, output, client, mode):
+def compare(left, right, output, client, mode, dispatcher=None):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
 
     Evidence belongs to content, so content present on both sides yields identical
@@ -166,20 +167,14 @@ def compare(left, right, output, client, mode):
             a, b = a_side[i], b_side[j]
             scored[a.id, b.id] = (max(score, scored.get((a.id, b.id), (0,))[0]), a, b)
     pairs = sorted(scored.values(), key=lambda x: (-x[0], x[1].id, x[2].id))
-    for score, a, b in pairs[:client.s.max_pairs]:
-        attempted.update((a.id,b.id))
-        images, payload = [], []
-        for e in (a,b):
-            p = e.model_dump(exclude=PROVENANCE_FIELDS)
-            if client.s.verify_visuals and e.image:
-                p["source_image"] = len(images) + 1
-                images.append(output / e.image)
-            payload.append(p)
-        calc = numeric_check(a,b)
-        prompt = COMPARE + "\nA=" + json.dumps(payload[0],ensure_ascii=False) + "\nB=" + json.dumps(payload[1],ensure_ascii=False)
-        prompt += "\nNumeric check=" + json.dumps(calc)
-        try:
-            judgment = client.ask(prompt, Judgment, images, key=("compare", "", settings_key, a.id, b.id))
+    results = {}
+
+    def judged(index, score, a, b, calc):
+        def finish(judgment, error):
+            if error is not None:
+                results[index] = {"a":a.id,"b":b.id,"retrieval_score":round(score,4),"relation":"uncertain",
+                    "rationale":str(error),"confidence":0,"same_conditions":False,"numeric":calc,"processing_error":True}
+                return
             # Numeric arithmetic and uncertain provenance can veto a confident judgment.
             reasons = []
             if judgment.relation in ("different", "equivalent") and not judgment.same_conditions:
@@ -197,11 +192,31 @@ def compare(left, right, output, client, mode):
                 judgment.rationale = "; ".join(reasons) + ". " + judgment.rationale
             if judgment.relation in ("equivalent","different","complementary"):
                 matched.update((a.id,b.id))
-            findings.append({"a":a.id, "b":b.id, "retrieval_score":round(score,4),
-                             **judgment.model_dump(), "numeric":calc})
-        except ModelFailure as e:
-            findings.append({"a":a.id,"b":b.id,"retrieval_score":round(score,4),"relation":"uncertain",
-                "rationale":str(e),"confidence":0,"same_conditions":False,"numeric":calc,"processing_error":True})
+            results[index] = {"a":a.id, "b":b.id, "retrieval_score":round(score,4), **judgment.model_dump(), "numeric":calc}
+        return finish
+
+    own = dispatcher is None
+    dispatch = dispatcher or Dispatcher(client)
+    with (dispatch if own else contextlib.nullcontext()):
+        for index, (score, a, b) in enumerate(pairs[:client.s.max_pairs]):
+            while dispatch.pending() >= max(4, 2 * dispatch.workers):
+                dispatch.wait_one()
+            attempted.update((a.id,b.id))
+            images, payload = [], []
+            for e in (a,b):
+                p = e.model_dump(exclude=PROVENANCE_FIELDS)
+                if client.s.verify_visuals and e.image:
+                    p["source_image"] = len(images) + 1
+                    images.append(output / e.image)
+                payload.append(p)
+            calc = numeric_check(a,b)
+            prompt = COMPARE + "\nA=" + json.dumps(payload[0],ensure_ascii=False) + "\nB=" + json.dumps(payload[1],ensure_ascii=False)
+            prompt += "\nNumeric check=" + json.dumps(calc)
+            dispatch.submit(prompt, Judgment, images, ("compare", "", settings_key, a.id, b.id),
+                            judged(index, score, a, b, calc))
+        dispatch.drain()
+    # Findings keep the order of their pairs, however requests complete.
+    findings.extend(results[i] for i in sorted(results))
     unmatched = [{"id":e.id,"status":"no_confirmed_counterpart" if e.id in attempted else "not_compared",
                   "note":"No confirmed counterpart in retrieved evidence; this does not establish absence."}
                  for e in left+right if e.id not in matched]

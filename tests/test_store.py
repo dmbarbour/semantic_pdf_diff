@@ -185,24 +185,34 @@ class ResumeAndReuse(unittest.TestCase):
         report = json.loads((out / 'report.json').read_text())
         return sorted((f['a'], f['b'], f['relation']) for f in report['findings'])
 
+    def interrupted_then_resumed(self, root, a, b, url, concurrency):
+        config = root / f'concurrency-{concurrency}.json'
+        config.write_text(json.dumps({'concurrency': concurrency}))
+        original = Client.send
+        def interrupting(client, *args, **kw):
+            if client.calls >= 2:
+                raise KeyboardInterrupt
+            return original(client, *args, **kw)
+        out = root / f'resumed-{concurrency}'
+        with patch.object(Client, 'send', interrupting), self.assertRaises(KeyboardInterrupt):
+            self.run_cli(a, b, out, url, '--config', str(config))
+        self.run_cli(a, b, out, url, '--config', str(config))
+        return self.findings(out)
+
     def test_interrupted_run_resumes_without_repeating_calls(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
             root = Path(d); a, b = self.pdfs(root)
             self.run_cli(a, b, root / 'baseline', url)
             baseline_requests, baseline = state['requests'], self.findings(root / 'baseline')
             state['requests'] = 0
-
-            original = Client.ask
-            def interrupting(client, *args, **kw):
-                if client.calls >= 2:
-                    raise KeyboardInterrupt
-                return original(client, *args, **kw)
-            with patch.object(Client, 'ask', interrupting), self.assertRaises(KeyboardInterrupt):
-                self.run_cli(a, b, root / 'resumed', url)
-            self.assertEqual(state['requests'], 2)
-            self.run_cli(a, b, root / 'resumed', url)
+            # Sequentially, nothing answered before the interruption is asked again.
+            self.assertEqual(self.interrupted_then_resumed(root, a, b, url, 1), baseline)
             self.assertEqual(state['requests'], baseline_requests)
-            self.assertEqual(self.findings(root / 'resumed'), baseline)
+            # Concurrently, requests answered but not yet saved when interrupted may be
+            # asked again (at most one per worker); the result is the same.
+            state['requests'] = 0
+            self.assertEqual(self.interrupted_then_resumed(root, a, b, url, 4), baseline)
+            self.assertLessEqual(state['requests'], baseline_requests + 4)
 
     def test_rerun_and_renamed_file_reuse_the_store(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d:

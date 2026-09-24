@@ -1,3 +1,4 @@
+import contextlib
 import hashlib
 import json
 import math
@@ -5,7 +6,7 @@ import re
 from pathlib import Path
 import pymupdf
 from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, claim_id, merge_occurrences
-from .llm import ModelFailure
+from .dispatch import Dispatcher
 
 # Bump when prompt assembly or task construction changes, not only the template text;
 # it is part of the extraction interpreter. 2: section heading path in prompts.
@@ -132,13 +133,15 @@ DERIVATION = {
     "overview": [DerivationStep(step="pdf-render", detail="whole page"), DerivationStep(step="model-extraction", detail="vision")],
 }
 
-def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
+def extract_pdf(path, content, output, client, on_task=None, on_sections=None, dispatcher=None):
     """Extract evidence from one PDF (a path or its bytes), identified by its content ID.
 
-    Returns (evidence, coverage).
+    Returns (evidence, coverage), both independent of the order in which tasks finish.
 
     on_task(row, evidence) is called as each task finishes, so a store can persist
     results task by task; on_sections(sections) is called once sections are known.
+    Model requests run on the dispatcher's worker threads (default: one dispatcher
+    sized by the `concurrency` setting); everything else runs on this thread.
     """
     s = client.s
     evidence, coverage = [], []
@@ -152,8 +155,8 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
         if on_task:
             on_task(row, list(items))
 
-    def consume(page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None):
-        """Run one extraction task, record it in the ledger and return its status.
+    def consume(page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None, then=None):
+        """Queue one extraction task; when it finishes, record it and call then(status).
 
         check(quote) -> bool | None. Native tasks reject claims failing it; visual tasks
         only record the result. locate(quote) narrows a claim's bbox within the task.
@@ -169,9 +172,19 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
         heading = " > ".join(section.heading_path)
         prompt = (EXTRACT + "\nSource type: " + region + (f"\nSection: {heading}" if heading else "")
                   + "\nSOURCE DATA:\n" + text)
-        try:
-            key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
-            result = client.ask(prompt, Extraction, images, key=key)
+        key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
+
+        def finish(result, error):
+            if error is not None:
+                row.update(status="failed", issues=[str(error)])
+            else:
+                handle(result)
+            evidence.extend(found)
+            record(row, found)
+            if then:
+                then(row["status"])
+
+        def handle(result):
             row["status"] = "complete" if result.complete else "partial"
             row["issues"] = list(result.issues)
             for claim in result.claims:
@@ -188,19 +201,18 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
                                       locator=PdfLocator(page=page_no, bbox=where, region=region, task=task),
                                       derivation=derivation or DERIVATION[region], image=image, quote_verified=verified))
                 row["claims"] += 1
-        except ModelFailure as e:
-            row.update(status="failed", issues=[str(e)])
-        evidence.extend(found)
-        record(row, found)
-        return row["status"]
+
+        dispatch.submit(prompt, Extraction, images, key, finish)
 
     def text_task(page_no, segments, task, depth=0):
         """segments: [(bbox, text)] of consecutive blocks sent together."""
         text = "\n\n".join(t for _, t in segments)
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
-        status = consume(page_no, union(b for b, _ in segments), task, text,
-                         check=lambda q: quoted(q, text), locate=locate)
+        consume(page_no, union(b for b, _ in segments), task, text, check=lambda q: quoted(q, text), locate=locate,
+                then=lambda status: refine_text(page_no, segments, text, task, depth, status))
+
+    def refine_text(page_no, segments, text, task, depth, status):
         if status == "complete" or depth >= s.refinement_depth:
             return
         if len(segments) > 1:
@@ -230,16 +242,20 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
                     "status": "partial", "issues": ["Table row exceeds text budget; inspect visual tiles"], "claims": 0})
             return
         if fits:
-            status = consume(page_no, bbox, task, text, derivation=derivation,
-                             check=lambda q: quoted(q, text) or covered(q, flat))
-            if status == "complete" or depth >= s.refinement_depth or not splittable:
-                return
+            def then(status):
+                if status != "complete" and depth < s.refinement_depth and splittable:
+                    split_columns(page_no, bbox, task, header, row, columns, depth + 1, derivation)
+            consume(page_no, bbox, task, text, derivation=derivation, check=lambda q: quoted(q, text) or covered(q, flat),
+                    then=then)
+        else:
+            split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
+
+    def split_columns(page_no, bbox, task, header, row, columns, depth, derivation):
         rest = columns[1:]
         middle = (len(rest) + 1) // 2
         for i, part in enumerate([rest[:middle], rest[middle:]]):
             # Budget-driven splits are mandatory; only quality-driven ones use depth.
-            table_task(page_no, bbox, f"{task}:c{i}", header, row, [columns[0], *part], depth + (1 if fits else 0),
-                       derivation)
+            table_task(page_no, bbox, f"{task}:c{i}", header, row, [columns[0], *part], depth, derivation)
 
     def visual_task(page_no, page, tag, rect, depth=0):
         name = f"{stem}-{tag.replace(':', '-')}.png"
@@ -247,8 +263,11 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
         native = rect * page.derotation_matrix
         layer = page.get_text("text", clip=native)
         check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
-        status = consume(page_no, native, tag, "", "assets/" + name, check=check,
-                         crop=(tuple(round(v, 3) for v in rect), s.image_side))
+        consume(page_no, native, tag, "", "assets/" + name, check=check,
+                crop=(tuple(round(v, 3) for v in rect), s.image_side),
+                then=lambda status: refine_visual(page_no, page, tag, rect, depth, status))
+
+    def refine_visual(page_no, page, tag, rect, depth, status):
         # Refine only local tiles; an overview may be incomplete because it spans
         # many facts, and all overview areas already have tile coverage.
         if (status == "complete" or tag == "overview" or depth >= s.refinement_depth
@@ -265,7 +284,12 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
 
     name = content if isinstance(path, (bytes, bytearray)) else Path(path).name
     opened = pymupdf.open(stream=path, filetype="pdf") if isinstance(path, (bytes, bytearray)) else pymupdf.open(path)
-    with opened as doc:
+    own = dispatcher is None
+    dispatch = dispatcher or Dispatcher(client)
+    # Pages are fed only while few requests are pending, so prepared requests
+    # (which hold image data) stay bounded however large the document.
+    bound = max(4, 2 * dispatch.workers)
+    with opened as doc, (dispatch if own else contextlib.nullcontext()):
         if doc.needs_pass:
             raise ValueError(f"{name}: encrypted PDF needs to be decrypted before comparison")
         if not doc.is_pdf or not len(doc):
@@ -277,6 +301,8 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
         # (header, width) of a table that ended near the bottom of the previous page
         carried = None
         for number, page in enumerate(doc, 1):
+            while dispatch.pending() >= bound:
+                dispatch.wait_one()
             # Native coordinates stay unrotated (PDF point coordinates). Consecutive
             # blocks are grouped up to the byte budget; oversized blocks are split.
             pieces = []
@@ -343,4 +369,6 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
                 record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
                         "task": f"vision:p{number}", "image": None, "status": "skipped",
                         "issues": ["Visual extraction disabled; charts, diagrams and scans may be missed"], "claims": 0})
+        dispatch.drain()
+    coverage.sort(key=lambda r: (r["page"] or 0, r["task"]))
     return merge_occurrences(evidence), coverage
