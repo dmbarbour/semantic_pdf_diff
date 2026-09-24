@@ -1,0 +1,63 @@
+# Multi-format source adapters
+
+- **Status:** Planned
+- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (locators, sections, store)
+
+## Goal
+
+Accept common report formats beyond PDF: `.txt`, `.md`, `.csv`, `.xlsx`, `.docx`, `.pptx`, images, and possibly legacy Office formats. Every claim keeps fine-grained provenance.
+
+## Key idea
+
+Most of these formats are **better sources than PDF**, because their structure is explicit rather than guessed. Each adapter produces the same intermediate units:
+
+- **text segments** with a heading path
+- **structured tables** (header plus rows, with a known cell locator)
+- **renderable visual regions** (embedded images, figures)
+
+Only content that is truly unstructured goes to the model. Structured data should become claims **deterministically** wherever possible.
+
+## Per-format approach
+
+| Format | Approach | Notes |
+|---|---|---|
+| `.txt`, `.md` | Text segments. Markdown headings give the heading path and sections. | Cheap; do first. |
+| `.csv`, `.xlsx` | **Deterministic claims:** entity = row label, attribute = column header, value = cell. Units parsed from headers like `Power (kW)`. At most one model call per table, to interpret ambiguous headers. | A model call per row doesn't scale to a 10k-row sheet, and it adds error to exact data. Handle merged and multi-row headers, formulas (use cached values), hidden sheets. Never follow external links. |
+| `.docx` | Real paragraphs, heading styles and real tables via `python-docx`. Embedded images go to the visual pipeline. | No table detection needed; quote checks become exact. |
+| `.pptx` | Text per shape, tables, and **chart XML, which holds the actual series data**. Embedded images go to vision. | Chart XML beats estimating values from pixels. SmartArt and grouped shapes are the awkward cases. |
+| Images (`.png`, `.jpg`, scans) | Straight into the existing visual pipeline. | Nearly free. |
+| Legacy `.doc`/`.ppt`/`.xls`, or visual fidelity for Office files | Optional headless LibreOffice conversion to PDF. | Provenance maps only to the converted PDF's pages, so this is a fallback, not the main path. |
+
+Candidates for later: HTML, and email exports.
+
+## Locators
+
+Each adapter defines its locator shape (see the store plan):
+
+- DOCX / MD / TXT: heading path plus paragraph or line range
+- XLSX / CSV: sheet plus cell range
+- PPTX: slide plus shape ID, or chart plus series/point
+- Image: image plus bounding box
+
+The report must render a suitable preview for each format: a text excerpt with its heading path, a small HTML table for a cell range, a slide thumbnail, and so on.
+
+## Packaging and safety
+
+- Adapters go behind optional extras, e.g. `pip install semantic-pdf-diff[office]`. `python-docx`, `python-pptx` and `openpyxl` are MIT/BSD licensed, unlike PyMuPDF's AGPL.
+- Treat every input as hostile: size limits, zip-bomb guards on Office files (they are zip archives), no macro evaluation, no external links followed.
+- `--plan` estimates model calls per format; spreadsheets can skew the numbers dramatically.
+
+## Milestones
+
+1. Adapter interface and intermediate units; refactor the PDF path to use it.
+2. `.txt` / `.md` adapters.
+3. `.csv` / `.xlsx` with deterministic claims.
+4. `.docx`.
+5. `.pptx`, including chart XML.
+6. Images; optional LibreOffice fallback.
+
+## Open questions
+
+- Which formats do users actually submit first? This should drive the order after milestone 2.
+- How should a deterministic spreadsheet claim be marked (source kind, reliability) relative to model-extracted claims?
+- Should very large sheets get per-table sampling or summary statistics instead of one claim per cell?
