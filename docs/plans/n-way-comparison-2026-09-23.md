@@ -98,10 +98,11 @@ Revisions of one design are commensurable by default. They use claim-level compa
 
 - **Context:** the gemma-4 deployment serves 262,144 tokens. Criterion-level requests hold all positions with generous context; splitting into groups is a rare fallback.
 - **Scale of N:** 4 or fewer is typical, 8 is large, and there is no artificial limit.
-- **Report legibility at any N:** one general matrix renderer. Self-contained inline JavaScript (no external resources) lets the reader choose which sources are shown as columns, pin one for side-by-side reading, and filter criteria. All sources are shown by default up to about five; beyond that the report opens on a subset with a source picker. The per-criterion distribution description always covers *all* sources, so a subset view never hides the overall picture.
+- **Report legibility at any N:** one general matrix renderer. Self-contained inline JavaScript (no external resources; data embedded as escaped JSON and never evaluated or inserted as raw HTML, as for all reports) lets the reader choose which sources are shown as columns, pin one for side-by-side reading, and filter criteria. All sources are shown by default up to about five; beyond that the report opens on a subset with a source picker. The per-criterion distribution description always covers *all* sources, so a subset view never hides the overall picture.
 - **Two- and three-way cases** use the same pipeline and renderer (N = 2 is just two columns). Presentation conveniences for small N (e.g. side-by-side evidence cards, as today) are tweaks within that renderer, not separate code paths, to keep implementation simple.
 - **Two-way proposals** therefore also go criteria first. Today's claim-level pairwise comparison remains the method for revisions.
 
 ## Open questions
 
-None currently.
+- **Units for normalization:** criteria promise normalized comparisons (per kW, per m², per year), but today's numeric check knows about 25 simple units and no compound ones. Options: adopt `pint` (BSD-licensed, handles compound units and conversions, case-sensitive prefixes), or extend our own table deliberately. **Recommendation:** `pint` behind our existing rules: our alias table on top, abstain on ambiguous or unparseable units, and keep "approximate" and basis vetoes.
+- **Money:** proposals often compare costs. Proposed policy: compare amounts only in the same currency and price basis (year, nominal or real); otherwise show them side by side and abstain from arithmetic. No exchange-rate or inflation conversion, since that would be a model-free judgment the sources didn't make.

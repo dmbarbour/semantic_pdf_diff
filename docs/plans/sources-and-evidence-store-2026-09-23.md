@@ -51,6 +51,9 @@ Plans use **source** for a comparison object. "Project" means a real-world proje
 
 - **Derivation:** every evidence row records *how directly* it was obtained from the bytes, as a chain of steps, e.g. a deterministic cell read; a model reading of text, a table or an image; a deterministic read under a model's interpretation of the headers; or a model reading of content that another tool's model wrote (a summary of summaries). The tool and reports use it to show whether a claim is primary, a summary, or a summary of summaries, and comparisons record the derivation of both sides. **Directness is provenance, not reliability**: a direct read of a questionable spreadsheet is still questionable.
 
+- **Derived text is still data.** Text a model derived from documents (claims, "about" statements, criteria extracted from rubrics) is sent back to models under the same rule as source text: data, never instructions. No other defences are planned; criteria are *meant* to come from documents.
+- **Endpoints per role:** the extraction model, the embedding model and test responders all use the shared `OPENAI_BASE_URL`, `OPENAI_MODEL` and `OPENAI_API_KEY` by default. Configuration can override the base URL and model per role. Credentials are never written into configuration: a role's configuration **names the environment variable** that holds its key (e.g. `"api_key_env": "EMBEDDING_API_KEY"`), so configuration files stay safe to share and commit.
+
 Evidence IDs are derived from `content ID + locator + claim`, so they are stable across renames, moves and re-packaging. They don't need an interpreter component, since one store has one extraction interpreter.
 
 ## Store
@@ -66,6 +69,8 @@ A store is a **local folder** that users may copy or share at whatever scope sui
   reports/         # generated HTML reports (disposable; regenerated from the database)
 ```
 
+**A store is as sensitive as its sources:** it holds extracted content, rendered crops and cached responses. It is created with owner-only permissions (folder `0700`, files `0600`) as a safe default, and the documentation says plainly that sharing a store folder shares its content.
+
 The expected scale is a few sources per user, typically a few revisions plus a few competing teams, so one store usually holds several sources and shares work among them. One process writes to a store at a time; a second writer gets a clear "store is in use" error. Copying a store folder is fine, but using one live over a network filesystem is not supported (SQLite locking is unreliable there).
 
 ### Why SQLite
@@ -75,7 +80,7 @@ The expected scale is a few sources per user, typically a few revisions plus a f
 - **Content-addressed reuse:** one store holds several sources. Revisions and competing proposals share whatever content they have in common, and that content is extracted only once.
 - It is part of the Python standard library, so there's no new dependency.
 
-Reports (HTML) remain files generated from the database.
+Reports (HTML) remain files generated from the database. They stay self-contained and safe to open: all document-derived text is escaped, data for scripts is embedded as escaped JSON and never evaluated or inserted as raw HTML, and a test feeds hostile text (script tags, `</script>`, event-handler attributes) through every report view.
 
 ### Tables (sketch)
 
@@ -176,10 +181,14 @@ Staged subcommands. The current two-file form stays as a shortcut that runs all 
 extract <source> [<source> ...] --store <dir> [--reset]
 compare --store <dir> <source> <source> [--mode proposals|revisions]
 show --store <dir> <view> [--format md|csv|jsonl]
+remove --store <dir> <source>
+gc --store <dir> [--dry-run]
 report --store <dir> <comparison>
 ```
 
 (`check`, `export` and N-way `compare` arrive with later plans.)
+
+`remove` unregisters a source; its reviewer decisions stay (orphaned) unless removed explicitly. `gc` deletes content, derived evidence, crops and cache entries that no remaining source references. Many users will simply delete a whole store when done, but a long-lived store shouldn't only ever grow.
 
 ## Folder and archive concerns
 
@@ -202,10 +211,10 @@ report --store <dir> <comparison>
 1. **Schema v2:** content, file, source and interpreter model; content-relative locators; derivation chains; claim context fields (topic, basis, uncertainty, context, role) in the schema, filled by the prompt work in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md); migrate `compare` and `report` off A/B.
 2. **Store folder and SQLite:** WAL, single-writer lock, task queue with per-task transactions, response cache in the database, interpreter binding with rejection, selective `--reset` and `--dry-run`; resume after interruption (tested by killing a run midway).
 3. **Annotations core:** the annotation table and record format; source provenance at registration and in manifests; extracted provenance from PDFs (document properties, sections, comments as content with context); export and import of reviewer decisions; orphan re-attachment. Capture from reports comes with its first consumer (reviewer feedback in scheduling-and-triage); model-recognized disagreements come with `check`.
-4. **PDF sections:** outline → font-size headings → page ranges; heading path in prompts. Real documents are sensitive and won't be shared (the tool runs inside a multi-layer sandbox), so heuristics are developed against the public corpus (see [Samples](#samples)) and must fall back gracefully when there's no outline or consistent heading font.
+4. **PDF sections:** outline → font-size headings → page ranges; heading path in prompts. When a table continues across pages, pass the previous chunk's table header and the section heading path with the continuation (affordable with the large context). Real documents are sensitive and won't be shared (the tool runs inside a multi-layer sandbox), so heuristics are developed against the public corpus (see [Samples](#samples)) and must fall back gracefully when there's no outline or consistent heading font.
 5. **Folder, zip and manifest sources;** duplicate occurrences in provenance.
 6. **Content-difference-first comparison** (shared / removed / added).
-7. **Views, `show` and the staged CLI,** with the current two-file command kept working; tests and docs.
+7. **Views, `show`, `remove`, `gc` and the staged CLI,** with the current two-file command kept working; owner-only store permissions; report escaping tests; per-role endpoint configuration with key environment variables; tests and docs.
 
 ## Decisions (2026-09-23)
 
@@ -219,6 +228,7 @@ report --store <dir> <comparison>
 - **Comparison settings** (retrieval options, aliases, comparison model) are recorded **per comparison**, not bound to the store. Each comparison is a self-contained record, so a user can re-run one with a larger `top_k` without any reset.
 - **Binding is a default guideline:** where a change obviously affects only part of the derived data, `--reset` clears just that part (see *Interpreter* above).
 - **Upgrades:** internal prompt versions and library versions are tracked and a change is rejected like any other interpreter change. That is acceptable because most users install once, spend a while on configuration, then use the same setup for a long time; upgrades are rare, deliberate events where a `--reset` or new store is expected.
+- **Store schema changes during development:** no migrations. A store whose schema version doesn't match refuses to open and asks for a new store; there are no users to migrate until the design settles.
 - **Future:** external converters (e.g. opening Cameo `.mdzip` models into recognized formats) are planned in [multi-format-adapters](multi-format-adapters-2026-09-23.md). They fit the content model: the converter and its version are part of the interpretation, and its outputs are derived content with provenance back to the original.
 
 ## Open questions

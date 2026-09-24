@@ -28,6 +28,10 @@ Glossary:
 6. **Keep it.** Answer keys for the public corpus are committed to the repo as annotation export files (the same format as any exported reviewer decisions; see *Annotations* in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md)), editable by hand, and rerun whenever retrieval or comparison changes, as a regression check. Labels for real documents stay inside the sandbox.
 7. **Spot-check on real documents** inside the sandbox, to confirm that public-corpus results carry over to real documents.
 
+## Extraction quality
+
+Retrieval and comparison can only be as good as the claims extracted, and nothing else measures that. For each page or table in the curated slice (the same slice as [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md)), keep a hand-checked list of the claims a careful reader would expect. Score each responder's extraction for recall (expected claims found) and precision (extracted claims that are right), split by kind (text, table, chart, diagram). The synthetic spreadsheet answer keys already cover table structure; this covers claims.
+
 ## Methods to compare (first round)
 
 - TF-IDF (current), with and without the current aliases
@@ -40,7 +44,8 @@ Glossary:
 - `benchmarks/retrieval/` with the labelling page, the scoring script, and the public-corpus answer keys as annotation export files
 - **reviewer-decision variants:** deliberately "good" and "bad" sets of reviewer decisions (aliases, criteria, forced table strategies) as export files, to measure how much those decisions move results, and to check that a bad set degrades them visibly rather than silently
 - a short results write-up recommending default retrieval settings
-- first real accuracy numbers for the project (the README currently has none)
+- expected-claim lists for the curated slice, committed as export files like the other labels
+- first real accuracy numbers for the project, for both extraction and retrieval (the README currently has none)
 
 ## Decisions (2026-09-24)
 

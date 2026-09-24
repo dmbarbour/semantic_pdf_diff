@@ -79,7 +79,7 @@ Recording in the owner's environment should be one command, not a project setup:
 2. Fixture database, zip packing, `fixtures summary`, and seeding a store from a fixture.
 3. Collection rounds on a curated slice of the sample corpus: export work lists, import answers.
 4. First tables: Claude on a small slice; the weak local VLM (Ollama, CPU) on the same slice.
-5. Integration tests that replay each table, with expected outcomes checked loosely (structure, coverage, provenance), since answers differ across responders.
+5. Integration tests that replay each table, with expected outcomes checked loosely (structure, coverage, provenance), since answers differ across responders. Once replay fixtures exist, continuous integration becomes worthwhile: every commit can run the full suite offline.
 6. **Recording kit** and a gemma-4 table recorded in-house on the same public slice.
 
 ## Decisions (2026-09-24)

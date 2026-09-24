@@ -55,7 +55,7 @@ Implications:
 
 ## Milestones (after the benchmark exists)
 
-1. Embedding client plus cache; hybrid retrieval behind a setting.
+1. Embedding client plus cache, using the shared endpoint by default with per-role overrides (see *Endpoints per role* in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md)); hybrid retrieval behind a setting.
 2. Keyword field in extraction; per-source consolidation into an alias map.
 3. Cross-source vocabulary merge.
 4. Choose defaults from benchmark results; document the tradeoffs.
