@@ -23,26 +23,42 @@ Teams may partition one report into many files, so a folder or archive is the na
 Other plans say "project" informally; in store terms that means a **source**.
 
 - **Content:** bytes plus the interpretation they are given. Approximated by a **content ID = SHA-256 of the bytes + normalized file extension** (lowercase, e.g. `sha256:…​.pdf`). The same bytes named `.txt` and `.md` are different content, because they are interpreted differently. Evidence attaches to content, never to paths.
+  - **Normalization** collapses only aliases known to share an interpretation (`.jpeg` → `.jpg`, `.tif` → `.tiff`, `.htm` → `.html`, `.yml` → `.yaml`, `.markdown` → `.md`), from a maintained table.
+  - **Files without an extension, or with one no adapter handles, are not interpreted** and contribute no evidence. They are still listed as files, with a `skipped` task outcome, so nothing disappears silently.
 - **File:** a path within a source that refers to content. Archive members are files too, with paths like `a.zip!/b.zip!/c.pdf`. An archive is itself content whose interpretation yields more files.
 - **Source:** a comparison object: a folder, a zip, a single file, or a manifest listing any of these. A source *has content via its files*.
 - **Duplicate content within a source** (the same PDF in two folders, a file both loose and inside a zip) is extracted once and contributes no new evidence. Every occurrence is still recorded, so provenance can say "also at …".
 - **Revisions are content differences, not timestamps.** Going from source A to source B means some content was removed (in A, not B), some added (in B, not A) and the rest is shared. A rename is shared content under a new path, so it changes only provenance. File times may be recorded for humans but carry no meaning in comparisons. This answers the earlier question of how manifests express revision metadata: they don't need to.
 - **Section:** a logical part of one piece of content, and the unit of scheduling, caching and triage. For PDFs it comes from the outline/bookmarks, falling back to headings guessed from font size, then to fixed page ranges. See [scheduling-and-triage](scheduling-and-triage-2026-09-23.md).
 - **Locator:** where a claim sits *within content*, never including the path: for PDF, page plus bounding box plus pass (text / table / tile / overview). Other formats add their own shapes later.
-- **Interpreter:** everything besides the bytes that shapes derived data. For extraction that means the model ID, prompt version, relevant settings, and tool and library versions (e.g. PyMuPDF). The same applies to embeddings, summaries and comparisons. Each distinct configuration gets an **interpreter ID** (a hash of its description), and every derived row records the interpreter that produced it.
+- **Interpreter:** everything besides the bytes that shapes derived data. For extraction that means the model ID, prompt versions, output-affecting settings (text budget, tile size, refinement depth…) and tool and library versions (e.g. PyMuPDF). There are separate interpreters for embeddings, summaries and comparisons. Settings that don't affect output (timeouts, call limits, concurrency) are not part of an interpreter.
+- **A store is bound to its interpreters.** The first run records each role's interpreter in the store's manifest. A later run whose interpreter differs is **rejected**, with a message naming what differs. Mixing models breaks things in unpredictable ways; embeddings especially are only comparable within one model. The user either creates a new store or passes `--reset`, which deletes all derived data (evidence, tasks, embeddings, summaries, comparisons, response cache) but keeps the registered sources and content, so the same sources re-run under the new interpreters. Adding a role that wasn't configured before (e.g. embeddings later) is allowed; changing an existing one is not.
 
-Evidence IDs are derived from `content ID + interpreter ID + locator + claim`, so they are stable across renames, moves and re-packaging.
+Evidence IDs are derived from `content ID + locator + claim`, so they are stable across renames, moves and re-packaging. They don't need an interpreter component, since one store has one extraction interpreter.
 
 ## Store
+
+### Layout
+
+A store is a **local folder** that users may copy or share at whatever scope suits them:
+
+```
+<store>/
+  store.sqlite     # sources, content, evidence, tasks, comparisons, response cache
+  assets/          # rendered crops and other auxiliary files, named by SHA-256
+  reports/         # generated HTML reports (disposable; regenerated from the database)
+```
+
+The expected scale is a few sources per user, typically a few revisions plus a few competing teams, so one store usually holds several sources and shares work among them. One process writes to a store at a time; a second writer gets a clear "store is in use" error. Copying a store folder is fine, but using one live over a network filesystem is not supported (SQLite locking is unreliable there).
 
 ### Why SQLite
 
 - **Many views from one store:** evidence with provenance, coverage summaries, per-source diffs and human-readable exports are all queries or views over the same tables.
 - **Stop and resume:** each extraction task commits in its own transaction, so a long run can be halted at any point and continued without losing or duplicating work. WAL mode lets reports and queries read while extraction writes.
-- **Content-addressed reuse:** one store can hold several sources. Revisions and competing proposals share whatever content they have in common, and that content is extracted only once.
+- **Content-addressed reuse:** one store holds several sources. Revisions and competing proposals share whatever content they have in common, and that content is extracted only once.
 - It is part of the Python standard library, so there's no new dependency.
 
-Reports (HTML) remain files generated from the store.
+Reports (HTML) remain files generated from the database.
 
 ### Tables (sketch)
 
@@ -51,14 +67,13 @@ Reports (HTML) remain files generated from the store.
 | `content` | content ID, SHA-256, extension, size, detected media type |
 | `source` | source ID, name, how it was given (folder / zip / file / manifest) |
 | `file` | source ID, path (with `!/` for archive members), content ID, parent archive file if any |
-| `interpreter` | interpreter ID, role (extract / embed / summarize / compare), model, endpoint label (credentials redacted), prompt hash, settings JSON, tool and library versions |
+| `interpreter` | one row per role (extract / embed / summarize / compare): model, endpoint label (credentials redacted), prompt hashes, output-affecting settings JSON, tool and library versions. This is the store's binding checked on every run. |
 | `section` | content ID, section ID, locator range, heading path |
-| `task` | content ID, section, pass, locator, interpreter ID, status (pending / complete / partial / failed / skipped / not_reached), attempts, issues. This is the coverage record and the resume queue. |
-| `evidence` | evidence ID, content ID, interpreter ID, task ID, locator JSON, claim fields, quality signals |
+| `task` | content ID, section, pass, locator, status (pending / complete / partial / failed / skipped / not_reached), attempts, issues. This is the coverage record and the resume queue. |
+| `evidence` | evidence ID, content ID, task ID, locator JSON, claim fields, quality signals |
+| `comparison` | comparison ID, mode, the sources compared, findings (so reports can be regenerated without model calls) |
 | `response_cache` | request hash → validated model response (replaces the `cache/` folder) |
 | `meta` | schema version, creation and tool info |
-
-Rendered image crops live beside the database as files named by their SHA-256, so the database stays small and reports can link to them directly (see open questions).
 
 ### Views and exports
 
@@ -79,10 +94,10 @@ For revisions, this can cut model calls dramatically when a new version changes 
 Staged subcommands. The current two-file form stays as a shortcut that runs all stages with a temporary store.
 
 ```
-extract <source> [<source> ...] --store <db>
-compare --store <db> <source> <source> [--mode proposals|revisions]
-show --store <db> <view> [--format md|csv|jsonl]
-report --store <db> <comparison>
+extract <source> [<source> ...] --store <dir> [--reset]
+compare --store <dir> <source> <source> [--mode proposals|revisions]
+show --store <dir> <view> [--format md|csv|jsonl]
+report --store <dir> <comparison>
 ```
 
 (`check`, `export` and N-way `compare` arrive with later plans.)
@@ -105,19 +120,27 @@ report --store <db> <comparison>
 ## Milestones
 
 1. Content, file, source and interpreter model; evidence schema v2 with content-relative locators; migrate `compare` and `report` off A/B.
-2. SQLite store: schema, WAL, task queue with per-task transactions, response cache moved into the database; resume after interruption (tested by killing a run midway).
+2. Store folder and SQLite schema: WAL, single-writer lock, task queue with per-task transactions, response cache in the database, interpreter binding with rejection and `--reset`; resume after interruption (tested by killing a run midway).
 3. PDF section detection (outline → font-size headings → page ranges); heading path in prompts.
 4. Folder, zip and manifest sources; duplicate occurrences in provenance.
 5. Content-difference-first comparison (shared / removed / added).
 6. Views and `show`; staged CLI with the current two-file command kept working; tests and docs.
 
+## Decisions (2026-09-23)
+
+- **Store format:** SQLite inside a store folder, with auxiliary files (crops) beside it and HTML reports generated from it.
+- **Revision metadata:** none needed; revisions are content differences.
+- **Files without extensions:** not interpreted, no evidence, listed as skipped.
+- **Extension aliases:** collapse only those known to share an interpretation.
+- **Model or interpreter changes:** rejected; new store or explicit `--reset`.
+- **Store scope:** one local folder, shared at any scope the user chooses; typically a few revisions and a few teams per user.
+- **Future:** external converters (e.g. opening Cameo `.mdzip` models into recognized formats) are planned in [multi-format-adapters](multi-format-adapters-2026-09-23.md). They fit the content model: the converter and its version are part of the interpretation, and its outputs are derived content with provenance back to the original.
+
 ## Open questions
 
 - **What structure do real documents have?** Real documents are sensitive and won't be shared; the tool will run inside a multi-layer sandbox. Section heuristics are developed against the public corpus (see [Samples](#samples)), and must fall back gracefully when there's no outline or consistent heading font.
-- **Image crops as files or blobs?** Files beside the database keep it small and are easy to link from reports; blobs make a store a single portable file. Start with files named by hash; revisit if portability matters.
-- **Extension normalization:** which aliases collapse (`.jpeg` → `.jpg`, `.htm` → `.html`)? What about files without an extension: sniff the type, or treat the empty extension as its own interpretation?
-- **Interpreter changes:** when the extraction model changes, keep old evidence side by side (queryable by interpreter) or garbage-collect it? Side by side allows comparing model versions; it needs a retention command.
-- **Store scope:** one store per comparison, per team or per organization? Content addressing works at any scope; the choice is mostly about access control inside the sandbox.
+- **What counts as an output-affecting setting?** The rule is clear, but the list needs care: getting it wrong either rejects harmless changes or lets meaningful ones through. Start strict (treat every extraction setting as output-affecting except timeouts, call limits and concurrency) and loosen with evidence.
+- **Does a tool upgrade that changes prompts require `--reset`?** Under the rule above, yes. That is predictable but may be annoying across frequent releases; keep prompt changes deliberate and versioned.
 
 ## Samples
 

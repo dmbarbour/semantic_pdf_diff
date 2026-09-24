@@ -30,6 +30,19 @@ Only content that is truly unstructured goes to the model. Structured data shoul
 
 Candidates for later: HTML, and email exports.
 
+### Extension policy
+
+Adapters are chosen **only by normalized extension**, consistent with the store's content model (content = bytes + interpretation, identified by SHA-256 + extension). Known aliases collapse (`.jpeg` → `.jpg` and so on). Files with no extension, or an extension no adapter or converter handles, are listed as skipped and contribute no evidence. No content sniffing.
+
+### External converters (future)
+
+Some formats need proprietary or heavyweight tools, e.g. Cameo/MagicDraw `.mdzip` models. Allow configuring **external converters as executables**, keyed by extension:
+
+- A converter "opens" content into formats we already handle (XMI/XML, CSV, HTML, PDF, PNG diagrams…). Its outputs become **derived content** in the store, with provenance back to the original file.
+- The converter's identity (executable hash, version, arguments) is part of the extraction interpreter, so changing it falls under the store's interpreter-binding rule (reject, or `--reset`).
+- Converters run inside the sandbox with no network, a timeout and output size limits (generous backstops), and write only to a scratch directory the tool provides.
+- The LibreOffice fallback for legacy Office formats becomes just one configured converter.
+
 ## Locators
 
 Each adapter defines its locator shape (see the store plan):
@@ -54,7 +67,7 @@ The report must render a suitable preview for each format: a text excerpt with i
 3. `.csv` / `.xlsx` with deterministic claims.
 4. `.docx`.
 5. `.pptx`, including chart XML.
-6. Images; optional LibreOffice fallback.
+6. Images; external converter interface, with LibreOffice as the first configured converter.
 
 ## Open questions
 
