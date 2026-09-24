@@ -16,11 +16,11 @@ Most of the pipeline is already independent of "two PDFs": `extract_pdf` never s
 - page and bounding box as the only way to locate a claim
 - a CLI that extracts, compares and reports in one run
 
-Teams may partition one report into many files, so a folder or archive is the natural thing to compare. A persistent store also makes single-source uses cheap ([single-project-outputs](single-project-outputs-2026-09-23.md)), and is the prerequisite for comparing N sources ([n-way-comparison](n-way-comparison-2026-09-23.md)).
+Teams may partition one report into many files, so a folder or archive is the natural thing to compare. A persistent store also makes single-source uses cheap ([single-source-outputs](single-source-outputs-2026-09-23.md)), and is the prerequisite for comparing N sources ([n-way-comparison](n-way-comparison-2026-09-23.md)).
 
 ## Concepts
 
-Other plans say "project" informally; in store terms that means a **source**.
+Plans use **source** for a comparison object. "Project" means a real-world project (or this software), never a comparison object.
 
 - **Content:** bytes plus the interpretation they are given. Approximated by a **content ID = SHA-256 of the bytes + normalized file extension** (lowercase, e.g. `sha256:…​.pdf`). The same bytes named `.txt` and `.md` are different content, because they are interpreted differently. Evidence attaches to content, never to paths.
   - **Normalization** collapses only aliases known to share an interpretation (`.jpeg` → `.jpg`, `.tif` → `.tiff`, `.htm` → `.html`, `.yml` → `.yaml`, `.markdown` → `.md`), from a maintained table.

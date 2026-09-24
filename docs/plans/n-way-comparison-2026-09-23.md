@@ -1,7 +1,7 @@
 # Criteria-first comparison of sources
 
 - **Status:** Planned (design settled 2026-09-24). Next after scheduling-and-triage: this is the main use case, since two-way proposal comparison goes criteria first too.
-- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (claim context fields, store); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) to recommend criteria; benefits from [retrieval-recall](retrieval-recall-2026-09-23.md)
+- **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (claim context fields, store); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) to recommend criteria; benefits from [retrieval-recall](retrieval-recall-2026-09-23.md)
 
 ## Goal
 
@@ -21,7 +21,7 @@ Projects that take different approaches toward the same end share their *ends*, 
 
 ### 1. Claims carry their own context
 
-Every claim, for every source and regardless of comparison, records its topic and "aboutness", basis, context (initial or final, scenario, phase) and role in the design. This lands with schema v2 in [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md).
+Every claim, for every source and regardless of comparison, records its topic and "aboutness", basis, context (initial or final, scenario, phase) and role in the design. This lands with schema v2 in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md).
 
 ### 2. Criteria: an evidence-based QA step
 
@@ -38,7 +38,7 @@ Criteria are **records with provenance, reviewed by people**, like other human Q
 - **Extracted from evidence.** Projects often know what they'll be measured by, and say so: rules, requirements, RFP evaluation sections, agenda items, score sheets. The model extracts comparison criteria from such documents, citing them.
 - **Aligned with the user's rubrics.** A user may supply the rubric or score sheet they plan to judge with, as a reference source. The tool derives criteria that will inform that judgment, without applying the rubric.
 - **Recommended by the model,** by clustering the sources' "about" statements to find shared ends, clearly marked as proposals.
-- **Entered or edited by users.** Every criterion can be added, merged, split, reworded or dropped. Changes are stored as reusable annotations that can be exported, imported and kept as configuration (see [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (*Annotations*)).
+- **Entered or edited by users.** Every criterion can be added, merged, split, reworded or dropped. Changes are stored as reusable annotations that can be exported, imported and kept as configuration (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).
 
 The workflow is **propose → review → run**. Expensive comparison runs only after a person has seen the criteria. Before interactive views exist, review happens by editing an exported criteria file and importing it back.
 

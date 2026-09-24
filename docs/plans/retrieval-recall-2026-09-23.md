@@ -1,7 +1,7 @@
 # Better retrieval recall: model keywords, alias consolidation, embeddings
 
 - **Status:** Tentative. Decide what to build from [retrieval-benchmark](retrieval-benchmark-2026-09-23.md) results.
-- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (sections), [retrieval-benchmark](retrieval-benchmark-2026-09-23.md) (to measure)
+- **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections), [retrieval-benchmark](retrieval-benchmark-2026-09-23.md) (to measure)
 
 ## Problem
 
@@ -23,8 +23,8 @@ Ask the model for relevant keywords as one extra output field while it reads a s
 - **Order dependence and caching.** Passing a running "previously used keywords" list into each prompt makes results depend on processing order. It also changes the prompt as the list grows, so editing one early file re-keys every later cached request. Instead:
   - **Pass 1:** free keywords per section, with no running list. This is order-independent and caches cleanly.
   - **Consolidation:** cluster the keywords into a canonical vocabulary (embedding similarity, plus small model batches to confirm merges). The output is a **reviewable alias map** that feeds the existing `aliases` mechanism.
-- **Context budget.** If vocabulary is ever put into a prompt (e.g. consolidating one project against another), include only the top-k prior keywords that match the current section, never the full list.
-- **Symmetry in proposal mode.** Build each project's vocabulary independently, then merge in a step that treats all projects equally. Otherwise team B's keywords are steered by team A's.
+- **Context budget.** If vocabulary is ever put into a prompt (e.g. consolidating one source against another), include only the top-k prior keywords that match the current section, never the full list.
+- **Symmetry in proposal mode.** Build each source's vocabulary independently, then merge in a step that treats all sources equally. Otherwise team B's keywords are steered by team A's.
 - Section-level keywords cost less than per-claim keywords. Claims inherit their section's keywords plus their own entity and attribute.
 
 ### 2. Embeddings
@@ -56,8 +56,8 @@ Implications:
 ## Milestones (after the benchmark exists)
 
 1. Embedding client plus cache; hybrid retrieval behind a setting.
-2. Keyword field in extraction; per-project consolidation into an alias map.
-3. Cross-project vocabulary merge.
+2. Keyword field in extraction; per-source consolidation into an alias map.
+3. Cross-source vocabulary merge.
 4. Choose defaults from benchmark results; document the tradeoffs.
 
 ## Open questions
@@ -68,4 +68,4 @@ Implications:
 
 - **Available models:** listed above.
 - **Language:** current sources are English, so English models are the default candidates. Keep the multilingual E5 models in the benchmark and as a configurable option, since future users may have other languages; don't assume English anywhere it is cheap not to (e.g. tokenization already uses Unicode word rules).
-- **Alias maps and other reviewer decisions:** every human QA judgment is **reusable data**. Accepting or rejecting a proposed alias, confirming a keyword merge, correcting an extraction or labelling a benchmark pair are all stored as annotations keyed by stable IDs. They survive report regeneration and store resets, can be exported as their own report and imported into another store, and, for alias decisions, can be exported as a configuration fragment (the `aliases` mapping). Aliases shape retrieval, which is recorded per comparison, so applying an updated alias map never needs a store reset. The annotation mechanism is specified in [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (*Annotations*).
+- **Alias maps and other reviewer decisions:** every human QA judgment is **reusable data**. Accepting or rejecting a proposed alias, confirming a keyword merge, correcting an extraction or labelling a benchmark pair are all stored as annotations keyed by stable IDs. They survive report regeneration and store resets, can be exported as their own report and imported into another store, and, for alias decisions, can be exported as a configuration fragment (the `aliases` mapping). Aliases shape retrieval, which is recorded per comparison, so applying an updated alias map never needs a store reset. The annotation mechanism is specified in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*).

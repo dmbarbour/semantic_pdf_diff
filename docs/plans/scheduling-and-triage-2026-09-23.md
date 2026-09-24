@@ -1,7 +1,7 @@
 # Rate-aware scheduling, section triage and claim quality signals
 
 - **Status:** Planned
-- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (sections as units of work)
+- **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections as units of work)
 
 ## Context
 
@@ -64,7 +64,7 @@ Keep three separate axes. They answer different questions, and mixing them into 
 |---|---|---|
 | **Reliability** | Is the extraction right? | native vs visual source, `quote_verified`, native and visual passes agreeing, `approximate`, retry depth, model confidence (lowest weight; uncalibrated) |
 | **Specificity** | Is it a usable engineering fact? | number plus unit, stated conditions, specific entity (`P-101`) vs generic ("the system"), requirement vs capability vs hedged wording |
-| **Salience** | Does the project treat it as important? | how often the entity is referenced across the project, section type (executive summary vs appendix), repetition across files |
+| **Salience** | Does the source treat it as important? | how often the entity is referenced across the source, section type (executive summary vs appendix), repetition across files |
 
 Rules:
 
@@ -103,4 +103,4 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 - **Throughput limits:** 300k tokens/min in business hours, 500k outside; configurable by time of day, and expected to change.
 - **Concurrent requests:** assume the server caps them. Use a modest, configurable concurrency limit (single digits by default) and let adaptive backoff find the working level, leaving room for the user's other tools on the same server.
 - **Time budgets:** none. Runs proceed unattended until done or stopped; preliminary reports cover the need to look early.
-- **Reviewer feedback:** stored as reusable annotations in the store, exportable and importable (see [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (*Annotations*)).
+- **Reviewer feedback:** stored as reusable annotations in the store, exportable and importable (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).

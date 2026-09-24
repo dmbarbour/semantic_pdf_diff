@@ -1,7 +1,7 @@
 # Multi-format source adapters
 
 - **Status:** Planned. Format priority (2026-09-23): PDF, then `.docx` and `.pptx`; Cameo models via a separate project.
-- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (locators, sections, store)
+- **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (locators, sections, store)
 
 ## Goal
 
@@ -44,7 +44,7 @@ The public corpus (`scripts/fetch_samples.py`) covers the priority formats, all 
 
 Cameo `.mdzip` models are digested by a separate project whose output is a large folder of Markdown and some CSV, including its own model-written summaries, aimed mainly at RAG ingestion elsewhere. This project consumes that folder **as an ordinary source** through the `.md` and `.csv` adapters; no converter or importer is needed.
 
-This project **does not judge content produced by external tools**, including the Cameo project's model-written summaries. Whether such content is weaker evidence is the provider's call: a provider may mark content with confidence levels or similar metadata, and this project passes that through to evidence and reports. Provider markings are embedded annotations; the convention (front matter, sidecar file or both) is an open question in [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (*Annotations*).
+This project **does not judge content produced by external tools**, including the Cameo project's model-written summaries. Whether such content is weaker evidence is the provider's call: a provider may mark content with confidence levels or similar metadata, and this project passes that through to evidence and reports. Provider markings are embedded annotations; the convention (front matter, sidecar file or both) is an open question in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*).
 
 ### Tables and spreadsheets
 
@@ -108,7 +108,7 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 
 ## Decisions (2026-09-23)
 
-- **Spreadsheet claims are marked by provenance, not trust.** A claim read directly from cells is *more direct* than one a model extracted from prose or a chart, and its derivation says so (see *Derivation* in [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md)). Directness is not reliability. A spreadsheet still raises questions: is our interpretation of the columns right (and if a model interpreted the headers, that is itself a model step in the derivation)? Is a value a measurement, a projection, a requirement or wishful thinking? Are uncertainties given? Those are judged like any other claim (see *Epistemic status* in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md)), not assumed away.
+- **Spreadsheet claims are marked by provenance, not trust.** A claim read directly from cells is *more direct* than one a model extracted from prose or a chart, and its derivation says so (see *Derivation* in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md)). Directness is not reliability. A spreadsheet still raises questions: is our interpretation of the columns right (and if a model interpreted the headers, that is itself a model step in the derivation)? Is a value a measurement, a projection, a requirement or wishful thinking? Are uncertainties given? Those are judged like any other claim (see *Epistemic status* in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md)), not assumed away.
 
 ## Open questions
 

@@ -1,17 +1,17 @@
-# Single-project outputs: consistency check, RAG export, overviews
+# Single-source outputs: consistency check, RAG export, overviews
 
 - **Status:** Planned (consistency check and export); Tentative (model-written summaries)
-- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) for per-section export chunks and fact-sheet context
+- **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) for per-section export chunks and fact-sheet context
 
 ## Goal
 
-Much of the pipeline is useful for **one project** on its own: extracted, provenance-tracked claims plus a coverage record. Expose that directly.
+Much of the pipeline is useful for **one source** on its own: extracted, provenance-tracked claims plus a coverage record. Expose that directly.
 
 ## Features
 
 ### 1. `check`: internal consistency
 
-Run the existing comparison with A = B = one project, excluding pairs of a claim with itself. It surfaces contradictions inside a project, such as:
+Run claim-level comparison with A = B = one source, excluding pairs of a claim with itself. It surfaces contradictions inside a source, such as:
 
 - pump power 10 kW in §2 but 12 kW in Appendix C
 - a spreadsheet total that disagrees with the narrative
@@ -23,11 +23,11 @@ It reuses retrieval, the numeric check and the uncertainty rules unchanged. For 
 
 The target RAG system is not ours to change. Its ingest tool accepts PDF, Markdown, text, `.docx`, `.pptx`, `.xlsx`, CSV and JSON (not JSONL). It preserves provenance poorly, ignores its `--metadata` argument in practice, handles spreadsheets badly and loses the meaning of diagrams. So the export is **a folder of explicit, self-contained Markdown chunk files**, one per chunk, designed so each survives ingestion on its own:
 
-- **Provenance in the text, not in metadata.** Each chunk states in prose where it came from: source, file path, page or slide or cell range, section heading path, and a short content ID for exact tracing. It also carries **provenance of the source itself** from the source and file metadata (title, organization or team, author, revision label, date; see *Source metadata* in [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md)), so the RAG system knows whose document and which revision a fact comes from. A human-readable citation line ("PS-3 design summary.pdf, p. 12, Table 3") is included so RAG answers can quote it.
+- **Provenance in the text, not in metadata.** Each chunk states in prose where it came from: source, file path, page or slide or cell range, section heading path, and a short content ID for exact tracing. It also carries **provenance of the source itself** from the source and file metadata (title, organization or team, author, revision label, date; see *Source metadata* in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md)), so the RAG system knows whose document and which revision a fact comes from. A human-readable citation line ("PS-3 design summary.pdf, p. 12, Table 3") is included so RAG answers can quote it.
 - **Sized to the ingest tool's chunking.** The tool extracts text with `markitdown` and splits into chunks of 512 tokens with 128 tokens of overlap by default (configurable on its command line). Export chunks therefore target roughly 400 tokens by default (configurable), leaving margin for tokenizer differences, so each file normally becomes one RAG chunk. When a chunk must be longer, a compact provenance line is repeated before each subsection, so any 512-token window still names its origin. The provenance header costs roughly 50–80 tokens per chunk; worth it.
 - **Tables inline, as small Markdown tables** with their headers and units, instead of separate CSV or `.xlsx` files the ingest tool would mangle. Large tables are split into chunks that each repeat the header and table identity.
 - **Diagrams and charts as text.** Claims from visual extraction (connections, operating points, axis readings, flagged approximations) are written out in words. That preserves exactly what the ingest tool would lose.
-- **Qualifiers kept with the facts:** conditions, basis (measured, projected, required…), stated uncertainty, derivation (direct read, model extraction, summary of summaries), quote-verification status and any issues or suspicions. Confidence appears as the qualifier it is, not as a bare number presented as truth. Relevant annotations travel too: provider markings, embedded comments, and reviewer corrections (see [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (*Annotations*)).
+- **Qualifiers kept with the facts:** conditions, basis (measured, projected, required…), stated uncertainty, derivation (direct read, model extraction, summary of summaries), quote-verification status and any issues or suspicions. Confidence appears as the qualifier it is, not as a bare number presented as truth. Relevant annotations travel too: provider markings, embedded comments, and reviewer corrections (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).
 - **Unique file names.** Re-ingesting apparently aggregates rather than replaces, so every chunk file gets a unique name (derived from its content hash plus an export ID) and the user controls the corpus directly: ingest a fresh export into a new or reset corpus, or ingest a **delta export** containing only chunks not present in a named previous export. The delta's `index.md` also lists chunks that disappeared, for the user to act on.
 - **Discovery chunks alongside detail chunks.** Besides chunks that explain content (comprehension), the export includes chunks that help find it (discovery): tables of topics, an entity index, an index of diagrams and charts with what each shows, and section maps. Each entry names the detail chunks' citations, so a RAG query about "what covers pump redundancy?" can land on an index and then on the facts.
 - **An `index.md`** listing every chunk with its citation, plus a note on how the export was produced (tool version, interpreters, coverage summary including what wasn't reached or was skipped).

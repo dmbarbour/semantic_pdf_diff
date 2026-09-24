@@ -1,7 +1,7 @@
 # Retrieval benchmark
 
 - **Status:** Planned (future). Claude will build most of this with you. Your main job is checking labels.
-- **Depends on:** nothing strictly. It is easier after [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) produces evidence stores to sample from.
+- **Depends on:** nothing strictly. It is easier after [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) produces evidence stores to sample from.
 - **Informs:** [retrieval-recall](retrieval-recall-2026-09-23.md), and later [n-way-comparison](n-way-comparison-2026-09-23.md)
 
 ## What this is, in plain terms
@@ -24,7 +24,7 @@ Glossary:
 2. **Extract claims (tool).** Run extraction to get evidence stores.
 3. **Propose candidate pairs (Claude).** Take a generous union of candidates from several methods (TF-IDF at high `k`, embeddings, keyword overlap), plus random pairs as controls. Casting a wide net matters: labelling only what TF-IDF finds would hide exactly the misses we want to measure.
 4. **Label (Claude drafts, you check).** A small labelling page shows each pair side by side with its source crops. Choices: *same topic*, *different topic*, *unsure*. Claude can pre-fill suggestions so you mostly confirm; aim for a few hundred pairs. Your judgement is the ground truth.
-5. **Score (tool).** A script that reports recall@k and precision for each method and setting, as a table and chart, split by claim kind (text/table/chart/diagram) and by within-project vs between-project pairs.
+5. **Score (tool).** A script that reports recall@k and precision for each method and setting, as a table and chart, split by claim kind (text/table/chart/diagram) and by within-source vs between-source pairs.
 6. **Keep it.** The answer key is versioned in the repo (or an in-house location) and rerun whenever retrieval changes, as a regression check.
 
 ## Methods to compare (first round)
