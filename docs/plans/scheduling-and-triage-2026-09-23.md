@@ -71,6 +71,16 @@ Rules:
 - Use the signals for **scheduling, sorting and filtering**. Show each component in the report. Never let them hide evidence.
 - Salience is the riskiest axis: it is domain-specific, and it is close to the "importance ranking" the README disclaims. Label it clearly.
 - Calibrate later with real feedback: if reviewers can mark findings "useful" or "wrong" in the report, those labels can tune the weights instead of intuition.
+- Derivation (how directly a claim was obtained) is shown alongside these axes but is not one of them: a direct read is not automatically more reliable than a model extraction.
+
+### Epistemic status and skeptical prompting
+
+Whatever its derivation, a claim can be a measurement, a calculation, a simulation result, a projection, a requirement, a target or an unsupported assertion, and it may or may not state its uncertainty. People mislead with statistics and graphs all the time. So:
+
+- **Record the basis of each claim:** extraction returns `basis` (measured / calculated / simulated / projected / required / targeted / asserted / unknown) and any stated uncertainty (interval, tolerance or "none given"). This extends the current prompt, which already distinguishes requirements from proposed capabilities. It applies to every format, including deterministic spreadsheet claims, whose basis may come from headers, notes or the surrounding document.
+- **Comparison respects basis the way it respects conditions:** a measured value and a projected value are not a contradiction. A basis mismatch vetoes a confident *different* or *equivalent* judgment, just as unmatched conditions do today.
+- **Lead the model to be suspicious**, since judgment quality is initially limited by gemma-4. Instructions ask it to question its own interpretation of columns and labels, and to notice presentation that can mislead: truncated or log axes, missing error bars, selective ranges, projections presented as results, totals that don't add up, and claims that don't fit together. Suspicions are recorded as issues on the claim or finding and shown in reports; they never silently drop evidence.
+- These prompt changes are interpreter changes (prompt versions), so they are made deliberately and versioned.
 
 ## Milestones
 

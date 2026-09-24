@@ -86,7 +86,10 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 5. `.csv` / `.xlsx` with deterministic claims.
 6. Images.
 
+## Decisions (2026-09-23)
+
+- **Deterministic spreadsheet claims are marked by provenance, not trust.** A claim read directly from cells is *more direct* than one a model extracted from prose or a chart, and its derivation says so (see *Derivation* in [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md)). Directness is not reliability. A spreadsheet still raises questions: is our interpretation of the columns right (and if a model interpreted the headers, that is itself a model step in the derivation)? Is a value a measurement, a projection, a requirement or wishful thinking? Are uncertainties given? Those are judged like any other claim (see *Epistemic status* in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md)), not assumed away.
+
 ## Open questions
 
-- How should a deterministic spreadsheet claim be marked (source kind, reliability) relative to model-extracted claims?
 - Should very large sheets get per-table sampling or summary statistics instead of one claim per cell?

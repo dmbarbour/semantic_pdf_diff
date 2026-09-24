@@ -48,6 +48,8 @@ Other plans say "project" informally; in store terms that means a **source**.
 
   `--reset --dry-run` reports what would be cleared, and the rejection message shows the same summary.
 
+- **Derivation:** every evidence row records *how directly* it was obtained from the bytes, as a chain of steps, e.g. a deterministic cell read; a model reading of text, a table or an image; a deterministic read under a model's interpretation of the headers; or a model reading of content that another tool's model wrote (a summary of summaries). The tool and reports use it to show whether a claim is primary, a summary, or a summary of summaries, and comparisons record the derivation of both sides. **Directness is provenance, not reliability**: a direct read of a questionable spreadsheet is still questionable.
+
 Evidence IDs are derived from `content ID + locator + claim`, so they are stable across renames, moves and re-packaging. They don't need an interpreter component, since one store has one extraction interpreter.
 
 ## Store
