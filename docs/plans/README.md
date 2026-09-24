@@ -13,7 +13,7 @@ Statuses:
 
 | Plan | Summary |
 |---|---|
-| [Projects, sections and evidence store](projects-and-evidence-store-2026-09-23.md) | Schema v2 with project/source/section/locator; persistent incremental per-project stores; folders as projects; staged CLI. The foundation for everything else. |
+| [Sources, content and evidence store](projects-and-evidence-store-2026-09-23.md) | SQLite store (resumable, many views); evidence attached to content (SHA-256 + extension) shared across sources; folders and zips as sources; revisions as content differences; interpreter metadata; staged CLI. The foundation for everything else. |
 
 ## Planned
 

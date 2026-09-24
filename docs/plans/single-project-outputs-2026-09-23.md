@@ -26,7 +26,7 @@ Claims are good retrieval units but lossy, so export both:
 - **source chunks** (text groups, table rows, visual region descriptions) with locators
 - **claims** linked to their chunks, with locator, quality signals and stable IDs
 
-Stable, content-addressed IDs allow incremental re-ingestion: only changed sources produce new records. JSONL first; target a specific schema only once there is a concrete consumer.
+Stable, content-addressed IDs allow incremental re-ingestion: only new content produces new records. The export is generated from the SQLite store as JSONL first; target a specific schema only once there is a concrete consumer. Records carry interpreter metadata (which models produced the claims, embeddings or summaries).
 
 ### 3. Fact sheet, built without the model (first-tier overview)
 
