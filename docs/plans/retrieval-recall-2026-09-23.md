@@ -31,6 +31,23 @@ Several in-house embedding models are available behind (or easily put behind) an
 3. **Topic clusters** for N-way comparison.
 4. **Section alignment** between projects, to narrow the candidate space before claim-level matching.
 
+#### Available in-house models (as of 2026-09-23)
+
+| Model | Max input tokens | Dimensions | Notes |
+|---|---|---|---|
+| `llmrails/ember-v1` | 512 | 1024 | English |
+| `sentence-transformers/all-MiniLM-L6-v2` | 256 | 384 | Smallest and fastest; a good baseline |
+| `sentence-transformers/all-mpnet-base-v2` | 384 | 768 | English |
+| `intfloat/multilingual-e5-small` | 512 | 384 | Multilingual |
+| `intfloat/multilingual-e5-large` | 512 | 1024 | Multilingual; largest, likely slowest |
+
+Implications:
+
+- **Input limits don't constrain claims.** A claim topic (`entity | attribute | conditions`) is typically tens of tokens, well under every limit. They do constrain **sections**, which exceed all of them: embed a section's heading path plus a short digest, or embed chunks and pool the vectors. The benchmark should compare the two.
+- **Prefixes are part of the interpreter.** E5 models expect `query: ` / `passage: ` prefixes (use `query: ` on both sides for symmetric claim-to-claim similarity). Check each model card for similar conventions. Whatever prefix is used gets recorded with the embedding interpreter, since changing it changes the vectors.
+- **Throughput isn't known yet;** measure it in the benchmark. Model size suggests MiniLM is several times faster than the others and e5-large the slowest. At our scale (thousands of short claim strings per store) even the slowest is probably fine, but section chunks could be much more numerous.
+- **All five are benchmark candidates.** Dimensions matter little for storage at this scale.
+
 ## Milestones (after the benchmark exists)
 
 1. Embedding client plus cache; hybrid retrieval behind a setting.
@@ -40,5 +57,10 @@ Several in-house embedding models are available behind (or easily put behind) an
 
 ## Open questions
 
-- Which in-house embedding models are available, and what are their context limits and throughput?
-- Should alias maps be committed alongside a project so reviewers can edit them?
+- Measured throughput of each in-house model on our hardware (to be measured in the benchmark).
+- Do sources include non-English text? If so, the multilingual E5 models matter more.
+
+## Decisions (2026-09-23)
+
+- **Available models:** listed above.
+- **Alias maps and other reviewer decisions:** every human QA judgment is **reusable data**. Accepting or rejecting a proposed alias, confirming a keyword merge, correcting an extraction or labelling a benchmark pair are all stored as annotations keyed by stable IDs. They survive report regeneration and store resets, can be exported as their own report and imported into another store, and, for alias decisions, can be exported as a configuration fragment (the `aliases` mapping). Aliases shape retrieval, which is recorded per comparison, so applying an updated alias map never needs a store reset. The annotation mechanism itself (storage, capture from reports, import and export) is shared with other plans and will be designed where it is first needed.
