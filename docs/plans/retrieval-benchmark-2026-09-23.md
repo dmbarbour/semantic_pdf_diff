@@ -20,7 +20,7 @@ Glossary:
 
 ## How we'd build it
 
-1. **Pick documents.** Real project documents are sensitive and unavailable, so start from the public corpus fetched by `scripts/fetch_samples.py`. It has competing proposals (`solar-decathlon-2013` teams, the `wind-reference-turbines` designs), revisions (`ietf-quic-transport`, the IEA 15 MW spreadsheets, the NASA interim and final reports) and natural vocabulary drift between authors. Later, the same tooling can be run inside the sandbox on real documents to check that public-corpus results carry over; those labels would never leave it.
+1. **Pick documents.** Real project documents are sensitive and unavailable, so start from the public corpus fetched by `scripts/fetch_samples.py`. It has competing proposals (`solar-decathlon-2013` teams, the `wind-reference-turbines` designs, the 3GPP company contributions, where the moderator summaries give a head start on which positions correspond), revisions (`ietf-quic-transport`, the IEA 15 MW spreadsheets, the NASA interim and final reports) and natural vocabulary drift between authors. Later, the same tooling can be run inside the sandbox on real documents to check that public-corpus results carry over; those labels would never leave it.
 2. **Extract claims (tool).** Run extraction to get evidence stores.
 3. **Propose candidate pairs (Claude).** Take a generous union of candidates from several methods (TF-IDF at high `k`, embeddings, keyword overlap), plus random pairs as controls. Casting a wide net matters: labelling only what TF-IDF finds would hide exactly the misses we want to measure.
 4. **Label (Claude drafts, you check).** A small labelling page shows each pair side by side with its source crops. Choices: *same topic*, *different topic*, *unsure*. Claude can pre-fill suggestions so you mostly confirm; aim for a few hundred pairs. Your judgement is the ground truth.
@@ -45,3 +45,4 @@ Glossary:
 - Can labels for the public corpus live in this repo (they describe public documents), with labels for real documents kept only in the sandbox?
 - Do results on the public corpus predict results on real documents? A small in-sandbox spot check would tell.
 - Should the same labelling page also collect relation labels (equivalent / different / …) so we can later measure the comparison step, not just retrieval?
+- Criteria-first comparison adds a second retrieval task, claim to criterion. Should the benchmark also label "does this claim address this criterion?" once criteria exist?

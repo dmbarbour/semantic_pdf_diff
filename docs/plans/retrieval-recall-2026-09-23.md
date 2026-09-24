@@ -7,7 +7,12 @@
 
 Before the model compares anything, a cheap step decides **which pairs of claims are worth comparing**. That step is called retrieval. Today it uses TF-IDF, which scores two claims as related when they share words, giving more weight to rare words ("chiller") than common ones ("system"). It is fast and transparent, but it **misses related claims that share no words**, e.g. "CHW supply temperature" vs "chilled water flow temp". Manual `aliases` help but don't scale. A missed pair is never compared, and never shows up in the report except as "unmatched".
 
-This gets worse with more files, more projects (the [n-way-comparison](n-way-comparison-2026-09-23.md) plan) and more drift in vocabulary between teams.
+This gets worse with more files, more sources and more drift in vocabulary between teams.
+
+Retrieval now serves two tasks:
+
+- **claim to claim:** candidate pairs for revisions and for `check` (claim-level comparison)
+- **claim to criterion:** finding which claims in each source address a criterion, for criteria-first proposal comparison ([n-way-comparison](n-way-comparison-2026-09-23.md)). A missed claim here makes a source look like it has "no evidence" for a criterion.
 
 ## Candidate improvements
 
@@ -28,8 +33,8 @@ Several in-house embedding models are available behind (or easily put behind) an
 
 1. **Hybrid candidate retrieval:** the union of TF-IDF and embedding candidates. Embed a claim's *topic* (`entity | attribute | conditions`), **not its value**: we want "both are about pump power at design load", and numbers make embeddings noisy. Lexical retrieval stays in the mix because embeddings are often weak on tags like `P-101`.
 2. **Keyword and entity clustering** for the consolidation step above.
-3. **Topic clusters** for N-way comparison.
-4. **Section alignment** between projects, to narrow the candidate space before claim-level matching.
+3. **Criteria support:** matching claims and sections to criteria, and clustering sections' "about" statements across sources to recommend criteria.
+4. **Section alignment** between sources, to narrow the candidate space before claim-level matching.
 
 #### Available in-house models (as of 2026-09-23)
 

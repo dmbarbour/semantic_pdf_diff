@@ -22,7 +22,7 @@ Only content that is truly unstructured goes to the model claim by claim. For st
 | Format | Approach | Notes |
 |---|---|---|
 | `.txt`, `.md` | Text segments. Markdown headings give the heading path and sections. | Cheap; do first. |
-| `.csv`, `.xlsx` | **Model-guided table interpretation**, applied mechanically to rows (see below). | A model call per row doesn't scale to a 10k-row sheet, and it adds error to exact data. Handle merged and multi-row headers, formulas (use cached values), hidden sheets. Never follow external links. |
+| `.csv`, `.xlsx` | **Model-guided table interpretation**, applied mechanically to rows (see below). | A model call per row doesn't scale to a 10k-row sheet, and it adds error to exact data. Handle merged and multi-row headers. Formulas: use cached values; if a formula has none, record the value as unknown with the formula text as an issue, never evaluate it. Hidden sheets are extracted but marked hidden, never silently merged with visible data. Never follow external links. |
 | `.docx` | Real paragraphs, heading styles and real tables via `python-docx`. Embedded images go to the visual pipeline. | No table detection needed; quote checks become exact. |
 | `.pptx` | Text per shape, tables, and **chart XML, which holds the actual series data**. Embedded images go to vision. | Chart XML beats estimating values from pixels. SmartArt and grouped shapes are the awkward cases. |
 | Images (`.png`, `.jpg`, scans) | Straight into the existing visual pipeline. | Nearly free. |

@@ -1,7 +1,7 @@
 # Comparing more than two sources: criteria first
 
 - **Status:** Planned (design settled 2026-09-24)
-- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (claim context fields, store); benefits from [retrieval-recall](retrieval-recall-2026-09-23.md)
+- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (claim context fields, store); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) to recommend criteria; benefits from [retrieval-recall](retrieval-recall-2026-09-23.md)
 
 ## Goal
 

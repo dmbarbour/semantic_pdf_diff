@@ -1,7 +1,7 @@
 # Single-project outputs: consistency check, RAG export, overviews
 
 - **Status:** Planned (consistency check and export); Tentative (model-written summaries)
-- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md)
+- **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) for per-section export chunks and fact-sheet context
 
 ## Goal
 
@@ -87,7 +87,7 @@ Claims grouped by entity and topic, showing values, conditions and provenance li
 
 ### 4. Cited summaries (second tier, tentative)
 
-A model-written overview for humans, produced by map-reduce within the small context window: section summaries, then topic summaries.
+A model-written overview for humans: section summaries, then topic summaries. With the deployment's 262,144-token context, whole sections and large sets of claims fit in one request, so little map-reduce is needed.
 
 - **Written in the style above, and every statement cites evidence IDs.** Citations are checked mechanically: the cited claims must exist, and any values stated must appear in them.
 - It is clearly labelled as generated and optional. It is the project's first *global* generated text, which the README currently avoids on purpose.

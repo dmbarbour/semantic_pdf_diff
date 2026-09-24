@@ -84,11 +84,15 @@ Reports (HTML) remain files generated from the database.
 | `content` | content ID, SHA-256, extension, size, detected media type |
 | `source` | source ID, name, how it was given (folder / zip / file / manifest), metadata (JSON) |
 | `file` | source ID, path (with `!/` for archive members), content ID, parent archive file if any, metadata (JSON: manifest-supplied and native document properties) |
-| `interpreter` | one row per role (extract / embed / summarize / compare): model, endpoint label (credentials redacted), prompt hashes, output-affecting settings JSON, tool and library versions. This is the store's binding checked on every run. |
-| `section` | content ID, section ID, locator range, heading path |
+| `interpreter` | one row per bound role (extract / embed / summarize; comparison settings are recorded per comparison instead): model, endpoint label (credentials redacted), prompt hashes, output-affecting settings JSON, tool and library versions. This is the store's binding checked on every run. |
+| `section` | content ID, section ID, locator range, heading path, triage results (type, density, keywords, "about" statement) |
+| `table_interpretation` | content ID, table region, sheet map, row-to-claims mapping, strategy, check results (see [multi-format-adapters](multi-format-adapters-2026-09-23.md)) |
 | `task` | content ID, section, pass, locator, status (pending / complete / partial / failed / skipped / not_reached), attempts, issues. This is the coverage record and the resume queue. |
-| `evidence` | evidence ID, content ID, task ID, locator JSON, claim fields, quality signals |
-| `comparison` | comparison ID, mode, the sources compared, findings (so reports can be regenerated without model calls) |
+| `evidence` | evidence ID, content ID, task ID, locator JSON, claim fields (including topic, basis, uncertainty, context and role), derivation chain, quality signals, issues |
+| `embedding` | text hash, embedding interpreter, vector (for claim topics and section "about" statements) |
+| `comparison` | comparison ID, mode, the sources compared, comparison settings and model, criteria used, findings or criterion descriptions (so reports can be regenerated without model calls) |
+| `criterion` | criterion ID, question, required basis and context, comparison method, provenance (extracted from which documents, recommended, or user-entered), review state |
+| `annotation` | human QA records: target (by stable ID), kind, value, context snapshot, author, time. Human input, not derived data, so `--reset` never deletes it; orphaned annotations are kept and re-attached where possible. |
 | `response_cache` | request hash → validated model response (replaces the `cache/` folder) |
 | `meta` | schema version, creation and tool info |
 
