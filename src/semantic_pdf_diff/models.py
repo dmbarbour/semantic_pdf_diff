@@ -157,6 +157,8 @@ class Settings(Strict):
     seed: int | None = None
     max_token_field: Literal["max_tokens", "max_completion_tokens"] = "max_tokens"
     aliases: dict[str, str] = Field(default_factory=dict)
+    # Debugging: verify that a semantic cache hit was recorded for a byte-identical request.
+    cache_check: bool = False
 
     @model_validator(mode="before")
     @classmethod

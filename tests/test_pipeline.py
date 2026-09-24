@@ -23,7 +23,7 @@ class Fake:
     def __init__(self,s=None,relation='different',same=True):
         self.s = s or Settings()
         self.relation,self.same = relation,same
-    def ask(self,prompt,schema,images=()):
+    def ask(self,prompt,schema,images=(),key=None):
         if schema is Judgment:
             return Judgment(relation=self.relation,rationale='Fixture judgment',confidence=.95,same_conditions=self.same)
         raise AssertionError('Unexpected extraction')
@@ -92,7 +92,7 @@ class Tests(unittest.TestCase):
 
     def test_extraction_coverage_and_unsupported_quote(self):
         class Extractor(Fake):
-            def ask(self,prompt,schema,images=()):
+            def ask(self,prompt,schema,images=(),key=None):
                 from semantic_pdf_diff.models import Claim
                 data=ev().model_dump(include=set(Claim.model_fields))
                 data['quote']='invented support'
@@ -157,7 +157,7 @@ class Tests(unittest.TestCase):
         from semantic_pdf_diff.models import Claim
         class Extractor(Fake):
             count=0
-            def ask(self,prompt,schema,images=()):
+            def ask(self,prompt,schema,images=(),key=None):
                 self.count+=1
                 return Extraction(claims=[],complete=False,issues=['Dense visual'])
         with tempfile.TemporaryDirectory() as directory:

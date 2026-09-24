@@ -90,8 +90,12 @@ DERIVATION = {
     "overview": [DerivationStep(step="pdf-render", detail="whole page"), DerivationStep(step="model-extraction", detail="vision")],
 }
 
-def extract_pdf(path, content, output, client):
-    """Extract evidence from one PDF, identified by its content ID; returns (evidence, coverage)."""
+def extract_pdf(path, content, output, client, on_task=None):
+    """Extract evidence from one PDF, identified by its content ID; returns (evidence, coverage).
+
+    on_task(row, evidence) is called as each task finishes, so a store can persist
+    results task by task.
+    """
     s = client.s
     evidence, coverage = [], []
     stem = content.split(":", 1)[1][:12]
@@ -99,7 +103,12 @@ def extract_pdf(path, content, output, client):
     assets.mkdir(exist_ok=True, parents=True)
     seen = set()
 
-    def consume(page_no, bbox, task, family, text, image=None, check=None, locate=None):
+    def record(row, items=()):
+        coverage.append(row)
+        if on_task:
+            on_task(row, list(items))
+
+    def consume(page_no, bbox, task, family, text, image=None, check=None, locate=None, crop=None):
         """Run one extraction task, record it in the ledger and return its status.
 
         check(quote) -> bool | None. Native tasks reject claims failing it; visual tasks
@@ -107,12 +116,14 @@ def extract_pdf(path, content, output, client):
         Exact duplicate claims within one family (native or visual) on a page are kept once.
         """
         region = task.split(":")[0]
+        found = []
         row = {"content": content, "page": page_no, "bbox": list(bbox), "task": task,
                "image": image, "status": "complete", "issues": [], "claims": 0}
         images = [output / image] if image else []
         prompt = EXTRACT + "\nSource type: " + region + "\nSOURCE DATA:\n" + text
         try:
-            result = client.ask(prompt, Extraction, images)
+            key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop)
+            result = client.ask(prompt, Extraction, images, key=key)
             row["status"] = "complete" if result.complete else "partial"
             row["issues"] = list(result.issues)
             for claim in result.claims:
@@ -128,13 +139,14 @@ def extract_pdf(path, content, output, client):
                 seen.add(key)
                 where = tuple(locate(claim.quote) if locate else bbox)
                 eid = "ev-" + hashlib.sha256((content + repr(key) + repr(where)).encode()).hexdigest()[:16]
-                evidence.append(Evidence(**claim.model_dump(), id=eid, content=content,
-                                         locator=PdfLocator(page=page_no, bbox=where, region=region, task=task),
-                                         derivation=DERIVATION[region], image=image, quote_verified=verified))
+                found.append(Evidence(**claim.model_dump(), id=eid, content=content,
+                                      locator=PdfLocator(page=page_no, bbox=where, region=region, task=task),
+                                      derivation=DERIVATION[region], image=image, quote_verified=verified))
                 row["claims"] += 1
         except ModelFailure as e:
             row.update(status="failed", issues=[str(e)])
-        coverage.append(row)
+        evidence.extend(found)
+        record(row, found)
         return row["status"]
 
     def text_task(page_no, segments, task, depth=0):
@@ -169,7 +181,7 @@ def extract_pdf(path, content, output, client):
         fits = len(text.encode()) <= s.text_bytes
         splittable = len(columns) > 2
         if not fits and not splittable:
-            coverage.append({"content": content, "page": page_no, "bbox": list(bbox), "task": task, "image": None,
+            record({"content": content, "page": page_no, "bbox": list(bbox), "task": task, "image": None,
                              "status": "partial", "issues": ["Table row exceeds text budget; inspect visual tiles"], "claims": 0})
             return
         if fits:
@@ -184,12 +196,13 @@ def extract_pdf(path, content, output, client):
             table_task(page_no, bbox, f"{task}:c{i}", header, row, [columns[0], *part], depth + (1 if fits else 0))
 
     def visual_task(page_no, page, tag, rect, depth=0):
-        name = f"{stem}-p{page_no}-{tag.replace(':', '-')}.png"
+        name = f"{stem}-{tag.replace(':', '-')}.png"
         render(page, rect, assets / name, s.image_side)
         native = rect * page.derotation_matrix
         layer = page.get_text("text", clip=native)
         check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
-        status = consume(page_no, native, tag, "visual", "", "assets/" + name, check=check)
+        status = consume(page_no, native, tag, "visual", "", "assets/" + name, check=check,
+                         crop=(tuple(round(v, 3) for v in rect), s.image_side))
         # Refine only local tiles; an overview may be incomplete because it spans
         # many facts, and all overview areas already have tile coverage.
         if (status == "complete" or tag == "overview" or depth >= s.refinement_depth
@@ -224,7 +237,7 @@ def extract_pdf(path, content, output, client):
                 extra = len(piece[2].encode()) + 2 if piece else 0
                 if group and (piece is None or size + extra > s.text_bytes):
                     ids = group[0][0] + (f"-{group[-1][0]}" if len(group) > 1 else "")
-                    text_task(number, [(b, t) for _, b, t in group], f"text:{ids}")
+                    text_task(number, [(b, t) for _, b, t in group], f"text:p{number}:{ids}")
                     group, size = [], 0
                 if piece:
                     group.append(piece)
@@ -233,8 +246,8 @@ def extract_pdf(path, content, output, client):
                 found = [(table.bbox, table.extract()) for table in page.find_tables().tables]
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors
                 found = []
-                coverage.append({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
-                                 "task": "table-detection", "image": None, "status": "failed",
+                record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
+                                 "task": f"table-detection:p{number}", "image": None, "status": "failed",
                                  "issues": [type(e).__name__ + ": " + str(e)], "claims": 0})
             for ti, (bbox, rows) in enumerate(found):
                 if not rows:
@@ -242,12 +255,15 @@ def extract_pdf(path, content, output, client):
                 header = rows[0]
                 width = max(len(r) for r in rows)
                 for ri, row in enumerate(rows[1:] or rows):
-                    table_task(number, tuple(bbox), f"table:{ti}:{ri}", header, row, list(range(width)))
+                    table_task(number, tuple(bbox), f"table:p{number}:{ti}:{ri}", header, row, list(range(width)))
             if s.vision:
                 for tag, rect in visual_regions(page, s.tile_points):
+                    # Task tags are unique within content: "<region>:p<page>[:<index>]".
+                    region, _, index = tag.partition(":")
+                    tag = f"{region}:p{number}" + (f":{index}" if index else "")
                     visual_task(number, page, tag, rect)
             else:
-                coverage.append({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
-                                 "task": "vision", "image": None, "status": "skipped",
+                record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
+                                 "task": f"vision:p{number}", "image": None, "status": "skipped",
                                  "issues": ["Visual extraction disabled; charts, diagrams and scans may be missed"], "claims": 0})
     return evidence, coverage

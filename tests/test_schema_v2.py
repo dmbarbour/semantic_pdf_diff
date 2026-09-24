@@ -27,7 +27,7 @@ class Recorder:
         self.s = Settings(**settings)
         self.prompts = []
         self.calls, self.cache_hits, self.usage = 0, 0, {}
-    def ask(self, prompt, schema, images=()):
+    def ask(self, prompt, schema, images=(), key=None):
         self.prompts.append(prompt)
         if schema is Judgment:
             return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)

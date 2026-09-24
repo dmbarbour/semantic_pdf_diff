@@ -54,7 +54,7 @@ class Recorder:
     def __init__(self, respond, **settings):
         self.s = Settings(**settings)
         self.respond, self.tasks = respond, []
-    def ask(self, prompt, schema, images=()):
+    def ask(self, prompt, schema, images=(), key=None):
         source = prompt.split('Source type: ')[1].split('\n')[0]
         self.tasks.append((source, prompt, list(images)))
         return self.respond(source, prompt)
@@ -224,7 +224,7 @@ class ExtractionTests(unittest.TestCase):
                 self.assertEqual((header[0], row[0]), ('Item', 'Pump P1'))
                 self.assertEqual(len(header), len(row))
             self.assertEqual(sorted(r['task'] for r in coverage if r['task'].startswith('table')),
-                             ['table:0:0', 'table:0:0:c0', 'table:0:0:c1'])
+                             ['table:p1:0:0', 'table:p1:0:0:c0', 'table:p1:0:0:c1'])
 
     def test_oversized_table_row_is_split_not_skipped(self):
         rows = [['Item'] + [f'Column {i}' for i in range(8)], ['Pump'] + ['x' * 60 for _ in range(8)]]

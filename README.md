@@ -31,7 +31,9 @@ pdf-semantic-diff old.pdf new.pdf --mode revisions --out revision-diff
 pdf-semantic-diff old.pdf new.pdf --plan
 ```
 
-Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error. Rerunning into the same output folder reuses cached model responses.
+Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error.
+
+The `--out` folder is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence and cached model responses, and an interrupted run resumes where it stopped. A store is bound to the model and extraction settings it was built with; a run with different ones is refused unless you pass `--reset` (preview with `--reset --dry-run`) or use a new folder.
 
 ## Documentation
 

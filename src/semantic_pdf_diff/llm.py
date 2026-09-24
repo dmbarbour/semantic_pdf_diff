@@ -27,6 +27,9 @@ class ModelFailure(RuntimeError):
 class BudgetExceeded(ModelFailure):
     pass
 
+class CacheKeyMismatch(RuntimeError):
+    """A semantic cache key matched a response recorded for a different request (debug check)."""
+
 def redact_url(url):
     """Drop user:password@ from a URL so it can be logged or written to reports."""
     parts = urllib.parse.urlsplit(url)
@@ -72,10 +75,17 @@ def json_text(answer):
     return answer
 
 class Client:
-    def __init__(self, settings: Settings, cache: Path, api_key: str | None = None):
+    """Chat Completions client with a response cache.
+
+    `cache` is either a Store, whose response cache uses semantic keys supplied by
+    callers, or a folder for a byte-keyed file cache (for library use without a store).
+    """
+    def __init__(self, settings: Settings, cache, api_key: str | None = None):
         self.s = settings
-        self.cache = cache
-        cache.mkdir(parents=True, exist_ok=True)
+        self.store = None if isinstance(cache, (str, Path)) else cache
+        self.cache = Path(cache) if self.store is None else None
+        if self.cache is not None:
+            self.cache.mkdir(parents=True, exist_ok=True)
         self.api_key = api_key if api_key is not None else os.getenv("OPENAI_API_KEY", "")
         self.calls = 0
         self.cache_hits = 0
@@ -84,7 +94,13 @@ class Client:
             print(f"Warning: sending OPENAI_API_KEY over unencrypted HTTP to {redact_url(settings.base_url)}",
                   file=sys.stderr)
 
-    def ask(self, prompt, schema, images=()):
+    def ask(self, prompt, schema, images=(), key=None):
+        """Ask the model for a `schema` object.
+
+        key: optional semantic cache key, a tuple (kind, region, *parts) identifying the
+        request by meaning (content, locator, input hash, crop). Within a store, the
+        bound interpreter covers everything else that shapes the response.
+        """
         # UTF-8 bytes deliberately overestimate typical text tokenization. Image tokens
         # are provider-specific: the operator must configure their upper bound.
         estimate = len((SYSTEM + prompt).encode()) + len(images) * self.s.image_tokens + 128
@@ -107,15 +123,11 @@ class Client:
             body["response_format"] = {"type": "json_schema", "json_schema": {
                 "name": schema.__name__, "schema": schema.model_json_schema()}}
         raw = json.dumps(body).encode()
-        key = hashlib.sha256(self.s.base_url.encode() + raw + json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()
-        target = self.cache / (key + ".json")
-        if target.exists():
-            try:
-                value = schema.model_validate_json(target.read_text())
-                self.cache_hits += 1
-                return value
-            except ValueError:
-                target.unlink()
+        request_hash = hashlib.sha256(self.s.base_url.encode() + raw + json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()
+        cached = self._lookup(request_hash, key, schema)
+        if cached is not None:
+            self.cache_hits += 1
+            return cached
         last = "Unknown model failure"
         for attempt in range(self.s.retries + 1):
             if self.calls >= self.s.max_calls:
@@ -141,9 +153,7 @@ class Client:
                 if not isinstance(answer, str) or not answer.strip():
                     raise ValueError("Response has no text content")
                 value = schema.model_validate_json(json_text(answer))
-                temp = target.with_suffix(".tmp")
-                temp.write_text(value.model_dump_json())
-                temp.replace(target)
+                self._save(request_hash, key, value)
                 return value
             except urllib.error.HTTPError as e:
                 last = f"HTTP {e.code}: {e.reason}"
@@ -155,3 +165,40 @@ class Client:
             if attempt < self.s.retries:
                 time.sleep(wait)
         raise ModelFailure(last)
+
+    def _semantic(self, request_hash, key):
+        if key is None:
+            return request_hash, "raw", ""
+        return hashlib.sha256(json.dumps(list(key), sort_keys=True, default=str).encode()).hexdigest(), key[0], key[1]
+
+    def _lookup(self, request_hash, key, schema):
+        if self.store is None:
+            target = self.cache / (request_hash + ".json")
+            if not target.exists():
+                return None
+            try:
+                return schema.model_validate_json(target.read_text())
+            except ValueError:
+                target.unlink()
+                return None
+        semantic, _, _ = self._semantic(request_hash, key)
+        row = self.store.cached(semantic)
+        if row is None:
+            return None
+        if self.s.cache_check and row[1] != request_hash:
+            raise CacheKeyMismatch(f"Cache key {key!r} matched a response recorded for a different request")
+        try:
+            return schema.model_validate_json(row[0])
+        except ValueError:
+            self.store.uncache(semantic)
+            return None
+
+    def _save(self, request_hash, key, value):
+        if self.store is None:
+            target = self.cache / (request_hash + ".json")
+            temp = target.with_suffix(".tmp")
+            temp.write_text(value.model_dump_json())
+            temp.replace(target)
+        else:
+            semantic, kind, region = self._semantic(request_hash, key)
+            self.store.cache(semantic, kind, region, request_hash, value.model_dump_json())

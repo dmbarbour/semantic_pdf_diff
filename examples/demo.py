@@ -28,7 +28,7 @@ right=[claim('B-1','primary pump','rated power','12000','W','table'),
 
 class FixtureClient:
     s=Settings(top_k=1,min_score=.25)
-    def ask(self,prompt,schema,images=()):
+    def ask(self,prompt,schema,images=(),key=None):
         import json
         a=json.loads(prompt.split('\nA=')[1].split('\nB=')[0])
         b=json.loads(prompt.split('\nB=')[1].split('\nNumeric check=')[0])

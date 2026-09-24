@@ -46,6 +46,12 @@ Defaults target an 8,192-token context. No request contains a whole PDF; even a 
 
 A typical page needs multiple calls, so large PDFs can require hundreds or thousands. Calls are sequential to avoid overwhelming a small-model server; `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--plan` makes no API calls and counts initial visual tasks; text, table, comparison, retries and refinement calls are additional. `--max-calls` caps actual HTTP attempts for one invocation, including retries.
 
-Rerun using the same output directory to reuse successful cached responses. Do not run concurrent processes into the same output directory. The cache key includes endpoint, model, prompt, image bytes, response schema and output/sampling parameters. Keep endpoint/model identifiers versioned when changing deployed weights; otherwise clear `cache/`. Cache entries contain extracted document information.
+The `--out` folder is an evidence store: `store.sqlite` (sources, files, content, evidence, coverage, cached model responses, comparisons) plus `assets/` for rendered crops. Stores are created with owner-only permissions and are as sensitive as the documents they were built from.
+
+- **Reuse and resume:** content already extracted is loaded from the store. Evidence and coverage are written task by task, and model responses are cached by the meaning of each request (content, task, input), so an interrupted run resumes by replaying cached answers. Tasks that failed (e.g. hitting `--max-calls`) are retried on the next run.
+- **One writer:** a second process writing to the same store gets a "store is in use" error.
+- **Binding:** the store records its extraction interpreter (model, prompts, output-affecting settings, library versions). A run with a different one is refused with the differences listed. `--reset` clears only the affected derived data (for example, a changed tile size clears only image-based evidence) and all comparisons; `--reset --dry-run` shows what would be cleared. Timeouts, retries, call limits, credentials and the endpoint URL don't count. Keep model identifiers versioned when deployed weights change; the store can't detect a silent weight swap.
+- **Schema changes** during development aren't migrated: an older store refuses to open; use a new folder.
+- **`cache_check`** (off by default) is a debugging aid: a cache hit whose stored request bytes differ from the current request raises an error instead of being served.
 
 Exit codes: `0` processing complete (semantic uncertainty may remain); `2` incomplete source coverage, a comparison processing failure, no extracted claims on either side, or pair-limit truncation; `1` fatal input/configuration error. Inspect the JSON and coverage ledger regardless of exit code.

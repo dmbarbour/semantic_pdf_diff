@@ -12,6 +12,7 @@ Provenance (schema v2):
 - Evidence attaches to content, never to paths. Each item has a **locator** within the content (one-based page, bounding box in unrotated PDF points, the extraction pass and task) and a **derivation** listing the steps from bytes to claim. Visual claims retain the exact PNG the model saw.
 - Evidence IDs derive from content, locator and claim, so they are stable across renames. The same PDF supplied as both sources is extracted once; its evidence is listed as *shared* and never sent for comparison.
 - `evidence.json` and `report.json` record the **interpreters**: the model, a hash of the prompts, the settings that affect output, and library versions.
+- Everything is kept in an evidence **store** (the `--out` folder); see [configuration](configuration.md) for reuse, resume and binding.
 
 ## Pipeline
 
@@ -39,6 +40,8 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `extract.py` | PDF text/tables, page/tile rendering, refinement and provenance |
 | `compare.py` | Retrieval, local reasoning and numeric checks |
 | `report.py` | Escaped HTML and JSON reports |
+| `provenance.py` | Content IDs, extension normalization, interpreter descriptions |
+| `store.py` | SQLite evidence store: binding, per-task records, semantic response cache, comparisons |
 | `cli.py` | Orchestration, planning and exit semantics |
 
 API contracts were checked against the [OpenAI Chat Completions reference](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create) and [PyMuPDF Page documentation](https://pymupdf.readthedocs.io/en/latest/page.html). Provider compatibility still needs a live smoke test.

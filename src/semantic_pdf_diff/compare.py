@@ -6,6 +6,7 @@ from collections import Counter, defaultdict
 from decimal import Decimal, InvalidOperation
 from .models import Judgment
 from .llm import ModelFailure
+from .provenance import comparison_interpreter, text_hash
 
 # Deliberately small, explicit dimensional conversions. Unknown units abstain.
 # No currency, affine temperature, ambiguous "ton", ranges or inequalities.
@@ -108,6 +109,8 @@ def compare(left, right, output, client, mode):
     Evidence belongs to content, so content present on both sides yields identical
     evidence; it is listed as shared and never sent to the model.
     """
+    # Comparisons aren't bound to a store, so their cache keys carry their own settings.
+    settings_key = text_hash(comparison_interpreter(client.s).model_dump_json())
     shared_ids = {e.id for e in left} & {e.id for e in right}
     findings, matched, attempted = [], set(), set()
     left = [e for e in left if e.id not in shared_ids]
@@ -127,7 +130,7 @@ def compare(left, right, output, client, mode):
         prompt = COMPARE + "\nA=" + json.dumps(payload[0],ensure_ascii=False) + "\nB=" + json.dumps(payload[1],ensure_ascii=False)
         prompt += "\nNumeric check=" + json.dumps(calc)
         try:
-            judgment = client.ask(prompt, Judgment, images)
+            judgment = client.ask(prompt, Judgment, images, key=("compare", "", settings_key, a.id, b.id))
             # Numeric arithmetic and uncertain provenance can veto a confident judgment.
             reasons = []
             if judgment.relation in ("different", "equivalent") and not judgment.same_conditions:
