@@ -31,7 +31,13 @@ Other plans say "project" informally; in store terms that means a **source**.
 - **Revisions are content differences, not timestamps.** Going from source A to source B means some content was removed (in A, not B), some added (in B, not A) and the rest is shared. A rename is shared content under a new path, so it changes only provenance. File times may be recorded for humans but carry no meaning in comparisons. This answers the earlier question of how manifests express revision metadata: they don't need to.
 - **Section:** a logical part of one piece of content, and the unit of scheduling, caching and triage. For PDFs it comes from the outline/bookmarks, falling back to headings guessed from font size, then to fixed page ranges. See [scheduling-and-triage](scheduling-and-triage-2026-09-23.md).
 - **Locator:** where a claim sits *within content*, never including the path: for PDF, page plus bounding box plus pass (text / table / tile / overview). Other formats add their own shapes later.
-- **Interpreter:** everything besides the bytes that shapes derived data. For extraction that means the model ID, prompt versions, output-affecting settings (text budget, tile size, refinement depth…) and tool and library versions (e.g. PyMuPDF). There are separate interpreters for embeddings, summaries and comparisons. Settings that don't affect output (timeouts, call limits, concurrency) are not part of an interpreter.
+- **Interpreter:** everything besides the bytes that shapes derived data. There are separate interpreters for extraction, embeddings and summaries. An interpreter includes:
+  - **everything sent to a model:** model identifier, prompt templates (tracked by an internal prompt version plus hash), sampling and output options (temperature, seed, response format, token limits) and image rendering (resolution, tile size)
+  - **everything that shapes chunking or sections:** text budget, tile overlap, refinement depth, section heuristics
+  - **tool and library versions** that affect parsing or rendering (this tool, PyMuPDF, adapter libraries)
+  - **configured external converters:** executable path, SHA-256, declared version and arguments. This is best effort only: a converter's own configuration files and dependencies can't be tracked, and **users are responsible** for resetting a store when they change them.
+
+  Not included: timeouts, retries, call limits, concurrency and rate limits, credentials, and the endpoint URL. The model identifier must identify the weights; if a server swaps weights under the same name, that is also the user's responsibility (the README already advises versioned model names).
 - **A store is bound to its interpreters.** The first run records each role's interpreter in the store's manifest. A later run whose interpreter differs is **rejected**, with a message naming what differs. Mixing models breaks things in unpredictable ways; embeddings especially are only comparable within one model. The user either creates a new store or passes `--reset`, which deletes all derived data (evidence, tasks, embeddings, summaries, comparisons, response cache) but keeps the registered sources and content, so the same sources re-run under the new interpreters. Adding a role that wasn't configured before (e.g. embeddings later) is allowed; changing an existing one is not.
 
 Evidence IDs are derived from `content ID + locator + claim`, so they are stable across renames, moves and re-packaging. They don't need an interpreter component, since one store has one extraction interpreter.
@@ -134,13 +140,14 @@ report --store <dir> <comparison>
 - **Extension aliases:** collapse only those known to share an interpretation.
 - **Model or interpreter changes:** rejected; new store or explicit `--reset`.
 - **Store scope:** one local folder, shared at any scope the user chooses; typically a few revisions and a few teams per user.
+- **What affects output:** anything sent to a model, plus anything that shapes chunking or sections (see *Interpreter* above). External converters are tracked best-effort; their hidden configuration is the user's responsibility.
+- **Upgrades:** internal prompt versions and library versions are tracked and a change is rejected like any other interpreter change. That is acceptable because most users install once, spend a while on configuration, then use the same setup for a long time; upgrades are rare, deliberate events where a `--reset` or new store is expected.
 - **Future:** external converters (e.g. opening Cameo `.mdzip` models into recognized formats) are planned in [multi-format-adapters](multi-format-adapters-2026-09-23.md). They fit the content model: the converter and its version are part of the interpretation, and its outputs are derived content with provenance back to the original.
 
 ## Open questions
 
 - **What structure do real documents have?** Real documents are sensitive and won't be shared; the tool will run inside a multi-layer sandbox. Section heuristics are developed against the public corpus (see [Samples](#samples)), and must fall back gracefully when there's no outline or consistent heading font.
-- **What counts as an output-affecting setting?** The rule is clear, but the list needs care: getting it wrong either rejects harmless changes or lets meaningful ones through. Start strict (treat every extraction setting as output-affecting except timeouts, call limits and concurrency) and loosen with evidence.
-- **Does a tool upgrade that changes prompts require `--reset`?** Under the rule above, yes. That is predictable but may be annoying across frequent releases; keep prompt changes deliberate and versioned.
+- **Comparison settings:** retrieval options (`top_k`, `min_score`, aliases) and the comparison model shape comparisons, but each comparison is a self-contained record. Suggestion: record them per comparison instead of binding the store, so a user can re-run one comparison with a larger `top_k` without a reset. Nothing mixes across comparisons, so this avoids the unpredictable breakage the binding rule exists to prevent.
 
 ## Samples
 
