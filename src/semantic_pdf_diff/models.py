@@ -215,7 +215,8 @@ class Settings(Strict):
     output_tokens: int = Field(default=1400, ge=256)
     image_tokens: int = Field(default=1200, ge=1)
     safety_tokens: int = Field(default=400, ge=100)
-    max_calls: int = Field(default=500, ge=1)
+    # A safety stop against runaway runs, not a budget: throughput is governed by rate_limits.
+    max_calls: int = Field(default=100_000, ge=1)
     retries: int = Field(default=2, ge=0, le=5)
     timeout: float = Field(default=120, gt=0)
     text_bytes: int = Field(default=1800, ge=200)

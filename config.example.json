@@ -3,7 +3,7 @@
   "output_tokens": 1400,
   "image_tokens": 1200,
   "safety_tokens": 400,
-  "max_calls": 500,
+  "max_calls": 100000,
   "retries": 2,
   "text_bytes": 1800,
   "image_side": 1000,
