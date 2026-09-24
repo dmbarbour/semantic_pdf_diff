@@ -56,10 +56,10 @@ report <result>
 - **Duplicate and superseded files:** detect identical hashes, and flag near-duplicates such as `report_v2_final_FINAL.pdf`, instead of double-counting claims.
 - **Heading-path context:** send the section heading path with each text group, so the model can tell which component a sentence is about. This helps PDFs and folders alike.
 - **Provenance in reports:** show `project / relative/path.pdf / section / p.12`.
-- **Zip archives as folders:** a `.zip`, whether given as the project or found inside one, is read as a folder without extracting it to disk. Provenance uses `archive.zip!/inner/path.pdf`, and the source hash is the member's content hash, so the same file inside or outside an archive gets the same evidence. Treat archives as hostile:
-  - reject absolute paths and `..` members (zip-slip)
-  - cap total uncompressed size, member count and compression ratio (zip bombs)
-  - limit how deeply nested archives are opened (depth 1 or 2)
+- **Zip archives as folders:** a `.zip`, whether given as the project or found inside one, is read as a folder without extracting it to disk. Provenance uses `archive.zip!/inner/path.pdf` (nested: `a.zip!/b.zip!/c.pdf`), and the source hash is the member's content hash, so the same file inside or outside an archive gets the same evidence. Safety limits are generous backstops against pathological input, not restrictions on normal use; all are configurable:
+  - reject absolute paths and `..` members (zip-slip), since members are never written to disk under their own names anyway
+  - nesting depth: at least 4 levels; default 8
+  - size backstops, set high: e.g. total uncompressed bytes per project in the tens of GB, and a compression-ratio check only on large members (e.g. over 1000:1 for members above 100 MB). Anything over a limit is recorded in the coverage record, not silently dropped.
   - record encrypted members as `skipped` in the coverage record rather than failing
   - ignore OS clutter (`__MACOSX/`, `.DS_Store`, `Thumbs.db`)
   
