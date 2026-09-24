@@ -32,9 +32,11 @@ Statuses:
 
 | Plan | Summary | Waiting on |
 |---|---|---|
-| Approach-level comparison *(plan not yet written)* | Summarize each source's *approach* to the shared ends, group sources that take the same approach, and compare within a group on what only that approach makes comparable (e.g. rotor speed among turbines, not against solar), while criteria compare across groups. Applied recursively to subsystems ("fractally"). Still compares, never judges. | Criteria-first comparison; triage "about" statements |
+| Approach-level comparison *(plan not yet written)* | Summarize each source's *approach* to the shared ends, including primary components and processes; group sources that take the same approach, and compare within a group on what only that approach makes comparable (e.g. rotor speed among turbines, not against solar), while criteria compare across groups. Applied recursively to subsystems ("fractally"). Still compares, never judges. | Criteria-first comparison; triage "about" statements |
+| Query-driven reports *(plan not yet written)* | When requesting a report, support a query to filter and focus a report |
 | Minimal-interpretation mode *(plan not yet written)* | A long-term option to limit how much model interpretation stands between a source and its evidence, e.g. favouring literal, verbatim or deterministic extraction. Motivated by layered interpreters, such as model summaries of models. | Evidence store; format adapters |
 | Interactive views *(plan not yet written)* | Live views over a store while a run proceeds: status-stamped preliminary reports, criteria review (propose → review → run), pending alias and keyword questions, review annotations. Terminal UI first (usable inside a sandbox), favouring a library that is easy to work with, extend and modify (e.g. Textual); a local web server later for other users. | Evidence store; preliminary reports from scheduling |
+| Automatic source partitioning *(plan not yet written)* | Provide users tools to partition a body of documents and evidence across teams (recognizing multiple components) and timelines (recognizing multiple versions of a file), so users don't need to partition manually. |
 
 ## Completed
 
