@@ -42,9 +42,9 @@ Statuses:
 
 1. Evidence store (active)
 2. Scheduling and triage (needed before large folders are practical)
-3. Single-project `check` / `export`, and the `.txt` / `.md` / `.csv` adapters, both cheap once the store exists
+3. Single-project `check` / `export`, and the adapter interface with `.txt` / `.md`, both cheap once the store exists
 4. Retrieval benchmark, which can start any time; then retrieval recall
-5. Remaining adapters (`.xlsx`, `.docx`, `.pptx`), in the order users need them
+5. `.docx` and `.pptx` adapters (the formats users submit most after PDF), then the external converter interface (Cameo integration point), then `.csv` / `.xlsx` and images
 6. N-way comparison
 
 ## Deferred decisions

@@ -1,6 +1,6 @@
 # Multi-format source adapters
 
-- **Status:** Planned
+- **Status:** Planned. Format priority (2026-09-23): PDF, then `.docx` and `.pptx`; Cameo models via a separate project.
 - **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (locators, sections, store)
 
 ## Goal
@@ -62,15 +62,18 @@ The report must render a suitable preview for each format: a text excerpt with i
 
 ## Milestones
 
-1. Adapter interface and intermediate units; refactor the PDF path to use it.
-2. `.txt` / `.md` adapters.
-3. `.csv` / `.xlsx` with deterministic claims.
-4. `.docx`.
-5. `.pptx`, including chart XML.
-6. Images; external converter interface, with LibreOffice as the first configured converter.
+Ordered by what users submit: PDF first (already supported), then `.docx` and `.pptx`, then the rest.
+
+1. Adapter interface and intermediate units; refactor the PDF path to use it. Include `.txt` / `.md` here as the simplest adapters: they are nearly free and exercise the interface (and the `ietf-quic-transport` samples).
+2. `.docx`.
+3. `.pptx`, including chart XML.
+4. External converter interface, with LibreOffice as the first configured converter. This is also the integration point for Cameo `.mdzip` models, which are being digested in a separate project: its output formats become inputs here.
+5. `.csv` / `.xlsx` with deterministic claims.
+6. Images.
 
 ## Open questions
 
-- Which formats do users actually submit first? This should drive the order after milestone 2.
+- **Samples for `.docx` and `.pptx`:** the public corpus has none yet. Find freely available engineering reports and slide decks (ideally competing or revised versions) and add them to `scripts/samples.json` before milestone 2.
+- **Cameo integration:** what will the separate Cameo project produce (XMI, CSV, HTML, diagram images, or claims directly)? That decides whether it plugs in as an external converter or as an importer of ready-made evidence.
 - How should a deterministic spreadsheet claim be marked (source kind, reliability) relative to model-extracted claims?
 - Should very large sheets get per-table sampling or summary statistics instead of one claim per cell?
