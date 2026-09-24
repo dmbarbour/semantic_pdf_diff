@@ -1,6 +1,6 @@
 # Robustness baseline (0.2.0)
 
-- **Status:** Completed 2026-09-23 (commit `50e74cb`)
+- **Status:** Completed 2026-09-23 (commit `50e74cb`). The stable baseline is tagged `v0.2.0`.
 - **Scope:** Fix correctness and robustness problems found in a review of 0.1.1 before generalizing the project.
 
 ## Why

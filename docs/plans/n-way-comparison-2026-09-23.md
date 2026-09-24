@@ -1,11 +1,11 @@
-# Comparing more than two sources: criteria first
+# Criteria-first comparison of sources
 
-- **Status:** Planned (design settled 2026-09-24)
+- **Status:** Planned (design settled 2026-09-24). Next after scheduling-and-triage: this is the main use case, since two-way proposal comparison goes criteria first too.
 - **Depends on:** [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (claim context fields, store); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) to recommend criteria; benefits from [retrieval-recall](retrieval-recall-2026-09-23.md)
 
 ## Goal
 
-Compare N sources at once, intelligently: several competing proposals, or an ordered series of revisions. **This project compares; it does not judge.** It produces no scores, rankings or rubric results, but it can organize comparisons around what a user will later judge by.
+Compare two or more sources intelligently: competing proposals (two-way included), or an ordered series of revisions. **This project compares; it does not judge.** It produces no scores, rankings or rubric results, but it can organize comparisons around what a user will later judge by.
 
 ## Why not compare claims directly
 
@@ -87,12 +87,12 @@ Revisions of one design are commensurable by default. They use claim-level compa
 
 ## Milestones
 
-1. Criteria records: provenance, annotations, export/import; extraction from reference documents and model recommendation.
-2. Source × criterion mapping with applicability outcomes.
-3. Per-source synthesis (context selection, derived implications, model-judged statistics).
-4. Cross-source description within each criterion: mechanical statistics plus one model request per criterion describing agreement, spread, outliers and incomparable positions.
-5. Matrix report.
-6. Ordered revision series (claim-level, content-difference first).
+1. **Criteria:** records built on annotations (provenance, review state, export and re-import for editing); extraction from reference documents and the user's rubrics; model recommendation from "about" statements.
+2. **Mapping** sources to criteria, with applicability outcomes.
+3. **Per-source synthesis:** context selection, derived implications, model-judged statistics.
+4. **Cross-source description** within each criterion: mechanical statistics plus one model request per criterion describing agreement, spread, outliers and incomparable positions.
+5. **Matrix report** with source picking and pinning; two-way proposals switch over from claim-level comparison here.
+6. **Ordered revision series** (claim-level, content-difference first).
 
 ## Decisions (2026-09-24)
 

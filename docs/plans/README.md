@@ -20,9 +20,9 @@ Statuses:
 | Plan | Summary | Depends on |
 |---|---|---|
 | [Scheduling and triage](scheduling-and-triage-2026-09-23.md) | Time-of-day rate limits and adaptive concurrency for the in-house server; fair share across sections and sources; status-stamped preliminary reports; section triage with "about" statements; claim quality signals, epistemic status (basis, uncertainty) and skeptical prompting. | Evidence store |
+| [Criteria-first comparison](n-way-comparison-2026-09-23.md) | Criteria first (for two-way proposals too): compare N sources by reviewed, evidence-based criteria (extracted from rules, requirements or the user's rubrics, or recommended), with applicability, per-source synthesis and a criteria × sources matrix. Compares, never judges. Revisions stay claim-level. | Evidence store; triage for "about" statements |
 | [Multi-format adapters](multi-format-adapters-2026-09-23.md) | `.txt`/`.md`, then `.docx` and `.pptx` (chart XML), then external converters, then `.csv`/`.xlsx` (table detection plus model-guided interpretation), then images. Cameo output is consumed as an ordinary source. | Evidence store |
 | [Single-project outputs](single-project-outputs-2026-09-23.md) | `check` for internal consistency; RAG `export` as self-contained Markdown chunks with provenance; a fact sheet built without the model; a shared writing style for people. (Cited summaries within it are tentative.) | Evidence store; triage for "about" statements |
-| [N-way comparison](n-way-comparison-2026-09-23.md) | Criteria first (for two-way proposals too): compare N sources by reviewed, evidence-based criteria (extracted from rules, requirements or the user's rubrics, or recommended), with applicability, per-source synthesis and a criteria × sources matrix. Compares, never judges. Revisions stay claim-level. | Evidence store; triage for "about" statements |
 | [Retrieval benchmark](retrieval-benchmark-2026-09-23.md) | Future: a labelled answer key of claim pairs, built together with Claude, to measure retrieval methods. | None strictly |
 
 ## Tentative
@@ -37,16 +37,19 @@ Statuses:
 
 | Plan | Summary |
 |---|---|
-| [Robustness baseline (0.2.0)](robustness-baseline-2026-09-23.md) | Fixed API-shape crashes, table refinement, unit case folding and de-duplication; text grouping, tile spacing, visual quote checks, tolerant parsing. |
+| [Robustness baseline (0.2.0)](robustness-baseline-2026-09-23.md) | Tagged `v0.2.0` as the stable baseline. Fixed API-shape crashes, table refinement, unit case folding and de-duplication; text grouping, tile spacing, visual quote checks, tolerant parsing. |
 
 ## Suggested order
 
+Nobody uses the tool between now and implementation (the stable baseline is tagged `v0.2.0`), so plans and checkpoints can be reordered, split or merged freely.
+
 1. Evidence store (active)
-2. Scheduling and triage (needed before large folders are practical)
-3. Single-project `check` / `export`, and the adapter interface with `.txt` / `.md`, both cheap once the store exists
-4. Retrieval benchmark, which can start any time; then retrieval recall
-5. `.docx` and `.pptx` adapters (the formats users submit most after PDF), then the external converter interface (Cameo integration point), then `.csv` / `.xlsx` and images
-6. N-way comparison
+2. Scheduling and triage (concurrency, sections, "about" statements, epistemic status)
+3. Criteria-first comparison: the main use case, two-way proposals included
+4. Adapter interface with `.txt` / `.md`, then `.docx` and `.pptx`
+5. Single-source `check` and RAG `export`
+6. Retrieval benchmark (can start any time), then retrieval recall
+7. External converters, `.csv` / `.xlsx`, images
 
 ## Deferred decisions
 

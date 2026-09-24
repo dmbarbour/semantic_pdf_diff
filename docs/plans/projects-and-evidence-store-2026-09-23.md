@@ -191,12 +191,13 @@ report --store <dir> <comparison>
 
 ## Milestones
 
-1. Content, file, source and interpreter model; evidence schema v2 with content-relative locators, derivation chains, and per-claim context: `basis` and uncertainty from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) (*Epistemic status*), plus topic, context (initial/final, scenario, phase) and role in the design from [n-way-comparison](n-way-comparison-2026-09-23.md); include the basis veto in comparison; migrate `compare` and `report` off A/B.
-2. Store folder and SQLite schema: WAL, single-writer lock, task queue with per-task transactions, response cache in the database, interpreter binding with rejection, selective `--reset` and `--dry-run`; resume after interruption (tested by killing a run midway).
-3. PDF section detection (outline → font-size headings → page ranges); heading path in prompts.
-4. Folder, zip and manifest sources; duplicate occurrences in provenance.
-5. Content-difference-first comparison (shared / removed / added).
-6. Views and `show`; staged CLI with the current two-file command kept working; tests and docs.
+1. **Schema v2:** content, file, source and interpreter model; content-relative locators; derivation chains; claim context fields (topic, basis, uncertainty, context, role) in the schema, filled by the prompt work in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md); migrate `compare` and `report` off A/B.
+2. **Store folder and SQLite:** WAL, single-writer lock, task queue with per-task transactions, response cache in the database, interpreter binding with rejection, selective `--reset` and `--dry-run`; resume after interruption (tested by killing a run midway).
+3. **Annotations core:** the annotation table and record format; source and file metadata at registration and in manifests; embedded annotations from PDFs (document properties, comments); export and import with disagreement handling; orphan re-attachment. Capture from reports comes with its first consumer (reviewer feedback in scheduling-and-triage).
+4. **PDF sections:** outline → font-size headings → page ranges; heading path in prompts.
+5. **Folder, zip and manifest sources;** duplicate occurrences in provenance.
+6. **Content-difference-first comparison** (shared / removed / added).
+7. **Views, `show` and the staged CLI,** with the current two-file command kept working; tests and docs.
 
 ## Decisions (2026-09-23)
 
