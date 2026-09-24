@@ -88,8 +88,8 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 
 ## Milestones
 
-0. **Prerequisite: union provenance** (see the store plan's *Decisions*), so results don't depend on which task finishes first.
-1. **Merged with milestone 2 (decided 2026-09-24; see the [store completion review](../reviews/store-complete-2026-09-24.md)): an in-memory task queue run by worker threads with a single store writer, plus** the concurrent client: time-of-day rate-limit rules, adaptive backoff, a modest concurrency cap; tests against a stub server that simulates latency and 429s; token and time estimates in `--plan`; progress bars, heartbeats and configurable verbosity.
+0. ✅ *Done 2026-09-24 (`6a2b622`).* **Prerequisite: union provenance** (see the store plan's *Decisions*), so results don't depend on which task finishes first.
+1. ✅ *Done 2026-09-24 (`1a3d460`, `456e6a9`, and progress/logging; see the [review](../reviews/scheduling-m1-concurrency-2026-09-24.md)).* **Merged with milestone 2 (decided 2026-09-24; see the [store completion review](../reviews/store-complete-2026-09-24.md)): an in-memory task queue run by worker threads with a single store writer, plus** the concurrent client: time-of-day rate-limit rules, adaptive backoff, a modest concurrency cap; tests against a stub server that simulates latency and 429s; token and time estimates in `--plan`; progress bars, heartbeats and configurable verbosity.
 2. **Persisting the task queue and the section queue** (the queue itself arrives with milestone 1): tasks persisted for progress reporting; fair share across sections and across compared sources; `not_reached` coverage status.
 3. **Triage without the model:** cheap signals and boilerplate detection. Use drawing sets as a test case: table detection there finds mostly drawing geometry, and about half the rows repeat across sheets (title blocks, legends; see the [store milestone 4 review](../reviews/store-m4-pdf-sections-2026-09-24.md)).
 4. **Model triage per section:** type, density, keywords and the "about" statement.

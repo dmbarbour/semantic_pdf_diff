@@ -47,6 +47,9 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `provenance.py` | Content IDs, extension normalization, interpreter descriptions |
 | `scan.py` | Scanning a source's roots: folders, zip archives, hidden files, safety limits |
 | `manifest.py` | Source manifests: export and import |
+| `throttle.py` | Rate limits with time-of-day rules; adaptive concurrency |
+| `dispatch.py` | Worker threads for model requests; everything else stays on the main thread |
+| `progress.py` | Progress bars, heartbeats and logging |
 | `store.py` | SQLite evidence store: binding, per-task records, semantic response cache, comparisons |
 | `cli.py` | Orchestration, planning and exit semantics |
 

@@ -40,6 +40,15 @@ pdf-semantic-diff compare --store work team-a team-b
 pdf-semantic-diff source export team-a --store work --output team-a.source.json --with-hashes
 ```
 
+Model requests run in parallel (`concurrency`, default 4, adapting down when the server throttles) within optional time-of-day rate limits, e.g. in a `--config` file:
+
+```json
+{"concurrency": 6, "rate_limits": [{"days": "mon-fri", "hours": "08:00-18:00", "tokens_per_minute": 300000},
+                                   {"tokens_per_minute": 500000}]}
+```
+
+Runs show progress bars on a terminal and heartbeat lines otherwise; `-q`, `-v`, `-vv` and `--log-file` control the detail. `--plan` estimates calls, tokens and time under the current limit.
+
 Inspect and maintain a store with `show` (views as Markdown, CSV or JSON Lines), `report` (regenerate a report without model calls) and `gc` (delete content no source references any more):
 
 ```bash

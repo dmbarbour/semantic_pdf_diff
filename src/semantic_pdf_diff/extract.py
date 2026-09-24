@@ -7,6 +7,7 @@ from pathlib import Path
 import pymupdf
 from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, claim_id, merge_occurrences
 from .dispatch import Dispatcher
+from .progress import NoProgress, log
 
 # Bump when prompt assembly or task construction changes, not only the template text;
 # it is part of the extraction interpreter. 2: section heading path in prompts.
@@ -88,6 +89,30 @@ def same_form(row, header):
     pairs = [(a, b) for a, b in zip(row, header) if a not in (None, "") or b not in (None, "")]
     return bool(pairs) and sum(a == b for a, b in pairs) / len(pairs) >= 0.5
 
+def text_groups(page, text_bytes):
+    """Consecutive text blocks grouped up to the byte budget (oversized blocks split).
+
+    Returns [(ids, [(bbox, text)])], where ids like '3.0-5.0' name the blocks grouped.
+    """
+    pieces = []
+    for bi, block in enumerate(page.get_text("blocks", sort=True)):
+        if block[6] != 0:
+            continue
+        for ci, chunk in enumerate(split_utf8(block[4].strip(), text_bytes)):
+            if chunk.strip():
+                pieces.append((f"{bi}.{ci}", tuple(block[:4]), chunk))
+    groups, group, size = [], [], 0
+    for piece in pieces + [None]:
+        extra = len(piece[2].encode()) + 2 if piece else 0
+        if group and (piece is None or size + extra > text_bytes):
+            ids = group[0][0] + (f"-{group[-1][0]}" if len(group) > 1 else "")
+            groups.append((ids, [(b, t) for _, b, t in group]))
+            group, size = [], 0
+        if piece:
+            group.append(piece)
+            size += extra
+    return groups
+
 def union(boxes):
     boxes = list(boxes)
     return (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
@@ -133,7 +158,7 @@ DERIVATION = {
     "overview": [DerivationStep(step="pdf-render", detail="whole page"), DerivationStep(step="model-extraction", detail="vision")],
 }
 
-def extract_pdf(path, content, output, client, on_task=None, on_sections=None, dispatcher=None):
+def extract_pdf(path, content, output, client, on_task=None, on_sections=None, dispatcher=None, progress=None):
     """Extract evidence from one PDF (a path or its bytes), identified by its content ID.
 
     Returns (evidence, coverage), both independent of the order in which tasks finish.
@@ -144,6 +169,7 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
     sized by the `concurrency` setting); everything else runs on this thread.
     """
     s = client.s
+    progress = progress or NoProgress()
     evidence, coverage = [], []
     stem = content.split(":", 1)[1][:12]
     assets = output / "assets"
@@ -181,6 +207,9 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
                 handle(result)
             evidence.extend(found)
             record(row, found)
+            progress.finish(row["status"])
+            log.debug("%s %s: %s, %d claim(s)%s", Path(name).name, task, row["status"], row["claims"],
+                      f" ({'; '.join(row['issues'])[:200]})" if row["issues"] else "")
             if then:
                 then(row["status"])
 
@@ -202,6 +231,7 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
                                       derivation=derivation or DERIVATION[region], image=image, quote_verified=verified))
                 row["claims"] += 1
 
+        progress.add()
         dispatch.submit(prompt, Extraction, images, key, finish)
 
     def text_task(page_no, segments, task, depth=0):
@@ -305,23 +335,8 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
                 dispatch.wait_one()
             # Native coordinates stay unrotated (PDF point coordinates). Consecutive
             # blocks are grouped up to the byte budget; oversized blocks are split.
-            pieces = []
-            for bi, block in enumerate(page.get_text("blocks", sort=True)):
-                if block[6] != 0:
-                    continue
-                for ci, chunk in enumerate(split_utf8(block[4].strip(), s.text_bytes)):
-                    if chunk.strip():
-                        pieces.append((f"{bi}.{ci}", tuple(block[:4]), chunk))
-            group, size = [], 0
-            for piece in pieces + [None]:
-                extra = len(piece[2].encode()) + 2 if piece else 0
-                if group and (piece is None or size + extra > s.text_bytes):
-                    ids = group[0][0] + (f"-{group[-1][0]}" if len(group) > 1 else "")
-                    text_task(number, [(b, t) for _, b, t in group], f"text:p{number}:{ids}")
-                    group, size = [], 0
-                if piece:
-                    group.append(piece)
-                    size += extra
+            for ids, segments in text_groups(page, s.text_bytes):
+                text_task(number, segments, f"text:p{number}:{ids}")
             try:
                 found = [(table.bbox, table.extract()) for table in page.find_tables().tables]
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors

@@ -13,9 +13,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from . import manifest
 from .compare import compare, file_difference
-from .extract import extract_pdf, visual_regions
-from .llm import Client, redact_url
+from .extract import EXTRACT, extract_pdf, text_groups, visual_regions
+from .llm import SYSTEM, Client, redact_url
 from .models import Settings, Source
+from .progress import Progress, log, setup_logging
+from .throttle import RateLimiter
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension
 from .report import write_report
 from .scan import ARCHIVES, Limits, read_origin, scan
@@ -43,7 +45,16 @@ def main(argv=None):
 
 # --- options shared by commands that run the model ---------------------------------
 
+def add_log_options(parser):
+    parser.add_argument('-q', '--quiet', action='store_true', help='Warnings and errors only')
+    parser.add_argument('-v', '--verbose', action='count', default=0, help='-v: tasks; -vv: also each model request')
+    parser.add_argument('--log-file', type=Path, help='Also write a detailed log here')
+
+def start_logging(args):
+    setup_logging(getattr(args, 'verbose', 0), getattr(args, 'quiet', False), getattr(args, 'log_file', None))
+
 def add_run_options(parser):
+    add_log_options(parser)
     parser.add_argument('--config', type=Path, help='Settings JSON; overrides environment defaults, CLI flags override it')
     parser.add_argument('--mode', choices=['proposals', 'revisions'], default='proposals')
     parser.add_argument('--model')
@@ -95,6 +106,7 @@ def shortcut_command(argv):
                         help='Store folder; also receives report.html, report.json and evidence.json')
     add_run_options(parser)
     args = parser.parse_args(argv)
+    start_logging(args)
     settings = load_settings(args)
     names = shortcut_names([args.a, args.b])
     if args.plan:
@@ -130,6 +142,7 @@ def compare_command(argv):
     parser.add_argument('--report', type=Path, help='Report folder (default: the store folder)')
     add_run_options(parser)
     args = parser.parse_args(argv)
+    start_logging(args)
     settings = load_settings(args)
     with Store(args.store) as store:
         names = list(args.sources)
@@ -152,28 +165,48 @@ def link_manifest(store, path):
         raise StoreError(f"source {source.name!r} already exists and isn't linked to {path}")
     if not existing or store.manifest_hash(source.name) != digest:
         store.save_source(source, replace=True, manifest_hash=digest)
-        print(f"{'Updated' if existing else 'Linked'} source {source.name!r} from {path}", file=sys.stderr)
+        log.info(f"{'Updated' if existing else 'Linked'} source {source.name!r} from {path}")
     return source.name
 
 # --- the run -----------------------------------------------------------------------
 
 def plan(sources, settings):
+    """Estimate calls, tokens and time without calling the model."""
     import pymupdf
-    result = []
+    scaffold = len((SYSTEM + EXTRACT).encode()) + 160   # prompt text per request; bytes overestimate tokens
+    answer = settings.output_tokens // 2                # assume answers use half the output reserve
+    rows, calls, tokens = [], 0, 0
     for source in sources:
         scanned = scan(source.roots, limits(settings))
-        pages = visual = pdfs = 0
+        pdfs = pages = text_calls = text_bytes = visual = 0
         for f in scanned.files:
-            if f.content.endswith('.pdf'):
-                pdfs += 1
-                with pymupdf.open(stream=read_origin(f.origin), filetype='pdf') as doc:
-                    pages += len(doc)
-                    visual += sum(len(visual_regions(p, settings.tile_points)) for p in doc) if settings.vision else 0
-        result.append({'source': source.name, 'files': len(scanned.files), 'pdfs': pdfs, 'pages': pages,
-                       'visual_tasks': visual, 'issues': len(scanned.issues)})
-    print(json.dumps({'sources': result, 'max_calls': settings.max_calls,
-        'note': 'Native text/table extraction, pair comparisons, retries and adaptive refinement add calls; '
-                'no API requests made.'}, indent=2))
+            if not f.content.endswith('.pdf'):
+                continue
+            pdfs += 1
+            with pymupdf.open(stream=read_origin(f.origin), filetype='pdf') as doc:
+                pages += len(doc)
+                for page in doc:
+                    groups = text_groups(page, settings.text_bytes)
+                    text_calls += len(groups)
+                    text_bytes += sum(len(t.encode()) for _, segments in groups for _, t in segments)
+                    if settings.vision:
+                        visual += len(visual_regions(page, settings.tile_points))
+        estimate = (text_calls * (scaffold + answer) + text_bytes
+                    + visual * (scaffold + settings.image_tokens + answer))
+        calls, tokens = calls + text_calls + visual, tokens + estimate
+        rows.append({'source': source.name, 'files': len(scanned.files), 'pdfs': pdfs, 'pages': pages,
+                     'text_tasks': text_calls, 'visual_tasks': visual, 'estimated_tokens': estimate,
+                     'issues': len(scanned.issues)})
+    tpm, _ = RateLimiter(settings.rate_limits).limits()
+    print(json.dumps({'sources': rows, 'total': {
+        'calls': calls, 'tokens': tokens, 'tokens_per_minute_limit_now': tpm,
+        'minutes_at_that_limit': round(tokens / tpm, 1) if tpm else None},
+        'max_calls': settings.max_calls,
+        **({'warning': f'about {calls} calls are expected but max_calls is {settings.max_calls}; '
+                       'the run would stop early (raise --max-calls)'} if calls > settings.max_calls else {}),
+        'note': 'Estimates exclude table rows (found during extraction), refinement, retries and comparisons; '
+                'image tokens use the configured image_tokens, so calibrate it for your server. No API requests made.'},
+        indent=2))
     return 0
 
 def run(args, settings, store, names, out, force_rescan=False):
@@ -183,19 +216,21 @@ def run(args, settings, store, names, out, force_rescan=False):
         return 0
     cleared = store.bind(interpreter, reset=args.reset)
     if cleared:
-        print(f"Reset cleared: {json.dumps(cleared)}", file=sys.stderr)
+        log.info(f"Reset cleared: {json.dumps(cleared)}")
     if settings.rescan == 'auto' or force_rescan:
         for name in names:
             summary = store.rescan(name, limits(settings), document_properties)
             changes = {k: len(summary[k]) for k in ('added', 'removed', 'changed') if summary[k]}
-            print(f"Scanned {name}: {summary['files']} files" + (f", {changes}" if changes else ''), file=sys.stderr)
+            log.info(f"Scanned {name}: {summary['files']} files" + (f", {changes}" if changes else ''))
     client = Client(settings, store)
     files = {name: store.files(name) for name in names}
     by_content, coverage, sections = {}, [], {}
+    progress = Progress('extract', client, heartbeat=settings.heartbeat_seconds)
     for name in names:
         for file in files[name]:
             if file.content not in by_content:
-                by_content[file.content] = extract_content(store, client, name, file, coverage, sections)
+                by_content[file.content] = extract_content(store, client, name, file, coverage, sections, progress)
+    progress.close()
     evidence = [e for items in by_content.values() for e in items]
     source_data = [store.source(n).model_dump() for n in names]
     file_data = [f.model_dump() for n in names for f in files[n]]
@@ -206,8 +241,10 @@ def run(args, settings, store, names, out, force_rescan=False):
         'interpreters': interpreters, 'evidence': [e.model_dump() for e in evidence], 'coverage': coverage,
         'scan_issues': scan_issues}, indent=2, ensure_ascii=False), encoding='utf-8')
     left, right = ([e for c in dict.fromkeys(f.content for f in files[n]) for e in by_content[c]] for n in names)
-    print(f"Comparing {len(left)} × {len(right)} extracted claims via retrieval", file=sys.stderr)
-    data = compare(left, right, store.folder, client, args.mode)
+    log.info(f"Comparing {len(left)} × {len(right)} extracted claims via retrieval")
+    progress = Progress('compare', client, heartbeat=settings.heartbeat_seconds)
+    data = compare(left, right, store.folder, client, args.mode, progress=progress)
+    progress.close()
     interpreters['compare'] = comparison_interpreter(settings).model_dump()
     data.update(schema_version=2, created_at=datetime.now(timezone.utc).isoformat(),
         sources=source_data, files=file_data, interpreters=interpreters, scan_issues=scan_issues,
@@ -225,13 +262,13 @@ def run(args, settings, store, names, out, force_rescan=False):
     # in the report even when all tasks completed successfully.
     return 2 if incomplete else 0
 
-def extract_content(store, client, source, file, coverage, sections):
+def extract_content(store, client, source, file, coverage, sections, progress=None):
     """Evidence for one piece of content: from the store, by extraction, or none if uninterpretable."""
     extension = '.' + file.content.rsplit('.', 1)[1] if '.' in file.content else None
     if extension in ARCHIVES:
         return []  # an archive is a container; its members are files in their own right
     if store.is_extracted(file.content):
-        print(f'Loaded from store: {file.path}', file=sys.stderr)
+        log.info(f'Loaded from store: {file.path}')
         coverage.extend(store.coverage(file.content))
         sections[file.content] = store.sections(file.content)
         return store.evidence(file.content)
@@ -243,12 +280,12 @@ def extract_content(store, client, source, file, coverage, sections):
         store.mark_extracted(file.content)
         coverage.append(row)
         return []
-    print(f'Extracting {file.path}', file=sys.stderr)
+    log.info(f'Extracting {file.path}')
     def keep_sections(found):
         sections[file.content] = found
         store.record_sections(file.content, found)
     evidence, ledger = extract_pdf(read_origin(store.origin(source, file.path)), file.content, store.folder, client,
-                                   on_task=store.record_task, on_sections=keep_sections)
+                                   on_task=store.record_task, on_sections=keep_sections, progress=progress)
     # Failed tasks (e.g. the call limit) are retried on the next run; the rest replays from cache.
     if not any(r['status'] == 'failed' for r in ledger):
         store.mark_extracted(file.content)
@@ -273,6 +310,7 @@ def source_command(argv):
         sub = commands.add_parser(name, help=help)
         sub.add_argument('--store', type=Path, required=True)
         sub.add_argument('--config', type=Path, help='Settings JSON (archive limits)')
+        add_log_options(sub)
         return sub
     add = command('add', 'Declare a source and scan it')
     add.add_argument('name')
@@ -295,6 +333,7 @@ def source_command(argv):
     importing.add_argument('manifest', type=Path)
     importing.add_argument('--name', help='Declare under another name')
     args = parser.parse_args(argv)
+    start_logging(args)
     settings = load_settings(args)
     with Store(args.store) as store:
         if args.command == 'add':
@@ -322,7 +361,7 @@ def source_command(argv):
             print_scan(store.rescan(args.name, limits(settings), document_properties), args.name)
         elif args.command == 'remove':
             store.remove_source(args.name)
-            print(f'Removed source {args.name!r}; {len(store.orphaned_content())} content item(s) now orphaned', file=sys.stderr)
+            log.info(f'Removed source {args.name!r}; {len(store.orphaned_content())} content item(s) now orphaned')
         elif args.command == 'export':
             source = require(store, args.name)
             text = manifest.export(source, store.files(args.name) if args.with_hashes else (), args.output)
@@ -336,12 +375,13 @@ def source_command(argv):
             print_scan(store.rescan(source.name, limits(settings), document_properties), source.name)
             different = manifest.mismatches(expected, store.files(source.name))
             if different:
-                print(f"Warning: {len(different)} file(s) differ from the manifest's hashes: {different[:5]}", file=sys.stderr)
+                log.warning(f"Warning: {len(different)} file(s) differ from the manifest's hashes: {different[:5]}")
     return 0
 
 def store_command(command, argv):
     parser = argparse.ArgumentParser(prog=f'pdf-semantic-diff {command}')
     parser.add_argument('--store', type=Path, required=True)
+    add_log_options(parser)
     if command == 'show':
         parser.description = 'Print a view of the store.'
         parser.add_argument('view', choices=Store.VIEWS)
@@ -356,6 +396,7 @@ def store_command(command, argv):
         parser.add_argument('--comparison', type=int, help='Comparison id (see: show comparisons); default: latest')
         parser.add_argument('--out', type=Path, help='Report folder (default: the store folder)')
     args = parser.parse_args(argv)
+    start_logging(args)
     if not (args.store / 'store.sqlite').exists():
         raise StoreError(f'{args.store} is not a store')
     with Store(args.store) as store:
@@ -393,10 +434,10 @@ def require(store, name):
     return source
 
 def print_scan(summary, name):
-    print(f"Scanned {name}: {summary['files']} files ({len(summary['added'])} added, {len(summary['removed'])} removed, "
-          f"{len(summary['changed'])} changed), {len(summary['issues'])} issue(s)", file=sys.stderr)
+    log.info(f"Scanned {name}: {summary['files']} files ({len(summary['added'])} added, {len(summary['removed'])} removed, "
+             f"{len(summary['changed'])} changed), {len(summary['issues'])} issue(s)")
     for path, reason in summary['issues'][:20]:
-        print(f'  {path}: {reason}', file=sys.stderr)
+        log.info(f'  {path}: {reason}')
 
 if __name__ == '__main__':
     sys.exit(main())

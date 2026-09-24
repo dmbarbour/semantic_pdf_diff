@@ -7,7 +7,7 @@ name = "semantic-pdf-diff"
 version = "0.2.0"
 description = "Evidence-first multimodal engineering PDF comparison for small VLMs"
 requires-python = ">=3.10"
-dependencies = ["PyMuPDF>=1.24.3,<2", "pydantic>=2.7,<3"]
+dependencies = ["PyMuPDF>=1.24.3,<2", "pydantic>=2.7,<3", "tqdm>=4.60,<5"]
 
 [project.optional-dependencies]
 # Synthetic sample generation and its tests.

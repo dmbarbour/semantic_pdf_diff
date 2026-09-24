@@ -7,6 +7,7 @@ from collections import Counter, defaultdict
 from decimal import Decimal, InvalidOperation
 from .models import Judgment
 from .dispatch import Dispatcher
+from .progress import NoProgress
 from .provenance import comparison_interpreter, text_hash
 
 # Deliberately small, explicit dimensional conversions. Unknown units abstain.
@@ -146,7 +147,7 @@ def file_difference(files_a, files_b):
 # Provenance stays out of the model's view; it sees the claims and any source crops.
 PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences"}
 
-def compare(left, right, output, client, mode, dispatcher=None):
+def compare(left, right, output, client, mode, dispatcher=None, progress=None):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
 
     Evidence belongs to content, so content present on both sides yields identical
@@ -168,9 +169,11 @@ def compare(left, right, output, client, mode, dispatcher=None):
             scored[a.id, b.id] = (max(score, scored.get((a.id, b.id), (0,))[0]), a, b)
     pairs = sorted(scored.values(), key=lambda x: (-x[0], x[1].id, x[2].id))
     results = {}
+    progress = progress or NoProgress()
 
     def judged(index, score, a, b, calc):
         def finish(judgment, error):
+            progress.finish("failed" if error is not None else "complete")
             if error is not None:
                 results[index] = {"a":a.id,"b":b.id,"retrieval_score":round(score,4),"relation":"uncertain",
                     "rationale":str(error),"confidence":0,"same_conditions":False,"numeric":calc,"processing_error":True}
@@ -212,6 +215,7 @@ def compare(left, right, output, client, mode, dispatcher=None):
             calc = numeric_check(a,b)
             prompt = COMPARE + "\nA=" + json.dumps(payload[0],ensure_ascii=False) + "\nB=" + json.dumps(payload[1],ensure_ascii=False)
             prompt += "\nNumeric check=" + json.dumps(calc)
+            progress.add()
             dispatch.submit(prompt, Judgment, images, ("compare", "", settings_key, a.id, b.id),
                             judged(index, score, a, b, calc))
         dispatch.drain()

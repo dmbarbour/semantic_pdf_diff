@@ -43,9 +43,18 @@ Defaults target an 8,192-token context. No request contains a whole PDF; even a 
 
 **Image token accounting is backend-specific.** `image_tokens` must be a conservative upper bound for one image at `image_side`. It is not an exact tokenizer. Calibrate against your serving backend before large runs. For a smaller context, reduce `output_tokens`, `text_bytes`, `image_side` and tile size together, and adjust image-token estimates according to the actual backend. Two-image comparison requests may still exceed budget and will be reported as uncertain; `verify_visuals: false` allows text-claim comparison at the cost of skipping direct visual reinspection.
 
+## Throughput and progress
+
+- **`concurrency`** (default 4): the most model requests in flight. An adaptive gate halves it when the server returns 429/503 or latency jumps, and grows it back by one after a run of successes. Results don't depend on it: concurrent and sequential runs produce identical evidence and findings.
+- **`rate_limits`**: time-of-day rules, the first matching one applies (local time), each with `tokens_per_minute` and/or `requests_per_minute`, optionally `days` (`"mon-fri"`, `"sat,sun"`) and `hours` (`"08:00-18:00"`, or overnight like `"22:00-06:00"`). Token use is estimated before each request and corrected from the server's reported usage. As an environment variable, `PDF_DIFF_RATE_LIMITS` takes the same JSON list.
+- **Progress:** a `tqdm` bar per stage on a terminal; otherwise a heartbeat line every `heartbeat_seconds` (30) with tasks done, tokens per minute and time remaining. `-q` shows warnings only, `-v` each task, `-vv` each model request; `--log-file` writes a detailed log.
+- **`--plan`** estimates calls, tokens and minutes at the limit in force now (excluding table rows, refinement, retries and comparisons), and warns when `max_calls` would stop the run early.
+
+None of these affect output, so changing them never needs `--reset`.
+
 ## Calls, caching and exit codes
 
-A typical page needs multiple calls, so large PDFs can require hundreds or thousands. Calls are sequential to avoid overwhelming a small-model server; `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--plan` makes no API calls and counts initial visual tasks; text, table, comparison, retries and refinement calls are additional. `--max-calls` caps actual HTTP attempts for one invocation, including retries.
+A typical page needs multiple calls, so large PDFs can require hundreds or thousands. `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--plan` makes no API calls and counts initial visual tasks; text, table, comparison, retries and refinement calls are additional. `--max-calls` caps actual HTTP attempts for one invocation, including retries.
 
 The `--out` folder is an evidence store: `store.sqlite` (sources, files, content, evidence, coverage, cached model responses, comparisons) plus `assets/` for rendered crops. Stores are created with owner-only permissions and are as sensitive as the documents they were built from.
 

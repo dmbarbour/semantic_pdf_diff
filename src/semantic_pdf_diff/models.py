@@ -239,6 +239,8 @@ class Settings(Strict):
     cache_check: bool = False
     # Throughput: requests in flight at most (adaptive below this), and rate-limit rules.
     concurrency: int = Field(default=4, ge=1, le=64)
+    # Seconds between progress lines when output isn't a terminal.
+    heartbeat_seconds: float = Field(default=30.0, gt=0)
     rate_limits: list[RateRule] = Field(default_factory=list)
     # Sources: rescan roots on every run ("auto") or only on `source update` ("manual").
     rescan: Literal["auto", "manual"] = "auto"
