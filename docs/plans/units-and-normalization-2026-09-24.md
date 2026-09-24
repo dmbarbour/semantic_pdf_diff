@@ -69,7 +69,7 @@ Every numeric comparison records the parsed quantities, the conversions applied,
 ## Milestones
 
 1. Quantity model and parser: points, intervals, bounds, tolerances, approximate values; ambiguity abstentions.
-2. Unit layer: alias table, ambiguity rules, dimension checks; evaluate the library choice against the collected unit strings, then adopt it.
+2. Unit layer on `pint`: alias table, ambiguity rules, dimension checks; check its parsing against the collected unit strings, and extend our alias layer wherever it falls short.
 3. Claim-level numeric check rebuilt on quantities; recording of conversions and abstentions.
 4. Money handling.
 5. Normalization with same-source normalizers and "cannot normalize" outcomes; statistics in common units.
@@ -78,7 +78,8 @@ Every numeric comparison records the parsed quantities, the conversions applied,
 
 - **Money:** same currency and price basis only; otherwise side by side, no arithmetic; no exchange-rate or inflation conversion.
 - **Ambiguity:** abstain with a stated reason, never guess.
+- **Unit library:** adopt [`pint`](https://github.com/hgrecco/pint) (BSD-licensed) behind our own alias and ambiguity layer, which stays ours.
 
 ## Open questions
 
-- **Unit library:** adopt [`pint`](https://github.com/hgrecco/pint) (BSD-licensed, pure Python, handles compound and offset units, case-sensitive prefixes) behind our alias and ambiguity layer, or extend our own table? **Recommendation:** `pint`, confirmed or rejected in milestone 2 against real unit strings. Our layer stays either way, since the ambiguity rules are ours.
+None currently.
