@@ -30,6 +30,7 @@ Statuses:
 |---|---|---|
 | [Retrieval recall](retrieval-recall-2026-09-23.md) | Model-generated section keywords, alias consolidation, hybrid lexical + embedding retrieval. | Retrieval benchmark results |
 | [N-way comparison](n-way-comparison-2026-09-23.md) | Compare N projects via topic clusters and a comparison matrix; ordered revision series. | Evidence store; ideally retrieval recall |
+| Interactive views *(plan not yet written)* | Live views over a store while a run proceeds: status-stamped preliminary reports, pending alias and keyword questions, review annotations. Terminal UI first (usable inside a sandbox), favouring a library that is easy to work with, extend and modify (e.g. Textual); a local web server later for other users. | Evidence store; preliminary reports from scheduling |
 
 ## Completed
 

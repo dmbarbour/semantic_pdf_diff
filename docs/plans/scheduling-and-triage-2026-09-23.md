@@ -46,14 +46,6 @@ Users can generate and inspect reports **while a run is still going**. That need
 - **Comparison interleaves with extraction:** a candidate pair is queued for comparison as soon as both claims exist, instead of waiting for all extraction to finish, so preliminary reports contain findings, not just evidence.
 - **`status` command:** a plain-text progress summary (per source: sections done, pending and failed; tokens used; estimated time remaining at current limits) that works in any terminal, including inside the sandbox.
 
-### Interactive views (future direction)
-
-A long-running process that users check on from time to time suggests an interactive mode: live preliminary reports, pending alias and keyword questions, and review annotations (see the *Decisions* in [retrieval-recall](retrieval-recall-2026-09-23.md)), all read from the same store.
-
-- **Terminal UI first**, because the primary user's sandbox cannot show a web page: a Python TUI over the store (progress, findings, evidence with quotes, pending questions and answering them). Candidate libraries are `curses` (standard library) or Textual (an optional extra).
-- **Local web server later**, for users outside such a sandbox, reusing the same view layer.
-- Both are readers of the store plus writers of annotations only; extraction stays in the background process.
-
 ### Triage before detailed extraction
 
 Score every section cheaply, then run detailed extraction in score order. Signals, cheapest first:
@@ -90,15 +82,14 @@ Rules:
 6. Reviewer feedback (as reusable annotations) feeding calibration.
 7. Time-of-day rate-limit rules; token and time estimates in `--plan`.
 8. Balanced progress across compared sources; comparison interleaved with extraction; status-stamped preliminary reports; `status` command.
-9. (Future) Terminal UI over the store; later a local web server.
 
 ## Open questions
 
-- Does the server also limit concurrent requests or queue depth? Adaptive backoff handles it either way, but a known cap avoids wasted 429s.
-- `curses` or Textual for the TUI? `curses` adds no dependency; Textual is much quicker to build a usable interface with.
+- What concurrency default works well in practice alongside other tools using the same server? Tune from real runs.
 
 ## Decisions (2026-09-23)
 
 - **Throughput limits:** 300k tokens/min in business hours, 500k outside; configurable by time of day, and expected to change.
+- **Concurrent requests:** assume the server caps them. Use a modest, configurable concurrency limit (single digits by default) and let adaptive backoff find the working level, leaving room for the user's other tools on the same server.
 - **Time budgets:** none. Runs proceed unattended until done or stopped; preliminary reports cover the need to look early.
 - **Reviewer feedback:** stored as reusable annotations in the store, exportable and importable (see the *Decisions* in [retrieval-recall](retrieval-recall-2026-09-23.md)).
