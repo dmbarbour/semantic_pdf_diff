@@ -1,6 +1,6 @@
 # Validation
 
-Sixty-three automated tests passed on Python 3.12 with PyMuPDF 1.28.2, Pydantic 2.13.5 and openpyxl 3.1.5. The fifty-nine core tests also passed on Python 3.10 with the minimum supported PyMuPDF 1.24.3 and Pydantic 2.7.0; the four synthetic-spreadsheet tests need the `dev` extra and are skipped without it.
+Seventy-four automated tests passed on Python 3.12 with PyMuPDF 1.28.2, Pydantic 2.13.5 and openpyxl 3.1.5. The seventy core tests also passed on Python 3.10 with the minimum supported PyMuPDF 1.24.3 and Pydantic 2.7.0; the four synthetic-spreadsheet tests need the `dev` extra and are skipped without it.
 
 The end-to-end test creates temporary PDFs, sends native text and rendered images to a local HTTP stub, generates HTML/JSON, and reruns with zero additional HTTP calls because of caching. Other tests cover retrieval across modalities, many-to-one candidates, unit conversions, uncertainty gates, byte budgets, malformed/truncated responses, call limits, visual refinement, quote rejection and escaped report content.
 
@@ -11,5 +11,7 @@ Robustness tests cover null/missing/non-object API response fields, fenced or pr
 Schema v2 tests cover content IDs and extension normalization, evidence IDs that survive renames, locators and derivation, lenient claim context fields, interpreter settings, shared content extracted once and never compared, and v2 output files.
 
 Store tests cover layout and owner-only permissions, schema-version refusal, the single-writer lock, interpreter binding (rejection with differences, dry-run previews, selective reset), semantic cache keys (every key part changes the key; the byte-check debug mode catches collisions), per-page task identity, resuming an interrupted run with no repeated model calls and identical findings, reuse after renames, and retrying failed tasks.
+
+Section tests cover outline sections (entries sharing a start page, depth limits, pages before the first entry), the page-range fallback, heading paths in prompts, cache keys and evidence, table continuation (with repeated headers, and new tables of the same form, which must not continue), skipping empty rows without renumbering, document properties, and sections reloaded from a store.
 
 Environment configuration tests verify typed parsing, API-key exclusion from serialized settings, empty-variable fallback, invalid-value handling and CLI > file > environment precedence.

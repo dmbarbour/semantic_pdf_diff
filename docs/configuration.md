@@ -34,6 +34,7 @@ Settings are in `config.example.json`; all omitted settings have defaults in `mo
 - `response_format` is `none` by default because some compatible servers do not support it; `json_object` requests JSON mode and `json_schema` sends the response schema for guided decoding (vLLM, llama.cpp, and similar), which is strongly recommended for small models where supported. The 0.1 `json_mode: true` setting still maps to `json_object`.
 - `temperature` defaults to `0` for reproducibility (set `null` to use the server default), and `seed` is sent when set.
 - Set `max_token_field` to `max_completion_tokens` if your server requires it.
+- `section_depth` (default 2) sets how many outline levels become sections; `section_pages` (default 20) sets the page-range size for PDFs without an outline. Both affect prompts, so changing them needs `--reset` on an existing store.
 - `--no-vision` is a deliberately incomplete text-only run, recorded as such.
 
 ## Context budget

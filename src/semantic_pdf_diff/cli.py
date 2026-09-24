@@ -71,7 +71,7 @@ def run(args, settings, store, sources, files, paths):
     for source, file in zip(sources, files):
         store.register(source, [file], sizes)
     client = Client(settings, store)
-    by_content, coverage = {}, []
+    by_content, coverage, sections = {}, [], {}
     for file, path in zip(files, paths):
         if file.content in by_content:
             print(f'Already extracted: {file.path} (same content)',file=sys.stderr)
@@ -79,9 +79,14 @@ def run(args, settings, store, sources, files, paths):
         if store.is_extracted(file.content):
             print(f'Loaded from store: {file.path}',file=sys.stderr)
             by_content[file.content], ledger = store.evidence(file.content), store.coverage(file.content)
+            sections[file.content] = store.sections(file.content)
         else:
             print(f'Extracting {file.path}',file=sys.stderr)
-            by_content[file.content], ledger = extract_pdf(path,file.content,store.folder,client,on_task=store.record_task)
+            def keep_sections(found, content=file.content):
+                sections[content] = found
+                store.record_sections(content, found)
+            by_content[file.content], ledger = extract_pdf(path,file.content,store.folder,client,
+                                                           on_task=store.record_task,on_sections=keep_sections)
             # Failed tasks (e.g. the call limit) are retried on the next run; the rest replays from cache.
             if not any(r['status'] == 'failed' for r in ledger):
                 store.mark_extracted(file.content)
@@ -97,6 +102,7 @@ def run(args, settings, store, sources, files, paths):
     interpreters['compare'] = comparison_interpreter(settings).model_dump()
     data.update(schema_version=2, created_at=datetime.now(timezone.utc).isoformat(),
         sources=[x.model_dump() for x in sources], files=[f.model_dump() for f in files], interpreters=interpreters,
+        sections=[{'content':c, **x.model_dump()} for c, items in sections.items() for x in items],
         evidence=[e.model_dump() for e in evidence],coverage=coverage,
         settings={**settings.model_dump(), 'base_url':redact_url(settings.base_url)}, usage={'api_calls':client.calls,'cache_hits':client.cache_hits,**client.usage},
         limitations=['Image-token budgeting must be calibrated to the serving backend.',
@@ -120,8 +126,18 @@ def register_sources(paths):
         sid = f's{number}'
         name = path.name if names.count(path.name) == 1 else f'{path.name} [{sid}]'
         sources.append(Source(id=sid, name=name, kind='file'))
-        files.append(FileRef(source=sid, path=path.name, content=content_id(path.read_bytes(), path.name)))
+        files.append(FileRef(source=sid, path=path.name, content=content_id(path.read_bytes(), path.name),
+                             metadata=document_properties(path)))
     return sources, files
+
+def document_properties(path):
+    """Native title and author, as extracted provenance for the file."""
+    if path.suffix.lower() != '.pdf':
+        return {}
+    import pymupdf
+    with pymupdf.open(path) as doc:
+        meta = doc.metadata or {}
+    return {k: ' '.join(meta[k].split()) for k in ('title', 'author') if (meta.get(k) or '').strip()}
 
 if __name__ == '__main__':
     sys.exit(main())

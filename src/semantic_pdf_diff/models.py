@@ -98,6 +98,14 @@ class PdfLocator(Strict):
 # Other formats add their own locator shapes, discriminated by `format`.
 Locator = PdfLocator
 
+class Section(Strict):
+    """A logical part of one piece of content: the unit of context, and later of scheduling."""
+    id: str
+    first_page: int = Field(ge=1)
+    last_page: int = Field(ge=1)
+    heading_path: list[str] = Field(default_factory=list)
+    origin: Literal["outline", "pages"]
+
 class DerivationStep(Strict):
     step: str
     detail: str = ""
@@ -106,6 +114,7 @@ class Evidence(Claim):
     id: str
     content: str
     locator: Locator
+    section: str = ""
     derivation: list[DerivationStep] = Field(default_factory=list)
     image: str | None = None
     # True: quote found in the PDF text layer; False: the region has a text layer but
@@ -147,6 +156,9 @@ class Settings(Strict):
     image_side: int = Field(default=1000, ge=256, le=2000)
     tile_points: int = Field(default=420, ge=100)
     refinement_depth: int = Field(default=1, ge=0, le=3)
+    # Sections come from the PDF outline down to this depth, else fixed page ranges.
+    section_depth: int = Field(default=2, ge=1, le=6)
+    section_pages: int = Field(default=20, ge=1, le=1000)
     top_k: int = Field(default=4, ge=1, le=30)
     min_score: float = Field(default=0.10, ge=0, le=1)
     max_pairs: int = Field(default=1000, ge=1)

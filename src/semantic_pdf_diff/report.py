@@ -14,6 +14,7 @@ def write_report(data, output):
     for f in data["files"]:
         occurrences.setdefault(f["content"], []).append(f"{names[f['source']]} / {f['path']}")
     where = lambda content: "; ".join(occurrences.get(content, ["unregistered content"]))
+    headings = {(x["content"], x["id"]): " > ".join(x["heading_path"]) for x in data.get("sections", [])}
     def card(eid):
         e = evidence[eid]
         image = ('<a href="'+esc(e['image'])+'"><img loading="lazy" src="'+esc(e['image'])+'" alt="Source crop"></a>') if e.get('image') else ''
@@ -22,7 +23,9 @@ def write_report(data, output):
                     }.get(e.get('quote_verified'), '')
         loc = e['locator']
         basis = f"<p>Basis: {esc(e['basis'])}</p>" if e.get('basis', 'unknown') != 'unknown' else ''
-        return f'''<section><h3>{esc(where(e['content']))} · page {loc['page']} · {esc(e['kind'])}</h3>
+        heading = headings.get((e['content'], e.get('section', '')), '')
+        heading = f" · § {esc(heading)}" if heading else ''
+        return f'''<section><h3>{esc(where(e['content']))}{heading} · page {loc['page']} · {esc(e['kind'])}</h3>
         <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
         <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}<blockquote>{esc(e['quote'])}</blockquote>{verified}
         <small>{esc(eid)} · {esc(loc['region'])} region, PDF bbox {esc(list(loc['bbox']))} · confidence {e['confidence']:.2f}</small>{image}</section>'''

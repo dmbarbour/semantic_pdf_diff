@@ -9,9 +9,9 @@ import json
 import os
 import sqlite3
 from pathlib import Path
-from .models import Evidence, FileRef, Interpreter, Source
+from .models import Evidence, FileRef, Interpreter, Section, Source
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -20,6 +20,8 @@ CREATE TABLE content (id TEXT PRIMARY KEY, size INTEGER NOT NULL, extracted INTE
 CREATE TABLE file (source TEXT NOT NULL REFERENCES source(id), path TEXT NOT NULL,
                    content TEXT NOT NULL REFERENCES content(id), metadata TEXT NOT NULL, PRIMARY KEY (source, path));
 CREATE TABLE interpreter (role TEXT PRIMARY KEY, description TEXT NOT NULL);
+CREATE TABLE section (content TEXT NOT NULL REFERENCES content(id), id TEXT NOT NULL, data TEXT NOT NULL,
+                      PRIMARY KEY (content, id));
 CREATE TABLE task (content TEXT NOT NULL REFERENCES content(id), task TEXT NOT NULL, region TEXT NOT NULL,
                    row TEXT NOT NULL, PRIMARY KEY (content, task));
 CREATE TABLE evidence (id TEXT PRIMARY KEY, content TEXT NOT NULL REFERENCES content(id), task TEXT NOT NULL,
@@ -185,6 +187,16 @@ class Store:
     def mark_extracted(self, content):
         with self.db:
             self.db.execute("UPDATE content SET extracted=1 WHERE id=?", (content,))
+
+    def record_sections(self, content, sections):
+        with self.db:
+            self.db.execute("DELETE FROM section WHERE content=?", (content,))
+            for section in sections:
+                self.db.execute("INSERT INTO section VALUES (?, ?, ?)", (content, section.id, section.model_dump_json()))
+
+    def sections(self, content):
+        return [Section.model_validate_json(d) for (d,) in
+                self.db.execute("SELECT data FROM section WHERE content=? ORDER BY rowid", (content,))]
 
     # --- per-task results ------------------------------------------------------
     def record_task(self, row, evidence):
