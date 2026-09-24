@@ -27,7 +27,7 @@ Plans use **source** for a comparison object. "Project" means a real-world proje
   - **Files without an extension, or with one no adapter handles, are not interpreted** and contribute no evidence. They are still listed as files, with a `skipped` task outcome, so nothing disappears silently.
 - **File:** a path within a source that refers to content. Archive members are files too, with paths like `a.zip!/b.zip!/c.pdf`. An archive is itself content whose interpretation yields more files.
 - **Source:** a comparison object: a folder, a zip, a single file, or a manifest listing any of these. A source *has content via its files*.
-- **Source metadata (provenance *of* sources):** this project treats sources as the provenance of evidence, but downstream consumers (RAG especially) also need to know where a source itself came from. When a source is registered, the user may attach free-form metadata, e.g. title, organization or team, author, revision label, date, description, handling or classification notes. A manifest can also attach metadata to individual files or path globs. Native document properties (PDF and `.docx` title and author, and similar) are read and kept as file-level metadata. Metadata is **human-supplied and not interpreted**. It appears in reports and is written into exports, and is not sent to extraction prompts, so editing it never needs a reset. The exception is file roles such as `errata`, which inform the model's handling of disagreements; changing a role re-runs `check` for that source.
+- **Source metadata (provenance *of* sources):** this project treats sources as the provenance of evidence, but downstream consumers (RAG especially) also need to know where a source itself came from. When a source is registered, the user may attach free-form metadata, e.g. title, organization or team, author, revision label, date, description, handling or classification notes. A manifest can also attach metadata to individual files or path globs. Native document properties (PDF and `.docx` title and author, and similar) are read and kept as file-level metadata. Metadata is **human-supplied and not interpreted**. It appears in reports and is written into exports, and is not sent to extraction prompts, so editing it never needs a reset.
 - **Duplicate content within a source** (the same PDF in two folders, a file both loose and inside a zip) is extracted once and contributes no new evidence. Every occurrence is still recorded, so provenance can say "also at …".
 - **Revisions are content differences, not timestamps.** Going from source A to source B means some content was removed (in A, not B), some added (in B, not A) and the rest is shared. A rename is shared content under a new path, so it changes only provenance. File times may be recorded for humans but carry no meaning in comparisons. This answers the earlier question of how manifests express revision metadata: they don't need to.
 - **Section:** a logical part of one piece of content, and the unit of scheduling, caching and triage. For PDFs it comes from the outline/bookmarks, falling back to headings guessed from font size, then to fixed page ranges. See [scheduling-and-triage](scheduling-and-triage-2026-09-23.md).
@@ -110,12 +110,12 @@ Conceptually these are one kind of record. Physically, much of it (locators, der
 
 | Kind | Examples | Lifetime |
 |---|---|---|
-| **Source provenance (user-supplied)** | title, organization, author, revision, date, whether the source is external, handling notes; the role of a file (e.g. `errata`) | kept across `--reset`; edited by the user |
+| **Source provenance (user-supplied)** | title, organization, author, revision, date, whether the source is external, handling notes | kept across `--reset`; edited by the user |
 | **Extracted provenance** | native document properties (title, author) traced to files; sections and heading paths; locators with context ("slide 42 speaker notes", "comment by …"); derivation chains; confidence and quality signals | derived, so it follows the extraction interpreter like evidence |
 | **Provider-declared** | recognized Markdown front matter keys, such as title, author or a provider's confidence level (e.g. from the Cameo export) | derived from content; passed through without judgment |
 | **Reviewer decisions** | criteria added, edited, merged or dropped; aliases accepted or rejected; a table mapping or strategy forced; a finding marked useful or not; benchmark labels | kept across `--reset`; re-attached or orphaned (below) |
 
-**No per-claim corrections by reviewers.** Reviewers use the tool to *avoid* reading the pile of source documents, with provenance as the basis for spot validation, so correcting individual values isn't ergonomic or realistic. Corrections come in as content instead: a user can **extend a source with an errata document** (any supported format), marked with the file role `errata` in its provenance so the model knows its intent. Conflicts between an errata document and the original are handled like any other disagreement (below).
+**No per-claim corrections by reviewers.** Reviewers use the tool to *avoid* reading the pile of source documents, with provenance as the basis for spot validation, so correcting individual values isn't ergonomic or realistic. Corrections come in as content instead: a user **extends the source with an errata document**, e.g. by adding `errata.md` to the source folder. It is ordinary content, so only the new file is extracted, and the model recognizes its intent from what it says. Conflicts between the errata and the original are handled like any other disagreement (below).
 
 ### Disagreements are claims
 
@@ -131,12 +131,12 @@ When the model recognizes that claims disagree (within one source, such as an er
 ### Behaviour
 
 - **Survives regeneration and resets.** Evidence IDs are content-based, so annotations survive report regeneration, renames and re-packaging. After a reset or model change, a reviewer decision whose target is gone is **orphaned, not deleted**. The tool tries to re-attach it via its context snapshot and lists what stays orphaned.
-- **Reviewer decisions are configuration**, and follow the same rule as any other configuration: a change that affects model derivations triggers the selective `--reset` or re-run of just what it affects, and a change that affects only final reports doesn't. For example, a forced table strategy changes that table's extraction (reset that table's evidence); edited criteria or aliases change comparisons (re-run the affected comparisons, which record their own settings); a usefulness mark changes only reports (nothing to re-run). Source provenance annotations affect only reports and exports, except file roles such as `errata`, which re-run `check` for their source when changed.
+- **Reviewer decisions are configuration**, and follow the same rule as any other configuration: a change that affects model derivations triggers the selective `--reset` or re-run of just what it affects, and a change that affects only final reports doesn't. For example, a forced table strategy changes that table's extraction (reset that table's evidence); edited criteria or aliases change comparisons (re-run the affected comparisons, which record their own settings); a usefulness mark changes only reports (nothing to re-run). Source provenance annotations affect only reports and exports.
 - **Visible, never destructive.** Reports show reviewer decisions and model-recognized disagreements next to the evidence they concern; evidence is never replaced or hidden.
 
 ### Capture
 
-- **CLI and manifests:** source provenance at registration; file roles such as `errata`.
+- **CLI and manifests:** source provenance at registration.
 - **Edit and re-import:** export a file (e.g. proposed criteria or table mappings), edit it, import it back. This is the review path before interactive views exist.
 - **Report controls:** review buttons in the static HTML report keep decisions in the browser's local storage, and an *Export reviews* button downloads them as JSON for `import-reviews`.
 - **Later:** interactive views write reviewer decisions directly.
@@ -149,7 +149,7 @@ When the model recognizes that claims disagree (within one source, such as an er
 
 ### Decisions (2026-09-24)
 
-- **Reviewer corrections:** none per claim; errata documents extend a source instead.
+- **Reviewer corrections:** none per claim; an errata document added to the source (e.g. `errata.md`) is ordinary content.
 - **Content vs annotation:** if the tool doesn't know why something is there, it's content, with a provenance annotation giving its context. Speaker notes, comments and unrecognized front matter are content.
 - **Document versions:** always read documents as they currently are (for `.docx`, with tracked changes applied), never earlier versions within one file; anything else confuses people.
 - **Disagreements:** recognized by the model and recorded as derived claims with severity and a handling decision, which may lower confidence in the claims involved.
@@ -201,7 +201,7 @@ report --store <dir> <comparison>
 
 1. **Schema v2:** content, file, source and interpreter model; content-relative locators; derivation chains; claim context fields (topic, basis, uncertainty, context, role) in the schema, filled by the prompt work in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md); migrate `compare` and `report` off A/B.
 2. **Store folder and SQLite:** WAL, single-writer lock, task queue with per-task transactions, response cache in the database, interpreter binding with rejection, selective `--reset` and `--dry-run`; resume after interruption (tested by killing a run midway).
-3. **Annotations core:** the annotation table and record format; source provenance and file roles (including `errata`) at registration and in manifests; extracted provenance from PDFs (document properties, sections, comments as content with context); export and import of reviewer decisions; orphan re-attachment. Capture from reports comes with its first consumer (reviewer feedback in scheduling-and-triage); model-recognized disagreements come with `check`.
+3. **Annotations core:** the annotation table and record format; source provenance at registration and in manifests; extracted provenance from PDFs (document properties, sections, comments as content with context); export and import of reviewer decisions; orphan re-attachment. Capture from reports comes with its first consumer (reviewer feedback in scheduling-and-triage); model-recognized disagreements come with `check`.
 4. **PDF sections:** outline → font-size headings → page ranges; heading path in prompts.
 5. **Folder, zip and manifest sources;** duplicate occurrences in provenance.
 6. **Content-difference-first comparison** (shared / removed / added).
