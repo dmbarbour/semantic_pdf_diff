@@ -90,7 +90,7 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 
 1. **Concurrent client:** time-of-day rate-limit rules, adaptive backoff, a modest concurrency cap; tests against a stub server that simulates latency and 429s; token and time estimates in `--plan`; progress bars, heartbeats and configurable verbosity.
 2. **Persistent task queue and section queue:** extraction restructured into discrete, persisted tasks (moved here from the store plan, since resume already works by cache replay); fair share across sections and across compared sources; `not_reached` coverage status.
-3. **Triage without the model:** cheap signals and boilerplate detection.
+3. **Triage without the model:** cheap signals and boilerplate detection. Use drawing sets as a test case: table detection there finds mostly drawing geometry, and about half the rows repeat across sheets (title blocks, legends; see the [store milestone 4 review](../reviews/store-m4-pdf-sections-2026-09-24.md)).
 4. **Model triage per section:** type, density, keywords and the "about" statement.
 5. **Epistemic status:** prompts ask for basis, uncertainty, context and role (filling the schema v2 fields); skeptical instructions; the basis veto in comparison. A deliberate prompt-version change.
 6. **Preliminary reports:** status stamps, honest gap labels, comparison interleaved with extraction, the `status` command.
