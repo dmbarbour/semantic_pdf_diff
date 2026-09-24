@@ -27,11 +27,15 @@ def write_report(data, output, assets=None):
                     }.get(e.get('quote_verified'), '')
         loc = e['locator']
         basis = f"<p>Basis: {esc(e['basis'])}</p>" if e.get('basis', 'unknown') != 'unknown' else ''
+        others = e.get('occurrences', [])[1:] if len(e.get('occurrences', [])) > 1 else []
+        seen_by = sorted({o['locator']['region'] for o in e.get('occurrences', [])})
+        also = (f"<p>Found {len(e['occurrences'])} times ({esc(', '.join(seen_by))}): "
+                + esc('; '.join(f"p.{o['locator']['page']} {o['locator']['region']}" for o in e['occurrences'])) + "</p>") if others else ''
         heading = headings.get((e['content'], e.get('section', '')), '')
         heading = f" · § {esc(heading)}" if heading else ''
         return f'''<section><h3>{esc(where(e['content']))}{heading} · page {loc['page']} · {esc(e['kind'])}</h3>
         <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
-        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}<blockquote>{esc(e['quote'])}</blockquote>{verified}
+        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}<blockquote>{esc(e['quote'])}</blockquote>{verified}{also}
         <small>{esc(eid)} · {esc(loc['region'])} region, PDF bbox {esc(list(loc['bbox']))} · confidence {e['confidence']:.2f}</small>{image}</section>'''
     counts = Counter(f['relation'] for f in data['findings'])
     issues = [r for r in data['coverage'] if r['status'] != 'complete']

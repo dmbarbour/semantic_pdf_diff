@@ -4,7 +4,7 @@ import math
 import re
 from pathlib import Path
 import pymupdf
-from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section
+from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, claim_id, merge_occurrences
 from .llm import ModelFailure
 
 # Bump when prompt assembly or task construction changes, not only the template text;
@@ -145,7 +145,6 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
     stem = content.split(":", 1)[1][:12]
     assets = output / "assets"
     assets.mkdir(exist_ok=True, parents=True)
-    seen = set()
     page_section = {}
 
     def record(row, items=()):
@@ -153,12 +152,13 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
         if on_task:
             on_task(row, list(items))
 
-    def consume(page_no, bbox, task, family, text, image=None, check=None, locate=None, crop=None, derivation=None):
+    def consume(page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None):
         """Run one extraction task, record it in the ledger and return its status.
 
         check(quote) -> bool | None. Native tasks reject claims failing it; visual tasks
         only record the result. locate(quote) narrows a claim's bbox within the task.
-        Exact duplicate claims within one family (native or visual) on a page are kept once.
+        Each claim found becomes one occurrence; sightings of the same claim by other
+        tasks are merged into one piece of evidence afterwards (union provenance).
         """
         region = task.split(":")[0]
         found = []
@@ -180,13 +180,10 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
                     row["status"] = "partial"
                     row["issues"].append("Rejected claim with unsupported literal quote")
                     continue
-                key = (page_no, family, claim.entity.casefold(), claim.attribute.casefold(),
-                       normalize(claim.value), claim.unit.strip(), normalize(claim.conditions), normalize(claim.quote))
-                if key in seen:
-                    continue
-                seen.add(key)
+                eid = claim_id(content, claim)
+                if any(e.id == eid for e in found):
+                    continue  # the same claim twice in one response: keep the first
                 where = tuple(locate(claim.quote) if locate else bbox)
-                eid = "ev-" + hashlib.sha256((content + repr(key) + repr(where)).encode()).hexdigest()[:16]
                 found.append(Evidence(**claim.model_dump(), id=eid, content=content, section=section.id,
                                       locator=PdfLocator(page=page_no, bbox=where, region=region, task=task),
                                       derivation=derivation or DERIVATION[region], image=image, quote_verified=verified))
@@ -202,7 +199,7 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
         text = "\n\n".join(t for _, t in segments)
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
-        status = consume(page_no, union(b for b, _ in segments), task, "native", text,
+        status = consume(page_no, union(b for b, _ in segments), task, text,
                          check=lambda q: quoted(q, text), locate=locate)
         if status == "complete" or depth >= s.refinement_depth:
             return
@@ -233,7 +230,7 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
                     "status": "partial", "issues": ["Table row exceeds text budget; inspect visual tiles"], "claims": 0})
             return
         if fits:
-            status = consume(page_no, bbox, task, "native", text, derivation=derivation,
+            status = consume(page_no, bbox, task, text, derivation=derivation,
                              check=lambda q: quoted(q, text) or covered(q, flat))
             if status == "complete" or depth >= s.refinement_depth or not splittable:
                 return
@@ -250,7 +247,7 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
         native = rect * page.derotation_matrix
         layer = page.get_text("text", clip=native)
         check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
-        status = consume(page_no, native, tag, "visual", "", "assets/" + name, check=check,
+        status = consume(page_no, native, tag, "", "assets/" + name, check=check,
                          crop=(tuple(round(v, 3) for v in rect), s.image_side))
         # Refine only local tiles; an overview may be incomplete because it spans
         # many facts, and all overview areas already have tile coverage.
@@ -346,4 +343,4 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None):
                 record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
                         "task": f"vision:p{number}", "image": None, "status": "skipped",
                         "issues": ["Visual extraction disabled; charts, diagrams and scans may be missed"], "claims": 0})
-    return evidence, coverage
+    return merge_occurrences(evidence), coverage

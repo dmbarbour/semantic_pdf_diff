@@ -9,9 +9,9 @@ import json
 import os
 import sqlite3
 from pathlib import Path
-from .models import Evidence, FileRef, Interpreter, Section, Source
+from .models import Evidence, FileRef, Interpreter, Section, Source, merge_occurrences
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -25,8 +25,9 @@ CREATE TABLE section (content TEXT NOT NULL REFERENCES content(id), id TEXT NOT 
                       PRIMARY KEY (content, id));
 CREATE TABLE task (content TEXT NOT NULL REFERENCES content(id), task TEXT NOT NULL, region TEXT NOT NULL,
                    row TEXT NOT NULL, PRIMARY KEY (content, task));
-CREATE TABLE evidence (id TEXT PRIMARY KEY, content TEXT NOT NULL REFERENCES content(id), task TEXT NOT NULL,
-                       region TEXT NOT NULL, data TEXT NOT NULL);
+-- One row per occurrence: a claim (id) sighted by one task. Loading merges them.
+CREATE TABLE evidence (id TEXT NOT NULL, content TEXT NOT NULL REFERENCES content(id), task TEXT NOT NULL,
+                       region TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (id, content, task));
 CREATE INDEX evidence_content ON evidence(content);
 CREATE TABLE response_cache (key TEXT PRIMARY KEY, kind TEXT NOT NULL, region TEXT NOT NULL,
                              request_hash TEXT NOT NULL, response TEXT NOT NULL, content TEXT NOT NULL DEFAULT '');
@@ -286,11 +287,12 @@ class Store:
                             (row["content"], row["task"], region, json.dumps(row)))
             for e in evidence:
                 self.db.execute("INSERT OR REPLACE INTO evidence VALUES (?, ?, ?, ?, ?)",
-                                (e.id, e.content, e.locator.task, region, e.model_dump_json()))
+                                (e.id, e.content, row["task"], region, e.model_copy(update={"occurrences": []}).model_dump_json()))
 
     def evidence(self, content):
-        return [Evidence.model_validate_json(d) for (d,) in
-                self.db.execute("SELECT data FROM evidence WHERE content=? ORDER BY rowid", (content,))]
+        """Claims for a piece of content, with occurrences merged (order-independent)."""
+        return merge_occurrences(Evidence.model_validate_json(d) for (d,) in
+                                 self.db.execute("SELECT data FROM evidence WHERE content=?", (content,)))
 
     def coverage(self, content):
         return [json.loads(r) for (r,) in self.db.execute("SELECT row FROM task WHERE content=? ORDER BY rowid", (content,))]

@@ -146,7 +146,8 @@
       "section": "",
       "derivation": [],
       "image": null,
-      "quote_verified": null
+      "quote_verified": null,
+      "occurrences": []
     },
     {
       "entity": "cooling circuit",
@@ -180,7 +181,8 @@
       "section": "",
       "derivation": [],
       "image": null,
-      "quote_verified": null
+      "quote_verified": null,
+      "occurrences": []
     },
     {
       "entity": "primary pump",
@@ -214,7 +216,8 @@
       "section": "",
       "derivation": [],
       "image": null,
-      "quote_verified": null
+      "quote_verified": null,
+      "occurrences": []
     },
     {
       "entity": "pump",
@@ -248,7 +251,8 @@
       "section": "",
       "derivation": [],
       "image": null,
-      "quote_verified": null
+      "quote_verified": null,
+      "occurrences": []
     },
     {
       "entity": "primary pump",
@@ -282,7 +286,8 @@
       "section": "",
       "derivation": [],
       "image": null,
-      "quote_verified": null
+      "quote_verified": null,
+      "occurrences": []
     },
     {
       "entity": "cooling circuit",
@@ -316,7 +321,8 @@
       "section": "",
       "derivation": [],
       "image": null,
-      "quote_verified": null
+      "quote_verified": null,
+      "occurrences": []
     },
     {
       "entity": "primary pump",
@@ -350,7 +356,8 @@
       "section": "",
       "derivation": [],
       "image": null,
-      "quote_verified": null
+      "quote_verified": null,
+      "occurrences": []
     },
     {
       "entity": "pump",
@@ -384,7 +391,8 @@
       "section": "",
       "derivation": [],
       "image": null,
-      "quote_verified": null
+      "quote_verified": null,
+      "occurrences": []
     },
     {
       "entity": "firewall",
@@ -418,7 +426,8 @@
       "section": "",
       "derivation": [],
       "image": null,
-      "quote_verified": null
+      "quote_verified": null,
+      "occurrences": []
     }
   ],
   "coverage": [],

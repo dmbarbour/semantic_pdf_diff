@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 from typing import Literal
@@ -112,7 +113,25 @@ class DerivationStep(Strict):
     step: str
     detail: str = ""
 
+class Occurrence(Strict):
+    """One sighting of a claim by one extraction task."""
+    locator: Locator
+    section: str = ""
+    kind: Literal["text", "table", "chart", "diagram"]
+    quote: str
+    quote_verified: bool | None = None
+    confidence: float = Field(ge=0, le=1)
+    image: str | None = None
+    derivation: list[DerivationStep] = Field(default_factory=list)
+
 class Evidence(Claim):
+    """A claim within one piece of content.
+
+    The ID derives from the content and the claim's identity only (see claim_id), so
+    it doesn't depend on where or in which order the claim was found. Locator, section,
+    quote, image and derivation are those of the representative occurrence; all
+    sightings are listed in `occurrences` (empty for a single, unmerged sighting).
+    """
     id: str
     content: str
     locator: Locator
@@ -122,6 +141,40 @@ class Evidence(Claim):
     # True: quote found in the PDF text layer; False: the region has a text layer but
     # the quote is absent (possible misread, or raster labels); None: not checkable.
     quote_verified: bool | None = None
+    occurrences: list[Occurrence] = Field(default_factory=list)
+
+def claim_id(content, claim):
+    """Evidence ID from content and claim identity: entity, attribute, value and conditions
+    (whitespace-normalized, case-folded), unit (exact: mW is not MW), approximate and basis."""
+    fold = lambda text: " ".join(str(text).split()).casefold()
+    identity = [content, fold(claim.entity), fold(claim.attribute), fold(claim.value), claim.unit.strip(),
+                fold(claim.conditions), claim.approximate, claim.basis]
+    return "ev-" + hashlib.sha256(json.dumps(identity).encode()).hexdigest()[:16]
+
+# Representative occurrence: native before visual, tile before overview, then the
+# smallest region, then page and task order.
+REGION_RANK = {"text": 0, "table": 0, "tile": 1, "overview": 2}
+
+def representative_rank(e):
+    x0, y0, x1, y1 = e.locator.bbox
+    return REGION_RANK.get(e.locator.region, 3), (x1 - x0) * (y1 - y0), e.locator.page, e.locator.task
+
+def merge_occurrences(sightings):
+    """Group single-sighting evidence by claim ID into claims whose provenance is the union
+    of their occurrences. The result doesn't depend on the order of `sightings`."""
+    groups = {}
+    for e in sightings:
+        groups.setdefault(e.id, []).append(e)
+    merged = []
+    for items in groups.values():
+        items.sort(key=representative_rank)
+        occurrences = [Occurrence(locator=i.locator, section=i.section, kind=i.kind, quote=i.quote,
+                                  quote_verified=i.quote_verified, confidence=i.confidence, image=i.image,
+                                  derivation=i.derivation)
+                       for i in sorted(items, key=lambda i: (i.locator.page, i.locator.task))]
+        merged.append(items[0].model_copy(update={"confidence": max(i.confidence for i in items),
+                                                  "occurrences": occurrences}))
+    return sorted(merged, key=lambda e: (e.locator.page, e.locator.task, e.id))
 
 class Interpreter(Strict):
     """Everything besides the bytes that shapes derived data for one role."""

@@ -143,7 +143,7 @@ def file_difference(files_a, files_b):
     return result
 
 # Provenance stays out of the model's view; it sees the claims and any source crops.
-PROVENANCE_FIELDS = {"id", "content", "locator", "derivation", "image", "quote_verified"}
+PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences"}
 
 def compare(left, right, output, client, mode):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
