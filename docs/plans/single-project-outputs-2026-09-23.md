@@ -23,8 +23,8 @@ It reuses retrieval, the numeric check and the uncertainty rules unchanged. For 
 
 The target RAG system is not ours to change. Its ingest tool accepts PDF, Markdown, text, `.docx`, `.pptx`, `.xlsx`, CSV and JSON (not JSONL). It preserves provenance poorly, ignores its `--metadata` argument in practice, handles spreadsheets badly and loses the meaning of diagrams. So the export is **a folder of explicit, self-contained Markdown chunk files**, one per chunk, designed so each survives ingestion on its own:
 
-- **Provenance in the text, not in metadata.** Each chunk states in prose where it came from: source, file path, page or slide or cell range, section heading path, and a short content ID for exact tracing. A human-readable citation line ("PS-3 design summary.pdf, p. 12, Table 3") is included so RAG answers can quote it.
-- **Small and self-contained.** Chunks are kept below a configurable size so the ingest tool is unlikely to split them. If it splits anyway, a compact provenance line is repeated before each subsection, so no fragment loses its origin.
+- **Provenance in the text, not in metadata.** Each chunk states in prose where it came from: source, file path, page or slide or cell range, section heading path, and a short content ID for exact tracing. It also carries **provenance of the source itself** from the source and file metadata (title, organization or team, author, revision label, date; see *Source metadata* in [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md)), so the RAG system knows whose document and which revision a fact comes from. A human-readable citation line ("PS-3 design summary.pdf, p. 12, Table 3") is included so RAG answers can quote it.
+- **Sized to the ingest tool's chunking.** The tool extracts text with `markitdown` and splits into chunks of 512 tokens with 128 tokens of overlap by default (configurable on its command line). Export chunks therefore target roughly 400 tokens by default (configurable), leaving margin for tokenizer differences, so each file normally becomes one RAG chunk. When a chunk must be longer, a compact provenance line is repeated before each subsection, so any 512-token window still names its origin. The provenance header costs roughly 50–80 tokens per chunk; worth it.
 - **Tables inline, as small Markdown tables** with their headers and units, instead of separate CSV or `.xlsx` files the ingest tool would mangle. Large tables are split into chunks that each repeat the header and table identity.
 - **Diagrams and charts as text.** Claims from visual extraction (connections, operating points, axis readings, flagged approximations) are written out in words. That preserves exactly what the ingest tool would lose.
 - **Qualifiers kept with the facts:** conditions, basis (measured, projected, required…), stated uncertainty, derivation (direct read, model extraction, summary of summaries), quote-verification status and any issues or suspicions. Confidence appears as the qualifier it is, not as a bare number presented as truth.
@@ -56,6 +56,11 @@ Section: 4 Mechanical > 4.2 Pumps. Content sha256:3f7ffce6….pdf.
 Cite as: PS-3 design summary.pdf, p. 12, Table 3.
 ```
 
+**Title and author.** The ingest tool is good at tracing content to a file's title and author, which it reads from PDF and `.docx` properties. Two ways to use that, to be compared in a trial:
+
+- Markdown chunks whose first heading is the citation and which open with YAML front matter (`title`, `author`/organization, `source`, `revision`). `markitdown` passes Markdown through largely as text, so the front matter at least remains readable in the chunk.
+- `.docx` chunks with the core `title` and `author` properties set from provenance, and the same body content. More work, but it plays to the tool's demonstrated strength.
+
 A JSON rendering of the same records (an array, since JSONL isn't accepted) is a cheap secondary option for tools that want structure, but Markdown is the primary target.
 
 ### 3. Fact sheet, built without the model (first-tier overview)
@@ -79,10 +84,10 @@ A model-written overview for humans, produced by map-reduce within the small con
 
 ## Decisions (2026-09-23)
 
-- **RAG target:** an external system with a fixed ingest tool (PDF, Markdown, text, `.docx`, `.pptx`, `.xlsx`, CSV, JSON; no JSONL; metadata ignored). Export explicit, self-contained Markdown chunks with provenance, tables, qualifiers and notes written into the text.
+- **RAG target:** an external system with a fixed ingest tool (PDF, Markdown, text, `.docx`, `.pptx`, `.xlsx`, CSV, JSON; no JSONL; `--metadata` ignored; `markitdown` extraction; 512-token chunks with 128-token overlap by default; good at tracing file title and author). Export explicit, self-contained chunks with provenance (including provenance of sources), tables, qualifiers and notes written into the text, sized to fit one ingest chunk.
 
 ## Open questions
 
-- **How does the ingest tool chunk and update?** Its splitting size and whether re-ingesting a file with the same name replaces the old one are unknown. Measure both with a small trial export, then set default chunk sizes and naming accordingly.
-- **Do RAG answers actually surface the in-text citation?** Check with a few queries after a trial ingestion; adjust citation wording and placement if not.
+- **Does re-ingesting a file with the same name replace the old one,** or add a duplicate? This decides whether stable file names are enough for updates or whether exports need an explicit removal list.
+- **Which carries provenance better, Markdown with front matter or `.docx` with title/author properties?** Compare with a trial ingestion of both and a few queries; also check that in-text citations surface in answers.
 - Is a structured fact sheet enough for human readers, or is prose needed?

@@ -27,6 +27,7 @@ Other plans say "project" informally; in store terms that means a **source**.
   - **Files without an extension, or with one no adapter handles, are not interpreted** and contribute no evidence. They are still listed as files, with a `skipped` task outcome, so nothing disappears silently.
 - **File:** a path within a source that refers to content. Archive members are files too, with paths like `a.zip!/b.zip!/c.pdf`. An archive is itself content whose interpretation yields more files.
 - **Source:** a comparison object: a folder, a zip, a single file, or a manifest listing any of these. A source *has content via its files*.
+- **Source metadata (provenance *of* sources):** this project treats sources as the provenance of evidence, but downstream consumers (RAG especially) also need to know where a source itself came from. When a source is registered, the user may attach free-form metadata, e.g. title, organization or team, author, revision label, date, description, handling or classification notes. A manifest can also attach metadata to individual files or path globs. Native document properties (PDF and `.docx` title and author, and similar) are read and kept as file-level metadata. Metadata is **human-supplied and not interpreted**: it is not part of any interpreter, so editing it never needs a reset. It appears in reports and is written into exports.
 - **Duplicate content within a source** (the same PDF in two folders, a file both loose and inside a zip) is extracted once and contributes no new evidence. Every occurrence is still recorded, so provenance can say "also at …".
 - **Revisions are content differences, not timestamps.** Going from source A to source B means some content was removed (in A, not B), some added (in B, not A) and the rest is shared. A rename is shared content under a new path, so it changes only provenance. File times may be recorded for humans but carry no meaning in comparisons. This answers the earlier question of how manifests express revision metadata: they don't need to.
 - **Section:** a logical part of one piece of content, and the unit of scheduling, caching and triage. For PDFs it comes from the outline/bookmarks, falling back to headings guessed from font size, then to fixed page ranges. See [scheduling-and-triage](scheduling-and-triage-2026-09-23.md).
@@ -81,8 +82,8 @@ Reports (HTML) remain files generated from the database.
 | Table | Contents |
 |---|---|
 | `content` | content ID, SHA-256, extension, size, detected media type |
-| `source` | source ID, name, how it was given (folder / zip / file / manifest) |
-| `file` | source ID, path (with `!/` for archive members), content ID, parent archive file if any |
+| `source` | source ID, name, how it was given (folder / zip / file / manifest), metadata (JSON) |
+| `file` | source ID, path (with `!/` for archive members), content ID, parent archive file if any, metadata (JSON: manifest-supplied and native document properties) |
 | `interpreter` | one row per role (extract / embed / summarize / compare): model, endpoint label (credentials redacted), prompt hashes, output-affecting settings JSON, tool and library versions. This is the store's binding checked on every run. |
 | `section` | content ID, section ID, locator range, heading path |
 | `task` | content ID, section, pass, locator, status (pending / complete / partial / failed / skipped / not_reached), attempts, issues. This is the coverage record and the resume queue. |
