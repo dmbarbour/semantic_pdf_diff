@@ -103,6 +103,45 @@ Do not judge proposal quality or invent causes/impacts. A supporting numeric con
 it cannot establish entity or condition equivalence. Image order is described with the claims.
 '''
 
+def relative_path(path):
+    """A file's path relative to its root, so sources with differently named roots
+    ('rev1/x.pdf', 'rev2/x.pdf', 'v1.zip!/x.pdf') line up."""
+    outer, sep, member = path.partition("!/")
+    if "/" in outer:
+        return path.split("/", 1)[1]
+    return member if sep else path
+
+def file_difference(files_a, files_b):
+    """Classify two sources' files: unchanged, modified, moved, added and removed.
+
+    Paths are compared relative to their roots; archives are skipped (their members are
+    compared instead). Two single-file sources are compared as one file.
+    """
+    def side(files):
+        items = [(f.path, f.content) for f in files if not f.content.endswith(".zip")]
+        keys = [relative_path(p) for p, _ in items]
+        return {(k if keys.count(k) == 1 else p): (p, c) for k, (p, c) in zip(keys, items)}
+    a, b = side(files_a), side(files_b)
+    if len(a) == 1 and len(b) == 1:
+        a, b = {"": next(iter(a.values()))}, {"": next(iter(b.values()))}
+    result = {"unchanged": [], "modified": [], "moved": [], "added": [], "removed": []}
+    for key in sorted(set(a) & set(b)):
+        (pa, ca), (pb, cb) = a[key], b[key]
+        result["unchanged" if ca == cb else "modified"].append([pa, pb] if ca != cb else pb)
+    rest_a = {k: v for k, v in a.items() if k not in b}
+    rest_b = {k: v for k, v in b.items() if k not in a}
+    by_content = {}
+    for key, (path, content) in sorted(rest_b.items()):
+        by_content.setdefault(content, []).append(key)
+    for key, (path, content) in sorted(rest_a.items()):
+        if by_content.get(content):
+            other = by_content[content].pop(0)
+            result["moved"].append([path, rest_b.pop(other)[0]])
+        else:
+            result["removed"].append(path)
+    result["added"] = sorted(path for path, _ in rest_b.values())
+    return result
+
 # Provenance stays out of the model's view; it sees the claims and any source crops.
 PROVENANCE_FIELDS = {"id", "content", "locator", "derivation", "image", "quote_verified"}
 
@@ -110,17 +149,24 @@ def compare(left, right, output, client, mode):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
 
     Evidence belongs to content, so content present on both sides yields identical
-    evidence; it is listed as shared and never sent to the model.
+    evidence; it is listed as shared and never compared with itself. Each side's
+    unique evidence is compared with the other side's unique evidence and with shared
+    evidence, so a claim whose counterpart sits in shared content isn't "unmatched".
     """
     # Comparisons aren't bound to a store, so their cache keys carry their own settings.
     settings_key = text_hash(comparison_interpreter(client.s).model_dump_json())
     shared_ids = {e.id for e in left} & {e.id for e in right}
+    shared = list({e.id: e for e in left if e.id in shared_ids}.values())
     findings, matched, attempted = [], set(), set()
     left = [e for e in left if e.id not in shared_ids]
     right = [e for e in right if e.id not in shared_ids]
-    pairs = candidates(left, right, client.s)
-    for i,j,score in pairs[:client.s.max_pairs]:
-        a,b = left[i],right[j]
+    scored = {}
+    for a_side, b_side in ((left, right + shared), (shared, right)):
+        for i, j, score in candidates(a_side, b_side, client.s):
+            a, b = a_side[i], b_side[j]
+            scored[a.id, b.id] = (max(score, scored.get((a.id, b.id), (0,))[0]), a, b)
+    pairs = sorted(scored.values(), key=lambda x: (-x[0], x[1].id, x[2].id))
+    for score, a, b in pairs[:client.s.max_pairs]:
         attempted.update((a.id,b.id))
         images, payload = [], []
         for e in (a,b):

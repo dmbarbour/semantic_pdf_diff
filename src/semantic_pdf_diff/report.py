@@ -58,6 +58,12 @@ select,input{padding:10px;border:1px solid #aac0cd;border-radius:6px;margin:8px}
 </style><header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1>'''
     page += f"<p>{' ↔ '.join(esc(x['name']) for x in data['sources'])}</p><p>Mode: {esc(data['mode'])}</p>"
     page += f"<p>{esc(dict(counts))}</p><p class='warning'>{len(issues)} incomplete, failed or skipped source tasks. {len(data['unmatched'])} claims lack a confirmed counterpart.</p>"
+    diff = data.get('file_difference')
+    if diff:
+        render = lambda item: esc(' → '.join(item) if isinstance(item, list) else item)
+        page += '<details><summary>Files: ' + ', '.join(f"{len(diff[k])} {k}" for k in ('unchanged', 'modified', 'moved', 'added', 'removed')) + '</summary>'
+        page += ''.join(f"<p><b>{k.title()}</b></p><ul>" + ''.join(f"<li>{render(i)}</li>" for i in diff[k]) + "</ul>"
+                        for k in ('modified', 'moved', 'added', 'removed', 'unchanged') if diff[k]) + '</details>'
     page += '<p>Model conclusions require review. “Complete” means the extractor reported no local issue, not proof of exhaustive coverage. Unmatched claims do not establish additions or deletions.</p>'
     page += '<p>Revision mode treats the first source as the earlier version and the second as the later one. Proposal mode treats both symmetrically; neither is ranked.</p>'
     page += '<details><summary>Run metadata and limitations</summary><pre>'+esc(json.dumps({k:v for k,v in data.items() if k not in ('evidence','coverage','findings','unmatched')},indent=2))+'</pre></details></header>'

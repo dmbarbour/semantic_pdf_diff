@@ -10,7 +10,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from . import manifest
-from .compare import compare
+from .compare import compare, file_difference
 from .extract import extract_pdf, visual_regions
 from .llm import Client, redact_url
 from .models import Settings, Source
@@ -207,6 +207,7 @@ def run(args, settings, store, names, out, force_rescan=False):
     interpreters['compare'] = comparison_interpreter(settings).model_dump()
     data.update(schema_version=2, created_at=datetime.now(timezone.utc).isoformat(),
         sources=source_data, files=file_data, interpreters=interpreters, scan_issues=scan_issues,
+        file_difference=file_difference(files[names[0]], files[names[1]]),
         sections=[{'content': c, **x.model_dump()} for c, items in sections.items() for x in items],
         evidence=[e.model_dump() for e in evidence], coverage=coverage,
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},

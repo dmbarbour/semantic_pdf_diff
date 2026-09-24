@@ -126,9 +126,12 @@ class CommandLine(unittest.TestCase):
             report = json.loads((self.store / 'report.json').read_text())
             self.assertEqual(code, 2)  # --no-vision and the unsupported .md are incomplete
             self.assertEqual(len(report['shared']), 1)  # the identical rules PDF
-            # The stub calls 10 kW and 12 kW equivalent; the numeric check vetoes that to uncertain.
-            self.assertEqual([f['relation'] for f in report['findings']], ['uncertain'])
-            self.assertIn('Numeric conversion disagrees', report['findings'][0]['rationale'])
+            # The stub calls every pair equivalent; the numeric check vetoes each to uncertain.
+            self.assertEqual({f['relation'] for f in report['findings']}, {'uncertain'})
+            self.assertTrue(all('Numeric conversion disagrees' in f['rationale'] for f in report['findings']))
+            # Unique claims are also compared with shared evidence.
+            self.assertTrue(any(report['shared'][0] in (f['a'], f['b']) for f in report['findings']))
+            self.assertNotIn(report['shared'][0], [u['id'] for u in report['unmatched']])
             unsupported = [r for r in report['coverage'] if r['task'] == 'unsupported']
             self.assertEqual(len(unsupported), 1)  # both readme.md files are the same content
             self.assertEqual(unsupported[0]['issues'], ['No adapter for .md files yet'])

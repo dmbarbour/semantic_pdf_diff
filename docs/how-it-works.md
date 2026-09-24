@@ -27,6 +27,8 @@ Provenance (schema v2):
 
 ## Modes
 
+Evidence from content present in both sources is **shared**: listed once, never compared with itself, but used as a retrieval target, so a claim in changed content whose counterpart sits in shared content isn't reported as unmatched. Reports also summarize the **file-level difference**: files unchanged, modified (same relative path, different content), moved or renamed (same content, different path), added and removed, with paths compared relative to each source's roots (so `rev1/x.pdf` lines up with `rev2/x.pdf`).
+
 Proposal mode is symmetric and does not rank teams. Revision mode labels A as earlier and B as later; numeric deltas are B minus A. Neither mode calls unmatched evidence a proven addition/deletion. Absence is harder to establish than a local difference.
 
 ## Model output handling
