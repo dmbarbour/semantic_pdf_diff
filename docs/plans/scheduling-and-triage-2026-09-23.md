@@ -103,4 +103,4 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 - **Throughput limits:** 300k tokens/min in business hours, 500k outside; configurable by time of day, and expected to change.
 - **Concurrent requests:** assume the server caps them. Use a modest, configurable concurrency limit (single digits by default) and let adaptive backoff find the working level, leaving room for the user's other tools on the same server.
 - **Time budgets:** none. Runs proceed unattended until done or stopped; preliminary reports cover the need to look early.
-- **Reviewer feedback:** stored as reusable annotations in the store, exportable and importable (see the *Decisions* in [retrieval-recall](retrieval-recall-2026-09-23.md)).
+- **Reviewer feedback:** stored as reusable annotations in the store, exportable and importable (see [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md) (*Annotations*)).

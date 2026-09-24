@@ -92,13 +92,64 @@ Reports (HTML) remain files generated from the database.
 | `embedding` | text hash, embedding interpreter, vector (for claim topics and section "about" statements) |
 | `comparison` | comparison ID, mode, the sources compared, comparison settings and model, criteria used, findings or criterion descriptions (so reports can be regenerated without model calls) |
 | `criterion` | criterion ID, question, required basis and context, comparison method, provenance (extracted from which documents, recommended, or user-entered), review state |
-| `annotation` | human QA records: target (by stable ID), kind, value, context snapshot, author, time. Human input, not derived data, so `--reset` never deletes it; orphaned annotations are kept and re-attached where possible. |
+| `annotation` | see *Annotations* below: target, kind, value, origin, context snapshot, author, time. User-supplied and QA annotations survive `--reset`; embedded ones follow extraction. |
 | `response_cache` | request hash → validated model response (replaces the `cache/` folder) |
 | `meta` | schema version, creation and tool info |
 
 ### Views and exports
 
 SQL views cover common questions: evidence with all its file occurrences per source, coverage by source and section, and content shared, added or removed between two sources. A `show` subcommand turns views into human-readable output (Markdown or CSV tables, JSONL for tools) without anyone needing to write SQL.
+
+## Annotations
+
+An **annotation** is a statement *about* something in the store that isn't itself a claim extracted from content: who wrote a source, a reviewer's correction, a provider's confidence marking, a comment embedded in a document. Several plans need them. This section consolidates their requirements.
+
+### Origins
+
+| Origin | Examples | Lifetime |
+|---|---|---|
+| **User-supplied** | source and file metadata (title, organization, author, revision, handling notes), given at registration or in a manifest | kept across `--reset`; edited by the user |
+| **Human QA** | extraction correct / wrong / corrected value; relation confirmed or overridden; finding useful or not; alias accepted or rejected; table mapping confirmed or corrected; criterion added, edited, merged or dropped; benchmark labels (same topic, addresses criterion) | kept across `--reset`; re-attached or orphaned (below) |
+| **Embedded in files** | native document properties (title, author); PDF comments and highlights; `.docx` comments and tracked changes; `.pptx` speaker notes; Markdown front matter; provider markings such as confidence levels (e.g. from the Cameo export) | derived from content by adapters, so they follow the extraction interpreter like evidence |
+
+Embedded annotations contribute to sections (context for extraction, e.g. a reviewer comment beside a paragraph) and to RAG exports (provenance, provider confidence), and they are shown in reports. This project passes provider markings through without judging them.
+
+### Record
+
+- **target** by stable ID: source, file, content, section, evidence, a pair of evidence IDs (finding or benchmark pair), criterion, alias proposal, table interpretation, or comparison
+- **kind** and **value**, including an optional correction and free-text note
+- **origin** (user / QA / embedded) and, for embedded ones, the locator where it was found
+- **context snapshot:** what the reviewer saw (quotes, values, paths), so the record reads on its own and can be re-attached
+- **author** (free text) and **time**
+
+### Behaviour
+
+- **Survives regeneration and resets.** Evidence IDs are content-based, so annotations survive report regeneration, renames and re-packaging. After a reset or model change, an annotation whose target is gone is **orphaned, not deleted**. The tool tries to re-attach it via its context snapshot (same content, same locator, same quoted text) and lists what stays orphaned.
+- **Never part of an interpreter.** Adding or editing annotations never needs a reset. Configuration derived from them (alias maps, criteria, forced table strategies) is recorded per comparison, where it applies.
+- **Visible, never destructive.** Reports show a reviewer's override or correction next to the model's output. Evidence is never replaced or hidden.
+
+### Capture
+
+- **CLI and manifests:** source and file metadata at registration.
+- **Edit and re-import:** export a file (e.g. proposed criteria or table mappings), edit it, import it back. This is the interim review path before interactive views exist.
+- **Report controls:** review buttons in the static HTML report keep judgments in the browser's local storage, and an *Export reviews* button downloads them as JSON for `import-reviews`.
+- **Later:** interactive views (terminal UI, web server) write annotations directly.
+
+### Export and import
+
+- **Export:** a machine-readable JSON file plus a readable report grouped by kind, with context snapshots. This is a standalone QA record.
+- **Import** merges annotations into any store. The same author replacing a judgment is an update. Different authors disagreeing are both kept and shown as a disagreement, never silently resolved.
+- **Configuration fragments:** accepted aliases, criteria and forced table strategies can be exported as configuration for future runs.
+
+### Open questions for discussion
+
+1. **Do human corrections flow downstream?** If a reviewer corrects a misread value, do comparisons and exports use the corrected value (marked "human-corrected" in the derivation), or only show it beside the original? Using it is more useful; showing only is more conservative.
+2. **Embedded content vs annotation:** are `.pptx` speaker notes and hidden text *content* (extracted into claims, with a derivation saying where they came from) or *annotations* (context only)? Proposed: notes are content; comments and tracked changes are annotations.
+3. **Tracked changes:** extract the document as it would read with changes accepted, as it was, or both? This interacts with revision comparison.
+4. **Disagreements:** is showing both sides enough, or is a designated resolver (a later annotation that settles it) needed?
+5. **Annotations from another organization's store:** mark them as external, and weight them differently in calibration?
+6. **Attribution:** is free-text author entry enough inside the sandbox, or will reviews need stronger attribution?
+7. **Provider marking convention:** Markdown front matter, a sidecar file, or both? (Moved here from the formats plan; settle when the first provider needs it.)
 
 ## Comparison consequences
 
