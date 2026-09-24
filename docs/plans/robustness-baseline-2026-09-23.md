@@ -31,5 +31,5 @@ Housekeeping: `import pymupdf` (PyMuPDF ≥ 1.24.3), 25 new regression tests (38
 
 ## Known limits carried forward
 
-- Nothing here measures real-model extraction accuracy; see [retrieval-benchmark](retrieval-benchmark-2026-09-23.md).
+- Nothing here measures real-model extraction accuracy; see [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md).
 - At default `tile_points` (420), a US Letter page still needs 6 tiles; about 440 would give 4.

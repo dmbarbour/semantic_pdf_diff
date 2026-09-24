@@ -2,7 +2,7 @@
 
 - **Status:** Planned
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (response cache, interpreter records)
-- **Enables:** fast realistic integration tests for every later plan; the [retrieval-benchmark](retrieval-benchmark-2026-09-23.md)
+- **Enables:** fast realistic integration tests for every later plan; the [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md)
 
 ## Goal
 

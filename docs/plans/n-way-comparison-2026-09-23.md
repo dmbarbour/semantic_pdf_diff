@@ -104,5 +104,4 @@ Revisions of one design are commensurable by default. They use claim-level compa
 
 ## Open questions
 
-- **Units for normalization:** criteria promise normalized comparisons (per kW, per m², per year), but today's numeric check knows about 25 simple units and no compound ones. Options: adopt `pint` (BSD-licensed, handles compound units and conversions, case-sensitive prefixes), or extend our own table deliberately. **Recommendation:** `pint` behind our existing rules: our alias table on top, abstain on ambiguous or unparseable units, and keep "approximate" and basis vetoes.
-- **Money:** proposals often compare costs. Proposed policy: compare amounts only in the same currency and price basis (year, nominal or real); otherwise show them side by side and abstain from arithmetic. No exchange-rate or inflation conversion, since that would be a model-free judgment the sources didn't make.
+None currently. Units, normalization and money are planned in [units-and-normalization](units-and-normalization-2026-09-24.md).

@@ -1,7 +1,7 @@
 # Better retrieval recall: model keywords, alias consolidation, embeddings
 
-- **Status:** Planned (2026-09-24). Built alongside [retrieval-benchmark](retrieval-benchmark-2026-09-23.md), whose results choose the defaults.
-- **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections), [retrieval-benchmark](retrieval-benchmark-2026-09-23.md) (to measure)
+- **Status:** Planned (2026-09-24). Built alongside [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md), whose results choose the defaults.
+- **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections), [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md) (to measure)
 
 ## Problem
 

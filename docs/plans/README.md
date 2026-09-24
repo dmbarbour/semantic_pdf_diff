@@ -20,10 +20,11 @@ Statuses:
 | Plan | Summary | Depends on |
 |---|---|---|
 | [Scheduling and triage](scheduling-and-triage-2026-09-23.md) | Time-of-day rate limits and adaptive concurrency for the in-house server; fair share across sections and sources; status-stamped preliminary reports; section triage with "about" statements; claim quality signals, epistemic status (basis, uncertainty) and skeptical prompting. | Evidence store |
+| [Units and normalization](units-and-normalization-2026-09-24.md) | Structured quantities (intervals, bounds, tolerances), compound units with explicit ambiguity rules, money compared only in the same currency and price basis, same-source normalization for criteria, statistics in common units. Abstain, never guess. | None strictly |
 | [Criteria-first comparison](n-way-comparison-2026-09-23.md) | Criteria first (for two-way proposals too): compare N sources by reviewed, evidence-based criteria (extracted from rules, requirements or the user's rubrics, or recommended), with applicability, per-source synthesis and a criteria × sources matrix. Compares, never judges. Revisions stay claim-level. | Evidence store; triage for "about" statements |
 | [Multi-format adapters](multi-format-adapters-2026-09-23.md) | `.txt`/`.md`, then `.docx` and `.pptx` (chart XML), then external converters, then `.csv`/`.xlsx` (table detection plus model-guided interpretation), then images. Cameo output is consumed as an ordinary source. | Evidence store |
 | [Single-source outputs](single-source-outputs-2026-09-23.md) | `check` for internal consistency; RAG `export` as self-contained Markdown chunks with provenance; a fact sheet built without the model; a shared writing style for people. (Cited summaries within it are tentative.) | Evidence store; triage for "about" statements |
-| [Retrieval benchmark](retrieval-benchmark-2026-09-23.md) | A labelled answer key (pairs, relations, claim-to-criterion) committed as annotation export files, with good and bad reviewer-decision variants; built together with Claude. | None strictly |
+| [Evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) | Extraction quality (recall, precision, hallucinations, values, qualifiers, provenance, coverage honesty) on curated public pages and synthetic documents with known contents; retrieval and comparison labels; all answer keys committed as annotation export files, with good and bad reviewer-decision variants. Built together with Claude. | Record/replay responder tables |
 | [Retrieval recall](retrieval-recall-2026-09-23.md) | Model-generated section keywords, alias consolidation, hybrid lexical + embedding retrieval (claim-to-claim and claim-to-criterion), with the in-house embedding models run locally for development. | Retrieval benchmark (built alongside) |
 | [Test models and record/replay](test-models-and-record-replay-2026-09-24.md) | Replay realistic model responses offline: requests keyed by meaning (not bytes), recorded in rounds on a small curated slice of the public corpus, answered by Claude (strong reference), a weak local VLM, optionally in-house gemma-4, plus the stub for failures; stored as zipped SQLite fixtures in the repo. Local embedding servers cover embeddings. | Evidence store (response cache) |
 
@@ -46,8 +47,8 @@ Nobody uses the tool between now and implementation (the stable baseline is tagg
 
 1. Evidence store (active)
 2. Scheduling and triage (concurrency, progress and logging, sections, "about" statements, epistemic status)
-3. Test models and record/replay, then the retrieval benchmark and retrieval recall (criteria-first comparison relies on claim-to-criterion retrieval)
-4. Criteria-first comparison: the main use case, two-way proposals included
+3. Test models and record/replay, then evaluation benchmarks and retrieval recall (criteria-first comparison relies on claim-to-criterion retrieval)
+4. Units and normalization, then criteria-first comparison: the main use case, two-way proposals included
 5. Adapter interface with `.txt` / `.md`, then `.docx` and `.pptx`
 6. Single-source `check` and RAG `export`
 7. External converters, `.csv` / `.xlsx`, images
