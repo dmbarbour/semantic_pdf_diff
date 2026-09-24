@@ -23,13 +23,14 @@ Statuses:
 | [Criteria-first comparison](n-way-comparison-2026-09-23.md) | Criteria first (for two-way proposals too): compare N sources by reviewed, evidence-based criteria (extracted from rules, requirements or the user's rubrics, or recommended), with applicability, per-source synthesis and a criteria × sources matrix. Compares, never judges. Revisions stay claim-level. | Evidence store; triage for "about" statements |
 | [Multi-format adapters](multi-format-adapters-2026-09-23.md) | `.txt`/`.md`, then `.docx` and `.pptx` (chart XML), then external converters, then `.csv`/`.xlsx` (table detection plus model-guided interpretation), then images. Cameo output is consumed as an ordinary source. | Evidence store |
 | [Single-source outputs](single-source-outputs-2026-09-23.md) | `check` for internal consistency; RAG `export` as self-contained Markdown chunks with provenance; a fact sheet built without the model; a shared writing style for people. (Cited summaries within it are tentative.) | Evidence store; triage for "about" statements |
-| [Retrieval benchmark](retrieval-benchmark-2026-09-23.md) | Future: a labelled answer key of claim pairs, built together with Claude, to measure retrieval methods. | None strictly |
+| [Retrieval benchmark](retrieval-benchmark-2026-09-23.md) | A labelled answer key (pairs, relations, claim-to-criterion) committed as annotation export files, with good and bad reviewer-decision variants; built together with Claude. | None strictly |
+| [Retrieval recall](retrieval-recall-2026-09-23.md) | Model-generated section keywords, alias consolidation, hybrid lexical + embedding retrieval (claim-to-claim and claim-to-criterion), with the in-house embedding models run locally for development. | Retrieval benchmark (built alongside) |
+| Test models and record/replay *(plan not yet written)* | Record every model request the pipeline would make on the sample corpus (prompts and images) without calling a model; build response tables from Claude (a strong reference) and from a weak local VLM (e.g. a small Gemma via Ollama on CPU); replay them in integration tests as a portable response cache. Plus local embedding servers (text-embeddings-inference) for the in-house embedding models. | Evidence store (response cache) |
 
 ## Tentative
 
 | Plan | Summary | Waiting on |
 |---|---|---|
-| [Retrieval recall](retrieval-recall-2026-09-23.md) | Model-generated section keywords, alias consolidation, hybrid lexical + embedding retrieval. | Retrieval benchmark results |
 | Minimal-interpretation mode *(plan not yet written)* | A long-term option to limit how much model interpretation stands between a source and its evidence, e.g. favouring literal, verbatim or deterministic extraction. Motivated by layered interpreters, such as model summaries of models. | Evidence store; format adapters |
 | Interactive views *(plan not yet written)* | Live views over a store while a run proceeds: status-stamped preliminary reports, criteria review (propose → review → run), pending alias and keyword questions, review annotations. Terminal UI first (usable inside a sandbox), favouring a library that is easy to work with, extend and modify (e.g. Textual); a local web server later for other users. | Evidence store; preliminary reports from scheduling |
 
@@ -44,11 +45,11 @@ Statuses:
 Nobody uses the tool between now and implementation (the stable baseline is tagged `v0.2.0`), so plans and checkpoints can be reordered, split or merged freely.
 
 1. Evidence store (active)
-2. Scheduling and triage (concurrency, sections, "about" statements, epistemic status)
-3. Criteria-first comparison: the main use case, two-way proposals included
-4. Adapter interface with `.txt` / `.md`, then `.docx` and `.pptx`
-5. Single-source `check` and RAG `export`
-6. Retrieval benchmark (can start any time), then retrieval recall
+2. Scheduling and triage (concurrency, progress and logging, sections, "about" statements, epistemic status)
+3. Test models and record/replay, then the retrieval benchmark and retrieval recall (criteria-first comparison relies on claim-to-criterion retrieval)
+4. Criteria-first comparison: the main use case, two-way proposals included
+5. Adapter interface with `.txt` / `.md`, then `.docx` and `.pptx`
+6. Single-source `check` and RAG `export`
 7. External converters, `.csv` / `.xlsx`, images
 
 ## Deferred decisions

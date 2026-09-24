@@ -44,6 +44,10 @@ Users can generate and inspect reports **while a run is still going**. That need
 - **Balance progress across the sources being compared.** If source A is fully extracted and source B only 10%, most of A's claims look "unmatched" merely because B's counterpart hasn't been read yet. The scheduler advances compared sources together (fair share across sources as well as sections), and prefers sections that align with already-extracted sections on the other side.
 - **Honest gap labels:** a claim is shown as "counterpart may not be extracted yet" (revisions, `check`), or a criterion cell as "not yet reached" (proposals), while relevant sections are still pending; only once they are done does it become "no counterpart found" or "no evidence found".
 - **Comparison interleaves with extraction:** in claim-level modes, a candidate pair is queued as soon as both claims exist. In criteria-first proposal mode, each source is mapped to criteria as its sections complete, and a criterion's cross-source description is produced (and marked provisional) once every source's relevant sections are done or the user asks for a preliminary report. Either way, preliminary reports contain findings, not just evidence.
+- **Progress display and logging,** so users can see things moving:
+  - **On a terminal:** `tqdm` progress bars per stage and source (tasks done, tokens per minute, estimated time remaining).
+  - **Otherwise** (redirected output, background jobs, logs): periodic **heartbeat** lines with the same numbers, at a configurable interval.
+  - **Verbosity:** `-q`, the default, `-v` and `-vv`, plus `--log-file`. Built on Python's `logging`, so levels and destinations are ordinary configuration. `-vv` includes per-request details, never credentials.
 - **`status` command:** a plain-text progress summary (per source: sections done, pending and failed; tokens used; estimated time remaining at current limits) that works in any terminal, including inside the sandbox.
 
 ### Triage before detailed extraction
@@ -84,7 +88,7 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 
 ## Milestones
 
-1. **Concurrent client:** time-of-day rate-limit rules, adaptive backoff, a modest concurrency cap; tests against a stub server that simulates latency and 429s; token and time estimates in `--plan`.
+1. **Concurrent client:** time-of-day rate-limit rules, adaptive backoff, a modest concurrency cap; tests against a stub server that simulates latency and 429s; token and time estimates in `--plan`; progress bars, heartbeats and configurable verbosity.
 2. **Section queue:** fair share across sections and across compared sources; `not_reached` coverage status.
 3. **Triage without the model:** cheap signals and boilerplate detection.
 4. **Model triage per section:** type, density, keywords and the "about" statement.

@@ -1,6 +1,6 @@
 # Better retrieval recall: model keywords, alias consolidation, embeddings
 
-- **Status:** Tentative. Decide what to build from [retrieval-benchmark](retrieval-benchmark-2026-09-23.md) results.
+- **Status:** Planned (2026-09-24). Built alongside [retrieval-benchmark](retrieval-benchmark-2026-09-23.md), whose results choose the defaults.
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections), [retrieval-benchmark](retrieval-benchmark-2026-09-23.md) (to measure)
 
 ## Problem
@@ -29,7 +29,7 @@ Ask the model for relevant keywords as one extra output field while it reads a s
 
 ### 2. Embeddings
 
-Several in-house embedding models are available behind (or easily put behind) an OpenAI-compatible `/v1/embeddings` endpoint, which fits the existing adapter, with a cache keyed on text hash. Likely uses, in order of expected payoff:
+Several in-house embedding models are available behind (or easily put behind) an OpenAI-compatible `/v1/embeddings` endpoint, which fits the existing adapter, with a cache keyed on text hash. For development and the benchmark, the same models run locally on CPU with Hugging Face's text-embeddings-inference server (Docker), which exposes the same endpoint shape; results should carry over to the in-house deployment. Likely uses, in order of expected payoff:
 
 1. **Hybrid candidate retrieval:** the union of TF-IDF and embedding candidates. Embed a claim's *topic* (`entity | attribute | conditions`), **not its value**: we want "both are about pump power at design load", and numbers make embeddings noisy. Lexical retrieval stays in the mix because embeddings are often weak on tags like `P-101`.
 2. **Keyword and entity clustering** for the consolidation step above.

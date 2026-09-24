@@ -28,7 +28,7 @@ The target RAG system is not ours to change. Its ingest tool accepts PDF, Markdo
 - **Tables inline, as small Markdown tables** with their headers and units, instead of separate CSV or `.xlsx` files the ingest tool would mangle. Large tables are split into chunks that each repeat the header and table identity.
 - **Diagrams and charts as text.** Claims from visual extraction (connections, operating points, axis readings, flagged approximations) are written out in words. That preserves exactly what the ingest tool would lose.
 - **Qualifiers kept with the facts:** conditions, basis (measured, projected, required…), stated uncertainty, derivation (direct read, model extraction, summary of summaries), quote-verification status and any issues or suspicions. Confidence appears as the qualifier it is, not as a bare number presented as truth. Relevant annotations travel too: provider-declared markings, recognized disagreements and their handling, and reviewer decisions such as criteria (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).
-- **Unique file names.** Re-ingesting apparently aggregates rather than replaces, so every chunk file gets a unique name (derived from its content hash plus an export ID) and the user controls the corpus directly: ingest a fresh export into a new or reset corpus, or ingest a **delta export** containing only chunks not present in a named previous export. The delta's `index.md` also lists chunks that disappeared, for the user to act on.
+- **Stable file names from content.** Each chunk file is named by its content hash plus extension (e.g. `3f7ffce6….md`), so an unchanged chunk keeps its name across exports and a changed one gets a new name. Re-ingesting apparently aggregates rather than replaces, so the user controls the corpus directly: ingest a full export into a new or reset corpus, or ingest a **delta export** containing only chunk files not present in a named previous export. The delta's `index.md` also lists chunk files that disappeared, for the user to act on.
 - **Discovery chunks alongside detail chunks.** Besides chunks that explain content (comprehension), the export includes chunks that help find it (discovery): tables of topics, an entity index, an index of diagrams and charts with what each shows, and section maps. Each entry names the detail chunks' citations, so a RAG query about "what covers pump redundancy?" can land on an index and then on the facts.
 - **An `index.md`** listing every chunk with its citation, plus a note on how the export was produced (tool version, interpreters, coverage summary including what wasn't reached or was skipped).
 
@@ -102,7 +102,7 @@ A model-written overview for humans: section summaries, then topic summaries. Wi
 ## Milestones
 
 1. `check` subcommand and report view.
-2. `export` as Markdown chunks with front matter (per section first, then per topic and per finding), discovery chunks, `index.md`, unique file names and delta exports; optional JSON array; `.docx` chunks as a later configuration option.
+2. `export` as Markdown chunks with front matter (per section first, then per topic and per finding), discovery chunks, `index.md`, content-derived file names and delta exports; optional JSON array; `.docx` chunks as a later configuration option.
 3. HTML fact sheet.
 4. (Tentative) cited summaries with citation verification.
 
@@ -110,7 +110,7 @@ A model-written overview for humans: section summaries, then topic summaries. Wi
 
 - **RAG target:** an external system with a fixed ingest tool (PDF, Markdown, text, `.docx`, `.pptx`, `.xlsx`, CSV, JSON; no JSONL; `--metadata` ignored; `markitdown` extraction; 512-token chunks with 128-token overlap by default; good at tracing file title and author). Export explicit, self-contained chunks with provenance (including provenance of sources), tables, qualifiers and notes written into the text, sized to fit one ingest chunk.
 
-- **Updates:** unique file names per export; the user manages RAG corpora (new, reset, or delta ingestion) rather than relying on replacement.
+- **Updates:** stable file names derived from chunk content (hash plus extension); the user manages RAG corpora (new, reset, or delta ingestion) rather than relying on replacement.
 - **Chunk format:** Markdown with YAML front matter first; `.docx` with title/author properties is a configuration option to try later.
 - **Discovery and comprehension:** export index-style chunks (topics, entities, diagrams, section maps) alongside detail chunks.
 - **Human readers:** some prose, enough to situate the facts but never burying them; facts as terse bullets and tables (see *Writing for people*).

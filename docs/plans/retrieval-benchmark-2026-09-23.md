@@ -1,6 +1,6 @@
 # Retrieval benchmark
 
-- **Status:** Planned (future). Claude will build most of this with you. Your main job is checking labels.
+- **Status:** Planned. Claude will build most of this with you. Your main job is checking labels. Embedding models run locally (see [retrieval-recall](retrieval-recall-2026-09-23.md)), so this no longer waits on in-house access.
 - **Depends on:** nothing strictly. It is easier after [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) produces evidence stores to sample from.
 - **Informs:** [retrieval-recall](retrieval-recall-2026-09-23.md), and later [n-way-comparison](n-way-comparison-2026-09-23.md)
 
