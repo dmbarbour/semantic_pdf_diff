@@ -214,7 +214,7 @@ report --store <dir> <comparison>
 4. **PDF sections:** outline → font-size headings → page ranges; heading path in prompts. When a table continues across pages, pass the previous chunk's table header and the section heading path with the continuation (affordable with the large context). Real documents are sensitive and won't be shared (the tool runs inside a multi-layer sandbox), so heuristics are developed against the public corpus (see [Samples](#samples)) and must fall back gracefully when there's no outline or consistent heading font.
 5. **Folder, zip and manifest sources;** duplicate occurrences in provenance.
 6. **Content-difference-first comparison** (shared / removed / added).
-7. **Views, `show`, `remove`, `gc` and the staged CLI,** with the current two-file command kept working; owner-only store permissions; report escaping tests; per-role endpoint configuration with key environment variables; tests and docs.
+7. **Views, `show`, `remove`, `gc` and the staged CLI** (revisit naming: until then the two-file command's `--out` folder doubles as the store, which is confusing when a report is the expected result; separate `--store` and report locations), with the current two-file command kept working; owner-only store permissions; report escaping tests; per-role endpoint configuration with key environment variables; tests and docs.
 
 ## Decisions (2026-09-23)
 
