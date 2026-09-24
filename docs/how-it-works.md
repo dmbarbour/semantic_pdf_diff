@@ -1,10 +1,17 @@
-# How it works (v0.2.0)
+# How it works
 
-This describes the current release: comparing two PDFs. The generalized design (sources as folders and archives, a persistent store, criteria-first comparison, more formats) is planned in [plans/](plans/README.md) and not yet implemented.
+This describes the current code: comparing two PDFs, with evidence in the content-based schema v2. The generalized design (sources as folders and archives, a persistent store, criteria-first comparison, more formats) is planned in [plans/](plans/README.md) and not yet implemented.
 
 ## Claims and provenance
 
-All modalities become atomic claims with `entity`, `attribute`, `value`, `unit`, `conditions`, `kind`, `quote`, `confidence` and `approximate`. Every claim receives a stable evidence ID, document label, one-based page and source bounding box in unrotated PDF points. Visual claims retain the exact PNG the model saw. A chart operating point can therefore match a table row, and a diagram connection can match a sentence.
+All modalities become atomic claims with `entity`, `attribute`, `value`, `unit`, `conditions`, `kind`, `quote`, `confidence` and `approximate`, plus context fields (`topic`, `basis`, `uncertainty`, `context`, `role`) that prompts don't request yet and so default to "not stated". A chart operating point can therefore match a table row, and a diagram connection can match a sentence.
+
+Provenance (schema v2):
+
+- Each input PDF is a **source** containing one **file**, which refers to **content**: the SHA-256 of its bytes plus its normalized extension (`sha256:…​.pdf`).
+- Evidence attaches to content, never to paths. Each item has a **locator** within the content (one-based page, bounding box in unrotated PDF points, the extraction pass and task) and a **derivation** listing the steps from bytes to claim. Visual claims retain the exact PNG the model saw.
+- Evidence IDs derive from content, locator and claim, so they are stable across renames. The same PDF supplied as both sources is extracted once; its evidence is listed as *shared* and never sent for comparison.
+- `evidence.json` and `report.json` record the **interpreters**: the model, a hash of the prompts, the settings that affect output, and library versions.
 
 ## Pipeline
 

@@ -5,7 +5,7 @@ import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 import pymupdf
-from semantic_pdf_diff.models import Evidence, Settings, Extraction, Judgment
+from semantic_pdf_diff.models import Evidence, FileRef, PdfLocator, Settings, Source, Extraction, Judgment
 from semantic_pdf_diff.llm import Client, BudgetExceeded, ModelFailure
 from semantic_pdf_diff.compare import candidates, numeric_check, compare
 from semantic_pdf_diff.extract import extract_pdf, split_utf8, tiles
@@ -13,7 +13,8 @@ from semantic_pdf_diff.report import write_report
 
 
 def ev(id='A-1', **kw):
-    data = dict(id=id, document=id[0],page=1,bbox=(0,0,100,100),source='text:0',entity='primary pump',
+    data = dict(id=id, content='sha256:' + id[0].lower() * 64 + '.pdf',
+        locator=PdfLocator(page=1, bbox=(0,0,100,100), region='text', task='text:0'), entity='primary pump',
         attribute='rated power',value='10',unit='kW',conditions='design load',kind='text',quote='10 kW',confidence=.95)
     data.update(kw)
     return Evidence(**data)
@@ -99,7 +100,7 @@ class Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/'test.pdf'
             doc=pymupdf.open();page=doc.new_page();page.insert_text((40,40),'Pump rated power 10 kW');doc.save(path);doc.close()
-            evidence,coverage,digest=extract_pdf(path,'A',Path(d),Extractor(Settings(vision=False)))
+            evidence,coverage=extract_pdf(path,'sha256:' + 'a' * 64 + '.pdf',Path(d),Extractor(Settings(vision=False)))
             self.assertEqual(evidence,[])
             self.assertTrue(any(r['status']=='partial' for r in coverage))
             self.assertTrue(any(r['status']=='skipped' for r in coverage))
@@ -163,14 +164,16 @@ class Tests(unittest.TestCase):
             root=Path(directory);path=root/'test.pdf'
             doc=pymupdf.open();doc.new_page(width=500,height=500);doc.save(path);doc.close()
             client=Extractor(Settings(refinement_depth=1))
-            _,coverage,_=extract_pdf(path,'A',root,client)
-            self.assertTrue(any('-r' in r['source'] for r in coverage))
+            _,coverage=extract_pdf(path,'sha256:' + 'a' * 64 + '.pdf',root,client)
+            self.assertTrue(any('-r' in r['task'] for r in coverage))
             self.assertTrue(all(r['status']=='partial' for r in coverage))
 
     def test_html_escapes_document_content(self):
         a,b=ev(entity='<script>alert(1)</script>'),ev('B-1')
         data=compare([a],[b],Path('.'),Fake(),'proposals')
-        data.update(evidence=[a.model_dump(),b.model_dump()],coverage=[],documents={'A':{'name':'A.pdf'},'B':{'name':'B.pdf'}})
+        data.update(evidence=[a.model_dump(),b.model_dump()],coverage=[],
+            sources=[Source(id='s1',name='A.pdf',kind='file').model_dump(),Source(id='s2',name='B.pdf',kind='file').model_dump()],
+            files=[FileRef(source='s1',path='A.pdf',content=a.content).model_dump(),FileRef(source='s2',path='B.pdf',content=b.content).model_dump()])
         with tempfile.TemporaryDirectory() as d:
             write_report(data,Path(d))
             html=(Path(d)/'report.html').read_text()

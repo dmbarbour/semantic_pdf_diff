@@ -99,15 +99,26 @@ Do not judge proposal quality or invent causes/impacts. A supporting numeric con
 it cannot establish entity or condition equivalence. Image order is described with the claims.
 '''
 
+# Provenance stays out of the model's view; it sees the claims and any source crops.
+PROVENANCE_FIELDS = {"id", "content", "locator", "derivation", "image", "quote_verified"}
+
 def compare(left, right, output, client, mode):
-    pairs = candidates(left, right, client.s)
+    """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
+
+    Evidence belongs to content, so content present on both sides yields identical
+    evidence; it is listed as shared and never sent to the model.
+    """
+    shared_ids = {e.id for e in left} & {e.id for e in right}
     findings, matched, attempted = [], set(), set()
+    left = [e for e in left if e.id not in shared_ids]
+    right = [e for e in right if e.id not in shared_ids]
+    pairs = candidates(left, right, client.s)
     for i,j,score in pairs[:client.s.max_pairs]:
         a,b = left[i],right[j]
         attempted.update((a.id,b.id))
         images, payload = [], []
         for e in (a,b):
-            p = e.model_dump(exclude={"bbox", "source", "image", "document", "page", "id"})
+            p = e.model_dump(exclude=PROVENANCE_FIELDS)
             if client.s.verify_visuals and e.image:
                 p["source_image"] = len(images) + 1
                 images.append(output / e.image)
@@ -142,7 +153,7 @@ def compare(left, right, output, client, mode):
     unmatched = [{"id":e.id,"status":"no_confirmed_counterpart" if e.id in attempted else "not_compared",
                   "note":"No confirmed counterpart in retrieved evidence; this does not establish absence."}
                  for e in left+right if e.id not in matched]
-    return {"mode":mode,"findings":findings,"unmatched":unmatched,
-            "retrieval":{"candidate_pairs":len(pairs),"attempted_pairs":min(len(pairs),client.s.max_pairs),
+    return {"mode":mode,"findings":findings,"unmatched":unmatched,"shared":sorted(shared_ids),
+            "retrieval":{"shared_evidence":len(shared_ids),"candidate_pairs":len(pairs),"attempted_pairs":min(len(pairs),client.s.max_pairs),
                          "omitted_by_pair_limit":max(0,len(pairs)-client.s.max_pairs),
                          "strategy":"bidirectional sparse TF-IDF top-k union; lexical recall is not guaranteed"}}

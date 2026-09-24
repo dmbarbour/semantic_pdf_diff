@@ -6,6 +6,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+Basis = Literal["measured", "calculated", "simulated", "projected", "required", "targeted", "asserted", "unknown"]
+
 class Claim(Strict):
     entity: str = Field(min_length=1, max_length=160)
     attribute: str = Field(min_length=1, max_length=160)
@@ -16,6 +18,15 @@ class Claim(Strict):
     quote: str = Field(min_length=1, max_length=400)
     confidence: float = Field(ge=0, le=1)
     approximate: bool = False
+    # Claim context (schema v2). Prompts don't ask for these yet, so they default to
+    # "not stated"; the epistemic-status work fills them.
+    topic: str = Field(default="", max_length=200)
+    basis: Basis = "unknown"
+    uncertainty: str = Field(default="", max_length=200)
+    context: str = Field(default="", max_length=300)
+    role: str = Field(default="", max_length=200)
+
+OPTIONAL_CLAIM_FIELDS = ("unit", "conditions", "approximate", "topic", "basis", "uncertainty", "context", "role")
 
 MAX_CLAIMS, MAX_ISSUES = 12, 10
 
@@ -42,11 +53,11 @@ class Extraction(Strict):
                 dropped += 1
                 continue
             item = {k: v for k, v in raw.items() if k in Claim.model_fields}
-            for k in ("unit", "conditions"):
+            for k in OPTIONAL_CLAIM_FIELDS:
                 if item.get(k) is None:
                     item.pop(k, None)
-            if item.get("approximate") is None:
-                item.pop("approximate", None)
+            if item.get("basis") not in Basis.__args__:
+                item.pop("basis", None)  # an unrecognized basis is "unknown", not a broken claim
             try:
                 claims.append(Claim.model_validate(item).model_dump())
             except ValidationError:
@@ -62,16 +73,52 @@ class Extraction(Strict):
             issues = issues[:MAX_ISSUES - 1] + [f"{len(issues) - MAX_ISSUES + 1} further issue(s) omitted"]
         return {"claims": claims, "complete": complete, "issues": [i[:500] for i in issues]}
 
+class Source(Strict):
+    """A comparison object: a folder, an archive, a single file or a manifest."""
+    id: str
+    name: str
+    kind: Literal["file", "folder", "zip", "manifest"]
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+class FileRef(Strict):
+    """A path within a source that refers to content."""
+    source: str
+    path: str
+    content: str
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+class PdfLocator(Strict):
+    """Where a claim sits within PDF content: unrotated page coordinates, never a path."""
+    format: Literal["pdf"] = "pdf"
+    page: int = Field(ge=1)
+    bbox: tuple[float, float, float, float]
+    region: Literal["text", "table", "tile", "overview"]
+    task: str
+
+# Other formats add their own locator shapes, discriminated by `format`.
+Locator = PdfLocator
+
+class DerivationStep(Strict):
+    step: str
+    detail: str = ""
+
 class Evidence(Claim):
     id: str
-    document: Literal["A", "B"]
-    page: int
-    bbox: tuple[float, float, float, float]
-    source: str
+    content: str
+    locator: Locator
+    derivation: list[DerivationStep] = Field(default_factory=list)
     image: str | None = None
     # True: quote found in the PDF text layer; False: the region has a text layer but
     # the quote is absent (possible misread, or raster labels); None: not checkable.
     quote_verified: bool | None = None
+
+class Interpreter(Strict):
+    """Everything besides the bytes that shapes derived data for one role."""
+    role: Literal["extract", "embed", "summarize", "compare"]
+    model: str
+    prompt_hash: str
+    settings: dict
+    versions: dict[str, str]
 
 class Judgment(Strict):
     relation: Literal["equivalent", "different", "complementary", "unrelated", "uncertain"]

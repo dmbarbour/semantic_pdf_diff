@@ -3,13 +3,16 @@ This demonstrates matching/reporting, not VLM extraction accuracy.
 Run from repository root: python examples/demo.py
 """
 from pathlib import Path
-from semantic_pdf_diff.models import Evidence, Settings, Judgment
+from semantic_pdf_diff.models import Evidence, FileRef, PdfLocator, Settings, Source, Judgment
 from semantic_pdf_diff.compare import compare
 from semantic_pdf_diff.report import write_report
 
 
+# Placeholder content IDs: this fixture has no real files behind it.
+CONTENT={'A':'sha256:'+'a'*64+'.pdf','B':'sha256:'+'b'*64+'.pdf'}
+
 def claim(id,entity,attribute,value,unit,kind,conditions='design duty',**extra):
-    return Evidence(id=id,document=id[0],page=1,bbox=(40,40,300,140),source='hand-authored fixture',
+    return Evidence(id=id,content=CONTENT[id[0]],locator=PdfLocator(page=1,bbox=(40,40,300,140),region='text',task='hand-authored fixture'),
         entity=entity,attribute=attribute,value=value,unit=unit,kind=kind,conditions=conditions,
         quote=f'{entity}: {attribute} {value} {unit} at {conditions}',confidence=.95,**extra)
 
@@ -40,7 +43,11 @@ class FixtureClient:
 
 out=Path('examples/demo-output')
 data=compare(left,right,out,FixtureClient(),'proposals')
-data.update(schema_version=1,fixture=True,documents={'A':{'name':'Team A (synthetic evidence)'},'B':{'name':'Team B (synthetic evidence)'}},
+data.update(schema_version=2,fixture=True,
+    sources=[Source(id='s1',name='Team A (synthetic evidence)',kind='file').model_dump(),
+             Source(id='s2',name='Team B (synthetic evidence)',kind='file').model_dump()],
+    files=[FileRef(source='s1',path='team-a.pdf',content=CONTENT['A']).model_dump(),
+           FileRef(source='s2',path='team-b.pdf',content=CONTENT['B']).model_dump()],
     evidence=[e.model_dump() for e in left+right],coverage=[],
     note='HAND-AUTHORED FIXTURE: no PDF extraction or real model inference was used. This report demonstrates behavior, not measured accuracy.')
 write_report(data,out)

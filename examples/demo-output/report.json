@@ -73,22 +73,44 @@
       "note": "No confirmed counterpart in retrieved evidence; this does not establish absence."
     }
   ],
+  "shared": [],
   "retrieval": {
+    "shared_evidence": 0,
     "candidate_pairs": 4,
     "attempted_pairs": 4,
     "omitted_by_pair_limit": 0,
     "strategy": "bidirectional sparse TF-IDF top-k union; lexical recall is not guaranteed"
   },
-  "schema_version": 1,
+  "schema_version": 2,
   "fixture": true,
-  "documents": {
-    "A": {
-      "name": "Team A (synthetic evidence)"
+  "sources": [
+    {
+      "id": "s1",
+      "name": "Team A (synthetic evidence)",
+      "kind": "file",
+      "metadata": {}
     },
-    "B": {
-      "name": "Team B (synthetic evidence)"
+    {
+      "id": "s2",
+      "name": "Team B (synthetic evidence)",
+      "kind": "file",
+      "metadata": {}
     }
-  },
+  ],
+  "files": [
+    {
+      "source": "s1",
+      "path": "team-a.pdf",
+      "content": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pdf",
+      "metadata": {}
+    },
+    {
+      "source": "s2",
+      "path": "team-b.pdf",
+      "content": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.pdf",
+      "metadata": {}
+    }
+  ],
   "evidence": [
     {
       "entity": "primary pump",
@@ -100,16 +122,26 @@
       "quote": "primary pump: rated power 10 kW at design duty",
       "confidence": 0.95,
       "approximate": false,
+      "topic": "",
+      "basis": "unknown",
+      "uncertainty": "",
+      "context": "",
+      "role": "",
       "id": "A-1",
-      "document": "A",
-      "page": 1,
-      "bbox": [
-        40.0,
-        40.0,
-        300.0,
-        140.0
-      ],
-      "source": "hand-authored fixture",
+      "content": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pdf",
+      "locator": {
+        "format": "pdf",
+        "page": 1,
+        "bbox": [
+          40.0,
+          40.0,
+          300.0,
+          140.0
+        ],
+        "region": "text",
+        "task": "hand-authored fixture"
+      },
+      "derivation": [],
       "image": null,
       "quote_verified": null
     },
@@ -123,16 +155,26 @@
       "quote": "cooling circuit: design flow 20 L/s at design duty",
       "confidence": 0.95,
       "approximate": false,
+      "topic": "",
+      "basis": "unknown",
+      "uncertainty": "",
+      "context": "",
+      "role": "",
       "id": "A-2",
-      "document": "A",
-      "page": 1,
-      "bbox": [
-        40.0,
-        40.0,
-        300.0,
-        140.0
-      ],
-      "source": "hand-authored fixture",
+      "content": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pdf",
+      "locator": {
+        "format": "pdf",
+        "page": 1,
+        "bbox": [
+          40.0,
+          40.0,
+          300.0,
+          140.0
+        ],
+        "region": "text",
+        "task": "hand-authored fixture"
+      },
+      "derivation": [],
       "image": null,
       "quote_verified": null
     },
@@ -146,16 +188,26 @@
       "quote": "primary pump: discharges to heat exchanger  at design duty",
       "confidence": 0.95,
       "approximate": false,
+      "topic": "",
+      "basis": "unknown",
+      "uncertainty": "",
+      "context": "",
+      "role": "",
       "id": "A-3",
-      "document": "A",
-      "page": 1,
-      "bbox": [
-        40.0,
-        40.0,
-        300.0,
-        140.0
-      ],
-      "source": "hand-authored fixture",
+      "content": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pdf",
+      "locator": {
+        "format": "pdf",
+        "page": 1,
+        "bbox": [
+          40.0,
+          40.0,
+          300.0,
+          140.0
+        ],
+        "region": "text",
+        "task": "hand-authored fixture"
+      },
+      "derivation": [],
       "image": null,
       "quote_verified": null
     },
@@ -169,16 +221,26 @@
       "quote": "pump: head at 20 L/s 35 m at design duty",
       "confidence": 0.95,
       "approximate": true,
+      "topic": "",
+      "basis": "unknown",
+      "uncertainty": "",
+      "context": "",
+      "role": "",
       "id": "A-4",
-      "document": "A",
-      "page": 1,
-      "bbox": [
-        40.0,
-        40.0,
-        300.0,
-        140.0
-      ],
-      "source": "hand-authored fixture",
+      "content": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pdf",
+      "locator": {
+        "format": "pdf",
+        "page": 1,
+        "bbox": [
+          40.0,
+          40.0,
+          300.0,
+          140.0
+        ],
+        "region": "text",
+        "task": "hand-authored fixture"
+      },
+      "derivation": [],
       "image": null,
       "quote_verified": null
     },
@@ -192,16 +254,26 @@
       "quote": "primary pump: rated power 12000 W at design duty",
       "confidence": 0.95,
       "approximate": false,
+      "topic": "",
+      "basis": "unknown",
+      "uncertainty": "",
+      "context": "",
+      "role": "",
       "id": "B-1",
-      "document": "B",
-      "page": 1,
-      "bbox": [
-        40.0,
-        40.0,
-        300.0,
-        140.0
-      ],
-      "source": "hand-authored fixture",
+      "content": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.pdf",
+      "locator": {
+        "format": "pdf",
+        "page": 1,
+        "bbox": [
+          40.0,
+          40.0,
+          300.0,
+          140.0
+        ],
+        "region": "text",
+        "task": "hand-authored fixture"
+      },
+      "derivation": [],
       "image": null,
       "quote_verified": null
     },
@@ -215,16 +287,26 @@
       "quote": "cooling circuit: design flow 0.020 m3/s at design duty",
       "confidence": 0.95,
       "approximate": false,
+      "topic": "",
+      "basis": "unknown",
+      "uncertainty": "",
+      "context": "",
+      "role": "",
       "id": "B-2",
-      "document": "B",
-      "page": 1,
-      "bbox": [
-        40.0,
-        40.0,
-        300.0,
-        140.0
-      ],
-      "source": "hand-authored fixture",
+      "content": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.pdf",
+      "locator": {
+        "format": "pdf",
+        "page": 1,
+        "bbox": [
+          40.0,
+          40.0,
+          300.0,
+          140.0
+        ],
+        "region": "text",
+        "task": "hand-authored fixture"
+      },
+      "derivation": [],
       "image": null,
       "quote_verified": null
     },
@@ -238,16 +320,26 @@
       "quote": "primary pump: discharges to heat exchanger  at design duty",
       "confidence": 0.95,
       "approximate": false,
+      "topic": "",
+      "basis": "unknown",
+      "uncertainty": "",
+      "context": "",
+      "role": "",
       "id": "B-3",
-      "document": "B",
-      "page": 1,
-      "bbox": [
-        40.0,
-        40.0,
-        300.0,
-        140.0
-      ],
-      "source": "hand-authored fixture",
+      "content": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.pdf",
+      "locator": {
+        "format": "pdf",
+        "page": 1,
+        "bbox": [
+          40.0,
+          40.0,
+          300.0,
+          140.0
+        ],
+        "region": "text",
+        "task": "hand-authored fixture"
+      },
+      "derivation": [],
       "image": null,
       "quote_verified": null
     },
@@ -261,16 +353,26 @@
       "quote": "pump: head at 20 L/s 32 m at design duty",
       "confidence": 0.95,
       "approximate": true,
+      "topic": "",
+      "basis": "unknown",
+      "uncertainty": "",
+      "context": "",
+      "role": "",
       "id": "B-4",
-      "document": "B",
-      "page": 1,
-      "bbox": [
-        40.0,
-        40.0,
-        300.0,
-        140.0
-      ],
-      "source": "hand-authored fixture",
+      "content": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.pdf",
+      "locator": {
+        "format": "pdf",
+        "page": 1,
+        "bbox": [
+          40.0,
+          40.0,
+          300.0,
+          140.0
+        ],
+        "region": "text",
+        "task": "hand-authored fixture"
+      },
+      "derivation": [],
       "image": null,
       "quote_verified": null
     },
@@ -284,16 +386,26 @@
       "quote": "firewall: audit log retention 90 days at security policy",
       "confidence": 0.95,
       "approximate": false,
+      "topic": "",
+      "basis": "unknown",
+      "uncertainty": "",
+      "context": "",
+      "role": "",
       "id": "B-5",
-      "document": "B",
-      "page": 1,
-      "bbox": [
-        40.0,
-        40.0,
-        300.0,
-        140.0
-      ],
-      "source": "hand-authored fixture",
+      "content": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.pdf",
+      "locator": {
+        "format": "pdf",
+        "page": 1,
+        "bbox": [
+          40.0,
+          40.0,
+          300.0,
+          140.0
+        ],
+        "region": "text",
+        "task": "hand-authored fixture"
+      },
+      "derivation": [],
       "image": null,
       "quote_verified": null
     }

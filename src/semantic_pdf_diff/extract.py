@@ -4,7 +4,7 @@ import math
 import re
 from pathlib import Path
 import pymupdf
-from .models import Evidence, Extraction
+from .models import DerivationStep, Evidence, Extraction, PdfLocator
 from .llm import ModelFailure
 
 EXTRACT = '''Extract atomic engineering claims from this one source. Return JSON:
@@ -82,25 +82,35 @@ def union(boxes):
     boxes = list(boxes)
     return (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
 
-def extract_pdf(path, label, output, client):
+# How each extraction pass gets from PDF bytes to a claim.
+DERIVATION = {
+    "text": [DerivationStep(step="pdf-text-layer", detail="grouped text blocks"), DerivationStep(step="model-extraction")],
+    "table": [DerivationStep(step="pdf-table-detection", detail="row with provisional header"), DerivationStep(step="model-extraction")],
+    "tile": [DerivationStep(step="pdf-render", detail="page tile"), DerivationStep(step="model-extraction", detail="vision")],
+    "overview": [DerivationStep(step="pdf-render", detail="whole page"), DerivationStep(step="model-extraction", detail="vision")],
+}
+
+def extract_pdf(path, content, output, client):
+    """Extract evidence from one PDF, identified by its content ID; returns (evidence, coverage)."""
     s = client.s
     evidence, coverage = [], []
-    digest = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    stem = content.split(":", 1)[1][:12]
     assets = output / "assets"
     assets.mkdir(exist_ok=True, parents=True)
     seen = set()
 
-    def consume(page_no, bbox, source, family, text, image=None, check=None, locate=None):
+    def consume(page_no, bbox, task, family, text, image=None, check=None, locate=None):
         """Run one extraction task, record it in the ledger and return its status.
 
         check(quote) -> bool | None. Native tasks reject claims failing it; visual tasks
         only record the result. locate(quote) narrows a claim's bbox within the task.
         Exact duplicate claims within one family (native or visual) on a page are kept once.
         """
-        row = {"document": label, "page": page_no, "bbox": list(bbox), "source": source,
+        region = task.split(":")[0]
+        row = {"content": content, "page": page_no, "bbox": list(bbox), "task": task,
                "image": image, "status": "complete", "issues": [], "claims": 0}
         images = [output / image] if image else []
-        prompt = EXTRACT + "\nSource type: " + source.split(":")[0] + "\nSOURCE DATA:\n" + text
+        prompt = EXTRACT + "\nSource type: " + region + "\nSOURCE DATA:\n" + text
         try:
             result = client.ask(prompt, Extraction, images)
             row["status"] = "complete" if result.complete else "partial"
@@ -117,21 +127,22 @@ def extract_pdf(path, label, output, client):
                     continue
                 seen.add(key)
                 where = tuple(locate(claim.quote) if locate else bbox)
-                eid = label + "-" + hashlib.sha256((digest + repr(key) + repr(where)).encode()).hexdigest()[:16]
-                evidence.append(Evidence(**claim.model_dump(), id=eid, document=label, page=page_no,
-                                         bbox=where, source=source, image=image, quote_verified=verified))
+                eid = "ev-" + hashlib.sha256((content + repr(key) + repr(where)).encode()).hexdigest()[:16]
+                evidence.append(Evidence(**claim.model_dump(), id=eid, content=content,
+                                         locator=PdfLocator(page=page_no, bbox=where, region=region, task=task),
+                                         derivation=DERIVATION[region], image=image, quote_verified=verified))
                 row["claims"] += 1
         except ModelFailure as e:
             row.update(status="failed", issues=[str(e)])
         coverage.append(row)
         return row["status"]
 
-    def text_task(page_no, segments, source, depth=0):
+    def text_task(page_no, segments, task, depth=0):
         """segments: [(bbox, text)] of consecutive blocks sent together."""
         text = "\n\n".join(t for _, t in segments)
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
-        status = consume(page_no, union(b for b, _ in segments), source, "native", text,
+        status = consume(page_no, union(b for b, _ in segments), task, "native", text,
                          check=lambda q: quoted(q, text), locate=locate)
         if status == "complete" or depth >= s.refinement_depth:
             return
@@ -144,9 +155,9 @@ def extract_pdf(path, label, output, client):
         else:
             return
         for i, part in enumerate(parts):
-            text_task(page_no, part, f"{source}:r{i}", depth + 1)
+            text_task(page_no, part, f"{task}:r{i}", depth + 1)
 
-    def table_task(page_no, bbox, source, header, row, columns, depth=0):
+    def table_task(page_no, bbox, task, header, row, columns, depth=0):
         """Send one table row with its header; split wide or partial rows by column.
 
         Column 0 is kept in every split as the provisional row label.
@@ -158,11 +169,11 @@ def extract_pdf(path, label, output, client):
         fits = len(text.encode()) <= s.text_bytes
         splittable = len(columns) > 2
         if not fits and not splittable:
-            coverage.append({"document": label, "page": page_no, "bbox": list(bbox), "source": source, "image": None,
+            coverage.append({"content": content, "page": page_no, "bbox": list(bbox), "task": task, "image": None,
                              "status": "partial", "issues": ["Table row exceeds text budget; inspect visual tiles"], "claims": 0})
             return
         if fits:
-            status = consume(page_no, bbox, source, "native", text,
+            status = consume(page_no, bbox, task, "native", text,
                              check=lambda q: quoted(q, text) or covered(q, flat))
             if status == "complete" or depth >= s.refinement_depth or not splittable:
                 return
@@ -170,10 +181,10 @@ def extract_pdf(path, label, output, client):
         middle = (len(rest) + 1) // 2
         for i, part in enumerate([rest[:middle], rest[middle:]]):
             # Budget-driven splits are mandatory; only quality-driven ones use depth.
-            table_task(page_no, bbox, f"{source}:c{i}", header, row, [columns[0], *part], depth + (1 if fits else 0))
+            table_task(page_no, bbox, f"{task}:c{i}", header, row, [columns[0], *part], depth + (1 if fits else 0))
 
     def visual_task(page_no, page, tag, rect, depth=0):
-        name = f"{label}-p{page_no}-{tag.replace(':', '-')}.png"
+        name = f"{stem}-p{page_no}-{tag.replace(':', '-')}.png"
         render(page, rect, assets / name, s.image_side)
         native = rect * page.derotation_matrix
         layer = page.get_text("text", clip=native)
@@ -195,9 +206,9 @@ def extract_pdf(path, label, output, client):
 
     with pymupdf.open(path) as doc:
         if doc.needs_pass:
-            raise ValueError(f"{label}: encrypted PDF needs to be decrypted before comparison")
+            raise ValueError(f"{Path(path).name}: encrypted PDF needs to be decrypted before comparison")
         if not doc.is_pdf or not len(doc):
-            raise ValueError(f"{label}: expected a nonempty PDF")
+            raise ValueError(f"{Path(path).name}: expected a nonempty PDF")
         for number, page in enumerate(doc, 1):
             # Native coordinates stay unrotated (PDF point coordinates). Consecutive
             # blocks are grouped up to the byte budget; oversized blocks are split.
@@ -222,8 +233,8 @@ def extract_pdf(path, label, output, client):
                 found = [(table.bbox, table.extract()) for table in page.find_tables().tables]
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors
                 found = []
-                coverage.append({"document": label, "page": number, "bbox": list(page.rect * page.derotation_matrix),
-                                 "source": "table-detection", "image": None, "status": "failed",
+                coverage.append({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
+                                 "task": "table-detection", "image": None, "status": "failed",
                                  "issues": [type(e).__name__ + ": " + str(e)], "claims": 0})
             for ti, (bbox, rows) in enumerate(found):
                 if not rows:
@@ -236,7 +247,7 @@ def extract_pdf(path, label, output, client):
                 for tag, rect in visual_regions(page, s.tile_points):
                     visual_task(number, page, tag, rect)
             else:
-                coverage.append({"document": label, "page": number, "bbox": list(page.rect * page.derotation_matrix),
-                                 "source": "vision", "image": None, "status": "skipped",
+                coverage.append({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
+                                 "task": "vision", "image": None, "status": "skipped",
                                  "issues": ["Visual extraction disabled; charts, diagrams and scans may be missed"], "claims": 0})
-    return evidence, coverage, digest
+    return evidence, coverage

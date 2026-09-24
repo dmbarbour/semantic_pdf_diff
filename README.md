@@ -4,7 +4,7 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 
 ## Status
 
-**v0.2.0** (tagged) compares two PDFs. It's a runnable baseline, not yet validated against a real model; see [limitations](docs/limitations.md).
+**v0.2.0** (tagged) compares two PDFs. It's a runnable baseline, not yet validated against a real model; see [limitations](docs/limitations.md). The main branch is mid-way through the generalization below; evidence already uses the new content-based schema (v2).
 
 A generalized design is planned and not yet implemented: sources as folders and zip archives, a persistent resumable store, more formats (`.docx`, `.pptx`, spreadsheets), criteria-first comparison of two or more sources, consistency checks and RAG export. See [docs/plans/](docs/plans/README.md).
 
@@ -22,7 +22,7 @@ export OPENAI_MODEL='your-vision-model-id'
 pdf-semantic-diff team-a.pdf team-b.pdf --out result
 ```
 
-Open `result/report.html`, keeping its `assets/` folder alongside it. Machine-readable results are in `report.json`; each document's extracted evidence and coverage are in `evidence-A.json` and `evidence-B.json`.
+Open `result/report.html`, keeping its `assets/` folder alongside it. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
 
 For revisions, supply the old PDF first. `--plan` estimates the work without calling the model:
 
