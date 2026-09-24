@@ -88,8 +88,9 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 
 ## Milestones
 
-1. **Concurrent client:** time-of-day rate-limit rules, adaptive backoff, a modest concurrency cap; tests against a stub server that simulates latency and 429s; token and time estimates in `--plan`; progress bars, heartbeats and configurable verbosity.
-2. **Persistent task queue and section queue:** extraction restructured into discrete, persisted tasks (moved here from the store plan, since resume already works by cache replay); fair share across sections and across compared sources; `not_reached` coverage status.
+0. **Prerequisite: union provenance** (see the store plan's *Decisions*), so results don't depend on which task finishes first.
+1. **Merged with milestone 2 (decided 2026-09-24; see the [store completion review](../reviews/store-complete-2026-09-24.md)): an in-memory task queue run by worker threads with a single store writer, plus** the concurrent client: time-of-day rate-limit rules, adaptive backoff, a modest concurrency cap; tests against a stub server that simulates latency and 429s; token and time estimates in `--plan`; progress bars, heartbeats and configurable verbosity.
+2. **Persisting the task queue and the section queue** (the queue itself arrives with milestone 1): tasks persisted for progress reporting; fair share across sections and across compared sources; `not_reached` coverage status.
 3. **Triage without the model:** cheap signals and boilerplate detection. Use drawing sets as a test case: table detection there finds mostly drawing geometry, and about half the rows repeat across sheets (title blocks, legends; see the [store milestone 4 review](../reviews/store-m4-pdf-sections-2026-09-24.md)).
 4. **Model triage per section:** type, density, keywords and the "about" statement.
 5. **Epistemic status:** prompts ask for basis, uncertainty, context and role (filling the schema v2 fields); skeptical instructions; the basis veto in comparison. A deliberate prompt-version change.
@@ -105,6 +106,7 @@ None currently.
 
 - **Context window:** the gemma-4 deployment serves 262,144 tokens; configure `context_tokens` to match. Extraction chunk sizes (`text_bytes`, tile size) are separate settings and stay small so each extraction stays focused. Large requests are for section-level work (triage, "about" statements) and criterion-level comparison. How much of a section triage reads is part of the extraction interpreter, since it shapes what the model sees.
 - **Throughput limits:** 300k tokens/min in business hours, 500k outside; configurable by time of day, and expected to change.
+- **`tqdm`** is accepted as a dependency for progress bars.
 - **Concurrent requests:** assume the server caps them. Use a modest, configurable concurrency limit (single digits by default) and let adaptive backoff find the working level, leaving room for the user's other tools on the same server. Tune the default from real runs.
 - **Time budgets:** none. Runs proceed unattended until done or stopped; preliminary reports cover the need to look early.
 - **Reviewer feedback:** stored as reusable annotations in the store, exportable and importable (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).
