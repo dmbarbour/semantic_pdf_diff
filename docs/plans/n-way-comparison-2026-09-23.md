@@ -94,8 +94,14 @@ Revisions of one design are commensurable by default. They use claim-level compa
 5. Matrix report.
 6. Ordered revision series (claim-level, content-difference first).
 
+## Decisions (2026-09-24)
+
+- **Context:** the gemma-4 deployment serves 262,144 tokens. Criterion-level requests hold all positions with generous context; splitting into groups is a rare fallback.
+- **Scale of N:** 4 or fewer is typical, 8 is large, and there is no artificial limit.
+- **Report legibility at any N:** one general matrix renderer. Self-contained inline JavaScript (no external resources) lets the reader choose which sources are shown as columns, pin one for side-by-side reading, and filter criteria. All sources are shown by default up to about five; beyond that the report opens on a subset with a source picker. The per-criterion distribution description always covers *all* sources, so a subset view never hides the overall picture.
+- **Two- and three-way cases** use the same pipeline and renderer (N = 2 is just two columns). Presentation conveniences for small N (e.g. side-by-side evidence cards, as today) are tweaks within that renderer, not separate code paths, to keep implementation simple.
+- **Two-way proposals** therefore also go criteria first. Today's claim-level pairwise comparison remains the method for revisions.
+
 ## Open questions
 
-- What is a realistic N? The report design differs between 3 sources and 20.
-- What context window does the gemma-4 deployment actually serve? The current default budget (`context_tokens` 8,192) was chosen for small models. Extraction chunks should stay small for focus, but criterion-level requests can use far more.
-- Does two-way proposal comparison also move to criteria first, with today's claim-level comparison kept for revisions? Likely yes, once criteria exist.
+None currently.

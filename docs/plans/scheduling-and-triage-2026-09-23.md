@@ -52,7 +52,7 @@ Score every section cheaply, then run detailed extraction in score order. Signal
 
 - **Signals needing no model:** density of numbers and units, tables present, density of vector drawings and images, whether a text layer exists, requirement language (`shall`, `must`).
 - **Boilerplate detection:** headers and footers repeated across pages, content identical across files, tables of contents, reference lists. Skip these or de-duplicate them.
-- **One model call per section** on its headings plus a text sample, returning the section type (specification, narrative, legal, appendix data), estimated density, keywords, and an **"about" statement**: a few sentences on the section's subject and scope that omit its specific values and decisions. The statement is used for section embeddings and alignment ([retrieval-recall](retrieval-recall-2026-09-23.md)). For very large sections, it is composed from subsections' statements.
+- **One model call per section** on its headings and text (the whole section when it fits the context budget, which with the deployment's 262,144-token window is nearly always; a representative sample otherwise), returning the section type (specification, narrative, legal, appendix data), estimated density, keywords, and an **"about" statement**: a few sentences on the section's subject and scope that omit its specific values and decisions. The statement is used for section embeddings and alignment ([retrieval-recall](retrieval-recall-2026-09-23.md)). Only sections too large for one request compose it from subsections' statements.
 
 Triage decides *order*, never *exclusion*. Low-scoring sections are still extracted if throughput allows, and are never silently dropped.
 
@@ -99,6 +99,7 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 
 ## Decisions (2026-09-23)
 
+- **Context window:** the gemma-4 deployment serves 262,144 tokens; configure `context_tokens` to match. Extraction chunk sizes (`text_bytes`, tile size) are separate settings and stay small so each extraction stays focused. Large requests are for section-level work (triage, "about" statements) and criterion-level comparison. How much of a section triage reads is part of the extraction interpreter, since it shapes what the model sees.
 - **Throughput limits:** 300k tokens/min in business hours, 500k outside; configurable by time of day, and expected to change.
 - **Concurrent requests:** assume the server caps them. Use a modest, configurable concurrency limit (single digits by default) and let adaptive backoff find the working level, leaving room for the user's other tools on the same server.
 - **Time budgets:** none. Runs proceed unattended until done or stopped; preliminary reports cover the need to look early.
