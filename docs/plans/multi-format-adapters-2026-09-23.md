@@ -21,10 +21,10 @@ Only content that is truly unstructured goes to the model claim by claim. For st
 
 | Format | Approach | Notes |
 |---|---|---|
-| `.txt`, `.md` | Text segments. Markdown headings give the heading path and sections; front matter becomes embedded annotations. | Cheap; do first. |
+| `.txt`, `.md` | Text segments. Markdown headings give the heading path and sections; recognized front matter keys become provenance annotations, and the rest is content. | Cheap; do first. |
 | `.csv`, `.xlsx` | **Model-guided table interpretation**, applied mechanically to rows (see below). | A model call per row doesn't scale to a 10k-row sheet, and it adds error to exact data. Handle merged and multi-row headers. Formulas: use cached values; if a formula has none, record the value as unknown with the formula text as an issue, never evaluate it. Hidden sheets are extracted but marked hidden, never silently merged with visible data. Never follow external links. |
-| `.docx` | Real paragraphs, heading styles and real tables via `python-docx`. Embedded images go to the visual pipeline. Comments and tracked changes become embedded annotations. | No table detection needed; quote checks become exact. |
-| `.pptx` | Text per shape, tables, speaker notes, and **chart XML, which holds the actual series data**. Embedded images go to vision. | Chart XML beats estimating values from pixels. SmartArt and grouped shapes are the awkward cases. |
+| `.docx` | Real paragraphs, heading styles and real tables via `python-docx`. Embedded images go to the visual pipeline. Read as currently written, with tracked changes applied. Comments are content, with a provenance annotation saying what they comment on. | No table detection needed; quote checks become exact. |
+| `.pptx` | Text per shape, tables, speaker notes (content, with "slide N speaker notes" as provenance), and **chart XML, which holds the actual series data**. Embedded images go to vision. | Chart XML beats estimating values from pixels. SmartArt and grouped shapes are the awkward cases. |
 | Images (`.png`, `.jpg`, scans) | Straight into the existing visual pipeline. | Nearly free. |
 | Legacy `.doc`/`.ppt`/`.xls`, or visual fidelity for Office files | Optional headless LibreOffice conversion to PDF. | Provenance maps only to the converted PDF's pages, so this is a fallback, not the main path. |
 
@@ -44,7 +44,7 @@ The public corpus (`scripts/fetch_samples.py`) covers the priority formats, all 
 
 Cameo `.mdzip` models are digested by a separate project whose output is a large folder of Markdown and some CSV, including its own model-written summaries, aimed mainly at RAG ingestion elsewhere. This project consumes that folder **as an ordinary source** through the `.md` and `.csv` adapters; no converter or importer is needed.
 
-This project **does not judge content produced by external tools**, including the Cameo project's model-written summaries. Whether such content is weaker evidence is the provider's call: a provider may mark content with confidence levels or similar metadata, and this project passes that through to evidence and reports. Provider markings are embedded annotations; the convention (front matter, sidecar file or both) is an open question in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*).
+This project **does not judge content produced by external tools**, including the Cameo project's model-written summaries. Whether such content is weaker evidence is the provider's call: a provider may mark content with confidence levels or similar metadata, and this project passes that through to evidence and reports. Provider markings use Markdown front matter and become provider-declared provenance annotations (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).
 
 ### Tables and spreadsheets
 

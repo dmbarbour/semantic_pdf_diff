@@ -17,7 +17,7 @@ Run claim-level comparison with A = B = one source, excluding pairs of a claim w
 - a spreadsheet total that disagrees with the narrative
 - a diagram connection that contradicts the text
 
-It reuses retrieval, the numeric check and the uncertainty rules unchanged. For a single-team review this is arguably more useful than comparing two teams. Duplicate claims (the same fact from the native and visual passes, or repeated across files) should show as *equivalent* support, not noise.
+It reuses retrieval, the numeric check and the uncertainty rules. Recognized disagreements are recorded as derived claims with their severity and the model's handling decision (e.g. an errata document supersedes the original), which may lower confidence in the claims involved; see *Disagreements are claims* in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md). For a single-team review this is arguably more useful than comparing two teams. Duplicate claims (the same fact from the native and visual passes, or repeated across files) should show as *equivalent* support, not noise.
 
 ### 2. `export`: RAG ingestion as Markdown chunks
 
@@ -27,7 +27,7 @@ The target RAG system is not ours to change. Its ingest tool accepts PDF, Markdo
 - **Sized to the ingest tool's chunking.** The tool extracts text with `markitdown` and splits into chunks of 512 tokens with 128 tokens of overlap by default (configurable on its command line). Export chunks therefore target roughly 400 tokens by default (configurable), leaving margin for tokenizer differences, so each file normally becomes one RAG chunk. When a chunk must be longer, a compact provenance line is repeated before each subsection, so any 512-token window still names its origin. The provenance header costs roughly 50–80 tokens per chunk; worth it.
 - **Tables inline, as small Markdown tables** with their headers and units, instead of separate CSV or `.xlsx` files the ingest tool would mangle. Large tables are split into chunks that each repeat the header and table identity.
 - **Diagrams and charts as text.** Claims from visual extraction (connections, operating points, axis readings, flagged approximations) are written out in words. That preserves exactly what the ingest tool would lose.
-- **Qualifiers kept with the facts:** conditions, basis (measured, projected, required…), stated uncertainty, derivation (direct read, model extraction, summary of summaries), quote-verification status and any issues or suspicions. Confidence appears as the qualifier it is, not as a bare number presented as truth. Relevant annotations travel too: provider markings, embedded comments, and reviewer corrections (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).
+- **Qualifiers kept with the facts:** conditions, basis (measured, projected, required…), stated uncertainty, derivation (direct read, model extraction, summary of summaries), quote-verification status and any issues or suspicions. Confidence appears as the qualifier it is, not as a bare number presented as truth. Relevant annotations travel too: provider-declared markings, recognized disagreements and their handling, and reviewer decisions such as criteria (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).
 - **Unique file names.** Re-ingesting apparently aggregates rather than replaces, so every chunk file gets a unique name (derived from its content hash plus an export ID) and the user controls the corpus directly: ingest a fresh export into a new or reset corpus, or ingest a **delta export** containing only chunks not present in a named previous export. The delta's `index.md` also lists chunks that disappeared, for the user to act on.
 - **Discovery chunks alongside detail chunks.** Besides chunks that explain content (comprehension), the export includes chunks that help find it (discovery): tables of topics, an entity index, an index of diagrams and charts with what each shows, and section maps. Each entry names the detail chunks' citations, so a RAG query about "what covers pump redundancy?" can land on an index and then on the facts.
 - **An `index.md`** listing every chunk with its citation, plus a note on how the export was produced (tool version, interpreters, coverage summary including what wasn't reached or was skipped).
@@ -64,6 +64,12 @@ Pump schedule for the PS-3 station design: three identical pumps, two duty and o
 
 Cite as: PS-3 design summary.pdf, p. 12, Table 3.
 ```
+
+**Provenance tags.** Full provenance annotations (a source's organization, revision, dates, handling notes, and the extraction's interpreters) can grow large, and repeating them in every chunk would crowd out content in 400-token chunks. So:
+
+- each source, and each file where it matters, gets one **provenance chunk** holding its full provenance annotation, headed by a short, distinctive **tag** (e.g. `SRC-PS3-TEAMA-REVC`)
+- detail chunks carry the tag plus a compact citation line, not the full provenance
+- the tag is plain text in the body (and in front matter), so the RAG system's own retrieval can connect a detail chunk to its provenance chunk when asked "whose document is this?"
 
 **Title and author.** The ingest tool is good at tracing content to a file's title and author, which it reads from PDF and `.docx` properties. The export format is a configuration choice:
 
