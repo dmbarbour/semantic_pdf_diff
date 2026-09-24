@@ -1,6 +1,6 @@
 # Validation
 
-Ninety-four automated tests passed on Python 3.12 with PyMuPDF 1.28.2, Pydantic 2.13.5 and openpyxl 3.1.5. The ninety core tests also passed on Python 3.10 with the minimum supported PyMuPDF 1.24.3 and Pydantic 2.7.0; the four synthetic-spreadsheet tests need the `dev` extra and are skipped without it.
+Ninety-eight automated tests passed on Python 3.12 with PyMuPDF 1.28.2, Pydantic 2.13.5 and openpyxl 3.1.5. The ninety-four core tests also passed on Python 3.10 with the minimum supported PyMuPDF 1.24.3 and Pydantic 2.7.0; the four synthetic-spreadsheet tests need the `dev` extra and are skipped without it.
 
 The end-to-end test creates temporary PDFs, sends native text and rendered images to a local HTTP stub, generates HTML/JSON, and reruns with zero additional HTTP calls because of caching. Other tests cover retrieval across modalities, many-to-one candidates, unit conversions, uncertainty gates, byte budgets, malformed/truncated responses, call limits, visual refinement, quote rejection and escaped report content.
 
@@ -17,5 +17,7 @@ Section tests cover outline sections (entries sharing a start page, depth limits
 Source tests cover scanning (folders, hidden files and folders, OS clutter, missing roots, duplicates, extensionless files, zip members, nested archives and the depth limit, unsafe paths, encrypted members, compression-ratio bombs, the per-source byte cap, re-reading bytes from nested origins), the registry (declaring and updating sources, the rescan fast path, added/changed/removed files, orphaned content, removal), and the command line (source add/list/show/update/remove, comparing declared folder and zip sources with shared and unsupported files, automatic and manual rescans, manifest export/import with hash checks, live manifest links and orphaning, folder shortcuts and name conflicts, report links to crops from another folder).
 
 Difference tests cover root-relative paths, classifying files as unchanged, modified, moved, added or removed across differently named roots and zip members, single-file sources, and matching unique claims against shared evidence.
+
+Maintenance tests cover every `show` view and format, `gc` previews and collection (exactly the orphaned content's evidence, cached responses and crops, nothing still referenced), removing sources with missing manifests only on request, and regenerating reports without model calls.
 
 Environment configuration tests verify typed parsing, API-key exclusion from serialized settings, empty-variable fallback, invalid-value handling and CLI > file > environment precedence.

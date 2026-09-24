@@ -201,4 +201,5 @@ class Client:
             temp.replace(target)
         else:
             semantic, kind, region = self._semantic(request_hash, key)
-            self.store.cache(semantic, kind, region, request_hash, value.model_dump_json())
+            content = key[2] if key and key[0] == "extract" else ""
+            self.store.cache(semantic, kind, region, request_hash, value.model_dump_json(), content)

@@ -1,6 +1,6 @@
 # Rate-aware scheduling, section triage and claim quality signals
 
-- **Status:** Planned
+- **Status:** Active (2026-09-24)
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections as units of work)
 
 ## Context

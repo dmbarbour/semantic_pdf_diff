@@ -11,7 +11,7 @@ import sqlite3
 from pathlib import Path
 from .models import Evidence, FileRef, Interpreter, Section, Source
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -29,8 +29,27 @@ CREATE TABLE evidence (id TEXT PRIMARY KEY, content TEXT NOT NULL REFERENCES con
                        region TEXT NOT NULL, data TEXT NOT NULL);
 CREATE INDEX evidence_content ON evidence(content);
 CREATE TABLE response_cache (key TEXT PRIMARY KEY, kind TEXT NOT NULL, region TEXT NOT NULL,
-                             request_hash TEXT NOT NULL, response TEXT NOT NULL);
+                             request_hash TEXT NOT NULL, response TEXT NOT NULL, content TEXT NOT NULL DEFAULT '');
 CREATE TABLE comparison (id INTEGER PRIMARY KEY AUTOINCREMENT, created TEXT NOT NULL, data TEXT NOT NULL);
+-- Views for `show` and for anyone querying the store directly.
+CREATE VIEW source_files AS
+    SELECT f.source, f.path, f.content, f.size, c.extracted FROM file f JOIN content c ON c.id = f.content;
+CREATE VIEW evidence_occurrences AS
+    SELECT f.source, f.path, e.id AS evidence, json_extract(e.data, '$.locator.page') AS page, e.region,
+           json_extract(e.data, '$.entity') AS entity, json_extract(e.data, '$.attribute') AS attribute,
+           json_extract(e.data, '$.value') AS value, json_extract(e.data, '$.unit') AS unit,
+           json_extract(e.data, '$.quote') AS quote
+    FROM evidence e JOIN file f ON f.content = e.content;
+CREATE VIEW coverage_by_source AS
+    SELECT f.source, json_extract(t.row, '$.status') AS status, COUNT(*) AS tasks
+    FROM task t JOIN (SELECT DISTINCT source, content FROM file) f ON f.content = t.content
+    GROUP BY f.source, status;
+CREATE VIEW orphaned_content AS
+    SELECT id AS content, size FROM content WHERE id NOT IN (SELECT content FROM file);
+CREATE VIEW comparisons AS
+    SELECT id, created, json_extract(data, '$.mode') AS mode, json_extract(data, '$.sources[0].name') AS first,
+           json_extract(data, '$.sources[1].name') AS second, json_array_length(data, '$.findings') AS findings
+    FROM comparison;
 """
 
 # Extraction regions that a changed extraction setting affects; anything not listed
@@ -280,16 +299,71 @@ class Store:
     def cached(self, key):
         return self.db.execute("SELECT response, request_hash FROM response_cache WHERE key=?", (key,)).fetchone()
 
-    def cache(self, key, kind, region, request_hash, response):
+    def cache(self, key, kind, region, request_hash, response, content=""):
         with self.db:
-            self.db.execute("INSERT OR REPLACE INTO response_cache VALUES (?, ?, ?, ?, ?)",
-                            (key, kind, region, request_hash, response))
+            self.db.execute("INSERT OR REPLACE INTO response_cache VALUES (?, ?, ?, ?, ?, ?)",
+                            (key, kind, region, request_hash, response, content))
 
     def uncache(self, key):
         with self.db:
             self.db.execute("DELETE FROM response_cache WHERE key=?", (key,))
 
+    # --- views and collection -------------------------------------------------
+    VIEWS = ("sources", "source_files", "evidence_occurrences", "coverage_by_source", "orphaned_content", "comparisons")
+
+    def view(self, name):
+        """Rows of a named view as dicts; 'sources' summarizes source definitions."""
+        if name == "sources":
+            return [{"name": s.name, "kind": s.kind, "roots": "; ".join(s.roots), "manifest": s.manifest or "",
+                     "files": len(self.files(s.name)), **{f"meta.{k}": v for k, v in s.metadata.items()}}
+                    for s in self.sources()]
+        if name not in self.VIEWS:
+            raise StoreError(f"unknown view {name!r}; choose from {', '.join(self.VIEWS)}")
+        cursor = self.db.execute(f"SELECT * FROM {name}")
+        columns = [c[0] for c in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor]
+
+    def gc(self, dry_run=False, orphaned_sources=False):
+        """Delete orphaned content with its derived data and crops. Returns what was (or would be) removed.
+
+        orphaned_sources also removes sources whose linked manifest file no longer exists.
+        """
+        from pathlib import Path as _Path
+        gone = [s.name for s in self.sources() if s.manifest and not _Path(s.manifest).exists()] if orphaned_sources else []
+        if gone and not dry_run:
+            for name in gone:
+                self.remove_source(name)
+        orphans = self.orphaned_content()
+        if gone and dry_run:  # content only those sources reference would be orphaned too
+            marks = ",".join("?" * len(gone))
+            orphans = sorted(set(orphans) | {c for (c,) in self.db.execute(
+                f"SELECT content FROM file WHERE source IN ({marks}) AND content NOT IN "
+                f"(SELECT content FROM file WHERE source NOT IN ({marks}))", gone + gone)})
+        crops = [p for c in orphans for p in self.assets.glob(c.split(":", 1)[1][:12] + "-*.png")]
+        summary = {"sources": gone, "content": len(orphans), "crops": len(crops), "dry_run": dry_run}
+        if orphans:
+            marks = ",".join("?" * len(orphans))
+            summary["evidence"] = self.db.execute(f"SELECT COUNT(*) FROM evidence WHERE content IN ({marks})", orphans).fetchone()[0]
+            summary["cached_responses"] = self.db.execute(
+                f"SELECT COUNT(*) FROM response_cache WHERE content IN ({marks})", orphans).fetchone()[0]
+            if not dry_run:
+                with self.db:
+                    for table in ("evidence", "task", "section", "response_cache"):
+                        self.db.execute(f"DELETE FROM {table} WHERE content IN ({marks})", orphans)
+                    self.db.execute(f"DELETE FROM content WHERE id IN ({marks})", orphans)
+                for path in crops:
+                    path.unlink(missing_ok=True)
+        return summary
+
     # --- comparisons -----------------------------------------------------------
+    def comparison(self, number=None):
+        """A saved comparison's data: the given id, or the latest."""
+        query = "SELECT data FROM comparison " + ("WHERE id=?" if number else "ORDER BY id DESC LIMIT 1")
+        row = self.db.execute(query, (number,) if number else ()).fetchone()
+        if row is None:
+            raise StoreError(f"no comparison {number}" if number else "the store has no comparisons yet")
+        return json.loads(row[0])
+
     def save_comparison(self, created, data):
         with self.db:
             cursor = self.db.execute("INSERT INTO comparison (created, data) VALUES (?, ?)",

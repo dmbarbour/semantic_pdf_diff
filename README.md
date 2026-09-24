@@ -40,6 +40,14 @@ pdf-semantic-diff compare --store work team-a team-b
 pdf-semantic-diff source export team-a --store work --output team-a.source.json --with-hashes
 ```
 
+Inspect and maintain a store with `show` (views as Markdown, CSV or JSON Lines), `report` (regenerate a report without model calls) and `gc` (delete content no source references any more):
+
+```bash
+pdf-semantic-diff show evidence_occurrences --store work --format csv
+pdf-semantic-diff report --store work --out reports/latest
+pdf-semantic-diff gc --store work --dry-run
+```
+
 A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. Only PDFs are extracted so far; other files are listed as skipped.
 
 Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error.

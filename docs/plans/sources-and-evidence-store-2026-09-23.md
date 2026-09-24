@@ -1,6 +1,6 @@
 # Sources, content and a SQLite evidence store
 
-- **Status:** Active (next up)
+- **Status:** Completed 2026-09-24, except reviewer-decision records, which arrive with their first consumer (see [milestone 2 review](../reviews/store-m2-sqlite-store-2026-09-24.md)). Summary: [store review](../reviews/store-complete-2026-09-24.md).
 - **Depends on:** [robustness-baseline](robustness-baseline-2026-09-23.md) (completed)
 - **Enables:** every other plan in this folder
 
@@ -218,7 +218,7 @@ report --store <dir> <comparison>
 4. ✅ *Done 2026-09-24 (`1834619`; see [review](../reviews/store-m4-pdf-sections-2026-09-24.md)).* **PDF sections:** outline → page ranges (font-size headings deferred: every multi-page sample PDF has an outline); native document properties into file metadata; heading path in prompts. When a table continues across pages, pass the previous chunk's table header and the section heading path with the continuation (affordable with the large context). Real documents are sensitive and won't be shared (the tool runs inside a multi-layer sandbox), so heuristics are developed against the public corpus (see [Samples](#samples)) and must fall back gracefully when there's no outline or consistent heading font.
 5. ✅ *Done 2026-09-24 (`7d3d209`, `2612487`; see [review](../reviews/store-m5-source-registry-2026-09-24.md)).* **Source registry:** declared sources with name, metadata and roots (`source add | list | show | update | remove`); rescans with in-place updates and orphaned content; folders and zip archives as roots (hidden files ignored, safety limits); manifest `source export` / `source import` and `--manifest`; duplicate occurrences in provenance; unsupported or extensionless files listed as skipped.
 6. ✅ *Done 2026-09-24 (shared evidence since milestone 1; shared retrieval targets and the file-level summary added; see the [milestone 5 review](../reviews/store-m5-source-registry-2026-09-24.md)).* **Content-difference-first comparison** (shared / removed / added).
-7. **Views, `show`, `gc` and the rest of the staged CLI** (`source` subcommands arrive with milestone 5) (revisit naming: until then the two-file command's `--out` folder doubles as the store, which is confusing when a report is the expected result; separate `--store` and report locations), with the current two-file command kept working; owner-only store permissions; report escaping tests; per-role endpoint configuration with key environment variables; tests and docs.
+7. ✅ *Done 2026-09-24.* **Views, `show`, `gc` and the rest of the staged CLI** (`source` subcommands arrive with milestone 5) (revisit naming: until then the two-file command's `--out` folder doubles as the store, which is confusing when a report is the expected result; separate `--store` and report locations), with the current two-file command kept working; owner-only store permissions; report escaping tests; per-role endpoint configuration with key environment variables; tests and docs.
 
 ## Decisions (2026-09-23)
 

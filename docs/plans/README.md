@@ -13,13 +13,12 @@ Statuses:
 
 | Plan | Summary |
 |---|---|
-| [Sources, content and evidence store](sources-and-evidence-store-2026-09-23.md) | SQLite store (resumable, many views); evidence attached to content (SHA-256 + extension) shared across sources; folders and zips as sources; revisions as content differences; interpreter metadata; staged CLI. The foundation for everything else. |
+| [Scheduling and triage](scheduling-and-triage-2026-09-23.md) | Time-of-day rate limits and adaptive concurrency for the in-house server; fair share across sections and sources; status-stamped preliminary reports; section triage with "about" statements; claim quality signals, epistemic status (basis, uncertainty) and skeptical prompting. |
 
 ## Planned
 
 | Plan | Summary | Depends on |
 |---|---|---|
-| [Scheduling and triage](scheduling-and-triage-2026-09-23.md) | Time-of-day rate limits and adaptive concurrency for the in-house server; fair share across sections and sources; status-stamped preliminary reports; section triage with "about" statements; claim quality signals, epistemic status (basis, uncertainty) and skeptical prompting. | Evidence store |
 | [Units and normalization](units-and-normalization-2026-09-24.md) | Structured quantities (intervals, bounds, tolerances), compound units with explicit ambiguity rules, money compared only in the same currency and price basis, same-source normalization for criteria, statistics in common units. Abstain, never guess. | None strictly |
 | [Criteria-first comparison](n-way-comparison-2026-09-23.md) | Criteria first (for two-way proposals too): compare N sources by reviewed, evidence-based criteria (extracted from rules, requirements or the user's rubrics, or recommended), with applicability, per-source synthesis and a criteria × sources matrix. Compares, never judges. Revisions stay claim-level. | Evidence store; triage for "about" statements |
 | [Multi-format adapters](multi-format-adapters-2026-09-23.md) | `.txt`/`.md`, then `.docx` and `.pptx` (chart XML), then external converters, then `.csv`/`.xlsx` (table detection plus model-guided interpretation), then images. Cameo output is consumed as an ordinary source. | Evidence store |
@@ -44,14 +43,15 @@ Statuses:
 
 | Plan | Summary |
 |---|---|
+| [Sources, content and evidence store](sources-and-evidence-store-2026-09-23.md) | SQLite store (resumable, many views); evidence attached to content (SHA-256 + extension) shared across sources; folders and zips as sources; revisions as content differences; interpreter metadata; staged CLI. Completed 2026-09-24 (reviewer-decision records arrive with their first consumer). |
 | [Robustness baseline (0.2.0)](robustness-baseline-2026-09-23.md) | Tagged `v0.2.0` as the stable baseline. Fixed API-shape crashes, table refinement, unit case folding and de-duplication; text grouping, tile spacing, visual quote checks, tolerant parsing. |
 
 ## Suggested order
 
 Nobody uses the tool between now and implementation (the stable baseline is tagged `v0.2.0`), so plans and checkpoints can be reordered, split or merged freely.
 
-1. Evidence store (active)
-2. Scheduling and triage (concurrency, progress and logging, sections, "about" statements, epistemic status)
+1. ~~Evidence store~~ (completed)
+2. Scheduling and triage (active) (concurrency, progress and logging, sections, "about" statements, epistemic status)
 3. Test models and record/replay, then evaluation benchmarks and retrieval recall (criteria-first comparison relies on claim-to-criterion retrieval)
 4. Units and normalization, then criteria-first comparison: the main use case, two-way proposals included
 5. Adapter interface with `.txt` / `.md`, then `.docx` and `.pptx`

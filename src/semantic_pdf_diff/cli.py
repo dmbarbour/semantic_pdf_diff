@@ -3,8 +3,10 @@
     pdf-semantic-diff A B --out DIR                     # shortcut: A and B are files, folders or zips
     pdf-semantic-diff compare --store DIR NAME NAME     # declared sources, or --manifest FILE
     pdf-semantic-diff source add|list|show|update|remove|export|import ...
+    pdf-semantic-diff show|gc|report --store DIR ...
 """
 import argparse
+import csv
 import json
 import sys
 from datetime import datetime, timezone
@@ -32,6 +34,8 @@ def main(argv=None):
             return source_command(argv[1:])
         if argv and argv[0] == 'compare':
             return compare_command(argv[1:])
+        if argv and argv[0] in ('show', 'gc', 'report'):
+            return store_command(argv[0], argv[1:])
         return shortcut_command(argv)
     except (OSError, ValueError, RuntimeError) as e:
         print(f'Error: {e}', file=sys.stderr)
@@ -334,6 +338,53 @@ def source_command(argv):
             if different:
                 print(f"Warning: {len(different)} file(s) differ from the manifest's hashes: {different[:5]}", file=sys.stderr)
     return 0
+
+def store_command(command, argv):
+    parser = argparse.ArgumentParser(prog=f'pdf-semantic-diff {command}')
+    parser.add_argument('--store', type=Path, required=True)
+    if command == 'show':
+        parser.description = 'Print a view of the store.'
+        parser.add_argument('view', choices=Store.VIEWS)
+        parser.add_argument('--format', choices=['md', 'csv', 'jsonl'], default='md')
+    elif command == 'gc':
+        parser.description = 'Delete orphaned content with its evidence, tasks, sections, cached responses and crops.'
+        parser.add_argument('--dry-run', action='store_true', help='Report what would be removed, change nothing')
+        parser.add_argument('--orphaned-sources', action='store_true',
+                            help='Also remove sources whose linked manifest file no longer exists')
+    else:
+        parser.description = 'Regenerate a report from a saved comparison, without model calls.'
+        parser.add_argument('--comparison', type=int, help='Comparison id (see: show comparisons); default: latest')
+        parser.add_argument('--out', type=Path, help='Report folder (default: the store folder)')
+    args = parser.parse_args(argv)
+    if not (args.store / 'store.sqlite').exists():
+        raise StoreError(f'{args.store} is not a store')
+    with Store(args.store) as store:
+        if command == 'show':
+            print_rows(store.view(args.view), args.format)
+        elif command == 'gc':
+            print(json.dumps(store.gc(dry_run=args.dry_run, orphaned_sources=args.orphaned_sources), indent=2))
+        else:
+            out = args.out or args.store
+            write_report(store.comparison(args.comparison), out, assets=store.folder / 'assets')
+            print(f"Report: {out / 'report.html'}")
+    return 0
+
+def print_rows(rows, style):
+    if style == 'jsonl':
+        for row in rows:
+            print(json.dumps(row, ensure_ascii=False))
+        return
+    columns = list(dict.fromkeys(k for row in rows for k in row))
+    if style == 'csv':
+        writer = csv.DictWriter(sys.stdout, columns, lineterminator='\n')
+        writer.writeheader()
+        writer.writerows(rows)
+        return
+    cell = lambda v: '' if v is None else str(v).replace('|', '\\|').replace('\n', ' ')
+    print('| ' + ' | '.join(columns) + ' |')
+    print('|' + '---|' * len(columns))
+    for row in rows:
+        print('| ' + ' | '.join(cell(row.get(c)) for c in columns) + ' |')
 
 def require(store, name):
     source = store.source(name)
