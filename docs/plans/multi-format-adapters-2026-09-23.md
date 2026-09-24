@@ -15,14 +15,14 @@ Most of these formats are **better sources than PDF**, because their structure i
 - **structured tables** (header plus rows, with a known cell locator)
 - **renderable visual regions** (embedded images, figures)
 
-Only content that is truly unstructured goes to the model. Structured data should become claims **deterministically** wherever possible.
+Only content that is truly unstructured goes to the model claim by claim. For structured data, the model decides *how* rows become claims, and that decision is then applied mechanically wherever possible (see *Tables and spreadsheets* below).
 
 ## Per-format approach
 
 | Format | Approach | Notes |
 |---|---|---|
 | `.txt`, `.md` | Text segments. Markdown headings give the heading path and sections. | Cheap; do first. |
-| `.csv`, `.xlsx` | **Deterministic claims:** entity = row label, attribute = column header, value = cell. Units parsed from headers like `Power (kW)`. At most one model call per table, to interpret ambiguous headers. | A model call per row doesn't scale to a 10k-row sheet, and it adds error to exact data. Handle merged and multi-row headers, formulas (use cached values), hidden sheets. Never follow external links. |
+| `.csv`, `.xlsx` | **Model-guided table interpretation**, applied mechanically to rows (see below). | A model call per row doesn't scale to a 10k-row sheet, and it adds error to exact data. Handle merged and multi-row headers, formulas (use cached values), hidden sheets. Never follow external links. |
 | `.docx` | Real paragraphs, heading styles and real tables via `python-docx`. Embedded images go to the visual pipeline. | No table detection needed; quote checks become exact. |
 | `.pptx` | Text per shape, tables, and **chart XML, which holds the actual series data**. Embedded images go to vision. | Chart XML beats estimating values from pixels. SmartArt and grouped shapes are the awkward cases. |
 | Images (`.png`, `.jpg`, scans) | Straight into the existing visual pipeline. | Nearly free. |
@@ -44,6 +44,19 @@ The public corpus (`scripts/fetch_samples.py`) covers the priority formats, all 
 Cameo `.mdzip` models are digested by a separate project whose output is a large folder of Markdown and some CSV, including its own model-written summaries, aimed mainly at RAG ingestion elsewhere. This project consumes that folder **as an ordinary source** through the `.md` and `.csv` adapters; no converter or importer is needed.
 
 This project **does not judge content produced by external tools**, including the Cameo project's model-written summaries. Whether such content is weaker evidence is the provider's call: a provider may mark content with confidence levels or similar metadata, and this project passes that through to evidence and reports. The convention for such markings (e.g. Markdown front matter or a sidecar file) is settled when a provider first needs it.
+
+### Tables and spreadsheets
+
+One claim per cell is not right in general: adjacent cells often compose into one claim (value and uncertainty, value and unit, min/nominal/max, a condition column). And a very large sheet can't simply be sampled: if one column lists requirement names, every row matters. So each table gets a **model interpretation step**:
+
+1. **Show the model enough of the table to judge:** headers, notes, and a spread of rows (first rows, some from the middle and end, and rows that look different, such as blank, merged or text-heavy ones), within the context budget.
+2. **The model returns a row-to-claims mapping:** which columns give the entity, attribute, value, unit, uncertainty, conditions and basis; which columns combine into one claim; and one or several claims per row.
+3. **And a processing strategy for the table:**
+   - **iterate:** every row is a distinct item (requirements, equipment lists), so the mapping is applied to all rows mechanically. This costs no model calls per row, even for 100k rows.
+   - **per-row extraction:** cells need interpretation (free-text descriptions), so rows go to the model individually or in small batches.
+   - **summarize:** rows are samples of one quantity (time series, logs), so statistics are computed mechanically over the columns the model identified, marked as derived.
+4. **Check the mapping mechanically** against more rows (does the value column parse as numbers? is the unit column constant?). Rows the mapping doesn't fit fall back to per-row extraction, and a high failure rate sends the table back for re-interpretation.
+5. **Record everything:** the mapping and strategy are stored with the table and appear in its derivation ("mechanical read under a model interpretation of the headers"). The coverage record states what happened ("summarized 50,000 rows; statistics over columns C–F"), so nothing is silently dismissed. Reviewers can confirm or correct a mapping as reusable QA data, and a configuration can force a strategy for a given table.
 
 ### Extension policy
 
@@ -83,13 +96,13 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 2. `.docx`.
 3. `.pptx`, including chart XML.
 4. External converter interface, with LibreOffice as the first configured converter.
-5. `.csv` / `.xlsx` with deterministic claims.
+5. `.csv` / `.xlsx` with model-guided table interpretation.
 6. Images.
 
 ## Decisions (2026-09-23)
 
-- **Deterministic spreadsheet claims are marked by provenance, not trust.** A claim read directly from cells is *more direct* than one a model extracted from prose or a chart, and its derivation says so (see *Derivation* in [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md)). Directness is not reliability. A spreadsheet still raises questions: is our interpretation of the columns right (and if a model interpreted the headers, that is itself a model step in the derivation)? Is a value a measurement, a projection, a requirement or wishful thinking? Are uncertainties given? Those are judged like any other claim (see *Epistemic status* in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md)), not assumed away.
+- **Spreadsheet claims are marked by provenance, not trust.** A claim read directly from cells is *more direct* than one a model extracted from prose or a chart, and its derivation says so (see *Derivation* in [projects-and-evidence-store](projects-and-evidence-store-2026-09-23.md)). Directness is not reliability. A spreadsheet still raises questions: is our interpretation of the columns right (and if a model interpreted the headers, that is itself a model step in the derivation)? Is a value a measurement, a projection, a requirement or wishful thinking? Are uncertainties given? Those are judged like any other claim (see *Epistemic status* in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md)), not assumed away.
 
 ## Open questions
 
-- Should very large sheets get per-table sampling or summary statistics instead of one claim per cell?
+None currently.

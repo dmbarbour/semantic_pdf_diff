@@ -135,7 +135,7 @@ report --store <dir> <comparison>
 
 ## Milestones
 
-1. Content, file, source and interpreter model; evidence schema v2 with content-relative locators; migrate `compare` and `report` off A/B.
+1. Content, file, source and interpreter model; evidence schema v2 with content-relative locators, derivation chains, and the claim `basis` and uncertainty fields from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) (*Epistemic status*), including the basis veto in comparison; migrate `compare` and `report` off A/B.
 2. Store folder and SQLite schema: WAL, single-writer lock, task queue with per-task transactions, response cache in the database, interpreter binding with rejection, selective `--reset` and `--dry-run`; resume after interruption (tested by killing a run midway).
 3. PDF section detection (outline → font-size headings → page ranges); heading path in prompts.
 4. Folder, zip and manifest sources; duplicate occurrences in provenance.
