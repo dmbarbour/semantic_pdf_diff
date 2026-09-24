@@ -165,6 +165,7 @@ report --store <dir> <comparison>
 - `solar-decathlon-2013`: four competing teams, one folder per team (drawings, project manual, jury scoresheets), plus shared rules. `--make-zips` also packs each team folder into a zip, which exercises archive reading and duplicate content (the same bytes loose and zipped).
 - `wind-reference-turbines`: three reference designs, each a folder with a PDF report and, for two of them, an `.xlsx` spreadsheet.
 - `ietf-quic-transport`: text revisions, useful for testing content-difference comparison once adapters for text exist.
+- The 3GPP sets and `archive-edge-cases`: natural zips (one file per company, some with `__MACOSX/` clutter), nested zips, and a legacy `.doc` that should be listed but skipped.
 
 ## Out of scope
 

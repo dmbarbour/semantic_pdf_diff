@@ -30,6 +30,21 @@ Only content that is truly unstructured goes to the model. Structured data shoul
 
 Candidates for later: HTML, and email exports.
 
+### Samples
+
+The public corpus (`scripts/fetch_samples.py`) covers the priority formats, all from 3GPP and kept as the original zips:
+
+- `.docx` revisions: `3gpp-ts38300-revisions` (TS 38.300 across releases, including a small-difference pair and one legacy `.doc`)
+- `.docx` competing proposals: `3gpp-ran1-beam-management` (four companies, plus moderator summaries)
+- `.pptx` competing proposals in a mixed-format set: `3gpp-rel19-aiml-views` (four `.pptx`, one `.docx`, four PDF on the same topic)
+- `.xlsx`: the two meetings' document lists, plus the wind-turbine spreadsheets
+
+### Cameo models (decided 2026-09-23)
+
+Cameo `.mdzip` models are digested by a separate project whose output is a large folder of Markdown and some CSV, including its own model-written summaries, aimed mainly at RAG ingestion elsewhere. This project consumes that folder **as an ordinary source** through the `.md` and `.csv` adapters; no converter or importer is needed.
+
+Its summaries are **secondary material**: text written by another model, not by the model's authors. Claims extracted from them should be marked as coming from derived text, with lower reliability than claims from primary content, and reports should show that distinction.
+
 ### Extension policy
 
 Adapters are chosen **only by normalized extension**, consistent with the store's content model (content = bytes + interpretation, identified by SHA-256 + extension). Known aliases collapse (`.jpeg` → `.jpg` and so on). Files with no extension, or an extension no adapter or converter handles, are listed as skipped and contribute no evidence. No content sniffing.
@@ -67,13 +82,12 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 1. Adapter interface and intermediate units; refactor the PDF path to use it. Include `.txt` / `.md` here as the simplest adapters: they are nearly free and exercise the interface (and the `ietf-quic-transport` samples).
 2. `.docx`.
 3. `.pptx`, including chart XML.
-4. External converter interface, with LibreOffice as the first configured converter. This is also the integration point for Cameo `.mdzip` models, which are being digested in a separate project: its output formats become inputs here.
+4. External converter interface, with LibreOffice as the first configured converter.
 5. `.csv` / `.xlsx` with deterministic claims.
 6. Images.
 
 ## Open questions
 
-- **Samples for `.docx` and `.pptx`:** the public corpus has none yet. Find freely available engineering reports and slide decks (ideally competing or revised versions) and add them to `scripts/samples.json` before milestone 2.
-- **Cameo integration:** what will the separate Cameo project produce (XMI, CSV, HTML, diagram images, or claims directly)? That decides whether it plugs in as an external converter or as an importer of ready-made evidence.
+- **Marking secondary material:** how should a source declare that some of its files are model-generated (e.g. the Cameo export's summaries), so claims from them carry lower reliability? Candidates: path globs in the source manifest, or a front-matter field in the Markdown itself.
 - How should a deterministic spreadsheet claim be marked (source kind, reliability) relative to model-extracted claims?
 - Should very large sheets get per-table sampling or summary statistics instead of one claim per cell?

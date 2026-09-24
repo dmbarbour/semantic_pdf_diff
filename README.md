@@ -92,11 +92,11 @@ A public test corpus of competing proposals and design revisions can be download
 
 ```bash
 python scripts/fetch_samples.py --list      # sets, sizes, sources and terms
-python scripts/fetch_samples.py             # default sets (~120 MB)
+python scripts/fetch_samples.py             # default sets (~150 MB)
 python scripts/fetch_samples.py --all --make-zips
 ```
 
-Default sets: `solar-decathlon-2013` (four competing house designs, one folder per team), `wind-reference-turbines` (three reference turbine designs with PDF reports and `.xlsx` data) and `ietf-quic-transport` (plain-text draft revisions through RFC 9000). `nasa-flagship-concepts` (~320 MB of competing mission-concept reports) is optional. Sources and terms are in `scripts/samples.json`. For example:
+Default sets: `solar-decathlon-2013` (four competing house designs, one folder per team), `wind-reference-turbines` (three reference turbine designs with PDF reports and `.xlsx` data), `ietf-quic-transport` (plain-text draft revisions through RFC 9000), `3gpp-ts38300-revisions` (zipped `.docx` revisions of a 5G specification), `3gpp-ran1-beam-management` (four companies' competing `.docx` proposals plus moderator summaries), `3gpp-rel19-aiml-views` (nine companies' competing views in `.pptx`, `.docx` and PDF) and `archive-edge-cases` (nested zips). The 3GPP files are kept as downloaded zips, since zips are meant to be read as folders. `nasa-flagship-concepts` (~320 MB of competing mission-concept reports) is optional. Sources and terms are in `scripts/samples.json`. For example:
 
 ```bash
 pdf-semantic-diff samples/wind-reference-turbines/nrel-5mw/NREL-5MW-reference-turbine.pdf \

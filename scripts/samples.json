@@ -334,6 +334,218 @@
         }
       ]
     },
+    "3gpp-ts38300-revisions": {
+      "default": true,
+      "use": "Revisions of one specification as zipped Word documents: 3GPP TS 38.300 (5G NR overall description) at v15.0.0 (a legacy .doc, useful for unsupported-format and converter tests), v17.0.0, and the adjacent v19.2.0 and v19.3.0 (a small-difference revision pair). Each zip holds one document.",
+      "terms": "Freely downloadable from 3GPP's public file server. Copyright remains with the 3GPP Organizational Partners and the contributing companies; downloaded for local testing only, not redistributed.",
+      "files": [
+        {
+          "path": "38300-f00.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/Specs/archive/38_series/38.300/38300-f00.zip"
+          ],
+          "sha256": "8af7ceee47a3fc9a470027f5903d94abcfb61ad3e959958e94fd004d366df632",
+          "bytes": 2277804
+        },
+        {
+          "path": "38300-h00.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/Specs/archive/38_series/38.300/38300-h00.zip"
+          ],
+          "sha256": "34e5a514fb9a9e519cec26b184583d43e8f4e3886d77ac3fb567282dc7b6b04b",
+          "bytes": 4673735
+        },
+        {
+          "path": "38300-j20.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/Specs/archive/38_series/38.300/38300-j20.zip"
+          ],
+          "sha256": "214311b6f5992c0144fe3963c5c107edcae3903ffda06971c068a21aa3891a7d",
+          "bytes": 7874648
+        },
+        {
+          "path": "38300-j30.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/Specs/archive/38_series/38.300/38300-j30.zip"
+          ],
+          "sha256": "db0285e91da8f26598294b0d635cbffdc45db3725fe70964c9301d5b3508cdcf",
+          "bytes": 7702454
+        }
+      ]
+    },
+    "3gpp-ran1-beam-management": {
+      "default": true,
+      "use": "Competing proposals as zipped .docx: four companies' contributions to 3GPP RAN1 meeting #116 (Feb 2024), agenda item 9.1.1, AI/ML-based beam management, one folder per company. moderator/ holds the feature lead's first and last summaries of all companies' positions (a rough reference for N-way comparison, and a revision pair). The meeting's document list is included as .xlsx. One zip contains __MACOSX clutter.",
+      "terms": "Freely downloadable from 3GPP's public file server. Copyright remains with the 3GPP Organizational Partners and the contributing companies; downloaded for local testing only, not redistributed.",
+      "files": [
+        {
+          "path": "ericsson/R1-2400171.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_116/Docs/R1-2400171.zip"
+          ],
+          "sha256": "3f7ffce69bca993ca1f32dfdde4984b090c960fe7467150000b017ee1edb5951",
+          "bytes": 227522
+        },
+        {
+          "path": "nokia/R1-2400793.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_116/Docs/R1-2400793.zip"
+          ],
+          "sha256": "9ea6cac30bba48e28465826108b87341e8a670d131a596f58f60a747ab7690ce",
+          "bytes": 297436
+        },
+        {
+          "path": "qualcomm/R1-2401431.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_116/Docs/R1-2401431.zip"
+          ],
+          "sha256": "f8cd3ff0e5b3f0639fbd3667784cbd8f22567eaa0737ae5aa7660ca299053d46",
+          "bytes": 857860
+        },
+        {
+          "path": "samsung/R1-2400720.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_116/Docs/R1-2400720.zip"
+          ],
+          "sha256": "407deec285ca4e794a3c5859d2b3f620f79383cae9c0eab225e0aa85ad414c4d",
+          "bytes": 243830
+        },
+        {
+          "path": "moderator/R1-2401596-FL-summary-0.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_116/Docs/R1-2401596.zip"
+          ],
+          "sha256": "5691d4afa8f939cd266fcc4fd3d744668b2ef720d3589698cd79c03b6a84cf39",
+          "bytes": 560385
+        },
+        {
+          "path": "moderator/R1-2401599-FL-summary-3.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_116/Docs/R1-2401599.zip"
+          ],
+          "sha256": "60ef14e4a809ce043e9f2ea3c8dfc950275d173f7a9fe5ae25025e8dafb7bdcc",
+          "bytes": 604074
+        },
+        {
+          "path": "TDoc_List_Meeting_RAN1_116.xlsx",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_116/Docs/TDoc_List_Meeting_RAN1%23116.xlsx"
+          ],
+          "sha256": "32fb5493bc316bc62e1a38e15436cbd1adf3d591341a60fffdbac69574ed1d7c",
+          "bytes": 407274
+        }
+      ]
+    },
+    "3gpp-rel19-aiml-views": {
+      "default": true,
+      "use": "Competing proposals in mixed formats: nine companies' views on AI/ML for the NR air interface, presented at the 3GPP RAN Release 19 workshop (June 2023), one zipped file per company folder. lg, oppo, huawei and lenovo are .pptx; ericsson is .docx; nokia, qualcomm, samsung and intel are .pdf. The workshop's document list is included as .xlsx.",
+      "terms": "Freely downloadable from 3GPP's public file server. Copyright remains with the 3GPP Organizational Partners and the contributing companies; downloaded for local testing only, not redistributed.",
+      "files": [
+        {
+          "path": "lg/RWS-230194.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230194.zip"
+          ],
+          "sha256": "c8bb10dfe49bdc7e3b781a9641ce098e01d8411ef4c870433aca21e41ead9282",
+          "bytes": 112717
+        },
+        {
+          "path": "oppo/RWS-230311.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230311.zip"
+          ],
+          "sha256": "32dbaa626bb4ec54850294fe734c74adf2c17f853b7e1aa01973cf223f36f804",
+          "bytes": 302016
+        },
+        {
+          "path": "huawei/RWS-230323.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230323.zip"
+          ],
+          "sha256": "1ad531e92409c40eb02aa18c4d7536bdd7db48b16ff5e7f1b0c343db83be53df",
+          "bytes": 639877
+        },
+        {
+          "path": "lenovo/RWS-230395.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230395.zip"
+          ],
+          "sha256": "456ce59abc0e3e73d28aba1a260a077108acc7ec221982d61963d611c4a7f607",
+          "bytes": 161937
+        },
+        {
+          "path": "ericsson/RWS-230150.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230150.zip"
+          ],
+          "sha256": "cc185eac3406100f908c85b75629efcc7684267ae6c13fc87ae3e1be5d0ec77f",
+          "bytes": 69711
+        },
+        {
+          "path": "nokia/RWS-230038.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230038.zip"
+          ],
+          "sha256": "d7bcc901823aef36c14138f1b96a3c4cf219f4e1669019cfd57ca293758eea10",
+          "bytes": 227071
+        },
+        {
+          "path": "qualcomm/RWS-230171.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230171.zip"
+          ],
+          "sha256": "8f30fcbd5dd6481b549eb18465dcf9b5615e891fbb39792469766b03eefe52ab",
+          "bytes": 80050
+        },
+        {
+          "path": "samsung/RWS-230210.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230210.zip"
+          ],
+          "sha256": "fd28e1b02be50f758fe509f9d508f7167e8f71669f232a1c229260d6eb3eb972",
+          "bytes": 345214
+        },
+        {
+          "path": "intel/RWS-230454.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230454.zip"
+          ],
+          "sha256": "a3c08eb9aea0f191447b472a13ef852489a2df01950eee66372b70fbcb29cc8f",
+          "bytes": 292519
+        },
+        {
+          "path": "TDoc_List_Meeting_RAN_Rel19_workshop.xlsx",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/TDoc_List_Meeting_RAN-Release%2019%20workshop.xlsx"
+          ],
+          "sha256": "a273b52ecdc2cc0a501a82eedbdd04e37783d730a3175aa19513d3ebdf2750d0",
+          "bytes": 115370
+        }
+      ]
+    },
+    "archive-edge-cases": {
+      "default": true,
+      "use": "Natural nested archives: two liaison statements from the 3GPP Release 19 workshop, each a zip containing a document plus another zip (one with a legacy .doc).",
+      "terms": "Freely downloadable from 3GPP's public file server. Copyright remains with the 3GPP Organizational Partners and the contributing companies; downloaded for local testing only, not redistributed.",
+      "files": [
+        {
+          "path": "RWS-230489.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230489.zip"
+          ],
+          "sha256": "f989009c7ed4c12bb73be365d6849a311f49f5c000cd7434fa117e3dc6697580",
+          "bytes": 678627
+        },
+        {
+          "path": "RWS-230490.zip",
+          "urls": [
+            "https://www.3gpp.org/ftp/tsg_ran/TSG_RAN/TSGR_AHs/2023_06_RAN_Rel19_WS/Docs/RWS-230490.zip"
+          ],
+          "sha256": "d5e15a332da31f365ece6568bfd5e00dac4b78a5ac07102149abd7c982de83f0",
+          "bytes": 485200
+        }
+      ]
+    },
     "nasa-flagship-concepts": {
       "default": false,
       "use": "Large (~320 MB). Competing flagship mission concepts for the 2020 Astrophysics Decadal Survey, each with an interim and a final report (revisions), plus the independent assessment that compares them. Very long PDFs with dense tables, charts and diagrams.",
