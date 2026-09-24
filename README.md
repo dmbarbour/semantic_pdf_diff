@@ -86,6 +86,23 @@ python examples/demo.py
 
 Tests use a local HTTP stub, temporary PDFs and controlled evidence. They exercise cross-format and many-to-one retrieval, case-sensitive unit conversion, uncertainty gates, UTF-8 chunking, text grouping and refinement, table column splitting, tile spacing and coverage, rotated pages, visual quote checks, malformed/truncated/null API output, `Retry-After`, claim salvage, caching, budgets, quote validation and HTML escaping. They do not establish real-model extraction accuracy. `examples/demo-output/report.html` is an explicitly hand-authored fixture report; it makes no API calls.
 
+## Sample documents
+
+A public test corpus of competing proposals and design revisions can be downloaded into the git-ignored `samples/` folder. Every file is checked against a pinned SHA-256 hash, and TLS is always verified:
+
+```bash
+python scripts/fetch_samples.py --list      # sets, sizes, sources and terms
+python scripts/fetch_samples.py             # default sets (~120 MB)
+python scripts/fetch_samples.py --all --make-zips
+```
+
+Default sets: `solar-decathlon-2013` (four competing house designs, one folder per team), `wind-reference-turbines` (three reference turbine designs with PDF reports and `.xlsx` data) and `ietf-quic-transport` (plain-text draft revisions through RFC 9000). `nasa-flagship-concepts` (~320 MB of competing mission-concept reports) is optional. Sources and terms are in `scripts/samples.json`. For example:
+
+```bash
+pdf-semantic-diff samples/wind-reference-turbines/nrel-5mw/NREL-5MW-reference-turbine.pdf \
+  samples/wind-reference-turbines/iea-15mw/IEA-15MW-reference-turbine.pdf --plan
+```
+
 ## Limits and engineering review
 
 - This is a runnable baseline, not a validated engineering sign-off system. No real VLM was available during development; evaluate against labeled representative PDFs before relying on findings.

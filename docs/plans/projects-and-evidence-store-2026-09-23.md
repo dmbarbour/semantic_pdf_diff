@@ -56,6 +56,14 @@ report <result>
 - **Duplicate and superseded files:** detect identical hashes, and flag near-duplicates such as `report_v2_final_FINAL.pdf`, instead of double-counting claims.
 - **Heading-path context:** send the section heading path with each text group, so the model can tell which component a sentence is about. This helps PDFs and folders alike.
 - **Provenance in reports:** show `project / relative/path.pdf / section / p.12`.
+- **Zip archives as folders:** a `.zip`, whether given as the project or found inside one, is read as a folder without extracting it to disk. Provenance uses `archive.zip!/inner/path.pdf`, and the source hash is the member's content hash, so the same file inside or outside an archive gets the same evidence. Treat archives as hostile:
+  - reject absolute paths and `..` members (zip-slip)
+  - cap total uncompressed size, member count and compression ratio (zip bombs)
+  - limit how deeply nested archives are opened (depth 1 or 2)
+  - record encrypted members as `skipped` in the coverage record rather than failing
+  - ignore OS clutter (`__MACOSX/`, `.DS_Store`, `Thumbs.db`)
+  
+  Other archive formats (`.tar.gz`, `.7z`) can follow the same interface later if needed.
 - **Names across files** ("P-101" in an equipment list vs "primary pump" in the narrative) get more common in folders. That is handled by alias consolidation in [retrieval-recall](retrieval-recall-2026-09-23.md), not here.
 
 ## Milestones
@@ -63,14 +71,21 @@ report <result>
 1. Evidence schema v2 and locator types; migrate `compare` and `report` to use `project`/`source` instead of A/B.
 2. Store layout plus manifest; incremental extraction keyed on source hash and settings.
 3. PDF section detection (outline → font-size headings → page ranges); heading path in prompts.
-4. Folder and manifest projects; duplicate-file detection.
+4. Folder, zip and manifest projects; duplicate-file detection.
 5. Staged CLI with the current two-file command kept working; tests and docs.
 
 ## Open questions
 
-- **What structure do real documents have?** Before choosing section heuristics, look at a few representative PDFs: do they have outlines, consistent heading fonts, or neither?
+- **What structure do real documents have?** Real project documents are sensitive and won't be shared; the tool will run inside a multi-layer sandbox. Section heuristics are developed against the public corpus from `scripts/fetch_samples.py` (see [Samples](#samples)), and must fall back gracefully when there's no outline or consistent heading font.
 - Store format: JSONL files are simple and diffable; SQLite would make queries easier later. Start with JSONL unless queries force the issue.
 - How should manifests express file order or revision metadata, if at all?
+
+## Samples
+
+`python scripts/fetch_samples.py` downloads a public test corpus into the git-ignored `samples/` folder and verifies pinned SHA-256 hashes (sources and terms are in `scripts/samples.json`). Relevant sets:
+
+- `solar-decathlon-2013`: four competing teams, one folder per team (drawings, project manual, jury scoresheets), plus shared rules. `--make-zips` also packs each team folder into a zip for archive testing.
+- `wind-reference-turbines`: three reference designs, each a folder with a PDF report and, for two of them, an `.xlsx` spreadsheet.
 
 ## Out of scope
 

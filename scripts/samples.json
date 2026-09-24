@@ -1,0 +1,389 @@
+{
+  "version": 1,
+  "note": "Paths are relative to <dest>/<set>/. Hashes are SHA-256 of the exact bytes; a download whose hash differs is rejected.",
+  "sets": {
+    "solar-decathlon-2013": {
+      "default": true,
+      "use": "Competing proposals as folders. Four U.S. DOE Solar Decathlon 2013 teams designed houses to the same rules (rules/). Each teams/<code>/ folder is one project: construction drawings (_cd), project manual (_manual) and four one-page jury scoresheets (jury/). Teams: dc = Team Capitol DC, ken = Kentucky/Indiana, scical = SCI-Arc/Caltech, calg = Team Alberta.",
+      "terms": "U.S. Department of Energy public website content. Fetched from the Internet Archive first because solardecathlon.gov currently fails TLS certificate verification; the original URL is kept as a fallback. Hashes make either source safe.",
+      "zip_projects": [
+        "teams/dc",
+        "teams/ken",
+        "teams/scical",
+        "teams/calg"
+      ],
+      "files": [
+        {
+          "path": "rules/2013_rules.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241207044327id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/2013_rules.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/2013_rules.pdf"
+          ],
+          "sha256": "4a32f37a7bbe68bfaf41c82fc56cc0bfe69ca2dc1b5141561e2b65cefe393819",
+          "bytes": 1242322
+        },
+        {
+          "path": "teams/dc/dc_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241024194653id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/dc_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/dc_cd.pdf"
+          ],
+          "sha256": "996c2df2e2363c7e99be5685ff6eb7c53c3b12a33f68616b96478aacf266f44d",
+          "bytes": 13224886
+        },
+        {
+          "path": "teams/dc/dc_manual.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241214041631id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/dc_manual.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/dc_manual.pdf"
+          ],
+          "sha256": "1ebfe80aaac11c5fd24ff41201f92845e3c3a504a8efd9e87816ba926d97ccc5",
+          "bytes": 9017401
+        },
+        {
+          "path": "teams/dc/jury/arch_dc.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241215044251id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/arch_dc.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/arch_dc.pdf"
+          ],
+          "sha256": "90f248c46a223becb37983c28d151a7e25bb7debb02886bbf7e4fd6956029c2f",
+          "bytes": 225996
+        },
+        {
+          "path": "teams/dc/jury/eng_dc.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241216111332id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/eng_dc.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/eng_dc.pdf"
+          ],
+          "sha256": "b1df7418d566bf25dc0fa5cd2608ae4568afd19f15c1f321be7a4cfa355bf7a4",
+          "bytes": 235714
+        },
+        {
+          "path": "teams/dc/jury/comm_dc.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241208172330id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/comm_dc.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/comm_dc.pdf"
+          ],
+          "sha256": "a29cbe1a44a0dc969e881cfb5627df06920e8b885bd8afe88784e7dd58fe5535",
+          "bytes": 246244
+        },
+        {
+          "path": "teams/dc/jury/market_dc.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241024204954id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/market_dc.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/market_dc.pdf"
+          ],
+          "sha256": "914bf51b3f90da7e6df1b12199ec22e1b28e6b55854f5265c15d677b2a8d1f6b",
+          "bytes": 234178
+        },
+        {
+          "path": "teams/ken/ken_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241026160759id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/ken_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/ken_cd.pdf"
+          ],
+          "sha256": "8f091a997b469588a5de671c56d63723f0456ccc91f44785571cea8ff41c0118",
+          "bytes": 14605341
+        },
+        {
+          "path": "teams/ken/ken_manual.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241025123725id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/ken_manual.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/ken_manual.pdf"
+          ],
+          "sha256": "d90126a6e0d575d8b3af0b4d969f70543ec40ed3fe9ee74fde41be210e59ae15",
+          "bytes": 5991926
+        },
+        {
+          "path": "teams/ken/jury/arch_ken.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241024181415id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/arch_ken.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/arch_ken.pdf"
+          ],
+          "sha256": "126cad9aca8b7449bff8d7587846b26c9e8ce242a0d4192fa47ace9cc02f4c3d",
+          "bytes": 225911
+        },
+        {
+          "path": "teams/ken/jury/eng_ken.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241025010627id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/eng_ken.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/eng_ken.pdf"
+          ],
+          "sha256": "4b9e25852cd2b2f175496ffbe9940f9f9ddc211ae06867ca482d3d5a17730e7f",
+          "bytes": 235645
+        },
+        {
+          "path": "teams/ken/jury/comm_ken.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241024042133id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/comm_ken.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/comm_ken.pdf"
+          ],
+          "sha256": "ec42a1238997f20bce26e5daa46f943248fcbe8be4cfb2033e06c58fc7861e14",
+          "bytes": 246326
+        },
+        {
+          "path": "teams/ken/jury/market_ken.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241024185125id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/market_ken.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/market_ken.pdf"
+          ],
+          "sha256": "5a66ce39354b158de563ca8ed4bccdc19c581ace9bb8c6639cfb913f9b2a4a0c",
+          "bytes": 234150
+        },
+        {
+          "path": "teams/scical/scical_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241214041628id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/scical_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/scical_cd.pdf"
+          ],
+          "sha256": "0ee73ff5d68fe33cf5960b68b20862a01ed39b128529b2a0684bf73667f33d94",
+          "bytes": 15892565
+        },
+        {
+          "path": "teams/scical/scical_manual.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241207174536id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/scical_manual.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/scical_manual.pdf"
+          ],
+          "sha256": "20597b1f8dc67acda47d92426320aafe7cfcd2445dfcba8beb51187766103cee",
+          "bytes": 7307835
+        },
+        {
+          "path": "teams/scical/jury/arch_scical.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241213082824id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/arch_scical.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/arch_scical.pdf"
+          ],
+          "sha256": "2a80443c9cdeb5d6750cea9f11bad4d431b63c7eeea25567681046ecf07d211d",
+          "bytes": 226020
+        },
+        {
+          "path": "teams/scical/jury/eng_scical.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241210101633id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/eng_scical.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/eng_scical.pdf"
+          ],
+          "sha256": "c67335966dcb68a379ec47f99701913e4fddb08b258be19a981ad9dd0767a8a8",
+          "bytes": 235743
+        },
+        {
+          "path": "teams/scical/jury/comm_scical.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241213082857id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/comm_scical.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/comm_scical.pdf"
+          ],
+          "sha256": "eabea202db0c7de07f95cbf2c6d8bb782db223b53029db8a669f45e10906ccbb",
+          "bytes": 246637
+        },
+        {
+          "path": "teams/scical/jury/market_scical.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241210101626id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/market_scical.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/market_scical.pdf"
+          ],
+          "sha256": "b73f03661c9a2fed7a8f8c0b7987a68128edce7b850c563766ec5783c200c747",
+          "bytes": 234139
+        },
+        {
+          "path": "teams/calg/calg_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241207044319id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/calg_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/calg_cd.pdf"
+          ],
+          "sha256": "747ca1bcb8dc7eaeb52c126228ddb88b2e79968807f290203b902801cdd0df86",
+          "bytes": 13705957
+        },
+        {
+          "path": "teams/calg/calg_manual.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241212204543id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/calg_manual.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/calg_manual.pdf"
+          ],
+          "sha256": "9ff32534c14ef55462073ee6853033b14ccaaeeea035f7cec943b42b16c623b7",
+          "bytes": 12339678
+        },
+        {
+          "path": "teams/calg/jury/arch_calg.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241207174505id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/arch_calg.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/arch_calg.pdf"
+          ],
+          "sha256": "c4a5da3d119162795797152ea1a4a6ef7834cf69c18788ebe49f227bcf504479",
+          "bytes": 225896
+        },
+        {
+          "path": "teams/calg/jury/eng_calg.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241207230819id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/eng_calg.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/eng_calg.pdf"
+          ],
+          "sha256": "40c8aa6ff2310486ba4796db991ac14b094a5d8b7634aa2380283ce8d0c8d373",
+          "bytes": 235908
+        },
+        {
+          "path": "teams/calg/jury/comm_calg.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241207223558id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/comm_calg.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/comm_calg.pdf"
+          ],
+          "sha256": "59fad38d8d88c1a2b7118600884f010c84c6cfe419bd001922e5899f386856e1",
+          "bytes": 246043
+        },
+        {
+          "path": "teams/calg/jury/market_calg.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241211195648id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/market_calg.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/market_calg.pdf"
+          ],
+          "sha256": "77be41c01c28dcd68d4a81bbca10ec4146fe3beda7a20c521f415fedde2362b5",
+          "bytes": 234073
+        }
+      ]
+    },
+    "wind-reference-turbines": {
+      "default": true,
+      "use": "Similar designs from different teams and eras (N-way comparison), plus spreadsheet revisions. Reference offshore turbine definitions: NREL 5 MW (2009), IEA 15 MW (2020), IEA 22 MW (2024). The IEA designs include tabular .xlsx data; iea-15mw-v1.0/ holds the earliest tagged spreadsheet for revision comparison against iea-15mw/.",
+      "terms": "Reports are U.S. government-funded technical reports distributed by OSTI.gov. Spreadsheets come from the IEAWindSystems GitHub repositories (Apache-2.0).",
+      "files": [
+        {
+          "path": "nrel-5mw/NREL-5MW-reference-turbine.pdf",
+          "urls": [
+            "https://www.osti.gov/servlets/purl/947422"
+          ],
+          "sha256": "b4ce1e088368857cb75460af0729411cc64c8a68efe0df4fb0c1324e96a21ff2",
+          "bytes": 952922
+        },
+        {
+          "path": "iea-15mw/IEA-15MW-reference-turbine.pdf",
+          "urls": [
+            "https://www.osti.gov/servlets/purl/1603478"
+          ],
+          "sha256": "93762e252922b1e75df59a453d2c08ef3f556367adf57229bc1800a4b1b11dbd",
+          "bytes": 6290463
+        },
+        {
+          "path": "iea-15mw/IEA-15-240-RWT_tabular.xlsx",
+          "urls": [
+            "https://raw.githubusercontent.com/IEAWindSystems/IEA-15-240-RWT/v1.1.18/Documentation/IEA-15-240-RWT_tabular.xlsx"
+          ],
+          "sha256": "9ed6ee219a97c443d0b900498e3ef4fefa12d855d9a7c9e4c5b9bc0702b9078a",
+          "bytes": 158491
+        },
+        {
+          "path": "iea-15mw-v1.0/IEA-15-240-RWT_tabular.xlsx",
+          "urls": [
+            "https://raw.githubusercontent.com/IEAWindSystems/IEA-15-240-RWT/v1.0/Documentation/IEA-15-240-RWT_tabular.xlsx"
+          ],
+          "sha256": "419c72a7a7993adcebf7541bee4a9d369efdac73ec0e464a5c8d6a1bc4de91d0",
+          "bytes": 150200
+        },
+        {
+          "path": "iea-22mw/IEA-22MW-reference-turbine.pdf",
+          "urls": [
+            "https://www.osti.gov/servlets/purl/2337779"
+          ],
+          "sha256": "92d95f3ed67c04a5e5dc21d21b0fc9a90391b9bbafdc26a6907284abb5ec7b8f",
+          "bytes": 11728689
+        },
+        {
+          "path": "iea-22mw/IEA-22-280-RWT_tabular.xlsx",
+          "urls": [
+            "https://raw.githubusercontent.com/IEAWindSystems/IEA-22-280-RWT/v1.1.0/Documentation/IEA-22-280-RWT_tabular.xlsx"
+          ],
+          "sha256": "8cf9a552a955982b210e8bc77702adc85c8ee0f1d1e10b5f717b3d29e95b4f84",
+          "bytes": 663185
+        }
+      ]
+    },
+    "ietf-quic-transport": {
+      "default": true,
+      "use": "Revisions of one design, as plain text. QUIC transport protocol Internet-Drafts -00 (2016), -20 (2019) and -34 (2021), and the published RFC 9000.",
+      "terms": "IETF documents, subject to the IETF Trust Legal Provisions (BCP 78/79).",
+      "files": [
+        {
+          "path": "draft-ietf-quic-transport-00.txt",
+          "urls": [
+            "https://www.ietf.org/archive/id/draft-ietf-quic-transport-00.txt"
+          ],
+          "sha256": "8470107145f6eb22b1402a11d7aa8dd0a489129742fa83fb37f8144a9b8a125f",
+          "bytes": 104247
+        },
+        {
+          "path": "draft-ietf-quic-transport-20.txt",
+          "urls": [
+            "https://www.ietf.org/archive/id/draft-ietf-quic-transport-20.txt"
+          ],
+          "sha256": "1b1ef1093dc1b922137596ece75c5f44483e5b95ab3009c0b2ac122c9cd7fec6",
+          "bytes": 340233
+        },
+        {
+          "path": "draft-ietf-quic-transport-34.txt",
+          "urls": [
+            "https://www.ietf.org/archive/id/draft-ietf-quic-transport-34.txt"
+          ],
+          "sha256": "d7f4b742ef216af3b4ce3bc5af2fe58d04e0ff1fea2d13145462701b959dda55",
+          "bytes": 476100
+        },
+        {
+          "path": "rfc9000.txt",
+          "urls": [
+            "https://www.rfc-editor.org/rfc/rfc9000.txt"
+          ],
+          "sha256": "f88aae47f8b18e102024916e975e919201d8dde689cba79b01079eaedd402e22",
+          "bytes": 403442
+        }
+      ]
+    },
+    "nasa-flagship-concepts": {
+      "default": false,
+      "use": "Large (~320 MB). Competing flagship mission concepts for the 2020 Astrophysics Decadal Survey, each with an interim and a final report (revisions), plus the independent assessment that compares them. Very long PDFs with dense tables, charts and diagrams.",
+      "terms": "arXiv-hosted reports (see each arXiv record for its license; e-prints v1 pinned) and a NASA public report.",
+      "files": [
+        {
+          "path": "habex/HabEx-interim-report.pdf",
+          "urls": [
+            "https://arxiv.org/pdf/1809.09674v1",
+            "https://export.arxiv.org/pdf/1809.09674v1"
+          ],
+          "sha256": "1cb9783c9ad2195b422a2974ad490677108a57d459e2adbe75d2705b81e5a9c7",
+          "bytes": 18952246
+        },
+        {
+          "path": "habex/HabEx-final-report.pdf",
+          "urls": [
+            "https://arxiv.org/pdf/2001.06683v1",
+            "https://export.arxiv.org/pdf/2001.06683v1"
+          ],
+          "sha256": "734ec2aea15b7e12766009a93aac6001d4f7f3e294cb625341cd51e8e56e2e52",
+          "bytes": 84204556
+        },
+        {
+          "path": "luvoir/LUVOIR-interim-report.pdf",
+          "urls": [
+            "https://arxiv.org/pdf/1809.09668v1",
+            "https://export.arxiv.org/pdf/1809.09668v1"
+          ],
+          "sha256": "3eefe61ab76edae6d8be00f5e6212f2a566c7519a5786ab17ba0b1b62073c1ac",
+          "bytes": 90926574
+        },
+        {
+          "path": "luvoir/LUVOIR-final-report.pdf",
+          "urls": [
+            "https://arxiv.org/pdf/1912.06219v1",
+            "https://export.arxiv.org/pdf/1912.06219v1"
+          ],
+          "sha256": "c7e072c4a2b896ddaa4ddea2453e7cc3db5f97b3d98478fc88cb1a2c377e0ff6",
+          "bytes": 125009999
+        },
+        {
+          "path": "independent-assessment/LCIT-final-report-2019.pdf",
+          "urls": [
+            "https://science.nasa.gov/wp-content/uploads/2023/04/LCIT_FinalRpt-2019-Nov8.pdf"
+          ],
+          "sha256": "dce332162573f1c47a57d9c802160e77d280545de4bd2ac58b293e1ba58c72ff",
+          "bytes": 1850465
+        }
+      ]
+    }
+  }
+}
