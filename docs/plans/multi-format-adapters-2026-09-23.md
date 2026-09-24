@@ -37,7 +37,8 @@ The public corpus (`scripts/fetch_samples.py`) covers the priority formats, all 
 - `.docx` revisions: `3gpp-ts38300-revisions` (TS 38.300 across releases, including a small-difference pair and one legacy `.doc`)
 - `.docx` competing proposals: `3gpp-ran1-beam-management` (four companies, plus moderator summaries)
 - `.pptx` competing proposals in a mixed-format set: `3gpp-rel19-aiml-views` (four `.pptx`, one `.docx`, four PDF on the same topic)
-- `.xlsx`: the two meetings' document lists, plus the wind-turbine spreadsheets
+- `.xlsx`: the two meetings' document lists, plus the wind-turbine spreadsheets. These are all tidy single tables.
+- **Messy spreadsheets:** `scripts/make_synthetic_samples.py` generates `samples/synthetic/messy-workbook.xlsx` and `messy-export.csv`, each with an `.expected.json` answer key (true table regions, header rows, composite columns, expected strategy, hidden sheet, the ambiguous layout that should be skipped). The table detection and interpretation work should be tested against these keys.
 
 ### Cameo models (decided 2026-09-23)
 

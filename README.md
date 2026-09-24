@@ -84,7 +84,7 @@ python -m unittest discover -s tests -v
 python examples/demo.py
 ```
 
-Tests use a local HTTP stub, temporary PDFs and controlled evidence. They exercise cross-format and many-to-one retrieval, case-sensitive unit conversion, uncertainty gates, UTF-8 chunking, text grouping and refinement, table column splitting, tile spacing and coverage, rotated pages, visual quote checks, malformed/truncated/null API output, `Retry-After`, claim salvage, caching, budgets, quote validation and HTML escaping. They do not establish real-model extraction accuracy. `examples/demo-output/report.html` is an explicitly hand-authored fixture report; it makes no API calls.
+Tests use a local HTTP stub, temporary PDFs and controlled evidence. They exercise cross-format and many-to-one retrieval, case-sensitive unit conversion, uncertainty gates, UTF-8 chunking, text grouping and refinement, table column splitting, tile spacing and coverage, rotated pages, visual quote checks, malformed/truncated/null API output, `Retry-After`, claim salvage, caching, budgets, quote validation and HTML escaping. Synthetic spreadsheet tests check that the generated messy samples match their answer keys; they need the `dev` extra (`pip install -e '.[dev]'`) and are skipped otherwise. None of this establishes real-model extraction accuracy. `examples/demo-output/report.html` is an explicitly hand-authored fixture report; it makes no API calls.
 
 ## Sample documents
 
@@ -97,6 +97,13 @@ python scripts/fetch_samples.py --all --make-zips
 ```
 
 Default sets: `solar-decathlon-2013` (four competing house designs, one folder per team), `wind-reference-turbines` (three reference turbine designs with PDF reports and `.xlsx` data), `ietf-quic-transport` (plain-text draft revisions through RFC 9000), `3gpp-ts38300-revisions` (zipped `.docx` revisions of a 5G specification), `3gpp-ran1-beam-management` (four companies' competing `.docx` proposals plus moderator summaries), `3gpp-rel19-aiml-views` (nine companies' competing views in `.pptx`, `.docx` and PDF) and `archive-edge-cases` (nested zips). The 3GPP files are kept as downloaded zips, since zips are meant to be read as folders. `nasa-flagship-concepts` (~320 MB of competing mission-concept reports) is optional. Sources and terms are in `scripts/samples.json`. For example:
+
+Deliberately messy synthetic spreadsheets (several tables on one sheet, multi-row headers, value/uncertainty pairs, a formula without a cached value, a hidden superseded sheet, a long list that must not be sampled), each with an answer key describing its true layout:
+
+```bash
+pip install -e '.[dev]'
+python scripts/make_synthetic_samples.py    # writes samples/synthetic/
+```
 
 ```bash
 pdf-semantic-diff samples/wind-reference-turbines/nrel-5mw/NREL-5MW-reference-turbine.pdf \

@@ -1,6 +1,6 @@
 # Validation
 
-Thirty-eight automated tests passed on Python 3.12 with PyMuPDF 1.28.2 and Pydantic 2.13.5, and on Python 3.10 with the minimum supported PyMuPDF 1.24.3 and Pydantic 2.7.0.
+Forty-two automated tests passed on Python 3.12 with PyMuPDF 1.28.2, Pydantic 2.13.5 and openpyxl 3.1.5. The thirty-eight core tests also passed on Python 3.10 with the minimum supported PyMuPDF 1.24.3 and Pydantic 2.7.0; the four synthetic-spreadsheet tests need the `dev` extra and are skipped without it.
 
 The end-to-end test creates temporary PDFs, sends native text and rendered images to a local HTTP stub, generates HTML/JSON, and reruns with zero additional HTTP calls because of caching. Other tests cover retrieval across modalities, many-to-one candidates, unit conversions, uncertainty gates, byte budgets, malformed/truncated responses, call limits, visual refinement, quote rejection and escaped report content.
 
