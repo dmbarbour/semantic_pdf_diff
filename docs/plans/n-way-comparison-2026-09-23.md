@@ -68,6 +68,10 @@ Only if one criterion's positions exceed the context budget are they split into 
 
 A **criteria × sources matrix.** Cells show the position, its evidence, its derivation and its applicability. Filters cover disagreement, "not applicable" and "no evidence found". The report ranks no one.
 
+## Follow-up
+
+**Approach-level comparison** (tentative, plan not yet written; see the [index](README.md)): summarize each source's approach, group sources that share one, and compare within groups on what only that approach makes comparable, recursively for subsystems. Criteria keep comparing across groups.
+
 ## Revisions
 
 Revisions of one design are commensurable by default. They use claim-level comparison (today's pairwise approach), starting from the content difference: shared, removed and added content. Deltas run between consecutive versions of an ordered series. Criteria remain available when a user wants revisions viewed through them.

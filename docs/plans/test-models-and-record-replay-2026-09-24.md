@@ -75,7 +75,7 @@ Recording in the owner's environment should be one command, not a project setup:
 
 ## Milestones
 
-1. Semantic request keys and the replay client modes, with unit tests against hand-made fixtures.
+1. Replay client modes, with unit tests against hand-made fixtures. Semantic request keys arrive earlier, with the store's response cache (store milestone 2), so a fixture is a copy of a store's cache table.
 2. Fixture database, zip packing, `fixtures summary`, and seeding a store from a fixture.
 3. Collection rounds on a curated slice of the sample corpus: export work lists, import answers.
 4. First tables: Claude on a small slice; the weak local VLM (Ollama, CPU) on the same slice.
