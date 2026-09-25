@@ -1,0 +1,328 @@
+{
+  "format": "semantic-pdf-diff-labels",
+  "version": 1,
+  "batch": "s02",
+  "reviewer": "ByteDance/Seed-2.0-pro",
+  "created": "2026-09-25",
+  "labels": [
+    {
+      "item": "c-c8cd13bd430a",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The highlighted table row in the source document lists Young's modulus for steel as 2.00E11 Pa. All extracted fields for this claim match the source table content exactly, and the section attribution matches the page context."
+    },
+    {
+      "item": "c-dfe716aae8ec",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The highlighted source text exactly matches the extracted claim. The reduced points scoring threshold is explicitly defined as 100 < % of original weight < 110, and all extracted details align faithfully with the source content."
+    },
+    {
+      "item": "c-fe7a5442c4a5",
+      "verdict": "flawed",
+      "flags": [
+        "entity_misbound",
+        "attribute_misassigned",
+        "condition_dropped"
+      ],
+      "fields": {
+        "entity": "wrong",
+        "attribute": "wrong",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "wrong",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source text in the Tower and Monopile Properties section contains the phrase \"allowing for 30 m of ground (water surface) clearance\" for the turbine hub height. The extracted numeric value, unit, verbatim quote, and section are correctly pulled from the source, but the entity and attribute are misidentified, and the clearance context is omitted."
+    },
+    {
+      "item": "p-e89efa69ad7c",
+      "verdict": "wrong",
+      "flags": [
+        "pairing_irrelevant",
+        "should_be_unrelated"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "ok",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Claim A is correctly extracted as 2x4 framing for the deck footing plan, and Claim B is correctly extracted as 2x4 cedar material from the exterior elevation. These refer to entirely different building components (deck footing framing vs exterior handrails) from separate document sets, so they are not the same subject, the pairing is invalid, and the judged complementary relation is incorrect."
+    },
+    {
+      "item": "a-34e398ca6949",
+      "verdict": "good",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "role": "ok",
+        "keywords": "ok",
+        "type": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source figure and surrounding document text confirm this is a Bode plot for the recursive single-pole generator speed low-pass filter frequency response, with magnitude (dB) and phase axes as described. The provided about, role, and keyword entries are accurate, do not include specific values, and properly describe the figure's content and purpose."
+    },
+    {
+      "item": "c-5a7bfafff22f",
+      "verdict": "wrong",
+      "flags": [
+        "attribute_misassigned",
+        "value_fabricated",
+        "quote_not_verbatim"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "wrong",
+        "value": "wrong",
+        "unit": "wrong",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "wrong",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source diagram correctly labels the entity as Roof Beam @ Grid 2,3,4,5 with the T.O. STEEL notation, but no length value of 21'-1 1/8\" is shown for this beam. Additionally, T.O. STEEL refers to top of steel elevation, not a length property, so the attribute is misassigned, and the quoted text incorrectly adds the dimension value which does not appear in the source label."
+    },
+    {
+      "item": "c-a509b4155456",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source page contains Figure 2-6, which is the cross section diagram for the IEA 15MW Offshore Reference Turbine Blade at section 0.7. The diagram legend explicitly lists Carbon UD as one of the material layers for this blade section. All extracted fields correctly match the content present in the source diagram."
+    },
+    {
+      "item": "c-c1fd0851eb49",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source contains Figure 9, the Cooking Subcontest scoring function chart, which confirms maximum (full) points per cooking task are awarded when vaporized water weight is ≥ 80 oz. All details in the extracted claim match the provided document section, chart axes, and stated conditions."
+    },
+    {
+      "item": "c-8694cec2d391",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source includes the axial stiffness chart for the blade, where at nondimensional span r/R=0.1 the plotted value is approximately 4e10 N. All extracted fields match the chart content, and approximate is correctly marked true for this chart reading."
+    },
+    {
+      "item": "p-1bd7249295e6",
+      "verdict": "wrong",
+      "flags": [
+        "pairing_irrelevant",
+        "should_be_unrelated"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "ok",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Claim A is correctly extracted as 25.0 m/s wind speed for the NREL 5MW Baseline Blade-Pitch Controller, and Claim B is correctly extracted as the 10.59-25 m/s rated power wind speed range for the IEA 15MW turbine controller. These are controllers for entirely different turbine models, so they are not the same subject, and the judged complementary relation is incorrect."
+    },
+    {
+      "item": "c-d97d647136b3",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source document section 8-5 Dishwasher, point d, contains the exact verbatim text quoted in the extracted claim. All details of the claim correctly match the stated rule text from the source."
+    },
+    {
+      "item": "c-54fc79853650",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source drawing shows the \"SECTION - EAST MODULE\" label with the scale value 3/8\" = 1'-0\" directly beneath it, inside the outlined region. All extracted values match the source exactly, and the provided quote is verbatim correct text from the drawing."
+    },
+    {
+      "item": "a-e31ab301077b",
+      "verdict": "acceptable",
+      "flags": [
+        "role_wrong"
+      ],
+      "fields": {
+        "about": "ok",
+        "role": "wrong",
+        "keywords": "ok",
+        "type": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source figure is confirmed as the Clothes Dryer Subcontest scoring function, which depicts the relationship between percentage of original weight and points earned per drying task. The provided about description correctly states what the figure covers without including specific values. The role field is empty, keywords capture the main topics, and this is a figure so the section-only type field is not applicable here."
+    },
+    {
+      "item": "c-19dabb059b33",
+      "verdict": "flawed",
+      "flags": [
+        "kind_wrong",
+        "region_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source is architectural drawing sheet A-202 Exterior Elevations, which explicitly includes the text \"CEMENT FIBRE BOARD SIDING\" for the exterior elevations. The core claim about the siding material is correct, but the extractor incorrectly classified this source as a table and marked the region as a table when this is an engineering drawing."
+    },
+    {
+      "item": "a-28c83b4d7451",
+      "verdict": "acceptable",
+      "flags": [
+        "role_wrong"
+      ],
+      "fields": {
+        "about": "ok",
+        "role": "wrong",
+        "keywords": "ok",
+        "type": "unsure"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source is sheet A-302 Building Sections, which contains the labelled Living Room Section (A1) and Centre Module Section (C1) as described. The about text accurately describes what the drawing depicts without including specific numeric values or design decisions. Keywords match the drawing content, while the role field is empty, and type does not apply as this is a drawing figure not a document section."
+    },
+    {
+      "item": "c-fbddd1cd2f33",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source diagram shows the 4x4 post is centered on the 1'-0\" wide footing, with an explicit 4 1/4\" dimension for the offset from the left footing edge. All extracted values, entity, attribute, unit, quote, and section match the content shown in the highlighted diagram region on page 1 of the document."
+    },
+    {
+      "item": "c-ffaa16ab59d3",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source document displays Figure 10, the scoring function for the Energy Balance Contest, which confirms 100 points are awarded for a net electrical energy balance of at least 0 kWh. All details in the extracted claim align with the source content, and the value is correctly marked as approximate for a chart reading."
+    }
+  ]
+}

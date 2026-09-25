@@ -1,0 +1,356 @@
+{
+  "format": "semantic-pdf-diff-labels",
+  "version": 1,
+  "batch": "s02",
+  "reviewer": "XiaomiMiMo/MiMo-V2.6-Pro",
+  "created": "2026-09-25",
+  "labels": [
+    {
+      "item": "c-c8cd13bd430a",
+      "verdict": "correct",
+      "flags": [
+        "nearby_claims_missed"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "unsure",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The highlighted table row in Table 4-1 (Material Properties for the Tower) reads 'Young's modulus, steel | E | 2 00E11 | Pa', i.e. 2.00E11 Pa, so the entity, attribute, value and unit are all faithfully captured. The quote reproduces the row verbatim (cells joined), and the section attribution to 'Tower and Monopile Properties' is consistent with the page heading. The basis is left as 'unknown' although the source states it as a tabulated material property, and the two adjacent highlighted rows (shear modulus 7.93E10 Pa, density 7 85E3 kg/m^3) were not extracted."
+    },
+    {
+      "item": "c-dfe716aae8ec",
+      "verdict": "flawed",
+      "flags": [
+        "referent_ambiguous",
+        "condition_dropped",
+        "basis_wrong",
+        "nearby_claims_missed"
+      ],
+      "fields": {
+        "entity": "wrong",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "wrong",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The highlighted row in Figure 8 (Scoring function for the Clothes Dryer Subcontest) reads 'Reduced points: 100 < % of original weight < 110', and the claim's value, strict inequality bounds and unit match it verbatim. However, the entity 'scoring' does not identify which subcontest or scoring function this belongs to, the section field is empty although the row sits under Figure 8 in the Clothes Dryer subcontest, and the basis is a defined scoring rule rather than 'unknown'. The adjacent Full points (≤100) and No points (≥110) rows were not extracted."
+    },
+    {
+      "item": "c-fe7a5442c4a5",
+      "verdict": "flawed",
+      "flags": [
+        "entity_misbound",
+        "attribute_misassigned",
+        "condition_dropped",
+        "quote_not_supporting",
+        "basis_wrong",
+        "nearby_claims_missed"
+      ],
+      "fields": {
+        "entity": "wrong",
+        "attribute": "wrong",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "wrong",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source sentence reads: 'The tower height was chosen such that the hub height reaches 150 m, allowing for 30 m of ground (water surface) clearance with 120-m blades.' The 30 m is a ground/water-surface clearance for the tower/hub-height sizing, not a 'depth' of 'ground', and the quote is truncated mid-phrase so it drops both 'clearance' and the 'with 120-m blades' condition. The value and unit are right, but the property and entity are misread; also missed is the nearby footnote that this 30-m clearance is not from an official standard and that offshore clearances vary 20–30 m."
+    },
+    {
+      "item": "p-e89efa69ad7c",
+      "verdict": "wrong",
+      "flags": [
+        "should_be_unrelated",
+        "would_relate_if_same_subject"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "wrong",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "A is a 2x4 framing note in the deck module/footing details (S-522, HARVEST scheme), while B is the truncated note '2x4 CEDAR HANDRAILS' on the A-202 exterior elevation (BOREALIS scheme) — a handrail member spec, not a general 'material' claim. The two describe different components (deck framing vs handrails) in different designs, so they are not counterparts and cannot be complementary; at most they would relate if they concerned the same member."
+    },
+    {
+      "item": "a-34e398ca6949",
+      "verdict": "acceptable",
+      "flags": [
+        "about_states_values"
+      ],
+      "fields": {
+        "about": "ok",
+        "role": "ok",
+        "keywords": "ok",
+        "type": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "medium",
+      "note": "The figure is a two-panel Bode plot (magnitude in dB and phase in degrees versus frequency in Hz) of the generator speed low-pass filter, matching the caption and the surrounding text. The about and role are accurate and useful, but the about adds 'recursive, single-pole', which is a stated design decision (the text says 'We chose the recursive, single-pole filter') rather than a neutral description of what is depicted."
+    },
+    {
+      "item": "c-5a7bfafff22f",
+      "verdict": "flawed",
+      "flags": [
+        "quote_not_verbatim",
+        "condition_misattached",
+        "region_wrong",
+        "value_fabricated"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "unsure",
+        "value": "unsure",
+        "unit": "unsure",
+        "conditions": "wrong",
+        "basis": "unsure",
+        "approximate": "unsure",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "source_illegible",
+      "confidence": "medium",
+      "note": "The sheet S-601 overview shows detail callout 'E6 ROOF BEAM @ GRID 2,3,4,5 T.O. STEEL', so the entity and section are right. However, the dimension 21'-1 1/8\" is not legible anywhere in the shown images, so the quote stitches an unverifiable value onto the detail title, and 'T.O. STEEL' is an elevation reference in the title, not an operating condition."
+    },
+    {
+      "item": "c-a509b4155456",
+      "verdict": "correct",
+      "flags": [
+        "nearby_claims_missed"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Figure 2-6 is titled 'Blade: IEA 15MW Offshore Reference Turbine; Section : 0.7' and its legend lists material names including 'Carbon UD', with corresponding colored regions in the cross-section plot. The claim correctly binds Carbon UD as a material layer of that blade at section 0.7, and the quote is verbatim. However, the legend also lists Medium Density Foam, Glass Triax, Glass Biax, Glass Uni and Gelcoat (plus CG/NA/SC markers), which were not extracted."
+    },
+    {
+      "item": "c-c1fd0851eb49",
+      "verdict": "flawed",
+      "flags": [
+        "quote_not_verbatim",
+        "basis_wrong",
+        "nearby_claims_missed"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Figure 9 and its companion table do show that full (maximum) points per cooking task are awarded when the weight of vaporized water is >= 80 oz (2300 g), so the core reading is right. However, the 'quote' is not verbatim text from the page but a bracketed paraphrase of the two axis labels, and the basis is left as 'unknown' when it is a defined scoring rule. The adjacent reduced-points (16 oz < weight < 80 oz) and no-points (<= 16 oz) regimes were not extracted."
+    },
+    {
+      "item": "c-8694cec2d391",
+      "verdict": "flawed",
+      "flags": [
+        "quote_not_verbatim",
+        "value_misread",
+        "basis_wrong",
+        "confidence_miscalibrated"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "unsure",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "medium",
+      "note": "Figure 2-10(c) plots Axial Stiffness [N] (y-axis scaled by 1e10) against Nondimensional Blade Span (r/R), so the entity, attribute, unit and scale factor are right. However, at r/R = 0.1 the curve is on its steep drop from ~4.5e10 at the root toward ~2.2e10 at r/R = 0.2, so 4e10 looks high (roughly 3–3.5e10); the quote is also stitched from axis labels and tick values rather than verbatim text, and the stated basis 'unknown' ignores the caption's 'computed using PreComp'."
+    },
+    {
+      "item": "p-1bd7249295e6",
+      "verdict": "wrong",
+      "flags": [
+        "would_relate_if_same_subject",
+        "should_be_uncertain",
+        "rationale_wrong"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "ok",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "medium",
+      "note": "A is a row of Table 7-1 (sensitivity of aerodynamic power to blade pitch) for the NREL 5-MW baseline controller, where 25.0 m/s is only a sampled wind-speed column entry, not a stated controller limit; B correctly gives the IEA 15-MW controller's Region 3 range 10.59–25 m/s at rated power. The two are different turbines and A does not assert an upper operating limit, so the rationale's claim that both give 'the upper limit of 25 m/s' is unsupported and the complementary relation cannot be established."
+    },
+    {
+      "item": "c-d97d647136b3",
+      "verdict": "flawed",
+      "flags": [
+        "basis_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source, section 8-5 item d, states verbatim: 'If the dishwasher has a heated drying option, this option shall be disabled.' The entity, value, condition and quote are faithful, but the claim records basis as 'unknown' when the source clearly states a requirement ('shall')."
+    },
+    {
+      "item": "c-54fc79853650",
+      "verdict": "correct",
+      "flags": [
+        "trivial_or_boilerplate"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "unsure",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The crop shows the view title 'SECTION - EAST MODULE' with the scale note '3/8\" = 1'-0\"' directly beneath it on sheet A-301 (BUILDING SECTIONS), so the entity, attribute, value and quote are faithful. The only issue is that this is a drawing scale note, which is boilerplate rather than an engineering fact useful for comparison."
+    },
+    {
+      "item": "a-e31ab301077b",
+      "verdict": "acceptable",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "keywords": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Figure 8 is a scoring-function plot for the Clothes Dryer Subcontest, with points per clothes drying task on the y-axis and percentage of original weight on the x-axis, plus a legend of full/reduced/no points bands. The About statement correctly identifies the subject and the two plotted variables without quoting any thresholds or values. The Role field is empty, so the stated purpose is missing, which keeps this from being fully complete."
+    },
+    {
+      "item": "c-19dabb059b33",
+      "verdict": "flawed",
+      "flags": [
+        "kind_wrong",
+        "region_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "unsure",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The crop is sheet A-202 'EXTERIOR ELEVATIONS' (South and West elevations) and carries the note 'CEMENT FIBRE BOARD SIDING', so the material fact and its verbatim quote are right. However, this is an architectural elevation drawing with a general note, not a table, and the red highlight sits on window/door openings rather than on the note text itself."
+    },
+    {
+      "item": "a-28c83b4d7451",
+      "verdict": "good",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "keywords": "ok",
+        "type": "unsure"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The sheet A-302 shows two building sections: C1 'SECTION - CENTRE MODULE' (kitchen, bathroom, mechanical room, with centre and west module labels) and A1 'LIVING ROOM SECTION' (living room and kitchen), each with finished floor and grade level markers. The about statement correctly names both sections, the rooms shown, and the floor/grade relationship without quoting any elevation values or design decisions. The role field is empty, so it is missing rather than wrong."
+    },
+    {
+      "item": "c-fbddd1cd2f33",
+      "verdict": "correct",
+      "flags": [
+        "nearby_claims_missed"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The A6 'LANDSCAPE FOOTING 18\"' detail on sheet S-522 shows a 1'-0\" wide footing with a 4x4 post, dimensioned 4 1/4\" from each footing edge to the post. The claim's left-side offset of 4 1/4\" is a faithful, exact reading of the drawing dimension. The symmetric right-side 4 1/4\" offset and the 1'-0\" footing width shown in the same dimension group were not extracted."
+    },
+    {
+      "item": "c-ffaa16ab59d3",
+      "verdict": "flawed",
+      "flags": [
+        "basis_wrong",
+        "quote_not_supporting",
+        "nearby_claims_missed"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Figure 10 plots 'Points at conclusion of Energy Balance Contest' against Net Electrical Energy (kWh), and the curve does reach 100 points at 0 kWh (full points for a net balance of at least 0 kWh), so the value, unit and entity are read correctly. However, the quoted text is only the figure caption and does not state the 100-points value, and the basis is not 'unknown' but a defined scoring rule/requirement of Contest 10. The adjacent scoring table (full points for >= 0 kWh, reduced points for -50 to 0 kWh, no points for <= -50 kWh) and the rule text were not captured."
+    }
+  ]
+}

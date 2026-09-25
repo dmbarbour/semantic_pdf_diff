@@ -89,3 +89,33 @@ Consensus estimates put the owner at 9/12 agreement with the others on claims.
 | Young's modulus is a weak test item: general knowledge corroborates it | To be addressed in sampling: prefer items not answerable from general knowledge. |
 
 Found on the way: overview tasks were refined (split) against the design, because tags had been renamed to `overview:pN`; fixed.
+
+## Batch s02 (after the fixes, prompt v6)
+
+Sampled from the re-recorded answers with the same sizes as s01 (seed 2); reviewed by Claude and the seven-model panel, per field; the owner's labels are pending.
+
+- **Claim consensus** (Dawid–Skene): 6 correct, 3 flawed, 3 wrong. For s01 it was 4, 5 and 3. With 12 different claims per batch, that's no evidence of improvement yet; batches need to be larger or repeated to measure changes.
+- **Per-field agreement on claims:**
+
+  | Field | α | Raw pairwise agreement |
+  |---|---|---|
+  | Entity | 0.73 | 0.94 |
+  | Attribute | 0.72 | 0.94 |
+  | Unit | 0.44 | 0.96 |
+  | Quote | 0.47 | 0.79 |
+  | Value | 0.37 | 0.87 |
+  | Section | 0.26 | 0.85 |
+  | Conditions | 0.28 | 0.83 |
+  | Approximate | 0.19 | 0.86 |
+  | Basis | 0.20 | 0.57 |
+
+  α understates agreement when nearly all answers are "ok" (a prevalence effect), so reports now show both. Basis is the genuinely ambiguous field: every claim says "unknown", and reviewers split on whether that's acceptable. The field's help now says "unknown" is wrong for a "shall" or "must" requirement or a reported measurement. The real fix is milestone 5 (epistemic status).
+- **Verdict agreement was lower than s01** (α 0.34 vs 0.59). DeepSeek-V4-Flash-Vision stood out (estimated accuracy 0.38; its reasoning also ran long enough to truncate). Kimi timed out once.
+- **Errors found:**
+  - A tile cut "2x4 CEDAR HANDRAILS" to "2x4 CED", bound to "exterior elevation".
+  - "30 m of ground (water surface) clearance" was read as a ground depth.
+  - An axial stiffness was read off a chart at the wrong span (4e10 vs about 3.4e10).
+  - A top-of-steel elevation was called a length.
+  - Quotes were composed from axis labels or taken from a caption.
+  - A table row key (wind speed 25 m/s) was treated as a property.
+- **Slicing artefact:** slices that start mid-section have no heading on their first pages, because only outline entries inside the slice are copied. Fixing it changes the slices' bytes, and therefore every recording; deferred to the next planned re-record.

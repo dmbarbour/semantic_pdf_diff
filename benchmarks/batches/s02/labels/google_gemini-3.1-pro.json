@@ -1,0 +1,330 @@
+{
+  "format": "semantic-pdf-diff-labels",
+  "version": 1,
+  "batch": "s02",
+  "reviewer": "google/gemini-3.1-pro",
+  "created": "2026-09-25",
+  "labels": [
+    {
+      "item": "c-c8cd13bd430a",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source table lists the Young's modulus for steel as 2.00E11 Pa. The extraction correctly captures the entity, attribute, value, and unit."
+    },
+    {
+      "item": "c-dfe716aae8ec",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source shows a scoring function table where 'Reduced points' corresponds to '100 < % of original weight < 110'. The extraction correctly captures this range, using 'x' to represent the variable and '% of original weight' as the unit."
+    },
+    {
+      "item": "c-fe7a5442c4a5",
+      "verdict": "wrong",
+      "flags": [
+        "entity_misbound",
+        "attribute_misassigned"
+      ],
+      "fields": {
+        "entity": "wrong",
+        "attribute": "wrong",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "unsure",
+        "basis": "unsure",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source text states 'allowing for 30 m of ground (water surface) clearance'. The 30 m refers to the clearance between the blades and the water surface, not the depth of the water or ground."
+    },
+    {
+      "item": "p-e89efa69ad7c",
+      "verdict": "wrong",
+      "flags": [
+        "pairing_irrelevant",
+        "upstream_claim_error",
+        "should_be_unrelated"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "wrong",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Claim A refers to the framing material for the deck footing, while Claim B refers to the material for the handrails. These are completely different components, so they do not share the same subject. Additionally, Claim B incorrectly truncated the quote '2x4 CEDAR HANDRAILS' to '2x4 CED'."
+    },
+    {
+      "item": "a-34e398ca6949",
+      "verdict": "good",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "role": "ok",
+        "keywords": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The 'about' field accurately describes the figure, identifying it as a Bode plot of the generator speed low-pass filter frequency response. It includes the filter type (recursive, single-pole) which functions here as a descriptive identifier rather than a specific numerical parameter value."
+    },
+    {
+      "item": "c-5a7bfafff22f",
+      "verdict": "wrong",
+      "flags": [
+        "value_misread",
+        "quote_not_verbatim"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "wrong",
+        "value": "wrong",
+        "unit": "wrong",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The model misread the drawing scale '3/4\" = 1'-0\"' located below the detail title as a length of '21'-1 1/8\"'. The value is incorrect and the quote was altered to include this misread text."
+    },
+    {
+      "item": "c-a509b4155456",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source image shows a cross-section diagram of the 'IEA 15MW Offshore Reference Turbine' blade at 'Section : 0.7'. The legend lists 'Carbon UD' as one of the material layers. The extraction correctly captures this information."
+    },
+    {
+      "item": "c-c1fd0851eb49",
+      "verdict": "flawed",
+      "flags": [
+        "value_misread",
+        "quote_not_verbatim",
+        "quote_not_supporting"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "wrong",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source table explicitly states 'Full points' for a weight >= 80 oz, whereas the extraction uses the interpreted value 'maximum'. Additionally, the quote provided is a description of the chart axes rather than a verbatim extraction from the text or table."
+    },
+    {
+      "item": "c-8694cec2d391",
+      "verdict": "wrong",
+      "flags": [
+        "value_misread"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "wrong",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The chart shows Axial Stiffness vs Nondimensional Blade Span. At a span (r/R) of 0.1, the curve is at 3 on the y-axis, which corresponds to 3e10 N given the 1e10 multiplier. The extracted value of 4e10 is incorrect."
+    },
+    {
+      "item": "p-1bd7249295e6",
+      "verdict": "wrong",
+      "flags": [
+        "should_be_unrelated",
+        "rationale_wrong"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "ok",
+        "same_subject": "ok",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Claim A extracts a single wind speed data point from a table of sensitivities for Region 3 of the 5-MW turbine. Claim B extracts the defined wind speed range for Region 3 of the 15-MW turbine. Because Claim A is just a single evaluation point and not the definition of the operating range, the two claims represent different properties and are unrelated."
+    },
+    {
+      "item": "c-d97d647136b3",
+      "verdict": "flawed",
+      "flags": [
+        "basis_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source text states 'If the dishwasher has a heated drying option, this option shall be disabled.' The extraction correctly captures the entity, value, and condition. However, the basis is clearly a requirement ('shall be'), not 'unknown'."
+    },
+    {
+      "item": "c-54fc79853650",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source image shows the title 'SECTION - EAST MODULE' with the text '3/8\" = 1'-0\"' directly below it, which indicates the scale of the drawing. The extraction correctly captures this information."
+    },
+    {
+      "item": "a-e31ab301077b",
+      "verdict": "good",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "keywords": "ok",
+        "type": "unsure"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The 'about' statement accurately describes the figure's content, identifying the axes of the graph (percentage of original weight vs. points earned) without stating the specific scoring thresholds. The role is missing."
+    },
+    {
+      "item": "c-19dabb059b33",
+      "verdict": "wrong",
+      "flags": [
+        "region_wrong",
+        "kind_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source is an architectural elevation drawing, not a table. Additionally, the text 'CEMENT FIBRE BOARD SIDING' is located above the highlighted red box, which instead highlights a row of windows and doors. Therefore, the region and kind are incorrect."
+    },
+    {
+      "item": "a-28c83b4d7451",
+      "verdict": "acceptable",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "role": "wrong",
+        "keywords": "ok",
+        "type": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The description accurately captures the contents of the building sections, including the specific rooms and modules shown. However, the role field is left blank, making the extraction incomplete."
+    },
+    {
+      "item": "c-fbddd1cd2f33",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The diagram shows a dimension of 4 1/4\" from the left edge of the central 4x4 post to the left edge of the footing base. The extraction correctly identifies this offset."
+    },
+    {
+      "item": "c-ffaa16ab59d3",
+      "verdict": "flawed",
+      "flags": [
+        "approximation_misflagged"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "wrong",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The chart and accompanying text clearly define the scoring rule where 0 kWh of net electrical energy yields exactly 100 points. Marking this as approximate is incorrect because it is an exact scoring definition, not an estimated reading."
+    }
+  ]
+}

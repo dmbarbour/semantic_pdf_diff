@@ -361,7 +361,10 @@ def agreement(folder):
                      for i in items]
             answered = sum(len(u) for u in units)
             if answered:
-                fields[field] = {"answers": answered, "alpha": _round(krippendorff_alpha(units))}
+                # Raw pairwise agreement too: when nearly every answer is the same, alpha is low
+                # even where reviewers almost all agree (a known prevalence effect).
+                fields[field] = {"answers": answered, "alpha": _round(krippendorff_alpha(units)),
+                                 "pairwise_agreement": _round(pairwise_agreement(units))}
         unclear = sum(labels[r][i]["clarity"] != "clear" for r in reviewers for i in items if i in labels[r])
         low = sum(labels[r][i]["confidence"] == "low" for r in reviewers for i in items if i in labels[r])
         usable = [[labels[r][i]["verdict"] in USABLE[kind] for r in reviewers if i in labels[r]] for i in items]
@@ -387,6 +390,16 @@ def scores(folder):
             for flag in label.get("flags", []):
                 row["flag:" + flag] = row.get("flag:" + flag, 0) + 1
     return [{"store": s, "type": t, "kind": k, "reviewers": v} for (s, t, k), v in sorted(out.items())]
+
+def pairwise_agreement(units):
+    """Share of reviewer pairs, over all items, giving the same answer (None without pairs)."""
+    same = total = 0
+    for values in units:
+        for i in range(len(values)):
+            for j in range(i + 1, len(values)):
+                total += 1
+                same += values[i] == values[j]
+    return same / total if total else None
 
 def _round(x):
     return None if x is None else round(x, 3)

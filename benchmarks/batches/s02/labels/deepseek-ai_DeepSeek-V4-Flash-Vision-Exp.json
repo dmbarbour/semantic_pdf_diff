@@ -1,0 +1,334 @@
+{
+  "format": "semantic-pdf-diff-labels",
+  "version": 1,
+  "batch": "s02",
+  "reviewer": "deepseek-ai/DeepSeek-V4-Flash-Vision-Exp",
+  "created": "2026-09-25",
+  "labels": [
+    {
+      "item": "c-c8cd13bd430a",
+      "verdict": "wrong",
+      "flags": [
+        "value_misread",
+        "quote_not_verbatim",
+        "confidence_miscalibrated"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "wrong",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source table shows Young's modulus for steel as 200E11 Pa, but the extracted claim reads it as 2.00E11 Pa, a factor of 100 too low. The quote also misplaces a space, rendering it non-verbatim."
+    },
+    {
+      "item": "c-dfe716aae8ec",
+      "verdict": "flawed",
+      "flags": [
+        "basis_wrong",
+        "condition_dropped",
+        "confidence_miscalibrated"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "wrong",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source shows a scoring table for the Clothes Dryer Subcontest with the reduced points row highlighted. The claim correctly reads the threshold as 100 < % of original weight < 110, but it omits the basis (a requirement) and the section/scope (Clothes Dryer Subcontest), and its confidence of 1.0 is too high given these omissions."
+    },
+    {
+      "item": "c-fe7a5442c4a5",
+      "verdict": "flawed",
+      "flags": [
+        "entity_misbound",
+        "attribute_misassigned",
+        "condition_dropped",
+        "quote_not_verbatim",
+        "basis_wrong"
+      ],
+      "fields": {
+        "entity": "wrong",
+        "attribute": "wrong",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "wrong",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source says 'allowing for 30 m of ground (water surface) clearance with 120-m blades.' The claim reads this as a 'depth (water surface)' for entity 'ground', but the source describes a clearance, not a depth. The quote is also missing the word 'clearance'. The value 30 m is correct, but the attribute, entity, quote, and conditions are off."
+    },
+    {
+      "item": "p-e89efa69ad7c",
+      "verdict": "wrong",
+      "flags": [
+        "pairing_irrelevant",
+        "should_be_unrelated"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "ok",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Claim A is correctly read as 2x4 framing in a deck footing detail, and Claim B is correctly read as 2x4 cedar handrails in an exterior elevation. However, these are different components in different drawings/documents, so they are not complementary; the relation should be unrelated."
+    },
+    {
+      "item": "a-34e398ca6949",
+      "verdict": "acceptable",
+      "flags": [
+        "about_states_values"
+      ],
+      "fields": {
+        "about": "ok",
+        "role": "ok",
+        "keywords": "ok",
+        "type": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source shows a Bode plot of a generator speed low-pass filter frequency response, with magnitude and phase versus frequency. The statement correctly describes the figure and its role, but it includes the design decision 'recursive, single-pole' and mentions a specific discrete time step and corner frequency, which goes beyond the figure's content."
+    },
+    {
+      "item": "c-a509b4155456",
+      "verdict": "flawed",
+      "flags": [
+        "attribute_misassigned",
+        "quote_not_supporting",
+        "nearby_claims_missed"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "wrong",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source shows a blade cross-section at 70% span with a legend listing several material layers, including Carbon UD. The claim states 'material layer: Carbon UD' as if it were the sole material layer, but the source shows multiple layers. The quote 'Carbon UD' is verbatim from the legend but does not support the singular attribution."
+    },
+    {
+      "item": "c-c1fd0851eb49",
+      "verdict": "flawed",
+      "flags": [
+        "quote_not_verbatim",
+        "approximation_misflagged",
+        "basis_wrong",
+        "confidence_miscalibrated"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "wrong",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source chart shows the scoring function with a maximum plateau for weight >= 80 oz, so the core fact is correct. However, the quote is a paraphrase of the axis labels, not a verbatim quote; the basis is 'unknown' instead of 'chart'; and the approximate flag is true for a qualitative maximum, which is not approximate."
+    },
+    {
+      "item": "c-8694cec2d391",
+      "verdict": "flawed",
+      "flags": [
+        "quote_not_verbatim"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source chart (Figure 2-10c) shows axial stiffness at r/R=0.1 is about 4e10 N, matching the claim. The quote is not verbatim but a concatenation of labels, so the quote field is wrong."
+    },
+    {
+      "item": "p-1bd7249295e6",
+      "verdict": "wrong",
+      "flags": [
+        "pairing_irrelevant",
+        "should_be_unrelated"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "ok",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Claim A is a row from NREL 5MW Table 7-1, a sensitivity table for aerodynamic power vs blade pitch in Region 3, not a controller operating range. Claim B is the IEA 15MW controller's Region 3 wind speed range. They are from different turbines and different properties, so the complementary relation is wrong; they should be unrelated."
+    },
+    {
+      "item": "c-d97d647136b3",
+      "verdict": "flawed",
+      "flags": [
+        "basis_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source text in section 8-5, item d, states 'If the dishwasher has a heated drying option, this option shall be disabled.' The claim's quote, entity, attribute, value, and conditions are all correct. However, the basis is marked 'unknown' when the source clearly states a requirement ('shall be disabled')."
+    },
+    {
+      "item": "c-54fc79853650",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source image shows the title 'SECTION - EAST MODULE' with the scale '3/8\" = 1'-0\"' directly beneath it. The extracted claim matches this exactly, including the verbatim quote."
+    },
+    {
+      "item": "a-e31ab301077b",
+      "verdict": "good",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "role": "wrong",
+        "keywords": "ok",
+        "type": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The figure shows a scoring function for the Clothes Dryer Subcontest, with the x-axis as percentage of original weight and the y-axis as points per clothes drying task. The about statement correctly describes this relationship without stating specific values. The role field is empty, so it is missing."
+    },
+    {
+      "item": "c-19dabb059b33",
+      "verdict": "flawed",
+      "flags": [
+        "kind_wrong",
+        "region_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source drawing labels the siding as 'CEMENT FIBRE BOARD SIDING', so the material value is correct. However, the claim is classified as a table and the highlighted red region in image 1 is around the windows, not the text label, so the kind and region are wrong."
+    },
+    {
+      "item": "a-28c83b4d7451",
+      "verdict": "acceptable",
+      "flags": [
+        "role_wrong"
+      ],
+      "fields": {
+        "about": "ok",
+        "role": "wrong",
+        "keywords": "ok",
+        "type": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source sheet A-302 shows two building sections, C1 (Centre Module) and A1 (Living Room Section), with room labels and finished floor/grade level elevations. The about statement accurately describes these sections, but the role field is empty."
+    },
+    {
+      "item": "c-fbddd1cd2f33",
+      "verdict": "flawed",
+      "flags": [
+        "basis_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source shows a dimension of 4 1/4\" from the left edge of the footing to the post, so the value is correct. However, the basis is listed as 'unknown' when the source is a drawing dimension, so the basis is misstated."
+    },
+    {
+      "item": "c-ffaa16ab59d3",
+      "verdict": "flawed",
+      "flags": [
+        "approximation_misflagged",
+        "basis_wrong",
+        "quote_not_supporting"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "wrong",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source shows a scoring function graph where at 0 kWh net electrical energy, the points awarded are 100, and the text confirms 'All available points are earned ... for a net electrical energy balance of at least 0 kWh.' The claim correctly reads the value, but marks it as approximate when it is exact, states the basis as unknown when it is a specified rule, and uses a quote (the figure caption) that does not itself support the value."
+    }
+  ]
+}

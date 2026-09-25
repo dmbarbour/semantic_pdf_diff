@@ -1,0 +1,304 @@
+{
+  "format": "semantic-pdf-diff-labels",
+  "version": 2,
+  "batch": "s02",
+  "reviewer": "claude-opus-5.5",
+  "created": "2026-09-25",
+  "labels": [
+    {
+      "item": "c-c8cd13bd430a",
+      "verdict": "correct",
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "quote": "ok",
+        "section": "ok",
+        "basis": "unsure"
+      },
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Same claim as in s01: Table 4-1, tower steel. A weak test item (general knowledge corroborates it)."
+    },
+    {
+      "item": "c-dfe716aae8ec",
+      "verdict": "flawed",
+      "fields": {
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "quote": "ok",
+        "entity": "wrong",
+        "conditions": "wrong",
+        "section": "unsure"
+      },
+      "flags": [
+        "referent_ambiguous",
+        "condition_dropped"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The Clothes Dryer subcontest's reduced-points band (Figure 8's table). 'scoring' doesn't say which contest, and no condition does either; the section is empty because the slice starts mid-section."
+    },
+    {
+      "item": "c-fe7a5442c4a5",
+      "verdict": "wrong",
+      "fields": {
+        "entity": "wrong",
+        "attribute": "wrong",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "wrong",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "flags": [
+        "attribute_misassigned",
+        "entity_misbound",
+        "condition_dropped"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "'30 m of ground (water surface) clearance with 120-m blades' is the blade-tip clearance above the water surface, not a ground depth. The footnote says the value isn't from an official standard."
+    },
+    {
+      "item": "p-e89efa69ad7c",
+      "verdict": "wrong",
+      "fields": {
+        "a": "unsure",
+        "b": "wrong",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "flags": [
+        "should_be_unrelated",
+        "upstream_claim_error",
+        "pairing_irrelevant"
+      ],
+      "clarity": "source_illegible",
+      "confidence": "medium",
+      "note": "B is '2x4 CEDAR HANDRAILS', cut at the tile edge to '2x4 CED' and bound to 'exterior elevation'. A (deck framing 2x4) is hard to confirm at overview resolution (the callouts read like 2x6 frame, 2x8 joist). Deck framing vs handrails: unrelated."
+    },
+    {
+      "item": "a-34e398ca6949",
+      "verdict": "good",
+      "fields": {
+        "about": "ok",
+        "role": "ok",
+        "keywords": "ok"
+      },
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": ""
+    },
+    {
+      "item": "c-5a7bfafff22f",
+      "verdict": "wrong",
+      "fields": {
+        "entity": "ok",
+        "attribute": "wrong",
+        "value": "unsure",
+        "unit": "ok",
+        "conditions": "unsure",
+        "quote": "unsure",
+        "section": "ok"
+      },
+      "flags": [
+        "attribute_misassigned"
+      ],
+      "clarity": "source_illegible",
+      "confidence": "medium",
+      "note": "'T.O. STEEL' marks a top-of-steel elevation, so 'length' is wrong. I can't find 21'-1 1/8\" on the sheet at this resolution."
+    },
+    {
+      "item": "c-a509b4155456",
+      "verdict": "correct",
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "conditions": "ok",
+        "quote": "ok",
+        "section": "unsure"
+      },
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Section 0.7's spar caps are Carbon UD; 'material layer' is a fair attribute (better than 'composition'). No section: the slice starts before the outline."
+    },
+    {
+      "item": "c-c1fd0851eb49",
+      "verdict": "flawed",
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "approximate": "ok",
+        "section": "ok",
+        "value": "ok",
+        "quote": "wrong"
+      },
+      "flags": [
+        "quote_not_verbatim"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Full points at >= 80 oz is right; 'maximum' is an acceptable value. The quote is composed from axis labels."
+    },
+    {
+      "item": "c-8694cec2d391",
+      "verdict": "wrong",
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "approximate": "ok",
+        "value": "wrong",
+        "quote": "wrong",
+        "section": "unsure"
+      },
+      "flags": [
+        "chart_axis_misread",
+        "quote_not_verbatim"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "At r/R = 0.1 the axial stiffness curve is about 3.4e10 N, not 4e10 (that's near r/R = 0.05)."
+    },
+    {
+      "item": "p-1bd7249295e6",
+      "verdict": "wrong",
+      "fields": {
+        "a": "wrong",
+        "b": "ok",
+        "same_subject": "unsure",
+        "relation": "wrong"
+      },
+      "flags": [
+        "upstream_claim_error",
+        "would_relate_if_same_subject"
+      ],
+      "clarity": "clear",
+      "confidence": "medium",
+      "note": "A is a table row key (wind speed 25 m/s in Table 7-1), not a property of the controller. B is IEA 15 MW's region-3 range. Different turbines; the shared 25 m/s is cut-out, not a relation between them."
+    },
+    {
+      "item": "c-d97d647136b3",
+      "verdict": "flawed",
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "conditions": "ok",
+        "quote": "ok",
+        "section": "ok",
+        "basis": "wrong"
+      },
+      "flags": [
+        "basis_wrong"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Right; 'shall be disabled' is a requirement, but the basis is unknown (as for every claim so far: the epistemic-status milestone isn't done)."
+    },
+    {
+      "item": "c-54fc79853650",
+      "verdict": "correct",
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "medium",
+      "note": "The scale under the east-module section title. Low value for comparison."
+    },
+    {
+      "item": "a-e31ab301077b",
+      "verdict": "good",
+      "fields": {
+        "about": "ok",
+        "keywords": "ok"
+      },
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": ""
+    },
+    {
+      "item": "c-19dabb059b33",
+      "verdict": "flawed",
+      "fields": {
+        "entity": "unsure",
+        "attribute": "ok",
+        "value": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "flags": [
+        "referent_ambiguous"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Cement fibre board siding is right, but 'exterior elevations' is the drawing, not the component (the exterior walls)."
+    },
+    {
+      "item": "a-28c83b4d7451",
+      "verdict": "good",
+      "fields": {
+        "about": "ok",
+        "keywords": "ok"
+      },
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "medium",
+      "note": ""
+    },
+    {
+      "item": "c-fbddd1cd2f33",
+      "verdict": "flawed",
+      "fields": {
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "quote": "ok",
+        "section": "ok",
+        "entity": "ok",
+        "conditions": "wrong"
+      },
+      "flags": [
+        "condition_dropped"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "4 1/4\" from the 4x4 post to the footing edge, each side, is right; it belongs to detail A6 (landscape footing), which the claim doesn't say."
+    },
+    {
+      "item": "c-ffaa16ab59d3",
+      "verdict": "flawed",
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "approximate": "ok",
+        "section": "ok",
+        "quote": "wrong"
+      },
+      "flags": [
+        "quote_not_supporting"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Right (full points at a net 0 kWh), but the quote is the figure caption, which doesn't state the value."
+    }
+  ]
+}

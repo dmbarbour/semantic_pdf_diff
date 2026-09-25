@@ -153,7 +153,8 @@ FIELDS = {
               _field("value", "Value", "Digits, bounds and ranges"),
               _field("unit", "Unit", "Including scale factors; wrong if missing"),
               _field("conditions", "Conditions", "Load case, scenario, scope; wrong if a needed one is missing"),
-              _field("basis", "Basis", "Requirement, target, measured, calculated..."),
+              _field("basis", "Basis", "Requirement, target, measured, calculated... 'unknown' is right only "
+                     "when the source doesn't say; it is wrong for a 'shall' or 'must' (required) or a reported measurement"),
               _field("approximate", "Approximate", "Readings off charts should be approximate"),
               _field("quote", "Quote", "Verbatim, and supports the claim"),
               _field("section", "Section", "The section it was attributed to")],

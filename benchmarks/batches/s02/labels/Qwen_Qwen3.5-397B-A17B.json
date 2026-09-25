@@ -1,0 +1,333 @@
+{
+  "format": "semantic-pdf-diff-labels",
+  "version": 1,
+  "batch": "s02",
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "created": "2026-09-25",
+  "labels": [
+    {
+      "item": "c-c8cd13bd430a",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The claim accurately extracts the Young's modulus for steel from Table 4-1 in the provided images. The entity, attribute, value (normalized from '2 00E11' to '2.00E11'), and unit match the source table row. The section title matches the document header. The page number in the item context (12) contradicts the image footer (21), but the claim fields themselves are faithful to the visible source content."
+    },
+    {
+      "item": "c-dfe716aae8ec",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The claim accurately reflects the highlighted text in Figure 8. The value '100 < x < 110' combined with the unit '% of original weight' matches the source inequality '100 < % of original weight < 110'. The quote is verbatim. The entity 'scoring' and attribute 'reduced points threshold' appropriately describe the rule."
+    },
+    {
+      "item": "c-fe7a5442c4a5",
+      "verdict": "flawed",
+      "flags": [
+        "attribute_misassigned",
+        "quote_not_verbatim",
+        "entity_misbound"
+      ],
+      "fields": {
+        "entity": "wrong",
+        "attribute": "wrong",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "unsure",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source text states 'allowing for 30 m of ground (water surface) clearance'. The claim correctly extracts the value '30 m' but misidentifies the attribute as 'depth' instead of 'clearance' and the entity as 'ground' rather than the clearance itself. The quote is truncated, omitting the word 'clearance' which is essential for the correct physical interpretation."
+    },
+    {
+      "item": "p-e89efa69ad7c",
+      "verdict": "wrong",
+      "flags": [
+        "pairing_irrelevant",
+        "should_be_unrelated"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "ok",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Claim A correctly identifies '2x4 FRAMING' in the Harvest proposal's deck structure. Claim B correctly identifies '2x4 CEDAR HANDRAILS' in the Borealis proposal's elevation. These are different building components (structural deck framing vs. architectural handrails) in competing designs, not counterparts or the same subject. Thus, they are unrelated, not complementary."
+    },
+    {
+      "item": "a-34e398ca6949",
+      "verdict": "good",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "role": "ok",
+        "keywords": "ok",
+        "type": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The statement accurately describes the figure as a Bode plot of a generator speed low-pass filter, matching the caption and image axes. It correctly identifies the filter structure ('recursive, single-pole') from the text as part of the subject description without stating the specific parameter values (0.25 Hz, 0.0125 s), which are appropriately generalized in the 'role' field."
+    },
+    {
+      "item": "c-5a7bfafff22f",
+      "verdict": "flawed",
+      "flags": [
+        "unit_wrong_or_missing",
+        "quote_not_verbatim"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "wrong",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The extraction correctly identifies the beam entity (Roof Beam @ Grid 2,3,4,5) and the length dimension (21'-1 1/8\") from detail E6. However, the 'unit' field is missing from the JSON (unit is embedded in the value string), and the 'quote' is a concatenation of the label and the dimension text rather than a single verbatim string from the source."
+    },
+    {
+      "item": "c-a509b4155456",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source image (Figure 2-6) shows a blade cross-section at 70% span (Section 0.7) for the IEA 15MW Offshore Reference Turbine. The legend on the right lists 'Carbon UD' as one of the material layers. The claim correctly extracts the entity, attribute, value, and condition from the chart title and legend. The quote is verbatim. The basis is listed as 'unknown' which is acceptable for a diagram label."
+    },
+    {
+      "item": "c-c1fd0851eb49",
+      "verdict": "flawed",
+      "flags": [
+        "quote_not_verbatim",
+        "quote_not_supporting",
+        "basis_wrong",
+        "approximation_misflagged"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "wrong",
+        "quote": "wrong",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The claim correctly identifies the condition (>= 80 oz) for earning 'Full points' (interpreted as 'maximum') based on the table and chart in Figure 9. However, the quote provided is a description of the axis labels with added annotations (e.g., '[y-axis]'), making it non-verbatim, and it fails to support the specific value or condition claimed (it should quote the table text 'Full points: Weight >= 80 oz'). Additionally, the basis is listed as 'unknown' despite being a rule/requirement, and the claim is marked as approximate despite being a defined rule."
+    },
+    {
+      "item": "c-8694cec2d391",
+      "verdict": "wrong",
+      "flags": [
+        "value_misread",
+        "basis_wrong",
+        "quote_not_verbatim"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "wrong",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "wrong",
+        "section": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The claim extracts a value of 4e10 N at r/R=0.1 from the 'Axial stiffness' chart (c). Visually, at x=0.1, the curve is significantly below the y=4 tick mark (likely around 3e10 N), making the value an overestimate (it matches the axis limit or root value). The basis is listed as 'unknown' despite the caption stating 'computed using PreComp'. The quote is stitched fragments rather than verbatim text. The context page number (7) does not match the visible page number (16)."
+    },
+    {
+      "item": "p-1bd7249295e6",
+      "verdict": "wrong",
+      "flags": [
+        "should_be_unrelated",
+        "would_relate_if_same_subject"
+      ],
+      "fields": {
+        "a": "ok",
+        "b": "ok",
+        "same_subject": "wrong",
+        "relation": "wrong"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "Claim A is extracted from the NREL 5-MW reference turbine document (Table 7-1), while Claim B is from the IEA 15-MW reference turbine document (Section 3.1.1). They describe parameters for two different turbines, not the same system or revisions of the same design. Therefore, they are not complementary information about a corresponding subject."
+    },
+    {
+      "item": "c-d97d647136b3",
+      "verdict": "flawed",
+      "flags": [
+        "basis_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "wrong",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source text (Section 8-5, item d) explicitly states a requirement ('shall be disabled') for the heated drying option if present. The extraction correctly captures the entity, value, condition, section, and provides a verbatim quote. However, the 'basis' field is labeled 'unknown' despite the text clearly indicating a requirement ('shall'), which is a metadata error."
+    },
+    {
+      "item": "c-54fc79853650",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source image clearly displays the text 'SECTION - EAST MODULE' with the scale '3/8\" = 1'-0\"' directly underneath it. The extracted claim accurately captures the entity, attribute (scale), and value exactly as shown in the highlighted region and the full page context."
+    },
+    {
+      "item": "a-e31ab301077b",
+      "verdict": "good",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "role": "wrong",
+        "keywords": "ok",
+        "type": "unsure"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The `about` statement accurately describes the figure's subject (scoring function) and the relationship between the axes variables (percentage of original weight vs. points) without citing specific numerical thresholds like 100% or 110%. The keywords are relevant and accurate. The `role` field is empty in the provided data, which is a missing component, but the primary statement is correct and useful."
+    },
+    {
+      "item": "c-19dabb059b33",
+      "verdict": "flawed",
+      "flags": [
+        "kind_wrong",
+        "region_wrong"
+      ],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source is a drawing (elevation view), but the claim identifies it as a 'table' (kind_wrong). The highlighted region (red box) outlines window openings, while the text 'CEMENT FIBRE BOARD SIDING' is located above the box, so the region does not contain the claim text (region_wrong). The extracted material value and quote are otherwise accurate and supported by the document text."
+    },
+    {
+      "item": "a-28c83b4d7451",
+      "verdict": "good",
+      "flags": [],
+      "fields": {
+        "about": "ok",
+        "keywords": "ok",
+        "type": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The statement accurately identifies the two specific sections (A1 and C1) shown on the sheet and correctly lists the visible room labels and elevation markers without citing specific numerical values. The keywords are relevant and accurate. The role field is empty in the provided data."
+    },
+    {
+      "item": "c-fbddd1cd2f33",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source image (Detail A6) clearly shows a dimension of 4 1/4\" measuring the distance from the left edge of the 1'-0\" wide footing to the left edge of the vertical 4x4 post. The extracted claim accurately identifies the entity (post), the attribute (offset from footing edge), the value, and the unit. The section reference matches the sheet title in the full page view."
+    },
+    {
+      "item": "c-ffaa16ab59d3",
+      "verdict": "correct",
+      "flags": [],
+      "fields": {
+        "entity": "ok",
+        "attribute": "ok",
+        "value": "ok",
+        "unit": "ok",
+        "conditions": "ok",
+        "basis": "ok",
+        "approximate": "ok",
+        "quote": "ok",
+        "section": "ok"
+      },
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source document (Solar Decathlon 2013 Rules, page 32) contains 'Contest 10. Energy Balance' with Figure 10. The figure's y-axis is labeled 'Points at conclusion of Energy Balance Contest' with a maximum value of 100. The graph shows the points reaching 100 at 0 kWh and staying flat for positive values. The table next to it confirms 'Full points' for 'Net electrical energy >= 0 kWh'. The claim correctly extracts the value 100 points at 0 kWh from the chart axis and context."
+    }
+  ]
+}
