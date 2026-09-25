@@ -16,8 +16,8 @@ CLAIM_FLAGS = [
        "e.g. Pump B's 45 kW recorded as Pump A's"),
     _f("What is claimed", "scope_level_error", "Wrong level: per-unit vs total, component vs system",
        "e.g. a 2 kW per-module rating claimed as the whole array's power"),
-    _f("What is claimed", "attribute_misassigned", "Right thing, wrong property (or property fused into the entity)",
-       "e.g. peak power recorded as continuous rating"),
+    _f("What is claimed", "attribute_misassigned", "Right thing, wrong or overstated property",
+       "e.g. peak power recorded as continuous rating; 'composition: glass' when glass is one of several materials"),
     _f("What is claimed", "relation_direction_reversed", "Directed relationship reversed",
        "e.g. 'HX-1 feeds P-2' when P-2 feeds HX-1"),
     _f("What is claimed", "referent_ambiguous", "Entity too vague to identify",
@@ -112,8 +112,9 @@ PAIR_FLAGS = [
 
 TAXONOMY = {
     "claim": {"verdicts": [
-        {"name": "correct", "label": "Correct", "help": "A faithful, useful reading of the source"},
-        {"name": "flawed", "label": "Usable but flawed", "help": "The core fact is right; a qualifier, quote or form is off"},
+        {"name": "correct", "label": "Correct", "help": "A faithful reading of the source (usefulness is judged by flags)"},
+        {"name": "flawed", "label": "Usable but flawed",
+         "help": "The core fact is right, but a qualifier, quote, scope or form is off, or part of the truth is stated as the whole"},
         {"name": "wrong", "label": "Wrong", "help": "The fact is misread, misbound or not supported"},
         {"name": "not_a_claim", "label": "Not a claim", "help": "Commentary, a heading or a fragment, not a fact"}],
         "flags": CLAIM_FLAGS},
@@ -123,7 +124,10 @@ TAXONOMY = {
         {"name": "wrong", "label": "Wrong", "help": "Misleading or incorrect"}],
         "flags": ABOUT_FLAGS},
     "pair": {"verdicts": [
-        {"name": "right", "label": "Relation right", "help": "The judged relation is correct for these two claims"},
+        {"name": "right", "label": "Relation right",
+         "help": "Relations: equivalent = same engineering meaning; different = incompatible values under the same conditions; "
+                 "complementary = distinct compatible information about a corresponding subject; unrelated = different "
+                 "subject or property; uncertain = correspondence can't be established"},
         {"name": "wrong", "label": "Relation wrong", "help": "Flag what it should be"}],
         "flags": PAIR_FLAGS},
 }

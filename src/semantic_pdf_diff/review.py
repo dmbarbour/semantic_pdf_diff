@@ -378,9 +378,9 @@ QUESTIONS = {
              "(the highlighted region, or the whole crop for images the extractor read) and the page.",
     "about": "Does this statement say what the figure or section is about, correctly and usefully, without stating "
              "specific values or design decisions?",
-    "pair": "An automated retrieval step paired these two claims (A and B, from two different sources) and a model judged "
-            "their relation (equivalent, different, complementary, unrelated or uncertain). Is the pairing sensible, and is "
-            "the judged relation right?",
+    "pair": "An automated retrieval step paired these two claims and a model judged their relation. A and B come from "
+            "different sources: competing proposals (different designs) or revisions of one document. Is the pairing "
+            "sensible, and is the judged relation right by the definitions given with the verdicts?",
 }
 
 JUDGE = """You are one reviewer on a panel checking an automated system that reads engineering documents.

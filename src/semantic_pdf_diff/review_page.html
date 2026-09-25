@@ -56,7 +56,7 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } c
 const QUESTIONS = {
   claim: 'Is this claim a correct, faithful reading of the source? Judge it against the highlighted region and the page.',
   about: 'Does this statement say what the figure or section is about, correctly and usefully, without stating specific values?',
-  pair: 'Retrieval paired these two claims and the model judged their relation. Is the pairing sensible, and is the relation right?'};
+  pair: 'Retrieval paired these two claims and the model judged their relation. A and B come from different sources: competing proposals (different designs) or revisions of one document. Is the pairing sensible, and is the relation right by the definitions under the verdicts?'};
 
 function fields(obj) {
   return '<dl>' + Object.entries(obj).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(typeof v === 'object' ? JSON.stringify(v) : v)}</dd>`).join('') + '</dl>';
