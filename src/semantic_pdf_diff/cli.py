@@ -196,8 +196,8 @@ def plan(sources, settings):
                     text_bytes += sum(len(t.encode()) for _, segments in groups for _, t in segments)
                     if settings.vision:
                         visual += len(visual_regions(page, settings.tile_points))
-                if settings.situate:  # one request per labelled figure and per section
-                    situating += (sum(1 for f in find_figures(doc) if f.label)
+                if settings.situate:  # one request per figure and per section (plus re-asks, not counted)
+                    situating += (len(find_figures(doc))
                                   + len(pdf_sections(doc, settings.section_depth, settings.section_pages)[0]))
         estimate = (text_calls * (scaffold + answer) + text_bytes
                     + visual * (scaffold + settings.image_tokens + answer)

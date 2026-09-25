@@ -96,8 +96,11 @@ def situating(situation, sections, where, esc):
         show = lambda target: ('<p class="warning">' + esc('; '.join(flags[target])) + '</p>') if target in flags else ''
         refs = q['references']
         rate = f"{refs['rate']:.0%}" if refs['rate'] is not None else 'n/a'
-        out.append(f"<h3>{esc(where(content))}</h3><p>{q['figures']['labelled']} labelled figures "
-                   f"({q['figures']['labelled_uncited']} never cited), {q['figures']['uncaptioned']} uncaptioned regions; "
+        fq = q['figures']
+        sources = ', '.join(f"{fq[k]} from {k[len('labelled_from_'):].replace('_', ' ')}" for k in fq
+                            if k.startswith('labelled_from_') and fq[k])
+        out.append(f"<h3>{esc(where(content))}</h3><p>{fq['total']} figures, {fq['total'] - fq['unlabelled']} labelled"
+                   f"{' (' + esc(sources) + ')' if sources else ''}, {fq['labelled_uncited']} of those never cited; "
                    f"{refs['resolved']} references resolved, {refs['unresolved']} unresolved ({rate} resolved).</p>")
         rows = ''.join(f"<tr><td>{esc(s['heading_path'] and ' > '.join(s['heading_path']) or s['id'])}</td>"
                        f"<td>{s['first_page']}–{s['last_page']}</td><td>{esc(s.get('section_type', ''))}</td>"
@@ -107,9 +110,10 @@ def situating(situation, sections, where, esc):
         out.append('<table><thead><tr><th>Section</th><th>Pages</th><th>Type</th><th>Density</th><th>About</th></tr></thead>'
                    f'<tbody>{rows}</tbody></table>')
         cited = lambda f: '; '.join('p.%d' % r['page'] for r in f['references']) or 'none'
-        figures = [f for f in x['figures'] if f['label']]
+        figures = x['figures']
         if figures:
-            rows = ''.join(f"<tr><td>{esc(f['caption'] or f['label'])}</td><td>{f['page']}</td>"
+            name = lambda f: f['caption'] or ' · '.join(filter(None, [f['label'], f.get('title')])) or 'unlabelled ' + f['kind']
+            rows = ''.join(f"<tr><td>{esc(name(f))}</td><td>{f['page']}</td>"
                            f"<td>{esc(f['about'])}{(' <i>' + esc(f['role']) + '</i>') if f['role'] else ''}{show(f['id'])}</td>"
                            f"<td>{esc(cited(f))}</td></tr>"
                            for f in figures)

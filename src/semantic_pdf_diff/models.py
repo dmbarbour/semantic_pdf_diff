@@ -139,6 +139,8 @@ class FigureAbout(Lenient):
     about: str = Field(min_length=1, max_length=800)
     role: str = Field(default="", max_length=500)
     keywords: list[str] = Field(default_factory=list, max_length=15)
+    label: str = Field(default="", max_length=60)    # an identifier visible in the figure, e.g. "Sheet A-101"
+    title: str = Field(default="", max_length=200)   # a title visible in the figure
 
 SECTION_TYPES = ("specification", "requirements", "narrative", "calculation", "data", "drawing", "procedure",
                  "legal", "administrative", "reference", "other")
@@ -160,6 +162,7 @@ class Reference(Strict):
     page: int
     bbox: tuple[float, float, float, float]
     text: str
+    paragraph: str = ""                                  # the text block holding the sentence
     label: str
     evidence: list[str] = Field(default_factory=list)   # claims extracted from the citing text
 
@@ -169,8 +172,10 @@ class Figure(Strict):
     page: int
     bbox: tuple[float, float, float, float]
     kind: Literal["figure", "table", "sheet", "exhibit"] = "figure"
-    label: str | None = None           # e.g. "figure 3", from the caption
+    label: str | None = None           # e.g. "figure 3" or "sheet A-101"
+    label_source: Literal["", "caption", "title block", "model"] = ""
     caption: str = ""
+    title: str = ""                    # a title from the title block or read by the model
     region: bool = True                # False: a caption whose drawing wasn't found
     references: list[Reference] = Field(default_factory=list)
     claims: list[str] = Field(default_factory=list)       # visual claims found inside the figure

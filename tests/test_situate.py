@@ -13,7 +13,8 @@ from semantic_pdf_diff.llm import ModelFailure
 from semantic_pdf_diff.models import Evidence, Extraction, Judgment, Occurrence, PdfLocator, Section, Settings
 from semantic_pdf_diff.progress import NoProgress
 from semantic_pdf_diff.provenance import triage_interpreter
-from semantic_pdf_diff.situate import figure_map, find_figures, grounding, quality, situate, values_in
+from semantic_pdf_diff.situate import (CAPTION, figure_map, find_figures, grounding, quality, situate, targets,
+                                      values_in)
 from semantic_pdf_diff.store import InterpreterMismatch, Store
 from stubs import situating_answer
 
@@ -73,6 +74,31 @@ class Figures(unittest.TestCase):
         self.assertEqual(fig1.claims, ['ev-tile'])
         self.assertEqual(sorted(r.label for r in unresolved), ['sheet M-101', 'table 7'])
 
+    def test_list_entries_and_repeats_are_not_citations(self):
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            contents = doc.new_page(width=400, height=500)
+            contents.insert_text((40, 60), 'Figure 1. Pump arrangement ........ 2')
+            page = doc.new_page(width=400, height=500)
+            page.insert_text((40, 40), 'Figure 1 shows the pumps; the valves in Figure 1 are shut.')
+            diagram(page, 100, 100)
+            page.insert_text((100, 290), 'Figure 1: Pump arrangement')
+            doc.save(Path(d) / 'l.pdf'); doc.close()
+            doc = pymupdf.open(Path(d) / 'l.pdf')
+            figures, _ = figure_map(doc, [])
+            doc.close()
+        (fig1,) = [f for f in figures if f.label == 'figure 1']
+        self.assertEqual([(r.page, r.paragraph) for r in fig1.references],
+                         [(2, 'Figure 1 shows the pumps; the valves in Figure 1 are shut.')])
+
+    def test_labels_captions_and_panels(self):
+        self.assertFalse(CAPTION.match('Figure 1 shows the pumps'))
+        self.assertTrue(all(CAPTION.match(t) for t in ('Figure 1: Pumps', 'Table 2 Pump sizes', 'TABLE 3 PUMP SCHEDULE')))
+        by_label = {'figure 24': ['fig'], 'sheet A101': ['sheet']}
+        self.assertEqual(targets(by_label, 'figure 2-4A'), ['fig'])    # a panel cites its figure
+        self.assertEqual(targets(by_label, 'sheet A-101'), ['sheet'])  # hyphens don't matter
+        self.assertIsNone(targets(by_label, 'figure 25'))
+
     def test_drawing_sheet_is_one_region(self):
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()
@@ -86,6 +112,45 @@ class Figures(unittest.TestCase):
             doc.close()
             self.assertEqual(sheet.page, 1)
             self.assertLess(sheet.bbox[0], 70)
+
+class Sheets(unittest.TestCase):
+    def test_sheet_is_one_figure_labelled_from_its_title_block(self):
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            prose = doc.new_page(width=600, height=400)
+            prose.insert_text((40, 60), 'Pumps are laid out as shown; see Sheet M201 for the pump room.')
+            sheet = doc.new_page(width=1200, height=800)
+            for i in range(100):  # few paths: the title block alone makes it a sheet
+                x = 40 + (i % 60) * 15
+                sheet.draw_line(pymupdf.Point(x, 60 + (i // 60) * 50), pymupdf.Point(x + 10, 90 + (i // 60) * 50))
+            for y in (600, 620, 640):
+                sheet.insert_text((60, y), 'NOTE', fontsize=8)
+            sheet.insert_text((1050, 760), 'M-201', fontsize=40)
+            sheet.insert_text((1000, 700), 'PUMP ROOM PLAN', fontsize=20)
+            doc.save(Path(d) / 's.pdf'); doc.close()
+            doc = pymupdf.open(Path(d) / 's.pdf')
+            figures, unresolved = figure_map(doc, [])
+            doc.close()
+        (drawing,) = figures
+        self.assertEqual((drawing.kind, drawing.label, drawing.title, drawing.label_source),
+                         ('sheet', 'sheet M-201', 'PUMP ROOM PLAN', 'title block'))
+        self.assertEqual(drawing.bbox, (0, 0, 1200, 800))
+        self.assertEqual([r.page for r in drawing.references], [1])  # 'M201' cites 'M-201'
+        self.assertEqual(unresolved, [])
+
+    def test_many_paths_without_a_title_block_make_a_sheet(self):
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            page = doc.new_page(width=1200, height=800)
+            for i in range(600):
+                x = 40 + (i % 60) * 15
+                page.draw_line(pymupdf.Point(x, 60 + (i // 60) * 50), pymupdf.Point(x + 10, 90 + (i // 60) * 50))
+            page.insert_text((60, 700), 'GENERAL NOTE: VERIFY ALL DIMENSIONS', fontsize=9)
+            doc.save(Path(d) / 's.pdf'); doc.close()
+            doc = pymupdf.open(Path(d) / 's.pdf')
+            (drawing,) = find_figures(doc)
+            doc.close()
+        self.assertEqual((drawing.kind, drawing.label), ('sheet', None))
 
 class Recorder:
     """Answers situating requests from the stub; extraction finds nothing; records requests."""
@@ -118,28 +183,40 @@ class Requests(unittest.TestCase):
             return situate(self.doc, 'sha256:' + 'a' * 64 + '.pdf', list(evidence), self.sections, self.dir, client,
                            dispatch, NoProgress())
 
-    def test_figures_first_then_sections_with_their_abouts(self):
+    def test_every_figure_in_context_then_sections(self):
         client = Recorder()
+        # A label only the figure itself shows (the stub "reads" it from the text after the figure).
+        self.doc[2].insert_text((60, 440), 'PRINTED LABEL Sheet M-101')
         tile = ev('ev-tile', 2, 'tile', (90, 90, 300, 300))
         sheet = ev('ev-sheet', 3, 'tile', (50, 240, 260, 410))  # on the uncaptioned diagram
         figures, sections, unresolved, issues = self.run_situate(client, [tile, sheet])
         prompts = [p for p, _, _ in client.asked]
         kinds = ['figure' if 'Situate one figure' in p else 'section' for p in prompts]
-        self.assertEqual(kinds, ['figure', 'figure', 'section', 'section'])  # labelled figures only
+        self.assertEqual(kinds, ['figure'] * 4 + ['section'] * 2)  # every figure, one again, then sections
         fig1_prompt, fig1_images, key = client.asked[0]
+        self.assertIn('Location: page 2 of 4, middle of the page; section: Pumps', fig1_prompt)
+        self.assertIn('Label: figure 1 (from its caption)', fig1_prompt)
         self.assertIn('Caption: Figure 1: Pump arrangement', fig1_prompt)
-        self.assertIn('The pump arrangement is shown in Figure 1.', fig1_prompt)
-        self.assertIn('Section: Pumps', fig1_prompt)
+        # The whole citing paragraph, with where it is.
+        self.assertIn('- (page 1, section: Pumps) The pump arrangement is shown in Figure 1. See also Table 7', fig1_prompt)
         self.assertEqual(len(fig1_images), 1)
         self.assertEqual(key[:2], ('triage', 'figure'))
-        self.assertEqual(client.asked[1][1], [])  # a caption without a drawing: no image
+        uncaptioned = prompts[1]
+        self.assertIn('Text before it:\nNotes on the arrangement', uncaptioned)
+        self.assertIn('Claims extracted from it:\n- e | a | v', uncaptioned)
+        self.assertEqual(client.asked[2][1], [])  # a caption without a drawing: no image
+        # The model read "Sheet M-101" from the uncaptioned figure: references resolve, and it is asked again.
+        (m101,) = [f for f in figures if f.label == 'sheet M-101']
+        self.assertEqual((m101.page, m101.label_source), (3, 'model'))
+        self.assertEqual(len(m101.references), 2)
+        self.assertIn('Paragraphs citing it:\n- (page 3, section: Sheets) Notes on the arrangement', prompts[3])
+        self.assertEqual(sorted(r.label for r in unresolved), ['table 7'])
         (fig1,) = [f for f in figures if f.label == 'figure 1']
         self.assertEqual(fig1.about, 'stub figure: Figure 1: Pump arrangement')
-        self.assertIn('stub figure: Figure 1', prompts[2])  # the section sees its figure's about
-        self.assertIn('unlabelled figure', prompts[3])      # uncaptioned regions feed through their claims only
+        self.assertIn('stub figure: Figure 1', prompts[4])  # sections see their figures' abouts
+        self.assertIn('- sheet M-101 (page 3): stub figure', prompts[5])
         self.assertEqual([s.about for s in sections], ['stub section: Pumps', 'stub section: Sheets'])
-        self.assertEqual(client.asked[2][1], [])            # prose section: no overviews
-        self.assertEqual(len(client.asked[3][1]), 2)        # diagram-heavy: page overviews
+        self.assertEqual([images for _, images, _ in client.asked[4:]], [[], []])  # no scans: no overviews
         self.assertEqual(issues, [])
 
     def test_failures_are_issues_and_long_text_is_trimmed(self):
@@ -151,7 +228,7 @@ class Requests(unittest.TestCase):
         self.sections = self.sections[:1] + [self.sections[1].model_copy(update={'first_page': 2, 'last_page': 2})]
         self.sections[0] = self.sections[0].model_copy(update={'last_page': 1})
         _, sections, _, issues = self.run_situate(client)
-        self.assertEqual({(i['target'], i['failed']) for i in issues},
+        self.assertEqual({(i['target'], i['failed']) for i in issues if i['target'].startswith('s')},
                          {('s1', False), ('s2', False), ('s2', True)})
         self.assertEqual(sections[1].about, '')
         self.assertTrue(all(len(p.encode()) < 2048 for p, _, _ in client.asked))
@@ -177,7 +254,7 @@ class Storage(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d); a, b = self.pdfs(root)
             _, first, _ = self.run_cli(root, a, b)
-            self.assertEqual(self.situating_calls(first), 4)  # a: 2 figures + 1 section; b: 1 section
+            self.assertEqual(self.situating_calls(first), 5)  # a: 3 figures + 1 section; b: 1 section
             report = json.loads((root / 'out/evidence.json').read_text())
             self.assertTrue(all(s['about'].startswith('stub section') for s in report['sections']))
             figures = [f for c in report['situation'].values() for f in c['figures'] if f['label']]
@@ -199,7 +276,7 @@ class Storage(unittest.TestCase):
             _, _, log = self.run_cli(root, a, b, client=Recorder(fail=('Caption: Figure 2',), vision=False))
             self.assertIn('1 request(s) failed', log)
             _, second, _ = self.run_cli(root, a, b)
-            self.assertEqual(self.situating_calls(second), 3)  # a again; b was complete
+            self.assertEqual(self.situating_calls(second), 4)  # a again; b was complete
 
     def test_no_situate_skips_the_stage(self):
         with tempfile.TemporaryDirectory() as d:
@@ -249,10 +326,13 @@ class Quality(unittest.TestCase):
                         Section(id='s2', first_page=3, last_page=4, origin='pages')]
             q = quality(doc, figures, sections, unresolved, [tile])
             doc.close()
+        unlabelled = next(f for f in figures if not f.label)
         found = {(f['target'], f['check']) for f in q['flags']}
-        self.assertEqual(found, {(fig1.id, 'values'), (fig2.id, 'grounding'), ('s1', 'shape')})  # s2 has no claims
+        self.assertEqual(found, {(fig1.id, 'values'), (fig2.id, 'grounding'), ('s1', 'shape'),
+                                 (unlabelled.id, 'missing')})  # s2 has no claims, so no about is expected
         self.assertEqual(q['references'], {'resolved': 2, 'unresolved': 2, 'rate': .5})
-        self.assertEqual(q['figures'], {'labelled': 2, 'uncaptioned': 1, 'labelled_uncited': 1})
+        self.assertEqual(q['figures'], {'total': 3, 'unlabelled': 1, 'labelled_uncited': 1, 'labelled_from_caption': 2,
+                                        'labelled_from_title_block': 0, 'labelled_from_model': 0})
 
 if __name__ == '__main__':
     unittest.main()
