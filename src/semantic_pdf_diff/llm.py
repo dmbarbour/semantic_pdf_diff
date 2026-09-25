@@ -178,7 +178,7 @@ class Client:
                 headers={"Content-Type": "application/json", **({"Authorization": "Bearer " + self.api_key} if self.api_key else {})})
             entry = self.limiter.acquire(request.estimate)
             self.gate.acquire()
-            started, throttled = time.monotonic(), False
+            started, throttled, generated = time.monotonic(), False, 0
             try:
                 with urllib.request.urlopen(http, timeout=self.s.timeout) as response:
                     result = json.load(response)
@@ -186,6 +186,7 @@ class Client:
                     raise ValueError("Response is not a JSON object")
                 usage = result.get("usage") or {}
                 reported = 0
+                generated = int(usage.get("completion_tokens") or 0) if isinstance(usage, dict) else 0
                 with self.lock:
                     for k in self.usage:
                         n = int(usage.get(k) or 0) if isinstance(usage, dict) else 0
@@ -216,7 +217,10 @@ class Client:
             except (ValueError, KeyError, IndexError, TypeError, AttributeError, OSError) as e:
                 last = f"{type(e).__name__}: {e}"
             finally:
-                self.gate.release(throttled=throttled, latency=time.monotonic() - started)
+                # Seconds per generated token (plus a fixed allowance): answer length alone varies
+                # latency tenfold, which must not read as a loaded server. Unknown without usage.
+                elapsed = time.monotonic() - started
+                self.gate.release(throttled=throttled, latency=elapsed / (generated + 32) if generated else None)
             if attempt < self.s.retries:
                 time.sleep(wait)
         raise ModelFailure(last)

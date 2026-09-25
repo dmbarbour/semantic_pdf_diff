@@ -9,7 +9,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from unittest.mock import patch
 import pymupdf
-from semantic_pdf_diff.models import Claim, Evidence, Extraction, Judgment, PdfLocator, Settings
+from semantic_pdf_diff.models import MAX_CLAIMS, Claim, Evidence, Extraction, Judgment, PdfLocator, Settings
 from semantic_pdf_diff.llm import Client, ModelFailure, redact_url
 from semantic_pdf_diff.compare import numeric_check
 from semantic_pdf_diff.extract import extract_pdf, tiles
@@ -124,9 +124,9 @@ class ValidationTests(unittest.TestCase):
         self.assertIn('Discarded 3 malformed claim(s)', result.issues)
 
     def test_salvage_caps_claims_and_issues(self):
-        result = Extraction.model_validate({'complete': True, 'claims': [GOOD] * 15,
+        result = Extraction.model_validate({'complete': True, 'claims': [GOOD] * (MAX_CLAIMS + 3),
                                             'issues': [f'issue {i}' for i in range(20)]})
-        self.assertEqual(len(result.claims), 12)
+        self.assertEqual(len(result.claims), MAX_CLAIMS)
         self.assertFalse(result.complete)
         self.assertEqual(len(result.issues), 10)
 

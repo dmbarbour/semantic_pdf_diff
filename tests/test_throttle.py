@@ -101,7 +101,9 @@ class ConcurrentClient(unittest.TestCase):
                     handler_state['peak'] = max(handler_state['peak'], handler_state['active'])
                     handler_state['count'] += 1
                     throttle = handler_state['count'] <= handler_state.get('throttle_first', 0)
-                time.sleep(handler_state.get('delay', 0.2))
+                delay, generated = handler_state.get('answer', lambda n: (handler_state.get('delay', 0.2), 5))(
+                    handler_state['count'])
+                time.sleep(delay)
                 with handler_state['lock']:
                     handler_state['active'] -= 1
                 if throttle:
@@ -109,7 +111,7 @@ class ConcurrentClient(unittest.TestCase):
                     return
                 self.send_response(200); self.end_headers()
                 self.wfile.write(json.dumps({'choices': [{'finish_reason': 'stop', 'message': {'content': EMPTY}}],
-                                             'usage': {'prompt_tokens': 10, 'completion_tokens': 5}}).encode())
+                                             'usage': {'prompt_tokens': 10, 'completion_tokens': generated}}).encode())
         server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
         thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
         self.addCleanup(lambda: (server.shutdown(), server.server_close(), thread.join()))
@@ -129,6 +131,18 @@ class ConcurrentClient(unittest.TestCase):
         self.assertEqual(state['peak'], 4)
         self.assertLess(elapsed, 12 * 0.2 / 2)           # far faster than sequential
         self.assertEqual((client.calls, client.usage), (12, {'prompt_tokens': 120, 'completion_tokens': 60}))
+
+    def test_long_answers_are_not_read_as_load(self):
+        # Every fourth answer is ten times longer, and takes ten times as long: same speed per token.
+        state = {'lock': threading.Lock(), 'active': 0, 'peak': 0, 'count': 0,
+                 'answer': lambda n: (0.4, 400) if n % 4 == 0 else (0.04, 40)}
+        url = self.serve(state)
+        with tempfile.TemporaryDirectory() as d:
+            client = Client(Settings(base_url=url, concurrency=4, retries=0), Path(d))
+            requests = [client.prepare(f'prompt {i}', Extraction) for i in range(16)]
+            with ThreadPoolExecutor(4) as pool:
+                list(pool.map(client.send, requests))
+        self.assertEqual(client.gate.limit, 4)
 
     def test_throttling_shrinks_concurrency(self):
         state = {'lock': threading.Lock(), 'active': 0, 'peak': 0, 'count': 0, 'throttle_first': 4, 'delay': 0.05}

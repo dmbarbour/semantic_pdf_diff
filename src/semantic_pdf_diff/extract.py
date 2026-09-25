@@ -14,15 +14,15 @@ from .progress import NoProgress, log
 
 # Bump when prompt assembly or task construction changes, not only the template text;
 # it is part of the extraction interpreter. 2: section heading path in prompts.
-# 3: exactly repeated table rows follow their first occurrence.
-PROMPT_VERSION = 3
+# 3: exactly repeated table rows follow their first occurrence. 4: claims per request configurable.
+PROMPT_VERSION = 4
 
 EXTRACT = '''Extract atomic engineering claims from this one source. Return JSON:
 {"claims":[{"entity":"component/system", "attribute":"property or directed relationship",
 "value":"literal value or target", "unit":"literal unit or empty", "conditions":"load, scenario, time, tolerances, scope",
 "kind":"text|table|chart|diagram", "quote":"short exact supporting text or visible labels",
 "confidence":0.0, "approximate":false}], "complete":true, "issues":[]}
-Maximum 6 claims. Set complete=false if content is clipped, ambiguous, unreadable, or more claims remain.
+Maximum {max_claims} claims. Set complete=false if content is clipped, ambiguous, unreadable, or more claims remain.
 For tables associate row labels, column headers and units. For charts preserve series, axes, units,
 operating point and trend; estimated plotted readings MUST be approximate. For diagrams extract
 labeled components and directed connections; never invent direction on unmarked edges.
@@ -322,7 +322,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         images = [output / image] if image else []
         section = page_section[page_no]
         heading = " > ".join(section.heading_path)
-        prompt = (EXTRACT + "\nSource type: " + region + (f"\nSection: {heading}" if heading else "")
+        prompt = (EXTRACT.replace("{max_claims}", str(s.claims_per_request)) + "\nSource type: " + region + (f"\nSection: {heading}" if heading else "")
                   + "\nSOURCE DATA:\n" + text)
         key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
 

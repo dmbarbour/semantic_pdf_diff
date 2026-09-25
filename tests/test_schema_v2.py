@@ -79,6 +79,16 @@ class ClaimContextTests(unittest.TestCase):
         self.assertEqual(result.claims[0].topic, '')
         self.assertEqual(result.claims[1].uncertainty, '± 0.5 kW')
 
+class ClaimsPerRequestTests(unittest.TestCase):
+    def test_prompt_asks_for_the_configured_number(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = make_pdf(Path(d) / 't.pdf')
+            client = Recorder(vision=False, claims_per_request=40)
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+            self.assertIn('Maximum 40 claims.', client.prompts[0])
+        self.assertNotEqual(extraction_interpreter(Settings()).settings,
+                            extraction_interpreter(Settings(claims_per_request=40)).settings)
+
 class InterpreterTests(unittest.TestCase):
     def test_interpreters_hold_only_output_affecting_settings(self):
         s = Settings(timeout=5, max_calls=3, base_url='http://user:secret@host/v1')

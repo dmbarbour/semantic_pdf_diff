@@ -29,7 +29,8 @@ class Claim(Strict):
 
 OPTIONAL_CLAIM_FIELDS = ("unit", "conditions", "approximate", "topic", "basis", "uncertainty", "context", "role")
 
-MAX_CLAIMS, MAX_ISSUES = 12, 10
+# Sanity bounds on one answer; the requested maximum is Settings.claims_per_request.
+MAX_CLAIMS, MAX_ISSUES = 200, 10
 
 class Extraction(Strict):
     claims: list[Claim] = Field(max_length=MAX_CLAIMS)
@@ -288,6 +289,8 @@ class Settings(Strict):
     base_url: str = "http://localhost:8000/v1"
     context_tokens: int = Field(default=8192, ge=2048)
     output_tokens: int = Field(default=1400, ge=256)
+    # Claims asked for per extraction request; raise with output_tokens (about 150 tokens per claim).
+    claims_per_request: int = Field(default=6, ge=1, le=100)
     image_tokens: int = Field(default=1200, ge=1)
     safety_tokens: int = Field(default=400, ge=100)
     # A safety stop against runaway runs, not a budget: throughput is governed by rate_limits.
