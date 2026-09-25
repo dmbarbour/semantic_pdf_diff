@@ -14,7 +14,8 @@ from .progress import NoProgress, log
 
 # Bump when prompt assembly or task construction changes, not only the template text;
 # it is part of the extraction interpreter. 2: section heading path in prompts.
-PROMPT_VERSION = 2
+# 3: exactly repeated table rows follow their first occurrence.
+PROMPT_VERSION = 3
 
 EXTRACT = '''Extract atomic engineering claims from this one source. Return JSON:
 {"claims":[{"entity":"component/system", "attribute":"property or directed relationship",
@@ -92,11 +93,7 @@ def same_form(row, header):
     pairs = [(a, b) for a, b in zip(row, header) if a not in (None, "") or b not in (None, "")]
     return bool(pairs) and sum(a == b for a, b in pairs) / len(pairs) >= 0.5
 
-def text_groups(page, text_bytes):
-    """Consecutive text blocks grouped up to the byte budget (oversized blocks split).
-
-    Returns [(ids, [(bbox, text)])], where ids like '3.0-5.0' name the blocks grouped.
-    """
+def text_pieces(page, text_bytes):
     pieces = []
     for bi, block in enumerate(page.get_text("blocks", sort=True)):
         if block[6] != 0:
@@ -104,6 +101,14 @@ def text_groups(page, text_bytes):
         for ci, chunk in enumerate(split_utf8(block[4].strip(), text_bytes)):
             if chunk.strip():
                 pieces.append((f"{bi}.{ci}", tuple(block[:4]), chunk))
+    return pieces
+
+def text_groups(page, text_bytes):
+    """Consecutive text blocks grouped up to the byte budget (oversized blocks split).
+
+    Returns [(ids, [(bbox, text)])], where ids like '3.0-5.0' name the blocks grouped.
+    """
+    pieces = text_pieces(page, text_bytes)
     groups, group, size = [], [], 0
     for piece in pieces + [None]:
         extra = len(piece[2].encode()) + 2 if piece else 0
@@ -115,6 +120,17 @@ def text_groups(page, text_bytes):
             group.append(piece)
             size += extra
     return groups
+
+UNIT = re.compile(r"\d\s?(?:[kMG]?W|kWh|[kM]?Pa|bar|psi|mm|cm|km|m²|m2|m³|m3|kg|L/s|l/s|L/min|°C|°F|K|%|Hz|kV|V|kVA|A|rpm|dB)\b")
+REQUIREMENT = re.compile(r"\b(?:shall|must|required|requirement)\b", re.IGNORECASE)
+
+def page_signals(page, tables):
+    """Cheap triage signals for one page; summed per section."""
+    text = page.get_text("text")
+    drawings = page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings()
+    return {"numbers": len(re.findall(r"\d+(?:[.,]\d+)?", text)), "units": len(UNIT.findall(text)),
+            "requirements": len(REQUIREMENT.findall(text)), "tables": tables, "images": len(page.get_images()),
+            "drawings": len(drawings), "characters": len(text.strip())}
 
 def union(boxes):
     boxes = list(boxes)
@@ -255,8 +271,28 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         if on_task:
             on_task(row, list(items))
 
-    def consume(page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None, then=None):
+    repeats = {}
+
+    def follow(entry, page_no, bbox, task, region):
+        """Record a repeated block from its first occurrence's result, without a model call."""
+        note = f"identical to {entry['task']} on page {entry['page']}; not re-sent"
+        step = DerivationStep(step="repeated-block", detail=note)
+        section = page_section[page_no]
+        copies = [e.model_copy(update={"locator": PdfLocator(page=page_no, bbox=tuple(bbox), region=region, task=task),
+                                       "section": section.id, "derivation": [*e.derivation, step]})
+                  for e in entry["found"]]
+        row = {"content": content, "page": page_no, "bbox": list(bbox), "task": task, "image": None,
+               "status": entry["row"]["status"], "issues": [note], "claims": len(copies), "duplicate_of": entry["task"]}
+        evidence.extend(copies)
+        record(row, copies)
+
+    def consume(page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None, then=None,
+                repeat_key=None, repeat_after=1):
         """Queue one extraction task; when it finishes, record it and call then(status).
+
+        repeat_key identifies exactly repeated boilerplate: once `repeat_after` earlier
+        sightings prove the repetition, the task follows the first occurrence's result
+        instead of calling the model (or is extracted normally if that one failed).
 
         check(quote) -> bool | None. Native tasks reject claims failing it; visual tasks
         only record the result. locate(quote) narrows a claim's bbox within the task.
@@ -264,6 +300,22 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         tasks are merged into one piece of evidence afterwards (union provenance).
         """
         region = task.split(":")[0]
+        entry = None
+        if repeat_key is not None and s.dedupe_repeated:
+            entry = repeats.setdefault(repeat_key, {"task": task, "page": page_no, "seen": 0, "done": False,
+                                                    "ok": False, "found": [], "row": None, "followers": []})
+            entry["seen"] += 1
+            if entry["task"] != task and entry["seen"] - 1 >= repeat_after:
+                again = lambda: consume(page_no, bbox, task, text, image, check, locate, crop, derivation, then)
+                if not entry["done"]:
+                    entry["followers"].append((lambda: follow(entry, page_no, bbox, task, region), again))
+                elif entry["ok"]:
+                    follow(entry, page_no, bbox, task, region)
+                else:
+                    again()
+                return
+            if entry["task"] != task:
+                entry = None  # an early sighting, extracted normally before repetition is proven
         found = []
         row = {"content": content, "page": page_no, "bbox": list(bbox), "task": task,
                "image": image, "status": "complete", "issues": [], "claims": 0}
@@ -283,6 +335,11 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             evidence.extend(found)
             record(row, found)
             progress.finish(row["status"])
+            if entry is not None:  # the first occurrence of a repeated block: release its followers
+                entry.update(done=True, ok=row["status"] in ("complete", "partial"), found=list(found), row=row)
+                for followed, again in entry.pop("followers"):
+                    followed() if entry["ok"] else again()
+                entry["followers"] = []
             log.debug("%s %s: %s, %d claim(s)%s", Path(name).name, task, row["status"], row["claims"],
                       f" ({'; '.join(row['issues'])[:200]})" if row["issues"] else "")
             if then:
@@ -332,7 +389,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         for i, part in enumerate(parts):
             text_task(page_no, part, f"{task}:r{i}", depth + 1)
 
-    def table_task(page_no, bbox, task, header, row, columns, depth=0, derivation=None):
+    def table_task(page_no, bbox, task, header, row, columns, depth=0, derivation=None, repeat_key=None):
         """Send one table row with its header; split wide or partial rows by column.
 
         Column 0 is kept in every split as the provisional row label.
@@ -352,7 +409,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 if status != "complete" and depth < s.refinement_depth and splittable:
                     split_columns(page_no, bbox, task, header, row, columns, depth + 1, derivation)
             consume(page_no, bbox, task, text, derivation=derivation, check=lambda q: quoted(q, text) or covered(q, flat),
-                    then=then)
+                    then=then, repeat_key=repeat_key, repeat_after=2)
         else:
             split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
 
@@ -399,6 +456,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         page_section.update(owner)
         if on_sections:
             on_sections(sections)
+        signals = {}
         # (header, width) of a table that ended near the bottom of the previous page
         carried = None
         for number, page in enumerate(doc, 1):
@@ -438,12 +496,20 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     # table) cost a model call and can't yield a claim.
                     if all(c is None or not str(c).strip() for c in row):
                         continue
+                    # Exactly repeated rows (same header and cells, same table position) follow their
+                    # first occurrence from the third sighting on; text is never de-duplicated.
+                    key = ("table", json.dumps([header, row], ensure_ascii=False, default=str),
+                           tuple(round(v / 2) * 2 for v in bbox))
                     table_task(number, tuple(bbox), f"table:p{number}:{ti}:{ri}", header, row, list(range(width)),
-                               derivation=derivation)
+                               derivation=derivation, repeat_key=key)
                 if bbox[3] > 0.8 * height:
                     carried = (header, width)
                 else:
                     carried = None
+            section = owner[number].id
+            for name_, value in page_signals(page, len(found)).items():
+                signals.setdefault(section, {}).setdefault(name_, 0)
+                signals[section][name_] += value
             if s.vision:
                 for tag, rect in visual_regions(page, s.tile_points):
                     # Task tags are unique within content: "<region>:p<page>[:<index>]".
@@ -454,6 +520,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
                         "task": f"vision:p{number}", "image": None, "status": "skipped",
                         "issues": ["Visual extraction disabled; charts, diagrams and scans may be missed"], "claims": 0})
+        if on_sections:
+            on_sections([x.model_copy(update={"signals": signals.get(x.id, {})}) for x in sections])
         while state["pending"]:  # refinement may still render crops from this document
             yield "waiting"
     coverage.sort(key=lambda r: (r["page"] or 0, r["task"]))

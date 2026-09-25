@@ -108,6 +108,9 @@ class Section(Strict):
     last_page: int = Field(ge=1)
     heading_path: list[str] = Field(default_factory=list)
     origin: Literal["outline", "pages"]
+    # Cheap triage signals summed over the section's pages (numbers, units, requirement
+    # words, tables, images, vector drawings, text characters); filled as pages are read.
+    signals: dict[str, int] = Field(default_factory=dict)
 
 class DerivationStep(Strict):
     step: str
@@ -226,6 +229,8 @@ class Settings(Strict):
     # Sections come from the PDF outline down to this depth, else fixed page ranges.
     section_depth: int = Field(default=2, ge=1, le=6)
     section_pages: int = Field(default=20, ge=1, le=1000)
+    # Extract exactly repeated table rows (same cells, same table position, 3+ pages) once.
+    dedupe_repeated: bool = True
     top_k: int = Field(default=4, ge=1, le=30)
     min_score: float = Field(default=0.10, ge=0, le=1)
     max_pairs: int = Field(default=1000, ge=1)

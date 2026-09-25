@@ -16,7 +16,7 @@ EXTENSION_ALIASES = {".jpeg": ".jpg", ".tif": ".tiff", ".htm": ".html", ".yml": 
 # Settings that shape what extraction sends to the model or how content is chunked.
 # Timeouts, retries, call limits, credentials and the endpoint URL are excluded.
 EXTRACTION_SETTINGS = ("model", "context_tokens", "output_tokens", "text_bytes", "image_side", "tile_points",
-                       "refinement_depth", "section_depth", "section_pages", "vision", "response_format", "temperature",
+                       "refinement_depth", "section_depth", "section_pages", "dedupe_repeated", "vision", "response_format", "temperature",
                        "seed", "max_token_field")
 COMPARISON_SETTINGS = ("model", "top_k", "min_score", "max_pairs", "verify_visuals", "aliases",
                        "response_format", "temperature", "seed", "output_tokens", "max_token_field")
