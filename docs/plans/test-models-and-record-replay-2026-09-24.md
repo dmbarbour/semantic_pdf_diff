@@ -79,8 +79,8 @@ Reordered 2026-09-25 (see *Decisions*): a cheap hosted gemma-4 makes live record
 
 1. ✅ Replay client modes (`replay`, `replay-or-record`) and the fixture database with reproducible zip packing and `fixtures summary`, tested against the stub model. *Not built: seeding a store from a fixture (replay serves the same purpose), `collect` mode.*
 2. ✅ Deterministic slices of the sample corpus (`scripts/make_slices.py`, `scripts/slices.json`): turbine reports, drawing sheets from two teams, competition rules.
-3. ◐ First tables: gemma-4-31B (DeepInfra), then gemma-4-31B-turbo and other hosted models for comparison.
-4. Integration tests that replay each table (`tests/test_replay_slices.py`), with outcomes checked loosely (structure, coverage, provenance), since answers differ across responders. Once replay fixtures exist, continuous integration becomes worthwhile: every commit can run the full suite offline.
+3. ◐ First tables. *Done: gemma-4-31B (DeepInfra), 2,906 requests on all slices (`tests/fixtures/replay-slices.zip`, 1.5 MB), about $0.48; failures are recorded too.* Next: gemma-4-31B-turbo and other hosted models for comparison.
+4. ◐ *Started: `tests/test_replay_slices.py` replays every responder on every slice run offline (about 50 s). Still to come: a lenient mode for comparisons, whose requests shift whenever extraction or retrieval changes.* Integration tests that replay each table, with outcomes checked loosely (structure, coverage, provenance), since answers differ across responders. Once replay fixtures exist, continuous integration becomes worthwhile: every commit can run the full suite offline.
 5. Collection rounds (`collect` mode, export work lists, import answers) for a Claude table and the weak local VLM.
 6. *Deferred:* the **recording kit** and a table recorded in-house, if the in-house deployment's answers differ enough from hosted gemma-4 to matter.
 
