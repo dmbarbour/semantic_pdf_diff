@@ -43,6 +43,8 @@ def main(argv=None):
             return store_command(argv[0], argv[1:])
         if argv and argv[0] == 'fixtures':
             return fixtures_command(argv[1:])
+        if argv and argv[0] == 'review':
+            return review_command(argv[1:])
         return shortcut_command(argv)
     except (OSError, ValueError, RuntimeError) as e:
         print(f'Error: {e}', file=sys.stderr)
@@ -340,6 +342,67 @@ def fixtures_command(argv):
     else:
         fixtures.pack(args.fixture, args.target)
         print(f'Packed {args.target}')
+    return 0
+
+def review_command(argv):
+    from . import review
+    parser = argparse.ArgumentParser(prog='pdf-semantic-diff review',
+        description='Review batches: sample results, label them (people and a panel of models), measure agreement.')
+    sub = parser.add_subparsers(dest='command', required=True)
+    sample = sub.add_parser('sample', help='Sample claims, about statements and claim pairs from stores into a batch')
+    sample.add_argument('batch', type=Path, help='Batch folder to create')
+    sample.add_argument('--store', action='append', required=True, metavar='LABEL=DIR',
+                        help='A store to sample, labelled by who produced it (hidden from reviewers); repeatable')
+    sample.add_argument('--claims', type=int, default=12, help='Claims per store (round-robin over claim kinds)')
+    sample.add_argument('--abouts', type=int, default=4, help='About statements per store')
+    sample.add_argument('--pairs', type=int, default=4, help='Claim pairs per store (round-robin over relations)')
+    sample.add_argument('--seed', type=int, default=1)
+    add = sub.add_parser('import', help="Check a reviewer's labels file and add it to the batch")
+    add.add_argument('batch', type=Path)
+    add.add_argument('labels', type=Path, nargs='+')
+    panel = sub.add_parser('judge', help='Ask models to review a batch, each as its own reviewer')
+    panel.add_argument('batch', type=Path)
+    panel.add_argument('--model', action='append', required=True, help='Model name at the configured endpoint; repeatable')
+    panel.add_argument('--limit', type=int, help='Only the first N items (to check cost first)')
+    add_log_options(panel)
+    for name, help in (('agreement', 'Agreement between reviewers: verdicts, flags, clarity, confidence'),
+                       ('scores', 'Verdicts per responder, item type and claim kind, per reviewer'),
+                       ('page', 'Rewrite the review page (after a taxonomy change)')):
+        sub.add_parser(name, help=help).add_argument('batch', type=Path)
+    args = parser.parse_args(argv)
+    if args.command == 'sample':
+        stores = []
+        for spec in args.store:
+            label, _, path = spec.partition('=')
+            if not path:
+                raise ValueError(f'--store {spec!r}: use LABEL=DIR')
+            stores.append((label, Path(path)))
+        batch = review.sample(stores, args.batch, args.claims, args.abouts, args.pairs, args.seed)
+        print(f"{len(batch['items'])} items: open {args.batch / 'review.html'} in a browser")
+    elif args.command == 'import':
+        for path in args.labels:
+            target, count = review.import_labels(args.batch, path)
+            print(f'{count} labels from {path} -> {target}')
+    elif args.command == 'judge':
+        start_logging(args)
+        for model in args.model:
+            settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000, image_tokens=3000,
+                                         concurrency=16, timeout=600, retries=2)
+            client = Client(settings, args.batch / '.judge-cache')
+            progress = Progress(f'judge {model}', client, heartbeat=settings.heartbeat_seconds)
+            target, count, failures = review.judge(args.batch, client, model, args.limit, progress)
+            progress.close()
+            for failure in failures[:5]:
+                log.warning(f'{model}: {failure}')
+            print(f"{model}: {count} labels -> {target}; {client.calls} calls, "
+                  f"{client.usage['prompt_tokens']} prompt and {client.usage['completion_tokens']} completion tokens")
+    elif args.command == 'agreement':
+        print(json.dumps(review.agreement(args.batch), indent=2))
+    elif args.command == 'scores':
+        print(json.dumps(review.scores(args.batch), indent=2))
+    else:
+        review.write_page(args.batch, json.loads((args.batch / 'batch.json').read_text(encoding='utf-8')))
+        print(f"Rewrote {args.batch / 'review.html'}")
     return 0
 
 def extract_sources(store, client, names, files, progress):

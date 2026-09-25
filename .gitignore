@@ -7,3 +7,7 @@ diff-output/
 samples/
 .env
 tests/fixtures/*.sqlite
+benchmarks/runs/
+benchmarks/batches/*/images/
+benchmarks/batches/*/review.html
+benchmarks/batches/*/.judge-cache/

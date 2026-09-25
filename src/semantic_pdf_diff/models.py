@@ -158,6 +158,14 @@ class SectionAbout(Lenient):
             self.type = "other"
         return self
 
+class PanelLabel(Lenient):
+    """A panel model's review of one item; checked against the taxonomy afterwards."""
+    verdict: str = ""
+    flags: list[str] = Field(default_factory=list, max_length=30)
+    clarity: str = ""
+    confidence: str = ""
+    note: str = Field(default="", max_length=1000)
+
 class Reference(Strict):
     """A sentence citing a figure (or table, sheet, exhibit) by label."""
     page: int

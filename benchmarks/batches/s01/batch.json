@@ -1,0 +1,676 @@
+{
+  "format": "semantic-pdf-diff-review-batch",
+  "version": 1,
+  "name": "s01",
+  "seed": 1,
+  "created": "2026-09-25",
+  "stores": [
+    {
+      "label": "gemma-4-31B/turbines",
+      "path": "benchmarks/runs/gemma-4-31B/turbines"
+    },
+    {
+      "label": "gemma-4-31B/drawings",
+      "path": "benchmarks/runs/gemma-4-31B/drawings"
+    },
+    {
+      "label": "gemma-4-31B/rules",
+      "path": "benchmarks/runs/gemma-4-31B/rules"
+    }
+  ],
+  "items": [
+    {
+      "id": "c-0806b876a28b",
+      "type": "claim",
+      "store": "gemma-4-31B/rules",
+      "target": {
+        "claim": "ev-94e8ea792bc713be"
+      },
+      "images": [
+        {
+          "src": "images/c-0806b876a28b-crop.jpg",
+          "caption": "The source text or table row, highlighted"
+        },
+        {
+          "src": "images/c-0806b876a28b-page.jpg",
+          "caption": "Page 2 of 4"
+        }
+      ],
+      "context": {
+        "document": "rules-2013-p35-38.pdf / rules-2013-p35-38.pdf",
+        "page": 2,
+        "region": "table",
+        "section": "Contest 9. Home Entertainment > 9-3. Dinner Party"
+      },
+      "shown": {
+        "entity": "starting water weight",
+        "attribute": "minimum value",
+        "value": "96.00",
+        "unit": "oz",
+        "conditions": "Contest 9-3 Dinner Party",
+        "kind": "text",
+        "quote": "the starting water weight shall be at least 96.00 oz",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "a-10284ac5720d",
+      "type": "about",
+      "store": "gemma-4-31B/turbines",
+      "target": {
+        "content": "sha256:b20ef3ef71f97cf1915f420319ccb34d9f9bded38e2eb3de8d448681708ab9b8.pdf",
+        "figure": "fig:p1:0"
+      },
+      "images": [
+        {
+          "src": "images/a-10284ac5720d-figure.jpg",
+          "caption": "The figure"
+        },
+        {
+          "src": "images/a-10284ac5720d-page.jpg",
+          "caption": "Page 1 of 12"
+        }
+      ],
+      "context": {
+        "document": "nrel-5mw-p25-36.pdf / nrel-5mw-p25-36.pdf",
+        "label": "table 5",
+        "caption": "Table 5-1 summarizes the drivetrain properties discussed in this section.",
+        "title": "Drivetrain Properties",
+        "cited by": ""
+      },
+      "shown": {
+        "about": "A summary of drivetrain properties, including speeds, gearbox ratio, generator efficiency, inertia, driveshaft constants, and brake specifications.",
+        "role": "To summarize the drivetrain properties discussed in the section.",
+        "keywords": "drivetrain, rotor speed, generator speed, gearbox ratio, electrical generator efficiency, generator inertia, driveshaft torsional-spring constant, driveshaft torsional-damping constant, high-speed shaft brake torque, high-speed shaft brake time constant"
+      }
+    },
+    {
+      "id": "c-d47fa69746a2",
+      "type": "claim",
+      "store": "gemma-4-31B/turbines",
+      "target": {
+        "claim": "ev-20901329091a2887"
+      },
+      "images": [
+        {
+          "src": "images/c-d47fa69746a2-crop.jpg",
+          "caption": "What the model read (its image)"
+        },
+        {
+          "src": "images/c-d47fa69746a2-page.jpg",
+          "caption": "Page 5 of 12"
+        }
+      ],
+      "context": {
+        "document": "iea-15mw-p20-31.pdf / iea-15mw-p20-31.pdf",
+        "page": 5,
+        "region": "tile",
+        "section": ""
+      },
+      "shown": {
+        "entity": "FFA-W3-211 airfoil, 77% span",
+        "attribute": "material composition",
+        "value": "glass_triax",
+        "conditions": "Pressure Side",
+        "kind": "chart",
+        "quote": "glass_triax",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "p-958d226635ef",
+      "type": "pair",
+      "store": "gemma-4-31B/drawings",
+      "target": {
+        "a": "ev-4ee3cd13a81df368",
+        "b": "ev-faa3d70822cceff5"
+      },
+      "images": [
+        {
+          "src": "images/p-958d226635ef-a-crop.jpg",
+          "caption": "A: What the model read (its image)"
+        },
+        {
+          "src": "images/p-958d226635ef-a-page.jpg",
+          "caption": "A: Page 1 of 4"
+        },
+        {
+          "src": "images/p-958d226635ef-b-crop.jpg",
+          "caption": "B: The source text or table row, highlighted"
+        },
+        {
+          "src": "images/p-958d226635ef-b-page.jpg",
+          "caption": "B: Page 4 of 4"
+        }
+      ],
+      "context": {
+        "A": {
+          "document": "dc-cd-p39-42.pdf / dc-cd-p39-42.pdf",
+          "page": 1,
+          "region": "tile",
+          "section": "S-522 - DECK FOOTING DETAILS"
+        },
+        "B": {
+          "document": "calg-cd-p39-42.pdf / calg-cd-p39-42.pdf",
+          "page": 4,
+          "region": "table",
+          "section": "A303-BUILDING SECTIONS"
+        }
+      },
+      "shown": {
+        "A": {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0",
+          "unit": "\"",
+          "kind": "diagram",
+          "quote": "GRADE LEVEL 0\"",
+          "confidence": 1.0,
+          "approximate": false,
+          "basis": "unknown"
+        },
+        "B": {
+          "entity": "BEDROOM",
+          "attribute": "FINISHED FLOOR height",
+          "value": "2' - 9 1/2\"",
+          "conditions": "relative to GRADE LEVEL",
+          "kind": "text",
+          "quote": "BEDROOM\nFINISHED FLOOR\n2' - 9 1/2\"",
+          "confidence": 1.0,
+          "approximate": false,
+          "basis": "unknown"
+        },
+        "relation": "complementary",
+        "rationale": "Claim A establishes the datum (Grade Level = 0\"), and Claim B provides the elevation of the Bedroom Finished Floor relative to that datum."
+      }
+    },
+    {
+      "id": "c-44cbaa2a98b8",
+      "type": "claim",
+      "store": "gemma-4-31B/rules",
+      "target": {
+        "claim": "ev-1b736b054cdf8ffd"
+      },
+      "images": [
+        {
+          "src": "images/c-44cbaa2a98b8-crop.jpg",
+          "caption": "What the model read (its image)"
+        },
+        {
+          "src": "images/c-44cbaa2a98b8-page.jpg",
+          "caption": "Page 2 of 4"
+        }
+      ],
+      "context": {
+        "document": "rules-2013-p35-38.pdf / rules-2013-p35-38.pdf",
+        "page": 2,
+        "region": "tile",
+        "section": "Contest 9. Home Entertainment > 9-3. Dinner Party"
+      },
+      "shown": {
+        "entity": "scoring function",
+        "attribute": "points per cooking task (linear increase start)",
+        "value": "20",
+        "unit": "oz",
+        "conditions": "weight of vaporized water",
+        "kind": "chart",
+        "quote": "Weight of vaporized water (oz) [x-axis]",
+        "confidence": 0.9,
+        "approximate": true,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "p-0370c82e26fc",
+      "type": "pair",
+      "store": "gemma-4-31B/turbines",
+      "target": {
+        "a": "ev-b070ff7d3663fb81",
+        "b": "ev-91abcc09557ca246"
+      },
+      "images": [
+        {
+          "src": "images/p-0370c82e26fc-a-crop.jpg",
+          "caption": "A: The source text or table row, highlighted"
+        },
+        {
+          "src": "images/p-0370c82e26fc-a-page.jpg",
+          "caption": "A: Page 10 of 12"
+        },
+        {
+          "src": "images/p-0370c82e26fc-b-crop.jpg",
+          "caption": "B: What the model read (its image)"
+        },
+        {
+          "src": "images/p-0370c82e26fc-b-page.jpg",
+          "caption": "B: Page 8 of 12"
+        }
+      ],
+      "context": {
+        "A": {
+          "document": "nrel-5mw-p25-36.pdf / nrel-5mw-p25-36.pdf",
+          "page": 10,
+          "region": "table",
+          "section": "7 Baseline Control System Properties > 7.3 Baseline Blade-Pitch Controller"
+        },
+        "B": {
+          "document": "iea-15mw-p20-31.pdf / iea-15mw-p20-31.pdf",
+          "page": 8,
+          "region": "tile",
+          "section": "Rotor Performance > Steady-State Performance"
+        }
+      },
+      "shown": {
+        "A": {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Pitch Angle",
+          "value": "23.47",
+          "unit": "º",
+          "conditions": "Wind Speed = 25.0 m/s",
+          "kind": "table",
+          "quote": "Pitch Angle\n(º) ... 23.47",
+          "confidence": 1.0,
+          "approximate": false,
+          "basis": "unknown"
+        },
+        "B": {
+          "entity": "blade pitch controller",
+          "attribute": "objective",
+          "value": "regulate rotational speed to 7.55 rpm",
+          "unit": "rpm",
+          "conditions": "10.59 m/s ≤ U ≤ 25 m/s",
+          "kind": "text",
+          "quote": "The objective of the blade pitch controller is to regulate the rotational speed to 7.55 rpm",
+          "confidence": 1.0,
+          "approximate": false,
+          "basis": "unknown"
+        },
+        "relation": "complementary",
+        "rationale": "Claim A provides a specific output value (Pitch Angle = 23.47º) for the controller at a specific wind speed (25 m/s), while Claim B describes the overall control objective (regulating rotational speed to 7.55 rpm) for the same controller across a wind speed range that includes 25 m/s. They provide distinct but compatible information about the same entity."
+      }
+    },
+    {
+      "id": "c-f28692b19d79",
+      "type": "claim",
+      "store": "gemma-4-31B/turbines",
+      "target": {
+        "claim": "ev-ee1aa5c0c73a7d9f"
+      },
+      "images": [
+        {
+          "src": "images/c-f28692b19d79-crop.jpg",
+          "caption": "The source text or table row, highlighted"
+        },
+        {
+          "src": "images/c-f28692b19d79-page.jpg",
+          "caption": "Page 12 of 12"
+        }
+      ],
+      "context": {
+        "document": "iea-15mw-p20-31.pdf / iea-15mw-p20-31.pdf",
+        "page": 12,
+        "region": "text",
+        "section": "Tower and Monopile Properties"
+      },
+      "shown": {
+        "entity": "steel",
+        "attribute": "Young’s modulus",
+        "value": "2.00E11",
+        "unit": "Pa",
+        "kind": "table",
+        "quote": "Young’s modulus, steel E 2 00E11 Pa",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "c-616da36ebfc0",
+      "type": "claim",
+      "store": "gemma-4-31B/turbines",
+      "target": {
+        "claim": "ev-0f9891f11a0d7486"
+      },
+      "images": [
+        {
+          "src": "images/c-616da36ebfc0-crop.jpg",
+          "caption": "What the model read (its image)"
+        },
+        {
+          "src": "images/c-616da36ebfc0-page.jpg",
+          "caption": "Page 3 of 12"
+        }
+      ],
+      "context": {
+        "document": "iea-15mw-p20-31.pdf / iea-15mw-p20-31.pdf",
+        "page": 3,
+        "region": "tile",
+        "section": ""
+      },
+      "shown": {
+        "entity": "blade section 0.7",
+        "attribute": "material composition",
+        "value": "Carbon UD",
+        "kind": "diagram",
+        "quote": "Carbon UD",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "c-ac18b7c3818a",
+      "type": "claim",
+      "store": "gemma-4-31B/drawings",
+      "target": {
+        "claim": "ev-3d5c5bf28c926990"
+      },
+      "images": [
+        {
+          "src": "images/c-ac18b7c3818a-crop.jpg",
+          "caption": "What the model read (its image)"
+        },
+        {
+          "src": "images/c-ac18b7c3818a-page.jpg",
+          "caption": "Page 4 of 4"
+        }
+      ],
+      "context": {
+        "document": "dc-cd-p39-42.pdf / dc-cd-p39-42.pdf",
+        "page": 4,
+        "region": "tile",
+        "section": "S-901 - FRAMING ISOMETRICS"
+      },
+      "shown": {
+        "entity": "Structural Engineer",
+        "attribute": "address",
+        "value": "1120 CONNECTICUT AVENUE, NW., SUITE 200 WASHINGTON, DC 20036",
+        "kind": "text",
+        "quote": "1120 CONNECTICUT AVENUE, NW., SUITE 200 WASHINGTON, DC 20036",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "c-27b2cf7f1bef",
+      "type": "claim",
+      "store": "gemma-4-31B/turbines",
+      "target": {
+        "claim": "ev-1962d15211623076"
+      },
+      "images": [
+        {
+          "src": "images/c-27b2cf7f1bef-crop.jpg",
+          "caption": "The source text or table row, highlighted"
+        },
+        {
+          "src": "images/c-27b2cf7f1bef-page.jpg",
+          "caption": "Page 12 of 12"
+        }
+      ],
+      "context": {
+        "document": "nrel-5mw-p25-36.pdf / nrel-5mw-p25-36.pdf",
+        "page": 12,
+        "region": "text",
+        "section": "7 Baseline Control System Properties > 7.3 Baseline Blade-Pitch Controller"
+      },
+      "shown": {
+        "entity": "baseline blade-pitch controller",
+        "attribute": "KI(θ = 0º)",
+        "value": "0.008068634",
+        "conditions": "θ = 0º",
+        "kind": "text",
+        "quote": "KI(θ = 0º) = 0.008068634",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "c-d71f35cf4199",
+      "type": "claim",
+      "store": "gemma-4-31B/rules",
+      "target": {
+        "claim": "ev-4a60c12fa0f0e2a0"
+      },
+      "images": [
+        {
+          "src": "images/c-d71f35cf4199-crop.jpg",
+          "caption": "What the model read (its image)"
+        },
+        {
+          "src": "images/c-d71f35cf4199-page.jpg",
+          "caption": "Page 4 of 4"
+        }
+      ],
+      "context": {
+        "document": "rules-2013-p35-38.pdf / rules-2013-p35-38.pdf",
+        "page": 4,
+        "region": "overview",
+        "section": "Contest 10. Energy Balance"
+      },
+      "shown": {
+        "entity": "Energy Balance Contest",
+        "attribute": "points at 0 kWh",
+        "value": "100",
+        "unit": "points",
+        "conditions": "net electrical energy balance",
+        "kind": "chart",
+        "quote": "Points at conclusion of Energy Balance Contest: 100; Net Electrical Energy (kWh): 0",
+        "confidence": 1.0,
+        "approximate": true,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "a-b8b74ae80ad0",
+      "type": "about",
+      "store": "gemma-4-31B/rules",
+      "target": {
+        "content": "sha256:85bd9cb0dce7d89d877ec8f133448142d6dab3a4b6542e113b2003d2bed08618.pdf",
+        "figure": "fig:p4:0"
+      },
+      "images": [
+        {
+          "src": "images/a-b8b74ae80ad0-figure.jpg",
+          "caption": "The figure"
+        },
+        {
+          "src": "images/a-b8b74ae80ad0-page.jpg",
+          "caption": "Page 4 of 4"
+        }
+      ],
+      "context": {
+        "document": "rules-2013-p35-38.pdf / rules-2013-p35-38.pdf",
+        "label": "figure 10",
+        "caption": "",
+        "title": "Scoring function for the Energy Balance Contest",
+        "cited by": ""
+      },
+      "shown": {
+        "about": "A graph depicting the scoring function for the Energy Balance Contest, showing the relationship between net electrical energy in kWh and points earned.",
+        "role": "To illustrate how reduced points are scaled linearly for a net electrical energy balance between -50 kWh and 0 kWh.",
+        "keywords": "Energy Balance Contest, net electrical energy, scoring function"
+      }
+    },
+    {
+      "id": "c-db101f9685b0",
+      "type": "claim",
+      "store": "gemma-4-31B/rules",
+      "target": {
+        "claim": "ev-4aaba7b075853a53"
+      },
+      "images": [
+        {
+          "src": "images/c-db101f9685b0-crop.jpg",
+          "caption": "The source text or table row, highlighted"
+        },
+        {
+          "src": "images/c-db101f9685b0-page.jpg",
+          "caption": "Page 2 of 4"
+        }
+      ],
+      "context": {
+        "document": "rules-2013-p35-38.pdf / rules-2013-p35-38.pdf",
+        "page": 2,
+        "region": "table",
+        "section": "Contest 9. Home Entertainment > 9-3. Dinner Party"
+      },
+      "shown": {
+        "entity": "vaporized water",
+        "attribute": "weight for no points",
+        "value": "≤ 16",
+        "unit": "oz",
+        "conditions": "Contest 9-3",
+        "kind": "table",
+        "quote": "No points: Weight ≤ 16 oz (450 g)",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "c-1b0c50c7b954",
+      "type": "claim",
+      "store": "gemma-4-31B/drawings",
+      "target": {
+        "claim": "ev-508988317beb2688"
+      },
+      "images": [
+        {
+          "src": "images/c-1b0c50c7b954-crop.jpg",
+          "caption": "What the model read (its image)"
+        },
+        {
+          "src": "images/c-1b0c50c7b954-page.jpg",
+          "caption": "Page 2 of 4"
+        }
+      ],
+      "context": {
+        "document": "dc-cd-p39-42.pdf / dc-cd-p39-42.pdf",
+        "page": 2,
+        "region": "tile",
+        "section": "S-601 - BEAM OPENINGS"
+      },
+      "shown": {
+        "entity": "ROOF BEAM @ GRID 2,3,4",
+        "attribute": "opening offset from top edge",
+        "value": "2",
+        "unit": "\"",
+        "conditions": "Detail E6",
+        "kind": "diagram",
+        "quote": "2\"",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "c-ccb464a3c35c",
+      "type": "claim",
+      "store": "gemma-4-31B/drawings",
+      "target": {
+        "claim": "ev-c3f65a16dc427f2c"
+      },
+      "images": [
+        {
+          "src": "images/c-ccb464a3c35c-crop.jpg",
+          "caption": "What the model read (its image)"
+        },
+        {
+          "src": "images/c-ccb464a3c35c-page.jpg",
+          "caption": "Page 1 of 4"
+        }
+      ],
+      "context": {
+        "document": "calg-cd-p39-42.pdf / calg-cd-p39-42.pdf",
+        "page": 1,
+        "region": "overview",
+        "section": "A202-EXTERIOR ELEVATIONS"
+      },
+      "shown": {
+        "entity": "Finished Floor",
+        "attribute": "elevation",
+        "value": "2",
+        "unit": "ft",
+        "conditions": "West Elevation",
+        "kind": "diagram",
+        "quote": "FINISHED FLOOR 2' - 3\"",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    },
+    {
+      "id": "a-4578ea48ad03",
+      "type": "about",
+      "store": "gemma-4-31B/drawings",
+      "target": {
+        "content": "sha256:8757cdd4366edbe78dd56a823053407bcc31e9594b9c4d8e178e22d9a11357d6.pdf",
+        "figure": "fig:p2:0"
+      },
+      "images": [
+        {
+          "src": "images/a-4578ea48ad03-figure.jpg",
+          "caption": "The figure"
+        },
+        {
+          "src": "images/a-4578ea48ad03-page.jpg",
+          "caption": "Page 2 of 4"
+        }
+      ],
+      "context": {
+        "document": "calg-cd-p39-42.pdf / calg-cd-p39-42.pdf",
+        "label": "sheet A-301",
+        "caption": "",
+        "title": "BUILDING SECTIONS",
+        "cited by": ""
+      },
+      "shown": {
+        "about": "Engineering drawing showing building sections for the East and West modules, including elevations for grade level and finished floor.",
+        "role": "",
+        "keywords": "building sections, East Module, West Module, finished floor, grade level"
+      }
+    },
+    {
+      "id": "c-4d29a6907d8f",
+      "type": "claim",
+      "store": "gemma-4-31B/drawings",
+      "target": {
+        "claim": "ev-c0d1205ad29d2fa8"
+      },
+      "images": [
+        {
+          "src": "images/c-4d29a6907d8f-crop.jpg",
+          "caption": "The source text or table row, highlighted"
+        },
+        {
+          "src": "images/c-4d29a6907d8f-page.jpg",
+          "caption": "Page 3 of 4"
+        }
+      ],
+      "context": {
+        "document": "dc-cd-p39-42.pdf / dc-cd-p39-42.pdf",
+        "page": 3,
+        "region": "table",
+        "section": "S-701 - PV DETAILS"
+      },
+      "shown": {
+        "entity": "C1",
+        "attribute": "thickness",
+        "value": "3/16",
+        "unit": "\"",
+        "kind": "table",
+        "quote": "C1 3/16\"",
+        "confidence": 1.0,
+        "approximate": false,
+        "basis": "unknown"
+      }
+    }
+  ]
+}

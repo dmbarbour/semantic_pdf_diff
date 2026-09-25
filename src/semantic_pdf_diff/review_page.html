@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Review: __TITLE__</title>
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--ink:#1b2733;--muted:#5b6b7a;--line:#d5dde4;--accent:#1f6f9f;--warn:#9a5a00;--sel:#e6f1f8}
+@media (prefers-color-scheme:dark){:root{--bg:#12171c;--card:#1b232b;--ink:#e3e9ee;--muted:#9aa9b6;--line:#2f3b46;--accent:#6fb3de;--warn:#e0a55a;--sel:#223444}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,sans-serif}
+header{position:sticky;top:0;z-index:2;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:16px;margin:0 8px 0 0}header input{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+button{padding:7px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer}button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.progress{flex:1;min-width:140px;height:8px;background:var(--line);border-radius:4px;overflow:hidden}.progress div{height:100%;background:var(--accent)}
+main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:16px;padding:16px;max-width:1500px;margin:auto}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.images figure{margin:0 0 12px}.images img{max-width:100%;border:1px solid var(--line);border-radius:4px;cursor:zoom-in;background:#fff}
+figcaption{color:var(--muted);font-size:13px}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:8px 0}dt{color:var(--muted)}dd{margin:0;overflow-wrap:anywhere}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.claimbox{border:1px solid var(--line);border-radius:8px;padding:8px}
+h2{font-size:15px;margin:4px 0 8px}h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 0 6px}
+.opts label{display:block;padding:5px 8px;border-radius:6px;cursor:pointer}.opts label:hover{background:var(--sel)}
+.opts label small{display:block;color:var(--muted);margin-left:24px}
+.flags details{border-top:1px solid var(--line);padding:4px 0}.flags summary{cursor:pointer;color:var(--muted);font-size:13px}
+textarea{width:100%;min-height:60px;border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--bg);color:var(--ink);font:inherit}
+nav{display:flex;gap:8px;justify-content:space-between;margin-top:12px}.done{color:var(--accent)}.hint{color:var(--muted);font-size:13px}
+.question{background:var(--sel);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+#zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;z-index:5;overflow:auto;cursor:zoom-out}#zoom img{display:block;margin:auto;max-width:none}
+#list{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}#list button{padding:2px 7px;font-size:12px}#list button.labelled{background:var(--sel)}#list button.current{outline:2px solid var(--accent)}
+</style>
+<header>
+  <h1>Review __TITLE__</h1>
+  <label>Your name <input id="reviewer" placeholder="e.g. david" size="12"></label>
+  <div class="progress"><div id="bar"></div></div><span id="count"></span>
+  <button id="copy">Copy labels</button><button class="primary" id="download">Download labels</button>
+</header>
+<main>
+  <section class="card images" id="images"></section>
+  <section class="card">
+    <div id="item"></div>
+    <form id="form"></form>
+    <nav><button id="prev">← Previous</button><span class="hint">Saved in this browser as you go. Keys: ← → to move.</span><button id="next" class="primary">Next →</button></nav>
+    <div id="list"></div>
+  </section>
+</main>
+<div id="zoom"><img alt=""></div>
+<script type="application/json" id="data">__DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById('data').textContent);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY = 'review:' + DATA.batch;
+let state = {reviewer: '', labels: {}, at: 0};
+try { state = Object.assign(state, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const QUESTIONS = {
+  claim: 'Is this claim a correct, faithful reading of the source? Judge it against the highlighted region and the page.',
+  about: 'Does this statement say what the figure or section is about, correctly and usefully, without stating specific values?',
+  pair: 'Retrieval paired these two claims and the model judged their relation. Is the pairing sensible, and is the relation right?'};
+
+function fields(obj) {
+  return '<dl>' + Object.entries(obj).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(typeof v === 'object' ? JSON.stringify(v) : v)}</dd>`).join('') + '</dl>';
+}
+function showItem() {
+  const item = DATA.items[state.at];
+  $('#images').innerHTML = item.images.map(i => `<figure><img src="${esc(i.src)}" alt="${esc(i.caption)}" loading="lazy"><figcaption>${esc(i.caption)}</figcaption></figure>`).join('');
+  let body = `<div class="question">${esc(QUESTIONS[item.type])}</div><h2>Item ${state.at + 1} of ${DATA.items.length} · ${esc(item.type)}</h2>`;
+  if (item.type === 'pair') {
+    body += `<div class="pair"><div class="claimbox"><b>A</b>${fields(item.shown.A)}${fields(item.context.A)}</div><div class="claimbox"><b>B</b>${fields(item.shown.B)}${fields(item.context.B)}</div></div>`
+          + `<h3>Model's judgment</h3>${fields({relation: item.shown.relation, rationale: item.shown.rationale})}`;
+  } else {
+    body += `<h3>${item.type === 'claim' ? 'Extracted claim' : 'Statement'}</h3>${fields(item.shown)}<h3>Where</h3>${fields(item.context)}`;
+  }
+  $('#item').innerHTML = body;
+  showForm(item);
+  showList();
+}
+function option(name, value, entry, checked, type = 'radio') {
+  return `<label><input type="${type}" name="${name}" value="${esc(entry.name)}" ${checked ? 'checked' : ''}> ${esc(entry.label)}${entry.help ? `<small>${esc(entry.help)}</small>` : ''}</label>`;
+}
+function showForm(item) {
+  const kind = DATA.taxonomy[item.type];
+  const label = state.labels[item.id] || {};
+  const flags = new Set(label.flags || []);
+  const groups = {};
+  kind.flags.forEach(f => (groups[f.group] = groups[f.group] || []).push(f));
+  let html = `<h3>Verdict</h3><div class="opts">${kind.verdicts.map(v => option('verdict', 0, v, label.verdict === v.name)).join('')}</div>`;
+  html += `<h3>What's wrong (any that apply)</h3><div class="flags opts">` + Object.entries(groups).map(([g, fs]) =>
+    `<details ${fs.some(f => flags.has(f.name)) ? 'open' : ''}><summary>${esc(g)}</summary>${fs.map(f => option('flags', 0, f, flags.has(f.name), 'checkbox')).join('')}</details>`).join('') + '</div>';
+  html += `<h3>Was the item clear?</h3><div class="opts">${DATA.clarity.map(c => option('clarity', 0, c, (label.clarity || 'clear') === c.name)).join('')}</div>`;
+  html += `<h3>Your confidence</h3><div class="opts">${DATA.confidence.map(c => option('confidence', 0, c, (label.confidence || 'medium') === c.name)).join('')}</div>`;
+  html += `<h3>Note (optional)</h3><textarea name="note" placeholder="What's wrong, or what should it say?">${esc(label.note || '')}</textarea>`;
+  $('#form').innerHTML = html;
+}
+function record() {
+  const item = DATA.items[state.at];
+  const form = new FormData($('#form'));
+  if (!form.get('verdict')) return;  // untouched items stay unlabelled
+  state.labels[item.id] = {item: item.id, verdict: form.get('verdict'), flags: form.getAll('flags'),
+    clarity: form.get('clarity'), confidence: form.get('confidence'), note: form.get('note') || ''};
+  save(); showProgress();
+}
+function showProgress() {
+  const n = Object.keys(state.labels).length;
+  $('#bar').style.width = (100 * n / DATA.items.length) + '%';
+  $('#count').textContent = `${n}/${DATA.items.length} labelled`;
+}
+function showList() {
+  $('#list').innerHTML = DATA.items.map((it, n) => `<button type="button" data-n="${n}" class="${state.labels[it.id] ? 'labelled' : ''} ${n === state.at ? 'current' : ''}">${n + 1}</button>`).join('');
+}
+function go(n) { record(); state.at = Math.max(0, Math.min(DATA.items.length - 1, n)); save(); showItem(); window.scrollTo(0, 0); }
+function labelsFile() {
+  record();
+  return JSON.stringify({format: DATA.format, version: 1, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
+    created: new Date().toISOString().slice(0, 10), labels: DATA.items.filter(i => state.labels[i.id]).map(i => state.labels[i.id])}, null, 2);
+}
+$('#form').addEventListener('change', record);
+$('#form').addEventListener('input', e => { if (e.target.name === 'note') record(); });
+$('#prev').onclick = () => go(state.at - 1);
+$('#next').onclick = () => go(state.at + 1);
+$('#list').onclick = e => { if (e.target.dataset.n) go(+e.target.dataset.n); };
+$('#reviewer').value = state.reviewer;
+$('#reviewer').oninput = e => { state.reviewer = e.target.value.trim(); save(); };
+$('#download').onclick = () => {
+  const blob = new Blob([labelsFile()], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `labels-${DATA.batch}-${(state.reviewer || 'anonymous').replace(/[^A-Za-z0-9._-]+/g, '_')}.json`;
+  a.click();
+};
+$('#copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(labelsFile()); $('#copy').textContent = 'Copied'; }
+  catch (e) { $('#copy').textContent = 'Copy failed: use Download'; }
+  setTimeout(() => $('#copy').textContent = 'Copy labels', 2000);
+};
+document.addEventListener('keydown', e => {
+  if (['TEXTAREA', 'INPUT'].includes(document.activeElement.tagName) && document.activeElement.type !== 'radio' && document.activeElement.type !== 'checkbox') return;
+  if (e.key === 'ArrowRight') go(state.at + 1);
+  if (e.key === 'ArrowLeft') go(state.at - 1);
+});
+$('#images').onclick = e => { if (e.target.tagName === 'IMG') { $('#zoom img').src = e.target.src; $('#zoom').style.display = 'block'; } };
+$('#zoom').onclick = () => $('#zoom').style.display = 'none';
+showItem(); showProgress();
+</script>
+</html>

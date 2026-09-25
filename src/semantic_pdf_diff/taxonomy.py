@@ -1,0 +1,150 @@
+"""What reviewers judge: verdicts, error flags, clarity and confidence, per item type.
+
+Design (see benchmarks/README.md for sources): a coarse verdict first, then any number
+of specific flags. Coarse verdicts agree far better between reviewers than error
+categories do, and flags keep the detail. Every flag has a one-line definition and an
+engineering example, which both people and panel models see. Names are stable: labels
+store them, so rename only with a migration.
+"""
+
+def _f(group, name, label, help):
+    return {"group": group, "name": name, "label": label, "help": help}
+
+CLAIM_FLAGS = [
+    # What is claimed: binding the value to the right thing, at the right level.
+    _f("What is claimed", "entity_misbound", "Value bound to the wrong component or thing",
+       "e.g. Pump B's 45 kW recorded as Pump A's"),
+    _f("What is claimed", "scope_level_error", "Wrong level: per-unit vs total, component vs system",
+       "e.g. a 2 kW per-module rating claimed as the whole array's power"),
+    _f("What is claimed", "attribute_misassigned", "Right thing, wrong property (or property fused into the entity)",
+       "e.g. peak power recorded as continuous rating"),
+    _f("What is claimed", "relation_direction_reversed", "Directed relationship reversed",
+       "e.g. 'HX-1 feeds P-2' when P-2 feeds HX-1"),
+    _f("What is claimed", "referent_ambiguous", "Entity too vague to identify",
+       "e.g. entity 'the unit' or 'system' with no way to tell which"),
+    _f("What is claimed", "aggregation_unsupported", "Computed, summed or inferred value presented as stated",
+       "e.g. 'total 120 MW' when the source only lists 3 x 40 MW"),
+    # Value and unit.
+    _f("Value and unit", "value_misread", "Wrong digits, sign or decimal point", "e.g. 0.35 read as 3.5"),
+    _f("Value and unit", "unit_wrong_or_missing", "Unit wrong, missing or mis-converted", "e.g. psi recorded as kPa"),
+    _f("Value and unit", "scale_factor_missed", "A multiplier in a header or caption ignored",
+       "e.g. a 'Cost ($k)' column recorded as dollars; % vs fraction"),
+    _f("Value and unit", "bound_or_range_collapsed", "A limit, range or tolerance reduced to one number",
+       "e.g. '<= 85 dBA' recorded as 85 dBA; '10 +/- 0.5' as 10"),
+    _f("Value and unit", "approximation_misflagged", "Approximate or estimated reading marked exact (or vice versa)",
+       "e.g. '~12 t', or a value read off a chart, marked exact"),
+    _f("Value and unit", "value_fabricated", "Value not in the source at all", "e.g. a typical steel density filled in"),
+    # Qualifiers: the conditions under which the value holds.
+    _f("Conditions and basis", "condition_dropped", "An operating condition or scope left out",
+       "e.g. efficiency without 'at 50% load'"),
+    _f("Conditions and basis", "condition_misattached", "A condition belonging to something else",
+       "e.g. the hot-day condition attached to the ISO rating"),
+    _f("Conditions and basis", "basis_wrong", "Requirement, target, estimate and measurement confused",
+       "e.g. a 'shall be >= 95%' requirement recorded as a measured result"),
+    _f("Conditions and basis", "time_or_version_wrong", "Wrong year, phase, revision or life stage",
+       "e.g. end-of-life capacity reported as beginning-of-life"),
+    _f("Conditions and basis", "scenario_confused", "Baseline, option or case values swapped",
+       "e.g. option B's mass attributed to the baseline"),
+    _f("Conditions and basis", "polarity_or_negation_error", "Negation or limit direction lost",
+       "e.g. 'shall not exceed 60 C' recorded as 'is 60 C'"),
+    # Where it came from.
+    _f("Provenance", "quote_not_verbatim", "Quote paraphrased or stitched together", "e.g. a quote joining two cells"),
+    _f("Provenance", "quote_not_supporting", "Quote exists but doesn't support this value or entity",
+       "e.g. the quote names Pump A; the value is Pump B's"),
+    _f("Provenance", "region_wrong", "The highlighted region doesn't contain the claim", ""),
+    _f("Provenance", "extrinsic_knowledge", "From general knowledge, not this document",
+       "e.g. a standard material property inserted"),
+    _f("Provenance", "confidence_miscalibrated", "Model confidence clearly too high or too low",
+       "e.g. 0.95 on a value misread from a log axis"),
+    # Reading tables, charts, diagrams and drawings.
+    _f("Tables, charts and drawings", "table_header_misaligned", "Wrong row or column header (incl. multi-level)",
+       "e.g. value taken from the 'Max' column instead of 'Nominal'"),
+    _f("Tables, charts and drawings", "table_note_lost", "Merged cell, footnote or note qualifier lost",
+       "e.g. footnote 'a) at 20 C' ignored"),
+    _f("Tables, charts and drawings", "chart_axis_misread", "Axis misread: interpolation, log scale, second axis",
+       "e.g. 300 on a log axis read as 30"),
+    _f("Tables, charts and drawings", "chart_series_swapped", "Legend or series mixed up",
+       "e.g. the design A curve read as design B"),
+    _f("Tables, charts and drawings", "chart_trend_wrong", "Direction or size of a change wrong",
+       "e.g. 'rises sharply' for a flat line"),
+    _f("Tables, charts and drawings", "diagram_edge_invented", "Connection that isn't in the diagram",
+       "e.g. a valve linked to a nearby but unconnected tank"),
+    _f("Tables, charts and drawings", "diagram_edge_direction_reversed", "Arrow or flow direction reversed", ""),
+    _f("Tables, charts and drawings", "drawing_callout_misbound", "Dimension, tolerance or note on the wrong feature",
+       "e.g. +/-0.05 applied to the wrong bore"),
+    # Form: is it a good claim at all.
+    _f("Form", "not_atomic", "Several facts fused into one claim", "e.g. 'mass 12 t and height 90 m' as one value"),
+    _f("Form", "trivial_or_boilerplate", "True but useless for comparison",
+       "e.g. a page number, drawing scale or revision date"),
+    _f("Form", "kind_wrong", "Claim kind wrong (text, table, chart, diagram)", ""),
+    _f("Form", "nearby_claims_missed", "Clearly important facts next to it were not extracted",
+       "a coverage signal: say what was missed in the note"),
+]
+
+ABOUT_FLAGS = [
+    _f("Content", "about_out_of_context", "States something not shown or not in the section",
+       "e.g. 'shows cost savings' for a mass chart"),
+    _f("Content", "about_wrong_subject", "Wrong subject, variable or scope",
+       "e.g. says the whole system when it covers one subsystem"),
+    _f("Content", "about_misses_main_point", "Misses what the figure or section is mainly about", ""),
+    _f("Content", "about_too_generic", "True but uninformative", "e.g. 'a chart of performance'"),
+    _f("Content", "about_states_values", "States specific values or design decisions", "e.g. 'shows the 126 m rotor'"),
+    _f("Context", "role_wrong", "The figure's stated purpose is wrong or invented", ""),
+    _f("Context", "type_or_density_wrong", "Section type or density is wrong", "e.g. a data table called narrative"),
+    _f("Context", "keywords_poor", "Keywords miss the main components or topics", ""),
+]
+
+PAIR_FLAGS = [
+    _f("Pairing", "pairing_irrelevant", "The two claims aren't about the same thing at all",
+       "retrieval shouldn't have paired them"),
+    _f("Pairing", "upstream_claim_error", "One of the claims is itself wrong, so the judgment can't be right", ""),
+    _f("Relation", "false_equivalent", "Called equivalent despite different conditions, scope or basis",
+       "e.g. hot-day vs ISO rating"),
+    _f("Relation", "false_different", "Called different over units, rounding or wording",
+       "e.g. 1.2 MW vs 1200 kW"),
+    _f("Relation", "should_be_equivalent", "Should be: equivalent", ""),
+    _f("Relation", "should_be_different", "Should be: different", ""),
+    _f("Relation", "should_be_complementary", "Should be: complementary (compatible, different aspects)", ""),
+    _f("Relation", "should_be_unrelated", "Should be: unrelated", ""),
+    _f("Relation", "should_be_uncertain", "Should be: uncertain (not enough to tell)", ""),
+    _f("Relation", "rationale_wrong", "Right relation for the wrong reason", ""),
+]
+
+TAXONOMY = {
+    "claim": {"verdicts": [
+        {"name": "correct", "label": "Correct", "help": "A faithful, useful reading of the source"},
+        {"name": "flawed", "label": "Usable but flawed", "help": "The core fact is right; a qualifier, quote or form is off"},
+        {"name": "wrong", "label": "Wrong", "help": "The fact is misread, misbound or not supported"},
+        {"name": "not_a_claim", "label": "Not a claim", "help": "Commentary, a heading or a fragment, not a fact"}],
+        "flags": CLAIM_FLAGS},
+    "about": {"verdicts": [
+        {"name": "good", "label": "Good", "help": "Correct and tells a reader what to expect"},
+        {"name": "acceptable", "label": "Acceptable", "help": "Correct but vague or incomplete"},
+        {"name": "wrong", "label": "Wrong", "help": "Misleading or incorrect"}],
+        "flags": ABOUT_FLAGS},
+    "pair": {"verdicts": [
+        {"name": "right", "label": "Relation right", "help": "The judged relation is correct for these two claims"},
+        {"name": "wrong", "label": "Relation wrong", "help": "Flag what it should be"}],
+        "flags": PAIR_FLAGS},
+}
+
+# The coarse question agreement is best measured on: is the result usable?
+USABLE = {"claim": {"correct", "flawed"}, "about": {"good", "acceptable"}, "pair": {"right"}}
+
+CLARITY = [
+    {"name": "clear", "label": "Clear", "help": "I could judge this item"},
+    {"name": "context_insufficient", "label": "Context insufficient",
+     "help": "I'd need more of the document than shown to judge"},
+    {"name": "source_illegible", "label": "Source illegible", "help": "The image or text can't be read well enough"},
+    {"name": "item_ambiguous", "label": "Item or question ambiguous",
+     "help": "The item could be read several ways, or the categories don't fit it"},
+]
+
+CONFIDENCE = [
+    {"name": "high", "label": "High", "help": "I'd stake a review comment on it"},
+    {"name": "medium", "label": "Medium", "help": "Probably right"},
+    {"name": "low", "label": "Low", "help": "A guess, or outside what I know"},
+]
+
+def flag_names(kind):
+    return {f["name"] for f in TAXONOMY[kind]["flags"]}
