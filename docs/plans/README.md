@@ -13,6 +13,7 @@ Statuses:
 
 | Plan | Summary |
 |---|---|
+| [Evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) | Review batches sampled from recorded answers, labelled by the owner, Claude and a panel of hosted models (verdict, error flags, clarity, confidence), with agreement measured; plus extraction, retrieval and comparison benchmarks on curated public pages and synthetic documents. |
 | [Test models and record/replay](test-models-and-record-replay-2026-09-24.md) | Replay recorded model answers offline: requests keyed by meaning (not bytes) plus an interpreter fingerprint, recorded by running the pipeline live against hosted gemma-4 (and other models for comparison) on deterministic slices of the public corpus; stored as zipped SQLite fixtures in the repo. |
 | [Scheduling and triage](scheduling-and-triage-2026-09-23.md) | Time-of-day rate limits and adaptive concurrency for the in-house server; fair share across sections and sources; status-stamped preliminary reports; section triage with "about" statements; claim quality signals, epistemic status (basis, uncertainty) and skeptical prompting. |
 
@@ -24,7 +25,6 @@ Statuses:
 | [Criteria-first comparison](n-way-comparison-2026-09-23.md) | Criteria first (for two-way proposals too): compare N sources by reviewed, evidence-based criteria (extracted from rules, requirements or the user's rubrics, or recommended), with applicability, per-source synthesis and a criteria × sources matrix. Compares, never judges. Revisions stay claim-level. | Evidence store; triage for "about" statements |
 | [Multi-format adapters](multi-format-adapters-2026-09-23.md) | `.txt`/`.md`, then `.docx` and `.pptx` (chart XML), then external converters, then `.csv`/`.xlsx` (table detection plus model-guided interpretation), then images. Cameo output is consumed as an ordinary source. | Evidence store |
 | [Single-source outputs](single-source-outputs-2026-09-23.md) | `check` for internal consistency; RAG `export` as self-contained Markdown chunks with provenance; a fact sheet built without the model; a shared writing style for people. (Cited summaries within it are tentative.) | Evidence store; triage for "about" statements |
-| [Evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) | Extraction quality (recall, precision, hallucinations, values, qualifiers, provenance, coverage honesty) on curated public pages and synthetic documents with known contents; retrieval and comparison labels; all answer keys committed as annotation export files, with good and bad reviewer-decision variants. Built together with Claude. | Record/replay responder tables |
 | [Retrieval recall](retrieval-recall-2026-09-23.md) | Model-generated section keywords, alias consolidation, hybrid lexical + embedding retrieval (claim-to-claim and claim-to-criterion), with the in-house embedding models run locally for development. | Retrieval benchmark (built alongside) |
 
 ## Tentative

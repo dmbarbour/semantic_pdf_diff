@@ -1,6 +1,6 @@
 # Evaluation benchmarks: extraction and retrieval
 
-- **Status:** Planned. Claude will build most of this with you. Your main job is checking labels. Embedding models run locally (see [retrieval-recall](retrieval-recall-2026-09-23.md)), so this no longer waits on in-house access.
+- **Status:** Active (2026-09-25): review tooling and the first batch done. Claude will build most of this with you. Your main job is checking labels. Embedding models run locally (see [retrieval-recall](retrieval-recall-2026-09-23.md)), so this no longer waits on in-house access.
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md) for responder tables (Claude, weak local VLM, in-house gemma-4); easier once [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) produces evidence stores to sample from.
 - **Informs:** [retrieval-recall](retrieval-recall-2026-09-23.md), prompt and extraction work in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) and [multi-format-adapters](multi-format-adapters-2026-09-23.md), and [n-way-comparison](n-way-comparison-2026-09-23.md)
 
@@ -103,6 +103,15 @@ All answer keys for the public corpus (expected-claim lists, adjudications, pair
 4. Labelling page and retrieval scoring; first retrieval results with local embeddings.
 5. gemma-4 scores once the in-house table is recorded.
 6. Relation and claim-to-criterion labels once criteria-first comparison exists.
+
+## Decisions (2026-09-25)
+
+- **Reviewers:** the owner, Claude in a session, and a panel of hosted models from different families (first panel: gemini-3.1-pro, Qwen3.5-397B, Kimi-K3), each labelling independently. Nobody is ground truth; agreement is measured (Krippendorff's α) and disagreement kept. The model under test doesn't judge its own work.
+- **Every label records clarity** (clear / context insufficient / source illegible / item ambiguous) **and the reviewer's confidence** (high / medium / low), so faults in the question are told apart from faults in the answer.
+- **Verdict, then flags:** a coarse verdict per item and multi-select error flags from a taxonomy consolidated from published error analyses (entity and scope binding first). See `benchmarks/README.md`.
+- **Review page:** a local, self-contained HTML page (works offline and in the sandbox for real documents), one item per screen, progress saved in the browser, labels exported as a file and imported with `review import`. Batches of about 15–20 items per session.
+- **Evidence-web relations** (component of, input to, output of, source of, contradicts…) get their own item type when that work starts.
+- First batch and findings: [evaluation-s01 review](../reviews/evaluation-s01-2026-09-25.md).
 
 ## Decisions (2026-09-24)
 
