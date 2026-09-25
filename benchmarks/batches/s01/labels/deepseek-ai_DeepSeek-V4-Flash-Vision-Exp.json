@@ -1,0 +1,154 @@
+{
+  "format": "semantic-pdf-diff-labels",
+  "version": 1,
+  "batch": "s01",
+  "reviewer": "deepseek-ai/DeepSeek-V4-Flash-Vision-Exp",
+  "created": "2026-09-25",
+  "labels": [
+    {
+      "item": "c-0806b876a28b",
+      "verdict": "flawed",
+      "flags": [
+        "condition_misattached"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source text under section 9-2 Cooking states: 'The water shall be vaporized in a single container and the starting water weight shall be at least 96.00 oz (2.721 kg).' The quoted value and wording are correct, but the claim assigns this requirement to 'Contest 9-3 Dinner Party,' which is the wrong section; it belongs to the Cooking subcontest."
+    },
+    {
+      "item": "a-10284ac5720d",
+      "verdict": "good",
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source shows Table 5-1, which lists drivetrain properties such as rotor/generator speeds, gearbox ratio, generator efficiency, inertia, driveshaft constants, and brake specifications. The statement and the item's description correctly identify that the table summarizes the drivetrain properties discussed in the section, without stating specific values or design decisions."
+    },
+    {
+      "item": "c-d47fa69746a2",
+      "verdict": "flawed",
+      "flags": [
+        "attribute_misassigned"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source chart for FFA-W3-211 at 77% span shows a green glass_triax layer on the pressure side, but the pressure-side layup also includes a black CarbonUD layer (and possibly other materials). Stating the material composition as just glass_triax overstates the composition, though glass_triax is indeed present."
+    },
+    {
+      "item": "p-0370c82e26fc",
+      "verdict": "wrong",
+      "flags": [
+        "pairing_irrelevant",
+        "should_be_unrelated"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The pairing is not sensible: Claim A is a pitch-angle value from the NREL 5-MW baseline controller table, while Claim B describes the IEA 15-MW blade-pitch controller objective. These are different turbines and different controller properties, so they are not about the same entity. The judged complementary relation is therefore wrong; it should be unrelated."
+    },
+    {
+      "item": "c-f28692b19d79",
+      "verdict": "wrong",
+      "flags": [
+        "value_misread",
+        "confidence_miscalibrated"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source table clearly lists Young's modulus for steel as 200E11 Pa, but the claim records 2.00E11 Pa, a factor of 100 too small. The quote also shows '2 00E11' instead of '200E11', indicating a misread of the value. The stated confidence of 1.0 is too high given this error."
+    },
+    {
+      "item": "c-616da36ebfc0",
+      "verdict": "flawed",
+      "flags": [
+        "attribute_misassigned"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source Figure 2-6 shows a blade cross-section at 70% span with a material stack listing Medium Density Foam, Glass Triax, Glass Biax, Carbon UD, Glass Uni, and Gelcoat. Carbon UD is one of several materials in the section, so stating the section's material composition as 'Carbon UD' overstates it."
+    },
+    {
+      "item": "c-ac18b7c3818a",
+      "verdict": "correct",
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The highlighted title block lists the Structural Engineer as ARUP ENGINEERING with the address '1120 CONNECTICUT AVENUE, NW., SUITE 200 WASHINGTON, DC 20036'. The claim matches this exactly."
+    },
+    {
+      "item": "c-27b2cf7f1bef",
+      "verdict": "correct",
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source text explicitly states 'K_I(θ = 0º) = 0.008068634' in the highlighted region. The claim matches this exactly, with the entity correctly identified as the baseline blade-pitch controller and the conditions correctly specified as θ = 0º."
+    },
+    {
+      "item": "c-d71f35cf4199",
+      "verdict": "flawed",
+      "flags": [
+        "quote_not_verbatim",
+        "approximation_misflagged"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source's Figure 10 and text show that full points (100) are earned for a net electrical energy balance of at least 0 kWh, so the value is correct. However, the quote is a paraphrase, not a verbatim source string, and the value is exact rather than approximate."
+    },
+    {
+      "item": "a-b8b74ae80ad0",
+      "verdict": "acceptable",
+      "flags": [
+        "about_states_values"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The figure shows the scoring function for the Energy Balance Contest, with a graph of points versus net electrical energy. The statement correctly describes the figure and its role, but the role includes specific values (-50 kWh and 0 kWh) that are not necessary for a general description."
+    },
+    {
+      "item": "c-db101f9685b0",
+      "verdict": "flawed",
+      "flags": [
+        "condition_misattached"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source table is in section 9-2 Cooking, not 9-3 Dinner Party. The value '≤ 16 oz' is correctly read from the table, but the condition 'Contest 9-3' is misattached."
+    },
+    {
+      "item": "c-1b0c50c7b954",
+      "verdict": "correct",
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source detail E6 shows a beam section with a rectangular opening and a vertical dimension chain of 2\", 6\", 2\". The 2\" dimension is the offset from the top edge to the top of the opening, matching the claim."
+    },
+    {
+      "item": "c-ccb464a3c35c",
+      "verdict": "wrong",
+      "flags": [
+        "value_misread"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source shows the West Elevation with the label 'FINISHED FLOOR 2' - 3\"', meaning 2 feet 3 inches (2.25 ft). The claim extracts the value as 2 ft, dropping the 3 inches, so the value is misread."
+    },
+    {
+      "item": "a-4578ea48ad03",
+      "verdict": "good",
+      "flags": [],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The sheet is titled BUILDING SECTIONS and contains two section drawings labeled SECTION - WEST MODULE and SECTION - EAST MODULE, with grade-level and finished-floor elevation markers. The statement accurately describes the content without introducing specific values or design decisions."
+    },
+    {
+      "item": "c-4d29a6907d8f",
+      "verdict": "wrong",
+      "flags": [
+        "value_fabricated",
+        "region_wrong",
+        "confidence_miscalibrated"
+      ],
+      "clarity": "clear",
+      "confidence": "high",
+      "note": "The source images show a title block with 'REFERENCE KEYNOTES' and 'SHEET KEYNOTES' highlighted, plus drawing details, but no table row or text containing 'C1' or '3/16\"'. The claimed quote and value are not present in the highlighted region or the visible page, so the reading is unsupported."
+    }
+  ]
+}

@@ -31,6 +31,18 @@ Batches are kept small (about 15–20 items, 10–20 minutes) so a session fits 
 - **Clarity**: was the item judgeable? *Context insufficient*, *source illegible* and *item or question ambiguous* mark items where the fault may lie with the question, not the answer.
 - **Confidence**: how sure you are of your own verdict.
 
+## Panels of people (and sensitive documents)
+
+The same method works with no model and nobody as referee:
+
+1. **Share the batch folder**, not a URL. Each person opens `review.html` offline, types their name, and sends back their labels file. Progress is saved per name, so several people can share one computer.
+2. **Import every file** with `review import`.
+3. **Run `review consensus`.** It estimates each reviewer's reliability and each item's most likely verdict from all the labels together, using the Dawid–Skene model (EM over each reviewer's confusion matrix). Nobody's labels count as the answer key.
+4. **Discuss the contested items** (those whose consensus is below 0.8 probability). Disagreement there usually means the item or rubric is ambiguous; clarity flags help tell the two apart.
+5. **Run `review agreement`** to report Krippendorff's α per item type and per flag: at least 0.80 is reliable, 0.667–0.80 tentative.
+
+For sensitive documents, everything stays local. Use `review judge` only with models you're allowed to send the documents to (e.g. an in-house deployment). A good first session for a new panel is a small practice batch, followed by a short discussion of the contested items before the real batches.
+
 ## Commands
 
 ```bash
@@ -44,6 +56,7 @@ pdf-semantic-diff review sample benchmarks/batches/s02 --store <label>=benchmark
 # Labels from people, a panel of models, and the results
 pdf-semantic-diff review import benchmarks/batches/s02 labels.json
 pdf-semantic-diff review judge benchmarks/batches/s02 --model google/gemini-3.1-pro --limit 2   # check cost first
+pdf-semantic-diff review consensus benchmarks/batches/s02 [--gate]   # reliability and consensus, no referee
 pdf-semantic-diff review agreement benchmarks/batches/s02
 pdf-semantic-diff review scores benchmarks/batches/s02
 ```

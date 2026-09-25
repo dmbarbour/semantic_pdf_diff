@@ -365,6 +365,10 @@ def review_command(argv):
     panel.add_argument('--model', action='append', required=True, help='Model name at the configured endpoint; repeatable')
     panel.add_argument('--limit', type=int, help='Only the first N items (to check cost first)')
     add_log_options(panel)
+    agree = sub.add_parser('consensus', help='Consensus verdicts and reviewer reliability, estimated from all labels '
+                                             '(Dawid-Skene), with contested items to discuss; no reviewer is referee')
+    agree.add_argument('batch', type=Path)
+    agree.add_argument('--gate', action='store_true', help='Use the usable-or-not question instead of the full verdict')
     for name, help in (('agreement', 'Agreement between reviewers: verdicts, flags, clarity, confidence'),
                        ('scores', 'Verdicts per responder, item type and claim kind, per reviewer'),
                        ('page', 'Rewrite the review page (after a taxonomy change)')):
@@ -396,6 +400,8 @@ def review_command(argv):
                 log.warning(f'{model}: {failure}')
             print(f"{model}: {count} labels -> {target}; {client.calls} calls, "
                   f"{client.usage['prompt_tokens']} prompt and {client.usage['completion_tokens']} completion tokens")
+    elif args.command == 'consensus':
+        print(json.dumps(review.consensus(args.batch, gate=args.gate), indent=2))
     elif args.command == 'agreement':
         print(json.dumps(review.agreement(args.batch), indent=2))
     elif args.command == 'scores':

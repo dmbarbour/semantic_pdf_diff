@@ -15,7 +15,8 @@ from .progress import NoProgress, log
 # Bump when prompt assembly or task construction changes, not only the template text;
 # it is part of the extraction interpreter. 2: section heading path in prompts.
 # 3: exactly repeated table rows follow their first occurrence. 4: claims per request configurable.
-PROMPT_VERSION = 4
+# 5: headings by position on the page; table rows located by their own box.
+PROMPT_VERSION = 5
 
 EXTRACT = '''Extract atomic engineering claims from this one source. Return JSON:
 {"claims":[{"entity":"component/system", "attribute":"property or directed relationship",
@@ -103,16 +104,18 @@ def text_pieces(page, text_bytes):
                 pieces.append((f"{bi}.{ci}", tuple(block[:4]), chunk))
     return pieces
 
-def text_groups(page, text_bytes):
-    """Consecutive text blocks grouped up to the byte budget (oversized blocks split).
+def text_groups(page, text_bytes, breaks=()):
+    """Consecutive text blocks grouped up to the byte budget (oversized blocks split),
+    never across a section boundary (breaks: y positions where sections start).
 
     Returns [(ids, [(bbox, text)])], where ids like '3.0-5.0' name the blocks grouped.
     """
     pieces = text_pieces(page, text_bytes)
+    part = lambda bbox: sum(bbox[1] + 0.5 >= y for y in breaks)
     groups, group, size = [], [], 0
     for piece in pieces + [None]:
         extra = len(piece[2].encode()) + 2 if piece else 0
-        if group and (piece is None or size + extra > text_bytes):
+        if group and (piece is None or size + extra > text_bytes or part(piece[1]) != part(group[-1][1])):
             ids = group[0][0] + (f"-{group[-1][0]}" if len(group) > 1 else "")
             groups.append((ids, [(b, t) for _, b, t in group]))
             group, size = [], 0
@@ -136,38 +139,119 @@ def union(boxes):
     boxes = list(boxes)
     return (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
 
+HEADING_GAP = 40.0  # an outline entry this close above the next one is only its parent heading
+
+def _squash(text):
+    return re.sub(r"[\W_]+", "", text).casefold()
+
+def heading_y(page, title):
+    """Where an outline title sits on its page (unrotated y), or 0 when it can't be found.
+
+    Outline destinations are often just the top of the page, so the title's own text line
+    is looked for instead."""
+    want = _squash(title)
+    if len(want) < 3:
+        return 0.0
+    for block in page.get_text("dict")["blocks"]:
+        for line in block.get("lines", ()):
+            text = _squash("".join(span["text"] for span in line["spans"]))
+            if text and (text == want or (len(text) >= 3 and (text.startswith(want) or want.startswith(text)))):
+                return float(line["bbox"][1])
+    return 0.0
+
+class SectionIndex:
+    """Which section a point in the document belongs to: the last one starting at or above it.
+
+    index[page] is the section at the top of a page (used for per-page signals)."""
+
+    def __init__(self, sections):
+        self.sections = sorted(sections, key=lambda s: (s.first_page, s.first_y))
+
+    def at(self, page, y=0.0):
+        if not self.sections:
+            return None
+        found = self.sections[0]
+        for section in self.sections:
+            if (section.first_page, section.first_y) <= (page, y + 0.5):
+                found = section
+            else:
+                break
+        return found
+
+    def __getitem__(self, page):
+        return self.at(page, 0.0)
+
+    def boundaries(self, page):
+        """y positions on a page where a new section starts."""
+        return [s.first_y for s in self.sections if s.first_page == page and s.first_y > 0]
+
+def row_boxes(table, extracted):
+    """Each row's box (None where unknown), aligned with the extracted rows; [] if they don't align."""
+    rows = getattr(table, "rows", None) or []
+    boxes = [tuple(r.bbox) if getattr(r, "bbox", None) else None for r in rows]
+    return boxes if len(boxes) == len(extracted) else []
+
 def pdf_sections(doc, depth, pages_per_section):
     """Sections from the outline down to `depth`, else fixed page ranges.
 
-    Returns (sections, section of each page). Assignment is per page: a page belongs to
-    the last outline entry starting on or before it, so an entry sharing its start page
-    with a later one gets no pages of its own.
+    Returns (sections, SectionIndex). An outline section runs from its title's position
+    (see heading_y) to the next title's, so one page can end one section and start the
+    next. A title directly followed by the next one (a parent heading and its first
+    child) gets no section of its own; the child's heading path includes it.
     """
     count = len(doc)
-    path, starts = [], {}
+    path, starts = [], []
     for level, title, page in doc.get_toc(simple=True):
         if level > depth:
             continue
         path = path[:level - 1] + [" ".join(str(title).split())]
         if 1 <= page <= count:
-            starts[page] = list(path)
-    sections, owner = [], {}
+            starts.append((page, heading_y(doc[page - 1], str(title)), list(path)))
     if starts:
-        current = None
-        for number in range(1, count + 1):
-            heading = starts.get(number, current["heading_path"] if current else [])
-            if current is None or heading is not current["heading_path"]:
-                current = {"first_page": number, "heading_path": heading}
-                sections.append(current)
-            current["last_page"] = number
-        sections = [Section(id=f"sec{i}", origin="outline", **fields) for i, fields in enumerate(sections, 1)]
+        starts.sort(key=lambda s: (s[0], s[1]))
+        kept = []
+        for start in starts:
+            if kept and kept[-1][0] == start[0] and start[1] - kept[-1][1] < HEADING_GAP:
+                kept.pop()  # nothing of its own between it and the next title
+            kept.append(start)
+        if kept[0][0] > 1 or _content_above(doc, kept[0][0], kept[0][1]):
+            kept.insert(0, (1, 0.0, []))  # front matter before the first title
+        fields = []
+        for i, (page, y, heading) in enumerate(kept):
+            if i + 1 < len(kept):
+                next_page, next_y, _ = kept[i + 1]
+                if next_y > 0 and _content_above(doc, next_page, next_y):
+                    last_page, last_y = next_page, next_y
+                else:
+                    last_page, last_y = max(page, next_page - 1), None
+            else:
+                last_page, last_y = count, None
+            fields.append({"first_page": page, "first_y": y, "last_page": last_page, "last_y": last_y,
+                           "heading_path": heading})
+        sections = [Section(id=f"sec{i}", origin="outline", **f) for i, f in enumerate(fields, 1)]
     else:
         sections = [Section(id=f"sec{i}", origin="pages", first_page=first, last_page=min(count, first + pages_per_section - 1))
                     for i, first in enumerate(range(1, count + 1, pages_per_section), 1)]
-    for section in sections:
-        for number in range(section.first_page, section.last_page + 1):
-            owner[number] = section
-    return sections, owner
+    return sections, SectionIndex(sections)
+
+def _content_above(doc, page, y):
+    """Whether any text on a page sits above y (else a section starting at y starts the page)."""
+    return y > 0 and any(b[6] == 0 and b[4].strip() and b[3] <= y + 1 for b in doc[page - 1].get_text("blocks"))
+
+def section_text(doc, section):
+    """A section's text, clipped to where it starts and ends on its first and last pages."""
+    import pymupdf
+    parts = []
+    for number in range(section.first_page, section.last_page + 1):
+        page = doc[number - 1]
+        native = page.rect * page.derotation_matrix
+        top = section.first_y if number == section.first_page else native.y0
+        bottom = section.last_y if number == section.last_page and section.last_y is not None else native.y1
+        if bottom <= top:
+            continue
+        clip = pymupdf.Rect(native.x0, top - 1, native.x1, bottom - 1) * page.rotation_matrix
+        parts.append(page.get_text("text", clip=clip))
+    return "\n".join(parts)
 
 # How each extraction pass gets from PDF bytes to a claim.
 DERIVATION = {
@@ -264,7 +348,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
     stem = content.split(":", 1)[1][:12]
     assets = output / "assets"
     assets.mkdir(exist_ok=True, parents=True)
-    page_section = {}
+    page_section = None  # a SectionIndex once the document is open
 
     def record(row, items=()):
         coverage.append(row)
@@ -277,7 +361,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         """Record a repeated block from its first occurrence's result, without a model call."""
         note = f"identical to {entry['task']} on page {entry['page']}; not re-sent"
         step = DerivationStep(step="repeated-block", detail=note)
-        section = page_section[page_no]
+        section = page_section.at(page_no, bbox[1])
         copies = [e.model_copy(update={"locator": PdfLocator(page=page_no, bbox=tuple(bbox), region=region, task=task),
                                        "section": section.id, "derivation": [*e.derivation, step]})
                   for e in entry["found"]]
@@ -320,7 +404,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         row = {"content": content, "page": page_no, "bbox": list(bbox), "task": task,
                "image": image, "status": "complete", "issues": [], "claims": 0}
         images = [output / image] if image else []
-        section = page_section[page_no]
+        section = page_section.at(page_no, bbox[1])  # the heading above the region, not the page's
         heading = " > ".join(section.heading_path)
         prompt = (EXTRACT.replace("{max_claims}", str(s.claims_per_request)) + "\nSource type: " + region + (f"\nSection: {heading}" if heading else "")
                   + "\nSOURCE DATA:\n" + text)
@@ -453,7 +537,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         if not doc.is_pdf or not len(doc):
             raise ValueError(f"{name}: expected a nonempty PDF")
         sections, owner = pdf_sections(doc, s.section_depth, s.section_pages)
-        page_section.update(owner)
+        page_section = owner
         if on_sections:
             on_sections(sections)
         signals = {}
@@ -463,10 +547,11 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             yield "page"
             # Native coordinates stay unrotated (PDF point coordinates). Consecutive
             # blocks are grouped up to the byte budget; oversized blocks are split.
-            for ids, segments in text_groups(page, s.text_bytes):
+            for ids, segments in text_groups(page, s.text_bytes, owner.boundaries(number)):
                 text_task(number, segments, f"text:p{number}:{ids}")
             try:
-                found = [(table.bbox, table.extract()) for table in page.find_tables().tables]
+                found = [(table.bbox, rows, row_boxes(table, rows)) for table in page.find_tables().tables
+                         for rows in [table.extract()]]
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors
                 found = []
                 record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
@@ -474,10 +559,11 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                         "issues": [type(e).__name__ + ": " + str(e)], "claims": 0})
             height = page.rect.height
             continuing, carried = carried, None
-            for ti, (bbox, rows) in enumerate(found):
+            for ti, (bbox, rows, boxes) in enumerate(found):
                 if not rows:
                     continue
                 header, body, derivation = rows[0], rows[1:] or rows, None
+                body_boxes = boxes[1:] if len(rows) > 1 else boxes
                 width = max(len(r) for r in rows)
                 # A table at the top of a page, as wide as one that ended at the bottom of the
                 # previous page, continues it, unless its first row is a header of the same
@@ -486,7 +572,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 if (ti == 0 and continuing and continuing[1] == width and bbox[1] < 0.2 * height
                         and (rows[0] == continuing[0] or not same_form(rows[0], continuing[0]))):
                     if rows[0] != continuing[0]:
-                        body = rows
+                        body, body_boxes = rows, boxes
                     header = continuing[0]
                     derivation = [DerivationStep(step="pdf-table-detection",
                                                  detail=f"row with header continued from page {number - 1}"),
@@ -500,7 +586,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     # first occurrence from the third sighting on; text is never de-duplicated.
                     key = ("table", json.dumps([header, row], ensure_ascii=False, default=str),
                            tuple(round(v / 2) * 2 for v in bbox))
-                    table_task(number, tuple(bbox), f"table:p{number}:{ti}:{ri}", header, row, list(range(width)),
+                    row_box = body_boxes[ri] if ri < len(body_boxes) and body_boxes[ri] else tuple(bbox)
+                    table_task(number, tuple(row_box), f"table:p{number}:{ti}:{ri}", header, row, list(range(width)),
                                derivation=derivation, repeat_key=key)
                 if bbox[3] > 0.8 * height:
                     carried = (header, width)

@@ -49,10 +49,14 @@ nav{display:flex;gap:8px;justify-content:space-between;margin-top:12px}.done{col
 const DATA = JSON.parse(document.getElementById('data').textContent);
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// Saved per batch and per reviewer name, so several people can use one browser.
 const KEY = 'review:' + DATA.batch;
-let state = {reviewer: '', labels: {}, at: 0};
-try { state = Object.assign(state, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+let store = {last: '', people: {}};
+try { store = Object.assign(store, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+const blank = name => ({reviewer: name, labels: {}, at: 0});
+let state = store.people[store.last] || blank(store.last);
+const save = () => { store.people[state.reviewer] = state; store.last = state.reviewer;
+  try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
 const QUESTIONS = {
   claim: 'Is this claim a correct, faithful reading of the source? Judge it against the highlighted region and the page.',
   about: 'Does this statement say what the figure or section is about, correctly and usefully, without stating specific values?',
@@ -120,7 +124,13 @@ $('#prev').onclick = () => go(state.at - 1);
 $('#next').onclick = () => go(state.at + 1);
 $('#list').onclick = e => { if (e.target.dataset.n) go(+e.target.dataset.n); };
 $('#reviewer').value = state.reviewer;
-$('#reviewer').oninput = e => { state.reviewer = e.target.value.trim(); save(); };
+$('#reviewer').onchange = e => {
+  const name = e.target.value.trim();
+  if (name === state.reviewer) return;
+  if (!state.reviewer && Object.keys(state.labels).length) { state.reviewer = name; }  // name the work done so far
+  else { state = store.people[name] || blank(name); }
+  save(); showItem(); showProgress();
+};
 $('#download').onclick = () => {
   const blob = new Blob([labelsFile()], {type: 'application/json'});
   const a = document.createElement('a');

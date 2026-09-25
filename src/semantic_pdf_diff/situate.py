@@ -13,8 +13,9 @@ KINDS = {"figure": "figure", "figures": "figure", "fig": "figure", "figs": "figu
          "dwg": "sheet", "exhibit": "exhibit", "exhibits": "exhibit"}
 NUMBER = r"((?:[A-Z]{1,3}-?)?\d+(?:[.-]\d+)*[a-z]?)"
 # A caption's label is followed by a separator, a capitalized title or nothing; "Figure 1 shows…" is prose.
+# The separator mustn't start a number: "Table 5-1 summarizes" isn't "Table 5" plus "-".
 CAPTION = re.compile(r"^\s*(Figure|Fig\.?|Table|Sheet|Drawing|Dwg\.?|Exhibit)\s+" + NUMBER
-                     + r"\s*(?:[:.\-–—]|(?=(?-i:[A-Z0-9(\"“]))|$)", re.IGNORECASE)
+                     + r"\s*(?:[:.\-–—](?!\d)|(?=(?-i:[A-Z0-9(\"“]))|$)", re.IGNORECASE)
 MENTION = re.compile(r"\b(Figures?|Figs?\.?|Tables?|Sheets?|Drawings?|Dwg\.?|Exhibits?)\s+" + NUMBER, re.IGNORECASE)
 
 CELL = 10.0          # grid resolution (points) for clustering vector drawings
@@ -25,6 +26,8 @@ MAX_PATH_AREA = 0.6  # paths covering more of the page (frames, backgrounds) are
 CAPTION_GAP = 72.0   # a caption pairs with a region at most this far above or below it
 LIST_ENTRY = re.compile(r"\.{2,}\s*\d+\s*$")  # "Figure 3-1. Title ........ 12" in a list of figures
 LIST_PAGE = 5        # this many unpaired caption lines on one page make it a list of figures or tables
+BANNER_HEIGHT = 36   # a page-wide rectangle no taller than this is a heading bar or frame, not a figure
+BANNER_WIDTH = 0.4   # share of the page width that makes a rectangle or region "page-wide"
 SHEET_PATHS = 500    # a page with this many vector paths, and at least one per two text characters, is a
                      # drawing sheet (drawing sets: 2 to 4 paths per character; reports: about 0.01)
 SHEET_NUMBER = re.compile(r"^[A-Z]{1,2}-?\d{1,3}(?:\.\d{1,2})?[A-Z]?$")
@@ -99,6 +102,13 @@ def _overlap(a, b):
 def page_drawings(page):
     return page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings()
 
+def _banner(d, page_width):
+    """A heading bar or a frame around a heading: one wide, thin rectangle."""
+    x0, y0, x1, y1 = d["rect"]
+    items = d.get("items") or []
+    rectangular = len(items) == 1 and items[0][0] in ("re", "qu")
+    return rectangular and 4 <= y1 - y0 <= BANNER_HEIGHT and x1 - x0 >= BANNER_WIDTH * page_width
+
 def drawing_regions(page, drawings=None):
     """Bounding boxes of clusters of vector paths, found on a coarse grid."""
     width, height = page.rect.width, page.rect.height
@@ -107,7 +117,7 @@ def drawing_regions(page, drawings=None):
     cells, counts = set(), {}
     for d in drawings:
         x0, y0, x1, y1 = d["rect"]
-        if _area((x0, y0, x1, y1)) > MAX_PATH_AREA * page_area:
+        if _area((x0, y0, x1, y1)) > MAX_PATH_AREA * page_area or _banner(d, width):
             continue
         cx0, cy0 = int(max(x0, 0) // CELL), int(max(y0, 0) // CELL)
         cx1, cy1 = int(min(x1, width) // CELL), int(min(y1, height) // CELL)
@@ -133,7 +143,8 @@ def drawing_regions(page, drawings=None):
         box = (min(c[0] for c in component) * CELL, min(c[1] for c in component) * CELL,
                (max(c[0] for c in component) + 1) * CELL, (max(c[1] for c in component) + 1) * CELL)
         paths = sum(counts.get(c, 0) for c in component)
-        if paths >= MIN_PATHS and _area(box) >= MIN_AREA * page_area:
+        wide_and_short = box[3] - box[1] <= BANNER_HEIGHT + 2 * CELL and box[2] - box[0] >= BANNER_WIDTH * width
+        if paths >= MIN_PATHS and _area(box) >= MIN_AREA * page_area and not wide_and_short:
             regions.append(box)
     return sorted(regions, key=lambda b: (b[1], b[0]))
 
@@ -368,12 +379,17 @@ def scanned(page, text):
     """Images and almost no text: a scan, which only an image of the page can show."""
     return bool(page.get_images()) and len(text.strip()) < 200
 
-def figure_material(doc, figure, section_of, by_id, text_by_page):
+def in_section(evidence, section, index):
+    """Claims in a section: by the section recorded with them, or by position for claims
+    recorded without one."""
+    return [e for e in evidence if (e.section or index.at(e.locator.page, e.locator.bbox[1]).id) == section.id]
+
+def figure_material(doc, figure, index, by_id, text_by_page):
     """Everything a figure request is given besides the image, as {part: text}."""
     page = doc[figure.page - 1]
-    heading = lambda p: " > ".join(section_of[p].heading_path) if p in section_of and section_of[p].heading_path else ""
-    part = {"location": f"page {figure.page} of {len(doc)}, {position(page, figure)}"
-                        + (f"; section: {heading(figure.page)}" if heading(figure.page) else "")}
+    heading = lambda p, y=0.0: " > ".join(index.at(p, y).heading_path) if index.sections else ""
+    where = heading(figure.page, figure.bbox[1])
+    part = {"location": f"page {figure.page} of {len(doc)}, {position(page, figure)}" + (f"; section: {where}" if where else "")}
     if figure.label:
         part["label"] = f"{figure.label} (from its {figure.label_source or 'caption'})"
     if figure.caption:
@@ -385,7 +401,8 @@ def figure_material(doc, figure, section_of, by_id, text_by_page):
     else:
         part["text before it"], part["text after it"] = surroundings(page, figure.bbox, AROUND)
     part["paragraphs citing it"] = "\n".join(
-        f"- (page {r.page}" + (f", section: {heading(r.page)}" if heading(r.page) else "") + f") {r.paragraph or r.text}"
+        f"- (page {r.page}" + (f", section: {heading(r.page, r.bbox[1])}" if heading(r.page, r.bbox[1]) else "")
+        + f") {r.paragraph or r.text}"
         for r in figure.references[:MAX_CITATIONS])
     part["claims extracted from it"] = "\n".join(claim_line(by_id[i]) for i in figure.claims[:MAX_FIGURE_CLAIMS] if i in by_id)
     return part
@@ -438,14 +455,12 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
     def key(kind, ident, *parts):
         return ("triage", kind, content, ident, hashlib.sha256("\x00".join(parts).encode()).hexdigest())
 
-    section_of = {}
-    for section in sections:
-        for page in range(section.first_page, section.last_page + 1):
-            section_of[page] = section
+    from .extract import SectionIndex, section_text
+    index = SectionIndex(sections) if sections else SectionIndex([])
 
     def ask_figure(figure):
         images = [render(figure.page, figure.bbox, f"{stem}-{figure.id.replace(':', '-')}.png")] if figure.region else []
-        part = figure_material(doc, figure, section_of, by_id, text_by_page)
+        part = figure_material(doc, figure, index, by_id, text_by_page)
         prompt, trimmed = fit(lambda scale: figure_prompt(part, scale), client, images)
         if trimmed:
             issues.append({"target": figure.id, "issue": "material trimmed to fit the context budget", "failed": False})
@@ -480,11 +495,12 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
     updated = {}
     for section in sections:
         pages = range(section.first_page, section.last_page + 1)
-        text = "\n".join(text_by_page[p] for p in pages).strip()
-        inside = [e for e in evidence if e.locator.page in pages]
+        text = section_text(doc, section).strip()
+        inside = in_section(evidence, section, index)
         claims = "\n".join(claim_line(e) for e in inside[:MAX_SECTION_CLAIMS]) or "(none)"
+        mine = [f for f in figures if index.at(f.page, f.bbox[1]).id == section.id][:MAX_SECTION_FIGURES]
         figs = "\n".join(f"- {f.label or 'unlabelled ' + f.kind} (page {f.page}): {f.about or f.caption or '(not described)'}"
-                         for f in [f for f in figures if f.page in pages][:MAX_SECTION_FIGURES]) or "(none)"
+                         for f in mine) or "(none)"
         # Sheets are shown by their figure requests; scans only by an image of the page.
         overview = [p for p in pages if p not in sheets and scanned(doc[p - 1], text_by_page[p])][:MAX_OVERVIEWS]
         images = [render(p, native_rect(doc[p - 1]), f"{stem}-overview-p{p}.png") for p in overview]
@@ -571,12 +587,13 @@ def quality(doc, figures, sections, unresolved, evidence):
         material = " ".join([f.caption, f.title, *around, *(r.paragraph or r.text for r in f.references),
                              claim_text(f.claims)])
         check("figure", f.id, f.about + " " + f.role if f.role else f.about, material, f"{f.caption} {f.title} {f.label or ''}")
+    from .extract import SectionIndex, section_text
+    index = SectionIndex(sections) if sections else None
     for s in sections:
-        pages = range(s.first_page, s.last_page + 1)
-        inside = [e.id for e in evidence if e.locator.page in pages]
+        inside = [e.id for e in in_section(evidence, s, index)]
         heading = " ".join(s.heading_path)
-        material = " ".join([heading, *(pages_text.get(p, "") for p in pages), claim_text(inside),
-                             *(f.about for f in figures if f.page in pages)])
+        material = " ".join([heading, section_text(doc, s), claim_text(inside),
+                             *(f.about for f in figures if index.at(f.page, f.bbox[1]).id == s.id)])
         check("section", s.id, s.about, material, heading, expected=bool(inside))
     labelled = [f for f in figures if f.label]
     resolved = sum(len(f.references) for f in figures)

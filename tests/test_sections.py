@@ -90,6 +90,33 @@ class SectionContext(unittest.TestCase):
             self.assertEqual(evidence[0].section, next(x.id for x in seen if x.heading_path == ['Design', 'Fans']))
             self.assertTrue(evidence[0].quote_verified)
 
+    def test_titles_on_the_page_divide_it(self):
+        from semantic_pdf_diff.extract import SectionIndex, section_text
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            first = doc.new_page(width=400, height=400)
+            for y, text in ((40, '1 Pumps'), (80, 'Pump rated power 10 kW'), (200, '2 Fans'), (240, 'Fan rated power 3 kW')):
+                first.insert_text((40, y), text)
+            doc.new_page(width=400, height=400).insert_text((40, 40), 'Fan motor 5 kW')
+            doc.set_toc([[1, '1 Pumps', 1], [1, '2 Fans', 1]])
+            path = Path(d) / 't.pdf'
+            doc.save(path); doc.close()
+            with pymupdf.open(path) as doc:
+                sections, index = pdf_sections(doc, 2, 20)
+                pumps, fans = sections
+                self.assertEqual((pumps.first_page, pumps.last_page, fans.first_page, fans.last_page), (1, 1, 1, 2))
+                self.assertLess(pumps.first_y, 40); self.assertGreater(fans.first_y, 150)
+                self.assertEqual(pumps.last_y, fans.first_y)
+                self.assertIs(index.at(1, 230), fans); self.assertIs(index.at(1, 70), pumps); self.assertIs(index[2], fans)
+                self.assertIn('10 kW', section_text(doc, pumps)); self.assertNotIn('3 kW', section_text(doc, pumps))
+                self.assertIn('3 kW', section_text(doc, fans)); self.assertIn('5 kW', section_text(doc, fans))
+            client = Recorder(vision=False)
+            evidence, _ = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+            headings = {k: p.split('\nSection: ', 1)[1].split('\n', 1)[0] for p, _ in client.asked
+                        for k in ('10 kW', '3 kW', '5 kW') if k in p.split('SOURCE DATA:')[1]}
+            self.assertEqual(headings, {'10 kW': '1 Pumps', '3 kW': '2 Fans', '5 kW': '2 Fans'})
+            self.assertEqual({e.value: e.section for e in evidence}, {'10': 'sec1', '3': 'sec2', '5': 'sec2'})
+
     def fake_tables(self, by_page, height=300):
         class Table:
             def __init__(self, bbox, rows): self.bbox, self.rows = bbox, rows

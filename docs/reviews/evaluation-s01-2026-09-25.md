@@ -41,3 +41,24 @@ Among the 12 claims, the consensus is about 4 correct, 4 flawed and 4 wrong. Tha
 - **The case:** NREL 5 MW's pitch angle at 25 m/s, against IEA 15 MW's pitch controller objective.
 - **The reviewers split:** the three panel models said "unrelated" (different turbines), and I said "complementary" (compatible facts about corresponding subsystems).
 - **In proposal mode, the interesting relation is "same attribute, different value across designs".** Today's labels mix that with contradiction ("different: incompatible values under the same conditions"), which only makes sense for revisions.
+
+## Update: a larger panel and consensus without a referee
+
+Four more hosted models joined the panel: ByteDance/Seed-2.0-pro, thinkingmachines/Inkling, deepseek-ai/DeepSeek-V4-Flash-Vision-Exp and XiaomiMiMo/MiMo-V2.6-Pro. NVIDIA Nemotron-3-Ultra rejected the image requests (HTTP 400). DeepSeek's reasoning ran past the 16,000-token output cap on 2 items.
+
+With eight reviewers, raw agreement on claims fell (verdict α 0.59, usable gate 0.68), because some reviewers are much more lenient. `review consensus` (Dawid–Skene) estimates each reviewer's reliability from the labels alone.
+
+| Reviewer | Claims: agrees with the others' majority | Estimated accuracy |
+|---|---|---|
+| claude-opus-5.5 | 11/11 | 1.00 |
+| MiMo-V2.6-Pro | 11/12 | 0.92 |
+| gemini-3.1-pro | 10/11 | 0.92 |
+| Kimi-K3 | 10/11 | 0.92 |
+| DeepSeek-V4-Flash-Vision | 10/11 | 0.91 |
+| Qwen3.5-397B | 10/12 | 0.83 |
+| Inkling | 8/11 | 0.75 |
+| Seed-2.0-pro | 7/12 | 0.58 (most lenient: e.g. missed the misattached condition) |
+
+- **Consensus is confident:** no claim is contested (every consensus is above 0.8 probability).
+- **The sample is small:** 12 claims make these estimates rough.
+- **The same procedure works for a panel of people with no referee** (see `benchmarks/README.md`).

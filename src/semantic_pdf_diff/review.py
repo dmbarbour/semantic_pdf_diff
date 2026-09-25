@@ -440,8 +440,9 @@ def judge(folder, client, reviewer, limit=None, progress=None):
             "created": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
             "labels": [labels[i["id"]] for i in items if i["id"] in labels]}
     target = folder / "labels" / f"{reviewer_file(reviewer)}.json"
-    target.parent.mkdir(exist_ok=True)
-    target.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    if data["labels"]:  # a model that answered nothing isn't a reviewer
+        target.parent.mkdir(exist_ok=True)
+        target.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return target, len(data["labels"]), failures
 
 def clean_label(item, answer):
@@ -457,3 +458,98 @@ def clean_label(item, answer):
     verdict = answer.get("verdict") if answer.get("verdict") in verdicts else kind["verdicts"][-1]["name"]
     return {"item": item["id"], "verdict": verdict, "flags": flags, "clarity": clarity, "confidence": confidence,
             "note": note.strip()}
+
+# --- consensus without a referee -----------------------------------------------------------
+
+def dawid_skene(labels, classes, iterations=50, smoothing=0.5):
+    """Estimate each item's true class and each reviewer's reliability from their labels alone.
+
+    labels: {item: {reviewer: class}}. Returns (posteriors {item: {class: p}},
+    confusion {reviewer: {true: {given: p}}}). Dawid & Skene (1979): EM over per-reviewer
+    confusion matrices, started from per-item vote shares; smoothing keeps small panels
+    from collapsing to certainty.
+    """
+    reviewers = sorted({r for given in labels.values() for r in given})
+    posteriors = {}
+    for item, given in labels.items():
+        counts = {c: smoothing / len(classes) for c in classes}
+        for c in given.values():
+            counts[c] += 1
+        total = sum(counts.values())
+        posteriors[item] = {c: counts[c] / total for c in classes}
+    confusion = {}
+    for _ in range(iterations):
+        prior = {c: sum(p[c] for p in posteriors.values()) + smoothing for c in classes}
+        norm = sum(prior.values())
+        prior = {c: v / norm for c, v in prior.items()}
+        confusion = {}
+        for r in reviewers:
+            table = {t: {g: smoothing for g in classes} for t in classes}
+            for item, given in labels.items():
+                if r in given:
+                    for t in classes:
+                        table[t][given[r]] += posteriors[item][t]
+            confusion[r] = {t: {g: v / sum(row.values()) for g, v in row.items()} for t, row in table.items()}
+        changed = 0.0
+        for item, given in labels.items():
+            score = {}
+            for t in classes:
+                p = prior[t]
+                for r, g in given.items():
+                    p *= confusion[r][t][g]
+                score[t] = p
+            total = sum(score.values()) or 1.0
+            new = {t: v / total for t, v in score.items()}
+            changed = max(changed, max(abs(new[t] - posteriors[item][t]) for t in classes))
+            posteriors[item] = new
+        if changed < 1e-6:
+            break
+    return posteriors, confusion
+
+CONTESTED = 0.8  # items whose consensus is less probable than this are worth discussing
+
+def consensus(folder, gate=False):
+    """Consensus verdicts and reviewer reliability per item type, with no reviewer as referee.
+
+    gate=True uses the usable-or-not question instead of the full verdict."""
+    batch = json.loads((Path(folder) / "batch.json").read_text(encoding="utf-8"))
+    labels = load_labels(folder)
+    result = {}
+    for kind in TAXONOMY:
+        items = [i["id"] for i in batch["items"] if i["type"] == kind]
+        value = (lambda l: "usable" if l["verdict"] in USABLE[kind] else "not usable") if gate else (lambda l: l["verdict"])
+        classes = ["usable", "not usable"] if gate else [v["name"] for v in TAXONOMY[kind]["verdicts"]]
+        given = {i: {r: value(labels[r][i]) for r in labels if i in labels[r]} for i in items}
+        given = {i: g for i, g in given.items() if g}
+        if not given:
+            continue
+        posteriors, confusion = dawid_skene(given, classes)
+        reviewers = {}
+        for r in sorted(labels):
+            mine = {i: g[r] for i, g in given.items() if r in g}
+            if not mine:
+                continue
+            # Leave-one-out: agreement with the others' majority, where they have one.
+            agree = total = 0
+            for i, v in mine.items():
+                others = [x for rr, x in given[i].items() if rr != r]
+                if others:
+                    top = max(set(others), key=others.count)
+                    if others.count(top) > len(others) / 2:
+                        total += 1
+                        agree += v == top
+            accuracy = sum(posteriors[i][v] for i, v in mine.items()) / len(mine)
+            mine_labels = [labels[r][i] for i in mine]
+            reviewers[r] = {"items": len(mine), "agrees_with_others": f"{agree}/{total}",
+                            "estimated_accuracy": round(accuracy, 3),
+                            "unclear": sum(l["clarity"] != "clear" for l in mine_labels),
+                            "low_confidence": sum(l["confidence"] == "low" for l in mine_labels)}
+        items_out = []
+        for i in items:
+            if i not in posteriors:
+                continue
+            best = max(posteriors[i], key=posteriors[i].get)
+            items_out.append({"item": i, "consensus": best, "probability": round(posteriors[i][best], 3),
+                              "contested": posteriors[i][best] < CONTESTED, "votes": given[i]})
+        result[kind] = {"reviewers": reviewers, "items": items_out}
+    return result

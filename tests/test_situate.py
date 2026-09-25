@@ -93,11 +93,30 @@ class Figures(unittest.TestCase):
 
     def test_labels_captions_and_panels(self):
         self.assertFalse(CAPTION.match('Figure 1 shows the pumps'))
+        self.assertFalse(CAPTION.match('Table 5-1 summarizes the drivetrain'))  # not 'Table 5' plus a separator
+        self.assertEqual(CAPTION.match('Table 5-1. Drivetrain').group(2), '5-1')
         self.assertTrue(all(CAPTION.match(t) for t in ('Figure 1: Pumps', 'Table 2 Pump sizes', 'TABLE 3 PUMP SCHEDULE')))
         by_label = {'figure 24': ['fig'], 'sheet A101': ['sheet']}
         self.assertEqual(targets(by_label, 'figure 2-4A'), ['fig'])    # a panel cites its figure
         self.assertEqual(targets(by_label, 'sheet A-101'), ['sheet'])  # hyphens don't matter
         self.assertIsNone(targets(by_label, 'figure 25'))
+
+    def test_heading_bars_and_frames_are_not_figures(self):
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            page = doc.new_page(width=612, height=792)
+            page.draw_rect(pymupdf.Rect(36, 100, 560, 114), color=None, fill=(0.8, 0.85, 0.95))  # heading bar
+            page.insert_text((40, 111), '9-3. Dinner Party')
+            page.draw_rect(pymupdf.Rect(20, 300, 550, 330))                                     # boxed heading
+            page.insert_text((200, 320), 'Contest 10. Energy Balance')
+            diagram(page, 100, 450)
+            page.insert_text((100, 640), 'Figure 1: Pump arrangement')
+            doc.save(Path(d) / 'h.pdf'); doc.close()
+            doc = pymupdf.open(Path(d) / 'h.pdf')
+            figures = find_figures(doc)
+            doc.close()
+        self.assertEqual([f.label for f in figures], ['figure 1'])
+        self.assertGreater(figures[0].bbox[1], 400)
 
     def test_drawing_sheet_is_one_region(self):
         with tempfile.TemporaryDirectory() as d:

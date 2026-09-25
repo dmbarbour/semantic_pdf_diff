@@ -44,6 +44,20 @@ class Tests(unittest.TestCase):
         result = compare(a,b,Path('.'),Fake(),'proposals')
         self.assertEqual({f['relation'] for f in result['findings']},{'different'})
 
+    def test_prompt_says_what_a_and_b_are(self):
+        class Recording(Fake):
+            def __init__(self):
+                super().__init__(relation='complementary'); self.asked = []
+            def ask(self, prompt, schema, images=(), key=None):
+                self.asked.append((prompt, key)); return super().ask(prompt, schema, images, key)
+        with tempfile.TemporaryDirectory() as d:
+            for mode, words in (('proposals', 'different proposals'), ('revisions', 'earlier revision')):
+                client = Recording()
+                compare([ev()], [ev('B-1', value='12')], Path(d), client, mode)
+                prompt, key = client.asked[0]
+                self.assertIn(words, prompt)
+                self.assertEqual(key[1], mode)  # a proposals judgment is never reused for revisions
+
     def test_condition_and_numeric_veto(self):
         with tempfile.TemporaryDirectory() as d:
             for client in [Fake(same=False),Fake(relation='equivalent')]:

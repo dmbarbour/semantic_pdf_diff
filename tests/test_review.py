@@ -19,6 +19,27 @@ class Alpha(unittest.TestCase):
         self.assertLess(review.krippendorff_alpha([['a', 'b'], ['b', 'a']]), 0)
         self.assertIsNone(review.krippendorff_alpha([['a', 'a'], ['a', 'a']]))  # no variation: undefined
 
+class Consensus(unittest.TestCase):
+    def test_reliable_reviewers_outweigh_random_ones(self):
+        import random
+        rng = random.Random(3)
+        classes = ['correct', 'flawed', 'wrong', 'not_a_claim']
+        truth = {f'i{n}': rng.choice(classes) for n in range(60)}
+        labels = {}
+        for item, true in truth.items():
+            given = {}
+            for r in ('careful-1', 'careful-2', 'careful-3'):
+                given[r] = true if rng.random() < 0.85 else rng.choice(classes)
+            for r in ('random-1', 'random-2'):
+                given[r] = rng.choice(classes)
+            labels[item] = given
+        posteriors, confusion = review.dawid_skene(labels, classes)
+        consensus = {i: max(p, key=p.get) for i, p in posteriors.items()}
+        self.assertGreaterEqual(sum(consensus[i] == truth[i] for i in truth), 54)  # at least 90% recovered
+        reliability = {r: sum(confusion[r][c][c] for c in classes) / len(classes) for r in confusion}
+        self.assertGreater(min(reliability[r] for r in reliability if r.startswith('careful')),
+                           max(reliability[r] for r in reliability if r.startswith('random')))
+
 class Highlight(unittest.TestCase):
     def test_box_lands_on_the_region_in_crops_and_pages(self):
         import pymupdf

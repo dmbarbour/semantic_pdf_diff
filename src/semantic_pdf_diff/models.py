@@ -107,6 +107,10 @@ class Section(Strict):
     id: str
     first_page: int = Field(ge=1)
     last_page: int = Field(ge=1)
+    # Where on its first and last page the section starts and ends (unrotated y); a
+    # page can hold the end of one section and the start of the next.
+    first_y: float = 0.0
+    last_y: float | None = None        # None: to the bottom of last_page
     heading_path: list[str] = Field(default_factory=list)
     origin: Literal["outline", "pages"]
     # Cheap triage signals summed over the section's pages (numbers, units, requirement
