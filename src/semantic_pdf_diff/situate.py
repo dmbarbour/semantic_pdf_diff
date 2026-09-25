@@ -158,50 +158,53 @@ def find_figures(doc):
     sheet (a page with a title block, or with many vector paths per text character) is one figure,
     labelled from its title block; its drawings aren't split further.
     A page with captions isn't a sheet: its drawings are captioned figures (e.g. charts)."""
+    return [f for number, page in enumerate(doc, 1) for f in page_figures(page, number)]
+
+def page_figures(page, number):
+    """One page's figures (see find_figures)."""
     figures = []
-    for number, page in enumerate(doc, 1):
-        captions = []
-        for block in page.get_text("blocks", sort=True):
-            match = CAPTION.match(block[4]) if block[6] == 0 else None
-            if match:
-                captions.append((tuple(block[:4]), " ".join(block[4].split()), label_of(*match.groups()),
-                                 KINDS[match.group(1).lower().rstrip(".")]))
-        # Entries in a list of figures or tables look like captions but aren't figures.
-        captions = [c for c in captions if not LIST_ENTRY.search(c[1])]
-        drawings = page_drawings(page)
-        label, title = title_block(page) if not captions else (None, "")
-        sheet = not captions and (label is not None or is_sheet(len(drawings), len(page.get_text("text").strip())))
-        regions = [] if sheet else drawing_regions(page, drawings) + image_regions(page)
-        pairs = []
-        for ci, (cbox, *_ ) in enumerate(captions):
-            for ri, rbox in enumerate(regions):
-                horizontal = min(cbox[2], rbox[2]) - max(cbox[0], rbox[0]) > 0
-                gap = max(rbox[1] - cbox[3], cbox[1] - rbox[3], 0)
-                if horizontal and gap <= CAPTION_GAP:
-                    pairs.append((gap, ci, ri))
-        used_c, used_r, paired = set(), set(), {}
-        for gap, ci, ri in sorted(pairs):
-            if ci not in used_c and ri not in used_r:
-                used_c.add(ci); used_r.add(ri)
-                paired[ci] = ri
-        if len(captions) - len(paired) >= LIST_PAGE:
-            captions = [c for ci, c in enumerate(captions) if ci in paired]  # a list page: keep only real pairs
-            paired = {i: paired[ci] for i, ci in enumerate(sorted(paired))}
-        items = []
-        for ci, (cbox, text, label, kind) in enumerate(captions):
-            if ci in paired:
-                items.append(dict(bbox=_union(cbox, regions[paired[ci]]), caption=text, label=label, kind=kind))
-            else:
-                items.append(dict(bbox=cbox, caption=text, label=label, kind=kind, region=False))
-        items += [dict(bbox=r) for ri, r in enumerate(regions) if ri not in used_r]
-        for item in items:
-            if item.get("label"):
-                item["label_source"] = "caption"
-        if sheet:
-            items.append(dict(bbox=tuple(native_rect(page)), kind="sheet", label=label, title=title,
-                              label_source="title block" if label else ""))
-        for i, item in enumerate(sorted(items, key=lambda x: (x["bbox"][1], x["bbox"][0]))):
-            figures.append(Figure(id=f"fig:p{number}:{i}", page=number, **item))
+    captions = []
+    for block in page.get_text("blocks", sort=True):
+        match = CAPTION.match(block[4]) if block[6] == 0 else None
+        if match:
+            captions.append((tuple(block[:4]), " ".join(block[4].split()), label_of(*match.groups()),
+                             KINDS[match.group(1).lower().rstrip(".")]))
+    # Entries in a list of figures or tables look like captions but aren't figures.
+    captions = [c for c in captions if not LIST_ENTRY.search(c[1])]
+    drawings = page_drawings(page)
+    label, title = title_block(page) if not captions else (None, "")
+    sheet = not captions and (label is not None or is_sheet(len(drawings), len(page.get_text("text").strip())))
+    regions = [] if sheet else drawing_regions(page, drawings) + image_regions(page)
+    pairs = []
+    for ci, (cbox, *_ ) in enumerate(captions):
+        for ri, rbox in enumerate(regions):
+            horizontal = min(cbox[2], rbox[2]) - max(cbox[0], rbox[0]) > 0
+            gap = max(rbox[1] - cbox[3], cbox[1] - rbox[3], 0)
+            if horizontal and gap <= CAPTION_GAP:
+                pairs.append((gap, ci, ri))
+    used_c, used_r, paired = set(), set(), {}
+    for gap, ci, ri in sorted(pairs):
+        if ci not in used_c and ri not in used_r:
+            used_c.add(ci); used_r.add(ri)
+            paired[ci] = ri
+    if len(captions) - len(paired) >= LIST_PAGE:
+        captions = [c for ci, c in enumerate(captions) if ci in paired]  # a list page: keep only real pairs
+        paired = {i: paired[ci] for i, ci in enumerate(sorted(paired))}
+    items = []
+    for ci, (cbox, text, label, kind) in enumerate(captions):
+        if ci in paired:
+            items.append(dict(bbox=_union(cbox, regions[paired[ci]]), caption=text, label=label, kind=kind))
+        else:
+            items.append(dict(bbox=cbox, caption=text, label=label, kind=kind, region=False))
+    items += [dict(bbox=r) for ri, r in enumerate(regions) if ri not in used_r]
+    for item in items:
+        if item.get("label"):
+            item["label_source"] = "caption"
+    if sheet:
+        items.append(dict(bbox=tuple(native_rect(page)), kind="sheet", label=label, title=title,
+                          label_source="title block" if label else ""))
+    for i, item in enumerate(sorted(items, key=lambda x: (x["bbox"][1], x["bbox"][0]))):
+        figures.append(Figure(id=f"fig:p{number}:{i}", page=number, **item))
     return figures
 
 ABBREVIATIONS = {"fig", "figs", "no", "nos", "eq", "eqs", "ref", "refs", "approx", "e.g", "i.e", "vs", "cf", "dwg", "sec"}
@@ -256,7 +259,7 @@ def attach_claims(figures, evidence):
                 # A visual claim's locator is its whole tile or overview: attach it when tile
                 # and figure mostly overlap either way; overviews only for figures covering a
                 # quarter of the page, or every claim on a page would join every figure.
-                if where.page == figure.page and where.region in ("tile", "overview") and figure.region:
+                if where.page == figure.page and where.region in ("tile", "overview", "figure") and figure.region:
                     shared = _overlap(where.bbox, figure.bbox)
                     close = shared >= 0.5 * max(min(_area(where.bbox), _area(figure.bbox)), 1e-6)
                     if close and (where.region == "tile" or _area(figure.bbox) >= 0.25 * _area(where.bbox)):

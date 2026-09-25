@@ -23,7 +23,7 @@ from .throttle import RateLimiter
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
 from .report import write_report
 from .scan import ARCHIVES, Limits, read_origin, scan
-from .situate import find_figures, quality, situate
+from .situate import find_figures, page_figures, quality, situate
 from .store import Store, StoreError
 
 LIMITATIONS = ['Image-token budgeting must be calibrated to the serving backend.',
@@ -205,7 +205,8 @@ def plan(sources, settings):
                     text_calls += len(groups)
                     text_bytes += sum(len(t.encode()) for _, segments in groups for _, t in segments)
                     if settings.vision:
-                        visual += len(visual_regions(page, settings.tile_points))
+                        visual += len(visual_regions(page, settings.tile_points,
+                                                     page_figures(page, 0) if settings.figure_tasks else []))
                 if settings.situate:  # one request per figure and per section (plus re-asks, not counted)
                     situating += (len(find_figures(doc))
                                   + len(pdf_sections(doc, settings.section_depth, settings.section_pages)[0]))

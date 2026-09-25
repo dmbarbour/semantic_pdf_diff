@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 import pymupdf
 from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, claim_id, merge_occurrences
+from .situate import page_figures
 from .dispatch import Dispatcher
 from .llm import CallLimitReached
 from .progress import NoProgress, log
@@ -16,7 +17,8 @@ from .progress import NoProgress, log
 # it is part of the extraction interpreter. 2: section heading path in prompts.
 # 3: exactly repeated table rows follow their first occurrence. 4: claims per request configurable.
 # 5: headings by position on the page; table rows located by their own box.
-PROMPT_VERSION = 5
+# 6: rules for unfamiliar charts, attributes free of conditions, parts of a whole; figure tasks.
+PROMPT_VERSION = 6
 
 EXTRACT = '''Extract atomic engineering claims from this one source. Return JSON:
 {"claims":[{"entity":"component/system", "attribute":"property or directed relationship",
@@ -29,6 +31,11 @@ operating point and trend; estimated plotted readings MUST be approximate. For d
 labeled components and directed connections; never invent direction on unmarked edges.
 Preserve negation, requirements versus proposed capabilities, ranges and inequality signs.
 Extract evidence only, not commentary. Use a short canonical entity and attribute; keep numeric value separate from unit.
+The attribute names the property only: put conditions (e.g. "at theta = 0", "at rated speed") in conditions.
+If a value is one of several parts (one layer, one material, one member), say what it is part of in the attribute
+(e.g. "spar cap material"), not "composition".
+If you are not sure how to read a chart, diagram or drawing convention, say so in issues, lower confidence, and mark
+readings approximate; do not guess what an unexplained symbol, colour or line style means.
 '''
 
 # Text shorter than this is not split further during refinement.
@@ -77,11 +84,24 @@ def tiles(rect, side, overlap=0.18):
         for x in starts(rect.x0, rect.x1):
             yield pymupdf.Rect(x, y, min(x + side, rect.x1), min(y + side, rect.y1))
 
-def visual_regions(page, side):
-    """Tiles first so higher-resolution crops win de-duplication; overview last."""
+FIGURE_PAD = 8.0  # points around a figure's region
+
+def visual_regions(page, side, figures=()):
+    """Tiles, then whole figures, then the overview (displayed coordinates).
+
+    Tiles are a fixed grid, so they can cut a chart from its legend or a diagram in two;
+    each detected figure (drawing or image, with its caption) is also read whole, unless
+    it already fits inside one tile or is the whole page (a drawing sheet: the overview)."""
     regions = []
     if max(page.rect.width, page.rect.height) > side:
         regions = [(f"tile:{i}", r) for i, r in enumerate(tiles(page.rect, side))]
+    grid = [r for _, r in regions] or [page.rect]
+    for i, figure in enumerate(f for f in figures if f.region):
+        shown = (pymupdf.Rect(figure.bbox) * page.rotation_matrix + (-FIGURE_PAD, -FIGURE_PAD, FIGURE_PAD, FIGURE_PAD)) & page.rect
+        whole_page = abs(shown) >= 0.9 * abs(page.rect)
+        if shown.is_empty or whole_page or any(shown in r for r in grid):
+            continue
+        regions.append((f"figure:{i}", shown))
     return regions + [("overview", page.rect)]
 
 def render(page, rect, target, max_side):
@@ -302,6 +322,8 @@ DERIVATION = {
     "text": [DerivationStep(step="pdf-text-layer", detail="grouped text blocks"), DerivationStep(step="model-extraction")],
     "table": [DerivationStep(step="pdf-table-detection", detail="row with provisional header"), DerivationStep(step="model-extraction")],
     "tile": [DerivationStep(step="pdf-render", detail="page tile"), DerivationStep(step="model-extraction", detail="vision")],
+    "figure": [DerivationStep(step="pdf-render", detail="detected figure with its caption"),
+               DerivationStep(step="model-extraction", detail="vision")],
     "overview": [DerivationStep(step="pdf-render", detail="whole page"), DerivationStep(step="model-extraction", detail="vision")],
 }
 
@@ -553,7 +575,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             # Budget-driven splits are mandatory; only quality-driven ones use depth.
             table_task(page_no, bbox, f"{task}:c{i}", header, row, [columns[0], *part], depth, derivation)
 
-    def visual_task(page_no, page, tag, rect, depth=0):
+    def visual_task(page_no, page, tag, rect, depth=0, text=""):
         name = f"{stem}-{tag.replace(':', '-')}.png"
         render(page, rect, assets / name, s.image_side)
         native = rect * page.derotation_matrix
@@ -562,14 +584,14 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", clip=native) if b[6] == 0]
         def place(quote):  # the first text block in the region holding the quote
             return next((box for box, text in blocks if covered(quote, text, fold=True)), None)
-        consume(page_no, native, tag, "", "assets/" + name, check=check, place=place,
+        consume(page_no, native, tag, text, "assets/" + name, check=check, place=place,
                 crop=(tuple(round(v, 3) for v in rect), s.image_side),
                 then=lambda status: refine_visual(page_no, page, tag, rect, depth, status))
 
     def refine_visual(page_no, page, tag, rect, depth, status):
-        # Refine only local tiles; an overview may be incomplete because it spans
-        # many facts, and all overview areas already have tile coverage.
-        if (status == "complete" or tag == "overview" or depth >= s.refinement_depth
+        # Refine only local tiles; an overview or a whole figure may be incomplete because
+        # it spans many facts, and all its areas already have tile coverage.
+        if (status == "complete" or tag.split(":")[0] in ("overview", "figure") or depth >= s.refinement_depth
                 or min(rect.width, rect.height) < MIN_REFINE_POINTS):
             return
         if rect.width > rect.height:
@@ -653,11 +675,16 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 signals.setdefault(section, {}).setdefault(name_, 0)
                 signals[section][name_] += value
             if s.vision:
-                for tag, rect in visual_regions(page, s.tile_points):
+                shown_figures = page_figures(page, number) if s.figure_tasks else []
+                for tag, rect in visual_regions(page, s.tile_points, shown_figures):
                     # Task tags are unique within content: "<region>:p<page>[:<index>]".
                     region, _, index = tag.partition(":")
                     tag = f"{region}:p{number}" + (f":{index}" if index else "")
-                    visual_task(number, page, tag, rect)
+                    caption = ""
+                    if region == "figure":  # the caption, when there is one, as source text
+                        figure = [f for f in shown_figures if f.region][int(index)]
+                        caption = f"Caption: {figure.caption}" if figure.caption else ""
+                    visual_task(number, page, tag, rect, text=caption)
             else:
                 record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
                         "task": f"vision:p{number}", "image": None, "status": "skipped",

@@ -118,6 +118,16 @@ class Figures(unittest.TestCase):
         self.assertEqual([f.label for f in figures], ['figure 1'])
         self.assertGreater(figures[0].bbox[1], 400)
 
+    def test_figures_are_read_whole_unless_a_tile_holds_them(self):
+        from semantic_pdf_diff.extract import visual_regions
+        from semantic_pdf_diff.situate import page_figures
+        page = self.doc[1]  # figure 1: a 180 x 190 point drawing with its caption
+        tags = lambda side: [t for t, _ in visual_regions(page, side, page_figures(page, 2))]
+        self.assertIn('figure:0', tags(120))      # small tiles cut it: read it whole too
+        self.assertNotIn('figure:0', tags(1000))  # one tile holds the whole page
+        rect = dict(visual_regions(page, 120, page_figures(page, 2)))['figure:0']
+        self.assertGreaterEqual(rect.y1, 290)     # the caption is included
+
     def test_drawing_sheet_is_one_region(self):
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()

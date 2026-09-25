@@ -57,10 +57,10 @@ CREATE VIEW comparisons AS
 
 # Extraction regions that a changed extraction setting affects; anything not listed
 # (model, prompts, library versions, sampling and output options) affects them all.
-ALL_REGIONS = frozenset({"text", "table", "tile", "overview", "vision", "table-detection"})
-VISUAL = frozenset({"tile", "overview", "vision"})
+ALL_REGIONS = frozenset({"text", "table", "tile", "figure", "overview", "vision", "table-detection"})
+VISUAL = frozenset({"tile", "figure", "overview", "vision"})
 SETTING_REGIONS = {
-    "tile_points": VISUAL, "image_side": VISUAL, "vision": VISUAL,
+    "tile_points": VISUAL, "image_side": VISUAL, "vision": VISUAL, "figure_tasks": frozenset({"figure"}),
     "text_bytes": frozenset({"text", "table"}),
 }
 

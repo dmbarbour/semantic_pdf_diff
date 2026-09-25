@@ -62,3 +62,30 @@ With eight reviewers, raw agreement on claims fell (verdict α 0.59, usable gate
 - **Consensus is confident:** no claim is contested (every consensus is above 0.8 probability).
 - **The sample is small:** 12 claims make these estimates rough.
 - **The same procedure works for a panel of people with no referee** (see `benchmarks/README.md`).
+
+## Update: the owner's review, and what changed because of it
+
+The owner labelled all 17 items (`labels/David.json`). They found it slow: flags were far from the fields they concerned, and there was no quick way to say which part of a claim was wrong.
+
+**Where the owner differed from the other reviewers' majority** (rubric-level disagreements):
+- **Stricter on two claims:** glass_triax (wrong, not flawed), and K_I, which should be separated from its condition.
+- **More lenient on one:** a quote composed from chart labels.
+- **The boxed-heading "about":** the owner, Gemini and Claude said wrong; the majority didn't.
+
+Consensus estimates put the owner at 9/12 agreement with the others on claims.
+
+**What the notes led to:**
+
+| Note | Change |
+|---|---|
+| Answers should sit next to each part of a claim; "contested" per field | Per-field ✓ / ✗ / ? next to entity, attribute, value, unit, conditions, basis, approximate, quote and section; pairs get four questions (A read right, B read right, same subject, relation right); "about" statements get about, role, keywords, type. The verdict follows the field answers unless chosen; flags moved under "More detail". Panel models answer per field too, and agreement is reported per field. |
+| No way to say "wrong section" | The section is one of the fields. |
+| "Bad cropping" (6 items) | Review: tile crops now show the model's image outlined within its surroundings. Extraction: each detected figure (with caption and legend) is now read whole, besides the tile grid that cut through them (`figure_tasks`, about 10% more visual tasks). |
+| Not knowing how to read a chart, for reviewers and models alike | Clarity option "not sure how to read the source". An extraction prompt rule: say so, lower confidence, mark readings approximate, and don't guess unexplained conventions. |
+| K_I should be separated from its condition; "composition" for one layer | Prompt rules: the attribute names the property only; say what a part belongs to. |
+| "Would be complementary if about the same subject" | A pair flag for exactly that; the relation vocabulary itself is still open (see the [research note](../research/comparing-designs-2026-09-25.md)). |
+| Let models zoom interactively, within a quota | Tentative plan row: interactive zoom for models. |
+| Try DeepInfra embedding models | Noted in the retrieval plan. |
+| Young's modulus is a weak test item: general knowledge corroborates it | To be addressed in sampling: prefer items not answerable from general knowledge. |
+
+Found on the way: overview tasks were refined (split) against the design, because tags had been renamed to `overview:pN`; fixed.

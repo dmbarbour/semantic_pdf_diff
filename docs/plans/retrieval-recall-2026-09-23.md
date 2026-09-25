@@ -64,6 +64,11 @@ Implications:
 
 None currently.
 
+## Notes (2026-09-25)
+
+- DeepInfra hosts embedding models too (e.g. google/embeddinggemma-300m), on the same pay-go account used for recording; they are candidates alongside the local text-embeddings-inference models, via the same `/v1/embeddings` shape (the owner's suggestion).
+- The first real run showed why this plan matters: on the turbine slices, 704 of 1,000 compared pairs were judged unrelated, and the pair limit left 3,308 candidates untried.
+
 ## Decisions (2026-09-23)
 
 - **Available models:** listed above.

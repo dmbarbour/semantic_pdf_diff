@@ -96,7 +96,7 @@ class PdfLocator(Strict):
     format: Literal["pdf"] = "pdf"
     page: int = Field(ge=1)
     bbox: tuple[float, float, float, float]
-    region: Literal["text", "table", "tile", "overview"]
+    region: Literal["text", "table", "tile", "figure", "overview"]
     task: str
 
 # Other formats add their own locator shapes, discriminated by `format`.
@@ -242,7 +242,7 @@ def claim_id(content, claim):
 
 # Representative occurrence: native before visual, tile before overview, then the
 # smallest region, then page and task order.
-REGION_RANK = {"text": 0, "table": 0, "tile": 1, "overview": 2}
+REGION_RANK = {"text": 0, "table": 0, "figure": 1, "tile": 2, "overview": 3}
 
 def representative_rank(e):
     x0, y0, x1, y1 = e.locator.bbox
@@ -323,6 +323,8 @@ class Settings(Strict):
     min_score: float = Field(default=0.10, ge=0, le=1)
     max_pairs: int = Field(default=1000, ge=1)
     vision: bool = True
+    # Read each detected figure whole, besides the tile grid (which can cut through figures).
+    figure_tasks: bool = True
     # Situating stage: figure and section "about" statements after extraction.
     situate: bool = True
     verify_visuals: bool = True

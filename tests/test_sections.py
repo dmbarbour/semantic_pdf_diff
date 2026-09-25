@@ -167,6 +167,21 @@ class SectionContext(unittest.TestCase):
                 # A displayed row (an unrotated column here), not the whole 300 x 90 table.
                 self.assertLess(pymupdf.Rect(e.locator.bbox).get_area(), 0.75 * 300 * 90)
 
+    def test_overviews_and_figures_are_not_refined(self):
+        class Partial(Recorder):
+            def ask(self, prompt, schema, images=(), key=None):
+                if images:
+                    self.asked.append((prompt, key))
+                    return Extraction(claims=[], complete=False)  # every image answer 'partial'
+                return super().ask(prompt, schema, images, key)
+        with tempfile.TemporaryDirectory() as d:
+            path = make_pdf(Path(d) / 't.pdf', ['Pump rated power 10 kW'], height=600)
+            _, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d),
+                                      Partial(tile_points=200, refinement_depth=1))
+            tasks = [r['task'] for r in coverage]
+            self.assertTrue(any(t.startswith('tile:') and '-r' in t for t in tasks))  # tiles are refined
+            self.assertFalse(any(t.startswith(('overview', 'figure')) and '-r' in t for t in tasks))
+
     def test_split_headings_are_found_and_outline_order_is_kept(self):
         from semantic_pdf_diff.extract import heading_y
         doc = pymupdf.open()
