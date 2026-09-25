@@ -6,3 +6,4 @@ dist/
 diff-output/
 samples/
 .env
+tests/fixtures/*.sqlite

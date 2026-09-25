@@ -1,6 +1,6 @@
 # Test models and record/replay
 
-- **Status:** Planned
+- **Status:** Active (2026-09-25)
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (response cache, interpreter records)
 - **Enables:** fast realistic integration tests for every later plan; the [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md)
 
@@ -75,12 +75,22 @@ Recording in the owner's environment should be one command, not a project setup:
 
 ## Milestones
 
-1. Replay client modes, with unit tests against hand-made fixtures. Semantic request keys arrive earlier, with the store's response cache (store milestone 2), so a fixture is a copy of a store's cache table.
-2. Fixture database, zip packing, `fixtures summary`, and seeding a store from a fixture.
-3. Collection rounds on a curated slice of the sample corpus: export work lists, import answers.
-4. First tables: Claude on a small slice; the weak local VLM (Ollama, CPU) on the same slice.
-5. Integration tests that replay each table, with expected outcomes checked loosely (structure, coverage, provenance), since answers differ across responders. Once replay fixtures exist, continuous integration becomes worthwhile: every commit can run the full suite offline.
-6. **Recording kit** and a gemma-4 table recorded in-house on the same public slice.
+Reordered 2026-09-25 (see *Decisions*): a cheap hosted gemma-4 makes live recording the first path, and collection rounds only matter for responders that can't be called (Claude in a session).
+
+1. ✅ Replay client modes (`replay`, `replay-or-record`) and the fixture database with reproducible zip packing and `fixtures summary`, tested against the stub model. *Not built: seeding a store from a fixture (replay serves the same purpose), `collect` mode.*
+2. ✅ Deterministic slices of the sample corpus (`scripts/make_slices.py`, `scripts/slices.json`): turbine reports, drawing sheets from two teams, competition rules.
+3. ◐ First tables: gemma-4-31B (DeepInfra), then gemma-4-31B-turbo and other hosted models for comparison.
+4. Integration tests that replay each table (`tests/test_replay_slices.py`), with outcomes checked loosely (structure, coverage, provenance), since answers differ across responders. Once replay fixtures exist, continuous integration becomes worthwhile: every commit can run the full suite offline.
+5. Collection rounds (`collect` mode, export work lists, import answers) for a Claude table and the weak local VLM.
+6. *Deferred:* the **recording kit** and a table recorded in-house, if the in-house deployment's answers differ enough from hosted gemma-4 to matter.
+
+## Decisions (2026-09-25)
+
+- **Hosted gemma-4 for recording.** The owner bought pay-go access to `google/gemma-4-31B-it` on DeepInfra (OpenAI-compatible; about $0.13 per million input tokens). A 24-page slice pair with comparisons cost about $0.26. It is slow per request (about 13 generated tokens/s), so recording runs at high concurrency.
+- **Record by running the pipeline live** (`--fixture-mode replay-or-record`): one run records every adaptive round (refinement, re-asks, comparisons), so rounds of collection aren't needed for callable models.
+- **Fixture keys:** the response cache's semantic key (the comparison key without its settings hash) plus an interpreter *fingerprint*: prompts and output-shaping settings, without the model (the responder stands for it) or library versions. Fixtures record the PyMuPDF version; replay tests skip under another version, since text and renderings may differ.
+- **Slices, not whole documents,** for recording cost and replay-test speed. Cutting is byte-deterministic for a given PyMuPDF version, pinned in `slices.json`.
+- **The in-house recording kit is deferred:** hosted gemma-4 covers realistic answers; the kit returns if the in-house deployment's answers differ enough to matter.
 
 ## Decisions (2026-09-24)
 
