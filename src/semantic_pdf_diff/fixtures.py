@@ -17,7 +17,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2  # 2: failures are recorded (response.error)
 MODES = ("replay", "replay-or-record")
 
 SCHEMA = """
@@ -26,9 +26,10 @@ CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE request (key TEXT NOT NULL, interpreter TEXT NOT NULL, kind TEXT NOT NULL, region TEXT NOT NULL,
                       content TEXT NOT NULL, key_parts TEXT NOT NULL, prompt TEXT NOT NULL, images TEXT NOT NULL,
                       schema TEXT NOT NULL, PRIMARY KEY (key, interpreter));
--- One row per answer: a responder's reply to a request.
+-- One row per answer: a responder's reply to a request, or its failure (error set, answer empty).
 CREATE TABLE response (key TEXT NOT NULL, interpreter TEXT NOT NULL, responder TEXT NOT NULL, answer TEXT NOT NULL,
-                       usage TEXT NOT NULL, recorded TEXT NOT NULL, PRIMARY KEY (key, interpreter, responder));
+                       usage TEXT NOT NULL, recorded TEXT NOT NULL, error TEXT,
+                       PRIMARY KEY (key, interpreter, responder));
 -- The interpreter descriptions behind each fingerprint, for reading.
 CREATE TABLE interpreter (fingerprint TEXT PRIMARY KEY, role TEXT NOT NULL, description TEXT NOT NULL);
 """
@@ -64,6 +65,11 @@ class Fixture:
                 self.db.executescript(SCHEMA)
                 self.db.execute("INSERT INTO meta VALUES ('schema_version', ?)", (str(SCHEMA_VERSION),))
         version = self.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
+        if version and version[0] == "1":  # small enough to migrate in place
+            with self.db:
+                self.db.execute("ALTER TABLE response ADD COLUMN error TEXT")
+                self.db.execute("UPDATE meta SET value=? WHERE key='schema_version'", (str(SCHEMA_VERSION),))
+            version = (str(SCHEMA_VERSION),)
         if not version or int(version[0]) != SCHEMA_VERSION:
             self.db.close()
             raise FixtureError(f"{self.path} has fixture schema {version and version[0]}, expected {SCHEMA_VERSION}")
@@ -71,6 +77,9 @@ class Fixture:
 
     def close(self):
         self.db.close()
+        temp = getattr(self, "temp", None)  # an unpacked zip's folder
+        if temp is not None:
+            temp.cleanup()
 
     def __enter__(self):
         return self
@@ -86,19 +95,19 @@ class Fixture:
         return dict(self.db.execute("SELECT key, value FROM meta"))
 
     def answer(self, key, interpreter, responder):
-        row = self.db.execute("SELECT answer FROM response WHERE key=? AND interpreter=? AND responder=?",
-                              (key, interpreter, responder)).fetchone()
-        return row[0] if row else None
+        """(answer, error) as recorded, or None."""
+        return self.db.execute("SELECT answer, error FROM response WHERE key=? AND interpreter=? AND responder=?",
+                               (key, interpreter, responder)).fetchone()
 
     def record(self, key, interpreter, responder, *, kind, region, content, key_parts, prompt, images, schema,
-               answer, usage=None, description=None, role=""):
+               answer, usage=None, description=None, role="", error=None):
         with self.db:
             self.db.execute("INSERT OR IGNORE INTO request VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             (key, interpreter, kind, region, content, json.dumps(key_parts, default=str), prompt,
                              json.dumps(images), schema))
-            self.db.execute("INSERT OR REPLACE INTO response VALUES (?, ?, ?, ?, ?, ?)",
+            self.db.execute("INSERT OR REPLACE INTO response VALUES (?, ?, ?, ?, ?, ?, ?)",
                             (key, interpreter, responder, answer, json.dumps(usage or {}, sort_keys=True),
-                             datetime.now(timezone.utc).strftime("%Y-%m-%d")))
+                             datetime.now(timezone.utc).strftime("%Y-%m-%d"), error))
             if description is not None:
                 self.db.execute("INSERT OR IGNORE INTO interpreter VALUES (?, ?, ?)",
                                 (interpreter, role, json.dumps(description, sort_keys=True)))
@@ -108,15 +117,15 @@ class Fixture:
         """Requests and answers per responder, kind and interpreter, with token usage."""
         rows = self.db.execute("""
             SELECT r.responder, q.kind, r.interpreter, COUNT(*), SUM(json_extract(r.usage, '$.prompt_tokens')),
-                   SUM(json_extract(r.usage, '$.completion_tokens'))
+                   SUM(json_extract(r.usage, '$.completion_tokens')), SUM(r.error IS NOT NULL)
             FROM response r JOIN request q ON q.key = r.key AND q.interpreter = r.interpreter
             GROUP BY r.responder, q.kind, r.interpreter ORDER BY r.responder, q.kind, r.interpreter""").fetchall()
         return {
             "meta": self.meta(),
             "requests": self.db.execute("SELECT COUNT(*) FROM request").fetchone()[0],
             "contents": [c for (c,) in self.db.execute("SELECT DISTINCT content FROM request WHERE content != '' ORDER BY content")],
-            "answers": [{"responder": a, "kind": b, "interpreter": c, "answers": d, "prompt_tokens": e or 0,
-                         "completion_tokens": f or 0} for a, b, c, d, e, f in rows],
+            "answers": [{"responder": a, "kind": b, "interpreter": c, "answers": d, "failures": g, "prompt_tokens": e or 0,
+                         "completion_tokens": f or 0} for a, b, c, d, e, f, g in rows],
         }
 
 def pack(fixture, target):

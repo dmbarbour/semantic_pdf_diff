@@ -285,6 +285,8 @@ def run(args, settings, store, names, out, force_rescan=False):
         limitations=LIMITATIONS)
     store.save_comparison(data['created_at'], data)
     write_report(data, out, assets=store.folder / 'assets')
+    if getattr(client, 'fixture', None) is not None:
+        client.fixture.close()
     incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
                   or data['retrieval']['omitted_by_pair_limit'] > 0 or any(f.get('processing_error') for f in data['findings']))
     print(f"Report: {out / 'report.html'}" + (' (incomplete source coverage)' if incomplete else ''))
@@ -306,7 +308,7 @@ def make_client(args, settings, store):
             import pymupdf
             fixture.note('pymupdf', pymupdf.VersionBind)
         if path is not args.fixture:
-            fixture.temp = temp  # removed with the fixture
+            fixture.temp = temp  # removed when the fixture closes
     if fixture is None:
         return Client(settings, store)
     return Client(settings, store, fixture=fixture, mode=args.fixture_mode, responder=args.responder)

@@ -63,6 +63,23 @@ class RecordAndReplay(unittest.TestCase):
         self.assertGreaterEqual(len(failed), 2)  # situating requests can miss too; they aren't coverage tasks
         self.assertTrue(all('No recorded answer' in r['issues'][0] for r in failed))
 
+    def test_recorded_failures_replay_as_failures_and_are_retried_when_recording(self):
+        self.record()
+        with sqlite3.connect(self.fixture) as db:
+            db.execute("UPDATE response SET answer = '', error = 'ValueError: Truncated model output' WHERE rowid IN "
+                       "(SELECT r.rowid FROM response r JOIN request q ON q.key = r.key AND q.interpreter = r.interpreter "
+                       "WHERE q.kind = 'triage' LIMIT 2)")  # situating failures aren't refined into new requests
+        code, report, _ = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture))
+        self.assertEqual(report['usage']['fixture']['missing'], 0)
+        failed = [i for x in report['situation'].values() for i in x['issues'] if i['failed']]
+        self.assertEqual(len(failed), 2)
+        self.assertTrue(all('Recorded failure: ValueError: Truncated' in i['issue'] for i in failed))
+        with jittery_model() as (url, state):
+            self.run_cli('again', url, '--fixture', str(self.fixture), '--fixture-mode', 'replay-or-record')
+            self.assertEqual(state['requests'], 2)  # only the recorded failures are asked again
+        with sqlite3.connect(self.fixture) as db:
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM response WHERE error IS NOT NULL').fetchone()[0], 0)
+
     def test_responders_and_interpreters_are_kept_apart(self):
         self.record('--responder', 'model-a')
         _, other, _ = self.run_cli('b', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-b')

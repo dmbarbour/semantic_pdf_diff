@@ -43,6 +43,8 @@ class Dispatcher:
         try:
             value = call(*args)
         except ModelFailure as e:
+            if hasattr(self.client, "failed"):
+                self.client.failed(request, e)
             finish(None, e)
             return
         self.client.save(request, value)

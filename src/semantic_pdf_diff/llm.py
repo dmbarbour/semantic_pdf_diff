@@ -149,7 +149,11 @@ class Client:
         cached = self.cached(request)
         if cached is not None:
             return cached
-        value = self.send(request)
+        try:
+            value = self.send(request)
+        except ModelFailure as e:
+            self.failed(request, e)
+            raise
         self.save(request, value)
         return value
 
@@ -210,10 +214,13 @@ class Client:
         responder's answers."""
         if self.fixture is not None and request.key is not None:
             kind = request.key[0]
-            answer = self.fixture.answer(self._fixture_key(request.key), self._fingerprint(kind)[0], self.responder)
-            if answer is not None:
+            row = self.fixture.answer(self._fixture_key(request.key), self._fingerprint(kind)[0], self.responder)
+            if row is not None and row[1] is not None and self.mode == "replay":
+                self.fixture.served += 1
+                raise ModelFailure(f"Recorded failure: {row[1]}")
+            if row is not None and row[1] is None:  # in record mode, recorded failures are asked again
                 try:
-                    value = request.schema.model_validate_json(answer)
+                    value = request.schema.model_validate_json(row[0])
                 except ValueError as e:
                     raise ModelFailure(f"Recorded answer no longer fits {request.schema.__name__}: {e}") from e
                 self.fixture.served += 1
@@ -230,14 +237,23 @@ class Client:
     def save(self, request, value):
         """Cache a response (main thread); in record mode, also record it in the fixture."""
         self._save(request.request_hash, request.key, value)
+        self._record(request, value.model_dump_json(), None)
+
+    def failed(self, request, error):
+        """Note a failed request (main thread): in record mode, the model's failure is recorded
+        so replay reproduces it. Unrecorded answers and call limits aren't the model's doing."""
+        if not isinstance(error, (NotRecorded, CallLimitReached)):
+            self._record(request, "", f"{type(error).__name__}: {error}")
+
+    def _record(self, request, answer, error):
         if self.fixture is not None and self.mode == "replay-or-record" and request.key is not None:
             kind, region = request.key[0], request.key[1]
             fingerprint, interpreter = self._fingerprint(kind)
             self.fixture.record(self._fixture_key(request.key), fingerprint, self.responder, kind=kind, region=region,
                                 content=request.key[2] if kind in ("extract", "triage") else "",
                                 key_parts=list(request.key), prompt=request.prompt, images=list(request.images),
-                                schema=request.schema.__name__, answer=value.model_dump_json(), usage=request.usage,
-                                description=interpreter.model_dump() if interpreter else None, role=kind)
+                                schema=request.schema.__name__, answer=answer, usage=request.usage,
+                                description=interpreter.model_dump() if interpreter else None, role=kind, error=error)
 
     def send(self, request):
         """Call the model, with retries (thread-safe; touches neither the cache nor the store)."""
