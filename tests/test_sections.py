@@ -140,6 +140,33 @@ class SectionContext(unittest.TestCase):
             self.assertTrue(visual and all('\nSection: 1 Pumps | 2 Fans\n' in p for p in visual))
             self.assertEqual({e.value: e.section for e in evidence}, {'10': 'sec1', '3': 'sec2'})
 
+    def test_rotated_sheets_tables_and_title_fragments(self):
+        from semantic_pdf_diff.extract import heading_y
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            page = doc.new_page(width=600, height=400)
+            for r in range(4):  # a ruled 4 x 2 table
+                page.draw_line(pymupdf.Point(100, 100 + 30 * r), pymupdf.Point(400, 100 + 30 * r))
+            for c in (100, 250, 400):
+                page.draw_line(pymupdf.Point(c, 100), pymupdf.Point(c, 190))
+            for r, (a, b) in enumerate((('Item', 'Power'), ('Pump', '10 kW'), ('Fan', '3 kW'))):
+                page.insert_text((110, 120 + 30 * r), a); page.insert_text((260, 120 + 30 * r), b)
+            page.insert_text((500, 380), 'S-522')  # a sheet number in the title block
+            page.set_rotation(90)
+            self.assertEqual(heading_y(page, 'S-522 - DECK FOOTING DETAILS'), 0.0)  # a fragment isn't the title
+            path = Path(d) / 'r.pdf'
+            doc.save(path); doc.close()
+            client = Recorder(vision=False)
+            evidence, _ = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+            with pymupdf.open(path) as doc:
+                native = doc[0].rect * doc[0].derotation_matrix
+            tables = [e for e in evidence if e.locator.region == 'table']
+            self.assertTrue(tables)
+            for e in tables:  # row boxes in unrotated coordinates, like every other locator
+                self.assertTrue(pymupdf.Rect(e.locator.bbox) in native + (-1, -1, 1, 1), e.locator.bbox)
+                # A displayed row (an unrotated column here), not the whole 300 x 90 table.
+                self.assertLess(pymupdf.Rect(e.locator.bbox).get_area(), 0.75 * 300 * 90)
+
     def test_split_headings_are_found_and_outline_order_is_kept(self):
         from semantic_pdf_diff.extract import heading_y
         doc = pymupdf.open()

@@ -165,6 +165,7 @@ class SectionAbout(Lenient):
 class PanelLabel(Lenient):
     """A panel model's review of one item; checked against the taxonomy afterwards."""
     verdict: str = ""
+    fields: dict[str, str] = Field(default_factory=dict)
     flags: list[str] = Field(default_factory=list, max_length=30)
     clarity: str = ""
     confidence: str = ""

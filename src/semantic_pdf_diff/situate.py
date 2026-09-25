@@ -382,13 +382,13 @@ def scanned(page, text):
 def in_section(evidence, section, index):
     """Claims in a section: by the section recorded with them, or by position for claims
     recorded without one."""
-    return [e for e in evidence if (e.section or index.at(e.locator.page, e.locator.bbox[1]).id) == section.id]
+    return [e for e in evidence if (e.section or index.box(e.locator.page, e.locator.bbox).id) == section.id]
 
 def figure_material(doc, figure, index, by_id, text_by_page):
     """Everything a figure request is given besides the image, as {part: text}."""
     page = doc[figure.page - 1]
-    heading = lambda p, y=0.0: " > ".join(index.at(p, y).heading_path) if index.sections else ""
-    where = heading(figure.page, figure.bbox[1])
+    heading = lambda p, box=(0, 0, 0, 0): " > ".join(index.box(p, box).heading_path) if index.sections else ""
+    where = heading(figure.page, figure.bbox)
     part = {"location": f"page {figure.page} of {len(doc)}, {position(page, figure)}" + (f"; section: {where}" if where else "")}
     if figure.label:
         part["label"] = f"{figure.label} (from its {figure.label_source or 'caption'})"
@@ -401,7 +401,7 @@ def figure_material(doc, figure, index, by_id, text_by_page):
     else:
         part["text before it"], part["text after it"] = surroundings(page, figure.bbox, AROUND)
     part["paragraphs citing it"] = "\n".join(
-        f"- (page {r.page}" + (f", section: {heading(r.page, r.bbox[1])}" if heading(r.page, r.bbox[1]) else "")
+        f"- (page {r.page}" + (f", section: {heading(r.page, r.bbox)}" if heading(r.page, r.bbox) else "")
         + f") {r.paragraph or r.text}"
         for r in figure.references[:MAX_CITATIONS])
     part["claims extracted from it"] = "\n".join(claim_line(by_id[i]) for i in figure.claims[:MAX_FIGURE_CLAIMS] if i in by_id)
@@ -456,7 +456,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
         return ("triage", kind, content, ident, hashlib.sha256("\x00".join(parts).encode()).hexdigest())
 
     from .extract import SectionIndex, section_text
-    index = SectionIndex(sections) if sections else SectionIndex([])
+    index = SectionIndex(sections, doc)
 
     def ask_figure(figure):
         images = [render(figure.page, figure.bbox, f"{stem}-{figure.id.replace(':', '-')}.png")] if figure.region else []
@@ -498,7 +498,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
         text = section_text(doc, section).strip()
         inside = in_section(evidence, section, index)
         claims = "\n".join(claim_line(e) for e in inside[:MAX_SECTION_CLAIMS]) or "(none)"
-        mine = [f for f in figures if index.at(f.page, f.bbox[1]).id == section.id][:MAX_SECTION_FIGURES]
+        mine = [f for f in figures if index.box(f.page, f.bbox).id == section.id][:MAX_SECTION_FIGURES]
         figs = "\n".join(f"- {f.label or 'unlabelled ' + f.kind} (page {f.page}): {f.about or f.caption or '(not described)'}"
                          for f in mine) or "(none)"
         # Sheets are shown by their figure requests; scans only by an image of the page.
@@ -588,12 +588,12 @@ def quality(doc, figures, sections, unresolved, evidence):
                              claim_text(f.claims)])
         check("figure", f.id, f.about + " " + f.role if f.role else f.about, material, f"{f.caption} {f.title} {f.label or ''}")
     from .extract import SectionIndex, section_text
-    index = SectionIndex(sections) if sections else None
+    index = SectionIndex(sections, doc)
     for s in sections:
         inside = [e.id for e in in_section(evidence, s, index)]
         heading = " ".join(s.heading_path)
         material = " ".join([heading, section_text(doc, s), claim_text(inside),
-                             *(f.about for f in figures if index.at(f.page, f.bbox[1]).id == s.id)])
+                             *(f.about for f in figures if index.box(f.page, f.bbox).id == s.id)])
         check("section", s.id, s.about, material, heading, expected=bool(inside))
     labelled = [f for f in figures if f.label]
     resolved = sum(len(f.references) for f in figures)

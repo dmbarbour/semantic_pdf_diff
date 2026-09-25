@@ -108,6 +108,8 @@ PAIR_FLAGS = [
     _f("Relation", "should_be_unrelated", "Should be: unrelated", ""),
     _f("Relation", "should_be_uncertain", "Should be: uncertain (not enough to tell)", ""),
     _f("Relation", "rationale_wrong", "Right relation for the wrong reason", ""),
+    _f("Relation", "would_relate_if_same_subject", "Would relate (e.g. complementary) if about the same subject, "
+       "but they aren't, or it's unclear", "e.g. two turbines' pitch settings"),
 ]
 
 TAXONOMY = {
@@ -135,11 +137,46 @@ TAXONOMY = {
 # The coarse question agreement is best measured on: is the result usable?
 USABLE = {"claim": {"correct", "flawed"}, "about": {"good", "acceptable"}, "pair": {"right"}}
 
+# Quick per-field answers shown next to each part of an item: the fastest way to say what's wrong.
+FIELD_ANSWERS = [
+    {"name": "ok", "label": "\u2713", "help": "Right"},
+    {"name": "wrong", "label": "\u2717", "help": "Wrong (or missing when it should be there)"},
+    {"name": "unsure", "label": "?", "help": "Can't tell, or contested"},
+]
+
+def _field(name, label, help=""):
+    return {"name": name, "label": label, "help": help}
+
+FIELDS = {
+    "claim": [_field("entity", "Entity", "The thing the value belongs to, at the right level"),
+              _field("attribute", "Attribute", "The property, stated specifically enough"),
+              _field("value", "Value", "Digits, bounds and ranges"),
+              _field("unit", "Unit", "Including scale factors; wrong if missing"),
+              _field("conditions", "Conditions", "Load case, scenario, scope; wrong if a needed one is missing"),
+              _field("basis", "Basis", "Requirement, target, measured, calculated..."),
+              _field("approximate", "Approximate", "Readings off charts should be approximate"),
+              _field("quote", "Quote", "Verbatim, and supports the claim"),
+              _field("section", "Section", "The section it was attributed to")],
+    "about": [_field("about", "About", "What it depicts or covers, without values"),
+              _field("role", "Role", "Why the document includes it"),
+              _field("keywords", "Keywords"),
+              _field("type", "Type and density", "Sections only")],
+    "pair": [_field("a", "Claim A is read correctly"),
+             _field("b", "Claim B is read correctly"),
+             _field("same_subject", "Same subject, or counterparts in two designs"),
+             _field("relation", "The judged relation is right")],
+}
+
+# Suggested verdict from field answers (the reviewer can always choose another).
+CORE_FIELDS = {"claim": {"entity", "attribute", "value"}, "about": {"about"}, "pair": {"relation"}}
+
 CLARITY = [
     {"name": "clear", "label": "Clear", "help": "I could judge this item"},
     {"name": "context_insufficient", "label": "Context insufficient",
      "help": "I'd need more of the document than shown to judge"},
     {"name": "source_illegible", "label": "Source illegible", "help": "The image or text can't be read well enough"},
+    {"name": "reading_unclear", "label": "Not sure how to read the source",
+     "help": "e.g. a chart or drawing convention I don't know; a domain expert might"},
     {"name": "item_ambiguous", "label": "Item or question ambiguous",
      "help": "The item could be read several ways, or the categories don't fit it"},
 ]
@@ -149,6 +186,20 @@ CONFIDENCE = [
     {"name": "medium", "label": "Medium", "help": "Probably right"},
     {"name": "low", "label": "Low", "help": "A guess, or outside what I know"},
 ]
+
+def field_names(kind):
+    return {f["name"] for f in FIELDS[kind]}
+
+def suggested_verdict(kind, fields):
+    """A verdict implied by per-field answers, or None when nothing is answered."""
+    if not fields:
+        return None
+    wrong = {f for f, answer in fields.items() if answer == "wrong"}
+    if kind == "claim":
+        return "wrong" if wrong & CORE_FIELDS["claim"] else "flawed" if wrong else "correct"
+    if kind == "about":
+        return "wrong" if wrong & CORE_FIELDS["about"] else "acceptable" if wrong else "good"
+    return "wrong" if "relation" in wrong else "right"
 
 def flag_names(kind):
     return {f["name"] for f in TAXONOMY[kind]["flags"]}

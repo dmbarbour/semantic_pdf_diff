@@ -104,14 +104,14 @@ def text_pieces(page, text_bytes):
                 pieces.append((f"{bi}.{ci}", tuple(block[:4]), chunk))
     return pieces
 
-def text_groups(page, text_bytes, breaks=()):
+def text_groups(page, text_bytes, section_of=None):
     """Consecutive text blocks grouped up to the byte budget (oversized blocks split),
-    never across a section boundary (breaks: y positions where sections start).
+    never across a section boundary (section_of(bbox) names a block's section).
 
     Returns [(ids, [(bbox, text)])], where ids like '3.0-5.0' name the blocks grouped.
     """
     pieces = text_pieces(page, text_bytes)
-    part = lambda bbox: sum(bbox[1] + 0.5 >= y for y in breaks)
+    part = section_of or (lambda bbox: None)
     groups, group, size = [], [], 0
     for piece in pieces + [None]:
         extra = len(piece[2].encode()) + 2 if piece else 0
@@ -152,25 +152,50 @@ def heading_y(page, title):
     want = _squash(title)
     if len(want) < 3:
         return 0.0
+    top = lambda bbox: display_y(page, bbox)
     for block in page.get_text("dict")["blocks"]:
         lines = block.get("lines", ())
         # A heading may be split across lines ("9-2." and "Cooking"), or begin a block.
         joined = "".join(_squash("".join(span["text"] for span in line["spans"])) for line in lines)
         if joined and joined.startswith(want):
-            return float(block["bbox"][1])
+            return top(block["bbox"])
         for line in lines:
             text = _squash("".join(span["text"] for span in line["spans"]))
-            if len(text) >= 3 and (text.startswith(want) or want.startswith(text)):
-                return float(line["bbox"][1])
+            # A line may hold most of a long title, but a fragment such as a sheet number isn't the title.
+            if len(text) >= 3 and (text.startswith(want) or (want.startswith(text) and len(text) >= 0.6 * len(want))):
+                return top(line["bbox"])
     return 0.0
+
+def display_y(page, bbox):
+    """The top of a box (unrotated page coordinates) as the page is displayed: section
+    positions follow reading order, which on a rotated page isn't the unrotated y."""
+    import pymupdf
+    return (pymupdf.Rect(bbox) * page.rotation_matrix).y0 if page.rotation else float(bbox[1])
 
 class SectionIndex:
     """Which section a point in the document belongs to: the last one starting at or above it.
 
     index[page] is the section at the top of a page (used for per-page signals)."""
 
-    def __init__(self, sections):
+    def __init__(self, sections, doc=None):
         self.sections = sorted(sections, key=lambda s: (s.first_page, s.first_y))
+        # Positions are as displayed; boxes are unrotated, so rotated pages need converting.
+        self.rotations = {n: page.rotation_matrix for n, page in enumerate(doc, 1) if page.rotation} if doc else {}
+
+    def top(self, page, bbox):
+        import pymupdf
+        matrix = self.rotations.get(page)
+        return (pymupdf.Rect(bbox) * matrix).y0 if matrix is not None else float(bbox[1])
+
+    def box(self, page, bbox):
+        """The section a box (unrotated coordinates) starts in."""
+        return self.at(page, self.top(page, bbox))
+
+    def spanned_box(self, page, bbox):
+        import pymupdf
+        matrix = self.rotations.get(page)
+        shown = pymupdf.Rect(bbox) * matrix if matrix is not None else pymupdf.Rect(bbox)
+        return self.spanned(page, shown.y0, shown.y1)
 
     def at(self, page, y=0.0):
         if not self.sections:
@@ -249,11 +274,14 @@ def pdf_sections(doc, depth, pages_per_section):
     else:
         sections = [Section(id=f"sec{i}", origin="pages", first_page=first, last_page=min(count, first + pages_per_section - 1))
                     for i, first in enumerate(range(1, count + 1, pages_per_section), 1)]
-    return sections, SectionIndex(sections)
+    return sections, SectionIndex(sections, doc)
 
 def _content_above(doc, page, y):
-    """Whether any text on a page sits above y (else a section starting at y starts the page)."""
-    return y > 0 and any(b[6] == 0 and b[4].strip() and b[3] <= y + 1 for b in doc[page - 1].get_text("blocks"))
+    """Whether any text on a page sits above y (displayed), else a section starting at y starts the page."""
+    import pymupdf
+    p = doc[page - 1]
+    return y > 0 and any(b[6] == 0 and b[4].strip() and (pymupdf.Rect(b[:4]) * p.rotation_matrix).y1 <= y + 1
+                         for b in p.get_text("blocks"))
 
 def section_text(doc, section):
     """A section's text, clipped to where it starts and ends on its first and last pages."""
@@ -261,13 +289,12 @@ def section_text(doc, section):
     parts = []
     for number in range(section.first_page, section.last_page + 1):
         page = doc[number - 1]
-        native = page.rect * page.derotation_matrix
-        top = section.first_y if number == section.first_page else native.y0
-        bottom = section.last_y if number == section.last_page and section.last_y is not None else native.y1
+        shown = page.rect  # section positions are as displayed
+        top = section.first_y if number == section.first_page else shown.y0
+        bottom = section.last_y if number == section.last_page and section.last_y is not None else shown.y1
         if bottom <= top:
             continue
-        clip = pymupdf.Rect(native.x0, top - 1, native.x1, bottom - 1) * page.rotation_matrix
-        parts.append(page.get_text("text", clip=clip))
+        parts.append(page.get_text("text", clip=pymupdf.Rect(shown.x0, top - 1, shown.x1, bottom - 1)))
     return "\n".join(parts)
 
 # How each extraction pass gets from PDF bytes to a claim.
@@ -378,7 +405,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         """Record a repeated block from its first occurrence's result, without a model call."""
         note = f"identical to {entry['task']} on page {entry['page']}; not re-sent"
         step = DerivationStep(step="repeated-block", detail=note)
-        section = page_section.at(page_no, bbox[1])
+        section = page_section.box(page_no, bbox)
         copies = [e.model_copy(update={"locator": PdfLocator(page=page_no, bbox=tuple(bbox), region=region, task=task),
                                        "section": section.id, "derivation": [*e.derivation, step]})
                   for e in entry["found"]]
@@ -397,7 +424,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
 
         check(quote) -> bool | None. Native tasks reject claims failing it; visual tasks
         only record the result. locate(quote) narrows a claim's bbox within the task.
-        place(quote) -> y or None: where a visual claim's quote sits, to find its section.
+        place(quote) -> box or None: where a visual claim's quote sits, to find its section.
         Each claim found becomes one occurrence; sightings of the same claim by other
         tasks are merged into one piece of evidence afterwards (union provenance).
         """
@@ -422,9 +449,9 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         row = {"content": content, "page": page_no, "bbox": list(bbox), "task": task,
                "image": image, "status": "complete", "issues": [], "claims": 0}
         images = [output / image] if image else []
-        section = page_section.at(page_no, bbox[1])  # the heading above the region, not the page's
+        section = page_section.box(page_no, bbox)  # the heading above the region, not the page's
         # A region spanning sections (a tile, an overview) is told all their headings.
-        heading = " | ".join(" > ".join(x.heading_path) for x in page_section.spanned(page_no, bbox[1], bbox[3])
+        heading = " | ".join(" > ".join(x.heading_path) for x in page_section.spanned_box(page_no, bbox)
                              if x.heading_path)
         prompt = (EXTRACT.replace("{max_claims}", str(s.claims_per_request)) + "\nSource type: " + region + (f"\nSection: {heading}" if heading else "")
                   + "\nSOURCE DATA:\n" + text)
@@ -462,8 +489,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 if any(e.id == eid for e in found):
                     continue  # the same claim twice in one response: keep the first
                 where = tuple(locate(claim.quote) if locate else bbox)
-                y = place(claim.quote) if place else where[1]
-                home = page_section.at(page_no, y).id if y is not None else section.id
+                spot = place(claim.quote) if place else where
+                home = page_section.box(page_no, spot).id if spot is not None else section.id
                 found.append(Evidence(**claim.model_dump(), id=eid, content=content, section=home,
                                       locator=PdfLocator(page=page_no, bbox=where, region=region, task=task),
                                       derivation=derivation or DERIVATION[region], image=image, quote_verified=verified))
@@ -532,9 +559,9 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         native = rect * page.derotation_matrix
         layer = page.get_text("text", clip=native)
         check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
-        blocks = [(b[1], b[4]) for b in page.get_text("blocks", clip=native) if b[6] == 0]
+        blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", clip=native) if b[6] == 0]
         def place(quote):  # the first text block in the region holding the quote
-            return next((y for y, text in blocks if covered(quote, text, fold=True)), None)
+            return next((box for box, text in blocks if covered(quote, text, fold=True)), None)
         consume(page_no, native, tag, "", "assets/" + name, check=check, place=place,
                 crop=(tuple(round(v, 3) for v in rect), s.image_side),
                 then=lambda status: refine_visual(page_no, page, tag, rect, depth, status))
@@ -572,11 +599,13 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             yield "page"
             # Native coordinates stay unrotated (PDF point coordinates). Consecutive
             # blocks are grouped up to the byte budget; oversized blocks are split.
-            for ids, segments in text_groups(page, s.text_bytes, owner.boundaries(number)):
+            for ids, segments in text_groups(page, s.text_bytes, lambda b, n=number: owner.box(n, b).id):
                 text_task(number, segments, f"text:p{number}:{ids}")
             try:
-                found = [(table.bbox, rows, row_boxes(table, rows)) for table in page.find_tables().tables
-                         for rows in [table.extract()]]
+                # Table detection works in displayed coordinates; locators are unrotated.
+                native = lambda b: tuple(pymupdf.Rect(b) * page.derotation_matrix) if b else None
+                found = [(native(table.bbox), rows, [native(b) for b in row_boxes(table, rows)])
+                         for table in page.find_tables().tables for rows in [table.extract()]]
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors
                 found = []
                 record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
@@ -587,6 +616,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             for ti, (bbox, rows, boxes) in enumerate(found):
                 if not rows:
                     continue
+                shown = pymupdf.Rect(bbox) * page.rotation_matrix  # continuation is judged as displayed
                 header, body, derivation = rows[0], rows[1:] or rows, None
                 body_boxes = boxes[1:] if len(rows) > 1 else boxes
                 width = max(len(r) for r in rows)
@@ -594,7 +624,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 # previous page, continues it, unless its first row is a header of the same
                 # form (a new table, e.g. the next day's schedule). An identical first row is
                 # a repeated header and is skipped.
-                if (ti == 0 and continuing and continuing[1] == width and bbox[1] < 0.2 * height
+                if (ti == 0 and continuing and continuing[1] == width and shown.y0 - page.rect.y0 < 0.2 * height
                         and (rows[0] == continuing[0] or not same_form(rows[0], continuing[0]))):
                     if rows[0] != continuing[0]:
                         body, body_boxes = rows, boxes
@@ -614,7 +644,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     row_box = body_boxes[ri] if ri < len(body_boxes) and body_boxes[ri] else tuple(bbox)
                     table_task(number, tuple(row_box), f"table:p{number}:{ti}:{ri}", header, row, list(range(width)),
                                derivation=derivation, repeat_key=key)
-                if bbox[3] > 0.8 * height:
+                if shown.y1 - page.rect.y0 > 0.8 * height:
                     carried = (header, width)
                 else:
                     carried = None

@@ -6,8 +6,16 @@ import unittest
 from pathlib import Path
 from semantic_pdf_diff import cli, review
 from semantic_pdf_diff.models import PanelLabel, Settings
-from semantic_pdf_diff.taxonomy import CLARITY, CONFIDENCE, TAXONOMY, flag_names
+from semantic_pdf_diff.taxonomy import CLARITY, CONFIDENCE, FIELDS, TAXONOMY, flag_names, suggested_verdict
 from test_concurrency import jittery_model, make_pdf
+
+class Fields(unittest.TestCase):
+    def test_suggested_verdicts(self):
+        self.assertEqual(suggested_verdict('claim', {'value': 'wrong', 'unit': 'ok'}), 'wrong')
+        self.assertEqual(suggested_verdict('claim', {'conditions': 'wrong', 'value': 'ok'}), 'flawed')
+        self.assertEqual(suggested_verdict('claim', {'value': 'ok', 'quote': 'unsure'}), 'correct')
+        self.assertEqual(suggested_verdict('pair', {'same_subject': 'wrong', 'relation': 'ok'}), 'right')
+        self.assertIsNone(suggested_verdict('about', {}))
 
 class Alpha(unittest.TestCase):
     def test_krippendorff_worked_example(self):
@@ -97,6 +105,7 @@ class Batches(unittest.TestCase):
     def labels(self, batch, reviewer, verdict_index=0):
         return {'format': review.FORMAT, 'version': 1, 'batch': batch['name'], 'reviewer': reviewer, 'labels': [
             {'item': i['id'], 'verdict': TAXONOMY[i['type']]['verdicts'][verdict_index]['name'], 'flags': [],
+             'fields': {FIELDS[i['type']][0]['name']: 'ok' if verdict_index == 0 else 'wrong'},
              'clarity': CLARITY[0]['name'], 'confidence': CONFIDENCE[0]['name'], 'note': ''} for i in batch['items']]}
 
     def test_sampling_is_stratified_blind_and_reproducible(self):
@@ -119,6 +128,7 @@ class Batches(unittest.TestCase):
         bad = json.loads(json.dumps(good))
         bad['labels'][0]['flags'] = ['not_a_flag']
         bad['labels'][1]['clarity'] = 'murky'
+        bad['labels'][2]['fields'] = {'colour': 'ok'}
         paths = {}
         for name, data in (('good', good), ('other', other), ('bad', bad)):
             paths[name] = folder / f'{name}.json'
@@ -129,7 +139,10 @@ class Batches(unittest.TestCase):
             self.assertEqual(cli.main(['review', 'import', str(folder), str(paths['bad'])]), 1)
         self.assertIn('not_a_flag', err.getvalue())
         self.assertIn('murky', err.getvalue())
+        self.assertIn('colour', err.getvalue())
         result = review.agreement(folder)
+        for kind in ('claim', 'about', 'pair'):  # per-field agreement on the first field of each item type
+            self.assertIn(FIELDS[kind][0]['name'], result['types'][kind]['fields'])
         self.assertEqual(result['reviewers'], ['claude', 'david'])
         claims = result['types']['claim']
         self.assertEqual(claims['verdict_agreement']['claude ~ david'].split('/')[1], str(claims['items']))

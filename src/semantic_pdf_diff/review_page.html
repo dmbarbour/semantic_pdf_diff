@@ -4,29 +4,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Review: __TITLE__</title>
 <style>
-:root{--bg:#f3f5f7;--card:#fff;--ink:#1b2733;--muted:#5b6b7a;--line:#d5dde4;--accent:#1f6f9f;--warn:#9a5a00;--sel:#e6f1f8}
-@media (prefers-color-scheme:dark){:root{--bg:#12171c;--card:#1b232b;--ink:#e3e9ee;--muted:#9aa9b6;--line:#2f3b46;--accent:#6fb3de;--warn:#e0a55a;--sel:#223444}}
+:root{--bg:#f3f5f7;--card:#fff;--ink:#1b2733;--muted:#5b6b7a;--line:#d5dde4;--accent:#1f6f9f;--ok:#1d7a46;--bad:#b3261e;--unsure:#8a6100;--sel:#e6f1f8}
+@media (prefers-color-scheme:dark){:root{--bg:#12171c;--card:#1b232b;--ink:#e3e9ee;--muted:#9aa9b6;--line:#2f3b46;--accent:#6fb3de;--ok:#5cc58a;--bad:#f07a70;--unsure:#e0b04f;--sel:#223444}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,sans-serif}
 header{position:sticky;top:0;z-index:2;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 header h1{font-size:16px;margin:0 8px 0 0}header input{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
-button{padding:7px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer}button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+button{padding:7px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer;font:inherit}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
 .progress{flex:1;min-width:140px;height:8px;background:var(--line);border-radius:4px;overflow:hidden}.progress div{height:100%;background:var(--accent)}
-main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:16px;padding:16px;max-width:1500px;margin:auto}
+main{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(360px,1fr);gap:16px;padding:16px;max-width:1500px;margin:auto}
 @media(max-width:900px){main{grid-template-columns:1fr}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
 .images figure{margin:0 0 12px}.images img{max-width:100%;border:1px solid var(--line);border-radius:4px;cursor:zoom-in;background:#fff}
 figcaption{color:var(--muted);font-size:13px}
-dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:8px 0}dt{color:var(--muted)}dd{margin:0;overflow-wrap:anywhere}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.claimbox{border:1px solid var(--line);border-radius:8px;padding:8px}
-h2{font-size:15px;margin:4px 0 8px}h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 0 6px}
-.opts label{display:block;padding:5px 8px;border-radius:6px;cursor:pointer}.opts label:hover{background:var(--sel)}
-.opts label small{display:block;color:var(--muted);margin-left:24px}
-.flags details{border-top:1px solid var(--line);padding:4px 0}.flags summary{cursor:pointer;color:var(--muted);font-size:13px}
-textarea{width:100%;min-height:60px;border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--bg);color:var(--ink);font:inherit}
-nav{display:flex;gap:8px;justify-content:space-between;margin-top:12px}.done{color:var(--accent)}.hint{color:var(--muted);font-size:13px}
+h2{font-size:15px;margin:4px 0 8px}h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:16px 0 6px}
 .question{background:var(--sel);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+table.fields{width:100%;border-collapse:collapse}table.fields td{padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.fields td.name{color:var(--muted);white-space:nowrap;width:1%}table.fields td.value{overflow-wrap:anywhere}
+table.fields td.answer{white-space:nowrap;width:1%;text-align:right}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:3px 9px;min-width:30px;background:var(--card)}.seg button+button{border-left:1px solid var(--line)}
+.seg button.on[data-a=ok]{background:var(--ok);color:#fff}.seg button.on[data-a=wrong]{background:var(--bad);color:#fff}.seg button.on[data-a=unsure]{background:var(--unsure);color:#fff}
+.empty{color:var(--muted);font-style:italic}.context{color:var(--muted);font-size:13px;margin-top:6px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.claimbox{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:14px}
+.claimbox dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 10px;margin:4px 0}.claimbox dt{color:var(--muted)}.claimbox dd{margin:0;overflow-wrap:anywhere}
+.opts{display:flex;flex-wrap:wrap;gap:6px}.opts label{border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
+.opts label:has(input:checked){background:var(--sel);border-color:var(--accent)}.opts input{margin-right:4px}
+.suggest{color:var(--muted);font-size:13px;margin-left:6px;text-transform:none;letter-spacing:0}
+details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}details.more>summary{cursor:pointer;color:var(--muted)}
+.flags details{border-top:1px solid var(--line);padding:4px 0}.flags summary{cursor:pointer;color:var(--muted);font-size:13px}
+.flags label{display:block;padding:3px 6px;border-radius:6px;cursor:pointer}.flags label:hover{background:var(--sel)}.flags small{display:block;color:var(--muted);margin-left:22px}
+textarea{width:100%;min-height:54px;border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--bg);color:var(--ink);font:inherit}
+nav{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px}.hint{color:var(--muted);font-size:13px}
 #zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;z-index:5;overflow:auto;cursor:zoom-out}#zoom img{display:block;margin:auto;max-width:none}
-#list{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}#list button{padding:2px 7px;font-size:12px}#list button.labelled{background:var(--sel)}#list button.current{outline:2px solid var(--accent)}
+#list{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px}#list button{padding:2px 7px;font-size:12px}#list button.labelled{background:var(--sel)}#list button.current{outline:2px solid var(--accent)}
 </style>
 <header>
   <h1>Review __TITLE__</h1>
@@ -38,8 +49,7 @@ nav{display:flex;gap:8px;justify-content:space-between;margin-top:12px}.done{col
   <section class="card images" id="images"></section>
   <section class="card">
     <div id="item"></div>
-    <form id="form"></form>
-    <nav><button id="prev">← Previous</button><span class="hint">Saved in this browser as you go. Keys: ← → to move.</span><button id="next" class="primary">Next →</button></nav>
+    <nav><button id="prev">← Previous</button><span class="hint">Saved in this browser. ← → move between items.</span><button id="next" class="primary">Next →</button></nav>
     <div id="list"></div>
   </section>
 </main>
@@ -58,68 +68,98 @@ let state = store.people[store.last] || blank(store.last);
 const save = () => { store.people[state.reviewer] = state; store.last = state.reviewer;
   try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
 const QUESTIONS = {
-  claim: 'Is this claim a correct, faithful reading of the source? Judge it against the highlighted region and the page.',
-  about: 'Does this statement say what the figure or section is about, correctly and usefully, without stating specific values?',
-  pair: 'Retrieval paired these two claims and the model judged their relation. A and B come from different sources: competing proposals (different designs) or revisions of one document. Is the pairing sensible, and is the relation right by the definitions under the verdicts?'};
+  claim: 'Is each part of this claim a faithful reading of the source? Mark each part; the verdict follows (change it if you disagree).',
+  about: 'Does this say what the figure or section is about, correctly and usefully, without specific values?',
+  pair: 'A and B come from different sources (competing designs, or revisions of one document). Were they read right, do they concern the same subject, and is the judged relation right?'};
 
-function fields(obj) {
-  return '<dl>' + Object.entries(obj).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(typeof v === 'object' ? JSON.stringify(v) : v)}</dd>`).join('') + '</dl>';
+const current = () => DATA.items[state.at];
+const label = () => state.labels[current().id]
+  || (state.labels[current().id] = {item: current().id, verdict: '', flags: [], fields: {}, clarity: 'clear', confidence: 'medium', note: '', chosen: false});
+
+function segment(field, answer) {
+  return `<span class="seg" data-field="${esc(field)}">` + DATA.field_answers.map(a =>
+    `<button type="button" data-a="${a.name}" title="${esc(a.help)}" class="${answer === a.name ? 'on' : ''}">${esc(a.label)}</button>`).join('') + '</span>';
+}
+function value(v) { return v === '' || v === undefined || v === null ? '<span class="empty">(none)</span>' : esc(typeof v === 'object' ? JSON.stringify(v) : v); }
+function fieldRows(item, l) {
+  const fields = DATA.fields[item.type].filter(f => item.type !== 'about' || f.name !== 'type' || item.shown.type !== undefined);
+  const shown = f => {
+    if (item.type === 'claim' && f.name === 'section') return item.context.section;
+    if (item.type === 'about' && f.name === 'type') return [item.shown.type, item.shown.density].filter(Boolean).join(', ');
+    return item.shown[f.name];
+  };
+  return '<table class="fields">' + fields.map(f => `<tr><td class="name" title="${esc(f.help)}">${esc(f.label)}</td>`
+    + (item.type === 'pair' ? '<td class="value"></td>' : `<td class="value">${value(shown(f))}</td>`)
+    + `<td class="answer">${segment(f.name, l.fields[f.name])}</td></tr>`).join('') + '</table>';
+}
+function claimBox(name, fields, context) {
+  return `<div class="claimbox"><b>${name}</b><dl>` + Object.entries(fields).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${value(v)}</dd>`).join('')
+    + `</dl><div class="context">${esc(context.document)} · p.${esc(context.page)}${context.section ? ' · ' + esc(context.section) : ''}</div></div>`;
+}
+function suggested(kind, fields) {
+  if (!Object.keys(fields).length) return '';
+  const wrong = new Set(Object.entries(fields).filter(([, a]) => a === 'wrong').map(([f]) => f));
+  const coreWrong = DATA.core_fields[kind].some(f => wrong.has(f));
+  if (kind === 'claim') return coreWrong ? 'wrong' : wrong.size ? 'flawed' : 'correct';
+  if (kind === 'about') return coreWrong ? 'wrong' : wrong.size ? 'acceptable' : 'good';
+  return wrong.has('relation') ? 'wrong' : 'right';
 }
 function showItem() {
-  const item = DATA.items[state.at];
+  const item = current(), l = label();
   $('#images').innerHTML = item.images.map(i => `<figure><img src="${esc(i.src)}" alt="${esc(i.caption)}" loading="lazy"><figcaption>${esc(i.caption)}</figcaption></figure>`).join('');
-  let body = `<div class="question">${esc(QUESTIONS[item.type])}</div><h2>Item ${state.at + 1} of ${DATA.items.length} · ${esc(item.type)}</h2>`;
-  if (item.type === 'pair') {
-    body += `<div class="pair"><div class="claimbox"><b>A</b>${fields(item.shown.A)}${fields(item.context.A)}</div><div class="claimbox"><b>B</b>${fields(item.shown.B)}${fields(item.context.B)}</div></div>`
-          + `<h3>Model's judgment</h3>${fields({relation: item.shown.relation, rationale: item.shown.rationale})}`;
-  } else {
-    body += `<h3>${item.type === 'claim' ? 'Extracted claim' : 'Statement'}</h3>${fields(item.shown)}<h3>Where</h3>${fields(item.context)}`;
-  }
-  $('#item').innerHTML = body;
-  showForm(item);
-  showList();
-}
-function option(name, value, entry, checked, type = 'radio') {
-  return `<label><input type="${type}" name="${name}" value="${esc(entry.name)}" ${checked ? 'checked' : ''}> ${esc(entry.label)}${entry.help ? `<small>${esc(entry.help)}</small>` : ''}</label>`;
-}
-function showForm(item) {
   const kind = DATA.taxonomy[item.type];
-  const label = state.labels[item.id] || {};
-  const flags = new Set(label.flags || []);
-  const groups = {};
+  let html = `<div class="question">${esc(QUESTIONS[item.type])}</div><h2>Item ${state.at + 1} of ${DATA.items.length} · ${esc(item.type)}</h2>`;
+  if (item.type === 'pair') {
+    html += `<div class="pair">${claimBox('A', item.shown.A, item.context.A)}${claimBox('B', item.shown.B, item.context.B)}</div>`
+          + `<h3>Judged relation</h3><div><b>${esc(item.shown.relation)}</b>: ${esc(item.shown.rationale)}</div>`;
+  } else if (item.type === 'about') {
+    html += `<div class="context">${Object.entries(item.context).filter(([, v]) => v).map(([k, v]) => `${esc(k)}: ${esc(v)}`).join(' · ')}</div>`;
+  } else {
+    html += `<div class="context">${esc(item.context.document)} · page ${esc(item.context.page)} · ${esc(item.context.region)} region</div>`;
+  }
+  html += `<h3>${item.type === 'pair' ? 'Questions' : 'Each part'}</h3>` + fieldRows(item, l);
+  const hint = suggested(item.type, l.fields);
+  html += `<h3>Verdict${hint && l.chosen && hint !== l.verdict ? `<span class="suggest">(your answers suggest: ${esc(hint)})</span>` : ''}</h3><div class="opts">`
+    + kind.verdicts.map(v => `<label title="${esc(v.help)}"><input type="radio" name="verdict" value="${v.name}" ${l.verdict === v.name ? 'checked' : ''}>${esc(v.label)}</label>`).join('') + '</div>';
+  html += `<h3>Was the item clear?</h3><div class="opts">` + DATA.clarity.map(c => `<label title="${esc(c.help)}"><input type="radio" name="clarity" value="${c.name}" ${l.clarity === c.name ? 'checked' : ''}>${esc(c.label)}</label>`).join('') + '</div>';
+  html += `<h3>Your confidence</h3><div class="opts">` + DATA.confidence.map(c => `<label title="${esc(c.help)}"><input type="radio" name="confidence" value="${c.name}" ${l.confidence === c.name ? 'checked' : ''}>${esc(c.label)}</label>`).join('') + '</div>';
+  html += `<h3>Note (optional)</h3><textarea name="note" placeholder="What's wrong, or what should it say?">${esc(l.note)}</textarea>`;
+  const groups = {}, flags = new Set(l.flags);
   kind.flags.forEach(f => (groups[f.group] = groups[f.group] || []).push(f));
-  let html = `<h3>Verdict</h3><div class="opts">${kind.verdicts.map(v => option('verdict', 0, v, label.verdict === v.name)).join('')}</div>`;
-  html += `<h3>What's wrong (any that apply)</h3><div class="flags opts">` + Object.entries(groups).map(([g, fs]) =>
-    `<details ${fs.some(f => flags.has(f.name)) ? 'open' : ''}><summary>${esc(g)}</summary>${fs.map(f => option('flags', 0, f, flags.has(f.name), 'checkbox')).join('')}</details>`).join('') + '</div>';
-  html += `<h3>Was the item clear?</h3><div class="opts">${DATA.clarity.map(c => option('clarity', 0, c, (label.clarity || 'clear') === c.name)).join('')}</div>`;
-  html += `<h3>Your confidence</h3><div class="opts">${DATA.confidence.map(c => option('confidence', 0, c, (label.confidence || 'medium') === c.name)).join('')}</div>`;
-  html += `<h3>Note (optional)</h3><textarea name="note" placeholder="What's wrong, or what should it say?">${esc(label.note || '')}</textarea>`;
-  $('#form').innerHTML = html;
+  html += `<details class="more" ${flags.size ? 'open' : ''}><summary>More detail (optional): specific problems</summary><div class="flags">` + Object.entries(groups).map(([g, fs]) =>
+    `<details ${fs.some(f => flags.has(f.name)) ? 'open' : ''}><summary>${esc(g)}</summary>` + fs.map(f =>
+    `<label><input type="checkbox" name="flags" value="${f.name}" ${flags.has(f.name) ? 'checked' : ''}> ${esc(f.label)}${f.help ? `<small>${esc(f.help)}</small>` : ''}</label>`).join('') + '</details>').join('') + '</div></details>';
+  $('#item').innerHTML = html;
+  showList(); showProgress();
 }
-function record() {
-  const item = DATA.items[state.at];
-  const form = new FormData($('#form'));
-  if (!form.get('verdict')) return;  // untouched items stay unlabelled
-  state.labels[item.id] = {item: item.id, verdict: form.get('verdict'), flags: form.getAll('flags'),
-    clarity: form.get('clarity'), confidence: form.get('confidence'), note: form.get('note') || ''};
-  save(); showProgress();
-}
+const answered = l => l && l.verdict;
 function showProgress() {
-  const n = Object.keys(state.labels).length;
+  const n = DATA.items.filter(i => answered(state.labels[i.id])).length;
   $('#bar').style.width = (100 * n / DATA.items.length) + '%';
   $('#count').textContent = `${n}/${DATA.items.length} labelled`;
 }
 function showList() {
-  $('#list').innerHTML = DATA.items.map((it, n) => `<button type="button" data-n="${n}" class="${state.labels[it.id] ? 'labelled' : ''} ${n === state.at ? 'current' : ''}">${n + 1}</button>`).join('');
+  $('#list').innerHTML = DATA.items.map((it, n) => `<button type="button" data-n="${n}" class="${answered(state.labels[it.id]) ? 'labelled' : ''} ${n === state.at ? 'current' : ''}">${n + 1}</button>`).join('');
 }
-function go(n) { record(); state.at = Math.max(0, Math.min(DATA.items.length - 1, n)); save(); showItem(); window.scrollTo(0, 0); }
-function labelsFile() {
-  record();
-  return JSON.stringify({format: DATA.format, version: 1, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
-    created: new Date().toISOString().slice(0, 10), labels: DATA.items.filter(i => state.labels[i.id]).map(i => state.labels[i.id])}, null, 2);
-}
-$('#form').addEventListener('change', record);
-$('#form').addEventListener('input', e => { if (e.target.name === 'note') record(); });
+$('#item').addEventListener('click', e => {
+  const b = e.target.closest('.seg button');
+  if (!b) return;
+  const l = label(), field = b.parentElement.dataset.field;
+  if (l.fields[field] === b.dataset.a) delete l.fields[field];  // click again to clear
+  else l.fields[field] = b.dataset.a;
+  if (!l.chosen) l.verdict = suggested(current().type, l.fields);
+  save(); showItem();
+});
+$('#item').addEventListener('change', e => {
+  const l = label(), t = e.target;
+  if (t.name === 'verdict') { l.verdict = t.value; l.chosen = true; }
+  else if (t.name === 'clarity') l.clarity = t.value;
+  else if (t.name === 'confidence') l.confidence = t.value;
+  else if (t.name === 'flags') l.flags = [...document.querySelectorAll('input[name=flags]:checked')].map(x => x.value);
+  save(); showItem();
+});
+$('#item').addEventListener('input', e => { if (e.target.name === 'note') { label().note = e.target.value; save(); } });
+function go(n) { state.at = Math.max(0, Math.min(DATA.items.length - 1, n)); save(); showItem(); window.scrollTo(0, 0); }
 $('#prev').onclick = () => go(state.at - 1);
 $('#next').onclick = () => go(state.at + 1);
 $('#list').onclick = e => { if (e.target.dataset.n) go(+e.target.dataset.n); };
@@ -127,10 +167,18 @@ $('#reviewer').value = state.reviewer;
 $('#reviewer').onchange = e => {
   const name = e.target.value.trim();
   if (name === state.reviewer) return;
-  if (!state.reviewer && Object.keys(state.labels).length) { state.reviewer = name; }  // name the work done so far
-  else { state = store.people[name] || blank(name); }
-  save(); showItem(); showProgress();
+  if (!state.reviewer && Object.keys(state.labels).length) state.reviewer = name;  // name the work done so far
+  else state = store.people[name] || blank(name);
+  save(); showItem();
 };
+function labelsFile() {
+  const out = DATA.items.filter(i => answered(state.labels[i.id])).map(i => {
+    const {chosen, ...l} = state.labels[i.id];
+    return l;
+  });
+  return JSON.stringify({format: DATA.format, version: 2, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
+    created: new Date().toISOString().slice(0, 10), labels: out}, null, 2);
+}
 $('#download').onclick = () => {
   const blob = new Blob([labelsFile()], {type: 'application/json'});
   const a = document.createElement('a');
@@ -144,12 +192,12 @@ $('#copy').onclick = async () => {
   setTimeout(() => $('#copy').textContent = 'Copy labels', 2000);
 };
 document.addEventListener('keydown', e => {
-  if (['TEXTAREA', 'INPUT'].includes(document.activeElement.tagName) && document.activeElement.type !== 'radio' && document.activeElement.type !== 'checkbox') return;
+  if (['TEXTAREA', 'INPUT'].includes(document.activeElement.tagName) && !['radio', 'checkbox'].includes(document.activeElement.type)) return;
   if (e.key === 'ArrowRight') go(state.at + 1);
   if (e.key === 'ArrowLeft') go(state.at - 1);
 });
 $('#images').onclick = e => { if (e.target.tagName === 'IMG') { $('#zoom img').src = e.target.src; $('#zoom').style.display = 'block'; } };
 $('#zoom').onclick = () => $('#zoom').style.display = 'none';
-showItem(); showProgress();
+showItem();
 </script>
 </html>
