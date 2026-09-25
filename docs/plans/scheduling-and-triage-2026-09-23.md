@@ -60,6 +60,39 @@ Score every section cheaply, then run detailed extraction in score order. Signal
 
 Triage decides *order*, never *exclusion*. Low-scoring sections are still extracted if throughput allows, and are never silently dropped.
 
+### Situating stage (model triage, decided 2026-09-25)
+
+Extraction is organized by **medium** (text groups, table rows, image tiles), but meaning is organized by **reference**: a figure is explained by prose elsewhere, and a drawing-only section by its sheet title, title block and callouts. Situating is therefore **its own stage after extraction**. It consumes what extraction produced (claims from every pass, section text, sections, signals), plus a few images where text is thin.
+
+1. **Figures and references, found mechanically:** image blocks and dense vector-drawing clusters, paired with nearby captions ("Figure 3: …", "Fig. 3", "Table 2", "Sheet M-101"). A regex over text blocks finds the sentences that cite them ("as shown in Figure 3", "refer to M-101"), building a reference graph (prose → figure) with exact provenance. Visual claims inside a figure's region are attached to it.
+2. **Figure "about", first (bottom-up):** one request per figure with its caption, the prose that references it, its visual claims and a modest image. It returns what the figure depicts and why it's there, with the prose links as provenance.
+3. **Section "about", from everything:** heading path, full text (whole sections fit the 262,144-token context), claims from all passes, and the figure "abouts". Diagram-heavy sections with little text (per their signals, e.g. drawing sheets) add a few low-resolution page overviews (a small cap per request), the sheet title, title-block rows and visual claims. The request returns type, estimated density, keywords and the "about" statement.
+4. **Situating context is linked, not rewritten:** a claim can gain links to the prose or figure that explains it, recorded as annotations. Claims themselves are never changed after extraction.
+
+It has **its own bound role** (`triage`): changing its model or prompts clears only situating results on `--reset`. Storage: sections gain `about`, type and keywords; a figure table holds caption, bounding box, references, "about" and linked claims. `--plan` counts section and figure requests separately. The one entanglement a single bottom-up pass doesn't resolve is prose whose meaning depends on a diagram; its own claims come from text, so it's no worse than before.
+
+#### Quality checks
+
+Mechanical checks run on every run and are reported, never silently applied:
+
+- **Reference resolution:** the share of "Figure N" / "Sheet X" references that resolve to a detected figure. Unresolved references point to missed figures, a recall signal that needs no labels. So does the share of detected figures with no caption or reference.
+- **"About" statements omit values:** numbers with units in an "about" statement are flagged, since aboutness should leave out specific values and decisions.
+- **Grounding:** the key terms of a figure's or section's "about" should appear in its caption, referencing prose, claims or text. Low overlap flags a possible hallucination.
+- **Shape:** length bounds; every section with extracted claims gets an "about".
+
+Human checks: reports offer a small sample of figure and section "abouts" for review (usefulness and correctness as reusable annotations). The [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) label figure–reference links and rate "abouts" against the public corpus.
+
+#### Alternatives to evaluate later
+
+Measured against the first pass above, on the evaluation benchmarks, not built speculatively:
+
+- **Diagrams as structured text:** the model transcribes a diagram into a graph (nodes, edges, labels) or into Mermaid/SVG that would render a semantically similar diagram. Claims could then be derived mechanically from edges, and topologies compared across sources. Promising for block diagrams and P&IDs, poor for charts and geometric drawings. A render-and-compare check by the same model isn't independent evidence.
+- **Vector geometry for connectivity:** in vector PDFs, lines, arrowheads and label positions (`get_drawings`) could recover connections mechanically, with the model only resolving ambiguities.
+- **Composite images:** render the diagram crop together with its associated text (caption, referencing sentences, section heading) as one image, in case the model binds text to image regions better inside the image than across the prompt. Also useful as a single view for human reviewers in reports.
+- **Sections first, then figures:** gives figures more context at the cost of a second round of requests.
+
+Where these would integrate is open. Figure-level situating (step 2) is the natural place for the first three.
+
 ### Claim quality signals
 
 Keep three separate axes. They answer different questions, and mixing them into one opaque score would hide which one drives a ranking.
@@ -92,7 +125,7 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 1. ✅ *Done 2026-09-24 (`1a3d460`, `456e6a9`, and progress/logging; see the [review](../reviews/scheduling-m1-concurrency-2026-09-24.md)).* **Merged with milestone 2 (decided 2026-09-24; see the [store completion review](../reviews/store-complete-2026-09-24.md)): an in-memory task queue run by worker threads with a single store writer, plus** the concurrent client: time-of-day rate-limit rules, adaptive backoff, a modest concurrency cap; tests against a stub server that simulates latency and 429s; token and time estimates in `--plan`; progress bars, heartbeats and configurable verbosity.
 2. ◐ *Partly done 2026-09-24: fair share across compared sources (pages fed round-robin, one queue for all their PDFs) and `not_reached` for work cut off by `max_calls`. Section priorities wait for triage (milestones 3–4); persisting the queue waits for preliminary reports (milestone 6).* **Persisting the task queue and the section queue** (the queue itself arrives with milestone 1): tasks persisted for progress reporting; fair share across sections and across compared sources; `not_reached` coverage status.
 3. ✅ *Done 2026-09-24 (see the [review](../reviews/scheduling-m3-triage-signals-2026-09-24.md)): per-section signals, and repeated table rows followed.* **Triage without the model:** cheap signals and boilerplate detection. Use drawing sets as a test case: table detection there finds mostly drawing geometry, and about half the rows repeat across sheets (title blocks, legends; see the [store milestone 4 review](../reviews/store-m4-pdf-sections-2026-09-24.md)).
-4. **Model triage per section:** type, density, keywords and the "about" statement.
+4. **Situating stage** (see *Situating stage* above): figures and references found mechanically; figure then section "abouts" as a separate stage after extraction, with its own bound `triage` role; mechanical quality checks in every report.
 5. **Epistemic status:** prompts ask for basis, uncertainty, context and role (filling the schema v2 fields); skeptical instructions; the basis veto in comparison. A deliberate prompt-version change.
 6. **Preliminary reports:** status stamps, honest gap labels, comparison interleaved with extraction, the `status` command.
 7. **Claim quality signals** with sorting and filtering in reports.

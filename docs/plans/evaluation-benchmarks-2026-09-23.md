@@ -59,6 +59,14 @@ Claims are never phrased identically, so scoring needs a matching step:
 
 Extraction is scored for every responder table from [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md): Claude (a strong reference, roughly the ceiling), the weak local VLM (the floor), and in-house gemma-4 (the number that matters). Differences between prompt versions are measured by re-recording the slice under the new prompt.
 
+## Situating quality
+
+For the situating stage ([scheduling-and-triage](scheduling-and-triage-2026-09-23.md)):
+
+- **Figure–reference links:** label which prose cites which figure on curated pages. Score link precision and recall, and figure detection recall (reports' unresolved-reference counts are a label-free proxy).
+- **"About" statements:** rate usefulness and correctness (does it say what the section or figure is about, without values?). Also measure whether "about" embeddings align sections across sources better than headings alone.
+- **Synthetic diagrams with known structure:** generate block diagrams and flow graphs from known graphs (e.g. via Mermaid or Graphviz) into PDFs, with captions and citing prose. The ground truth (nodes, edges, direction, references) is exact by construction. They test visual extraction, situating, and the structured-text and vector-geometry alternatives alike.
+
 ## Retrieval and comparison
 
 1. **Pick documents.** Start from the public corpus fetched by `scripts/fetch_samples.py`. It has competing proposals (`solar-decathlon-2013` teams, the `wind-reference-turbines` designs, the 3GPP company contributions, where the moderator summaries give a head start on which positions correspond), revisions (`ietf-quic-transport`, the IEA 15 MW spreadsheets, the NASA interim and final reports) and natural vocabulary drift between authors.
