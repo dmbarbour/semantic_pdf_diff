@@ -117,6 +117,44 @@ class SectionContext(unittest.TestCase):
             self.assertEqual(headings, {'10 kW': '1 Pumps', '3 kW': '2 Fans', '5 kW': '2 Fans'})
             self.assertEqual({e.value: e.section for e in evidence}, {'10': 'sec1', '3': 'sec2', '5': 'sec2'})
 
+    def test_visual_claims_take_the_section_where_their_quote_is(self):
+        class Seeing(Recorder):
+            def ask(self, prompt, schema, images=(), key=None):
+                if images:  # 'reads' both values off the image
+                    self.asked.append((prompt, key))
+                    return Extraction(claims=[{'entity': e, 'attribute': 'power', 'value': v, 'unit': 'kW', 'kind': 'diagram',
+                                               'quote': f'{e} rated power {v} kW', 'confidence': .8}
+                                              for e, v in (('Pump', '10'), ('Fan', '3'))], complete=True)
+                return super().ask(prompt, schema, images, key)
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            page = doc.new_page(width=400, height=400)
+            for y, text in ((40, '1 Pumps'), (80, 'Pump rated power 10 kW'), (200, '2 Fans'), (240, 'Fan rated power 3 kW')):
+                page.insert_text((40, y), text)
+            doc.set_toc([[1, '1 Pumps', 1], [1, '2 Fans', 1]])
+            path = Path(d) / 't.pdf'
+            doc.save(path); doc.close()
+            client = Seeing(tile_points=1000)  # one tile (and the overview) covers the whole page
+            evidence, _ = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+            visual = [p for p, k in client.asked if k and k[1] in ('tile', 'overview')]
+            self.assertTrue(visual and all('\nSection: 1 Pumps | 2 Fans\n' in p for p in visual))
+            self.assertEqual({e.value: e.section for e in evidence}, {'10': 'sec1', '3': 'sec2'})
+
+    def test_split_headings_are_found_and_outline_order_is_kept(self):
+        from semantic_pdf_diff.extract import heading_y
+        doc = pymupdf.open()
+        page = doc.new_page(width=400, height=400)
+        page.insert_text((40, 60), 'Contest 9. Home')
+        page.insert_text((40, 150), '9-2.'); page.insert_text((90, 150), 'Cooking')  # a numbered heading in two pieces
+        page.insert_text((40, 190), 'Rules about cooking')
+        self.assertGreater(heading_y(page, '9-2. Cooking'), 130)
+        # 'Missing child' isn't on the page: it can't start above its parent, so the parent collapses into it.
+        doc.set_toc([[1, 'Contest 9. Home', 1], [2, 'Missing child', 1], [2, '9-2. Cooking', 1]])
+        sections, index = pdf_sections(doc, 2, 20)
+        self.assertEqual([x.heading_path for x in sections],
+                         [['Contest 9. Home', 'Missing child'], ['Contest 9. Home', '9-2. Cooking']])
+        self.assertEqual(index.at(1, 180).heading_path[-1], '9-2. Cooking')
+
     def fake_tables(self, by_page, height=300):
         class Table:
             def __init__(self, bbox, rows): self.bbox, self.rows = bbox, rows

@@ -153,9 +153,14 @@ def heading_y(page, title):
     if len(want) < 3:
         return 0.0
     for block in page.get_text("dict")["blocks"]:
-        for line in block.get("lines", ()):
+        lines = block.get("lines", ())
+        # A heading may be split across lines ("9-2." and "Cooking"), or begin a block.
+        joined = "".join(_squash("".join(span["text"] for span in line["spans"])) for line in lines)
+        if joined and joined.startswith(want):
+            return float(block["bbox"][1])
+        for line in lines:
             text = _squash("".join(span["text"] for span in line["spans"]))
-            if text and (text == want or (len(text) >= 3 and (text.startswith(want) or want.startswith(text)))):
+            if len(text) >= 3 and (text.startswith(want) or want.startswith(text)):
                 return float(line["bbox"][1])
     return 0.0
 
@@ -180,6 +185,12 @@ class SectionIndex:
 
     def __getitem__(self, page):
         return self.at(page, 0.0)
+
+    def spanned(self, page, y0, y1):
+        """Sections a region of a page overlaps, top first."""
+        found = [self.at(page, y0)]
+        found += [s for s in self.sections if s.first_page == page and y0 < s.first_y < y1 and s not in found]
+        return [s for s in found if s is not None]
 
     def boundaries(self, page):
         """y positions on a page where a new section starts."""
@@ -208,7 +219,13 @@ def pdf_sections(doc, depth, pages_per_section):
         if 1 <= page <= count:
             starts.append((page, heading_y(doc[page - 1], str(title)), list(path)))
     if starts:
-        starts.sort(key=lambda s: (s[0], s[1]))
+        # Keep outline order: an entry can't start above the one before it on the same page
+        # (a title that wasn't found takes its predecessor's position).
+        for i in range(1, len(starts)):
+            page, y, heading = starts[i]
+            if page == starts[i - 1][0] and y < starts[i - 1][1]:
+                starts[i] = (page, starts[i - 1][1], heading)
+        starts.sort(key=lambda s: s[0])  # stable: outline order within a page
         kept = []
         for start in starts:
             if kept and kept[-1][0] == start[0] and start[1] - kept[-1][1] < HEADING_GAP:
@@ -371,7 +388,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         record(row, copies)
 
     def consume(page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None, then=None,
-                repeat_key=None, repeat_after=1):
+                repeat_key=None, repeat_after=1, place=None):
         """Queue one extraction task; when it finishes, record it and call then(status).
 
         repeat_key identifies exactly repeated boilerplate: once `repeat_after` earlier
@@ -380,6 +397,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
 
         check(quote) -> bool | None. Native tasks reject claims failing it; visual tasks
         only record the result. locate(quote) narrows a claim's bbox within the task.
+        place(quote) -> y or None: where a visual claim's quote sits, to find its section.
         Each claim found becomes one occurrence; sightings of the same claim by other
         tasks are merged into one piece of evidence afterwards (union provenance).
         """
@@ -405,7 +423,9 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                "image": image, "status": "complete", "issues": [], "claims": 0}
         images = [output / image] if image else []
         section = page_section.at(page_no, bbox[1])  # the heading above the region, not the page's
-        heading = " > ".join(section.heading_path)
+        # A region spanning sections (a tile, an overview) is told all their headings.
+        heading = " | ".join(" > ".join(x.heading_path) for x in page_section.spanned(page_no, bbox[1], bbox[3])
+                             if x.heading_path)
         prompt = (EXTRACT.replace("{max_claims}", str(s.claims_per_request)) + "\nSource type: " + region + (f"\nSection: {heading}" if heading else "")
                   + "\nSOURCE DATA:\n" + text)
         key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
@@ -442,7 +462,9 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 if any(e.id == eid for e in found):
                     continue  # the same claim twice in one response: keep the first
                 where = tuple(locate(claim.quote) if locate else bbox)
-                found.append(Evidence(**claim.model_dump(), id=eid, content=content, section=section.id,
+                y = place(claim.quote) if place else where[1]
+                home = page_section.at(page_no, y).id if y is not None else section.id
+                found.append(Evidence(**claim.model_dump(), id=eid, content=content, section=home,
                                       locator=PdfLocator(page=page_no, bbox=where, region=region, task=task),
                                       derivation=derivation or DERIVATION[region], image=image, quote_verified=verified))
                 row["claims"] += 1
@@ -510,7 +532,10 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         native = rect * page.derotation_matrix
         layer = page.get_text("text", clip=native)
         check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
-        consume(page_no, native, tag, "", "assets/" + name, check=check,
+        blocks = [(b[1], b[4]) for b in page.get_text("blocks", clip=native) if b[6] == 0]
+        def place(quote):  # the first text block in the region holding the quote
+            return next((y for y, text in blocks if covered(quote, text, fold=True)), None)
+        consume(page_no, native, tag, "", "assets/" + name, check=check, place=place,
                 crop=(tuple(round(v, 3) for v in rect), s.image_side),
                 then=lambda status: refine_visual(page_no, page, tag, rect, depth, status))
 

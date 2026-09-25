@@ -80,6 +80,23 @@ class RecordAndReplay(unittest.TestCase):
         with sqlite3.connect(self.fixture) as db:
             self.assertEqual(db.execute('SELECT COUNT(*) FROM response WHERE error IS NOT NULL').fetchone()[0], 0)
 
+    def test_prune_keeps_what_the_latest_runs_used(self):
+        from semantic_pdf_diff.fixtures import Fixture, _now
+        import time
+        self.record()
+        with sqlite3.connect(self.fixture) as db:  # an answer from an older prompt, never asked for again
+            db.execute("INSERT INTO response SELECT 'stale', interpreter, responder, answer, usage, recorded, error, NULL "
+                       "FROM response LIMIT 1")
+        time.sleep(1.1)
+        mark = _now()
+        time.sleep(1.1)
+        self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture))
+        with Fixture(self.fixture) as f:
+            self.assertEqual(f.prune(mark, dry_run=True)['answers_removed'], 1)
+            f.prune(mark)
+        _, report, _ = self.run_cli('again', UNREACHABLE, '--fixture', str(self.fixture))
+        self.assertEqual(report['usage']['fixture']['missing'], 0)
+
     def test_responders_and_interpreters_are_kept_apart(self):
         self.record('--responder', 'model-a')
         _, other, _ = self.run_cli('b', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-b')

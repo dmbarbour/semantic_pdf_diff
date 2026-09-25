@@ -90,6 +90,7 @@ Reordered 2026-09-25 (see *Decisions*): a cheap hosted gemma-4 makes live record
 - **Record by running the pipeline live** (`--fixture-mode replay-or-record`): one run records every adaptive round (refinement, re-asks, comparisons), so rounds of collection aren't needed for callable models.
 - **Fixture keys:** the response cache's semantic key (the comparison key without its settings hash) plus an interpreter *fingerprint*: prompts and output-shaping settings, without the model (the responder stands for it) or library versions. Fixtures record the PyMuPDF version; replay tests skip under another version, since text and renderings may differ.
 - **Slices, not whole documents,** for recording cost and replay-test speed. Cutting is byte-deterministic for a given PyMuPDF version, pinned in `slices.json`.
+- **Iterating on prompts:** after a change, top up with `replay-or-record` (only requests whose key or fingerprint changed are asked), then `fixtures prune --unused-since <time before the runs>` drops answers no current run uses, and `fixtures pack`. Last-use times aren't packed, so the zip changes only when answers do.
 - **The in-house recording kit is deferred:** hosted gemma-4 covers realistic answers; the kit returns if the in-house deployment's answers differ enough to matter.
 
 ## Decisions (2026-09-24)

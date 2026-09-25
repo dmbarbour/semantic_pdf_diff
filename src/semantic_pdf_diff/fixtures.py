@@ -17,7 +17,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-SCHEMA_VERSION = 2  # 2: failures are recorded (response.error)
+SCHEMA_VERSION = 3  # 2: failures are recorded (response.error); 3: response.used
 MODES = ("replay", "replay-or-record")
 
 SCHEMA = """
@@ -28,7 +28,7 @@ CREATE TABLE request (key TEXT NOT NULL, interpreter TEXT NOT NULL, kind TEXT NO
                       schema TEXT NOT NULL, PRIMARY KEY (key, interpreter));
 -- One row per answer: a responder's reply to a request, or its failure (error set, answer empty).
 CREATE TABLE response (key TEXT NOT NULL, interpreter TEXT NOT NULL, responder TEXT NOT NULL, answer TEXT NOT NULL,
-                       usage TEXT NOT NULL, recorded TEXT NOT NULL, error TEXT,
+                       usage TEXT NOT NULL, recorded TEXT NOT NULL, error TEXT, used TEXT,
                        PRIMARY KEY (key, interpreter, responder));
 -- The interpreter descriptions behind each fingerprint, for reading.
 CREATE TABLE interpreter (fingerprint TEXT PRIMARY KEY, role TEXT NOT NULL, description TEXT NOT NULL);
@@ -65,17 +65,25 @@ class Fixture:
                 self.db.executescript(SCHEMA)
                 self.db.execute("INSERT INTO meta VALUES ('schema_version', ?)", (str(SCHEMA_VERSION),))
         version = self.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
-        if version and version[0] == "1":  # small enough to migrate in place
+        if version and version[0] in ("1", "2"):  # small enough to migrate in place
             with self.db:
-                self.db.execute("ALTER TABLE response ADD COLUMN error TEXT")
+                if version[0] == "1":
+                    self.db.execute("ALTER TABLE response ADD COLUMN error TEXT")
+                self.db.execute("ALTER TABLE response ADD COLUMN used TEXT")
                 self.db.execute("UPDATE meta SET value=? WHERE key='schema_version'", (str(SCHEMA_VERSION),))
             version = (str(SCHEMA_VERSION),)
         if not version or int(version[0]) != SCHEMA_VERSION:
             self.db.close()
             raise FixtureError(f"{self.path} has fixture schema {version and version[0]}, expected {SCHEMA_VERSION}")
-        self.served, self.recorded, self.missing = 0, 0, []
+        self.served, self.recorded, self.missing, self.used = 0, 0, [], set()
 
     def close(self):
+        if self.used:
+            with self.db:
+                now = _now()
+                self.db.executemany("UPDATE response SET used=? WHERE key=? AND interpreter=? AND responder=?",
+                                    [(now, *u) for u in sorted(self.used)])
+            self.used = set()
         self.db.close()
         temp = getattr(self, "temp", None)  # an unpacked zip's folder
         if temp is not None:
@@ -95,9 +103,12 @@ class Fixture:
         return dict(self.db.execute("SELECT key, value FROM meta"))
 
     def answer(self, key, interpreter, responder):
-        """(answer, error) as recorded, or None."""
-        return self.db.execute("SELECT answer, error FROM response WHERE key=? AND interpreter=? AND responder=?",
-                               (key, interpreter, responder)).fetchone()
+        """(answer, error) as recorded, or None. Marks the answer as used (see prune)."""
+        row = self.db.execute("SELECT answer, error FROM response WHERE key=? AND interpreter=? AND responder=?",
+                              (key, interpreter, responder)).fetchone()
+        if row is not None:
+            self.used.add((key, interpreter, responder))  # written once, on close
+        return row
 
     def record(self, key, interpreter, responder, *, kind, region, content, key_parts, prompt, images, schema,
                answer, usage=None, description=None, role="", error=None):
@@ -105,13 +116,28 @@ class Fixture:
             self.db.execute("INSERT OR IGNORE INTO request VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             (key, interpreter, kind, region, content, json.dumps(key_parts, default=str), prompt,
                              json.dumps(images), schema))
-            self.db.execute("INSERT OR REPLACE INTO response VALUES (?, ?, ?, ?, ?, ?, ?)",
+            self.db.execute("INSERT OR REPLACE INTO response VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                             (key, interpreter, responder, answer, json.dumps(usage or {}, sort_keys=True),
-                             datetime.now(timezone.utc).strftime("%Y-%m-%d"), error))
+                             datetime.now(timezone.utc).strftime("%Y-%m-%d"), error, _now()))
             if description is not None:
                 self.db.execute("INSERT OR IGNORE INTO interpreter VALUES (?, ?, ?)",
                                 (interpreter, role, json.dumps(description, sort_keys=True)))
         self.recorded += 1
+
+    def prune(self, before, responder=None, dry_run=False):
+        """Drop answers not used (replayed or recorded) since `before` (ISO time), and
+        requests left without answers. Returns the counts."""
+        where = "(used IS NULL OR used < ?)" + (" AND responder = ?" if responder else "")
+        args = (before, responder) if responder else (before,)
+        answers = self.db.execute(f"SELECT COUNT(*) FROM response WHERE {where}", args).fetchone()[0]
+        if not dry_run:
+            with self.db:
+                self.db.execute(f"DELETE FROM response WHERE {where}", args)
+                self.db.execute("DELETE FROM request WHERE NOT EXISTS (SELECT 1 FROM response r "
+                                "WHERE r.key = request.key AND r.interpreter = request.interpreter)")
+                self.db.execute("DELETE FROM interpreter WHERE fingerprint NOT IN (SELECT interpreter FROM request)")
+            self.db.execute("VACUUM")
+        return {"answers_removed": answers, "dry_run": dry_run}
 
     def summary(self):
         """Requests and answers per responder, kind and interpreter, with token usage."""
@@ -134,9 +160,10 @@ def pack(fixture, target):
     source = sqlite3.connect(fixture)
     memory = sqlite3.connect(":memory:")
     memory.executescript(SCHEMA)
+    columns = {"response": "key, interpreter, responder, answer, usage, recorded, error, NULL"}  # 'used' isn't packed
     for table, order in (("meta", "key"), ("request", "key, interpreter"), ("response", "key, interpreter, responder"),
                          ("interpreter", "fingerprint")):
-        rows = source.execute(f"SELECT * FROM {table} ORDER BY {order}").fetchall()
+        rows = source.execute(f"SELECT {columns.get(table, '*')} FROM {table} ORDER BY {order}").fetchall()
         if rows:
             marks = ",".join("?" * len(rows[0]))
             memory.executemany(f"INSERT INTO {table} VALUES ({marks})", rows)
@@ -150,6 +177,9 @@ def pack(fixture, target):
     with zipfile.ZipFile(buffer, "w") as archive:
         archive.writestr(info, bytes(data))
     Path(target).write_bytes(buffer.getvalue())
+
+def _now():
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 def _dump(db):  # pragma: no cover - Python < 3.11 lacks Connection.serialize
     import tempfile

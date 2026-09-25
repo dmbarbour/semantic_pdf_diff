@@ -333,7 +333,16 @@ def fixtures_command(argv):
     pack = sub.add_parser('pack', help='Zip a fixture reproducibly (unchanged data gives identical bytes)')
     pack.add_argument('fixture', type=Path)
     pack.add_argument('target', type=Path)
+    prune = sub.add_parser('prune', help='Drop answers not replayed or recorded since a time (after prompt changes)')
+    prune.add_argument('fixture', type=Path)
+    prune.add_argument('--unused-since', required=True, help='ISO time, e.g. noted before replaying every run')
+    prune.add_argument('--responder')
+    prune.add_argument('--dry-run', action='store_true')
     args = parser.parse_args(argv)
+    if args.command == 'prune':
+        with fixtures.Fixture(args.fixture) as fixture:
+            print(json.dumps(fixture.prune(args.unused_since, args.responder, args.dry_run)))
+        return 0
     if args.command == 'summary':
         with tempfile.TemporaryDirectory() as d:
             path = fixtures.unpack(args.fixture, d) if args.fixture.suffix == '.zip' else args.fixture
