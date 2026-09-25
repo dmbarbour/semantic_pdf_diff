@@ -215,10 +215,14 @@ def claim_line(e):
     return f"- {e.entity} | {e.attribute} | {e.value}{unit}{conditions}"
 
 def diagram_heavy(section):
-    """Little text but drawings or images: e.g. drawing sheets."""
+    """Drawing sheets (many vector paths relative to text) or scans (images, almost no text).
+
+    On the samples, drawing sets have a median of 2 to 4 paths per text character; reports ~0.01.
+    """
     pages = section.last_page - section.first_page + 1
     sig = section.signals
-    return sig.get("characters", 0) / pages < 800 and (sig.get("drawings", 0) / pages > 200 or sig.get("images", 0) > 0)
+    drawings, characters = sig.get("drawings", 0), sig.get("characters", 0)
+    return (drawings / pages >= 500 and drawings >= characters / 2) or (sig.get("images", 0) > 0 and characters / pages < 200)
 
 def fit_text(text, client, prompt, images):
     """Trim section text to the request budget; returns (text, trimmed?)."""
@@ -316,3 +320,81 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
         dispatch.submit(prompt, SectionAbout, images, key("section", section.id, prompt), finish)
     dispatch.drain()
     return figures, [updated.get(s.id, s) for s in sections], unresolved, issues
+
+# --- quality checks --------------------------------------------------------------------
+
+# A number with a unit: the kind of specific value an "about" statement should leave out.
+VALUE = re.compile(r"(?<![\w.])\d+(?:[.,]\d+)?\s?-?(?:[kMG]?Wh?|[kM]?Pa|bar|psi|mm|cm|km|m|m²|m2|m³|m3|kg|t|tonnes|"
+                   r"L/s|l/s|L/min|gpm|°C|°F|K|%|Hz|kV|V|kVA|A|rpm|dB|ms|s|min|h|hrs?|ft|in|lbs?|k?N|k?Nm|m/s|km/h|mph)"
+                   r"(?![\w/])")
+STOPWORDS = frozenset("""about above after also among and are around based been being between both but can
+contains containing describes describing depicts depicting details detailing document each figure figures
+for from has have how includes including information into its kind kinds main more most other over
+provides section sections shown shows such than that the their them there these this those through
+table tables under using various what when where which while with within without""".split())
+GROUNDING_MIN = 0.5
+ABOUT_LENGTH = {"figure": (20, 800), "section": (40, 1200)}
+
+def terms(text):
+    """Content words, lowercased, with a plural 's' dropped."""
+    words = re.findall(r"[a-z][a-z\-]{3,}", text.lower())
+    return {w[:-1] if w.endswith("s") and not w.endswith("ss") else w for w in words if w not in STOPWORDS}
+
+def grounding(about, material):
+    """Share of the about's content words found in its material (None if it has none)."""
+    wanted = terms(about)
+    if not wanted:
+        return None
+    have = terms(material)
+    return len(wanted & have) / len(wanted)
+
+def values_in(about, names=""):
+    """Numbers with units in an about, except those in names (e.g. 'IEA 15 MW' in a heading)."""
+    squash = lambda s: re.sub(r"[\s\-]", "", s.lower())
+    return [m.group() for m in VALUE.finditer(about) if squash(m.group()) not in squash(names)]
+
+def quality(doc, figures, sections, unresolved, evidence):
+    """Mechanical checks on situating results; reported, never applied."""
+    by_id = {e.id: e for e in evidence}
+    claim_text = lambda ids: " ".join(f"{by_id[i].entity} {by_id[i].attribute} {by_id[i].conditions}"
+                                      for i in ids if i in by_id)
+    flags = []
+
+    def check(kind, target, about, material, names, expected=True):
+        if not about:
+            if expected:
+                flags.append({"target": target, "check": "missing", "detail": f"no {kind} about"})
+            return
+        low, high = ABOUT_LENGTH[kind]
+        if not low <= len(about) <= high:
+            flags.append({"target": target, "check": "shape", "detail": f"{len(about)} characters"})
+        found = values_in(about, names)
+        if found:
+            flags.append({"target": target, "check": "values", "detail": ", ".join(found[:5])})
+        share = grounding(about, material)
+        if share is not None and share < GROUNDING_MIN:
+            flags.append({"target": target, "check": "grounding",
+                          "detail": f"{share:.0%} of its terms appear in its material"})
+
+    for f in figures:
+        if not f.label:
+            continue
+        material = " ".join([f.caption, *(r.text for r in f.references), claim_text(f.claims)])
+        check("figure", f.id, f.about + " " + f.role if f.role else f.about, material, f.caption)
+    pages_text = {n: page.get_text("text") for n, page in enumerate(doc, 1)}
+    for s in sections:
+        pages = range(s.first_page, s.last_page + 1)
+        inside = [e.id for e in evidence if e.locator.page in pages]
+        heading = " ".join(s.heading_path)
+        material = " ".join([heading, *(pages_text.get(p, "") for p in pages), claim_text(inside),
+                             *(f.about for f in figures if f.page in pages)])
+        check("section", s.id, s.about, material, heading, expected=bool(inside))
+    labelled = [f for f in figures if f.label]
+    resolved = sum(len(f.references) for f in figures)
+    return {
+        "references": {"resolved": resolved, "unresolved": len(unresolved),
+                       "rate": round(resolved / (resolved + len(unresolved)), 3) if resolved + len(unresolved) else None},
+        "figures": {"labelled": len(labelled), "uncaptioned": len(figures) - len(labelled),
+                    "labelled_uncited": sum(1 for f in labelled if not f.references)},
+        "flags": flags,
+    }

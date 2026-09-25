@@ -22,7 +22,7 @@ from .throttle import RateLimiter
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
 from .report import write_report
 from .scan import ARCHIVES, Limits, read_origin, scan
-from .situate import find_figures, situate
+from .situate import find_figures, quality, situate
 from .store import Store, StoreError
 
 LIMITATIONS = ['Image-token budgeting must be calibrated to the serving backend.',
@@ -249,7 +249,8 @@ def run(args, settings, store, names, out, force_rescan=False):
     situations = situate_sources(store, client, names, files, by_content, sections) if triage else {}
     evidence = [e for items in by_content.values() for e in items]
     situation_data = {c: {'figures': [f.model_dump() for f in figures], 'unresolved': [r.model_dump() for r in unresolved],
-                          'issues': issues} for c, (figures, unresolved, issues) in sorted(situations.items())}
+                          'issues': issues, 'quality': checks}
+                      for c, (figures, unresolved, issues, checks) in sorted(situations.items())}
     source_data = [store.source(n).model_dump() for n in names]
     file_data = [f.model_dump() for n in names for f in files[n]]
     scan_issues = [{'source': n, 'path': p, 'reason': r} for n in names for p, r in store.issues(n)]
@@ -326,34 +327,41 @@ def situate_sources(store, client, names, files, by_content, sections):
     """Figures and section "about" statements for each fully extracted PDF: loaded from
     the store, or requested (figures first, then sections, per PDF).
 
-    Returns {content: (figures, unresolved references, issues)}; sections are updated in place.
+    Quality checks run on every run, for loaded results too.
+    Returns {content: (figures, unresolved references, issues, quality)}; sections are updated in place.
     """
     import pymupdf
-    situations, todo = {}, []
+    situations, todo, loaded = {}, [], []
     for name in names:
         for file in files[name]:
             content = file.content
-            if content in situations or any(c == content for _, c in todo) or not content.endswith('.pdf') \
-                    or not store.is_extracted(content):
+            if content in situations or not content.endswith('.pdf') or not store.is_extracted(content):
                 continue
             found = store.situation(content)
             if found is not None:
-                situations[content] = found
                 sections[content] = store.sections(content)
+                loaded.append((name, file.path, content))
             else:
-                todo.append(((name, file.path), content))
+                todo.append((name, file.path, content))
+            situations[content] = found
+    open_pdf = lambda name, path: pymupdf.open(stream=read_origin(store.origin(name, path)), filetype='pdf')
+    for name, path, content in loaded:
+        figures, unresolved, issues = situations[content]
+        with open_pdf(name, path) as doc:
+            situations[content] += (quality(doc, figures, sections[content], unresolved, by_content[content]),)
     if not todo:
         return situations
     log.info(f"Situating {len(todo)} PDF(s)")
     progress = Progress('situate', client, heartbeat=client.s.heartbeat_seconds)
     with Dispatcher(client) as dispatch:
-        for (name, path), content in todo:
-            with pymupdf.open(stream=read_origin(store.origin(name, path)), filetype='pdf') as doc:
+        for name, path, content in todo:
+            with open_pdf(name, path) as doc:
                 figures, found, unresolved, issues = situate(doc, content, by_content[content], sections.get(content, []),
                                                              store.folder, client, dispatch, progress)
+                checks = quality(doc, figures, found, unresolved, by_content[content])
             store.record_situation(content, figures, found, unresolved, issues)
             sections[content] = found
-            situations[content] = (figures, unresolved, issues)
+            situations[content] = (figures, unresolved, issues, checks)
             failed = sum(i['failed'] for i in issues)
             if failed:
                 log.warning(f'Situating {path}: {failed} request(s) failed; the next run retries them')

@@ -13,7 +13,7 @@ from semantic_pdf_diff.llm import ModelFailure
 from semantic_pdf_diff.models import Evidence, Extraction, Judgment, Occurrence, PdfLocator, Section, Settings
 from semantic_pdf_diff.progress import NoProgress
 from semantic_pdf_diff.provenance import triage_interpreter
-from semantic_pdf_diff.situate import figure_map, find_figures, situate
+from semantic_pdf_diff.situate import figure_map, find_figures, grounding, quality, situate, values_in
 from semantic_pdf_diff.store import InterpreterMismatch, Store
 from stubs import situating_answer
 
@@ -111,7 +111,7 @@ class Requests(unittest.TestCase):
         self.addCleanup(self.doc.close)
         self.sections = [Section(id='s1', first_page=1, last_page=2, heading_path=['Pumps'], origin='outline'),
                          Section(id='s2', first_page=3, last_page=4, heading_path=['Sheets'], origin='outline',
-                                 signals={'characters': 50, 'drawings': 900})]
+                                 signals={'characters': 50, 'drawings': 1200})]
 
     def run_situate(self, client, evidence=()):
         with Dispatcher(client) as dispatch:
@@ -187,6 +187,11 @@ class Storage(unittest.TestCase):
             again = json.loads((root / 'out/evidence.json').read_text())
             self.assertEqual(again['situation'], report['situation'])
             self.assertEqual(again['sections'], report['sections'])
+            self.assertEqual({c: x['quality'] for c, x in again['situation'].items()},
+                             {c: x['quality'] for c, x in report['situation'].items()})  # checks rerun on loaded results
+            page = (root / 'out/report.html').read_text()
+            self.assertIn('Situating: figures and sections', page)
+            self.assertIn('stub figure: Figure 1: Pump arrangement', page)
 
     def test_failed_requests_are_retried_next_run(self):
         with tempfile.TemporaryDirectory() as d:
@@ -219,6 +224,35 @@ class Storage(unittest.TestCase):
                 self.assertEqual(store.db.execute('SELECT COUNT(*) FROM task').fetchone()[0], evidence_before)
                 self.assertTrue(all(s.about == '' for (c,) in store.db.execute('SELECT DISTINCT content FROM section')
                                     for s in store.sections(c)))
+
+class Quality(unittest.TestCase):
+    def test_values_and_names(self):
+        about = 'The NREL 5-MW turbine: a 126 m rotor, 90% efficiency at 12.1 rpm; see Figure 3 and 2 pumps'
+        self.assertEqual(values_in(about, 'NREL 5-MW baseline'), ['126 m', '90%', '12.1 rpm'])
+
+    def test_grounding(self):
+        self.assertEqual(grounding('Blade structural properties along the span',
+                                   'Figure 2: Distributed blade structural properties along span'), 1.0)
+        self.assertLess(grounding('Offshore mooring line tensions', 'Figure 2: Blade structural properties'), .5)
+        self.assertIsNone(grounding('The figure shows', 'anything'))
+
+    def test_flags(self):
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open(build(Path(d) / 'f.pdf'))
+            tile = ev('ev-tile', 2, 'tile', (90, 90, 300, 300))
+            figures, unresolved = figure_map(doc, [tile])
+            fig1 = next(f for f in figures if f.label == 'figure 1')
+            fig1.about = 'Pump arrangement rated at 10 kW'                       # a value
+            fig2 = next(f for f in figures if f.label == 'figure 2')
+            fig2.about = 'Offshore mooring tensions for floating platforms'     # ungrounded
+            sections = [Section(id='s1', first_page=1, last_page=2, origin='pages', about='Pump arrangement'),
+                        Section(id='s2', first_page=3, last_page=4, origin='pages')]
+            q = quality(doc, figures, sections, unresolved, [tile])
+            doc.close()
+        found = {(f['target'], f['check']) for f in q['flags']}
+        self.assertEqual(found, {(fig1.id, 'values'), (fig2.id, 'grounding'), ('s1', 'shape')})  # s2 has no claims
+        self.assertEqual(q['references'], {'resolved': 2, 'unresolved': 2, 'rate': .5})
+        self.assertEqual(q['figures'], {'labelled': 2, 'uncaptioned': 1, 'labelled_uncited': 1})
 
 if __name__ == '__main__':
     unittest.main()

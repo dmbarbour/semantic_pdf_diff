@@ -74,7 +74,51 @@ select,input{padding:10px;border:1px solid #aac0cd;border-radius:6px;margin:8px}
     page += '<label>Show <select id="filter"><option value="all">All relations</option>'+''.join('<option>'+r+'</option>' for r in ['different','equivalent','complementary','uncertain','unrelated'])+'</select></label><input id="query" placeholder="Search findings" aria-label="Search findings">'
     page += '<main>'+''.join(rows)+'</main><details><summary>Unmatched evidence ('+str(len(data['unmatched']))+')</summary>'+unmatched+'</details>'
     page += '<details><summary>Shared evidence ('+str(len(data.get('shared', [])))+'): identical content in both sources, not compared</summary>'+shared+'</details>'
+    page += situating(data.get('situation', {}), data.get('sections', []), where, esc)
     page += '<details class="coverage"><summary>Files not scanned ('+str(len(data.get('scan_issues', [])))+'): hidden, unsafe or over limits</summary><table><thead><tr><th>Source</th><th>Path</th><th>Reason</th></tr></thead><tbody>'+issues_found+'</tbody></table></details>'
     page += '<details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>File</th><th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody>'+coverage+'</tbody></table></details>'
     page += '''<script>function filter(){const r=document.querySelector('#filter').value,q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;document.querySelector('#query').oninput=filter;</script></html>'''
     (output/'report.html').write_text(page,encoding='utf-8')
+
+def situating(situation, sections, where, esc):
+    """Figures, section "abouts" and their quality checks, per content."""
+    if not situation:
+        return ''
+    flagged = sum(len(x['quality']['flags']) for x in situation.values())
+    out = [f'<details class="coverage"><summary>Situating: figures and sections ({flagged} quality flags)</summary>',
+           '<p>Model-written "about" statements place figures and sections in context. Quality flags are mechanical '
+           'checks: values in an "about", terms not grounded in its material, odd lengths, missing statements.</p>']
+    for content, x in situation.items():
+        q = x['quality']
+        flags = {}
+        for flag in q['flags']:
+            flags.setdefault(flag['target'], []).append(f"{flag['check']}: {flag['detail']}")
+        show = lambda target: ('<p class="warning">' + esc('; '.join(flags[target])) + '</p>') if target in flags else ''
+        refs = q['references']
+        rate = f"{refs['rate']:.0%}" if refs['rate'] is not None else 'n/a'
+        out.append(f"<h3>{esc(where(content))}</h3><p>{q['figures']['labelled']} labelled figures "
+                   f"({q['figures']['labelled_uncited']} never cited), {q['figures']['uncaptioned']} uncaptioned regions; "
+                   f"{refs['resolved']} references resolved, {refs['unresolved']} unresolved ({rate} resolved).</p>")
+        rows = ''.join(f"<tr><td>{esc(s['heading_path'] and ' > '.join(s['heading_path']) or s['id'])}</td>"
+                       f"<td>{s['first_page']}–{s['last_page']}</td><td>{esc(s.get('section_type', ''))}</td>"
+                       f"<td>{esc(s.get('density', ''))}</td><td>{esc(s.get('about', ''))}{show(s['id'])}"
+                       f"<small>{esc(', '.join(s.get('keywords', [])))}</small></td></tr>"
+                       for s in sections if s['content'] == content)
+        out.append('<table><thead><tr><th>Section</th><th>Pages</th><th>Type</th><th>Density</th><th>About</th></tr></thead>'
+                   f'<tbody>{rows}</tbody></table>')
+        cited = lambda f: '; '.join('p.%d' % r['page'] for r in f['references']) or 'none'
+        figures = [f for f in x['figures'] if f['label']]
+        if figures:
+            rows = ''.join(f"<tr><td>{esc(f['caption'] or f['label'])}</td><td>{f['page']}</td>"
+                           f"<td>{esc(f['about'])}{(' <i>' + esc(f['role']) + '</i>') if f['role'] else ''}{show(f['id'])}</td>"
+                           f"<td>{esc(cited(f))}</td></tr>"
+                           for f in figures)
+            out.append('<table><thead><tr><th>Figure</th><th>Page</th><th>About</th><th>Cited on</th></tr></thead>'
+                       f'<tbody>{rows}</tbody></table>')
+        if x['unresolved']:
+            out.append('<p>Unresolved references (possibly missed figures):</p><ul>' + ''.join(
+                f"<li>p.{r['page']}: {esc(r['text'])}</li>" for r in x['unresolved'][:50]) + '</ul>')
+        failed = [i for i in x['issues'] if i['failed']]
+        if failed:
+            out.append('<p class="warning">' + esc(f"{len(failed)} situating request(s) failed; the next run retries them.") + '</p>')
+    return ''.join(out) + '</details>'
