@@ -78,6 +78,13 @@ class Fixture:
     def __exit__(self, *exc):
         self.close()
 
+    def note(self, key, value):
+        with self.db:
+            self.db.execute("INSERT OR REPLACE INTO meta VALUES (?, ?)", (key, str(value)))
+
+    def meta(self):
+        return dict(self.db.execute("SELECT key, value FROM meta"))
+
     def answer(self, key, interpreter, responder):
         row = self.db.execute("SELECT answer FROM response WHERE key=? AND interpreter=? AND responder=?",
                               (key, interpreter, responder)).fetchone()
@@ -105,6 +112,7 @@ class Fixture:
             FROM response r JOIN request q ON q.key = r.key AND q.interpreter = r.interpreter
             GROUP BY r.responder, q.kind, r.interpreter ORDER BY r.responder, q.kind, r.interpreter""").fetchall()
         return {
+            "meta": self.meta(),
             "requests": self.db.execute("SELECT COUNT(*) FROM request").fetchone()[0],
             "contents": [c for (c,) in self.db.execute("SELECT DISTINCT content FROM request WHERE content != '' ORDER BY content")],
             "answers": [{"responder": a, "kind": b, "interpreter": c, "answers": d, "prompt_tokens": e or 0,

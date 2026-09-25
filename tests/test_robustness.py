@@ -130,6 +130,14 @@ class ValidationTests(unittest.TestCase):
         self.assertFalse(result.complete)
         self.assertEqual(len(result.issues), 10)
 
+    def test_latex_backslashes_in_answers_are_repaired(self):
+        from semantic_pdf_diff.llm import json_text
+        answer = '```json\n{"complete": true, "claims": [{"entity": "filter", "attribute": "state matrix", "value": "\\alpha", ' \
+                 '"kind": "text", "quote": "A_d = \\alpha", "confidence": 0.9}]}\n```'
+        result = Extraction.model_validate_json(json_text(answer))
+        self.assertEqual(result.claims[0].value, '\\alpha')
+        self.assertEqual(json_text('{"a": "line\\nbreak"}'), '{"a": "line\\nbreak"}')  # valid escapes untouched
+
     def test_judgment_ignores_extra_keys(self):
         j = Judgment.model_validate({'relation':'equivalent','rationale':'r','confidence':.9,'same_conditions':True,'notes':'x'})
         self.assertEqual(j.relation, 'equivalent')

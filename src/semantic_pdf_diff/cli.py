@@ -302,6 +302,9 @@ def make_client(args, settings, store):
             temp = tempfile.TemporaryDirectory(prefix='fixture-')
             path = fixtures.unpack(path, temp.name)
         fixture = fixtures.Fixture(path, create=args.fixture_mode != 'replay')
+        if args.fixture_mode != 'replay':  # text and rendering depend on it: replay tests compare versions
+            import pymupdf
+            fixture.note('pymupdf', pymupdf.VersionBind)
         if path is not args.fixture:
             fixture.temp = temp  # removed with the fixture
     if fixture is None:

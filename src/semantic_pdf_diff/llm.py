@@ -82,7 +82,20 @@ def json_text(answer):
         start, end = answer.find("{"), answer.rfind("}")
         if start != -1 and end > start:
             answer = answer[start:end + 1]
+    try:
+        json.loads(answer)
+    except ValueError:
+        # Models write LaTeX (\alpha, \Omega) inside JSON strings: keep such backslashes literal.
+        repaired = VALID_ESCAPE.sub(lambda m: m.group(0) if m.group(1) else "\\\\", answer)
+        if repaired != answer:
+            try:
+                json.loads(repaired)
+                return repaired
+            except ValueError:
+                pass
     return answer
+
+VALID_ESCAPE = re.compile(r'\\(["\\/bfnrt]|u[0-9a-fA-F]{4})?')
 
 @dataclass
 class Request:
