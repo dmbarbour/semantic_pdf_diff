@@ -90,6 +90,7 @@ Measured against the first pass above, on the evaluation benchmarks, not built s
 - **Vector geometry for connectivity:** in vector PDFs, lines, arrowheads and label positions (`get_drawings`) could recover connections mechanically, with the model only resolving ambiguities.
 - **Composite images:** render the diagram crop together with its associated text (caption, referencing sentences, section heading) as one image, in case the model binds text to image regions better inside the image than across the prompt. Also useful as a single view for human reviewers in reports.
 - **Sections first, then figures:** gives figures more context at the cost of a second round of requests.
+- **Mixed mode (escalate on doubt):** situate once everywhere, cheaply. Where confidence is low or a quality check flags a result (unresolved references, values in an "about", poor grounding), run additional independent passes (e.g. a different context bundle, representation or ordering from the alternatives above) and keep what they agree on. Disagreement is itself reported. The extra cost goes only where it's needed, and agreement between variants is a better signal than the model's self-reported confidence. The same pattern could later apply to extraction of hard regions.
 
 Where these would integrate is open. Figure-level situating (step 2) is the natural place for the first three.
 
