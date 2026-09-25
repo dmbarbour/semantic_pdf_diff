@@ -5,3 +5,4 @@ build/
 dist/
 diff-output/
 samples/
+.env
