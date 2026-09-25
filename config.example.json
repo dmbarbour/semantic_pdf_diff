@@ -12,6 +12,7 @@
   "min_score": 0.1,
   "max_pairs": 1000,
   "vision": true,
+  "situate": true,
   "verify_visuals": true,
   "response_format": "none",
   "temperature": 0,

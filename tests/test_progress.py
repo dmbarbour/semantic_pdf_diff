@@ -87,8 +87,9 @@ class PlanEstimates(unittest.TestCase):
                 cli.main([str(root / 'a.pdf'), str(root / 'b.pdf'), '--plan', '--config', str(config)])
             plan = json.loads(out.getvalue())
             self.assertEqual([s['text_tasks'] for s in plan['sources']], [1, 1])
+            self.assertEqual([s['situating_tasks'] for s in plan['sources']], [1, 1])  # one section each
             total = plan['total']
-            self.assertEqual(total['calls'], sum(s['text_tasks'] + s['visual_tasks'] for s in plan['sources']))
+            self.assertEqual(total['calls'], sum(s['text_tasks'] + s['visual_tasks'] + s['situating_tasks'] for s in plan['sources']))
             self.assertEqual(total['minutes_at_that_limit'], round(total['tokens'] / 10000, 1))
             self.assertIn('max_calls is 3', plan['warning'])
 

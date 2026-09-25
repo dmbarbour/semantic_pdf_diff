@@ -13,14 +13,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from . import manifest
 from .compare import compare, file_difference
-from .extract import EXTRACT, Job, run_jobs, text_groups, visual_regions
+from .dispatch import Dispatcher
+from .extract import EXTRACT, Job, pdf_sections, run_jobs, text_groups, visual_regions
 from .llm import SYSTEM, Client, redact_url
 from .models import Settings, Source
 from .progress import Progress, log, setup_logging
 from .throttle import RateLimiter
-from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension
+from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
 from .report import write_report
 from .scan import ARCHIVES, Limits, read_origin, scan
+from .situate import find_figures, situate
 from .store import Store, StoreError
 
 LIMITATIONS = ['Image-token budgeting must be calibrated to the serving backend.',
@@ -63,6 +65,7 @@ def add_run_options(parser):
     parser.add_argument('--max-calls', type=int)
     parser.add_argument('--top-k', type=int)
     parser.add_argument('--no-vision', action='store_true', help='Explicitly incomplete text-only run')
+    parser.add_argument('--no-situate', action='store_true', help='Skip figure and section "about" statements')
     parser.add_argument('--plan', action='store_true', help='Inspect sources and estimate visual tasks without API calls')
     parser.add_argument('--reset', action='store_true',
                         help='Clear derived data affected by a changed extraction interpreter, then run')
@@ -77,6 +80,8 @@ def load_settings(args):
             options[name] = getattr(args, name)
     if getattr(args, 'no_vision', False):
         options['vision'] = False
+    if getattr(args, 'no_situate', False):
+        options['situate'] = False
     return Settings.from_env(**options)
 
 def limits(settings):
@@ -178,7 +183,7 @@ def plan(sources, settings):
     rows, calls, tokens = [], 0, 0
     for source in sources:
         scanned = scan(source.roots, limits(settings))
-        pdfs = pages = text_calls = text_bytes = visual = 0
+        pdfs = pages = text_calls = text_bytes = visual = situating = 0
         for f in scanned.files:
             if not f.content.endswith('.pdf'):
                 continue
@@ -191,11 +196,16 @@ def plan(sources, settings):
                     text_bytes += sum(len(t.encode()) for _, segments in groups for _, t in segments)
                     if settings.vision:
                         visual += len(visual_regions(page, settings.tile_points))
+                if settings.situate:  # one request per labelled figure and per section
+                    situating += (sum(1 for f in find_figures(doc) if f.label)
+                                  + len(pdf_sections(doc, settings.section_depth, settings.section_pages)[0]))
         estimate = (text_calls * (scaffold + answer) + text_bytes
-                    + visual * (scaffold + settings.image_tokens + answer))
-        calls, tokens = calls + text_calls + visual, tokens + estimate
+                    + visual * (scaffold + settings.image_tokens + answer)
+                    + situating * (scaffold + settings.image_tokens + answer))  # text excluded: roughly one more read
+        estimate += text_bytes if situating else 0
+        calls, tokens = calls + text_calls + visual + situating, tokens + estimate
         rows.append({'source': source.name, 'files': len(scanned.files), 'pdfs': pdfs, 'pages': pages,
-                     'text_tasks': text_calls, 'visual_tasks': visual, 'estimated_tokens': estimate,
+                     'text_tasks': text_calls, 'visual_tasks': visual, 'situating_tasks': situating, 'estimated_tokens': estimate,
                      'issues': len(scanned.issues)})
     tpm, _ = RateLimiter(settings.rate_limits).limits()
     print(json.dumps({'sources': rows, 'total': {
@@ -211,12 +221,21 @@ def plan(sources, settings):
 
 def run(args, settings, store, names, out, force_rescan=False):
     interpreter = extraction_interpreter(settings)
+    triage = triage_interpreter(settings) if settings.situate else None
     if args.dry_run:
-        print(json.dumps({'would_clear': store.bind(interpreter, reset=True, dry_run=True)}, indent=2))
+        would = {'extract': store.bind(interpreter, reset=True, dry_run=True)}
+        if triage:
+            would['triage'] = store.bind(triage, reset=True, dry_run=True)
+        print(json.dumps({'would_clear': would}, indent=2))
         return 0
-    cleared = store.bind(interpreter, reset=args.reset)
-    if cleared:
-        log.info(f"Reset cleared: {json.dumps(cleared)}")
+    # Check both before clearing either, so a rejected run changes nothing.
+    for role in filter(None, (interpreter, triage)):
+        if not args.reset:
+            store.bind(role, dry_run=True)
+    for role in filter(None, (interpreter, triage)):
+        cleared = store.bind(role, reset=args.reset)
+        if cleared:
+            log.info(f"Reset cleared ({role.role}): {json.dumps(cleared)}")
     if settings.rescan == 'auto' or force_rescan:
         for name in names:
             summary = store.rescan(name, limits(settings), document_properties)
@@ -227,15 +246,19 @@ def run(args, settings, store, names, out, force_rescan=False):
     progress = Progress('extract', client, heartbeat=settings.heartbeat_seconds)
     by_content, coverage, sections = extract_sources(store, client, names, files, progress)
     progress.close()
+    situations = situate_sources(store, client, names, files, by_content, sections) if triage else {}
     evidence = [e for items in by_content.values() for e in items]
+    situation_data = {c: {'figures': [f.model_dump() for f in figures], 'unresolved': [r.model_dump() for r in unresolved],
+                          'issues': issues} for c, (figures, unresolved, issues) in sorted(situations.items())}
     source_data = [store.source(n).model_dump() for n in names]
     file_data = [f.model_dump() for n in names for f in files[n]]
     scan_issues = [{'source': n, 'path': p, 'reason': r} for n in names for p, r in store.issues(n)]
-    interpreters = {'extract': interpreter.model_dump()}
+    interpreters = {'extract': interpreter.model_dump(), **({'triage': triage.model_dump()} if triage else {})}
     out.mkdir(parents=True, exist_ok=True)
     (out / 'evidence.json').write_text(json.dumps({'schema_version': 2, 'sources': source_data, 'files': file_data,
         'interpreters': interpreters, 'evidence': [e.model_dump() for e in evidence], 'coverage': coverage,
-        'scan_issues': scan_issues}, indent=2, ensure_ascii=False), encoding='utf-8')
+        'sections': [{'content': c, **x.model_dump()} for c, items in sorted(sections.items()) for x in items],
+        'situation': situation_data, 'scan_issues': scan_issues}, indent=2, ensure_ascii=False), encoding='utf-8')
     left, right = ([e for c in dict.fromkeys(f.content for f in files[n]) for e in by_content[c]] for n in names)
     log.info(f"Comparing {len(left)} × {len(right)} extracted claims via retrieval")
     progress = Progress('compare', client, heartbeat=settings.heartbeat_seconds)
@@ -245,7 +268,8 @@ def run(args, settings, store, names, out, force_rescan=False):
     data.update(schema_version=2, created_at=datetime.now(timezone.utc).isoformat(),
         sources=source_data, files=file_data, interpreters=interpreters, scan_issues=scan_issues,
         file_difference=file_difference(files[names[0]], files[names[1]]),
-        sections=[{'content': c, **x.model_dump()} for c, items in sections.items() for x in items],
+        sections=[{'content': c, **x.model_dump()} for c, items in sorted(sections.items()) for x in items],
+        situation=situation_data,
         evidence=[e.model_dump() for e in evidence], coverage=coverage,
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
         usage={'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage}, limitations=LIMITATIONS)
@@ -297,6 +321,44 @@ def extract_sources(store, client, names, files, progress):
         run_jobs(queues, store.folder, client, progress=progress)
     coverage.sort(key=lambda r: (r['content'], r['page'] or 0, r['task']))  # independent of completion order
     return by_content, coverage, sections
+
+def situate_sources(store, client, names, files, by_content, sections):
+    """Figures and section "about" statements for each fully extracted PDF: loaded from
+    the store, or requested (figures first, then sections, per PDF).
+
+    Returns {content: (figures, unresolved references, issues)}; sections are updated in place.
+    """
+    import pymupdf
+    situations, todo = {}, []
+    for name in names:
+        for file in files[name]:
+            content = file.content
+            if content in situations or any(c == content for _, c in todo) or not content.endswith('.pdf') \
+                    or not store.is_extracted(content):
+                continue
+            found = store.situation(content)
+            if found is not None:
+                situations[content] = found
+                sections[content] = store.sections(content)
+            else:
+                todo.append(((name, file.path), content))
+    if not todo:
+        return situations
+    log.info(f"Situating {len(todo)} PDF(s)")
+    progress = Progress('situate', client, heartbeat=client.s.heartbeat_seconds)
+    with Dispatcher(client) as dispatch:
+        for (name, path), content in todo:
+            with pymupdf.open(stream=read_origin(store.origin(name, path)), filetype='pdf') as doc:
+                figures, found, unresolved, issues = situate(doc, content, by_content[content], sections.get(content, []),
+                                                             store.folder, client, dispatch, progress)
+            store.record_situation(content, figures, found, unresolved, issues)
+            sections[content] = found
+            situations[content] = (figures, unresolved, issues)
+            failed = sum(i['failed'] for i in issues)
+            if failed:
+                log.warning(f'Situating {path}: {failed} request(s) failed; the next run retries them')
+    progress.close()
+    return situations
 
 def pdf_job(store, source, file, by_content, coverage, sections):
     def keep_sections(found):

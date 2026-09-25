@@ -36,6 +36,7 @@ Settings are in `config.example.json`; all omitted settings have defaults in `mo
 - Set `max_token_field` to `max_completion_tokens` if your server requires it.
 - `section_depth` (default 2) sets how many outline levels become sections; `section_pages` (default 20) sets the page-range size for PDFs without an outline. Both affect prompts, so changing them needs `--reset` on an existing store.
 - `--no-vision` is a deliberately incomplete text-only run, recorded as such.
+- `situate` (default `true`; `--no-situate` on the command line) runs the situating stage: one request per labelled figure and per section after extraction. Its model, prompts and output settings are bound to the store as the `triage` role; changing them needs `--reset`, which clears only situating results.
 
 ## Context budget
 

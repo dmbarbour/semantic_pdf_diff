@@ -9,9 +9,9 @@ import json
 import os
 import sqlite3
 from pathlib import Path
-from .models import Evidence, FileRef, Interpreter, Section, Source, merge_occurrences
+from .models import Evidence, Figure, FileRef, Interpreter, Section, Source, merge_occurrences
 
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -31,6 +31,8 @@ CREATE TABLE evidence (id TEXT NOT NULL, content TEXT NOT NULL REFERENCES conten
 CREATE INDEX evidence_content ON evidence(content);
 CREATE TABLE response_cache (key TEXT PRIMARY KEY, kind TEXT NOT NULL, region TEXT NOT NULL,
                              request_hash TEXT NOT NULL, response TEXT NOT NULL, content TEXT NOT NULL DEFAULT '');
+-- Situating results per content: figures, unresolved references, issues, complete.
+CREATE TABLE situation (content TEXT PRIMARY KEY REFERENCES content(id), data TEXT NOT NULL);
 CREATE TABLE comparison (id INTEGER PRIMARY KEY AUTOINCREMENT, created TEXT NOT NULL, data TEXT NOT NULL);
 -- Views for `show` and for anyone querying the store directly.
 CREATE VIEW source_files AS
@@ -155,6 +157,10 @@ class Store:
         differences = interpreter_differences(json.loads(row[0]), new)
         if not differences:
             return {}
+        if interpreter.role == "triage":
+            if not reset:
+                raise InterpreterMismatch("triage", differences, {"situating"})
+            return self.clear_situating(dry_run=dry_run, rebind=None if dry_run else new)
         regions = affected_regions(differences)
         if not reset:
             raise InterpreterMismatch(interpreter.role, differences, regions)
@@ -178,6 +184,27 @@ class Store:
                 self.db.execute(f"DELETE FROM response_cache WHERE kind='extract' AND region IN ({marks})", regions)
                 self.db.execute("DELETE FROM comparison")
                 self.db.execute("UPDATE content SET extracted=0")
+                self.db.execute("DELETE FROM situation")  # situating reads the evidence
+                if rebind is not None:
+                    self.db.execute("UPDATE interpreter SET description=? WHERE role=?", (json.dumps(rebind), rebind["role"]))
+        return counts
+
+    def clear_situating(self, dry_run=False, rebind=None):
+        """Forget situating results (figures, "about" statements) and cached triage responses."""
+        counts = {
+            "situated_content": self.db.execute("SELECT COUNT(*) FROM situation").fetchone()[0],
+            "cached_responses": self.db.execute("SELECT COUNT(*) FROM response_cache WHERE kind='triage'").fetchone()[0],
+            "regions": ["situating"],
+        }
+        if not dry_run:
+            with self.db:
+                self.db.execute("DELETE FROM situation")
+                self.db.execute("DELETE FROM response_cache WHERE kind='triage'")
+                for content, sid, data in self.db.execute("SELECT content, id, data FROM section").fetchall():
+                    plain = Section.model_validate_json(data).model_copy(
+                        update={"about": "", "section_type": "", "density": "", "keywords": []})
+                    self.db.execute("UPDATE section SET data=? WHERE content=? AND id=?",
+                                    (plain.model_dump_json(), content, sid))
                 if rebind is not None:
                     self.db.execute("UPDATE interpreter SET description=? WHERE role=?", (json.dumps(rebind), rebind["role"]))
         return counts
@@ -277,6 +304,30 @@ class Store:
         return [Section.model_validate_json(d) for (d,) in
                 self.db.execute("SELECT data FROM section WHERE content=? ORDER BY rowid", (content,))]
 
+    def record_situation(self, content, figures, sections, unresolved, issues):
+        """Figures and section "about" statements for one content, in one transaction.
+
+        Complete (so later runs load it) only when no request failed."""
+        data = {"figures": [f.model_dump() for f in figures], "unresolved": [r.model_dump() for r in unresolved],
+                "issues": issues, "complete": not any(i["failed"] for i in issues)}
+        with self.db:
+            for section in sections:
+                self.db.execute("UPDATE section SET data=? WHERE content=? AND id=?",
+                                (section.model_dump_json(), content, section.id))
+            self.db.execute("INSERT OR REPLACE INTO situation VALUES (?, ?)", (content, json.dumps(data)))
+
+    def situation(self, content):
+        """(figures, unresolved references, issues) if situating completed, else None."""
+        from .models import Reference
+        row = self.db.execute("SELECT data FROM situation WHERE content=?", (content,)).fetchone()
+        if row is None:
+            return None
+        data = json.loads(row[0])
+        if not data["complete"]:
+            return None
+        return ([Figure.model_validate(f) for f in data["figures"]],
+                [Reference.model_validate(r) for r in data["unresolved"]], data["issues"])
+
     # --- per-task results ------------------------------------------------------
     def record_task(self, row, evidence):
         """Write one task's coverage row and evidence in a single transaction."""
@@ -350,7 +401,7 @@ class Store:
                 f"SELECT COUNT(*) FROM response_cache WHERE content IN ({marks})", orphans).fetchone()[0]
             if not dry_run:
                 with self.db:
-                    for table in ("evidence", "task", "section", "response_cache"):
+                    for table in ("evidence", "task", "section", "situation", "response_cache"):
                         self.db.execute(f"DELETE FROM {table} WHERE content IN ({marks})", orphans)
                     self.db.execute(f"DELETE FROM content WHERE id IN ({marks})", orphans)
                 for path in crops:

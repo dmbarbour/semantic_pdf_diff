@@ -10,6 +10,7 @@ from semantic_pdf_diff import cli
 from semantic_pdf_diff.extract import extract_pdf, pdf_sections
 from semantic_pdf_diff.models import Extraction, Judgment, Settings
 from semantic_pdf_diff.provenance import content_id
+from stubs import situating_answer
 
 def make_pdf(path, pages, toc=None, metadata=None, height=300):
     doc = pymupdf.open()
@@ -34,6 +35,8 @@ class Recorder:
         self.asked.append((prompt, key))
         if schema is Judgment:
             return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)
+        if situating_answer(prompt):
+            return schema.model_validate(situating_answer(prompt))
         data = prompt.split('SOURCE DATA:\n')[1]
         if ' kW' in data:
             value = data.split(' kW')[0].split()[-1]

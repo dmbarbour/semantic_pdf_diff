@@ -181,3 +181,138 @@ def figure_map(doc, evidence):
     unresolved = find_references(doc, figures)
     attach_claims(figures, evidence)
     return figures, unresolved
+
+# --- model requests ------------------------------------------------------------------
+
+# Bump when prompts or request construction change; part of the triage interpreter.
+PROMPT_VERSION = 1
+
+SITUATE_FIGURE = '''Situate one figure (or table, or drawing sheet) from an engineering document, using only the
+material below: its caption, the sentences that cite it, claims extracted from it, and its image if given.
+Return JSON {"about": "what it depicts: subject, scope and the kinds of information shown",
+"role": "why the document includes it, as the citing sentences explain; empty if they don't say",
+"keywords": ["component, system or topic terms"]}.
+Do not state specific values, quantities or design decisions in "about" or "role". Do not guess beyond the material.
+'''
+
+SITUATE_SECTION = '''Describe one section of an engineering document, using only the material below: its heading
+path, its text, claims extracted from it (including from charts and diagrams), the figures it contains, and page
+images if given. Return JSON {"type": "specification|requirements|narrative|calculation|data|drawing|procedure|
+legal|administrative|reference|other", "density": "low|medium|high (how much specific engineering information)",
+"keywords": ["component, system or topic terms"], "about": "a few sentences on the section's subject and scope:
+the components and kinds of information it covers"}.
+Omit specific values, quantities and design decisions from "about". Do not guess beyond the material.
+'''
+
+MAX_CITATIONS = 8
+MAX_FIGURE_CLAIMS = 40
+MAX_SECTION_CLAIMS = 150
+MAX_OVERVIEWS = 3
+
+def claim_line(e):
+    unit = f" {e.unit}" if e.unit else ""
+    conditions = f" ({e.conditions})" if e.conditions else ""
+    return f"- {e.entity} | {e.attribute} | {e.value}{unit}{conditions}"
+
+def diagram_heavy(section):
+    """Little text but drawings or images: e.g. drawing sheets."""
+    pages = section.last_page - section.first_page + 1
+    sig = section.signals
+    return sig.get("characters", 0) / pages < 800 and (sig.get("drawings", 0) / pages > 200 or sig.get("images", 0) > 0)
+
+def fit_text(text, client, prompt, images):
+    """Trim section text to the request budget; returns (text, trimmed?)."""
+    from .llm import SYSTEM
+    s = client.s
+    room = (s.context_tokens - s.output_tokens - s.safety_tokens - 256 - len(images) * s.image_tokens
+            - len((SYSTEM + prompt).encode()))
+    data = text.encode()
+    if len(data) <= room:
+        return text, False
+    return data[:max(0, room)].decode(errors="ignore"), True
+
+def situate(doc, content, evidence, sections, output, client, dispatch, progress, image_side=None):
+    """Figures, then sections (bottom-up): returns (figures, sections, unresolved, issues).
+
+    Model requests run on the dispatcher; everything else on this thread.
+    """
+    import hashlib
+    import pymupdf
+    from .models import FigureAbout, SectionAbout
+    figures, unresolved = figure_map(doc, evidence)
+    by_id = {e.id: e for e in evidence}
+    stem = content.split(":", 1)[1][:12]
+    assets = output / "assets"
+    assets.mkdir(parents=True, exist_ok=True)
+    side = image_side or client.s.image_side
+    issues = []
+
+    def render(page_no, rect, name):
+        page = doc[page_no - 1]
+        rect = pymupdf.Rect(rect)
+        scale = min(2.5, side / max(rect.width, rect.height, 1))
+        page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=rect, alpha=False).save(assets / name)
+        return output / "assets" / name
+
+    def key(kind, ident, *parts):
+        return ("triage", kind, content, ident, hashlib.sha256("\x00".join(parts).encode()).hexdigest())
+
+    section_of = {}
+    for section in sections:
+        for page in range(section.first_page, section.last_page + 1):
+            section_of[page] = section
+
+    # 1. Figures with labels: the ones prose can cite.
+    for figure in figures:
+        if not figure.label:
+            continue
+        heading = " > ".join(section_of[figure.page].heading_path) if figure.page in section_of else ""
+        citations = "\n".join(f"- (page {r.page}) {r.text}" for r in figure.references[:MAX_CITATIONS]) or "(none found)"
+        claims = "\n".join(claim_line(by_id[i]) for i in figure.claims[:MAX_FIGURE_CLAIMS] if i in by_id) or "(none)"
+        prompt = (SITUATE_FIGURE + f"\nSection: {heading}\nCaption: {figure.caption}\nCiting sentences:\n{citations}"
+                  f"\nClaims extracted from it:\n{claims}\n")
+        images = [render(figure.page, figure.bbox, f"{stem}-{figure.id.replace(':', '-')}.png")] if figure.region else []
+
+        def finish(result, error, figure=figure):
+            progress.finish("failed" if error else "complete")
+            if error is not None:
+                issues.append({"target": figure.id, "issue": str(error), "failed": True})
+                return
+            figure.about, figure.role, figure.keywords = result.about, result.role, list(result.keywords)
+        progress.add()
+        dispatch.submit(prompt, FigureAbout, images, key("figure", figure.id, prompt), finish)
+    dispatch.drain()
+
+    # 2. Sections, from their text, claims and figures.
+    text_by_page = {n: page.get_text("text") for n, page in enumerate(doc, 1)}
+    updated = {}
+    for section in sections:
+        pages = range(section.first_page, section.last_page + 1)
+        text = "\n".join(text_by_page[p] for p in pages).strip()
+        inside = [e for e in evidence if e.locator.page in pages]
+        claims = "\n".join(claim_line(e) for e in inside[:MAX_SECTION_CLAIMS]) or "(none)"
+        figs = "\n".join(f"- {f.label or 'unlabelled figure'} (page {f.page}): {f.about or f.caption or '(not described)'}"
+                         for f in figures if f.page in pages and (f.label or f.claims)) or "(none)"
+        images = []
+        if diagram_heavy(section):
+            images = [render(p, doc[p - 1].rect, f"{stem}-overview-p{p}.png") for p in list(pages)[:MAX_OVERVIEWS]]
+        heading = " > ".join(section.heading_path) or "(no heading)"
+        head = (SITUATE_SECTION + f"\nHeading path: {heading}\nPages: {section.first_page}-{section.last_page}"
+                f"\nFigures:\n{figs}\nClaims:\n{claims}\nText:\n")
+        body, trimmed = fit_text(text, client, head, images)
+        if trimmed:
+            issues.append({"target": section.id, "issue": "text trimmed to fit the context budget", "failed": False})
+        prompt = head + body
+
+        def finish(result, error, section=section):
+            progress.finish("failed" if error else "complete")
+            if error is not None:
+                issues.append({"target": section.id, "issue": str(error), "failed": True})
+                updated[section.id] = section
+                return
+            updated[section.id] = section.model_copy(update={"about": result.about, "section_type": result.type,
+                                                             "density": result.density, "keywords": list(result.keywords)})
+        progress.add()
+        dispatch.submit(prompt, SectionAbout, images, key("section", section.id, prompt), finish)
+    dispatch.drain()
+    return figures, [updated.get(s.id, s) for s in sections], unresolved, issues

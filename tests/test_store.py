@@ -17,6 +17,7 @@ from semantic_pdf_diff.llm import CacheKeyMismatch, Client
 from semantic_pdf_diff.models import Claim, Extraction, Judgment, PdfLocator, Evidence, Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
 from semantic_pdf_diff.store import InterpreterMismatch, Store, StoreError, StoreInUse
+from stubs import situating_answer
 
 EMPTY = {'claims': [], 'complete': True, 'issues': []}
 
@@ -32,6 +33,8 @@ def model_server():
             prompt = body['messages'][1]['content'][0]['text']
             if 'Compare exactly' in prompt:
                 answer = {'relation': 'equivalent', 'rationale': 'stub', 'confidence': .9, 'same_conditions': True}
+            elif situating_answer(prompt):
+                answer = situating_answer(prompt)
             elif 'SOURCE DATA:\n' in prompt and 'kW' in prompt.split('SOURCE DATA:\n')[1]:
                 value = prompt.split('SOURCE DATA:\n')[1].split(' kW')[0].split()[-1]
                 answer = {'claims': [{'entity': 'pump', 'attribute': 'rated power', 'value': value, 'unit': 'kW',
@@ -248,7 +251,7 @@ class ResumeAndReuse(unittest.TestCase):
             self.assertIn('--reset', log)
             with contextlib.redirect_stdout(io.StringIO()) as out:
                 cli.main([str(a), str(b), '--out', str(root / 'out'), '--model', 'another-model', '--reset', '--dry-run'])
-            self.assertGreater(json.loads(out.getvalue())['would_clear']['evidence'], 0)
+            self.assertGreater(json.loads(out.getvalue())['would_clear']['extract']['evidence'], 0)
             code, _ = self.run_cli(a, b, root / 'out', url, '--model', 'another-model', '--reset')
             self.assertEqual(code, 2)  # --no-vision is deliberately incomplete
 

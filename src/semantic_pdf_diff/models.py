@@ -111,6 +111,49 @@ class Section(Strict):
     # Cheap triage signals summed over the section's pages (numbers, units, requirement
     # words, tables, images, vector drawings, text characters); filled as pages are read.
     signals: dict[str, int] = Field(default_factory=dict)
+    # Filled by the situating stage.
+    about: str = ""
+    section_type: str = ""
+    density: str = ""
+    keywords: list[str] = Field(default_factory=list)
+
+class Lenient(Strict):
+    """Model output: unknown keys are dropped, nulls become defaults, and overlong
+    strings and lists are cut to their limits rather than failing the answer."""
+    @model_validator(mode="before")
+    @classmethod
+    def tidy(cls, data):
+        if not isinstance(data, dict):
+            return data
+        tidied = {}
+        for key, value in data.items():
+            if key not in cls.model_fields or value is None:
+                continue
+            limit = next((m.max_length for m in cls.model_fields[key].metadata if hasattr(m, "max_length")), None)
+            if limit is not None and isinstance(value, (str, list)):
+                value = value[:limit]
+            tidied[key] = value
+        return tidied
+
+class FigureAbout(Lenient):
+    about: str = Field(min_length=1, max_length=800)
+    role: str = Field(default="", max_length=500)
+    keywords: list[str] = Field(default_factory=list, max_length=15)
+
+SECTION_TYPES = ("specification", "requirements", "narrative", "calculation", "data", "drawing", "procedure",
+                 "legal", "administrative", "reference", "other")
+
+class SectionAbout(Lenient):
+    about: str = Field(min_length=1, max_length=1200)
+    type: str = "other"
+    density: Literal["low", "medium", "high"] = "medium"
+    keywords: list[str] = Field(default_factory=list, max_length=20)
+
+    @model_validator(mode="after")
+    def known_type(self):
+        if self.type not in SECTION_TYPES:
+            self.type = "other"
+        return self
 
 class Reference(Strict):
     """A sentence citing a figure (or table, sheet, exhibit) by label."""
@@ -205,7 +248,7 @@ def merge_occurrences(sightings):
 
 class Interpreter(Strict):
     """Everything besides the bytes that shapes derived data for one role."""
-    role: Literal["extract", "embed", "summarize", "compare"]
+    role: Literal["extract", "triage", "embed", "summarize", "compare"]
     model: str
     prompt_hash: str
     settings: dict
@@ -259,6 +302,8 @@ class Settings(Strict):
     min_score: float = Field(default=0.10, ge=0, le=1)
     max_pairs: int = Field(default=1000, ge=1)
     vision: bool = True
+    # Situating stage: figure and section "about" statements after extraction.
+    situate: bool = True
     verify_visuals: bool = True
     response_format: Literal["none", "json_object", "json_schema"] = "none"
     temperature: float | None = Field(default=0.0, ge=0, le=2)

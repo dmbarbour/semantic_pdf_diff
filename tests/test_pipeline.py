@@ -10,6 +10,7 @@ from semantic_pdf_diff.llm import Client, BudgetExceeded, ModelFailure
 from semantic_pdf_diff.compare import candidates, numeric_check, compare
 from semantic_pdf_diff.extract import extract_pdf, split_utf8, tiles
 from semantic_pdf_diff.report import write_report
+from stubs import situating_answer
 
 
 def ev(id='A-1', **kw):
@@ -122,6 +123,8 @@ class Tests(unittest.TestCase):
                 prompt=parts[0]['text']
                 if 'Compare exactly' in prompt:
                     answer=Judgment(relation='equivalent',rationale='Controlled same-value fixture',confidence=.95,same_conditions=True).model_dump()
+                elif situating_answer(prompt):
+                    answer=situating_answer(prompt)
                 else:
                     claim=ev().model_dump(include=set(Claim.model_fields))
                     claim['quote']='10 kW'

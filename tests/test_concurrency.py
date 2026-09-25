@@ -12,6 +12,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import pymupdf
 from semantic_pdf_diff import cli
+from stubs import situating_answer
 
 @contextlib.contextmanager
 def jittery_model():
@@ -33,6 +34,8 @@ def jittery_model():
             if 'Compare exactly' in prompt:
                 relation = ['equivalent', 'different', 'complementary', 'unrelated'][int(digest, 16) % 4]
                 answer = {'relation': relation, 'rationale': 'stub', 'confidence': .9, 'same_conditions': True}
+            elif situating_answer(prompt):
+                answer = situating_answer(prompt)
             elif len(parts) > 1:  # an image: a claim derived from its pixels
                 answer = {'claims': [{'entity': 'drawing', 'attribute': 'label', 'value': digest[:4], 'kind': 'diagram',
                                       'quote': digest[:4], 'confidence': .8}],

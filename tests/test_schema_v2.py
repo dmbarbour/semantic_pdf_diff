@@ -12,6 +12,7 @@ from semantic_pdf_diff.extract import extract_pdf
 from semantic_pdf_diff.models import Extraction, Judgment, Settings
 from semantic_pdf_diff.provenance import (COMPARISON_SETTINGS, EXTRACTION_SETTINGS, comparison_interpreter,
                                           content_id, extraction_interpreter, normalized_extension)
+from stubs import situating_answer
 
 GOOD = {'entity': 'primary pump', 'attribute': 'rated power', 'value': '10', 'unit': 'kW',
         'kind': 'text', 'quote': '10 kW', 'confidence': .9}
@@ -31,6 +32,8 @@ class Recorder:
         self.prompts.append(prompt)
         if schema is Judgment:
             return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)
+        if situating_answer(prompt):
+            return schema.model_validate(situating_answer(prompt))
         return Extraction(claims=[GOOD] if 'SOURCE DATA:\nPump' in prompt else [], complete=True)
 
 class ContentTests(unittest.TestCase):
@@ -118,8 +121,8 @@ class CliTests(unittest.TestCase):
             self.assertEqual(evidence['schema_version'], 2)
             self.assertEqual([s['name'] for s in evidence['sources']], ['a.pdf', 'b.pdf'])
             self.assertEqual({s['kind'] for s in evidence['sources']}, {'shortcut'})
-            self.assertEqual(set(evidence['interpreters']), {'extract'})
-            self.assertEqual(set(report['interpreters']), {'extract', 'compare'})
+            self.assertEqual(set(evidence['interpreters']), {'extract', 'triage'})
+            self.assertEqual(set(report['interpreters']), {'extract', 'triage', 'compare'})
             self.assertFalse(any('document' in e for e in evidence['evidence']))
             self.assertFalse(list(root.glob('out/evidence-*.json')))
 

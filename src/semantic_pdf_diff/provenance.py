@@ -18,6 +18,8 @@ EXTENSION_ALIASES = {".jpeg": ".jpg", ".tif": ".tiff", ".htm": ".html", ".yml": 
 EXTRACTION_SETTINGS = ("model", "context_tokens", "output_tokens", "text_bytes", "image_side", "tile_points",
                        "refinement_depth", "section_depth", "section_pages", "dedupe_repeated", "vision", "response_format", "temperature",
                        "seed", "max_token_field")
+TRIAGE_SETTINGS = ("model", "context_tokens", "output_tokens", "image_side", "response_format", "temperature",
+                   "seed", "max_token_field")
 COMPARISON_SETTINGS = ("model", "top_k", "min_score", "max_pairs", "verify_visuals", "aliases",
                        "response_format", "temperature", "seed", "output_tokens", "max_token_field")
 
@@ -55,6 +57,12 @@ def extraction_interpreter(settings):
     from .extract import EXTRACT, PROMPT_VERSION
     from .llm import SYSTEM
     return interpreter("extract", settings, (SYSTEM, EXTRACT, f"v{PROMPT_VERSION}"), EXTRACTION_SETTINGS)
+
+def triage_interpreter(settings):
+    from .situate import PROMPT_VERSION, SITUATE_FIGURE, SITUATE_SECTION
+    from .llm import SYSTEM
+    return interpreter("triage", settings, (SYSTEM, SITUATE_FIGURE, SITUATE_SECTION, f"v{PROMPT_VERSION}"),
+                       TRIAGE_SETTINGS)
 
 def comparison_interpreter(settings):
     from .compare import COMPARE, PROMPT_VERSION
