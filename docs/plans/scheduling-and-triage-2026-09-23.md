@@ -106,6 +106,7 @@ None currently.
 
 - **Context window:** the gemma-4 deployment serves 262,144 tokens; configure `context_tokens` to match. Extraction chunk sizes (`text_bytes`, tile size) are separate settings and stay small so each extraction stays focused. Large requests are for section-level work (triage, "about" statements) and criterion-level comparison. How much of a section triage reads is part of the extraction interpreter, since it shapes what the model sees.
 - **Throughput limits:** 300k tokens/min in business hours, 500k outside; configurable by time of day, and expected to change.
+- **Section ordering (2026-09-24):** deferred to preliminary reports (milestone 6), where order first has value; triage (milestone 3) stores per-section signals for it. See the [fair-share review](../reviews/scheduling-m2-fair-share-2026-09-24.md).
 - **`tqdm`** is accepted as a dependency for progress bars.
 - **Concurrent requests:** assume the server caps them. Use a modest, configurable concurrency limit (single digits by default) and let adaptive backoff find the working level, leaving room for the user's other tools on the same server. Tune the default from real runs.
 - **Time budgets:** none. Runs proceed unattended until done or stopped; preliminary reports cover the need to look early.
