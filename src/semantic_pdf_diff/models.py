@@ -112,6 +112,30 @@ class Section(Strict):
     # words, tables, images, vector drawings, text characters); filled as pages are read.
     signals: dict[str, int] = Field(default_factory=dict)
 
+class Reference(Strict):
+    """A sentence citing a figure (or table, sheet, exhibit) by label."""
+    page: int
+    bbox: tuple[float, float, float, float]
+    text: str
+    label: str
+    evidence: list[str] = Field(default_factory=list)   # claims extracted from the citing text
+
+class Figure(Strict):
+    """A figure found mechanically: a drawing cluster or image, a caption, or both."""
+    id: str
+    page: int
+    bbox: tuple[float, float, float, float]
+    kind: Literal["figure", "table", "sheet", "exhibit"] = "figure"
+    label: str | None = None           # e.g. "figure 3", from the caption
+    caption: str = ""
+    region: bool = True                # False: a caption whose drawing wasn't found
+    references: list[Reference] = Field(default_factory=list)
+    claims: list[str] = Field(default_factory=list)       # visual claims found inside the figure
+    # Filled by the situating requests.
+    about: str = ""
+    role: str = ""
+    keywords: list[str] = Field(default_factory=list)
+
 class DerivationStep(Strict):
     step: str
     detail: str = ""
