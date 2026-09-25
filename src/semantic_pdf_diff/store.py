@@ -334,6 +334,7 @@ class Store:
         region = region_of(row["task"])
         with self.db:
             self.db.execute("DELETE FROM evidence WHERE content=? AND task=?", (row["content"], row["task"]))
+            self.db.execute("DELETE FROM situation WHERE content=?", (row["content"],))  # it read the old evidence
             self.db.execute("INSERT OR REPLACE INTO task VALUES (?, ?, ?, ?)",
                             (row["content"], row["task"], region, json.dumps(row)))
             for e in evidence:

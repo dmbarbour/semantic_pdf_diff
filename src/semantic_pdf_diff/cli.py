@@ -9,9 +9,10 @@ import argparse
 import csv
 import json
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from . import manifest
+from . import fixtures, manifest
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
 from .extract import EXTRACT, Job, pdf_sections, run_jobs, text_groups, visual_regions
@@ -40,6 +41,8 @@ def main(argv=None):
             return compare_command(argv[1:])
         if argv and argv[0] in ('show', 'gc', 'report'):
             return store_command(argv[0], argv[1:])
+        if argv and argv[0] == 'fixtures':
+            return fixtures_command(argv[1:])
         return shortcut_command(argv)
     except (OSError, ValueError, RuntimeError) as e:
         print(f'Error: {e}', file=sys.stderr)
@@ -66,6 +69,11 @@ def add_run_options(parser):
     parser.add_argument('--top-k', type=int)
     parser.add_argument('--no-vision', action='store_true', help='Explicitly incomplete text-only run')
     parser.add_argument('--no-situate', action='store_true', help='Skip figure and section "about" statements')
+    parser.add_argument('--fixture', type=Path,
+                        help='Replay fixture (.sqlite, or a .zip for replay only): answers come from it, not the model')
+    parser.add_argument('--fixture-mode', choices=fixtures.MODES, default='replay',
+                        help='replay: fail requests with no recorded answer; replay-or-record: ask the model and record')
+    parser.add_argument('--responder', help='Whose recorded answers to use or record (default: the model name)')
     parser.add_argument('--plan', action='store_true', help='Inspect sources and estimate visual tasks without API calls')
     parser.add_argument('--reset', action='store_true',
                         help='Clear derived data affected by a changed extraction interpreter, then run')
@@ -241,12 +249,12 @@ def run(args, settings, store, names, out, force_rescan=False):
             summary = store.rescan(name, limits(settings), document_properties)
             changes = {k: len(summary[k]) for k in ('added', 'removed', 'changed') if summary[k]}
             log.info(f"Scanned {name}: {summary['files']} files" + (f", {changes}" if changes else ''))
-    client = Client(settings, store)
+    client = make_client(args, settings, store)
     files = {name: store.files(name) for name in names}
     progress = Progress('extract', client, heartbeat=settings.heartbeat_seconds)
     by_content, coverage, sections = extract_sources(store, client, names, files, progress)
     progress.close()
-    situations = situate_sources(store, client, names, files, by_content, sections) if triage else {}
+    situations = situate_sources(store, client, names, files, by_content, sections, coverage) if triage else {}
     evidence = [e for items in by_content.values() for e in items]
     situation_data = {c: {'figures': [f.model_dump() for f in figures], 'unresolved': [r.model_dump() for r in unresolved],
                           'issues': issues, 'quality': checks}
@@ -273,7 +281,8 @@ def run(args, settings, store, names, out, force_rescan=False):
         situation=situation_data,
         evidence=[e.model_dump() for e in evidence], coverage=coverage,
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
-        usage={'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage}, limitations=LIMITATIONS)
+        usage={'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage, **fixture_usage(client)},
+        limitations=LIMITATIONS)
     store.save_comparison(data['created_at'], data)
     write_report(data, out, assets=store.folder / 'assets')
     incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
@@ -282,6 +291,51 @@ def run(args, settings, store, names, out, force_rescan=False):
     # 2 makes automation aware of incomplete processing; uncertainty still appears
     # in the report even when all tasks completed successfully.
     return 2 if incomplete else 0
+
+def make_client(args, settings, store):
+    fixture = None
+    if getattr(args, 'fixture', None):
+        path = args.fixture
+        if path.suffix == '.zip':
+            if args.fixture_mode != 'replay':
+                raise ValueError('record into a .sqlite fixture, then pack it: pdf-semantic-diff fixtures pack')
+            temp = tempfile.TemporaryDirectory(prefix='fixture-')
+            path = fixtures.unpack(path, temp.name)
+        fixture = fixtures.Fixture(path, create=args.fixture_mode != 'replay')
+        if path is not args.fixture:
+            fixture.temp = temp  # removed with the fixture
+    if fixture is None:
+        return Client(settings, store)
+    return Client(settings, store, fixture=fixture, mode=args.fixture_mode, responder=args.responder)
+
+def fixture_usage(client):
+    f = getattr(client, 'fixture', None)  # test doubles have none
+    if f is None:
+        return {}
+    if f.missing:
+        log.warning(f"Replay: {len(f.missing)} request(s) have no answer from {client.responder}; first: {f.missing[0]}")
+    log.info(f"Fixture {f.path.name}: {f.served} answers replayed, {f.recorded} recorded, {len(f.missing)} missing")
+    return {'fixture': {'path': str(f.path), 'responder': client.responder, 'mode': client.mode,
+                        'replayed': f.served, 'recorded': f.recorded, 'missing': len(f.missing)}}
+
+def fixtures_command(argv):
+    parser = argparse.ArgumentParser(prog='pdf-semantic-diff fixtures', description='Replay fixtures of recorded answers.')
+    sub = parser.add_subparsers(dest='command', required=True)
+    summary = sub.add_parser('summary', help='What a fixture holds: requests, answers per responder, tokens')
+    summary.add_argument('fixture', type=Path)
+    pack = sub.add_parser('pack', help='Zip a fixture reproducibly (unchanged data gives identical bytes)')
+    pack.add_argument('fixture', type=Path)
+    pack.add_argument('target', type=Path)
+    args = parser.parse_args(argv)
+    if args.command == 'summary':
+        with tempfile.TemporaryDirectory() as d:
+            path = fixtures.unpack(args.fixture, d) if args.fixture.suffix == '.zip' else args.fixture
+            with fixtures.Fixture(path) as fixture:
+                print(json.dumps(fixture.summary(), indent=2))
+    else:
+        fixtures.pack(args.fixture, args.target)
+        print(f'Packed {args.target}')
+    return 0
 
 def extract_sources(store, client, names, files, progress):
     """Evidence for every content item of the sources: loaded from the store, extracted
@@ -323,7 +377,7 @@ def extract_sources(store, client, names, files, progress):
     coverage.sort(key=lambda r: (r['content'], r['page'] or 0, r['task']))  # independent of completion order
     return by_content, coverage, sections
 
-def situate_sources(store, client, names, files, by_content, sections):
+def situate_sources(store, client, names, files, by_content, sections, coverage):
     """Figures and section "about" statements for each fully extracted PDF: loaded from
     the store, or requested (figures first, then sections, per PDF).
 
@@ -335,7 +389,10 @@ def situate_sources(store, client, names, files, by_content, sections):
     for name in names:
         for file in files[name]:
             content = file.content
-            if content in situations or not content.endswith('.pdf') or not store.is_extracted(content):
+            # Situated once every task has run, even if some failed: a failed task shouldn't hold
+            # back the rest. Evidence that changes later (a retry succeeding) invalidates it.
+            if content in situations or not content.endswith('.pdf') or by_content.get(content) is None \
+                    or any(r['content'] == content and r['status'] == 'not_reached' for r in coverage):
                 continue
             found = store.situation(content)
             if found is not None:

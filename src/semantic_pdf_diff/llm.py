@@ -34,6 +34,9 @@ class BudgetExceeded(ModelFailure):
 class CallLimitReached(BudgetExceeded):
     """max_calls was reached: the work wasn't attempted, as opposed to failing."""
 
+class NotRecorded(ModelFailure):
+    """Replay found no recorded answer for a request."""
+
 class CacheKeyMismatch(RuntimeError):
     """A semantic cache key matched a response recorded for a different request (debug check)."""
 
@@ -88,6 +91,10 @@ class Request:
     key: tuple | None
     schema: type
     estimate: int  # tokens, input plus output reserve, for rate limiting
+    prompt: str = ""
+    images: tuple = ()        # SHA-256 of each image sent
+    usage: dict | None = None  # as the server reported it, set by send
+    unrecorded: bool = False   # replay found no answer: send fails without calling the model
 
 class Client:
     """Chat Completions client with a response cache.
@@ -95,8 +102,14 @@ class Client:
     `cache` is either a Store, whose response cache uses semantic keys supplied by
     callers, or a folder for a byte-keyed file cache (for library use without a store).
     """
-    def __init__(self, settings: Settings, cache, api_key: str | None = None):
+    def __init__(self, settings: Settings, cache, api_key: str | None = None, fixture=None, mode="replay",
+                 responder=None):
+        """fixture: an open fixtures.Fixture. In `replay` mode answers come only from it and
+        unrecorded requests fail; in `replay-or-record` mode unrecorded requests go to the
+        model and are recorded under `responder` (default: the model name)."""
         self.s = settings
+        self.fixture, self.mode, self.responder = fixture, mode, responder or settings.model
+        self.fingerprints = {}
         self.store = None if isinstance(cache, (str, Path)) else cache
         self.cache = Path(cache) if self.store is None else None
         if self.cache is not None:
@@ -135,8 +148,11 @@ class Client:
         if estimate + self.s.output_tokens + self.s.safety_tokens > self.s.context_tokens:
             raise BudgetExceeded(f"Request exceeds configured context budget ({estimate} estimated input tokens)")
         content = [{"type": "text", "text": prompt}]
+        hashes = []
         for path in images:
-            data = base64.b64encode(Path(path).read_bytes()).decode()
+            raw_image = Path(path).read_bytes()
+            hashes.append(hashlib.sha256(raw_image).hexdigest())
+            data = base64.b64encode(raw_image).decode()
             content.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + data}})
         body = {"model": self.s.model, "messages": [
             {"role": "system", "content": SYSTEM}, {"role": "user", "content": content}],
@@ -152,21 +168,68 @@ class Client:
                 "name": schema.__name__, "schema": schema.model_json_schema()}}
         raw = json.dumps(body).encode()
         request_hash = hashlib.sha256(self.s.base_url.encode() + raw + json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()
-        return Request(raw, request_hash, key, schema, estimate + self.s.output_tokens)
+        return Request(raw, request_hash, key, schema, estimate + self.s.output_tokens, prompt, tuple(hashes))
+
+    def _fixture_key(self, key):
+        """A request's key in a fixture. A comparison's store key carries a hash of the
+        comparison settings, model included (comparisons aren't bound to the store); in a
+        fixture the interpreter fingerprint covers those settings and the responder the model."""
+        parts = list(key)
+        if parts[0] == "compare":
+            parts[2] = ""
+        return hashlib.sha256(json.dumps(parts, sort_keys=True, default=str).encode()).hexdigest()
+
+    def _fingerprint(self, kind):
+        """(fingerprint, interpreter) for a request kind's role."""
+        if kind not in self.fingerprints:
+            from . import provenance
+            from .fixtures import fingerprint
+            make = {"extract": provenance.extraction_interpreter, "triage": provenance.triage_interpreter,
+                    "compare": provenance.comparison_interpreter}.get(kind)
+            interpreter = make(self.s) if make else None
+            self.fingerprints[kind] = (fingerprint(interpreter), interpreter) if interpreter else ("", None)
+        return self.fingerprints[kind]
 
     def cached(self, request):
-        """The cached response, or None (main thread: the store is single-threaded)."""
+        """The cached response, or None (main thread: the store is single-threaded).
+
+        With a fixture, only the fixture answers: the store's cache may hold another
+        responder's answers."""
+        if self.fixture is not None and request.key is not None:
+            kind = request.key[0]
+            answer = self.fixture.answer(self._fixture_key(request.key), self._fingerprint(kind)[0], self.responder)
+            if answer is not None:
+                try:
+                    value = request.schema.model_validate_json(answer)
+                except ValueError as e:
+                    raise ModelFailure(f"Recorded answer no longer fits {request.schema.__name__}: {e}") from e
+                self.fixture.served += 1
+                return value
+            if self.mode == "replay":
+                request.unrecorded = True
+                self.fixture.missing.append(list(request.key))
+            return None
         value = self._lookup(request.request_hash, request.key, request.schema)
         if value is not None:
             self.cache_hits += 1
         return value
 
     def save(self, request, value):
-        """Cache a response (main thread)."""
+        """Cache a response (main thread); in record mode, also record it in the fixture."""
         self._save(request.request_hash, request.key, value)
+        if self.fixture is not None and self.mode == "replay-or-record" and request.key is not None:
+            kind, region = request.key[0], request.key[1]
+            fingerprint, interpreter = self._fingerprint(kind)
+            self.fixture.record(self._fixture_key(request.key), fingerprint, self.responder, kind=kind, region=region,
+                                content=request.key[2] if kind in ("extract", "triage") else "",
+                                key_parts=list(request.key), prompt=request.prompt, images=list(request.images),
+                                schema=request.schema.__name__, answer=value.model_dump_json(), usage=request.usage,
+                                description=interpreter.model_dump() if interpreter else None, role=kind)
 
     def send(self, request):
         """Call the model, with retries (thread-safe; touches neither the cache nor the store)."""
+        if request.unrecorded:
+            raise NotRecorded(f"No recorded answer from {self.responder} for {request.key[:2] + request.key[3:4]}")
         last = "Unknown model failure"
         for attempt in range(self.s.retries + 1):
             with self.lock:
@@ -187,6 +250,9 @@ class Client:
                 usage = result.get("usage") or {}
                 reported = 0
                 generated = int(usage.get("completion_tokens") or 0) if isinstance(usage, dict) else 0
+                if isinstance(usage, dict):
+                    request.usage = {k: usage[k] for k in ("prompt_tokens", "completion_tokens", "estimated_cost")
+                                     if isinstance(usage.get(k), (int, float))}
                 with self.lock:
                     for k in self.usage:
                         n = int(usage.get(k) or 0) if isinstance(usage, dict) else 0

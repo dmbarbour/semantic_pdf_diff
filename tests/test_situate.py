@@ -278,6 +278,18 @@ class Storage(unittest.TestCase):
             _, second, _ = self.run_cli(root, a, b)
             self.assertEqual(self.situating_calls(second), 4)  # a again; b was complete
 
+    def test_a_failed_extraction_task_does_not_block_situating(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d); a, b = self.pdfs(root)
+            client = Recorder(fail=('SOURCE DATA:\nPump rated power 12 kW',), vision=False)
+            code, _, _ = self.run_cli(root, a, b, client=client)
+            self.assertEqual(code, 2)
+            report = json.loads((root / 'out/evidence.json').read_text())
+            self.assertTrue(any(r['status'] == 'failed' for r in report['coverage']))
+            self.assertEqual(len(report['situation']), 2)  # both PDFs situated anyway
+            _, again, _ = self.run_cli(root, a, b)          # the retry succeeds: b is situated afresh
+            self.assertEqual(sum('Describe one section' in p for p, _, _ in again.asked), 1)
+
     def test_no_situate_skips_the_stage(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d); a, b = self.pdfs(root)
