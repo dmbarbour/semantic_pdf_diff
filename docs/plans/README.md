@@ -21,6 +21,7 @@ Statuses:
 
 | Plan | Summary | Depends on |
 |---|---|---|
+| [Query improvement in rounds](query-improvement-2026-09-26.md) | Improve queries (context, chunking, crops, instructions) in repeated rounds: one lever per variant, judged on the same inputs as the current baseline (pairwise, by the panel, anchored by the owner), accepted only without a loss in any stratum; history graphed with cost. | Record/replay; evaluation benchmarks |
 | [Units and normalization](units-and-normalization-2026-09-24.md) | Structured quantities (intervals, bounds, tolerances), compound units with explicit ambiguity rules, money compared only in the same currency and price basis, same-source normalization for criteria, statistics in common units. Abstain, never guess. | None strictly |
 | [Criteria-first comparison](n-way-comparison-2026-09-23.md) | Criteria first (for two-way proposals too): compare N sources by reviewed, evidence-based criteria (extracted from rules, requirements or the user's rubrics, or recommended), with applicability, per-source synthesis and a criteria × sources matrix. Compares, never judges. Revisions stay claim-level. | Evidence store; triage for "about" statements |
 | [Multi-format adapters](multi-format-adapters-2026-09-23.md) | `.txt`/`.md`, then `.docx` and `.pptx` (chart XML), then external converters, then `.csv`/`.xlsx` (table detection plus model-guided interpretation), then images. Cameo output is consumed as an ordinary source. | Evidence store |
