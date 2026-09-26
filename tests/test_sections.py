@@ -188,8 +188,15 @@ class SectionContext(unittest.TestCase):
         base = Settings(vision=False)
         self.assertEqual(fingerprint(extraction_interpreter(base)), fingerprint(extraction_interpreter(Settings(vision=False,
                          context_before=0, extract_rules=[]))))  # levers at their defaults don't change fingerprints
+        # Content levers are in each request's key, so fixtures share answers across variants...
+        self.assertEqual(fingerprint(extraction_interpreter(base)),
+                         fingerprint(extraction_interpreter(Settings(vision=False, context_before=300, table_filter=True))))
+        # ...but a store still binds them (it mustn't mix evidence from different variants),
+        self.assertNotEqual(extraction_interpreter(base).settings,
+                            extraction_interpreter(Settings(vision=False, table_filter=True)).settings)
+        # and changed instructions are a different question altogether.
         self.assertNotEqual(fingerprint(extraction_interpreter(base)),
-                            fingerprint(extraction_interpreter(Settings(vision=False, context_before=300))))
+                            fingerprint(extraction_interpreter(Settings(vision=False, extract_rules=['Be brief.']))))
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()
             page = doc.new_page(width=400, height=400)

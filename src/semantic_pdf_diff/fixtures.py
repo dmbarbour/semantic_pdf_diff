@@ -45,8 +45,14 @@ def fingerprint(interpreter):
 
     The model is the responder; library versions are left out so that an upgrade that
     changes nothing a request depends on doesn't invalidate recorded answers (if it does
-    change the input, the input hash in the key changes)."""
-    settings = {k: v for k, v in interpreter.settings.items() if k != "model"}
+    change the input, the input hash in the key changes).
+
+    Query levers are left out too: those that change a request's content (context, a
+    region's text layer) are already in its key, instruction changes are in the prompt
+    hash, and the table filter only changes which requests exist. So a variant re-records
+    only the requests it actually changes. (Stores still bind levers: see provenance.)"""
+    from .provenance import LEVERS
+    settings = {k: v for k, v in interpreter.settings.items() if k != "model" and k not in LEVERS}
     data = json.dumps({"role": interpreter.role, "prompt_hash": interpreter.prompt_hash, "settings": settings},
                       sort_keys=True)
     return hashlib.sha256(data.encode()).hexdigest()[:16]
