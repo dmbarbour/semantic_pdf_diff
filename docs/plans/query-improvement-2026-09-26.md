@@ -1,6 +1,6 @@
 # Query improvement in rounds
 
-- **Status:** Planned (2026-09-26). Draft for discussion.
+- **Status:** Active (2026-09-26).
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md) (fixtures, recording by responder); [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md) (review pages, panel, consensus).
 - **Feeds:** every prompt and context change in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) (e.g. epistemic status) and later plans.
 
@@ -15,6 +15,12 @@ What we've learned so far shapes this:
 
 ## The loop
 
+0. **Research and hypotheses.** Each round opens with a short research pass on its top failure mode, run by Claude with subagents at no provider cost. Examples:
+   - cropping images that contain text
+   - classifying page regions without a model (layout analysis, XY-cuts, whitespace, PyMuPDF's layout tools)
+   - table structure, and associating captions with figures
+
+   The findings go in `docs/research/`, and each round's review (`docs/reviews/round-NN-<date>.md`) states hypotheses ("adding the neighbouring paragraph will cut 'surrounding text missing' by half on text tasks") that the round then tests. This keeps changes grounded in evidence rather than guesses.
 1. **Diagnose.** Aggregate the latest panel and human labels:
    - what questions were missing ("surrounding text", "legend", "heading"...)
    - which answer fields fail (entity, conditions, quote...)
@@ -34,7 +40,7 @@ What we've learned so far shapes this:
    - **Absolute checks:** the per-field right/wrong/unsure on each output's claims.
    - **The question itself, blind,** when the variant changed the input.
 
-   A person spot-checks a small subset. Claims identical in both outputs (same claim ID) keep their labels and aren't re-judged.
+   Claims identical in both outputs (same claim ID) keep their labels and aren't re-judged. Claude labels a small anchor subset each round, answering blind where the stage calls for it. The owner spot-checks when results stabilise or before a top-up, not every round (see *Decisions*).
 5. **Decide** by the acceptance rules below. An accepted variant becomes the new baseline.
 6. **Graph and log** the round.
 
@@ -87,6 +93,26 @@ A static, self-contained report page (works offline; can also be shared as an ar
 - **What's missing, over rounds:** a stacked bar of the panel's "missing" answers; the levers should shrink the bars they target.
 - **Quality vs cost:** usable claims per dollar or per page against tokens per page, one point per accepted baseline.
 
+## Restarting when the budget runs out
+
+The provider balance will run out mid-round; a round must pause cleanly and resume later without repeating paid work.
+
+- **Every step is a checkpoint.** A round is a sequence of steps: research, variants, record, sample, judge questions, judge pairs, decide, report. Each step's state is in `benchmarks/rounds/rNN/state.json`: done, in progress with its position, or paused and why.
+- **Nothing paid for is repeated.**
+  - Recording goes into the fixture (`replay-or-record`), so a resumed recording replays what's recorded and asks only the rest.
+  - Panel answers are cached by request in the batch folder, so a resumed judging step pays only for what's missing.
+- **Out-of-balance errors stop the round.** An HTTP 402 or a provider billing error isn't retried; the step is marked "paused: budget" and the runner exits. `review rounds resume` continues from the checkpoint after a top-up.
+- **A spending ledger.** Every model response's reported cost (DeepInfra returns `estimated_cost`) goes into `benchmarks/ledger.jsonl`, with round, step, model and tokens. The runner stops before a step whose estimate would pass the round's cap (default $15), or the known balance, which is set by hand after a top-up.
+
+## Figures at every step
+
+Every step appends its figures to `benchmarks/history.jsonl`, one record per measurement:
+- round, step, variant, stratum
+- metric, value, interval, sample size
+- the cost of producing it, and a timestamp
+
+That includes the mechanical metrics after recording, adequacy after question judging, win rates and absolute rates after answer judging, the decision, and the ledger totals. The report page draws every graph from this file, so a partial or paused round still shows what it measured.
+
 ## Budget
 
 Measured so far: recording all five slices costs about $0.50; a panel pass on a 17-item batch costs about $0.70–1.50 (reasoning-heavy judges cost most).
@@ -128,9 +154,15 @@ Every round prints an estimate before spending (tokens × the provider's listed 
 5. The report page and history.
 6. Later: model-proposed variants from failure clusters, with the owner approving what runs.
 
+## Decisions (2026-09-26)
+
+- **Budget:** $10–15 per round, capped. About $50 is left after $9.99 spent so far; the owner tops up by hand and decides whether to continue based on the improvements shown.
+- **Restarts:** rounds must pause cleanly when the balance runs out and resume without repeating paid work (see *Restarting*).
+- **Owner's time:** no spot checks every round (reviewing low-quality questions is draining). The owner reviews when results stabilise, or before a top-up, and may bring ideas then. Claude fills the anchor role in between.
+- **Research every round,** including heuristics that don't need a model (cropping text-bearing images, classifying page regions, table structure), and a proper per-round review with hypotheses, so changes aren't made blind.
+- **Figures at every step** go into the history file, so every stage can be graphed.
+- **Acceptance is automatic** when the rules pass, with a round summary for the owner. Assumed from "halt or continue based on improvements"; to be confirmed.
+
 ## Open questions
 
-1. **Budget:** about $10–15 per round, with a hard cap per round? What should the cap be?
-2. **Approval:** should accepted variants become the baseline automatically when the rules pass, or wait for the owner's approval each round? I'd suggest automatic, with a summary to review.
-3. **Human time per round:** is about 15 spot-check items reasonable, plus a few blind extractions for recall?
-4. **Model fixed per cycle?** I'd keep the responder (gemma-4-31B) fixed while improving queries, and compare models separately; otherwise effects mix.
+1. **Model fixed per cycle?** Proposed: keep the responder (gemma-4-31B) fixed while improving queries, and compare models separately, so effects don't mix.
