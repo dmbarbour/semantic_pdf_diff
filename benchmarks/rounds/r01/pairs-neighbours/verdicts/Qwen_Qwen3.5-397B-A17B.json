@@ -1,0 +1,149 @@
+{
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "verdicts": {
+    "u-calg-cd-p39-42-9a895974-p3-table": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets extract the scale for the Centre Module section but share the same OCR error ('MODUL' instead of 'MODULE') and both fail to extract the scale for the 'LIVING ROOM SECTION' which is also present on the page. Set A includes 'SECTION -' in the entity name while Set B moves it to conditions, but this structural difference does not compensate for the shared misread and omission."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets fail to extract the 'LIVING ROOM SECTION' scale which is clearly present in the keynotes and drawing labels. Both sets contain a typo ('MODUL' instead of 'MODULE'). Set B is slightly better because it captures the full label 'SECTION - CENTRE MODULE' (despite the typo) as the entity, whereas Set A truncates the entity name and assigns 'SECTION' to a vague condition field."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set B correctly identifies both elevation markers (Grade Level at 0'-0\" and Finished Floor at 2'-9 1/2\") for both the West and East modules. Set A incorrectly attributes the Finished Floor elevation value to the Grade Level entity and fabricates quotes combining text that does not appear together in the document."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A correctly extracts the elevations for both 'Grade Level' (0'-0\") and 'Finished Floor' (2'-9 1/2\") for both the West and East modules, accurately binding values to their labels. Set B incorrectly assigns the Finished Floor elevation value (2'-9 1/2\") to the 'Grade Level' entity for both modules, creating factually wrong claims supported by non-existent quotes."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p12-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 15,
+        "variant_wrong": 9,
+        "note": "Set B is better because it correctly extracts the explicit integral gain value from the text (0.008068634), whereas Set A fails to capture this specific number correctly in any claim (listing 0.007, 0.005, etc.). Both sets suffer from significant errors reading the graph, often confusing the left axis (0-1) with the right axis (0-0.025), resulting in impossible gain values (e.g., Proportional Gain = 0.8 s), but Set B has fewer of these axis-confusion hallucinations and more accurate text-based claims."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 13,
+        "variant_wrong": 8,
+        "note": "Set A is better because it more accurately extracts the explicit numerical values from the text for gains at 0 degrees (KP, KI, KD), whereas Set B repeatedly hallucinates incorrect values for the integral gain at 0 degrees (claiming 0.005, 0.007, 0.3 instead of 0.008068634). Both sets contain significant errors when interpreting the graph data for other angles (often ignoring the right-axis scale), but Set A has fewer of these gross magnitude errors. Set B does correctly extract the gain-correction formula which Set A misses, but this does not outweigh the numerous incorrect numerical claims."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p1-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is preferred because it contains fewer redundant/trivial claims (10 vs 11) while capturing all key facts accurately. Set A includes multiple duplicate claims for the rotor speed (items 4, 8, 9) which adds noise without new information. Both sets exhibit a minor inconsistency in entity binding for the brake properties (using 'High-Speed Shaft' for time constant but 'High-Speed Shaft Brake' for torque), but Set B is overall cleaner."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set A is preferred because it is more concise, containing fewer redundant claims than Set B. Set B extracts the Rotor Rated Speed three times (including an exact duplicate label), whereas Set A extracts it twice. Both sets incorrectly bind the Brake Time Constant entity to 'High-Speed Shaft' instead of 'High-Speed Shaft Brake' as indicated in the table, but Set A avoids the excessive noise found in Set B."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 5,
+        "note": "Set B is significantly better because it correctly extracts critical equipment specifications from the Notes section (Inverter power, Breaker ratings, Enclosure types) which Set A misses entirely. Both sets struggle with binding Wiring Schedule symbol IDs to their descriptions (e.g., both attribute Symbol 20's data to Symbol 50 or shift 31/32/33/34), resulting in a similar number of wrong wiring claims. However, Set B's inclusion of accurate system-level data makes it much more useful and complete."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set A is better because it extracts critical engineering claims from the 'NOTES' section (Inverter power, Breaker ratings, Enclosure types) which Set B completely misses. Both sets contain hallucinated claims regarding Circuit/Schedule 50 wiring (claiming 3#6 CU instead of 3#4/0 AL), but Set A has fewer of these erroneous claims (1 vs 3). Set A also correctly identifies most Wiring Schedule items matching the image, despite some text layer garbling, whereas Set B fragments the schedule into many claims but fails to capture the equipment specifications."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p11-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 4,
+        "note": "Set B is better because it correctly identifies theta_k as a blade-pitch angle, whereas Set A incorrectly labels it as a 'pitch sensitivity intercept' (Claim 2). Set B also provides a more accurate graph reading for intermediate points (-100E+6 at 17.5 deg vs Set A's -90E+6 at 15 deg, where the graph shows ~-80E+6). Both sets contain a contradictory claim about the last data point value (-90E+6 vs -120E+6), but Set A has more semantic and reading errors overall."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 4,
+        "note": "Set A is better because it avoids the semantic error in Set B which incorrectly labels theta_K as a 'pitch sensitivity intercept' (it is a blade-pitch angle). Set A also provides a more accurate visual estimate for the data point at 17.5 degrees compared to Set B's inaccurate reading at 15 degrees. Both sets contain redundant claims and some imprecise visual estimates where exact text values exist, but Set B has more factual and reading errors."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p11-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Set B is better because it correctly extracts the unit 'watt/rad' in the value field for the pitch sensitivity claim (Claim 1), whereas Set A truncates it to 'watt/ra' in Claim 2. Both sets share similar errors in quoting 'θ =' instead of 'θk =' for the blade-pitch angle constant and truncating units in some quotes, but Set B maintains higher fidelity in the extracted data values."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets extract the same two unique values (pitch sensitivity at theta=0 and theta_k) but duplicate them with different entities/attributes, leading to redundancy in both. Both sets fail to capture the subscript 'k' in the quotes for theta_k (quoting 'θ =' instead of 'θk ='), and both have one claim with a truncated unit ('watt/ra' instead of 'watt/rad'). Set A structures the condition for sensitivity slightly better (in the conditions field vs attribute name), but Set B is otherwise identical in accuracy and errors."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p1-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is more complete as it extracts the DOWEC turbine power loss claim (0.35 MW) explicitly stated in the text, which Set B omits. Both sets accurately extract the main NREL turbine properties from the text and table with similar fidelity and redundancy (e.g., extracting values from both text and table). Neither set contains misread or misbound claims."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is slightly better because it captures an additional relevant engineering fact from the text regarding the DOWEC turbine's power loss (0.35 MW), which Set A omits. Set B also demonstrates more precise entity binding by consistently associating properties like efficiency and frictional losses with the 'NREL 5-MW baseline wind turbine' entity, whereas Set A sometimes uses generic entities like 'Generator' or 'Gearbox'. Both sets are accurate with no misread values or hallucinations."
+      }
+    }
+  }
+}
