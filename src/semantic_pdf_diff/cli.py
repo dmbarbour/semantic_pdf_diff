@@ -367,6 +367,8 @@ def review_command(argv):
     sample.add_argument('--abouts', type=int, default=4, help='About statements per store')
     sample.add_argument('--pairs', type=int, default=4, help='Claim pairs per store (round-robin over relations)')
     sample.add_argument('--seed', type=int, default=1)
+    sample.add_argument('--fixture', type=Path,
+                        help='The recording the stores were replayed from: items then show exactly what each model was asked')
     add = sub.add_parser('import', help="Check a reviewer's labels file and add it to the batch")
     add.add_argument('batch', type=Path)
     add.add_argument('labels', type=Path, nargs='+')
@@ -374,11 +376,16 @@ def review_command(argv):
     panel.add_argument('batch', type=Path)
     panel.add_argument('--model', action='append', required=True, help='Model name at the configured endpoint; repeatable')
     panel.add_argument('--limit', type=int, help='Only the first N items (to check cost first)')
+    panel.add_argument('--stage', choices=['answers', 'questions'], default='answers',
+                       help='Judge the answers (default), or the questions blind (the inputs, without answers)')
     add_log_options(panel)
     agree = sub.add_parser('consensus', help='Consensus verdicts and reviewer reliability, estimated from all labels '
                                              '(Dawid-Skene), with contested items to discuss; no reviewer is referee')
     agree.add_argument('batch', type=Path)
     agree.add_argument('--gate', action='store_true', help='Use the usable-or-not question instead of the full verdict')
+    agree.add_argument('--stage', choices=['answers', 'questions'], default='answers')
+    questions = sub.add_parser('question-agreement', help='Agreement between reviewers on the questions (inputs)')
+    questions.add_argument('batch', type=Path)
     for name, help in (('agreement', 'Agreement between reviewers: verdicts, flags, clarity, confidence'),
                        ('scores', 'Verdicts per responder, item type and claim kind, per reviewer'),
                        ('page', 'Rewrite the review page (after a taxonomy change)')):
@@ -391,8 +398,10 @@ def review_command(argv):
             if not path:
                 raise ValueError(f'--store {spec!r}: use LABEL=DIR')
             stores.append((label, Path(path)))
-        batch = review.sample(stores, args.batch, args.claims, args.abouts, args.pairs, args.seed)
-        print(f"{len(batch['items'])} items: open {args.batch / 'review.html'} in a browser")
+        batch = review.sample(stores, args.batch, args.claims, args.abouts, args.pairs, args.seed, args.fixture)
+        asked = sum(1 for i in batch['items'] if i.get('request'))
+        print(f"{len(batch['items'])} items: first judge the questions blind ({asked} recorded) in "
+              f"{args.batch / 'questions.html'}, then the answers in {args.batch / 'review.html'}")
     elif args.command == 'import':
         for path in args.labels:
             target, count = review.import_labels(args.batch, path)
@@ -404,21 +413,23 @@ def review_command(argv):
                                          concurrency=16, timeout=600, retries=2)
             client = Client(settings, args.batch / '.judge-cache')
             progress = Progress(f'judge {model}', client, heartbeat=settings.heartbeat_seconds)
-            target, count, failures = review.judge(args.batch, client, model, args.limit, progress)
+            target, count, failures = review.judge(args.batch, client, model, args.limit, progress, args.stage)
             progress.close()
             for failure in failures[:5]:
                 log.warning(f'{model}: {failure}')
             print(f"{model}: {count} labels -> {target}; {client.calls} calls, "
                   f"{client.usage['prompt_tokens']} prompt and {client.usage['completion_tokens']} completion tokens")
     elif args.command == 'consensus':
-        print(json.dumps(review.consensus(args.batch, gate=args.gate), indent=2))
+        print(json.dumps(review.consensus(args.batch, gate=args.gate, stage=args.stage), indent=2))
+    elif args.command == 'question-agreement':
+        print(json.dumps(review.question_agreement(args.batch), indent=2))
     elif args.command == 'agreement':
         print(json.dumps(review.agreement(args.batch), indent=2))
     elif args.command == 'scores':
         print(json.dumps(review.scores(args.batch), indent=2))
     else:
         review.write_page(args.batch, json.loads((args.batch / 'batch.json').read_text(encoding='utf-8')))
-        print(f"Rewrote {args.batch / 'review.html'}")
+        print(f"Rewrote {args.batch / 'questions.html'} and {args.batch / 'review.html'}")
     return 0
 
 def extract_sources(store, client, names, files, progress):

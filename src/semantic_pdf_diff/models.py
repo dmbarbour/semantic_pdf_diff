@@ -171,6 +171,15 @@ class PanelLabel(Lenient):
     confidence: str = ""
     note: str = Field(default="", max_length=1000)
 
+class PanelQuestionLabel(Lenient):
+    """A panel model's judgment of one question (a model's input), made without its answer."""
+    adequacy: str = ""
+    missing: list[str] = Field(default_factory=list, max_length=20)
+    worth: str = ""
+    blind: str = Field(default="", max_length=2000)
+    confidence: str = ""
+    note: str = Field(default="", max_length=1000)
+
 class Reference(Strict):
     """A sentence citing a figure (or table, sheet, exhibit) by label."""
     page: int

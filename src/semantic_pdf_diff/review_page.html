@@ -37,6 +37,8 @@ details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}de
 textarea{width:100%;min-height:54px;border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--bg);color:var(--ink);font:inherit}
 nav{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px}.hint{color:var(--muted);font-size:13px}
 #zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;z-index:5;overflow:auto;cursor:zoom-out}#zoom img{display:block;margin:auto;max-width:none}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;font-size:13px;max-height:360px;overflow:auto}
+details.request{margin:6px 0}details.request>summary{cursor:pointer}.summary{font-weight:600}
 #list{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px}#list button{padding:2px 7px;font-size:12px}#list button.labelled{background:var(--sel)}#list button.current{outline:2px solid var(--accent)}
 </style>
 <header>
@@ -106,7 +108,8 @@ function suggested(kind, fields) {
 }
 function showItem() {
   const item = current(), l = label();
-  $('#images').innerHTML = item.images.map(i => `<figure><img src="${esc(i.src)}" alt="${esc(i.caption)}" loading="lazy"><figcaption>${esc(i.caption)}</figcaption></figure>`).join('');
+  const sent = item.request ? item.request.images : [];
+  $('#images').innerHTML = [...sent, ...item.images].map(i => `<figure><img src="${esc(i.src)}" alt="${esc(i.caption)}" loading="lazy"><figcaption>${esc(i.caption)}</figcaption></figure>`).join('');
   const kind = DATA.taxonomy[item.type];
   let html = `<div class="question">${esc(QUESTIONS[item.type])}</div><h2>Item ${state.at + 1} of ${DATA.items.length} · ${esc(item.type)}</h2>`;
   if (item.type === 'pair') {
@@ -117,10 +120,20 @@ function showItem() {
   } else {
     html += `<div class="context">${esc(item.context.document)} · page ${esc(item.context.page)} · ${esc(item.context.region)} region</div>`;
   }
-  html += `<h3>${item.type === 'pair' ? 'Questions' : 'Each part'}</h3>` + fieldRows(item, l);
+  if (item.request) {
+    html += `<h3>What the model was asked</h3><div class="summary">${esc(item.request.summary)}</div>`
+      + (item.request.heading !== undefined ? `<div class="context">Section heading given: ${esc(item.request.heading)}</div>` : '')
+      + `<details class="request" open><summary>The input it was given</summary><pre>${esc(item.request.query)}</pre></details>`
+      + `<details class="request"><summary>Full instructions</summary><pre>${esc(item.request.instructions)}</pre></details>`;
+  }
+  html += `<h3>${item.type === 'pair' ? 'Questions' : 'Each part (judged against that input)'}</h3>` + fieldRows(item, l);
   const hint = suggested(item.type, l.fields);
   html += `<h3>Verdict${hint && l.chosen && hint !== l.verdict ? `<span class="suggest">(your answers suggest: ${esc(hint)})</span>` : ''}</h3><div class="opts">`
     + kind.verdicts.map(v => `<label title="${esc(v.help)}"><input type="radio" name="verdict" value="${v.name}" ${l.verdict === v.name ? 'checked' : ''}>${esc(v.label)}</label>`).join('') + '</div>';
+  if (item.type === 'claim') {
+    html += `<h3>As evidence for comparing designs (with its section attached)</h3><div class="opts">` + DATA.usefulness.map(u =>
+      `<label title="${esc(u.help)}"><input type="radio" name="usefulness" value="${u.name}" ${l.usefulness === u.name ? 'checked' : ''}>${esc(u.label)}</label>`).join('') + '</div>';
+  }
   html += `<h3>Was the item clear?</h3><div class="opts">` + DATA.clarity.map(c => `<label title="${esc(c.help)}"><input type="radio" name="clarity" value="${c.name}" ${l.clarity === c.name ? 'checked' : ''}>${esc(c.label)}</label>`).join('') + '</div>';
   html += `<h3>Your confidence</h3><div class="opts">` + DATA.confidence.map(c => `<label title="${esc(c.help)}"><input type="radio" name="confidence" value="${c.name}" ${l.confidence === c.name ? 'checked' : ''}>${esc(c.label)}</label>`).join('') + '</div>';
   html += `<h3>Note (optional)</h3><textarea name="note" placeholder="What's wrong, or what should it say?">${esc(l.note)}</textarea>`;
@@ -154,6 +167,7 @@ $('#item').addEventListener('change', e => {
   const l = label(), t = e.target;
   if (t.name === 'verdict') { l.verdict = t.value; l.chosen = true; }
   else if (t.name === 'clarity') l.clarity = t.value;
+  else if (t.name === 'usefulness') l.usefulness = t.value;
   else if (t.name === 'confidence') l.confidence = t.value;
   else if (t.name === 'flags') l.flags = [...document.querySelectorAll('input[name=flags]:checked')].map(x => x.value);
   save(); showItem();

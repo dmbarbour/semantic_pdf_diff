@@ -15,11 +15,20 @@ Nobody is ground truth here. Each reviewer (you, Claude in a session, and a pane
 
 ## Reviewing a batch (for people)
 
-1. Open `batches/<name>/review.html` in a browser (double-click it; it works offline).
+Each batch has two pages. Do them in this order:
+
+1. **`questions.html`: judge the questions, blind.** Each item shows only what the model was asked: a one-line summary of the kind of request, the section heading it was given, the exact input (text and images), and the full instructions, folded. Judge whether a careful reader could answer well from that input alone (enough, partly, not enough), what was missing, and whether it was worth asking. Optionally, write what you would extract. You never see the model's answer here.
+2. **`review.html`: judge the answers.** The same input is shown with the model's answer. Judge each part of the answer against that input, and whether the claim is usable as evidence with its section attached.
+
+Separating the two tells apart faults in what we ask (our chunking, headings, crops, context) from faults in how the model answers.
+
+For each page:
+
+1. Open it in a browser (double-click it; it works offline).
 2. Type your name at the top. Work through the items, one per screen: pick a verdict, tick any flags that apply, say how clear the item was and how confident you are, and optionally leave a note. Click any image to zoom. `←` and `→` move between items.
 3. Progress is saved in the browser as you go, so you can stop and come back (same browser, same file).
-4. When done (or at any point), click **Download labels**. That saves `labels-<batch>-<name>.json`, usually to your Downloads folder. Then either:
-   - run `pdf-semantic-diff review import benchmarks/batches/<name> ~/Downloads/labels-<batch>-<name>.json`, or
+4. When done (or at any point), click **Download labels**. That saves `questions-<batch>-<name>.json` or `labels-<batch>-<name>.json`, usually to your Downloads folder. Then either:
+   - run `pdf-semantic-diff review import benchmarks/batches/<name> <file>` (it tells the two kinds apart), or
    - tell Claude where the file is, or click **Copy labels** and paste the text into the conversation.
 
 Batches are kept small (about 15–20 items, 10–20 minutes) so a session fits comfortably; more batches can follow.
@@ -51,7 +60,10 @@ pdf-semantic-diff samples/slices/A.pdf samples/slices/B.pdf --out benchmarks/run
     --fixture tests/fixtures/replay-slices.zip --responder <responder> --config <recording settings>
 
 # Sample a batch (claims round-robin over kinds; abouts; pairs round-robin over relations)
-pdf-semantic-diff review sample benchmarks/batches/s02 --store <label>=benchmarks/runs/... --claims 4 --abouts 1 --pairs 1
+pdf-semantic-diff review sample benchmarks/batches/s02 --store <label>=benchmarks/runs/... --claims 4 --abouts 1 --pairs 1 \
+    --fixture tests/fixtures/replay-slices.zip        # so items show exactly what each model was asked
+pdf-semantic-diff review judge benchmarks/batches/s02 --model <m> --stage questions   # the panel judges questions blind
+pdf-semantic-diff review question-agreement benchmarks/batches/s02
 
 # Labels from people, a panel of models, and the results
 pdf-semantic-diff review import benchmarks/batches/s02 labels.json

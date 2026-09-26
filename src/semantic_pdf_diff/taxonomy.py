@@ -171,6 +171,52 @@ FIELDS = {
 # Suggested verdict from field answers (the reviewer can always choose another).
 CORE_FIELDS = {"claim": {"entity", "attribute", "value"}, "about": {"about"}, "pair": {"relation"}}
 
+# --- judging questions (the model's input, before seeing its answer) ---------------------
+
+ADEQUACY = [
+    {"name": "enough", "label": "Enough", "help": "Everything needed to answer fully is in the input"},
+    {"name": "partly", "label": "Partly", "help": "Something useful is missing, but a partial answer is possible"},
+    {"name": "not_enough", "label": "Not enough", "help": "A good answer isn't possible from this input"},
+]
+
+MISSING = [
+    _field("heading", "Section heading or title", "e.g. which contest, component or subsystem this is about"),
+    _field("surrounding_text", "Surrounding text", "the sentence or paragraph before or after the chunk"),
+    _field("legend_or_key", "Legend, key or axis labels", "cut off, or elsewhere on the page"),
+    _field("caption", "Caption or figure title", ""),
+    _field("table_header", "Table header or row labels", ""),
+    _field("resolution", "Resolution", "small labels or dimensions can't be read"),
+    _field("other_page", "Something on another page", "e.g. a table continued, a definition, a referenced figure"),
+    _field("domain_knowledge", "Domain knowledge", "how to read this kind of chart or drawing"),
+    _field("instructions", "Clearer instructions", "the request itself is ambiguous for this input"),
+]
+
+WORTH = [
+    {"name": "worth", "label": "Worth asking", "help": "The input holds facts worth extracting"},
+    {"name": "little", "label": "Little value", "help": "Mostly boilerplate, labels or fragments"},
+    {"name": "none", "label": "Nothing to extract", "help": "e.g. an empty region or only decoration"},
+]
+
+# Usefulness of a claim as final evidence, with the context attached to it after extraction.
+USEFULNESS = [
+    {"name": "usable", "label": "Usable as is", "help": "Clear enough to compare with other sources"},
+    {"name": "with_context", "label": "Usable with its context", "help": "Only with its section or linked figure"},
+    {"name": "not_useful", "label": "Not useful", "help": "Trivial, vague or unanchored even in context"},
+]
+
+# One line per kind of request, so reviewers learn to recognise the (folded) instructions.
+REQUEST_SUMMARIES = {
+    ("extract", "text"): "Extract up to N atomic engineering claims (entity, attribute, value, unit, conditions, quote) from a text chunk.",
+    ("extract", "table"): "Extract claims from one table row, given the table's header.",
+    ("extract", "tile"): "Extract claims from an image of part of a page (a tile), checked against the page's text where possible.",
+    ("extract", "figure"): "Extract claims from an image of one detected figure, with its caption.",
+    ("extract", "overview"): "Extract claims from a low-resolution image of the whole page.",
+    ("triage", "figure"): "Say what a figure depicts and why it's there, from its location, caption, surrounding text and citing paragraphs.",
+    ("triage", "section"): "Say what a section covers (type, density, keywords, about) from its heading, text, claims and figures.",
+    ("compare", "proposals"): "Relate two claims from competing designs: equivalent, different, complementary, unrelated or uncertain.",
+    ("compare", "revisions"): "Relate two claims from two revisions of one document: equivalent, different, complementary, unrelated or uncertain.",
+}
+
 CLARITY = [
     {"name": "clear", "label": "Clear", "help": "I could judge this item"},
     {"name": "context_insufficient", "label": "Context insufficient",

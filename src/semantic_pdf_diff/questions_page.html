@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Questions: __TITLE__</title>
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--ink:#1b2733;--muted:#5b6b7a;--line:#d5dde4;--accent:#1f6f9f;--sel:#e6f1f8;--code:#f6f8fa}
+@media (prefers-color-scheme:dark){:root{--bg:#12171c;--card:#1b232b;--ink:#e3e9ee;--muted:#9aa9b6;--line:#2f3b46;--accent:#6fb3de;--sel:#223444;--code:#161d24}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,sans-serif}
+header{position:sticky;top:0;z-index:2;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:16px;margin:0 8px 0 0}header input{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+button{padding:7px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer;font:inherit}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.progress{flex:1;min-width:140px;height:8px;background:var(--line);border-radius:4px;overflow:hidden}.progress div{height:100%;background:var(--accent)}
+main{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(360px,1fr);gap:16px;padding:16px;max-width:1500px;margin:auto}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.images figure{margin:0 0 12px}.images img{max-width:100%;border:1px solid var(--line);border-radius:4px;cursor:zoom-in;background:#fff}
+figcaption{color:var(--muted);font-size:13px}
+h2{font-size:15px;margin:4px 0 8px}h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:16px 0 6px}
+.question{background:var(--sel);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+.summary{font-weight:600;margin:6px 0}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--code);border:1px solid var(--line);border-radius:6px;padding:8px;font-size:13px;max-height:420px;overflow:auto}
+pre.input{max-height:none;font-size:14px}
+details.instructions>summary{cursor:pointer;color:var(--muted)}
+.opts{display:flex;flex-wrap:wrap;gap:6px}.opts label{border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
+.opts label:has(input:checked){background:var(--sel);border-color:var(--accent)}.opts input{margin-right:4px}
+textarea{width:100%;min-height:54px;border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--bg);color:var(--ink);font:inherit}
+nav{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px}.hint{color:var(--muted);font-size:13px}
+#zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;z-index:5;overflow:auto;cursor:zoom-out}#zoom img{display:block;margin:auto;max-width:none}
+#list{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px}#list button{padding:2px 7px;font-size:12px}#list button.labelled{background:var(--sel)}#list button.current{outline:2px solid var(--accent)}
+.missing{color:var(--muted)}
+</style>
+<header>
+  <h1>Questions __TITLE__</h1>
+  <label>Your name <input id="reviewer" placeholder="e.g. david" size="12"></label>
+  <div class="progress"><div id="bar"></div></div><span id="count"></span>
+  <button id="copy">Copy labels</button><button class="primary" id="download">Download labels</button>
+</header>
+<main>
+  <section class="card images" id="images"></section>
+  <section class="card">
+    <div id="item"></div>
+    <nav><button id="prev">← Previous</button><span class="hint">Saved in this browser. ← → move between items.</span><button id="next" class="primary">Next →</button></nav>
+    <div id="list"></div>
+  </section>
+</main>
+<div id="zoom"><img alt=""></div>
+<script type="application/json" id="data">__DATA__</script>
+<script>
+// Judging questions, blind: what each model was asked, never what it answered.
+const DATA = JSON.parse(document.getElementById('data').textContent);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY = 'questions:' + DATA.batch;
+let store = {last: '', people: {}};
+try { store = Object.assign(store, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+const blank = name => ({reviewer: name, labels: {}, at: 0});
+let state = store.people[store.last] || blank(store.last);
+const save = () => { store.people[state.reviewer] = state; store.last = state.reviewer;
+  try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
+const items = DATA.items.filter(i => i.request);
+const current = () => items[state.at];
+const label = () => state.labels[current().id]
+  || (state.labels[current().id] = {item: current().id, adequacy: '', missing: [], worth: '', blind: '', confidence: 'medium', note: ''});
+const radios = (name, options, value) => '<div class="opts">' + options.map(o =>
+  `<label title="${esc(o.help)}"><input type="radio" name="${name}" value="${o.name}" ${value === o.name ? 'checked' : ''}>${esc(o.label)}</label>`).join('') + '</div>';
+
+function showItem() {
+  if (!items.length) { $('#item').innerHTML = '<p>No recorded requests in this batch.</p>'; return; }
+  const item = current(), l = label(), r = item.request;
+  // The input, as the model got it: images (if any) and text, on the left.
+  $('#images').innerHTML = r.images.map(i => `<figure><img src="${esc(i.src)}" alt="${esc(i.caption)}"><figcaption>${esc(i.caption)}</figcaption></figure>`).join('')
+    + (r.images.length ? '' : '<p class="missing">No image was sent: the model had only this text.</p>')
+    + (r.heading !== undefined ? `<p><b>Section heading given:</b> ${esc(r.heading)}</p>` : '')
+    + `<h3>The input</h3><pre class="input">${esc(r.query)}</pre>`;
+  let html = `<div class="question">Judge the <b>question</b>, not an answer: could a careful reader answer it well from this input alone? You'll see the model's answer on the other page.</div>`
+    + `<h2>Question ${state.at + 1} of ${items.length} · ${esc(item.type)}</h2><div class="summary">${esc(r.summary)}</div>`
+    + `<p class="missing">The input is on the left.</p>`
+    + `<details class="instructions"><summary>Full instructions (the same for every request of this kind)</summary><pre>${esc(r.instructions)}</pre></details>`;
+  html += `<h3>Was the input enough?</h3>` + radios('adequacy', DATA.adequacy, l.adequacy);
+  html += `<h3>What's missing (any)</h3><div class="opts">` + DATA.missing.map(m =>
+    `<label title="${esc(m.help)}"><input type="checkbox" name="missing" value="${m.name}" ${l.missing.includes(m.name) ? 'checked' : ''}>${esc(m.label)}</label>`).join('') + '</div>';
+  html += `<h3>Worth asking?</h3>` + radios('worth', DATA.worth, l.worth);
+  html += `<h3>Your confidence</h3>` + radios('confidence', DATA.confidence, l.confidence);
+  html += `<h3>What would you extract or say? (optional)</h3><textarea name="blind" placeholder="Your own answer, before seeing the model's: one fact per line">${esc(l.blind)}</textarea>`;
+  html += `<h3>Note (optional)</h3><textarea name="note" placeholder="Concerns about the question or the input">${esc(l.note)}</textarea>`;
+  $('#item').innerHTML = html;
+  showList(); showProgress();
+}
+const answered = l => l && l.adequacy;
+function showProgress() {
+  const n = items.filter(i => answered(state.labels[i.id])).length;
+  $('#bar').style.width = (100 * n / Math.max(items.length, 1)) + '%';
+  $('#count').textContent = `${n}/${items.length} judged`;
+}
+function showList() {
+  $('#list').innerHTML = items.map((it, n) => `<button type="button" data-n="${n}" class="${answered(state.labels[it.id]) ? 'labelled' : ''} ${n === state.at ? 'current' : ''}">${n + 1}</button>`).join('');
+}
+$('#item').addEventListener('change', e => {
+  const l = label(), t = e.target;
+  if (t.name === 'missing') l.missing = [...document.querySelectorAll('input[name=missing]:checked')].map(x => x.value);
+  else if (['adequacy', 'worth', 'confidence'].includes(t.name)) l[t.name] = t.value;
+  save(); showProgress(); showList();
+});
+$('#item').addEventListener('input', e => { if (['blind', 'note'].includes(e.target.name)) { label()[e.target.name] = e.target.value; save(); } });
+function go(n) { state.at = Math.max(0, Math.min(items.length - 1, n)); save(); showItem(); window.scrollTo(0, 0); }
+$('#prev').onclick = () => go(state.at - 1);
+$('#next').onclick = () => go(state.at + 1);
+$('#list').onclick = e => { if (e.target.dataset.n) go(+e.target.dataset.n); };
+$('#reviewer').value = state.reviewer;
+$('#reviewer').onchange = e => {
+  const name = e.target.value.trim();
+  if (name === state.reviewer) return;
+  if (!state.reviewer && Object.keys(state.labels).length) state.reviewer = name;
+  else state = store.people[name] || blank(name);
+  save(); showItem();
+};
+function labelsFile() {
+  return JSON.stringify({format: DATA.format, version: 1, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
+    created: new Date().toISOString().slice(0, 10), labels: items.filter(i => answered(state.labels[i.id])).map(i => state.labels[i.id])}, null, 2);
+}
+$('#download').onclick = () => {
+  const blob = new Blob([labelsFile()], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `questions-${DATA.batch}-${(state.reviewer || 'anonymous').replace(/[^A-Za-z0-9._-]+/g, '_')}.json`;
+  a.click();
+};
+$('#copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(labelsFile()); $('#copy').textContent = 'Copied'; }
+  catch (e) { $('#copy').textContent = 'Copy failed: use Download'; }
+  setTimeout(() => $('#copy').textContent = 'Copy labels', 2000);
+};
+document.addEventListener('keydown', e => {
+  if (['TEXTAREA', 'INPUT'].includes(document.activeElement.tagName) && !['radio', 'checkbox'].includes(document.activeElement.type)) return;
+  if (e.key === 'ArrowRight') go(state.at + 1);
+  if (e.key === 'ArrowLeft') go(state.at - 1);
+});
+$('#images').onclick = e => { if (e.target.tagName === 'IMG') { $('#zoom img').src = e.target.src; $('#zoom').style.display = 'block'; } };
+$('#zoom').onclick = () => $('#zoom').style.display = 'none';
+showItem();
+</script>
+</html>

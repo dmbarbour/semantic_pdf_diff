@@ -88,8 +88,9 @@ class Batches(unittest.TestCase):
         config.write_text(json.dumps({'concurrency': 4, 'tile_points': 180, 'retries': 0}))
         with jittery_model() as (url, _), contextlib.redirect_stdout(io.StringIO()), \
              contextlib.redirect_stderr(io.StringIO()):
-            cli.main([str(a), str(b), '--out', str(root / 'store'), '--base-url', url, '--config', str(config)])
-        cls.store = root / 'store'
+            cli.main([str(a), str(b), '--out', str(root / 'store'), '--base-url', url, '--config', str(config),
+                      '--fixture', str(root / 'f.sqlite'), '--fixture-mode', 'replay-or-record'])
+        cls.store, cls.fixture = root / 'store', root / 'f.sqlite'
 
     @classmethod
     def tearDownClass(cls):
@@ -99,7 +100,7 @@ class Batches(unittest.TestCase):
         folder = Path(self.dir.name) / name
         with contextlib.redirect_stdout(io.StringIO()):
             cli.main(['review', 'sample', str(folder), '--store', f'SECRET-RESPONDER={self.store}', '--claims', '6',
-                      '--abouts', '2', '--pairs', '2', '--seed', str(seed)])
+                      '--abouts', '2', '--pairs', '2', '--seed', str(seed), '--fixture', str(self.fixture)])
         return folder, json.loads((folder / 'batch.json').read_text())
 
     def labels(self, batch, reviewer, verdict_index=0):
@@ -148,6 +149,60 @@ class Batches(unittest.TestCase):
         self.assertEqual(claims['verdict_agreement']['claude ~ david'].split('/')[1], str(claims['items']))
         scores = review.scores(folder)
         self.assertEqual({row['store'] for row in scores}, {'SECRET-RESPONDER'})
+
+    def test_items_carry_the_exact_request(self):
+        folder, batch = self.batch('q1')
+        requests = [i['request'] for i in batch['items']]
+        self.assertTrue(all(requests))
+        claim = next(i for i in batch['items'] if i['type'] == 'claim')
+        self.assertIn('SOURCE DATA', claim['request']['query'])
+        self.assertIn('Extract atomic engineering claims', claim['request']['instructions'])
+        self.assertIn('heading', claim['request'])
+        visual = [i for i in batch['items'] if i['type'] == 'claim' and i['context']['region'] in ('tile', 'overview')]
+        self.assertTrue(visual and all(i['request']['images'] and (folder / i['request']['images'][0]['src']).exists()
+                                       for i in visual))
+        page = (folder / 'questions.html').read_text()
+        self.assertIn(claim['request']['summary'], page)
+        data = json.loads(page.split('id="data">')[1].split('</script>')[0].replace('<\\/', '</'))
+        # The questions page never carries an answer: items hold only what the model was asked.
+        self.assertEqual({key for i in data['items'] for key in i}, {'id', 'type', 'request'})
+
+    def test_question_labels_import_agree_and_judge(self):
+        folder, batch = self.batch('q2')
+        ids = [i['id'] for i in batch['items'] if i.get('request')]
+        def labels(name, adequacy):
+            return {'format': review.QUESTIONS_FORMAT, 'version': 1, 'batch': batch['name'], 'reviewer': name,
+                    'labels': [{'item': i, 'adequacy': adequacy, 'missing': ['heading'], 'worth': 'worth', 'blind': '',
+                                'confidence': 'high', 'note': ''} for i in ids]}
+        for name, adequacy in (('ann', 'enough'), ('bo', 'partly')):
+            (folder / f'{name}.json').write_text(json.dumps(labels(name, adequacy)))
+            with contextlib.redirect_stdout(io.StringIO()):
+                cli.main(['review', 'import', str(folder), str(folder / f'{name}.json')])
+        self.assertTrue((folder / 'labels/questions/ann.json').exists())
+        self.assertFalse((folder / 'labels/ann.json').exists())
+        result = review.question_agreement(folder)
+        self.assertEqual(result['reviewers'], ['ann', 'bo'])
+        self.assertEqual(result['adequacy']['pairwise_agreement'], 0.0)
+        bad = labels('cy', 'plenty')
+        (folder / 'cy.json').write_text(json.dumps(bad))
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(cli.main(['review', 'import', str(folder), str(folder / 'cy.json')]), 1)
+        self.assertIn('plenty', err.getvalue())
+        class Panel(FakePanel):
+            def ask(self, prompt, schema, images=(), key=None):
+                self.prompts.append((prompt, list(images)))
+                return schema(adequacy='not_enough', missing=['heading', 'bogus'], worth='little', confidence='low',
+                              note='thin')
+        panel = Panel()
+        target, count, _ = review.judge(folder, panel, 'model-q', stage='questions')
+        self.assertEqual((target.parent.name, count), ('questions', len(ids)))
+        data = json.loads(target.read_text())
+        self.assertEqual(data['labels'][0]['missing'], ['heading'])
+        for prompt, _ in panel.prompts:  # judged blind: the question, never the model's answer
+            self.assertIn('THE QUESTION', prompt)
+            self.assertNotIn('"verdict"', prompt.split('THE QUESTION')[1])
+        consensus = review.consensus(folder, stage='questions')
+        self.assertEqual(set(consensus['claim']['reviewers']), {'ann', 'bo', 'model-q'})
 
     def test_panel_reviews_are_cleaned_into_labels(self):
         folder, batch = self.batch('b3')
