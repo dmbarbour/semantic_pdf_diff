@@ -182,6 +182,14 @@ class PanelQuestionLabel(Lenient):
     confidence: str = ""
     note: str = Field(default="", max_length=1000)
 
+class PairVerdict(Lenient):
+    """A panel model's comparison of two claim sets for the same page region."""
+    better: str = ""
+    a_wrong: int | None = None
+    b_wrong: int | None = None
+    confidence: str = ""
+    note: str = Field(default="", max_length=1500)
+
 class Reference(Strict):
     """A sentence citing a figure (or table, sheet, exhibit) by label."""
     page: int

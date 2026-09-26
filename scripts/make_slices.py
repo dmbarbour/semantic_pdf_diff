@@ -23,12 +23,19 @@ def sha256(data):
     return hashlib.sha256(data).hexdigest()
 
 def cut(source, first, last):
-    """Pages first..last (1-based) with the outline entries inside them; bytes are deterministic."""
+    """Pages first..last (1-based) with their outline: the entries in force at the first page
+    (so a slice starting mid-section keeps its headings), then those inside. Bytes are deterministic."""
     with pymupdf.open(source) as doc:
         part = pymupdf.open()
         part.insert_pdf(doc, from_page=first - 1, to_page=last - 1, links=False, annots=False)
-        toc = [[level, title, page - first + 1] for level, title, page, *_ in doc.get_toc(simple=False)
-               if first <= page <= last]
+        entries = [(level, title, page) for level, title, page, *_ in doc.get_toc(simple=False)]
+        in_force = {}
+        for level, title, page in entries:
+            if page < first:
+                in_force = {k: v for k, v in in_force.items() if k < level}
+                in_force[level] = title
+        toc = [[level, title, 1] for level, title in sorted(in_force.items())]
+        toc += [[level, title, page - first + 1] for level, title, page in entries if first <= page <= last]
     if toc:
         base, fixed, previous = min(level for level, _, _ in toc), [], 0
         for level, title, page in toc:
