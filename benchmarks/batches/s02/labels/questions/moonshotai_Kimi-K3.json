@@ -1,0 +1,203 @@
+{
+  "format": "semantic-pdf-diff-question-labels",
+  "version": 1,
+  "batch": "s02",
+  "reviewer": "moonshotai/Kimi-K3",
+  "created": "2026-09-26",
+  "labels": [
+    {
+      "item": "c-c8cd13bd430a",
+      "adequacy": "enough",
+      "missing": [
+        "surrounding_text"
+      ],
+      "worth": "worth",
+      "blind": "Steel Young's modulus E = 2.00E11 Pa (Table 4-1)\nSteel shear modulus G = 7.93E10 Pa\nSteel density ρ = 7.85E3 kg/m3\nSoil shear modulus Gs = 140E6 Pa, representative of dense sand or gravel\nSoil Poisson's ratio νs = 0.4\nNo detailed geotechnical analysis conducted; soil modeled with spring constants in a 1-D finite-element model (equations in Appendix B.2)\nFinal mass values (Table 1-1) include an extra 7% outfitting mass beyond cylindrical shell mass plus 100 t for the transition piece\n30-m clearance value is not specified in an official standard; offshore wind turbine clearances vary between 20 m and 30 m",
+      "confidence": "high",
+      "note": "The chunk is a self-contained passage from a wind turbine design report: a paragraph on soil modeling, Table 4-1 (Material Properties for the Tower) with full headers, symbols, values and units, plus text on cross-sectional properties, mass adjustments (7% outfitting, 100 t transition piece), and a footnote on the 30-m clearance. A good answer needs only faithful extraction; the table is complete and the prose is intact. Minor issues: OCR artifacts put spaces where decimal points belong ('2 00E11' = 2.00E11, consistently interpretable), and the footnote's antecedent (which clearance) sits outside the chunk, but the claims remain extractable as stated."
+    },
+    {
+      "item": "c-dfe716aae8ec",
+      "adequacy": "partly",
+      "missing": [
+        "heading",
+        "surrounding_text",
+        "other_page"
+      ],
+      "worth": "worth",
+      "blind": "A laundry load is eligible for clothes-drying points only after a complete, uninterrupted cycle in an automatic clothes washer (cycle settings per Contest 8-3h).\nDrying method may be active (e.g., machine), passive (e.g., clothes line), or any combination.\nAny drying method requiring towels to be visible must be demonstrated to the architecture and market appeal juries during house visits.\nOn several contest days two loads must be dried; teams may combine both loads in one drying cycle but each load is scored separately.\nFull points: dried load weight ≤100% of original weight.\nReduced points: dried load weight >100% and <110% of original weight.\nNo points: dried load weight ≥110% of original weight.",
+      "confidence": "high",
+      "note": "A mid-list chunk (items b–d) from what appears to be a contest rules document on clothes drying, plus a small scoring table keyed to '% of original weight' (full ≤100, reduced 100–110, none ≥110). The rules and thresholds are literally stated and extractable, but the section/contest heading, the preceding item(s), and the definition of what 'original weight' is measured against are not in the chunk, and Contest 8-3h is referenced but lives elsewhere."
+    },
+    {
+      "item": "c-fe7a5442c4a5",
+      "adequacy": "enough",
+      "missing": [
+        "surrounding_text",
+        "other_page"
+      ],
+      "worth": "worth",
+      "blind": "Steel Young's modulus E = 2.00E11 Pa (Table 4-1)\nSteel shear modulus G = 7.93E10 Pa (Table 4-1)\nSteel density = 7.85E3 kg/m^3 (Table 4-1)\nSoil shear modulus Gs = 140E6 Pa (Table 4-1)\nSoil Poisson's ratio = 0.4 (Table 4-1)\nHub height reaches 150 m with 30 m ground/water-surface clearance (body text)\nMonopile foundation outer diameter = 10 m (body text)\nSoil stiffness modeled as spring constants in a one-dimensional finite-element model; no soil property analysis conducted (body text)\nReported mass values include extra 7% outfitting mass and 100 t for transition piece (body text)\nOffshore wind turbine clearances can vary between 20 m and 30 m (footnote)",
+      "confidence": "high",
+      "note": "The tile is a page from an NREL wind turbine report containing Table 4-1 (Material Properties for the Tower: steel E, G, density; soil shear modulus and Poisson's ratio) plus body text with quantitative claims (hub height 150 m, 30 m clearance, 10-m monopile outer diameter, 7% outfitting mass, 100 t transition piece, 20-30 m clearance range). The table is fully legible with headers and units; some body text is clipped at the tile's left/right edges, but the extraction instructions explicitly handle that via complete=false and confidence flags."
+    },
+    {
+      "item": "p-e89efa69ad7c",
+      "adequacy": "enough",
+      "missing": [],
+      "worth": "worth",
+      "blind": "relation: unrelated — A is nominal 2x4 framing in the deck-module connection (S-522); B is 2x4 cedar handrails on the exterior elevation.\nOnly the nominal \"2x4\" size coincides; the components/scope differ (structural framing vs handrail) and B alone states a species (cedar).\nNot a contradiction: distinct components/conditions, so per the instructions they are not counterparts; same_conditions=false.",
+      "confidence": "medium",
+      "note": "The bundle is two claim records plus two legible drawings. On image 1 (sheet S-522) the callout \"2\\\" X 4\\\" FRAMING\" is readable, but it sits in the B1 \"DECK MODULE CONNECTION\" detail, not the C1 \"DECKING FOOTING PLAN\" that record A names; on image 2 the elevation label actually reads \"2x4 CEDAR HANDRAILS,\" which record B truncates to \"2x4 CED.\" A good answer must recover from the drawings that A is deck-module framing lumber while B is a cedar handrail, then apply the rule that distinct components are not counterparts."
+    },
+    {
+      "item": "a-34e398ca6949",
+      "adequacy": "enough",
+      "missing": [],
+      "worth": "worth",
+      "blind": "about: A Bode plot (magnitude in dB and phase in degrees versus frequency in Hz) showing the frequency response of the generator speed low-pass filter used in the baseline control-measurement filtering.\nrole: The citing text says it presents the frequency response of the chosen recursive single-pole low-pass filter, with the corner frequency set at the -3 dB point shown in the plot, supporting the filter design discussion in Section 7.1.\nkeywords: generator speed low-pass filter, Bode plot, frequency response, baseline control-measurement filter, magnitude, phase\nlabel: Figure 7-1\ntitle: (none printed inside the figure itself; only the caption)",
+      "confidence": "high",
+      "note": "The input gives the figure's location (page 5, section 7.1), its caption, the surrounding paragraph that cites it (explaining the filter's corner frequency choice and that the plot shows the resulting frequency response), extracted claims, and the image itself with readable axis labels. Everything needed to state what the figure depicts and why the document includes it is present."
+    },
+    {
+      "item": "c-5a7bfafff22f",
+      "adequacy": "partly",
+      "missing": [
+        "resolution",
+        "legend_or_key",
+        "other_page"
+      ],
+      "worth": "worth",
+      "blind": "Sheet S-601 titled 'BEAM OPENINGS'.\nContains details labeled E6 'ROOF BEAM @ GRID 2,3,4,5 T.O. STEEL', D5 'FLOOR BEAM @ GRID 5', C1 'ROOF BEAM @ GRID 6 & NEAR GRID 5', B1 'FLOOR BEAM NEAR GRID 5', A1 'FLOOR BEAM @ GRID 6', C4 'FLOOR BEAM @ GRID 4', B4 'FLOOR BEAM @ GRID 3', A4 'FLOOR BEAM @ GRID 2'.\nBeams span between grid bubbles labeled A/B and C/D with circular opening symbols and dimension strings that are not legible at this resolution.\nGeneral sheet note appears to require a radius around edges of openings in beams (exact wording not fully legible).",
+      "confidence": "high",
+      "note": "The input is a single low-resolution image of structural sheet S-601 'BEAM OPENINGS' with eight beam elevation details (roof/floor beams at various grids) plus general notes and keynote blocks. A good answer could capture the sheet identity, detail labels/titles, and grid references, but the small dimension strings, opening sizes, and keynote text are largely illegible at this resolution, so most quantitative claims cannot be verified."
+    },
+    {
+      "item": "c-a509b4155456",
+      "adequacy": "partly",
+      "missing": [
+        "resolution",
+        "surrounding_text",
+        "other_page"
+      ],
+      "worth": "worth",
+      "blind": "Figure 2-5 shows the lofted 3D blade shape with an x/y/z coordinate triad.\nFigure 2-6 shows the blade cross section at 70% span (Section: 0.7) of the IEA 15MW Offshore Reference Turbine.\nCross-section axes are x2 (m) and x3 (m), spanning roughly +1.0 to -2.0 m and -1.0 to +1.0 m.\nMaterials in the colorbar: Medium Density Foam, Glass Triax, Glass Biax, Carbon UD, Glass Uni, Gelcoat.\nMarkers defined: CG = Mass Center, GC = Geometric Center, NA = Neutral Axes, SC = Generalized Shear Center.\nCG, GC, NA, and SC all lie near x3 ≈ 0 m, at roughly x2 ≈ 0.1–0.3 m (approximate, low resolution).\nPage 12; footer states the report is available from NREL at www.nrel.gov/publications.",
+      "confidence": "high",
+      "note": "The input is a single low-resolution full page (p.12) containing Figure 2-5 (lofted blade shape with an axis triad) and Figure 2-6 (blade cross section at 70% span of the IEA 15MW Offshore Reference Turbine) with a materials colorbar, a marker legend (CG/GC/NA/SC), and axis labels x2/x3 in meters. A good answer could extract the figure captions, turbine identity, section location, material list, marker definitions, and axis units, but exact coordinates of the centers and any layer thicknesses are not reliably readable at this resolution, and no body text accompanies the figures."
+    },
+    {
+      "item": "c-c1fd0851eb49",
+      "adequacy": "partly",
+      "missing": [
+        "surrounding_text",
+        "legend_or_key",
+        "other_page"
+      ],
+      "worth": "worth",
+      "blind": "Cooking Subcontest: reduced points earned when between 1.000 lb (16.00 oz / 0.454 kg) and 5.000 lb of water is vaporized; reduced points scale linearly per Figure 9.\nCooking Subcontest: water must be vaporized in a single container; starting water weight given as 2.721 kg (lb value clipped).\nFigure 9 chart: x-axis 'Weight of vaporized water (oz)' 0-100, y-axis 'Points per cooking task'; zero points up to 16 oz, linear rise from 16 to 80 oz, full points at/above 80 oz (dashed vertical line at 80).\nLegend box partly visible: 'Reduced points: 16 oz (450 g...)'; 'Full points' and 'No points' values clipped.\nDinner Party (9-3): each team hosts two dinner parties; guest decathletes from three competing teams; guest decathletes submit three percentage integer scores (meal quality, ambiance, overall experience).",
+      "confidence": "high",
+      "note": "The input is a page tile (image) covering the end of section 9-2 Cooking (scoring rules and Figure 9, a points-vs-ounces-vaporized chart) and the start of 9-3 Dinner Party. The right edge of the tile is clipped, so several values (e.g., the 5.000 lb equivalents, the 'Full points' and 'No points' legend entries, the starting water weight in lb) are cut off, but most text and the chart axes/trend are readable, and the extraction instructions explicitly tell the model to flag clipping via complete=false and issues."
+    },
+    {
+      "item": "c-8694cec2d391",
+      "adequacy": "enough",
+      "missing": [
+        "surrounding_text"
+      ],
+      "worth": "worth",
+      "blind": "Fig 2-10(a): blade mass density decreases monotonically from ~3000 kg/m at r/R=0 to ~100 kg/m at r/R=1.0 (approximate).\nFig 2-10(b): edgewise and flapwise stiffness start near 1.5e11 N.m^2 at the root and torsional near 0.9e11 N.m^2, all decaying toward ~0 at the tip (approximate).\nFig 2-10(c): axial stiffness drops from ~4.5e10 N at the root to near 0 at the tip, with a slight local rise around r/R~0.3-0.4 (approximate).\nFig 2-10 caption: blade beam structural properties vs blade-curve position along the span, computed using PreComp.\nFig 2-11: planform spans chordwise roughly -4 m to +2.5 m; pitch axis (dotted) near chordwise 0; mass, neutral, geometric, and shear centers all lie within ~0-0.7 m chordwise (approximate).\nFooter: report available at no cost from NREL at www.nrel.gov/publications; page 16.",
+      "confidence": "medium",
+      "note": "The input is a full report page (p.16) at modest resolution containing Figure 2-10 (three charts of blade mass density, edge/flap/torsional stiffness, and axial stiffness vs nondimensional span r/R) and Figure 2-11 (blade planform with pitch axis, mass/neutral/geometric/shear centers), plus captions and an NREL footer. A good answer would extract axis labels, units, series names, trends, and approximate readings; the instructions explicitly permit approximate chart readings, which fits the resolution. The page does not identify which turbine/blade these properties belong to, so entity naming must stay generic."
+    },
+    {
+      "item": "p-1bd7249295e6",
+      "adequacy": "partly",
+      "missing": [
+        "table_header",
+        "surrounding_text"
+      ],
+      "worth": "worth",
+      "blind": "relation: complementary (uncertain also defensible)\nBoth claims concern wind speed for a blade-pitch controller; same property, counterpart entities.\nA is a single tabled value (25.0 m/s); B is a Region 3 range (10.59–25 m/s) at rated power; A's value equals B's upper bound.\nA point vs a range is not equivalent, and there is no conflicting value under stated shared conditions, so not 'different'.\nA's operating conditions/role are unstated (table header and context missing), so correspondence of conditions cannot be confirmed.",
+      "confidence": "medium",
+      "note": "The input gives both claims with quotes and units, plus an image of a table fragment (wind-speed rows 22.0–25.0 m/s, the 25.0 row highlighted) and a text fragment mentioning Region 3. A is a single tabled wind-speed value (25.0 m/s); B is a Region 3 range (10.59–25 m/s) at rated power. To judge the relation confidently a reader needs to know what the table's 25.0 m/s row represents (an operating point, a limit, a simulation case), which the cut-off header and missing preceding sentence would establish."
+    },
+    {
+      "item": "c-d97d647136b3",
+      "adequacy": "enough",
+      "missing": [],
+      "worth": "worth",
+      "blind": "Dishwasher: half of available points earned if temperature sensor reaches 120°F (48.9°C)\nTwo temperature sensors required for redundancy; temperature-of-record rule partly clipped ('lower of the two readings' if one is defective)\nDishwasher shall operate automatically with at least one wash and rinse cycle; capacity of eight place settings per manufacturer's specifications\nHeated drying option shall be disabled if present\nCycle 'interruption' includes adjustment of supply temperature or flow (definition clipped)\nCycle completion confirmed by an audible or visible signal (clipped)\n'Regular' settings selected if available, otherwise settings closest to 'normal'/'regular'\nDishwasher may be run empty, partially loaded, or fully loaded\nLighting 9-1: all available points for keeping all interior and exterior house lights on (time condition clipped); point details in Appendix A-3\nTile is right-edge and top/bottom clipped, so complete=false with issues noting clipping",
+      "confidence": "high",
+      "note": "The tile is page 29 of the U.S. DOE Solar Decathlon 2013 Rules: the tail of §8-5 Dishwasher (items a-h) and the start of Contest 9 / 9-1 Lighting. Many lines are clipped at the right edge and the chunk starts/ends mid-sentence, but the extraction instructions explicitly cover this (set complete=false, note issues), and numerous claims are fully readable (120°F/48.9°C half-points rule, dual-sensor redundancy, eight place settings, heated drying disabled, loading flexibility, lighting points with Appendix A-3 reference). A good answer extracts the readable requirements and flags the clipping."
+    },
+    {
+      "item": "c-54fc79853650",
+      "adequacy": "partly",
+      "missing": [
+        "legend_or_key",
+        "other_page"
+      ],
+      "worth": "little",
+      "blind": "Section title: SECTION - EAST MODULE\nScale: 3/8\" = 1'-0\"\nGrid line labeled: 2\nDrawing shows a horizontal louvered screen above a beam/slab supported by column-like elements and a jack/post on a footing (component identities unlabeled, so uncertain)",
+      "confidence": "high",
+      "note": "The input is a cropped tile of an architectural building section titled 'SECTION - EAST MODULE' at scale 3/8\" = 1'-0\", showing a louvered screen atop a beam/slab with columns, a jack-like support, and grid line '2'. A few literal claims (title, scale, grid label, visible components) are extractable, but the drawing is clipped at the tile edges and almost nothing is dimensioned or labeled, so most geometry cannot be turned into verified engineering claims."
+    },
+    {
+      "item": "a-e31ab301077b",
+      "adequacy": "partly",
+      "missing": [
+        "surrounding_text",
+        "other_page"
+      ],
+      "worth": "worth",
+      "blind": "about: Scoring function for the Clothes Dryer Subcontest - a curve of points per clothes-drying task versus percent of original weight, divided into full, reduced and no-points bands.\nrole: Not explained by the provided text (the supplied following paragraph concerns the dishwasher); per the instructions this field would be empty.\nkeywords: clothes dryer, subcontest, scoring function, points per drying task, percent of original weight\nlabel: Figure 8\ntitle: Scoring function for the Clothes Dryer Subcontest",
+      "confidence": "high",
+      "note": "The input gives the figure's location, caption ('Figure 8: Scoring function for the Clothes Dryer Subcontest') and extracted claims describing the scoring bands, which is enough to say what it depicts and to supply label, title and keywords. However, the 'text before' is empty, there are no citing paragraphs, and the 'text after' is the start of the Dishwasher section (a different subcontest), so the figure's role cannot be grounded in surrounding prose as the question requests; the relevant clothes-dryer rules sit on the previous page. The claims list is also noisy, mixing dishwasher facts with clothes-dryer facts."
+    },
+    {
+      "item": "c-19dabb059b33",
+      "adequacy": "partly",
+      "missing": [
+        "table_header",
+        "legend_or_key",
+        "surrounding_text",
+        "other_page"
+      ],
+      "worth": "little",
+      "blind": "One row cell reads '1.02 / W2', another '1.02 / D1', another '1.06 / W2' (likely detail reference + window/door type codes).\nHeader mentions 'CEMENT FIBRE BOARD SIDING' and similar code clusters (W1, W2, W5, W6, D1; 1.01–1.14).\nNo column labels, row label, or code definitions are present, so the codes' meaning cannot be determined from this input.",
+      "confidence": "high",
+      "note": "The input is a single sparse row plus a mostly-null, jumbled header from a table on drawing sheet 'A202-EXTERIOR ELEVATIONS'. Cells contain codes like '1.02\\nW2', '1.02\\nD1', '1.06\\nW2' and a header mention of 'CEMENT FIBRE BOARD SIDING', but there are no column labels, no row label, and no key explaining the W/D codes or the 1.xx numbers. A good answer could only transcribe literal cell text; meaningful entity/attribute claims (e.g., which elevation, what W2 or 1.02 denote) are not recoverable."
+    },
+    {
+      "item": "a-28c83b4d7451",
+      "adequacy": "enough",
+      "missing": [
+        "surrounding_text"
+      ],
+      "worth": "worth",
+      "blind": "about: A drawing sheet of building cross-sections for a modular competition house, showing two sections (Living Room Section A1; Section - Centre Module C1) with interior room layout (kitchen, living rooms, bathroom, mechanical room), the centre and west modules, floor and grade elevations, and drawing scales.\nrole: Part of the construction/as-built document set for Team Alberta's U.S. Department of Energy Solar Decathlon 2013 entry, per the title block revision history; no citing paragraphs given.\nkeywords: building section, centre module, west module, kitchen, living room, bathroom, mechanical room, finished floor, grade level\nlabel: A-302\ntitle: BUILDING SECTIONS",
+      "confidence": "high",
+      "note": "The input is a full architectural sheet (A-302, BUILDING SECTIONS) with its title block, two labeled section drawings (A1 Living Room Section, C1 Section - Centre Module), room names, elevations, scales, revision history, plus extracted claims. That is plenty to state what the figure depicts, its label and title; the 'role' can be grounded in the title block (Solar Decathlon 2013 competition entry, issued for construction / as-built set), and the instructions explicitly allow role to be empty since no citing paragraphs exist."
+    },
+    {
+      "item": "c-fbddd1cd2f33",
+      "adequacy": "partly",
+      "missing": [
+        "surrounding_text"
+      ],
+      "worth": "worth",
+      "blind": "Detail title: LANDSCAPE FOOTING 18\" (section S-522 - DECK FOOTING DETAILS)\nFooting plan width: 1'-0\"\nVertical member offset from each footing edge: 4 1/4\"\nDrawing scale: 3\" = 1'-0\"\nGraphic scale bar marked 0, 3\", 6\"\nLeader arrow targets the vertical member/post, but its callout text is clipped off-tile\nNo footing thickness/depth dimension visible in this tile; basis of the 18\" in the title not shown",
+      "confidence": "high",
+      "note": "The tile shows a clipped 'LANDSCAPE FOOTING 18\"' detail from S-522 with readable dimensions (1'-0\" overall footing width, 4 1/4\" offsets each side), a stated scale of 3\" = 1'-0\", and a graphic scale bar. A leader arrow points at the vertical member but its callout text is cut off above the tile, and no vertical/depth dimension (e.g., what the 18\" refers to, footing thickness) is visible, so only partial extraction is possible. The instructions themselves are clear and even anticipate clipped content (complete=false), so the question is answerable in part."
+    },
+    {
+      "item": "c-ffaa16ab59d3",
+      "adequacy": "enough",
+      "missing": [],
+      "worth": "worth",
+      "blind": "Display brightness shall be set to at least 75% of maximum; observers spot-check that supplied content is shown (9-4 fragment).\nEach guest team scores the host on home theater quality/design, ambiance, and overall experience; three guest teams each submit three integer percentage scores (0-100%) by 10:30 p.m.; the nine scores are averaged and multiplied by the maximum available points.\nVillage organized into five neighborhoods of four houses; at least one decathlete from each neighboring house must spend at least 15 minutes during the movie in each neighbor's house.\nComfort Zone Contest suspended during movie night; occupancy Rule 11-1 not in effect.\nMovie chosen by team vote from three organizer-selected options; shown in all houses; provided in several popular video formats.\nAudio/visual equipment settings must be declared to an organizer before movie night and verified as maintained; host team restores declared settings after guest evaluations.\nEnergy Balance: full points for net electrical energy balance >= 0 kWh; reduced points scaled linearly for -50 kWh < balance < 0 kWh; no points for balance <= -50 kWh.\nFigure 10 chart: x-axis Net Electrical Energy (kWh), range -75 to 25; y-axis Points at conclusion of Energy Balance Contest, 0-100; line at 0 from -75 to -50, linear rise from (-50, 0) to (0, 100), flat at 100 beyond 0.",
+      "confidence": "high",
+      "note": "The input is a readable full-page image (Solar Decathlon 2013 Rules, p.32) containing the end of 9-4 (display brightness rule), all of 9-5 Movie Night, Contest 10 Energy Balance text, and Figure 10 with labeled axes and a points legend. A good answer needs careful reading of the text rules and the chart; the top 9-4 fragment continues from the previous page, and referenced appendices (A-3, B-1, Rule 11-1) are elsewhere but only need to be noted as references, not resolved."
+    }
+  ]
+}

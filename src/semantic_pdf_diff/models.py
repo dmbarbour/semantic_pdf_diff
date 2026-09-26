@@ -134,6 +134,8 @@ class Lenient(Strict):
         for key, value in data.items():
             if key not in cls.model_fields or value is None:
                 continue
+            if cls.model_fields[key].annotation is str and isinstance(value, list):  # lines given as a list
+                value = "\n".join(map(str, value))
             limit = next((m.max_length for m in cls.model_fields[key].metadata if hasattr(m, "max_length")), None)
             if limit is not None and isinstance(value, (str, list)):
                 value = value[:limit]

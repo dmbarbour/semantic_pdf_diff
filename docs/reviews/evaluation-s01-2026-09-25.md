@@ -119,3 +119,24 @@ Sampled from the re-recorded answers with the same sizes as s01 (seed 2); review
   - Quotes were composed from axis labels or taken from a caption.
   - A table row key (wind speed 25 m/s) was treated as a property.
 - **Slicing artefact:** slices that start mid-section have no heading on their first pages, because only outline entries inside the slice are copied. Fixing it changes the slices' bytes, and therefore every recording; deferred to the next planned re-record.
+
+## s02 questions, judged blind by the panel
+
+Six panel models judged s02's 17 questions from the exact inputs, without seeing the answers. Claude, having seen the answers, sat this stage out.
+
+- **Consensus on the 12 claim questions:** 2 had enough input, 9 partly enough, 1 not enough (a table row read without its context).
+- **What was missing, by how often reviewers marked it** (and their pairwise agreement):
+
+  | Missing | Marks | Agreement |
+  |---|---|---|
+  | Surrounding text | 68 | 0.66 |
+  | Something on another page | 36 | 0.56 |
+  | Legend or key | 20 | 0.89 |
+  | Table header | 16 | 0.92 |
+  | Resolution | 16 | 0.82 |
+  | Section heading | 15 | 0.81 |
+  | Caption | 13 | 0.78 |
+
+- **The pattern supports the next extraction lever.** Most wrong claims so far trace back to thin input rather than a weak model. The planned lever: give each extraction request labelled context (the section heading, the neighbouring paragraph, the figure's caption and legend), clearly separated from the source data to extract from.
+- **Adequacy is judged less consistently than answers** (α 0.26, raw agreement 0.58); "partly" is a wide middle. The owner's blind judgments will show whether people split the same way.
+- **Two panel fixes:** Gemini first answered the question it was shown instead of reviewing it, so the model's instructions are now fenced off in the judging prompt. Inkling gave its blind answer as a list, so model answers given as lists now become lines.

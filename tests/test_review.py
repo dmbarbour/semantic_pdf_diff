@@ -17,6 +17,10 @@ class Fields(unittest.TestCase):
         self.assertEqual(suggested_verdict('pair', {'same_subject': 'wrong', 'relation': 'ok'}), 'right')
         self.assertIsNone(suggested_verdict('about', {}))
 
+    def test_panel_answers_given_as_lists_become_lines(self):
+        from semantic_pdf_diff.models import PanelQuestionLabel
+        self.assertEqual(PanelQuestionLabel.model_validate({'blind': ['a fact', 'another']}).blind, 'a fact\nanother')
+
 class Alpha(unittest.TestCase):
     def test_krippendorff_worked_example(self):
         # Krippendorff (2011), "Computing Krippendorff's Alpha-Reliability", nominal example: 0.743.
