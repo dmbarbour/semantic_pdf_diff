@@ -27,6 +27,13 @@ def jittery_model():
                 state['requests'] += 1
                 state['active'] += 1
                 state['peak'] = max(state['peak'], state['active'])
+                broke = state.get('balance') is not None and state['requests'] > state['balance']
+            if broke:  # the account ran out: the provider refuses with 402
+                with state['lock']:
+                    state['active'] -= 1
+                self.send_response(402); self.end_headers()
+                self.wfile.write(b'{"error": "Insufficient balance"}')
+                return
             time.sleep(random.uniform(0, 0.03))
             parts = body['messages'][1]['content']
             prompt = parts[0]['text']
@@ -48,8 +55,9 @@ def jittery_model():
             with state['lock']:
                 state['active'] -= 1
             self.send_response(200); self.end_headers()
-            self.wfile.write(json.dumps({'choices': [{'finish_reason': 'stop',
-                                                      'message': {'content': json.dumps(answer)}}]}).encode())
+            self.wfile.write(json.dumps({'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(answer)}}],
+                                         'usage': {'prompt_tokens': 100, 'completion_tokens': 20,
+                                                   'estimated_cost': 0.001}}).encode())
     server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
     try:

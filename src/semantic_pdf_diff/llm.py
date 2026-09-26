@@ -34,6 +34,12 @@ class BudgetExceeded(ModelFailure):
 class CallLimitReached(BudgetExceeded):
     """max_calls was reached: the work wasn't attempted, as opposed to failing."""
 
+class OutOfBudget(CallLimitReached):
+    """The provider's balance ran out, or the run's cost cap was reached: work not attempted,
+    to be resumed after a top-up (like the call limit, never recorded as a model failure)."""
+
+BILLING = ("balance", "insufficient", "payment", "billing", "credit", "quota")
+
 class NotRecorded(ModelFailure):
     """Replay found no recorded answer for a request."""
 
@@ -131,6 +137,9 @@ class Client:
         self.calls = 0
         self.cache_hits = 0
         self.usage = {"prompt_tokens": 0, "completion_tokens": 0}
+        self.cost = 0.0             # as the provider reports it (usage.estimated_cost)
+        self.out_of_budget = None   # why sending stopped, once it has
+        self.ledger = None          # a ledger.Ledger to record every response's cost
         self.lock = threading.Lock()
         self.limiter = RateLimiter(settings.rate_limits)
         self.gate = AdaptiveGate(settings.concurrency)
@@ -234,14 +243,20 @@ class Client:
             self.cache_hits += 1
         return value
 
+    def _account(self, request):
+        if self.ledger is not None and request.usage:
+            self.ledger.add(self.s.model, request.key[0] if request.key else "raw", request.usage)
+
     def save(self, request, value):
         """Cache a response (main thread); in record mode, also record it in the fixture."""
+        self._account(request)
         self._save(request.request_hash, request.key, value)
         self._record(request, value.model_dump_json(), None)
 
     def failed(self, request, error):
         """Note a failed request (main thread): in record mode, the model's failure is recorded
         so replay reproduces it. Unrecorded answers and call limits aren't the model's doing."""
+        self._account(request)  # a failed answer may still have been paid for
         if not isinstance(error, (NotRecorded, CallLimitReached)):
             self._record(request, "", f"{type(error).__name__}: {error}")
 
@@ -262,6 +277,11 @@ class Client:
         last = "Unknown model failure"
         for attempt in range(self.s.retries + 1):
             with self.lock:
+                if self.out_of_budget:
+                    raise OutOfBudget(self.out_of_budget)
+                if self.s.max_cost is not None and self.cost >= self.s.max_cost:
+                    self.out_of_budget = f"cost cap reached (${self.cost:.2f} of ${self.s.max_cost:.2f})"
+                    raise OutOfBudget(self.out_of_budget)
                 if self.calls >= self.s.max_calls:
                     raise CallLimitReached("API call limit reached; rerun with cache and a higher --max-calls")
                 self.calls += 1
@@ -282,6 +302,8 @@ class Client:
                 if isinstance(usage, dict):
                     request.usage = {k: usage[k] for k in ("prompt_tokens", "completion_tokens", "estimated_cost")
                                      if isinstance(usage.get(k), (int, float))}
+                    with self.lock:
+                        self.cost += float(request.usage.get("estimated_cost") or 0.0)
                 with self.lock:
                     for k in self.usage:
                         n = int(usage.get(k) or 0) if isinstance(usage, dict) else 0
@@ -305,6 +327,14 @@ class Client:
                 requests_log.debug("%s %s: HTTP %s after %.2fs", request.schema.__name__,
                                    request.key[:2] + request.key[3:4] if request.key else "", e.code, time.monotonic() - started)
                 last = f"HTTP {e.code}: {e.reason}"
+                try:
+                    body = e.read(2000).decode(errors="replace").lower()
+                except Exception:
+                    body = ""
+                if e.code == 402 or (e.code in (400, 403) and any(word in body for word in BILLING)):
+                    with self.lock:
+                        self.out_of_budget = f"provider balance exhausted ({last}); top up and resume"
+                    raise OutOfBudget(self.out_of_budget) from e
                 throttled = e.code in (429, 503)
                 if e.code not in RETRYABLE:
                     raise ModelFailure(last) from e

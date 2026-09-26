@@ -97,6 +97,36 @@ class RecordAndReplay(unittest.TestCase):
         _, report, _ = self.run_cli('again', UNREACHABLE, '--fixture', str(self.fixture))
         self.assertEqual(report['usage']['fixture']['missing'], 0)
 
+    def test_running_out_of_balance_pauses_and_resumes(self):
+        from semantic_pdf_diff import ledger
+        ledger_path = self.root / 'ledger.jsonl'
+        with jittery_model() as (url, state):
+            state['balance'] = 12  # the 13th request is refused: 402
+            code, _, log = self.run_cli('live', url, '--fixture', str(self.fixture), '--fixture-mode', 'replay-or-record',
+                                        '--ledger', str(ledger_path), '--ledger-tag', 'round=r00', '--ledger-tag', 'step=record')
+            paid = state['requests']
+        self.assertEqual(code, 3)
+        self.assertIn('Paused: provider balance exhausted', log)
+        with sqlite3.connect(self.fixture) as db:  # running out isn't the model's failure
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM response WHERE error IS NOT NULL').fetchone()[0], 0)
+        records = ledger.read(ledger_path)
+        self.assertEqual(len(records), 12)
+        self.assertEqual({(r['round'], r['step']) for r in records}, {('r00', 'record')})
+        self.assertAlmostEqual(ledger.spent(ledger_path, round='r00'), 0.012)
+        with jittery_model() as (url, state):  # topped up: resume
+            code, report, _ = self.run_cli('live2', url, '--fixture', str(self.fixture), '--fixture-mode', 'replay-or-record')
+            self.assertNotEqual(code, 3)
+            self.assertEqual(report['usage']['fixture']['replayed'], 12)
+            self.assertFalse(any(r['status'] == 'not_reached' for r in report['coverage']))
+
+    def test_cost_cap_stops_sending(self):
+        with jittery_model() as (url, state):
+            code, report, log = self.run_cli('capped', url, '--max-cost', '0.005')
+            self.assertEqual(code, 3)
+            self.assertIn('cost cap reached', log)
+            self.assertLessEqual(state['requests'], 5 + 4)  # the cap, plus requests already in flight
+            self.assertTrue(any(r['status'] == 'not_reached' for r in report['coverage']))
+
     def test_responders_and_interpreters_are_kept_apart(self):
         self.record('--responder', 'model-a')
         _, other, _ = self.run_cli('b', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-b')

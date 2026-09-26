@@ -76,16 +76,35 @@ def add_run_options(parser):
     parser.add_argument('--fixture-mode', choices=fixtures.MODES, default='replay',
                         help='replay: fail requests with no recorded answer; replay-or-record: ask the model and record')
     parser.add_argument('--responder', help='Whose recorded answers to use or record (default: the model name)')
+    add_budget_options(parser)
     parser.add_argument('--plan', action='store_true', help='Inspect sources and estimate visual tasks without API calls')
     parser.add_argument('--reset', action='store_true',
                         help='Clear derived data affected by a changed extraction interpreter, then run')
     parser.add_argument('--dry-run', action='store_true', help='With --reset: report what would be cleared, change nothing')
 
+def add_budget_options(parser):
+    parser.add_argument('--max-cost', type=float, help='Stop sending once the provider-reported cost reaches this many dollars')
+    parser.add_argument('--ledger', type=Path, help='Append every response\'s reported cost to this JSON-lines file')
+    parser.add_argument('--ledger-tag', action='append', default=[], metavar='KEY=VALUE',
+                        help='Tag ledger records, e.g. round=r01 step=record (repeatable)')
+
+def attach_ledger(client, args):
+    if getattr(args, 'ledger', None):
+        from .ledger import Ledger
+        tags = dict(tag.split('=', 1) for tag in args.ledger_tag if '=' in tag)
+        client.ledger = Ledger(args.ledger, **tags)
+    return client
+
+def budget_note(client):
+    """A line saying the run paused for budget, if it did (the process exits 3)."""
+    reason = getattr(client, 'out_of_budget', None)
+    return f"Paused: {reason}. Rerun the same command to resume; finished work is kept." if reason else None
+
 def load_settings(args):
     options = json.loads(args.config.read_text()) if getattr(args, 'config', None) else {}
     if not isinstance(options, dict):
         raise ValueError(f'{args.config}: settings file must contain a JSON object')
-    for name in ['model', 'base_url', 'context_tokens', 'max_calls', 'top_k']:
+    for name in ['model', 'base_url', 'context_tokens', 'max_calls', 'top_k', 'max_cost']:
         if getattr(args, name, None) is not None:
             options[name] = getattr(args, name)
     if getattr(args, 'no_vision', False):
@@ -293,6 +312,10 @@ def run(args, settings, store, names, out, force_rescan=False):
     incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
                   or data['retrieval']['omitted_by_pair_limit'] > 0 or any(f.get('processing_error') for f in data['findings']))
     print(f"Report: {out / 'report.html'}" + (' (incomplete source coverage)' if incomplete else ''))
+    note = budget_note(client)
+    if note:
+        log.warning(note)
+        return 3
     # 2 makes automation aware of incomplete processing; uncertainty still appears
     # in the report even when all tasks completed successfully.
     return 2 if incomplete else 0
@@ -313,8 +336,8 @@ def make_client(args, settings, store):
         if path is not args.fixture:
             fixture.temp = temp  # removed when the fixture closes
     if fixture is None:
-        return Client(settings, store)
-    return Client(settings, store, fixture=fixture, mode=args.fixture_mode, responder=args.responder)
+        return attach_ledger(Client(settings, store), args)
+    return attach_ledger(Client(settings, store, fixture=fixture, mode=args.fixture_mode, responder=args.responder), args)
 
 def fixture_usage(client):
     f = getattr(client, 'fixture', None)  # test doubles have none
@@ -378,6 +401,7 @@ def review_command(argv):
     panel.add_argument('--limit', type=int, help='Only the first N items (to check cost first)')
     panel.add_argument('--stage', choices=['answers', 'questions'], default='answers',
                        help='Judge the answers (default), or the questions blind (the inputs, without answers)')
+    add_budget_options(panel)
     add_log_options(panel)
     agree = sub.add_parser('consensus', help='Consensus verdicts and reviewer reliability, estimated from all labels '
                                              '(Dawid-Skene), with contested items to discuss; no reviewer is referee')
@@ -410,15 +434,21 @@ def review_command(argv):
         start_logging(args)
         for model in args.model:
             settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000, image_tokens=3000,
-                                         concurrency=16, timeout=600, retries=2)
-            client = Client(settings, args.batch / '.judge-cache')
+                                         concurrency=16, timeout=600, retries=2,
+                                         **({'max_cost': args.max_cost} if args.max_cost else {}))
+            client = attach_ledger(Client(settings, args.batch / '.judge-cache'), args)
             progress = Progress(f'judge {model}', client, heartbeat=settings.heartbeat_seconds)
             target, count, failures = review.judge(args.batch, client, model, args.limit, progress, args.stage)
             progress.close()
             for failure in failures[:5]:
                 log.warning(f'{model}: {failure}')
             print(f"{model}: {count} labels -> {target}; {client.calls} calls, "
-                  f"{client.usage['prompt_tokens']} prompt and {client.usage['completion_tokens']} completion tokens")
+                  f"{client.usage['prompt_tokens']} prompt and {client.usage['completion_tokens']} completion tokens, "
+                  f"${client.cost:.3f}")
+            note = budget_note(client)
+            if note:
+                log.warning(note)
+                return 3
     elif args.command == 'consensus':
         print(json.dumps(review.consensus(args.batch, gate=args.gate, stage=args.stage), indent=2))
     elif args.command == 'question-agreement':

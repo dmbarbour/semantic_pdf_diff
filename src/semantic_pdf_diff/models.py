@@ -319,6 +319,8 @@ class Settings(Strict):
     safety_tokens: int = Field(default=400, ge=100)
     # A safety stop against runaway runs, not a budget: throughput is governed by rate_limits.
     max_calls: int = Field(default=100_000, ge=1)
+    # Stop sending once the provider-reported cost of this run reaches this many dollars.
+    max_cost: float | None = Field(default=None, gt=0)
     retries: int = Field(default=2, ge=0, le=5)
     timeout: float = Field(default=120, gt=0)
     text_bytes: int = Field(default=1800, ge=200)
