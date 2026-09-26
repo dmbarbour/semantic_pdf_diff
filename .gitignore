@@ -11,3 +11,4 @@ benchmarks/runs/
 benchmarks/batches/*/images/
 benchmarks/batches/*/review.html
 benchmarks/batches/*/.judge-cache/
+benchmarks/batches/*/questions.html
