@@ -62,7 +62,8 @@ const save = () => { store.people[state.reviewer] = state; store.last = state.re
 const items = DATA.items.filter(i => i.request);
 const current = () => items[state.at];
 const label = () => state.labels[current().id]
-  || (state.labels[current().id] = {item: current().id, adequacy: '', missing: [], worth: '', blind: '', confidence: 'medium', note: ''});
+  // Nothing is preset: people stop part way, and an unanswered question must stay unanswered.
+  || (state.labels[current().id] = {item: current().id, adequacy: '', missing: [], worth: '', blind: '', confidence: '', note: ''});
 const radios = (name, options, value) => '<div class="opts">' + options.map(o =>
   `<label title="${esc(o.help)}"><input type="radio" name="${name}" value="${o.name}" ${value === o.name ? 'checked' : ''}>${esc(o.label)}</label>`).join('') + '</div>';
 
@@ -88,7 +89,7 @@ function showItem() {
   $('#item').innerHTML = html;
   showList(); showProgress();
 }
-const answered = l => l && l.adequacy;
+const answered = l => l && (l.adequacy || l.missing.length || l.worth || l.confidence || l.blind.trim() || l.note.trim());
 function showProgress() {
   const n = items.filter(i => answered(state.labels[i.id])).length;
   $('#bar').style.width = (100 * n / Math.max(items.length, 1)) + '%';
@@ -118,7 +119,9 @@ $('#reviewer').onchange = e => {
 };
 function labelsFile() {
   return JSON.stringify({format: DATA.format, version: 1, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
-    created: new Date().toISOString().slice(0, 10), labels: items.filter(i => answered(state.labels[i.id])).map(i => state.labels[i.id])}, null, 2);
+    created: new Date().toISOString().slice(0, 10), labels: items.filter(i => answered(state.labels[i.id])).map(i =>
+      // only what was answered
+      Object.fromEntries(Object.entries(state.labels[i.id]).filter(([k, v]) => k === 'item' || (Array.isArray(v) ? v.length : String(v).trim()))))}, null, 2);
 }
 $('#download').onclick = () => {
   const blob = new Blob([labelsFile()], {type: 'application/json'});

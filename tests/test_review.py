@@ -204,6 +204,29 @@ class Batches(unittest.TestCase):
         consensus = review.consensus(folder, stage='questions')
         self.assertEqual(set(consensus['claim']['reviewers']), {'ann', 'bo', 'model-q'})
 
+    def test_partial_labels_are_accepted_and_skipped_where_unanswered(self):
+        folder, batch = self.batch('partial')
+        full = self.labels(batch, 'finisher')
+        claims = [i['id'] for i in batch['items'] if i['type'] == 'claim']
+        partial = {'format': review.FORMAT, 'version': 2, 'batch': batch['name'], 'reviewer': 'quitter', 'labels': [
+            {'item': claims[0], 'fields': {'value': 'wrong'}},               # one field, then stopped
+            {'item': claims[1], 'verdict': 'correct', 'verdict_chosen': True},
+            {'item': claims[2], 'note': 'unsure what this is'}]}
+        questions = {'format': review.QUESTIONS_FORMAT, 'version': 1, 'batch': batch['name'], 'reviewer': 'quitter',
+                     'labels': [{'item': claims[0], 'missing': ['heading']}]}
+        for name, data in (('full', full), ('partial', partial), ('questions', questions)):
+            (folder / f'{name}.json').write_text(json.dumps(data))
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(cli.main(['review', 'import', str(folder), str(folder / f'{name}.json')]), 0)
+        agreement = review.agreement(folder)['types']['claim']
+        self.assertEqual(agreement['verdict_agreement']['finisher ~ quitter'], '1/1')  # only the item both judged
+        self.assertIn('value', agreement['fields'])
+        consensus = review.consensus(folder)['claim']['reviewers']
+        self.assertEqual(consensus['quitter']['items'], 1)
+        review.scores(folder)
+        self.assertEqual(review.question_agreement(folder)['adequacy']['answers'], {})
+        review.consensus(folder, stage='questions')
+
     def test_panel_reviews_are_cleaned_into_labels(self):
         folder, batch = self.batch('b3')
         panel = FakePanel()

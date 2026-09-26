@@ -76,7 +76,8 @@ const QUESTIONS = {
 
 const current = () => DATA.items[state.at];
 const label = () => state.labels[current().id]
-  || (state.labels[current().id] = {item: current().id, verdict: '', flags: [], fields: {}, clarity: 'clear', confidence: 'medium', note: '', chosen: false});
+  // Nothing is preset: people stop part way, and an unanswered question must stay unanswered.
+  || (state.labels[current().id] = {item: current().id, verdict: '', flags: [], fields: {}, clarity: '', confidence: '', usefulness: '', note: '', chosen: false});
 
 function segment(field, answer) {
   return `<span class="seg" data-field="${esc(field)}">` + DATA.field_answers.map(a =>
@@ -145,7 +146,9 @@ function showItem() {
   $('#item').innerHTML = html;
   showList(); showProgress();
 }
-const answered = l => l && l.verdict;
+// An item counts once anything about it has been answered.
+const answered = l => l && (l.verdict || Object.keys(l.fields).length || l.clarity || l.confidence || l.usefulness
+                           || l.flags.length || l.note.trim());
 function showProgress() {
   const n = DATA.items.filter(i => answered(state.labels[i.id])).length;
   $('#bar').style.width = (100 * n / DATA.items.length) + '%';
@@ -186,9 +189,13 @@ $('#reviewer').onchange = e => {
   save(); showItem();
 };
 function labelsFile() {
+  // Only what was answered is exported; a verdict filled in from field answers is marked as suggested.
   const out = DATA.items.filter(i => answered(state.labels[i.id])).map(i => {
     const {chosen, ...l} = state.labels[i.id];
-    return l;
+    const kept = Object.fromEntries(Object.entries(l).filter(([k, v]) =>
+      k === 'item' || (Array.isArray(v) ? v.length : typeof v === 'object' ? Object.keys(v).length : String(v).trim())));
+    if (kept.verdict) kept.verdict_chosen = chosen;
+    return kept;
   });
   return JSON.stringify({format: DATA.format, version: 2, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
     created: new Date().toISOString().slice(0, 10), labels: out}, null, 2);
