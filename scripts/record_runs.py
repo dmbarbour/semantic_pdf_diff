@@ -33,6 +33,8 @@ def main(argv=None):
     parser.add_argument("--tag", action="append", default=[], metavar="KEY=VALUE")
     parser.add_argument("--max-cost", type=float)
     parser.add_argument("--plan", action="store_true", help="estimate calls and tokens without calling the model")
+    parser.add_argument("--extract-only", action="store_true",
+                        help="extraction only: each slice on its own, without situating or comparisons")
     args = parser.parse_args(argv)
 
     sys.path.insert(0, str(ROOT / "src"))
@@ -46,10 +48,17 @@ def main(argv=None):
     args.out.mkdir(parents=True, exist_ok=True)
     config = args.out / "settings.json"
     config.write_text(json.dumps(settings, indent=2))
+    if args.extract_only:  # each slice once, paired with itself: nothing to compare
+        seen = []
+        for run in runs:
+            for name in run["slices"]:
+                if name not in seen:
+                    seen.append(name)
+        runs = [{"name": name, "slices": [name, name]} for name in seen]
     worst = 0
     for run in runs:
         a, b = (ROOT / "samples/slices" / f"{name}.pdf" for name in run["slices"])
-        command = [str(a), str(b), "--config", str(config), "-q"]
+        command = [str(a), str(b), "--config", str(config), "-q"] + (["--no-situate"] if args.extract_only else [])
         if args.plan:
             buffer = io.StringIO()
             with contextlib.redirect_stdout(buffer):

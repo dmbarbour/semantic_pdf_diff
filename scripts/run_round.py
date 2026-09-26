@@ -63,7 +63,11 @@ def main(argv=None):
     def spent_figure(step):
         figure("spent", ledger.spent(LEDGER, round=name, step=step), step=step)
 
-    variants = {"baseline": spec["baseline"], **spec["variants"]}
+    # A variant is a settings path, or {"settings": path, "unit": "page"} for variants that move claims between kinds.
+    settings_of = lambda value: value["settings"] if isinstance(value, dict) else value
+    unit_of = lambda value: value.get("unit", "family") if isinstance(value, dict) else "family"
+    variants = {"baseline": settings_of(spec["baseline"]), **{v: settings_of(x) for v, x in spec["variants"].items()}}
+    extract = ["--extract-only"] if spec.get("extract_only", True) else []
     runs_root = ROOT / "benchmarks/runs" / name
 
     def wanted(step):
@@ -76,7 +80,8 @@ def main(argv=None):
             if remaining() <= 0:
                 mark(step, "paused: round cap reached")
                 return 3
-            code = record_runs.main(["--fixture", str(FIXTURE), "--set", spec.get("set", "dev"), "--variant", str(folder / path),
+            code = record_runs.main(extract + ["--fixture", str(FIXTURE), "--set", spec.get("set", "dev"),
+                                     "--variant", str(folder / path),
                                      "--out", str(runs_root / "record" / v), "--ledger", str(LEDGER),
                                      "--tag", f"round={name}", "--tag", "step=record", "--tag", f"variant={v}",
                                      "--max-cost", f"{remaining():.4f}"])
@@ -90,7 +95,7 @@ def main(argv=None):
     for v, path in variants.items():
         step = f"replay:{v}"
         if wanted("replay") and not done(step):
-            code = record_runs.main(["--replay", "--fixture", str(FIXTURE), "--set", spec.get("set", "dev"),
+            code = record_runs.main(extract + ["--replay", "--fixture", str(FIXTURE), "--set", spec.get("set", "dev"),
                                      "--variant", str(folder / path), "--out", str(runs_root / v)])
             mark(step, "done" if code in (0, 2) else f"failed: exit {code}")
 
@@ -108,7 +113,8 @@ def main(argv=None):
         batch = folder / f"pairs-{v}"
         # 4. Sample units where the variant's answers differ from the baseline's.
         if wanted("pairs") and not done(f"pairs:{v}") and done(f"replay:{v}") and done("replay:baseline"):
-            built = rounds.build_batch(runs_root / "baseline", runs_root / v, batch, n=int(spec.get("units", 60)))
+            built = rounds.build_batch(runs_root / "baseline", runs_root / v, batch, n=int(spec.get("units", 60)),
+                                       unit=unit_of(spec["variants"][v]))
             figure("units_changed", built["units"]["units"] - built["units"]["unchanged"], variant=v, step="pairs")
             figure("units_total", built["units"]["units"], variant=v, step="pairs")
             mark(f"pairs:{v}", "done")

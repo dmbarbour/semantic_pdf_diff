@@ -17,8 +17,12 @@ FAMILY = {"text": "text", "table": "table", "tile": "visual", "figure": "visual"
 MAX_CLAIMS = 25     # claims shown per side (sampled when there are more)
 PAGE_TEXT = 6000    # characters of the page's text layer shown to judges
 
-def collect(runs_dir):
-    """{(run, content, page, family): {"claims": {id: claim}, "tasks": n}} for every store under runs_dir."""
+def collect(runs_dir, unit="family"):
+    """{(run, content, page, family): {"claims": {id: claim}, "tasks": n}} for every store under runs_dir.
+
+    unit="page" merges a page's kinds into one unit ("page"): for variants that move claims
+    between kinds (e.g. dropping false tables whose facts the tiles also read)."""
+    family_of = (lambda region: FAMILY.get(region)) if unit == "family" else (lambda region: "page" if region in FAMILY else None)
     from .store import Store
     units = defaultdict(lambda: {"claims": {}, "tasks": 0})
     for folder in sorted(Path(runs_dir).iterdir()):
@@ -28,22 +32,23 @@ def collect(runs_dir):
             contents = sorted({f.content for f in store.files() if f.content.endswith(".pdf")})
             for content in contents:
                 for row in store.coverage(content):
-                    family = FAMILY.get(row["task"].split(":")[0])
+                    family = family_of(row["task"].split(":")[0])
                     if family and row.get("page"):
                         units[(folder.name, content, row["page"], family)]["tasks"] += 1
                 for e in store.evidence(content):
                     for o in e.occurrences or [e]:
-                        family = FAMILY.get(o.locator.region)
+                        family = family_of(o.locator.region)
                         if family:
                             claim = {k: getattr(e, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
                             claim["quote"] = o.quote
                             units[(folder.name, content, o.locator.page, family)]["claims"][e.id] = claim
     return dict(units)
 
-def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", "visual"), changed_only=True):
-    """Sample up to n units present in both, stratified by family (round-robin), preferring
+def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", "visual", "page"), changed_only=True,
+               unit="family"):
+    """Sample up to n units present in both, stratified by family (round-robin), keeping only
     units whose claims differ (identical answers can't prefer either side)."""
-    base, var = collect(baseline_dir), collect(variant_dir)
+    base, var = collect(baseline_dir, unit), collect(variant_dir, unit)
     keys = sorted(k for k in set(base) | set(var) if k[3] in families and (k in base or k in var))
     rng = random.Random(seed)
     groups = defaultdict(list)
@@ -63,7 +68,7 @@ def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", 
     return [(k, base.get(k, {"claims": {}})["claims"], var.get(k, {"claims": {}})["claims"]) for k in picked], \
         {"units": len(keys), "unchanged": same}
 
-def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, pages=None):
+def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
     """Write a pairwise batch: pairs.json (with which side is the baseline) and page images."""
     from .review import render
     from .store import Store
@@ -71,7 +76,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, pages=None):
     import pymupdf
     folder = Path(folder)
     (folder / "images").mkdir(parents=True, exist_ok=True)
-    picked, counts = pair_units(baseline_dir, variant_dir, n, seed)
+    picked, counts = pair_units(baseline_dir, variant_dir, n, seed, unit=unit)
     rng = random.Random(seed + 1)
     items = []
     docs = {}
