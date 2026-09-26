@@ -154,6 +154,18 @@ Every round prints an estimate before spending (tokens × the provider's listed 
 5. The report page and history.
 6. Later: model-proposed variants from failure clusters, with the owner approving what runs.
 
+## Future lever: repeated readings and agreement
+
+Round 1 showed that asking the same question again often gets a different answer: a misread dimension here, a dropped minus sign there. That is a quality problem in itself, and a lever to try once the single-query levers settle.
+
+- **Ask several times; keep what agrees.** Ask the same question k times (e.g. k = 3) and keep claims that most readings agree on, flagging the rest as uncertain. This is self-consistency voting, and the "mixed mode" idea in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md): spend it only where doubt is high (low confidence, a failed quote check, a quality flag), not everywhere.
+- **Vary the query, not only the sample.** Ask the final top variants (different context or crop choices) and combine their answers. Agreement across differently framed questions is stronger evidence than agreement across repeats of one question, and it may cancel each framing's blind spots.
+- **Measure it like any other lever:** pairwise against a single reading, with its extra cost as a guard.
+
+**Record/replay stays deterministic: one recorded response per request.**
+- Each repeat is a separate request. Its key carries a reading index (reading 1, 2, 3…), so each has its own recorded answer, and a replay serves exactly those.
+- Nothing relies on temperature 0 for repeatability. Caching, batching, GPU partitioning and floating-point order make hosted inference non-deterministic regardless.
+
 ## Decisions (2026-09-26)
 
 - **Budget:** $10–15 per round, capped. About $50 is left after $9.99 spent so far; the owner tops up by hand and decides whether to continue based on the improvements shown.
