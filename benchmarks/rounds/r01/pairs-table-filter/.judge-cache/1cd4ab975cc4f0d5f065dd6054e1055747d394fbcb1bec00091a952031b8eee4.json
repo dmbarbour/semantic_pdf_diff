@@ -1,0 +1,1 @@
+{"better":"B","a_wrong":6,"b_wrong":3,"confidence":"high","note":"Set B is better because it contains fewer hallucinated values. Set A invents several incorrect elevations (e.g., 2'-5 1/2\", 2'-0\", 2'-3 1/2\") that do not appear in the document. Both sets incorrectly assign the Finished Floor elevation to the Grade Level in some claims, but Set B is overall more accurate."}

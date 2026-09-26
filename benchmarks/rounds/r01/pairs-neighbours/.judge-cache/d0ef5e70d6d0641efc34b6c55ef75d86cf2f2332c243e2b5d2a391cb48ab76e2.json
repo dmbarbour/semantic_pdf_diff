@@ -1,0 +1,1 @@
+{"better":"same","a_wrong":6,"b_wrong":6,"confidence":"high","note":"Both sets fail to correctly associate the detail callouts (A1, A4, B1, B4) with their corresponding beam names, mixing them up entirely. Both also truncate the name for detail C1. Set A includes a duplicate claim for the roof beam at grid 2,3,4,5. They are equally flawed."}

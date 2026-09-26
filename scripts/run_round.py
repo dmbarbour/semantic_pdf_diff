@@ -109,49 +109,87 @@ def main(argv=None):
             mark(step, "done")
 
     judges = spec.get("judges", [])
+    chunk, target, minimum = int(spec.get("chunk", 8)), int(spec.get("units", 60)), int(spec.get("min_units", 16))
+
+    # 4. Sample units where each variant's answers differ from the baseline's.
     for v in spec["variants"]:
         batch = folder / f"pairs-{v}"
-        # 4. Sample units where the variant's answers differ from the baseline's.
         if wanted("pairs") and not done(f"pairs:{v}") and done(f"replay:{v}") and done("replay:baseline"):
             built = rounds.build_batch(runs_root / "baseline", runs_root / v, batch, n=int(spec.get("units", 60)),
                                        unit=unit_of(spec["variants"][v]))
             figure("units_changed", built["units"]["units"] - built["units"]["unchanged"], variant=v, step="pairs")
             figure("units_total", built["units"]["units"], variant=v, step="pairs")
             mark(f"pairs:{v}", "done")
-        # 5. Panel judging, within what's left of the round's cap.
-        if wanted("judge") and done(f"pairs:{v}"):
-            from semantic_pdf_diff.llm import Client
-            from semantic_pdf_diff.ledger import Ledger
-            from semantic_pdf_diff.models import Settings
-            for model in judges:
-                step = f"judge:{v}:{model}"
-                if done(step):
-                    continue
-                if remaining() <= 0:
-                    mark(step, "paused: round cap reached")
-                    return 3
-                settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000, image_tokens=3000,
-                                             concurrency=16, timeout=600, retries=2, max_cost=remaining())
-                client = Client(settings, batch / ".judge-cache")
-                client.ledger = Ledger(LEDGER, round=name, step="judge", variant=v, judge=model)
-                _, count, failures = rounds.judge_pairs(batch, client, model)
-                if client.out_of_budget:
-                    mark(step, f"paused: {client.out_of_budget}")
-                    return 3
-                state.setdefault("failures", {})[step] = len(failures)  # e.g. malformed answers; the rest counts
-                mark(step, "done")
-            spent_figure("judge")
-        # 6. Decide.
-        if wanted("decide") and all(done(f"judge:{v}:{m}") for m in judges) and judges and not done(f"decide:{v}"):
-            result = rounds.decide(batch)
-            (batch / "decision.json").write_text(json.dumps(result, indent=2) + "\n")
-            if result["overall"]:
-                figure("win_rate", result["overall"], variant=v, stratum="all", step="decide", units=result["units_judged"])
-            for stratum, value in result["strata"].items():
-                if value:
-                    figure("win_rate", value, variant=v, stratum=stratum, step="decide")
-            figure("decision", result["decision"], variant=v, step="decide")
-            mark(f"decide:{v}", "done")
+
+    # 5. Judge in chunks, round-robin over variants and judges, so that at the cap every variant
+    #    has about the same number of units judged. A variant stops early once its result is clear;
+    #    state records how far each got, and raising "units" later resumes (paid verdicts are cached).
+    judged = state.setdefault("judged", {})    # variant -> units judged by every judge
+    stopped = state.setdefault("stopped", {})  # variant -> why judging stopped
+    for v in spec["variants"]:  # rounds judged before chunking: all judges done means complete
+        if judges and all(done(f"judge:{v}:{m}") for m in judges) and v not in stopped:
+            judged[v] = min(target, len(json.loads((folder / f"pairs-{v}" / "pairs.json").read_text())["items"]))
+            stopped[v] = f"complete at {judged[v]}"
+    save_state()
+
+    def finish_variant(v, reason):
+        batch = folder / f"pairs-{v}"
+        stopped[v] = reason
+        result = rounds.decide(batch, judged[v])
+        (batch / "decision.json").write_text(json.dumps({**result, "stopped": reason}, indent=2) + "\n")
+        if result["overall"]:
+            figure("win_rate", result["overall"], variant=v, stratum="all", step="decide", units=result["units_judged"])
+        for stratum, value in result["strata"].items():
+            if value:
+                figure("win_rate", value, variant=v, stratum=stratum, step="decide", units=result["units_judged"])
+        figure("decision", f"{result['decision']} ({reason})", variant=v, step="decide")
+        mark(f"decide:{v}", "done")
+
+    if wanted("judge") and judges:
+        from semantic_pdf_diff.llm import Client
+        from semantic_pdf_diff.ledger import Ledger
+        from semantic_pdf_diff.models import Settings
+        active = [v for v in spec["variants"] if done(f"pairs:{v}") and v not in stopped]
+        while active:
+            for v in list(active):
+                batch = folder / f"pairs-{v}"
+                available = len(json.loads((batch / "pairs.json").read_text())["items"])
+                upto = min(judged.get(v, 0) + chunk, target, available)
+                for model in judges:
+                    if remaining() <= 0:
+                        state["paused"] = f"round cap reached while judging {v} (units {judged.get(v, 0)}->{upto})"
+                        save_state()
+                        spent_figure("judge")
+                        return 3
+                    settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000,
+                                                 image_tokens=3000, concurrency=16, timeout=600, retries=2,
+                                                 max_cost=remaining())
+                    client = Client(settings, batch / ".judge-cache")
+                    client.ledger = Ledger(LEDGER, round=name, step="judge", variant=v, judge=model)
+                    _, _, failures = rounds.judge_pairs(batch, client, model, limit=upto)
+                    state.setdefault("failures", {})[f"judge:{v}:{model}"] = len(failures)
+                    if client.out_of_budget:
+                        state["paused"] = f"{client.out_of_budget} while judging {v}"
+                        save_state()
+                        spent_figure("judge")
+                        return 3
+                judged[v] = upto
+                state.pop("paused", None)
+                save_state()
+                result = rounds.decide(batch, upto)
+                if result["overall"]:
+                    figure("win_rate_interim", result["overall"], variant=v, stratum="all", step="judge", units=upto)
+                clear = result["decision"].startswith(("accepted", "rejected"))
+                if upto >= minimum and clear:
+                    finish_variant(v, f"stopped early at {upto} units: clear result")
+                elif upto >= min(target, available):
+                    finish_variant(v, f"complete at {upto} units")
+                if v in stopped:
+                    active.remove(v)
+        spent_figure("judge")
+    for v in spec["variants"]:  # variants finished in an earlier run, before chunked judging
+        if v in stopped and not done(f"decide:{v}") and judged.get(v):
+            finish_variant(v, stopped[v])
 
     # 7. Report.
     if wanted("report"):

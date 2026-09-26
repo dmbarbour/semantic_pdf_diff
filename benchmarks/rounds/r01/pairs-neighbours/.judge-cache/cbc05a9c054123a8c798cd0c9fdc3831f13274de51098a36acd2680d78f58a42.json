@@ -1,0 +1,1 @@
+{"better":"B","a_wrong":2,"b_wrong":1,"confidence":"high","note":"Both sets extract the same core information from the table. However, both sets suffer from redundant extractions (e.g., extracting 'Rated Rotor Speed' multiple times under slightly different attribute names). Set B is slightly better because it has fewer redundant claims compared to Set A."}

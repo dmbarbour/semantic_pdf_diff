@@ -182,14 +182,20 @@ def bootstrap(values, resamples=2000, level=0.90, seed=7):
     tail = (1 - level) / 2
     return (sum(values) / n, means[int(tail * resamples)], means[min(resamples - 1, int((1 - tail) * resamples))])
 
-def unit_scores(folder):
-    """{unit id: score in [0, 1]} averaged over judges and both orders (1 = variant better)."""
+def unit_scores(folder, limit=None):
+    """{unit id: score in [0, 1]} averaged over judges and both orders (1 = variant better).
+
+    limit: only the batch's first `limit` units (the ones every judge has seen when judging
+    proceeds in chunks)."""
     folder = Path(folder)
+    batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
+    allowed = {i["id"] for i in batch["items"][:limit]}
     scores = defaultdict(list)
     for path in sorted((folder / "verdicts").glob("*.json")):
         for unit, orders in json.loads(path.read_text(encoding="utf-8"))["verdicts"].items():
-            for v in orders.values():
-                scores[unit].append(v["score"])
+            if unit in allowed:
+                for v in orders.values():
+                    scores[unit].append(v["score"])
     return {u: sum(s) / len(s) for u, s in scores.items() if s}
 
 # Acceptance (docs/plans/query-improvement): win clearly overall, lose clearly nowhere.
@@ -197,11 +203,12 @@ WIN_LOW = 0.50          # the overall interval must lie above this to call it a 
 NONINFERIOR_LOW = 0.45  # ...or at least above this for "no worse" (then it needs another gain, e.g. cost)
 STRATUM_LOSS_HIGH = 0.45  # a stratum whose interval lies entirely below this blocks the variant
 
-def decide(folder):
-    """Win rates with intervals, overall and per family, and the acceptance decision."""
+def decide(folder, limit=None):
+    """Win rates with intervals, overall and per family, and the acceptance decision
+    (over the first `limit` units when judging is still in progress)."""
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    scores = unit_scores(folder)
+    scores = unit_scores(folder, limit)
     family = {i["id"]: i["family"] for i in batch["items"]}
     overall = bootstrap(list(scores.values()))
     strata = {}

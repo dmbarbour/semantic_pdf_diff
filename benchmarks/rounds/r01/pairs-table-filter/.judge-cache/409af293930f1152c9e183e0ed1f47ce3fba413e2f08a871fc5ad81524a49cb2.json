@@ -1,0 +1,1 @@
+{"better":"B","a_wrong":10,"b_wrong":7,"confidence":"medium","note":"Both sets struggle significantly with binding dimensions to the correct beam details, often mixing up values from different grid lines. Set B is slightly better as it captures the general sheet note regarding the edge radius and has slightly fewer misbound or invented claims than Set A."}

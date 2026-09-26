@@ -1,0 +1,1 @@
+{"better":"A","a_wrong":4,"b_wrong":5,"confidence":"high","note":"Both sets contain several hallucinated claims not present in the document text or image (e.g., '5/4 x 6 x 12 in', '2 x 6 x 12 in', '4.5 in bolt length'). Set A is slightly better as it has fewer completely invented claims compared to Set B, which hallucinates multiple dimensions and materials."}

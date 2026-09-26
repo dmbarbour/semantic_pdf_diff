@@ -1,0 +1,1 @@
+{"better":"B","a_wrong":1,"b_wrong":0,"confidence":"high","note":"Set B is better because it correctly extracts the metric equivalents for the scoring weights without inventing any text. Set A invents a quote, claiming the text says 'single task' when it actually says 'single container'. Both sets have some redundancy, but Set B is more faithful to the source text."}

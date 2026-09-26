@@ -1,0 +1,1 @@
+{"better":"same","a_wrong":0,"b_wrong":0,"confidence":"high","note":"Both sets extract the scale for the Centre Module section. Set A splits 'SECTION' into the conditions field, while Set B includes it in the entity name. Both are acceptable representations of the data, though both truncate 'MODULE' to 'MODUL'."}

@@ -1,0 +1,20 @@
+{
+  "units_judged": 48,
+  "overall": {
+    "mean": 0.43,
+    "low": 0.351,
+    "high": 0.507
+  },
+  "strata": {
+    "page": {
+      "mean": 0.43,
+      "low": 0.351,
+      "high": 0.507
+    }
+  },
+  "decision": "inconclusive: judge more units",
+  "units": {
+    "units": 56,
+    "unchanged": 5
+  }
+}

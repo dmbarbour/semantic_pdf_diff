@@ -1,0 +1,1 @@
+{"better":"B","a_wrong":1,"b_wrong":0,"confidence":"high","note":"Set A incorrectly extracts '20 points' as the maximum points for the Energy Balance Contest, misinterpreting a y-axis tick mark on Figure 10 (the actual maximum is 100). Set B avoids this error and correctly extracts the relevant thresholds and rules without introducing false claims."}

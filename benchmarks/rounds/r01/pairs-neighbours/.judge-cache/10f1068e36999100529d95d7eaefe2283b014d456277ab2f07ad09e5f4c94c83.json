@@ -1,0 +1,1 @@
+{"better":"A","a_wrong":1,"b_wrong":2,"confidence":"high","note":"Both sets extract the properties from the table accurately. However, both sets struggle with deduplication of the 'Rated Rotor Speed' claim. Set A includes it twice, while Set B includes it three times (once with a redundant 'rated' condition). Set A is slightly better because it has fewer redundant claims."}

@@ -60,6 +60,7 @@ class Rounds(unittest.TestCase):
         rounds.judge_pairs(folder, Judge(), 'counter')
         decision = rounds.decide(folder)
         self.assertEqual(decision['units_judged'], len(batch['items']))
+        self.assertEqual(rounds.decide(folder, limit=2)['units_judged'], 2)  # only units every judge has seen so far
         self.assertIn(decision['decision'].split(':')[0], ('accepted', 'rejected', 'no worse', 'inconclusive'))
         self.assertIn('overall', decision)
 

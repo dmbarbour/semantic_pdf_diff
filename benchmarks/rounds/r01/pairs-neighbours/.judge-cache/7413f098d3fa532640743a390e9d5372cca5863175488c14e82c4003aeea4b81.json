@@ -1,0 +1,1 @@
+{"better":"same","a_wrong":0,"b_wrong":0,"confidence":"high","note":"Both sets extract the scale for the Centre Module section and both have a slight typo truncating 'MODULE' to 'MODUL'. Set A keeps the full title as the entity, while Set B splits 'SECTION' into a condition, but both effectively capture the same information."}

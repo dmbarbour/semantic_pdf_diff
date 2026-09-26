@@ -1,0 +1,1 @@
+{"better":"B","a_wrong":0,"b_wrong":0,"confidence":"high","note":"Both sets extract a high number of accurate claims from both the text and the table. Set B is slightly better because it successfully extracts the power loss claim for the DOWEC turbine, which Set A misses. Both sets correctly handle the zero value for frictional losses."}

@@ -3,7 +3,10 @@
   "hypotheses": "docs/research/round-01-context-heuristics-2026-09-26.md",
   "baseline": "variants/baseline.json",
   "variants": {
-    "table-filter": {"settings": "variants/table-filter.json", "unit": "page"},
+    "table-filter": {
+      "settings": "variants/table-filter.json",
+      "unit": "page"
+    },
     "neighbours": "variants/neighbours.json",
     "text-layer": "variants/text-layer.json",
     "lead-in": "variants/lead-in.json"
@@ -12,5 +15,11 @@
   "extract_only": true,
   "units": 48,
   "cap": 15.0,
-  "judges": ["google/gemini-3.1-pro", "Qwen/Qwen3.5-397B-A17B", "XiaomiMiMo/MiMo-V2.6-Pro"]
+  "judges": [
+    "google/gemini-3.1-pro",
+    "Qwen/Qwen3.5-397B-A17B",
+    "XiaomiMiMo/MiMo-V2.6-Pro"
+  ],
+  "chunk": 8,
+  "min_units": 16
 }
