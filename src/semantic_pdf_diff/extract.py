@@ -38,6 +38,14 @@ If you are not sure how to read a chart, diagram or drawing convention, say so i
 readings approximate; do not guess what an unexplained symbol, colour or line style means.
 '''
 
+def extraction_template(s):
+    """The extraction instructions in force: the baseline, or a variant's (with {max_claims} unfilled)."""
+    template = s.extract_prompt or EXTRACT
+    return template + "".join(rule.rstrip() + "\n" for rule in s.extract_rules)
+
+CONTEXT_NOTE = "CONTEXT (for reference only: do not extract claims from it):"
+LAYER_NOTE = "TEXT LAYER OF THIS REGION (from the PDF, may be partial; use it to read small labels):"
+
 # Text shorter than this is not split further during refinement.
 MIN_REFINE_BYTES = 400
 # Visual refinement stops at crops narrower than this (PDF points).
@@ -241,6 +249,31 @@ class SectionIndex:
         """y positions on a page where a new section starts."""
         return [s.first_y for s in self.sections if s.first_page == page and s.first_y > 0]
 
+def real_table(page, table, rows):
+    """Whether a detected table looks like a table, not a chart's gridlines, a drawing sheet's
+    frame or paragraphs in boxes (docs/research/round-01): at least half its cells filled, few
+    words straddling cell edges, 2+ rows and columns, 6+ words, under half the page, and not
+    mostly long paragraphs. On the samples this kept 4 of 4 real tables and dropped 70 of 70 others."""
+    cells = [c for row in rows for c in row]
+    if len(rows) < 2 or max((len(r) for r in rows), default=0) < 2 or not cells:
+        return False
+    filled = [str(c).strip() for c in cells if c is not None and str(c).strip()]
+    if len(filled) / len(cells) < 0.5 or sum(len(c.split()) for c in filled) < 6:
+        return False
+    if sum(len(c) > 80 for c in filled) > 0.3 * len(filled):
+        return False
+    box = pymupdf.Rect(table.bbox)
+    if abs(box) > 0.5 * abs(page.rect):
+        return False
+    edges = [pymupdf.Rect(c) for c in getattr(table, "cells", None) or [] if c]
+    if edges:
+        words = [pymupdf.Rect(w[:4]) * page.rotation_matrix for w in page.get_text("words")]
+        words = [w for w in words if w.intersects(box) and w.width > 0]
+        split = sum(1 for w in words if any(0.15 < abs(w & c) / abs(w) < 0.85 for c in edges if w.intersects(c)))
+        if words and split / len(words) > 0.05:
+            return False
+    return True
+
 def row_boxes(table, extracted):
     """Each row's box (None where unknown), aligned with the extracted rows; [] if they don't align."""
     rows = getattr(table, "rows", None) or []
@@ -437,7 +470,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         record(row, copies)
 
     def consume(page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None, then=None,
-                repeat_key=None, repeat_after=1, place=None):
+                repeat_key=None, repeat_after=1, place=None, context=""):
         """Queue one extraction task; when it finishes, record it and call then(status).
 
         repeat_key identifies exactly repeated boilerplate: once `repeat_after` earlier
@@ -475,9 +508,12 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         # A region spanning sections (a tile, an overview) is told all their headings.
         heading = " | ".join(" > ".join(x.heading_path) for x in page_section.spanned_box(page_no, bbox)
                              if x.heading_path)
-        prompt = (EXTRACT.replace("{max_claims}", str(s.claims_per_request)) + "\nSource type: " + region + (f"\nSection: {heading}" if heading else "")
+        prompt = (extraction_template(s).replace("{max_claims}", str(s.claims_per_request)) + "\nSource type: " + region
+                  + (f"\nSection: {heading}" if heading else "") + (f"\n{context}" if context else "")
                   + "\nSOURCE DATA:\n" + text)
         key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
+        if context:  # only then, so requests without context keep their recorded keys
+            key += (hashlib.sha256(context.encode()).hexdigest(),)
 
         def finish(result, error):
             state["pending"] -= 1
@@ -522,12 +558,60 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         state["pending"] += 1
         dispatch.submit(prompt, Extraction, images, key, finish)
 
+    blocks_of = {}
+
+    def page_blocks(page_no):
+        """The page's text blocks in reading order: [(bbox, text)]."""
+        if page_no not in blocks_of:
+            blocks_of[page_no] = [(tuple(b[:4]), " ".join(b[4].split())) for b in doc[page_no - 1].get_text("blocks", sort=True)
+                                  if b[6] == 0 and b[4].strip()]
+        return blocks_of[page_no]
+
+    def surrounding(page_no, first, last, before, after):
+        """Text before the block at `first` and after the block at `last`, crossing to the
+        neighbouring pages when the page runs out."""
+        if not before and not after:
+            return ""
+        blocks = page_blocks(page_no)
+        boxes = [b for b, _ in blocks]
+        i0 = boxes.index(first) if first in boxes else 0
+        i1 = len(boxes) - 1 - boxes[::-1].index(last) if last in boxes else len(boxes) - 1
+        head = " ".join(t for _, t in blocks[:i0])
+        tail = " ".join(t for _, t in blocks[i1 + 1:])
+        if before and len(head) < before and page_no > 1:
+            head = " ".join(t for _, t in page_blocks(page_no - 1)) + " " + head
+        if after and len(tail) < after and page_no < len(doc):
+            tail = tail + " " + " ".join(t for _, t in page_blocks(page_no + 1))
+        parts = []
+        if before and head.strip():
+            parts.append("Before: ..." + head.strip()[-before:])
+        if after and tail.strip():
+            parts.append("After: " + tail.strip()[:after] + "...")
+        return (CONTEXT_NOTE + "\n" + "\n".join(parts)) if parts else ""
+
+    tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
+
+    def table_top(page_no, row_box):
+        for box in tables_on.get(page_no, ()):
+            if box[1] - 2 <= row_box[1] <= box[3] + 2:
+                return box
+        return row_box
+
+    def lead_in(page_no, bbox, limit):
+        """Text just above a table (its lead-in sentence or caption), as context."""
+        if not limit:
+            return ""
+        above = " ".join(t for b, t in page_blocks(page_no) if b[3] <= bbox[1] + 2)
+        return (CONTEXT_NOTE + "\nAbove the table: ..." + above.strip()[-limit:]) if above.strip() else ""
+
     def text_task(page_no, segments, task, depth=0):
         """segments: [(bbox, text)] of consecutive blocks sent together."""
         text = "\n\n".join(t for _, t in segments)
+        context = surrounding(page_no, segments[0][0], segments[-1][0], s.context_before, s.context_after)
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
         consume(page_no, union(b for b, _ in segments), task, text, check=lambda q: quoted(q, text), locate=locate,
+                context=context,
                 then=lambda status: refine_text(page_no, segments, text, task, depth, status))
 
     def refine_text(page_no, segments, text, task, depth, status):
@@ -564,7 +648,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 if status != "complete" and depth < s.refinement_depth and splittable:
                     split_columns(page_no, bbox, task, header, row, columns, depth + 1, derivation)
             consume(page_no, bbox, task, text, derivation=derivation, check=lambda q: quoted(q, text) or covered(q, flat),
-                    then=then, repeat_key=repeat_key, repeat_after=2)
+                    then=then, repeat_key=repeat_key, repeat_after=2, context=lead_in(page_no, table_top(page_no, bbox), s.table_context))
         else:
             split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
 
@@ -584,6 +668,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", clip=native) if b[6] == 0]
         def place(quote):  # the first text block in the region holding the quote
             return next((box for box, text in blocks if covered(quote, text, fold=True)), None)
+        if s.visual_text_layer and layer.strip():
+            text = (text + "\n" if text else "") + LAYER_NOTE + "\n" + " ".join(layer.split())[:s.visual_text_layer]
         consume(page_no, native, tag, text, "assets/" + name, check=check, place=place,
                 crop=(tuple(round(v, 3) for v in rect), s.image_side),
                 then=lambda status: refine_visual(page_no, page, tag, rect, depth, status))
@@ -627,7 +713,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 # Table detection works in displayed coordinates; locators are unrotated.
                 native = lambda b: tuple(pymupdf.Rect(b) * page.derotation_matrix) if b else None
                 found = [(native(table.bbox), rows, [native(b) for b in row_boxes(table, rows)])
-                         for table in page.find_tables().tables for rows in [table.extract()]]
+                         for table in page.find_tables().tables for rows in [table.extract()]
+                         if not s.table_filter or real_table(page, table, rows)]
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors
                 found = []
                 record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
@@ -635,6 +722,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                         "issues": [type(e).__name__ + ": " + str(e)], "claims": 0})
             height = page.rect.height
             continuing, carried = carried, None
+            tables_on[number] = [bbox for bbox, _, _ in found]
             for ti, (bbox, rows, boxes) in enumerate(found):
                 if not rows:
                     continue

@@ -182,6 +182,56 @@ class SectionContext(unittest.TestCase):
             self.assertTrue(any(t.startswith('tile:') and '-r' in t for t in tasks))  # tiles are refined
             self.assertFalse(any(t.startswith(('overview', 'figure')) and '-r' in t for t in tasks))
 
+    def test_query_levers(self):
+        from semantic_pdf_diff.fixtures import fingerprint
+        from semantic_pdf_diff.provenance import extraction_interpreter
+        base = Settings(vision=False)
+        self.assertEqual(fingerprint(extraction_interpreter(base)), fingerprint(extraction_interpreter(Settings(vision=False,
+                         context_before=0, extract_rules=[]))))  # levers at their defaults don't change fingerprints
+        self.assertNotEqual(fingerprint(extraction_interpreter(base)),
+                            fingerprint(extraction_interpreter(Settings(vision=False, context_before=300))))
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            page = doc.new_page(width=400, height=400)
+            pad = ' Further description follows in the operating manual for the plant room equipment.' * 2
+            for y, text in ((40, 'The pumps described here serve the chilled water loop.' + pad), (160, 'Pump rated power 10 kW.' + pad),
+                            (280, 'Both pumps are duty and standby.' + pad)):
+                page.insert_textbox(pymupdf.Rect(40, y - 12, 380, y + 90), text, fontsize=9)
+            path = Path(d) / 't.pdf'
+            doc.save(path); doc.close()
+            prompts = {}
+            for name, settings in (('base', {'text_bytes': 260}), ('lever', {'context_before': 300, 'context_after': 300,
+                                   'text_bytes': 260, 'extract_rules': ['Say which loop a pump serves.']})):
+                client = Recorder(vision=False, **settings)
+                extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+                prompts[name] = next((p, k) for p, k in client.asked if '10 kW' in p.split('SOURCE DATA:\n')[1])
+            base_prompt, base_key = prompts['base']
+            prompt, key = prompts['lever']
+            self.assertNotIn('CONTEXT', base_prompt)
+            self.assertIn('CONTEXT (for reference only', prompt)
+            self.assertIn('Before: ...The pumps described here serve the chilled water loop.', prompt)
+            self.assertIn('After: Both pumps are duty and standby.', prompt)
+            self.assertIn('Say which loop a pump serves.', prompt)
+            self.assertEqual(len(key), len(base_key) + 1)  # context hash only when context is present
+
+    def test_table_filter_keeps_tables_and_drops_grids(self):
+        from semantic_pdf_diff.extract import real_table
+        doc = pymupdf.open()
+        page = doc.new_page(width=600, height=800)
+        def grid(x, y, rows, cols, w=150, h=30):
+            for r in range(rows + 1):
+                page.draw_line(pymupdf.Point(x, y + h * r), pymupdf.Point(x + w * cols, y + h * r))
+            for c in range(cols + 1):
+                page.draw_line(pymupdf.Point(x + w * c, y), pymupdf.Point(x + w * c, y + h * rows))
+        grid(100, 100, 3, 2)   # a real table
+        for r, (a, b) in enumerate((('Item', 'Power'), ('Pump', '10 kW'), ('Fan', '3 kW'))):
+            page.insert_text((110, 120 + 30 * r), a); page.insert_text((260, 120 + 30 * r), b)
+        grid(100, 400, 5, 4, w=100)  # a chart's gridlines: no text in the cells
+        page.insert_text((150, 560), 'Wind speed (m/s)')
+        verdicts = sorted((t.bbox[1] < 300, real_table(page, t, t.extract())) for t in page.find_tables().tables)
+        self.assertIn((True, True), verdicts)    # the table is kept
+        self.assertNotIn((False, True), verdicts)  # the grid, if detected at all, is dropped
+
     def test_split_headings_are_found_and_outline_order_is_kept(self):
         from semantic_pdf_diff.extract import heading_y
         doc = pymupdf.open()

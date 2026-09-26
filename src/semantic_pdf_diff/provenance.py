@@ -49,14 +49,23 @@ def library_versions():
             versions[package] = "unknown"
     return versions
 
+# Query levers: included in an interpreter only when changed from their defaults, so adding a
+# lever doesn't change existing fingerprints (and recorded answers keep replaying).
+LEVERS = ("extract_prompt", "extract_rules", "context_before", "context_after", "table_context", "visual_text_layer",
+          "table_filter")
+
 def interpreter(role, settings, prompts, names):
-    return Interpreter(role=role, model=settings.model, prompt_hash=text_hash(*prompts),
-                       settings={name: getattr(settings, name) for name in names}, versions=library_versions())
+    defaults = type(settings).model_fields
+    values = {name: getattr(settings, name) for name in names
+              if name not in LEVERS or getattr(settings, name) != defaults[name].get_default(call_default_factory=True)}
+    return Interpreter(role=role, model=settings.model, prompt_hash=text_hash(*prompts), settings=values,
+                       versions=library_versions())
 
 def extraction_interpreter(settings):
-    from .extract import EXTRACT, PROMPT_VERSION
+    from .extract import PROMPT_VERSION, extraction_template
     from .llm import SYSTEM
-    return interpreter("extract", settings, (SYSTEM, EXTRACT, f"v{PROMPT_VERSION}"), EXTRACTION_SETTINGS)
+    return interpreter("extract", settings, (SYSTEM, extraction_template(settings), f"v{PROMPT_VERSION}"),
+                       EXTRACTION_SETTINGS + LEVERS)
 
 def triage_interpreter(settings):
     from .situate import PROMPT_VERSION, SITUATE_FIGURE, SITUATE_SECTION

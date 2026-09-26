@@ -338,6 +338,15 @@ class Settings(Strict):
     vision: bool = True
     # Read each detected figure whole, besides the tile grid (which can cut through figures).
     figure_tasks: bool = True
+    # Query levers (docs/plans/query-improvement): the defaults reproduce the baseline queries, and
+    # levers left at their defaults stay out of interpreter fingerprints, so recordings still apply.
+    extract_prompt: str | None = None       # replaces the extraction instructions
+    extract_rules: list[str] = Field(default_factory=list)  # appended to the instructions
+    context_before: int = Field(default=0, ge=0, le=20000)  # characters of preceding text, as context
+    context_after: int = Field(default=0, ge=0, le=20000)   # characters of following text, as context
+    table_context: int = Field(default=0, ge=0, le=20000)   # characters of text above a table (lead-in, caption)
+    visual_text_layer: int = Field(default=0, ge=0, le=20000)  # characters of a region's PDF text sent with its image
+    table_filter: bool = False               # drop detected "tables" that are charts, frames or paragraphs
     # Situating stage: figure and section "about" statements after extraction.
     situate: bool = True
     verify_visuals: bool = True
