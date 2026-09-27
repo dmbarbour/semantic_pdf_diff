@@ -381,20 +381,6 @@ def sheet_details(page, lines=None):
     return out
 
 SCALE = re.compile(r"\d[\"']?\s*=\s*\d|\bSCALE\b|\bN\.?T\.?S\b", re.IGNORECASE)
-LEGIBLE_AREA = 645120  # points² a crop may cover at a 12 pt smallest font (research round 1: about 12 px per em)
-
-def legible_side(page, rect):
-    """The largest square side (points) at which a crop's small print stays legible: the 5th
-    percentile font size f, weighted by characters, allows LEGIBLE_AREA·(f/12)²."""
-    sizes = sorted((s["size"], len(s["text"].strip())) for b in page.get_text("dict", clip=rect * page.derotation_matrix)["blocks"]
-                   for l in b.get("lines", ()) for s in l["spans"] if s["text"].strip())
-    total, seen = sum(n for _, n in sizes), 0
-    for size, n in sizes:
-        seen += n
-        if seen >= 0.05 * total:
-            return math.sqrt(LEGIBLE_AREA) * size / 12
-    return math.sqrt(LEGIBLE_AREA)
-
 def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=False):
     """Tiles, then whole figures, then the overview: [(tag, Rect, note)] in displayed coordinates.
 
@@ -402,7 +388,7 @@ def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=Fa
     whitespace gaps, skipping bands with no graphics that text tasks already cover
     (tiling="bands"). grow extends grid tiles to whole text lines. details cuts a drawing sheet
     into its details (and title-block and notes columns), each tiled on its own when larger
-    than its small print allows, with the sheet's and the detail's titles as the note. A grid can cut a chart
+    than a tile, with the sheet's and the detail's titles as the note. A grid can cut a chart
     from its legend or a diagram in two, so each detected figure (drawing or image, with its
     caption) is also read whole, unless it already fits inside one tile or is the whole page
     (a drawing sheet: the overview)."""
@@ -418,8 +404,9 @@ def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=Fa
             for number, title, rect in viewports:
                 note = f"{sheet}. " + (f"Detail {number}: {title}" if title else f"Detail {number}") if number \
                     else f"{sheet}. Title block or notes column"
-                most = max(side, legible_side(page, rect))
-                pieces = [rect] if max(rect.width, rect.height) <= most else list(tiles(rect, most))
+                # Larger crops lose small print (round 5: a 620-point crop missed a title block's
+                # revision table that 420-point tiles read), so a detail is tiled like a page.
+                pieces = [rect] if max(rect.width, rect.height) <= 1.25 * side else list(tiles(rect, side))
                 parts += [(grown(page, r, lines=lines) & rect if grow else r, note) for r in pieces]
             regions = [(f"tile:{i}", r, note) for i, (r, note) in enumerate(parts) if not r.is_empty]
         elif tiling == "bands" and page.rect.width <= 1.6 * side:
