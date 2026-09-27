@@ -78,6 +78,18 @@ def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", 
     return [(k, base.get(k, {"claims": {}})["claims"], var.get(k, {"claims": {}})["claims"]) for k in picked], \
         {"units": len(keys), "unchanged": same}
 
+def shown(a, b, rng, limit=MAX_CLAIMS):
+    """Claim IDs of each side to show judges, at most `limit` each: every claim only one side has
+    (sampled if there are too many), then the same sample of shared claims on both sides. Sampling
+    each side separately (before round 7) showed judges different subsets of mostly shared claims,
+    so on large units they compared samples rather than the lever."""
+    only_a, only_b = sorted(set(a) - set(b)), sorted(set(b) - set(a))
+    shared = sorted(set(a) & set(b))
+    pick = lambda ids, k: ids if len(ids) <= k else sorted(rng.sample(ids, k))
+    only_a, only_b = pick(only_a, limit), pick(only_b, limit)
+    common = pick(shared, max(0, limit - max(len(only_a), len(only_b))))
+    return sorted(only_a + common), sorted(only_b + common)
+
 def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
     """Write a pairwise batch: pairs.json (with which side is the baseline) and page images."""
     from .review import render
@@ -100,11 +112,10 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
             if not (folder / "images" / name).exists():
                 (folder / "images" / name).write_bytes(render(doc, page, None, None, 1400))
             text = doc[page - 1].get_text("text")[:PAGE_TEXT]
-        sample = lambda claims: [claims[i] for i in sorted(claims)[:MAX_CLAIMS]] if len(claims) <= MAX_CLAIMS \
-            else [claims[i] for i in sorted(rng.sample(sorted(claims), MAX_CLAIMS))]
+        shown_a, shown_b = shown(a, b, rng)
         items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}", "run": run, "content": content,
                       "page": page, "family": family, "image": f"images/{name}", "page_text": text,
-                      "baseline": sample(a), "variant": sample(b),
+                      "baseline": [a[i] for i in shown_a], "variant": [b[i] for i in shown_b],
                       "counts": {"baseline": len(a), "variant": len(b), "shared": len(set(a) & set(b))}})
     batch = {"format": "semantic-pdf-diff-pairwise-batch", "version": 1, "baseline": str(baseline_dir),
              "variant": str(variant_dir), "seed": seed, "units": counts, "items": items}

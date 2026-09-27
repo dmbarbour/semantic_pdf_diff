@@ -97,6 +97,15 @@ class Rounds(unittest.TestCase):
         self.assertIn('cut off at the right', page)
         self.assertIn('duplicates', page)
 
+    def test_judges_see_every_difference_and_the_same_shared_sample(self):
+        import random
+        a = {f'id{i:02}': i for i in range(40)}
+        b = {k: v for k, v in a.items() if v not in (3, 7)} | {'new1': 1, 'new2': 2}
+        shown_a, shown_b = rounds.shown(a, b, random.Random(1), limit=25)
+        self.assertTrue({'id03', 'id07'} <= set(shown_a) and {'new1', 'new2'} <= set(shown_b))
+        self.assertEqual(set(shown_a) - {'id03', 'id07'}, set(shown_b) - {'new1', 'new2'})  # same shared sample
+        self.assertTrue(len(shown_a) <= 25 and len(shown_b) <= 25)
+
     def test_rubric_v1_prompt_is_unchanged(self):
         prompt = rounds.pairwise_prompt('v1')
         self.assertNotIn('a_problems', prompt)
