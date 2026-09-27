@@ -231,6 +231,9 @@ class Occurrence(Strict):
     confidence: float = Field(ge=0, le=1)
     image: str | None = None
     derivation: list[DerivationStep] = Field(default_factory=list)
+    # How this sighting worded the claim ("entity | attribute | value unit | conditions"), when
+    # it was merged with the claim as another reading of the same fact (see readings.reconcile).
+    wording: str = ""
 
 class Evidence(Claim):
     """A claim within one piece of content.
@@ -359,6 +362,7 @@ class Settings(Strict):
     tiling: Literal["grid", "bands"] = "grid"  # bands: full-width, cut at whitespace gaps, on report-sized pages
     grow_tiles: bool = False                 # extend grid tiles to include every text line they cut
     sheet_details: bool = False              # cut drawing sheets into their details, titled from the sheet
+    reconcile: bool = False                  # merge readings of one fact by different tasks into one claim
     references: bool = False                 # abbreviations defined elsewhere and cited figures' captions as context
     # Situating stage: figure and section "about" statements after extraction.
     situate: bool = True

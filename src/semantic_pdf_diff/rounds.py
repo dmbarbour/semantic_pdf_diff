@@ -17,6 +17,15 @@ FAMILY = {"text": "text", "table": "table", "tile": "visual", "figure": "visual"
 MAX_CLAIMS = 25     # claims shown per side (sampled when there are more)
 PAGE_TEXT = 6000    # characters of the page's text layer shown to judges
 
+def _reader(runs_dir):
+    """Evidence as the runs' settings present it (settings.json beside the runs)."""
+    path = Path(runs_dir) / "settings.json"
+    settings = json.loads(path.read_text()) if path.exists() else {}
+    if settings.get("reconcile"):
+        from .readings import reconcile
+        return lambda store, content: reconcile(store.evidence(content))
+    return lambda store, content: store.evidence(content)
+
 def collect(runs_dir, unit="family"):
     """{(run, content, page, family): {"claims": {id: claim}, "tasks": n}} for every store under runs_dir.
 
@@ -25,6 +34,7 @@ def collect(runs_dir, unit="family"):
     family_of = (lambda region: FAMILY.get(region)) if unit == "family" else (lambda region: "page" if region in FAMILY else None)
     from .store import Store
     units = defaultdict(lambda: {"claims": {}, "tasks": 0})
+    read = _reader(runs_dir)
     for folder in sorted(Path(runs_dir).iterdir()):
         if not (folder / "store.sqlite").exists():
             continue
@@ -35,7 +45,7 @@ def collect(runs_dir, unit="family"):
                     family = family_of(row["task"].split(":")[0])
                     if family and row.get("page"):
                         units[(folder.name, content, row["page"], family)]["tasks"] += 1
-                for e in store.evidence(content):
+                for e in read(store, content):
                     for o in e.occurrences or [e]:
                         family = family_of(o.locator.region)
                         if family:
@@ -239,6 +249,7 @@ def mechanical(runs_dir):
     """Figures that need no reviewer: task outcomes, claims per task, verified quotes, by family."""
     from .store import Store
     stats = defaultdict(lambda: defaultdict(float))
+    read = _reader(runs_dir)
     for folder in sorted(Path(runs_dir).iterdir()):
         if not (folder / "store.sqlite").exists():
             continue
@@ -252,7 +263,11 @@ def mechanical(runs_dir):
                         stats[key]["tasks"] += 1
                         stats[key][row["status"]] += 1
                         stats[key]["claims"] += row.get("claims", 0)
-                for e in store.evidence(content):
+                for e in read(store, content):
+                    family = FAMILY.get(e.locator.region)
+                    if family:  # distinct claims, as presented (merged readings count once)
+                        for key in (family, "all"):
+                            stats[key]["distinct_claims"] += 1
                     for o in e.occurrences or [e]:
                         family = FAMILY.get(o.locator.region)
                         if family and o.quote_verified is not None:
@@ -264,6 +279,7 @@ def mechanical(runs_dir):
         tasks = s["tasks"] or 1
         out[key] = {"tasks": int(s["tasks"]), "failed_rate": round(s["failed"] / tasks, 4),
                     "partial_rate": round(s["partial"] / tasks, 4), "claims_per_task": round(s["claims"] / tasks, 3),
+                    "distinct_claims": int(s["distinct_claims"]),
                     "verified_quote_rate": round(s["verified_quotes"] / s["checked_quotes"], 4) if s["checked_quotes"] else None}
     return out
 

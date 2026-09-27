@@ -15,6 +15,7 @@ from pathlib import Path
 from . import fixtures, manifest
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
+from .readings import reconcile
 from .extract import EXTRACT, Job, pdf_sections, run_jobs, text_groups, visual_regions
 from .llm import SYSTEM, Client, redact_url
 from .models import Settings, Source
@@ -277,6 +278,8 @@ def run(args, settings, store, names, out, force_rescan=False):
     progress = Progress('extract', client, heartbeat=settings.heartbeat_seconds)
     by_content, coverage, sections = extract_sources(store, client, names, files, progress)
     progress.close()
+    if settings.reconcile:  # readings of one fact by different tasks become one claim
+        by_content = {c: reconcile(items) if items else items for c, items in by_content.items()}
     situations = situate_sources(store, client, names, files, by_content, sections, coverage) if triage else {}
     evidence = [e for items in by_content.values() for e in items]
     situation_data = {c: {'figures': [f.model_dump() for f in figures], 'unresolved': [r.model_dump() for r in unresolved],
