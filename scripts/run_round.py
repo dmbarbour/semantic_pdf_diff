@@ -6,6 +6,7 @@ A round is a folder, e.g. benchmarks/rounds/r01/, holding round.json:
      "variants": {"neighbours": "variants/neighbours.json"},
      "set": "dev", "units": 60, "cap": 15.0,
      "judge_timeout": 300, "judge_retries": 0,   # optional; a stalled judge otherwise holds a chunk for 30 minutes
+     "rubric": "v2",                             # optional judging rubric (rounds.RUBRICS); default v1
      "judges": ["google/gemini-3.1-pro", "Qwen/Qwen3.5-397B-A17B", "XiaomiMiMo/MiMo-V2.6-Pro"]}
 
 Variant files are settings (query levers) merged over the recording's base settings.
@@ -179,7 +180,8 @@ def main(argv=None):
                                                  max_cost=remaining())
                     client = Client(settings, batch / ".judge-cache")
                     client.ledger = Ledger(LEDGER, round=name, step="judge", variant=v, judge=model)
-                    _, _, failures = rounds.judge_pairs(batch, client, model, limit=upto)
+                    _, _, failures = rounds.judge_pairs(batch, client, model, limit=upto,
+                                                        rubric=spec.get("rubric", "v1"))
                     state.setdefault("failures", {})[f"judge:{v}:{model}"] = len(failures)
                     if failures:  # why, for diagnosis (a judge that times out on long units, say)
                         state.setdefault("failure_notes", {})[f"judge:{v}:{model}"] = [f[:300] for f in failures]

@@ -175,6 +175,12 @@ Round 1 showed that asking the same question again often gets a different answer
 - **Figures at every step** go into the history file, so every stage can be graphed.
 - **Acceptance is automatic** when the rules pass, with a round summary for the owner. Assumed from "halt or continue based on improvements"; to be confirmed.
 
+**Judging rubric v2 (the owner, 2026-09-27; from round 7):**
+- **What changes:** document administration (contacts, addresses, lot or project numbers, revision dates, copyright, logos) is neutral in pairwise judging. Neither side is preferred for including or omitting it; such claims are checked only for correctness.
+- **Why:** in round 5, crops that happened to isolate a title block swung results.
+- **Where it really belongs:** provenance gets its own layer (plans index: *Subject, parties and provenance*).
+- **Setup:** rounds choose a rubric in `round.json` (`"rubric": "v2"`). v1 is the default and leaves earlier prompts unchanged, so their cached verdicts still replay.
+
 ## Progress
 
 | Round | What | Result | Cost |
