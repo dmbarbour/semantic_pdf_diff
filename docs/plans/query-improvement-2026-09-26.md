@@ -185,6 +185,16 @@ Round 1 showed that asking the same question again often gets a different answer
 
 **Champion (2026-09-26):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images). Later rounds compare against it.
 
+**Levers built, not yet judged:**
+
+| Lever | Hypothesis | Measured without the model |
+|---|---|---|
+| `stem_context` | 2: numbered items and headings as parents | (round 3) |
+| `tiling: bands` | 3: full-width bands cut at whitespace | NREL: 12 bands cutting 5 lines, against 72 tiles cutting 1,027 |
+| `grow_tiles` | extra: tiles grown to whole lines | Drawing sheets: lines cut 137→35, 139→50 |
+| `sheet_details` | 5: a drawing sheet's details, titled from the sheet | 16–25 images per sheet instead of 35; 0–10 lines cut instead of 23–79 |
+| `references` | 8: abbreviations defined elsewhere, cited captions | 3–15 of 8–17 chunks per report slice gain a line |
+
 **The tool's defaults** stay at the v6 queries for now, so the recorded fixture keeps replaying. The champion becomes the default at a milestone, after a few rounds, with one full re-recording (about $1).
 
 ## Open questions
