@@ -1,0 +1,23 @@
+{
+  "name": "r08",
+  "set": "dev",
+  "note": "Merged readings with the most local representative; a chart-reading rule for image tasks from the judges' remarks. Rubric v3 (judges see the page's headings).",
+  "baseline": "variants/baseline.json",
+  "variants": {
+    "reconcile": "variants/reconcile.json",
+    "charts": "variants/charts.json"
+  },
+  "extract_only": true,
+  "units": 32,
+  "chunk": 8,
+  "min_units": 16,
+  "cap": 8.0,
+  "judge_timeout": 450,
+  "judge_retries": 0,
+  "rubric": "v3",
+  "judges": [
+    "Qwen/Qwen3.5-397B-A17B",
+    "XiaomiMiMo/MiMo-V2.6-Pro"
+  ],
+  "hypotheses": "docs/reviews/round-08-2026-09-27.md"
+}

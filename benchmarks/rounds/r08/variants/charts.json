@@ -1,0 +1,13 @@
+{
+  "context_before": 400,
+  "context_after": 400,
+  "visual_text_layer": 1500,
+  "table_context": 400,
+  "stem_context": true,
+  "tiling": "bands",
+  "grow_tiles": true,
+  "skip_empty": true,
+  "visual_rules": [
+    "For charts and plots, give a value only where the chart labels or marks it (a labelled tick, a data label, an annotated point); between those, state the trend and the range instead of a reading. Take each series' identity from its legend key, not from its position."
+  ]
+}

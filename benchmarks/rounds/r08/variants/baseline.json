@@ -1,0 +1,10 @@
+{
+  "context_before": 400,
+  "context_after": 400,
+  "visual_text_layer": 1500,
+  "table_context": 400,
+  "stem_context": true,
+  "tiling": "bands",
+  "grow_tiles": true,
+  "skip_empty": true
+}
