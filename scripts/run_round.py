@@ -36,7 +36,7 @@ def main(argv=None):
     parser.add_argument("round", type=Path)
     parser.add_argument("--only", choices=["record", "replay", "measure", "pairs", "judge", "decide", "report"])
     args = parser.parse_args(argv)
-    from semantic_pdf_diff import ledger, rounds
+    from semantic_pdf_diff import insights, ledger, rounds
     import record_runs
 
     folder = args.round.resolve()
@@ -149,6 +149,7 @@ def main(argv=None):
         stopped[v] = reason
         result = rounds.decide(batch, judged[v])
         (batch / "decision.json").write_text(json.dumps({**result, "stopped": reason}, indent=2) + "\n")
+        insights.analyse(batch, judged[v])  # the clues to why: agreement, changes, issues, tags, remarks
         if result["overall"]:
             figure("win_rate", result["overall"], variant=v, stratum="all", step="decide", units=result["units_judged"])
         for stratum, value in result["strata"].items():
@@ -213,6 +214,10 @@ def main(argv=None):
         figure("spent_total", ledger.spent(LEDGER, round=name), step="report")
         rounds.report(HISTORY, REPORT)
         print(f"Report: {REPORT}")
+        for v in spec["variants"]:  # rounds decided before analyses existed
+            if done(f"decide:{v}") and not (folder / f"pairs-{v}" / "analysis.json").exists():
+                insights.analyse(folder / f"pairs-{v}", judged.get(v))
+        print(f"Insights: {insights.page(folder)}")
     return 0
 
 if __name__ == "__main__":

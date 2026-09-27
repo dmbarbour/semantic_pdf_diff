@@ -64,6 +64,45 @@ class Rounds(unittest.TestCase):
         self.assertIn(decision['decision'].split(':')[0], ('accepted', 'rejected', 'no worse', 'inconclusive'))
         self.assertIn('overall', decision)
 
+    def test_rubric_v2_tags_problems_and_keeps_remarks_for_the_insights_page(self):
+        from semantic_pdf_diff import insights
+        folder = self.root / 'batch-v2'
+        batch = rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=4)
+        (folder / 'round.json').parent.mkdir(exist_ok=True)
+
+        class Tagger(Judge):
+            def ask(self, prompt, schema, images=(), key=None):
+                self.prompts.append(prompt)
+                return PairVerdict(better='A', note='A binds values', a_problems=['duplicates', 'not-a-tag'],
+                                   b_problems=['Misbound'], remarks='The page image is cut off at the right.')
+        judge = Tagger()
+        rounds.judge_pairs(folder, judge, 'tagger', rubric='v2')
+        self.assertTrue(all('a_problems' in p and 'neutral' in p for p in judge.prompts))
+        verdicts = json.loads((folder / 'verdicts' / 'tagger.json').read_text())['verdicts']
+        first = verdicts[batch['items'][0]['id']]
+        # Tags follow the sides, not the positions; unknown tags are dropped.
+        self.assertEqual(first['baseline-first']['baseline_problems'], ['duplicates'])
+        self.assertEqual(first['variant-first']['baseline_problems'], ['misbound'])
+        self.assertEqual(first['baseline-first']['remarks'], 'The page image is cut off at the right.')
+        analysis = insights.analyse(folder)
+        self.assertEqual(analysis['summary']['units'], len(batch['items']))
+        self.assertTrue(all(u['order_flipped'] == ['tagger'] for u in analysis['units']))  # always "A": flips
+        self.assertEqual(analysis['summary']['remarks'], 2 * len(batch['items']))
+        round_folder = self.root
+        (round_folder / 'round.json').write_text(json.dumps({'name': 'rt', 'variants': {'v2': 'x.json'}}))
+        (round_folder / 'pairs-v2').mkdir(exist_ok=True)
+        for name in ('pairs.json', 'analysis.json'):
+            (round_folder / 'pairs-v2' / name).write_text((folder / name).read_text())
+        page = insights.page(round_folder).read_text()
+        self.assertIn('cut off at the right', page)
+        self.assertIn('duplicates', page)
+
+    def test_rubric_v1_prompt_is_unchanged(self):
+        prompt = rounds.pairwise_prompt('v1')
+        self.assertNotIn('a_problems', prompt)
+        self.assertNotIn('neutral', prompt)
+        self.assertIn('{page_text}', prompt)
+
     def test_bootstrap_and_rules(self):
         mean, low, high = rounds.bootstrap([1.0] * 40 + [0.0] * 10)
         self.assertAlmostEqual(mean, 0.8)

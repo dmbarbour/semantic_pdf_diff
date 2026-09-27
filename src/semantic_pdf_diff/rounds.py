@@ -135,16 +135,49 @@ SET B:
 {b}
 """
 
-# Rubric additions by version; "v1" (none) keeps earlier rounds' prompts, and so their cached verdicts.
+# Why a set is worse: tags judges give each side from rubric v2 on, so reasons can be counted.
+PAIR_PROBLEMS = {
+    "misbound": "a value bound to the wrong component, property, detail or row",
+    "misread": "a value, unit, sign or label read wrong",
+    "invented": "a claim the page doesn't support",
+    "missing": "an important fact on the page left out",
+    "duplicates": "the same fact repeated, or stated under two names",
+    "vague": "a vague or generic entity or attribute",
+    "conditions": "needed conditions lost or wrong",
+    "quote": "quotes that don't support their claims",
+    "trivial": "trivial claims (labels, indices, fragments) of no engineering use",
+}
+
+# Rubric versions. v1 keeps earlier rounds' prompts, and so their cached verdicts.
 RUBRICS = {
-    "v1": "",
+    "v1": {"addition": "", "tags": False},
     # The owner, 2026-09-27: who owns, designed or reviewed a project matters for provenance, but belongs
     # in its own layer (plans index: subject, parties and provenance); until then, crops that happen to
-    # include or omit a title block shouldn't swing a comparison.
-    "v2": "\nDocument administration (contacts, addresses, lot or project numbers, revision dates, copyright, "
-          "logos) is neutral: don't prefer a set for including or omitting it; judge such claims only for "
-          "correctness.",
+    # include or omit a title block shouldn't swing a comparison. Also: problem tags for each side, and
+    # remarks for the maintainers (the owner: give judges a way to comment for us to review).
+    "v2": {"addition": "\nDocument administration (contacts, addresses, lot or project numbers, revision dates, "
+                       "copyright, logos) is neutral: don't prefer a set for including or omitting it; judge such "
+                       "claims only for correctness.", "tags": True},
 }
+
+V1_OUTPUT = """Return only JSON, reasoning first: {{"note": "...", "better": "A|B|same", "a_wrong": 0, "b_wrong": 0, "confidence": "high|medium|low"}}
+- note: two to four sentences comparing them (what one gets right that the other doesn't).
+- a_wrong, b_wrong: how many claims in each set are wrong (misread, misbound, unsupported or invented).
+"""
+V2_OUTPUT = ("""Return only JSON, reasoning first: {{"note": "...", "better": "A|B|same", "a_wrong": 0, "b_wrong": 0, "a_problems": [], "b_problems": [], "confidence": "high|medium|low", "remarks": ""}}
+- note: two to four sentences comparing them (what one gets right that the other doesn't).
+- a_wrong, b_wrong: how many claims in each set are wrong (misread, misbound, unsupported or invented).
+- a_problems, b_problems: which of these each set suffers from; any number, or none:
+""" + "".join(f"  {k}: {v}\n" for k, v in PAIR_PROBLEMS.items()) + """- remarks: optional, for the maintainers of this tool rather than about which set is better: problems with
+  the inputs (an unreadable or cut-off image, a garbled text layer), important facts both sets miss, patterns
+  you notice, suggestions. Leave it empty when there is nothing worth saying.
+""")
+
+def pairwise_prompt(rubric):
+    """The pairwise template for a rubric version (placeholders: page, family, page_text, a, b)."""
+    spec = RUBRICS[rubric]
+    template = PAIRWISE.replace(V1_OUTPUT, V2_OUTPUT) if spec["tags"] else PAIRWISE
+    return template.replace("{rubric}", spec["addition"])
 
 def _claims_text(claims):
     return "\n".join(f"- {c['entity']} | {c['attribute']} | {c['value']}{' ' + c['unit'] if c.get('unit') else ''}"
@@ -162,12 +195,14 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
     progress = progress or NoProgress()
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     verdicts, failures = {}, []
+    template = pairwise_prompt(rubric)
+    tags = lambda values: sorted({str(t).strip().lower() for t in values or ()} & set(PAIR_PROBLEMS))
     with Dispatcher(client) as dispatch:
         for item in batch["items"][:limit]:
             for order in ("baseline-first", "variant-first"):
                 a, b = (item["baseline"], item["variant"]) if order == "baseline-first" else (item["variant"], item["baseline"])
-                prompt = PAIRWISE.format(page=item["page"], family=item["family"], page_text=item["page_text"],
-                                         a=_claims_text(a), b=_claims_text(b), rubric=RUBRICS[rubric])
+                prompt = template.format(page=item["page"], family=item["family"], page_text=item["page_text"],
+                                         a=_claims_text(a), b=_claims_text(b))
 
                 def finish(value, error, item=item, order=order):
                     progress.finish("failed" if error else "complete")
@@ -183,6 +218,12 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
                         "baseline_wrong": v.get("a_wrong") if order == "baseline-first" else v.get("b_wrong"),
                         "variant_wrong": v.get("b_wrong") if order == "baseline-first" else v.get("a_wrong"),
                         "note": v.get("note", "")}
+                    if RUBRICS[rubric]["tags"]:
+                        first, second = tags(v.get("a_problems")), tags(v.get("b_problems"))
+                        verdicts[item["id"]][order].update(
+                            baseline_problems=first if order == "baseline-first" else second,
+                            variant_problems=second if order == "baseline-first" else first,
+                            remarks=v.get("remarks", "").strip())
                 progress.add()
                 dispatch.submit(prompt, PairVerdict, [folder / item["image"]], None, finish)
         dispatch.drain()
