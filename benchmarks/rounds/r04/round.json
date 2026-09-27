@@ -7,7 +7,7 @@
     "combined": "variants/combined.json"
   },
   "extract_only": true,
-  "units": 32,
+  "units": 48,
   "chunk": 8,
   "min_units": 16,
   "cap": 10.0,

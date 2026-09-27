@@ -1,0 +1,437 @@
+{
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "verdicts": {
+    "u-habex-interim-p80-89-52da8af4-p4-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 6,
+        "note": "Both sets share significant errors confusing the 'Cameras' and 'Spectrometers' sections of Table 5.5-3, specifically attributing IR Spectrometer specifications (FOV, array width, detector) to the 'IR Guide camera'. Both also mislabel 'Spectrometer resolution' as 'count'. However, Set B is better because it correctly extracts the Visible Camera FOV (11.9\") and avoids Set A's incorrect claim that the Visible Camera array width is 4,096 pixels (a spectrometer value). Set B also correctly identifies the Visible Spectrometer type."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 5,
+        "note": "Set A is preferred because it correctly extracts the Visible camera FOV (11.9\") whereas Set B only provides the incorrect Spectrometer FOV (1.9\"). Set A also avoids the erroneous Visible camera array width claim (4,096 pixels) found in Set B, though both sets share similar errors confusing Camera and Spectrometer specs for the IR channel. Set B does capture UV camera FOV and IR starshade separation/IWA data that Set A misses, but the accuracy on the Visible camera specifications makes Set A more reliable for that component."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p5-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is superior because it captures critical engineering parameters that Set B omits, specifically the EMCCD operating temperature (153 K) and the thruster firing period (every few 100 s). Set B also suffers from significantly more redundancy, containing three pairs of duplicate claims compared to only one pair in Set A. Both sets are generally faithful to the text and figure labels, though Set A provides a more complete optical path description."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is better because it captures key engineering parameters that Set A misses, specifically the EMCCD operating temperature (153 K) and the thruster firing frequency (every few 100 s). Set B also provides a more complete optical path description. Both sets contain redundant duplicate claims (e.g., f/# values and field stop diameters), but Set B's higher coverage of numerical data makes it more complete without introducing factual errors."
+      }
+    },
+    "u-ken-manual-p70-79-3b80816c-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 15,
+        "variant_wrong": 8,
+        "note": "Set B is better because it uses the specific attribute names from the chart legend ('Avg. High', 'Avg. Mean', 'Avg. Low') whereas Set A invents vague terms like 'temperature (mid)' and 'average temperature'. Set B also correctly incorporates the text context linking 'Bowman Field' to Louisville, while Set A mostly ignores this. Both sets contain data accuracy issues (swapping Irvine and Louisville values for certain months), but Set B's claims are more faithful to the document's defined properties."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 7,
+        "variant_wrong": 11,
+        "note": "Set A includes seven claims with vague, non-engineering entities ('Temperature Series 1/2/3') rather than binding values to the specific locations (Louisville/Irvine) shown in the charts. Set A also contains contradictory claims for Louisville January Avg. Low temperature (22 F and 40 F). Set B binds all claims to locations and avoids contradictions, though it has several reading errors on Bowman Field and Louisville shoulder months."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p8-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is better because it captures the spectral wavelength bands for all three channels (Blue, Red, IR), which are fundamental definitions of the channels, whereas Set A only captures one Red band. Set B also extracts Telescope Resolution and Spectrometer Resolution for all channels, providing a more complete picture of optical performance. Set A is stronger on hardware components (Detectors, Deformable Mirrors for all channels), but the omission of most wavelength data and Telescope Resolution is a significant gap in channel specifications. Set B misses the Red Channel Deformable Mirror specs and all IWA values, but overall provides better coverage of the defining optical characteristics."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is better because it captures critical performance parameters that Set B misses entirely, specifically the 'Telescope resolution' row (3 claims) and most 'OWA' values (3 claims vs 1). Set A also extracts wavelength bands much more comprehensively (4 bands vs 1). While Set B captures IWA and Spectrometer types slightly better, the omission of the Telescope Resolution data and most wavelength definitions in Set B represents a larger gap in engineering specifications. Both sets are accurate with no obvious misreads."
+      }
+    },
+    "u-ken-manual-p70-79-3b80816c-p5-text": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets contain the same significant factual error: one claim in each set (Set A Claim 6, Set B Claim 7) incorrectly attributes the Irvine cooling load (14,661 Btu/hr) to the Louisville, KY site, contradicting the document's Figure 11 and 12 captions. Both sets also correctly extract the Irvine load elsewhere and the Louisville load (15,853 Btu/hr) in other claims, creating internal contradictions in both. Coverage of other parameters (lighting, equipment, infiltration, HVAC sizes) is identical and accurate."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets contain the same critical factual error, incorrectly attributing the Irvine cooling load (14,661 Btu/hr) to the Louisville site in one claim each. Set A is preferred because it correctly identifies the specific site locations (e.g., 'Irvine, CA site', 'Louisville, KY site') as entities for the valid load claims, whereas Set B often defaults to the generic 'building' entity with location details in the conditions. Both sets accurately extract the HVAC sizing and internal load assumptions from the text."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p1-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A is more accurate and comprehensive, correctly capturing the co-launch configuration components from Figure 5.5-3 which Set B misses. Set B contains factual errors, such as hallucinating the word 'arcsecond' in the pointing error value ('sub-milliarcsecond arcsecond' vs 'levels') and omitting the approximation symbol ('~') in one claim. Both sets suffer from significant redundancy with duplicate claims, but Set A remains faithful to the source text and figures."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set A is better because it captures both pointing requirements (1/10 PSF and sub-milliarcsecond residual) while Set B misses the residual error. Set A also describes the 22.8 m dimension more accurately as 'HabEx in SLS' rather than just 'HabEx telescope'. Set B suffers from excessive redundancy (e.g., four claims for primary mirror diameter) which makes it less efficient, though its facts are generally correct."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p10-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 18,
+        "variant_wrong": 16,
+        "note": "Both sets struggle significantly with the table's column structure, frequently misbinding values to the wrong topological charge or stellar size condition (0 mas vs 1 mas). Set B is slightly better as it correctly extracts more specific values for Charges 6 and 10 (e.g., Defocus, Spherical) which Set A largely misattributes to Charge 4 or assigns incorrect conditions. However, Set B contains a hallucinated 'Charge 7' claim, while Set A systematically mislabels Charge 6/8/10 data as Charge 4."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 22,
+        "variant_wrong": 20,
+        "note": "Set A is slightly better because it correctly extracts the Defocus aberration values for Charges 4, 6, and 10 (0 mas stellar size), whereas Set B misbinds almost all Defocus values to incorrect charges (e.g., assigning 4.6 nm to Charge 4 or 8 instead of 6). However, Set A contains a hallucinated claim for 'Charge 7' which does not exist in the table. Both sets frequently confuse the 0 mas (left table) and 1 mas (right table) conditions, applying values from one side to the conditions of the other."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p3-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 0,
+        "note": "Set B is more precise and faithful, preserving the approximation symbol (~) for the telescope distance which Set A drops, and avoiding Set A's entity binding errors (binding science bands to the document title). Set B also captures the 'six beam paths' hardware detail that Set A misses. Although Set B omits the IWA trend claim found in Set A, Set A suffers from significant redundancy (multiple duplicate claims for bands and IWA) and fidelity issues."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 0,
+        "note": "Set A is more faithful to the source text, correctly preserving the approximate symbol (~) for the telescope distance which Set B omits. Set A also demonstrates better entity binding, whereas Set B incorrectly attributes science bands to the document title ('HabEx 4-Meter Baseline Design') in three separate claims and duplicates the IWA claim. While Set B captures the IWA trend relationship that Set A misses, Set A's higher precision and lack of misbound or redundant claims make it the better extraction."
+      }
+    },
+    "u-scical-cd-p40-43-c22f3f4e-p3-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set B is better because it accurately extracts the step dimension and quote, whereas Set A hallucinates a value ('1 1/8\"') and a supporting quote ('STEP 1 1/8\"') that do not exist in the text layer (which reads '2'-6 1/8\"'). Set B also correctly identifies the sheet number (P-401) and links the Solar Pump Station name to its keynote, which Set A omits. Set A includes more section references (A3, A5), but the presence of invented data violates the faithfulness requirement."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 8,
+        "variant_wrong": 7,
+        "note": "Set A is better because it correctly identifies the sheet number (P-401) and avoids the hallucinated dimension value ('1 1/8\"') present in Set B. Both sets incorrectly label elevation views (A1, A3, A5) as 'section references' and include vague 'connection' claims unsupported by the text legend, but Set B's factual error on the step dimension and missing sheet number make it less faithful. Set A captures the Reference Keynotes and Sheet Keynotes more comprehensively without inventing data."
+      }
+    },
+    "u-ken-manual-p70-79-3b80816c-p7-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 11,
+        "variant_wrong": 11,
+        "note": "Both sets fail to distinguish between the R-47.5 and R-57.5 rows, incorrectly labeling all values as R-47.5 (9 wrong claims each due to value/condition mismatch). Both also mislabel 'Loads' (Btu/hr) as 'Energy Use' in several BEoptE+ claims. However, Set A is slightly better as it includes a correct claim for the R-value itself and correctly identifies one additional data point compared to Set B."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 11,
+        "variant_wrong": 11,
+        "note": "Both sets correctly extract R-47.5 data for roughly 8 claims but systematically misattribute R-57.5 values to R-47.5 conditions in about 11 claims. Both frequently confuse 'Load' (Btu/hr) and 'Energy Use' (kWh) attributes. Set B includes one additional trivial R-value claim but otherwise mirrors Set A's errors and accuracy profile."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p9-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set A is better because it captures specific engineering details present in the text, such as the mathematical form of the phase screw dislocation ($e^{il\theta}$) and the 'phase-based' classification, which Set B omits. Set B includes a claim characterizing the relationship between charge and sensitivity as 'inverse,' which is an interpretation not explicitly stated in the text (which says 'higher... lower'), making it slightly less faithful. Both sets contain redundant claims (duplicates regarding starlight rejection and topological charge definition), but Set A's coverage of the VVC physics is more comprehensive and faithful to the source text."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is preferred because it captures specific technical details present in the text that Set A omits, specifically the 'phase-based' classification of the VVC and the mathematical form 'eilθ' of the phase screw dislocation. Both sets exhibit redundancy with duplicate claims regarding starlight rejection and topological charge definition, but Set B provides a more comprehensive extraction of the available engineering parameters without introducing errors."
+      }
+    },
+    "u-scical-cd-p40-43-c22f3f4e-p2-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 10,
+        "variant_wrong": 2,
+        "note": "Set B extracts dimension values and specification numbers with much higher accuracy, preserving fractions and full digits (e.g., 10'-0 1/2\" vs 10'-0, 11 31 13.A7 vs 31 13.A7) where Set A frequently truncates. Set A also invents locations like 'Section B' and 'intermediate plumbing line' not supported by the text or image. Set B contains one significant error conflating PVC piping with cable/hose details, but remains more faithful to the core engineering data."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 9,
+        "variant_wrong": 3,
+        "note": "Set A is significantly better at capturing precise engineering values (e.g., 10'-0 1/2\", 2'-0 3/8\") whereas Set B frequently truncates these to feet only (10'-0, 2'-0). Set B also misidentifies grid lines as detail references (6, 3.A7) and truncates keynote numbers (31 13.A7, 11 23). Set A has one clear invention regarding PVC material for cables (conflating two notes) and some redundant claims with minor quote errors, but its data fidelity is much higher."
+      }
+    },
+    "u-ken-manual-p70-79-3b80816c-p10-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A is significantly better because it extracts the detailed monthly performance data from the tables, which Set B completely ignores. Although Set A incorrectly identifies the unit for 'Energy Value' as kWh instead of dollars ($) in two claims, its comprehensiveness regarding the page's primary data content outweighs this error. Set B is accurate on the few static claims it makes but fails to capture the majority of the engineering data presented in the tables."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A extracts the static system specifications and site data accurately with no errors. Set B extracts more data including the monthly table but incorrectly identifies the unit for 'Energy Value' as 'kWh' instead of '$' (dollars) for two claims, violating the 'nothing invented' rule. Per the instruction that fewer wrong claims beats more claims, Set A is preferred for its complete fidelity despite lower recall."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p4-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 0,
+        "note": "Set A contains significant factual errors by misbinding UV Spectrometer specifications (1024 pixels, CCD201, Slit/grism) to the Visible Channel Spectrometer, which Table 5.5-3 shows has 4,096 pixels, CCD282, and IFS type. Set B correctly extracts the UV Spectrometer details and avoids these misbindings, although it includes some redundant claims. Set A also uses vague entity labels like 'Another Spectrometer' for data that clearly belongs to the Visible channel."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 0,
+        "note": "Set A is significantly better because it accurately extracts specifications from the tables and text without misbinding attributes. Set B contains multiple factual errors regarding the Visible Channel Spectrometer, incorrectly assigning the Camera's array width (1024 vs 4096), the UV channel's type (Slit/grism vs IFS), and the UV/Camera's detector (CCD201 vs CCD282) to the Visible Spectrometer entity. Set B also uses vague entity labels like 'Another Spectrometer (unnamed)' whereas Set A is specific. Both sets suffer from redundancy (duplicate claims), but Set A's accuracy makes it superior."
+      }
+    },
+    "u-scical-cd-p40-43-c22f3f4e-p4-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 3,
+        "note": "Set B is slightly better because it correctly extracts title block metadata (Checked By: Andrew Gong) and describes component relationships more precisely (Booster Pump to Flow Meter) without inventing terms like 'header' (Set A). Both sets incorrectly identify the 4 FT dimension as vertical when it is horizontal in the waste schematic. Set B has one misclassification (labeling the Fire Sprinkler line as 'domestic supply'), but Set A has more vague or unsupported conditions ('from header', 'Municipal Water Supply' instead of 'Potable Water Reel')."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set B is better because it captures specific engineering attributes like pipe material ('1\" CPVC') and equipment type ('Type A' for Potable Water Reel) that Set A misses. Set B also interprets dimension lines more accurately (e.g., 'Laundry to Shower | vertical distance | 4 FT' vs Set A's vague 'Laundry line | length'). Set A includes a likely misbound claim linking the total horizontal dimension (60-0 FT) specifically to 'flex pipe', and misinterprets a spacing dimension as a line length."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p7-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set B is better because it consistently uses precise attribute names (e.g., 'IR bandpass' in claim 9 vs. generic 'bandpass' in Set A claim 6) and includes conditions (e.g., 'UV mode') to capture the table column context. Set A is slightly less faithful due to the vague attribute in one claim and lack of contextual conditions."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A extracts all 9 table cells with precise attribute names (e.g., 'IR bandpass') and correctly uses the 'conditions' field to capture column context (e.g., 'UV mode'). Set B extracts the same data but uses a vague attribute ('bandpass' instead of 'IR bandpass') for one claim and largely omits the 'conditions' field, embedding context in quotes instead. Set A is more faithful to the table structure and requested schema."
+      }
+    },
+    "u-scical-cd-p40-43-c22f3f4e-p3-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A correctly extracts a valid equipment specification mapping (Booster Pump to 22 11 23) from the Reference Keynotes table found in the document text and image. Set B provides no claims at all, failing to capture any of the available engineering data such as the equipment legend or sheet information. Set A is faithful to the source text, while Set B offers no utility."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is completely empty, failing to extract any engineering data from a page rich in keynotes and sheet information. Set B correctly extracts one specification reference for the Booster Pump from the Reference Keynotes section, making it strictly more useful despite being incomplete. Since Set A captures nothing while Set B captures valid data accurately, Set B is superior."
+      }
+    },
+    "u-iea-22mw-p12-21-255d62ed-p3-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is better because it captures engineering evidence from both Figure 2 and Figure 3 captions, including the naming convention for the FFA-W3-241 airfoil which Set B completely misses. Set B only extracts data regarding the FFA-W3-211 airfoil from Figure 3, making it less comprehensive. Both sets contain accurate extractions with no hallucinated values, but Set A provides more complete coverage of the document's content."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is better because it concisely extracts the specific engineering claims for the FFA-W3-211 airfoil directly from the figure captions without redundancy. Set B includes the same correct claims but duplicates the relative thickness for FFA-W3-211 (once from specific data, once from general naming rules) and infers claims for FFA-W3-241 from the naming convention, which makes it slightly less focused and contains trivial redundancy."
+      }
+    },
+    "u-ken-manual-p70-79-3b80816c-p2-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is superior because it extracts all the textual specifications found in Set A while also accurately capturing the parametric data (wall R-values) and axis labels from Figures 3 and 4. Set A is accurate but incomplete as it ignores the significant engineering evidence presented in the charts. Neither set contains factually wrong claims based on the provided text and images."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is better because it captures critical engineering parameters from the figures (wall R-values and axis labels) in addition to the text, while Set B ignores the visual data entirely. Set A's claims regarding the chart legends and axes are accurate and supported by the image and captions, representing the specific variables tested in the analysis. Both sets correctly extract the textual specifications, but Set B's omission of the figure data makes it significantly less complete regarding the insulation analysis evidence."
+      }
+    },
+    "u-iea-22mw-p12-21-255d62ed-p8-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set B correctly interprets the figure legends by extracting 'visual representation' for the green and blue shadings, whereas Set A incorrectly binds 'thickness' to the color values (e.g., claiming thickness is 'green shading'). Set B also captures the explicit 'carbon fiber' material mention for the spar cap found in the text. Both sets contain redundant claims, but Set A includes semantic errors in attribute-value binding."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A correctly identifies the relationship between shading and the component as a 'visual representation', whereas Set B incorrectly binds 'green/blue shading' values to the 'thickness' attribute (shading represents thickness, it is not the thickness value itself). Set A is more redundant with duplicate claims but maintains semantic accuracy on these visual descriptions. Set B also adds an unsupported 'main shear webs' condition to one claim not present in the associated quote."
+      }
+    },
+    "u-ken-manual-p70-79-3b80816c-p2-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 3,
+        "note": "Set A is better because it accurately extracts text values (e.g., lighting energy 650 kWh/yr), whereas Set B hallucinates a conflicting value (50 kWh/yr) with a fabricated quote. Both sets contain errors in reading the graph data (e.g., Louisville energy at R-150/20 is ~1600 kWh, but both claim 1100-1300 kWh), but Set B's text hallucination is a critical failure. Set A is more faithful to the provided text layer."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 7,
+        "variant_wrong": 4,
+        "note": "Set B is better because it correctly extracts key text specifications missing in Set A, specifically the home area (900 ft2) and heat pump HSPF (9.3). Set A hallucinates a lighting energy value of 50 kWh/yr which contradicts the text (650 kWh/yr) and fabricates a quote to support it. While both sets contain inconsistent graph readings (e.g., conflicting energy values for the same insulation parameters), Set B is more faithful to the textual data and avoids invented values."
+      }
+    },
+    "u-iea-22mw-p12-21-255d62ed-p3-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Set B is better because it accurately extracts negative lift and drag data points visible in the plots (e.g., Cl=-1.0 at -20 deg), whereas Set A incorrectly claims a lift coefficient of 0.0 at 0 deg angle of attack, which contradicts the graph. Both sets contain an inaccurate claim for lift coefficient at 15 deg (1.5 vs ~1.8), but Set B also includes the correct value (1.8) in a separate claim. Set A contains excessive duplicate claims for relative thickness and a garbled quote for the Reynolds number."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 3,
+        "note": "Set A is better because it avoids the clearly incorrect claim in Set B that the lift coefficient is 0.0 at 0 degrees angle of attack (the graph shows a cambered airfoil with positive lift). Set B also contains excessive redundancy, extracting the same thickness and Reynolds number values multiple times with slight variations, whereas Set A is more concise. Both sets share inaccuracies regarding the Mixed flow lift-to-drag ratio and lift coefficient at 15 degrees, but Set A's overall fidelity to the graph data is higher."
+      }
+    },
+    "u-iea-22mw-p12-21-255d62ed-p8-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 2,
+        "note": "Set B is better because it correctly extracts the specific '50% span' condition for the aft shear web which Set A omits, and it avoids Set A's hallucinated 'X-axis' chord width claim (the figure only shows Y and Z axes). While both sets incorrectly hallucinate blade lengths (135m/130m) not supported by the visible 120m axis, Set A includes semantically incorrect bindings (e.g., claiming 'green shading' is a 'material') and contains significantly more garbled quotes and repetitive claims."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 2,
+        "note": "Set A is better because it maintains quote integrity and avoids hallucinating specific dimensions not found in the text layer (e.g., Set B claims a 5m chord width and conflicting lengths of 120m/135m with truncated quotes). Set A correctly binds visual representations (green/blue shading) to their meanings, whereas Set B incorrectly binds 'green shading' to 'material'. Although Set A misses the BECAS/stiffness matrix information present in the bottom paragraph, its claims are more faithful and less erroneous overall."
+      }
+    },
+    "u-scical-cd-p40-43-c22f3f4e-p1-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set B is superior because it extracts critical document metadata (submission dates, lot number, personnel) that Set A completely omits, providing a more complete engineering record. Both sets share errors where they misbind specific component reference keys (e.g., Pump Station) to a vague 'Solar Thermal Distribution System' entity, and Set B includes one typo in a reference number (13.0 vs 13.01). Set A is heavily padded with redundant variations of the same three keynote claims while missing the title block information."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A is significantly better as it captures critical title block metadata (submission dates, drawing date, authors, lot number) that Set B omits entirely. Set A has one value error (truncating 23 56 13.01 to 23 56 13.0), whereas Set B's extracted claims are accurate but sparse. The comprehensive nature of Set A makes it more useful for engineering verification despite the minor transcription error."
+      }
+    }
+  }
+}

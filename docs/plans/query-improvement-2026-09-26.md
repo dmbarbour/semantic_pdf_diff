@@ -183,8 +183,9 @@ Round 1 showed that asking the same question again often gets a different answer
 | r01b | The same, re-asking only changed requests | Text layer 0.72, table lead-in 0.71, neighbouring text 0.68 accepted; table filter inconclusive (12 pages) | $3.40 |
 | r02 / r02h | The three together, development / held-out | 0.68 (0.54–0.81) / 0.71 (0.56–0.86): accepted | $2.04 |
 | r03 | Stems, bands, grown tiles, each against the champion | Stems 0.63 (0.51–0.75), bands 0.83 (0.70–0.94), grown tiles 0.80 (0.70–0.89): accepted | $2.51 |
+| r04 / r04h | The three together, development / held-out | 0.64 (0.54–0.73) at 40 units / 0.69 (0.57–0.82): accepted | $2.91 |
 
-**Champion (2026-09-26):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images). Later rounds compare against it.
+**Champion (2026-09-27):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images, numbered-item stems, whitespace bands on report pages, tiles grown to whole lines). Later rounds compare against it.
 
 **Levers built, not yet judged:**
 

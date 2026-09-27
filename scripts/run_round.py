@@ -115,6 +115,10 @@ def main(argv=None):
     # 4. Sample units where each variant's answers differ from the baseline's.
     for v in spec["variants"]:
         batch = folder / f"pairs-{v}"
+        if done(f"pairs:{v}"):  # "units" raised past the sample: resample (the first units stay the same)
+            built = json.loads((batch / "pairs.json").read_text())
+            if len(built["items"]) < min(int(spec.get("units", 60)), built["units"]["units"] - built["units"]["unchanged"]):
+                state["steps"].pop(f"pairs:{v}")
         if wanted("pairs") and not done(f"pairs:{v}") and done(f"replay:{v}") and done("replay:baseline"):
             built = rounds.build_batch(runs_root / "baseline", runs_root / v, batch, n=int(spec.get("units", 60)),
                                        unit=unit_of(spec["variants"][v]))
@@ -131,6 +135,12 @@ def main(argv=None):
         if judges and all(done(f"judge:{v}:{m}") for m in judges) and v not in stopped:
             judged[v] = min(target, len(json.loads((folder / f"pairs-{v}" / "pairs.json").read_text())["items"]))
             stopped[v] = f"complete at {judged[v]}"
+    for v in list(stopped):  # "units" raised since a variant completed: judge on
+        pairs = folder / f"pairs-{v}" / "pairs.json"
+        if stopped[v].startswith("complete at") and pairs.exists() \
+                and judged.get(v, 0) < min(target, len(json.loads(pairs.read_text())["items"])):
+            stopped.pop(v)
+            state["steps"].pop(f"decide:{v}", None)
     save_state()
 
     def finish_variant(v, reason):
