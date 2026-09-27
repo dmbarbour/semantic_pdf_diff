@@ -847,12 +847,16 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         # A region spanning sections (a tile, an overview) is told all their headings.
         heading = " | ".join(" > ".join(x.heading_path) for x in page_section.spanned_box(page_no, bbox)
                              if x.heading_path)
-        prompt = (extraction_template(s).replace("{max_claims}", str(s.claims_per_request)) + "\nSource type: " + region
+        rules = "".join(rule.rstrip() + "\n" for rule in s.visual_rules) if region in ("tile", "figure", "overview") else ""
+        prompt = (extraction_template(s).replace("{max_claims}", str(s.claims_per_request)) + rules
+                  + "\nSource type: " + region
                   + (f"\nSection: {heading}" if heading else "") + (f"\n{context}" if context else "")
                   + "\nSOURCE DATA:\n" + text)
         key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
         if context:  # only then, so requests without context keep their recorded keys
             key += (hashlib.sha256(context.encode()).hexdigest(),)
+        if rules:  # image-task rules aren't in the interpreter's prompt hash (text tasks keep replaying),
+            key += ("visual rules", hashlib.sha256(rules.encode()).hexdigest())  # so they're in the key
 
         def finish(result, error):
             state["pending"] -= 1

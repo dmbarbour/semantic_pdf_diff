@@ -356,6 +356,7 @@ class Settings(Strict):
     # levers left at their defaults stay out of interpreter fingerprints, so recordings still apply.
     extract_prompt: str | None = None       # replaces the extraction instructions
     extract_rules: list[str] = Field(default_factory=list)  # appended to the instructions
+    visual_rules: list[str] = Field(default_factory=list)   # appended for image tasks only (tiles, figures, overview)
     context_before: int = Field(default=0, ge=0, le=20000)  # characters of preceding text, as context
     context_after: int = Field(default=0, ge=0, le=20000)   # characters of following text, as context
     table_context: int = Field(default=0, ge=0, le=20000)   # characters of text above a table (lead-in, caption)

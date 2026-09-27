@@ -287,6 +287,25 @@ class SectionContext(unittest.TestCase):
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d) / 'off', plain)
             self.assertTrue(all(len(i) <= 1 for _, i in plain.images))
 
+    def test_image_rules_reach_image_tasks_and_make_them_different_requests(self):
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            page = doc.new_page(width=900, height=900)
+            page.insert_text((40, 60), 'Pump rated 12 kW', fontsize=9)
+            path = Path(d) / 'p.pdf'
+            doc.save(path); doc.close()
+            keys = {}
+            for name, extra in (('plain', {}), ('visual', {'visual_rules': ['Read charts only at labelled ticks.']})):
+                client = Recorder(vision=True, **extra)
+                extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d) / name, client)
+                keys[name] = {k[3]: k for _, k in client.asked if k}
+                prompts = {k[3]: p for p, k in client.asked if k}
+                if name == 'visual':  # the rule reaches image tasks only
+                    self.assertTrue(all(('labelled ticks' in p) == t.startswith(('tile', 'overview', 'figure'))
+                                        for t, p in prompts.items()))
+            for task, key in keys['plain'].items():  # a fixture must never serve one's answer for the other
+                self.assertEqual(key == keys['visual'][task], task.startswith('text'))
+
     def test_table_filter_keeps_tables_and_drops_grids(self):
         from semantic_pdf_diff.extract import real_table
         doc = pymupdf.open()
