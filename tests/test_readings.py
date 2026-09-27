@@ -22,9 +22,8 @@ class Readings(unittest.TestCase):
         self.assertEqual(len(found), 1)
         words = {o.wording for o in found[0].occurrences}
         self.assertEqual(len(found[0].occurrences), 3)  # every reading stays a sighting
-        self.assertIn('handrails | material | 2x4 cedar', words)
-        # The most informative reading represents it ("material/dimension" says more than "material").
-        self.assertEqual((found[0].attribute, found[0].locator.task), ('material/dimension', 'tile:p1:1'))
+        self.assertIn('Handrail | material/dimension | 2x4 Cedar', words)
+        self.assertEqual(found[0].locator.task, 'tile:p1:0')  # the most local reading represents it
 
     def test_distinct_facts_with_one_value_stay_apart(self):
         cases = [
@@ -48,11 +47,14 @@ class Readings(unittest.TestCase):
         ])
         self.assertEqual(len(found), 2)  # the unconditioned reading doesn't join both
 
-    def test_a_reading_with_conditions_represents_one_without(self):
-        found = reconcile([sighting('tower', 'damping ratio', '1', '%', task='text:p1:0', region='text'),
-                           sighting('tower', 'damping ratio', '1', '%', 'isolated tower, without rotor-nacelle mass')])
+    def test_the_local_reading_represents_one_with_conditions_from_a_wide_region(self):
+        found = reconcile([sighting('member', 'section', 'W10X12', task='table:p1:0', region='table', bbox=(0, 0, 200, 50)),
+                           sighting('member', 'section', 'W10X12', conditions='Structure South Elevation - Main',
+                                    task='overview:p1', region='overview', bbox=(0, 0, 2448, 1584))])
         self.assertEqual(len(found), 1)
-        self.assertEqual(found[0].conditions, 'isolated tower, without rotor-nacelle mass')
+        self.assertEqual(found[0].conditions, '')  # the wide region's condition stays a wording, not the claim
+        self.assertIn('member | section | W10X12 | Structure South Elevation - Main',
+                      {o.wording for o in found[0].occurrences})
 
     def test_values_match_across_spacing_and_units_written_into_the_value(self):
         found = reconcile([sighting('pump', 'power', '10', 'kW'), sighting('pump', 'power', '10 kW', task='tile:p1:1')])

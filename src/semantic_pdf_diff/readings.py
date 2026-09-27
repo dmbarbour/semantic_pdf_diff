@@ -16,7 +16,7 @@ Conservative by design. Two claims are one fact when they
   "material/size"; not "West Module" and "East Module", nor "fore-aft stiffness" and
   "side-to-side stiffness").
 Every reading in a cluster must agree on conditions with every other.
-Clustering is greedy against each cluster's representative (the most informative reading), so
+Clustering is greedy against each cluster's representative (the most local reading), so
 chains of near-matches don't merge distinct facts.
 """
 import re
@@ -73,11 +73,12 @@ def sightings(e):
 
 def reconcile(evidence):
     """Claims (occurrences already merged by ID) with readings of one fact merged into one."""
-    # The most informative reading represents a fact (round 6: one ranked by region alone dropped
-    # an "isolated tower" condition another reading kept): most condition words, then most entity
-    # and attribute words, then the region rank.
-    informative = lambda e: (-len(_words(e.conditions)), -len(_words(e.entity)) - len(_words(e.attribute)))
-    claims = sorted(evidence, key=lambda e: (informative(e), representative_rank(e), e.id))
+    # The most local reading represents a fact: text or table before a tile, a tile before the
+    # overview. Round 7 tried the most informative reading instead (most condition words): wide
+    # regions attach context from elsewhere on the page ("Structure South Elevation - Main" on a
+    # sheet without it), and judges tagged three times as many claims invented. Round 6's one
+    # case the other way (a local reading lacking "isolated tower") is the cheaper error.
+    claims = sorted(evidence, key=lambda e: (representative_rank(e), e.id))
     clusters = []  # [representative, [members]]
     for e in claims:
         for cluster in clusters:
