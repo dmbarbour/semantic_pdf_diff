@@ -1,0 +1,221 @@
+{
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "verdicts": {
+    "u-calg-cd-p39-42-9a895974-p4-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets contain identical errors where the elevation '2' - 9 1/2\"' is misread as '2' 3 1/2\"' in two claims each. However, Set A is superior because it includes four additional correct claims that accurately link specific rooms (Bedroom, Kitchen) to their corresponding finished floor and grade level elevations shown in the sections. Set B is effectively a subset of Set A with the same errors but lower recall of valid engineering data."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets contain identical OCR errors, misreading the finished floor elevation '2' - 9 1/2\"' as '2' 3 1/2\"' in two claims each. However, Set B is better because it includes four additional correct claims that link specific rooms (Bedroom, Kitchen) to their respective grade and finished floor elevations, which Set A omits. Set B provides more comprehensive engineering data coverage while maintaining the same level of accuracy on shared claims."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p1-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Set A is more accurate regarding the document's figures and references. Set B incorrectly interprets the x-axis values (90-120) of the scoring graph as points rather than weight percentage and hallucinates an '8 h' cycle duration from the section reference '8-3h'. Both sets share a factual error claiming 48.9°C is the threshold for half-points (it is 46.1°C), and both contain excessive duplicate claims."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Set A contains significant hallucinations and misreadings, specifically inventing an '8 h' cycle duration from a section reference ('Contest 8-3h') and misinterpreting the x-axis values of the scoring graph as points. Set B avoids these errors and captures additional valid claims regarding drying methods and heated drying options that Set A missed. Both sets share a minor error binding the 48.9°C value to the half-points threshold, but Set B is much more faithful to the source text overall."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets share identical significant hallucinations: they claim 'Grade Level' is at 2'-9 1/2\" (it is Finished Floor) and misread the East Module Finished Floor height as 2'-3 1/2\" (it is 2'-9 1/2\"). Set A is better because it extracts a larger volume of correct claims (e.g., specific section scales, redundant but accurate floor elevations) without introducing any additional errors compared to Set B."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets share identical significant errors: they hallucinate a '2' 3 1/2\"' height for the East Module finished floor and incorrectly attribute the '2' - 9 1/2\"' elevation to 'Grade Level' in multiple claims. However, Set B is better because it includes correct claims binding the Finished Floor elevation (2' - 9 1/2\") to the East Module (Claim 18), whereas Set A only provides the hallucinated value for the East Module. Set B provides more comprehensive and accurate bindings overall despite the shared errors."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p3-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 5,
+        "note": "Both sets contain significant errors, including hallucinating 'L300X14' instead of the visible 'L3X3X1/4' and inventing the value '12 2 5/8 ft' (text layer says '12'-3 3/4\"'). Set B is worse because it repeats the hallucinated length value for both modules and misbinds '7'-0\"' to Module B (it belongs to Module A). Set A has fewer wrong claims overall, though it also misbinds '10'-3 3/4\"' to Module A."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 4,
+        "note": "Both sets incorrectly extract 'L300X14' instead of the documented 'L3X3X1/4'. Set A is preferred because it correctly captures the main structural lengths ('10'-3 3/4\"' and '12'-3 3/4\"') in claims 11 and 13, whereas Set B fails to identify the correct length for Module A (claiming '10'-3 3/4\"' instead of '12'-3 3/4\"') and hallucinates '12' 2 5/8\"' for Module B. Although Set A has more hallucinated claims (two instances of '12' 2 5/8\"' and a misbound '7'-0\"'), its inclusion of the correct critical dimensions makes it more faithful to the engineering data."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p2-page": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets incorrectly claim the scoring function increases linearly from 0 oz (it is 0 points until 16 oz), though Set B includes a separate correct claim specifying the 16-80 oz range. Set A severely misrepresents the dinner party guest limit (claiming 8 people per house instead of 8 total) and fabricates a quote to support this error. Set B hallucinates a contest name ('Home Entertainment Contest 9') but correctly captures other details like VIP limits and neighborhood size that Set A misses."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set A is better because it correctly extracts specific constraints like the VIP guest limit (2) and neighborhood house count (4), whereas Set B misinterprets the dinner party guest list limit as 8 people per neighboring house instead of 8 total. Both sets include a claim erroneously stating the linear scoring range begins at 0 oz (it begins at 16 oz), but Set A also provides a correct claim for the 16-80 oz range. Set A includes an invented contest name ('Home Entertainment'), but its extraction of specific rule constraints is more accurate and complete."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 8,
+        "variant_wrong": 15,
+        "note": "Set A is more faithful to the text layer values, correctly identifying the W8X13 section for the Roof Beam (E6) and the 2'-6\" spacing for the C1 beam, whereas Set B incorrectly labels the W8X13 beam as a Floor Beam and claims 2'-0\" spacing. Set B contains numerous hallucinated or misbound dimensions (e.g., assigning Grid 3 dimensions to Grid 4, claiming 6\" opening height for the round-hole Roof Beam E6). While Set B correctly extracts the 1/2\" radius note which Set A misses, Set A has significantly fewer factual errors regarding beam sections and dimension values."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 7,
+        "variant_wrong": 5,
+        "note": "Set A correctly extracts the General Sheet Note regarding edge radius and provides accurate dimensions for Beam D5 (Grid 5), whereas Set B confuses beam labels (identifying A4 as Grid 6 and B4 as Near Grid 5) and misses the general note. While both sets contain dimension reading errors and section binding mistakes (e.g., swapping W8X13/W10X13 for Roof/Floor beams near Grid 5/6), Set A maintains better label-to-beam consistency overall."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-page": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 12,
+        "variant_wrong": 12,
+        "note": "Both sets contain significant errors, particularly confusing wiring symbols 20 and 50 (swapping specifications) and hallucinating wire IDs (A: 11, 104, 107; B: 101, 105). Set B is slightly better because it correctly extracts Wiring Schedule 10 and Note 7 (Junction Box), which Set A misses. Set B also correctly identifies the Main Service Panel conduit size (2-1/2\"), whereas Set A misattributes this to Circuit 150. Although Set B incorrectly assigns the 200A breaker to the Sub-Panel (it is 50A), Set A's claim of a '3 W' breaker rating is nonsensical. Set B has fewer hallucinated entities."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 3,
+        "note": "Set A is better because it hallucinates fewer non-existent wire identifiers (2 vs 3 in Set B) and captures more legend items accurately (e.g., Item 10). While Set A incorrectly attributes the 200A breaker from Note 6 to the Sub-Panel (Note 2 specifies 50A), Set B makes a semantic error by labeling '3W' as the main breaker rating and incorrectly identifies symbol '50' as a quantity. Set B also misses several wiring schedule details that Set A extracts correctly."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p1-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 8,
+        "note": "Set A correctly extracts the Wiring Schedule items with accurate values, whereas Set B hallucinates non-existent schedule items (21, 22, 24) and provides incorrect wire sizes for existing items (e.g., claims Item 20 is 3#10 instead of 3#12, Item 50 is 3#8 instead of 3#6). Set A also correctly distinguishes the NFDS enclosure from the Main Panel, while Set B incorrectly attributes the NEMA 3R enclosure to the Main Panel. Both sets suffer from OCR errors in quotes (reading '3#4/0' as '3440'), but Set A's extracted values are far more faithful to the document content."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 10,
+        "note": "Set A hallucinates several wiring schedule items (21, 22, 24) that do not exist in the document and consistently misreads the conductor size '3#4/0' as '3440' for items 150 and 151. Set B accurately extracts the actual wiring schedule entries (31-34, 50, 151) with correct values, though it invents terms like 'Voltage Organizer' and has one OCR error in a quote for item 150. Set B is significantly more faithful to the source data."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p4-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Set A is preferred because it captures the display brightness requirements from the top of the page and the village neighborhood count (5), both of which Set B omits entirely. Both sets contain a factual error claiming the maximum points are 20 (misreading the Y-axis tick mark), although both also correctly identify 100 points in other claims. Set A provides more complete coverage of the provided text despite both having significant duplicate claims."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Set B is better because it captures the display brightness rule from the top of the page and the village neighborhood count (5), which Set A omits entirely. Both sets contain an incorrect claim interpreting the '20' axis tick as the maximum points (the graph and context indicate 100), but Set B provides more comprehensive coverage of the document's text. Set A is also more redundant with multiple claims for the same facts (e.g., decathlete visit duration)."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p11-page": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 7,
+        "variant_wrong": 4,
+        "note": "Both sets correctly extract the key parameters from the text box (-25.52E+6 watt/rad and 6.302336 deg) but both include inaccurate estimations of the graph's data points (e.g., claiming the last data point is -90E+6 when it is visually near -120E+6). Set A is better because Set B contains OCR-style typos in units ('watt/ra') and repeatedly misidentifies the specific parameter theta_K as the generic variable theta in entity names and quotes."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 10,
+        "variant_wrong": 6,
+        "note": "Both sets share significant substantive errors, including mislabeling theta_K as an 'intercept', inaccurate graph readings (-30E+6 vs -25.52E+6 at zero), and a truncated quote ('∂θ' instead of '∂P/∂θ'). However, Set B is better because it is a cleaned subset of Set A, removing a unit typo ('watt/ra'), several vague claims (e.g., extracting 'Angle' or 'θ' without context), and redundant entries found in Set A."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p1-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set A is preferred because it avoids the severe text hallucinations found in Set B (e.g., 'FLAT BLACK', 'SINGLE HOUGHY'), which are not present in the source text. While Set A suffers from significant redundancy and one logic error regarding the Solar Envelope height reference (claiming 18' from Finished Floor instead of Grade Level), Set B introduces multiple fabricated quotes and misattributes the cable railing diameter to the column thickness. Set B does capture useful sheet notes, but the fidelity issues outweigh this benefit."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set A is preferred because it captures critical engineering notes (door operation, solar tube spacing) that Set B misses entirely, and it has significantly fewer trivial duplicate claims. Although Set A contains three hallucinated or incorrect claims (flat black finish, 'Single Houghy' quote, column mislabeling) compared to Set B's two (column mislabeling, height inference error), Set B's high redundancy (multiple duplicates for Solar Envelope, Cable Railing, Finished Floor) and omission of the General Sheet Notes make it less comprehensive and faithful overall."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p4-page": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 10,
+        "variant_wrong": 6,
+        "note": "Set A is better because it correctly binds single circuits for several key loads (Refrigerator 11, Clothes Washer 13, Data Rack 9) which Set B incorrectly merges with adjacent circuits (e.g., claiming Grey Water Pump is 11-12). Set A also correctly extracts the Main Breaker rating (150A), which Set B misses. Set B introduces more significant value errors (e.g., claiming Circuit 40 is 50A when it is 15A) and has a higher count of misbound circuit pairs."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 8,
+        "note": "Set A is better because it correctly extracts specific circuit bindings for the Potable Water Pump (9/10), Grey Water Pump (11/12), and Wiser Power Meter (33/34), whereas Set B consistently offsets these values (e.g., claiming Refrigerator is circuit 11, Clothes Washer is 13). Set B also includes many vague claims referencing 'Row X' without specific circuit numbers, while Set A is more precise. Although Set B correctly identifies the Main Breaker (150A) which Set A misses, Set A's higher precision on the majority of circuit loads and fewer vague claims make it superior."
+      }
+    }
+  }
+}

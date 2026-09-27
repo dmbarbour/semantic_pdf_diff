@@ -1,0 +1,50 @@
+{
+  "steps": {
+    "record:baseline": "done",
+    "record:table-filter": "done",
+    "record:neighbours": "done",
+    "record:text-layer": "done",
+    "record:lead-in": "done",
+    "replay:baseline": "done",
+    "replay:table-filter": "done",
+    "replay:neighbours": "done",
+    "replay:text-layer": "done",
+    "replay:lead-in": "done",
+    "measure:baseline": "done",
+    "measure:table-filter": "done",
+    "measure:neighbours": "done",
+    "measure:text-layer": "done",
+    "measure:lead-in": "done",
+    "pairs:table-filter": "done",
+    "pairs:neighbours": "done",
+    "pairs:text-layer": "done",
+    "pairs:lead-in": "done",
+    "decide:table-filter": "done",
+    "decide:text-layer": "done",
+    "decide:lead-in": "done",
+    "decide:neighbours": "done"
+  },
+  "updated": "2026-09-27T01:47:35+00:00",
+  "judged": {
+    "table-filter": 12,
+    "neighbours": 24,
+    "text-layer": 16,
+    "lead-in": 15
+  },
+  "stopped": {
+    "table-filter": "complete at 12 units",
+    "text-layer": "stopped early at 16 units: clear result",
+    "lead-in": "complete at 15 units",
+    "neighbours": "stopped early at 24 units: clear result"
+  },
+  "failures": {
+    "judge:table-filter:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:table-filter:XiaomiMiMo/MiMo-V2.6-Pro": 3,
+    "judge:neighbours:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:neighbours:XiaomiMiMo/MiMo-V2.6-Pro": 0,
+    "judge:text-layer:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:text-layer:XiaomiMiMo/MiMo-V2.6-Pro": 2,
+    "judge:lead-in:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:lead-in:XiaomiMiMo/MiMo-V2.6-Pro": 3
+  }
+}

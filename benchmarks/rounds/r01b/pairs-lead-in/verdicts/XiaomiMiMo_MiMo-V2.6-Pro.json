@@ -1,0 +1,249 @@
+{
+  "reviewer": "XiaomiMiMo/MiMo-V2.6-Pro",
+  "verdicts": {
+    "u-calg-cd-p39-42-9a895974-p4-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Both sets capture the same four datum values from the two section level markers (grade level 0'-0\" and finished floor 2'-9 1/2\"), and both bind them to the kitchen/bedroom areas shown in the C1 and A1 sections. Set A's quotes each include the room name along with the level and value, so the entity binding is actually supported by the quoted text. Set B's two grade-level claims quote only the generic 'GRADE LEVEL 0'-0\"' string, which does not support the Kitchen or Bedroom binding, and its 'relative to grade level' condition is an inference not stated on the sheet. Set A is therefore the more faithful set with no unsupported claims."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets correctly capture the two datum markers (GRADE LEVEL 0' - 0\" and FINISHED FLOOR 2' - 9 1/2\") for the kitchen/dining section and the bedroom section, with values bound to the right rooms and quotes that match the text layer. Set A is slightly better because it keeps the needed condition that the finished floor value is relative to grade level and its quote includes both marker lines supporting that relationship. Set B labels the same values as 'elevations' without stating the datum/condition, making the claims less complete and slightly ambiguous. Neither set invents values or misbinds components."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p2-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are numerically accurate against Table 6-1: every value, unit and elevation/HtFract pairing I checked matches the table rows. Set A spreads its claims across mass density, fore-aft/side-to-side stiffness and inertia, torsional and axial stiffness, and its quotes consistently restate the full row (elevation, HtFract, property, value), so each claim is bound to its condition. Set B devotes 10 of 25 claims to trivial 0.0 center-of-gravity offsets and several of its quotes use ellipses (e.g. 'TwSSStif (N•m2) ... 534.82E+9') that never show the row the value comes from, leaving the stated elevation unsupported by the quote; it also labels fore-aft stiffness as 'forward-aft'. Set A therefore gives more substantive, better-supported coverage of the same table."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Both sets are numerically accurate against Table 6-1, with values correctly bound to rows and columns. Set A, however, pads its output with eleven near-trivial claims (ten identical 0.0 m cg-offset entries plus a bare elevation entry), uses vague ellipsis quotes for several of them, mislabels TwFAStif as \"forward-aft stiffness,\" and omits the side-to-side inertia column entirely. Set B covers a broader mix of properties (mass density, FA/SS stiffness, torsional and axial stiffness, both inertias, cg offsets) with fuller, row-specific quotes and only eight trivial entries, so it carries more useful information with less noise."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p11-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Both sets capture the two figure values but duplicate them; Set B binds them to the correct entity (the NREL 5-MW baseline wind turbine, for which the regression was computed) and names the properties accurately as pitch sensitivity at θ=0º. Set A instead attributes the values to a 'Blade-Pitch Controller' and to 'Rotor-Collective Blade-Pitch', neither of which is the subject in the source, and it mislabels θ_k = 6.302336º as a generic blade-pitch angle. Set B's only real error is calling 6.302336º the 'best-fit line intercept' (the intercept is the -25.52E+6 watt/rad value), while its other θ claim is merely vague. Overall Set B is more faithful and has fewer misbound claims."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set A correctly attributes both values to the NREL 5-MW baseline wind turbine and keeps the θ = 0º condition on the pitch sensitivity, matching the figure annotation and surrounding text. Set B invents a 'Blade-Pitch Controller' entity and binds the values to 'Rotor-Collective Blade-Pitch' (an axis label), while also presenting θK = 6.302336º as a generic pitch angle rather than the angle at which pitch sensitivity doubles. Set A is not flawless: it duplicates both facts and mislabels θK as the 'best-fit line intercept', which the text says is a different term. Overall A's bindings and conditions are more faithful."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets correctly capture the grade level at 0'-0\" and finished floor at 2'-9 1/2\" for both the West (C1) and East (A1) module sections, with quotes that support the values. Set A additionally captures the drawing scale (3/8\" = 1'-0\") for both section drawings, which Set B omits entirely, so B is missing a real fact present on the page. Set A's only questionable entry is the vague 'building | grade level' claim, which duplicates the datum-level claims; Set B is otherwise clean but less complete and its combined quotes for the finished-floor height are slightly loose."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets correctly capture the grade level (0' - 0\") and finished floor (2' - 9 1/2\") datums for the West and East Module sections, and both bind the finished-floor height to the modules relative to grade. Set B additionally captures the drawing scale (3/8\" = 1'-0\") for both sections, an important fact Set A omits entirely. Set A's claims are all supported but redundant, including one generic grade-level claim with no section condition. Set B's only real defect is the vague 'building | grade level' claim, which misbinds a datum to the building entity."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p3-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set B binds dimensions and member profiles to the correct details (Module A total length 12'-3 3/4\", Module B total length 10'-3 3/4\", L3X3X1/4 profiles for both modules), which Set A leaves as vague 'PV Detail | dimension' claims including a trivial bare 6\". Set A is otherwise accurate but omits the module-level bindings and total lengths. Set B's only clear error is the claim of a 5/16\" through bolt for Module A — 5/16\" does not appear in the source (the bolt is 3/8\" THROUGH BOLT), and 'bolt type' is also misbound. Despite that one wrong claim, Set B captures more of the important facts correctly."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Set A captures the key structural facts of both details — the overall lengths (10'-3 3/4\" for Module B, 12'-3 3/4\" for Module A) and the L3X3X1/4 member profiles — which Set B omits entirely. Set B is largely a subset of A plus one vague 'PV Detail | dimension | 6\"' claim whose 6\" value is unbound to any specific feature. Set A's one clear defect is the 'bolt type | 5/16\"' claim for Module A, a value that does not appear anywhere in the text layer and is unsupported by the sheet (the bolts are 3/8\" through bolts). Both sets share the same generic dimension claims and the S-301-conditioned bolt claim, so A wins on completeness despite its single invented value."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p10-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 26,
+        "variant_wrong": 0,
+        "note": "Set B captures all 15 rows of Table 7-1 with the correct entity (aerodynamic power), the correct property (∂P/∂θ sensitivity to blade pitch), and full operating conditions (wind speed, rotor speed, pitch angle) with supporting quotes. Set A misbinds every claim to a 'Baseline Blade-Pitch Controller' that does not appear on the page, splits rows into partial claims that drop the rotor-speed and pitch-angle conditions, and includes trivial repeated claims (e.g., rotor speed 12.1 rpm) while omitting several table rows entirely. Set A's values are individually readable from the table but are attached to the wrong component and lack needed conditions, so nearly all of its claims are misbound or trivial."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 25,
+        "variant_wrong": 0,
+        "note": "Set A extracts all 15 Table 7-1 rows with the sensitivity ∂P/∂θ correctly bound to aerodynamic power and each row's wind speed, rotor speed and pitch angle kept as conditions, matching the table exactly. Set B fragments the same table into trivial single-cell claims (e.g., 'Wind Speed = 12.0 m/s' with no conditions), drops several rows, and binds every claim to a 'Baseline Blade-Pitch Controller' entity that does not appear on this page. B's quotes are also ellipsized fragments rather than supporting text, so its values are largely misbound even where numerically read correctly."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p1-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets cover all nine Table 5-1 properties with accurate values and supporting quotes, but A repeats the rated rotor speed three times while B duplicates it only twice. B also binds the brake time constant to the High-Speed Shaft Brake (A misbinds it to the High-Speed Shaft) and keeps the 'fully-deployed' condition on the brake torque, which A drops. A's only advantage is naming the generator speed attribute more explicitly, which does not offset its extra redundancy and misbinding."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Both sets cover all nine Table 5-1 properties with accurate values and supporting quotes, so the difference is in redundancy and binding. Set A keeps the fully-deployed condition on the brake torque and has only one redundant rotor-speed claim, while Set B repeats the rotor speed three times and binds the brake time constant to 'High-Speed Shaft' rather than the brake. Set B's added 'rated' conditions are harmless but redundant with the property names, and it drops the explicit fully-deployed condition. Overall Set A is marginally cleaner and more faithful."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p3-table": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A correctly binds the 1% structural-damping ratio to the isolated tower and preserves the stated condition (without the rotor-nacelle assembly mass present), matching the prose. Set B attaches an invented, misbound condition (Height above Ground = 87.6 m) to the damping ratio and drops the real isolated-tower condition. Set A's extra 'overall height' claim is supported by the text ('overall tower height of 87.6 m'), so it is redundant but not wrong. All four table values are otherwise correctly captured in both sets."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A captures the four table properties correctly but attaches an unsupported condition to the damping ratio (Height above Ground = 87.6 m), whereas the text states the 1% damping applies to the isolated tower without the rotor-nacelle assembly mass, which Set B records correctly. Set B also keeps all four table values with supporting quotes and adds the overall tower height of 87.6 m from the prose. Set B's only weakness is a redundant second height claim (overall height duplicating height above ground) with a quote that names a different property, but it is not a misread of the value. Overall Set B is more faithful and complete."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p1-table": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets correctly capture the handrail, siding, cladding, cable railing, grade level, solar envelope, railing post, and tube-count facts, and both make the same misbinding of 2' - 9 1/2\" (a finished-floor elevation) to the evacuated solar thermal tubes. Set A additionally captures the finished floor elevation with its relative-to-grade condition, an important datum Set B omits. Set B instead repeats three claims (cable railing diameter, grade level elevation, solar envelope height) in near-identical form, adding trivial redundancy without new information."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 2,
+        "note": "Both sets misbind the 2' - 9 1/2\" finished-floor elevation to the evacuated solar thermal tubes as a height, but Set B additionally captures the finished floor elevation correctly with its condition relative to grade level, which Set A omits. Set A also contains three redundant duplicate claims (cable railing diameter, grade level elevation, and solar envelope height each stated twice in different unit formats), adding trivial noise. Set B's only extra issue is a redundant cladding/siding material claim, so it is the more faithful and complete set."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p4-table": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 0,
+        "note": "Both sets capture the same three Energy Balance scoring thresholds with accurate quotes and values. Set A binds them to net electrical energy and keeps the meaningful condition 'at contest conclusion,' which is supported by the text's 'at the conclusion of the specified energy balance period.' Set B instead fills the conditions field with 'Net electrical energy,' which is the measured quantity rather than a condition, so all three of its claims carry a misbound/unsupported condition. Set A is therefore more faithful overall."
+      },
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets extract the same three Figure 10 scoring thresholds with identical values and supporting quotes, and neither invents or misreads anything. Set A binds the claims to the Contest 10 scoring rules (a sensible component/property pairing) but its condition field merely repeats the variable 'Net electrical energy'. Set B keeps the genuinely important timing condition ('at contest conclusion', per 'at the conclusion of the specified energy balance period') but binds the points thresholds to the entity 'Net electrical energy' rather than to the contest's scoring. These are complementary, roughly equal strengths and weaknesses, so the sets are effectively equivalent in correctness."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p2-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 4,
+        "note": "Set A captures the reduced-points range (16–80 oz) and the no-points and full-points thresholds with their inequality conditions intact, and it includes the single-container requirement, though it misquotes that requirement as 'single task' instead of 'single container'. Set B omits the reduced-points range entirely and states the scoring thresholds as plain weights (16 oz, 450 g, 80 oz, 2300 g) without the ≥/≤/inequality relations, misstating the scoring rule. Both sets contain redundant duplicate starting-water claims, but A's coverage of the scoring function is materially more complete and faithful."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets correctly capture the 96.00 oz (2.721 kg) minimum starting water weight and the Figure 9 full-points (80 oz / 2300 g) and no-points (16 oz / 450 g) thresholds, and both contain several redundant restatements of the same facts. Set B additionally captures the reduced-points band (16 oz < Weight < 80 oz), which Set A omits entirely despite it being a key scoring condition. However, Set B includes one unsupported claim quoting 'The water shall be vaporized in a single task' — the source says 'vaporized in a single container', so the quote and value are misread/invented. Set A is error-free but thinner, missing both the reduced-points range and the single-container requirement."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 4,
+        "note": "Both sets share the same four misbound keynote codes (A4, A1, B4, B1 are shifted one beam off relative to the sheet keynotes), and both correctly capture the W10X15/W8X13 sections and the 1/2\" opening edge radius note. Set B correctly names the C1 beam as \"ROOF BEAM @ GRID 6 & NEAR GRID 5\", whereas Set A truncates it to \"ROOF BEAM @ GRID 6\" and also adds a redundant duplicate of the E6 roof beam claim. Set B is therefore cleaner and more faithful with no extra noise."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 4,
+        "note": "Both sets correctly assign W10X15 to the floor beams and W8X13 to the roof beams, and both capture the 1/2\" opening edge radius note. However, both swap the keynote callouts: A1 is FLOOR BEAM @ GRID 6 and A4 is FLOOR BEAM @ GRID 2 (and B1 is FLOOR BEAM NEAR GRID 5, B4 is FLOOR BEAM @ GRID 3), so four claims in each set carry misbound conditions. Set A is slightly better because it keeps the full 'ROOF BEAM @ GRID 6 & NEAR GRID 5' description with C1, whereas Set B truncates that entity/quote to 'ROOF BEAM @ GRID 6' and also repeats the E6 roof beam claim as a redundant duplicate."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p1-table": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets are largely faithful to the wiring schedule, but Set A binds every value cleanly to the correct row and property, including 150's #4G ground conductor, 20's 3#12 conductors, and 50's 3#6 conductors, which Set B omits. Set B's main flaw is the 150 claim 'conductor configuration | 3#4/0, #4G.', which folds the ground conductor into the conductor configuration, and its 'Wiring 10 | conductor size | #12/2WG' treats a cable designation as a conductor size. Set A also covers 32's USE-2 wire type and 34's 3#10G ground explicitly, giving it slightly better coverage with no misbindings."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets are largely faithful to the wiring schedule, but Set A covers more of the schedule's facts: it gives conductor material for items 20, 31, 32, 33, 34, 10, 150 and 151 and fully covers rows 31, 32, 33, 10 and 151. Set B is cleanly bound with no clear misreads, but it omits conductor material for items 20, 31, 34 and 50, omits item 10's #12/2WG cable and item 150's 3#4/0 conductors and 2-1/2\"C. Set A's only weakness is one loose binding (item 150's ground #4G folded into 'conductor configuration') and the imprecise label of #12/2WG as 'conductor size'. Set A also captures item 32's full 2#10USE-2 specification and item 50's #8G ground, which Set B splits or leaves partly out."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets bind the wiring-schedule rows to the correct descriptions and neither states a value that is not on the page. B is the more complete and better-anchored extraction: it captures 150's AL material and #4G ground, 151's ARMORED CABLE, and 34's 3#10G, with quotes tied to the row marks, whereas A drops those facts, repeats item 10's material redundantly, and appends \"AWG\" to values that appear only as \"#6\"/\"#8G\". A does win on one row (it keeps 50's 3#6 and #8G and 20's #12G, which B omits), but B's coverage is broader overall."
+      }
+    }
+  }
+}

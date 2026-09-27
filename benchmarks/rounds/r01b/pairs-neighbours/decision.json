@@ -1,0 +1,21 @@
+{
+  "units_judged": 24,
+  "overall": {
+    "mean": 0.682,
+    "low": 0.557,
+    "high": 0.802
+  },
+  "strata": {
+    "text": {
+      "mean": 0.682,
+      "low": 0.557,
+      "high": 0.802
+    }
+  },
+  "decision": "accepted: wins",
+  "units": {
+    "units": 137,
+    "unchanged": 94
+  },
+  "stopped": "stopped early at 24 units: clear result"
+}

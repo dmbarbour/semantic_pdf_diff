@@ -1,0 +1,293 @@
+{
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "verdicts": {
+    "u-dc-manual-p59-66-a157bdf0-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set B captures critical engineering claims regarding actuation method, energy source, and mechanism which Set A largely misses. Set A contains multiple factual errors in conditions, confusing 'HARVEST HOME' with 'HARVEST SCREEN' or truncating it to 'HARVEST', and includes a value typo ('20% %'). Set B has some quote truncation errors ('HARVES', 'opment') and misbinds the glazing percentage to the Screens in two claims, but its overall engineering evidence is more comprehensive and accurate."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Set A captures critical engineering functionality (energy source, movement mechanism, actuation method) that Set B largely omits, making it more useful for engineering analysis. However, Set A contains redundant claims and misbinds the 20% glazing statistic to the Screens entity in two instances (Claims 8, 10), while Set B has text extraction errors (typos, truncated building name) in its percentage claims. Set A is preferred for technical completeness despite the noise."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p2-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 2,
+        "note": "Set B is better because it correctly identifies technical attributes (e.g., Shear Modulus vs. Set A's Yield Strength) and units (N*m^2 vs. Set A's N*m^3) for the majority of valid claims. Set A contains systematic unit errors on stiffness properties and mislabels material properties, whereas Set B's errors are limited to two hallucinated claims not found in the text or table."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 3,
+        "note": "Set A correctly extracts physical units for stiffness properties (N*m^2) and accurately identifies the Shear Modulus, whereas Set B repeatedly cites incorrect units (N*m^3) and mislabels Shear Modulus as Yield Strength. Although Set A contains hallucinated values (218.3 N/m) and a row index error, Set B accumulates more factual errors regarding units and property definitions. Set A is preferred for higher physical fidelity in the valid claims."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p2-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Set A is preferred because it correctly identifies the full points threshold (80 oz) consistently across multiple claims, whereas Set B contradicts itself by claiming 0 points at 80 oz and 20 oz, which directly violates the 'Full points' and 'Reduced points' rules. Both sets incorrectly represent the starting water weight as 6.00 lb (not in text, text says 96.00 oz), but Set A fabricates this value in a quote while Set B falsely claims the text is clipped. Set A has a minor error on the linear scaling range (0-80 oz) but corrects it in another claim, while Set B's scoring point errors are fundamental engineering misinterpretations."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Set A is better because it accurately extracts the Dinner Party guest composition rules, whereas Set B misquotes the limit as 'eight people from each' house instead of eight total. Set B also fabricates '6.00 lb' in a quote where the text reads '96.00 oz'. Both sets contain errors interpreting the scoring graph (Set A claims 0 points at 80 oz and 20 oz; Set B claims linear scaling from 0 oz), and both have redundant claims, but Set A's text fidelity on critical rules is higher."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 7,
+        "variant_wrong": 3,
+        "note": "Set B is significantly more accurate regarding specific engineering values, correctly identifying the 3/4\" threaded rod and 2\"x8\" joists, whereas Set A hallucinates values like 1/2\" rods, 2x6 joists, and 4x8 plywood that contradict the text layer. Set B does contain some binding errors (attributing the 8'-0\" span to the footing plan and confusing decking dimensions for joists), but these are fewer and less severe than Set A's invented data. Set A also mislocates several dimensions to the wrong details (e.g., placing A6 dimensions in Deck Module Connection)."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 10,
+        "variant_wrong": 4,
+        "note": "Set A is significantly more faithful to the provided text layer, correctly extracting specific dimensions like the 3/4\" x 5 1/2\" reclaimed wood and 3/8\" x 4\" bolts. Set B hallucinates standard lumber sizes (5/4 x 6, 3/4 x 4 x 8) that contradict the document's specific notes, and incorrectly attributes dimensions to details (e.g., assigning A6 dimensions to B1, claiming 2x6 joists instead of 2x8). Set A has a few binding errors (joist size, C1 width), but Set B contains numerous invented values and misreadings."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 12,
+        "variant_wrong": 10,
+        "note": "Set B is better because it correctly extracts Reynolds numbers for all airfoils listed in the legend, whereas Set A misses several and includes a typo ('SNL-FFA-WFA-W3-500'). Set A hallucinates a large number of non-existent airfoil names (FFA-W3-1 through FFA-W3-6) that do not appear in the text or image, while Set B's entity errors are fewer (mostly FFA-W3-2 and FFA-W3-3 during graph reading). Set B also provides claims derived from the drag polar plot (b) which Set A largely ignores."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 12,
+        "variant_wrong": 9,
+        "note": "Set A is better because its entity extraction errors are primarily truncations of actual airfoil names found in the legend (e.g., 'SNL-FFA' instead of 'SNL-FFA-W3-500'), whereas Set B hallucinates completely non-existent airfoil designations (e.g., 'FFA-W3-1', 'FFA-W3-4', 'FFA-W3-5', 'FFA-W3-6') that appear nowhere in the text or images. Set B also contains a typo in an entity name ('SNL-FFA-WFA-W3-500'). Both sets correctly extract Reynolds numbers for the valid airfoils, but Set A has fewer claims bound to invented entities."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p4-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A correctly extracts multiple metadata fields from the document's title block (sheet number, title, lot number, drawn/checked by, copyright) that are clearly visible in both the image and the text layer. Set B provides no claims at all, failing to capture any of the available engineering information. Set A is significantly better as it provides accurate, grounded data while Set B is empty."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B correctly extracts multiple key metadata fields from the document's title block (sheet number, title, lot number, drawn/checked by, copyright) which are clearly visible in the image and supported by the text layer. Set A provides no claims at all, failing to capture any available engineering evidence. Set B is faithful and accurate, while Set A is empty."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p4-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 12,
+        "variant_wrong": 6,
+        "note": "Set B is more faithful to the source text and image bindings for most specific claims (e.g., Potable Water Pump 5/6, Spare 17/18 and 19/20, Organizer 39/40), whereas Set A contains numerous incorrect circuit number bindings (e.g., ERV at 27/28 instead of 23/24, Kitchen Receptacles at 15/16 instead of 17/18). Although Set B has some truncated entity names (e.g., 'ACLES', 'TACLE'), Set A's frequent misalignment of loads to circuit numbers represents more significant engineering errors. Set B correctly captures several specific circuit/load pairs that Set A gets wrong or misses."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 8,
+        "variant_wrong": 12,
+        "note": "Set B is better because it preserves entity names much more accurately (e.g., 'ORGANIZER VOLTAGE MONITORING' vs Set A's 'ORGANIZER VOLTAGE MO'). Set A contains multiple nonsensical fragments ('ACLES', 'TACLE', 'PTACLE') resulting from poor text extraction alignment. While both sets struggle with precise circuit number bindings (often grouping odd/even pairs), Set B's claims are more readable and structurally consistent, whereas Set A includes vague claims ('Main Panel | circuit breaker load') and significant binding errors (e.g., Wiser Power Meter bound to circuits 31-34 instead of 33-34)."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 7,
+        "variant_wrong": 0,
+        "note": "Set B is significantly more accurate, correctly extracting wire schedules, revision history, and metadata consistent with the document image. Set A contains multiple hallucinations (inventing cable symbol 21 and spec SP100E), significant OCR errors (reading 3#4/0 as 3440, 3#12 as 3#10, 3#6 as 3#8), and misattributes the NEMA 3R enclosure to the Main Panel instead of the NFDS. Set B faithfully represents the engineering data without inventing values."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 8,
+        "variant_wrong": 2,
+        "note": "Set A accurately extracts the Wiring Schedule values (e.g., Symbol 150 is 3#4/0 AL, Symbol 50 is 3#6 CU) and revision history, matching the visual document content. Set B hallucinates non-existent items (Cable 21, SP100E) and misreads wire gauges (e.g., claims Cable 20 is 3#10 instead of 3#12, Cable 50 is 3#8 instead of 3#6). Set A has minor OCR truncations but preserves engineering data integrity, whereas Set B contains multiple factual errors and invented data."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A contains a significant factual error in claim 6, stating the East Module finished floor height is 2' 3 1/2\" when the text and image clearly show 2' - 9 1/2\". Set B correctly identifies the finished floor height for both modules as 2' - 9 1/2\". While both sets are repetitive, Set B is more accurate."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A is preferred because it accurately extracts the finished floor elevation (2' - 9 1/2\") for both the East and West modules, matching the text layer and image. Set B contains a significant hallucination in one claim, stating the East Module finished floor height is 2' 3 1/2\" when the source clearly indicates 2' - 9 1/2\" for both sections. While Set A includes some redundant claims, it maintains factual fidelity whereas Set B introduces an incorrect value."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p6-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Set A is significantly more accurate regarding numerical values, whereas Set B contains multiple transcription errors (e.g., gear ratio 97.1:1 vs 97:1, mechanical power 5.298610 vs 5.296610, and a severe misread of transitional speed as rated speed 1.963 rpm). Set A has one unit error in a duplicate claim (Nm/rpm instead of Nm/rpm²) but otherwise faithfully extracts the data. Set B's errors occur in unique claims, reducing its reliability compared to A."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 2,
+        "note": "Set B is preferred because it has fewer factual errors in numerical values and units. Set A contains two incorrect claims: a typo in the rated mechanical power (5.298610 vs 5.296610 MW) and a severe truncation error for rated generator speed (1.963 rpm vs 1173.7 rpm). Set B has one unit error (Nm/rpm vs N·m/rpm²) but is otherwise accurate on the core controller parameters. Although Set B misses the filter information from the first paragraph, Set A's hallucinated values and higher number of trivial duplicate claims make it less reliable."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p6-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 8,
+        "variant_wrong": 2,
+        "note": "Set A is better because it correctly captures the explicit 'one-to-one depth-to-height ratio' stated in the text, whereas Set B incorrectly claims a 1.2 ratio in multiple instances. Set B also frequently omits critical terms from the height formula (such as 'window azimuth' or trigonometric functions) and misattributes the 'average' condition to the structural bend angle instead of spacing reduction. While Set A contains redundant claims and some truncated quotes, its factual extractions regarding ratios and conditions are more faithful to the source."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 7,
+        "note": "Set A provides more complete and readable values for the engineering formulas and metrics, whereas Set B frequently truncates values and quotes (e.g., 'Cos (solar', 'sing', 'hern'), rendering some claims unusable. Both sets struggle with the complex height formula, inventing simplified versions that omit trigonometric functions, and both capture the contradictory 1:1 vs 1.2 ratio statements from the text. Set A incorrectly binds the 'average' condition to the structural bend angle, while Set B correctly identifies the powder coated finish as a distinct attribute, but Set A's overall data quality is higher due to less truncation."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p7-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 2,
+        "note": "Set A is more faithful to the text, correctly extracting the torque rate limit (15,000 N•m/s) and rated speed definition, whereas Set B contradicts itself on the rate limit (claiming 'not specified' then '15,000') and misidentifies the rated speed as the filtered speed value. Set B also contains nonsensical graph readings (e.g., 900 N·m torque at 1400 rpm) and inaccurate curve intersections. While Set A includes some redundant claims and minor quote truncation, its technical values are consistently accurate compared to the source."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Set B captures key textual engineering claims missed by Set A, such as the high intrinsic structural damping and the single-DOF model design. Set A contains factual errors, specifically misattributing the 1173.7 rpm value to 'filtered generator speed' instead of 'rated generator speed' and incorrectly claiming the torque rate limit is 'not specified' in one entry despite extracting it correctly in another. Set B has some redundancy and minor quote truncations but is more faithful to the source text's technical content."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p3-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set A correctly distinguishes between Module A and Module B dimensions (e.g., identifying 3'-1 5/16\" for Module B and 2'-11 7/8\" for Module A), whereas Set B incorrectly attributes Module A dimensions to Module B (e.g., claiming 2'-3 7/8\" and 2'-11 7/8\" are Module B). Set A has one OCR error ('4 13\"' instead of '4 13/16\"') and one truncation, but Set B has multiple critical binding errors regarding the specific modules."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 3,
+        "note": "Set B is preferred because it correctly identifies the drawing scale and more accurately binds dimensions to their respective modules (e.g., assigning 2'-11 7/8\" to Module A), whereas Set A frequently misattributes Module A dimensions to Module B or uses vague entities. However, Set B contains a clear extraction error ('4 13\"' instead of '4 13/16\"') and formatting issues, while Set A trusts an OCR error ('12'-3 3/4\"' vs image '10'-3 3/4\"') and has more generic claims."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p9-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Set A is significantly more comprehensive, capturing critical engineering details missed by Set B, such as Region 3 controller behavior, design constraints (tip deflection/tower clearance), and the tip loss model effect. However, Set A contains substantial redundancy (multiple duplicate claims) and three factual/binding errors (identifying the 90 m peak as deflection rather than force, and attributing blade pitch to the rotor). Set B is more concise but omits entire sections of the text (Region 3, constraints) and contains a value error regarding the design point TSR (stating 8.5 instead of 9.0). Set A is preferred because missing important facts (constraints, Region 3) weighs heavier than redundancy, provided the core data is mostly present."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Set B is superior because it captures critical engineering constraints (tip deflection, tower clearance) and Region 3 control logic that Set A omits entirely. Set A contains multiple factual errors regarding the Tip-Speed Ratio (claiming design point is 8.5 and set point is 9.0, whereas text states design is 9.0 and optimal/set point is 8.5), while Set B is consistent on these values. Although Set B includes one misread claim (identifying the 90 m peak as deflection rather than force) and significant redundancy, its broader coverage of the text's technical content makes it more faithful to the source."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 7,
+        "variant_wrong": 6,
+        "note": "Set B is better because it avoids the hallucinated wire numbers (101, 105, 106) found in Set A which do not exist in the document. Set B also correctly distinguishes the 200A NFDS (Note 6) from the 50A Sub-Panel breaker (Note 2), whereas Set A incorrectly attributes the 200A rating to the Sub-Panel. Additionally, Set B captures valid title block metadata (revisions, lot number) and Note 7 (Junction Box) that Set A misses, despite both sets struggling with legend symbol bindings due to text layer noise."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 6,
+        "note": "Set A is better because it captures document metadata (revisions, lot number) and most notes correctly without inventing data, whereas Set B hallucinates non-existent wire symbols (101, 105, 106) and misattributes the sub-panel main breaker capacity (200A vs 50A). Set A does struggle with wire specifications due to text layer noise (e.g., Symbol 50 material, Symbol 10 spec), but these misreads are less severe than inventing components or getting safety-critical ratings wrong."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p10-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 9,
+        "variant_wrong": 8,
+        "note": "Set B is better because it captures important engineering parameters from the text (rated power, rated speed) and the mathematical equations (7-16a/b) which Set A misses. Set A contains a hallucinated value (-113.40E+6) and a condition binding error (labeling Wind Speed as Pitch Angle), whereas Set B's errors are primarily magnitude truncations (dropping E+6) and one typo. Set A is also excessively redundant."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 9,
+        "variant_wrong": 8,
+        "note": "Set A is better because it captures critical engineering claims from the text paragraph (rated mechanical power, rated rotor speed) and the mathematical models (Equations 7-16a/b), which Set B misses entirely. Both sets suffer from frequent magnitude errors in table data extraction (dropping '+6' from exponents), with Set A having ~9 wrong claims and Set B having ~8 wrong claims (including a variable binding error). Set A's completeness regarding the document's key parameters outweighs the similar noise level in table extraction."
+      }
+    }
+  }
+}

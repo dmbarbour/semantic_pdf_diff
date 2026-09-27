@@ -1,0 +1,3387 @@
+{
+  "format": "semantic-pdf-diff-pairwise-batch",
+  "version": 1,
+  "baseline": "/home/dmbarbour/projects/semantic_pdf_diff/benchmarks/runs/r01b/baseline",
+  "variant": "/home/dmbarbour/projects/semantic_pdf_diff/benchmarks/runs/r01b/lead-in",
+  "seed": 1,
+  "units": {
+    "units": 137,
+    "unchanged": 122
+  },
+  "items": [
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p4-table",
+      "run": "calg-cd-p39-42",
+      "content": "sha256:9a895974bcaa376163077de84a01fc16746b5353a679fa73dee42638b3ed1463.pdf",
+      "page": 4,
+      "family": "table",
+      "image": "images/calg-cd-p39-42-9a895974-p4.jpg",
+      "page_text": "6\n5\n4\n3\n2\n1\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\n---\n-\nKITCHEN\n6\n5\n4\n3\n2\n1\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\n---\n-\nMECHANICAL\n ROOM\nBEDROOM\nBEDROOM\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nSTATUS:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nSEALS\nMARK\nDATE\nDESCRIPTION\nTEAM ALBERTA\nUNIVERSITY OF CALGARY\n2500 UNIVERSITY DR NW\nCALGARY, AB  T2N 1N4\nMOUNT ROYAL UNIVERSITY\n4825 MT ROYAL GATE SW\nCALGARY, AB  T3E 6K6\nWWW.SOLARDECATHLON.CA\nINFO@SOLARDECATHLON.CA\n1\n04/29/2013\nISSUED FOR ELEC/MECH\n2\n05/03/2013\nISSUED FOR CLADDING\n3\n05/13/2013\nISSUED FOR STRUCTURAL REVIEW\n4\n05/22/2013\nISSUED FOR CONSTRUCTION 95%\n5\n08/22/2013\nAS BUILT SET\n22/08/2013 5:10:08 PM\nA-303\nBUILDING SECTIONS\n116\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n 3/8\" = 1'-0\"\nC1\nDINING ROOM SECTION\n 3/8\" = 1'-0\"\nA1\nBEDROOM SECTION\n0\n4'\n6'\n2'\n0\n4'\n6'\n2'\n",
+      "baseline": [
+        {
+          "entity": "Kitchen",
+          "attribute": "grade level elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "KITCHEN\nGRADE LEVEL\n0' - 0\""
+        },
+        {
+          "entity": "Bedroom",
+          "attribute": "finished floor elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "BEDROOM\nFINISHED FLOOR\n2' - 9 1/2\""
+        },
+        {
+          "entity": "Bedroom",
+          "attribute": "grade level elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "BEDROOM\nGRADE LEVEL\n0' - 0\""
+        },
+        {
+          "entity": "Kitchen",
+          "attribute": "finished floor elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "KITCHEN\nFINISHED FLOOR\n2' - 9 1/2\""
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Kitchen",
+          "attribute": "grade level",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL\n0' - 0\""
+        },
+        {
+          "entity": "Bedroom",
+          "attribute": "grade level",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL\n0' - 0\""
+        },
+        {
+          "entity": "Kitchen",
+          "attribute": "finished floor height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to grade level",
+          "quote": "KITCHEN\nFINISHED FLOOR\n2' - 9 1/2\"\nGRADE LEVEL\n0' - 0\""
+        },
+        {
+          "entity": "Bedroom",
+          "attribute": "finished floor height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to grade level",
+          "quote": "BEDROOM\nFINISHED FLOOR\n2' - 9 1/2\"\nGRADE LEVEL\n0' - 0\""
+        }
+      ],
+      "counts": {
+        "baseline": 4,
+        "variant": 4,
+        "shared": 0
+      }
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p2-table",
+      "run": "nrel-5mw-p25-36",
+      "content": "sha256:5eaf02be63d27c2ce3aaf706899464d07f8cd44eef6de936525857825f631aba.pdf",
+      "page": 2,
+      "family": "table",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p2.jpg",
+      "page_text": " 15 \n6  Tower Properties \nThe properties of the tower for the NREL offshore 5-MW baseline wind turbine will depend on \nthe type support structure used to carry the rotor-nacelle assembly.  The type of support structure \nwill, in turn, depend on the installation site, whose properties vary significantly through \ndifferences in water depth, soil type, and wind and wave severity.  Offshore support-structure \ntypes include fixed-bottom monopiles, gravity bases, and space-frames—such as tripods, \nquadpods, and lattice frames (e.g., “jackets”)—and floating structures.  This section documents \nthe tower properties for the equivalent land-based version of the NREL 5-MW baseline wind \nturbine.  These properties provide a basis with which to design towers for site-specific offshore \nsupport structures.  For example, different types of offshore support structures for the NREL 5-\nMW baseline wind turbine have been designed for—and investigated in—separate phases of the \nOC3 project [13,25]. \nWe based the distributed properties of the land-based tower for the NREL 5-MW baseline wind \nturbine on the base diameter (6 m) and thickness (0.027 m), top diameter (3.87 m) and thickness \n(0.019 m), and effective mechanical steel properties of the tower used in the DOWEC study (as \ngiven in Table 9 on page 31 of Ref. [14]).  The Young’s modulus was taken to be 210 GPa, the \nshear modulus was taken to be 80.8 GPa, and the effective density of the steel was taken to be \n8,500 kg/m3.  The density of 8,500 kg/m3 was meant to be an increase above steel’s typical value \nof 7,850 kg/m3 to account for paint, bolts, welds, and flanges that are not accounted for in the \ntower thickness data.  The radius and thickness of the tower were assumed to be linearly tapered \nfrom the tower base to tower top.  Because the REpower 5M machine had a larger tower-top \nmass than the DOWEC wind turbine, we scaled up the thickness of the tower relative to the \nvalues given earlier in this paragraph to strengthen the tower.  We chose an increase of 30% to \nensure that the first fore-aft and side-to-side tower frequencies were placed between the one- and \nthree-per-rev frequencies throughout the operational range of the wind turbine in a Campbell \ndiagram.  Table 6-1 gives the resulting distributed tower properties. \nThe entries in the first column, “Elevation,” are the vertical locations along the tower centerline \nrelative to the tower base.  “HtFract” is the fractional height along the tower centerline from the \ntower base (0.0) to the tower top (1.0).  The rest of columns are similar to those described for the \ndistributed blade properties presented in Table 2-1. \nThe resulting overall (integrated) tower mass is 347,460 kg and is centered at 38.234 m along the \nTable 6-1.  Distributed Tower Properties \nElevation\nHtFract\nTMassDen\nTwFAStif\nTwSSStif\nTwGJStif\nTwEAStif TwFAIner TwSSIner TwFAcgOf TwSScgOf\n(m)\n(-)\n(kg/m)\n(N•m2)\n(N•m2)\n(N•m2)\n(N)\n(kg•m)\n(kg•m)\n(m)\n(m)\n0.00\n0.0\n5590.87\n614.34E+9\n614.34E+9\n472.75E+9\n138.13E+9\n24866.3\n24866.3\n0.0\n0.0\n8.76\n0.1\n5232.43\n534.82E+9\n534.82E+9\n411.56E+9\n129.27E+9\n21647.5\n21647.5\n0.0\n0.0\n17.52\n0.2\n4885.76\n463.27E+9\n463.27E+9\n356.50E+9\n120.71E+9\n18751.3\n18751.3\n0.0\n0.0\n26.28\n0.3\n4550.87\n399.13E+9\n399.13E+9\n307.14E+9\n112.43E+9\n16155.3\n16155.3\n0.0\n0.0\n35.04\n0.4\n4227.75\n341.88E+9\n341.88E+9\n263.09E+9\n104.45E+9\n13838.1\n13838.1\n0.0\n0.0\n43.80\n0.5\n3916.41\n291.01E+9\n291.01E+9\n223.94E+9\n96.76E+9\n11779.0\n11779.0\n0.0\n0.0\n52.56\n0.6\n3616.83\n246.03E+9\n246.03E+9\n189.32E+9\n89.36E+9\n9958.2\n9958.2\n0.0\n0.0\n61.32\n0.7\n3329.03\n206.46E+9\n206.46E+9\n158.87E+9\n82.25E+9\n8356.6\n8356.6\n0.0\n0.0\n70.08\n0.8\n3053.01\n171.85E+9\n171.85E+9\n132.24E+9\n75.43E+9\n6955.9\n6955.9\n0.0\n0.0\n78.84\n0.9\n2788.75\n141.78E+9\n141.78E+9\n109.10E+9\n68.90E+9\n5738.6\n5738.6\n0.0\n0.0\n87.60\n1.0\n2536.27\n115.82E+9\n115.82E+9\n89.13E+9\n62.66E+9\n4688.0\n4688.0\n0.0\n0.0 \n",
+      "baseline": [
+        {
+          "entity": "Tower",
+          "attribute": "TwFAStif",
+          "value": "341.88E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TwFAStif (N•m2) 341.88E+9"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwSScgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "Elevation (m) 43.80, HtFract (-) 0.5, TwSScgOf (m) 0.0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "Mass Density",
+          "value": "4885.76",
+          "unit": "kg/m",
+          "conditions": "Elevation = 17.52 m",
+          "quote": "4885.76"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwEAStif",
+          "value": "89.36E+9",
+          "unit": "N",
+          "conditions": "Elevation = 52.56 m",
+          "quote": "89.36E+9"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwEAStif",
+          "value": "75.43E+9",
+          "unit": "N",
+          "conditions": "Elevation = 70.08 m",
+          "quote": "75.43E+9"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAIner",
+          "value": "4688.0",
+          "unit": "kg•m",
+          "conditions": "Elevation = 87.60 m",
+          "quote": "4688.0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAIner",
+          "value": "24866.3",
+          "unit": "kg•m",
+          "conditions": "Elevation = 0.00 m",
+          "quote": "Elevation (m) 0.00, TwFAIner (kg•m) 24866.3"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "FA Stiffness",
+          "value": "534.82E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 8.76 m, HtFract = 0.1",
+          "quote": "Elevation (m) 8.76, HtFract (-) 0.1, TwFAStif (N•m2) 534.82E+9"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "Fore-Aft Stiffness",
+          "value": "141.78E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "Elevation (m) 78.84, HtFract (-) 0.9, TwFAStif (N•m2) 141.78E+9"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwSSStif",
+          "value": "399.13E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwSSStif (N•m2) 399.13E+9"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TMassDen",
+          "value": "3616.83",
+          "unit": "kg/m",
+          "conditions": "Elevation = 52.56 m",
+          "quote": "3616.83"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "Elevation",
+          "value": "17.52",
+          "unit": "m",
+          "conditions": "HtFract = 0.2",
+          "quote": "17.52"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwSScgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 52.56 m",
+          "quote": "0.0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwGJStif",
+          "value": "189.32E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 52.56 m",
+          "quote": "189.32E+9"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwSSIner",
+          "value": "24866.3",
+          "unit": "kg•m",
+          "conditions": "Elevation = 0.00 m",
+          "quote": "Elevation (m) 0.00, TwSSIner (kg•m) 24866.3"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwGJStif",
+          "value": "263.09E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TwGJStif (N•m2) 263.09E+9"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwSSStif",
+          "value": "291.01E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "Elevation (m) 43.80, HtFract (-) 0.5, TwSSStif (N•m2) 291.01E+9"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "Mass Density",
+          "value": "5232.43",
+          "unit": "kg/m",
+          "conditions": "Elevation = 8.76 m, HtFract = 0.1",
+          "quote": "Elevation (m) 8.76, HtFract (-) 0.1, TMassDen (kg/m) 5232.43"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "HtFract",
+          "value": "0.8",
+          "unit": "",
+          "conditions": "Elevation = 70.08 m",
+          "quote": "0.8"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "SS Inertia",
+          "value": "21647.5",
+          "unit": "kg•m",
+          "conditions": "Elevation = 8.76 m, HtFract = 0.1",
+          "quote": "Elevation (m) 8.76, HtFract (-) 0.1, TwSSIner (kg•m) 21647.5"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwSScgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 70.08 m",
+          "quote": "0.0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "HtFract",
+          "value": "0.6",
+          "unit": "",
+          "conditions": "Elevation = 52.56 m",
+          "quote": "0.6"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "Fore-Aft Inertia",
+          "value": "5738.6",
+          "unit": "kg•m",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "Elevation (m) 78.84, HtFract (-) 0.9, TwFAIner (kg•m) 5738.6"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAcgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwFAcgOf (m) 0.0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "SS center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 8.76 m, HtFract = 0.1",
+          "quote": "Elevation (m) 8.76, HtFract (-) 0.1, TwSScgOf (m) 0.0"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "tower",
+          "attribute": "side-to-side center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "elevation = 87.60 m",
+          "quote": "TwSScgOf (m) ... 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwSScgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 70.08 m, HtFract = 0.8",
+          "quote": "70.08, 0.8, ..., 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "axial stiffness",
+          "value": "104.45E+9",
+          "unit": "N",
+          "conditions": "elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TwEAStif (N) 104.45E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "mass density",
+          "value": "2788.75",
+          "unit": "kg/m",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "78.84, 0.9, 2788.75"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "elevation = 52.56 m, HtFract = 0.6",
+          "quote": "Elevation (m) 52.56, HtFract (-) 0.6, TwFAcgOf (m) 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 61.32 m, HtFract = 0.7",
+          "quote": "61.32, 0.7, 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 61.32 m, HtFract = 0.7",
+          "quote": "61.32, 0.7, 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft inertia",
+          "value": "24866.3",
+          "unit": "kg•m",
+          "conditions": "Elevation = 0.00 m",
+          "quote": "Elevation (m) 0.00 ... TwFAIner (kg•m) 24866.3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "206.46E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 61.32 m, HtFract = 0.7",
+          "quote": "61.32, 0.7, 206.46E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwSSStif",
+          "value": "171.85E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 70.08 m, HtFract = 0.8",
+          "quote": "70.08, 0.8, ..., 171.85E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "TwSScgOf (m) ... 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TwFAcgOf (m) 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwFAcgOf (m) 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "614.34E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 0.00 m",
+          "quote": "Elevation (m) 0.00 ... TwSSStif (N•m2) 614.34E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwEAStif",
+          "value": "75.43E+9",
+          "unit": "N",
+          "conditions": "Elevation = 70.08 m, HtFract = 0.8",
+          "quote": "70.08, 0.8, ..., 75.43E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "axial stiffness",
+          "value": "82.25E+9",
+          "unit": "N",
+          "conditions": "Elevation = 61.32 m, HtFract = 0.7",
+          "quote": "61.32, 0.7, 82.25E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "115.82E+9",
+          "unit": "N•m2",
+          "conditions": "elevation = 87.60 m",
+          "quote": "TwSSStif (N•m2) ... 115.82E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "463.27E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 17.52 m, HtFract = 0.2",
+          "quote": "TwSSStif (N•m2) ... 463.27E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwSScgOf (m) 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "534.82E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 8.76 m, HtFract = 0.1",
+          "quote": "TwSSStif (N•m2) ... 534.82E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwFAcgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 70.08 m, HtFract = 0.8",
+          "quote": "70.08, 0.8, ..., 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "elevation",
+          "value": "87.60",
+          "unit": "m",
+          "conditions": "HtFract = 1.0",
+          "quote": "87.60"
+        },
+        {
+          "entity": "tower",
+          "attribute": "torsional stiffness",
+          "value": "411.56E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 8.76 m, HtFract = 0.1",
+          "quote": "TwGJStif (N•m2) ... 411.56E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft stiffness",
+          "value": "463.27E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 17.52 m, HtFract = 0.2",
+          "quote": "TwFAStif (N•m2) ... 463.27E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "forward-aft stiffness",
+          "value": "141.78E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "TwFAStif (N•m2) ... 141.78E+9"
+        }
+      ],
+      "counts": {
+        "baseline": 106,
+        "variant": 100,
+        "shared": 8
+      }
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p11-table",
+      "run": "nrel-5mw-p25-36",
+      "content": "sha256:5eaf02be63d27c2ce3aaf706899464d07f8cd44eef6de936525857825f631aba.pdf",
+      "page": 11,
+      "family": "table",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p11.jpg",
+      "page_text": " 24 \nwhere \n(\n)\nP\n0\nθ\nθ\n∂\n=\n∂\n is the pitch sensitivity at rated and θK is the blade-pitch angle at which the \npitch sensitivity has doubled from its value at the rated operating point; that is, \n \n(\n)\n(\n)\nK\nP\nP\n2\n0\nθ\nθ\nθ\nθ\nθ\n∂\n∂\n=\n=\n=\n∂\n∂\n. \n(7-17) \nOn the right-hand side of Eq. (7-16a), the first and second terms in square brackets represent the \nslope and intercept of the best-fit line, respectively.  We computed this regression for the NREL \n5-MW baseline wind turbine and present the results in Figure 7-3. \nThe linear relation between pitch sensitivity and blade-pitch angle presents a simple technique \nfor implementing gain scheduling based on blade-pitch angle; that is, \n \n( )\n(\n)\n( )\nDrivetrain\n0\nn\nP\nGear\n2I\nK\nGK\nP\nN\n0\nϕ\nϕ\nΩζ ω\nθ\nθ\nθ\nθ\n=\n∂\n\n\n−\n=\n\n\n∂\n\n\n \n(7-18) \n \nand \n-140E+6\n-120E+6\n-100E+6\n-80E+6\n-60E+6\n-40E+6\n-20E+6\n000E+0\n0\n5\n10\n15\n20\nRotor-Collective Blade-Pitch Angle, º\nPitch Sensitivity, watt/rad\nOriginal Data\nBest-Fit Line\n0E+6\n∂P /∂θ (θ =0º) = -25.52E+6 watt/rad\n                  θ k = 6.302336º\n \nFigure 7-3.  Best-fit line of pitch sensitivity in Region 3 \n",
+      "baseline": [
+        {
+          "entity": "Rotor-Collective Blade-Pitch",
+          "attribute": "Angle (θ)",
+          "value": "6.302336",
+          "unit": "º",
+          "conditions": "",
+          "quote": "θ = 6.302336º"
+        },
+        {
+          "entity": "Blade-Pitch Controller",
+          "attribute": "∂P /∂θ (θ =0º)",
+          "value": "-25.52E+6",
+          "unit": "watt/ra",
+          "conditions": "θ = 0º",
+          "quote": "∂P /∂θ (θ =0º) = -25.52E+6 watt/ra"
+        },
+        {
+          "entity": "Rotor-Collective Blade-Pitch",
+          "attribute": "Sensitivity (∂P /∂θ)",
+          "value": "-25.52E+6",
+          "unit": "watt/rad",
+          "conditions": "θ = 0º",
+          "quote": "∂P /∂θ (θ =0º) = -25.52E+6 watt/rad"
+        },
+        {
+          "entity": "Blade-Pitch Controller",
+          "attribute": "θ",
+          "value": "6.302336",
+          "unit": "º",
+          "conditions": "",
+          "quote": "θ = 6.302336º"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "NREL 5-MW baseline wind turbine",
+          "attribute": "∂P /∂θ (θ =0º)",
+          "value": "-25.52E+6",
+          "unit": "watt/ra",
+          "conditions": "θ = 0º",
+          "quote": "∂P /∂θ (θ =0º) = -25.52E+6 watt/ra"
+        },
+        {
+          "entity": "NREL 5-MW baseline wind turbine",
+          "attribute": "best-fit line intercept (θ)",
+          "value": "6.302336",
+          "unit": "º",
+          "conditions": "best-fit line for pitch sensitivity",
+          "quote": "θ = 6.302336º"
+        },
+        {
+          "entity": "NREL 5-MW baseline wind turbine",
+          "attribute": "θ",
+          "value": "6.302336",
+          "unit": "º",
+          "conditions": "",
+          "quote": "θ = 6.302336º"
+        },
+        {
+          "entity": "NREL 5-MW baseline wind turbine",
+          "attribute": "pitch sensitivity (∂P /∂θ) at θ = 0º",
+          "value": "-25.52E+6",
+          "unit": "watt/rad",
+          "conditions": "θ = 0º",
+          "quote": "∂P /∂θ (θ =0º) = -25.52E+6 watt/rad"
+        }
+      ],
+      "counts": {
+        "baseline": 4,
+        "variant": 4,
+        "shared": 0
+      }
+    },
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p2-table",
+      "run": "calg-cd-p39-42",
+      "content": "sha256:9a895974bcaa376163077de84a01fc16746b5353a679fa73dee42638b3ed1463.pdf",
+      "page": 2,
+      "family": "table",
+      "image": "images/calg-cd-p39-42-9a895974-p2.jpg",
+      "page_text": "GRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nB\nA\nH\nJ\nF\nD\nE\nC\nG\n---\n-\n---\n-\n---\n-\n---\n-\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nK\nB\nA\nH\nJ\nF\nD\nE\nC\nG\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nSTATUS:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nSEALS\nMARK\nDATE\nDESCRIPTION\nTEAM ALBERTA\nUNIVERSITY OF CALGARY\n2500 UNIVERSITY DR NW\nCALGARY, AB  T2N 1N4\nMOUNT ROYAL UNIVERSITY\n4825 MT ROYAL GATE SW\nCALGARY, AB  T3E 6K6\nWWW.SOLARDECATHLON.CA\nINFO@SOLARDECATHLON.CA\n1\n04/29/2013\nISSUED FOR ELEC/MECH\n2\n05/03/2013\nISSUED FOR CLADDING\n3\n05/13/2013\nISSUED FOR STRUCTURAL REVIEW\n4\n05/22/2013\nISSUED FOR CONSTRUCTION 95%\n5\n08/22/2013\nAS BUILT SET\n22/08/2013 5:09:58 PM\nA-301\nBUILDING SECTIONS\n116\n 3/8\" = 1'-0\"\nC1\nSECTION - WEST MODULE\n 3/8\" = 1'-0\"\nA1\nSECTION - EAST MODULE\n0\n4'\n6'\n2'\n0\n4'\n6'\n2'\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n",
+      "baseline": [
+        {
+          "entity": "West Module",
+          "attribute": "grade level",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "East Module",
+          "attribute": "grade level",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "West Module",
+          "attribute": "finished floor height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to grade level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "West Module",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "East Module",
+          "attribute": "finished floor height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to grade level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Section - West Module",
+          "attribute": "drawing scale",
+          "value": "3/8\"",
+          "unit": "per 1'-0\"",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "building",
+          "attribute": "grade level",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "East Module",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "East Module",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "West Module",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Section - East Module",
+          "attribute": "drawing scale",
+          "value": "3/8\"",
+          "unit": "per 1'-0\"",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "Section - East Module",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "Section - West Module",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "West Module",
+          "attribute": "finished floor height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to grade level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\" GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "Section - East Module",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "East Module",
+          "attribute": "finished floor height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to grade level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\" GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "grade level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "Section - West Module",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        }
+      ],
+      "counts": {
+        "baseline": 11,
+        "variant": 7,
+        "shared": 2
+      }
+    },
+    {
+      "id": "u-dc-cd-p39-42-2523f154-p3-table",
+      "run": "dc-cd-p39-42",
+      "content": "sha256:2523f1544fb49efaeb6fca153d07242bc9d08d700fecf10a0e0a6896b0f3fd66.pdf",
+      "page": 3,
+      "family": "table",
+      "image": "images/dc-cd-p39-42-2523f154-p3.jpg",
+      "page_text": "D\nC\nC1\nS-301\n3'-8 3/8\"\n3'-6\"\n3'-1 5/16\"\n10'-3 3/4\"\n6\"\n1 1/2\"\n1 1/2\"\n7 1/16\"\n2'-2 7/8\"\n6 3/16\"\n1'-8 11/16\"\n3\"\n4 13/16\"\n2\"\n2\"\n4\"\n2\"\n5/8\"\n6\"\nL3X3X1/4\nL3X3X1/4\nL3X3X1/4\n3/8\" THROUGH BOLT\n3/8\" THROUGH BOLT\nB\nA4\nS-301\nA\n12'-3 3/4\"\n2'-3 7/8\"\n7'-0\"\n2'-11 7/8\"\n6\"\n1 1/2\"\n1 1/2\"\n5/8\"\n6 13/16\"\n1'-11 1/8\"\n6 3/16\"\n2'-5 5/16\"\n6\"\n3\"\n4 3/4\"\n2\"\n2\"\n2\"\n4\"\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nNONE: PROJECT IS\nPUBLIC DOMAIN\nARCHITECT OF RECORD\nWILLIAM JELEN, AIA\n620 MICHIGAN AVE NE\nCROUGH CENTER\nWASHINGTON, DC 20064\nTEL: 202.344.5513\nSTRUCTURAL ENGINEER\nBOB ALLISON, PE\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nMEP ENGINEER\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nTEAM CAPITOL DC\nTEAM CAPITOL DC\n8/22/2013 4:48:20 PM\nS-701\nPV DETAILS\n115\nTeam Capitol dc\nTHE CATHOLIC UNIVERSITY OF AMERICA\nSCHOOL OF ARCHITECTURE\n620 MICHIGAN AVENUE, NE.\nWASHINGTON, DC 20064\n 1 1/2\" = 1'-0\"\nC1\nMODULE B - PV STRUCTURAL MEMBER - NORTH/SOUTH\n 1 1/2\" = 1'-0\"\nA1\nMODULE A - PV STRUCTURAL MEMBER - NORTH/SOUTH\nREFERENCE KEYNOTES\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n0\n1'\n1 1/2'\n1/2\"\n0\n1'\n1 1/2'\n1/2\"\nMARK\nDATE\nDESCRIPTION\n1\n2012.10.11\n80% DD Submission\n2\n2012.11.20\n80% DD Revisions\n3\n2013.02.04\n100% CD Submission\n4\n2013.08.22\nAs-Built Submission\n",
+      "baseline": [
+        {
+          "entity": "Through Bolt",
+          "attribute": "diameter",
+          "value": "3/8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" THROUGH BOLT"
+        },
+        {
+          "entity": "PV Detail",
+          "attribute": "dimension",
+          "value": "3'-8 3/8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3'-8 3/8\""
+        },
+        {
+          "entity": "PV Detail",
+          "attribute": "dimension",
+          "value": "6\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "6\""
+        },
+        {
+          "entity": "PV Detail",
+          "attribute": "dimension",
+          "value": "3'-6\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3'-6\""
+        },
+        {
+          "entity": "PV Detail",
+          "attribute": "dimension",
+          "value": "3'-1 5/16\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3'-1 5/16\""
+        },
+        {
+          "entity": "Through Bolt",
+          "attribute": "diameter",
+          "value": "3/8\"",
+          "unit": "",
+          "conditions": "S-301",
+          "quote": "3/8\" THROUGH BOLT\nS-301"
+        },
+        {
+          "entity": "Angle",
+          "attribute": "size",
+          "value": "L3X3X1/4",
+          "unit": "",
+          "conditions": "",
+          "quote": "L3X3X1/4"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Through Bolt",
+          "attribute": "diameter",
+          "value": "3/8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" THROUGH BOLT"
+        },
+        {
+          "entity": "PV Detail",
+          "attribute": "dimension",
+          "value": "3'-8 3/8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3'-8 3/8\""
+        },
+        {
+          "entity": "MODULE B - PV STRUCTURAL MEMBER - NORTH/SOUTH",
+          "attribute": "total length",
+          "value": "10'-3 3/4\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "10'-3 3/4\""
+        },
+        {
+          "entity": "PV Detail",
+          "attribute": "dimension",
+          "value": "3'-6\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3'-6\""
+        },
+        {
+          "entity": "PV Detail",
+          "attribute": "dimension",
+          "value": "3'-1 5/16\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3'-1 5/16\""
+        },
+        {
+          "entity": "MODULE A - PV STRUCTURAL MEMBER - NORTH/SOUTH",
+          "attribute": "member profile",
+          "value": "L3X3X1/4",
+          "unit": "",
+          "conditions": "",
+          "quote": "L3X3X1/4"
+        },
+        {
+          "entity": "MODULE A - PV STRUCTURAL MEMBER - NORTH/SOUTH",
+          "attribute": "bolt type",
+          "value": "5/16\"",
+          "unit": "",
+          "conditions": "through bolt",
+          "quote": "5/16\""
+        },
+        {
+          "entity": "Through Bolt",
+          "attribute": "diameter",
+          "value": "3/8\"",
+          "unit": "",
+          "conditions": "S-301",
+          "quote": "3/8\" THROUGH BOLT\nS-301"
+        },
+        {
+          "entity": "Angle",
+          "attribute": "size",
+          "value": "L3X3X1/4",
+          "unit": "",
+          "conditions": "",
+          "quote": "L3X3X1/4"
+        },
+        {
+          "entity": "MODULE A - PV STRUCTURAL MEMBER - NORTH/SOUTH",
+          "attribute": "total length",
+          "value": "12'-3 3/4\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "12'-3 3/4\""
+        },
+        {
+          "entity": "MODULE B - PV STRUCTURAL MEMBER - NORTH/SOUTH",
+          "attribute": "member profile",
+          "value": "L3X3X1/4",
+          "unit": "",
+          "conditions": "",
+          "quote": "L3X3X1/4"
+        },
+        {
+          "entity": "MODULE B - PV STRUCTURAL MEMBER - NORTH/SOUTH",
+          "attribute": "bolt type",
+          "value": "3/8\" THROUGH BOLT",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" THROUGH BOLT"
+        }
+      ],
+      "counts": {
+        "baseline": 7,
+        "variant": 12,
+        "shared": 6
+      }
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p10-table",
+      "run": "nrel-5mw-p25-36",
+      "content": "sha256:5eaf02be63d27c2ce3aaf706899464d07f8cd44eef6de936525857825f631aba.pdf",
+      "page": 10,
+      "family": "table",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p10.jpg",
+      "page_text": " 23 \nof given, steady, and uniform wind speeds; at the rated rotor speed (\n0\nΩ = 12.1 rpm); and at the \ncorresponding blade-pitch angles that produce the rated mechanical power (P0 = 5.296610 MW).  \nThe linearization analysis involves perturbing the rotor-collective blade-pitch angle at each \noperating point and measuring the resulting variation in aerodynamic power.  Within FAST, the \npartial derivative is computed using the central-difference-perturbation numerical technique.  We \ncreated a slightly customized copy of FAST with AeroDyn so that the linearization procedure \nwould invoke the frozen-wake assumption, in which the induced wake velocities are held \nconstant while the blade-pitch angle is perturbed.  This gives a more accurate linearization for \nheavily loaded rotors (i.e., for operating points in Region 3 closest to rated).  Table 7-1 presents \nthe results. \nAs Table 7-1 shows, the sensitivity of aerodynamic power to rotor-collective blade pitch varies \nconsiderably over Region 3, so constant PI gains are not adequate for effective speed control.  \nThe pitch sensitivity, though, varies nearly linearly with blade-pitch angle: \n \n(\n)\n(\n)\nK\nP\n0\nP\nP\n0\nθ\nθ\nθ\nθ\nθ\nθ\nθ\n∂\n\n\n=\n\n\n∂\n∂\n\n\n∂\n=\n+\n=\n\n\n\n\n∂\n∂\n\n\n\n\n\n\n \n(7-16a) \n \nor \n \n(\n)\nK\n1\n1\nP\nP\n0\n1\nθ\nθ\nθ\nθ\nθ\n=\n∂\n\n\n∂\n=\n+\n\n\n∂\n∂\n\n\n, \n(7-16b) \nTable 7-1.  Sensitivity of Aerodynamic Power to Blade \nPitch in Region 3 \nWind Speed\nRotor Speed\nPitch Angle\n∂P /∂θ\n(m/s)\n(rpm)\n(º)\n(watt/rad)\n11.4 - Rated\n12.1\n0.00\n-28.24E+6\n12.0\n12.1\n3.83\n-43.73E+6\n13.0\n12.1\n6.60\n-51.66E+6\n14.0\n12.1\n8.70\n-58.44E+6\n15.0\n12.1\n10.45\n-64.44E+6\n16.0\n12.1\n12.06\n-70.46E+6\n17.0\n12.1\n13.54\n-76.53E+6\n18.0\n12.1\n14.92\n-83.94E+6\n19.0\n12.1\n16.23\n-90.67E+6\n20.0\n12.1\n17.47\n-94.71E+6\n21.0\n12.1\n18.70\n-99.04E+6\n22.0\n12.1\n19.94\n-105.90E+6\n23.0\n12.1\n21.18\n-114.30E+6\n24.0\n12.1\n22.35\n-120.20E+6\n25.0\n12.1\n23.47\n-125.30E+6 \n",
+      "baseline": [
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "∂P /∂θ",
+          "value": "-94.71E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 20.0 m/s",
+          "quote": "∂P /∂θ\n(watt/rad) ... -94.71E+6"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Wind Speed",
+          "value": "12.0",
+          "unit": "m/s",
+          "conditions": "",
+          "quote": "Wind Speed\n(m/s) ... 12.0"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Pitch Angle",
+          "value": "6.60",
+          "unit": "º",
+          "conditions": "Wind Speed = 13.0 m/s",
+          "quote": "Pitch Angle\n(º) ... 6.60"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Rotor Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "Wind Speed = 19.0 m/s",
+          "quote": "Rotor Speed\n(rpm) ... 12.1"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Pitch Angle",
+          "value": "22.35",
+          "unit": "º",
+          "conditions": "Wind Speed = 24.0 m/s",
+          "quote": "Pitch Angle\n(º) ... 22.35"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Rotor Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "Wind Speed = 25.0 m/s",
+          "quote": "Rotor Speed\n(rpm) ... 12.1"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "∂P /∂θ",
+          "value": "-51.66E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 13.0 m/s",
+          "quote": "∂P /∂θ\n(watt/rad) ... -51.66E+6"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Rotor Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "Wind Speed = 14.0 m/s",
+          "quote": "Rotor Speed\n(rpm) ... 12.1"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Rotor Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "Wind Speed = 24.0 m/s",
+          "quote": "Rotor Speed\n(rpm) ... 12.1"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Wind Speed",
+          "value": "24.0",
+          "unit": "m/s",
+          "conditions": "",
+          "quote": "Wind Speed\n(m/s) ... 24.0"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Pitch Angle",
+          "value": "23.47",
+          "unit": "º",
+          "conditions": "Wind Speed = 25.0 m/s",
+          "quote": "Pitch Angle\n(º) ... 23.47"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "∂P /∂θ",
+          "value": "-90.67E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 19.0 m/s",
+          "quote": "∂P /∂θ\n(watt/rad) ... -90.67E+6"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "∂P /∂θ",
+          "value": "-64.44E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 15.0 m/s",
+          "quote": "∂P /∂θ\n(watt/rad) ... -64.44E+6"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "∂P /∂θ",
+          "value": "-43.73E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 12.0 m/s",
+          "quote": "∂P /∂θ\n(watt/rad) ... -43.73E+6"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Wind Speed",
+          "value": "11.4",
+          "unit": "m/s",
+          "conditions": "Rated",
+          "quote": "11.4 - Rated"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "∂P /∂θ",
+          "value": "-28.24E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 11.4 m/s (Rated)",
+          "quote": "-28.24E+6"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Wind Speed",
+          "value": "25.0",
+          "unit": "m/s",
+          "conditions": "",
+          "quote": "Wind Speed\n(m/s) ... 25.0"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "∂P /∂θ",
+          "value": "-70.46E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 16.0 m/s",
+          "quote": "∂P /∂θ\n(watt/rad) ... -70.46E+6"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Wind Speed",
+          "value": "13.0",
+          "unit": "m/s",
+          "conditions": "",
+          "quote": "Wind Speed\n(m/s) ... 13.0"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Pitch Angle",
+          "value": "10.45",
+          "unit": "º",
+          "conditions": "Wind Speed = 15.0 m/s",
+          "quote": "Pitch Angle\n(º) ... 10.45"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Pitch Angle",
+          "value": "18.70",
+          "unit": "º",
+          "conditions": "Wind Speed = 21.0 m/s",
+          "quote": "Pitch Angle\n(º) ... 18.70"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Pitch Angle",
+          "value": "8.70",
+          "unit": "º",
+          "conditions": "Wind Speed = 14.0 m/s",
+          "quote": "Pitch Angle\n(º) ... 8.70"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Rotor Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "Wind Speed = 11.4 m/s (Rated)",
+          "quote": "12.1"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Rotor Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "Wind Speed = 12.0 m/s",
+          "quote": "Rotor Speed\n(rpm) ... 12.1"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "∂P /∂θ",
+          "value": "-114.30E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 23.0 m/s",
+          "quote": "∂P /∂θ\n(watt/rad) ... -114.30E+6"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-58.44E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 14.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 8.70 º",
+          "quote": "Wind Speed (m/s) 14.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 8.70, ∂P /∂θ (watt/rad) -58.44E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-120.20E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 24.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 22.35 º",
+          "quote": "Wind Speed (m/s) 24.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 22.35, ∂P /∂θ (watt/rad) -120.20E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-94.71E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 20.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 17.47 º",
+          "quote": "Wind Speed (m/s) 20.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 17.47, ∂P /∂θ (watt/rad) -94.71E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-83.94E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 18.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 14.92 º",
+          "quote": "Wind Speed (m/s) 18.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 14.92, ∂P /∂θ (watt/rad) -83.94E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-76.53E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 17.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 13.54 º",
+          "quote": "Wind Speed (m/s) 17.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 13.54, ∂P /∂θ (watt/rad) -76.53E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-114.30E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 23.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 21.18 º",
+          "quote": "Wind Speed (m/s) 23.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 21.18, ∂P /∂θ (watt/rad) -114.30E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-99.04E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 21.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 18.70 º",
+          "quote": "Wind Speed (m/s) 21.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 18.70, ∂P /∂θ (watt/rad) -99.04E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-105.90E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 22.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 19.94 º",
+          "quote": "Wind Speed (m/s) 22.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 19.94, ∂P /∂θ (watt/rad) -105.90E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-90.67E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 19.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 16.23 º",
+          "quote": "Wind Speed (m/s) 19.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 16.23, ∂P /∂θ (watt/rad) -90.67E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-70.46E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 16.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 12.06 º",
+          "quote": "Wind Speed (m/s) 16.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 12.06, ∂P /∂θ (watt/rad) -70.46E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-28.24E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 11.4 m/s (Rated), Rotor Speed = 12.1 rpm, Pitch Angle = 0.00 º",
+          "quote": "Wind Speed (m/s) 11.4 - Rated, Rotor Speed (rpm) 12.1, Pitch Angle (º) 0.00, ∂P /∂θ (watt/rad) -28.24E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-51.66E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 13.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 6.60 º",
+          "quote": "Wind Speed (m/s) 13.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 6.60, ∂P /∂θ (watt/rad) -51.66E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-64.44E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 15.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 10.45 º",
+          "quote": "Wind Speed (m/s) 15.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 10.45, ∂P /∂θ (watt/rad) -64.44E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-125.30E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 25.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 23.47 º",
+          "quote": "Wind Speed (m/s) 25.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 23.47, ∂P /∂θ (watt/rad) -125.30E+6"
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-43.73E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 12.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 3.83 º",
+          "quote": "Wind Speed (m/s) 12.0, Rotor Speed (rpm) 12.1, Pitch Angle (º) 3.83, ∂P /∂θ (watt/rad) -43.73E+6"
+        }
+      ],
+      "counts": {
+        "baseline": 60,
+        "variant": 15,
+        "shared": 0
+      }
+    },
+    {
+      "id": "u-ken-cd-p95-98-f7b0008f-p4-table",
+      "run": "ken-cd-p95-98",
+      "content": "sha256:f7b0008f89c3d843f44ce34c08e4f0f5235cc77def8d91b98d2ff1d8baeec279.pdf",
+      "page": 4,
+      "family": "table",
+      "image": "images/ken-cd-p95-98-f7b0008f-p4.jpg",
+      "page_text": "CIRCUIT DESCRIPTION\nRATING\nCIRCUIT NUMBER\nRATING\nCIRCUIT DESCRIPTION\nMAIN BREAKER\n150A\nHVAC FURNACE\n15A\n1\n2\n50A\nCOOKTOP\n3\n4\nHVAC CONDESER\n20A\n5\n6\n20A\nOVEN\n7\n8\nDATA RACK, WISER CONTROL POWER\n20A\n9\n10\n20A\nPOTABLE WATER PUMP\nREFRIGERATOR\n20A\n11\n12\n20A\nGREY WATER PUMP\nCLOTHES WASHER\n20A\n13\n14\n20A\nKITCHEN RECEPTACLES N & E WALL\nDISHWASHER\n20A\n15\n16\n20A\nKITCHEN RECEPTACLES ISLAND, S WALL & SMOKE ALARM\nMICROWAVE RECEPTACLE\n20A\n17\n18\n20A\nOUTDOOR LIGHTING S WALL & WALL WASH LIGHTS\nMASTER BEDROOM RECEPTACLES, LIGHTS & SMOKE ALARM\n20A\n19\n20\n20A\nBATHROOM, PANTRY & LAUNDRY LIGHTS\nGUEST BEDROOM RECEPTACLES, LIGHTS & SMOKE ALARM\n20A\n21\n22\n20A\nSPARE\nKITCHEN LIGHTING\n20A\n23\n24\n20A\nSPARE\nSHOWER LIGHT\n20A\n25\n26\n20A\nOUTDOOR LIGHTING N WALL & DECK LIGHTING\nLIVING ROOM RECEPTACLES\n20A\n27\n28\n20A\nERV RECT, MECH ROOM CONV. RECT. & LIGHT\nBATHROOM RECEPTACLE\n20A\n29\n30\n30A\nCLOTHES DRYER\nWATER HEATER\n30A\n31\n32\n33\n34\n15A\nWISER POWER METER (X2) VOLTAGE SENSING AND CONTROL POWER\nOUTDOOR RECEPTACLES N & S SECTIONS\n20A\n35\n36\nINVERTER FEED\n50A\n37\n38\n15A\nORGANIZER VOLTAGE MONITORING\n39\n40\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nCONTACT:\nCONSULTANTS\nNONE: PROJECT IS\nPUBLIC DOMAIN\n     01\n      10/11/2012\n       DESIGN DEVELOPMENT\n     02\n      11/20/2012\n         DD RESUBMISSION\n     03\n      02/14/2013\n       CONSTRUCTION DOCS\n     04\n      04/05/2013\n         CDS RESUBMISSION\n     05\n      08/22/2013\n      AS-BUILTS DOCUMENTS\n8/22/2013 2:04:25 PM\nE-607\nMAIN PANEL CIRCUIT\nBREAKER SCHEDULE\n113\nCONNOR CLICK\nCONNOR CLICK\nTEAM KENTUCKIANA\nUNIVERISTY OF LOUISVILLE\n2301 SOUTH 3RD STREET\nLOUISVILLE, KY 40292\nUOFLSOLARDECATHLON@GMAIL.COM\nWWW.SD2013.TEAMKENTUCKIANA.ORG\nMARK\nDATE\nDESCRIPTION\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\n",
+      "baseline": [
+        {
+          "entity": "SPARE",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 22",
+          "quote": "22... 20A... SPARE"
+        },
+        {
+          "entity": "ERV RECT, MECH ROOM CONV. RECT. & LIGHT",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "ERV RECT, MECH ROOM CONV. RECT. & LIGHT, 20, A"
+        },
+        {
+          "entity": "CLOTHES WASHER circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 13",
+          "quote": "CLOTHES WASHER... 20A... 13"
+        },
+        {
+          "entity": "DISHWASHER",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 15",
+          "quote": "DISHWASHER... 20A... 15"
+        },
+        {
+          "entity": "GREY WATER PUMP circuit breaker",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 12",
+          "quote": "12... 20... A... GREY WATER PUMP"
+        },
+        {
+          "entity": "KITCHEN LIGHTING",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 23",
+          "quote": "KITCHEN LIGHTING... 20A... 23"
+        },
+        {
+          "entity": "POTABLE WATER PUMP",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 10",
+          "quote": "10... 20A... POTABLE WATER PUMP"
+        },
+        {
+          "entity": "OVEN",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 6",
+          "quote": "6... 20A... OVEN"
+        },
+        {
+          "entity": "DISHWASHER",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "DISHWASHER, 20, A"
+        },
+        {
+          "entity": "ORGANIZER VOLTAGE MONITORING",
+          "attribute": "rating",
+          "value": "15",
+          "unit": "A",
+          "conditions": "circuit number 38",
+          "quote": "38... 15A... ORGANIZER VOLTAGE MONITORING"
+        },
+        {
+          "entity": "OUTDOOR LIGHTING N WALL & DECK LIGHTING",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 26",
+          "quote": "26... 20A... OUTDOOR LIGHTING N WALL & DECK LIGHTING"
+        },
+        {
+          "entity": "DATA RACK, WISER CONTROL POWER",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 9",
+          "quote": "DATA RACK, WISER CONTROL POWER... 20A... 9"
+        },
+        {
+          "entity": "CLOTHES DRYER",
+          "attribute": "rating",
+          "value": "30",
+          "unit": "A",
+          "conditions": "circuit number 30",
+          "quote": "30... 30A... CLOTHES DRYER"
+        },
+        {
+          "entity": "SHOWER LIGHT",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 25",
+          "quote": "SHOWER LIGHT... 20A... 25"
+        },
+        {
+          "entity": "BATHROOM RECEPTACLE",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 29",
+          "quote": "BATHROOM RECEPTACLE... 20A... 29"
+        },
+        {
+          "entity": "MAIN BREAKER",
+          "attribute": "rating",
+          "value": "150",
+          "unit": "A",
+          "conditions": "",
+          "quote": "MAIN BREAKER... 150A"
+        },
+        {
+          "entity": "HVAC CONDESER",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 5",
+          "quote": "HVAC CONDESER... 20A... 5"
+        },
+        {
+          "entity": "MICROWAVE RECEPTACLE",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 17",
+          "quote": "MICROWAVE RECEPTACLE... 20A... 17"
+        },
+        {
+          "entity": "ERV RECT, MECH ROOM CONV. RECT. & LIGHT",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit 28",
+          "quote": "28... 20... A... ERV RECT, MECH ROOM CONV. RECT. & LIGHT"
+        },
+        {
+          "entity": "WATER HEATER",
+          "attribute": "circuit breaker rating",
+          "value": "30",
+          "unit": "A",
+          "conditions": "circuit number 31",
+          "quote": "WATER HEATER... 30A... 31"
+        },
+        {
+          "entity": "LIVING ROOM RECEP",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit numbers 27, 28",
+          "quote": "LIVING ROOM RECEP... 20A... 27, 28"
+        },
+        {
+          "entity": "GUEST BEDROOM RECEPTACLES, LIGHTS & SMOKE ALARM",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 21",
+          "quote": "GUEST BEDROOM RECEPTACLES, LIGHTS & SMOKE ALARM... 20A... 21"
+        },
+        {
+          "entity": "REFRIGERATOR circuit breaker",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 11",
+          "quote": "REFRIGERATOR... 20A... 11"
+        },
+        {
+          "entity": "LIVING ROOM RECEP",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "LIVING ROOM RECEP, 20, A"
+        },
+        {
+          "entity": "MASTER BEDROOM R",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "BATHROOM, PANTRY & LAUNDRY LIGHTS",
+          "quote": "MASTER BEDROOM R, 20, A, BATHROOM, PANTRY & LAUNDRY LIGHTS"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "DATA RACK, WISER CONTROL POWER",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 9",
+          "quote": "DATA RACK, WISER CONTROL POWER... 20A... 9"
+        },
+        {
+          "entity": "SPARE",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 24",
+          "quote": "24... 20... A... SPARE"
+        },
+        {
+          "entity": "Circuit 34",
+          "attribute": "rating",
+          "value": "15",
+          "unit": "A",
+          "conditions": "WISER POWER METER (X2) VOLTAGE SENSING AND CONTROL POWER",
+          "quote": "34 15A WISER POWER METER (X2) VOLTAGE SENSING AND CONTROL POWER"
+        },
+        {
+          "entity": "CLOTHES WASHER circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 13",
+          "quote": "CLOTHES WASHER... 20A... 13"
+        },
+        {
+          "entity": "DISHWASHER",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 15",
+          "quote": "DISHWASHER...20A...15"
+        },
+        {
+          "entity": "KITCHEN LIGHTING",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 23",
+          "quote": "KITCHEN LIGHTING... 20A... 23"
+        },
+        {
+          "entity": "GREY WATER PUMP circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 12",
+          "quote": "12... 20 A... GREY WATER PUMP"
+        },
+        {
+          "entity": "DISHWASHER circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 15",
+          "quote": "DISHWASHER... 20A... 15"
+        },
+        {
+          "entity": "Circuit 21",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "GUEST BEDROOM RECEPTACLES, LIGHTS & SMOKE ALARM",
+          "quote": "GUEST BEDROOM RECEPTACLES, LIGHTS & SMOKE ALARM... 20A... 21"
+        },
+        {
+          "entity": "ORGANIZER VOLTAGE MONITORING",
+          "attribute": "rating",
+          "value": "15",
+          "unit": "A",
+          "conditions": "",
+          "quote": "15A... ORGANIZER VOLTAGE MONITORING"
+        },
+        {
+          "entity": "REFRIGERATOR circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 11",
+          "quote": "REFRIGERATOR... 20A... 11"
+        },
+        {
+          "entity": "CLOTHES DRYER",
+          "attribute": "rating",
+          "value": "30",
+          "unit": "A",
+          "conditions": "circuit number 30",
+          "quote": "30... 30A... CLOTHES DRYER"
+        },
+        {
+          "entity": "COOKTOP",
+          "attribute": "rating",
+          "value": "50",
+          "unit": "A",
+          "conditions": "circuit number 2",
+          "quote": "2...50A...COOKTOP"
+        },
+        {
+          "entity": "SHOWER LIGHT",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 25",
+          "quote": "SHOWER LIGHT... 20A... 25"
+        },
+        {
+          "entity": "DISHWASHER circuit breaker",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "DISHWASHER, 20, A"
+        },
+        {
+          "entity": "POTABLE WATER PUMP",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 10",
+          "quote": "10... 20A... POTABLE WATER PUMP"
+        },
+        {
+          "entity": "HVAC CONDESER",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 5",
+          "quote": "HVAC CONDESER...20A...5"
+        },
+        {
+          "entity": "WATER HEATER",
+          "attribute": "circuit breaker rating",
+          "value": "30",
+          "unit": "A",
+          "conditions": "circuit number 31",
+          "quote": "WATER HEATER... 30A... 31"
+        },
+        {
+          "entity": "INVERTER FEED",
+          "attribute": "rating",
+          "value": "50",
+          "unit": "A",
+          "conditions": "",
+          "quote": "INVERTER FEED... 50A"
+        },
+        {
+          "entity": "ERV RECT, MECH ROOM CONV. RECT. & LIGHT",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit 28",
+          "quote": "28 ... 20 ... A ... ERV RECT, MECH ROOM CONV. RECT. & LIGHT"
+        },
+        {
+          "entity": "Circuit 22",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "SPARE",
+          "quote": "22... 20A... SPARE"
+        },
+        {
+          "entity": "LIVING ROOM RECEP",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "LIVING ROOM RECEP 20 A"
+        },
+        {
+          "entity": "MICROWAVE RECEPTACLE",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit 17",
+          "quote": "MICROWAVE RECEPTACLE...20A...17"
+        },
+        {
+          "entity": "MASTER BEDROOM R",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "BATHROOM, PANTRY & LAUNDRY LIGHTS",
+          "quote": "MASTER BEDROOM R 20 A BATHROOM, PANTRY & LAUNDRY LIGHTS"
+        },
+        {
+          "entity": "HVAC FURNACE",
+          "attribute": "rating",
+          "value": "15",
+          "unit": "A",
+          "conditions": "circuit number 1",
+          "quote": "HVAC FURNACE...15A...1"
+        }
+      ],
+      "counts": {
+        "baseline": 34,
+        "variant": 33,
+        "shared": 17
+      }
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p1-table",
+      "run": "nrel-5mw-p25-36",
+      "content": "sha256:5eaf02be63d27c2ce3aaf706899464d07f8cd44eef6de936525857825f631aba.pdf",
+      "page": 1,
+      "family": "table",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p1.jpg",
+      "page_text": " 14 \n5  Drivetrain Properties \nWe specified the NREL 5-MW baseline wind turbine to have the same rated rotor speed (12.1 \nrpm), rated generator speed (1173.7 rpm), and gearbox ratio (97:1) as the REpower 5M machine.  \nThe gearbox was assumed be a typical multiple-stage gearbox but with no frictional losses—a \nrequirement of the preprocessor functionality in FAST for creating ADAMS models [11].  The \nelectrical efficiency of the generator was taken to be 94.4%.  This was chosen to be roughly the \nsame as the total mechanical-to-electrical conversion loss used by the DOWEC turbine at rated \npower—that is, the DOWEC turbine had about 0.35 MW of power loss at about 6.25 MW of \naerodynamic power (from Figure 15, page 24 of Ref. [14]).  The generator inertia about the high-\nspeed shaft was taken to be 534.116 kg•m2, which is the same equivalent low-speed shaft \ngenerator inertia used in the DOWEC study (i.e., 5,025,500 kg•m2 from page 36 of Ref. [14]). \nThe driveshaft was taken to have the same natural frequency as the RECOFF turbine model and \na structural-damping ratio—associated with the free-free mode of a drivetrain composed of a \nrigid generator and rigid rotor—of 5% critical.  This resulted in an equivalent driveshaft linear-\nspring constant of 867,637,000 N•m/rad and a linear-damping constant of 6,215,000 N•m/(rad/s). \nThe high-speed shaft brake was assumed to have the same ratio of maximum brake torque to \nmaximum generator torque and the same time lag as used in the DOWEC study (from page 29 of \nRef. [14]).  This resulted in a fully deployed high-speed shaft brake torque of 28,116.2 N•m and \na time lag of 0.6 s.  This time lag is the amount of time it takes for the brake to fully engage once \ndeployed.  The FAST and ADAMS models employ a simple linear ramp from nothing to full \nbraking over the 0.6-s period. \nTable 5-1 summarizes the drivetrain properties discussed in this section.  \nTable 5-1.  Drivetrain Properties \nRated Rotor Speed\n12.1 rpm\nRated Generator Speed\n1173.7 rpm\nGearbox Ratio\n97 :1\nElectrical Generator Efficiency\n94.4 %\nGenerator Inertia about High-Speed Shaft\n534.116 kg•m2\nEquivalent Drive-Shaft Torsional-Spring Constant\n867,637,000 N•m/rad\nEquivalent Drive-Shaft Torsional-Damping Constant\n6,215,000 N•m/(rad/s)\nFully-Deployed High-Speed Shaft Brake Torque\n28,116.2 N•m\nHigh-Speed Shaft Brake Time Constant\n0.6 s\n \n",
+      "baseline": [
+        {
+          "entity": "Gearbox",
+          "attribute": "Gearbox Ratio",
+          "value": "97 :1",
+          "unit": "",
+          "conditions": "",
+          "quote": "Gearbox Ratio, 97 :1"
+        },
+        {
+          "entity": "Electrical Generator",
+          "attribute": "Efficiency",
+          "value": "94.4",
+          "unit": "%",
+          "conditions": "",
+          "quote": "Electrical Generator Efficiency, 94.4 %"
+        },
+        {
+          "entity": "High-Speed Shaft",
+          "attribute": "Brake Time Constant",
+          "value": "0.6",
+          "unit": "s",
+          "conditions": "",
+          "quote": "High-Speed Shaft Brake Time Constant, 0.6 s"
+        },
+        {
+          "entity": "Rotor",
+          "attribute": "Rated Rotor Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "rated",
+          "quote": "Rated Rotor Speed, 12.1 rpm"
+        },
+        {
+          "entity": "Generator",
+          "attribute": "Rated Generator Speed",
+          "value": "1173.7",
+          "unit": "rpm",
+          "conditions": "rated",
+          "quote": "Rated Generator Speed, 1173.7 rpm"
+        },
+        {
+          "entity": "Generator",
+          "attribute": "Inertia about High-Speed Shaft",
+          "value": "534.116",
+          "unit": "kg•m2",
+          "conditions": "",
+          "quote": "Generator Inertia about High-Speed Shaft, 534.116 kg•m2"
+        },
+        {
+          "entity": "Drive-Shaft",
+          "attribute": "Equivalent Torsional-Spring Constant",
+          "value": "867,637,000",
+          "unit": "N•m/rad",
+          "conditions": "",
+          "quote": "Equivalent Drive-Shaft Torsional-Spring Constant, 867,637,000 N•m/rad"
+        },
+        {
+          "entity": "Rotor",
+          "attribute": "Rated Rotor Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "",
+          "quote": "Rated Rotor Speed, 12.1 rpm"
+        },
+        {
+          "entity": "Rotor",
+          "attribute": "Rated Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "",
+          "quote": "Rated Rotor Speed, 12.1 rpm"
+        },
+        {
+          "entity": "Drive-Shaft",
+          "attribute": "Equivalent Torsional-Damping Constant",
+          "value": "6,215,000",
+          "unit": "N•m/(rad/s)",
+          "conditions": "",
+          "quote": "Equivalent Drive-Shaft Torsional-Damping Constant, 6,215,000 N•m/(rad/s)"
+        },
+        {
+          "entity": "High-Speed Shaft Brake",
+          "attribute": "Fully-Deployed Brake Torque",
+          "value": "28,116.2",
+          "unit": "N•m",
+          "conditions": "",
+          "quote": "Fully-Deployed High-Speed Shaft Brake Torque, 28,116.2 N•m"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Electrical Generator",
+          "attribute": "Efficiency",
+          "value": "94.4",
+          "unit": "%",
+          "conditions": "",
+          "quote": "Electrical Generator Efficiency, 94.4 %"
+        },
+        {
+          "entity": "High-Speed Shaft Brake",
+          "attribute": "Time Constant",
+          "value": "0.6",
+          "unit": "s",
+          "conditions": "",
+          "quote": "High-Speed Shaft Brake Time Constant, 0.6 s"
+        },
+        {
+          "entity": "Generator",
+          "attribute": "Inertia about High-Speed Shaft",
+          "value": "534.116",
+          "unit": "kg•m2",
+          "conditions": "",
+          "quote": "Generator Inertia about High-Speed Shaft, 534.116 kg•m2"
+        },
+        {
+          "entity": "Drive-Shaft",
+          "attribute": "Equivalent Torsional-Spring Constant",
+          "value": "867,637,000",
+          "unit": "N•m/rad",
+          "conditions": "",
+          "quote": "Equivalent Drive-Shaft Torsional-Spring Constant, 867,637,000 N•m/rad"
+        },
+        {
+          "entity": "High-Speed Shaft Brake",
+          "attribute": "Fully-Deployed Brake Torque",
+          "value": "28,116.2",
+          "unit": "N•m",
+          "conditions": "fully-deployed",
+          "quote": "Fully-Deployed High-Speed Shaft Brake Torque, 28,116.2 N•m"
+        },
+        {
+          "entity": "Generator",
+          "attribute": "Rated Speed",
+          "value": "1173.7",
+          "unit": "rpm",
+          "conditions": "",
+          "quote": "Rated Generator Speed, 1173.7 rpm"
+        },
+        {
+          "entity": "Rotor",
+          "attribute": "Rated Rotor Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "",
+          "quote": "Rated Rotor Speed, 12.1 rpm"
+        },
+        {
+          "entity": "Rotor",
+          "attribute": "Rated Speed",
+          "value": "12.1",
+          "unit": "rpm",
+          "conditions": "",
+          "quote": "Rated Rotor Speed, 12.1 rpm"
+        },
+        {
+          "entity": "Gearbox",
+          "attribute": "Ratio",
+          "value": "97 :1",
+          "unit": "",
+          "conditions": "",
+          "quote": "Gearbox Ratio, 97 :1"
+        },
+        {
+          "entity": "Drive-Shaft",
+          "attribute": "Equivalent Torsional-Damping Constant",
+          "value": "6,215,000",
+          "unit": "N•m/(rad/s)",
+          "conditions": "",
+          "quote": "Equivalent Drive-Shaft Torsional-Damping Constant, 6,215,000 N•m/(rad/s)"
+        }
+      ],
+      "counts": {
+        "baseline": 11,
+        "variant": 10,
+        "shared": 6
+      }
+    },
+    {
+      "id": "u-dc-cd-p39-42-2523f154-p2-table",
+      "run": "dc-cd-p39-42",
+      "content": "sha256:2523f1544fb49efaeb6fca153d07242bc9d08d700fecf10a0e0a6896b0f3fd66.pdf",
+      "page": 2,
+      "family": "table",
+      "image": "images/dc-cd-p39-42-2523f154-p2.jpg",
+      "page_text": "B\nA\n5'-1\"\n8\"\n11\"\n10\"\n4'-6\"\n2\"\n6\"\n2\"\nW10X15\nB\nA\n5'-0\"\n10\"\n10\"\n10\"\n10\"\n8\"\n3'-0\"\n2\"\n6\"\n2\"\nW10X15\nB\nA\n3'-7\"\n10\"\n5'-3\"\n8\"\n1'-8\"\n2\"\n6\"\n2\"\n2\"\n6\"\n2\"\nW10X15\nB\nA\n2'-1\"\n8\"\n9'-3\"\n2\"\n6\"\n2\"\nW10X15\nD\nC\n4'-2\"\n10\"\n1'-3\"\n8\"\n3'-1\"\nW10X15\n2\"\n6\"\n2\"\nD\nC\n2'-6\"\n2'-6\"\n2'-6\"\n2'-6\"\nW8X13\nø 3\"\nD\nC\n10'-0\"\n4'-2\"\n10\"\n1'-1\"\n10\"\n3'-1\"\n2\"\n6\"\n2\"\nB\nA\n3'-0\"\n3'-0\"\n3'-0\"\n3'-0\"\nW8X13\nø 3\"\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nNONE: PROJECT IS\nPUBLIC DOMAIN\nARCHITECT OF RECORD\nWILLIAM JELEN, AIA\n620 MICHIGAN AVE NE\nCROUGH CENTER\nWASHINGTON, DC 20064\nTEL: 202.344.5513\nSTRUCTURAL ENGINEER\nBOB ALLISON, PE\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nMEP ENGINEER\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nTEAM CAPITOL DC\nTEAM CAPITOL DC\n8/22/2013 4:48:11 PM\nS-601\nBEAM OPENINGS\n115\nTeam Capitol dc\nTHE CATHOLIC UNIVERSITY OF AMERICA\nSCHOOL OF ARCHITECTURE\n620 MICHIGAN AVENUE, NE.\nWASHINGTON, DC 20064\n 3/4\" = 1'-0\"\nA4\nFLOOR BEAM @ GRID 2\n 3/4\" = 1'-0\"\nB4\nFLOOR BEAM @ GRID 3\n 3/4\" = 1'-0\"\nC4\nFLOOR BEAM @ GRID 4\n 3/4\" = 1'-0\"\nD5\nFLOOR BEAM @ GRID 5\n 3/4\" = 1'-0\"\nB1\nFLOOR BEAMNEAR GRID 5\n 3/4\" = 1'-0\"\nC1\nROOF BEAM @ GRID 6 & NEAR GRID 5\n 3/4\" = 1'-0\"\nA1\nFLOOR BEAM @ GRID 6\n 3/4\" = 1'-0\"\nE6\nROOF BEAM @ GRID 2,3,4,5 T.O. STEEL\nREFERENCE KEYNOTES\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n0\n2'\n3'\n1'\n1/2\" RADIUS AROUND EDGES OF OPENINGS IN BEAMS\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\nMARK\nDATE\nDESCRIPTION\n1\n2012.10.11\n80% DD Submission\n2\n2012.11.20\n80% DD Revisions\n3\n2013.02.04\n100% CD Submission\n4\n2013.08.22\nAs-Built Submission\n",
+      "baseline": [
+        {
+          "entity": "FLOOR BEAM @ GRID 5",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "D5",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 5\nD5"
+        },
+        {
+          "entity": "ROOF BEAM @ GRID 2,3,4,5",
+          "attribute": "section",
+          "value": "W8X13",
+          "unit": "",
+          "conditions": "T.O. STEEL, E6",
+          "quote": "W8X13\nROOF BEAM @ GRID 2,3,4,5 T.O. STEEL\nE6"
+        },
+        {
+          "entity": "ROOF BEAM @ GRID 6",
+          "attribute": "section",
+          "value": "W8X13",
+          "unit": "",
+          "conditions": "C1",
+          "quote": "W8X13\nROOF BEAM @ GRID 6"
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 6",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "A4",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 6\nA4"
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 2",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "A1",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 2\nA1"
+        },
+        {
+          "entity": "FLOOR BEAM NEAR GRID 5",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "B4",
+          "quote": "W10X15\nFLOOR BEAMNEAR GRID 5 B4"
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 3",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "B1",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 3\nB1"
+        },
+        {
+          "entity": "Roof Beam @ Grid 2,3,4,5",
+          "attribute": "section",
+          "value": "W8X13",
+          "unit": "",
+          "conditions": "T.O. STEEL",
+          "quote": "W8X13\nROOF BEAM @ GRID 2,3,4,5 T.O. STEEL"
+        },
+        {
+          "entity": "beam openings",
+          "attribute": "edge radius",
+          "value": "1/2",
+          "unit": "\"",
+          "conditions": "around edges",
+          "quote": "1/2\" RADIUS AROUND EDGES OF OPENINGS IN BEAMS"
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 4",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "C4",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 4\nC4"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "FLOOR BEAM @ GRID 5",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "D5",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 5\nD5"
+        },
+        {
+          "entity": "ROOF BEAM @ GRID 6 & NEAR GRID 5",
+          "attribute": "section",
+          "value": "W8X13",
+          "unit": "",
+          "conditions": "C1",
+          "quote": "W8X13\nROOF BEAM @ GRID 6 & NEAR GRID 5"
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 6",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "A4",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 6\nA4"
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 2",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "A1",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 2\nA1"
+        },
+        {
+          "entity": "FLOOR BEAM NEAR GRID 5",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "B4",
+          "quote": "W10X15\nFLOOR BEAMNEAR GRID 5 B4"
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 3",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "B1",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 3\nB1"
+        },
+        {
+          "entity": "Roof Beam @ Grid 2,3,4,5",
+          "attribute": "section",
+          "value": "W8X13",
+          "unit": "",
+          "conditions": "T.O. STEEL",
+          "quote": "W8X13\nROOF BEAM @ GRID 2,3,4,5 T.O. STEEL"
+        },
+        {
+          "entity": "beam openings",
+          "attribute": "edge radius",
+          "value": "1/2",
+          "unit": "\"",
+          "conditions": "around edges",
+          "quote": "1/2\" RADIUS AROUND EDGES OF OPENINGS IN BEAMS"
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 4",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "C4",
+          "quote": "W10X15\nFLOOR BEAM @ GRID 4\nC4"
+        }
+      ],
+      "counts": {
+        "baseline": 10,
+        "variant": 9,
+        "shared": 8
+      }
+    },
+    {
+      "id": "u-ken-cd-p95-98-f7b0008f-p1-table",
+      "run": "ken-cd-p95-98",
+      "content": "sha256:f7b0008f89c3d843f44ce34c08e4f0f5235cc77def8d91b98d2ff1d8baeec279.pdf",
+      "page": 1,
+      "family": "table",
+      "image": "images/ken-cd-p95-98-f7b0008f-p1.jpg",
+      "page_text": "NOTES\nWIRING SCHEDULE\n1\n150\n50\nSIDE OF HOUSE\n6\nMAIN PANEL MP, 120/240V, 1\u0001, 3W.\n150A/2P MAIN BREAKER, MAIN BONDING JUMPER\n1\n200A/2P NFDS, NEMA 3R ENCLOSURE\n6\nDESCRIPTION\nSYMBOL\n150\nCU: 3#12, #12G., 3/4\"C.\n20\nCU: 3#6, #8G., 1\"C.\n50\nAL: 3#4/0, #4G., 2-1/2\"C.\nCU: 2#10, #10G., 3/4\"C.\n31\nCU: 2#10USE-2\n32\nCU: 6#10, #10G., 1\"C.\n33\nCU: 6#10, 3#10G., 1\"C.\n34\n151\nAL: 3#4/0, ARMORED CABLE\n10\nCU: #12/2WG.\nTO ORGANIZER\nUTILITY PANEL\n4 AWG, COPPER TO GND\nTO ORGANIZER\nINSTRUMENTATION PANEL\nL1, L2, & N, NO GND\nVOLTAGE SENSOR TO\nORGANIZER INST PANEL\nCURRENT SENSOR TO\nORGANIZER INST PANEL\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nCONTACT:\nCONSULTANTS\nNONE: PROJECT IS\nPUBLIC DOMAIN\n     01\n      10/11/2012\n       DESIGN DEVELOPMENT\n     02\n      11/20/2012\n         DD RESUBMISSION\n     03\n      02/14/2013\n       CONSTRUCTION DOCS\n     04\n      04/05/2013\n         CDS RESUBMISSION\n     05\n      08/22/2013\n      AS-BUILTS DOCUMENTS\n8/22/2013 11:40:03 AM\nE-601-2\nSINGLE-LINE DIAGRAM\n- ORGANIZER\nINTERFACE\n113\nJASON GILL\nCONNOR CLICK\nTEAM KENTUCKIANA\nUNIVERISTY OF LOUISVILLE\n2301 SOUTH 3RD STREET\nLOUISVILLE, KY 40292\nUOFLSOLARDECATHLON@GMAIL.COM\nWWW.SD2013.TEAMKENTUCKIANA.ORG\nMARK\nDATE\nDESCRIPTION\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\n",
+      "baseline": [
+        {
+          "entity": "Wiring Schedule Item 20",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#10G."
+        },
+        {
+          "entity": "Wiring Schedule Item 32",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring 151",
+          "attribute": "conductor material",
+          "value": "AL",
+          "unit": "",
+          "conditions": "",
+          "quote": "151, AL"
+        },
+        {
+          "entity": "Wiring Schedule Item 31",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring 151",
+          "attribute": "conductor configuration",
+          "value": "3#4/0",
+          "unit": "",
+          "conditions": "",
+          "quote": "151, 3#4/0"
+        },
+        {
+          "entity": "Wiring 150",
+          "attribute": "conductor configuration",
+          "value": "3#4/0, #4G.",
+          "unit": "",
+          "conditions": "",
+          "quote": "150, AL: 3#4/0, #4G."
+        },
+        {
+          "entity": "Wiring Schedule 34",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring 50",
+          "attribute": "ground conductor size",
+          "value": "#8G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#8G."
+        },
+        {
+          "entity": "Wiring Schedule Item 20",
+          "attribute": "ground conductor size",
+          "value": "#12G",
+          "unit": "AWG",
+          "conditions": "",
+          "quote": "#12G."
+        },
+        {
+          "entity": "Wiring Schedule Item 20",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "inch",
+          "conditions": "",
+          "quote": "3/4\"C."
+        },
+        {
+          "entity": "Wiring Schedule 34",
+          "attribute": "conductor count and size",
+          "value": "6#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "6#10"
+        },
+        {
+          "entity": "Wiring Schedule Item 31",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#10G."
+        },
+        {
+          "entity": "Wiring Schedule Item 31",
+          "attribute": "conductor quantity and size",
+          "value": "2#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "2#10"
+        },
+        {
+          "entity": "Wiring Schedule Item 32",
+          "attribute": "conductor specification",
+          "value": "2#10USE-2",
+          "unit": "",
+          "conditions": "",
+          "quote": "2#10USE-2"
+        },
+        {
+          "entity": "Wiring 10",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring 150",
+          "attribute": "conductor material",
+          "value": "AL",
+          "unit": "",
+          "conditions": "",
+          "quote": "150, AL"
+        },
+        {
+          "entity": "Wiring 10",
+          "attribute": "conductor size",
+          "value": "#12/2WG",
+          "unit": "",
+          "conditions": "",
+          "quote": "#12/2WG"
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring Schedule Item 31",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "in",
+          "conditions": "",
+          "quote": "3/4\"C."
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conductor size",
+          "value": "6#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "6#10"
+        },
+        {
+          "entity": "Wiring 50",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring 151",
+          "attribute": "cable type",
+          "value": "ARMORED CABLE",
+          "unit": "",
+          "conditions": "",
+          "quote": "151, ARMORED CABLE"
+        },
+        {
+          "entity": "Wiring Schedule 34",
+          "attribute": "ground conductor count and size",
+          "value": "3#10G.",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#10G."
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Wiring 151",
+          "attribute": "conductor specification",
+          "value": "3#4/0",
+          "unit": "",
+          "conditions": "",
+          "quote": "151, AL: 3#4/0"
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#10G."
+        },
+        {
+          "entity": "Wiring Schedule Item 32",
+          "attribute": "conductor quantity and size",
+          "value": "2#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "2#10"
+        },
+        {
+          "entity": "Wiring 151",
+          "attribute": "material",
+          "value": "AL",
+          "unit": "",
+          "conditions": "",
+          "quote": "151, AL: 3#4/0"
+        },
+        {
+          "entity": "Wiring Schedule Item 32",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring 31",
+          "attribute": "conductor quantity and size",
+          "value": "2#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "31, 2#10"
+        },
+        {
+          "entity": "Wiring Schedule Item 32",
+          "attribute": "wire type",
+          "value": "USE-2",
+          "unit": "",
+          "conditions": "",
+          "quote": "USE-2"
+        },
+        {
+          "entity": "Wiring 20",
+          "attribute": "ground conductor size",
+          "value": "#12G",
+          "unit": "AWG",
+          "conditions": "",
+          "quote": "#12G."
+        },
+        {
+          "entity": "Wiring Schedule Item 50",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring Schedule Item 34",
+          "attribute": "conductor count and size",
+          "value": "6#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "6#10"
+        },
+        {
+          "entity": "Wiring Schedule Item 10",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "10, CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 50",
+          "attribute": "conductor configuration",
+          "value": "3#6",
+          "unit": "AWG",
+          "conditions": "",
+          "quote": "3#6"
+        },
+        {
+          "entity": "Wiring Schedule Item 50",
+          "attribute": "ground conductor configuration",
+          "value": "#8G",
+          "unit": "AWG",
+          "conditions": "",
+          "quote": "#8G."
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring 150",
+          "attribute": "material",
+          "value": "AL",
+          "unit": "",
+          "conditions": "",
+          "quote": "150, AL"
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conductor size",
+          "value": "6#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "6#10"
+        },
+        {
+          "entity": "Wiring 31",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "31, #10G."
+        },
+        {
+          "entity": "Wiring Schedule Item 34",
+          "attribute": "ground conductor count and size",
+          "value": "3#10G.",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#10G."
+        },
+        {
+          "entity": "Wiring 150",
+          "attribute": "ground conductor",
+          "value": "#4G",
+          "unit": "",
+          "conditions": "",
+          "quote": "150, AL: #4G."
+        },
+        {
+          "entity": "Wiring 20",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "inch",
+          "conditions": "",
+          "quote": "3/4\"C."
+        },
+        {
+          "entity": "Wiring 20",
+          "attribute": "conductor count and size",
+          "value": "3#12",
+          "unit": "AWG",
+          "conditions": "",
+          "quote": "3#12"
+        },
+        {
+          "entity": "Wiring 31",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "in",
+          "conditions": "",
+          "quote": "31, 3/4\"C."
+        },
+        {
+          "entity": "Wiring 151",
+          "attribute": "cable type",
+          "value": "ARMORED CABLE",
+          "unit": "",
+          "conditions": "",
+          "quote": "151, ARMORED CABLE"
+        },
+        {
+          "entity": "Wiring Schedule Item 34",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        }
+      ],
+      "counts": {
+        "baseline": 30,
+        "variant": 31,
+        "shared": 6
+      }
+    },
+    {
+      "id": "u-ken-cd-p95-98-f7b0008f-p3-table",
+      "run": "ken-cd-p95-98",
+      "content": "sha256:f7b0008f89c3d843f44ce34c08e4f0f5235cc77def8d91b98d2ff1d8baeec279.pdf",
+      "page": 3,
+      "family": "table",
+      "image": "images/ken-cd-p95-98-f7b0008f-p3.jpg",
+      "page_text": "NOTES\n2\n20\n50\n31\n20\n31\n20\n31\n4\n4\n4\n34\n5\n7\nSUB-PANEL PV, 120/240V, 1\u0001, 3W.\nNEMA 3R ENCLOSURE, 50A/2P MAIN BREAKER\n2\n2.8KW INVERTER WITH GROUND FAULT\n4\n60A DC NFDS, NEMA 3R ENCLOSURE\n5\n200A/2P NFDS, NEMA 3R ENCLOSURE\n6\nNEMA 3R JUNCTION BOX ON SIDE OF HOUSE\n7\nNEC 690.42 EXCEPTION\nREQUIRED CONDUCTOR TO GROUND BOND MADE\nBY THE GROUND FAULT PROTECTION DEVICE.\nDESCRIPTION\nSYMBOL\n150\nCU: 3#12, #12G., 3/4\"C.\n20\nCU: 3#6, #8G., 1\"C.\n50\nAL: 3#4/0, #4G., 2-1/2\"C.\nCU: 2#10, #10G., 3/4\"C.\n31\nCU: 2#10USE-2\n32\nCU: 6#10, #10G., 1\"C.\n33\nCU: 6#10, 3#10G., 1\"C.\n34\n151\nAL: 3#4/0, ARMORED CABLE\n10\nCU: #12/2WG.\nWIRING SCHEDULE\nLEGEND\nTO MAIN SERVICE PANEL\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nCONTACT:\nCONSULTANTS\nNONE: PROJECT IS\nPUBLIC DOMAIN\n     01\n      10/11/2012\n       DESIGN DEVELOPMENT\n     02\n      11/20/2012\n         DD RESUBMISSION\n     03\n      02/14/2013\n       CONSTRUCTION DOCS\n     04\n      04/05/2013\n         CDS RESUBMISSION\n     05\n      08/22/2013\n      AS-BUILTS DOCUMENTS\n8/22/2013 2:04:25 PM\nE-602-2\nSINGLE-LINE DIAGRAM\n- PV EQUIPMENT\n113\nJASON GILL\nCONNOR CLICK\nTEAM KENTUCKIANA\nUNIVERISTY OF LOUISVILLE\n2301 SOUTH 3RD STREET\nLOUISVILLE, KY 40292\nUOFLSOLARDECATHLON@GMAIL.COM\nWWW.SD2013.TEAMKENTUCKIANA.ORG\nMARK\nDATE\nDESCRIPTION\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\nPRODUCED BY AN AUTODESK STUDENT PRODUCT\n",
+      "baseline": [
+        {
+          "entity": "Wiring Item 33",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Item 33",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring Item 33",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#10G."
+        },
+        {
+          "entity": "Circuit 150",
+          "attribute": "conduit size",
+          "value": "2-1/2",
+          "unit": "in",
+          "conditions": "",
+          "quote": "2-1/2\"C."
+        },
+        {
+          "entity": "Circuit 150",
+          "attribute": "conductor size",
+          "value": "3#4/0",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#4/0"
+        },
+        {
+          "entity": "Circuit 20",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "in",
+          "conditions": "",
+          "quote": "3/4\"C."
+        },
+        {
+          "entity": "Wiring Schedule 34",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring 10",
+          "attribute": "conductor type",
+          "value": "CU: #12/2WG",
+          "unit": "",
+          "conditions": "",
+          "quote": "10, CU: #12/2WG."
+        },
+        {
+          "entity": "Circuit 31",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "in",
+          "conditions": "",
+          "quote": "3/4\"C."
+        },
+        {
+          "entity": "Wiring Schedule 34",
+          "attribute": "conductor count and size",
+          "value": "6#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "6#10"
+        },
+        {
+          "entity": "Circuit 31",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#10G."
+        },
+        {
+          "entity": "Wiring Item 33",
+          "attribute": "conductor size",
+          "value": "6#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "6#10"
+        },
+        {
+          "entity": "Circuit 20",
+          "attribute": "conductor configuration",
+          "value": "3#12",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#12"
+        },
+        {
+          "entity": "Wiring 50",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "inch",
+          "conditions": "",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring 50",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring item 10",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "10 ... CU"
+        },
+        {
+          "entity": "Wire 151",
+          "attribute": "conductor material",
+          "value": "AL",
+          "unit": "",
+          "conditions": "",
+          "quote": "151...AL"
+        },
+        {
+          "entity": "Circuit 20",
+          "attribute": "ground conductor",
+          "value": "#12G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#12G."
+        },
+        {
+          "entity": "Wiring Schedule 34",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring 50",
+          "attribute": "conductor count and size",
+          "value": "3#6",
+          "unit": "AWG",
+          "conditions": "",
+          "quote": "3#6"
+        },
+        {
+          "entity": "Wire 32",
+          "attribute": "conductor specification",
+          "value": "2#10USE-2",
+          "unit": "",
+          "conditions": "",
+          "quote": "32...CU: 2#10USE-2"
+        },
+        {
+          "entity": "Wire 32",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "32...CU: 2#10USE-2"
+        },
+        {
+          "entity": "Wire 151",
+          "attribute": "conductor count and size",
+          "value": "3#4/0",
+          "unit": "",
+          "conditions": "",
+          "quote": "151...3#4/0"
+        },
+        {
+          "entity": "Wiring 50",
+          "attribute": "ground conductor size",
+          "value": "#8G",
+          "unit": "AWG",
+          "conditions": "",
+          "quote": "#8G."
+        },
+        {
+          "entity": "Circuit 31",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#10G."
+        },
+        {
+          "entity": "Wiring Schedule 31",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule 150",
+          "attribute": "conduit size",
+          "value": "2-1/2",
+          "unit": "in",
+          "conditions": "",
+          "quote": "2-1/2\"C."
+        },
+        {
+          "entity": "Wiring Schedule 150",
+          "attribute": "conductor count and size",
+          "value": "3#4/0",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#4/0"
+        },
+        {
+          "entity": "Circuit 20",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "in",
+          "conditions": "",
+          "quote": "20 ... 3/4\"C."
+        },
+        {
+          "entity": "Wiring Schedule Item 34",
+          "attribute": "conductor count and size",
+          "value": "6#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "6#10"
+        },
+        {
+          "entity": "Circuit 10",
+          "attribute": "wiring",
+          "value": "CU: #12/2WG",
+          "unit": "",
+          "conditions": "",
+          "quote": "10 ... CU: #12/2WG."
+        },
+        {
+          "entity": "Circuit 20",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "20 ... CU"
+        },
+        {
+          "entity": "Circuit 50",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "50 ... 1\"C."
+        },
+        {
+          "entity": "Wiring Schedule 151",
+          "attribute": "conductor quantity and size",
+          "value": "3#4/0",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#4/0"
+        },
+        {
+          "entity": "Wiring Schedule 31",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "in",
+          "conditions": "",
+          "quote": "3/4\"C."
+        },
+        {
+          "entity": "Circuit 32",
+          "attribute": "wiring",
+          "value": "2#10USE-2",
+          "unit": "",
+          "conditions": "material: CU",
+          "quote": "32 ... CU: 2#10USE-2"
+        },
+        {
+          "entity": "Circuit 20",
+          "attribute": "conductor count and size",
+          "value": "3#12",
+          "unit": "",
+          "conditions": "",
+          "quote": "20 ... 3#12"
+        },
+        {
+          "entity": "Wiring Schedule 150",
+          "attribute": "ground conductor size",
+          "value": "#4G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#4G."
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conductor size",
+          "value": "6#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "6#10"
+        },
+        {
+          "entity": "Circuit 50",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "50 ... CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 34",
+          "attribute": "ground conductor count and size",
+          "value": "3#10G.",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#10G."
+        },
+        {
+          "entity": "Wiring Schedule Item 34",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule 151",
+          "attribute": "conductor material",
+          "value": "AL",
+          "unit": "",
+          "conditions": "",
+          "quote": "AL"
+        },
+        {
+          "entity": "Wiring Schedule 151",
+          "attribute": "cable type",
+          "value": "ARMORED CABLE",
+          "unit": "",
+          "conditions": "",
+          "quote": "ARMORED CABLE"
+        },
+        {
+          "entity": "Wiring Schedule 150",
+          "attribute": "conductor material",
+          "value": "AL",
+          "unit": "",
+          "conditions": "",
+          "quote": "AL"
+        },
+        {
+          "entity": "Wiring Schedule Item 34",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring Schedule 31",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#10G."
+        }
+      ],
+      "counts": {
+        "baseline": 31,
+        "variant": 29,
+        "shared": 2
+      }
+    },
+    {
+      "id": "u-rules-2013-p35-38-3c85ed49-p2-table",
+      "run": "rules-2013-p35-38",
+      "content": "sha256:3c85ed4975a5b66094cac543e455aa89666eb83ea7498dd3ab7c0b34e5716905.pdf",
+      "page": 2,
+      "family": "table",
+      "image": "images/rules-2013-p35-38-3c85ed49-p2.jpg",
+      "page_text": "U.S. Department of Energy Solar Decathlon 2013 Rules \n30 \nAugust 1, 2013 \nException: Lights located within manufactured residential appliances such as a refrigerator, clothes dryer, \nmicrowave, and oven that are intended to illuminate the interior of the appliance are not required to be \nilluminated. Lights that are not designed to be connected to the house electrical system are not required to be \nilluminated. \na. \nAll dimmers shall be adjusted to their highest positions and all other lighting control equipment shall be \ndisabled or overridden so that the controlled lamps are fully and continuously on during the specified \nperiods. \nb. \nPartial credit will be awarded for partial compliance. \n9-2. \nCooking \nAll available points are earned by using a kitchen appliance to vaporize 5.000 lb (80.00 oz or 2.268 kg) of water \nwithin a specified period of time. See Appendix A-3 for specific details regarding the number of points per \ncooking task and the time periods designated for cooking tasks. \na. \nReduced points are earned if between 1.000 lb (16.00 oz or 0.454 kg) and 5.000 lb (80.00 oz or 2.268 kg) are \nvaporized. Reduced point values are scaled linearly, as shown in Figure 9. \nb. \nAny kitchen appliance may be used, but it must operate in its normal configuration as it is vaporizing the \nwater. \nc. \nThe water shall be vaporized in a single container and the starting water weight shall be at least 96.00 oz \n(2.721 kg). \n \nFigure 9: Scoring function for the Cooking Subcontest \n9-3. \nDinner Party \nEach team shall host two dinner parties for its neighbors during contest week. See Appendix A-3 for the dinner \nparty schedule and the number of available points per dinner party. Dinner parties will feature a pair of guest \ndecathletes from each of three competing teams, and each pair of guest decathletes shall assign a score to the host \nteam after each dinner party. The quality of the meal, ambiance, and overall experience shall be considered in the \nevaluation. \na. \nTo maintain consistency among the juried contests and subcontests, guest teams shall use the scoring \nmethodology described in the “Phase 3: Deliberation” section of Appendix B-1. Each of the three pairs of \nguest decathletes shall submit three percentage integer scores, i.e., one score for quality of the meal, one \nscore for ambiance, and one score for overall experience, to the contest officials by 11 p.m. These nine \nscores will be averaged and multiplied by the maximum available points in the scoring server to generate a \nfinal score for each dinner party. Percentage integer scores may range from 0% (lowest possible score) to \n100% (highest possible score). \nb. \nThe village will be organized into five small “neighborhoods.” Each neighborhood consists of four \nneighboring houses. The guest list for the dinner party shall be limited to eight people—two people from \neach of the three neighboring houses and up to two VIP guests. VIP guests may include organizers, media, \ngovernment employees, family members, or other individuals approved by the organizers to attend the dinner \nparties. \nc. \nSee Rule 11-1d for house occupancy rules during the dinner party. \nFull points:\nWeight ≥80 oz (2300 g)\nReduced points:\n16 oz (450 g) < Weight < 80 oz (2300 g)\nNo points:\nWeight ≤16 oz\n(450 g)\n0\n10\n20\n30\n40\n50\n60\n70\n80\n90\n100\nPoints per cooking task\nWeight of vaporized water (oz)\n",
+      "baseline": [
+        {
+          "entity": "starting water",
+          "attribute": "minimum weight",
+          "value": "96.00",
+          "unit": "oz",
+          "conditions": "Contest 9",
+          "quote": "starting water weight shall be at least 96.00 oz"
+        },
+        {
+          "entity": "water vaporization",
+          "attribute": "process",
+          "value": "single task",
+          "unit": "",
+          "conditions": "vaporization requirement",
+          "quote": "The water shall be vaporized in a single task"
+        },
+        {
+          "entity": "vaporized water",
+          "attribute": "weight for full points",
+          "value": "≥ 80",
+          "unit": "oz",
+          "conditions": "Contest 9",
+          "quote": "Full points: Weight ≥ 80 oz (2300 g)"
+        },
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "96.00",
+          "unit": "oz",
+          "conditions": "Cooking Subcontest",
+          "quote": "starting water weight shall be at least 96.00 oz"
+        },
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "96.00",
+          "unit": "oz",
+          "conditions": "minimum",
+          "quote": "starting water weight shall be at least 96.00 oz"
+        },
+        {
+          "entity": "vaporized water",
+          "attribute": "weight for reduced points",
+          "value": "16 < Weight < 80",
+          "unit": "oz",
+          "conditions": "Contest 9",
+          "quote": "Reduced points: 16 oz (450 g) < Weight < 80 oz (2300 g)"
+        },
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "2.721",
+          "unit": "kg",
+          "conditions": "Cooking Subcontest",
+          "quote": "starting water weight shall be at least 96.00 oz (2.721 kg)"
+        },
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "2.721",
+          "unit": "kg",
+          "conditions": "minimum",
+          "quote": "starting water weight shall be at least 96.00 oz (2.721 kg)"
+        },
+        {
+          "entity": "vaporized water",
+          "attribute": "weight for no points",
+          "value": "≤ 16",
+          "unit": "oz",
+          "conditions": "Contest 9",
+          "quote": "No points: Weight ≤ 16 oz (450 g)"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "96.00",
+          "unit": "oz",
+          "conditions": "Cooking Subcontest",
+          "quote": "starting water weight shall be at least 96.00 oz"
+        },
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "96.00",
+          "unit": "oz",
+          "conditions": "minimum",
+          "quote": "starting water weight shall be at least 96.00 oz"
+        },
+        {
+          "entity": "vaporized water",
+          "attribute": "weight",
+          "value": "16",
+          "unit": "oz",
+          "conditions": "No points threshold",
+          "quote": "No points: Weight ≤ 16 oz (450 g)"
+        },
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "2.721",
+          "unit": "kg",
+          "conditions": "Cooking Subcontest",
+          "quote": "starting water weight shall be at least 96.00 oz (2.721 kg)"
+        },
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "2.721",
+          "unit": "kg",
+          "conditions": "minimum",
+          "quote": "starting water weight shall be at least 96.00 oz (2.721 kg)"
+        },
+        {
+          "entity": "vaporized water",
+          "attribute": "weight",
+          "value": "2300",
+          "unit": "g",
+          "conditions": "Full points threshold",
+          "quote": "Full points: Weight ≥ 80 oz (2300 g)"
+        },
+        {
+          "entity": "vaporized water",
+          "attribute": "weight",
+          "value": "80",
+          "unit": "oz",
+          "conditions": "Full points threshold",
+          "quote": "Full points: Weight ≥ 80 oz (2300 g)"
+        },
+        {
+          "entity": "vaporized water",
+          "attribute": "weight",
+          "value": "450",
+          "unit": "g",
+          "conditions": "No points threshold",
+          "quote": "No points: Weight ≤ 16 oz (450 g)"
+        }
+      ],
+      "counts": {
+        "baseline": 9,
+        "variant": 8,
+        "shared": 4
+      }
+    },
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p1-table",
+      "run": "calg-cd-p39-42",
+      "content": "sha256:9a895974bcaa376163077de84a01fc16746b5353a679fa73dee42638b3ed1463.pdf",
+      "page": 1,
+      "family": "table",
+      "image": "images/calg-cd-p39-42-9a895974-p1.jpg",
+      "page_text": "SOLAR ENVELOPE\n18' - 0\"\n6\n5\n4\n3\n2\n1\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nCEMENT FIBRE BOARD SIDING\nEVACUATED SOLAR THERMAL TUBES\n2 X APSE-20 (40 TUBES)\nW1\n1.01\nW2\n1.02\nD1\n1.01\nW2\n1.04\nW1\n1.03\nW1\n1.05\nD1\n1.02\nW2\n1.06\nW1\n1.07\nW5\n1.12\nW5\n1.14\nW6\n1.13\nPV SOLAR ARRAY\nPV SOLAR ARRAY\n2x4 CEDAR HANDRAIL\nPOWDERCOATED\nSTEEL FLATBAR\nRAILING POSTS\n1/8\" STEEL CABLE RAILING\nSOLAR ENVELOPE\n18' - 0\"\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nK\nB\nA\nH\nF\nD\nE\nC\nG\nP1\nP2\nCEMENT FIBRE BOARD SIDING\n2x4 CEDAR HANDRAILS\n1 X 4 CEDAR\nT&G SIDING\n1x4 TONNGUE & GROOVE\nCEDAR CLADDING\n2x4 CEDAR HANDRAILS\nEVACUATED SOLAR\nTHERMAL TUBES\nPOWDERCOATED\nSTEEL FLATBAR\nRAILING POST TYP.\nSITE BOUNDARY\nSITE BOUNDARY\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nSTATUS:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nSEALS\nMARK\nDATE\nDESCRIPTION\nTEAM ALBERTA\nUNIVERSITY OF CALGARY\n2500 UNIVERSITY DR NW\nCALGARY, AB  T2N 1N4\nMOUNT ROYAL UNIVERSITY\n4825 MT ROYAL GATE SW\nCALGARY, AB  T3E 6K6\nWWW.SOLARDECATHLON.CA\nINFO@SOLARDECATHLON.CA\n1\n04/29/2013\nISSUED FOR ELEC/MECH\n2\n05/03/2013\nISSUED FOR CLADDING\n3\n05/13/2013\nISSUED FOR STRUCTURAL REVIEW\n4\n05/22/2013\nISSUED FOR CONSTRUCTION 95%\n5\n08/22/2013\nAS BUILT SET\n22/08/2013 5:09:55 PM\nA-202\nEXTERIOR ELEVATIONS\n116\n0\n2'\n4'\n8'\n0\n2'\n4'\n8'\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n 1/4\" = 1'-0\"\nC1\nSOUTH ELEVATION\n 1/4\" = 1'-0\"\nA1\nWEST ELEVATION\n1.\nSEE A-511 FOR SPECIFIC HARDIE\nINSTALLATION\n2.\nSPACING MAY BE LARGER BETWEEN SOLAR\nTHERMAL TUBE ARRAYS. NECESSARY VALVES\nAND PIPING NOT SHOWN HERE\n3.\nDOTTED LINES INDICATE DOOR SWING.\nLAYERED SWING LINES INDICATE BOTH TILT AND\nTURN OPERATION POSSIBLE.\n",
+      "baseline": [
+        {
+          "entity": "handrail",
+          "attribute": "material",
+          "value": "2x4 cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "2x4 CEDAR HANDRAIL"
+        },
+        {
+          "entity": "siding",
+          "attribute": "material",
+          "value": "cement fibre board",
+          "unit": "",
+          "conditions": "",
+          "quote": "CEMENT FIBRE BOARD SIDING"
+        },
+        {
+          "entity": "evacuated solar thermal tubes",
+          "attribute": "height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "EVACUATED SOLAR THERMAL TUBES\n2' - 9 1/2\""
+        },
+        {
+          "entity": "grade level",
+          "attribute": "elevation",
+          "value": "0",
+          "unit": "ft",
+          "conditions": "",
+          "quote": "GRADE LEVEL\n0' - 0\""
+        },
+        {
+          "entity": "solar envelope",
+          "attribute": "height",
+          "value": "18' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "SOLAR ENVELOPE 18' - 0\""
+        },
+        {
+          "entity": "cladding",
+          "attribute": "material",
+          "value": "1x4 tongue & groove cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "1x4 TONNGUE & GROOVE\nCEDAR CLADDING"
+        },
+        {
+          "entity": "cable railing",
+          "attribute": "diameter",
+          "value": "1/8",
+          "unit": "in",
+          "conditions": "",
+          "quote": "1/8\" STEEL CABLE RAILING"
+        },
+        {
+          "entity": "cable railing",
+          "attribute": "diameter",
+          "value": "1/8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "1/8\" STEEL CABLE RAILING"
+        },
+        {
+          "entity": "grade level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "solar envelope",
+          "attribute": "height",
+          "value": "18",
+          "unit": "ft",
+          "conditions": "",
+          "quote": "SOLAR ENVELOPE\n18' - 0\""
+        },
+        {
+          "entity": "railing posts",
+          "attribute": "material",
+          "value": "powdercoated steel flatbar",
+          "unit": "",
+          "conditions": "",
+          "quote": "POWDERCOATED\nSTEEL FLATBAR\nRAILING POSTS"
+        },
+        {
+          "entity": "evacuated solar thermal tubes",
+          "attribute": "quantity",
+          "value": "2 X APSE-20 (40 TUBES)",
+          "unit": "",
+          "conditions": "",
+          "quote": "2 X APSE-20 (40 TUBES)"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "handrail",
+          "attribute": "material",
+          "value": "2x4 cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "2x4 CEDAR HANDRAIL"
+        },
+        {
+          "entity": "siding",
+          "attribute": "material",
+          "value": "cement fibre board",
+          "unit": "",
+          "conditions": "",
+          "quote": "CEMENT FIBRE BOARD SIDING"
+        },
+        {
+          "entity": "evacuated solar thermal tubes",
+          "attribute": "height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "EVACUATED SOLAR THERMAL TUBES 2' - 9 1/2\""
+        },
+        {
+          "entity": "grade level",
+          "attribute": "elevation",
+          "value": "0",
+          "unit": "ft",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "cladding",
+          "attribute": "material",
+          "value": "1x4 tongue & groove cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "1x4 TONNGUE & GROOVE CEDAR CLADDING"
+        },
+        {
+          "entity": "cladding",
+          "attribute": "material",
+          "value": "cement fibre board siding",
+          "unit": "",
+          "conditions": "",
+          "quote": "CEMENT FIBRE BOARD SIDING"
+        },
+        {
+          "entity": "cable railing",
+          "attribute": "diameter",
+          "value": "1/8",
+          "unit": "in",
+          "conditions": "",
+          "quote": "1/8\" STEEL CABLE RAILING"
+        },
+        {
+          "entity": "solar envelope",
+          "attribute": "height",
+          "value": "18",
+          "unit": "ft",
+          "conditions": "",
+          "quote": "SOLAR ENVELOPE 18' - 0\""
+        },
+        {
+          "entity": "railing posts",
+          "attribute": "material",
+          "value": "powdercoated steel flatbar",
+          "unit": "",
+          "conditions": "",
+          "quote": "POWDERCOATED STEEL FLATBAR RAILING POSTS"
+        },
+        {
+          "entity": "finished floor",
+          "attribute": "height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to grade level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "evacuated solar thermal tubes",
+          "attribute": "quantity",
+          "value": "2 x APSE-20 (40 tubes)",
+          "unit": "",
+          "conditions": "",
+          "quote": "2 X APSE-20 (40 TUBES)"
+        }
+      ],
+      "counts": {
+        "baseline": 12,
+        "variant": 11,
+        "shared": 9
+      }
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p3-table",
+      "run": "nrel-5mw-p25-36",
+      "content": "sha256:5eaf02be63d27c2ce3aaf706899464d07f8cd44eef6de936525857825f631aba.pdf",
+      "page": 3,
+      "family": "table",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p3.jpg",
+      "page_text": " 16 \ntower centerline above the ground.  This result follows directly from the overall tower height of \n87.6 m. \nWe specified a structural-damping ratio of 1% critical in all modes of the isolated tower (without \nthe rotor-nacelle assembly mass present), which corresponds to the values used in the DOWEC \nstudy (from page 21 of Ref. [14]). \nTable 6-2 summarizes the undistributed tower properties discussed in this section. \n \nTable 6-2.  Undistributed Tower Properties \nHeight above Ground\n87.6 m\nOverall (Integrated) Mass\n347,460 kg\nCM Location (w.r.t. Ground along Tower Centerline)\n38.234 m\nStructural-Damping Ratio (All Modes)\n1 %\n \n",
+      "baseline": [
+        {
+          "entity": "Tower",
+          "attribute": "Overall (Integrated) Mass",
+          "value": "347,460",
+          "unit": "kg",
+          "conditions": "",
+          "quote": "Overall (Integrated) Mass, 347,460 kg"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "Height above Ground",
+          "value": "87.6",
+          "unit": "m",
+          "conditions": "",
+          "quote": "Height above Ground, 87.6 m"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "CM Location (w.r.t. Ground along Tower Centerline)",
+          "value": "38.234",
+          "unit": "m",
+          "conditions": "",
+          "quote": "CM Location (w.r.t. Ground along Tower Centerline), 38.234 m"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "Structural-Damping Ratio (All Modes)",
+          "value": "1",
+          "unit": "%",
+          "conditions": "Height above Ground = 87.6 m",
+          "quote": "Structural-Damping Ratio (All Modes), 1 %"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "tower",
+          "attribute": "overall (integrated) mass",
+          "value": "347,460",
+          "unit": "kg",
+          "conditions": "",
+          "quote": "Overall (Integrated) Mass, 347,460 kg"
+        },
+        {
+          "entity": "isolated tower",
+          "attribute": "structural-damping ratio (all modes)",
+          "value": "1",
+          "unit": "%",
+          "conditions": "without the rotor-nacelle assembly mass present",
+          "quote": "Structural-Damping Ratio (All Modes), 1 %"
+        },
+        {
+          "entity": "tower",
+          "attribute": "height above ground",
+          "value": "87.6",
+          "unit": "m",
+          "conditions": "",
+          "quote": "Height above Ground, 87.6 m"
+        },
+        {
+          "entity": "tower",
+          "attribute": "overall height",
+          "value": "87.6",
+          "unit": "m",
+          "conditions": "",
+          "quote": "Height above Ground, 87.6 m"
+        },
+        {
+          "entity": "tower",
+          "attribute": "CM Location (w.r.t. Ground along Tower Centerline)",
+          "value": "38.234",
+          "unit": "m",
+          "conditions": "",
+          "quote": "CM Location (w.r.t. Ground along Tower Centerline), 38.234 m"
+        }
+      ],
+      "counts": {
+        "baseline": 4,
+        "variant": 5,
+        "shared": 3
+      }
+    },
+    {
+      "id": "u-rules-2013-p35-38-3c85ed49-p4-table",
+      "run": "rules-2013-p35-38",
+      "content": "sha256:3c85ed4975a5b66094cac543e455aa89666eb83ea7498dd3ab7c0b34e5716905.pdf",
+      "page": 4,
+      "family": "table",
+      "image": "images/rules-2013-p35-38-3c85ed49-p4.jpg",
+      "page_text": "U.S. Department of Energy Solar Decathlon 2013 Rules \n32 \nAugust 1, 2013 \nthe display of supplied content shall be resumed whenever the computer is not being used for other practical \npurposes. The brightness of the display shall be set to at least 75% of maximum. Observers will conduct spot \nchecks to verify that the computer is either showing the supplied content or is being used by a decathlete, and \nthat the brightness is at the required level. \n9-5. \nMovie Night \nEach team shall host a movie night for its neighbors during contest week. See Appendix A-3 for the movie night \nschedule and the number of available points for movie night. Each guest team shall assign a score to each host \nteam. The quality and design of the home theater system, ambiance, and overall experience shall be considered in \nthe evaluation. \na. \nTo maintain consistency among the juried contests and subcontests, guest teams shall use the scoring \nmethodology described in the “Phase 3: Deliberation” section of Appendix B-1. Each of the three guest \nteams shall submit three percentage integer scores, i.e., one score for the quality and design of the home \ntheater system, one score for ambiance, and one score for overall experience, to the contest officials by 10:30 \np.m. These nine scores will be averaged and multiplied by the maximum available points in the scoring \nserver to generate a final score for movie night. Percentage integer scores may range from 0% (lowest \npossible score) to 100% (highest possible score). \nb. \nThe village will be organized into five small “neighborhoods.” Each neighborhood consists of four \nneighboring houses. One or more decathletes from each neighboring house shall spend at least 15 minutes \nduring the movie in each of their neighbors’ houses. \nc. \nThe Comfort Zone Contest is suspended during movie night. Therefore, the occupancy rule, Rule 11-1, is not \nin effect on movie night. \nd. \nPrior to the event, team members signed up for the Yahoo Group will have the option to vote for one of three \nmovies selected by the organizers. The movie receiving the most votes shall be provided by the organizers on \nthe day of movie night and shall be the movie shown in all houses on movie night. The selected movie shall \nbe available in several of the most popular video formats, so that each team may request the format most \nsuitable for its home theater system. \ne. \nThe audio/visual equipment settings to be used on movie night shall be declared to a designated organizer \nprior to movie night. Observers or a small team of organizers, or both, will verify that these settings are \nmaintained on movie night. Guests are encouraged to evaluate the usability of the home theater system and \nits controls, but the host team is responsible for returning the equipment back to the declared settings after \nthe guests have finished their evaluation(s). \nContest 10. Energy Balance \nAll available points are earned at the conclusion of the specified energy balance period (see Appendix A-3 for the \nenergy balance schedule) for a net electrical energy balance of at least 0 kWh. A positive net electrical energy \nbalance indicates net production; a negative net electrical energy balance indicates net consumption. \na. \nReduced points are earned for a net electrical energy balance between -50 kWh and 0 kWh. Reduced points \nare scaled linearly, as shown in Figure 10. \n \nFigure 10: Scoring function for the Energy Balance Contest \nFull points:\nNet electrical energy ≥\n0 kWh\nReduced points:\n-50 kWh <\nNet electrical energy <\n0 kWh\nNo points:\nNet electrical energy ≤\n-50 kWh\n0\n20\n40\n60\n80\n100\n-75\n-50\n-25\n0\n25\nPoints at conclusion of Energy \nBalance Contest\nNet Electrical Energy (kWh)\n",
+      "baseline": [
+        {
+          "entity": "Contest 10 Energy Balance",
+          "attribute": "reduced points range",
+          "value": "-50 < x < 0",
+          "unit": "kWh",
+          "conditions": "Net electrical energy",
+          "quote": "Reduced points: -50 kWh < Net electrical energy < 0 kWh"
+        },
+        {
+          "entity": "Contest 10 Energy Balance",
+          "attribute": "full points threshold",
+          "value": "≥ 0",
+          "unit": "kWh",
+          "conditions": "Net electrical energy",
+          "quote": "Full points: Net electrical energy ≥ 0 kWh"
+        },
+        {
+          "entity": "Contest 10 Energy Balance",
+          "attribute": "no points threshold",
+          "value": "≤ -50",
+          "unit": "kWh",
+          "conditions": "Net electrical energy",
+          "quote": "No points: Net electrical energy ≤ -50 kWh"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Net electrical energy",
+          "attribute": "reduced points range",
+          "value": "-50 < x < 0",
+          "unit": "kWh",
+          "conditions": "at contest conclusion",
+          "quote": "Reduced points: -50 kWh < Net electrical energy < 0 kWh"
+        },
+        {
+          "entity": "Net electrical energy",
+          "attribute": "no points threshold",
+          "value": "≤ -50",
+          "unit": "kWh",
+          "conditions": "at contest conclusion",
+          "quote": "No points: Net electrical energy ≤ -50 kWh"
+        },
+        {
+          "entity": "Net electrical energy",
+          "attribute": "full points threshold",
+          "value": "≥ 0",
+          "unit": "kWh",
+          "conditions": "at contest conclusion",
+          "quote": "Full points: Net electrical energy ≥ 0 kWh"
+        }
+      ],
+      "counts": {
+        "baseline": 3,
+        "variant": 3,
+        "shared": 0
+      }
+    }
+  ]
+}

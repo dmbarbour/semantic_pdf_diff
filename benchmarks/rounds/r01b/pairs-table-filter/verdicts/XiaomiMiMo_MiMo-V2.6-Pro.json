@@ -1,0 +1,195 @@
+{
+  "reviewer": "XiaomiMiMo/MiMo-V2.6-Pro",
+  "verdicts": {
+    "u-calg-cd-p39-42-9a895974-p4-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets share the same core claims and the same two clear errors: the value \"2' 3 1/2\"\" (twice, for Bedroom and Dining sections) appears nowhere on the page, which reads \"2' - 9 1/2\"\" for FINISHED FLOOR, so those quotes are misread/invented in both. Set A additionally captures the room-level elevations (Bedroom and Kitchen finished floor at 2' - 9 1/2\" and grade level at 0' - 0\"), which are supported by the section labels and datum markers and are missing from B. A's only downside is one redundant duplicate grade-level claim and slightly loose binding of the section datum to individual rooms, but it recovers facts B omits. Both also contain the same vague \"interior space\" location claim and the same unsupported \"2' 3 1/2\"\" items."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 2,
+        "note": "Both sets share the same core claims, including two misread finished-floor values of 2' 3 1/2\" (the sheet reads 2' - 9 1/2\") and some vague/duplicate entries. Set B adds four claims binding the section-level GRADE LEVEL and FINISHED FLOOR datum markers to individual rooms (Bedroom, Kitchen), which the drawing does not support — those markers are section datums, not room-specific elevations, and the quotes merely concatenate separate labels. Set A stays closer to what the sheet states and avoids these misbound claims, though it also carries redundant Grade Level/Finished Floor restatements. Overall A is the more faithful set."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p1-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 6,
+        "note": "Both sets contain heavy duplication and repeat the same misread that 48.9 °C is the half-points threshold (it is 46.1 °C / 115 °F), and both truncate the half-points quote so it reads as 'points are earned'. Set A additionally captures correct, distinct facts the page supports: the 120 °F / 48.9 °C full-points threshold, the heated-drying option must be disabled, and the allowed active/passive drying methods. Set B adds two clear errors absent from A: it reads the chart's x-axis tick values (90/100/110/120) as 'points' for the scoring function, and it invents an 8-hour clothes-drying cycle duration that appears nowhere on the page, plus a garbled 'eight place settings place settings' value. Overall A is more faithful and adds more correct coverage."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 6,
+        "note": "Both sets repeat the same core dishwasher and clothes-dryer scoring facts, and both share a few flaws (the bracketed chart quotes, the garbled \"one wash and rinse and cycle\" quote, and the misbound claim that 48.9 °C is the half-points threshold). Set A adds two clear errors the source does not support: an invented 8-hour clothes-drying cycle duration (from \"Contest 8-3h\"/\"8-5\") and a misreading of the chart's 90–120 x-axis tick values as points. Set B instead adds several correct, distinct claims A misses (heated drying option must be disabled, allowable drying methods, automatic operation), while its own errors are milder (a mislabeled \"minimum temperature\" and a 115 °F claim that drops the half-points condition)."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-page": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Set B is essentially a deduplicated subset of Set A: both contain the same three unsupported claims (two 'Grade Level elevation 2' - 9 1/2\"' claims whose quote conflates the finished-floor value with grade level, and the 'East Module finished floor 2' 3 1/2\"' value that appears nowhere in the text layer, which reads 2' - 9 1/2\"). Every unique fact captured by A — sheet number A-301, title BUILDING SECTIONS, lot 116, the 3/8\" = 1'-0\" scales for C1/West and A1/East, grade 0'-0\", finished floor 2' - 9 1/2\" — is also present in B. A's extra entries are correct but largely redundant restatements of the same facts (grade level 0'-0\" and finished floor 2' - 9 1/2\" each repeated several times, plus a vague 'building | grade level' claim), so neither set has an advantage in correctness or coverage of unique facts."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets correctly capture the sheet data (A-301, BUILDING SECTIONS, lot 116), the 3/8\"=1'-0\" scales, and the section elevations (FINISHED FLOOR 2'-9 1/2\", GRADE LEVEL 0'-0\") for both modules. Both make the same three errors: two claims misbind 2'-9 1/2\" to Grade Level (the quote actually reads GRADE LEVEL 0'-0\"), and one claim asserts an East Module finished-floor height of 2' 3 1/2\" that appears nowhere on the page. B additionally binds the finished floor and grade level correctly to each module (East and West) and gives the East Module section scale, facts A leaves generic or gets wrong, while adding only redundant-but-correct duplicates rather than new errors."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p3-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 4,
+        "note": "Both sets are dominated by vague 'component/dimension' claims and both invent the quote \"12' 2 5/8\"\", which appears nowhere on the page. A misbinds the 10'-3 3/4\" length to Module A and adds an unsupported 'edge to center of hole' condition, but it keeps the L3X3X1/4 angle callout faithful to the text layer. B is worse on binding: it assigns 7'-0\" (a Module A detail dimension) to Module B twice, repeats the invented 12' 2 5/8\" length for both modules, and layers on invented 'top/bottom section' and 'from top' conditions. Neither set captures the 3/8\" THROUGH BOLT callouts or the 4 13/16\"/4 3/4\" dimensions."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 4,
+        "note": "Both sets contain the same misread profile label \"L300X14\" (the text layer reads L3X3X1/4) and an invented length quote \"12' 2 5/8\"\" that appears nowhere on the page, but Set A repeats that invention for both modules while Set B makes it once. Set A correctly binds L3X3X1/4 to both the Module A and Module B PV structural members with the North/South condition and captures both overall detail lengths (12'-3 3/4\" and 10'-3 3/4\"), whereas Set B misbinds 10'-3 3/4\" (a Module B/C1 dimension) to Module A and omits 12'-3 3/4\" entirely. Set A's clear error is assigning 7'-0\" (a Module A dimension) to Module B, and both sets pad with vague \"component/dimension\" claims, but Set A's correct, well-conditioned claims are the more informative ones."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p2-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 4,
+        "note": "Both sets capture the core Cooking thresholds (5.000 lb / 80 oz / 2.268 kg for full points, 1.000–5.000 lb reduced, ≤16 oz no points) and the 96.00 oz starting-water minimum, and both repeat the same facts many times. Set A additionally gets the dinner-party facts right (two parties per team, two guests per neighboring house, 0–100% percentage scores), but it contains one substantive misread: it claims an eight-person guest list 'per neighboring house' and backs it with a fabricated quote, when the rule limits the whole party to eight people (two from each of three houses plus up to two VIPs). Set B avoids that error and adds correct neighborhood (four houses) and VIP (up to two) facts, but it misbinds the 96.00 oz rule to an invented 'Home Entertainment Contest 9' condition and uses the Figure 9 caption as a quote for claims it does not support. Both sets also share weak or invented figure quotes, so the margin is modest."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 5,
+        "note": "Both sets capture the core Cooking thresholds (5.000 lb / 80 oz / 2.268 kg for full points, 1.000–5.000 lb reduced, ≤16 oz no points, 96.00 oz starting weight) and both repeat the same reduced-point bounds many times. Set A invents a condition ('Home Entertainment Contest 9') for the 96 oz minimum and uses three quotes (the Figure 9 caption or the bare axis label) that do not support the claims attached to them. Set B adds correct facts A misses (two dinner parties during contest week; two people from each of the three neighboring houses) and has fewer unsupported quotes, but it does misquote the guest-list rule and wrongly states an 8-person limit per neighboring house, and it misbinds the 0–100% range to the final dinner party score. Net, B covers more of the page correctly despite one clear misread."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 8,
+        "variant_wrong": 14,
+        "note": "Set A binds several section designations correctly (W10X15 for Floor Beam @ Grid 2 and @ Grid 5, W8X13 for Roof Beam @ Grid 2,3,4,5 T.O. Steel) and keeps the 3 in. opening diameter and 2 in. offsets tied to plausible details. Set B invents multiple beam lengths as sums of segments (2'-0\"x4, 3'-0\"+3'-0\"+9'-0\"+1'-6\", 6'-0\"+1'-0\"+1'-0\"+3'-0\"+3'-0\", 4'-0\"+13'-0\"+3'-1\") that appear nowhere in the text and are 'quoted' only by detail titles, and it misassigns W8X13 to Floor Beam near Grid 5 (which is W10X15) and 3'-7\"/5'-0\" to the wrong beams. Both sets share errors (4'-2\" attributed to a roof beam, 2 in. bottom offset at Detail E6 where no 2 in. appears, and a computed 20 in. spacing in B), but A's misbindings (1'-3\" and 8\" placed at Grid 6 & Near Grid 5, 10'-0\" as 'total span', wrong detail letters A4/B4) are fewer than B's fabricated lengths and misbindings."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 10,
+        "variant_wrong": 16,
+        "note": "Set A invents several beam length sums (e.g., 3'-0\"+3'-0\"+9'-0\"+1'-6\" for Grid 4, 6'-0\"+1'-0\"+1'-0\"+3'-0\"+3'-0\" for Grid 3, 4'-0\"+13'-0\"+3'-1\" for Grid 6) that appear nowhere on the sheet, binds 3'-7\" and 5'-0\" to the wrong details, and assigns W8X13 to the floor beam near Grid 5 when that beam is W10X15. Set B keeps the section designations correct (W10X15 floor beams, W8X13 roof beam at grids 2,3,4,5) and correctly reports the 2\" opening edge offsets, 10\"/8\" opening widths and 3\" opening diameter, though it also mis-binds detail labels (A4/B4) and reads the 2\" edge offset as opening height. Both repeat the unsupported 2\" bottom offset at Detail E6 and mislabel the 6\" opening height as a beam width, and both truncate the entity \"ROOF BEAM @ GR\" while attaching 4'-2\" (a floor-beam dimension) to it. Set B has fewer fabricated or misbound values overall, so it is the better set."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p1-page": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 10,
+        "note": "Set A stays close to the schedule and notes, correctly binding items 31–34 and 50 to their CU/AL materials, conductor and conduit sizes, the 200A/2P NFDS rating, and the L1, L2, & N / NO GND and COPPER TO GND conditions. Set B invents schedule items 21, 22 and 24 (SP100E, SP105) that do not exist on the page and misreads several descriptions (item 20 as 3#10/1#12G, item 50 as 3#8/1#6, 3#4/0 as \"3440\"), plus misbinds 3W as a phase configuration. A's flaws are limited to two fabricated \"VOLTAGE/CURRENT ORGANIZER\" quotes and one misbound 2-1/2\" diameter claim, while B also omits the instrumentation-panel conductor condition that A captures."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 9,
+        "note": "Set A invents schedule items 21, 22 and 24 (\"SP100E\", \"#10, SP105\") that do not exist on the page, misreads item 20 as 3#10/1#12G and item 50 as 3#8/1#6, renders 3#4/0 as \"3440\", binds the NEMA 3R enclosure to MAIN PANEL MP instead of the note-6 NFDS, and calls 3W a phase configuration. Set B tracks the wiring schedule and notes more faithfully (items 31-34, 50, 150, 151, NFDS rating, L1/L2/N with NO GND, copper-to-GND), though it also invents \"Voltage Organizer\"/\"Current Organizer\" input claims with fabricated quotes, mislabels the 2-1/2\"C. conduit as cable 150 diameter, and truncates the instrumentation-panel conductors to L1, L2. Both omit the 120/240V, 1-phase and 150A main-breaker data, but B has materially fewer wrong claims and more correct ones."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p4-page": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets capture the core Energy Balance thresholds (full points ≥ 0 kWh, reduced −50 to 0 kWh, no points ≤ −50 kWh) and the movie-night scoring and visit rules, and both make the same misreading of the figure's y-axis tick '20' as a maximum of 20 points. Set B additionally captures the display brightness requirement (at least 75% of maximum) and the five-neighborhood village organization, which Set A omits entirely. Set A instead adds only the trivial movie-option count and a trivial axis-label claim, and is padded with four near-identical 15-minute visit claims. Coverage of substantive page facts therefore favors B, though both share one clear error."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 2,
+        "note": "Both sets capture the core Energy Balance thresholds, the 15-minute neighbor visit rule, the Rule 11-1 suspension, and the 0–100% score range, and both repeat the same error of reading the y-axis tick label \"20\" as the maximum points (the figure's maximum is 100 points). Set A additionally extracts the display brightness requirement (≥75% of maximum) and the five-neighborhood village organization, which Set B omits, while Set B adds the three-movie voting option and the 100-point maximum. Set B also includes a trivial axis-label claim (\"Net Electrical Energy (kWh)\") and an elided quote with an inserted ellipsis, making it slightly less clean. Overall A carries more correct, non-trivial content with comparable error."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p11-page": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 7,
+        "variant_wrong": 3,
+        "note": "Both sets share the same core correct claims (∂P/∂θ at θ=0 = -25.52E+6 watt/rad, θK = 6.302336º, the doubling relation) and the same weak graph-estimate claims. Set B adds four claims that misbind figure axis labels to entities (e.g. 'Rotor-Collective Blade-Pitch | Angle (θ) | 6.302336º' and 'Blade-Pitch Controller | θ | 6.302336º', which confuse θK with θ, plus a 'Blade-Pitch Controller' binding of ∂P/∂θ with a truncated unit 'watt/ra'). Set A instead adds one valid claim (partial derivative of power with respect to pitch angle at θ=0). Both sets share minor mislabels (calling the θ=0 value the 'slope' and θK the 'intercept') and an unsupported -90E6 estimate at the last data point."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 12,
+        "variant_wrong": 8,
+        "note": "Both sets capture the key figure values (∂P/∂θ at θ=0° = -25.52E+6 watt/rad, θ_k = 6.302336°) and the doubling relation of Eq. (7-17), and both share the same weaknesses: θ_k mislabeled as the best-fit 'intercept', several chart-read values (-30E+6, -90E+6, -120E+6) with fabricated quotes like 'Original Data point at x=0' that appear nowhere in the page, and quotes that are only axis labels. Set A adds four further bad claims absent from B: θ = 6.302336° bound to 'Rotor-Collective Blade-Pitch Angle' and to 'Blade-Pitch Controller' (misbinding θ_k as a generic pitch angle), a 'Blade-Pitch Controller' claim for ∂P/∂θ with a truncated unit (watt/ra), and a garbled 'Rotor-Collective Blade-Pitch | Sensitivity' claim. Since B is A minus these misbound/invented items and loses no correct fact, B is the cleaner, more faithful set."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p1-page": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 3,
+        "note": "Set B binds the 18'-0\" solar envelope figure correctly as an elevation and adds several well-supported, distinct facts (40 tubes in the APSE-20 arrays, powdercoated steel flatbar railing posts, tilt-and-turn door operation, tube-array spacing note, cement fibre board siding), whereas Set A repeats the same facts many times and repeatedly mislabels the 18'-0\" level line as a height/dimension and the 2'-9 1/2\" finished-floor level as a building height. Both sets contain an unsupported 'POWDERCOATED STEEL COLUMN' quote, and B adds two more invented 'Steel Column' claims (flat black finish, 1/8\" thickness) not present in the text layer. Set A does capture the finished floor elevation, sheet title and drawing scale, which B omits, but A's misbindings and duplication are more numerous than B's errors."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set A captures sheet-note and material facts that B omits entirely — the solar-thermal-array spacing note, the tilt/turn door operation, cement fibre board siding, the 2x4 cedar handrail and powdercoated steel flatbar railing post assemblies, and the 40-tube count — with correct window/door tag pairings. Set B instead repeats itself heavily (cable-rail diameter three times, finished floor and solar envelope values three to four times each) and adds a miscomputed claim that 18'-0\" is the finished-floor-to-solar-envelope height when 18'-0\" is the envelope elevation above grade (grade-to-FF is 2'-9 1/2\"). Both sets share one misbound claim (\"Steel Column\" powdercoated steel with a quote that does not appear; the text reads POWDERCOATED STEEL FLATBAR RAILING POST TYP.), while A adds two further unsupported claims (\"FLAT BLACK\" finish and a fabricated \"1/8\\\" STEEL SINGLE HOUGHY\" quote for a column thickness). A's broader correct coverage of notes and assemblies outweighs its extra errors versus B's redundancy and misread height, though B does correctly capture the finished floor elevation and drawing scale that A misses."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-page": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 15,
+        "variant_wrong": 11,
+        "note": "Both sets scramble the wiring-schedule symbol/description pairing, but B gets more of it right (10 = #12/2WG, 33 = 6#10/#10G/1\", 151 = AL 3#4/0 armored, 31 = 3/4\" conduit) and captures facts A misses entirely, e.g. the 50A/2P main breaker (2P pole count), the NEMA 3R junction box, and the 2-1/2\" conduit on the run to the main service panel. A invents wires 11, 104 and 107, misassigns the 3#12 and 3#6 specs to symbols 20 and 50, binds 120/240V and 1-phase to the PV equipment instead of the sub-panel, and reports the main breaker rating as \"3 W\". B still errs on symbol 50 (calls it CU 3#6/#8G instead of AL 3#4/0/#4G/2-1/2\"), repeats A's wrong \"Cable 20 = 3#12\" claim, reads NEMA 3R as NEMA 3, and attaches a fabricated \"200A/2P MAIN BREAKER\" quote to the sub-panel, plus several unbound/vague claims (\"enclosure\", \"cable\")."
+      }
+    }
+  }
+}

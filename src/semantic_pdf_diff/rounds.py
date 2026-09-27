@@ -289,12 +289,13 @@ def report(history_path, target, title="Query improvement"):
 
     def chart(series, ylabel, lo=0.0, hi=1.0, height=220, band=None):
         """series: {name: [(round, value, low, high)]} drawn over rounds; band draws a line at y."""
-        width, left, bottom = 720, 48, 28
+        width, left, bottom, top = 720, 48, 28, 26
         xs = {r: left + (i + 0.5) * (width - left - 10) / max(len(rounds), 1) for i, r in enumerate(rounds)}
-        y = lambda v: 10 + (height - bottom - 10) * (1 - (v - lo) / ((hi - lo) or 1))
+        y = lambda v: top + (height - bottom - top) * (1 - (v - lo) / ((hi - lo) or 1))
+        spread = 14  # series in the same round sit side by side, not on top of each other
         colours = ["#1f6f9f", "#b3261e", "#1d7a46", "#8a6100", "#6b3fa0", "#00796b", "#c2185b", "#455a64"]
         parts = [f'<svg viewBox="0 0 {width} {height}" role="img" aria-label="{esc(ylabel)}">',
-                 f'<text x="4" y="14" class="axis">{esc(ylabel)}</text>']
+                 f'<text x="4" y="12" class="axis">{esc(ylabel)}</text>']
         for tick in (lo, (lo + hi) / 2, hi):
             parts.append(f'<line x1="{left}" x2="{width - 10}" y1="{y(tick):.1f}" y2="{y(tick):.1f}" class="grid"/>'
                          f'<text x="{left - 6}" y="{y(tick) + 4:.1f}" class="axis" text-anchor="end">{tick:g}</text>')
@@ -302,9 +303,12 @@ def report(history_path, target, title="Query improvement"):
             parts.append(f'<line x1="{left}" x2="{width - 10}" y1="{y(band):.1f}" y2="{y(band):.1f}" class="band"/>')
         for r, x in xs.items():
             parts.append(f'<text x="{x:.1f}" y="{height - 8}" class="axis" text-anchor="middle">{esc(r)}</text>')
+        count = len(series)
         for n, (name, points) in enumerate(sorted(series.items())):
             colour = colours[n % len(colours)]
-            pts = [(xs[r], y(v), None if a is None else y(a), None if b is None else y(b)) for r, v, a, b in points if r in xs]
+            shift = (n - (count - 1) / 2) * spread
+            pts = [(xs[r] + shift, y(v), None if a is None else y(a), None if b is None else y(b))
+                   for r, v, a, b in points if r in xs]
             if len(pts) > 1:
                 parts.append('<polyline fill="none" stroke="%s" stroke-width="2" points="%s"/>'
                              % (colour, " ".join(f"{px:.1f},{py:.1f}" for px, py, _, _ in pts)))
@@ -312,18 +316,22 @@ def report(history_path, target, title="Query improvement"):
                 if a is not None and b is not None:
                     parts.append(f'<line x1="{px:.1f}" x2="{px:.1f}" y1="{a:.1f}" y2="{b:.1f}" stroke="{colour}" stroke-width="2"/>')
                 parts.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="4" fill="{colour}"><title>{esc(name)}</title></circle>')
-            parts.append(f'<text x="{width - 12}" y="{24 + 14 * n}" class="legend" text-anchor="end" fill="{colour}">{esc(name)}</text>')
+            parts.append(f'<text x="{width - 12}" y="{top + 12 + 14 * n}" class="legend" text-anchor="end" '
+                         f'style="fill:{colour}">{esc(name)}</text>')
         return "".join(parts) + "</svg>"
 
     def series(metric, by="variant", where=None):
-        out = defaultdict(list)
+        """The latest value per series and round (steps may record a figure more than once)."""
+        latest = {}
         for r in records:
-            if r["metric"] == metric and (where is None or where(r)):
-                value = r["value"]
-                if isinstance(value, dict):
-                    out[r.get(by, "")].append((r.get("round", ""), value["mean"], value["low"], value["high"]))
-                elif value is not None:
-                    out[r.get(by, "")].append((r.get("round", ""), value, None, None))
+            if r["metric"] == metric and (where is None or where(r)) and r["value"] is not None:
+                latest[(r.get(by, ""), r.get("round", ""))] = r["value"]
+        out = defaultdict(list)
+        for (name, rnd), value in sorted(latest.items(), key=lambda kv: rounds.index(kv[0][1])):
+            if isinstance(value, dict):
+                out[name].append((rnd, value["mean"], value["low"], value["high"]))
+            else:
+                out[name].append((rnd, value, None, None))
         return out
 
     sections = [
