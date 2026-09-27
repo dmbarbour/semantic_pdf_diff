@@ -122,10 +122,10 @@ class Figures(unittest.TestCase):
         from semantic_pdf_diff.extract import visual_regions
         from semantic_pdf_diff.situate import page_figures
         page = self.doc[1]  # figure 1: a 180 x 190 point drawing with its caption
-        tags = lambda side: [t for t, _ in visual_regions(page, side, page_figures(page, 2))]
+        tags = lambda side: [t for t, _, _ in visual_regions(page, side, page_figures(page, 2))]
         self.assertIn('figure:0', tags(120))      # small tiles cut it: read it whole too
         self.assertNotIn('figure:0', tags(1000))  # one tile holds the whole page
-        rect = dict(visual_regions(page, 120, page_figures(page, 2)))['figure:0']
+        rect = {t: r for t, r, _ in visual_regions(page, 120, page_figures(page, 2))}['figure:0']
         self.assertGreaterEqual(rect.y1, 290)     # the caption is included
 
     def test_bands_and_grown_tiles_keep_lines_whole(self):
@@ -136,8 +136,8 @@ class Figures(unittest.TestCase):
             page.insert_text((50, y), 'Line of engineering text with a value of 12.5 kW at design load', fontsize=9)
         diagram(page, 150, 300)  # ...and a diagram in the middle
         cut = lambda regions: sum(1 for r in regions for box, _ in _lines(page) if r.intersects(box) and box not in r)
-        grid = [r for t, r in visual_regions(page, 420) if t.startswith('tile')]
-        bands = [r for t, r in visual_regions(page, 420, tiling='bands') if t.startswith('tile')]
+        grid = [r for t, r, _ in visual_regions(page, 420) if t.startswith('tile')]
+        bands = [r for t, r, _ in visual_regions(page, 420, tiling='bands') if t.startswith('tile')]
         self.assertGreater(cut(grid), 10)
         self.assertLess(len(bands), len(grid))
         self.assertTrue(bands)
@@ -145,6 +145,38 @@ class Figures(unittest.TestCase):
         self.assertEqual(cut(bands), 0)
         tile = grid[0]
         self.assertLessEqual(cut([grown(page, tile)]), cut([tile]))
+
+    def test_sheet_details_are_read_one_by_one_with_their_titles(self):
+        from semantic_pdf_diff.extract import sheet_details, visual_regions
+        doc = pymupdf.open()
+        page = doc.new_page(width=2448, height=1584)
+        page.draw_rect(pymupdf.Rect(108, 72, 2394, 1512))  # frame
+        page.draw_line(pymupdf.Point(2124, 72), pymupdf.Point(2124, 1512))  # title-block border
+        page.insert_text((2210, 1480), 'S-522', fontsize=50)
+        page.insert_text((2150, 1400), 'DECK DETAILS', fontsize=20)
+        for name, title, x, y in [('C1', 'DECKING FOOTING PLAN', 250, 700), ('C3', 'FOOTING ELEVATION', 1200, 700),
+                                  ('A1', 'MODULE CONNECTION', 250, 1400)]:
+            diagram(page, x + 50, y - 400)
+            for i in range(12):  # dimensions and notes in small print
+                page.insert_text((x + 60, y - 420 + 14 * i), f'{i + 1}" TYP', fontsize=9)
+            page.insert_text((x, y), name, fontsize=25, fontname='cour')  # in its bubble
+            page.insert_text((x + 50, y), title, fontsize=25)
+            page.insert_text((x + 50, y + 14), '1" = 1\'-0"', fontsize=9)
+        for i in range(20):
+            page.insert_text((2140, 200 + 14 * i), f'NOTE {i}', fontsize=9)
+        found = {n: (t, r) for n, t, r in sheet_details(page)}
+        self.assertEqual(set(found) - {''}, {'C1', 'C3', 'A1'})
+        self.assertEqual(found['C1'][0], 'DECKING FOOTING PLAN 1" = 1\'-0"')
+        for name, (_, rect) in found.items():
+            if name:
+                others = [r for n, (_, r) in found.items() if n and n != name]
+                self.assertFalse(any(abs(rect & r) > 0.02 * abs(rect) for r in others))  # details don't overlap
+        self.assertGreaterEqual(found[''][1].x0, 2124)  # the title-block column
+        self.assertLess(found['C1'][1].y1, found['A1'][1].y0 + 5)   # C1 ends where A1 begins
+        self.assertLess(found['C1'][1].x1, 1200)                    # and before C3
+        notes = [n for t, _, n in visual_regions(page, 420, details=True) if t.startswith('tile')]
+        self.assertIn('Sheet S-522 DECK DETAILS. Detail C3: FOOTING ELEVATION 1" = 1\'-0"', notes)
+        self.assertFalse(any(n for t, _, n in visual_regions(page, 420) if t.startswith('tile')))  # off by default
 
     def test_drawing_sheet_is_one_region(self):
         with tempfile.TemporaryDirectory() as d:

@@ -226,7 +226,7 @@ def plan(sources, settings):
                     if settings.vision:
                         visual += len(visual_regions(page, settings.tile_points,
                                                      page_figures(page, 0) if settings.figure_tasks else [],
-                                                     settings.tiling, settings.grow_tiles))
+                                                     settings.tiling, settings.grow_tiles, settings.sheet_details))
                 if settings.situate:  # one request per figure and per section (plus re-asks, not counted)
                     situating += (len(find_figures(doc))
                                   + len(pdf_sections(doc, settings.section_depth, settings.section_pages)[0]))

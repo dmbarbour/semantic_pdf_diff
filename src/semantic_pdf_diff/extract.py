@@ -215,33 +215,165 @@ def grown(page, rect, limit=0.25, lines=None):
             break
     return out & page.rect
 
-def visual_regions(page, side, figures=(), tiling="grid", grow=False):
-    """Tiles, then whole figures, then the overview (displayed coordinates).
+DETAIL_NUMBER = re.compile(r"^[A-H]\d{1,2}$")  # grid-referenced detail numbers (US National CAD Standard)
+BORDER = 0.6  # a vertical line this share of the page height is a frame or title-block border
+
+def _borders(page):
+    """Long vertical lines as displayed: [(x, y0, y1)], merged when closer than 30 points."""
+    found = []
+    for d in page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings():
+        for item in d.get("items") or ():
+            if item[0] == "l":
+                a, b = (pymupdf.Point(p) * page.rotation_matrix for p in item[1:3])
+                if abs(a.x - b.x) < 1:
+                    found.append((a.x, min(a.y, b.y), max(a.y, b.y)))
+            elif item[0] == "re":
+                r = pymupdf.Rect(item[1]) * page.rotation_matrix
+                found += [(r.x0, r.y0, r.y1), (r.x1, r.y0, r.y1)]
+    out = []
+    for x, y0, y1 in sorted(v for v in found if v[2] - v[1] >= BORDER * page.rect.height):
+        if out and x - out[-1][0] < 30:
+            out[-1] = (out[-1][0], min(out[-1][1], y0), max(out[-1][2], y1))
+        else:
+            out.append((x, y0, y1))
+    return out
+
+def _widest_gap(boxes, lo, hi, band):
+    """Middle of the widest x range in [lo, hi] that no box crossing the band covers, or None."""
+    reach, gaps = lo, []
+    for a, z in sorted((b.x0, b.x1) for b in boxes if b.intersects(band)):
+        if z <= lo:
+            continue
+        if a > reach:
+            gaps.append((reach, min(a, hi)))
+        reach = max(reach, z)
+        if reach >= hi:
+            break
+    if reach < hi:
+        gaps.append((reach, hi))
+    gaps = [g for g in gaps if g[1] > g[0]]
+    return (lambda g: (g[0] + g[1]) / 2)(max(gaps, key=lambda g: g[1] - g[0])) if gaps else None
+
+def sheet_details(page, lines=None):
+    """A drawing sheet's details as displayed: [(number, title, Rect)], and its side columns
+    (title block, notes) as ("", "", Rect); [] if the page has no detail numbers.
+
+    Detail titles are large grid references such as "B4" at a detail's bottom left. A detail
+    runs up to the next title above it and across to the widest gap before the next detail to
+    its right (research round 1: this isolated all five details on dc S-522)."""
+    lines = _lines(page) if lines is None else lines
+    spans = [(s["size"], s["text"].strip(), pymupdf.Rect(s["bbox"]) * page.rotation_matrix)
+             for b in page.get_text("dict")["blocks"] for l in b.get("lines", ()) for s in l["spans"] if s["text"].strip()]
+    if not spans:
+        return []
+    median = sorted(size for size, _, _ in spans)[len(spans) // 2]
+    numbers = [(t, r, size) for size, t, r in spans if DETAIL_NUMBER.match(t) and size >= 2 * median]
+    borders = [b for b in _borders(page) if b[0] > 0.5 * page.rect.width and b[0] > max(r.x1 for _, r, _ in numbers)] \
+        if numbers else []
+    if not numbers or not borders:
+        return []
+    left = [b for b in _borders(page) if b[0] < 0.2 * page.rect.width]
+    x0 = left[-1][0] if left else page.rect.x0
+    right, y0, y1 = borders[0]
+    area = pymupdf.Rect(x0, y0, right, y1)
+    size = max(s for _, _, s in numbers)
+    column = 6 * size  # titles closer than this in x share a column
+    boxes = [box for box, _ in lines] + [g for g in _graphics(page) if g.width < 0.5 * area.width and g.height < 0.5 * area.height]
+    boxes = [b for b in boxes if b.intersects(area)]
+    view = {}
+    for name, t, _ in numbers:
+        top = area.y0
+        for _, u, _ in numbers:
+            if abs(u.x0 - t.x0) < column and u.y1 < t.y1 - 1.6 * size:
+                top = max(top, u.y1 + 1.2 * size)  # below the title above (and its scale line)
+        view[name] = [t.x0 - 1.2 * size, top, area.x1, min(area.y1, t.y1 + 1.2 * size)]  # with the scale bar
+    for name, t, _ in numbers:
+        r = view[name]
+        for other, u, _ in numbers:
+            ru = view[other]
+            if u.x0 > t.x0 + column and ru[1] < r[3] and ru[3] > r[1]:
+                band = pymupdf.Rect(t.x0, max(r[1], ru[1]), u.x0, min(r[3], ru[3]))
+                gap = _widest_gap(boxes, t.x0 + column, u.x0 + 0.4 * size, band)
+                edge = gap if gap is not None else u.x0 - 0.8 * size
+                r[2] = min(r[2], edge)
+                ru[0] = min(ru[0], edge)
+    for name, t, _ in numbers:
+        r = view[name]
+        lefts = [view[o][2] for o, u, _ in numbers if u.x0 < t.x0 - column and view[o][1] < r[3] and view[o][3] > r[1]]
+        r[0] = max(lefts) if lefts else area.x0
+    out = []
+    for name, t, s in sorted(numbers, key=lambda n: (n[1].y0, n[1].x0)):
+        # The title is set about as large as the number, beside it; the scale line is small, below it.
+        near = pymupdf.Rect(t.x1 - 1, t.y0 - s, t.x1 + 25 * s, t.y1 + s)
+        beside = sorted((r for size, text, r in spans if r.intersects(near) and r.x0 >= near.x0 and text != name
+                         and (size >= 0.6 * s or SCALE.search(text))), key=lambda r: (round(r.y0), r.x0))
+        title = " ".join(text for size, text, r in spans for b in beside if r == b)
+        out.append((name, " ".join(dict.fromkeys(title.split()))[:200], pymupdf.Rect(view[name]) & page.rect))
+    edges = [b[0] for b in _borders(page) if b[0] >= right] + [page.rect.x1]
+    for a, z in zip(edges, edges[1:]):
+        column = pymupdf.Rect(a, y0, z, y1) & page.rect
+        if any(box.intersects(column) and box.x0 >= a - 1 for box, _ in lines):
+            out.append(("", "", column))
+    return out
+
+SCALE = re.compile(r"\d[\"']?\s*=\s*\d|\bSCALE\b|\bN\.?T\.?S\b", re.IGNORECASE)
+LEGIBLE_AREA = 645120  # points² a crop may cover at a 12 pt smallest font (research round 1: about 12 px per em)
+
+def legible_side(page, rect):
+    """The largest square side (points) at which a crop's small print stays legible: the 5th
+    percentile font size f, weighted by characters, allows LEGIBLE_AREA·(f/12)²."""
+    sizes = sorted((s["size"], len(s["text"].strip())) for b in page.get_text("dict", clip=rect * page.derotation_matrix)["blocks"]
+                   for l in b.get("lines", ()) for s in l["spans"] if s["text"].strip())
+    total, seen = sum(n for _, n in sizes), 0
+    for size, n in sizes:
+        seen += n
+        if seen >= 0.05 * total:
+            return math.sqrt(LEGIBLE_AREA) * size / 12
+    return math.sqrt(LEGIBLE_AREA)
+
+def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=False):
+    """Tiles, then whole figures, then the overview: [(tag, Rect, note)] in displayed coordinates.
 
     Tiles are a fixed grid (tiling="grid"), or on report-sized pages full-width bands cut at
     whitespace gaps, skipping bands with no graphics that text tasks already cover
-    (tiling="bands"). grow extends grid tiles to whole text lines. A grid can cut a chart from
-    its legend or a diagram in two, so each detected figure (drawing or image, with its
+    (tiling="bands"). grow extends grid tiles to whole text lines. details cuts a drawing sheet
+    into its details (and title-block and notes columns), each tiled on its own when larger
+    than its small print allows, with the sheet's and the detail's titles as the note. A grid can cut a chart
+    from its legend or a diagram in two, so each detected figure (drawing or image, with its
     caption) is also read whole, unless it already fits inside one tile or is the whole page
     (a drawing sheet: the overview)."""
     regions = []
     if max(page.rect.width, page.rect.height) > side:
-        if tiling == "bands" and page.rect.width <= 1.6 * side:
+        lines = _lines(page) if grow or details else None
+        viewports = sheet_details(page, lines) if details else []
+        if viewports:
+            from .situate import title_block
+            label, heading = title_block(page)
+            sheet = " ".join(x for x in (label.title() if label else "Drawing sheet", heading) if x)
+            parts = []
+            for number, title, rect in viewports:
+                note = f"{sheet}. " + (f"Detail {number}: {title}" if title else f"Detail {number}") if number \
+                    else f"{sheet}. Title block or notes column"
+                most = max(side, legible_side(page, rect))
+                pieces = [rect] if max(rect.width, rect.height) <= most else list(tiles(rect, most))
+                parts += [(grown(page, r, lines=lines) & rect if grow else r, note) for r in pieces]
+            regions = [(f"tile:{i}", r, note) for i, (r, note) in enumerate(parts) if not r.is_empty]
+        elif tiling == "bands" and page.rect.width <= 1.6 * side:
             graphics = _graphics(page)
-            regions = [(f"tile:{i}", r) for i, r in enumerate(
+            regions = [(f"tile:{i}", r, "") for i, r in enumerate(
                 b for b in bands(page, side) if any(b.intersects(g) for g in graphics))]
         else:
-            lines = _lines(page) if grow else None
-            regions = [(f"tile:{i}", grown(page, r, lines=lines) if grow else r)
+            lines = lines if lines is not None else (_lines(page) if grow else None)
+            regions = [(f"tile:{i}", grown(page, r, lines=lines) if grow else r, "")
                        for i, r in enumerate(tiles(page.rect, side))]
-    grid = [r for _, r in regions] or [page.rect]
+    grid = [r for _, r, _ in regions] or [page.rect]
     for i, figure in enumerate(f for f in figures if f.region):
         shown = (pymupdf.Rect(figure.bbox) * page.rotation_matrix + (-FIGURE_PAD, -FIGURE_PAD, FIGURE_PAD, FIGURE_PAD)) & page.rect
         whole_page = abs(shown) >= 0.9 * abs(page.rect)
         if shown.is_empty or whole_page or any(shown in r for r in grid):
             continue
-        regions.append((f"figure:{i}", shown))
-    return regions + [("overview", page.rect)]
+        regions.append((f"figure:{i}", shown, f"Caption: {figure.caption}" if figure.caption else ""))
+    return regions + [("overview", page.rect, "")]
 
 def render(page, rect, target, max_side):
     # clip is in rotated page coordinates, as used by Page.get_pixmap.
@@ -921,15 +1053,13 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 signals[section][name_] += value
             if s.vision:
                 shown_figures = page_figures(page, number) if s.figure_tasks else []
-                for tag, rect in visual_regions(page, s.tile_points, shown_figures, s.tiling, s.grow_tiles):
+                for tag, rect, note in visual_regions(page, s.tile_points, shown_figures, s.tiling, s.grow_tiles,
+                                                      s.sheet_details):
                     # Task tags are unique within content: "<region>:p<page>[:<index>]".
                     region, _, index = tag.partition(":")
                     tag = f"{region}:p{number}" + (f":{index}" if index else "")
-                    caption = ""
-                    if region == "figure":  # the caption, when there is one, as source text
-                        figure = [f for f in shown_figures if f.region][int(index)]
-                        caption = f"Caption: {figure.caption}" if figure.caption else ""
-                    visual_task(number, page, tag, rect, text=caption)
+                    # A figure's caption, or a sheet detail's titles, as source text.
+                    visual_task(number, page, tag, rect, text=note)
             else:
                 record({"content": content, "page": number, "bbox": list(page.rect * page.derotation_matrix),
                         "task": f"vision:p{number}", "image": None, "status": "skipped",

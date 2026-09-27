@@ -358,6 +358,7 @@ class Settings(Strict):
     stem_context: bool = False               # tell text and table tasks which numbered items and headings they're under
     tiling: Literal["grid", "bands"] = "grid"  # bands: full-width, cut at whitespace gaps, on report-sized pages
     grow_tiles: bool = False                 # extend grid tiles to include every text line they cut
+    sheet_details: bool = False              # cut drawing sheets into their details, titled from the sheet
     # Situating stage: figure and section "about" statements after extraction.
     situate: bool = True
     verify_visuals: bool = True
