@@ -146,6 +146,20 @@ class Figures(unittest.TestCase):
         tile = grid[0]
         self.assertLessEqual(cut([grown(page, tile)]), cut([tile]))
 
+    def test_blank_tiles_are_skipped_and_the_rest_keep_their_numbers(self):
+        from semantic_pdf_diff.extract import visual_regions
+        doc = pymupdf.open()
+        page = doc.new_page(width=900, height=900)
+        page.insert_text((40, 60), 'Pump rated 12 kW', fontsize=9)  # only the top-left corner has content
+        every = [t for t, _, _ in visual_regions(page, 420) if t.startswith('tile')]
+        kept = [t for t, _, _ in visual_regions(page, 420, skip_empty=True) if t.startswith('tile')]
+        self.assertEqual(kept, ['tile:0'])
+        self.assertGreater(len(every), 1)
+        diagram(page, 600, 600)  # content in the far corner too: its tile is kept, under its own number
+        kept = [t for t, _, _ in visual_regions(page, 420, skip_empty=True) if t.startswith('tile')]
+        self.assertEqual(kept[0], 'tile:0')
+        self.assertEqual(kept[-1], every[-1])
+
     def test_sheet_details_are_read_one_by_one_with_their_titles(self):
         from semantic_pdf_diff.extract import sheet_details, visual_regions
         doc = pymupdf.open()

@@ -381,7 +381,14 @@ def sheet_details(page, lines=None):
     return out
 
 SCALE = re.compile(r"\d[\"']?\s*=\s*\d|\bSCALE\b|\bN\.?T\.?S\b", re.IGNORECASE)
-def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=False):
+def _empty(page, rects, lines=None):
+    """Which rects hold no text line, drawing or image (blank paper: the model reports "the image is
+    blank" and returns nothing; 7% of grid tiles on the development drawing sheets, round 5d)."""
+    lines = _lines(page) if lines is None else lines
+    marks = [box for box, _ in lines] + _graphics(page)
+    return [not any(r.intersects(m) for m in marks) for r in rects]
+
+def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=False, skip_empty=False):
     """Tiles, then whole figures, then the overview: [(tag, Rect, note)] in displayed coordinates.
 
     Tiles are a fixed grid (tiling="grid"), or on report-sized pages full-width bands cut at
@@ -418,6 +425,8 @@ def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=Fa
             lines = lines if lines is not None else (_lines(page) if grow else None)
             regions = [(f"tile:{i}", grown(page, r, lines=lines) if grow else r, "")
                        for i, r in enumerate(tiles(page.rect, side))]
+    if skip_empty and regions:  # drop blank tiles, keeping the others' numbers (and so their recorded keys)
+        regions = [x for x, empty in zip(regions, _empty(page, [r for _, r, _ in regions])) if not empty]
     grid = [r for _, r, _ in regions] or [page.rect]
     for i, figure in enumerate(f for f in figures if f.region):
         shown = (pymupdf.Rect(figure.bbox) * page.rotation_matrix + (-FIGURE_PAD, -FIGURE_PAD, FIGURE_PAD, FIGURE_PAD)) & page.rect
@@ -1139,7 +1148,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             if s.vision:
                 shown_figures = page_figures(page, number) if s.figure_tasks else []
                 for tag, rect, note in visual_regions(page, s.tile_points, shown_figures, s.tiling, s.grow_tiles,
-                                                      s.sheet_details):
+                                                      s.sheet_details, s.skip_empty):
                     # Task tags are unique within content: "<region>:p<page>[:<index>]".
                     region, _, index = tag.partition(":")
                     tag = f"{region}:p{number}" + (f":{index}" if index else "")

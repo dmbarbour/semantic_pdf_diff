@@ -53,7 +53,7 @@ def library_versions():
 # lever doesn't change existing fingerprints (and recorded answers keep replaying).
 LEVERS = ("extract_prompt", "extract_rules", "context_before", "context_after", "table_context", "visual_text_layer",
           "table_filter", "stem_context", "tiling", "grow_tiles", "sheet_details",
-          "references", "tile_locator")
+          "references", "tile_locator", "skip_empty")
 
 def interpreter(role, settings, prompts, names):
     defaults = type(settings).model_fields

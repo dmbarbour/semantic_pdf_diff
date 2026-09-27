@@ -16,6 +16,7 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Numbered-item stems | `stem_context` | In the champion | r03 0.63 (0.51–0.75); r04 combined 0.64 / r04h 0.69 |
 | Whitespace bands | `tiling: bands` | In the champion | r03 0.83 (0.70–0.94) |
 | Grown tiles | `grow_tiles` | In the champion | r03 0.80 (0.70–0.89) |
+| Skip empty tiles | `skip_empty` | In the champion (cost only) | 43 of 963 tiles (4.5%) skipped on the development slices, 0 claims lost |
 | Table filter | `table_filter` | Not accepted | r01b 0.41 (0.23–0.57), 12 pages |
 | References | `references` | Not accepted | r05 0.50 (0.35–0.66), 17 units |
 | Sheet details | `sheet_details` | Parked | r05–r05d: 0.64 → 0.50 → 0.48 → 0.42 |
@@ -56,6 +57,12 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 - **Mechanism:** grid tiles grown to include every text line they cut.
 - **Got:** a win on sheets and reports.
 - **Why:** cut notes read whole ("2x4 cedar handrail"), values bound to named parts.
+
+### Skip empty tiles (`skip_empty`)
+- **Mechanism:** tiles with no text line, drawing or image aren't sent; the rest keep their numbers, so recorded answers still replay.
+- **Found:** in round 5d's analysis, the model's issue notes kept saying "the image is blank".
+- **Measured without the model:** 43 of 963 champion tiles skipped on the development slices, and none of them had yielded a claim.
+- **Accepted into the champion as a pure cost saving** (2026-09-27). There are no changed answers to judge.
 
 ### Table filter (`table_filter`)
 - **Mechanism:** drops detected "tables" that are chart gridlines or drawing grids.
@@ -103,4 +110,4 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 - **Early stopping at 16–24 units inflates wins;** the combination rounds (r02, r04) at 40–48 units are more honest.
 - **Before round 7,** units with more than 25 claims showed judges separately drawn samples, which added noise to visual units in every round. This was fixed in `5850dfd`.
 - **Rubric v2 from round 7:** document administration is neutral; judges tag each side's problems and may leave remarks.
-- **Free cost saving noticed in r05d's analysis:** 7% of grid tiles and 11% of detail tiles were blank paper that the model reported as blank. Skipping crops with no text, drawings or images would save those requests.
+- **Free cost saving noticed in r05d's analysis:** the model kept reporting blank tiles. Built as `skip_empty` (see above).
