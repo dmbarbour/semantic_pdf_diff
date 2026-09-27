@@ -1,0 +1,23 @@
+{
+  "steps": {
+    "record:baseline": "done",
+    "record:combined": "done",
+    "replay:baseline": "done",
+    "replay:combined": "done",
+    "measure:baseline": "done",
+    "measure:combined": "done",
+    "pairs:combined": "done",
+    "decide:combined": "done"
+  },
+  "updated": "2026-09-27T04:45:59+00:00",
+  "judged": {
+    "combined": 16
+  },
+  "stopped": {
+    "combined": "stopped early at 16 units: clear result"
+  },
+  "failures": {
+    "judge:combined:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:combined:XiaomiMiMo/MiMo-V2.6-Pro": 0
+  }
+}

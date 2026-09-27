@@ -175,6 +175,18 @@ Round 1 showed that asking the same question again often gets a different answer
 - **Figures at every step** go into the history file, so every stage can be graphed.
 - **Acceptance is automatic** when the rules pass, with a round summary for the owner. Assumed from "halt or continue based on improvements"; to be confirmed.
 
+## Progress
+
+| Round | What | Result | Cost |
+|---|---|---|---|
+| r01 | Four levers, one per variant | Confounded: every variant re-asked every request, so run-to-run variation dominated; paused | $10.03 |
+| r01b | The same, re-asking only changed requests | Text layer 0.72, table lead-in 0.71, neighbouring text 0.68 accepted; table filter inconclusive (12 pages) | $3.40 |
+| r02 / r02h | The three together, development / held-out | 0.68 (0.54–0.81) / 0.71 (0.56–0.86): accepted | $2.04 |
+
+**Champion (2026-09-26):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images). Later rounds compare against it.
+
+**The tool's defaults** stay at the v6 queries for now, so the recorded fixture keeps replaying. The champion becomes the default at a milestone, after a few rounds, with one full re-recording (about $1).
+
 ## Open questions
 
 1. **Model fixed per cycle?** Proposed: keep the responder (gemma-4-31B) fixed while improving queries, and compare models separately, so effects don't mix.

@@ -1,0 +1,293 @@
+{
+  "reviewer": "XiaomiMiMo/MiMo-V2.6-Pro",
+  "verdicts": {
+    "u-ken-manual-p70-79-3b80816c-p10-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A is clean but limited to five station/system specs, omitting the monthly PVWatts table data and other specifications. Set B covers the same correct specs plus the monthly solar radiation, AC energy, and energy value rows with proper month conditions, giving substantially more faithful coverage. However, B misstates the unit for two Energy Value claims (63.81 and 35.62 are dollars, not kWh). Despite those two unit errors, B's broader correct coverage outweighs A's omissions."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A captures the PVWatts monthly table data (solar radiation, AC energy, energy value for months 7 and 11) that Set B omits entirely, and binds those values to the correct month conditions and location. Set B is accurate but thin, missing the table's key quantitative facts. However, A errs on two claims by giving the Energy Value unit as kWh when the table column is in dollars ($)."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p5-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 3,
+        "note": "Set A binds every value correctly, notably calling the thruster firing interval a period (not a frequency), and cleanly captures the filter passbands (0.45–1.0 µm at nominal distance, 0.45–0.67 µm for UV science), the 1.0 µm astro-coating response limit, the 47→1330 f/# change, field stops, 1 kHz readout and ~1 s data suspension. Set B does recover three quantitative facts A omits (EMCCD at 153 K, the 11.9\" imaging field stop, and the ~7e-3 central-spot intensity at 1.7 µm), but it twice mislabels the firing interval as a 'frequency' with a value in seconds and includes a garbled, incomplete sub-systems claim whose quote is jumbled figure labels. Both sets pad with trivial figure-label claims and duplicates (A's are loosely bound to the chapter title, B's to the visible channel), so the deciding difference is that A has no misread or misbound values while B has three. On balance A is the more faithful extraction, though B's coverage of the detector temperature and field stops is a real advantage."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 2,
+        "note": "Set A captures several substantive facts that B misses — the 11.9\" imaging field stop, the 153 K EMCCD operating temperature, the ~7e-3 central-spot intensity at 1.7 µm, and the camera+IFS channel composition — while B instead adds the 0.45–1.0 µm visible-work passband and the 1.0 µm response limit that A omits. Both sets are padded with trivial figure-label 'component' claims and duplicates, but B binds five of these to the page/section title 'HabEx 4-Meter Baseline Design' rather than the visible channel, a clear misbinding. A's main defect is labeling the 'every few 100 s' thruster period as a firing frequency (twice, as duplicates). On balance A has more correct, well-bound claims and fewer misread ones."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p2-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set B captures the UV-driven protected-aluminum coating requirement with its condition, the ray behavior after the tertiary (collimated, converging to a common on-axis pupil plane), and the instrument field-of-view directions, all supported by the text. Set A instead pads its list with duplicates and trivial claims (e.g. 'HabEx telescope | tertiary mirror | M3' from 'the tertiary mirror beside the primary') and misreads the M2 radius of curvature as -1,983 mm (table says -1,953 mm) plus a non-verbatim '19.800' quote. Both sets wrongly give M2 thickness as 190 mm (table: 100 mm), and B additionally invents an 'obscuration to next optic' of 9,030 mm for M2. B is the more faithful and better-conditioned set overall, though it omits the M2 radius of curvature."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 3,
+        "note": "Both sets reproduce most of Table 5.5-1 correctly and both share the same fabricated \"[lines to]\" quotes and the same wrong M2 thickness of 190 mm (table says 100 mm). Set A additionally captures real prose facts the page supports and B omits: the UV-driven protected-aluminum requirement on the first two mirrors, the rays being collimated after M3 and converging to a common on-axis pupil plane, and the coronagraph/starshade field directions. Set B adds its own errors (M2 radius of curvature given as -1,983 mm instead of -1,953 mm, a unit-converted 19.800 m with an invented quote, and a \"tertiary mirror = M3\" claim whose quote does not identify M3), while A's main defect is the invented \"obscuration to next optic 9,030 mm\" for M2. A also carries more duplicate/trivial claims, but its wrong claims are fewer and it covers more of the important content."
+      }
+    },
+    "u-ken-manual-p70-79-3b80816c-p7-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 10,
+        "variant_wrong": 11,
+        "note": "Both sets make the same systematic error of attributing the R-57.5 row values (17,080; 14,880; 2,423; 459; 2,882; 19,802; 15,852; 2,870; 3,920 Btu/hr or kWh) to R-47.5, so each has about ten misbound values. Set B is better because it binds real properties (heating/cooling load, heating/cooling/total energy use) and keeps the eQuest vs BEoptE+ conditions, whereas Set A's attributes are placeholders such as 'value 1', 'energy value 2' or 'energy consumption (column 3, value 1)' that never identify the measured property, and it even drops the software condition in two claims. Set B does mislabel the four BEoptE+ Btu/hr load values as 'energy use' and includes one trivial R-value claim, but overall it yields more faithful, interpretable claims. Neither set captures the 2.08%/0.51% results or the R-57.5 comparison."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 20,
+        "variant_wrong": 11,
+        "note": "Both sets make the same core error of attributing the R-57.5 table row values (e.g., 17,080 Btu/hr, 2,423 kWh, 2,870 kWh, 3,920 kWh, 15,852 Btu/hr, 2,882 kWh) to R-47.5. Set A nevertheless binds most values to the correct property (heating/cooling load vs. heating/cooling/total energy use) and software (eQuest vs. BEoptE+), so its surviving claims are meaningful and supported, though a few loads are mislabeled as 'energy use'. Set B leaves nearly every attribute as a placeholder ('value 1', 'energy value 2', 'energy analysis result'), so even its correctly valued claims do not identify the measured property, and it also misbinds the R-57.5 rows. Neither set captures the 2.08%/0.51% energy-increase results."
+      }
+    },
+    "u-ken-manual-p70-79-3b80816c-p3-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets bind values and quotes correctly to the source text, including the R-60/R-33/R-20 insulation values, window type, 18 SEER assumption, and the relative insulation effects. Set B, however, duplicates two claims (ceiling insulation effect and wall insulation effect each appear twice with near-identical wording) and renders R-values as '33 R', '60 R', '20 R' rather than the document's 'R-33', 'R-60', 'R-20'. Set A covers the same correct facts without redundancy, so it is the cleaner and more faithful extraction. Neither set contains a factually wrong claim."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Both sets capture the same core facts with supporting quotes: window type, R-60 ceiling, R-33 walls, R-20 floors, 18 SEER, and the relative insulation effects. Set A, however, contains two exact duplicate claims (ceiling 'greatest' and wall 'second greatest' each appear twice under slightly different attribute labels), adding trivial redundancy without new information. Set B presents the same correct content in eight clean, non-redundant claims, and formats R-values more faithfully (R-33 vs '33 R'). Neither set captures the diminishing-return finding or the optimum R-60/R-33 energy-savings conclusion as distinct claims, so that omission is shared."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Set B captures key quantitative facts that A misses entirely — the 400 mm primary thickness, the collimated 50 mm output beam, the scarfed straylight tube, the 22.8 m length in Figure 5.5-2, and the solar panel tower label — all supported by the text or figure labels. Set A invents two quotes in arrow form ('Starshade -> Starshade bus', 'Telescope -> Telescope bus') that appear nowhere in the source, and mis-binds 'open-back Zerodur' as a material. B's only real defect is the garbled focal-length value '2.5 f/' (source: f/2.5), plus some duplication. Overall B is more complete and more faithful."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Set A captures several important facts that B omits entirely: the 400 mm primary thickness, the scarfed straylight tube, the TMA designation, the collimated 50 mm output beam, the FSM-driven sub-milliarcsecond residual pointing error, and the 22.8 m length in Figure 5.5-2. Set B instead adds weak diagram-derived 'connection' claims whose quotes (\"Starshade -> Starshade bus\", \"Telescope -> Telescope bus\") are not text in the source, and it relabels the stated f/2.5 focal length as a focal ratio. Set A's defects are mostly garbled units/values (\"sub-milliarcsecond arcsecond\", \"2.5 f/\", a dropped \"~\") plus several redundant duplicates of the 4 m diameter and Zerodur claims, while B also mis-binds the starshade bus to the HabEx spacecraft baseline design. Both sets are bloated with figure-label component claims, but A is the more complete and faithful extraction."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p10-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 13,
+        "variant_wrong": 23,
+        "note": "Set A reads the table values correctly and binds most of them to the right aberration rows (Tip-tilt, Defocus, Astigmatism, Spherical, Trefoil), whereas Set B systematically assigns values to the wrong topological charge (e.g. 0.36 and 0.44 are the 1-mas Charge-6 entries but are labeled charge 4; 36, 15, 5.5, 1.0, 0.95 are likewise bound to the wrong charge column). Set B also invents conditions not in the source ('stellar size 0 mas', 'stellar size < 1 mas') and misreads the Defocus index as 0. Set A's main defect is a block of 13 claims whose entity is the section title 'HabEx 4-Meter Baseline Design' with a meaningless 'Mode 1/2/3' attribute instead of the charge column, plus several claims that drop the charge condition; still it is far more faithful overall."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 24,
+        "variant_wrong": 20,
+        "note": "Set A correctly binds several table values to their charge columns (e.g. charge 8 = 36 nm, charge 6 = 15 nm, 1.0 nm, 0.95 nm) and keeps the 2e-11 raw starlight suppression (2.5–3.5 λ/D) condition, whereas Set B never identifies the charge column at all, binding values to 'HabEx 4-Meter Baseline Design' with invented 'Mode 1/2/3' labels or to bare aberration names, so its numbers cannot be verified against the four charge columns. Set A nonetheless misassigns many right-hand (stellar size 1 mas) values to charge 4 (0.36, 0.44, 0.71, 0.35, 0.0065 nm) and invents a 'stellar size 0 mas' condition and a 'Defocus, index 0' reading not in the source. Set B also drops the suppression and 1 mas conditions entirely and includes a trivial index claim, so A yields more genuinely correct, component-bound claims despite its own frequent charge misbindings."
+      }
+    },
+    "u-scical-cd-p40-43-c22f3f4e-p2-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets correctly capture the three general sheet notes (waste pipe slope per 2009 IRC, PVC for supply and waste pipe) with supporting quotes. Set B additionally extracts the elevation markers (INT. STEP 2'-6 1/8\", FINISH FLOOR 2'-0 3/8\") relative to the 0\" ground plane datum and the 1/2\" = 1'-0\" scale of the Water Supply Longitudinal Section, all of which are supported by the text layer and image. Set A omits these facts without adding any errors, so B is the more complete and equally faithful extraction."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets correctly capture the PVC material requirement for supply and waste pipe and the 1/4 in/ft minimum waste pipe slope per 2009 IRC. Set A additionally extracts three well-supported facts from the section drawings: the INT. STEP and FINISH FLOOR elevations (2'-6 1/8\" and 2'-0 3/8\") relative to the 0\" ground plane, and the 1/2\" = 1'-0\" scale of the Water Supply Longitudinal Section. Set B omits these entirely, so it misses important dimensional information without gaining any accuracy advantage."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p9-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets correctly capture the 4 m off-axis monolith baseline, the perfect starlight rejection claim with its aperture/charge conditions, and the eilθ phase screw dislocation. B additionally extracts supported facts A misses: the VVC being phase-based, the field amplitude zeroed locally at the singularity, the topological charge definition, and the charge–low-order-aberration sensitivity trade. A's third claim duplicates its second and invents the expansion 'Vortex Vectoring Coronagraph' for VVC, which the text never states; B's only flaw is one duplicated claim, which is redundant rather than wrong."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A covers more of the page's substantive facts correctly — the phase-based VVC type, locally zeroed field amplitude, the 4 m off-axis monolith, the eilθ screw dislocation, the topological-charge definition, and the charge/IWA–aberration trade-off — all with supporting quotes and conditions. Set B omits several of these and expands VVC as 'Vortex Vectoring Coronagraph', an expansion not supported anywhere in the text (the page only refers to vector vortex masks and cites VVC). Set A's only weakness is redundancy (the starlight-rejection and topological-charge claims each appear twice), while Set B also duplicates the starlight-rejection claim and renders the charge relationship vaguely as 'inverse'."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p3-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Both sets capture the main numeric facts (124,000 km separation, ±1 m lateral travel, 60 mas tip angle, 28 mas IWA, the three science bands). Set A binds every claim to the correct component/property and additionally captures the six beam paths and the 0.3–1.0 µm operating band; its only weakness is calling the 0.2 µm UV limit a 'suppression band' and one quote whose condition (nominal operation) is not in the quoted text. Set B misbinds three science-band claims to the section title 'HabEx 4-Meter Baseline Design' as the entity and duplicates the IWA and science-band claims, while omitting the six beam paths count."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set A covers the IWA-wavelength trend and the UV suppression limit correctly, but it binds three science-band claims to the document title \"HabEx 4-Meter Baseline Design\" instead of a component, and it repeats several claims verbatim. Set B is cleaner and adds the six beam paths fact that A misses, with only two defects: it labels 0.2 µm as a \"suppression band\" (the text gives it as a suppression limit down to 0.2 µm in the UV) and invents the condition \"nominal operation\" for the 0.3–1.0 µm operating band. B omits the IWA-increases-with-wavelength statement, but overall it has fewer misbound or unsupported claims."
+      }
+    },
+    "u-iea-22mw-p12-21-255d62ed-p8-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 10,
+        "variant_wrong": 6,
+        "note": "Set B captures the key structural facts correctly — shear webs of biaxial glass/foam sandwich, spar caps of pultruded carbon, trailing edge reinforcement of unidirectional glass, skin triaxial, the ~50% span aft shear web and the 6×6 stiffness/inertia matrices — while Set A misstates the trailing edge reinforcement as unidirectional carbon and invents several dimensional claims (blade length 135/120 m, max width 4 m, chord 5 m, Z range 0–100 m) that are not in the text and only loosely read off axes. Set A also has vague 'internal structural layout' claims and a duplicated uniaxial glass placement entry. Set B is not flawless: it repeats the shear-web material several times, binds the sandwich material to the whole blade, gives an unsupported quote for 'pultruded carbon', and likewise invents a 135 m blade length from axis readings, but its errors are fewer and its correct claims more substantive."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 8,
+        "variant_wrong": 5,
+        "note": "Set A captures the key structural facts faithfully — shear web sandwich construction, the aft web extending ~50% of span from the root, skin triaxial, spar cap carbon uniaxial/pultruded carbon, edge uniaxial glass for edgewise loads, and the 6×6 stiffness/inertia matrices — while Set B omits the aft-web extent, the skin/spar laminate callouts and the matrix dimension. Set B also contains clear misreads: trailing edge reinforcement called 'unidirectional carbon' (source says unidirectional glass), a 'maximum width 4 m' and 'maximum chord width 5 m' read off axis tick labels, and three mutually inconsistent Z ranges/lengths (0–100 m, 0–120 m, 120 m) alongside an unsupported 135 m length. Set A's main faults are three invented 135 m length claims from axis readings, one misbound blue-shading claim, and one claim whose quote does not support the stated material. Both sets contain redundant duplicates and trivial 'shown in red/green' claims, but A is the more accurate and complete set."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p7-table": {
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets extract exactly the nine cells of Table 5.5-4 and bind each value to the correct channel column and bandpass row (e.g., 0.2–0.45 µm UV bandpass in the UV column, 0.54–1.0 µm visible bandpass in the IR column, 0.975–1.8 µm IR bandpass in the IR column). Set A names the channel as the entity and the band as the attribute, while Set B mixes entity/attribute/condition naming (UV bandpass, UV channel, UV band; range vs. bandpass) and puts the channel in conditions, but neither misreads a value. Both equally drop the per-cell science/guide mode qualifiers (e.g., 0.3–0.45 µm in the IR column is guide mode) and both ignore the other page facts (153K/60K detectors, 1k×1k formats, 32×32 pupil image, 4\" field stop, 3.8\"×3.8\" IFS FOV at R=40), so their coverage and accuracy are effectively identical."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Both sets cover all nine cells of Table 5.5-4 with the correct numeric ranges, and both equally drop the (science)/(guide) mode qualifiers that are the real conditions in the table. Set B binds each value cleanly to the UV/Visible/IR channel (e.g. 'IR filter | UV bandpass | 0.3–0.45', 'Visible filter | visible bandpass | 0.45–1.0') with quotes that track the table rows and columns. Set A instead labels the channel as a 'condition' and in two claims names the entity 'UV band' / 'Visible band' while the attribute is the IR bandpass (1.6–1.8 µm), which is internally contradictory and misbound. Otherwise the value coverage is equivalent."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p4-table": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 8,
+        "variant_wrong": 2,
+        "note": "Set A binds nearly all values correctly to the camera vs. spectrometer rows of Table 5.5-3 and to the science-band rows of Table 5.5-2, including starshade separations and guide bands; its only errors are two IR Guide camera claims (FOV 3.8\" and 2×2 LMAPD) that actually belong to the IR spectrometer rows. Set B repeatedly misreads the detector format '1×1' as a 'quantity', calls spectrometer resolution (140, 40) a 'count', and binds the Visible spectrometer array width 4,096 to the Visible detector, while using the page header 'HabEx 4-Meter Baseline Design' as the entity for several starshade-band claims. B also omits the starshade separation distances and the IR science wavelength band that A captures."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set B correctly binds the starshade separations (69,000/124,000 km), science-band IWAs and wavelength bands from Table 5.5-2, which Set A omits almost entirely, while also capturing camera FOV, array widths and detector types. Set A garbles the spectrometer resolution row as 'count' (140, 40) and ambiguously binds the 4,096-pixel array width to the Visible detector, plus repeats trivial 1×1 detector claims. Set B's main faults are binding the IR spectrometer's 3.8\" FOV and 2×2 LMAPD detector to the IR Guide camera (whose FOV is '-' and detector is 1×1 LMAPD). Overall B is more complete and more faithfully bound."
+      }
+    },
+    "u-scical-cd-p40-43-c22f3f4e-p3-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 6,
+        "note": "Set A captures the sheet metadata correctly (date 08.22.2013, lot #101, drawn by, copyright NONE, construction-set submission 02/14/2013) and gives the correct TOP OF STEEL 11'-5\", plus three correct keynote bindings; Set B omits all of that and misreads the steel dimension as 1'-5\" and invents a \"STEP 1 1/8\"\" dimension from the INT. STEP 2'-6 1/8\" text. However, A fabricates four scale values (1/4\" = 1'-0\" for the plan and the A1/A3/A5 elevations, where the sheet reads 1/2\" = 1'-0\") and repeats a bogus TOP OF STEEL 11'-0\" claim, while B gets all three scale claims right and correctly binds INT. STEP 2'-6 1/8\". B is further padded with four invented \"connection | system/component\" claims and a truncated C1 title (\"MECHANICAL\" instead of MECHANICAL ROOM LAYOUT), so on net A has more correct, useful claims and slightly fewer unsupported ones."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 7,
+        "note": "A reports the sheet's drawing scales correctly (1/2\" = 1'-0\" for C1 and the mech room elevations) and captures the INT. STEP 2'-6 1/8\" dimension plus the reference-keynote descriptions, whereas B states every view scale as 1/4\" = 1'-0\" with quotes that appear nowhere on the page and adds a fabricated \"TOP OF STEEL 11'-0\"\" that contradicts its own correct 11'-5\" claim. A's faults are mostly empty \"connection | system/component\" filler plus two misread dimensions (STEP 1 1/8\", STEEL 1'-5\") and a misbound C1 title, and it also labels the A1/A3/A5 elevations as section references. B additionally drops the INT. STEP dimension and several keynote descriptions, and most of its correct content is title-block metadata (date, lot number, copyright, drawn by)."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p8-table": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A correctly binds both wavelength bands for the blue and red channels, all three pixel resolutions, the spectrometer types (IFS/IFS/Slit) and the 0.4 mm DM actuator pitch, with conditions (2.4 λ/D, wavelength) kept and no invented qualifiers. Set B adds useful facts (OWA 0.74/1.57 as, red-channel FOV 2.2\", IR spectrometer λ/Δλ = 40) but attaches a spurious \"HabEx 4-Meter Baseline Design\" condition to the OWA claims and leaves its 1/4 CCD282 (EMCCD) detector claims ambiguous between the camera and spectrometer detector rows. Set A does omit the OWA values, red-channel FOV and telescope resolution 23 mas, but every one of its claims is supported and correctly bound, whereas B is noisier and drops the blue 0.45–0.55 µm band, red 0.82–1.0 µm band, red/IR pixel resolutions and the DM pitch."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 2,
+        "note": "Both sets are drawn accurately from Table 5.5-5 and largely bind values to the correct channel and row, with roughly equal coverage breadth. Set B is more systematic (all three pixel resolutions, all five wavelength bands, spectrometer types, DM actuator pitch) and preserves the 2.4 λ/D condition on the IWA claims, which Set A drops. Set A adds OWA values, the IR spectrometer resolution (40) and the Red FOV, but it more often misbinds spectrometer-row values to the channel as a whole (1/4 CCD282 as the Blue/Red \"detector\", 2048 as the channel \"Array width\"), producing contradictory same-attribute pairs, and it adds a trivial \"HabEx 4-Meter Baseline Design\" condition on the OWA claims. Set B's only real flaw is the same section-qualifier ambiguity on the 2048 array-width claims plus one redundant IR array-width entry."
+      }
+    },
+    "u-ken-manual-p70-79-3b80816c-p1-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 8,
+        "variant_wrong": 9,
+        "note": "Both sets read the two temperature charts and both contain several misread points, but Set A is more often on target: its Louisville July high/low (87–88 F), May high (76 F), April low (47 F) and Irvine Aug/Jul mean and high values match the plotted series, and it also captures the text fact that Bowman Field weather data came from DOE/NREL. Set B systematically misreads the Louisville chart (e.g., Jan high 66 F and Jan mean 55 F against plotted ~40 F and ~32 F, Feb mean 56 F vs ~36 F, Jun mean 67 F vs ~75 F, Jun low 55 F vs ~64 F) and adds a vague, misbound Bowman Field 'temperature 63 F' claim with no series. Set A does invent two non-entities ('Weather Data (High)/(Low)') and contradicts itself on Irvine Aug mean/low and Louisville Jan mean, but its wrong count is still lower. Quotes in A are also more traceable to figure and series than B's abbreviated ones."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 7,
+        "variant_wrong": 9,
+        "note": "Set B reads the plotted series more accurately and keeps the Avg. High/Mean/Low labels bound to the right chart and month (e.g., Louisville July high 88 F, Irvine August high 85 F, Irvine October high 79 F), whereas Set A misreads several Louisville points outright (January high 66 F, January mean 55 F, June mean 67 F, March high 67 F, June low 55 F). Set B also captures the weather-data-source statement from the text, although it narrows 'Department of Energy or NREL' to just the DOE. Set B's weaknesses are the two invented 'Weather Data (High/Low)' entities and a handful of points a few degrees off the curves. Set A additionally uses vague properties such as 'temperature (mid)' and misbinds a Bowman Field temperature value."
+      }
+    }
+  }
+}
