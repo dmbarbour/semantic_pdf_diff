@@ -1,0 +1,311 @@
+{
+  "reviewer": "XiaomiMiMo/MiMo-V2.6-Pro",
+  "verdicts": {
+    "u-rules-2013-p35-38-3c85ed49-p2-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets are heavily redundant, repeating the same starting-water minimum (96.00 oz / 2.721 kg) and Figure 9 vaporized-water thresholds several times, and both omit the body-text full-credit figure of 5.000 lb (80.00 oz / 2.268 kg) and the linear scaling of reduced points. Set B is more faithful in binding the scoring thresholds, preserving the inequality signs (≥80 oz, ≤16 oz, 16<Weight<80 oz, 450<Weight<2300 g) exactly as printed. Set A drops the inequalities in several threshold claims (stating bare values 16 oz, 80 oz, 2300 g, 450 g) and loosely renders the single-container requirement as 'vaporized in a single task', a mild misstatement. Otherwise the two sets cover essentially the same correct facts."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets focus on the Cooking water-weight thresholds and the 96.00 oz starting-water minimum, and both are heavily redundant, but Set A keeps the inequality directions (≥ 80 oz, ≤ 16 oz, 450 < W < 2300 g) exactly as stated in Figure 9 and the rule text. Set B drops the inequalities (e.g. '16 oz' and '2300 g' as bare thresholds, '16 to 80 oz' for a strictly bounded range) and misstates the single-container condition as 'vaporized in a single task'. Neither set captures the body-text full-points requirement of 5.000 lb (80.00 oz or 2.268 kg) vaporized, but Set A is otherwise fully supported and better bound."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p8-text": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "The two sets are nearly identical in content, quotes, and bindings; both capture the 5 rpm minimum speed with its 3P rationale, the 7.55 rpm rated speed at 10.59 m/s, 95 m/s tip speed, pitch schedule, Region 2.5 negligibility, and the DTU quadratic gain scheduling. The only substantive difference is how the two control-region headings are framed: A records the wind-speed range as the value with the mode label as a condition, while B records the mode label as the value with the range as a condition — both are defensible readings of the same heading text. Both sets contain the same minor duplication of pitch and speed claims and the same slightly inferred condition 'at rated rotational speed' for the 95 m/s tip speed, so neither gains an advantage."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "The two sets are nearly identical in content, quotes, and conditions, including the same duplicated claims (pitch start wind speed, 0° pitch setting, minimum and rated rotational speed). The only differences are the two wind-region claims: A frames them as 'operation mode' (rated power / optimal TSR) with the wind-speed range as condition, while B frames them as 'operating range' with the mode as condition; both are supported by the same region headings and neither misbinds values. No claims in either set are misread or invented, and both omit the same facts (e.g., DTU pole frequencies, ROSCO estimator)."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p2-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets capture the table values and material constants correctly, but B covers the full geometry pair (base diameter 6 m and top diameter 3.87 m) that A only half reports, omitting the base diameter entirely. A adds the 7,850 kg/m3 typical steel density and the paint/bolts/welds/flanges rationale, which B drops, but A also states a thickness scaling of '1.3 ratio', a value never given in the source (the text says an increase of 30%). B's claims are all directly supported, including the fuller 'radius and thickness taper' statement, so B is slightly more faithful overall."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets capture the same core table values, geometry, and steel moduli with correct bindings and supporting quotes. Set B adds the correct background fact of steel's typical density (7,850 kg/m3) and a more informative condition on the effective density (paint, bolts, welds, flanges), while Set A keeps the stated 30% thickness increase and correctly attributes the linear taper to both radius and thickness. Set B's only defect is restating the 30% increase as a '1.3 ratio' value that does not appear in the quoted text, a minor derived value. The extra correct fact in B roughly offsets that small misstatement, so the sets are essentially equivalent."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p9-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets cover the same core claims and each contains one redundant near-duplicate (A repeats the generator-torque negative-damping claim, B repeats the second-order response claim), so neither is penalized for invention or misbinding. B is more faithful on conditions: it retains the 'active pitch-to-feather wind turbine' context for the derivative/proportional/integral term effects, which A drops, while keeping the positive-gains and Region 3 conditions. A's quotes are marginally fuller (e.g., 'Ref. [10] recommends...'), but this does not offset B's better condition coverage."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 2,
+        "note": "Both sets capture the main claims accurately: negative damping from the generator-torque controller in Region 3, the derivative/proportional/integral term effects, and the Ref. [10] design targets (ωφn = 0.6 rad/s, ζφ = 0.6–0.7). Set A, however, contains two redundant pairs of claims (the second-order response claim appears twice and the generator-torque negative-damping claim appears twice), adding trivial duplication without new information. Set B keeps the same substantive content with only one duplicated claim and slightly cleaner quotes (e.g., 'Ref. [10] recommends neglecting the derivative gain'). Set A's extra condition 'active pitch-to-feather wind turbine' is supported by the text, so it is not an error, just more verbose."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p8-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A captures the definitions of ∆Ω and ∆Ω̇ (low-speed shaft speed perturbation and acceleration), which Set B omits entirely, while both sets otherwise agree on the symbol definitions and the Region 3 relationships. Set B does include the aerodynamic-torque assumption (negligible variation with rotor speed) that A misses, but it also repeats the generator-torque/generator-speed relationship twice (once as TGen, once as a generic 'generator torque' claim), which is redundant and trivial. Both sets bind values correctly with supporting quotes and no invented facts, so A's coverage of distinct, correct claims is slightly better."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are accurate on the claims they make, with quotes correctly bound and Region 3 conditions retained. Set A uniquely captures the aerodynamic-torque assumption (negligible variation with rotor speed in Region 3), but it also repeats the generator-torque inverse-proportionality claim under a second entity name, a trivial duplicate. Set B instead adds two correct symbol definitions (∆Ω and ∆Ω̇) that A omits, giving B more unique supported claims with one fewer redundant entry."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p4-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the same core facts (2500/2900 gram forces, 400 gram total actuation force, 30/12 percent load shares, two mirrored assemblies per bay) with supporting quotes and correct conditions. Set B additionally separates the louver counts cleanly into 64 total louvers per operable screen bay and 32 louvers actuated per wire, both supported by the source sentence. Set A compresses this into a single vaguer 'actuation capacity: 32 of the 64 louvers' claim bound to the inline pulley system, losing the 64-louver fact and giving a less precise attribute. Neither set contains an outright wrong or invented claim."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets bind the Flexinol wire forces (2500 g martensite, 2900 g austenite), the 400 g total actuation force, and the 30/12 percent heating/cooling load shares correctly with supporting quotes. Set A additionally extracts the 64 total louvers per operable screen bay and states the 32 louvers actuated per wire as a clean numeric claim, whereas Set B folds that into a vaguer 'actuation capacity: 32 of the 64 louvers' and omits the 64-louver total. Set A's claims are therefore slightly more complete and precise without introducing errors."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p12-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the four numeric gains/damping values correctly with supporting quotes, but Set B contains four near-duplicate claims (each gain and the damping ratio repeated under 'baseline' and non-'baseline' entities), adding bulk without new information. Set A is more economical and additionally preserves the stated rationale condition that ζφ = 0.7 (upper limit of the recommended range) was used to compensate for neglecting negative damping from the generator-torque controller in determining KP, which Set B omits. Neither set misreads or invents values, so the difference is redundancy and condition coverage rather than outright error."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the four numeric facts (KP, KI, KD, ζφ) with correct values, units and conditions, and all quotes are supported by the page text. Set A simply restates each fact twice (once as 'baseline blade-pitch controller' and once as 'blade-pitch controller'), yielding four redundant, trivial claims with no added information. Set B avoids the duplication and additionally records the stated rationale that ζφ = 0.7 was used to compensate for neglecting negative damping from the generator-torque controller, a condition present in the text (though its quote only covers the value, a minor weakness). Coverage of the important facts is otherwise equal, so B is the cleaner and more faithful set."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p6-text": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "The two sets are essentially identical in content: both capture the filter characteristics, all five control regions, the peak power coefficient with its wind-speed/pitch/tip-speed-ratio conditions, and the rated values (1173.7 rpm, 5 MW, 5.296610 MW, 43,093.55 N·m, 94.4%). Differences are only cosmetic (quote wording such as 'the rated mechanical power...' vs 'rated mechanical power...', entity labels like 'generator-slip' vs 'generator | slip percentage', and condition ordering). Both contain the same duplicated Region 3 torque claim and the same slightly indirect 'chosen filter flat in pass band' claim, so neither gains an advantage."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets cover essentially the same claims with the same values, conditions, and supporting quotes, including the peak power coefficient with its tip-speed ratio, pitch angle, and 8 m/s wind speed conditions, and the Region 1½/2½ transition definitions. Differences are only in wording of entity labels (e.g., 'generator-slip' vs 'generator | slip percentage', 'generator speed' vs 'generator | transitional speed') and quote truncation for the gearbox ratio, none of which affect correctness. Both contain the same minor redundancy (the Region 3 inverse-proportionality claim stated twice) and the same debatable 'time domain' condition on the filter roll-off, so neither is favored."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p12-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 7,
+        "variant_wrong": 0,
+        "note": "Set A duplicates six facts (steel density, Young's modulus, shear modulus, soil shear modulus, soil Poisson's ratio, transition piece mass), restating the same values with only formatting differences, which adds trivial claims without new information. Set B is clean and additionally captures the 7% outfitting mass addition that Set A omits. Set A also adds an unsupported 'typical variation' condition to the 20–30 m clearance footnote claim. Both sets bind values and quotes correctly otherwise, but B is more complete and free of redundancy."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A is a clean, faithful extraction: all 14 claims are correctly bound and quoted, including the material table values, the 0.170 Hz first mode, the 0.10–0.13 Hz wave range, the 10-m monopile diameter, and the 7% outfitting and 100 t transition-piece mass notes. Set B covers essentially the same facts plus the footnote's 20–30 m clearance range, but it repeats seven claims (steel density, Young's modulus and shear modulus, soil shear modulus and Poisson's ratio, and the transition-piece mass three times), adding trivial redundancy. B also labels the 20–30 m clearance spread as a 'typical variation', which the footnote does not state (it only says clearances can vary and are not specified in an official standard). A's only gap is omitting that footnote range, a minor loss outweighed by B's duplication and one unsupported condition."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p1-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets contain the same core claims, all faithfully bound to the source values and units (generator efficiency 94.4%, generator inertia 534.116 kg•m2, driveshaft spring/damping constants, brake torque 28,116.2 N•m and 0.6 s time lag, rated speeds and gearbox ratio). The only difference is that Set B repeats the driveshaft linear-damping constant claim twice, adding a redundant, trivial entry. Set A is otherwise identical in coverage and accuracy, so it is marginally better for avoiding that duplicate."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "The two sets are nearly identical in content and accuracy, with all values correctly bound to the right components and supported by their quotes. Set A includes one additional correct claim from the body text (driveshaft linear-damping constant of 6,215,000 N•m/(rad/s)) that Set B omits. Both sets contain some redundant restatements of the same facts from the table and body text, but none are misread or invented. Set A's extra faithful claim gives it a slight edge."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p4-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets contain the same six claims, all correctly bound and supported by the page text. Set A additionally preserves the 'assumed' condition on the three structural damping values, which the source explicitly states ('were assumed to be 3%, 3%, and 6%'); Set B drops that qualifier, making the damping values read as measured rather than assumed. No claims in either set are misread, misbound, or invented, so the difference is small but favors A."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the same six facts with accurate values, bindings, and supporting quotes: the three first-mode structural damping values (3%, 3%, 6%), the s-coordinate endpoints (0 at suction-side trailing edge, 1 at pressure-side trailing edge), and the flatback trailing-edge definition with its 'for flatback airfoils' condition. The only difference is that Set B preserves the qualifier that the damping values were 'assumed' rather than measured, which is a meaningful provenance condition stated in the source. Set A drops that qualifier, slightly overstating the certainty of the damping values. Neither set contains misread, misbound, or invented claims."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p9-text": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets contain the same five claims with identical values, conditions, and quotes, differing only in minor attribute wording ('force profile' vs 'force trend', 'peak force location' vs 'peak location'). Both correctly bind the 4° pitch to low wind speeds/Region 1.5, the 90 m force peak to below-rated wind speeds, and the outboard 5% drop to the Prandtl tip loss model. Neither invents values or drops conditions, and both omit the same secondary facts (e.g., design-point pitch of 0°, optimal pitch of −1.0°)."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets contain the same five claims with identical values, conditions, and quotes, differing only in trivial wording of two attribute labels (e.g., 'force trend' vs 'force profile', 'blade forces peak location' vs 'blade peak force location'). All claims are supported by the text: the 4° pitch at low wind speeds, the 90 m force peak under below-rated wind speeds, the design-point TSR of 9.0 versus the optimal TSR of 8.5, and the Prandtl tip-loss explanation for the outboard 5% drop. Neither set misbinds values or invents facts, and both omit the same secondary facts (e.g., optimal pitch of −1.0°, Region 3 behavior)."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p11-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A captures the two Figure 3-3 spanwise force claims (normal and tangential force in N/m versus blade span, for U = 6–10 m/s) and the Figure 3-2 coefficient-surface claim, all with quotes that support them. Set B is empty and therefore misses every fact on the page. Set A's only defect is binding the Figure 3-2 surfaces to a '15-MW rotor', which is not stated anywhere on this page. Despite that one unsupported binding, A is clearly the better extraction."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A contains no claims at all, so it captures none of the page's engineering content, including the spanwise normal and tangential force curves versus wind speed and the CCBlade power/thrust coefficient surfaces. Set B correctly binds the Figure 3-3 force quantities (N/m, U = 6–10 m/s) and the Figure 3-2 coefficient surfaces as functions of blade pitch and TSR with steady-state BEM conditions, with supporting quotes. However, Set B's third claim attributes the surfaces to a '15-MW rotor', which is not stated anywhere on this page (the caption only says CCBlade), so that entity binding is invented. Despite this one flaw, Set B's two well-supported claims outweigh Set A's empty output."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p10-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B captures all 15 rows of Table 7-1 with correct ∂P/∂θ values, units (watt/rad) and full wind-speed/rotor-speed/pitch-angle conditions, all matching the page exactly, and also includes the nearly-linear pitch-sensitivity relationship and the rated mechanical power. Set A omits the entire table — the main quantitative content of the page — and instead repeats the rated-power claim twice, one copy dropping the 'rated' condition. Both sets bind the turbine entity name ('NREL offshore 5-MW baseline wind turbine') that is not literally stated on this page, but since this is shared it does not differentiate them."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A captures all 15 Table 7-1 rows with correct wind speed, rotor speed, pitch angle and ∂P/∂θ values in watt/rad, plus the rated mechanical power and the near-linear pitch-sensitivity relationship, with quotes that support each claim. Set B omits the entire sensitivity table — the main engineering content of the page — and instead repeats the rated-power claim twice, so it misses the key facts. Both sets bind the rated power to the turbine entity name not spelled out on this page, a shared minor issue; nothing else is misread or invented in either set."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p3-text": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets contain the same six claims with identical entity/attribute/value bindings and conditions, all supported by the page text: 400 g total actuation force, 10 g maximum pull force per louver at axial rotation points, 15-20C austenite range, 200C-to-cryogenic martensite transformation range, and 2500/2900 g pull forces in the martensite/austenite phases. The only differences are quote length: B's quotes for the martensite transformation and austenite range include slightly more surrounding context (the Ni:Ti ratio statement and the Dynalloy wire specification), while A's are trimmed but still accurate and supportive. Neither set misbinds values, invents facts, or drops needed conditions, so the difference is immaterial."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the same six claims with correct bindings and conditions, and neither invents values. A's quotes are fuller and better support the stated conditions: its martensite-transformation quote includes the nickel-to-titanium ratio basis for the theoretical condition, and its austenite-range quote includes the fact that 15-20C fell within an existing Dynalloy wire specification. B truncates these quotes and drops the word 'temperatures' from the martensite range value, making its evidence slightly weaker."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p5-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Both sets capture the same core facts (−3 dB at corner frequency, 0.25 Hz corner frequency, 0.0125 s time step) with supporting quotes, and both include a redundant duplicate time-step claim. The key difference is entity binding: the page names the component only as the 'generator speed low-pass filter' / 'low-pass filter', so the name 'Baseline Control-Measurement Filter' is invented. Set A uses that unsupported entity on three of its four claims, while Set B binds the substantive claims to the correct filter and only the redundant fourth claim carries the invented name."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Both sets correctly capture the -3 dB corner-frequency definition and the 0.0125 s time step, but Set A binds the corner frequency (0.25 Hz) and time step to the generator speed low-pass filter named in the page and Figure 7-1 caption. Set B instead attributes the corner frequency and both time-step claims to a 'Baseline Control-Measurement Filter', an entity that does not appear anywhere on this page. Set A's only flaw is one redundant time-step claim with that same invented entity, while Set B has three misbound claims and duplicates the time step."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p5-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are accurate and faithful to the page, with quotes that match the text and conditions preserved. Set A includes one additional supported claim (ABS as the material of the 3D-printed pulley parts) that Set B omits, while Set B's claims are otherwise equivalent in substance. Neither set contains misread or invented claims, so the difference is only coverage, favoring A slightly."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are faithful to the page: the 15–30C transformation range, the strain/transition-temperature relationship, the threaded Flexinol connection, 250 louvers, 32 aluminum rods, 3D ABS printing, the no-additional-energy behavior and the hysteresis effect on closure speed are all correctly bound with supporting quotes. Set B adds one extra claim (ABS as the material of the pulley-assembly parts) that is supported by the same sentence as its manufacturing-method claim, so it is redundant but not wrong. Neither set misreads, misbinds or invents anything, and neither omits an important fact, so the sets are effectively equivalent in quality."
+      }
+    }
+  }
+}

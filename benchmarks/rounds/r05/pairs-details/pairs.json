@@ -1,0 +1,2692 @@
+{
+  "format": "semantic-pdf-diff-pairwise-batch",
+  "version": 1,
+  "baseline": "/home/dmbarbour/projects/semantic_pdf_diff/benchmarks/runs/r05/baseline",
+  "variant": "/home/dmbarbour/projects/semantic_pdf_diff/benchmarks/runs/r05/details",
+  "seed": 1,
+  "units": {
+    "units": 137,
+    "unchanged": 129
+  },
+  "items": [
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p3-visual",
+      "run": "calg-cd-p39-42",
+      "content": "sha256:9a895974bcaa376163077de84a01fc16746b5353a679fa73dee42638b3ed1463.pdf",
+      "page": 3,
+      "family": "visual",
+      "image": "images/calg-cd-p39-42-9a895974-p3.jpg",
+      "page_text": "6\n5\n4\n3\n2\n1\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nKITCHEN\nLIVING  ROOM\nLIVING  ROOM\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nK\nB\nA\nBATHROOM\nH\nJ\nF\nD\nE\nC\nG\n---\n-\nA-304\n5\nKITCHEN\nCENTRE MODULE\nMECHANICAL\nROOM\nWEST MODULE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nSTATUS:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nSEALS\nMARK\nDATE\nDESCRIPTION\nTEAM ALBERTA\nUNIVERSITY OF CALGARY\n2500 UNIVERSITY DR NW\nCALGARY, AB  T2N 1N4\nMOUNT ROYAL UNIVERSITY\n4825 MT ROYAL GATE SW\nCALGARY, AB  T3E 6K6\nWWW.SOLARDECATHLON.CA\nINFO@SOLARDECATHLON.CA\n1\n04/29/2013\nISSUED FOR ELEC/MECH\n2\n05/03/2013\nISSUED FOR CLADDING\n3\n05/13/2013\nISSUED FOR STRUCTURAL REVIEW\n4\n05/22/2013\nISSUED FOR CONSTRUCTION 95%\n5\n08/22/2013\nAS BUILT SET\n22/08/2013 5:10:03 PM\nA-302\nBUILDING SECTIONS\n116\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n 3/8\" = 1'-0\"\nA1\nLIVING ROOM SECTION\n 3/8\" = 1'-0\"\nC1\nSECTION - CENTRE MODULE\n0\n4'\n6'\n2'\n0\n4'\n6'\n2'\n",
+      "baseline": [
+        {
+          "entity": "Centre Module",
+          "attribute": "finished floor height",
+          "value": "2' - 9 1/2\"",
+          "unit": "ft-in",
+          "conditions": "relative to grade level 0'-0\"",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "feet-inches",
+          "conditions": "datum",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "contains",
+          "value": "Bathroom",
+          "unit": "",
+          "conditions": "",
+          "quote": "BATHROOM"
+        },
+        {
+          "entity": "Living Room Section",
+          "attribute": "contains",
+          "value": "Living Room",
+          "unit": "",
+          "conditions": "",
+          "quote": "LIVING ROOM"
+        },
+        {
+          "entity": "Living Room Section",
+          "attribute": "contains",
+          "value": "Kitchen",
+          "unit": "",
+          "conditions": "",
+          "quote": "KITCHEN"
+        },
+        {
+          "entity": "Living Room",
+          "attribute": "finished floor height",
+          "value": "2' - 3 1/2\"",
+          "unit": "ft-in",
+          "conditions": "relative to grade level 0'-0\"",
+          "quote": "FINISHED FLOOR 2' - 3 1/2\""
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "contains",
+          "value": "Mechanical Room",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM"
+        },
+        {
+          "entity": "CENTRE MODULE",
+          "attribute": "location",
+          "value": "K",
+          "unit": "",
+          "conditions": "building section",
+          "quote": "CENTRE MODULE"
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "feet-inches",
+          "conditions": "relative to Grade Level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "GRADE LEVEL",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Mechanical Room",
+          "attribute": "location",
+          "value": "Building Section A302",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM"
+        },
+        {
+          "entity": "WEST MODULE",
+          "attribute": "location",
+          "value": "West",
+          "unit": "",
+          "conditions": "",
+          "quote": "WEST MODULE"
+        },
+        {
+          "entity": "Section C1",
+          "attribute": "scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "contains",
+          "value": "Kitchen",
+          "unit": "",
+          "conditions": "",
+          "quote": "KITCHEN"
+        },
+        {
+          "entity": "FINISHED FLOOR",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Drawing A1",
+          "attribute": "scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "building section",
+          "attribute": "contains room",
+          "value": "MECHANICAL ROOM",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM"
+        },
+        {
+          "entity": "Living Room Section",
+          "attribute": "drawing scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "building section",
+          "attribute": "contains room",
+          "value": "BATHROOM",
+          "unit": "",
+          "conditions": "",
+          "quote": "BATHROOM"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Centre Module",
+          "attribute": "finished floor height",
+          "value": "2' - 9 1/2\"",
+          "unit": "ft-in",
+          "conditions": "relative to grade level 0'-0\"",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "internal room",
+          "value": "Mechanical Room",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM"
+        },
+        {
+          "entity": "Living Room Section",
+          "attribute": "scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "Detail A1",
+          "quote": "Detail A1: 3/8\" = 1'-0\" LIVING ROOM SECTION"
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "contains",
+          "value": "Bathroom",
+          "unit": "",
+          "conditions": "",
+          "quote": "BATHROOM"
+        },
+        {
+          "entity": "Living Room Section",
+          "attribute": "contains",
+          "value": "Living Room",
+          "unit": "",
+          "conditions": "",
+          "quote": "LIVING ROOM"
+        },
+        {
+          "entity": "Living Room Section",
+          "attribute": "contains",
+          "value": "Kitchen",
+          "unit": "",
+          "conditions": "",
+          "quote": "KITCHEN"
+        },
+        {
+          "entity": "Building",
+          "attribute": "room layout",
+          "value": "Living Room adjacent to Kitchen",
+          "unit": "",
+          "conditions": "",
+          "quote": "LIVING ROOM KITCHEN"
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "adjacent component",
+          "value": "West Module",
+          "unit": "",
+          "conditions": "",
+          "quote": "WEST MODULE"
+        },
+        {
+          "entity": "Living Room",
+          "attribute": "finished floor height",
+          "value": "2' - 3 1/2\"",
+          "unit": "ft-in",
+          "conditions": "relative to grade level 0'-0\"",
+          "quote": "FINISHED FLOOR 2' - 3 1/2\""
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "contains",
+          "value": "Mechanical Room",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM"
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "feet-inches",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to Grade Level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "contains",
+          "value": "Kitchen",
+          "unit": "",
+          "conditions": "",
+          "quote": "KITCHEN"
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "internal room",
+          "value": "Bathroom",
+          "unit": "",
+          "conditions": "",
+          "quote": "BATHROOM"
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "feet-inches",
+          "conditions": "",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "section scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\" SECTION - CENTRE MODULE"
+        },
+        {
+          "entity": "Centre Module",
+          "attribute": "section scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "Detail C1: 3/8\" = 1'-0\" SECTION - CENTRE MODULE"
+        },
+        {
+          "entity": "West Module",
+          "attribute": "position",
+          "value": "adjacent to Centre Module",
+          "unit": "",
+          "conditions": "",
+          "quote": "WEST MODULE"
+        }
+      ],
+      "counts": {
+        "baseline": 19,
+        "variant": 19,
+        "shared": 8
+      }
+    },
+    {
+      "id": "u-dc-cd-p39-42-2523f154-p1-visual",
+      "run": "dc-cd-p39-42",
+      "content": "sha256:2523f1544fb49efaeb6fca153d07242bc9d08d700fecf10a0e0a6896b0f3fd66.pdf",
+      "page": 1,
+      "family": "visual",
+      "image": "images/dc-cd-p39-42-2523f154-p1.jpg",
+      "page_text": "1\n1'-0\"\n3 1/2\"\n3 1/2\"\n1'-0\"\nFIRST FLR\n2'-4\"\nGRADE LEVEL\n0\"\n3/4\" X 5 1/2\" PLYWOOD\nDECK\n2\" X 8\" FRAME\n3/8\" X 4\" HEX THROUGH BOLT\n2\" X 8\" JOIST\n1 1/2\"\n1 1/2\"\n7 1/2\"\nGRADE LEVEL\n0\"\n3/8\" X 4\" HEX THROUGH BOLT\nCOMMON WOOD NAILS OR SCREWS\n2\" X 8\" JOIST\n3/4\" X 5 1/2\" RECLAIMED WOOD SURFACE\nFIRST FLR\n2'-4\"\nGRADE LEVEL\n0\"\n8'-0\"\n4X4 TO BE CUT AS NEEDED\n1'-0\"\n4 1/4\"\n4 1/4\"\n3 3/4\"\n1 1/4\"\n3/4\" THREADED ROD\n1\" NUT\nSLEVE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nNONE: PROJECT IS\nPUBLIC DOMAIN\nARCHITECT OF RECORD\nWILLIAM JELEN, AIA\n620 MICHIGAN AVE NE\nCROUGH CENTER\nWASHINGTON, DC 20064\nTEL: 202.344.5513\nSTRUCTURAL ENGINEER\nBOB ALLISON, PE\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nMEP ENGINEER\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nTEAM CAPITOL DC\nTEAM CAPITOL DC\n8/22/2013 4:48:00 PM\nS-522\nDECK FOOTING\nDETAILS\n115\nTeam Capitol dc\nTHE CATHOLIC UNIVERSITY OF AMERICA\nSCHOOL OF ARCHITECTURE\n620 MICHIGAN AVENUE, NE.\nWASHINGTON, DC 20064\n 6\" = 1'-0\"\nC1\nDECKING FOOTING PLAN\n 1 1/2\" = 1'-0\"\nB1\nDECK MODULE CONNECTION\n 1\" = 1'-0\"\nB4\nDECK MODULE TO MODULE SECTION\nMARK\nDATE\nDESCRIPTION\n1\n2012.10.11\n80% DD Submission\n2\n2012.11.20\n80% DD Revisions\n3\n2013.02.04\n100% CD Submission\n4\n2013.08.22\nAs-Built Submission\n 1\" = 1'-0\"\nC3\nFOOTING ELEVATION\n 3\" = 1'-0\"\nA6\nLANDSCAPE FOOTING 18\"\n0\n1\"\n2\"\n4\"\n3\"\n0\n1'\n1 1/2'\n1/2\"\n0\n6\"\n1'\n3\"\n0\n1/2'\n1'\n2'\n0\n1/2'\n1'\n2'\n",
+      "baseline": [
+        {
+          "entity": "deck module section",
+          "attribute": "height",
+          "value": "1 1/4",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "1 1/4\""
+        },
+        {
+          "entity": "through bolt",
+          "attribute": "length",
+          "value": "4",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "3/8\" X 4\" HEX THROUGH BOLT"
+        },
+        {
+          "entity": "plywood deck",
+          "attribute": "dimensions",
+          "value": "3/4\" X 5 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/4\" X 5 1/2\" PLYWOOD DECK"
+        },
+        {
+          "entity": "GRADE LEVEL",
+          "attribute": "elevation",
+          "value": "0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0\""
+        },
+        {
+          "entity": "through bolt",
+          "attribute": "diameter",
+          "value": "3/8",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "3/8\" X 4\" HEX THROUGH BOLT"
+        },
+        {
+          "entity": "deck frame",
+          "attribute": "dimension",
+          "value": "2\" X 8\"",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2\" X 8\" FRAME"
+        },
+        {
+          "entity": "through bolt",
+          "attribute": "length",
+          "value": "4",
+          "unit": "\"",
+          "conditions": "hex through bolt",
+          "quote": "3/8\" X 4\" HEX THROUGH BOLT"
+        },
+        {
+          "entity": "component 1",
+          "attribute": "height",
+          "value": "3 1/2\"",
+          "unit": "in",
+          "conditions": "",
+          "quote": "3 1/2\""
+        },
+        {
+          "entity": "landscape footing",
+          "attribute": "width",
+          "value": "1'-0\"",
+          "unit": "\"",
+          "conditions": "A6 LANDSCAPE FOOTING",
+          "quote": "1'-0\""
+        },
+        {
+          "entity": "post",
+          "attribute": "nominal size",
+          "value": "4x4",
+          "unit": "",
+          "conditions": "to be cut as needed",
+          "quote": "4X4 TO BE CUT AS NEEDED"
+        },
+        {
+          "entity": "deck fastening",
+          "attribute": "fastener type",
+          "value": "common wood nails or screws",
+          "unit": "",
+          "conditions": "",
+          "quote": "COMMON WOOD NAILS OR SCREWS"
+        },
+        {
+          "entity": "drawing",
+          "attribute": "scale",
+          "value": "3\" = 1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3\" = 1'-0\""
+        },
+        {
+          "entity": "through bolt",
+          "attribute": "diameter",
+          "value": "3/8",
+          "unit": "\"",
+          "conditions": "hex through bolt",
+          "quote": "3/8\" X 4\" HEX THROUGH BOLT"
+        },
+        {
+          "entity": "B4 DECK",
+          "attribute": "drawing scale",
+          "value": "1",
+          "unit": "\" = 1'-0\"",
+          "conditions": "",
+          "quote": "1\" = 1'-0\" B4 DECK"
+        },
+        {
+          "entity": "joist",
+          "attribute": "nominal size",
+          "value": "2\" X 8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "2\" X 8\" JOIST"
+        },
+        {
+          "entity": "hex through bolt",
+          "attribute": "diameter",
+          "value": "3/8",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "3/8\" X 4\" HEX THROUGH BOLT"
+        },
+        {
+          "entity": "plywood deck",
+          "attribute": "nominal size",
+          "value": "3/4\" X 5 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/4\" X 5 1/2\" PLYWOOD DECK"
+        },
+        {
+          "entity": "frame",
+          "attribute": "dimensions",
+          "value": "2\" X 8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "2\" X 8\" FRAME"
+        },
+        {
+          "entity": "decking",
+          "attribute": "thickness",
+          "value": "1 1/2",
+          "unit": "\"",
+          "conditions": "second instance",
+          "quote": "1 1/2\""
+        },
+        {
+          "entity": "threaded rod",
+          "attribute": "connection",
+          "value": "sleve",
+          "unit": "",
+          "conditions": "",
+          "quote": "SLEVE"
+        },
+        {
+          "entity": "joist",
+          "attribute": "width",
+          "value": "1 1/2\"",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "1 1/2\""
+        },
+        {
+          "entity": "decking support",
+          "attribute": "height",
+          "value": "7 1/2",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "7 1/2\""
+        },
+        {
+          "entity": "through bolt",
+          "attribute": "head type",
+          "value": "HEX",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" X 4\" HEX THROUGH BOLT"
+        },
+        {
+          "entity": "reclaimed wood surface",
+          "attribute": "dimension",
+          "value": "3/4\" X 5 1/2\"",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "3/4\" X 5 1/2\" RECLAIMED WOOD SURFACE"
+        },
+        {
+          "entity": "deck",
+          "attribute": "plywood thickness",
+          "value": "3/4",
+          "unit": "\"",
+          "conditions": "plywood deck",
+          "quote": "3/4\" X 5 1/2\" PLYWOOD DECK"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "decking footing",
+          "attribute": "length",
+          "value": "1'-0\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "1'-0\""
+        },
+        {
+          "entity": "footing overhang",
+          "attribute": "width (right)",
+          "value": "4 1/4",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "4 1/4\""
+        },
+        {
+          "entity": "deck module",
+          "attribute": "fastener type",
+          "value": "common wood nails or screws",
+          "unit": "",
+          "conditions": "",
+          "quote": "COMMON WOOD NAILS OR SCREWS"
+        },
+        {
+          "entity": "decking footing",
+          "attribute": "width",
+          "value": "1'-0\"",
+          "unit": "ft",
+          "conditions": "Detail C1",
+          "quote": "1'-0\""
+        },
+        {
+          "entity": "Landscape Footing 18",
+          "attribute": "overhang width (right)",
+          "value": "4 1/4\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "4 1/4\""
+        },
+        {
+          "entity": "frame",
+          "attribute": "nominal size",
+          "value": "2\" X 8\"",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2\" X 8\" FRAME"
+        },
+        {
+          "entity": "bracket",
+          "attribute": "height",
+          "value": "1 1/4",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "1 1/4\""
+        },
+        {
+          "entity": "deck module connection",
+          "attribute": "frame size",
+          "value": "2\" x 8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "2\" X 8\" FRAME"
+        },
+        {
+          "entity": "LANDSCAPE FOOTING",
+          "attribute": "width",
+          "value": "1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "1'-0\""
+        },
+        {
+          "entity": "internal component",
+          "attribute": "height",
+          "value": "3 1/2\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "3 1/2\""
+        },
+        {
+          "entity": "joist",
+          "attribute": "nominal size",
+          "value": "2\" X 8\"",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2\" X 8\" JOIST"
+        },
+        {
+          "entity": "landscape footing",
+          "attribute": "width",
+          "value": "1'-0\"",
+          "unit": "\"",
+          "conditions": "A6 LANDSCAPE FOOTING",
+          "quote": "1'-0\""
+        },
+        {
+          "entity": "top channel/bracket",
+          "attribute": "height",
+          "value": "1 1/4\"",
+          "unit": "in",
+          "conditions": "Detail A6",
+          "quote": "1 1/4\""
+        },
+        {
+          "entity": "joist",
+          "attribute": "nominal depth",
+          "value": "8",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2\" X 8\" JOIST"
+        },
+        {
+          "entity": "Landscape Footing 18",
+          "attribute": "width",
+          "value": "1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "1'-0\""
+        },
+        {
+          "entity": "deck module connection",
+          "attribute": "hex through bolt size",
+          "value": "3/8\" x 4\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" X 4\" HEX THROUGH BOLT"
+        },
+        {
+          "entity": "post",
+          "attribute": "material/size",
+          "value": "4X4",
+          "unit": "",
+          "conditions": "to be cut as needed",
+          "quote": "4X4 TO BE CUT AS NEEDED"
+        },
+        {
+          "entity": "joist",
+          "attribute": "dimensions",
+          "value": "2\" X 8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "2\" X 8\" JOIST"
+        },
+        {
+          "entity": "deck joist",
+          "attribute": "dimension",
+          "value": "2\" X 8\"",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2\" X 8\" JOIST"
+        },
+        {
+          "entity": "decking footing",
+          "attribute": "length",
+          "value": "1'-0\"",
+          "unit": "ft",
+          "conditions": "Detail C1",
+          "quote": "1'-0\""
+        },
+        {
+          "entity": "bracket",
+          "attribute": "width",
+          "value": "3 3/4",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "3 3/4\""
+        },
+        {
+          "entity": "reclaimed wood surface",
+          "attribute": "dimensions",
+          "value": "X 5 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "\" X 5 1/2\" RECLAIMED WOOD SURFACE"
+        },
+        {
+          "entity": "footing spacing",
+          "attribute": "distance",
+          "value": "8",
+          "unit": "ft",
+          "conditions": "between footings in Detail C3",
+          "quote": "8'-0\""
+        },
+        {
+          "entity": "first floor",
+          "attribute": "elevation relative to grade",
+          "value": "2'-4\"",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "FIRST FLR 2'-4\" GRADE LEVEL 0\""
+        },
+        {
+          "entity": "first floor",
+          "attribute": "elevation",
+          "value": "2'-4\"",
+          "unit": "",
+          "conditions": "relative to grade level",
+          "quote": "FIRST FLR 2'-4\""
+        }
+      ],
+      "counts": {
+        "baseline": 61,
+        "variant": 70,
+        "shared": 24
+      }
+    },
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p1-visual",
+      "run": "calg-cd-p39-42",
+      "content": "sha256:9a895974bcaa376163077de84a01fc16746b5353a679fa73dee42638b3ed1463.pdf",
+      "page": 1,
+      "family": "visual",
+      "image": "images/calg-cd-p39-42-9a895974-p1.jpg",
+      "page_text": "SOLAR ENVELOPE\n18' - 0\"\n6\n5\n4\n3\n2\n1\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nCEMENT FIBRE BOARD SIDING\nEVACUATED SOLAR THERMAL TUBES\n2 X APSE-20 (40 TUBES)\nW1\n1.01\nW2\n1.02\nD1\n1.01\nW2\n1.04\nW1\n1.03\nW1\n1.05\nD1\n1.02\nW2\n1.06\nW1\n1.07\nW5\n1.12\nW5\n1.14\nW6\n1.13\nPV SOLAR ARRAY\nPV SOLAR ARRAY\n2x4 CEDAR HANDRAIL\nPOWDERCOATED\nSTEEL FLATBAR\nRAILING POSTS\n1/8\" STEEL CABLE RAILING\nSOLAR ENVELOPE\n18' - 0\"\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nK\nB\nA\nH\nF\nD\nE\nC\nG\nP1\nP2\nCEMENT FIBRE BOARD SIDING\n2x4 CEDAR HANDRAILS\n1 X 4 CEDAR\nT&G SIDING\n1x4 TONNGUE & GROOVE\nCEDAR CLADDING\n2x4 CEDAR HANDRAILS\nEVACUATED SOLAR\nTHERMAL TUBES\nPOWDERCOATED\nSTEEL FLATBAR\nRAILING POST TYP.\nSITE BOUNDARY\nSITE BOUNDARY\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nSTATUS:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nSEALS\nMARK\nDATE\nDESCRIPTION\nTEAM ALBERTA\nUNIVERSITY OF CALGARY\n2500 UNIVERSITY DR NW\nCALGARY, AB  T2N 1N4\nMOUNT ROYAL UNIVERSITY\n4825 MT ROYAL GATE SW\nCALGARY, AB  T3E 6K6\nWWW.SOLARDECATHLON.CA\nINFO@SOLARDECATHLON.CA\n1\n04/29/2013\nISSUED FOR ELEC/MECH\n2\n05/03/2013\nISSUED FOR CLADDING\n3\n05/13/2013\nISSUED FOR STRUCTURAL REVIEW\n4\n05/22/2013\nISSUED FOR CONSTRUCTION 95%\n5\n08/22/2013\nAS BUILT SET\n22/08/2013 5:09:55 PM\nA-202\nEXTERIOR ELEVATIONS\n116\n0\n2'\n4'\n8'\n0\n2'\n4'\n8'\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n 1/4\" = 1'-0\"\nC1\nSOUTH ELEVATION\n 1/4\" = 1'-0\"\nA1\nWEST ELEVATION\n1.\nSEE A-511 FOR SPECIFIC HARDIE\nINSTALLATION\n2.\nSPACING MAY BE LARGER BETWEEN SOLAR\nTHERMAL TUBE ARRAYS. NECESSARY VALVES\nAND PIPING NOT SHOWN HERE\n3.\nDOTTED LINES INDICATE DOOR SWING.\nLAYERED SWING LINES INDICATE BOTH TILT AND\nTURN OPERATION POSSIBLE.\n",
+      "baseline": [
+        {
+          "entity": "handrail",
+          "attribute": "material/size",
+          "value": "2x4 cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "2x4 CEDAR HANDRAIL"
+        },
+        {
+          "entity": "door swing",
+          "attribute": "diagrammatic representation",
+          "value": "dotted lines",
+          "unit": "",
+          "conditions": "",
+          "quote": "DOTTED LINES INDICATE DOOR SWING"
+        },
+        {
+          "entity": "cladding",
+          "attribute": "material",
+          "value": "1x4 tongue & groove cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "1x4 TONNGUE & GROOVE CEDAR CLADDING"
+        },
+        {
+          "entity": "solar envelope",
+          "attribute": "dimension",
+          "value": "18' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "SOLAR ENVELOPE 18' - 0\""
+        },
+        {
+          "entity": "Evacuated Solar Thermal Tubes",
+          "attribute": "configuration",
+          "value": "2",
+          "unit": "sets/arrays",
+          "conditions": "",
+          "quote": "2 X APSE-20"
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "height",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Window W5",
+          "attribute": "identifier",
+          "value": "1.14",
+          "unit": "",
+          "conditions": "",
+          "quote": "1.14 W5"
+        },
+        {
+          "entity": "door D1",
+          "attribute": "identifier",
+          "value": "1.01",
+          "unit": "",
+          "conditions": "",
+          "quote": "1.01 D1"
+        },
+        {
+          "entity": "EVACUATED SOLAR THERMAL TUBES",
+          "attribute": "model",
+          "value": "APSE-20",
+          "unit": "",
+          "conditions": "",
+          "quote": "EVACUATED SOLAR THERMAL TUBES 2 X APSE-20"
+        },
+        {
+          "entity": "solar thermal tubes",
+          "attribute": "type",
+          "value": "evacuated",
+          "unit": "",
+          "conditions": "",
+          "quote": "EVACUATED SOLAR THERMAL TUBES"
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "height",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "handrails",
+          "attribute": "material/dimension",
+          "value": "2x4 cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "2x4 CEDAR HANDRAILS"
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "feet-inches",
+          "conditions": "South Elevation",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "handrails",
+          "attribute": "material",
+          "value": "cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "2x4 CEDAR HANDRAILS"
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "feet-inches",
+          "conditions": "South Elevation",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Window W1",
+          "attribute": "identifier",
+          "value": "1.03",
+          "unit": "",
+          "conditions": "",
+          "quote": "1.03 W1"
+        },
+        {
+          "entity": "exterior wall",
+          "attribute": "cladding material",
+          "value": "CEMENT FIBRE BOARD SIDING",
+          "unit": "",
+          "conditions": "",
+          "quote": "CEMENT FIBRE BOARD SIDING"
+        },
+        {
+          "entity": "West Elevation",
+          "attribute": "drawing scale",
+          "value": "1/4\" = 1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "1/4\" = 1'-0\""
+        },
+        {
+          "entity": "handrails",
+          "attribute": "material",
+          "value": "2x4 cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "2x4 CEDAR HANDRAILS"
+        },
+        {
+          "entity": "Window W1",
+          "attribute": "identifier",
+          "value": "1.05",
+          "unit": "",
+          "conditions": "",
+          "quote": "1.05 W1"
+        },
+        {
+          "entity": "Window W6",
+          "attribute": "identifier",
+          "value": "1.13",
+          "unit": "",
+          "conditions": "",
+          "quote": "1.13 W6"
+        },
+        {
+          "entity": "railing posts",
+          "attribute": "material/finish",
+          "value": "powdercoated steel flatbar",
+          "unit": "",
+          "conditions": "",
+          "quote": "POWDERCOATED STEEL FLATBAR RAILING POSTS"
+        },
+        {
+          "entity": "Door D1",
+          "attribute": "identifier",
+          "value": "1.02",
+          "unit": "",
+          "conditions": "",
+          "quote": "1.02 D1"
+        },
+        {
+          "entity": "W2",
+          "attribute": "identifier value",
+          "value": "1.06",
+          "unit": "",
+          "conditions": "",
+          "quote": "1.06 W2"
+        },
+        {
+          "entity": "evacuated solar thermal tubes",
+          "attribute": "quantity",
+          "value": "40",
+          "unit": "tubes",
+          "conditions": "2 X APSE-20",
+          "quote": "EVACUATED SOLAR THERMAL TUBES 2 X APSE-20 (40 TUBES)"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "siding",
+          "attribute": "material",
+          "value": "cement fibre board",
+          "unit": "",
+          "conditions": "",
+          "quote": "CEMENT FIBRE BOARD SIDING"
+        },
+        {
+          "entity": "window 1.02",
+          "attribute": "type",
+          "value": "W2",
+          "unit": "",
+          "conditions": "South Elevation",
+          "quote": "1.02 W2"
+        },
+        {
+          "entity": "solar envelope",
+          "attribute": "height",
+          "value": "18' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "SOLAR ENVELOPE 18' - 0\""
+        },
+        {
+          "entity": "siding",
+          "attribute": "type",
+          "value": "T&G",
+          "unit": "",
+          "conditions": "",
+          "quote": "1 X 4 CEDAR T&G SIDING"
+        },
+        {
+          "entity": "railing post",
+          "attribute": "material",
+          "value": "powdercoated steel flatbar",
+          "unit": "",
+          "conditions": "typical",
+          "quote": "POWDERCOATED STEEL FLATBAR RAILING POST TYP."
+        },
+        {
+          "entity": "PV SOLAR ARRAY",
+          "attribute": "presence",
+          "value": "installed",
+          "unit": "",
+          "conditions": "South Elevation",
+          "quote": "PV SOLAR ARRAY"
+        },
+        {
+          "entity": "railing post",
+          "attribute": "finish",
+          "value": "powdercoated",
+          "unit": "",
+          "conditions": "typical",
+          "quote": "POWDERCOATED STEEL FLATBAR RAILING POST TYP."
+        },
+        {
+          "entity": "EVACUATED SOLAR THERMAL TUBES",
+          "attribute": "model",
+          "value": "APSE-20",
+          "unit": "",
+          "conditions": "",
+          "quote": "EVACUATED SOLAR THERMAL TUBES 2 X APSE-20"
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "siding",
+          "attribute": "dimension",
+          "value": "1x4",
+          "unit": "",
+          "conditions": "",
+          "quote": "1 X 4 CEDAR T&G SIDING"
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to Grade Level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "roof/upper structure",
+          "attribute": "component",
+          "value": "PV SOLAR ARRAY",
+          "unit": "",
+          "conditions": "South Elevation",
+          "quote": "PV SOLAR ARRAY"
+        },
+        {
+          "entity": "Cable Railing",
+          "attribute": "material",
+          "value": "steel",
+          "unit": "",
+          "conditions": "",
+          "quote": "1/8\" STEEL CABLE RAILING"
+        },
+        {
+          "entity": "Cladding",
+          "attribute": "material",
+          "value": "CEDAR",
+          "unit": "",
+          "conditions": "1x4 TONNGUE & GROOVE",
+          "quote": "1x4 TONNGUE & GROOVE CEDAR CLADDING"
+        },
+        {
+          "entity": "railing post",
+          "attribute": "material",
+          "value": "steel flatbar",
+          "unit": "",
+          "conditions": "typical",
+          "quote": "POWDERCOATED STEEL FLATBAR RAILING POST TYP."
+        },
+        {
+          "entity": "Roof",
+          "attribute": "component",
+          "value": "PV SOLAR ARRAY",
+          "unit": "",
+          "conditions": "",
+          "quote": "PV SOLAR ARRAY"
+        },
+        {
+          "entity": "handrails",
+          "attribute": "material",
+          "value": "2x4 cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "2x4 CEDAR HANDRAILS"
+        },
+        {
+          "entity": "door 1.01",
+          "attribute": "type",
+          "value": "D1",
+          "unit": "",
+          "conditions": "South Elevation",
+          "quote": "1.01 D1"
+        },
+        {
+          "entity": "Hardie installation",
+          "attribute": "specification reference",
+          "value": "A-511",
+          "unit": "",
+          "conditions": "",
+          "quote": "SEE A-511 FOR SPECIFIC HARDIE INSTALLATION"
+        },
+        {
+          "entity": "window 1.05",
+          "attribute": "type",
+          "value": "W1",
+          "unit": "",
+          "conditions": "South Elevation",
+          "quote": "1.05 W1"
+        },
+        {
+          "entity": "window 1.12",
+          "attribute": "type",
+          "value": "W5",
+          "unit": "",
+          "conditions": "South Elevation",
+          "quote": "1.12 W5"
+        },
+        {
+          "entity": "window 1.13",
+          "attribute": "type",
+          "value": "W6",
+          "unit": "",
+          "conditions": "South Elevation",
+          "quote": "1.13 W6"
+        },
+        {
+          "entity": "exterior wall",
+          "attribute": "cladding material",
+          "value": "1x4 TONNGUE & GROOVE CEDAR CLADDING",
+          "unit": "",
+          "conditions": "West Elevation",
+          "quote": "1x4 TONNGUE & GROOVE CEDAR CLADDING"
+        },
+        {
+          "entity": "evacuated solar thermal tubes",
+          "attribute": "quantity",
+          "value": "40",
+          "unit": "tubes",
+          "conditions": "2 X APSE-20",
+          "quote": "EVACUATED SOLAR THERMAL TUBES 2 X APSE-20 (40 TUBES)"
+        }
+      ],
+      "counts": {
+        "baseline": 67,
+        "variant": 60,
+        "shared": 22
+      }
+    },
+    {
+      "id": "u-dc-cd-p39-42-2523f154-p4-visual",
+      "run": "dc-cd-p39-42",
+      "content": "sha256:2523f1544fb49efaeb6fca153d07242bc9d08d700fecf10a0e0a6896b0f3fd66.pdf",
+      "page": 4,
+      "family": "visual",
+      "image": "images/dc-cd-p39-42-2523f154-p4.jpg",
+      "page_text": "1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nNONE: PROJECT IS\nPUBLIC DOMAIN\nARCHITECT OF RECORD\nWILLIAM JELEN, AIA\n620 MICHIGAN AVE NE\nCROUGH CENTER\nWASHINGTON, DC 20064\nTEL: 202.344.5513\nSTRUCTURAL ENGINEER\nBOB ALLISON, PE\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nMEP ENGINEER\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nTEAM CAPITOL DC\nTEAM CAPITOL DC\n8/22/2013 4:48:29 PM\nS-901\nFRAMING ISOMETRICS\n115\nTeam Capitol dc\nTHE CATHOLIC UNIVERSITY OF AMERICA\nSCHOOL OF ARCHITECTURE\n620 MICHIGAN AVENUE, NE.\nWASHINGTON, DC 20064\nA1\nSTRUCTURE ISOMETRIC\nMARK\nDATE\nDESCRIPTION\n1\n2012.10.11\n80% DD Submission\n2\n2012.11.20\n80% DD Revisions\n3\n2013.02.04\n100% CD Submission\n4\n2013.08.22\nAs-Built Submission\n",
+      "baseline": [],
+      "variant": [
+        {
+          "entity": "Project",
+          "attribute": "Structural Engineer",
+          "value": "Bob Allison, PE, Arup Engineering",
+          "unit": "",
+          "conditions": "",
+          "quote": "STRUCTURAL ENGINEER BOB ALLISON, PE ARUP ENGINEERING"
+        },
+        {
+          "entity": "Project",
+          "attribute": "MEP Engineer",
+          "value": "Arup Engineering",
+          "unit": "",
+          "conditions": "",
+          "quote": "MEP ENGINEER ARUP ENGINEERING"
+        },
+        {
+          "entity": "Project",
+          "attribute": "Architect of Record",
+          "value": "William Jelen, AIA",
+          "unit": "",
+          "conditions": "",
+          "quote": "ARCHITECT OF RECORD WILLIAM JELEN, AIA"
+        },
+        {
+          "entity": "Project",
+          "attribute": "Team Name",
+          "value": "Team Capitol dc",
+          "unit": "",
+          "conditions": "",
+          "quote": "TEAM NAME: Team Capitol dc"
+        }
+      ],
+      "counts": {
+        "baseline": 0,
+        "variant": 4,
+        "shared": 0
+      }
+    },
+    {
+      "id": "u-dc-cd-p39-42-2523f154-p2-visual",
+      "run": "dc-cd-p39-42",
+      "content": "sha256:2523f1544fb49efaeb6fca153d07242bc9d08d700fecf10a0e0a6896b0f3fd66.pdf",
+      "page": 2,
+      "family": "visual",
+      "image": "images/dc-cd-p39-42-2523f154-p2.jpg",
+      "page_text": "B\nA\n5'-1\"\n8\"\n11\"\n10\"\n4'-6\"\n2\"\n6\"\n2\"\nW10X15\nB\nA\n5'-0\"\n10\"\n10\"\n10\"\n10\"\n8\"\n3'-0\"\n2\"\n6\"\n2\"\nW10X15\nB\nA\n3'-7\"\n10\"\n5'-3\"\n8\"\n1'-8\"\n2\"\n6\"\n2\"\n2\"\n6\"\n2\"\nW10X15\nB\nA\n2'-1\"\n8\"\n9'-3\"\n2\"\n6\"\n2\"\nW10X15\nD\nC\n4'-2\"\n10\"\n1'-3\"\n8\"\n3'-1\"\nW10X15\n2\"\n6\"\n2\"\nD\nC\n2'-6\"\n2'-6\"\n2'-6\"\n2'-6\"\nW8X13\nø 3\"\nD\nC\n10'-0\"\n4'-2\"\n10\"\n1'-1\"\n10\"\n3'-1\"\n2\"\n6\"\n2\"\nB\nA\n3'-0\"\n3'-0\"\n3'-0\"\n3'-0\"\nW8X13\nø 3\"\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nNONE: PROJECT IS\nPUBLIC DOMAIN\nARCHITECT OF RECORD\nWILLIAM JELEN, AIA\n620 MICHIGAN AVE NE\nCROUGH CENTER\nWASHINGTON, DC 20064\nTEL: 202.344.5513\nSTRUCTURAL ENGINEER\nBOB ALLISON, PE\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nMEP ENGINEER\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nTEAM CAPITOL DC\nTEAM CAPITOL DC\n8/22/2013 4:48:11 PM\nS-601\nBEAM OPENINGS\n115\nTeam Capitol dc\nTHE CATHOLIC UNIVERSITY OF AMERICA\nSCHOOL OF ARCHITECTURE\n620 MICHIGAN AVENUE, NE.\nWASHINGTON, DC 20064\n 3/4\" = 1'-0\"\nA4\nFLOOR BEAM @ GRID 2\n 3/4\" = 1'-0\"\nB4\nFLOOR BEAM @ GRID 3\n 3/4\" = 1'-0\"\nC4\nFLOOR BEAM @ GRID 4\n 3/4\" = 1'-0\"\nD5\nFLOOR BEAM @ GRID 5\n 3/4\" = 1'-0\"\nB1\nFLOOR BEAMNEAR GRID 5\n 3/4\" = 1'-0\"\nC1\nROOF BEAM @ GRID 6 & NEAR GRID 5\n 3/4\" = 1'-0\"\nA1\nFLOOR BEAM @ GRID 6\n 3/4\" = 1'-0\"\nE6\nROOF BEAM @ GRID 2,3,4,5 T.O. STEEL\nREFERENCE KEYNOTES\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n0\n2'\n3'\n1'\n1/2\" RADIUS AROUND EDGES OF OPENINGS IN BEAMS\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\nMARK\nDATE\nDESCRIPTION\n1\n2012.10.11\n80% DD Submission\n2\n2012.11.20\n80% DD Revisions\n3\n2013.02.04\n100% CD Submission\n4\n2013.08.22\nAs-Built Submission\n",
+      "baseline": [
+        {
+          "entity": "B1 FLOOR BEAM NEAR GRID 5",
+          "attribute": "opening diameter",
+          "value": "3",
+          "unit": "in",
+          "conditions": "",
+          "quote": "ø 3\""
+        },
+        {
+          "entity": "BEAM @ GRID 6 & NEAR GRID 5",
+          "attribute": "spacing between openings",
+          "value": "1'-3\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "1'-3\""
+        },
+        {
+          "entity": "steel",
+          "attribute": "elevation reference",
+          "value": "T.O.",
+          "unit": "",
+          "conditions": "D 2,3,4,5",
+          "quote": "D 2,3,4,5 T.O. STEEL"
+        },
+        {
+          "entity": "opening/spacing",
+          "attribute": "dimension",
+          "value": "3",
+          "unit": "ft",
+          "conditions": "segment 2",
+          "quote": "3'-0\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "bottom offset",
+          "value": "2",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "width",
+          "value": "3'-1\"",
+          "unit": "feet-inches",
+          "conditions": "at grid line C",
+          "quote": "3'-1\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 6",
+          "attribute": "opening width",
+          "value": "6\"",
+          "unit": "",
+          "conditions": "Detail A1",
+          "quote": "6\""
+        },
+        {
+          "entity": "C1 ROOF BEAM @ GRID 6 & NEAR GRID 5",
+          "attribute": "section",
+          "value": "W8X13",
+          "unit": "",
+          "conditions": "",
+          "quote": "W8X13"
+        },
+        {
+          "entity": "beam opening group",
+          "attribute": "distance to left boundary",
+          "value": "4'-2\"",
+          "unit": "\"",
+          "conditions": "near Grid 5",
+          "quote": "4'-2\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "end distance",
+          "value": "1'-8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "1'-8\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "top offset",
+          "value": "2",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "width",
+          "value": "1'-8\"",
+          "unit": "feet-inches",
+          "conditions": "Detail A",
+          "quote": "1'-8\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "spacing",
+          "value": "2'-6\"",
+          "unit": "",
+          "conditions": "at GRID 6 & NEAR GRID 5",
+          "quote": "2'-6\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "distance from top edge",
+          "value": "2",
+          "unit": "\"",
+          "conditions": "near Grid 5",
+          "quote": "2\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 4",
+          "attribute": "length",
+          "value": "5'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "5'-0\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 5",
+          "attribute": "bottom edge distance to opening",
+          "value": "2",
+          "unit": "\"",
+          "conditions": "relative to beam bottom",
+          "quote": "2\""
+        },
+        {
+          "entity": "beam",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "between GRID 3 and GRID 4",
+          "quote": "W10X15"
+        },
+        {
+          "entity": "A1 FLOOR BEAM @ GRID 6",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "",
+          "quote": "W10X15"
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "spacing between openings",
+          "value": "1'-1\"",
+          "unit": "\"",
+          "conditions": "near Grid 5",
+          "quote": "1'-1\""
+        },
+        {
+          "entity": "beam opening group",
+          "attribute": "distance to right boundary",
+          "value": "3'-1\"",
+          "unit": "\"",
+          "conditions": "near Grid 5",
+          "quote": "3'-1\""
+        },
+        {
+          "entity": "FLOOR BEAMNEA",
+          "attribute": "drawing scale",
+          "value": "3/4\" = 1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/4\" = 1'-0\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 3",
+          "attribute": "opening length",
+          "value": "5'-1\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "5'-1\""
+        },
+        {
+          "entity": "beam",
+          "attribute": "section",
+          "value": "W8X13",
+          "unit": "",
+          "conditions": "at GRID 6 & NEAR GRID 5",
+          "quote": "W8X13"
+        },
+        {
+          "entity": "ROOF BEAM",
+          "attribute": "opening spacing",
+          "value": "2'-6\"",
+          "unit": "ft-in",
+          "conditions": "between openings",
+          "quote": "2'-6\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "edge distance",
+          "value": "10",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "10\""
+        }
+      ],
+      "variant": [
+        {
+          "entity": "opening 1",
+          "attribute": "width",
+          "value": "10\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "10\""
+        },
+        {
+          "entity": "opening 1 and 2",
+          "attribute": "spacing between openings",
+          "value": "11",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "11\""
+        },
+        {
+          "entity": "floor beam @ grid 5",
+          "attribute": "opening distance from grid B",
+          "value": "2'-1\"",
+          "unit": "",
+          "conditions": "Detail D5",
+          "quote": "2'-1\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 5",
+          "attribute": "section profile",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "",
+          "quote": "W10X15"
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 6",
+          "attribute": "total length",
+          "value": "10'-0\"",
+          "unit": "",
+          "conditions": "between Grid D and Grid C",
+          "quote": "10'-0\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 3",
+          "attribute": "distance from Grid B to first opening",
+          "value": "5",
+          "unit": "'-0\"",
+          "conditions": "",
+          "quote": "5'-0\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 4",
+          "attribute": "distance from Grid B to opening start",
+          "value": "3'-7\"",
+          "unit": "",
+          "conditions": "Detail C4",
+          "quote": "3'-7\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 6",
+          "attribute": "depth",
+          "value": "6\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "6\""
+        },
+        {
+          "entity": "floor beam @ grid 5",
+          "attribute": "opening top offset",
+          "value": "2\"",
+          "unit": "",
+          "conditions": "Detail D5",
+          "quote": "2\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 6",
+          "attribute": "distance from Grid D to first opening",
+          "value": "4'-2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "4'-2\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 3",
+          "attribute": "top flange width",
+          "value": "2\"",
+          "unit": "",
+          "conditions": "Detail B4",
+          "quote": "2\""
+        },
+        {
+          "entity": "FLOOR BEAMNEAR GRID 5",
+          "attribute": "section profile",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "",
+          "quote": "W10X15"
+        },
+        {
+          "entity": "opening 2",
+          "attribute": "bottom offset",
+          "value": "2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "2\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 2",
+          "attribute": "length from Grid B to first opening",
+          "value": "5'-1\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "5'-1\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 3",
+          "attribute": "depth",
+          "value": "6\"",
+          "unit": "",
+          "conditions": "Detail B4",
+          "quote": "6\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "height",
+          "value": "6",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "6\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "height",
+          "value": "6",
+          "unit": "\"",
+          "conditions": "FLOOR BEAM @ GRID 5",
+          "quote": "6\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 6",
+          "attribute": "distance from second opening to end",
+          "value": "3",
+          "unit": "ft 1 in",
+          "conditions": "Detail A1",
+          "quote": "3'-1\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 4 opening",
+          "attribute": "distance from bottom flange",
+          "value": "2",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 4",
+          "attribute": "opening height",
+          "value": "6\"",
+          "unit": "",
+          "conditions": "Detail C4",
+          "quote": "6\""
+        },
+        {
+          "entity": "beam opening",
+          "attribute": "distance from end of opening to beam end",
+          "value": "9'-3\"",
+          "unit": "",
+          "conditions": "FLOOR BEAM @ GRID 5",
+          "quote": "9'-3\""
+        },
+        {
+          "entity": "opening 2",
+          "attribute": "height",
+          "value": "6\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "6\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 4",
+          "attribute": "distance from Grid B to first opening",
+          "value": "3'-7\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3'-7\""
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 2",
+          "attribute": "length from second opening to Grid A",
+          "value": "4'-6\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "4'-6\""
+        },
+        {
+          "entity": "floor beam @ grid 5",
+          "attribute": "opening width",
+          "value": "8\"",
+          "unit": "",
+          "conditions": "Detail D5",
+          "quote": "8\""
+        }
+      ],
+      "counts": {
+        "baseline": 107,
+        "variant": 124,
+        "shared": 13
+      }
+    },
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p2-visual",
+      "run": "calg-cd-p39-42",
+      "content": "sha256:9a895974bcaa376163077de84a01fc16746b5353a679fa73dee42638b3ed1463.pdf",
+      "page": 2,
+      "family": "visual",
+      "image": "images/calg-cd-p39-42-9a895974-p2.jpg",
+      "page_text": "GRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nB\nA\nH\nJ\nF\nD\nE\nC\nG\n---\n-\n---\n-\n---\n-\n---\n-\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\nK\nB\nA\nH\nJ\nF\nD\nE\nC\nG\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nSTATUS:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nSEALS\nMARK\nDATE\nDESCRIPTION\nTEAM ALBERTA\nUNIVERSITY OF CALGARY\n2500 UNIVERSITY DR NW\nCALGARY, AB  T2N 1N4\nMOUNT ROYAL UNIVERSITY\n4825 MT ROYAL GATE SW\nCALGARY, AB  T3E 6K6\nWWW.SOLARDECATHLON.CA\nINFO@SOLARDECATHLON.CA\n1\n04/29/2013\nISSUED FOR ELEC/MECH\n2\n05/03/2013\nISSUED FOR CLADDING\n3\n05/13/2013\nISSUED FOR STRUCTURAL REVIEW\n4\n05/22/2013\nISSUED FOR CONSTRUCTION 95%\n5\n08/22/2013\nAS BUILT SET\n22/08/2013 5:09:58 PM\nA-301\nBUILDING SECTIONS\n116\n 3/8\" = 1'-0\"\nC1\nSECTION - WEST MODULE\n 3/8\" = 1'-0\"\nA1\nSECTION - EAST MODULE\n0\n4'\n6'\n2'\n0\n4'\n6'\n2'\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n",
+      "baseline": [
+        {
+          "entity": "Finished Floor",
+          "attribute": "height above grade level",
+          "value": "2' - 9 1/2\"",
+          "unit": "ft-in",
+          "conditions": "Section C1 (West Module)",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "SECTION - EAST MODULE",
+          "attribute": "scale",
+          "value": "3/8\"",
+          "unit": "per 1'-0\"",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "Revision 1",
+          "attribute": "date",
+          "value": "04/29/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "1 04/29/2013 ISSUED FOR ELEC/MECH"
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "ft-in",
+          "conditions": "Reference datum",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Revision 2",
+          "attribute": "description",
+          "value": "ISSUED FOR CLADDING",
+          "unit": "",
+          "conditions": "",
+          "quote": "2 05/03/2013 ISSUED FOR CLADDING"
+        },
+        {
+          "entity": "Project",
+          "attribute": "name",
+          "value": "U.S. DEPARTMENT OF ENERGY SOLAR DECATHLON 2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "U.S. DEPARTMENT OF ENERGY SOLAR DECATHLON 2013"
+        },
+        {
+          "entity": "Revision 5",
+          "attribute": "date",
+          "value": "08/22/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "5 08/22/2013 AS BUILT SET"
+        },
+        {
+          "entity": "Revision 1",
+          "attribute": "description",
+          "value": "ISSUED FOR ELEC/MECH",
+          "unit": "",
+          "conditions": "",
+          "quote": "1 04/29/2013 ISSUED FOR ELEC/MECH"
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "feet-inches",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "GRADE LEVEL",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "FINISHED FLOOR",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Revision 4",
+          "attribute": "description",
+          "value": "ISSUED FOR CONSTRUCTION 95%",
+          "unit": "",
+          "conditions": "",
+          "quote": "4 05/22/2013 ISSUED FOR CONSTRUCTION 95%"
+        },
+        {
+          "entity": "Section C1",
+          "attribute": "scale",
+          "value": "3/8\"",
+          "unit": "per 1'-0\"",
+          "conditions": "",
+          "quote": "C1 3/8\" = 1'-0\""
+        },
+        {
+          "entity": "SECTION - WEST MODULE",
+          "attribute": "scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "feet-inches",
+          "conditions": "",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Drawing",
+          "attribute": "lot number",
+          "value": "116",
+          "unit": "",
+          "conditions": "",
+          "quote": "LOT NUMBER: 116"
+        },
+        {
+          "entity": "Revision 5",
+          "attribute": "description",
+          "value": "AS BUILT SET",
+          "unit": "",
+          "conditions": "",
+          "quote": "5 08/22/2013 AS BUILT SET"
+        },
+        {
+          "entity": "Revision 3",
+          "attribute": "description",
+          "value": "ISSUED FOR STRUCTURAL REVIEW",
+          "unit": "",
+          "conditions": "",
+          "quote": "3 05/13/2013 ISSUED FOR STRUCTURAL REVIEW"
+        },
+        {
+          "entity": "Section C1",
+          "attribute": "scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "ratio",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "height above grade level",
+          "value": "2' - 9 1/2\"",
+          "unit": "ft-in",
+          "conditions": "Section A1 (East Module)",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Revision 2",
+          "attribute": "date",
+          "value": "05/03/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "2 05/03/2013 ISSUED FOR CLADDING"
+        },
+        {
+          "entity": "Revision 3",
+          "attribute": "date",
+          "value": "05/13/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "3 05/13/2013 ISSUED FOR STRUCTURAL REVIEW"
+        },
+        {
+          "entity": "Revision 4",
+          "attribute": "date",
+          "value": "05/22/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "4 05/22/2013 ISSUED FOR CONSTRUCTION 95%"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "Finished Floor",
+          "attribute": "height above grade level",
+          "value": "2' - 9 1/2\"",
+          "unit": "ft-in",
+          "conditions": "Section C1 (West Module)",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Sheet A-301",
+          "attribute": "lot number",
+          "value": "116",
+          "unit": "",
+          "conditions": "",
+          "quote": "LOT NUMBER: 116"
+        },
+        {
+          "entity": "Sheet A-301",
+          "attribute": "sheet title",
+          "value": "BUILDING SECTIONS",
+          "unit": "",
+          "conditions": "",
+          "quote": "SHEET TITLE BUILDING SECTIONS"
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "ft-in",
+          "conditions": "Reference datum",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "feet-inches",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "feet-inches",
+          "conditions": "relative to Grade Level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to Grade Level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "height above grade level",
+          "value": "2' - 9 1/2\"",
+          "unit": "ft-in",
+          "conditions": "Section A1 (East Module)",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        }
+      ],
+      "counts": {
+        "baseline": 23,
+        "variant": 9,
+        "shared": 5
+      }
+    },
+    {
+      "id": "u-dc-cd-p39-42-2523f154-p3-visual",
+      "run": "dc-cd-p39-42",
+      "content": "sha256:2523f1544fb49efaeb6fca153d07242bc9d08d700fecf10a0e0a6896b0f3fd66.pdf",
+      "page": 3,
+      "family": "visual",
+      "image": "images/dc-cd-p39-42-2523f154-p3.jpg",
+      "page_text": "D\nC\nC1\nS-301\n3'-8 3/8\"\n3'-6\"\n3'-1 5/16\"\n10'-3 3/4\"\n6\"\n1 1/2\"\n1 1/2\"\n7 1/16\"\n2'-2 7/8\"\n6 3/16\"\n1'-8 11/16\"\n3\"\n4 13/16\"\n2\"\n2\"\n4\"\n2\"\n5/8\"\n6\"\nL3X3X1/4\nL3X3X1/4\nL3X3X1/4\n3/8\" THROUGH BOLT\n3/8\" THROUGH BOLT\nB\nA4\nS-301\nA\n12'-3 3/4\"\n2'-3 7/8\"\n7'-0\"\n2'-11 7/8\"\n6\"\n1 1/2\"\n1 1/2\"\n5/8\"\n6 13/16\"\n1'-11 1/8\"\n6 3/16\"\n2'-5 5/16\"\n6\"\n3\"\n4 3/4\"\n2\"\n2\"\n2\"\n4\"\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nNONE: PROJECT IS\nPUBLIC DOMAIN\nARCHITECT OF RECORD\nWILLIAM JELEN, AIA\n620 MICHIGAN AVE NE\nCROUGH CENTER\nWASHINGTON, DC 20064\nTEL: 202.344.5513\nSTRUCTURAL ENGINEER\nBOB ALLISON, PE\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nMEP ENGINEER\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nTEAM CAPITOL DC\nTEAM CAPITOL DC\n8/22/2013 4:48:20 PM\nS-701\nPV DETAILS\n115\nTeam Capitol dc\nTHE CATHOLIC UNIVERSITY OF AMERICA\nSCHOOL OF ARCHITECTURE\n620 MICHIGAN AVENUE, NE.\nWASHINGTON, DC 20064\n 1 1/2\" = 1'-0\"\nC1\nMODULE B - PV STRUCTURAL MEMBER - NORTH/SOUTH\n 1 1/2\" = 1'-0\"\nA1\nMODULE A - PV STRUCTURAL MEMBER - NORTH/SOUTH\nREFERENCE KEYNOTES\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n0\n1'\n1 1/2'\n1/2\"\n0\n1'\n1 1/2'\n1/2\"\nMARK\nDATE\nDESCRIPTION\n1\n2012.10.11\n80% DD Submission\n2\n2012.11.20\n80% DD Revisions\n3\n2013.02.04\n100% CD Submission\n4\n2013.08.22\nAs-Built Submission\n",
+      "baseline": [
+        {
+          "entity": "PV Detail",
+          "attribute": "dimension",
+          "value": "2'-3 7/8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "2'-3 7/8\""
+        },
+        {
+          "entity": "base block",
+          "attribute": "hole center height",
+          "value": "2",
+          "unit": "\"",
+          "conditions": "from bottom",
+          "quote": "2\""
+        },
+        {
+          "entity": "Module B - PV Structural Member - North/South",
+          "attribute": "segment length",
+          "value": "3'-1 5/16\"",
+          "unit": "",
+          "conditions": "rightmost section",
+          "quote": "3'-1 5/16\""
+        },
+        {
+          "entity": "right-side component",
+          "attribute": "width",
+          "value": "3",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "3\""
+        },
+        {
+          "entity": "dimension",
+          "attribute": "length",
+          "value": "10'-3 3/4\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "10'-3 3/4\""
+        },
+        {
+          "entity": "base block",
+          "attribute": "height",
+          "value": "4",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "4\""
+        },
+        {
+          "entity": "total assembly",
+          "attribute": "height",
+          "value": "2'-5 5/16",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2'-5 5/16\""
+        },
+        {
+          "entity": "structural member",
+          "attribute": "vertical dimension",
+          "value": "2'-2 7/8",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2'-2 7/8\""
+        },
+        {
+          "entity": "PV detail",
+          "attribute": "lower vertical segment",
+          "value": "1'-11 1/8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "1'-11 1/8\""
+        },
+        {
+          "entity": "PV support detail",
+          "attribute": "height",
+          "value": "5/8",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "5/8\""
+        },
+        {
+          "entity": "base assembly",
+          "attribute": "width to center",
+          "value": "4 13/16",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "4 13/16\""
+        },
+        {
+          "entity": "top connection",
+          "attribute": "width",
+          "value": "6",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "6\""
+        },
+        {
+          "entity": "base block",
+          "attribute": "width",
+          "value": "3",
+          "unit": "\"",
+          "conditions": "single block",
+          "quote": "3\""
+        },
+        {
+          "entity": "structural member",
+          "attribute": "vertical dimension",
+          "value": "1'-8 11/16",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "1'-8 11/16\""
+        },
+        {
+          "entity": "Module B - PV Structural Member - North/South",
+          "attribute": "segment length",
+          "value": "3'-6\"",
+          "unit": "",
+          "conditions": "center section",
+          "quote": "3'-6\""
+        },
+        {
+          "entity": "PV Detail",
+          "attribute": "vertical dimension",
+          "value": "2'-3 7/8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "2'-3 7/8\""
+        },
+        {
+          "entity": "Module B - PV Structural Member - North/South",
+          "attribute": "segment length",
+          "value": "3'-8 3/8\"",
+          "unit": "",
+          "conditions": "leftmost section",
+          "quote": "3'-8 3/8\""
+        },
+        {
+          "entity": "right-side component",
+          "attribute": "total width",
+          "value": "4 13/16",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "4 13/16\""
+        },
+        {
+          "entity": "middle section",
+          "attribute": "height",
+          "value": "1'-8 11/16",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "1'-8 11/16\""
+        },
+        {
+          "entity": "dimension",
+          "attribute": "length",
+          "value": "3'-8 3/8\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3'-8 3/8\""
+        },
+        {
+          "entity": "beam",
+          "attribute": "height",
+          "value": "6 3/16",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "6 3/16\""
+        },
+        {
+          "entity": "MODULE B - P",
+          "attribute": "dimension",
+          "value": "2'-3 7/8\"",
+          "unit": "",
+          "conditions": "Detail A",
+          "quote": "2'-3 7/8\""
+        },
+        {
+          "entity": "PV STRUCTURAL MEMBER",
+          "attribute": "flange width (right)",
+          "value": "1 1/2",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "1 1/2\""
+        },
+        {
+          "entity": "MODULE B - P",
+          "attribute": "scale",
+          "value": "1 1/2\" = 1'-0\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "1 1/2\" = 1'-0\""
+        },
+        {
+          "entity": "base block",
+          "attribute": "gap to center",
+          "value": "2",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "2\""
+        }
+      ],
+      "variant": [
+        {
+          "entity": "PV structural member",
+          "attribute": "horizontal dimension",
+          "value": "3'-1 5/16\"",
+          "unit": "",
+          "conditions": "Module B",
+          "quote": "3'-1 5/16\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "top member width",
+          "value": "6",
+          "unit": "\"",
+          "conditions": "Detail A1",
+          "quote": "6\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "dimension",
+          "value": "3\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "3\""
+        },
+        {
+          "entity": "structural member",
+          "attribute": "offset height",
+          "value": "7 1/16\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "7 1/16\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "horizontal dimension",
+          "value": "3'-1 5/16\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "3'-1 5/16\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "vertical dimension (segment 2)",
+          "value": "2'-2 7/8\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "2'-2 7/8\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "right section width",
+          "value": "3'-1 5/16\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "3'-1 5/16\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "horizontal dimension",
+          "value": "6\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "6\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "horizontal distance to grid B",
+          "value": "2'-11 7/8\"",
+          "unit": "",
+          "conditions": "Detail A1",
+          "quote": "2'-11 7/8\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "base detail height",
+          "value": "4",
+          "unit": "\"",
+          "conditions": "Detail A1",
+          "quote": "4\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "left section width",
+          "value": "3'-6\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "3'-6\""
+        },
+        {
+          "entity": "Structural Member - North/South",
+          "attribute": "dimension",
+          "value": "4 13/16",
+          "unit": "inch",
+          "conditions": "horizontal spacing",
+          "quote": "4 13/16\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "dimension",
+          "value": "4 13/16\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "4 13/16\""
+        },
+        {
+          "entity": "Module A - PV Structural Member - North/South",
+          "attribute": "segment length",
+          "value": "7'-0\"",
+          "unit": "",
+          "conditions": "center section",
+          "quote": "7'-0\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "vertical dimension",
+          "value": "1'-8 11/16\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "1'-8 11/16\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "offset/dimension",
+          "value": "1 1/2\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "1 1/2\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "dimension",
+          "value": "4\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "4\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "upper section height",
+          "value": "6 3/16\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "6 3/16\""
+        },
+        {
+          "entity": "PV structural member",
+          "attribute": "vertical dimension",
+          "value": "2\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "2\""
+        },
+        {
+          "entity": "MODULE A - PV STRUCTURAL MEMBER - NORTH/SOUTH",
+          "attribute": "total length",
+          "value": "12'-3 3/4\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "12'-3 3/4\""
+        },
+        {
+          "entity": "Structural Member - North/South",
+          "attribute": "dimension",
+          "value": "1 1/2",
+          "unit": "inch",
+          "conditions": "horizontal offset",
+          "quote": "1 1/2\""
+        },
+        {
+          "entity": "through bolt",
+          "attribute": "diameter",
+          "value": "3/8\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "3/8\" THROUGH BOLT"
+        },
+        {
+          "entity": "Structural Member - North/South",
+          "attribute": "dimension",
+          "value": "7 1/16",
+          "unit": "inch",
+          "conditions": "vertical height",
+          "quote": "7 1/16\""
+        },
+        {
+          "entity": "Structural Member - North/South",
+          "attribute": "dimension",
+          "value": "5/8",
+          "unit": "inch",
+          "conditions": "vertical offset",
+          "quote": "5/8\""
+        },
+        {
+          "entity": "Structural Member - North/South",
+          "attribute": "component",
+          "value": "L3X3X1/4",
+          "unit": "",
+          "conditions": "",
+          "quote": "L3X3X1/4"
+        }
+      ],
+      "counts": {
+        "baseline": 90,
+        "variant": 109,
+        "shared": 10
+      }
+    },
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p4-visual",
+      "run": "calg-cd-p39-42",
+      "content": "sha256:9a895974bcaa376163077de84a01fc16746b5353a679fa73dee42638b3ed1463.pdf",
+      "page": 4,
+      "family": "visual",
+      "image": "images/calg-cd-p39-42-9a895974-p4.jpg",
+      "page_text": "6\n5\n4\n3\n2\n1\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\n---\n-\nKITCHEN\n6\n5\n4\n3\n2\n1\nGRADE LEVEL\n0' - 0\"\nFINISHED FLOOR\n2' - 9 1/2\"\n---\n-\nMECHANICAL\n ROOM\nBEDROOM\nBEDROOM\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nSTATUS:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nSEALS\nMARK\nDATE\nDESCRIPTION\nTEAM ALBERTA\nUNIVERSITY OF CALGARY\n2500 UNIVERSITY DR NW\nCALGARY, AB  T2N 1N4\nMOUNT ROYAL UNIVERSITY\n4825 MT ROYAL GATE SW\nCALGARY, AB  T3E 6K6\nWWW.SOLARDECATHLON.CA\nINFO@SOLARDECATHLON.CA\n1\n04/29/2013\nISSUED FOR ELEC/MECH\n2\n05/03/2013\nISSUED FOR CLADDING\n3\n05/13/2013\nISSUED FOR STRUCTURAL REVIEW\n4\n05/22/2013\nISSUED FOR CONSTRUCTION 95%\n5\n08/22/2013\nAS BUILT SET\n22/08/2013 5:10:08 PM\nA-303\nBUILDING SECTIONS\n116\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n 3/8\" = 1'-0\"\nC1\nDINING ROOM SECTION\n 3/8\" = 1'-0\"\nA1\nBEDROOM SECTION\n0\n4'\n6'\n2'\n0\n4'\n6'\n2'\n",
+      "baseline": [
+        {
+          "entity": "Building",
+          "attribute": "room layout",
+          "value": "BEDROOM",
+          "unit": "",
+          "conditions": "",
+          "quote": "BEDROOM"
+        },
+        {
+          "entity": "Mechanical Room",
+          "attribute": "adjacent to",
+          "value": "Bedroom",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM BEDROOM"
+        },
+        {
+          "entity": "dining room section",
+          "attribute": "drawing scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "in/ft",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\" C1 DINING ROOM SECTION"
+        },
+        {
+          "entity": "Building",
+          "attribute": "room layout",
+          "value": "MECHANICAL ROOM",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM"
+        },
+        {
+          "entity": "Revision 1",
+          "attribute": "date",
+          "value": "04/29/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "1 04/29/2013 ISSUED FOR ELEC/MECH"
+        },
+        {
+          "entity": "Mechanical Room",
+          "attribute": "location",
+          "value": "adjacent to Bedroom 4",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM BEDROOM 4"
+        },
+        {
+          "entity": "Bedroom 4",
+          "attribute": "location",
+          "value": "adjacent to Mechanical Room",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM BEDROOM 4"
+        },
+        {
+          "entity": "Project",
+          "attribute": "name",
+          "value": "U.S. DEPARTMENT OF ENERGY SOLAR DECATHLON 2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "U.S. DEPARTMENT OF ENERGY SOLAR DECATHLON 2013"
+        },
+        {
+          "entity": "Revision 5",
+          "attribute": "date",
+          "value": "08/22/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "5 08/22/2013 AS BUILT SET"
+        },
+        {
+          "entity": "Revision 1",
+          "attribute": "description",
+          "value": "ISSUED FOR ELEC/MECH",
+          "unit": "",
+          "conditions": "",
+          "quote": "1 04/29/2013 ISSUED FOR ELEC/MECH"
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "feet-inches",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "GRADE LEVEL",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Bedroom Section A1",
+          "attribute": "scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "ratio",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "FINISHED FLOOR",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Revision 4",
+          "attribute": "description",
+          "value": "ISSUED FOR CONSTRUCTION 95%",
+          "unit": "",
+          "conditions": "",
+          "quote": "4 05/22/2013 ISSUED FOR CONSTRUCTION 95%"
+        },
+        {
+          "entity": "Bedroom",
+          "attribute": "adjacent to",
+          "value": "Mechanical Room",
+          "unit": "",
+          "conditions": "",
+          "quote": "BEDROOM MECHANICAL ROOM"
+        },
+        {
+          "entity": "bedroom section",
+          "attribute": "drawing scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "in/ft",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\" A1 BEDROOM SECTION"
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "feet-inches",
+          "conditions": "",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Drawing",
+          "attribute": "lot number",
+          "value": "116",
+          "unit": "",
+          "conditions": "",
+          "quote": "LOT NUMBER: 116"
+        },
+        {
+          "entity": "Revision 5",
+          "attribute": "description",
+          "value": "AS BUILT SET",
+          "unit": "",
+          "conditions": "",
+          "quote": "5 08/22/2013 AS BUILT SET"
+        },
+        {
+          "entity": "Revision 2",
+          "attribute": "date",
+          "value": "05/03/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "2 05/03/2013 ISSUED FOR CLADDING"
+        },
+        {
+          "entity": "Revision 3",
+          "attribute": "date",
+          "value": "05/13/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "3 05/13/2013 ISSUED FOR STRUCTURAL REVIEW"
+        },
+        {
+          "entity": "Drawing C1",
+          "attribute": "scale",
+          "value": "3/8\"",
+          "unit": "3/8\" = 1'-0\"",
+          "conditions": "",
+          "quote": "C1 3/8\" = 1'-0\""
+        },
+        {
+          "entity": "building",
+          "attribute": "grade level",
+          "value": "0' - 0\"",
+          "unit": "ft-in",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Revision 4",
+          "attribute": "date",
+          "value": "05/22/2013",
+          "unit": "",
+          "conditions": "",
+          "quote": "4 05/22/2013 ISSUED FOR CONSTRUCTION 95%"
+        }
+      ],
+      "variant": [
+        {
+          "entity": "dining room section",
+          "attribute": "drawing scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "in/ft",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\" C1 DINING ROOM SECTION"
+        },
+        {
+          "entity": "Dining Room Section",
+          "attribute": "scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "Detail C1: 3/8\" = 1'-0\" DINING ROOM SECTION"
+        },
+        {
+          "entity": "BEDROOM SECTION",
+          "attribute": "scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "Building",
+          "attribute": "section detail",
+          "value": "A1",
+          "unit": "",
+          "conditions": "Bedroom Section",
+          "quote": "Detail A1: 3/8\" = 1'-0\" BEDROOM SECTION"
+        },
+        {
+          "entity": "Building",
+          "attribute": "drawing scale",
+          "value": "3/8",
+          "unit": "in/ft",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\""
+        },
+        {
+          "entity": "Bedroom",
+          "attribute": "spatial relationship",
+          "value": "adjacent to",
+          "unit": "",
+          "conditions": "",
+          "quote": "BEDROOM"
+        },
+        {
+          "entity": "document",
+          "attribute": "sheet number",
+          "value": "A-303",
+          "unit": "",
+          "conditions": "",
+          "quote": "A-303"
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Kitchen",
+          "attribute": "location",
+          "value": "Dining Room Section",
+          "unit": "",
+          "conditions": "Detail C1",
+          "quote": "KITCHEN"
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "relative to Grade Level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "building",
+          "attribute": "finished floor height",
+          "value": "2' - 9 1/2\"",
+          "unit": "ft-in",
+          "conditions": "relative to grade level",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Mechanical Room",
+          "attribute": "spatial relationship",
+          "value": "adjacent to",
+          "unit": "",
+          "conditions": "",
+          "quote": "MECHANICAL ROOM"
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "bedroom section",
+          "attribute": "drawing scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "in/ft",
+          "conditions": "",
+          "quote": "3/8\" = 1'-0\" A1 BEDROOM SECTION"
+        },
+        {
+          "entity": "BEDROOM SECTION",
+          "attribute": "scale",
+          "value": "3/8\" = 1'-0\"",
+          "unit": "",
+          "conditions": "Detail A1",
+          "quote": "Detail A1: 3/8\" = 1'-0\" BEDROOM SECTION"
+        },
+        {
+          "entity": "document",
+          "attribute": "sheet title",
+          "value": "BUILDING SECTIONS",
+          "unit": "",
+          "conditions": "",
+          "quote": "SHEET TITLE BUILDING SECTIONS"
+        },
+        {
+          "entity": "building",
+          "attribute": "grade level",
+          "value": "0' - 0\"",
+          "unit": "ft-in",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "document",
+          "attribute": "lot number",
+          "value": "116",
+          "unit": "",
+          "conditions": "",
+          "quote": "LOT NUMBER: 116"
+        }
+      ],
+      "counts": {
+        "baseline": 29,
+        "variant": 18,
+        "shared": 6
+      }
+    }
+  ]
+}

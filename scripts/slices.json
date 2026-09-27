@@ -146,6 +146,30 @@
       "use": "Drawing sheets from a fourth team.",
       "set": "heldout",
       "sha256": "c22f3f4ea3e6eb642c6359366aa24e0defa16a469ca20117085302086b3ce25f"
+    },
+    {
+      "name": "dc-cd-p31-38",
+      "source": "solar-decathlon-2013/teams/dc/dc_cd.pdf",
+      "source_sha256": "996c2df2e2363c7e99be5685ff6eb7c53c3b12a33f68616b96478aacf266f44d",
+      "pages": [
+        31,
+        38
+      ],
+      "use": "Eight detail sheets (4-6 numbered details each), for levers that act on drawing sheets.",
+      "set": "dev",
+      "sha256": "870cc2fdfb78aa4c47b4489e9a594f7ddc038d5d273e34d0a160859fb16714ca"
+    },
+    {
+      "name": "calg-cd-p62-66",
+      "source": "solar-decathlon-2013/teams/calg/calg_cd.pdf",
+      "source_sha256": "747ca1bcb8dc7eaeb52c126228ddb88b2e79968807f290203b902801cdd0df86",
+      "pages": [
+        62,
+        66
+      ],
+      "use": "Five detail sheets from another team, for levers that act on drawing sheets.",
+      "set": "dev",
+      "sha256": "e0051becfd8968d3511251477c93dce5ac9799468f91ae8c25bd24ef00558c1e"
     }
   ],
   "runs": [
@@ -228,6 +252,22 @@
         "scical-cd-p40-43"
       ],
       "set": "heldout"
+    },
+    {
+      "name": "dc-sheets",
+      "slices": [
+        "dc-cd-p31-38",
+        "dc-cd-p31-38"
+      ],
+      "set": "dev"
+    },
+    {
+      "name": "calg-sheets",
+      "slices": [
+        "calg-cd-p62-66",
+        "calg-cd-p62-66"
+      ],
+      "set": "dev"
     }
   ]
 }
