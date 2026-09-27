@@ -20,8 +20,8 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Table filter | `table_filter` | Not accepted | r01b 0.41 (0.23–0.57), 12 pages |
 | References | `references` | Not accepted | r05 0.50 (0.35–0.66), 17 units |
 | Sheet details | `sheet_details` | Parked | r05–r05d: 0.64 → 0.50 → 0.48 → 0.42 |
-| Merged readings | `reconcile` | Re-testing after fixes | r06 0.58 (0.47–0.69): no worse; text 0.72, visual 0.43 |
-| Tile locator | `tile_locator` | Being judged | r06 |
+| Merged readings | `reconcile` | Re-testing (r08) | r06 0.58 no worse; r07 0.54 with an embellishing representative (reverted) |
+| Tile locator | `tile_locator` | Parked | r06 0.49 (flawed sampling), r07 0.58 (0.47–0.68): no worse; wins on IEA and LCIT in both rounds |
 
 ## Levers
 
@@ -98,11 +98,19 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 - **Why (from the round's analysis), two causes:**
   1. **Measurement:** on large units, judges saw different samples of each side (fixed: every difference plus one shared sample).
   2. **Lever:** the representative wording was chosen by region and dropped conditions another reading had (fixed: the most informative reading represents).
-- **Next:** re-test with both fixes (r07).
+- **r07 (with the most informative reading representing):** 0.54. The judges tagged 31 variant claims invented against 11, because wide regions attach context from elsewhere ("Structure South Elevation - Main"). Reverted to the most local reading.
+- **Next:** r08 with rubric v3.
 
 ### Tile locator (`tile_locator`)
 - **Mechanism:** a 384 px page thumbnail with the tile outlined in red, as a second image with each tile. The owner's suggestion.
-- **Interim:** 0.41 (0.23–0.58) at 16 units. To be explained from the round's analysis: whether the model extracted from the thumbnail, ignored it, or got confused.
+- **r06:** 0.49, with flawed sampling. **r07:** 0.58 (0.47–0.68), no worse.
+- **By document, the same direction in both rounds:** IEA-15 0.82 / 0.80 and LCIT 1.00 / 0.92 won; dc-manual 0.00 / 0.08 lost.
+- **Tags:** fewer missing facts, invented claims and quote problems; slightly more duplicates. The model's issue notes never mention the thumbnail.
+- **Parked:** a small cost with no established gain.
+- **Next ideas:**
+  - a larger sample on report pages only
+  - a larger thumbnail on sheets
+  - the thumbnail only for tiles that cut a figure
 
 ## Measurement notes (affect how to read the table)
 

@@ -1,0 +1,21 @@
+{
+  "units_judged": 32,
+  "overall": {
+    "mean": 0.576,
+    "low": 0.473,
+    "high": 0.681
+  },
+  "strata": {
+    "visual": {
+      "mean": 0.576,
+      "low": 0.473,
+      "high": 0.681
+    }
+  },
+  "decision": "no worse: accept only with another gain (e.g. cost)",
+  "units": {
+    "units": 176,
+    "unchanged": 115
+  },
+  "stopped": "complete at 32 units"
+}

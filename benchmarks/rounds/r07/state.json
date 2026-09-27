@@ -1,0 +1,59 @@
+{
+  "steps": {
+    "record:baseline": "done",
+    "record:reconcile": "done",
+    "record:locator": "done",
+    "replay:baseline": "done",
+    "replay:reconcile": "done",
+    "replay:locator": "done",
+    "measure:baseline": "done",
+    "measure:reconcile": "done",
+    "measure:locator": "done",
+    "pairs:reconcile": "done",
+    "pairs:locator": "done",
+    "decide:reconcile": "done",
+    "decide:locator": "done"
+  },
+  "updated": "2026-09-27T20:56:30+00:00",
+  "judged": {
+    "reconcile": 32,
+    "locator": 32
+  },
+  "stopped": {
+    "reconcile": "complete at 32 units",
+    "locator": "complete at 32 units"
+  },
+  "failures": {
+    "judge:reconcile:Qwen/Qwen3.5-397B-A17B": 1,
+    "judge:reconcile:XiaomiMiMo/MiMo-V2.6-Pro": 3,
+    "judge:locator:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:locator:XiaomiMiMo/MiMo-V2.6-Pro": 15
+  },
+  "failure_notes": {
+    "judge:reconcile:XiaomiMiMo/MiMo-V2.6-Pro": [
+      "u-dc-cd-p31-38-870cc2fd-p4-visual baseline-first: ValidationError: 1 validation error for PairVerdict\n  Invalid JSON: trailing comma at line 1 column 1937 [type=json_invalid, input_value='{\"note\": \"Set A captures...from the text alone.\",}', input_type=str]\n    For further information visit https://e",
+      "u-calg-cd-p62-66-e0051bec-p5-table baseline-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-dc-cd-p31-38-870cc2fd-p3-table variant-first: TimeoutError: The read operation timed out"
+    ],
+    "judge:locator:XiaomiMiMo/MiMo-V2.6-Pro": [
+      "u-ken-cd-p95-98-f7b0008f-p3-visual variant-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-calg-cd-p62-66-e0051bec-p5-visual variant-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-calg-cd-p62-66-e0051bec-p5-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p62-66-e0051bec-p1-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-nrel-5mw-p25-36-5eaf02be-p12-visual variant-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p39-42-2523f154-p1-visual variant-first: TimeoutError: The read operation timed out",
+      "u-nrel-5mw-p25-36-5eaf02be-p7-visual variant-first: TimeoutError: The read operation timed out",
+      "u-nrel-5mw-p25-36-5eaf02be-p7-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p39-42-9a895974-p1-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p39-42-2523f154-p1-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p5-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p5-visual variant-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p6-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p11-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p11-visual variant-first: TimeoutError: The read operation timed out"
+    ],
+    "judge:reconcile:Qwen/Qwen3.5-397B-A17B": [
+      "u-dc-cd-p31-38-870cc2fd-p3-table variant-first: HTTP 500: Internal Server Error"
+    ]
+  }
+}

@@ -1,0 +1,1035 @@
+{
+  "reviewer": "XiaomiMiMo/MiMo-V2.6-Pro",
+  "verdicts": {
+    "u-iea-15mw-p20-31-f7071680-p10-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets capture the main operating values (design-point CP = 0.489 and CT = 0.804, 15 MW rated power, 20 MN-m rated torque, TSR 20→3, blade pitch 0→22°) and both repeat the same misread of the right-axis tick 2.25 as a rotor-thrust value at 10 m/s. Set B is the cleaner set: it binds Cp ≈ 0.5 to the Region 2 plateau (7–10 m/s) instead of a single wind speed, reads rotor thrust at 25 m/s as 0.9 MN (closer to the curve) rather than 1.0 MN, and repeats each fact far less often. Set A states the same facts up to three times (rated torque, TSR at 3 m/s, design-point CP, blade pitch 0° in Region 2) and gives mutually inconsistent rotor-thrust values at 10 m/s (2.8 and 2.25 MN).",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "Both extractions read the right-axis gridline label 2.25 in panel (b) as a data value for rotor thrust at 10 m/s; the actual thrust there is near the curve peak (~2.6–2.8 MN at the Region 2/3 boundary ~10.5 m/s), so the 2.7/2.8 MN claims are also only approximate. Both give Power Coef. ≈ 0.1 at ~17 m/s, which looks too low (the curve is nearer 0.2 there). Most quotes are bare axis labels and do not support the numeric values claimed — a systemic weakness of chart extraction in both sets. Both sets also omit the rated/region-boundary wind speed (~10.5 m/s) that conditions most of these plateaus."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets capture the same core facts — design point CP = 0.489 and CT = 0.804, the Region 3 plateaus (gen. torque 20 MN-m, generator power 15 MW, rotor speed ~7 RPM), TSR 20→3 and blade pitch 0→22° — and both contain the same internally contradictory rotor-thrust reading at 10 m/s (2.25 MN alongside 2.7 MN in A, 2.8 MN in B). Set A is the cleaner extraction: it repeats far fewer facts (two duplicate pairs versus four in B, where TSR = 20 at 3 m/s, design-point CP = 0.489, blade pitch 0° over 7–10 m/s and generator torque 20 MN-m each appear twice) and gives the Region 2 ranges for CP ≈ 0.5 and CT ≈ 0.8 instead of only single points. Set B's only real advantage is a slightly better endpoint reading of rotor thrust at 25 m/s (1.0 MN vs A's 0.9 MN).",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "remarks": "Page is a three-panel curve figure with no data labels, so every numeric claim is a chart reading and every quote is only an axis label/legend entry; neither set's quotes can actually substantiate the plotted values. Both sets assert two different rotor-thrust values at 10 m/s (2.25 vs 2.7/2.8 MN) — the curve peaks near 2.8 MN at the rated point just right of 10 m/s, so 2.25 MN is the low/wrong one in both. Minor shared approximations not counted as wrong: rotor thrust at 25 m/s reads ~1.0 MN (A says 0.9) and power coefficient at ~17 m/s reads ~0.2 (both say 0.1). Both sets also miss the caption's attribution of the performance to the ROSCO controller, and both use the generic attribute name \"value\" for several claims."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p10-visual": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets cover all 15 rows of Table 7-1 plus the rated rotor speed and rated mechanical power, and both bind values to the correct rows and properties. Both contain the same two misread values (-82.60E+6 for the 18.0 m/s row instead of -83.94E+6, and -113.40E+6 for the 23.0 m/s row instead of -114.30E+6) and both repeat six rows as duplicate claims. The only differences are cosmetic (entity/attribute wording for the rated power and rated speed claims), so the sets are effectively equivalent in correctness.",
+        "baseline_problems": [
+          "duplicates",
+          "misread"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread"
+        ],
+        "remarks": "Both extractions contain the identical fabricated values -82.60E+6 (18.0 m/s row) and -113.40E+6 (23.0 m/s row), which do not appear anywhere on the page; this suggests a shared upstream OCR/table-parsing defect rather than independent errors. Both also emit each of six table rows twice (11.4, 12.0, 17.0, 21.0, 22.0, 24.0 m/s), indicating a deduplication failure in the pipeline. Neither set captures the qualitative findings (sensitivity varies considerably over Region 3 so constant PI gains are inadequate; sensitivity varies nearly linearly with pitch angle) or the frozen-wake linearization assumption."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets cover all 15 rows of Table 7-1 plus the rated rotor speed and rated mechanical power, with identical bindings, units and conditions. Both also contain the same two misread values (-82.60E+6 for the 18.0 m/s row and -113.40E+6 for the 23.0 m/s row) stated alongside the correct values, and both repeat six rows as duplicates. The only differences are cosmetic wording of the entity/attribute labels (e.g. 'rotor | rated mechanical power' vs 'mechanical power | rated power'), so the sets are equally good.",
+        "baseline_problems": [
+          "duplicates",
+          "misread"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread"
+        ],
+        "remarks": "Both extractions appear to come from the same upstream pipeline: each emits the correct and an incorrect variant of the 18.0 m/s (-83.94E+6 vs -82.60E+6) and 23.0 m/s (-114.30E+6 vs -113.40E+6) rows, and each duplicates six rows (11.4, 12.0, 17.0, 21.0, 22.0, 24.0 m/s). The table is fully legible in the image; the text layer garbles the equations (7-16a/7-16b), but neither set extracted them. Neither set captures the qualitative finding that pitch sensitivity varies nearly linearly with blade-pitch angle (Eq. 7-16) or the frozen-wake linearization assumption."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p5-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Both sets cover the same core facts (filter type, corner frequency 0.25 Hz at the -3 dB point, 0.0125 s time step, and Bode-plot readings at 0.01/0.10/1.00 Hz), and both contain the same conflicting pairs at 1.00 Hz (phase -75 vs -80 deg, magnitude -12 vs -12.5 dB) where the quoted numbers contradict the stated values. Set A adds a third, invented phase reading of -72 deg at 1.00 Hz and leans on the figure caption as the quote for four plot-derived values, so its quotes support the claims even less. Set B is otherwise identical but has one fewer wrong claim and better-matched quotes for the plot readings, making it the cleaner set.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misread",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "Both extractions read values off the Bode plot curves, which are only approximately legible; the -80 deg and -12.5 dB claims contradict the axis labels quoted alongside them (-75 and -12), and both sets state the 1.00 Hz phase and magnitude twice with conflicting values. The figure caption is used as the quote for several plot-derived claims in both sets, which does not actually support the numeric values. Neither set captures the state-space matrix definitions (A_d = alpha, B_d = 1-alpha, C_d = alpha, D_d = 1-alpha) present on the page."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Both sets cover the same core facts (filter type, corner frequency 0.25 Hz at the -3 dB point, 0.0125 s time step) and both read the Bode plot at the same three frequencies, but each repeats several facts and states two or three conflicting values for the same point. Set A is slightly cleaner: it gives phase at 1.00 Hz as -75 and -80 deg, while Set B adds a third, -72 deg, whose own quote says -75. Both also state magnitude at 1.00 Hz as both -12 and -12.5 dB, and both use the figure caption as the quote for specific plotted values, which does not support them.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "Both sets leave out the discrete-time state-space matrix definitions (A_d = alpha, B_d = 1-alpha, C_d = alpha, D_d = 1-alpha) and the relation of the corner frequency to the blade's first edgewise natural frequency as a stated condition. Chart-derived values at 0.10 and 1.00 Hz are approximate readings from the plot and the text layer gives only axis tick labels, so exact values cannot be verified; the -80, -72 and -12.5 dB claims are contradicted by their own quotes (which say -75 and -12). Repeated claims (phase 0 deg at 0.01 Hz and magnitude 0 dB at 0.01 Hz appear twice in each set) suggest the extractor emits both a caption-quoted and a chart-quoted variant of the same fact."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "The two sets are nearly identical in content, values, units and quotes; both correctly capture the drivetrain properties from the prose and Table 5-1, including the 5% critical damping ratio with its free-free-mode condition and the no-frictional-losses gearbox assumption. The only substantive difference is that Set A states the fully-deployed high-speed shaft brake torque three times (including a third variant 'High-Speed Shaft Brake | Torque | ... | conditions: Fully-Deployed'), whereas Set B states it twice. Both sets duplicate every table fact once under a component name and once under the turbine name, and both omit the DOWEC-derived supporting figures (0.35 MW loss at 6.25 MW aerodynamic power; 5,025,500 kg•m² equivalent low-speed-shaft inertia). Set B is marginally better for less duplication, with no loss of correct content.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "remarks": "Both sets repeat each Table 5-1 row twice (component-level and 'NREL 5-MW baseline wind turbine'-level claims), a systematic duplication pattern worth suppressing in the extractor. Both also leave out the DOWEC comparison figures (0.35 MW loss at ~6.25 MW aerodynamic power; 5,025,500 kg•m² equivalent low-speed-shaft generator inertia) that justify the 94.4% efficiency and 534.116 kg•m² inertia. Note the prose calls the 0.6 s value a 'time lag' while Table 5-1 labels it 'Time Constant'; both sets follow the table label, which is acceptable but the two names are not reconciled."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "The two sets are essentially identical: both cover the same nine drivetrain properties with correct values, units, and quotes, and both keep the free-free-mode damping condition and the FAST/ADAMS no-friction-loss condition. The only difference is how the fully-deployed brake torque is phrased (A as attribute 'fully-deployed torque', B as attribute 'Torque' with condition 'Fully-Deployed'), which is a wash. Both sets state every fact twice (once bound to the component, once to the NREL 5-MW turbine), so both suffer equally from duplication. Neither captures the DOWEC comparison figures (0.35 MW loss at 6.25 MW aerodynamic power, 5,025,500 kg•m² low-speed-shaft inertia) or the driveshaft natural-frequency statement.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both extractions appear to be the same pipeline output with one claim rephrased; each of the nine table rows is emitted twice (component-level and turbine-level), inflating claim counts without adding information. Facts both sets omit: the DOWEC-derived 0.35 MW loss at ~6.25 MW aerodynamic power, the DOWEC equivalent low-speed-shaft generator inertia of 5,025,500 kg•m², and the statement that the driveshaft natural frequency matches the RECOFF model (no numeric value given on the page)."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p1-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 8,
+        "note": "Set B binds values to the correct elevations more often and captures the drawing scales for South Bedroom, North Bedroom and North Living plus the West Living MWL01 and 3'-9 11/16\" segments with fewer invented bindings. Set A repeatedly attaches overall elevation heights to panel/label entities (W1 width 9'-11 1/4\", \"height P1\" 9'-10 1/4\", MWL01 width 3'-9 11/16\", D1 width 3'-6\"), puts 7'-6\" on North Bedroom when that dimension sits in the West Bedroom (A3) block, and claims WB in the East Bedroom elevation where no WB appears. Set B's main faults are duplication (3'-9 11/16\", the 1/2\"=1'-0\" scale and 9'-11 1/2\" each stated twice), the misbound 1'-5 3/4\" to North Living (it is in North Bedroom C5) and an unsupported P3 height of 7'-2 1/2\". Both sets leave many dimensions under vague entities such as \"interior elevation\", \"component\" or \"wall section\" and omit a number of dimensions present on the sheet.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "misread",
+          "missing",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "missing",
+          "vague"
+        ],
+        "remarks": "The text layer runs in drawing order C1 North Living, C3 West Living, C5 North Bedroom, A1 South Bedroom, A3 West Bedroom, A5 East Bedroom; several of A's errors come from reading a dimension out of its block (7'-6\" and 3'-6\" belong to A3/A1 respectively, not to North Bedroom or D1). Both sets use bare dimension strings as quotes, so quotes give little evidence of which dimension line a value came from. Facts both sets miss include 13'-3 3/4\", 2'-9 1/8\", 9'-2 3/4\", 3'-6 1/4\", 7\", 4 1/2\", 9'-1 7/8\", 8'-8 3/8\", 9'-10\", the F1/F2 and TV labels, D3 and P4; the artwork note explicitly defers size to the artwork package, so A's \"artwork height 4'-3\"\" is unsupported."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p8-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Set B captures more useful engineering content — bolt diameter and length broken out, hex head type, adjustable footing type, CLEARVUE railing type, and the 2\"X8\" joist/frame correctly bound to the RAILING ATTACHMENT (C1) detail — while Set A repeats the joist/frame, grade-level and nail-spacing facts several times and includes tautological 'component = its own name' claims. Set A also misbinds the 8'-0\" dimension to a generic 'deck connection' when it is the TYP. DECK MODULE (A1) dimension, which B states correctly. Both sets attach the 1'-4 3/4\" spacing to the wrong context (A vaguely as 'deck connection', B explicitly as 'Detail C1' although that dimension string sits in detail A1) and both omit the A5 deck-to-house build-up. B's few errors are milder than A's duplication and trivial claims, so B is the better set.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "missing",
+          "quote",
+          "trivial"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "missing",
+          "vague"
+        ],
+        "remarks": "Both extractions ignore the A5 deck-to-house connection build-up shown in the right-hand section: 3\" STEEL DECKING, W10 X 15, 4-1/2\" STRUCTURAL INSULATED PANEL W/ VAPOR BARRIER, CONTINUOUS WATERPROOFING MEMBRANE, 3\" WOOD LAG SCREW WITH WASHER, and the 3/8\" x 4\" HEX BOLT there; the 4'-0\" module dimension is also missed by both. The dimension string 1'-4 3/4\" / 1'-4\" / 1'-3 1/4\" belongs to detail A1 (TYP. DECK MODULE), not C1, so B's 'Detail C1' condition is a misattribution and A's 'center to center' condition is unverified. Set A shows a clear pattern of restating the same fact under two names (joist/frame dimension x3, grade level x2, nail spacing x2, railing post bracket x2) plus tautological component claims."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Set A captures more distinct, correctly bound engineering facts — bolt length (4\"), bolt diameter (3/8\"), hex head type, CLEARVUE cable railing type, adjustable scaffold footing type, and the 8'-0\" deck module dimension — that Set B omits or reduces to trivial 'presence' claims. Set B does pick up one fact A misses (7/16\" plate holes @ 12\" O.C.), but it repeats the joist, frame, grade level, railing-post-bracket and nail-spacing facts two or three times each and adds self-referential 'component = itself' claims. Both sets bind the 1'-4 3/4\" and 8'-0\" plan dimensions to a vague 'deck connection' entity; A additionally mis-attributes the 1'-4 3/4\" dimension to Detail C1 (it is in A1, Typ. Deck Module), while B mis-states 8'-0\" as deck-connection spacing. On balance A is the more faithful and more useful set.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "missing",
+          "quote",
+          "trivial"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "trivial",
+          "vague"
+        ],
+        "remarks": "Both sets ignore the whole A5 deck-to-house connection build-up shown in the text layer: 3/4\" exterior plywood, 3\" steel decking, W10 X 15, 4-1/2\" structural insulated panel w/ vapor barrier, continuous waterproofing membrane, and 3\" wood lag screw with washer — a significant shared omission. Set A also drops the 7/16\" holes @ 12\" O.C. spacing that B captures. The 1'-4 3/4\" / 1'-4\" / 1'-3 1/4\" and 4'-0\" / 8'-0\" strings are plan dimensions of the typical deck module in detail A1, not 'deck connection' spacings; both extractors appear to bind bare dimension strings to whatever detail label is nearest. Text layer and image are legible; no administration content was used in judging."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p4-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Set A captures more of the page's real engineering content — the glass tile identity (FIRECLAY CRUSH \"DANDELION\", 2\"x6\"), the edge strip, the backsplash adhesive, and the D3 and D5 scales — while Set B drops all of these and instead pads with revision-history rows (admin, neutral) plus several invented conditions. Set B also misbinds the PT1 paint/finish code as a \"PT1 substrate\" and attaches an unsupported \"Laundry Millwork Detail D5\" condition to the 3/8\" wall tile. Set A's main faults are one misread (treating the grid line \"E\" as a slope direction), a duplicated slope and duplicated wall-tile/PT1 facts, and vague entities (\"drawing\", \"surface\"). Both sets miss the 1/2\" gypsum wallboard, 3/4\" MDF gable w/ P3, steel L-bracket attachment and blocking.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "missing",
+          "quote",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing",
+          "quote",
+          "trivial"
+        ],
+        "remarks": "The text layer flattens the D3 and D5 callouts into one run, so the single \"3/8\\\" PORCELAIN WALL TILE\" and \"EDGE STRIP\" strings each serve two details; attributions to a specific detail cannot be verified from the text layer alone (the image does show the wall tile in both D3 and D5). \"PT1\" is a finish/paint code, not a substrate or a named surface; both sets handle it poorly (A vaguely as \"surface\", B misbound as \"PT1 substrate\"). Facts neither set picks up: 1/2\" GYPSUM WALLBOARD, 3/4\" MDF GABLE FIN. W/ P3, STEEL L-BRACKET ATTACHMENT, BLOCKING AS REQ'D, and the \"IN BRICK LAYOUT\" tile layout."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Set A binds the shower-pan buildup, substrate slope, glass tile dimensions and porcelain tile thickness correctly and with only one clear error (the 3/8\" porcelain wall tile is attributed to Laundry Millwork Detail D5, when it belongs to the backsplash detail D3). Set B captures the D3 and D5 scales and the edge strip that A omits, but it introduces more defects: it reads the grid line 'E' as a slope direction, gives an unsupported generic 'drawing | scale' on a sheet that carries two different scales, and adds vague PT1 'finish paint'/'surface finish' claims. Both sets duplicate facts (slope, tile thickness, copyright/lot) and both omit the 1/2\" gypsum wallboard, 3/4\" MDF gable and steel L-bracket. On balance A is the cleaner, better-bound set despite B's slightly wider coverage.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "misread",
+          "missing",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "missing",
+          "trivial"
+        ],
+        "remarks": "Both extractions leave out several labelled assembly items visible in the details: 1/2\" GYPSUM WALLBOARD, 3/4\" MDF GABLE FIN. W/ P3, STEEL L-BRACKET ATTACHMENT and BLOCKING AS REQ'D. The text layer drops the grid/zone letters context, which likely caused B's 'direction E' error; PT1 is a finish/paint key mark, so claims naming a specific attribute ('finish paint', 'surface finish') are speculative. Set A also repeats the same slope fact under two entity names and the lot number/copyright under both 'document' and 'sheet'/'project'."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p3-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Both sets extract the same layup materials and the CG/GC/NA/SC marker data from Figure 2-6, but B captures more of the marker coordinates (NA x2 and SC x2 in addition to the x3 values) while A states the NA, CG and GC x3 coordinates twice with contradictory values (0.05/0.1 m versus 0.0 m). B's only clear error is an internally conflicting CG x2 value (-0.15 m and -0.2 m, the latter apparently the GC value misbound), whereas A has three contradicted coordinate readings plus a 70%-span claim whose quote is only the figure title. Both sets duplicate every material under both \"material\" and \"material layer\" and both omit the Figure 2-5 lofted blade shape.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "missing"
+        ],
+        "remarks": "Marker coordinates are only legible to roughly ±0.05 m from the plot, so exact values could not be fully verified; the non-zero x3 readings (NA 0.05, CG 0.1, GC 0.05) are consistent with the markers sitting slightly above the x3 = 0 line and are corroborated across both sets, so A's 0.0 m restatements were treated as the misreads. The condition strings \"Section : 0.7\" and \"cross section at 70% span\" denote the same section and were judged as one fact, which is why each set's material/coordinate repetitions count as duplicates. Both sets miss Figure 2-5 (lofted blade shape) and neither records the x2/x3 axis units beyond the values themselves."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 1,
+        "note": "Set A captures the full set of reference-point coordinates, including SC x2 = 0.1 m and NA x2 = -0.1 m, which Set B omits entirely, and its x3 values are internally consistent. Set B states the x3 coordinates of NA, CG and GC as 0.0 m while elsewhere giving 0.05/0.1 m for the same points, so three of its claims contradict its own others, and one cross-section claim carries the figure title as its quote instead of the caption. Set A's only substantive error is a conflicting CG x2 value (-0.2 m vs -0.15 m, the latter agreeing with Set B). Both sets repeat every layup material as both 'material' and 'material layer'.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread"
+        ],
+        "remarks": "Marker coordinates in Figure 2-6 are only readable to roughly ±0.05 m at this resolution, so the exact x2/x3 values of CG/GC/NA/SC cannot be verified beyond the mutual agreement of the two sets (CG x2 ≈ -0.15, GC x2 ≈ -0.2, SC x3 = 0.0). Both extractions duplicate each material under two attribute names ('material' and 'material layer') and repeat the 70% span cross-section fact; neither reports anything from Figure 2-5 (lofted blade shape), which is only a caption and of little engineering value."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p12-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 6,
+        "note": "Both sets capture the text-stated gains (KP(θ=0°)=0.01882681 s, KI(θ=0°)=0.008068634, KD=0.0 s²) and the damping ratio ζφ = 0.7, and both read Figure 7-4 in essentially the same way. Set B repeats the erroneous 0.020 s proportional-gain-at-0° claim twice and gives 0.005 s at 25° where A gives 0.004 s, so B carries one extra wrong/duplicate claim; otherwise the two sets are near-identical. Both invent values at 25° even though the plotted curves end near 23°, both restate the θ=0 gains with off plot-read values (0.020 s, 0.007), and both duplicate the θ=0 facts under several names. Neither includes the gain-correction law GK(θ)=1/(1+θ/θK) or the previous-time-step implementation detail.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "remarks": "Figure 7-4's x-axis only spans roughly 0-23°, so every claim conditioned on 25° (three in each set) is unsupported; both sets treat the plot as if it extended to 25°. Both sets also re-derive the θ=0 gains from the curve (0.020 s, 0.007, 0.008, 0.0081) even though the text gives them exactly, producing conflicting duplicates. Quotes in both sets are mostly axis/legend labels that do not support the numeric values, and Set B additionally embeds values (e.g. \"... 0.002 ...\") that appear nowhere in the source text. Facts both sets miss: Eq. (7-20) GK(θ)=1/(1+θ/θK), the use of the previous time step's blade-pitch angle to compute GK for the next step, and the stated limitation that the simple gain-scheduling law cannot keep ωφn and ζφ constant."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p8-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Both sets capture the four-column LIGHTING LEVELS table and the Title 24 switch/vacancy-sensor requirements, and both repeat roughly the same facts with and without conditions. Set A's values all match the page, whereas Set B introduces two clear misreads: General Use/Movement stated as 5 FC (page says 3 FC) and the CFL equivalent stated as 5W (text layer says 9W). Set A does omit the 40W incandescent = 9W CFL = 7W LED efficacy example that Set B partially captures, but Set B only gets the LED half of it right. On balance Set A is the more faithful set because it contains no wrong values.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "Both sets duplicate nearly every table fact (with and without the activity condition) and use inconsistent attribute names ('lighting source' vs 'power source') for the same lamp-count row. Both quote the table header with typos ('CONRAST'/'CONSTRAC[T]'), which appear to be OCR/quote-layer artifacts rather than extraction errors. Both sets miss the statements that low-efficacy luminaires may be paired with vacancy sensors and dimmer switches, that dimmers vary energy consumption, and that the LED has higher efficacy because it emits more light per watt."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets cover the four-column lighting-levels table and the Title 24 switch/vacancy-sensor requirements, and both repeat every table fact twice (with and without its activity condition). Set A additionally captures the bulb-equivalence facts from the prose, getting the 7W LED equivalence right, while Set B omits both equivalences entirely. However, Set A misreads the CFL equivalence as 5W where the page says 9W, and Set B garbles the 'HIGH CONSTRACT' label as 'CONRAST' in one quote. On balance A captures more of the page's engineering content with one value error, while B drops two important facts.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread"
+        ],
+        "remarks": "Text layer omits the graphic's LIGHTING LEVELS table entirely; all table claims were verified against the page image. The graphic itself contains the typo 'HIGH CONSTRACT' (for CONTRAST), which Set A reproduces faithfully and Set B mangles further as 'CONRAST'. Both sets miss: the definition of efficacy (light output vs. electric input), the statement that the LED bulb has higher efficacy because it puts out more light per watt, that low-efficacy luminaires may be paired with vacancy sensors and dimmer switches, and that dimmer switches allow gradual adjustment of light output/energy consumption. Both sets also state each table fact twice (once bare, once with the activity condition), inflating the claim counts."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p2-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 4,
+        "note": "Both sets cover the same five spanwise curves and share the same duplicated/conflicting pairs (prebend 0 m at r/R=0 twice, pitch-axis 50% at r/R=0 twice, twist 15.5/15 deg at the root, thickness 22/20% at the tip, chord 5.1/5 m at the root). Set A adds a clearly misread point (relative thickness 40% at r/R=0.25, where the curve is about 35%) and a misread twist of 0 deg at r/R=0.6 (curve is still slightly positive there), and its pitch-axis value at r/R=0.6 (30%) is less accurate than Set B's 29%. Set B also gives the closer chord peak (5.8 m near r/R≈0.25 versus A's 5.7 m), so B is the more faithful set overall, though only slightly. Both sets quote subplot captions or bare axis labels that do not support the numeric claims.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "The text layer contains only axis ticks, labels and captions, so every numeric claim comes from reading the plotted curves; small reading differences (e.g. 5.7 vs 5.8 m, 37 vs 38%) are within plot resolution and were not all counted as wrong. Facts both sets miss: relative thickness is about 100% at the root (r/R=0), and the chord maximum is about 5.85 m near r/R≈0.22. Both sets repeat the same facts under near-identical wording (chord/chord length, -2.0/-2 deg, 15.5/15 deg), and several quotes are only subplot labels such as '(a) Chord length' or '(d) Prebend', which cannot support a specific value at a specific span."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Both sets read the same five spanwise curves and share most claims, including the same near-duplicate pairs (prebend 0 m at r/R=0, pitch axis 50% at r/R=0, twist 15/15.5 deg at root, chord 5/5.1 m at root, twist -2 deg at r/R≈0.85) and the same self-contradiction of relative thickness 20% and 22% at r/R=1.0 (the curve sits at ~22%, so the 20% claim is wrong in both). A reads the chord peak as 5.8 m at r/R≈0.25 and the pitch-axis location at r/R=0.6 as 29%, both closer to the plotted curves than B's 5.7 m and 30%. B adds an extra relative-thickness claim of 40% at r/R=0.25 that the curve does not support (it is ~35-37% there; 40% occurs near r/R=0.2), and several of its quotes are only subplot captions such as \"(c) Twist\" that support nothing. Overall A carries slightly more accurate values and one fewer unsupported reading.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "All numeric claims here come from reading plotted curves; the text layer contains only axis labels and tick values, so no quote can literally support a curve-read value — both sets' quotes are weak by construction, and B's subplot-caption quotes are the weakest. Both sets also contradict themselves (relative thickness 20% vs 22% at r/R=1.0) and repeat several facts under slightly different values (5/5.1 m, 15/15.5 deg, 5.7/5.8 m), suggesting the extractor emits multiple samples of the same curve point. Both miss the root relative thickness of 100% at r/R=0, a conspicuous feature of plot (b). Curve-read values are approximate; borderline calls (pitch axis 30% at r/R=0.5, twist 0 deg at r/R=0.6) were treated as mild misreads where the plotted value is clearly off the claimed one."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p4-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 9,
+        "note": "Set A binds the louver counts to the operable screen bay and keeps the Flexinol force/temperature facts distinct, and its chart readings carry numeric values with the nickel-content condition. Set B repeats the 400 g, 2900 g, 2500 g, 15–20 C and louver facts under a misspelled \"Flexnoll® actuator\" entity, misbinds the 64/32 louvers and the 15–20 C Irvine range to the actuator, and misbinds the 2500 g wire load to the spring. B also emits two chart claims whose \"value\" is just the label \"Ms °C\" and gives two conflicting readings at ~50 at.% Ni (50 C and 0 °C). Both sets share the same garbled \"cool force\" quote and the unsupported Ms = -100 C at 53 at.% Ni point.",
+        "baseline_problems": [
+          "conditions",
+          "quote",
+          "trivial"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "remarks": "Both sets quote \"specified wire provided a 2500 gram force during the cool force\"; the page reads \"The specified wire allowed a 2500 gram force during the cool, martensite phase\", so the condition (martensite phase) is lost and the verb misquoted in both. Both also claim Ms = -100 C at 53 at.% Ni, but the plotted data in the chart appears to end near 51.5 at.% Ni, so that point is likely invented; the chart is a scatter plot of literature data (Harrison et al., Han et al.) and single-value readings at given Ni contents are approximate at best. Set B's repeated \"Flexnoll®\" spelling is a consistent OCR/label misread of Flexinol®. Neither set captures the two mirrored independent assemblies per bay."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 9,
+        "note": "Set B carries the same core Flexinol actuator and energy-load facts as A but without A's six duplicate claims repeated under the misspelled name \"Flexnoll®\", its misbound spring-force claim, and its two chart fragments that give \"Ms °C\" as a value; B also adds the supported trend that Ms temperature decreases with increasing nickel content. A's larger count adds mostly repetitions and label fragments rather than new correct content, and it also invents a 0 °C @ 50 at% chart point. Both sets bind chart-title quotes to numeric Ms values and both garble the \"cool, martensite phase\" quote as \"during the cool force\".",
+        "baseline_problems": [
+          "conditions",
+          "missing",
+          "quote",
+          "trivial"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing",
+          "quote",
+          "trivial",
+          "vague"
+        ],
+        "remarks": "Both sets miss the fact that each bay carries two mirrored, independently acting assemblies and the role of the spring as the strain-force element running the assembly length. Chart-derived claims (50 C @ 50 at%, -100 C @ 53 at%, 100 C @ 49 at%, -100 C @ 51 at%) are read off a small scatter plot and are approximate; the -100 C @ 53 at% point looks doubtful since the lowest points sit near 51.5-52 at%, and A's 0 °C @ 50 at% point is likewise questionable. Both use the chart title as the quote for numeric values, which does not support the numbers. A consistently misspells Flexinol as \"Flexnoll\" (counted as misread labels) and repeats six facts verbatim under that name."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p5-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Set B binds values to identifiable details and members (duct opening dimensions in DUCT FRAMING DETAIL 3, PL 4 1/2X4 1/2X1/2 with FLOOR FRAMING DETAIL C1, W10X15, L4X4X5/16) and reads the revision block correctly, whereas Set A leaves most values attached to unnamed 'structural element', 'component' or bare 'dimension' entities. Set A also invents a duct framing height of 6' (no 6' appears anywhere on the page) and repeats several facts (6 7/8\", 1'-4\", 1/4\" TYP, the 1 1/2\"=1'-0\" scale) under two or three names. Set B's weaknesses are a few speculative bindings ('Detail B' for the 6\" and 6 7/8\" dimensions, 'Detail A' for the weld size) and a duplicated 6\" claim, but it is the more faithful and informative set overall.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "missing",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "missing",
+          "vague"
+        ],
+        "remarks": "The text layer is in scrambled reading order, so dimension-to-detail assignment can only be resolved from the image; several of both sets' bindings (e.g. 8\", 5 1/8\", 2\", 10\") are therefore hard to verify. Both sets treat the circled '4' as a grid line ('located at grid 4' / 'grid line 4'); in the image these circled numbers and A/B bubbles are detail and section callouts, not grid lines. Set A omits W10X15, L4X4X5/16, PL 4 1/2X4 1/2X1/2, HSS 4X4X1/4, 5 7/8\" and 1'-3\"; Set B omits the 1 1/2\" = 1'-0\" drawing scales, W8X10, PL5X3/8, 2'-4 1/2\", 5 1/8\", 8\" and 2\". The 1/4\" TYP is most plausibly a weld size, but neither set demonstrates this from the quote."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 7,
+        "variant_wrong": 4,
+        "note": "Set A binds several values to identifiable details and components correctly (PL 4 1/2X4 1/2X1/2 in Floor Framing Detail C1, W10X15 in Duct Framing Detail 3, sheet title and revision rows), and its quotes are real page text. Set B repeats the same dimensions several times (6 7/8\", 1'-4\", 8\", 1/4\" TYP, scale), leaves most entities generic (\"structural element\", \"dimension\", \"Duct Framing Detail\"), and includes a fabricated value/quote \"6'\" for duct framing height that does not appear on the page. Both sets over-interpret unnamed dimensions (e.g. \"offset to beam center\", \"side clearance to channel\" in A; \"overall height\", \"offset\", \"spacing\" in B), but B does so more often and also misreads the detail scale as a bare \"1 1/2\"\" value.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "vague"
+        ],
+        "remarks": "Both extractions attach engineering attributes (offset, clearance, internal dimension, spacing, height) to bare dimension strings whose actual witness lines cannot be verified from the text layer; at this image resolution the dimensioned feature is often ambiguous, so those claims are flagged as unsupported interpretations rather than definite misreads. Set B's \"6' ft\" claim with quote \"6'\" has no counterpart anywhere in the text layer (only 6\", 6 7/8\", and the 1 1/2' scale bar exist) and looks like an OCR/association error. Neither set captures the HSS 4 X 4 X 1/4 reference keynote or the C3X6 channel members, which are prominent on the sheet."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p3-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 5,
+        "note": "Both sets mix sound spec/finish claims with speculative bindings of bare dimension strings to named objects, but Set A is the stronger extraction: it keeps the full clearance note's second condition (1\\\" either side), correctly binds the bulkhead cladding/finish and the 3/4\\\" MDF gable, and repeats itself far less. Set B states the same 3/4\\\"=1'-0\\\" scale three times and the same 1/2\\\" MDF finish and 3'-0\\\" island height under two or three names, and it invents three DINING TABLE properties (overhang 6\\\", clearance height 3'-0\\\", thickness 5\\\") plus conditions the page never states. Set A's weaknesses are an invented condition (\\\"dimension B\\\") and a few loose bindings (MWK04 width 2 ft, DINING TABLE height, DIRTT wall width 4'-0\\\"); Set B does capture the 2\\\"x6\\\" framing size and the 12\\\" clear-above that Set A omits.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "missing",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "missing",
+          "trivial",
+          "vague"
+        ],
+        "remarks": "Text layer is a jumble of isolated dimension strings and tags with no positional binding, so several dimension-to-entity assignments (5\\\" as backsplash vs. table thickness, 4'-0\\\" as wall vs. platform width, 2'-0\\\", 8\\\", 3'-0\\\" near DW/MWK04) cannot be confirmed at this image resolution; I treated unverifiable bindings as unsupported rather than as confirmed errors where the value itself is real. Both sets miss the larger overall dimensions on the sheet (6'-7 1/2\\\", 3'-3 3/4\\\" x2, 8'-4\\\" in A only via B, 2'-2 3/16\\\", 2'-5 1/16\\\", 7'-0 1/8\\\", 6 1/2\\\") and the 2\\\"x6\\\" FRAMING / 1/2\\\" MDF bulkhead build-up is split inconsistently between them. Recurring pattern: extractions turn bare dimension strings into confident object attributes and then fabricate conditions to make them read plausibly."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets capture the bulkhead build-up (GYP cladding, P3 finish), the 6\" platform, the 3/4\" MDF gable and the 1/2\" MDF P3 finish, and both scatter the same 3'-0\" dimension across several components. A adds the 2\" x 6\" framing and 8\" base that B omits, but it repeats the 3/4\" = 1'-0\" scale four times, truncates an entity to \"CENTER MO\", and binds 3'-0\"/6\"/5\" to the dining table and to DW with invented conditions. B is cleaner overall, keeps the 1\" side clearance and the MWK04 2'-0\" width, but invents \"dimension B\", misbinds 4'-0\" to the DIRTT wall, and includes a trivial \"GT\" claim whose quote supports nothing.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "missing",
+          "quote",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "missing",
+          "vague"
+        ],
+        "remarks": "The text layer is a jumbled, unordered dump of the dimension strings, so several dimension-to-object bindings (the 3'-0\", 5\", 6\" and 4'-0\" values) cannot be verified from the text alone and were judged only as far as the image supports them; both extractions guess at these. Both sets miss the laundry-section dimensions (2'-5 1/16\", 6 1/2\", 7'-0 1/8\") and the island dimensions (6'-7 1/2\", 3'-3 3/4\", 2'-2 3/16\"), and neither keeps the full clearance note (A takes the 12\" above, B takes the 1\" either side). Repeated scale claims (3/4\" = 1'-0\") and the same 3'-0\" value restated under several component names are the main noise pattern in both sets."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A covers both section scales (West/C1 and East/A1), both datum elevations, and the full revision record with correctly bound dates and descriptions, and it keeps the section conditions on the finished-floor claims. Set B invents a \"Section B\" condition for the finished floor (B is a grid/section marker, not a section containing that datum) and garbles the East Module scale value as \"3/8\\\" 1'-0\\\"\". Both sets repeat the same grade-level, finished-floor and West-Module-scale facts several times under slightly different names, but A's coverage of the page's engineering content is broader and free of misbound or misread values.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing"
+        ],
+        "remarks": "Both extractions state the same datum facts three times (Grade Level 0'-0\" and Finished Floor 2'-9 1/2\") and repeat the West Module / C1 scale under two names; C1 IS the West Module section and A1 the East Module section, so these should be collapsed. Set A's \"Project | name | U.S. DEPARTMENT OF ENERGY SOLAR DECATHLON 2013\" concatenates the client block and the event logo text; it is administration and neutral here, but the binding is loose. Set B omits the revision table entirely (administration, so neutral) but also omits the East/West datum pairing beyond what it duplicates. The text layer drops the '=' and some spacing in scale strings, which likely caused B's misread value."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Both sets capture the core elevations (Finished Floor 2' - 9 1/2\" above Grade Level 0' - 0\") and the 3/8\" = 1'-0\" scales for the West (C1) and East (A1) module sections, and both repeat those same facts several times. Set B additionally extracts the full revision table (marks 1-5 with dates and descriptions) and the project/lot data, all of which match the title block, whereas Set A adds a claim conditioned on \"Section B\", which is only a grid-line letter on the page and not a section. Set B therefore has more correct, faithful claims and no misbound values, while Set A's only extra non-administrative content is that unsupported condition; Set B's weakness is slightly heavier duplication of the scale and elevation facts.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound"
+        ],
+        "remarks": "Both extractions restate the same two elevations and the section scales three or more times under slightly different entity/attribute spellings (e.g. 'elevation' vs 'height above grade level', 'scale' vs 'drawing scale'), a deduplication problem in the pipeline. The text layer is heavily out of reading order (grid letters, dimension strings and title-block fields interleaved), which likely caused Set A's 'Section B' condition. Neither set notes that the GENERAL SHEET NOTES and SHEET KEYNOTES boxes appear empty on the page, and neither captures the A1 (East Module) scale as its own named claim beyond the shared 3/8\" = 1'-0\" value."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p8-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set B captures all three overarching concerns, including the ATD cost-granularity limitation that Set A omits entirely. Set A's thermal-control claim also drops 'instruments and' from the source, narrowing the claim to requirements alone. Both sets' remaining claims are faithful to the page text, though B's attribute labels ('granularity', 'implementation difficulty') are interpretive rather than literal.",
+        "baseline_problems": [
+          "misbound",
+          "missing"
+        ],
+        "variant_problems": [
+          "vague"
+        ],
+        "remarks": "The page is a qualitative assessment slide with no numeric engineering values; all claims are judgment statements. Set B's attribute names are inferred paraphrases rather than terms used on the page, but the values and quotes remain faithful. Both sets correctly avoid the administrative footer (page number, release marking)."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A captures all three concerns on the page with faithful quotes and correct bindings, including the ATD cost-granularity point that Set B omits entirely. Set B's entities are vague section-title labels ('HabEx (2)') rather than the actual subjects (the HABEX mission, the instruments and thermal-control requirements), and its thermal-control claim drops the instruments half of the statement. Set A's attribute names are reasonable paraphrases and its quotes support each claim.",
+        "baseline_problems": [
+          "misbound",
+          "missing",
+          "vague"
+        ],
+        "variant_problems": [],
+        "remarks": "Both sets are qualitative assessment statements rather than numeric engineering claims; Set A is nonetheless the more faithful rendering. Set B's omission of the ATD cost breakout concern is the most significant gap."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p7-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A binds values to the specific components (solar thermal collector, control system) and includes two additional supported facts: the collector's function of producing hot water and the passive design strategy of the thermal envelope. Set B's claims are all supported but are loosely bound to HARVEST HOME as the entity rather than to the collector or control system, making them vaguer, and it omits the hot-water function and passive design facts. Neither set invents values or misreads the text, so A wins on precision and coverage rather than on B being wrong.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "missing",
+          "vague"
+        ],
+        "remarks": "Both sets omit the 2010 California residential lighting statistic (about 22% of household electrical use) and the daylight harvesting / two lighting system categories (overhead and task lighting) described in section 4.2. Set B consistently names HARVEST HOME as the entity while pushing the real component into the attribute string, a pattern that weakens claim binding."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are accurate and well-quoted, but Set B captures two additional supported facts — the flat-plate solar thermal collector's primary function of producing hot water and the passive design strategies used for the thermal envelope — that Set A omits. Set B also binds the supplemental electric-coil heat to the solar thermal collector (the component the sentence actually describes), whereas Set A loosely attributes it to HARVEST HOME as a whole. Neither set invents values or misreads the text, so the difference is coverage and binding precision.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "Both sets miss the quantified fact that residential lighting consumed about 22% of a household's electrical use in California as of 2010 (with its citation), and both omit the Daylight Harvesting description and the two lighting system categories (main overhead vs. task lighting) in section 4.2. Set A's 'hot water supplemental heat source' claim is bound to HARVEST HOME rather than the solar thermal collector/hot water system — loose but not clearly wrong. The referenced diagram of desired light levels and equivalent incandescent bulb power is not present in the page image, so no claims can be drawn from it."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p12-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Both sets cover essentially the same facts and share the same errors: a 0.18 Hz tower natural frequency that contradicts the stated 0.170 Hz, the 0.170 Hz first-mode claim stated twice, the ocean-wave range stated twice, and legend labels used as quotes. Set A additionally fabricates quote text ('[vertical line at ~0.17]') that does not appear on the page, while Set B attributes the 0.17 Hz reading to Figure 4-1 and adds the WISDEM/OpenFAST design condition to the material claim. Set B is therefore marginally more faithful, though the two are close.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misread",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "Both sets repeat the same facts under two names (tower-monopile first mode 0.170 Hz vs 'Tower, 1st Nat. Freq.' 0.17 Hz; ocean wave range twice) and both assert a 0.18 Hz tower natural frequency that the text contradicts (0.170 Hz). The 1P (0.09-0.13 Hz) and 3P (0.25-0.38 Hz) ranges and the JONSWAP peak (~0.11 Hz) are figure readings not stated in the text; they look plausible but are approximate. Both sets miss the 7% outfitting mass allowance, the 100 t transition piece mass, and the note that a floating substructure requires a stiffer tower. The table's Poisson's ratio row lists units 'Pa', a source-document error neither set propagated."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "The two sets are nearly identical in content and share the same defects: a misread 0.18 Hz tower frequency that conflicts with the stated 0.170 Hz, an invented 'steady-state' condition, duplicated claims (first tower-monopile mode and the 0.10–0.13 Hz wave range), and 1P/3P ranges whose quotes are only legend labels. A is marginally more faithful: it keeps the 'designed in WISDEM and OpenFAST' condition on the material claim and gives a clean verbatim quote for the 0.17 Hz figure reading, whereas B appends a fabricated bracketed annotation ('[vertical line at ~0.17]') to its quote. Otherwise the correct material, geometry and frequency claims are the same in both.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misread",
+          "quote",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misread",
+          "quote",
+          "trivial"
+        ],
+        "remarks": "Both sets miss notable page facts: the 7% outfitting mass allowance and 100 t transition piece mass, the note that a floating/semisubmersible substructure requires a stiffer tower and shifted frequency requirements, and the soil modeled as spring constants representative of dense sand/gravel. Both state the first tower-monopile mode twice (0.170 Hz) and also give 0.18 Hz for the same quantity from the figure — internally inconsistent; the text value is 0.170 Hz. The 1P (0.09–0.13 Hz) and 3P (0.25–0.38 Hz) ranges and the wave-peak/Wind-PSD values are chart readings not stated in the text, and their quotes are legend labels only. Table 4-1 lists the unit of Poisson's ratio as 'Pa', a typo in the source; neither set propagated it."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p3-visual": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the same four tower properties from Table 6-2 with correct values, units, and conditions, and both keep the isolated-tower (no rotor-nacelle mass) condition for the damping ratio. Each set redundantly restates three of the four facts: A duplicates height (as 'height above ground' and 'overall height'), CM location, and mass; B duplicates CM location, mass, and the damping ratio (table row plus prose sentence). Neither set misreads or invents anything, and neither omits an important fact, so their overall quality is essentially equal.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both extractions emit near-identical duplicate pairs (CM location and integrated mass appear twice in each set); A additionally splits the 87.6 m height into two attribute names, B splits the damping ratio across table and prose. Deduplication would improve both. The prose note that 87.6 m follows from the overall tower height and the DOWEC/Ref. [14] provenance of the damping value are not extracted by either set, but these are minor."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the four Table 6-2 tower properties with correct values, units and conditions, and both repeat three facts (CM location, integrated mass, and one more) as duplicates. Set A's extra claim restates the damping ratio from the prose with the fuller condition (1% critical, isolated tower without rotor-nacelle assembly mass), which is a genuinely supported and informative claim. Set B's extra claim is only a re-naming of the height fact ('overall height' vs 'height above ground'), adding nothing. Otherwise the sets are equivalent, so the edge to A is small.",
+        "baseline_problems": [
+          "duplicates",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both extractions emit each table row plus a near-identical restatement (CM location and integrated mass appear twice in both; A repeats damping, B repeats height) — a de-duplication pass keyed on (entity, property, value) would help. The prose also states the damping value as '1% critical' and ties it to the DOWEC study (Ref. [14], p. 21); only A's second damping claim picks up the 'critical' qualifier. The page's first sentence fragment ('tower centerline above the ground...') is a continuation from the previous page and is not independently extractable here."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p5-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Both sets extract only the ~100 issues/concerns fact from the first bullet and ignore the other three bullets. Set A restates that fact twice more but misbinds the value: it attributes 100 findings to the Draft Final Reports and 100 as a quantity of mission concepts (there are four mission concepts), with fragmentary quotes. Set B keeps the value bound to LCIT review issues/concerns with a supporting quote, but states the same fact three times. Set B is therefore more faithful, though highly redundant.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "remarks": "Both sets miss the page's other facts: findings provided to STDTs before public release, STDT modifications after LCIT and Red Team reviews, STDT feedback/summary of changes per finding, and the significant reduction of remaining issues after re-review. Set A's second and third claims look like degenerate re-extractions of the same sentence with the value attached to the wrong entity."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A's three claims all correctly bind the ~100 issues/concerns to the initial LCIT reviews across the four mission concepts, with a supporting quote, though they are three restatements of the same fact. Set B's first claim is fine, but its second claim misattributes the 100 findings to the Draft Final Reports themselves and its third claim misbinds 100 to the mission concepts (there are four mission concepts, not 100), both with truncated, misleading quotes. Set B therefore contains two misbound/unsupported claims, while Set A's only flaw is redundancy.",
+        "baseline_problems": [
+          "misbound",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets extract only the first bullet's numeric fact and omit the page's other process facts (STDTs made significant modifications before public release; STDTs provided per-finding feedback and change references; the final set of remaining issues was significantly reduced). Set A's three claims are near-identical restatements of one fact, suggesting a deduplication failure."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p4-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A contains no claims at all, so it captures none of the title-block or revision-history content on the page. Set B's twelve claims all match the text layer and image: the four revision rows (mark, date, description) are correctly bound and quoted, and the drawn-by, checked-by, lot-number and copyright fields are read accurately. Since Set A is empty, Set B is unambiguously better despite its claims being largely administrative.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [],
+        "remarks": "Set A is empty, so the comparison is degenerate. The page is a title block with a framing/structure isometric drawing; the drawing itself carries no dimension or member-size text in the text layer, so there is little engineering content to extract beyond the revision table and title-block fields. Both sets omit the sheet title 'FRAMING ISOMETRICS' and sheet number 'S-901', which are administrative and therefore neutral."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A extracts the revision table and title-block fields accurately, with values correctly bound to each revision row and quotes that support them. Set B contains no claims at all, so it captures none of the page content. Since the page is essentially a title block and revision history over a framing isometric drawing, A's administrative claims are correct and complete enough, while B is empty. A is therefore clearly better.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [],
+        "remarks": "The page is a structure isometric drawing (S-901, FRAMING ISOMETRICS) whose only extractable text is title-block and revision-history content; the drawing itself carries no readable dimensions or member sizes in the text layer. Set A covers all four revision rows plus lot number, drawn by, checked by and copyright; it omits sheet title/number and contact blocks, which are administrative and neutral. Set B produced nothing at all."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 8,
+        "note": "Set A's wiring-schedule claims (symbols 31–34, 50, 150, 151) are read correctly and bound to the right symbol rows, and its revision-table entries are accurate. Set B covers the NOTES block more broadly but repeatedly garbles it (150A/SNAP main breaker instead of 50A/2P, 'MIDS' for NFDS, 'HEMPEL'/'HEMLOCK' for NEMA 3R), invents 60 Hz and 100 A values that appear nowhere on the page, misbinds symbol 34 as a DC disconnect, and repeats the main-service-panel connection and 120/240 V facts several times. A's errors are limited to one invented connection (2 to 20) and one misread 'quantity 50', plus a few trivial label claims.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "misread",
+          "quote",
+          "trivial",
+          "vague"
+        ],
+        "remarks": "Both sets largely miss the NOTES equipment specs: 2.8kW inverter with ground fault, 60A DC NFDS (Note 5), 200A/2P NFDS (B has the rating, A omits it), and the 50A/2P main breaker on the PV sub-panel. The text layer flattens the note numbering (notes run 2, 4, 5, 6, 7), which likely caused B's wrong note references; B also shows OCR-style corruption ('UND FAULT', 'HEMPEL', 'HEMLOCK', 'MIDS') suggesting it worked from a degraded text layer. A's quotes '2 ... 20' and '4 -> 31' are paraphrases rather than literal page text."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p6-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 6,
+        "note": "Set A binds values more faithfully overall: its member profiles, plate sizes, scales and revision rows match the page, and it avoids inventing conditions. Set B captures a few good facts A misses (the 1/4\" weld size, 1/4\" stiff plates, T.O. STEEL 11'-4\", the bent plate and PL dimensions), but it introduces several unsupported claims (slope/gap 1/4\" at \"upper\" and \"lower\" edge, \"cutting plane E\", an unspecified 1 1/2\" \"offset distance\", and 1'-0\" \"spacing\" read from the scale line) and repeats the same facts two or three times. A's main errors are the 11\"X3/8\" support plate mislabeled as \"reinforcement\", the scale 1 1/2\" = 1'-0\" misread as reinforcement spacing, and a 1/4\" weld symbol read as a slope. On balance A is the cleaner, more correct set despite omitting some valid details.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "misread",
+          "vague"
+        ],
+        "remarks": "Both sets read the 1 1/2\" = 1'-0\" scale line as an engineering dimension (A: reinforcement spacing; B: component spacing) — a recurring pattern worth flagging. A also calls the 1/4\"▽ weld symbol a slope, while B correctly reads it as a weld size. Facts both sets leave out or only partly capture: W8X10 members, the 5\"X3/8\" continuous support plates, the 2'-9 1/16\" and 3'-0\" dimensions, and the 11\"X3/8\" support plate width is never stated as a plate size in B. Detail-to-member bindings (e.g. whether L4X4X5/16 belongs to the West or East roof cantilever) could not be verified with certainty at this image resolution."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 6,
+        "note": "Set A captures substantially more of the page's engineering content correctly — C8X11.5, W10X15, HSS4X4X1/4, L4X4X5/16, L3X3X1/4, PL 4 1/2X4 1/2X1/2, CONT. BENT PLATE 7.5X3X1/4, 1/4\" stiff plates, T.O. STEEL 11'-4\", FIRST FLR 2'-4\" and the (2) 3/4\" bolts — while Set B omits most of these. However, A is noisier: it repeats several facts (bolts, W10X15, HSS, T.O. STEEL, the 1/4\" dimension three times) and misreads the drawing scale as a spacing and a grid letter as a cutting plane. Set B is cleaner but loses key facts and also misbinds the scale as \"reinforcement spacing\" and the 11\"X3/8\" CONT. SUPPORT PLATES as \"reinforcement,\" plus reads a weld symbol as a slope. On balance A's much better coverage of the actual member and connection data outweighs its extra noise.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "misread",
+          "missing",
+          "quote",
+          "vague"
+        ],
+        "remarks": "Text layer is in scrambled reading order and does not include the weld symbols (e.g. the triangle after 1/4\"), so weld-size claims can only be verified from the image. Both sets make the same class of error: treating the detail scale '1 1/2\" = 1'-0\"' as a physical dimension (A: component spacing; B: reinforcement spacing) — it is a drawing scale only. Both also miss the 5\"X3/8\" CONT. SUPPORT PLATES, the 2'-9 1/16\" and 3'-0\" dimensions in Detail C5, and the 1 1/2\" dimension near the C1/C5 bolted angles. Set A's quote '1 1/2\" = 1'-0\" C5 SOUT' is truncated and does not match the text layer."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p2-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 11,
+        "variant_wrong": 0,
+        "note": "Set A's nine claims are all accurate and correctly bound, but it repeats the HabEx starshade diameter three times and omits several facts on the page (LUVOIR-A 15 m aperture, LUVOIR-B's three instruments, Origins 5.9 m and its three instruments, HabEx's four instruments). Set B covers more of the page but contains many misbound and garbled claims: instrument counts attached to generic 'on-axis/off-axis/axis telescope', 'spacecraft' or the Lynx mirror assembly instead of the mission concepts, the 10 m focal length reported as a mirror-assembly 'dimension' and even as a 'diameter', and a truncated 'n-axis telescope' entity. B also repeats the LUVOIR-B, HabEx and starshade facts several times under slightly different names. A is clearly the better set despite its gaps.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "remarks": "Both sets miss Origins entirely in A and only partially in B (B has the 5.9 m aperture but not its three science instruments). B's quotes show text-layer truncation artifacts ('n-axis telescope', '10 m nd three science instruments', 'grazing incidence mir'), suggesting the extractor split on hyphens and line breaks; entity resolution should map generic telescope/mirror/spacecraft phrases back to the mission-concept bullet they belong to."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 0,
+        "note": "Set B binds every value to the correct mission concept and property with no misreadings, while Set A mixes in garbled entities ('n-axis telescope', 'axis telescope'), misbinds Lynx's 10 m focal length as a mirror-assembly 'dimension'/'diameter', and attributes the science-instrument counts to the mirror assembly or a bare 'spacecraft' instead of the mission. Set A also repeats the same facts many times (HabEx 4 m twice, starshade 52 m three times, LUVOIR-B 8 m twice) and states several claims under vague generic entities. Set B is much cleaner but incomplete: it omits LUVOIR-A's 15 m diameter, LUVOIR-B's three instruments, and the whole Origins entry (5.9 m, three instruments), so Set A covers more of the page's facts despite its noise.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "remarks": "Both sets miss Origins' three science instruments; Set B also drops LUVOIR-A's 15 m diameter, LUVOIR-B's three instruments and HabEx's four instruments (Set A covers the latter only under the vague entity 'spacecraft'). Set A's quotes show text-layer/OCR spillover ('10 m nd three science instruments', 'grazing incidence mir'), and several of its claims are the same fact restated under generic entities ('on-axis telescope', 'off-axis telescope', 'starshade'), which inflated its claim count without adding information."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p4-visual": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "The two sets are essentially identical in content: both capture the s-coordinate endpoints, the flatback trailing-edge definition, the ontology definition, and the modal damping values, and both make the same two errors (edgewise damping given as 5% where the page says 3%, and a garbled 'flatback surface | midpoint definition | normalized arc length position' claim whose quote is cut off and whose value is misbound). The only difference is that set A keeps 'following the curved blade reference axis' as an explicit condition on the composite-layers definition while set B folds it into the value; both are faithful. Neither set captures the stiffness-matrix/tool-chain facts (PreComp, VABS, BECAS, OpenFAST, HAWC2).",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing",
+          "quote",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing",
+          "quote",
+          "trivial"
+        ],
+        "remarks": "Both sets misread the damping sentence: the page states 3%, 3%, and 6% for flapwise, edgewise and torsional modes, but both quote and extract 5% for the edgewise mode. Both repeat the s=0 and s=1 endpoint facts twice under two entity names ('normalized arc length position coordinate (s)' and 'normalized arc length position'). Both include the figure-2-7 annotation labels (Plane of Rotation, Chord Line, Arc Width, Offset, Pitch Axis, θrot) as bare 'has component/has property' claims with no engineering content. Both omit the important facts that stiffness matrices per cross section were computed with PreComp/VABS (NREL) or BECAS (DTU) and used in OpenFAST or HAWC2. The text layer garbles 'zero' as 'ero' in one quote and the last claim's quote is cut off ('For ﬂat ge is deﬁned...'), which both sets reproduced."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "The two sets are nearly identical in content and share the same errors: both misread the first edgewise structural damping as 5% (the page states 3%, 3%, 6%) and both carry a garbled, misbound 'flatback surface | midpoint definition' claim. Both also duplicate the normalized arc-length endpoint facts under two entity names and repeat figure-label trivia. The only difference is that A keeps 'following the curved blade reference axis' inside the composite-layer definition while B moves it to a conditions field — both are faithful, so neither gains an advantage.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "trivial"
+        ],
+        "remarks": "Both sets quote the damping sentence as '3%, 5%, and 6%' whereas the page (text layer and image) reads '3%, 3%, and 6%'; the edgewise value 5% is therefore wrong in both. The 'flatback surface | midpoint definition | normalized arc length position' claim is unsupported/misbound in both — the page defines the trailing edge (not a normalized position) as the midpoint of the flatback surface, and its quote is truncated/garbled. The suction-side s=0 quote is also garbled ('position ero at...'). Figure 2-7 labels (Plane of Rotation, Chord Line, Pitch Axis, Arc Width, Offset, θrot) are extracted as trivial 'has component/has property' claims in both sets. Both sets also miss the tool-chain facts (PreComp/VABS/BECAS computing stiffness matrices used in OpenFAST/HAWC2)."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p6-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 12,
+        "variant_wrong": 0,
+        "note": "Set A gives an internally consistent reading of the stacked bars: a thin glass_biax layer of about 3 mm on top of a medium_density_foam core whose thickness decreases from roughly 42-43 mm at SNL-FFA-W3-500 15% to 13 mm at FFA-W3-211 77%, matching the plotted bar totals. Set B instead attributes the large core thicknesses (13-42 mm) to CarbonUD, a layer with no visible black segment of that size, and states every web0 glass_biax value twice with conflicting values (3 mm and 4 mm). Set B also omits most web1 data that Set A captures. Set A is clearly the better set despite skipping the 64% and 100% span positions.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "Both sets quote stitched text-layer fragments (labels and percentages) that cannot literally contain the numeric values, since the values exist only as bar heights in the figure; this affects both equally. Exact bar values are only readable to within a millimetre or two from the image, so small discrepancies (e.g. Set B's foam 40/35/30/10 vs Set A's 43/38/33/13) were not counted as errors on their own. Set A omits the FFA-W3-241 64% and FFA-W3-211 100% positions entirely; Set B covers 64% and 100% for web0 but drops most web1 series. The circular 0%/2% columns appear to have zero or near-zero layup thickness and are unclaimed by both."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p1-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "A captures the sheet's key technical specs that B omits entirely: the 18'-0\" solar envelope height, the 40-tube count for the 2 X APSE-20 collectors, and the 1/8\" steel cable railing (material plus cable diameter). B is more careful with the window tags, correctly typing 1.07/1.06/1.02 as identifiers where A mislabels them as \"dimension\", and B also records both drawing scales. Both sets invent a PV-array grid-line location that the page does not state and both repeat the finished-floor, grade-level and handrail facts several times. On balance A's coverage of the substantive envelope, collector and railing facts outweighs its two misbound tag claims.",
+        "baseline_problems": [],
+        "variant_problems": [],
+        "remarks": "Both sets miss POWDERCOATED STEEL FLATBAR RAILING POSTS, the D1/W5/W6 door and window marks, and General Sheet Note 2 (spacing may be larger between solar thermal tube arrays; necessary valves and piping not shown) and Note 3 (dotted lines = door swing, layered swing lines = tilt and turn) - note 2 is a real design condition. The PV-array grid-line location claimed by both sets is not resolvable from the text layer and only weakly from the image, so both claims are treated as unsupported; if the drawing does place one array over grids 4-5 or 4-6, that claim should be re-scored. Text layer contains the typo \"TONNGUE\"; A silently corrected it in one claim while quoting the misspelling."
+      }
+    }
+  }
+}

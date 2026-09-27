@@ -1,0 +1,1 @@
+{"better":"B","a_wrong":0,"b_wrong":0,"confidence":"high","note":"Set A is completely empty and fails to extract any information from the document page. Set B correctly extracts revision history and key title block metadata (lot number, drawn by, checked by, copyright) with accurate values and supporting quotes.","a_problems":["missing"],"b_problems":[],"remarks":""}
