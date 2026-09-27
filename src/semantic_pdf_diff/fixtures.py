@@ -7,7 +7,10 @@ settings, but not the model or library versions). Answers are stored per respond
 fixture can hold several models' answers to the same requests.
 
 Modes (see Client): `replay` serves recorded answers and fails on anything unrecorded;
-`replay-or-record` serves recorded answers and records live answers for the rest.
+`replay-or-record` serves recorded answers and records live answers for the rest, asking
+recorded failures again; `record-new` records only what was never asked, replaying recorded
+failures as failures (a variant's run then differs from its baseline only where the variant
+changes a request, not where a retried timeout happens to succeed).
 """
 import hashlib
 import io
@@ -18,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA_VERSION = 3  # 2: failures are recorded (response.error); 3: response.used
-MODES = ("replay", "replay-or-record")
+MODES = ("replay", "replay-or-record", "record-new")
 
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);

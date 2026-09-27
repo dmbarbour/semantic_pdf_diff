@@ -29,6 +29,8 @@ def main(argv=None):
     parser.add_argument("--responder", help="default: the configured model")
     parser.add_argument("--out", type=Path, default=ROOT / "benchmarks/runs/scratch", help="folder for the runs' stores")
     parser.add_argument("--replay", action="store_true", help="replay only (no model calls); fails on anything unrecorded")
+    parser.add_argument("--retry-failures", action="store_true",
+                        help="ask recorded failures again (default: replay them, so variants differ only where they change requests)")
     parser.add_argument("--ledger", type=Path)
     parser.add_argument("--tag", action="append", default=[], metavar="KEY=VALUE")
     parser.add_argument("--max-cost", type=float)
@@ -66,7 +68,7 @@ def main(argv=None):
             print(run["name"], json.dumps(json.loads(buffer.getvalue())["total"]))
             continue
         command += ["--out", str(args.out / run["name"]), "--fixture", str(args.fixture),
-                    "--fixture-mode", "replay" if args.replay else "replay-or-record"]
+                    "--fixture-mode", "replay" if args.replay else "replay-or-record" if args.retry_failures else "record-new"]
         if args.replay:
             command += ["--base-url", "http://127.0.0.1:9/v1"]
         if args.responder:

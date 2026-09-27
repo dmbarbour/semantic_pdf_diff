@@ -124,8 +124,9 @@ class Client:
     def __init__(self, settings: Settings, cache, api_key: str | None = None, fixture=None, mode="replay",
                  responder=None):
         """fixture: an open fixtures.Fixture. In `replay` mode answers come only from it and
-        unrecorded requests fail; in `replay-or-record` mode unrecorded requests go to the
-        model and are recorded under `responder` (default: the model name)."""
+        unrecorded requests fail; in `replay-or-record` mode unrecorded requests (and recorded
+        failures) go to the model and are recorded under `responder` (default: the model name);
+        `record-new` is the same but replays recorded failures as failures."""
         self.s = settings
         self.fixture, self.mode, self.responder = fixture, mode, responder or settings.model
         self.fingerprints = {}
@@ -224,10 +225,10 @@ class Client:
         if self.fixture is not None and request.key is not None:
             kind = request.key[0]
             row = self.fixture.answer(self._fixture_key(request.key), self._fingerprint(kind)[0], self.responder)
-            if row is not None and row[1] is not None and self.mode == "replay":
+            if row is not None and row[1] is not None and self.mode in ("replay", "record-new"):
                 self.fixture.served += 1
                 raise ModelFailure(f"Recorded failure: {row[1]}")
-            if row is not None and row[1] is None:  # in record mode, recorded failures are asked again
+            if row is not None and row[1] is None:  # in replay-or-record mode, recorded failures are asked again
                 try:
                     value = request.schema.model_validate_json(row[0])
                 except ValueError as e:
@@ -261,7 +262,7 @@ class Client:
             self._record(request, "", f"{type(error).__name__}: {error}")
 
     def _record(self, request, answer, error):
-        if self.fixture is not None and self.mode == "replay-or-record" and request.key is not None:
+        if self.fixture is not None and self.mode != "replay" and request.key is not None:
             kind, region = request.key[0], request.key[1]
             fingerprint, interpreter = self._fingerprint(kind)
             self.fixture.record(self._fixture_key(request.key), fingerprint, self.responder, kind=kind, region=region,

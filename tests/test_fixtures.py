@@ -74,6 +74,10 @@ class RecordAndReplay(unittest.TestCase):
         failed = [i for x in report['situation'].values() for i in x['issues'] if i['failed']]
         self.assertEqual(len(failed), 2)
         self.assertTrue(all('Recorded failure: ValueError: Truncated' in i['issue'] for i in failed))
+        with jittery_model() as (url, state):  # record-new: failures stay recorded failures, nothing is asked
+            code, report, _ = self.run_cli('new', url, '--fixture', str(self.fixture), '--fixture-mode', 'record-new')
+            self.assertEqual(state['requests'], 0)
+            self.assertEqual(len([i for x in report['situation'].values() for i in x['issues'] if i['failed']]), 2)
         with jittery_model() as (url, state):
             self.run_cli('again', url, '--fixture', str(self.fixture), '--fixture-mode', 'replay-or-record')
             self.assertEqual(state['requests'], 2)  # only the recorded failures are asked again

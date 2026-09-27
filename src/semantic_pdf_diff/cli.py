@@ -75,7 +75,8 @@ def add_run_options(parser):
     parser.add_argument('--fixture', type=Path,
                         help='Replay fixture (.sqlite, or a .zip for replay only): answers come from it, not the model')
     parser.add_argument('--fixture-mode', choices=fixtures.MODES, default='replay',
-                        help='replay: fail requests with no recorded answer; replay-or-record: ask the model and record')
+                        help='replay: fail requests with no recorded answer; replay-or-record: ask the model and record '
+                             '(recorded failures too); record-new: record only requests never asked')
     parser.add_argument('--responder', help='Whose recorded answers to use or record (default: the model name)')
     add_budget_options(parser)
     parser.add_argument('--plan', action='store_true', help='Inspect sources and estimate visual tasks without API calls')
