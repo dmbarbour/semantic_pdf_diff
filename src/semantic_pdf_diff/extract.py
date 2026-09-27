@@ -149,15 +149,91 @@ def tiles(rect, side, overlap=0.18):
 
 FIGURE_PAD = 8.0  # points around a figure's region
 
-def visual_regions(page, side, figures=()):
+def _lines(page):
+    """Text lines as displayed: [(Rect, text)]."""
+    out = []
+    for block in page.get_text("dict")["blocks"]:
+        for line in block.get("lines", ()):
+            text = "".join(s["text"] for s in line["spans"]).strip()
+            if text:
+                out.append((pymupdf.Rect(line["bbox"]) * page.rotation_matrix, text))
+    return out
+
+def _graphics(page):
+    """Drawings (smaller than half the page: not frames) and images, as displayed."""
+    boxes = []
+    for d in page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings():
+        r = pymupdf.Rect(d["rect"]) * page.rotation_matrix
+        if r.height < 0.5 * page.rect.height:
+            boxes.append(r)
+    for image in page.get_image_info():
+        boxes.append(pymupdf.Rect(image["bbox"]) * page.rotation_matrix)
+    return boxes
+
+def bands(page, height, gap_from=0.5, pad=4.0, overlap=0.15):
+    """Full-width bands down a page, each cut at the widest empty horizontal gap in the lower
+    part of its window, so lines, charts and legends aren't split (research round 1: on the
+    report slices this cut 7 lines where a grid cut 2,126). Falls back to an overlapping cut."""
+    boxes = [b for b in [r for r, _ in _lines(page)] + _graphics(page) if not b.is_empty or b.height > 0]
+    if not boxes:
+        return []
+    content = pymupdf.Rect(boxes[0])
+    for b in boxes:
+        content |= b
+    content = (content + (-pad, -pad, pad, pad)) & page.rect
+    spans, gaps = sorted((b.y0, b.y1) for b in boxes), []
+    reach = spans[0][1]
+    for y0, y1 in spans[1:]:
+        if y0 > reach + 1:
+            gaps.append((reach, y0))
+        reach = max(reach, y1)
+    out, top = [], content.y0
+    while content.y1 - top > height:
+        fits = [g for g in gaps if top + gap_from * height <= (g[0] + g[1]) / 2 <= top + height]
+        if fits:
+            gap = max(fits, key=lambda g: (g[1] - g[0], g[0]))
+            cut = following = (gap[0] + gap[1]) / 2
+        else:
+            cut, following = top + height, top + height * (1 - overlap)
+        out.append(pymupdf.Rect(content.x0, top, content.x1, cut))
+        top = following
+    out.append(pymupdf.Rect(content.x0, top, content.x1, content.y1))
+    return out
+
+def grown(page, rect, limit=0.25, lines=None):
+    """A crop grown to include every text line it cuts, by at most `limit` of its size per side."""
+    lines = _lines(page) if lines is None else lines
+    most = rect + (-limit * rect.width, -limit * rect.height, limit * rect.width, limit * rect.height)
+    out = pymupdf.Rect(rect)
+    for _ in range(3):
+        changed = False
+        for box, _ in lines:
+            if out.intersects(box) and box not in out and box in most:
+                out |= box
+                changed = True
+        if not changed:
+            break
+    return out & page.rect
+
+def visual_regions(page, side, figures=(), tiling="grid", grow=False):
     """Tiles, then whole figures, then the overview (displayed coordinates).
 
-    Tiles are a fixed grid, so they can cut a chart from its legend or a diagram in two;
-    each detected figure (drawing or image, with its caption) is also read whole, unless
-    it already fits inside one tile or is the whole page (a drawing sheet: the overview)."""
+    Tiles are a fixed grid (tiling="grid"), or on report-sized pages full-width bands cut at
+    whitespace gaps, skipping bands with no graphics that text tasks already cover
+    (tiling="bands"). grow extends grid tiles to whole text lines. A grid can cut a chart from
+    its legend or a diagram in two, so each detected figure (drawing or image, with its
+    caption) is also read whole, unless it already fits inside one tile or is the whole page
+    (a drawing sheet: the overview)."""
     regions = []
     if max(page.rect.width, page.rect.height) > side:
-        regions = [(f"tile:{i}", r) for i, r in enumerate(tiles(page.rect, side))]
+        if tiling == "bands" and page.rect.width <= 1.6 * side:
+            graphics = _graphics(page)
+            regions = [(f"tile:{i}", r) for i, r in enumerate(
+                b for b in bands(page, side) if any(b.intersects(g) for g in graphics))]
+        else:
+            lines = _lines(page) if grow else None
+            regions = [(f"tile:{i}", grown(page, r, lines=lines) if grow else r)
+                       for i, r in enumerate(tiles(page.rect, side))]
     grid = [r for _, r in regions] or [page.rect]
     for i, figure in enumerate(f for f in figures if f.region):
         shown = (pymupdf.Rect(figure.bbox) * page.rotation_matrix + (-FIGURE_PAD, -FIGURE_PAD, FIGURE_PAD, FIGURE_PAD)) & page.rect
@@ -845,7 +921,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 signals[section][name_] += value
             if s.vision:
                 shown_figures = page_figures(page, number) if s.figure_tasks else []
-                for tag, rect in visual_regions(page, s.tile_points, shown_figures):
+                for tag, rect in visual_regions(page, s.tile_points, shown_figures, s.tiling, s.grow_tiles):
                     # Task tags are unique within content: "<region>:p<page>[:<index>]".
                     region, _, index = tag.partition(":")
                     tag = f"{region}:p{number}" + (f":{index}" if index else "")

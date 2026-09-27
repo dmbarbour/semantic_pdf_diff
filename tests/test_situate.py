@@ -128,6 +128,24 @@ class Figures(unittest.TestCase):
         rect = dict(visual_regions(page, 120, page_figures(page, 2)))['figure:0']
         self.assertGreaterEqual(rect.y1, 290)     # the caption is included
 
+    def test_bands_and_grown_tiles_keep_lines_whole(self):
+        from semantic_pdf_diff.extract import _lines, grown, visual_regions
+        doc = pymupdf.open()
+        page = doc.new_page(width=612, height=792)
+        for y in range(60, 760, 14):  # a page of text lines...
+            page.insert_text((50, y), 'Line of engineering text with a value of 12.5 kW at design load', fontsize=9)
+        diagram(page, 150, 300)  # ...and a diagram in the middle
+        cut = lambda regions: sum(1 for r in regions for box, _ in _lines(page) if r.intersects(box) and box not in r)
+        grid = [r for t, r in visual_regions(page, 420) if t.startswith('tile')]
+        bands = [r for t, r in visual_regions(page, 420, tiling='bands') if t.startswith('tile')]
+        self.assertGreater(cut(grid), 10)
+        self.assertLess(len(bands), len(grid))
+        self.assertTrue(bands)
+        self.assertEqual(len({(round(b.x0), round(b.x1)) for b in bands}), 1)  # all span the content's full width
+        self.assertEqual(cut(bands), 0)
+        tile = grid[0]
+        self.assertLessEqual(cut([grown(page, tile)]), cut([tile]))
+
     def test_drawing_sheet_is_one_region(self):
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()

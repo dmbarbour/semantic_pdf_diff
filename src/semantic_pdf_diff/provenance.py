@@ -52,7 +52,7 @@ def library_versions():
 # Query levers: included in an interpreter only when changed from their defaults, so adding a
 # lever doesn't change existing fingerprints (and recorded answers keep replaying).
 LEVERS = ("extract_prompt", "extract_rules", "context_before", "context_after", "table_context", "visual_text_layer",
-          "table_filter", "stem_context")
+          "table_filter", "stem_context", "tiling", "grow_tiles")
 
 def interpreter(role, settings, prompts, names):
     defaults = type(settings).model_fields
