@@ -111,6 +111,12 @@ class Rounds(unittest.TestCase):
         self.assertNotIn('a_problems', prompt)
         self.assertNotIn('neutral', prompt)
         self.assertIn('{page_text}', prompt)
+        v3 = rounds.pairwise_prompt('v3').format(page=5, family='text', page_text='t', a='- a', b='- b',
+                                                 sections='7 Control > 7.1 Filter')
+        self.assertIn('under the headings: 7 Control > 7.1 Filter', v3)  # judges see what the extractor saw
+        batch = json.loads((self.root / 'batch' / 'pairs.json').read_text()) if (self.root / 'batch').exists() else None
+        if batch:
+            self.assertTrue(all('sections' in i for i in batch['items']))
 
     def test_bootstrap_and_rules(self):
         mean, low, high = rounds.bootstrap([1.0] * 40 + [0.0] * 10)

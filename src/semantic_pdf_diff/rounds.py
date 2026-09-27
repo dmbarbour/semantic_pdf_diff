@@ -107,6 +107,11 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
             with Store(Path(baseline_dir) / run) as store:
                 file = next(f for f in store.files() if f.content == content)
                 docs[(run, content)] = read_origin(store.origin(file.source, file.path))
+        if (run, content, "sections") not in docs:
+            with Store(Path(baseline_dir) / run) as store:
+                docs[(run, content, "sections")] = store.sections(content)
+        headings = [" > ".join(x.heading_path) for x in docs[(run, content, "sections")]
+                    if x.heading_path and x.first_page <= page <= x.last_page]
         with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
             name = f"{run}-{content.split(':')[1][:8]}-p{page}.jpg"
             if not (folder / "images" / name).exists():
@@ -115,6 +120,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
         shown_a, shown_b = shown(a, b, rng)
         items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}", "run": run, "content": content,
                       "page": page, "family": family, "image": f"images/{name}", "page_text": text,
+                      "sections": headings,
                       "baseline": [a[i] for i in shown_a], "variant": [b[i] for i in shown_b],
                       "counts": {"baseline": len(a), "variant": len(b), "shared": len(set(a) & set(b))}})
     batch = {"format": "semantic-pdf-diff-pairwise-batch", "version": 1, "baseline": str(baseline_dir),
@@ -169,6 +175,13 @@ RUBRICS = {
     "v2": {"addition": "\nDocument administration (contacts, addresses, lot or project numbers, revision dates, "
                        "copyright, logos) is neutral: don't prefer a set for including or omitting it; judge such "
                        "claims only for correctness.", "tags": True},
+    # Round 7: judges called a section title the extractor rightly used ("Baseline Control-Measurement
+    # Filter", heading 7.1 on the page before) invented, because they saw only the page. v3 also shows
+    # the headings the page falls under, as the extractor's prompts do.
+    "v3": {"addition": "\nDocument administration (contacts, addresses, lot or project numbers, revision dates, "
+                       "copyright, logos) is neutral: don't prefer a set for including or omitting it; judge such "
+                       "claims only for correctness.\nEntity names may come from the headings the page falls under "
+                       "(listed with the page): those aren't invented.", "tags": True, "sections": True},
 }
 
 V1_OUTPUT = """Return only JSON, reasoning first: {{"note": "...", "better": "A|B|same", "a_wrong": 0, "b_wrong": 0, "confidence": "high|medium|low"}}
@@ -188,6 +201,9 @@ def pairwise_prompt(rubric):
     """The pairwise template for a rubric version (placeholders: page, family, page_text, a, b)."""
     spec = RUBRICS[rubric]
     template = PAIRWISE.replace(V1_OUTPUT, V2_OUTPUT) if spec["tags"] else PAIRWISE
+    if spec.get("sections"):
+        template = template.replace("PAGE {page} ({family} content). Its text layer:",
+                                    "PAGE {page} ({family} content), under the headings: {sections}. Its text layer:")
     return template.replace("{rubric}", spec["addition"])
 
 def _claims_text(claims):
@@ -213,7 +229,8 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
             for order in ("baseline-first", "variant-first"):
                 a, b = (item["baseline"], item["variant"]) if order == "baseline-first" else (item["variant"], item["baseline"])
                 prompt = template.format(page=item["page"], family=item["family"], page_text=item["page_text"],
-                                         a=_claims_text(a), b=_claims_text(b))
+                                         a=_claims_text(a), b=_claims_text(b),
+                                         sections=" | ".join(item.get("sections") or ()) or "none")
 
                 def finish(value, error, item=item, order=order):
                     progress.finish("failed" if error else "complete")
