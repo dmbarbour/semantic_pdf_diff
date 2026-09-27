@@ -32,6 +32,8 @@ class Readings(unittest.TestCase):
             [sighting('tower', 'fore-aft stiffness', '291.01E+9', 'N•m2'),
              sighting('tower', 'side-to-side stiffness', '291.01E+9', 'N•m2')],
             [sighting('Door D1', 'identifier', '1.02'), sighting('Window W2', 'identifier', '1.02')],
+            [sighting('MODULE A - PV STRUCTURAL MEMBER', 'member profile', 'L3X3X1/4'),
+             sighting('MODULE B - PV STRUCTURAL MEMBER', 'member profile', 'L3X3X1/4')],
             [sighting('pump', 'power', '10', 'kW'), sighting('pump', 'power', '10', 'kW', page=2)],  # other page
             [sighting('pump', 'power', '10', 'kW'), sighting('pump', 'power', '10', 'kW', bbox=(500, 500, 900, 900))],
         ]

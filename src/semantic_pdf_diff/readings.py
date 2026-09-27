@@ -22,7 +22,9 @@ chains of near-matches don't merge distinct facts.
 import re
 from .models import Occurrence, representative_rank
 
-STOPWORDS = {"a", "an", "the", "of", "for", "and", "or", "in", "on", "at", "to", "by", "with", "per", "from", "as",
+# Not "a": single letters name modules, details and grid lines ("Module A" and "Module B" are two
+# things; round 8 merged them when "a" was dropped as an article).
+STOPWORDS = {"the", "of", "for", "and", "or", "in", "on", "at", "to", "by", "with", "per", "from", "as",
              "is", "are", "value", "values", "total"}
 QUOTES = str.maketrans({"’": "'", "‘": "'", "′": "'", "″": '"', "“": '"', "”": '"', "×": "x", "−": "-", "–": "-",
                         "—": "-"})
