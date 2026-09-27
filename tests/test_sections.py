@@ -33,6 +33,7 @@ class Recorder:
         self.asked = []
     def ask(self, prompt, schema, images=(), key=None):
         self.asked.append((prompt, key))
+        self.images = getattr(self, 'images', []) + [(prompt, list(images))]
         if schema is Judgment:
             return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)
         if situating_answer(prompt):
@@ -266,6 +267,25 @@ class SectionContext(unittest.TestCase):
             plain = Recorder(vision=False)
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), plain)
             self.assertFalse(any('Defined elsewhere' in p or 'Cited:' in p for p, _ in plain.asked))
+
+    def test_tiles_come_with_a_page_locator_when_asked(self):
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            page = doc.new_page(width=900, height=900)  # larger than a tile: tiled
+            page.insert_text((40, 60), 'Pump rated 12 kW', fontsize=9)
+            path = Path(d) / 'big.pdf'
+            doc.save(path); doc.close()
+            client = Recorder(vision=True, tile_locator=True)
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d) / 'on', client)
+            tiles = [(p, i) for p, i in client.images if 'Source type: tile' in p]
+            self.assertTrue(tiles)
+            self.assertTrue(all(len(i) == 2 and str(i[1]).endswith('-where.png') for _, i in tiles))
+            self.assertTrue(all('outlined in red' in p for p, _ in tiles))
+            overview = [i for p, i in client.images if 'Source type: overview' in p]
+            self.assertTrue(overview and all(len(i) == 1 for i in overview))  # only tiles get one
+            plain = Recorder(vision=True)
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d) / 'off', plain)
+            self.assertTrue(all(len(i) <= 1 for _, i in plain.images))
 
     def test_table_filter_keeps_tables_and_drops_grids(self):
         from semantic_pdf_diff.extract import real_table

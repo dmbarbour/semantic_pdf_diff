@@ -427,6 +427,20 @@ def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=Fa
         regions.append((f"figure:{i}", shown, f"Caption: {figure.caption}" if figure.caption else ""))
     return regions + [("overview", page.rect, "")]
 
+LOCATOR_SIDE = 384  # pixels: the page thumbnail that shows where a tile sits
+LOCATOR_NOTE = ("The last image is the whole page, small, with this region outlined in red: it shows where the "
+                "region sits, for orientation only.")
+
+def render_locator(page, rect, target, side=LOCATOR_SIDE, width=3):
+    """The whole page, small, with rect (displayed coordinates) outlined in red."""
+    scale = side / max(page.rect.width, page.rect.height)
+    pix = page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), alpha=False)
+    box = (rect * pymupdf.Matrix(scale, scale)).irect & pix.irect
+    for edge in (pymupdf.IRect(box.x0, box.y0, box.x1, box.y0 + width), pymupdf.IRect(box.x0, box.y1 - width, box.x1, box.y1),
+                 pymupdf.IRect(box.x0, box.y0, box.x0 + width, box.y1), pymupdf.IRect(box.x1 - width, box.y0, box.x1, box.y1)):
+        pix.set_rect(edge & pix.irect, (255, 0, 0))
+    pix.save(target)
+
 def render(page, rect, target, max_side):
     # clip is in rotated page coordinates, as used by Page.get_pixmap.
     scale = min(2.5, max_side / max(rect.width, rect.height))
@@ -785,7 +799,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         record(row, copies)
 
     def consume(page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None, then=None,
-                repeat_key=None, repeat_after=1, place=None, context=""):
+                repeat_key=None, repeat_after=1, place=None, context="", extra_images=()):
         """Queue one extraction task; when it finishes, record it and call then(status).
 
         repeat_key identifies exactly repeated boilerplate: once `repeat_after` earlier
@@ -805,7 +819,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                                                     "ok": False, "found": [], "row": None, "followers": []})
             entry["seen"] += 1
             if entry["task"] != task and entry["seen"] - 1 >= repeat_after:
-                again = lambda: consume(page_no, bbox, task, text, image, check, locate, crop, derivation, then)
+                again = lambda: consume(page_no, bbox, task, text, image, check, locate, crop, derivation, then,
+                                        place=place, context=context, extra_images=extra_images)
                 if not entry["done"]:
                     entry["followers"].append((lambda: follow(entry, page_no, bbox, task, region), again))
                 elif entry["ok"]:
@@ -818,7 +833,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         found = []
         row = {"content": content, "page": page_no, "bbox": list(bbox), "task": task,
                "image": image, "status": "complete", "issues": [], "claims": 0}
-        images = [output / image] if image else []
+        images = ([output / image] if image else []) + [output / x for x in extra_images]
         section = page_section.box(page_no, bbox)  # the heading above the region, not the page's
         # A region spanning sections (a tile, an overview) is told all their headings.
         heading = " | ".join(" > ".join(x.heading_path) for x in page_section.spanned_box(page_no, bbox)
@@ -1024,8 +1039,13 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             return next((box for box, text in blocks if covered(quote, text, fold=True)), None)
         if s.visual_text_layer and layer.strip():
             text = (text + "\n" if text else "") + LAYER_NOTE + "\n" + " ".join(layer.split())[:s.visual_text_layer]
+        extra, context = (), ""
+        if s.tile_locator and tag.startswith("tile"):  # where on the page this tile sits
+            where = f"{stem}-{tag.replace(':', '-')}-where.png"
+            render_locator(page, rect, assets / where)
+            extra, context = ("assets/" + where,), CONTEXT_NOTE + "\n" + LOCATOR_NOTE
         consume(page_no, native, tag, text, "assets/" + name, check=check, place=place,
-                crop=(tuple(round(v, 3) for v in rect), s.image_side),
+                crop=(tuple(round(v, 3) for v in rect), s.image_side), context=context, extra_images=extra,
                 then=lambda status: refine_visual(page_no, page, tag, rect, depth, status))
 
     def refine_visual(page_no, page, tag, rect, depth, status):
