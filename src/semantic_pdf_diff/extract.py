@@ -402,10 +402,9 @@ def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=Fa
             sheet = " ".join(x for x in (label.title() if label else "Drawing sheet", heading) if x)
             parts = []
             for number, title, rect in viewports:
-                # Side columns get the sheet only: "Title block" made the model skip a legible
-                # revision table as not engineering (round 5b).
-                note = f"{sheet}. " + (f"Detail {number}: {title}" if title else f"Detail {number}") if number \
-                    else f"{sheet}."
+                # Side columns get no note: with "Title block" (round 5b), or even the sheet's title
+                # (5c), the model skipped a legible revision table as not engineering.
+                note = f"{sheet}. " + (f"Detail {number}: {title}" if title else f"Detail {number}") if number else ""
                 # Larger crops lose small print (round 5: a 620-point crop missed a title block's
                 # revision table that 420-point tiles read), so a detail is tiled like a page.
                 pieces = [rect] if max(rect.width, rect.height) <= 1.25 * side else list(tiles(rect, side))
