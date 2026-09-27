@@ -182,6 +182,7 @@ Round 1 showed that asking the same question again often gets a different answer
 | r01 | Four levers, one per variant | Confounded: every variant re-asked every request, so run-to-run variation dominated; paused | $10.03 |
 | r01b | The same, re-asking only changed requests | Text layer 0.72, table lead-in 0.71, neighbouring text 0.68 accepted; table filter inconclusive (12 pages) | $3.40 |
 | r02 / r02h | The three together, development / held-out | 0.68 (0.54–0.81) / 0.71 (0.56–0.86): accepted | $2.04 |
+| r03 | Stems, bands, grown tiles, each against the champion | Stems 0.63 (0.51–0.75), bands 0.83 (0.70–0.94), grown tiles 0.80 (0.70–0.89): accepted | $2.51 |
 
 **Champion (2026-09-26):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images). Later rounds compare against it.
 
@@ -189,9 +190,6 @@ Round 1 showed that asking the same question again often gets a different answer
 
 | Lever | Hypothesis | Measured without the model |
 |---|---|---|
-| `stem_context` | 2: numbered items and headings as parents | (round 3) |
-| `tiling: bands` | 3: full-width bands cut at whitespace | NREL: 12 bands cutting 5 lines, against 72 tiles cutting 1,027 |
-| `grow_tiles` | extra: tiles grown to whole lines | Drawing sheets: lines cut 137→35, 139→50 |
 | `sheet_details` | 5: a drawing sheet's details, titled from the sheet | 16–25 images per sheet instead of 35; 0–10 lines cut instead of 23–79 |
 | `references` | 8: abbreviations defined elsewhere, cited captions | 3–15 of 8–17 chunks per report slice gain a line |
 

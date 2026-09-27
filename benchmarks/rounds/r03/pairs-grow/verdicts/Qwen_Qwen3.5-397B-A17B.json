@@ -1,0 +1,275 @@
+{
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "verdicts": {
+    "u-dc-manual-p59-66-a157bdf0-p3-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set B is slightly better because it correctly extracts the temperature value '200C' whereas Set A hallucinates '-200C' in one claim. Both sets suffer from significant redundancy and both misinterpret the phase diagram by claiming Austenite transforms to Martensite via 'deformation' (the diagram labels this arrow 'cooling'). Set B has one attribute error ('maximum friction' instead of 'pull force'), but Set A has more diagram interpretation errors and the value hallucination."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets suffer from significant redundancy and share a common error misinterpreting the diagram's deformation phase as involving Austenite. Set A is preferred because it consistently extracts the correct temperature value (200C) with better quote support, whereas Set B hallucinates a negative sign (-200C) in one claim while getting it right in another. Set A has one claim mislabeling pull force as friction, but this semantic imprecision is less severe than Set B's numerical data error."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p5-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set A is better due to more consistent entity naming and fewer transcription errors compared to Set B (which has 'input mission matrix' typo and 'ete time step' OCR error). Set B also contains a clear graph reading error (claiming -75 deg phase at 0.5 Hz when the plot shows approx -60 deg) and internal contradictions on phase values at 1.00 Hz. Set A has a binding error on one matrix claim and a unit oddity, but is overall more faithful."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 3,
+        "note": "Set A is more faithful to the numerical values in the text and graph, correctly extracting the corner frequency as 0.25 Hz and magnitude as -12 dB. Set B introduces errors, labeling the corner frequency as '0.25 fraction' instead of Hz and claiming -12.5 dB magnitude while quoting -12. Both sets suffer from redundancy and inconsistent entity names not found on the page, but Set A's engineering data is more accurate."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set B correctly identifies the 'Plywood Deck' dimensions and entity, whereas Set A misbinds these dimensions to the 'Joist' (claiming a 3/4\" x 5 1/2\" joist), creating a contradiction with its own correct 2\"x8\" joist claim. Set B also provides full quotes, while Set A truncates some (e.g., 'HEX THROUG'). However, Set B incorrectly attributes the 8'-0\" dimension (from detail C3) to the 'Decking Footing Plan' (C1, which is 1'-0\"), and includes more duplicate claims than Set A. Set A correctly captures the C1 plan dimension and the Nut size, which Set B misses."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 3,
+        "note": "Set A is better because it correctly distinguishes between the joist dimensions (2x8) and the deck surface dimensions (3/4x5.5), whereas Set B incorrectly claims the joist is 3/4\"x5.5\". Set B also repeatedly misattributes dimensions from the B1 section view (1 1/2\", 7 1/2\") to the C1 plan view, while Set A generally keeps view contexts clearer despite misplacing the 8'-0\" dimension. Set A faithfully extracts the typo 'SLEVE' whereas Set B invents a 'nut sleeve' component."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p5-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 10,
+        "variant_wrong": 8,
+        "note": "Set B is better because it correctly estimates the thickness of thin layers (e.g., glass_triax at 3-4mm) whereas Set A erroneously assigns the total airfoil thickness to thin layers (e.g., claiming glass_triax is 45mm thick). Set B also provides a comprehensive material composition claim. However, Set B hallucinates s-coordinates (e.g., s=100 on a 0-80 axis) and mislabels TE as LE, while Set A incorrectly places foam at the trailing edge."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 10,
+        "note": "Set B correctly identifies the maximum total thickness for each airfoil span (e.g., 100mm for 301, 50mm for 211@77%), which aligns with the chart y-axis maxima. Set A frequently misbinds these maximum thickness values to the Trailing Edge (TE) or specific s-coordinates where the airfoil is visually thin, resulting in physically implausible claims (e.g., 105mm thickness at TE). Set B has some contradictions and layer misattributions, but Set A has more fundamental errors in geometry interpretation and coordinate reading."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p2-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets contain identical hallucinations regarding hysteresis (20-50C vs 25-50C) and mechanical force (20,000 PSI vs 25,000 PSI), resulting in 3 wrong claims each. However, Set A correctly extracts the commercial wire transition temperatures as '70, 90 C' (Claim 14), whereas Set B truncates this to '90 C' (Claim 6), losing the 70C data point entirely. Set A also includes a contradictory hallucination that Titanium content is 'not specified' (Claim 13), but since it also contains correct Titanium claims, the information is preserved, unlike the lost 70C value in Set B."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets contain identical hallucinations regarding hysteresis (20-50°C vs 25-50°C) and mechanical force (20,000 PSI vs 25,000 PSI), presenting incorrect values alongside correct ones. Set B is preferred because it correctly captures the full range of commercially available wire transition temperatures (70°C and 90°C), whereas Set A only extracts 90°C. Additionally, Set B provides a cleaner extraction for Nickel composition, while Set A includes a claim with a mismatched quote (Nickel attribute with Titanium quote text)."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p8-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B correctly extracts two of the three bullet points with accurate values and supporting quotes, whereas Set A fails to extract any information from the page. Although Set B misses the third point regarding ATD costs, it provides faithful engineering claims unlike the empty Set A."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A correctly extracts two of the three bullet points regarding the HabEx mission scope and thermal control requirements, binding them to the correct entity with supporting quotes. Set B fails to extract any claims from the text, missing all available engineering evidence on the page. Set A is significantly better as it provides faithful data while Set B provides nothing."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p2-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 7,
+        "variant_wrong": 3,
+        "note": "Set B is better because it correctly binds science instrument counts to specific mission names (e.g., LUVOIR-A, LUVOIR-B), whereas Set A often uses vague or corrupted entities like 'n-axis telescope' or 'axis telescope'. Both sets incorrectly label the Lynx 10 m focal length as a 'dimension' or 'size' in some claims, but Set A makes this error twice while Set B makes it once. Set A also includes more vague entity extractions like 'baseline mission spacecraft'."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 7,
+        "variant_wrong": 6,
+        "note": "Both sets contain significant noise, including duplicate claims and vague or misbound entities (e.g., using 'spacecraft' instead of 'HabEx'). Set A is preferable because it contains fewer nonsensical entity fragments; Set B extracts 'axis telescope' twice which is a broken OCR fragment, whereas Set A's 'on-axis telescope' is at least a coherent phrase. Additionally, Set B incorrectly attributes the 10 m focal length as a 'size' and 'dimension' of the mirror assembly in two separate claims, while Set A only does this once."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p5-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Set B is better because it correctly identifies the value 100 as referring to 'findings' in its second claim, whereas Set A incorrectly binds this value to 'resultant mission concepts count'. Both sets contain a significant error in their third claim by stating there are 100 mission concepts instead of four, but Set A compounds this error in its second claim as well. Set B's second claim is semantically accurate regarding the text, despite having a truncated quote."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Both sets correctly extract the primary claim regarding approximately 100 issues and concerns. However, both sets incorrectly interpret the text to claim there are 100 mission concepts, whereas the text explicitly states 'four mission concepts'. Set A is better because it only contains one instance of this factual error (claim 3), while Set B repeats this error in two separate claims (claims 2 and 3)."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A is significantly better because it captures critical title block information including the full revision history, project name, and lot number, which Set B omits entirely. Set B also contains a transcription error in the scale value ('3/8\" 1'-0\"' instead of '3/8\" = 1'-0\"'). While Set A includes some redundant claims for elevations, its completeness and accuracy regarding the engineering metadata make it superior."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is better because it comprehensively extracts the revision history and project metadata from the title block (lot number, client, revision dates/descriptions), which Set A completely omits. Both sets accurately capture the geometric dimensions and scales shown in the sections, though both suffer from significant redundancy by repeating the same facts with minor formatting variations. Set B provides a more complete and useful representation of the document's engineering information without introducing inaccuracies."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p1-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 13,
+        "variant_wrong": 6,
+        "note": "Set A correctly extracts the full airfoil names from the legend (e.g., FFA-W3-330blend, FFA-W3-360), whereas Set B hallucinates truncated entity names like 'FFA-W3-3' and 'FFA-W3-2' which do not exist in the document text. While Set A contains some contradictory graph readings (e.g., two different max cl/cd values for FFA-W3-360) and some inaccurate values (SNL-FFA-W3-500 max cl/cd is ~25, not 110), its entity binding is faithful. Set B's failure to identify the specific airfoil models makes the majority of its claims ungrounded and incorrect regarding entity attribution."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 14,
+        "variant_wrong": 6,
+        "note": "Set B is significantly better because it correctly extracts the full airfoil designations from the legend (e.g., 'FFA-W3-330blend', 'FFA-W3-360'), whereas Set A hallucinates or truncates entity names (e.g., 'FFA-W3-3', 'FFA-W3-2', 'SNL-FFA') which do not exist in the document text. While Set B contains some inaccuracies in reading specific graph values (e.g., overestimating max lift-to-drag ratios), its claims are bound to the correct components. Set A's entity errors make many claims unverifyable and factually incorrect regarding the component identity."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p3-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A is better because it accurately transcribes all fractional dimensions (e.g., 4 13/16\"), whereas Set B truncates a value to \"4 13\"\" which is a misread. Set A also correctly captures the drawing scale, which Set B misses. Set B includes an unsupported engineering attribute (\"web thickness\") for a base dimension, while Set A uses safer, albeit vague, descriptions."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Set B is better because it faithfully extracts values without truncation (e.g., correctly capturing '4 13/16\"' where Set A truncates to '4 13\"') and includes critical metadata like the drawing scale and member specifications (L3X3X1/4) which Set A omits. Set A contains a clear value extraction error and mislabels a dimension as 'web thickness' for an angle member, whereas Set B correctly identifies the angle spec despite one misclassification of a component as an 'I-beam'."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p1-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A is more accurate and faithful to the source text, avoiding the significant misbinding errors in Set B where handrail dimensions (2x4) are incorrectly attributed to siding. Set A captures a wider range of window and door identifiers and correctly extracts general sheet notes (Hardie reference, door operation), whereas Set B misses these. While Set B includes revision history and finished floor elevation which Set A omits, the factual errors in Set B regarding component properties make it less reliable."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Set B captures critical General Sheet Notes (door operation, Hardie specification) and more window identifiers, which are key engineering claims missed by Set A. Set A includes revision history but contains misbindings (assigning 2x4 dimension to siding instead of handrail) and misses the sheet notes. Set B has one hallucinated spatial claim (PV grid lines) and more duplicate claims, but its coverage of technical specifications is superior."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p11-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 4,
+        "note": "Both sets contain significant redundancy and share errors, such as estimating the pitch angle at 23º (graph ends near 21º) and using -30E+6 for sensitivity at 0º despite explicit text stating -25.52E+6. Set A is penalized for a significantly inaccurate graph reading (-90E+6 for the last data point, which is visually near -120E+6). Set B is slightly better as it includes a more accurate graph reading at 20º (-110E+6) and captures the textual claim about the 'linear relation', although it also has a sloppy quote mismatch in one claim."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Set A provides faithful quotes and accurate graph readings (e.g., -120E+6 at max angle), whereas Set B truncates mathematical symbols in quotes (∂θ instead of ∂P/∂θ) and misreads the graph's final data point (-90E+6 instead of -120E+6). Although Set A is highly redundant with many duplicate claims, its extractions are factually more reliable and faithful to the document text. Set B's quote errors and hallucinated values reduce its trustworthiness."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 2,
+        "note": "Set B is more accurate, avoiding Set A's hallucinated 'Current Organizer' entity (present in both but Set A adds more garbage), the '0/240V' voltage error (present in both), and Set A's specific failures like the 'RGANIZER' typo in quotes and the nonsensical 'INSTRUMENT L1, L2' connection claim. While Set A captures more document metadata (revisions, checked by) and some circuits (20, 32) that Set B misses, Set B provides higher fidelity engineering claims for the wiring schedule and notes (e.g., correct 'Organizer' spelling, Utility Panel wire specs, NFDS rating) with fewer fabricated or misread values."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Both sets share two factual errors: misreading the system voltage as '0/240 V' instead of '120/240V' and hallucinating a 'Current Organizer' connection. Set A includes invented quotes (e.g., '1 -> 150') and trivial duplicate claims (Voltage Sensor, Circuit 50 material), reducing its quality. Set B provides significantly better coverage, correctly extracting metadata (Copyright, Checked By), more revision history entries, and additional circuit details (20, 32) that Set A misses, despite minor OCR typos in some quotes."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p4-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 11,
+        "note": "Set A is better because it correctly binds circuit numbers to loads more often than Set B (e.g., Potable Water Pump 5-6, Spare circuits 17-18/21-22/23-24, Kitchen Receptacles Island 11-12). Set B contains significant hallucinations and misbindings, such as assigning the Oven to circuits 5-8 (should be 3-4), Potable Water Pump to circuit 10 (should be 5-6), and Data Rack to circuit 8 (should be 5-6). Both sets include vague 'Main Panel' claims, but Set A's specific engineering claims are more faithful to the document's table structure."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 20,
+        "variant_wrong": 19,
+        "note": "Both sets suffer from severe circuit number misalignment due to the two-column layout, resulting in many wrong bindings (e.g., Refrigerator assigned to circuit 11 instead of 9-10). Set A is preferred because it extracts more complete and readable entity descriptions, whereas Set B includes garbled text like 'PTACLES' and 'ACLES' and more vague 'Main Panel' claims. Set A also captures more distinct loads (Furnace, Oven, Dryer) despite the binding errors."
+      }
+    }
+  }
+}

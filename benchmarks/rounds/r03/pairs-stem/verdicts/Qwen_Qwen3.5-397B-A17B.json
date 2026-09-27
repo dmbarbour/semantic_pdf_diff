@@ -1,0 +1,437 @@
+{
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "verdicts": {
+    "u-ken-cd-p95-98-f7b0008f-p4-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 14,
+        "variant_wrong": 14,
+        "note": "Both sets suffer from significant errors in circuit number bindings for the middle section of the table, likely due to misalignment in the provided text layer compared to the image (e.g., both claim Circuit 14 for Kitchen Receptacles N&E, but the image shows Circuit 10). However, Set A is better because it correctly extracted more specific claims from the sections where the text layer aligned with the image, such as Cooktop (Circuit 2), ERV Rect (Circuit 28), Bathroom Receptacle (Circuit 29), Water Heater (Circuit 31), and Inverter Feed. Set B missed these correct data points and had fewer correct circuit bindings overall (3 vs 6)."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set B is significantly more complete, capturing critical high-amperage circuits (Cooktop 50A, Inverter Feed 50A, Water Heater 30A) that Set A misses entirely. Set A includes vague or invented abbreviations (e.g., 'MASTER BEDROOM R') and splits related attributes into separate claims, whereas Set B binds them correctly. Both sets follow the provided text layer for circuit numbers which conflicts with the image in several places (e.g., Refrigerator circuit), but Set B's comprehensive extraction of components and ratings makes it the superior engineering record."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p8-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 6,
+        "note": "Set A is better because its primary claims regarding bulb power equivalence include full sentence quotes that actually support the 'equivalence' condition, whereas Set B uses fragment quotes (e.g., 'a 7W LED bulb') that do not evidence the equivalence claim. Both sets suffer from significant redundancy (duplicate claims), but Set A captures the core engineering facts with faithful evidence in at least half its entries, while Set B leaves key conditions unsupported by the provided quotes."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 3,
+        "note": "Set A is better because it contains fewer redundant claims than Set B. Set B extracts every unique fact twice (e.g., the vacancy sensor requirement and bulb wattages appear in duplicate pairs), creating unnecessary noise. While Set B often provides more complete quotes that better support the stated conditions, the excessive duplication violates the preference for fewer trivial claims. Both sets miss the specific room constraints for high efficacy luminaires (kitchen, bathroom, etc.) mentioned in the second paragraph."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p1-table": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets accurately extract the three scoring conditions from Figure 8 with correct quotes and values. Set A uses a slightly more precise entity ('clothes drying task' matching the Y-axis label), while Set B adds a context condition ('scoring for laundry loads') derived from the surrounding text. Both normalize the inequality syntax in the value field identically (introducing 'x'), and neither contains factual errors."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets accurately extract the three scoring criteria from Figure 8 regarding clothes drying weight percentages, with correct values, inequalities, and supporting quotes. Set A includes a generic 'conditions' field while Set B uses a slightly more precise entity name ('clothes drying task' matching the axis label), but these differences are negligible. Both sets omit the textual claims regarding Dishwasher and Lighting found on the same page, resulting in equal coverage and correctness."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p3-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set B correctly identifies the 15-20C range as an 'established' design parameter based on climate data, whereas Set A ambiguously labels it a wire property conditioned on wire specification availability. Set B's extraction reflects the causal logic of the text (climate data determined the range, which then matched a wire spec) more accurately than Set A. Both sets accurately extract the force values and theoretical transformation ranges."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is better because its quotes are more complete and directly support the stated conditions, particularly for the austenite temperature range claim where the quote includes the wire specification context matching the condition. Set A's quote for that claim is a fragment that does not evidence its condition (Irvine data), which appears in a different sentence. Set B also preserves the full value text ('cryogenic temperatures') more faithfully than Set A."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p2-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A is better because its quotes fully support the entity-value bindings, specifically including the text 'starting water weight' for the metric values, whereas Set B uses fragmentary quotes like '(2.721 kg)' that do not independently verify the entity. Set A is also less redundant, avoiding multiple claims for the same starting water requirement with only minor condition label variations found in Set B. While Set B captures the reduced points range well, the poor quote quality for the starting water metric values and excessive redundancy make it inferior."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is preferred because it extracts the 'reduced points' weight range (16 to 80 oz) from Figure 9, which is a key part of the scoring function that Set B omits entirely. Both sets exhibit redundancy by creating multiple separate claims for the starting water weight (96.00 oz and 2.721 kg) with slightly varying conditions, but Set A's completeness regarding the scoring logic outweighs this verbosity. Neither set contains factually incorrect values or misbound attributes relative to the provided text and image."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p12-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets extract the same key engineering facts accurately, including material properties, dimensions, and frequencies. However, both sets contain significant redundancy with duplicate claims for the same properties. Set A is slightly better because it has fewer trivial duplicate claims (19 total vs 20 in Set B), specifically avoiding the extra duplicate entry for the transition piece mass found in Set B."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets extract the same core engineering data with high accuracy and faithfulness to the source text and table, including material properties, dimensions, and frequency constraints. Both sets exhibit significant redundancy with duplicate claims for properties like density and modulus, though Set A contains one additional duplicate entry compared to Set B. Given the negligible difference in content, accuracy, and overall quality, the sets are considered equally effective."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p11-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Set A is preferred because it avoids the exact duplicate claims found in Set B (claims 2 and 3 are identical in B). Although Set A incorrectly labels the parameter $\theta_K$ as a 'best-fit line intercept' in one claim, it provides more distinct attribute descriptions and correctly links the value to the 'best-fit line' context mentioned in the text. Both sets share the same unit typo ('watt/ra') in one claim and fail to capture the 'K' subscript in the attribute or quote for the second value."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets contain a unit typo ('watt/ra' instead of 'watt/rad') in the first claim and misquote the symbol 'θk' as 'θ' in the claims regarding the 6.3 degree value. However, Set B incorrectly labels the 6.3 degree value as the 'best-fit line intercept', which contradicts the graph (x-intercept is >20º) and the text definition (angle where sensitivity doubles), whereas Set A uses a vague but not factually incorrect attribute ('theta'). Both sets include redundant duplicate claims for the theta value."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p6-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set B is better because it avoids the semantic error found in Set A, where Claim 1 incorrectly identifies the bend condition as 'longitude' instead of 'longitudinal' (text: 'longitudinal section'). Set B also provides a more contextually appropriate entity binding for the solar altitude claim ('Harvest Shade Screen') in Claim 4, although it redundantly includes the variable-based claim in Claim 7. Both sets suffer from unnecessary duplication (e.g., shape claims in both, solar altitude in B, bend in A), but Set A's factual misread makes it inferior."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A is better because it avoids the semantic error found in Set B where 'longitudinal' is misread as 'longitude' (a geographic coordinate) in the first claim. Both sets suffer from quote truncation (e.g., 'windo' instead of 'window azimuth') and include redundant claims (duplicate shape entries, vague 'solar altitude | value' entry), but Set B's hallucination of 'longitude' makes it less faithful to the engineering text."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p4-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets correctly identify the entities (Kitchen, Bedroom) and their respective elevations (Finished Floor and Grade Level) based on the section labels and elevation markers. Set B is better because its quotes are more precise and specific to each claim; Set A includes extraneous text (the Grade Level information) in the quotes for the Finished Floor claims, making the evidence binding less clean."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is preferred because its quotes are more precise, binding only the relevant text to each claim (e.g., separating finished floor and grade level text), whereas Set B includes the grade level text within the quotes for finished floor height claims, creating redundancy and less precise evidence binding. Both sets correctly extract the values and entities (Kitchen/Bedroom) from the drawing labels."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p12-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 0,
+        "note": "Set A duplicates every claim, listing them once with 'blade-pitch controller' and again with 'baseline blade-pitch controller', creating significant redundancy. Set B is more concise, extracting the gains and damping ratio without full duplication, although it splits the damping ratio conditions into two separate claims. Set B is preferred for avoiding trivial duplicate claims while maintaining accuracy."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 0,
+        "note": "Set A is better because it provides a concise and non-redundant extraction of the engineering claims. Set B contains significant duplication, extracting the same gain and damping values twice with slightly varying entity names (e.g., 'blade-pitch controller' vs 'baseline blade-pitch controller'), which creates trivial claims without adding information. Both sets accurately capture the values and conditions from the text, but Set A's organization is much cleaner."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p2-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 2,
+        "note": "Set A is better structured with consistent conditions (Elevation and HtFract) and normalized attribute names, avoiding trivial metadata extractions. Set B includes trivial claims (extracting index columns like 'elevation' and 'fractional height' as properties) and inconsistent attribute naming. Set A has one value discrepancy (68.90E+9 vs 62.66E+9 at 78.84m) due to an OCR error in the provided text layer compared to the image, but its overall fidelity to engineering claim structure is superior."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Set A is slightly better as it adheres more closely to the source terminology ('fore-aft' vs Set B's 'forward-aft' in two claims). Set A has one claim (fractional height) missing a row condition, making it semantically vague, while Set B has two claims with incorrect attribute names. Both sets extract numerical values accurately from the table."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p5-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Set A is more faithful to the provided page, using the entity name 'low-pass filter' which appears in the text, whereas Set B predominantly uses 'Baseline Control-Measurement Filter' which is not found in the provided text or image captions. Set B also includes a redundant duplicate claim regarding the discrete time step. While Set B correctly identifies the full filter name from the figure caption in its first claim, its subsequent claims rely on the unsupported entity name."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Set B is more faithful to the provided text, correctly binding the corner frequency and time step to the 'low-pass filter' entity mentioned in the text. Set A invents the entity name 'Baseline Control-Measurement Filter' for three of its four claims, which is not supported by the page content (text or caption). While Set A correctly extracts the -3 dB magnitude definition using the figure caption, Set B captures the primary engineering parameters with accurate entity binding, making it the better set overall."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-table": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set A is better because it maintains exact fidelity to the source text for values (e.g., '0' - 0\"' instead of normalizing to '0 ft' as in Set B Claim 1). Set A also uses more precise condition names that match the drawing labels ('Section - East Module' vs 'East Module'). Both sets capture the key elevation data for both modules accurately, but Set A's consistency between extracted values and quotes is higher."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set B is more faithful to the source text, preserving the exact elevation format '0' - 0\"' in all claims, whereas Set A normalizes one claim to '0 ft' which is an inference not strictly in the text. Set B also uses more precise condition labels ('Section - West Module') that match the drawing titles better than Set A's shortened versions ('West Module'). Both sets contain redundant unconditioned claims, but Set A's unconditioned claim involves the value normalization error."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p10-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Set A is better because it extracts the wind speed range (3 to 25 m/s) from the controller regulation trajectory plot, which is valid engineering data present in the source but missing from Set B. Both sets contain a duplicate claim with a minor formatting error in the value ('0.489 -'), counting as one wrong claim each. Set A provides more correct and faithful claims overall by including the operational range."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Set B is better because it extracts an additional valid claim regarding the wind speed range (3 to 25 m/s) for the controller regulation trajectory, which Set A misses. Both sets correctly identify the Design Point Power Coefficient (0.489), but both also include a duplicate/malformed claim with the value '0.489 -' which is not supported by the text. Set B provides more useful engineering data without increasing the error count."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 12,
+        "variant_wrong": 10,
+        "note": "Set B is slightly better because it correctly identifies and extracts claims for Wiring Schedule Item 10 (conductor size, material, count), whereas Set A misattributes Item 10's #12 conductor to Circuit 20. Both sets struggle with distinguishing between symbols 31, 32, 33, and 34, and both incorrectly attribute the ground conductor of Item 50 to Item 150. Set B has fewer total misbindings (approx. 10 vs 12)."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 12,
+        "variant_wrong": 9,
+        "note": "Set A is preferred because it extracts data for Wiring Schedule Item 10 which Set B misses entirely. Set B makes more severe errors on Item 50, incorrectly assigning Item 20's conductor size (3#6) and ground size (#8G) to Item 50 (which is 3#4/0, #4G), whereas Set A only errs on Item 50's material and conduit size. Both sets struggle with the OCR confusion between items 31, 32, and 34, and both incorrectly assign a conduit size to Item 150 (Armored Cable), but Set A's overall claim count includes valid extractions (Item 10) that Set B omits."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p11-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set B is better because it extracts claims from both figures on the page, whereas Set A completely ignores Figure 3-2 (Power and Thrust Coefficients). Set B also summarizes the wind speed conditions (6 m/s to 10 m/s) concisely, avoiding the excessive repetition in Set A which generates 10 trivial claims for the same plot. However, Set B includes one unsupported entity ('15-MW rotor') not present in the text or image captions, while Set A is faithful but incomplete."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set A is preferred because it captures the engineering data from both Figure 3-2 (coefficients) and Figure 3-3 (forces), whereas Set B completely omits the power and thrust coefficient data from the top half of the page. Set A concisely summarizes the wind speed range conditions, avoiding the excessive redundancy found in Set B's ten claims for a single figure. Although Set A hallucinates the '15-MW rotor' entity which is not present in the provided text or image, its comprehensive coverage of the page's actual content makes it significantly more useful."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p2-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A is better because it avoids the redundant claims present in Set B. Set B duplicates the extraction for commercially available wire transition temperature (claims 2 and 7) and linear diffuser transition temperature range (claims 10 and 12), which counts as trivial repetition. Both sets share a minor quote inaccuracy regarding the material composition definition (attributing 'solid-state phase transformation' to the wire rather than its actuation), but Set A is more concise and faithful to the unique information density."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 2,
+        "note": "Set B is better because it captures the same technical information as Set A without the redundant duplicate claims (Set A duplicates the transition temperature claims twice). Both sets share minor inaccuracies, including a truncated quote that alters the sentence subject and an incomplete extraction of the '70C and 90C' temperature range, but Set B's lack of duplication makes it more concise and faithful."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p7-text": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set B is better because it correctly categorizes 'Pitch axis' as a 'structural property' rather than a 'structural property center' as Set A does (an axis is not a center). Set B also provides a more precise condition ('chordwise position') derived from the Y-axis label of Figure 2-11, whereas Set A uses the broader figure caption context. Both sets miss the data from Figure 2-10, but Set B's claims regarding Figure 2-11 are more technically accurate."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 5,
+        "note": "Set A is better because it uses attribute names and conditions directly grounded in the text labels (attribute 'structural property' from caption, condition 'chordwise position' from y-axis label). Set B invents a compound attribute 'structural property center' which does not appear in the document, and uses a vaguer condition ('blade planform') derived from the caption rather than the specific axis variable."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p7-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set B is superior because it avoids the factual error in Set A regarding the generator torque (Set A claims 50,000 N•m based on the graph axis limit, whereas the text explicitly states 47,402.91 N•m). Additionally, Set A contains multiple redundant duplicate claims (e.g., maximum torque and control goal appear twice), whereas Set B presents a concise, non-repetitive list of accurate extractions."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A is concise and accurate, capturing all key text specifications without redundancy. Set B includes multiple duplicate claims (e.g., rated speed, control goal, saturation torque) and incorrectly extracts the graph axis limit (50,000 N•m) as a controller value, contradicting the text specification of 47,402.91 N•m."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p1-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is superior because it captures critical dimensional data (heights from grade to finished floor and solar envelope) that appear in the text layer and image, which Set B completely omits. Set B contains significant redundancy, extracting the same claims for handrails, cladding, and solar tubes multiple times with slight attribute variations. Set A provides a concise, non-redundant list that faithfully represents the engineering specifications found in the document."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is better because it captures critical dimensional data (Finished Floor height and Solar Envelope height) that Set A completely omits, which are key engineering facts on an elevation drawing. Set A also contains significant redundancy, extracting the same handrail, cladding, and solar tube specifications multiple times as separate claims, whereas Set B is concise and comprehensive. Both sets accurately transcribe the material specifications and text layer typos (e.g., 'TONNGUE')."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p5-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is more comprehensive, capturing two valid engineering claims that Set B omits: the effect of hysteresis on rotational closure speed and the specific material (ABS) of the pulley parts. Both sets accurately extract the core fabrication parameters and design relationships without inventing data, but Set A's inclusion of the hysteresis behavior makes it more complete regarding the system's performance characteristics."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is better because it extracts two additional correct claims found in the text that Set A misses: the slowing effect of the hysteresis period on louver closure and the ABS material of the pulley parts. Both sets are accurate on their overlapping claims, with no misreadings or unsupported values detected in either. Set B provides a more complete representation of the engineering data on the page."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p2-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 0,
+        "note": "Set A is better because it captures the Lynx instrument count (3 science instruments) which Set B completely misses. Set A also adheres strictly to the text vocabulary (using 'diameter'), whereas Set B infers 'aperture' for four claims which is not explicitly stated in the source text. Both sets contain redundant duplicate claims, but Set B has more redundancy and includes unsupported attribute terminology."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is better because it captures the instrument count for Lynx (3), which Set A omits despite extracting other Lynx parameters like diameter and focal length. Both sets contain significant redundancy (e.g., extracting both 'diameter' and 'aperture' or duplicate claims for the same value), but Set B is more complete regarding the science instrument counts for all five mission concepts. Neither set contains factually incorrect claims based on the provided text."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p9-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Both sets accurately extract the key engineering claims regarding the PID controller design, natural frequency, damping ratio, and term effects. However, Set A contains redundant claims: it extracts the 'second-order system' response twice (claims 3 and 10) with identical quotes and values, whereas Set B extracts this only once. Both sets contain a similar redundancy regarding the generator-torque controller's negative damping effect, but Set A's additional duplication makes it less concise."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A is better because it avoids the exact duplicate claim found in Set B (claims 3 and 10 in B are identical in content, quote, and conditions). While Set A has some redundancy between claims 1 and 10 regarding negative damping, claim 10 adds specific conditions not present in claim 1, making it informative rather than trivial. Both sets accurately capture the engineering parameters and design recommendations from the text."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p6-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A is better because it accurately extracts the filter characteristics without structural errors, whereas Set B incorrectly binds 'time domain' as a condition for the filter roll-off (it is a fragment from the previous sentence) and includes a duplicate claim. Set A provides a more detailed breakdown of the specific filter types (Chebyshev Type 1/2, Elliptic, Bessel) compared to Set B's generic 'chosen filter' entry for that section. Although Set B captures some rated power values that Set A misses, the presence of wrong bindings and duplicates makes it less faithful."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set A is better because it captures critical design parameters of the implemented controller (rated mechanical/electric power, Region 2 constant, number of control regions) which Set B omits. Set B focuses extensively on the characteristics of rejected filter alternatives (Chebyshev, Elliptic, Bessel) which are less important than the baseline controller specifications. Set A contains one duplicate claim (claims 17 and 18), but its coverage of the primary engineering data is superior."
+      }
+    }
+  }
+}

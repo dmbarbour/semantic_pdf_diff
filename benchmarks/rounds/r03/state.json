@@ -1,0 +1,70 @@
+{
+  "steps": {
+    "record:baseline": "done",
+    "record:stem": "done",
+    "record:bands": "done",
+    "record:grow": "done",
+    "replay:baseline": "done",
+    "replay:stem": "done",
+    "replay:bands": "done",
+    "replay:grow": "done",
+    "measure:baseline": "done",
+    "measure:stem": "done",
+    "measure:bands": "done",
+    "measure:grow": "done",
+    "pairs:stem": "done",
+    "pairs:bands": "done",
+    "pairs:grow": "done",
+    "decide:stem": "done",
+    "decide:bands": "done",
+    "decide:grow": "done"
+  },
+  "updated": "2026-09-27T08:16:54+00:00",
+  "judged": {
+    "stem": 24,
+    "bands": 16,
+    "grow": 16
+  },
+  "stopped": {
+    "stem": "stopped early at 24 units: clear result",
+    "bands": "stopped early at 16 units: clear result",
+    "grow": "stopped early at 16 units: clear result"
+  },
+  "failures": {
+    "judge:stem:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:stem:XiaomiMiMo/MiMo-V2.6-Pro": 4,
+    "judge:bands:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:bands:XiaomiMiMo/MiMo-V2.6-Pro": 3,
+    "judge:grow:Qwen/Qwen3.5-397B-A17B": 2,
+    "judge:grow:XiaomiMiMo/MiMo-V2.6-Pro": 7
+  },
+  "failure_notes": {
+    "judge:stem:Qwen/Qwen3.5-397B-A17B": [
+      "u-ken-cd-p95-98-f7b0008f-p3-table variant-first: TimeoutError: The read operation timed out"
+    ],
+    "judge:stem:XiaomiMiMo/MiMo-V2.6-Pro": [
+      "u-ken-cd-p95-98-f7b0008f-p4-table variant-first: TimeoutError: The read operation timed out",
+      "u-ken-cd-p95-98-f7b0008f-p3-table variant-first: TimeoutError: The read operation timed out",
+      "u-ken-cd-p95-98-f7b0008f-p3-table baseline-first: TimeoutError: The read operation timed out",
+      "u-nrel-5mw-p25-36-5eaf02be-p2-table variant-first: TimeoutError: The read operation timed out"
+    ],
+    "judge:bands:XiaomiMiMo/MiMo-V2.6-Pro": [
+      "u-iea-15mw-p20-31-f7071680-p5-visual variant-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p7-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-dc-manual-p59-66-a157bdf0-p4-visual variant-first: TimeoutError: The read operation timed out"
+    ],
+    "judge:grow:XiaomiMiMo/MiMo-V2.6-Pro": [
+      "u-ken-cd-p95-98-f7b0008f-p1-visual baseline-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-ken-cd-p95-98-f7b0008f-p4-visual variant-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-ken-cd-p95-98-f7b0008f-p4-visual baseline-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-iea-15mw-p20-31-f7071680-p5-visual variant-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p5-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-ken-cd-p95-98-f7b0008f-p1-visual variant-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p1-visual baseline-first: TimeoutError: The read operation timed out"
+    ],
+    "judge:grow:Qwen/Qwen3.5-397B-A17B": [
+      "u-nrel-5mw-p25-36-5eaf02be-p8-visual variant-first: ValidationError: 1 validation error for PairVerdict\n  Invalid JSON: control character (\\u0000-\\u001F) found while parsing a string at line 2 column 160 [type=json_invalid, input_value='{\\n\"note\": \"Set A is pre...\"confidence\": \"high\"\\n}', input_type",
+      "u-nrel-5mw-p25-36-5eaf02be-p8-visual baseline-first: ValidationError: 1 validation error for PairVerdict\n  Invalid JSON: control character (\\u0000-\\u001F) found while parsing a string at line 2 column 321 [type=json_invalid, input_value='{\\n\"note\": \"Set A extrac...onfidence\": \"medium\"\\n}', input_typ"
+    ]
+  }
+}
