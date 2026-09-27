@@ -359,6 +359,7 @@ class Settings(Strict):
     tiling: Literal["grid", "bands"] = "grid"  # bands: full-width, cut at whitespace gaps, on report-sized pages
     grow_tiles: bool = False                 # extend grid tiles to include every text line they cut
     sheet_details: bool = False              # cut drawing sheets into their details, titled from the sheet
+    references: bool = False                 # abbreviations defined elsewhere and cited figures' captions as context
     # Situating stage: figure and section "about" statements after extraction.
     situate: bool = True
     verify_visuals: bool = True

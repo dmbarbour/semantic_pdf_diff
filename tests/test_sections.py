@@ -239,6 +239,34 @@ class SectionContext(unittest.TestCase):
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), plain)
             self.assertFalse(any('Within:' in p for p, _ in plain.asked))
 
+    def test_references_bring_definitions_and_cited_captions(self):
+        from semantic_pdf_diff.extract import _long_form, glossary
+        self.assertEqual(_long_form('LCOE', 'we report the levelized cost of energy'), 'levelized cost of energy')
+        self.assertIsNone(_long_form('LCOE', 'we report the annual yield'))
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            first = doc.new_page(width=400, height=400)
+            first.insert_text((40, 40), 'The rotor uses a proportional-integral (PI) pitch controller.', fontsize=9)
+            second = doc.new_page(width=400, height=400)
+            for i in range(16):
+                second.draw_rect(pymupdf.Rect(60 + (i % 4) * 45, 60 + (i // 4) * 35, 90 + (i % 4) * 45, 80 + (i // 4) * 35))
+            second.insert_text((60, 230), 'Figure 3: Pitch response to a wind step')
+            third = doc.new_page(width=400, height=400)
+            third.insert_text((40, 60), 'The PI gains give 12 kW of margin (Figure 3, Table 9).', fontsize=9)
+            path = Path(d) / 'r.pdf'
+            doc.save(path)
+            self.assertEqual(glossary(doc), {'PI': 'proportional-integral'})
+            doc.close()
+            client = Recorder(vision=False, references=True)
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+            prompt = next(p for p, _ in client.asked if '12 kW' in p.split('SOURCE DATA:')[1])
+            self.assertIn('Defined elsewhere: PI = proportional-integral', prompt)
+            self.assertIn('Cited: Figure 3: Pitch response to a wind step (page 2); Table 9: not found in this document',
+                          prompt)
+            plain = Recorder(vision=False)
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), plain)
+            self.assertFalse(any('Defined elsewhere' in p or 'Cited:' in p for p, _ in plain.asked))
+
     def test_table_filter_keeps_tables_and_drops_grids(self):
         from semantic_pdf_diff.extract import real_table
         doc = pymupdf.open()

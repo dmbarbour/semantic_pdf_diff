@@ -98,6 +98,70 @@ def stem_index(doc):
                 rows.append((display_y(page, line["bbox"]), [f"{m} {t[:70]}".strip() for _, m, t in stack]))
     return index
 
+SHORT_FORM = re.compile(r"\(([A-Za-z][A-Za-z0-9&/.-]{1,9})\)")
+
+def _long_form(short, before):
+    """The words before "(short)" that spell it out (Schwartz and Hearst, 2003): the short
+    form's letters are matched right to left, its first letter at a word's start; None if none."""
+    words = before.split()[-min(len(short) + 5, 2 * len(short)):]
+    text = " ".join(words)
+    letters = [c.lower() for c in short if c.isalnum()]
+    i = len(text) - 1
+    for k in range(len(letters) - 1, -1, -1):
+        while i >= 0 and (text[i].lower() != letters[k] or (k == 0 and i > 0 and text[i - 1].isalnum())):
+            i -= 1
+        if i < 0:
+            return None
+        i -= 1
+    found = text[text.rfind(" ", 0, i + 1) + 1:].strip(" ,;:")
+    return found if len(found) > len(short) and short.lower() not in found.lower() else None
+
+def glossary(doc):
+    """{abbreviation: long form} for "long form (ABBR)" anywhere in the document (first one wins)."""
+    out = {}
+    for page in doc:
+        text = " ".join(page.get_text("text").split())
+        for match in SHORT_FORM.finditer(text):
+            short = match.group(1).rstrip(".")
+            if short in out or not any(c.isupper() for c in short) or short.isdigit():
+                continue
+            found = _long_form(short, text[max(0, match.start() - 200):match.start()])
+            if found:
+                out[short] = found
+    return out
+
+MAX_REFERENCES = 3  # definitions, and cited figures or tables, added per chunk
+
+def references(text, terms, figures):
+    """Context lines for what a chunk cites but doesn't hold: abbreviations defined elsewhere in
+    the document, and the captions of the figures and tables it mentions (research round 1)."""
+    from .situate import MENTION, label_key, label_of, targets
+    lines = []
+    defined = [f"{short} = {long}" for short, long in terms.items()
+               if f"({short})" not in text and re.search(rf"\b{re.escape(short)}s?\b", text)]
+    if defined:
+        lines.append("Defined elsewhere: " + "; ".join(defined[:MAX_REFERENCES]))
+    by_label = {}
+    for figure in figures:
+        if figure.label:
+            by_label.setdefault(label_key(figure.label), []).append(figure)
+    cited = []
+    for match in MENTION.finditer(text):
+        label = label_of(*match.groups())
+        found = targets(by_label, label)
+        name = label[0].upper() + label[1:]
+        if found and found[0].caption and found[0].caption[:60] not in " ".join(text.split()):
+            entry = f"{found[0].caption[:150]} (page {found[0].page})"
+        elif found:
+            continue  # the chunk is the caption, or the figure has none
+        else:
+            entry = f"{name}: not found in this document"
+        if entry not in cited:
+            cited.append(entry)
+    if cited:
+        lines.append("Cited: " + "; ".join(cited[:MAX_REFERENCES]))
+    return "\n".join(lines)
+
 CONTEXT_NOTE = "CONTEXT (for reference only: do not extract claims from it):"
 LAYER_NOTE = "TEXT LAYER OF THIS REGION (from the PDF, may be partial; use it to read small labels):"
 
@@ -890,11 +954,24 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             return context
         return (context + "\n" + line) if context else (CONTEXT_NOTE + "\n" + line)
 
+    cited = {}
+
+    def with_references(context, text):
+        if not s.references:
+            return context
+        if not cited:
+            cited.update(terms=glossary(doc), figures=[f for n, page in enumerate(doc, 1) for f in page_figures(page, n)])
+        lines = references(text, cited["terms"], cited["figures"])
+        if not lines:
+            return context
+        return (context + "\n" + lines) if context else (CONTEXT_NOTE + "\n" + lines)
+
     def text_task(page_no, segments, task, depth=0):
         """segments: [(bbox, text)] of consecutive blocks sent together."""
         text = "\n\n".join(t for _, t in segments)
         context = with_within(surrounding(page_no, segments[0][0], segments[-1][0], s.context_before, s.context_after),
                               page_no, segments[0][0])
+        context = with_references(context, text)
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
         consume(page_no, union(b for b, _ in segments), task, text, check=lambda q: quoted(q, text), locate=locate,
@@ -936,8 +1013,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     split_columns(page_no, bbox, task, header, row, columns, depth + 1, derivation)
             consume(page_no, bbox, task, text, derivation=derivation, check=lambda q: quoted(q, text) or covered(q, flat),
                     then=then, repeat_key=repeat_key, repeat_after=2,
-                    context=with_within(lead_in(page_no, table_top(page_no, bbox), s.table_context), page_no,
-                                        table_top(page_no, bbox)))
+                    context=with_references(with_within(lead_in(page_no, table_top(page_no, bbox), s.table_context),
+                                                        page_no, table_top(page_no, bbox)), flat))
         else:
             split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
 
