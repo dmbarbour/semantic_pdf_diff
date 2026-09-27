@@ -1,0 +1,22 @@
+{
+  "name": "r05",
+  "set": "dev",
+  "note": "Research hypotheses 5 (drawing-sheet details) and 8 (definitions and cited captions), each against the round-4 champion.",
+  "baseline": "variants/baseline.json",
+  "variants": {
+    "details": "variants/details.json",
+    "references": "variants/references.json"
+  },
+  "extract_only": true,
+  "units": 32,
+  "chunk": 8,
+  "min_units": 16,
+  "cap": 10.0,
+  "judge_timeout": 450,
+  "judge_retries": 0,
+  "judges": [
+    "Qwen/Qwen3.5-397B-A17B",
+    "XiaomiMiMo/MiMo-V2.6-Pro"
+  ],
+  "hypotheses": "docs/reviews/round-05-2026-09-27.md"
+}
