@@ -355,6 +355,7 @@ class Settings(Strict):
     table_context: int = Field(default=0, ge=0, le=20000)   # characters of text above a table (lead-in, caption)
     visual_text_layer: int = Field(default=0, ge=0, le=20000)  # characters of a region's PDF text sent with its image
     table_filter: bool = False               # drop detected "tables" that are charts, frames or paragraphs
+    stem_context: bool = False               # tell text and table tasks which numbered items and headings they're under
     # Situating stage: figure and section "about" statements after extraction.
     situate: bool = True
     verify_visuals: bool = True

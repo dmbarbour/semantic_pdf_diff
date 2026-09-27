@@ -43,6 +43,61 @@ def extraction_template(s):
     template = s.extract_prompt or EXTRACT
     return template + "".join(rule.rstrip() + "\n" for rule in s.extract_rules)
 
+# Numbered markers, from outer to inner: "Contest 9.", "9-2." or "3.1", "c.", "(iii)", "4.".
+STEM = re.compile(r"^\s*(Contest \d+\.|\d+-\d+\.|\d+(?:\.\d+)+\.?|[a-z]\.|\((?:[ivx]+|\d+|[a-z])\)\.?|\d+\.)(?=\s|$)")
+
+def _stem_level(marker):
+    if marker.startswith("Contest"):
+        return 0
+    if re.match(r"\d+-\d+\.|\d+(\.\d+)+", marker):
+        return 1
+    if re.match(r"[a-z]\.", marker):
+        return 2
+    return 3 if marker.startswith("(") else 4
+
+def stem_index(doc):
+    """{page: [(displayed y, parents)]}: for each line, the numbered items and headings it sits
+    under (research round 1), so a list item keeps its parents across page breaks. Lines that
+    repeat at the same height on most pages (headers, footers) are skipped."""
+    from collections import Counter
+    def key(line):
+        return re.sub(r"\d+", "#", "".join(s["text"] for s in line["spans"]).strip()), round(line["bbox"][1] / 5)
+    pages = [page.get_text("dict", sort=True)["blocks"] for page in doc]
+    seen, sizes = Counter(), Counter()
+    for blocks in pages:
+        keys = set()
+        for block in blocks:
+            for line in block.get("lines", ()):
+                keys.add(key(line))
+                for span in line["spans"]:
+                    sizes[round(span["size"])] += len(span["text"])
+        seen.update(keys)
+    margins = {k for k, n in seen.items() if n >= max(2, len(doc) // 2) and k[0]}
+    body = sizes.most_common(1)[0][0] if sizes else 10
+    stack, pending, index = [], None, {}
+    for number, (page, blocks) in enumerate(zip(doc, pages), 1):
+        rows = index.setdefault(number, [])
+        for block in blocks:
+            for line in block.get("lines", ()):
+                text = "".join(s["text"] for s in line["spans"]).strip()
+                if not text or key(line) in margins:
+                    continue
+                first = line["spans"][0]
+                heading = (first["size"] > body + 0.5 or (first["flags"] & 16 and len(text) < 60)) and len(text) < 90
+                match = STEM.match(text)
+                if match:
+                    level = _stem_level(match.group(1))
+                    level = 1 if heading and level > 1 else level
+                    while stack and stack[-1][0] >= level:
+                        stack.pop()
+                    rest = text[match.end():].strip()
+                    stack.append([level, match.group(1), rest])
+                    pending = stack[-1] if not rest else None  # a marker alone: its text is the next line
+                elif pending is not None:
+                    pending[2], pending = text, None
+                rows.append((display_y(page, line["bbox"]), [f"{m} {t[:70]}".strip() for _, m, t in stack]))
+    return index
+
 CONTEXT_NOTE = "CONTEXT (for reference only: do not extract claims from it):"
 LAYER_NOTE = "TEXT LAYER OF THIS REGION (from the PDF, may be partial; use it to read small labels):"
 
@@ -604,10 +659,34 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         above = " ".join(t for b, t in page_blocks(page_no) if b[3] <= bbox[1] + 2)
         return (CONTEXT_NOTE + "\nAbove the table: ..." + above.strip()[-limit:]) if above.strip() else ""
 
+    stems = {}
+
+    def within(page_no, bbox):
+        """The numbered items and headings a region sits under, e.g. '9-2. Cooking > c. ...'."""
+        if not s.stem_context:
+            return ""
+        if not stems:
+            stems.update(stem_index(doc))
+        top = display_y(doc[page_no - 1], bbox)
+        path = []
+        for number in range(page_no, 0, -1):  # the last line above it, on this page or earlier ones
+            above = [p for y, p in stems.get(number, []) if number < page_no or y < top - 1]
+            if above:
+                path = above[-1]
+                break
+        return ("Within: " + " > ".join(path)) if path else ""
+
+    def with_within(context, page_no, bbox):
+        line = within(page_no, bbox)
+        if not line:
+            return context
+        return (context + "\n" + line) if context else (CONTEXT_NOTE + "\n" + line)
+
     def text_task(page_no, segments, task, depth=0):
         """segments: [(bbox, text)] of consecutive blocks sent together."""
         text = "\n\n".join(t for _, t in segments)
-        context = surrounding(page_no, segments[0][0], segments[-1][0], s.context_before, s.context_after)
+        context = with_within(surrounding(page_no, segments[0][0], segments[-1][0], s.context_before, s.context_after),
+                              page_no, segments[0][0])
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
         consume(page_no, union(b for b, _ in segments), task, text, check=lambda q: quoted(q, text), locate=locate,
@@ -648,7 +727,9 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 if status != "complete" and depth < s.refinement_depth and splittable:
                     split_columns(page_no, bbox, task, header, row, columns, depth + 1, derivation)
             consume(page_no, bbox, task, text, derivation=derivation, check=lambda q: quoted(q, text) or covered(q, flat),
-                    then=then, repeat_key=repeat_key, repeat_after=2, context=lead_in(page_no, table_top(page_no, bbox), s.table_context))
+                    then=then, repeat_key=repeat_key, repeat_after=2,
+                    context=with_within(lead_in(page_no, table_top(page_no, bbox), s.table_context), page_no,
+                                        table_top(page_no, bbox)))
         else:
             split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
 

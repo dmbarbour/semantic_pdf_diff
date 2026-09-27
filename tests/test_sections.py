@@ -221,6 +221,24 @@ class SectionContext(unittest.TestCase):
             self.assertIn('Say which loop a pump serves.', prompt)
             self.assertEqual(len(key), len(base_key) + 1)  # context hash only when context is present
 
+    def test_stem_context_follows_numbered_items_across_pages(self):
+        with tempfile.TemporaryDirectory() as d:
+            doc = pymupdf.open()
+            first = doc.new_page(width=400, height=400)
+            first.insert_text((40, 40), '9-2. Cooking', fontsize=14)
+            first.insert_text((40, 80), 'a. Reduced points are earned between 16 oz and 80 oz.', fontsize=9)
+            second = doc.new_page(width=400, height=400)
+            second.insert_text((40, 60), 'c. The starting water weight shall be at least 96 oz.', fontsize=9)
+            path = Path(d) / 's.pdf'
+            doc.save(path); doc.close()
+            client = Recorder(vision=False, stem_context=True)
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+            prompt = next(p for p, _ in client.asked if '96 oz' in p.split('SOURCE DATA:')[1])
+            self.assertIn('Within: 9-2. Cooking > a. Reduced points are earned', prompt)
+            plain = Recorder(vision=False)
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), plain)
+            self.assertFalse(any('Within:' in p for p, _ in plain.asked))
+
     def test_table_filter_keeps_tables_and_drops_grids(self):
         from semantic_pdf_diff.extract import real_table
         doc = pymupdf.open()
