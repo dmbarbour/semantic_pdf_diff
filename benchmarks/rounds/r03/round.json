@@ -19,5 +19,7 @@
   "judges": [
     "Qwen/Qwen3.5-397B-A17B",
     "XiaomiMiMo/MiMo-V2.6-Pro"
-  ]
+  ],
+  "judge_timeout": 300,
+  "judge_retries": 0
 }

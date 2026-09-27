@@ -5,6 +5,7 @@ A round is a folder, e.g. benchmarks/rounds/r01/, holding round.json:
     {"name": "r01", "baseline": "variants/baseline.json",
      "variants": {"neighbours": "variants/neighbours.json"},
      "set": "dev", "units": 60, "cap": 15.0,
+     "judge_timeout": 300, "judge_retries": 0,   # optional; a stalled judge otherwise holds a chunk for 30 minutes
      "judges": ["google/gemini-3.1-pro", "Qwen/Qwen3.5-397B-A17B", "XiaomiMiMo/MiMo-V2.6-Pro"]}
 
 Variant files are settings (query levers) merged over the recording's base settings.
@@ -162,12 +163,16 @@ def main(argv=None):
                         spent_figure("judge")
                         return 3
                     settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000,
-                                                 image_tokens=3000, concurrency=16, timeout=600, retries=2,
+                                                 image_tokens=3000, concurrency=16,
+                                                 timeout=int(spec.get("judge_timeout", 600)),
+                                                 retries=int(spec.get("judge_retries", 2)),
                                                  max_cost=remaining())
                     client = Client(settings, batch / ".judge-cache")
                     client.ledger = Ledger(LEDGER, round=name, step="judge", variant=v, judge=model)
                     _, _, failures = rounds.judge_pairs(batch, client, model, limit=upto)
                     state.setdefault("failures", {})[f"judge:{v}:{model}"] = len(failures)
+                    if failures:  # why, for diagnosis (a judge that times out on long units, say)
+                        state.setdefault("failure_notes", {})[f"judge:{v}:{model}"] = [f[:300] for f in failures]
                     if client.out_of_budget:
                         state["paused"] = f"{client.out_of_budget} while judging {v}"
                         save_state()
