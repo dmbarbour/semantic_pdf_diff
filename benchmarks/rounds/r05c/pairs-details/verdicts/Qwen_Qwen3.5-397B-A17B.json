@@ -1,0 +1,365 @@
+{
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "verdicts": {
+    "u-calg-cd-p62-66-e0051bec-p1-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 6,
+        "note": "Set A correctly identifies most elevation titles (e.g., North Living, West Living) and binds dimensions accurately, though it confuses the height of the North Bedroom with the West Bedroom and the South Bedroom height with the North Bedroom. Set B repeatedly hallucinates elevation titles, labeling the West Bedroom Elevation (A3) as 'South Bedroom Elevation A3 West,' and swaps width/height values between the North and East bedrooms. Set A is more faithful to the document's structure and labels."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 5,
+        "note": "Set A is better because it binds most claims to specific elevation views (e.g., North Living, West Living) and captures detailed component data (finishes, models like MWD01/02) accurately. Set B frequently uses vague entities like 'Wall section' or 'interior elevation' and contains clear value errors on specific heights (e.g., claiming South Bedroom height is 9'-10\" when it is 9'-2\"). Although Set A confuses South and West Bedroom labels in several claims, its overall specificity and accuracy on other views are superior."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 2,
+        "note": "Set B correctly identifies beam sections (e.g., B1 as W10X15) and attributes dimensions to the correct grid locations (e.g., 5'-0\" to Grid 3), whereas Set A confuses beam identities (claiming B1 is W8X13 and E6 is W10X15) and misplaces key dimensions like the 10'-0\" length. Set A also incorrectly assigns an 8\" rectangular opening to the E6 beam which clearly shows round holes (ø 3\"). Set B has minor semantic errors (calling an offset a flange width) but is significantly more faithful to the drawing's explicit tags and dimensions."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 3,
+        "note": "Set A correctly identifies beam sections (e.g., B1 as W10X15, E6 implied correctly in other claims) and binds dimensions to the correct grid details more consistently. Set B makes critical errors in beam sections (claiming B1 is W8X13 and E6 is W10X15, whereas the drawing shows the reverse for the round hole beams vs rectangular hole beams) and misattributes dimensions (assigning Grid 3's 5'-0\" dimension to Grid 4). Set A has minor interpretation issues (e.g., calling an edge distance 'flange width'), but Set B's errors are factual misreads of the text layer."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p3-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Both sets hallucinate the Living Room finished floor height as 2'-3 1/2\" when the document clearly states 2'-9 1/2\" for both sections. Set A is significantly noisier, containing multiple redundant claims for the same elevations and scales, and includes weak bindings like locating the Centre Module at grid line 'K' or assigning the sheet number as the Mechanical Room's location. Set B is more concise, avoids redundancy, and provides better contextual conditions for scales and module relationships."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Both sets share a significant hallucination on the Living Room finished floor height (claiming 2'-3 1/2\" instead of the visible 2'-9 1/2\"). Set A is preferred because it binds attributes more precisely to their specific sections (e.g., Detail A1 vs C1) and avoids the trivial or vague claims found in Set B (e.g., 'Location | West' or 'Location | K'). Set B is also noisier, containing multiple redundant claims for the same elevations and scales."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p5-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 4,
+        "note": "Set A correctly binds entities to their attributes and locations across the schedules, though it suffers from text truncation errors on manufacturer names ('TIERRA S' instead of 'TIERRA SOL') and descriptions ('PORCELA'). Set B contains significant logical errors, such as attributing Quartz thickness to PT1 tile and assigning Paint specifications (Pratt & Lambert) to the Wall Base (WB) entity, alongside extraction typos like 'FR' and 'SP-L'. Set A is preferred for maintaining faithful entity-attribute relationships despite minor OCR-style truncations."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 4,
+        "note": "Set B is better because it correctly extracts complex dimension data (Millwork, Furniture) and maintains correct entity-attribute bindings for the Finish Schedule (e.g., Wall Base location vs. Set A's hallucinated paint material). Set A contains significant misbindings, assigning Quartz thickness to PT1 tile and Accent Paint details to Wall Base, whereas Set B's errors are mostly minor truncations (e.g., 'TIERRA S' instead of 'SOL') and one furniture description swap."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p4-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Set A is significantly more comprehensive, capturing the revision history, project name, and lot number which Set B omits entirely. However, Set A hallucinates a room name 'Bedroom 4' by conflating the room label with a grid line in two claims, whereas Set B is more conservative but misses critical metadata. Set A's completeness outweighs its specific binding errors."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A accurately extracts the key engineering data (scales, elevations, room adjacencies) without inventing details, though it contains some redundancy. Set B includes more metadata (revisions, project name) but hallucinates a specific room label 'Bedroom 4' which does not exist in the text or image (only 'BEDROOM' is present), and suffers from significant redundancy (duplicate claims for elevations and revisions)."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p4-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Set A correctly extracts critical title block metadata (Lot Number, Team Name, Address, Copyright) which Set B completely ignores. Set A contains one hallucinated condition ('direction E' for slope) and one attribute error (identifying thinset as tile material), while Set B contains misbindings (assigning PT1 to the floor instead of the curb, and Edge Strip to Laundry Millwork instead of Backsplash) along with significant redundancy. Set A is preferred for its completeness and better handling of document metadata."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 0,
+        "note": "Set A is more faithful to the source text, avoiding the inventions found in Set B (e.g., 'direction E' for slope and 'installed' for edge strip) and correctly distinguishing adhesive from material (Set B calls thinset 'material'). Set B captures valuable title block metadata (Lot Number, Team) that Set A misses, but Set B also misbinds the finish 'P3' as part of the attachment method. Set A's redundancy (multiple claims for the same tile layout) is less severe than Set B's factual inaccuracies."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p4-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set B captures critical engineering data missed by Set A, specifically the 28-inch diameter footing plate, the threaded rod's elevation accommodation range, and the Teflon plate hole specifications. Set A omits these significant details and includes interpretation errors, such as labeling a brace size '3X 1/4' as a quantity of 3. Although Set B contains errors in parsing the pin connection plate dimensions (reading 1 inch thickness as 1/2 inch) and mislocating the threaded rod to Detail A3 instead of B1, its superior coverage of the document's technical specifications makes it the more useful extraction."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set A captures significantly more critical engineering data, including the 28\" diameter plate, Teflon plate hole size, and threaded rod elevation accommodation, which Set B misses entirely. Set B contains several vague claims ('component | dimension') and incorrectly binds the L3X3X1/4 angle to the column cap plate. Although Set A misinterprets the thickness and length of the PL3-1/2x3-1/2x1 plate (swapping 1\" and 1/2\"), its overall completeness and specificity make it more useful."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p6-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 8,
+        "note": "Set A correctly extracts project metadata (copyright, lot number, revisions) and accurately identifies most structural members, though it misattributes some Detail 1 features to C5. Set B frequently hallucinates that dimensions and plates from the South Floor Cantilever (C5) and Floor Overhang (A1) belong to the Module Link (A4), and misses all title block information. Set A is more faithful to the document's text and layout."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set B is better because it accurately extracts critical title block metadata (copyright status, lot number, revision dates) that Set A misses entirely. Both sets make similar errors binding specific structural members to the wrong detail (e.g., attributing the C1 angle member to C5), but Set B provides more comprehensive coverage of the document's administrative and geometric data. Set A contains a specific geometric error claiming the Module Link has 11\" support plates (it has 5\") and misidentifies a horizontal dimension as vertical."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is significantly better because it captures comprehensive document metadata including revision history, project name, lot number, and section scales, which Set A entirely omits. While both sets accurately extract the floor and grade elevation data, Set A is overly repetitive with minor variations of the same dimension claims. Set B provides a complete and faithful representation of the engineering drawing's content without inventing values."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is significantly better as it extracts critical title block information including the revision history, project name, lot number, and section scales, which Set B completely omits. While both sets exhibit some redundancy in extracting the floor and grade elevations, Set A provides a comprehensive view of the document's engineering data without inventing values. Set B is too sparse, focusing only on elevation labels and missing the context provided by the revision table and drawing scales."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p8-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 5,
+        "note": "Set B is better because it correctly extracts the nail size as '8D' (Set A incorrectly reads '8 8D' from a nearby detail bubble artifact) and captures critical engineering components missed by Set A, such as the '3\" WOOD LAG SCREW' and 'GRADE LEVEL 0\"'. Set B also provides complete quotes, whereas Set A truncates text (e.g., 'OUGH BOLT'). Both sets make binding errors on the A1 dimensions (Set B attributes them to Railing Attachment, Set A to Deck Module A3), but Set B's data fidelity is higher."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 6,
+        "note": "Set A is significantly better due to higher fidelity in quotes and correct binding of dimensions to components (e.g., correctly identifying Railing Attachment segments). Set B contains multiple errors including hallucinated quotes ('OUGH BOLT', 'Detail A3: 3/4\" = 1'-0\"...'), unnecessary unit conversions (1.33 ft), and misbinding railing dimensions to the Deck Module."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p7-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 2,
+        "note": "Set B correctly distinguishes between the PV Post Detail (A1) and Crane Attachment Details (A5, C3), accurately attributing dimensions like 2\" TYP and 3\" TYP to the PV Post base plate, whereas Set A incorrectly attributes these to the Crane Attachment or C3. Set A also contains significant redundancy, extracting the same plate and bolt dimensions multiple times with slight variations, and truncates quotes (e.g., '3/4\" D'). Set B has minor errors binding specific plate thicknesses to the wrong detail (assigning C3's 1/2\" PL to A5), but its overall component identification is more accurate and faithful to the document structure."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 3,
+        "note": "Set A correctly attributes most claims to their specific details (A1, A3, A5, C3), whereas Set B frequently misattributes PV Post details (A1, e.g., 2\" TYP, 3\" TYP) to Crane Attachments. Set B also misidentifies plate thickness as weld size (3/8\") and contains excessive redundant claims. Set A has minor errors, such as attributing the 1/2\" plate to Detail A5 instead of A3, but is overall more faithful and precise."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p2-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 2,
+        "note": "Set A demonstrates better understanding of the document structure, correctly distinguishing section labels (e.g., Structural Section 3, Detail A1) from grid lines, whereas Set B repeatedly misidentifies section markers (A1, C1) as grids or columns (e.g., 'Grid C1', 'Column A1'). Set A does contain some redundant claims and one inferred unit conversion (8.71875 ft), but Set B has more fundamental semantic binding errors regarding the document's entities."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 3,
+        "note": "Set B captures the significant overall span of Structural Section 3 (37'-6\") which Set A misses. Set A incorrectly extracts a 3'-0\" segment length (image shows 2'-6\") likely propagating OCR noise, whereas Set B avoids this specific error. Both sets confuse section labels (A1, C1, A4) with grid lines or component types, but Set B's use of 'Detail' is less misleading than Set A's 'Column' for a section label. Set B has a factual error placing W8X10 at the bottom level (it is top), but overall provides slightly more accurate global dimensions."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p5-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 7,
+        "note": "Set A contains multiple significant binding errors, incorrectly attributing C3X6 channels and L4X4X5/16 angles to Detail A5 (which shows W8X10 and L3X3X1/4) and placing W10X15 in Detail C2 (which shows W10X12). It also falsely claims a 10-inch depth for a C3X6 member. Set B is much more accurate, correctly binding sections to their specific details (e.g., L4X4X5/16 to Roof Framing, PL sizes to C1/C4) and capturing scales, though it shares one error regarding C3X6 in Detail 2."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A is more accurate, avoiding specific engineering misbindings found in Set B, such as attributing a 10-inch depth to a C3X6 channel (which is 3 inches deep) or claiming L4X4 angles are in Detail A5 (which shows L3X3). Set B provides more specific detail references (e.g., 'Detail C2'), which is useful, but the factual errors and higher redundancy outweigh this benefit. Set A maintains better fidelity to the visible text and standard engineering properties."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p3-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 5,
+        "note": "Set A correctly extracts title block metadata (revisions, client, project name) and most material specifications, but incorrectly identifies the DW width as 3'-0\" (which is the height). Set B captures key North Island dimensions more accurately (total width, DW width) but hallucinates bindings for tag MWK04 in East Island/Section drawings where it does not appear, and normalizes values poorly (8 ft vs 8'-4\"). Set A has fewer factual errors and hallucinations overall."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set B is better because it accurately captures document metadata (revisions, client, project name) and transcribes dimension values faithfully (e.g., 8' - 4\"), whereas Set A truncates values (8 ft vs 8' - 4\") and misidentifies dimensions (DW width vs height). Set B has fewer value mismatches, though it incorrectly labels DW height as width. Set A also has binding errors (SK as component of MWK04)."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p1-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is preferred because it captures critical engineering notes regarding door operation (tilt/turn) and specific solar tube quantities that Set B omits entirely. Although Set A contains significant redundancy with multiple claims for the same dimensions (e.g., Finished Floor, Handrails), these claims are accurate and faithful to the text layer. Set B is cleaner but fails to extract the General Sheet Notes which define component behavior and installation conditions."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is better because it captures critical engineering information missing in Set A, specifically the General Sheet Notes regarding door swing/operation and the specific quantity of solar thermal tubes (40 tubes). Set A is highly redundant, extracting the same dimensions (Solar Envelope, Handrails) multiple times with trivial variations, whereas Set B provides broader coverage of unique facts (Grade Level elevation, Window/Door identifiers) despite some minor redundancy. Both sets are factually faithful to the text layer, but Set B represents the document's engineering content more comprehensively."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p1-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set A is better because it correctly distinguishes between view titles (e.g., C1, C3) and grid lines, whereas Set B incorrectly treats view titles like 'C1' as grid lines (claim: 'between grid D and C1'). Set A also accurately captures specific view heights (8'-8 1/2\" for West, 8'-8 5/8\" for North), while Set B mislocates the 2'-0\" dimension to Detail C1 (it is in the South/North elevations). Set A has a value extraction error ('27 ft' vs '27'-8\"'), but Set B has multiple binding errors and messy unit formatting."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Set A provides more specific and useful engineering claims, particularly binding section sizes (e.g., HSS4X6X1/4, L4X4X5/16) to their correct elevation views (C1, A1), whereas Set B is often generic ('Structural Member'). However, Set A contains condition errors (attributing 2'-0\" to C1 instead of C3, and referencing 'Grid C1'). Set B has significant interpretation errors (claiming 9'-0\" is Grade to T.O. Steel instead of First Floor to T.O. Steel) and extraction inaccuracies (value '27 ft' vs quote '27'-8\"'). Set A is preferred for higher fidelity on member sections despite similar error counts."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p3-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 1,
+        "note": "Set B correctly binds dimensions to their respective modules (e.g., assigning 7'-0\" and 2'-3 7/8\" to Module A), whereas Set A misattributes Module A dimensions to Module B and propagates OCR errors like 3'-8 3/8\" (visually 7'-0 3/8\"). Set A also includes confusing entity references (S-301) and duplicate claims. While both sets inherit the text layer's OCR error for 1'-8 11/16\", Set B is significantly more faithful to the visual layout and component associations."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A correctly binds dimensions to their specific modules (Module A vs Module B), such as assigning 10'-3 3/4\" to Module B and 7'-0\" to Module A. Set B contains a clear binding error where it attributes a Module A dimension (2'-3 7/8\") to Module B, and incorrectly treats the reference sheet 'S-301' as a component name. While Set B captures the angle specification (L3X3X1/4) and scale which Set A misses, Set A's accuracy in contextualizing the engineering data makes it more reliable."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p1-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 0,
+        "note": "Set A is more faithful to the document's detail labels, correctly associating the 8'-0\" dimension with Detail C3 (Footing Elevation), whereas Set B incorrectly binds it to Detail C1 (Decking Footing Plan) and hallucinates a 'span 5-6' label not present in the text. Set B also misbinds the 1\" dimension to a 'nut sleeve' rather than the nut specifically. While Set A suffers from significant redundancy with many duplicate claims, Set B contains factual errors and invented entities which are penalized more heavily."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 3,
+        "note": "Set B is more accurate in binding dimensions to their specific details, correctly associating the 8'-0\" width with the Footing Elevation (C3), whereas Set A incorrectly binds it to the Decking Footing Plan (C1) and invents a 'span 5-6' entity. Set B also correctly extracts the threaded rod diameter (3/4\"), while Set A misinterprets the separate 'NUT' and 'SLEVE' labels as a single 'nut sleeve' component. Both sets suffer from significant redundancy with duplicate claims, but Set B demonstrates better fidelity to the engineering details and component properties."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p2-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 8,
+        "note": "Set A correctly identifies elevation titles (e.g., North Kitchen Elevation) more often than Set B, which repeatedly mislabels D5 as 'South Bathroom Elevation D5' despite the text clearly stating 'North Kitchen'. Both sets struggle with binding dimensions to the correct elevation (e.g., attributing East Kitchen widths to North Kitchen), but Set B makes more fundamental errors in dimension types (claiming a vertical height is a total width) and component labels (assigning shower pan height to MWB01). Set A is more faithful to the text labels even when dimension binding fails."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 5,
+        "note": "Set A is more faithful to the text layer, correctly extracting the DIRTT Living Wall dimensions and the 'H1' tag for the robe hook (whereas Set B hallucinates a numeric height from a different elevation). Set B contains more misbound dimensions, assigning East/West Kitchen widths to the North Kitchen and North Bathroom. While Set A incorrectly labels D5 as 'South Bathroom' in two claims, the associated values are correct for the South Bathroom, whereas Set B's errors involve assigning values to the wrong rooms entirely."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p3-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 2,
+        "note": "Set A correctly distinguishes the Fitted Stiffener specification (PL5X3/8 in Detail A3) from the PV Attachment plate (PL5x4x3/8 in Detail A1), whereas Set B incorrectly assigns the PV plate specification and hole pattern to the Fitted Stiffener and Foundation. Set A contains more duplicate claims and one value error (reading 'MIN' as 'MAX' for opening height), but its entity binding is significantly more faithful to the drawing details. Set B has multiple misbindings conflating properties from Detail A1 with Details A3 and A5."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 7,
+        "note": "Set B correctly identifies the Fitted Stiffener specification (PL5X3/8) as shown in Detail A3, whereas Set A incorrectly attributes the PV Attachment plate (PL5x4x3/8) to the stiffener. Both sets misinterpret the '1'-0\" MIN' dimension as a maximum, but Set B repeats this error four times compared to Set A's single instance. Set B is preferred for accurate component identification despite the repetitive constraint errors."
+      }
+    }
+  }
+}
