@@ -1,0 +1,333 @@
+{
+  "reviewer": "XiaomiMiMo/MiMo-V2.6-Pro",
+  "verdicts": {
+    "u-calg-cd-p62-66-e0051bec-p1-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 12,
+        "note": "Set A contains numerous misbindings of dimensions to the wrong elevation: 9' - 2\", 4 1/2\", 9' - 11 1/2\", 8' - 8\", 3' - 6\" and 9' - 10 1/4\" are attached to South/West/North Bedroom elevations where those values do not appear (e.g. 8' - 8\" and 3' - 6\" belong to A1 South Bedroom, 9' - 2\" and 4 1/2\" to C5 North Bedroom), and it invents an 'Artwork … center point X' measurement and an 'above MWD01' condition. Set A does correctly capture the C1 North Living dimensions, the artwork note, TV/MWL01 in C3 West Living and the A1 scale-related facts, but its repeated use of the label 'SOUTH BEDROOM ELEVATION A3 WEST' (A3 is the West Bedroom) corrupts several claims. Set B is mostly value-faithful and gets the A1 scale, MWL01/TV in West Living and the C3 segment dimensions right, but many claims are vague ('interior elevation', 'Wall section', 'room elevation') and it also misassigns 7' - 6\" to North Bedroom and 9' - 10\" to South Bedroom. Overall B makes far fewer outright misread or invented claims, so it is the better set despite its vagueness."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 2,
+        "note": "Set A misbinds several values to the wrong detail: it assigns W8X13 to B1 FLOOR BEAM NEAR GRID 5 and W10X15 to E6 (both are reversed — B1 is W10X15, C1/E6 are W8X13), puts 10'-0\" and 8\" on details (near Grid 5, E6) whose dimension strings contain no such values, and gives FLOOR BEAM @ GRID 4 a 5'-0\" length that actually belongs to the B4/FLOOR BEAM @ GRID 3 detail. Set B correctly ties W10X15 to A4, B1 and Grid 5 beams, ø 3\" to the C1 and E6 roof beams, and 4'-2\"/3'-1\" to the B1 (FLOOR BEAM NEAR GRID 5) detail. Set B's main errors are calling the 2\" dimension a 'top flange width' on Detail B4 and assigning 2'-6\" to Detail C4, where that dimension does not appear (it belongs to C1). Both sets contain vague, unlocalized opening claims, but Set B keeps conditions and values consistently bound to the correct details."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p3-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 2,
+        "note": "Both sets capture the core elevations (finished floor 2'-9 1/2\" and grade 0'-0\") and room containment, and both repeat the same misread value 2'-3 1/2\" for the Living Room finished floor, which is not on the page. Set A adds several misbound or trivial claims: grid marker K treated as the Centre Module's location, sheet number A302 as a room 'location', 'WEST MODULE | location | West' as tautology, and detail bubble A1 treated as a drawing number for the scale. Set B instead correctly binds the 3/8\"=1'-0\" scales to the Living Room Section (A1) and Centre Module section (C1), and adds supported sheet metadata (A-302, BUILDING SECTIONS, lot number 116). Set B's only other weakness is the 'West Module adjacent to Centre Module' claim, whose quote does not itself support adjacency."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 1,
+        "note": "Both sets capture the core elevations and room containment, but Set A also correctly records the sheet number A-302, sheet title BUILDING SECTIONS, lot number 116, and the A1/C1 scales, which Set B omits. Set B adds several vague or misbound claims (CENTRE MODULE 'location K' where K is a grid line, MECHANICAL ROOM 'location Building Section A302', WEST MODULE 'location West', and generic 'building section contains room' entries) plus repeated duplicate finished-floor claims. Both sets share one misread value: the Living Room finished floor is 2' - 9 1/2\" in the source, not 2' - 3 1/2\". Set A's only other weakness is a quote for the West/Centre adjacency that does not itself support the relation."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p5-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 5,
+        "note": "Set A binds values to the correct components and properties throughout, with only three truncated values (\"TIERRA S\" twice and \"PORCELA\"). Set B makes more serious errors: it misreads the faucet model as SP-L-65014LF-PC and the shower head model as 2655, truncates SK's manufacturer to \"FR\" and description to \"SI\", and misbinds F1's description as \"FA\" when F1 is a BED. Both sets cover similar ground, but A is more accurate and complete on equipment, plumbing, finish and millwork data."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 6,
+        "note": "Set B binds nearly all values correctly and completely (e.g., SH model 52655, FAUCET model BSP-L-65014LF-PC with its F2 tag, MWD02 and MWL01 dimensions), whereas Set A repeatedly truncates or garbles values: SK manufacturer 'FR' (FRANKE), SK description 'SI' (SINK), FAUCET model 'SP-L-65014LF-PC', SHOWER HEAD '2655', and WB profile missing 'MDF'. Set A also misreads F1's description as 'FA' when the schedule lists BED, and drops the material from the wall base profile. Set B's only defects are truncated manufacturer/description strings (TIERRA S, PORCELA), so it is the more faithful set despite omitting a few facts A captured (revision, quartz, glass type)."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p4-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set A captures the full revision history (marks 1–5 with dates and descriptions), the lot number, and the section scales, all supported by the title block and sheet text. Set B omits the revision table and lot number entirely and mislabels the A1 bedroom section as 'Detail A1', including a fabricated quote ('Detail A1: 3/8\" = 1'-0\"') not present in the text. Set A does contain errors — two claims invent 'Bedroom 4' (the '4' is a grid line) and it mislabels the client/competition as the project name — but its coverage of the title block facts outweighs Set B's gaps."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Set B captures the full revision table (five revisions with dates and descriptions) plus the lot number 116, all correctly bound and quoted, which Set A omits entirely despite being major content of the title block. Set A's ten claims are mostly sound on scales and elevations but contain three duplicate pairs and one quote padded with invented text (\"Detail A1: 3/8\\\" = 1'-0\\\"\"). Set B's errors are the two invented \"Bedroom 4\" adjacency claims (no such label exists on the sheet) and the misbound project-name claim (that text is the client/logo block, not a stated project name), plus a couple of trivial room-layout claims and one duplicate elevation. On balance B's correct coverage of revisions and lot number outweighs its few errors."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p7-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 6,
+        "note": "Both sets capture the main member sizes (L3x3x1/4 angle, 3\" STD pipe, 4 1/2x4 1/2x1/2 plate, 3/4\" bolts and holes, 1 1/2\" hole, T.O. STEEL 11'-4\"), but Set B introduces several unsupported bindings: a 'PV POST base plate edge distance' of 2\", a weld size with an invented 'top connection' condition, a 'typical' condition and quote for T.O. STEEL that is not in the text, and a fabricated '1/4\" TYP' typical dimension. Set A errs mainly in mislabeling the PL 3\"X3/8\"X1'-6\" plate as an angle, inventing a 'CRANE ATTACHEMENT C3' entity for the 3\" TYP dimension, and leaving two vague dimension claims (3/8\", 2\") with ambiguous quotes. Set A also covers plate thicknesses (1\" TYP, 1/2\" TYP, 3/8\" PL TYP) and the C3 scale, while Set B uniquely captures the 4 X 3/8\" cap plate, but Set B's invented property/condition bindings outweigh that gain."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 6,
+        "note": "Both sets capture the core C3/A5 crane-attachment callouts (3\" STD pipe, 4-1/2x4-1/2x1/2 plate, (2) 3/4\" bolts, 1-1/2\" hole, 1\" plate, 1/4\" weld) and both make the same misread of the PL 3\"x3/8\"x1'-6\" plate as an \"angle.\" Set A adds the 4x3/8\" cap plate, its 3/8\" thickness, the 3/4\" DIA HOLE TYP and 1'-4-1/4\" dimension, but also invents conditions/attributes (weld 3/8\" \"top connection,\" PV post \"edge distance,\" \"total height\") and a fabricated quote \"T.O. STEEL 11'-4\" TYP,\" plus heavy duplication. Set B adds the 1/2\" PL TYP, 3/8\" PL TYP and the C3 scale, but degrades several callouts into vague \"dimension\" claims (3\" TYP, 2\" TYP, 3/8\") and an unsupported 3/8\" weld; wrong counts and overall coverage come out about even."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p4-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 4,
+        "note": "Set A binds the tile, wallboard, gable and bracket facts cleanly and captures the detail scales (D1/D3/D5 at 6\"=1'-0\", D5 at 1 1/2\"=1'-0\"), the 3/8\" porcelain wall tile, lot number and project name, with quotes that match the text. Set B adds the 1/4\" per foot substrate slope that A misses, but it fabricates the quote \"3\\\" SUBFLOOR FIN.\" to invent a 3 in subfloor thickness, misbinds P3 (a finish on the MDF gable) as part of the L-bracket attachment, calls THIN SET the top layer, and treats the layer name FIN. BATHROOM FLOOR as a finish value, plus it omits the porcelain wall tile and all detail scales and repeats several claims. A's only real defect is the vague PT1 'surface finish' claim, so A is the stronger set overall."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 5,
+        "note": "Set B captures the title-block and detail facts (lot number 116, BOREALIS, the 6\"=1'-0\" and 1 1/2\"=1'-0\" detail scales) and binds the gable, porcelain wall tile and glass tile data correctly. Set A invents a '3\" SUBFLOOR' thickness by splicing the shower-pan dimension with the SUBFLOOR label, and misbinds 'P3' (a finish code) to the steel L-bracket attachment. A also adds unsupported conditions ('top layer', 'boundary') and several trivial/duplicate claims, while B's few weaknesses are mainly vague entities (e.g. 'surface | finish | PT1', 'edge strip | presence')."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p5-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 9,
+        "variant_wrong": 12,
+        "note": "Both sets mix sound section callouts (W10X15, W8X10, C3X6, L4X4X5/16, HSS 4x4x1/4 with keynote 05) with loose dimension grabs, but Set A also captures genuinely supported items Set B misses, notably the 1 1/2\" = 1'-0\" detail scale and the PL 4 1/2X4 1/2X1/2 plate size. Set B invents properties and conditions not in the source — 'spacing' for 11 1/2\" and 6\", 'depth' of a C3X6 for 10\", a 'bottom' clearance for 5/8\" — and repeats 11 1/2\" three times and 1/4\" TYP three times. Set A's main faults are vague entities ('structural element', 'dimension'), the misbound PL5X3/8 to 'component B', and a garbled '1\" in' clearance, but it introduces fewer fabricated conditions overall."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 4,
+        "note": "Set A binds values to the correct member types and detail locations more often, correctly identifying C3X6 as a channel, W10X12/W10X15 as beams and HSS4X4X1/4 with detail conditions (C1/C2, A5), and it captures the 11 1/2\" framing spacing that B omits. Set B covers some facts A misses (W8X10, PL5X3/8, PL 4 1/2X4 1/2X1/2, L3X3X1/4, the 1 1/2\"=1'-0\" scale) but mislabels C3X6 as a \"Beam\", assigns L4X4X5/16 to roof framing without support, invents \"clearance\" readings for bare 1\" dimensions, and cites a nonexistent \"Detail 2\". A's weaknesses are invented bindings (1 13/16\" as a duct opening width, 5/8\" as bottom clearance, 10\" as the depth of a C3X6 member) plus several redundant/vague restatements of the 1/4\" TYP thickness. On balance A has more correctly bound, condition-carrying claims and fewer outright misbindings."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p2-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 8,
+        "note": "Set B preserves more useful context (grid locations, section references, and the grade-to-first-floor and first-floor-to-T.O.-steel vertical relationships) and avoids the vague, condition-less 'dimension/structural member' claims that fill Set A. Set A repeatedly invents or misassigns conditions — 'lower level', 'bottom level', and 'Detail A1' for dimensions (1'-8 7/16\", 1'-8\", 8\", 10\") and W10X15 that appear in other sections — and duplicates several claims. B is not clean either: 'Grid Dimension (C1 to B)', 'Grid B to Section A4', and 'diagonal brace PL3\"X1/4\"' misbind section markers or member types, and a few claims are repeated, but its total of misbound/unsupported claims is smaller. Both correctly capture the key elevations (GRADE LEVEL 0\", FIRST FLR 2'-4\", T.O. STEEL 11'-4\")."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p3-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 7,
+        "note": "Set A captures the title-block facts (client, website, revision dates/descriptions) and the material callouts (QZ countertop, 1/2\" MDF finished with P3, bulkhead clad and finished with P3) with supporting quotes. Set B invents entities and conditions not on the page (\"Upper Millwork\", MWK04 \"excluding 6\\\" offset\", MWK04 \"offset from dining table\"), rounds 8'-4\" to 8 ft, and repeats the same 2\"x6\" framing fact three times under different entities. Set A also has misbindings (SK read as \"skirt\", 4'-0\" bound to the DIRTT BREATHE WALL width, the laundry 1\" side clearance re-attributed to a \"Platform\", DW width, East Island countertop thickness), but its errors are fewer and it covers more of the genuinely stated facts."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 8,
+        "note": "Set B captures the title-block and project facts correctly (revision dates/descriptions, client, website) and binds the platform clearance condition ('MIN. 12\" CLEAR ABOVE AND 1\" EITHER SIDE') properly, while Set A offers none of these and repeats the 2\"x6\" framing claim three times. Set A also invents conditions not on the page ('excluding 6\" offset', 'from left edge to counter transition'), mis-binds SK to MWK04 as a sink component, uses an entity ('Upper Millwork') that does not appear, and states 8 ft where the quoted dimension is 8' - 4\". Set B is not clean either — 'SK = skirt', the dining-table 6\" clearance, the BOREALIS project name and the 4' - 0\" width attributed to the DIRTT Breathe wall are unsupported bindings — but its errors are fewer and its correct claims more numerous and better conditioned."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p8-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 8,
+        "variant_wrong": 4,
+        "note": "Set A binds the key fabrication facts correctly — SIP thickness with vapor barrier, 3\" steel decking, 3/4\" exterior-grade plywood, PL 8 x 3/8 with 7/16\" holes at 12\" O.C., lag screw with washer, and the sealant/waterproofing notes — with mostly supporting quotes. Set B introduces several misbindings and inventions: it merges the W10 x 15 beam into a 'steel decking' spec, calls 3/4\" a deck thickness (it is the plywood), invents 'connection to joist', 'connection | frame' and 'center to center' conditions, and mangles the nail entity ('ank nail') with a truncated quote. Set A is not clean either: both 8'-0\" claims are misbound to the A3 module-to-module connection when the dimension belongs to the A1 typical deck module, the nail value is misread as '8 8D', and the through-bolt quote is a fragment ('OUGH BOLT'), plus it carries duplicates and self-referential claims. Overall A is more faithful and has fewer substantive errors, though both sets pad with repeated/trivial entries."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 8,
+        "variant_wrong": 5,
+        "note": "Set B captures more substantively correct claims — SIP thickness with vapor barrier, exterior-grade plywood, 3\" steel decking, W10x15 beam section, plate hole diameter/spacing, and bolt size and head type — while Set A duplicates the same joist/frame/grade-level claims several times and adds garbled or misbound ones (e.g. 'ank nail', 'deck thickness 3/4\"' bound to FIRST FLR, and W10 X 15 merged with 3\" steel decking as one specification). Both sets misbind the 5'-2 1/2\" and 8'-0\" dimensions (they belong to the A1 deck module detail, not railing post spacing or deck connection spacing), and B also mislabels the 8'-0\" as an A3 connection length. A additionally invents unsupported relations (scaffold footing 'connection: frame', bracket 'connection to joist') and offers tautological claims, so B is the cleaner and more faithful set overall."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p2-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A captures the full revision table (dates and descriptions for revisions 1–5), the scale of both sections, and the lot number, whereas Set B omits all revision history and scale information. Set B is cleaner and adds the sheet title and sheet number, but it misses too many important facts on the page. Set A's main flaw is redundancy (repeated Grade Level, Finished Floor, and Section C1 scale claims) plus one misbinding of the client/event name as a project name. Both correctly bind the finished floor and grade level elevations to the West (C1) and East (A1) module sections."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set B captures the revision table (marks 1–5 with dates and descriptions) and the two section scales (3/8\" = 1'-0\" for C1/West Module and A1/East Module), all supported by the text layer, whereas Set A omits these entirely and instead repeats the same grade/finished-floor elevations four times. Set A's claims are accurate but largely redundant and trivial. Set B's only questionable item is binding the client logo text 'U.S. DEPARTMENT OF ENERGY SOLAR DECATHLON 2013' to 'Project | name' when the sheet labels it CLIENT. Both sets correctly state finished floor 2' - 9 1/2\" above grade 0' - 0\" for both modules and lot number 116."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p6-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 7,
+        "variant_wrong": 6,
+        "note": "Set A captures the key structural specifications with correct bindings — continuous bent plate 7.5X3X1/4, the 11\"X3/8\" and 5\"X3/8\" continuous support plates, 3/4\" bolt diameter, W10X15/W8X10/L3X3X1/4/C8X11.5 sections, and the FIRST FLR 2'-4\" and GRADE LEVEL 0\" elevations. Set B omits bolt diameter and the bent-plate/support-plate dimensions entirely, and instead offers vague or trivial claims (\"plate | thickness | 1/4\"\", \"unspecified component | 1 1/2'\", revision-table rows, repeated B-L1a-GF labels). Both sets contain fabricated or garbled quotes (A: \"1/4\\\" R\" and the truncated \"3/4 DIA BO\"; B: \"CONT. BE 1/4\\\"\" and a weld symbol misread as slope), and both invent dimension conditions, but A's errors are fewer relative to its larger body of correct, well-bound claims."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 8,
+        "variant_wrong": 4,
+        "note": "Set B captures the key Module Link facts (W10X15, 3/4\" bolts with quantity, 5\"X3/8\" support plates, the 2'-9 1/16\" and 3'-0 13/16\" dimensions) and the continuous bent plate 7.5X3X1/4\", all of which Set A omits. Set A instead pads with vague, unbound claims (bare \"1/4\"\" attributed to 'plate', 'weld', 'floor overhang', a scale-bar \"1 1/2'\" given to an 'unspecified component') and invents an entity and quote ('Continuous Bevel', \"CONT. BE 1/4\"\") that do not exist in the text, plus a weld symbol read as a 'slope'. Set B's faults are mainly duplicated claims and invented dimension qualifiers (e.g. 'from grade level to mid-plate') and one quote (\"1/4\\\" R\") not present in the text layer, but it is materially more complete and better bound."
+      }
+    },
+    "u-calg-cd-p39-42-9a895974-p1-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 3,
+        "note": "Set A captures the sheet's substantive facts — the 40-tube solar thermal array (2 X APSE-20), the 1/4\"=1'-0\" drawing scale, finished floor at 2'-9 1/2\" above grade, and the note that layered swing lines indicate both tilt and turn door operation — all supported by their quotes. Set B omits these and instead includes trivial or unsupported claims: W5 and W6 'location: South Elevation' backed only by the bare tag text, a vague 'roof/upper structure | component | PV SOLAR ARRAY', and a P1 material claim whose quote ('P1 CEMENT FIBRE BOARD SIDING') is a fabricated concatenation not present in the text layer. Set A is largely redundant but its claims are correctly bound and faithful, whereas Set B loses important conditions and invents at least one quote."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Set B captures important facts Set A misses, notably the 40-tube quantity (2 X APSE-20), the 1/4\" = 1'-0\" drawing scale, the tilt-and-turn door operation note, and the window/door tag bindings (1.14 W5, 1.01 D1, 1.13 W6), all supported by the text. Set A is padded with repeated handrail and cement-fibre-board claims plus vague or misbound ones (PV SOLAR ARRAY as a 'roof/upper structure component', 'presence: installed', and P1 given a fabricated non-contiguous quote). Set B's only real defect is labeling the 18'-0\" solar envelope dimension as an 'elevation', while Set A has several trivial, duplicated, and unsupported claims. Coverage of siding, railing, handrail, grade and finished-floor facts is comparable, so B wins on accuracy and added correct detail."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p3-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 6,
+        "note": "Set A captures more of the page's real engineering facts — the 28\" dia footing, 3\" std pipe, 3/4\" bolt, PL5X3/8 fitted stiffener, 14/16 gauge deck plates, 6\" min each side of opening, and the >6\" dia reinforcement threshold — with quotes that support them. Set B omits the footing, stiffener spec and gauge plates, and instead misbinds the 6\" MIN dimensions to invented 'edge distance' and 'spacing/clearance' attributes and attaches 1 1/4\" to the fitted stiffener as a vertical offset. Set B also repeats the 1'-0\" MAX OPENING value five times under invented width/height attributes and truncates the #10 TEK SCREWS quote. Set A's weaknesses are a vague 'connection | dimension | 3/8 in' claim and calling HSS4X4X1/4 a stiffener, plus some duplication."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 6,
+        "note": "Set B captures the page's key facts more faithfully, including the 28\" dia footing, both plate gauges (14 ga and 16 ga at the respective deck-opening details), the PL5X3/8 fitted stiffener, and the general note that reinforcement applies to openings greater than 6\" dia. Set A invents several attribute/condition bindings — 6\" MIN read as 'spacing/clearance', 1 1/4\" bound to the fitted stiffener as a 'vertical offset', 1/4\" as a 'top fillet weld', and 1'-0\" split into fabricated 'height' claims — and it omits the footing diameter and the 16 gauge plate. B's errors are milder (a '3 DIAM' value read straight from the quote, 6\" MIN EACH SIDE called 'minimum width', HSS4X4X1/4 labeled a stiffener profile, and a vague 'connection dimension' for 3/8\" TYP), and B also has fewer redundant restatements."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p4-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A contains no claims at all, so it captures none of the title-block information on the page. Set B's four claims are all supported by the image and text layer: the title block shows LOT NUMBER 115, DRAWN BY and CHECKED BY TEAM CAPITOL DC, and SHEET TITLE FRAMING ISOMETRICS on sheet S-901. The quotes are lightly reconstructed from the label/value pairs but faithfully support each claim, and nothing is invented or misbound. Set B is therefore clearly better despite omitting other facts such as the revision history."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A captures four title-block facts — sheet title FRAMING ISOMETRICS, lot number 115, and drawn by / checked by TEAM CAPITOL DC — all of which are supported by the text layer and the title block shown in the image. Set B contains no claims at all, so it omits every available fact from the page. A is therefore clearly better despite its small size, and none of its claims appear misread or invented."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p3-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 4,
+        "note": "Set B captures two clearly correct claims that Set A omits entirely — the drawing scale (1 1/2\" = 1'-0\") and the angle member profile (L3X3X1/4) — and correctly binds segment lengths such as 3'-8 3/8\" (leftmost) and 10'-3 3/4\" (Module B total). Set A makes several clear misbindings: it calls 2'-3 7/8\" a 'total height' when it is a horizontal segment of Detail A1, labels 1 1/2\" a 'flange thickness' although the member is an L3X3X1/4 angle (1/4\" thick), and twice asserts a 'base plate thickness' of 5/8\" that the drawing does not support. Both sets contain vague 'dimension'/'component' claims, but Set B's main error is assigning 2'-3 7/8\" to Module B/Detail A when it belongs to the Module A detail. Overall Set B is more faithful and adds the profile and scale facts Set A misses."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 6,
+        "note": "Set A correctly binds the two overall lengths to the right details (10'-3 3/4\" to Module B/C1, 12'-3 3/4\" to Module A/A1), identifies the L3X3X1/4 angle members and the 1 1/2\"=1'-0\" scale, and its segment readings (3'-8 3/8\" leftmost in C1) match the drawing. Set B invents or misbinds several properties: 2'-3 7/8\" is a horizontal segment in A1 but is called a \"total height,\" 1 1/2\" is called a \"flange thickness,\" 5/8\" is twice called a \"base plate thickness\" (duplicated claim), and 4\" is called a \"base block height.\" Both sets contain vague entities (\"component,\" \"dimension,\" \"base block\") and A also misattributes 2'-3 7/8\" to \"MODULE B - P\" under Detail A, but A has fewer unsupported property bindings overall."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p1-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 2,
+        "note": "Set A captures the material and dimensional facts more faithfully — plywood deck and reclaimed wood surface 5 1/2\" widths, 3/4\" threaded rod, 4x4 post/member, grade level 0\" and FIRST FLR 2'-4\" — with values bound to the correct components. Set B adds several misbound or vague claims, e.g. 1 1/4\" attributed to a 'deck module section' height (that dimension sits in the A6 footing detail), 'decking thickness 1 1/2\"' with an invented 'second instance' condition, 'decking support height 7 1/2\"', and 'component 1 width 1'-0\"', plus trivial drawing-scale entries. Set A is not clean either — 'upper component width 3 3/4\"' and 'deck module connection top right offset' are vague/unbound, and it repeats several claims — but its errors are fewer and its coverage of the key structural facts is better."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 2,
+        "note": "Set B binds values to the correct components and keeps detail conditions (threaded rod 3/4\" in A6, plywood deck and reclaimed wood surface 5 1/2\" widths, bolt length 4\", grade level 0\", footing 3 1/2\" and 1'-0\" in C1), with only vague/invented attributes on the 1 1/2\" and 3 3/4\" items. Set A invents or misbinds several claims: decking thickness 1 1/2\" (decking is 3/4\" x 5 1/2\"), 'deck module section height 1 1/4\"', 'component 1 width 1'-0\"', and an invented 'offset from edge to post 2' attribute, plus a vague 'decking support height 7 1/2\"'. A does capture useful facts B omits (1\" nut, 2\" x 8\" frame, drawing scales), but its errors are more numerous and more serious."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p4-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 5,
+        "note": "Set A binds most values to the right components and keeps key conditions (neoprene pad 1/2\" thickness, A36 threaded rod 2-1/4\" dia with the up-to-12\" elevation-difference condition, 3/4\" plate, PL8X3/8\", 11\" dia x 1/2\" plate, T.O. steel 11'-4\"). Set B invents a quote binding L3X3X1/4 to the column cap plate and calls C3X6 an angle, and it pads the list with four unbound \"component | dimension\" claims that carry no entity. Set A does err (reads 3/8\" plate thickness as a weld size, misreads PL3-1/2X3-1/2X1 as 1/2\" thick and 1\" long, and puts the threaded rod in Detail A3), but its errors are fewer and it captures facts B omits."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 6,
+        "note": "Set A binds most values to the right members — the (1) 2-1/4\" heavy hex nut, keeper plate used during craning, W8X10 beam, pin connection plate PL3-1/2X3-1/2X1 and the 11'-4\" T.O. steel — with only two clear misbindings (L3X3X1/4 labeled a column cap plate with a stitched-together quote, and C3X6 labeled an angle). Set B does capture a few facts A omits (1/2\" neoprene pad, 2-1/4\" A36 threaded rod with up to 12\" elevation difference, 3/4\" plate, C5 scale), but it makes more substantive errors: it invents a 3/8\" weld size, misreads PL3-1/2X3-1/2X1 as 1/2\" thick and 1\" long, puts the threaded rod in Detail A3 instead of B1, and binds PL 6X6X1/4 / L3X3X1/4 to the diagonal brace and HSS4X4X1/4 to a bracing member. A is padded with vague \"component | dimension\" entries and duplicates, but its claims are more often true and correctly bound, so it is the better set."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p1-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 5,
+        "note": "A binds dimensions to the right bays and datums (Bay B-C = 3'-1\", 7'-6\" bay spacing, L4X4X5/16 on the South elevation, T.O. Steel and First Floor kept relative to Grade Level), whereas B assigns 10'-0\" to the B–C bay (the middle bay is 3'-1\") and corrupts several values ('7 ft-in', '5 ft-in', '10 ft', '18 ft', '32'-0\" ft-in'). A's main faults are the '27 ft' claim contradicting its own 27'-8\" quote, the 27'-8\" overall dimension mis-bound to grids 4–8 (twice), an unsupported 'gusset plate' label and a vague '3\" height'. B additionally invents the 'minus top plate/cap' condition, calls an L3x3x1/4 angle a beam, and mislabels elevations C1/C3 as details."
+      }
+    }
+  }
+}

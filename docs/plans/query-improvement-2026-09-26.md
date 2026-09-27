@@ -185,6 +185,7 @@ Round 1 showed that asking the same question again often gets a different answer
 | r03 | Stems, bands, grown tiles, each against the champion | Stems 0.63 (0.51–0.75), bands 0.83 (0.70–0.94), grown tiles 0.80 (0.70–0.89): accepted | $2.51 |
 | r04 / r04h | The three together, development / held-out | 0.64 (0.54–0.73) at 40 units / 0.69 (0.57–0.82): accepted | $2.91 |
 | r05 | Sheet details, references | Details 0.64 (0.41–0.86) on 8 units, with a resolution flaw since fixed; references 0.50 (0.35–0.66): neither accepted | $1.04 |
+| r05b–d | Details with two more sheet slices, and two fixes | 0.50, 0.48, 0.42: parked (isolated title blocks read as out of scope) | $3.46 |
 
 **Champion (2026-09-27):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images, numbered-item stems, whitespace bands on report pages, tiles grown to whole lines). Later rounds compare against it.
 
@@ -192,7 +193,7 @@ Round 1 showed that asking the same question again often gets a different answer
 
 | Lever | Hypothesis | Measured without the model |
 |---|---|---|
-| `sheet_details` | 5: a drawing sheet's details, titled from the sheet | 16–25 images per sheet instead of 35; 0–10 lines cut instead of 23–79 |
+| `sheet_details` | 5: a drawing sheet's details, titled from the sheet | 28–38 images per sheet against 35; 1–23 lines cut instead of 23–79; parked after r05d |
 | `references` | 8: abbreviations defined elsewhere, cited captions | 3–15 of 8–17 chunks per report slice gain a line; r05 neutral, not accepted |
 
 **The tool's defaults** stay at the v6 queries for now, so the recorded fixture keeps replaying. The champion becomes the default at a milestone, after a few rounds, with one full re-recording (about $1).
