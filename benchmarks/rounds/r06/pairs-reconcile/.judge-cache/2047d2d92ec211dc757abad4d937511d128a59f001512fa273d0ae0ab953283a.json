@@ -1,0 +1,1 @@
+{"better":"A","a_wrong":0,"b_wrong":1,"confidence":"high","note":"Set A is more faithful because it captures the 'Region 3' condition for the generator rated speed claim, which is explicitly scoped in the source text ('In Region 3...'). Set B omits this condition, violating the requirement to keep needed conditions. Both sets are otherwise identical in accuracy and content."}

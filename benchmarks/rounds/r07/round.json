@@ -1,0 +1,23 @@
+{
+  "name": "r07",
+  "set": "dev",
+  "note": "Round 6 re-judged: consistent claim samples for judges, the most informative reading representing a merge, and rubric v2 (problem tags, remarks, neutral administration).",
+  "baseline": "variants/baseline.json",
+  "variants": {
+    "reconcile": "variants/reconcile.json",
+    "locator": "variants/locator.json"
+  },
+  "extract_only": true,
+  "units": 32,
+  "chunk": 8,
+  "min_units": 16,
+  "cap": 10.0,
+  "judge_timeout": 450,
+  "judge_retries": 0,
+  "judges": [
+    "Qwen/Qwen3.5-397B-A17B",
+    "XiaomiMiMo/MiMo-V2.6-Pro"
+  ],
+  "hypotheses": "docs/reviews/round-06-2026-09-27.md",
+  "rubric": "v2"
+}
