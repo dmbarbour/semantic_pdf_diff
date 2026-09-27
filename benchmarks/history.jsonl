@@ -674,3 +674,55 @@
 {"metric": "decision", "round": "r05", "step": "decide", "time": "2026-09-27T12:01:48+00:00", "value": "inconclusive: judge more units (complete at 17 units)", "variant": "references"}
 {"metric": "spent", "round": "r05", "step": "judge", "time": "2026-09-27T12:01:48+00:00", "value": 0.982411}
 {"metric": "spent_total", "round": "r05", "step": "report", "time": "2026-09-27T12:01:49+00:00", "value": 1.038935}
+{"metric": "spent", "round": "r05b", "step": "record", "time": "2026-09-27T12:41:15+00:00", "value": 0.20798}
+{"metric": "spent", "round": "r05b", "step": "record", "time": "2026-09-27T13:07:33+00:00", "value": 0.363911}
+{"metric": "tasks", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 268, "variant": "baseline"}
+{"metric": "failed_rate", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 0.0075, "variant": "baseline"}
+{"metric": "partial_rate", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 0.306, "variant": "baseline"}
+{"metric": "claims_per_task", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 3.72, "variant": "baseline"}
+{"metric": "verified_quote_rate", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 1.0, "variant": "baseline"}
+{"metric": "tasks", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 2221, "variant": "baseline"}
+{"metric": "failed_rate", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 0.0036, "variant": "baseline"}
+{"metric": "partial_rate", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 0.0761, "variant": "baseline"}
+{"metric": "claims_per_task", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 2.522, "variant": "baseline"}
+{"metric": "verified_quote_rate", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 0.9748, "variant": "baseline"}
+{"metric": "tasks", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 843, "variant": "baseline"}
+{"metric": "failed_rate", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 0.0047, "variant": "baseline"}
+{"metric": "partial_rate", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 0.0534, "variant": "baseline"}
+{"metric": "claims_per_task", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 0.912, "variant": "baseline"}
+{"metric": "verified_quote_rate", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 1.0, "variant": "baseline"}
+{"metric": "tasks", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 1110, "variant": "baseline"}
+{"metric": "failed_rate", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 0.0018, "variant": "baseline"}
+{"metric": "partial_rate", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 0.0378, "variant": "baseline"}
+{"metric": "claims_per_task", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 3.456, "variant": "baseline"}
+{"metric": "verified_quote_rate", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 0.9632, "variant": "baseline"}
+{"metric": "tasks", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 268, "variant": "details"}
+{"metric": "failed_rate", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 0.0075, "variant": "details"}
+{"metric": "partial_rate", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 0.306, "variant": "details"}
+{"metric": "claims_per_task", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 3.72, "variant": "details"}
+{"metric": "verified_quote_rate", "round": "r05b", "step": "measure", "stratum": "text", "time": "2026-09-27T13:11:48+00:00", "value": 1.0, "variant": "details"}
+{"metric": "tasks", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 2114, "variant": "details"}
+{"metric": "failed_rate", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 0.0038, "variant": "details"}
+{"metric": "partial_rate", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 0.0743, "variant": "details"}
+{"metric": "claims_per_task", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 2.7, "variant": "details"}
+{"metric": "verified_quote_rate", "round": "r05b", "step": "measure", "stratum": "all", "time": "2026-09-27T13:11:48+00:00", "value": 0.9732, "variant": "details"}
+{"metric": "tasks", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 843, "variant": "details"}
+{"metric": "failed_rate", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 0.0047, "variant": "details"}
+{"metric": "partial_rate", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 0.0534, "variant": "details"}
+{"metric": "claims_per_task", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 0.912, "variant": "details"}
+{"metric": "verified_quote_rate", "round": "r05b", "step": "measure", "stratum": "table", "time": "2026-09-27T13:11:48+00:00", "value": 1.0, "variant": "details"}
+{"metric": "tasks", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 1003, "variant": "details"}
+{"metric": "failed_rate", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 0.002, "variant": "details"}
+{"metric": "partial_rate", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 0.0299, "variant": "details"}
+{"metric": "claims_per_task", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 3.929, "variant": "details"}
+{"metric": "verified_quote_rate", "round": "r05b", "step": "measure", "stratum": "visual", "time": "2026-09-27T13:11:48+00:00", "value": 0.9611, "variant": "details"}
+{"metric": "units_changed", "round": "r05b", "step": "pairs", "time": "2026-09-27T13:11:50+00:00", "value": 20, "variant": "details"}
+{"metric": "units_total", "round": "r05b", "step": "pairs", "time": "2026-09-27T13:11:50+00:00", "value": 176, "variant": "details"}
+{"metric": "win_rate_interim", "round": "r05b", "step": "judge", "stratum": "all", "time": "2026-09-27T13:22:27+00:00", "units": 8, "value": {"high": 0.698, "low": 0.302, "mean": 0.5}, "variant": "details"}
+{"metric": "win_rate_interim", "round": "r05b", "step": "judge", "stratum": "all", "time": "2026-09-27T13:33:53+00:00", "units": 16, "value": {"high": 0.615, "low": 0.312, "mean": 0.461}, "variant": "details"}
+{"metric": "win_rate_interim", "round": "r05b", "step": "judge", "stratum": "all", "time": "2026-09-27T13:44:11+00:00", "units": 20, "value": {"high": 0.637, "low": 0.375, "mean": 0.504}, "variant": "details"}
+{"metric": "win_rate", "round": "r05b", "step": "decide", "stratum": "all", "time": "2026-09-27T13:44:11+00:00", "units": 20, "value": {"high": 0.637, "low": 0.375, "mean": 0.504}, "variant": "details"}
+{"metric": "win_rate", "round": "r05b", "step": "decide", "stratum": "visual", "time": "2026-09-27T13:44:11+00:00", "units": 20, "value": {"high": 0.637, "low": 0.375, "mean": 0.504}, "variant": "details"}
+{"metric": "decision", "round": "r05b", "step": "decide", "time": "2026-09-27T13:44:11+00:00", "value": "inconclusive: judge more units (complete at 20 units)", "variant": "details"}
+{"metric": "spent", "round": "r05b", "step": "judge", "time": "2026-09-27T13:44:11+00:00", "value": 0.993277}
+{"metric": "spent_total", "round": "r05b", "step": "report", "time": "2026-09-27T13:44:11+00:00", "value": 1.357189}

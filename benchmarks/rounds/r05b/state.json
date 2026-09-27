@@ -1,0 +1,33 @@
+{
+  "steps": {
+    "record:baseline": "done",
+    "record:details": "done",
+    "replay:baseline": "done",
+    "replay:details": "done",
+    "measure:baseline": "done",
+    "measure:details": "done",
+    "pairs:details": "done",
+    "decide:details": "done"
+  },
+  "updated": "2026-09-27T13:44:11+00:00",
+  "judged": {
+    "details": 20
+  },
+  "stopped": {
+    "details": "complete at 20 units"
+  },
+  "failures": {
+    "judge:details:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:details:XiaomiMiMo/MiMo-V2.6-Pro": 6
+  },
+  "failure_notes": {
+    "judge:details:XiaomiMiMo/MiMo-V2.6-Pro": [
+      "u-dc-cd-p39-42-2523f154-p2-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p62-66-e0051bec-p5-visual variant-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p62-66-e0051bec-p2-visual baseline-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p31-38-870cc2fd-p2-visual variant-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p31-38-870cc2fd-p3-visual variant-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p62-66-e0051bec-p2-visual variant-first: TimeoutError: The read operation timed out"
+    ]
+  }
+}

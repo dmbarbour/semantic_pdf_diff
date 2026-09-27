@@ -1,0 +1,21 @@
+{
+  "name": "r05c",
+  "set": "dev",
+  "note": "r05b again after side columns lost the \"Title block or notes column\" note, which made the model skip legible revision tables.",
+  "baseline": "variants/baseline.json",
+  "variants": {
+    "details": "variants/details.json"
+  },
+  "extract_only": true,
+  "units": 32,
+  "chunk": 8,
+  "min_units": 16,
+  "cap": 10.0,
+  "judge_timeout": 450,
+  "judge_retries": 0,
+  "judges": [
+    "Qwen/Qwen3.5-397B-A17B",
+    "XiaomiMiMo/MiMo-V2.6-Pro"
+  ],
+  "hypotheses": "docs/reviews/round-05-2026-09-27.md"
+}

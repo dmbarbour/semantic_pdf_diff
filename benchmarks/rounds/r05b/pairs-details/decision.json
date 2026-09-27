@@ -1,0 +1,21 @@
+{
+  "units_judged": 20,
+  "overall": {
+    "mean": 0.504,
+    "low": 0.375,
+    "high": 0.637
+  },
+  "strata": {
+    "visual": {
+      "mean": 0.504,
+      "low": 0.375,
+      "high": 0.637
+    }
+  },
+  "decision": "inconclusive: judge more units",
+  "units": {
+    "units": 176,
+    "unchanged": 156
+  },
+  "stopped": "complete at 20 units"
+}
