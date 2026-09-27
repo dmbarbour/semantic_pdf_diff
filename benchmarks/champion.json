@@ -6,5 +6,6 @@
   "stem_context": true,
   "tiling": "bands",
   "grow_tiles": true,
-  "skip_empty": true
+  "skip_empty": true,
+  "reconcile": true
 }

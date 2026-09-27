@@ -192,8 +192,11 @@ Round 1 showed that asking the same question again often gets a different answer
 | r04 / r04h | The three together, development / held-out | 0.64 (0.54–0.73) at 40 units / 0.69 (0.57–0.82): accepted | $2.91 |
 | r05 | Sheet details, references | Details 0.64 (0.41–0.86) on 8 units, with a resolution flaw since fixed; references 0.50 (0.35–0.66): neither accepted | $1.04 |
 | r05b–d | Details with two more sheet slices, and two fixes | 0.50, 0.48, 0.42: parked (isolated title blocks read as out of scope) | $3.46 |
+| r06 | Merged readings, tile locator | 0.58 and 0.49: judges saw separately drawn samples (fixed) | $3.38 |
+| r07 | The same, re-judged (rubric v2) | 0.54 (representative embellished; reverted) and 0.58 (locator parked) | $3.38 |
+| r08 | Merged readings (local representative), chart-reading rule (rubric v3) | 0.56 (accepted with its claim reduction) and 0.59 (not accepted) | $3.55 |
 
-**Champion (2026-09-27):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images, numbered-item stems, whitespace bands on report pages, tiles grown to whole lines). Later rounds compare against it.
+**Champion (2026-09-27):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images, numbered-item stems, whitespace bands on report pages, tiles grown to whole lines; since 2026-09-27 also empty tiles skipped and readings of one fact merged). Later rounds compare against it.
 
 **Levers built, not yet judged:**
 

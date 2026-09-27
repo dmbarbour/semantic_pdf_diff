@@ -20,7 +20,8 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Table filter | `table_filter` | Not accepted | r01b 0.41 (0.23–0.57), 12 pages |
 | References | `references` | Not accepted | r05 0.50 (0.35–0.66), 17 units |
 | Sheet details | `sheet_details` | Parked | r05–r05d: 0.64 → 0.50 → 0.48 → 0.42 |
-| Merged readings | `reconcile` | Re-testing (r08) | r06 0.58 no worse; r07 0.54 with an embellishing representative (reverted) |
+| Merged readings | `reconcile` | In the champion (2026-09-27) | r08 0.56 (0.45–0.67) no worse, with 13.5% fewer claims; the owner's design decision |
+| Chart-reading rule | `visual_rules` | Not accepted | r08 0.59 (0.47–0.71); vaguer readings, out-of-range ones remain |
 | Tile locator | `tile_locator` | Parked | r06 0.49 (flawed sampling), r07 0.58 (0.47–0.68): no worse; wins on IEA and LCIT in both rounds |
 
 ## Levers
@@ -99,7 +100,15 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
   1. **Measurement:** on large units, judges saw different samples of each side (fixed: every difference plus one shared sample).
   2. **Lever:** the representative wording was chosen by region and dropped conditions another reading had (fixed: the most informative reading represents).
 - **r07 (with the most informative reading representing):** 0.54. The judges tagged 31 variant claims invented against 11, because wide regions attach context from elsewhere ("Structure South Elevation - Main"). Reverted to the most local reading.
-- **Next:** r08 with rubric v3.
+- **r08 (the most local reading representing, rubric v3):** 0.56 (0.45–0.67). Duplicates 87 → 63, invented 10 → 7, conditions 16 → 11, but missing 51 → 65.
+- **The missing facts, traced:** "Module A" merged with "Module B" because "a" was a stopword (fixed, `e7ea841`).
+- **Accepted into the champion:** no worse, with a gain (13.5% fewer claims) and the owner's decision.
+
+### Chart-reading rule (`visual_rules`)
+- **Mechanism:** image tasks only: values only where labelled or marked, otherwise trend and range; series from the legend.
+- **Source:** round 7's remarks.
+- **Got:** 0.59, no worse. The out-of-range readings survived (NREL: 23° and 25° on a 0–20° axis), and IEA lost specific readings to vague and sometimes wrong trends.
+- **Next:** a mechanical range check instead of a prohibition.
 
 ### Tile locator (`tile_locator`)
 - **Mechanism:** a 384 px page thumbnail with the tile outlined in red, as a second image with each tile. The owner's suggestion.

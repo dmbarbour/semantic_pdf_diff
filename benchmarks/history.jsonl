@@ -1024,3 +1024,100 @@
 {"metric": "decision", "round": "r07", "step": "decide", "time": "2026-09-27T20:56:30+00:00", "value": "no worse: accept only with another gain (e.g. cost) (complete at 32 units)", "variant": "locator"}
 {"metric": "spent", "round": "r07", "step": "judge", "time": "2026-09-27T20:56:30+00:00", "value": 3.367211}
 {"metric": "spent_total", "round": "r07", "step": "report", "time": "2026-09-27T20:56:30+00:00", "value": 3.377628}
+{"metric": "spent", "round": "r08", "step": "record", "time": "2026-09-27T21:17:05+00:00", "value": 0}
+{"metric": "spent", "round": "r08", "step": "record", "time": "2026-09-27T21:19:27+00:00", "value": 0}
+{"metric": "spent", "round": "r08", "step": "record", "time": "2026-09-27T21:48:08+00:00", "value": 0.272684}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:28+00:00", "value": 268, "variant": "baseline"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:28+00:00", "value": 0.0075, "variant": "baseline"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:28+00:00", "value": 0.306, "variant": "baseline"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:28+00:00", "value": 3.72, "variant": "baseline"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:28+00:00", "value": 893, "variant": "baseline"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:28+00:00", "value": 1.0, "variant": "baseline"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:28+00:00", "value": 2176, "variant": "baseline"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:28+00:00", "value": 0.0028, "variant": "baseline"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:28+00:00", "value": 0.0777, "variant": "baseline"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:28+00:00", "value": 2.574, "variant": "baseline"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:28+00:00", "value": 4388, "variant": "baseline"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:28+00:00", "value": 0.9748, "variant": "baseline"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:28+00:00", "value": 841, "variant": "baseline"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:28+00:00", "value": 0.0024, "variant": "baseline"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:28+00:00", "value": 0.0535, "variant": "baseline"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:28+00:00", "value": 0.914, "variant": "baseline"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:28+00:00", "value": 625, "variant": "baseline"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:28+00:00", "value": 1.0, "variant": "baseline"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:28+00:00", "value": 1067, "variant": "baseline"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:28+00:00", "value": 0.0019, "variant": "baseline"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:28+00:00", "value": 0.0394, "variant": "baseline"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:28+00:00", "value": 3.595, "variant": "baseline"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:28+00:00", "value": 2870, "variant": "baseline"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:28+00:00", "value": 0.9632, "variant": "baseline"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:32+00:00", "value": 268, "variant": "reconcile"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:32+00:00", "value": 0.0075, "variant": "reconcile"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:32+00:00", "value": 0.306, "variant": "reconcile"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:32+00:00", "value": 3.72, "variant": "reconcile"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:32+00:00", "value": 814, "variant": "reconcile"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:32+00:00", "value": 1.0, "variant": "reconcile"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:32+00:00", "value": 2176, "variant": "reconcile"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:32+00:00", "value": 0.0028, "variant": "reconcile"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:32+00:00", "value": 0.0777, "variant": "reconcile"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:32+00:00", "value": 2.574, "variant": "reconcile"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:32+00:00", "value": 3792, "variant": "reconcile"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:32+00:00", "value": 0.9748, "variant": "reconcile"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:32+00:00", "value": 841, "variant": "reconcile"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:32+00:00", "value": 0.0024, "variant": "reconcile"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:32+00:00", "value": 0.0535, "variant": "reconcile"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:32+00:00", "value": 0.914, "variant": "reconcile"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:32+00:00", "value": 555, "variant": "reconcile"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:32+00:00", "value": 1.0, "variant": "reconcile"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:32+00:00", "value": 1067, "variant": "reconcile"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:32+00:00", "value": 0.0019, "variant": "reconcile"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:32+00:00", "value": 0.0394, "variant": "reconcile"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:32+00:00", "value": 3.595, "variant": "reconcile"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:32+00:00", "value": 2423, "variant": "reconcile"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:32+00:00", "value": 0.9632, "variant": "reconcile"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:33+00:00", "value": 268, "variant": "charts"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:33+00:00", "value": 0.0075, "variant": "charts"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:33+00:00", "value": 0.306, "variant": "charts"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:33+00:00", "value": 3.72, "variant": "charts"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:33+00:00", "value": 893, "variant": "charts"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "text", "time": "2026-09-27T21:53:33+00:00", "value": 1.0, "variant": "charts"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:33+00:00", "value": 2166, "variant": "charts"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:33+00:00", "value": 0.0023, "variant": "charts"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:33+00:00", "value": 0.0776, "variant": "charts"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:33+00:00", "value": 2.641, "variant": "charts"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:33+00:00", "value": 4460, "variant": "charts"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "all", "time": "2026-09-27T21:53:33+00:00", "value": 0.9729, "variant": "charts"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:33+00:00", "value": 841, "variant": "charts"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:33+00:00", "value": 0.0024, "variant": "charts"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:33+00:00", "value": 0.0535, "variant": "charts"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:33+00:00", "value": 0.914, "variant": "charts"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:33+00:00", "value": 625, "variant": "charts"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "table", "time": "2026-09-27T21:53:33+00:00", "value": 1.0, "variant": "charts"}
+{"metric": "tasks", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:33+00:00", "value": 1057, "variant": "charts"}
+{"metric": "failed_rate", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:33+00:00", "value": 0.0009, "variant": "charts"}
+{"metric": "partial_rate", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:33+00:00", "value": 0.0388, "variant": "charts"}
+{"metric": "claims_per_task", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:33+00:00", "value": 3.742, "variant": "charts"}
+{"metric": "distinct_claims", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:33+00:00", "value": 2942, "variant": "charts"}
+{"metric": "verified_quote_rate", "round": "r08", "step": "measure", "stratum": "visual", "time": "2026-09-27T21:53:33+00:00", "value": 0.9608, "variant": "charts"}
+{"metric": "units_changed", "round": "r08", "step": "pairs", "time": "2026-09-27T21:53:40+00:00", "value": 91, "variant": "reconcile"}
+{"metric": "units_total", "round": "r08", "step": "pairs", "time": "2026-09-27T21:53:40+00:00", "value": 176, "variant": "reconcile"}
+{"metric": "units_changed", "round": "r08", "step": "pairs", "time": "2026-09-27T21:53:43+00:00", "value": 63, "variant": "charts"}
+{"metric": "units_total", "round": "r08", "step": "pairs", "time": "2026-09-27T21:53:43+00:00", "value": 176, "variant": "charts"}
+{"metric": "win_rate_interim", "round": "r08", "step": "judge", "stratum": "all", "time": "2026-09-27T22:08:44+00:00", "units": 8, "value": {"high": 0.781, "low": 0.281, "mean": 0.531}, "variant": "reconcile"}
+{"metric": "win_rate_interim", "round": "r08", "step": "judge", "stratum": "all", "time": "2026-09-27T22:20:07+00:00", "units": 8, "value": {"high": 0.969, "low": 0.641, "mean": 0.828}, "variant": "charts"}
+{"metric": "win_rate_interim", "round": "r08", "step": "judge", "stratum": "all", "time": "2026-09-27T22:34:00+00:00", "units": 16, "value": {"high": 0.75, "low": 0.424, "mean": 0.591}, "variant": "reconcile"}
+{"metric": "win_rate_interim", "round": "r08", "step": "judge", "stratum": "all", "time": "2026-09-27T22:47:01+00:00", "units": 16, "value": {"high": 0.805, "low": 0.453, "mean": 0.633}, "variant": "charts"}
+{"metric": "win_rate_interim", "round": "r08", "step": "judge", "stratum": "all", "time": "2026-09-27T23:02:02+00:00", "units": 24, "value": {"high": 0.684, "low": 0.413, "mean": 0.545}, "variant": "reconcile"}
+{"metric": "win_rate_interim", "round": "r08", "step": "judge", "stratum": "all", "time": "2026-09-27T23:15:42+00:00", "units": 24, "value": {"high": 0.708, "low": 0.427, "mean": 0.568}, "variant": "charts"}
+{"metric": "win_rate_interim", "round": "r08", "step": "judge", "stratum": "all", "time": "2026-09-27T23:28:49+00:00", "units": 32, "value": {"high": 0.671, "low": 0.454, "mean": 0.562}, "variant": "reconcile"}
+{"metric": "win_rate", "round": "r08", "step": "decide", "stratum": "all", "time": "2026-09-27T23:28:50+00:00", "units": 32, "value": {"high": 0.671, "low": 0.454, "mean": 0.562}, "variant": "reconcile"}
+{"metric": "win_rate", "round": "r08", "step": "decide", "stratum": "table", "time": "2026-09-27T23:28:50+00:00", "units": 32, "value": {"high": 0.667, "low": 0.33, "mean": 0.5}, "variant": "reconcile"}
+{"metric": "win_rate", "round": "r08", "step": "decide", "stratum": "text", "time": "2026-09-27T23:28:50+00:00", "units": 32, "value": {"high": 0.841, "low": 0.432, "mean": 0.648}, "variant": "reconcile"}
+{"metric": "win_rate", "round": "r08", "step": "decide", "stratum": "visual", "time": "2026-09-27T23:28:50+00:00", "units": 32, "value": {"high": 0.725, "low": 0.35, "mean": 0.537}, "variant": "reconcile"}
+{"metric": "decision", "round": "r08", "step": "decide", "time": "2026-09-27T23:28:50+00:00", "value": "no worse: accept only with another gain (e.g. cost) (complete at 32 units)", "variant": "reconcile"}
+{"metric": "win_rate_interim", "round": "r08", "step": "judge", "stratum": "all", "time": "2026-09-27T23:39:39+00:00", "units": 32, "value": {"high": 0.711, "low": 0.465, "mean": 0.59}, "variant": "charts"}
+{"metric": "win_rate", "round": "r08", "step": "decide", "stratum": "all", "time": "2026-09-27T23:39:39+00:00", "units": 32, "value": {"high": 0.711, "low": 0.465, "mean": 0.59}, "variant": "charts"}
+{"metric": "win_rate", "round": "r08", "step": "decide", "stratum": "visual", "time": "2026-09-27T23:39:39+00:00", "units": 32, "value": {"high": 0.711, "low": 0.465, "mean": 0.59}, "variant": "charts"}
+{"metric": "decision", "round": "r08", "step": "decide", "time": "2026-09-27T23:39:39+00:00", "value": "no worse: accept only with another gain (e.g. cost) (complete at 32 units)", "variant": "charts"}
+{"metric": "spent", "round": "r08", "step": "judge", "time": "2026-09-27T23:39:39+00:00", "value": 3.276216}
+{"metric": "spent_total", "round": "r08", "step": "report", "time": "2026-09-27T23:39:40+00:00", "value": 3.5489}
