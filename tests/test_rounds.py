@@ -286,25 +286,18 @@ class Rounds(unittest.TestCase):
         self.assertIsNone(result['claim_agreement_with_judges'])  # the judges' two orders disagreed there: unsure
 
     def test_context_completes_the_sets_without_moving_marked_claims(self):
-        import sqlite3
         folder = self.root / 'spot-context'
         batch = rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=3, limit=1)
         before = {i['id']: [rounds._ident(c) for c in i['baseline']] for i in batch['items']}
-        fixture = self.root / 'fixture.sqlite'  # the recorded requests, for what each claim was read from
-        with sqlite3.connect(fixture) as db:
-            db.execute('CREATE TABLE request (content TEXT, kind TEXT, key_parts TEXT, prompt TEXT)')
-            for item in batch['items']:
-                for c in item['baseline'] + item['variant']:
-                    db.execute('INSERT INTO request VALUES (?, ?, ?, ?)', (item['content'], 'extract',
-                               json.dumps(['extract', 'text', item['content'], c['_task']]), 'rules\nSOURCE DATA:\nPump 10 kW'))
-        after = rounds.add_context(folder, self.root / 'baseline', self.root / 'variant', n=3, limit=1, fixture=fixture)
+        after = rounds.add_context(folder, self.root / 'baseline', self.root / 'variant', n=3, limit=1)
         for item in after['items']:
             shown = [rounds._ident(c) for c in item['baseline']]
             self.assertEqual(shown[:len(before[item['id']])], before[item['id']])  # earlier positions kept
             self.assertEqual(item['hidden_shared'], 0)
             self.assertTrue((folder / item['page_image']).exists())
+            self.assertEqual(set(item['sources']), {'baseline', 'variant'})  # each side's own inputs
         page = rounds.write_spotcheck(folder).read_text()
-        self.assertIn('Pump 10 kW', page)  # a text claim's input, shown with it
+        self.assertIn('Pump 10 kW', page)  # a text claim's input, from its run's query log
 
     def test_judges_see_the_whole_page_and_every_claim_grouped(self):
         folder = self.root / 'spot-whole'

@@ -3,7 +3,9 @@
 One process writes to a store at a time. Evidence and coverage are written per
 task in their own transactions; a rerun resumes by replaying cached model
 responses. The store is bound to its extraction interpreter: a run with a
-different one is rejected unless the affected derived data is reset.
+different one is rejected unless the affected derived data is reset. Cached responses are
+kept through a reset: they're keyed by the query that reached the model (and the model), so
+unchanged queries replay and changed ones are asked afresh.
 """
 import json
 import os
@@ -11,7 +13,7 @@ import sqlite3
 from pathlib import Path
 from .models import Evidence, Figure, FileRef, Interpreter, Section, Source, merge_occurrences
 
-SCHEMA_VERSION = 7
+SCHEMA_VERSION = 8  # 8: responses cached by query hash and model; the query log
 
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -29,8 +31,15 @@ CREATE TABLE task (content TEXT NOT NULL REFERENCES content(id), task TEXT NOT N
 CREATE TABLE evidence (id TEXT NOT NULL, content TEXT NOT NULL REFERENCES content(id), task TEXT NOT NULL,
                        region TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (id, content, task));
 CREATE INDEX evidence_content ON evidence(content);
+-- Responses by the query that reached the model and the model (llm.Client._cache_key).
 CREATE TABLE response_cache (key TEXT PRIMARY KEY, kind TEXT NOT NULL, region TEXT NOT NULL,
-                             request_hash TEXT NOT NULL, response TEXT NOT NULL, content TEXT NOT NULL DEFAULT '');
+                             query TEXT NOT NULL, response TEXT NOT NULL, content TEXT NOT NULL DEFAULT '');
+-- Diagnostics: each query's recipe (how the pipeline built it: role, region, content, task, ...)
+-- and its text, to see what a task was asked. Never used to find answers.
+CREATE TABLE query (hash TEXT NOT NULL, recipe TEXT NOT NULL, role TEXT NOT NULL, region TEXT NOT NULL,
+                    content TEXT NOT NULL, task TEXT NOT NULL, prompt TEXT NOT NULL, images TEXT NOT NULL,
+                    PRIMARY KEY (hash, recipe));
+CREATE INDEX query_task ON query(content, task);
 -- Situating results per content: figures, unresolved references, issues, complete.
 CREATE TABLE situation (content TEXT PRIMARY KEY REFERENCES content(id), data TEXT NOT NULL);
 CREATE TABLE comparison (id INTEGER PRIMARY KEY AUTOINCREMENT, created TEXT NOT NULL, data TEXT NOT NULL);
@@ -179,8 +188,6 @@ class Store:
         counts = {
             "tasks": self.db.execute(f"SELECT COUNT(*) FROM task WHERE region IN ({marks})", regions).fetchone()[0],
             "evidence": self.db.execute(f"SELECT COUNT(*) FROM evidence WHERE region IN ({marks})", regions).fetchone()[0],
-            "cached_responses": self.db.execute(
-                f"SELECT COUNT(*) FROM response_cache WHERE kind='extract' AND region IN ({marks})", regions).fetchone()[0],
             "comparisons": self.db.execute("SELECT COUNT(*) FROM comparison").fetchone()[0],
             "regions": regions,
         }
@@ -188,7 +195,6 @@ class Store:
             with self.db:
                 self.db.execute(f"DELETE FROM task WHERE region IN ({marks})", regions)
                 self.db.execute(f"DELETE FROM evidence WHERE region IN ({marks})", regions)
-                self.db.execute(f"DELETE FROM response_cache WHERE kind='extract' AND region IN ({marks})", regions)
                 self.db.execute("DELETE FROM comparison")
                 self.db.execute("UPDATE content SET extracted=0")
                 self.db.execute("DELETE FROM situation")  # situating reads the evidence
@@ -197,16 +203,14 @@ class Store:
         return counts
 
     def clear_situating(self, dry_run=False, rebind=None):
-        """Forget situating results (figures, "about" statements) and cached triage responses."""
+        """Forget situating results (figures, "about" statements); cached answers stay (see above)."""
         counts = {
             "situated_content": self.db.execute("SELECT COUNT(*) FROM situation").fetchone()[0],
-            "cached_responses": self.db.execute("SELECT COUNT(*) FROM response_cache WHERE kind='triage'").fetchone()[0],
             "regions": ["situating"],
         }
         if not dry_run:
             with self.db:
                 self.db.execute("DELETE FROM situation")
-                self.db.execute("DELETE FROM response_cache WHERE kind='triage'")
                 for content, sid, data in self.db.execute("SELECT content, id, data FROM section").fetchall():
                     plain = Section.model_validate_json(data).model_copy(
                         update={"about": "", "section_type": "", "density": "", "keywords": []})
@@ -375,14 +379,35 @@ class Store:
     def coverage(self, content):
         return [json.loads(r) for (r,) in self.db.execute("SELECT row FROM task WHERE content=? ORDER BY rowid", (content,))]
 
-    # --- response cache (semantic keys) ---------------------------------------
+    # --- response cache (by query and model) and the query log -----------------
     def cached(self, key):
-        return self.db.execute("SELECT response, request_hash FROM response_cache WHERE key=?", (key,)).fetchone()
+        return self.db.execute("SELECT response, query FROM response_cache WHERE key=?", (key,)).fetchone()
 
-    def cache(self, key, kind, region, request_hash, response, content=""):
+    def cache(self, key, kind, region, query, response, content=""):
         with self.db:
             self.db.execute("INSERT OR REPLACE INTO response_cache VALUES (?, ?, ?, ?, ?, ?)",
-                            (key, kind, region, request_hash, response, content))
+                            (key, kind, region, query, response, content))
+
+    def note_query(self, query, recipe, prompt, images):
+        """Log a query's recipe and text (diagnostics: what a task was asked)."""
+        from .fixtures import recipe_labels
+        digest, role, region, content, task = recipe_labels(recipe)
+        with self.db:
+            self.db.execute("INSERT OR IGNORE INTO query VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                            (query, json.dumps(list(recipe), default=str), role, region, content, task, prompt,
+                             json.dumps(list(images))))
+
+    def queries(self, content=None, task=None, role=None):
+        """Logged queries: [{hash, recipe, role, region, content, task, prompt, images}], latest last."""
+        where, args = [], []
+        for column, value in (("content", content), ("task", task), ("role", role)):
+            if value is not None:
+                where.append(f"{column}=?")
+                args.append(value)
+        rows = self.db.execute("SELECT hash, recipe, role, region, content, task, prompt, images FROM query"
+                               + (" WHERE " + " AND ".join(where) if where else "") + " ORDER BY rowid", args)
+        return [{"hash": h, "recipe": json.loads(r), "role": role_, "region": region, "content": c, "task": t,
+                 "prompt": p, "images": json.loads(i)} for h, r, role_, region, c, t, p, i in rows]
 
     def uncache(self, key):
         with self.db:
@@ -428,7 +453,7 @@ class Store:
                 f"SELECT COUNT(*) FROM response_cache WHERE content IN ({marks})", orphans).fetchone()[0]
             if not dry_run:
                 with self.db:
-                    for table in ("evidence", "task", "section", "situation", "response_cache"):
+                    for table in ("evidence", "task", "section", "situation", "response_cache", "query"):
                         self.db.execute(f"DELETE FROM {table} WHERE content IN ({marks})", orphans)
                     self.db.execute(f"DELETE FROM content WHERE id IN ({marks})", orphans)
                 for path in crops:

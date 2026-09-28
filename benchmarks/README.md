@@ -87,8 +87,8 @@ pdf-semantic-diff samples/slices/A.pdf samples/slices/B.pdf --out benchmarks/run
     --fixture tests/fixtures/replay-slices.zip --responder <responder> --config <recording settings>
 
 # Sample a batch (claims round-robin over kinds; abouts; pairs round-robin over relations)
-pdf-semantic-diff review sample benchmarks/batches/s02 --store <label>=benchmarks/runs/... --claims 4 --abouts 1 --pairs 1 \
-    --fixture tests/fixtures/replay-slices.zip        # so items show exactly what each model was asked
+pdf-semantic-diff review sample benchmarks/batches/s02 --store <label>=benchmarks/runs/... --claims 4 --abouts 1 --pairs 1
+    # items show exactly what each model was asked, from the stores' query logs
 pdf-semantic-diff review judge benchmarks/batches/s02 --model <m> --stage questions   # the panel judges questions blind
 pdf-semantic-diff review question-agreement benchmarks/batches/s02
 

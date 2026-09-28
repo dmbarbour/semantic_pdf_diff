@@ -10,7 +10,7 @@ Robustness tests cover null/missing/non-object API response fields, fenced or pr
 
 Schema v2 tests cover content IDs and extension normalization, evidence IDs that survive renames, locators and derivation, lenient claim context fields, interpreter settings, shared content extracted once and never compared, and v2 output files.
 
-Store tests cover layout and owner-only permissions, schema-version refusal, the single-writer lock, interpreter binding (rejection with differences, dry-run previews, selective reset), semantic cache keys (every key part changes the key; the byte-check debug mode catches collisions), per-page task identity, resuming an interrupted run with no repeated model calls and identical findings, reuse after renames, and retrying failed tasks.
+Store tests cover layout and owner-only permissions, schema-version refusal, the single-writer lock, interpreter binding (rejection with differences, dry-run previews, selective reset), the content-addressed cache (a query is found by what reached the model and the model, whatever its recipe; a changed query is asked, never served a stale answer; resets keep cached answers), per-page task identity, resuming an interrupted run with no repeated model calls and identical findings, reuse after renames, and retrying failed tasks.
 
 Section tests cover outline sections (entries sharing a start page, depth limits, pages before the first entry), the page-range fallback, heading paths in prompts, cache keys and evidence, table continuation (with repeated headers, and new tables of the same form, which must not continue), skipping empty rows without renumbering, document properties, and sections reloaded from a store.
 
@@ -19,6 +19,8 @@ Source tests cover scanning (folders, hidden files and folders, OS clutter, miss
 Difference tests cover root-relative paths, classifying files as unchanged, modified, moved, added or removed across differently named roots and zip members, single-file sources, and matching unique claims against shared evidence.
 
 Maintenance tests cover every `show` view and format, `gc` previews and collection (exactly the orphaned content's evidence, cached responses and crops, nothing still referenced), removing sources with missing manifests only on request, and regenerating reports without model calls.
+
+Fixture tests cover recording and replaying offline (a changed query is a miss, never a stale answer; identical queries share one answer and are asked once, even in flight), recorded failures by outcome (the model's replayed, transient ones asked again), the A/A control's second samples, two replays forming the same evidence and reports, re-keying a fixture keyed the old way by replay (answers carried with their dates, changed queries let go), reproducible packing, summaries from the side tables, and prune's guard (nothing pruned after a run that missed, or of most answers). Settings tests toggle every setting through the whole pipeline against a stub that records what reached the model: endpoint settings change no query, post-processing ones no extraction query, and shaping and selecting ones some query.
 
 Union provenance tests cover claim identity (what merges and what doesn't), merging that gives the same result for every order of sightings, one claim merged across passes and pages in a real extraction, and a store that records tasks in any order, replays idempotently and keeps a claim when a selective reset removes only its visual sightings.
 

@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = Path(__file__).with_name("slices.json")
-# The settings every recording shares (part of each request's fingerprint).
+# The settings every recording shares (they shape the queries, so they decide which answers replay).
 BASE_SETTINGS = {"claims_per_request": 20, "output_tokens": 4000, "context_tokens": 262144, "image_tokens": 300}
 
 def main(argv=None):
@@ -31,6 +31,9 @@ def main(argv=None):
                         help="A/A control: extraction for these regions (comma-separated) answered afresh, recorded apart")
     parser.add_argument("--out", type=Path, default=ROOT / "benchmarks/runs/scratch", help="folder for the runs' stores")
     parser.add_argument("--replay", action="store_true", help="replay only (no model calls); fails on anything unrecorded")
+    parser.add_argument("--rekey-from", type=Path, metavar="FIXTURE",
+                        help="with --replay: carry answers from a schema-3 fixture into --fixture (created if need be) "
+                             "wherever the query rebuilt now is the one recorded")
     parser.add_argument("--retry-failures", action="store_true",
                         help="ask recorded failures again (default: replay them, so variants differ only where they change requests)")
     parser.add_argument("--ledger", type=Path)
@@ -80,6 +83,8 @@ def main(argv=None):
             command += ["--responder", args.responder]
         if args.fresh_regions:
             command += ["--fresh-regions", args.fresh_regions]
+        if args.rekey_from:
+            command += ["--rekey-from", str(args.rekey_from)]
         if args.ledger:
             command += ["--ledger", str(args.ledger)] + [f"--ledger-tag={t}" for t in args.tag + [f"run={run['name']}"]]
         if args.max_cost:  # a cap for the whole recording, not per slice (each run's client starts at 0)

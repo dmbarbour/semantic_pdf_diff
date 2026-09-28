@@ -50,7 +50,8 @@ def library_versions():
     return versions
 
 # Query levers: included in an interpreter only when changed from their defaults, so adding a
-# lever doesn't change existing fingerprints (and recorded answers keep replaying).
+# lever doesn't rebind existing stores. (Recorded answers don't depend on this: fixtures and caches are
+# keyed by the query that reached the model; docs/plans/content-addressed-queries-2026-09-28.md.)
 LEVERS = ("extract_prompt", "extract_rules", "context_before", "context_after", "table_context", "visual_text_layer",
           "table_filter", "stem_context", "tiling", "grow_tiles", "sheet_details",
           "references", "tile_locator", "skip_empty",

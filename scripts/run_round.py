@@ -147,7 +147,7 @@ def main(argv=None):
                                        unit=unit_of(spec["variants"][v]))
             if rounds.RUBRICS[spec.get("rubric", "v1")].get("whole"):  # the whole page and every claim (v6)
                 rounds.add_context(batch, runs_root / "baseline", runs_root / v, n=int(spec.get("units", 60)),
-                                   fixture=FIXTURE, unit=unit_of(spec["variants"][v]))
+                                   unit=unit_of(spec["variants"][v]))
             figure("units_changed", built["units"]["units"] - built["units"]["unchanged"], variant=v, step="pairs")
             figure("units_total", built["units"]["units"], variant=v, step="pairs")
             mark(f"pairs:{v}", "done")

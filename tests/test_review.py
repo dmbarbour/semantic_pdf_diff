@@ -104,7 +104,7 @@ class Batches(unittest.TestCase):
         folder = Path(self.dir.name) / name
         with contextlib.redirect_stdout(io.StringIO()):
             cli.main(['review', 'sample', str(folder), '--store', f'SECRET-RESPONDER={self.store}', '--claims', '6',
-                      '--abouts', '2', '--pairs', '2', '--seed', str(seed), '--fixture', str(self.fixture)])
+                      '--abouts', '2', '--pairs', '2', '--seed', str(seed)])
         return folder, json.loads((folder / 'batch.json').read_text())
 
     def labels(self, batch, reviewer, verdict_index=0):

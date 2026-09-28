@@ -13,7 +13,7 @@ from pathlib import Path
 from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff import cli
-from semantic_pdf_diff.llm import CacheKeyMismatch, Client
+from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.models import Claim, Extraction, Judgment, PdfLocator, Evidence, Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
 from semantic_pdf_diff.store import InterpreterMismatch, Store, StoreError, StoreInUse
@@ -155,25 +155,36 @@ class Binding(unittest.TestCase):
             store.bind(extraction_interpreter(Settings(tile_points=500, model='other-model')), reset=True)
             self.assertEqual(self.count(store, 'evidence'), 0)
 
-class SemanticCache(unittest.TestCase):
-    def test_keys_decide_hits_and_debug_check_catches_collisions(self):
+class ContentAddressedCache(unittest.TestCase):
+    def test_answers_are_found_by_what_reached_the_model(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(d) as store:
             client = Client(Settings(base_url=url, retries=0), store)
             key = ('extract', 'text', 'sha256:x.pdf', 'text:0', 'input-hash', None)
             client.ask('first prompt', Extraction, key=key)
             client.ask('first prompt', Extraction, key=key)
             self.assertEqual((state['requests'], client.cache_hits), (1, 1))
-            for i in range(2, len(key)):
-                changed = key[:i] + ('different',) + key[i + 1:]
-                client.ask('first prompt', Extraction, key=changed)
-            self.assertEqual(state['requests'], len(key) - 1)
-            # A key that ignores a real change in the request is served silently...
-            self.assertEqual(client.ask('edited prompt', Extraction, key=key).complete, True)
-            self.assertEqual(state['requests'], len(key) - 1)
-            # ...unless the debug check compares request bytes.
-            checking = Client(Settings(base_url=url, retries=0, cache_check=True), store)
-            with self.assertRaises(CacheKeyMismatch):
-                checking.ask('edited prompt', Extraction, key=key)
+            # The recipe is a label: the same query built another way is the same query...
+            client.ask('first prompt', Extraction, key=key[:3] + ('text:9',) + key[4:])
+            self.assertEqual(state['requests'], 1)
+            # ...and a changed query is asked, whatever recipe it comes with (no stale answer for it).
+            client.ask('edited prompt', Extraction, key=key)
+            self.assertEqual(state['requests'], 2)
+            other = Client(Settings(base_url=url, retries=0, model='other-model'), store)  # another model: asked
+            other.ask('first prompt', Extraction, key=key)
+            self.assertEqual(state['requests'], 3)
+            # What each query was, and how it was built, is logged for diagnostics.
+            logged = store.queries(content='sha256:x.pdf', task='text:0')
+            self.assertEqual({q['prompt'] for q in logged}, {'first prompt', 'edited prompt'})
+
+    def test_a_reset_keeps_cached_answers(self):
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(d) as store:
+            store.bind(extraction_interpreter(Settings()))
+            client = Client(Settings(base_url=url, retries=0), store)
+            key = ('extract', 'tile', 'sha256:x.pdf', 'tile:p1:0', 'input-hash', None)
+            client.ask('a tile', Extraction, key=key)
+            store.bind(extraction_interpreter(Settings(tile_points=500)), reset=True)
+            client.ask('a tile', Extraction, key=key)
+            self.assertEqual(state['requests'], 1)  # unchanged queries aren't paid for again
 
 class TaskIdentity(unittest.TestCase):
     def test_pages_never_share_tasks_or_cache_entries(self):

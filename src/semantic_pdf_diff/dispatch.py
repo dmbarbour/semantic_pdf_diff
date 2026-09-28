@@ -15,6 +15,9 @@ class Dispatcher:
         self.split = all(hasattr(client, m) for m in ("prepare", "cached", "send", "save"))
         self.pool = ThreadPoolExecutor(self.workers, thread_name_prefix="model") if self.workers > 1 and self.split else None
         self.inflight = {}
+        # Queries asked again while the same query is in flight (the same page in two documents):
+        # they wait for its answer rather than being sent (and paid for) twice.
+        self.waiting = {}
 
     def submit(self, prompt, schema, images, key, finish):
         """Ask for `schema`; finish(value, error) is called on this thread, now or later."""
@@ -34,21 +37,37 @@ class Dispatcher:
             return
         if value is not None:
             finish(value, None)
-        elif self.pool is None:
+            return
+        same = self._same(request)
+        if same is not None and same in self.waiting:
+            self.waiting[same].append(finish)
+            return
+        if same is not None:
+            self.waiting[same] = []
+        if self.pool is None:
             self._complete(request, finish, self.client.send, request)
         else:
             self.inflight[self.pool.submit(self.client.send, request)] = (request, finish)
 
+    def _same(self, request):
+        """What makes two requests the same ask: the query, and which answer to it (see Client._sample)."""
+        query = getattr(request, "query", None)
+        sample = getattr(self.client, "_sample", None)
+        return (query, sample(request) if sample else 0) if query else None
+
     def _complete(self, request, finish, call, *args):
+        waiting = self.waiting.pop(self._same(request), [])
         try:
             value = call(*args)
         except ModelFailure as e:
             if hasattr(self.client, "failed"):
                 self.client.failed(request, e)
-            finish(None, e)
+            for done in [finish] + waiting:
+                done(None, e)
             return
         self.client.save(request, value)
-        finish(value, None)
+        for done in [finish] + waiting:
+            done(value, None)
 
     def pending(self):
         return len(self.inflight)

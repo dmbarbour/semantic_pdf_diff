@@ -80,7 +80,10 @@ def add_run_options(parser):
     parser.add_argument('--responder', help='Whose recorded answers to use or record (default: the model name)')
     parser.add_argument('--fresh-regions', default='', metavar='REGIONS',
                         help='A/A control: answer extraction for these regions (e.g. tile,figure,overview) afresh, '
-                             'recorded apart from the responder\'s other answers')
+                             'as a second sample of each query')
+    parser.add_argument('--rekey-from', type=Path, metavar='FIXTURE',
+                        help='carry answers from a fixture keyed the old way (schema 3) into --fixture when the query '
+                             'rebuilt now is the one recorded (re-keying by replay; no model calls in replay mode)')
     add_budget_options(parser)
     parser.add_argument('--plan', action='store_true', help='Inspect sources and estimate visual tasks without API calls')
     parser.add_argument('--reset', action='store_true',
@@ -340,8 +343,9 @@ def make_client(args, settings, store):
                 raise ValueError('record into a .sqlite fixture, then pack it: pdf-semantic-diff fixtures pack')
             temp = tempfile.TemporaryDirectory(prefix='fixture-')
             path = fixtures.unpack(path, temp.name)
-        fixture = fixtures.Fixture(path, create=args.fixture_mode != 'replay')
-        if args.fixture_mode != 'replay':  # text and rendering depend on it: replay tests compare versions
+        rekey = getattr(args, 'rekey_from', None) is not None
+        fixture = fixtures.Fixture(path, create=args.fixture_mode != 'replay' or rekey)
+        if args.fixture_mode != 'replay' or rekey:  # text and rendering depend on it: replay tests compare versions
             import pymupdf
             fixture.note('pymupdf', pymupdf.VersionBind)
         if path is not args.fixture:
@@ -349,8 +353,11 @@ def make_client(args, settings, store):
     if fixture is None:
         return attach_ledger(Client(settings, store), args)
     fresh = [r for r in getattr(args, 'fresh_regions', '').split(',') if r]
+    legacy = fixtures.LegacyFixture(args.rekey_from) if getattr(args, 'rekey_from', None) else None
+    if legacy is not None:
+        fixture.legacy = legacy  # closed with the fixture
     return attach_ledger(Client(settings, store, fixture=fixture, mode=args.fixture_mode, responder=args.responder,
-                                fresh_regions=fresh), args)
+                                fresh_regions=fresh, rekey_from=legacy), args)
 
 def fixture_usage(client):
     f = getattr(client, 'fixture', None)  # test doubles have none
@@ -358,9 +365,12 @@ def fixture_usage(client):
         return {}
     if f.missing:
         log.warning(f"Replay: {len(f.missing)} request(s) have no answer from {client.responder}; first: {f.missing[0]}")
-    log.info(f"Fixture {f.path.name}: {f.served} answers replayed, {f.recorded} recorded, {len(f.missing)} missing")
+    legacy = getattr(client, 'rekey_from', None)
+    log.info(f"Fixture {f.path.name}: {f.served} answers replayed, {f.recorded} recorded, {len(f.missing)} missing"
+             + (f"; re-keyed {legacy.matched}, stale {legacy.stale}" if legacy else ""))
     return {'fixture': {'path': str(f.path), 'responder': client.responder, 'mode': client.mode,
-                        'replayed': f.served, 'recorded': f.recorded, 'missing': len(f.missing)}}
+                        'replayed': f.served, 'recorded': f.recorded, 'missing': len(f.missing),
+                        **({'rekeyed': legacy.matched, 'stale': legacy.stale} if legacy else {})}}
 
 def fixtures_command(argv):
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff fixtures', description='Replay fixtures of recorded answers.')
@@ -409,8 +419,6 @@ def review_command(argv):
     sample.add_argument('--abouts', type=int, default=4, help='About statements per store')
     sample.add_argument('--pairs', type=int, default=4, help='Claim pairs per store (round-robin over relations)')
     sample.add_argument('--seed', type=int, default=1)
-    sample.add_argument('--fixture', type=Path,
-                        help='The recording the stores were replayed from: items then show exactly what each model was asked')
     add = sub.add_parser('import', help="Check a reviewer's labels file and add it to the batch")
     add.add_argument('batch', type=Path)
     add.add_argument('labels', type=Path, nargs='+')
@@ -441,7 +449,7 @@ def review_command(argv):
             if not path:
                 raise ValueError(f'--store {spec!r}: use LABEL=DIR')
             stores.append((label, Path(path)))
-        batch = review.sample(stores, args.batch, args.claims, args.abouts, args.pairs, args.seed, args.fixture)
+        batch = review.sample(stores, args.batch, args.claims, args.abouts, args.pairs, args.seed)
         asked = sum(1 for i in batch['items'] if i.get('request'))
         print(f"{len(batch['items'])} items: first judge the questions blind ({asked} recorded) in "
               f"{args.batch / 'questions.html'}, then the answers in {args.batch / 'review.html'}")

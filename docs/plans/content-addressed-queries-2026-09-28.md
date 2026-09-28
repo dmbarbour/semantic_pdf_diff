@@ -1,6 +1,6 @@
 # Content-addressed queries, checks and records
 
-- **Status:** Planned (2026-09-28).
+- **Status:** Active (2026-09-28): milestones 1–2 done.
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md), whose keys this replaces; [query improvement](query-improvement-2026-09-26.md), whose rounds get the checks.
 - **Feeds:** every later round; the [weighted quality estimates](README.md) (judgement records); a lever search (plans index).
 - **Why:**
@@ -181,6 +181,17 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
     - Not exercised, with reasons: `section_pages` and `dedupe_repeated` (content these documents lack), plus the source and archive limits and the endpoint URL.
   - **Found:** `image_tokens` isn't only a budget. Situating fits its text to what's left of the context window after each image's allowance, so it shapes queries, as do `context_tokens` and `safety_tokens`.
   - **Prune guard:** each run's use of a fixture is logged in a `session` table (not packed). Prune refuses, unless forced, when no run used the fixture since the given time, when a run since then missed requests, or when it would drop more than half the answers.
+- **Milestone 2 (2026-09-28): done.**
+  - **Keys:** `llm.query_hash` names each query by the system and user text, the image hashes, the response format and the generation settings; the model and transport are left out.
+  - **Fixture schema 4:** a main `response` table keyed by (query, responder, sample) with outcomes, and side tables `description` and `recipe` that summaries read and lookups never do.
+  - **Stores (schema 8):** answers are cached by query and model, so resets keep them. A query log holds each query's recipe and text; review batches and the spot check's "read from" read it, each side from its own run.
+  - **Identical queries share one answer,** such as the same page in both documents. The dispatcher asks each only once, even when both are in flight together.
+  - **Re-keying by replay:** `--rekey-from <schema-3 fixture>`.
+    - **The replay fixture:** 3,779 queries carried over. 105 comparisons were stale: their claims had been reworded since they were recorded, and the old keys (claim IDs) had kept serving the old answers. They were recorded afresh for $0.015. All ten runs replay with 0 missing, and the zip went from 2.7 to 1.4 MB.
+    - **The local master fixture** (`tests/fixtures/slices.sqlite`): the replay fixture, plus what re-keyed from the old master under the current defaults (all 12 runs, sheets included) and round 0's levers (extraction only). That's 6,501 answers from 14 documents, 14 MB against 100 MB. Everything else was let go, along with the older local fixtures.
+  - **Tests:** re-keying (answers carried with their dates, changed queries let go), two replays forming the same evidence and reports, and the new cache's guarantees.
+  - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
+  - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
 
 ## Decisions (2026-09-28)
 

@@ -510,16 +510,15 @@ BETTER = [{"name": "A", "label": "A is better"}, {"name": "B", "label": "B is be
           {"name": "same", "label": "About the same"}, {"name": "unsure", "label": "Can't tell"}]
 SURE = [{"name": "high", "label": "Sure"}, {"name": "medium", "label": "Fairly sure"}, {"name": "low", "label": "Guessing"}]
 
-def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, fixture=None, unit="family"):
+def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, unit="family"):
     """Give a batch's units what a reviewer needs to judge them (the owner, 2026-09-28: a band of
     a table without its header can't be judged; "missing" can't be judged from a sample):
     - every claim of both sets, the unshown ones appended after those shown (so marks already
       made on the shown ones stay attached to the same claims);
     - the whole page with the unit's region outlined, and the page's whole text layer;
-    - for text and table claims, the input their request was given (from the recording).
+    - for text and table claims, the input their request was given (from each side's own run store).
     Units are recomputed exactly as build_batch sampled them."""
     import pymupdf
-    import sqlite3
     from .review import render
     from .scan import read_origin
     from .store import Store
@@ -529,17 +528,18 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
         raise ValueError(f"{folder}'s units were built by an earlier collect ({batch.get('unit_claims', 'merged wording')}); "
                          "rebuild the batch to add context")
     picked, _ = pair_units(baseline_dir, variant_dir, n, seed, unit=unit, limit=limit)
-    db = sqlite3.connect(fixture) if fixture and Path(fixture).exists() else None
     sources, docs = {}, {}
 
-    def source(content, task):
-        if db is None or not task or not task.startswith(("text", "table")):
+    def source(side_dir, run, content, task):
+        """The input a text or table task was given, from that side's run store (its query log)."""
+        if not task or not task.startswith(("text", "table")):
             return None
-        if (content, task) not in sources:
-            row = db.execute("SELECT prompt FROM request WHERE content=? AND kind='extract' AND key_parts LIKE ? LIMIT 1",
-                             (content, f'%"{task}"%')).fetchone()
-            sources[(content, task)] = row[0].split("SOURCE DATA:\n", 1)[1].strip() if row and "SOURCE DATA:\n" in row[0] else None
-        return sources[(content, task)]
+        if (side_dir, run, content) not in sources:
+            with Store(Path(side_dir) / run) as store:
+                sources[(side_dir, run, content)] = {q["task"]: q["prompt"] for q in store.queries(content=content,
+                                                                                                    role="extract")}
+        prompt = sources[(side_dir, run, content)].get(task)
+        return prompt.split("SOURCE DATA:\n", 1)[1].strip() if prompt and "SOURCE DATA:\n" in prompt else None
 
     by_id = {i["id"]: i for i in batch["items"]}
     for (run, content, page, family, *band), a, b in picked:
@@ -556,8 +556,9 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
         item["hidden_shared"] = 0
         item["counts"] = {"baseline": len(item["baseline"]), "variant": len(item["variant"]),
                           "shared": len({_ident(c) for c in item["baseline"]} & {_ident(c) for c in item["variant"]})}
-        item["sources"] = {c["_task"]: text for side in ("baseline", "variant") for c in item[side]
-                           if (text := source(content, c.get("_task")))}
+        item["sources"] = {side: {c["_task"]: text for c in item[side]
+                                  if (text := source(side_dir, run, content, c.get("_task")))}
+                           for side, side_dir in (("baseline", baseline_dir), ("variant", variant_dir))}
         if (run, content) not in docs:
             with Store(Path(baseline_dir) / run) as store:
                 file = next(f for f in store.files() if f.content == content)
@@ -581,15 +582,18 @@ def write_spotcheck(folder, seed=3):
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     rng = random.Random(seed)
     order, items = {}, []
-    def public(item, claims, other):
+    def public(item, claims, side, other):
         """Claims for the page: without internals, with the input a text or table claim was read
         from, and the position of the same claim in the other set (marked together)."""
         twins = {_ident(c): k for k, c in enumerate(item[other])}
+        sources = item.get("sources") or {}
+        if set(sources) <= {"baseline", "variant"}:  # each side's own inputs (batches before 2026-09-28: shared)
+            sources = sources.get(side) or {}
         out = []
         for c in claims:
             shown = {k: v for k, v in c.items() if not k.startswith("_")}
             task = c.get("_task") or ""
-            read = (item.get("sources") or {}).get(task)
+            read = sources.get(task)
             shown["source"] = read if read else ("read from an image of this part of the page"
                                                  if task.startswith(("tile", "figure", "overview")) else "")
             shown["twin"] = twins.get(_ident(c))
@@ -607,8 +611,8 @@ def write_spotcheck(folder, seed=3):
                       "title": f"{document}, page {item['page']}, {item['family']} content"
                                + (f", part {band[0] + 1} of {band[1]}" if band else ""),
                       "headings": " | ".join(item.get("sections") or ()), "before": item.get("before", ""),
-                      "within": item.get("within", ""), "A": public(item, item[first], second),
-                      "B": public(item, item[second], first), "page_image": item.get("page_image", ""),
+                      "within": item.get("within", ""), "A": public(item, item[first], first, second),
+                      "B": public(item, item[second], second, first), "page_image": item.get("page_image", ""),
                       "page_text_full": item.get("page_text_full", ""),
                       "a_note": note(first), "b_note": note(second)})
     howto = PAIRWISE.split("Which set is better?")[1].split("{rubric}")[0].strip() + " " + RUBRICS["v4"]["addition"].strip()

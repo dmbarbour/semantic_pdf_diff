@@ -361,7 +361,7 @@ class Settings(Strict):
     figure_tasks: bool = True
     # Query levers (docs/plans/query-improvement). The defaults are the champion of the improvement
     # rounds, promoted 2026-09-28 (rounds 1-9; benchmarks/champion.json); round 0's queries are
-    # benchmarks/round0.json. Levers left at their defaults stay out of interpreter fingerprints.
+    # benchmarks/round0.json. Levers left at their defaults stay out of stores' interpreter bindings.
     extract_prompt: str | None = None       # replaces the extraction instructions
     extract_rules: list[str] = Field(default_factory=list)  # appended to the instructions
     visual_rules: list[str] = Field(default_factory=list)   # appended for image tasks only (tiles, figures, overview)
@@ -389,8 +389,6 @@ class Settings(Strict):
     seed: int | None = None
     max_token_field: Literal["max_tokens", "max_completion_tokens"] = "max_tokens"
     aliases: dict[str, str] = Field(default_factory=dict)
-    # Debugging: verify that a semantic cache hit was recorded for a byte-identical request.
-    cache_check: bool = False
     # Throughput: requests in flight at most (adaptive below this), and rate-limit rules.
     concurrency: int = Field(default=4, ge=1, le=64)
     # Seconds between progress lines when output isn't a terminal.
@@ -460,7 +458,7 @@ class Settings(Strict):
 # tests/test_settings.py toggles each one through the whole pipeline and checks it keeps to its class.
 SETTING_CLASSES = {
     **dict.fromkeys(("model", "base_url", "max_calls", "max_cost", "retries", "timeout", "stream",
-                     "cache_check", "concurrency", "heartbeat_seconds", "rate_limits"), "endpoint"),
+                     "concurrency", "heartbeat_seconds", "rate_limits"), "endpoint"),
     # The token budgets shape too: situating fits its text to what's left of the context window.
     **dict.fromkeys(("context_tokens", "safety_tokens", "image_tokens", "output_tokens", "claims_per_request", "text_bytes",
                      "image_side", "section_depth", "section_pages", "dedupe_repeated", "extract_prompt",

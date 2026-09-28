@@ -184,20 +184,11 @@ class SectionContext(unittest.TestCase):
             self.assertFalse(any(t.startswith(('overview', 'figure')) and '-r' in t for t in tasks))
 
     def test_query_levers(self):
-        from semantic_pdf_diff.fixtures import fingerprint
         from semantic_pdf_diff.provenance import extraction_interpreter
         r0 = lambda **levers: Settings(vision=False, **{**ROUND0, **levers})  # levers relative to round 0
-        base = r0()
-        self.assertEqual(fingerprint(extraction_interpreter(base)),
-                         fingerprint(extraction_interpreter(r0(context_before=0, extract_rules=[]))))
-        # Content levers are in each request's key, so fixtures share answers across variants...
-        self.assertEqual(fingerprint(extraction_interpreter(base)),
-                         fingerprint(extraction_interpreter(r0(context_before=300, table_filter=True))))
-        # ...but a store still binds them (it mustn't mix evidence from different variants),
-        self.assertNotEqual(extraction_interpreter(base).settings, extraction_interpreter(r0(table_filter=True)).settings)
-        # and changed instructions are a different question altogether.
-        self.assertNotEqual(fingerprint(extraction_interpreter(base)),
-                            fingerprint(extraction_interpreter(r0(extract_rules=['Be brief.']))))
+        # A store binds levers: it mustn't mix evidence from different variants. (Answers are shared
+        # wherever a variant's queries are the same: they're found by what reaches the model.)
+        self.assertNotEqual(extraction_interpreter(r0()).settings, extraction_interpreter(r0(table_filter=True)).settings)
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()
             page = doc.new_page(width=400, height=400)

@@ -21,7 +21,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 LEDGER = ROOT / "benchmarks/ledger.jsonl"
-FIXTURE = ROOT / "tests/fixtures/slices.sqlite"  # the recorded requests: what each claim was read from
 DOCUMENTS = {s["name"]: s.get("family") for s in json.loads((ROOT / "scripts/slices.json").read_text())["slices"]}
 
 def combine(dirs, target):
@@ -76,12 +75,12 @@ def main(argv=None):
                 if p.is_symlink() and p.name not in shared:
                     p.unlink()
         batch = rounds.build_batch(base, var, args.folder, n=args.units, seed=args.seed, limit=args.claims)
-        rounds.add_context(args.folder, base, var, n=args.units, seed=args.seed, limit=args.claims, fixture=FIXTURE)
+        rounds.add_context(args.folder, base, var, n=args.units, seed=args.seed, limit=args.claims)
         print(f"{len(batch['items'])} units; page: {rounds.write_spotcheck(args.folder)}")
     elif args.command == "context":
         sources = args.folder / "sources"
         rounds.add_context(args.folder, sources / "baseline", sources / "variant", n=args.units, seed=args.seed,
-                           limit=args.claims, fixture=FIXTURE)
+                           limit=args.claims)
         print(f"Context added; page: {rounds.write_spotcheck(args.folder)}")
     elif args.command == "judge":
         from semantic_pdf_diff.ledger import Ledger

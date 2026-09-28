@@ -53,9 +53,6 @@ def transient(error):
 class NotRecorded(ModelFailure):
     """Replay found no recorded answer for a request."""
 
-class CacheKeyMismatch(RuntimeError):
-    """A semantic cache key matched a response recorded for a different request (debug check)."""
-
 def redact_url(url):
     """Drop user:password@ from a URL so it can be logged or written to reports."""
     parts = urllib.parse.urlsplit(url)
@@ -149,36 +146,55 @@ def read_stream(response):
 
 VALID_ESCAPE = re.compile(r'\\(["\\/bfnrt]|u[0-9a-fA-F]{4})?')
 
+def query_hash(prompt, image_hashes, params):
+    """A query's name: the SHA-256 of what reaches the model (the system and user text, each image's
+    bytes by hash, the response format and generation settings as sent), leaving out the model (the
+    responder) and how the answer travels. A changed query has another name, so a recorded answer
+    never stands in for it (docs/plans/content-addressed-queries-2026-09-28.md)."""
+    canonical = {"system": SYSTEM, "user": prompt, "images": list(image_hashes), "params": params}
+    return hashlib.sha256(json.dumps(canonical, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+def describe(prompt, image_sizes, params):
+    """Facts about a query's own content, for fixture summaries: nothing the model didn't see."""
+    source = re.search(r"^Source type: (\S+)", prompt, re.MULTILINE)
+    return {"template": hashlib.sha256(prompt.split("\n", 1)[0].encode()).hexdigest()[:12],
+            "source_type": source.group(1) if source else "", "text_chars": len(prompt),
+            "image_bytes": list(image_sizes), "params": params}
+
 @dataclass
 class Request:
     raw: bytes
-    request_hash: str
-    key: tuple | None
+    request_hash: str          # the byte cache's key (library use without a store): the whole request, model included
+    key: tuple | None          # the caller's recipe: how the query was built (role, region, content, task, ...); labels only
     schema: type
     estimate: int  # tokens, input plus output reserve, for rate limiting
     prompt: str = ""
     images: tuple = ()        # SHA-256 of each image sent
     usage: dict | None = None  # as the server reported it, set by send
     unrecorded: bool = False   # replay found no answer: send fails without calling the model
+    query: str = ""            # the query's hash (query_hash): the name answers are recorded and cached under
+    description: dict | None = None  # facts about the query's content (describe)
 
 class Client:
     """Chat Completions client with a response cache.
 
-    `cache` is either a Store, whose response cache uses semantic keys supplied by
-    callers, or a folder for a byte-keyed file cache (for library use without a store).
+    `cache` is either a Store, whose response cache is keyed by the query that reached the
+    model and the model, or a folder for a byte-keyed file cache (for library use without a store).
     """
     def __init__(self, settings: Settings, cache, api_key: str | None = None, fixture=None, mode="replay",
-                 responder=None, fresh_regions=None):
+                 responder=None, fresh_regions=None, rekey_from=None):
         """fixture: an open fixtures.Fixture. In `replay` mode answers come only from it and
         unrecorded requests fail; in `replay-or-record` mode unrecorded requests (and recorded
         failures) go to the model and are recorded under `responder` (default: the model name);
-        `record-new` is the same but replays recorded failures as failures."""
+        `record-new` is the same but replays the model's failures as failures (transient ones
+        are asked again). rekey_from: a fixtures.LegacyFixture whose answers are carried into
+        `fixture` when the query rebuilt now is the one recorded (re-keying by replay)."""
         self.s = settings
         self.fixture, self.mode, self.responder = fixture, mode, responder or settings.model
-        # A/A control: extraction requests for these regions are answered afresh, recorded apart
-        # (responder + "#fresh"), so a round can measure how much re-asking alone moves results.
+        # A/A control: extraction requests for these regions are answered afresh, as another sample
+        # of the same query, so a round can measure how much re-asking alone moves results.
         self.fresh_regions = frozenset(fresh_regions or ())
-        self.fingerprints = {}
+        self.rekey_from = rekey_from
         self.store = None if isinstance(cache, (str, Path)) else cache
         self.cache = Path(cache) if self.store is None else None
         if self.cache is not None:
@@ -202,9 +218,9 @@ class Client:
     def ask(self, prompt, schema, images=(), key=None):
         """Ask the model for a `schema` object: prepare, look up, send and save in one call.
 
-        key: optional semantic cache key, a tuple (kind, region, *parts) identifying the
-        request by meaning (content, locator, input hash, crop). Within a store, the
-        bound interpreter covers everything else that shapes the response.
+        key: the recipe, a tuple (kind, region, *parts) saying how the query was built (content,
+        locator, input hash, crop). It labels the query in fixtures and the store's query log;
+        answers are found by the query itself (query_hash), never by the recipe.
         """
         request = self.prepare(prompt, schema, images, key)
         cached = self.cached(request)
@@ -226,10 +242,11 @@ class Client:
         if estimate + self.s.output_tokens + self.s.safety_tokens > self.s.context_tokens:
             raise BudgetExceeded(f"Request exceeds configured context budget ({estimate} estimated input tokens)")
         content = [{"type": "text", "text": prompt}]
-        hashes = []
+        hashes, sizes = [], []
         for path in images:
             raw_image = Path(path).read_bytes()
             hashes.append(hashlib.sha256(raw_image).hexdigest())
+            sizes.append(len(raw_image))
             data = base64.b64encode(raw_image).decode()
             content.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + data}})
         body = {"model": self.s.model, "messages": [
@@ -248,66 +265,69 @@ class Client:
         # so cached answers still match.
         request_hash = hashlib.sha256(self.s.base_url.encode() + json.dumps(body).encode()
                                       + json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()
+        params = {k: v for k, v in body.items() if k not in ("model", "messages")}
+        query = query_hash(prompt, hashes, params)
         if self.s.stream:
             body.update(stream=True, stream_options={"include_usage": True})
         raw = json.dumps(body).encode()
-        return Request(raw, request_hash, key, schema, estimate + self.s.output_tokens, prompt, tuple(hashes))
+        return Request(raw, request_hash, key, schema, estimate + self.s.output_tokens, prompt, tuple(hashes),
+                       query=query, description=describe(prompt, sizes, params))
 
-    def _fixture_key(self, key):
-        """A request's key in a fixture. A comparison's store key carries a hash of the
-        comparison settings, model included (comparisons aren't bound to the store); in a
-        fixture the interpreter fingerprint covers those settings and the responder the model."""
-        parts = list(key)
-        if parts[0] == "compare":
-            parts[2] = ""
-        return hashlib.sha256(json.dumps(parts, sort_keys=True, default=str).encode()).hexdigest()
-
-    def _responder(self, request):
+    def _sample(self, request):
+        """Which answer to a query this run wants: 0, or 1 for the A/A control's fresh regions."""
         fresh = request.key and request.key[0] == "extract" and request.key[1] in self.fresh_regions
-        return self.responder + "#fresh" if fresh else self.responder
-
-    def _fingerprint(self, kind):
-        """(fingerprint, interpreter) for a request kind's role."""
-        if kind not in self.fingerprints:
-            from . import provenance
-            from .fixtures import fingerprint
-            make = {"extract": provenance.extraction_interpreter, "triage": provenance.triage_interpreter,
-                    "compare": provenance.comparison_interpreter}.get(kind)
-            interpreter = make(self.s) if make else None
-            self.fingerprints[kind] = (fingerprint(interpreter), interpreter) if interpreter else ("", None)
-        return self.fingerprints[kind]
+        return 1 if fresh else 0
 
     def cached(self, request):
         """The cached response, or None (main thread: the store is single-threaded).
 
         With a fixture, only the fixture answers: the store's cache may hold another
-        responder's answers."""
-        if self.fixture is not None and request.key is not None:
-            kind = request.key[0]
-            row = self.fixture.answer(self._fixture_key(request.key), self._fingerprint(kind)[0], self._responder(request))
-            if row is not None and row[1] is not None and (self.mode == "replay"
-                                                            or self.mode == "record-new" and not transient(row[1])):
+        responder's answers. Either way, a store keeps the query's recipe and text, to see
+        what each task was asked (diagnostics; never used for lookup)."""
+        if self.store is not None and request.key is not None:
+            self.store.note_query(request.query, request.key, request.prompt, request.images)
+        if self.fixture is not None:
+            sample = self._sample(request)
+            row = self.fixture.answer(request.query, self.responder, sample)
+            if row is None and self.rekey_from is not None and request.key is not None:
+                row = self._rekey(request, sample)
+            if row is not None and request.key is not None:
+                self.fixture.note_recipe(request.query, request.key)
+            if row is not None and row[0] != "ok" and (self.mode == "replay"
+                                                        or self.mode == "record-new" and row[0] == "invalid"):
                 self.fixture.served += 1
-                raise ModelFailure(f"Recorded failure: {row[1]}")
-            if row is not None and row[1] is None:  # recorded failures in record modes fall through: asked again
+                raise ModelFailure(f"Recorded failure: {row[2]}")
+            if row is not None and row[0] == "ok":  # recorded failures in record modes fall through: asked again
                 try:
-                    value = request.schema.model_validate_json(row[0])
+                    value = request.schema.model_validate_json(row[1])
                 except ValueError as e:
                     raise ModelFailure(f"Recorded answer no longer fits {request.schema.__name__}: {e}") from e
                 self.fixture.served += 1
                 return value
-            if self.mode == "replay":
+            if self.mode == "replay" and row is None:
                 request.unrecorded = True
-                self.fixture.missing.append(list(request.key))
+                self.fixture.missing.append(list(request.key) if request.key else [request.query])
             return None
-        value = self._lookup(request.request_hash, request.key, request.schema)
+        value = self._lookup(request)
         if value is not None:
             self.cache_hits += 1
         return value
 
+    def _rekey(self, request, sample):
+        """Carry an answer from a schema-3 fixture when the query rebuilt now is the one recorded."""
+        found = self.rekey_from.lookup(request.key, self.s, sample, self.responder, request.prompt, request.images)
+        if found is None:
+            return None
+        answer, error, usage, recorded = found
+        outcome = "ok" if error is None else "transient" if transient(error) else "invalid"
+        self.fixture.record(request.query, self.responder, sample, outcome=outcome, answer=answer, error=error,
+                            usage=usage, recorded=recorded, description=request.description, recipe=request.key)
+        self.fixture.recorded -= 1  # re-keyed, not recorded
+        return outcome, answer, error
+
     def save(self, request, value):
         """Cache a response (main thread); in record mode, also record it in the fixture."""
-        self._save(request.request_hash, request.key, value)
+        self._save(request, value)
         self._record(request, value.model_dump_json(), None)
 
     def failed(self, request, error):
@@ -317,19 +337,16 @@ class Client:
             self._record(request, "", f"{type(error).__name__}: {error}")
 
     def _record(self, request, answer, error):
-        if self.fixture is not None and self.mode != "replay" and request.key is not None:
-            kind, region = request.key[0], request.key[1]
-            fingerprint, interpreter = self._fingerprint(kind)
-            self.fixture.record(self._fixture_key(request.key), fingerprint, self._responder(request), kind=kind, region=region,
-                                content=request.key[2] if kind in ("extract", "triage") else "",
-                                key_parts=list(request.key), prompt=request.prompt, images=list(request.images),
-                                schema=request.schema.__name__, answer=answer, usage=request.usage,
-                                description=interpreter.model_dump() if interpreter else None, role=kind, error=error)
+        if self.fixture is not None and self.mode != "replay":
+            outcome = "ok" if error is None else "transient" if transient(error) else "invalid"
+            self.fixture.record(request.query, self.responder, self._sample(request), outcome=outcome, answer=answer,
+                                error=error, usage=request.usage, description=request.description, recipe=request.key)
 
     def send(self, request):
         """Call the model, with retries (thread-safe; touches neither the cache nor the store)."""
         if request.unrecorded:
-            raise NotRecorded(f"No recorded answer from {self.responder} for {request.key[:2] + request.key[3:4]}")
+            raise NotRecorded(f"No recorded answer from {self.responder} for "
+                              f"{request.key[:2] + request.key[3:4] if request.key else request.query}")
         last = "Unknown model failure"
         for attempt in range(self.s.retries + 1):
             with self.lock:
@@ -421,40 +438,36 @@ class Client:
                 time.sleep(wait)
         raise ModelFailure(last)
 
-    def _semantic(self, request_hash, key):
-        if key is None:
-            return request_hash, "raw", ""
-        return hashlib.sha256(json.dumps(list(key), sort_keys=True, default=str).encode()).hexdigest(), key[0], key[1]
+    def _cache_key(self, request):
+        """The store cache's key: the query and the model answering it."""
+        return hashlib.sha256((self.s.model + "\x00" + request.query).encode()).hexdigest()
 
-    def _lookup(self, request_hash, key, schema):
+    def _lookup(self, request):
         if self.store is None:
-            target = self.cache / (request_hash + ".json")
+            target = self.cache / (request.request_hash + ".json")
             if not target.exists():
                 return None
             try:
-                return schema.model_validate_json(target.read_text())
+                return request.schema.model_validate_json(target.read_text())
             except ValueError:
                 target.unlink()
                 return None
-        semantic, _, _ = self._semantic(request_hash, key)
-        row = self.store.cached(semantic)
+        row = self.store.cached(self._cache_key(request))
         if row is None:
             return None
-        if self.s.cache_check and row[1] != request_hash:
-            raise CacheKeyMismatch(f"Cache key {key!r} matched a response recorded for a different request")
         try:
-            return schema.model_validate_json(row[0])
+            return request.schema.model_validate_json(row[0])
         except ValueError:
-            self.store.uncache(semantic)
+            self.store.uncache(self._cache_key(request))
             return None
 
-    def _save(self, request_hash, key, value):
+    def _save(self, request, value):
         if self.store is None:
-            target = self.cache / (request_hash + ".json")
+            target = self.cache / (request.request_hash + ".json")
             temp = target.with_suffix(".tmp")
             temp.write_text(value.model_dump_json())
             temp.replace(target)
         else:
-            semantic, kind, region = self._semantic(request_hash, key)
-            content = key[2] if key and key[0] in ("extract", "triage") else ""
-            self.store.cache(semantic, kind, region, request_hash, value.model_dump_json(), content)
+            key = request.key or ("raw", "")
+            content = key[2] if key[0] in ("extract", "triage") else ""
+            self.store.cache(self._cache_key(request), key[0], key[1], request.query, value.model_dump_json(), content)

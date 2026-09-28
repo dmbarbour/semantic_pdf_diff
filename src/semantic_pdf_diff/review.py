@@ -123,33 +123,26 @@ class Source:
 def _headings(source, content):
     return {s.id: " > ".join(s.heading_path) for s in source.store.sections(content)}
 
-def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, fixture=None):
+def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1):
     """Write a batch: a stratified random sample of claims (round-robin over claim kinds),
-    about statements and claim pairs from each store.
-
-    fixture: the recording the stores were replayed from; each item then shows the exact
-    request (instructions and input) that produced it."""
+    about statements and claim pairs from each store. Each item shows the exact request
+    (instructions and input) that produced it, from the store's query log."""
     folder = Path(folder)
     (folder / "images").mkdir(parents=True, exist_ok=True)
     rng = random.Random(seed)
-    requests = Requests(fixture) if fixture else None
     items = []
-    try:
-        for label, path in stores:
-            source = Source(label, path)
-            try:
-                found = _sample_claims(source, folder, rng, claims)
-                found += _sample_abouts(source, folder, rng, abouts)
-                found += _sample_pairs(source, folder, rng, pairs)
-                if requests:
-                    for item in found:
-                        item["request"] = requests.describe(item, source, folder)
-                items += found
-            finally:
-                source.close()
-    finally:
-        if requests:
-            requests.close()
+    for label, path in stores:
+        source = Source(label, path)
+        try:
+            found = _sample_claims(source, folder, rng, claims)
+            found += _sample_abouts(source, folder, rng, abouts)
+            found += _sample_pairs(source, folder, rng, pairs)
+            requests = Requests(source.store)
+            for item in found:
+                item["request"] = requests.describe(item, source, folder)
+            items += found
+        finally:
+            source.close()
     rng.shuffle(items)  # responders and item types interleaved
     batch = {"format": "semantic-pdf-diff-review-batch", "version": 1, "name": folder.name, "seed": seed,
              "created": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
@@ -159,36 +152,19 @@ def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, fixture=None):
     return batch
 
 class Requests:
-    """The recorded requests behind sampled items: what exactly each model was asked."""
+    """The requests behind sampled items, from a store's query log: what exactly the model was asked."""
 
-    def __init__(self, fixture):
-        import sqlite3
-        import tempfile
-        path = Path(fixture)
-        self.temp = None
-        if path.suffix == ".zip":
-            from .fixtures import unpack
-            self.temp = tempfile.TemporaryDirectory(prefix="fixture-")
-            path = unpack(path, self.temp.name)
-        self.db = sqlite3.connect(path)
+    def __init__(self, store):
         self.index = {}
-        for key_parts, prompt, interpreter, images in self.db.execute("SELECT key_parts, prompt, interpreter, images FROM request"):
-            parts = json.loads(key_parts)
+        for q in store.queries():
+            parts = q["recipe"]
             if parts[0] == "extract":
                 ident = ("extract", parts[2], parts[3])        # content, task
             elif parts[0] == "triage":
                 ident = ("triage", parts[2], parts[1], parts[3])  # content, figure or section, id
             else:
                 ident = ("compare", parts[3], parts[4])        # a, b
-            self.index[ident] = (parts, prompt, interpreter, len(json.loads(images)))
-        self.side = {}
-        for fingerprint, description in self.db.execute("SELECT fingerprint, description FROM interpreter"):
-            self.side[fingerprint] = json.loads(description).get("settings", {}).get("image_side", 1000)
-
-    def close(self):
-        self.db.close()
-        if self.temp:
-            self.temp.cleanup()
+            self.index[ident] = (parts, q["prompt"], len(q["images"]))
 
     def describe(self, item, source, folder):
         """{summary, instructions, query, images} for an item, or None if it wasn't recorded."""
@@ -203,7 +179,7 @@ class Requests:
             found = self.index.get(("compare", item["target"]["a"], item["target"]["b"]))
         if found is None:
             return None
-        parts, prompt, interpreter, sent = found
+        parts, prompt, sent = found
         split = {"extract": "\nSource type:", "compare": "\nA="}.get(parts[0])
         if split and split in prompt:
             at = prompt.index(split)

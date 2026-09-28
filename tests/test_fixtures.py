@@ -45,14 +45,26 @@ class RecordAndReplay(unittest.TestCase):
         self.assertEqual(replay_code, code)
         self.assertEqual(self.outcome(replayed), self.outcome(live))
         self.assertEqual(replayed['usage']['api_calls'], 0)
-        self.assertEqual(replayed['usage']['fixture'], {**replayed['usage']['fixture'], 'replayed': requests,
-                                                        'recorded': 0, 'missing': 0})
+        # Every query replays, including those answered once for several tasks (identical queries,
+        # e.g. the same page in both documents, share one answer and are asked once).
+        self.assertEqual(replayed['usage']['fixture'], {**replayed['usage']['fixture'], 'recorded': 0, 'missing': 0})
+        self.assertGreater(replayed['usage']['fixture']['replayed'], live['usage']['fixture']['recorded'])
+
+    def test_replays_form_the_same_reports(self):
+        """What a fixture is for: the sample documents and the answers to prior queries are enough to
+        form the same reports, byte for byte, but for when they were made."""
+        self.record()
+        one = self.run_cli('one', UNREACHABLE, '--fixture', str(self.fixture))[1]
+        two = self.run_cli('two', UNREACHABLE, '--fixture', str(self.fixture))[1]
+        self.assertEqual((self.root / 'one' / 'evidence.json').read_bytes(), (self.root / 'two' / 'evidence.json').read_bytes())
+        one.pop('created_at'), two.pop('created_at')
+        self.assertEqual(json.dumps(one, sort_keys=True), json.dumps(two, sort_keys=True))
 
     def test_unrecorded_requests_fail_visibly(self):
         self.record()
         with sqlite3.connect(self.fixture) as db:
-            db.execute("DELETE FROM response WHERE rowid IN (SELECT r.rowid FROM response r JOIN request q "
-                       "ON q.key = r.key AND q.interpreter = r.interpreter WHERE q.kind = 'extract' LIMIT 2)")
+            db.execute("DELETE FROM response WHERE rowid IN (SELECT r.rowid FROM response r JOIN recipe q "
+                       "ON q.query = r.query WHERE q.role = 'extract' LIMIT 2)")
         code, report, log = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture))
         self.assertEqual(code, 2)
         # The two failed tasks are refined into smaller requests, which weren't recorded either.
@@ -66,9 +78,9 @@ class RecordAndReplay(unittest.TestCase):
     def test_recorded_failures_replay_as_failures_and_are_retried_when_recording(self):
         self.record()
         with sqlite3.connect(self.fixture) as db:
-            db.execute("UPDATE response SET answer = '', error = 'ValueError: Truncated model output' WHERE rowid IN "
-                       "(SELECT r.rowid FROM response r JOIN request q ON q.key = r.key AND q.interpreter = r.interpreter "
-                       "WHERE q.kind = 'triage' LIMIT 2)")  # situating failures aren't refined into new requests
+            db.execute("UPDATE response SET outcome = 'invalid', answer = '', error = 'ValueError: Truncated model output' "
+                       "WHERE rowid IN (SELECT r.rowid FROM response r JOIN recipe q ON q.query = r.query "
+                       "WHERE q.role = 'triage' LIMIT 2)")  # situating failures aren't refined into new requests
         code, report, _ = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture))
         self.assertEqual(report['usage']['fixture']['missing'], 0)
         failed = [i for x in report['situation'].values() for i in x['issues'] if i['failed']]
@@ -88,16 +100,17 @@ class RecordAndReplay(unittest.TestCase):
         import sqlite3
         self.record()
         with sqlite3.connect(self.fixture) as db:
-            tiles = db.execute("SELECT COUNT(*) FROM request WHERE kind='extract' AND region IN ('tile', 'overview')").fetchone()[0]
+            tiles = db.execute("SELECT COUNT(DISTINCT query) FROM recipe WHERE role='extract' "
+                               "AND region IN ('tile', 'overview')").fetchone()[0]
         self.assertGreater(tiles, 0)
         with jittery_model() as (url, state):  # only the image regions are asked; text replays
             self.run_cli('aa', url, '--fixture', str(self.fixture), '--fixture-mode', 'record-new',
                          '--fresh-regions', 'tile,overview', '--no-situate')
             self.assertGreater(state['requests'], 0)
             self.assertLessEqual(state['requests'], tiles)
-        with sqlite3.connect(self.fixture) as db:
-            fresh = db.execute("SELECT COUNT(*) FROM response WHERE responder LIKE '%#fresh'").fetchone()[0]
-        self.assertEqual(fresh, state['requests'])
+        with sqlite3.connect(self.fixture) as db:  # a second sample of each image query, beside the first
+            fresh = db.execute("SELECT COUNT(*) FROM response WHERE sample = 1").fetchone()[0]
+        self.assertEqual(fresh, state['requests'])  # each asked once, even where both documents share a page
         code, report, _ = self.run_cli('aa-replay', UNREACHABLE, '--fixture', str(self.fixture),
                                        '--fresh-regions', 'tile,overview', '--no-situate')
         self.assertEqual(report['usage']['fixture']['missing'], 0)  # replayed from the control's own answers
@@ -107,8 +120,8 @@ class RecordAndReplay(unittest.TestCase):
         import time
         self.record()
         with sqlite3.connect(self.fixture) as db:  # an answer from an older prompt, never asked for again
-            db.execute("INSERT INTO response SELECT 'stale', interpreter, responder, answer, usage, recorded, error, NULL "
-                       "FROM response LIMIT 1")
+            db.execute("INSERT INTO response SELECT 'stale', responder, sample, outcome, answer, error, usage, recorded, "
+                       "NULL FROM response LIMIT 1")
         time.sleep(1.1)
         mark = _now()
         time.sleep(1.1)
@@ -140,6 +153,67 @@ class RecordAndReplay(unittest.TestCase):
             f.prune(mark, force=True)
             self.assertEqual(f.db.execute('SELECT COUNT(*) FROM response').fetchone()[0], 0)
 
+    def legacy_fixture(self, run, path):
+        """A schema-3 fixture of a recorded run, keyed the old way (tuple and fingerprint), built
+        from the run's query log and the new fixture's answers."""
+        import hashlib
+        from semantic_pdf_diff import provenance
+        from semantic_pdf_diff.fixtures import _legacy_fingerprint
+        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.store import Store
+        settings = Settings(**json.loads((self.root / f'{run}.json').read_text()))
+        make = {'extract': provenance.extraction_interpreter, 'triage': provenance.triage_interpreter,
+                'compare': provenance.comparison_interpreter}
+        old = sqlite3.connect(path)
+        old.executescript("""
+            CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+            CREATE TABLE request (key TEXT, interpreter TEXT, kind TEXT, region TEXT, content TEXT, key_parts TEXT,
+                                  prompt TEXT, images TEXT, schema TEXT, PRIMARY KEY (key, interpreter));
+            CREATE TABLE response (key TEXT, interpreter TEXT, responder TEXT, answer TEXT, usage TEXT, recorded TEXT,
+                                   error TEXT, used TEXT, PRIMARY KEY (key, interpreter, responder));
+            CREATE TABLE interpreter (fingerprint TEXT PRIMARY KEY, role TEXT, description TEXT);
+            INSERT INTO meta VALUES ('schema_version', '3');""")
+        answers = dict((q, (a, e)) for q, a, e in sqlite3.connect(self.fixture).execute(
+            'SELECT query, answer, error FROM response WHERE sample = 0'))
+        with Store(self.root / run) as store:
+            for q in store.queries():
+                parts = list(q['recipe'])
+                fingerprint = _legacy_fingerprint(make[parts[0]](settings))
+                keyed = list(parts)
+                if keyed[0] == 'compare':
+                    keyed[2] = ''
+                key = hashlib.sha256(json.dumps(keyed, sort_keys=True, default=str).encode()).hexdigest()
+                old.execute('INSERT OR IGNORE INTO request VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                            (key, fingerprint, parts[0], parts[1], '', json.dumps(parts), q['prompt'],
+                             json.dumps(q['images']), ''))
+                answer, error = answers[q['hash']]
+                old.execute('INSERT OR IGNORE INTO response VALUES (?, ?, ?, ?, ?, ?, ?, NULL)',
+                            (key, fingerprint, 'gemma-4', answer, '{}', '2026-09-01', error))
+        old.commit()
+        old.close()
+
+    def test_old_fixtures_are_re_keyed_by_replay(self):
+        _, live, _ = self.record()
+        legacy = self.root / 'v3.sqlite'
+        self.legacy_fixture('live', legacy)
+        rekeyed = self.root / 'v4.sqlite'
+        _, replayed, _ = self.run_cli('rekey', UNREACHABLE, '--fixture', str(rekeyed), '--rekey-from', str(legacy))
+        self.assertEqual(replayed['usage']['fixture']['missing'], 0)
+        self.assertEqual(replayed['usage']['fixture']['stale'], 0)
+        self.assertEqual(self.outcome(replayed), self.outcome(live))
+        with sqlite3.connect(rekeyed) as db:  # the original dates come along
+            self.assertEqual({d for (d,) in db.execute('SELECT recorded FROM response')}, {'2026-09-01'})
+        _, again, _ = self.run_cli('rekeyed', UNREACHABLE, '--fixture', str(rekeyed))  # now on its own
+        self.assertEqual(again['usage']['fixture']['missing'], 0)
+        # An answer recorded for a query that's since changed has no obvious transition: it's let go.
+        with sqlite3.connect(legacy) as db:
+            db.execute("UPDATE request SET prompt = prompt || ' (older wording)' WHERE kind = 'triage' AND rowid = "
+                       "(SELECT MIN(rowid) FROM request WHERE kind = 'triage')")
+        _, stale, _ = self.run_cli('rekey2', UNREACHABLE, '--fixture', str(self.root / 'v4b.sqlite'),
+                                   '--rekey-from', str(legacy))
+        self.assertEqual(stale['usage']['fixture']['stale'], 1)
+        self.assertGreaterEqual(stale['usage']['fixture']['missing'], 1)
+
     def test_running_out_of_balance_pauses_and_resumes(self):
         from semantic_pdf_diff import ledger
         ledger_path = self.root / 'ledger.jsonl'
@@ -159,7 +233,7 @@ class RecordAndReplay(unittest.TestCase):
         with jittery_model() as (url, state):  # topped up: resume
             code, report, _ = self.run_cli('live2', url, '--fixture', str(self.fixture), '--fixture-mode', 'replay-or-record')
             self.assertNotEqual(code, 3)
-            self.assertEqual(report['usage']['fixture']['replayed'], 12)
+            self.assertGreaterEqual(report['usage']['fixture']['replayed'], 12)  # identical queries share answers
             self.assertFalse(any(r['status'] == 'not_reached' for r in report['coverage']))
 
     def test_cost_cap_stops_sending(self):
@@ -170,14 +244,17 @@ class RecordAndReplay(unittest.TestCase):
             self.assertLessEqual(state['requests'], 5 + 4)  # the cap, plus requests already in flight
             self.assertTrue(any(r['status'] == 'not_reached' for r in report['coverage']))
 
-    def test_responders_and_interpreters_are_kept_apart(self):
+    def test_responders_and_changed_queries_are_kept_apart(self):
         self.record('--responder', 'model-a')
         _, other, _ = self.run_cli('b', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-b')
         self.assertEqual(other['usage']['fixture']['replayed'], 0)
-        # A prompt-shaping setting changes the fingerprint: nothing recorded applies.
+        # A setting that shapes extraction queries changes them: none of their answers applies.
         _, changed, _ = self.run_cli('c', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-a',
                                      settings={'claims_per_request': 9})
-        self.assertEqual(changed['usage']['fixture']['replayed'], 0)
+        self.assertGreater(changed['usage']['fixture']['missing'], 0)
+        with sqlite3.connect(self.fixture) as db:
+            extraction = {q for (q,) in db.execute("SELECT query FROM recipe WHERE role = 'extract'")}
+        self.assertTrue(extraction)
         # The model name isn't part of it: the responder is.
         _, same, _ = self.run_cli('d', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-a',
                                   '--model', 'renamed')
@@ -193,8 +270,11 @@ class RecordAndReplay(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()) as out:
             cli.main(['fixtures', 'summary', str(first)])
         summary = json.loads(out.getvalue())
-        self.assertEqual(sum(a['answers'] for a in summary['answers']), requests)
-        self.assertEqual({a['kind'] for a in summary['answers']}, {'extract', 'triage', 'compare'})
+        with sqlite3.connect(self.fixture) as db:
+            self.assertEqual(sum(a['answers'] for a in summary['answers']),
+                             db.execute('SELECT COUNT(*) FROM response').fetchone()[0])
+        self.assertEqual({a['role'] for a in summary['answers']}, {'extract', 'triage', 'compare'})
+        self.assertEqual(len(summary['contents']), 2)  # the documents recorded from, for the replay test
         _, replayed, _ = self.run_cli('zip', UNREACHABLE, '--fixture', str(first))
         self.assertEqual(self.outcome(replayed), self.outcome(live))
         code, _, log = self.run_cli('zip2', UNREACHABLE, '--fixture', str(first), '--fixture-mode', 'replay-or-record')
