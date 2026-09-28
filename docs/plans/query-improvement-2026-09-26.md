@@ -228,10 +228,11 @@ Round 1 showed that asking the same question again often gets a different answer
     - Levers not accepted or parked are tried again against later champions, since a baseline that moved can change the answer.
     - Other ways of doing one idea are tried as its variants; there may be subtleties a first version misses (quotes: exact, excerpts, fragments; stems: as in r03, as fixed).
   - **Later:** a search closer to genetic programming, combining and mutating levers to get out of the local optima that one lever at a time finds (plans index: *Lever search*).
-- **Levers that act on part of a page (B):**
+- **Levers that act on part of a page (B), open:**
   - **The problem:** a rule added to every image prompt (the chart rule) re-asks every image, so the few units it acts on are judged among many that changed only by chance.
-  - **The fix:** a lever acts only on the requests it applies to (tiles with charts, say), and the rest replay unchanged.
-  - **The owner's condition:** the choice of requests must be robust and easy to review. It must be mechanical and deterministic, and each variant lists the requests it changes, with page thumbnails, to be looked over before judging.
+  - **Proposed:** a lever adds to a request only where it applies (tiles with charts, say); the rest replay unchanged.
+  - **The owner:** agrees that requests should be cached by what reaches the model. If this means updating only a sample of queries, the means must be robust and easy to review.
+  - **A separate question the owner raised:** whether to skip re-asking changed requests that no judged unit will use. It depends on how time and money split between extraction and judging: extraction was $3.94 of the ledger's $40.31, judging $35.56.
 - **Spot checks (C):** mix close calls and clear ones, drawn from a decided round's batch and stratified by closeness (close, flipped with the order, clear), for more robust quality estimates.
 - **Measurements owed (D):** agreed, after the owner's surveys.
 
