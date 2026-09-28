@@ -18,13 +18,11 @@ MAX_CLAIMS = 25     # claims shown per side (sampled when there are more)
 PAGE_TEXT = 6000    # characters of the page's text layer shown to judges
 
 def _reader(runs_dir):
-    """Evidence as the runs' settings present it (settings.json beside the runs)."""
+    """Evidence as the runs present it: the store says whether readings are merged; stores from
+    before it recorded that (rounds 6–8) fall back to settings.json beside the runs."""
     path = Path(runs_dir) / "settings.json"
     settings = json.loads(path.read_text()) if path.exists() else {}
-    if settings.get("reconcile"):
-        from .readings import reconcile
-        return lambda store, content: reconcile(store.evidence(content))
-    return lambda store, content: store.evidence(content)
+    return lambda store, content: store.evidence(content, reconcile=True if settings.get("reconcile") else None)
 
 def collect(runs_dir, unit="family"):
     """{(run, content, page, family): {"claims": {id: claim}, "tasks": n}} for every store under runs_dir.
@@ -51,14 +49,48 @@ def collect(runs_dir, unit="family"):
                         if family:
                             claim = {k: getattr(e, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
                             claim["quote"] = o.quote
+                            claim["_box"] = list(o.locator.bbox)  # where it was read (splitting units)
                             units[(folder.name, content, o.locator.page, family)]["claims"][e.id] = claim
     return dict(units)
+
+MAX_BANDS = 4  # a unit is cut into at most this many bands
+
+def split_units(base, var, limit=MAX_CLAIMS):
+    """Units with more than `limit` claims on either side, cut into bands of the page by where the
+    claims were read (the meta-analysis of rounds 1–8: half of all units, three quarters of visual
+    ones, had more, and gave weaker verdicts). Keys gain a band (index, count, y0, y1), in
+    unrotated page coordinates; unchanged bands then drop out like unchanged units."""
+    out_a, out_b = {}, {}
+    for key in set(base) | set(var):
+        a = base.get(key, {"claims": {}, "tasks": 0})
+        b = var.get(key, {"claims": {}, "tasks": 0})
+        size = max(len(a["claims"]), len(b["claims"]))
+        if size <= limit:
+            if key in base:
+                out_a[key] = a
+            if key in var:
+                out_b[key] = b
+            continue
+        claims = {**b["claims"], **a["claims"]}
+        centre = lambda i: (claims[i]["_box"][1] + claims[i]["_box"][3]) / 2
+        order = sorted(claims, key=lambda i: (centre(i), i))
+        k = min(MAX_BANDS, -(-size // limit))
+        for part in range(k):
+            ids = order[part * len(order) // k:(part + 1) * len(order) // k]
+            if not ids:
+                continue
+            y0 = min(claims[i]["_box"][1] for i in ids)
+            y1 = max(claims[i]["_box"][3] for i in ids)
+            band = key + ((part, k, round(y0, 1), round(y1, 1)),)
+            out_a[band] = {"claims": {i: a["claims"][i] for i in ids if i in a["claims"]}, "tasks": a["tasks"]}
+            out_b[band] = {"claims": {i: b["claims"][i] for i in ids if i in b["claims"]}, "tasks": b["tasks"]}
+    return out_a, out_b
 
 def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", "visual", "page"), changed_only=True,
                unit="family"):
     """Sample up to n units present in both, stratified by family (round-robin), keeping only
     units whose claims differ (identical answers can't prefer either side)."""
-    base, var = collect(baseline_dir, unit), collect(variant_dir, unit)
+    base, var = split_units(collect(baseline_dir, unit), collect(variant_dir, unit))
     keys = sorted(k for k in set(base) | set(var) if k[3] in families and (k in base or k in var))
     rng = random.Random(seed)
     groups = defaultdict(list)
@@ -90,6 +122,29 @@ def shown(a, b, rng, limit=MAX_CLAIMS):
     common = pick(shared, max(0, limit - max(len(only_a), len(only_b))))
     return sorted(only_a + common), sorted(only_b + common)
 
+LEAD = 400  # characters of text before a unit shown to judges (as the extractor's neighbouring context)
+
+def _lead(doc, page, region, cache, key):
+    """(text just before the region, the numbered items and headings it sits under), as the
+    extractor saw them in its context (neighbouring text, "Within:" stems)."""
+    from .extract import display_y, reading_blocks, stem_index
+    if key + ("stems",) not in cache:
+        cache[key + ("stems",)] = stem_index(doc)
+    stems = cache[key + ("stems",)]
+    here = doc[page - 1]
+    top = display_y(here, tuple(region))
+    above = [b[4] for b in reading_blocks(here) if b[6] == 0 and display_y(here, tuple(b[:4])) < top - 1]
+    if not above and page > 1:
+        above = [b[4] for b in reading_blocks(doc[page - 2]) if b[6] == 0]
+    before = " ".join(" ".join(above).split())[-LEAD:]
+    path = []
+    for number in range(page, 0, -1):
+        rows = [p for y, p in stems.get(number, []) if number < page or y < top - 1]
+        if rows:
+            path = rows[-1]
+            break
+    return before, " > ".join(path)
+
 def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
     """Write a pairwise batch: pairs.json (with which side is the baseline) and page images."""
     from .review import render
@@ -102,27 +157,33 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
     rng = random.Random(seed + 1)
     items = []
     docs = {}
-    for (run, content, page, family), a, b in picked:
+    for (run, content, page, family, *band), a, b in picked:
         if (run, content) not in docs:
             with Store(Path(baseline_dir) / run) as store:
                 file = next(f for f in store.files() if f.content == content)
                 docs[(run, content)] = read_origin(store.origin(file.source, file.path))
-        if (run, content, "sections") not in docs:
-            with Store(Path(baseline_dir) / run) as store:
                 docs[(run, content, "sections")] = store.sections(content)
         headings = [" > ".join(x.heading_path) for x in docs[(run, content, "sections")]
                     if x.heading_path and x.first_page <= page <= x.last_page]
         with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
-            name = f"{run}-{content.split(':')[1][:8]}-p{page}.jpg"
-            if not (folder / "images" / name).exists():
-                (folder / "images" / name).write_bytes(render(doc, page, None, None, 1400))
-            text = doc[page - 1].get_text("text")[:PAGE_TEXT]
+            unrotated = doc[page - 1].rect * doc[page - 1].derotation_matrix
+            part, parts, y0, y1 = band[0] if band else (0, 1, unrotated.y0, unrotated.y1)
+            region = pymupdf.Rect(unrotated.x0, max(unrotated.y0, y0 - 12), unrotated.x1, min(unrotated.y1, y1 + 12))
+            name = f"{run}-{content.split(':')[1][:8]}-p{page}" + (f"-b{part}of{parts}" if band else "") + ".jpg"
+            if not (folder / "images" / name).exists():  # a band is shown as its own crop, at full size
+                (folder / "images" / name).write_bytes(render(doc, page, region if band else None, None, 1400))
+            text = doc[page - 1].get_text("text", clip=region if band else None)[:PAGE_TEXT]
+            before, within = _lead(doc, page, region, docs, (run, content))
         shown_a, shown_b = shown(a, b, rng)
-        items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}", "run": run, "content": content,
-                      "page": page, "family": family, "image": f"images/{name}", "page_text": text,
-                      "sections": headings,
+        shared = set(a) & set(b)
+        items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}" + (f"-b{part}of{parts}" if band else ""),
+                      "run": run, "content": content, "page": page, "family": family,
+                      "band": [part, parts, y0, y1] if band else None,
+                      "image": f"images/{name}", "page_text": text, "sections": headings,
+                      "before": before, "within": within,
                       "baseline": [a[i] for i in shown_a], "variant": [b[i] for i in shown_b],
-                      "counts": {"baseline": len(a), "variant": len(b), "shared": len(set(a) & set(b))}})
+                      "hidden_shared": len(shared - set(shown_a)),
+                      "counts": {"baseline": len(a), "variant": len(b), "shared": len(shared)}})
     batch = {"format": "semantic-pdf-diff-pairwise-batch", "version": 1, "baseline": str(baseline_dir),
              "variant": str(variant_dir), "seed": seed, "units": counts, "items": items}
     (folder / "pairs.json").write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -182,6 +243,16 @@ RUBRICS = {
                        "copyright, logos) is neutral: don't prefer a set for including or omitting it; judge such "
                        "claims only for correctness.\nEntity names may come from the headings the page falls under "
                        "(listed with the page): those aren't invented.", "tags": True, "sections": True},
+    # The overall review (2026-09-28): judges weren't told when they saw a sample of a large unit,
+    # nor shown the context the extractor had (text before the region, the numbered items it sits
+    # under); large units are cut into bands, each shown as its own crop.
+    "v4": {"addition": "\nDocument administration (contacts, addresses, lot or project numbers, revision dates, "
+                       "copyright, logos) is neutral: don't prefer a set for including or omitting it; judge such "
+                       "claims only for correctness.\nEntity names and conditions may come from the context given "
+                       "with the page (its headings, the text before it, the numbered items it sits under): those "
+                       "aren't invented.\nA set may be a sample of its claims: each says how many it shows; claims "
+                       "not shown are identical in both sets, so they aren't missing from either.",
+           "tags": True, "sections": True, "context": True},
 }
 
 V1_OUTPUT = """Return only JSON, reasoning first: {{"note": "...", "better": "A|B|same", "a_wrong": 0, "b_wrong": 0, "confidence": "high|medium|low"}}
@@ -204,16 +275,30 @@ def pairwise_prompt(rubric):
     if spec.get("sections"):
         template = template.replace("PAGE {page} ({family} content). Its text layer:",
                                     "PAGE {page} ({family} content), under the headings: {sections}. Its text layer:")
+    if spec.get("context"):
+        template = (template.replace("PAGE {page} ({family} content)", "PAGE {page}{part} ({family} content)")
+                    .replace(". Its text layer:", ".\nText before it: ...{before}\nIt sits under: {within}\nIts text layer:")
+                    .replace("SET A:", "SET A ({a_note}):").replace("SET B:", "SET B ({b_note}):"))
     return template.replace("{rubric}", spec["addition"])
+
+def _set_note(shown, total, hidden):
+    return (f"all {total} claims" if shown >= total else
+            f"{shown} of its {total} claims; {hidden} shared claims not shown are identical in both sets")
 
 def _claims_text(claims):
     return "\n".join(f"- {c['entity']} | {c['attribute']} | {c['value']}{' ' + c['unit'] if c.get('unit') else ''}"
                      f"{' | conditions: ' + c['conditions'] if c.get('conditions') else ''} | quote: {c['quote']}"
                      for c in claims) or "(no claims)"
 
-def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"):
-    """Ask one model to compare every unit, in both orders; writes verdicts/<reviewer>.json.
-    Answers are cached in the batch folder, so a rerun (e.g. after a budget pause) pays only for what's missing."""
+def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1", only=None, retry_failed=False,
+                verdicts_dir="verdicts"):
+    """Ask one model to compare every unit (or only those in `only`), in both orders; merges
+    into verdicts/<reviewer>.json. Answers are cached in the batch folder, so a rerun (e.g. after
+    a budget pause) pays only for what's missing.
+
+    A verdict that fails (a judge timing out on a long unit) isn't asked again on later calls,
+    which used to hold every later chunk for another timeout; retry_failed asks such verdicts
+    once more (run_round does, when a variant's judging ends). failures/<reviewer>.json counts them."""
     from .dispatch import Dispatcher
     from .models import PairVerdict
     from .progress import NoProgress
@@ -221,22 +306,42 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
     folder = Path(folder)
     progress = progress or NoProgress()
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    verdicts, failures = {}, []
+    target = folder / verdicts_dir / f"{reviewer_file(reviewer)}.json"
+    verdicts = json.loads(target.read_text(encoding="utf-8"))["verdicts"] if target.exists() else {}
+    failed_path = folder / "failures" / f"{reviewer_file(reviewer)}.json"
+    failed = json.loads(failed_path.read_text(encoding="utf-8")) if failed_path.exists() else {}
+    failures = []
     template = pairwise_prompt(rubric)
     tags = lambda values: sorted({str(t).strip().lower() for t in values or ()} & set(PAIR_PROBLEMS))
     with Dispatcher(client) as dispatch:
         for item in batch["items"][:limit]:
+            if only is not None and item["id"] not in only:
+                continue
             for order in ("baseline-first", "variant-first"):
+                attempts = failed.get(f"{item['id']}|{order}", 0)
+                if order in verdicts.get(item["id"], {}) or (attempts and not (retry_failed and attempts == 1)):
+                    continue  # judged already, or failed and not (or no longer) retried
                 a, b = (item["baseline"], item["variant"]) if order == "baseline-first" else (item["variant"], item["baseline"])
+                counts = item.get("counts") or {}
+                notes = {side: _set_note(len(item[side]), counts.get(side, len(item[side])), item.get("hidden_shared", 0))
+                         for side in ("baseline", "variant")}
+                first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
+                band = item.get("band")
                 prompt = template.format(page=item["page"], family=item["family"], page_text=item["page_text"],
                                          a=_claims_text(a), b=_claims_text(b),
-                                         sections=" | ".join(item.get("sections") or ()) or "none")
+                                         sections=" | ".join(item.get("sections") or ()) or "none",
+                                         part=f", part {band[0] + 1} of {band[1]} (the image shows that part)" if band else "",
+                                         before=item.get("before") or "(start of the document)",
+                                         within=item.get("within") or "nothing numbered",
+                                         a_note=notes[first], b_note=notes[second])
 
                 def finish(value, error, item=item, order=order):
                     progress.finish("failed" if error else "complete")
                     if error is not None:
                         failures.append(f"{item['id']} {order}: {error}")
+                        failed[f"{item['id']}|{order}"] = failed.get(f"{item['id']}|{order}", 0) + 1
                         return
+                    failed.pop(f"{item['id']}|{order}", None)
                     v = value.model_dump()
                     better = v.get("better")
                     variant_is = "B" if order == "baseline-first" else "A"
@@ -255,11 +360,13 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
                 progress.add()
                 dispatch.submit(prompt, PairVerdict, [folder / item["image"]], None, finish)
         dispatch.drain()
-    target = folder / "verdicts" / f"{reviewer_file(reviewer)}.json"
     if verdicts:
         target.parent.mkdir(exist_ok=True)
         target.write_text(json.dumps({"reviewer": reviewer, "verdicts": verdicts}, indent=2, ensure_ascii=False) + "\n",
                           encoding="utf-8")
+    if failed or failed_path.exists():
+        failed_path.parent.mkdir(exist_ok=True)
+        failed_path.write_text(json.dumps(failed, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return target, len(verdicts), failures
 
 def bootstrap(values, resamples=2000, level=0.90, seed=7):
@@ -272,8 +379,31 @@ def bootstrap(values, resamples=2000, level=0.90, seed=7):
     tail = (1 - level) / 2
     return (sum(values) / n, means[int(tail * resamples)], means[min(resamples - 1, int((1 - tail) * resamples))])
 
-def unit_scores(folder, limit=None):
-    """{unit id: score in [0, 1]} averaged over judges and both orders (1 = variant better).
+def unsettled(folder, reviewers, limit=None):
+    """Units (of the first `limit`) that the given judges leave unsettled, for a second judge:
+    one of them lacks an order (a failed verdict), flipped with the order, or they disagree."""
+    from .review import reviewer_file
+    folder = Path(folder)
+    batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
+    files = [folder / "verdicts" / f"{reviewer_file(r)}.json" for r in reviewers]
+    verdicts = [json.loads(f.read_text(encoding="utf-8"))["verdicts"] if f.exists() else {} for f in files]
+    out = set()
+    for item in batch["items"][:limit]:
+        leanings = set()
+        for judge in verdicts:
+            orders = judge.get(item["id"], {})
+            scores = [v["score"] for v in orders.values()]
+            if len(scores) < 2 or {0.0, 1.0} <= set(scores):
+                out.add(item["id"])
+                break
+            mean = sum(scores) / 2
+            leanings.add((mean > 0.5) - (mean < 0.5))
+        if len(leanings - {0}) > 1:
+            out.add(item["id"])
+    return out
+
+def unit_scores(folder, limit=None, verdicts_dir="verdicts"):
+    """{unit id: score in [0, 1]}: each judge's two orders averaged, then the judges (1 = variant better).
 
     limit: only the batch's first `limit` units (the ones every judge has seen when judging
     proceeds in chunks)."""
@@ -281,32 +411,34 @@ def unit_scores(folder, limit=None):
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     allowed = {i["id"] for i in batch["items"][:limit]}
     scores = defaultdict(list)
-    for path in sorted((folder / "verdicts").glob("*.json")):
+    for path in sorted((folder / verdicts_dir).glob("*.json")):
         for unit, orders in json.loads(path.read_text(encoding="utf-8"))["verdicts"].items():
-            if unit in allowed:
-                for v in orders.values():
-                    scores[unit].append(v["score"])
+            # Each judge's two orders first, so its position bias cancels; a judge with one order
+            # only (the other failed) would bring its bias in, so it sits that unit out.
+            if unit in allowed and len(orders) == 2:
+                scores[unit].append(sum(v["score"] for v in orders.values()) / 2)
     return {u: sum(s) / len(s) for u, s in scores.items() if s}
 
 # Acceptance (docs/plans/query-improvement): win clearly overall, lose clearly nowhere.
 WIN_LOW = 0.50          # the overall interval must lie above this to call it a win...
 NONINFERIOR_LOW = 0.45  # ...or at least above this for "no worse" (then it needs another gain, e.g. cost)
-STRATUM_LOSS_HIGH = 0.45  # a stratum whose interval lies entirely below this blocks the variant
+STRATUM_LOSS_HIGH = 0.45  # a stratum whose interval lies entirely below this blocks the variant...
+STRATUM_MIN_UNITS = 6     # ...if it has at least this many units (two lost units would otherwise block)
 
-def decide(folder, limit=None):
+def decide(folder, limit=None, verdicts_dir="verdicts"):
     """Win rates with intervals, overall and per family, and the acceptance decision
     (over the first `limit` units when judging is still in progress)."""
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    scores = unit_scores(folder, limit)
+    scores = unit_scores(folder, limit, verdicts_dir)
     family = {i["id"]: i["family"] for i in batch["items"]}
     overall = bootstrap(list(scores.values()))
-    strata = {}
+    strata, sizes = {}, {}
     for f in sorted(set(family.values())):
         values = [s for u, s in scores.items() if family.get(u) == f]
         if values:
-            strata[f] = bootstrap(values)
-    losing = [f for f, (_, _, high) in strata.items() if high < STRATUM_LOSS_HIGH]
+            strata[f], sizes[f] = bootstrap(values), len(values)
+    losing = [f for f, (_, _, high) in strata.items() if high < STRATUM_LOSS_HIGH and sizes[f] >= STRATUM_MIN_UNITS]
     if overall is None:
         verdict = "no data"
     elif losing:
@@ -318,10 +450,14 @@ def decide(folder, limit=None):
     elif overall[2] < WIN_LOW:
         verdict = "rejected: loses"
     else:
-        verdict = "inconclusive: judge more units"
+        verdict = "inconclusive"
     fmt = lambda t: None if t is None else {"mean": round(t[0], 3), "low": round(t[1], 3), "high": round(t[2], 3)}
+    units = batch["units"]
+    changed = units["units"] - units["unchanged"]
+    # Win rates are over changed units only: coverage says how much of the output a lever touches.
     return {"units_judged": len(scores), "overall": fmt(overall), "strata": {f: fmt(t) for f, t in strata.items()},
-            "decision": verdict, "units": batch["units"]}
+            "strata_units": sizes, "decision": verdict, "units": units,
+            "coverage": round(changed / units["units"], 3) if units["units"] else None}
 
 # --- mechanical figures (free: from the replay stores and the fixture) ---------------------
 
@@ -362,16 +498,6 @@ def mechanical(runs_dir):
                     "distinct_claims": int(s["distinct_claims"]),
                     "verified_quote_rate": round(s["verified_quotes"] / s["checked_quotes"], 4) if s["checked_quotes"] else None}
     return out
-
-def fixture_tokens(fixture, fingerprint):
-    """(requests, prompt tokens, completion tokens, cost) recorded for one extraction fingerprint."""
-    import sqlite3
-    db = sqlite3.connect(fixture)
-    rows = db.execute("SELECT usage FROM response WHERE interpreter=?", (fingerprint,)).fetchall()
-    db.close()
-    usage = [json.loads(u) for (u,) in rows]
-    return (len(usage), sum(u.get("prompt_tokens", 0) for u in usage), sum(u.get("completion_tokens", 0) for u in usage),
-            round(sum(u.get("estimated_cost", 0.0) for u in usage), 4))
 
 # --- the report ------------------------------------------------------------------------------
 
@@ -416,12 +542,15 @@ def report(history_path, target, title="Query improvement"):
                          f'style="fill:{colour}">{esc(name)}</text>')
         return "".join(parts) + "</svg>"
 
-    def series(metric, by="variant", where=None):
-        """The latest value per series and round (steps may record a figure more than once)."""
+    def series(metric, by="variant", where=None, per_round=False):
+        """The latest value per series and round (steps may record a figure more than once).
+        per_round: one series per round and variant, since a variant's name in another round
+        is measured against another baseline (joining them would draw a trend that isn't one)."""
         latest = {}
         for r in records:
             if r["metric"] == metric and (where is None or where(r)) and r["value"] is not None:
-                latest[(r.get(by, ""), r.get("round", ""))] = r["value"]
+                name = f"{r.get('round', '')} {r.get(by, '')}" if per_round else r.get(by, "")
+                latest[(name, r.get("round", ""))] = r["value"]
         out = defaultdict(list)
         for (name, rnd), value in sorted(latest.items(), key=lambda kv: rounds.index(kv[0][1])):
             if isinstance(value, dict):
@@ -432,7 +561,7 @@ def report(history_path, target, title="Query improvement"):
 
     sections = [
         ("Variant win rate against the baseline (1 = variant always better; interval 90%)",
-         chart(series("win_rate", where=lambda r: r.get("stratum") == "all"), "win rate", band=0.5)),
+         chart(series("win_rate", where=lambda r: r.get("stratum") == "all", per_round=True), "win rate", band=0.5)),
         ("Win rate by kind of input", chart(series("win_rate", by="stratum", where=lambda r: r.get("stratum") != "all"),
                                             "win rate", band=0.5)),
         ("Task outcomes (share partial)", chart(series("partial_rate", where=lambda r: r.get("stratum") == "all"), "partial")),

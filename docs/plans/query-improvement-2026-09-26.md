@@ -81,7 +81,13 @@ A variant is accepted when all of these hold:
 3. **Guards:** failures and partials don't rise; cost per page rises no more than an agreed cap (e.g. 20%) without a matching quality gain.
 4. **Regression set:** no confirmed-good claim is lost without a better one replacing it.
 
-Rounds stop early when the result is already clear (sequential testing), so clear winners and losers don't use the whole budget. Rejected variants are kept in the log with their results, so ideas aren't retried blindly.
+**Decided once, at a fixed sample** (from round 9, 2026-09-28):
+- **Every variant is judged to its full sample (32 units) and decided once.** Rounds 1–8 stopped as soon as an interval cleared, looking at 16, 24 and 32 units; simulations on their data put the chance of accepting a lever with no effect at 12–18%, against 6–9% for a single look (see the [overall review](../reviews/overall-review-2026-09-28.md)). Extending an inconclusive round is another look, so it's noted in the review.
+- **A stratum needs at least 6 units to block a variant.** Two lost units could otherwise reject it.
+- **Win rates are over changed units only.** Decisions report their coverage (the share of units a lever changed) alongside.
+- **Units larger than 25 claims are cut into up to 4 bands of the page,** each judged as its own crop.
+
+Rejected variants are kept in the log with their results, so ideas aren't retried blindly.
 
 ## Graphs
 
@@ -174,6 +180,19 @@ Round 1 showed that asking the same question again often gets a different answer
 - **Research every round,** including heuristics that don't need a model (cropping text-bearing images, classifying page regions, table structure), and a proper per-round review with hypotheses, so changes aren't made blind.
 - **Figures at every step** go into the history file, so every stage can be graphed.
 - **Acceptance is automatic** when the rules pass, with a round summary for the owner. Assumed from "halt or continue based on improvements"; to be confirmed.
+
+## Decisions (2026-09-28)
+
+- **Extraction first** (the owner): comparisons are deferred until extraction quality is reasonably good, or until it can't easily be improved further.
+- **Judges** (the owner):
+  - **Normal rounds** use the cheap judge, MiMo-V2.6-Pro, on every unit. Qwen3.5-397B gives second opinions only where MiMo leaves a unit unsettled: a failed verdict, a flip with the order.
+  - **The most promising candidates** get a separate confirmation by the expensive judges (Qwen, Gemini): `confirm_judges` in `round.json`, off by default.
+- **Round method** (the owner approved the overall review's changes):
+  - fixed samples (above)
+  - each judge's two orders averaged before judges are combined
+  - failed verdicts asked once more at the end, instead of on every chunk
+  - rubric v4: judges are told when a set is a sample, and see the text before the unit and the numbered items it sits under
+  - an A/A control variant (`"fresh"` regions re-asked) for levers that re-ask everything
 
 **Judging rubric v2 (the owner, 2026-09-27; from round 7):**
 - **What changes:** document administration (contacts, addresses, lot or project numbers, revision dates, copyright, logos) is neutral in pairwise judging. Neither side is preferred for including or omitting it; such claims are checked only for correctness.

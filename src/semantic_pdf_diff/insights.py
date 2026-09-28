@@ -16,7 +16,7 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
-FAMILY = {"text": "text", "table": "table", "tile": "visual", "figure": "visual", "overview": "visual"}
+from .rounds import FAMILY
 
 def _issues(runs_dir, run, content, page, family):
     """{issue: tasks} the model reported for one unit's tasks, from a replay store."""

@@ -13,7 +13,8 @@
       ],
       "use": "Drivetrain, tower and control-system properties: tables, charts, equations.",
       "sha256": "5eaf02be63d27c2ce3aaf706899464d07f8cd44eef6de936525857825f631aba",
-      "set": "dev"
+      "set": "dev",
+      "public": true
     },
     {
       "name": "iea-15mw-p20-31",
@@ -25,7 +26,8 @@
       ],
       "use": "Rotor performance, controller, steady-state performance, tower: the counterpart of the NREL slice.",
       "sha256": "f7071680c894a81e1b73dfa7379e298572be5d807406f5bbc5379fe4ca110ad1",
-      "set": "dev"
+      "set": "dev",
+      "public": true
     },
     {
       "name": "dc-cd-p39-42",
@@ -37,7 +39,8 @@
       ],
       "use": "Four drawing sheets (structural and PV details) with title blocks.",
       "sha256": "2523f1544fb49efaeb6fca153d07242bc9d08d700fecf10a0e0a6896b0f3fd66",
-      "set": "dev"
+      "set": "dev",
+      "public": true
     },
     {
       "name": "calg-cd-p39-42",
@@ -49,7 +52,8 @@
       ],
       "use": "Four drawing sheets from another team, for comparison with dc.",
       "sha256": "9a895974bcaa376163077de84a01fc16746b5353a679fa73dee42638b3ed1463",
-      "set": "dev"
+      "set": "dev",
+      "public": true
     },
     {
       "name": "rules-2013-p35-38",
@@ -61,7 +65,8 @@
       ],
       "use": "Competition rules: requirement language and tables.",
       "sha256": "3c85ed4975a5b66094cac543e455aa89666eb83ea7498dd3ab7c0b34e5716905",
-      "set": "dev"
+      "set": "dev",
+      "public": true
     },
     {
       "name": "lcit-report-p12-19",
@@ -73,7 +78,8 @@
       ],
       "use": "Independent assessment report: prose findings and recommendations.",
       "set": "dev",
-      "sha256": "bb5dd36f04b236ce7efb51ee3d4b11a94909fc3b323a58da3e94d5cf3fd51de8"
+      "sha256": "bb5dd36f04b236ce7efb51ee3d4b11a94909fc3b323a58da3e94d5cf3fd51de8",
+      "public": true
     },
     {
       "name": "dc-manual-p59-66",
@@ -85,7 +91,8 @@
       ],
       "use": "Project manual (specifications): requirement language.",
       "set": "dev",
-      "sha256": "a157bdf0c3212e4522ae137ca5703f89138b6e639db451e6814238cf1929f156"
+      "sha256": "a157bdf0c3212e4522ae137ca5703f89138b6e639db451e6814238cf1929f156",
+      "public": true
     },
     {
       "name": "ken-cd-p95-98",
@@ -97,7 +104,8 @@
       ],
       "use": "Four drawing sheets from a third team.",
       "set": "dev",
-      "sha256": "f7b0008f89c3d843f44ce34c08e4f0f5235cc77def8d91b98d2ff1d8baeec279"
+      "sha256": "f7b0008f89c3d843f44ce34c08e4f0f5235cc77def8d91b98d2ff1d8baeec279",
+      "public": true
     },
     {
       "name": "iea-22mw-p12-21",
@@ -109,7 +117,8 @@
       ],
       "use": "A third turbine report: captioned tables and charts.",
       "set": "heldout",
-      "sha256": "255d62ede64298165b05a31497e9cffd305f104e615257e3c2a6f6ff8eb92f56"
+      "sha256": "255d62ede64298165b05a31497e9cffd305f104e615257e3c2a6f6ff8eb92f56",
+      "public": true
     },
     {
       "name": "habex-interim-p80-89",
@@ -121,7 +130,8 @@
       ],
       "use": "Mission concept report with figures and tables.",
       "set": "heldout",
-      "sha256": "52da8af46a1c2107bd1a5754c2083c822cc4275df4438bca7c559d444391d93a"
+      "sha256": "52da8af46a1c2107bd1a5754c2083c822cc4275df4438bca7c559d444391d93a",
+      "public": true
     },
     {
       "name": "ken-manual-p70-79",
@@ -133,7 +143,8 @@
       ],
       "use": "Another team's project manual.",
       "set": "heldout",
-      "sha256": "3b80816c4e6e1898ed04a3ad55f5cfce2d3cbbbe941ffd6e6484712920c88ac1"
+      "sha256": "3b80816c4e6e1898ed04a3ad55f5cfce2d3cbbbe941ffd6e6484712920c88ac1",
+      "public": true
     },
     {
       "name": "scical-cd-p40-43",
@@ -145,7 +156,8 @@
       ],
       "use": "Drawing sheets from a fourth team.",
       "set": "heldout",
-      "sha256": "c22f3f4ea3e6eb642c6359366aa24e0defa16a469ca20117085302086b3ce25f"
+      "sha256": "c22f3f4ea3e6eb642c6359366aa24e0defa16a469ca20117085302086b3ce25f",
+      "public": true
     },
     {
       "name": "dc-cd-p31-38",
@@ -157,7 +169,8 @@
       ],
       "use": "Eight detail sheets (4-6 numbered details each), for levers that act on drawing sheets.",
       "set": "dev",
-      "sha256": "870cc2fdfb78aa4c47b4489e9a594f7ddc038d5d273e34d0a160859fb16714ca"
+      "sha256": "870cc2fdfb78aa4c47b4489e9a594f7ddc038d5d273e34d0a160859fb16714ca",
+      "public": true
     },
     {
       "name": "calg-cd-p62-66",
@@ -169,7 +182,8 @@
       ],
       "use": "Five detail sheets from another team, for levers that act on drawing sheets.",
       "set": "dev",
-      "sha256": "e0051becfd8968d3511251477c93dce5ac9799468f91ae8c25bd24ef00558c1e"
+      "sha256": "e0051becfd8968d3511251477c93dce5ac9799468f91ae8c25bd24ef00558c1e",
+      "public": true
     }
   ],
   "runs": [

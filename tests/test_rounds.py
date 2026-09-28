@@ -5,6 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 from semantic_pdf_diff import cli, rounds
+from unittest.mock import patch
+from semantic_pdf_diff.llm import ModelFailure
 from semantic_pdf_diff.models import PairVerdict, Settings
 from test_concurrency import jittery_model, make_pdf
 
@@ -117,6 +119,77 @@ class Rounds(unittest.TestCase):
         batch = json.loads((self.root / 'batch' / 'pairs.json').read_text()) if (self.root / 'batch').exists() else None
         if batch:
             self.assertTrue(all('sections' in i for i in batch['items']))
+
+    def test_large_units_are_cut_into_bands_by_where_claims_were_read(self):
+        claims = lambda ids, y: {i: {'entity': 'e', 'attribute': 'a', 'value': i, 'quote': i, '_box': [0, y(n), 10, y(n) + 5]}
+                                 for n, i in enumerate(ids)}
+        key = ('run', 'c', 1, 'visual')
+        base = {key: {'claims': claims([f'x{i:02}' for i in range(60)], lambda n: n * 10), 'tasks': 3},
+                ('run', 'c', 2, 'text'): {'claims': claims(['t1'], lambda n: 0), 'tasks': 1}}
+        var = {key: {'claims': claims([f'x{i:02}' for i in range(50)], lambda n: n * 10), 'tasks': 3}}
+        a, b = rounds.split_units(base, var, limit=25)
+        bands = sorted(k for k in a if k[:4] == key)
+        self.assertEqual(len(bands), 3)  # 60 claims, at most 25 per band
+        self.assertEqual(sum(len(a[k]['claims']) for k in bands), 60)
+        self.assertTrue(all(k[4][2] <= k[4][3] for k in bands))
+        top = bands[0]
+        self.assertEqual(a[top]['claims'].keys(), b[top]['claims'].keys())  # the variant lost only lower claims
+        self.assertIn(('run', 'c', 2, 'text'), a)  # small units stay whole
+
+    def test_scores_average_each_judges_orders_and_skip_single_orders(self):
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            (folder / 'pairs.json').write_text(json.dumps({'items': [{'id': 'u1', 'family': 'text'}, {'id': 'u2', 'family': 'text'}],
+                                                           'units': {'units': 10, 'unchanged': 8}}))
+            (folder / 'verdicts').mkdir()
+            both = {'baseline-first': {'score': 1.0}, 'variant-first': {'score': 0.0}}  # a flip: 0.5
+            (folder / 'verdicts' / 'j1.json').write_text(json.dumps({'reviewer': 'j1', 'verdicts': {
+                'u1': both, 'u2': {'baseline-first': {'score': 1.0}}}}))  # u2: one order only (biased)
+            (folder / 'verdicts' / 'j2.json').write_text(json.dumps({'reviewer': 'j2', 'verdicts': {
+                'u1': {'baseline-first': {'score': 1.0}, 'variant-first': {'score': 1.0}}}}))
+            self.assertEqual(rounds.unit_scores(folder), {'u1': 0.75})
+            with patch('semantic_pdf_diff.review.reviewer_file', lambda r: r):
+                self.assertEqual(rounds.unsettled(folder, ['j1']), {'u1', 'u2'})  # flipped; failed an order
+            self.assertEqual(rounds.decide(folder)['coverage'], 0.2)
+
+    def test_a_small_stratum_cannot_block(self):
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            items = [{'id': f't{i}', 'family': 'text'} for i in range(12)] + [{'id': 'b1', 'family': 'table'},
+                                                                              {'id': 'b2', 'family': 'table'}]
+            (folder / 'pairs.json').write_text(json.dumps({'items': items, 'units': {'units': 14, 'unchanged': 0}}))
+            (folder / 'verdicts').mkdir()
+            win = {'baseline-first': {'score': 1.0}, 'variant-first': {'score': 1.0}}
+            loss = {'baseline-first': {'score': 0.0}, 'variant-first': {'score': 0.0}}
+            (folder / 'verdicts' / 'j.json').write_text(json.dumps({'reviewer': 'j', 'verdicts': {
+                **{f't{i}': win for i in range(12)}, 'b1': loss, 'b2': loss}}))
+            decision = rounds.decide(folder)
+            self.assertEqual(decision['strata_units']['table'], 2)
+            self.assertTrue(decision['decision'].startswith('accepted'))  # two lost tables don't block
+
+    def test_failed_verdicts_are_not_asked_again_until_the_retry(self):
+        folder = self.root / 'batch-retry'
+        rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=2)
+
+        class Flaky(Judge):
+            def __init__(self):
+                super().__init__()
+                self.fail = True
+            def ask(self, prompt, schema, images=(), key=None):
+                self.prompts.append(prompt)
+                if self.fail:
+                    raise ModelFailure('TimeoutError: The read operation timed out')
+                return PairVerdict(better='same', note='ok')
+        judge = Flaky()
+        _, _, failures = rounds.judge_pairs(folder, judge, 'flaky')
+        asked = len(judge.prompts)
+        self.assertEqual(len(failures), asked)
+        rounds.judge_pairs(folder, judge, 'flaky')  # a later chunk: the failed ones aren't asked again
+        self.assertEqual(len(judge.prompts), asked)
+        judge.fail = False
+        rounds.judge_pairs(folder, judge, 'flaky', retry_failed=True)  # once more, at the end
+        self.assertEqual(len(judge.prompts), 2 * asked)
+        self.assertEqual(json.loads((folder / 'failures' / 'flaky.json').read_text()), {})
 
     def test_bootstrap_and_rules(self):
         mean, low, high = rounds.bootstrap([1.0] * 40 + [0.0] * 10)
