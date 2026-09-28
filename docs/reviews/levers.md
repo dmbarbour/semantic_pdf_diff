@@ -21,7 +21,7 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | References | `references` | Not accepted | r05 0.50 (0.35–0.66), 17 units |
 | Sheet details | `sheet_details` | Parked | r05–r05d: 0.64 → 0.50 → 0.48 → 0.42 |
 | Merged readings | `reconcile` | In the champion (2026-09-27) | r08 0.56 (0.45–0.67) no worse, with 13.5% fewer claims; the owner's design decision |
-| Fragment quotes | `quote_match: fragments` | In the champion (2026-09-28); held-out check r09h | r09b 0.66 (0.53–0.77), text 0.77; missing 44 → 16, misbound 18 → 30 |
+| Fragment quotes | `quote_match: fragments` | In the champion (2026-09-28) | r09b 0.66 (0.53–0.77); held-out r09h 0.66 (0.50–0.81), text 0.89; visual weaker in both (0.44, 0.40) |
 | Excerpt quotes (with an in-order window) | `quote_match: excerpts` | Not accepted | r09 0.51 (0.39–0.63); the window let chart-axis labels through as values |
 | Chart-reading rule | `visual_rules` | Not accepted | r08 0.59 (0.47–0.71); vaguer readings, out-of-range ones remain |
 | Tile locator | `tile_locator` | Parked | r06 0.49 (flawed sampling), r07 0.58 (0.47–0.68): no worse; wins on IEA and LCIT in both rounds |

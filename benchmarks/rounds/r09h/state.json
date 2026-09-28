@@ -1,0 +1,28 @@
+{
+  "steps": {
+    "record:baseline": "done",
+    "record:fragments": "done",
+    "replay:baseline": "done",
+    "replay:fragments": "done",
+    "measure:baseline": "done",
+    "measure:fragments": "done",
+    "pairs:fragments": "done",
+    "decide:fragments": "done"
+  },
+  "updated": "2026-09-28T09:46:38+00:00",
+  "judged": {
+    "fragments": 21
+  },
+  "stopped": {
+    "fragments": "complete at 21 units"
+  },
+  "failures": {
+    "judge:fragments:XiaomiMiMo/MiMo-V2.6-Pro": 0,
+    "judge:fragments:Qwen/Qwen3.5-397B-A17B": 0
+  },
+  "escalated": {
+    "fragments": [
+      "u-habex-interim-p80-89-52da8af4-p5-text-b1of2"
+    ]
+  }
+}
