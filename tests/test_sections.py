@@ -10,7 +10,7 @@ from semantic_pdf_diff import cli
 from semantic_pdf_diff.extract import extract_pdf, pdf_sections
 from semantic_pdf_diff.models import Extraction, Judgment, Settings
 from semantic_pdf_diff.provenance import content_id
-from stubs import situating_answer
+from stubs import ROUND0, situating_answer
 
 def make_pdf(path, pages, toc=None, metadata=None, height=300):
     doc = pymupdf.open()
@@ -81,7 +81,7 @@ class SectionContext(unittest.TestCase):
     def test_heading_path_in_prompt_key_and_evidence(self):
         with tempfile.TemporaryDirectory() as d:
             path = make_pdf(Path(d) / 't.pdf', ['Intro text', 'Overview', 'Pump rated power 10 kW', 'More', 'End'], TOC)
-            client = Recorder(vision=False)
+            client = Recorder(vision=False, **ROUND0)
             seen = []
             evidence, _ = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client, on_sections=seen.extend)
             prompt, key = next((p, k) for p, k in client.asked if '10 kW' in p)
@@ -178,7 +178,7 @@ class SectionContext(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             path = make_pdf(Path(d) / 't.pdf', ['Pump rated power 10 kW'], height=600)
             _, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d),
-                                      Partial(tile_points=200, refinement_depth=1))
+                                      Partial(tile_points=200, refinement_depth=1, **ROUND0))
             tasks = [r['task'] for r in coverage]
             self.assertTrue(any(t.startswith('tile:') and '-r' in t for t in tasks))  # tiles are refined
             self.assertFalse(any(t.startswith(('overview', 'figure')) and '-r' in t for t in tasks))
@@ -186,18 +186,18 @@ class SectionContext(unittest.TestCase):
     def test_query_levers(self):
         from semantic_pdf_diff.fixtures import fingerprint
         from semantic_pdf_diff.provenance import extraction_interpreter
-        base = Settings(vision=False)
-        self.assertEqual(fingerprint(extraction_interpreter(base)), fingerprint(extraction_interpreter(Settings(vision=False,
-                         context_before=0, extract_rules=[]))))  # levers at their defaults don't change fingerprints
+        r0 = lambda **levers: Settings(vision=False, **{**ROUND0, **levers})  # levers relative to round 0
+        base = r0()
+        self.assertEqual(fingerprint(extraction_interpreter(base)),
+                         fingerprint(extraction_interpreter(r0(context_before=0, extract_rules=[]))))
         # Content levers are in each request's key, so fixtures share answers across variants...
         self.assertEqual(fingerprint(extraction_interpreter(base)),
-                         fingerprint(extraction_interpreter(Settings(vision=False, context_before=300, table_filter=True))))
+                         fingerprint(extraction_interpreter(r0(context_before=300, table_filter=True))))
         # ...but a store still binds them (it mustn't mix evidence from different variants),
-        self.assertNotEqual(extraction_interpreter(base).settings,
-                            extraction_interpreter(Settings(vision=False, table_filter=True)).settings)
+        self.assertNotEqual(extraction_interpreter(base).settings, extraction_interpreter(r0(table_filter=True)).settings)
         # and changed instructions are a different question altogether.
         self.assertNotEqual(fingerprint(extraction_interpreter(base)),
-                            fingerprint(extraction_interpreter(Settings(vision=False, extract_rules=['Be brief.']))))
+                            fingerprint(extraction_interpreter(r0(extract_rules=['Be brief.']))))
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()
             page = doc.new_page(width=400, height=400)
@@ -210,7 +210,7 @@ class SectionContext(unittest.TestCase):
             prompts = {}
             for name, settings in (('base', {'text_bytes': 260}), ('lever', {'context_before': 300, 'context_after': 300,
                                    'text_bytes': 260, 'extract_rules': ['Say which loop a pump serves.']})):
-                client = Recorder(vision=False, **settings)
+                client = Recorder(vision=False, **{**ROUND0, **settings})
                 extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
                 prompts[name] = next((p, k) for p, k in client.asked if '10 kW' in p.split('SOURCE DATA:\n')[1])
             base_prompt, base_key = prompts['base']
@@ -236,7 +236,7 @@ class SectionContext(unittest.TestCase):
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
             prompt = next(p for p, _ in client.asked if '96 oz' in p.split('SOURCE DATA:')[1])
             self.assertIn('Within: 9-2. Cooking > a. Reduced points are earned', prompt)
-            plain = Recorder(vision=False)
+            plain = Recorder(vision=False, stem_context=False)
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), plain)
             self.assertFalse(any('Within:' in p for p, _ in plain.asked))
 

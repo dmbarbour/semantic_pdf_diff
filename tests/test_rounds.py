@@ -191,6 +191,30 @@ class Rounds(unittest.TestCase):
         self.assertEqual(len(judge.prompts), 2 * asked)
         self.assertEqual(json.loads((folder / 'failures' / 'flaky.json').read_text()), {})
 
+    def test_a_spot_check_is_blind_and_imports_as_verdicts(self):
+        folder = self.root / 'spot'
+        rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=4, limit=5)
+        page = rounds.write_spotcheck(folder).read_text()
+        order = json.loads((folder / 'spotcheck-order.json').read_text())
+        self.assertNotIn('baseline', page.split('id="data">')[1].split('</script>')[0].replace('"baseline":', ''))
+        rounds.judge_pairs(folder, Judge(), 'counter')  # the panel, for the comparison
+        items = list(order)
+        answers = [{'item': items[0], 'better': 'A', 'a_problems': ['missing'], 'b_problems': [], 'confidence': 'high',
+                    'note': 'A reads the whole row'},
+                   {'item': items[1], 'better': 'unsure', 'a_problems': [], 'b_problems': [], 'confidence': '', 'note': ''}]
+        file = self.root / 'answers.json'
+        file.write_text(json.dumps({'format': rounds.SPOTCHECK_FORMAT, 'batch': 'spot', 'reviewer': 'Dana Q',
+                                    'answers': answers}))
+        verdicts = json.loads(rounds.import_spotcheck(folder, file).read_text())['verdicts']
+        first = verdicts[items[0]]
+        chosen = next(iter(first.values()))
+        self.assertEqual(chosen['score'], 1.0 if order[items[0]] == 'variant' else 0.0)  # A mapped back to its side
+        side_a = order[items[0]]
+        self.assertEqual(chosen[f'{side_a}_problems'], ['missing'])
+        self.assertIsNone(next(iter(verdicts[items[1]].values()))['score'])  # "can't tell" isn't a score
+        result = rounds.anchor(folder)['Dana Q']
+        self.assertEqual(result['units'], 1)
+
     def test_bootstrap_and_rules(self):
         mean, low, high = rounds.bootstrap([1.0] * 40 + [0.0] * 10)
         self.assertAlmostEqual(mean, 0.8)

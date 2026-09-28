@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spot check: __TITLE__</title>
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--ink:#1b2733;--muted:#5b6b7a;--line:#d5dde4;--accent:#1f6f9f;--sel:#e6f1f8}
+@media (prefers-color-scheme:dark){:root{--bg:#12171c;--card:#1b232b;--ink:#e3e9ee;--muted:#9aa9b6;--line:#2f3b46;--accent:#6fb3de;--sel:#223444}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,sans-serif}
+header{position:sticky;top:0;z-index:2;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:16px;margin:0 8px 0 0}header input{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+button{padding:7px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer;font:inherit}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.progress{flex:1;min-width:140px;height:8px;background:var(--line);border-radius:4px;overflow:hidden}.progress div{height:100%;background:var(--accent)}
+main{max-width:1500px;margin:auto;padding:16px;display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.top{display:grid;grid-template-columns:1fr;gap:8px}
+.top img{max-width:100%;border:1px solid var(--line);border-radius:4px;cursor:zoom-in;background:#fff}
+h2{font-size:15px;margin:0 0 6px}h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 0 6px}
+.muted{color:var(--muted);font-size:13px}.question{background:var(--sel);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+.sets{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:900px){.sets{grid-template-columns:1fr}}
+.set h3{margin-top:0}.set ol{margin:0;padding-left:22px}.set li{margin:0 0 6px;overflow-wrap:anywhere}
+.set .q{display:block;color:var(--muted);font-size:13px}.set .v{font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:6px}.opts label{border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
+.opts label:has(input:checked){background:var(--sel);border-color:var(--accent)}.opts input{margin-right:4px}
+.tags label{font-size:13px}
+textarea{width:100%;min-height:54px;border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--bg);color:var(--ink);font:inherit}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;font-size:13px;max-height:320px;overflow:auto}
+nav{display:flex;gap:8px;justify-content:space-between;align-items:center}
+#list{display:flex;gap:4px;flex-wrap:wrap}#list button{padding:2px 7px;font-size:12px}#list button.done{background:var(--sel)}#list button.current{outline:2px solid var(--accent)}
+#zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;z-index:5;overflow:auto;cursor:zoom-out}#zoom img{display:block;margin:auto;max-width:none}
+details summary{cursor:pointer}
+</style>
+<header>
+  <h1>Spot check __TITLE__</h1>
+  <label>Your name <input id="reviewer" placeholder="e.g. david" size="12"></label>
+  <div class="progress"><div id="bar"></div></div><span id="count"></span>
+  <button id="copy">Copy answers</button><button class="primary" id="download">Download answers</button>
+</header>
+<main>
+  <section class="card">
+    <div class="question">Two sets of claims were read from the same part of a page. Which set is better?</div>
+    <details><summary class="muted">How to judge (the same instructions the model judges get)</summary><div id="howto"></div></details>
+  </section>
+  <section class="card" id="item"></section>
+  <section class="card"><nav><button id="prev">← Previous</button><span class="muted">Saved in this browser. Answer as much or as little as you like.</span><button id="next" class="primary">Next →</button></nav>
+    <div id="list" style="margin-top:10px"></div></section>
+</main>
+<div id="zoom"><img alt=""></div>
+<script type="application/json" id="data">__DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById('data').textContent);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY = 'spotcheck:' + DATA.batch;
+let store = {last: '', people: {}};
+try { store = Object.assign(store, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+const blank = name => ({reviewer: name, answers: {}, at: 0});
+let state = store.people[store.last] || blank(store.last);
+const save = () => { store.people[state.reviewer] = state; store.last = state.reviewer;
+  try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
+const current = () => DATA.items[state.at];
+// Nothing is preset: an unanswered question stays unanswered.
+const answer = () => state.answers[current().id] || (state.answers[current().id] = {better: '', a_problems: [], b_problems: [], confidence: '', note: ''});
+const answered = a => a && (a.better || a.a_problems.length || a.b_problems.length || a.confidence || a.note.trim());
+$('#howto').innerHTML = `<p>${esc(DATA.howto)}</p><ul>` + DATA.problems.map(p => `<li><b>${esc(p.label)}</b>: ${esc(p.help)}</li>`).join('') + '</ul>';
+
+function claims(list) {
+  return list.length ? '<ol>' + list.map(c => `<li><span class="v">${esc(c.entity)} · ${esc(c.attribute)} = ${esc(c.value)}${c.unit ? ' ' + esc(c.unit) : ''}</span>`
+    + (c.conditions ? ` <span class="muted">(${esc(c.conditions)})</span>` : '') + `<span class="q">“${esc(c.quote)}”</span></li>`).join('') + '</ol>'
+    : '<p class="muted">(no claims)</p>';
+}
+function choice(name, options, value) {
+  return '<div class="opts">' + options.map(o => `<label title="${esc(o.help || '')}"><input type="radio" name="${name}" value="${o.name}" ${value === o.name ? 'checked' : ''}>${esc(o.label)}</label>`).join('') + '</div>';
+}
+function tags(name, chosen) {
+  return '<div class="opts tags">' + DATA.problems.map(p => `<label title="${esc(p.help)}"><input type="checkbox" name="${name}" value="${p.name}" ${chosen.includes(p.name) ? 'checked' : ''}>${esc(p.label)}</label>`).join('') + '</div>';
+}
+function show() {
+  const it = current(), a = answer();
+  let html = `<h2>Item ${state.at + 1} of ${DATA.items.length}: ${esc(it.title)}</h2>`
+    + `<div class="top"><div><img src="${esc(it.image)}" alt="the part of the page read"><div class="muted">Click to enlarge.</div></div><div>`
+    + (it.headings ? `<div class="muted">Under the headings: ${esc(it.headings)}</div>` : '')
+    + (it.within ? `<div class="muted">Within: ${esc(it.within)}</div>` : '')
+    + (it.before ? `<details><summary class="muted">Text just before it</summary><pre>…${esc(it.before)}</pre></details>` : '')
+    + `<details><summary class="muted">Its text layer (what the PDF says in text)</summary><pre>${esc(it.page_text)}</pre></details></div></div>`
+    + `<div class="sets" style="margin-top:12px"><div class="set"><h3>Set A (${esc(it.a_note)})</h3>${claims(it.A)}</div>`
+    + `<div class="set"><h3>Set B (${esc(it.b_note)})</h3>${claims(it.B)}</div></div>`
+    + `<h3>Which set is better?</h3>` + choice('better', DATA.better, a.better)
+    + `<h3>Problems in set A (any)</h3>` + tags('a_problems', a.a_problems)
+    + `<h3>Problems in set B (any)</h3>` + tags('b_problems', a.b_problems)
+    + `<h3>How sure are you?</h3>` + choice('confidence', DATA.confidence, a.confidence)
+    + `<h3>Note (optional): anything we should know</h3><textarea name="note" placeholder="What decided it, what both sets miss, what was hard to judge…">${esc(a.note)}</textarea>`;
+  $('#item').innerHTML = html;
+  const n = DATA.items.filter(i => answered(state.answers[i.id])).length;
+  $('#bar').style.width = (100 * n / DATA.items.length) + '%'; $('#count').textContent = `${n}/${DATA.items.length} answered`;
+  $('#list').innerHTML = DATA.items.map((i, k) => `<button type="button" data-n="${k}" class="${answered(state.answers[i.id]) ? 'done' : ''} ${k === state.at ? 'current' : ''}">${k + 1}</button>`).join('');
+}
+$('#item').addEventListener('change', e => {
+  const a = answer(), t = e.target;
+  if (t.name === 'better') a.better = t.value;
+  else if (t.name === 'confidence') a.confidence = t.value;
+  else if (t.name === 'a_problems' || t.name === 'b_problems') a[t.name] = [...document.querySelectorAll(`input[name=${t.name}]:checked`)].map(x => x.value);
+  save(); show();
+});
+$('#item').addEventListener('input', e => { if (e.target.name === 'note') { answer().note = e.target.value; save(); } });
+$('#item').addEventListener('click', e => { if (e.target.tagName === 'IMG') { $('#zoom img').src = e.target.src; $('#zoom').style.display = 'block'; } });
+$('#zoom').onclick = () => $('#zoom').style.display = 'none';
+function go(n) { state.at = Math.max(0, Math.min(DATA.items.length - 1, n)); save(); show(); window.scrollTo(0, 0); }
+$('#prev').onclick = () => go(state.at - 1); $('#next').onclick = () => go(state.at + 1);
+$('#list').onclick = e => { if (e.target.dataset.n) go(+e.target.dataset.n); };
+$('#reviewer').value = state.reviewer;
+$('#reviewer').onchange = e => {
+  const name = e.target.value.trim();
+  if (name === state.reviewer) return;
+  if (!state.reviewer && Object.keys(state.answers).length) state.reviewer = name;  // name the work done so far
+  else state = store.people[name] || blank(name);
+  save(); show();
+};
+function answersFile() {  // only what was answered
+  const out = DATA.items.filter(i => answered(state.answers[i.id])).map(i => ({item: i.id, ...state.answers[i.id]}));
+  return JSON.stringify({format: DATA.format, version: 1, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
+    created: new Date().toISOString().slice(0, 10), answers: out}, null, 2);
+}
+$('#download').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([answersFile()], {type: 'application/json'}));
+  a.download = `spotcheck-${DATA.batch}-${(state.reviewer || 'anonymous').replace(/[^A-Za-z0-9._-]+/g, '_')}.json`; a.click();
+};
+$('#copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(answersFile()); $('#copy').textContent = 'Copied'; }
+  catch (e) { $('#copy').textContent = 'Copy failed: use Download'; }
+  setTimeout(() => $('#copy').textContent = 'Copy answers', 2000);
+};
+document.addEventListener('keydown', e => {
+  if (['TEXTAREA', 'INPUT'].includes(document.activeElement.tagName) && !['radio', 'checkbox'].includes(document.activeElement.type)) return;
+  if (e.key === 'ArrowRight') go(state.at + 1); if (e.key === 'ArrowLeft') go(state.at - 1);
+});
+show();
+</script>
+</html>

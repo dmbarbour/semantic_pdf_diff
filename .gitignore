@@ -14,3 +14,5 @@ benchmarks/batches/*/.judge-cache/
 benchmarks/batches/*/questions.html
 benchmarks/report.html
 benchmarks/rounds/*/insights.html
+benchmarks/spotchecks/*/spotcheck.html
+benchmarks/spotchecks/*/sources/

@@ -122,6 +122,31 @@ def json_text(answer):
                 pass
     return answer
 
+def read_stream(response):
+    """An OpenAI-style server-sent event stream, assembled into the shape of a plain response:
+    {"choices": [{"message": {"content": ...}, "finish_reason": ...}], "usage": ...}."""
+    parts, finish, usage = [], None, None
+    for raw in response:
+        line = raw.decode("utf-8", errors="replace").strip()
+        if not line.startswith("data:"):
+            continue
+        payload = line[5:].strip()
+        if payload == "[DONE]":
+            break
+        chunk = json.loads(payload)
+        if not isinstance(chunk, dict):
+            raise ValueError("Stream chunk is not a JSON object")
+        if chunk.get("error"):
+            raise ValueError(f"Stream error: {str(chunk['error'])[:300]}")
+        if chunk.get("usage"):
+            usage = chunk["usage"]
+        for choice in chunk.get("choices") or ():
+            delta = choice.get("delta") or choice.get("message") or {}
+            if isinstance(delta.get("content"), str):
+                parts.append(delta["content"])
+            finish = choice.get("finish_reason") or finish
+    return {"choices": [{"message": {"content": "".join(parts)}, "finish_reason": finish}], "usage": usage}
+
 VALID_ESCAPE = re.compile(r'\\(["\\/bfnrt]|u[0-9a-fA-F]{4})?')
 
 @dataclass
@@ -218,8 +243,13 @@ class Client:
         elif self.s.response_format == "json_schema":
             body["response_format"] = {"type": "json_schema", "json_schema": {
                 "name": schema.__name__, "schema": schema.model_json_schema()}}
+        # The hash names what is asked; how the answer travels (streamed or not) isn't part of it,
+        # so cached answers still match.
+        request_hash = hashlib.sha256(self.s.base_url.encode() + json.dumps(body).encode()
+                                      + json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()
+        if self.s.stream:
+            body.update(stream=True, stream_options={"include_usage": True})
         raw = json.dumps(body).encode()
-        request_hash = hashlib.sha256(self.s.base_url.encode() + raw + json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()
         return Request(raw, request_hash, key, schema, estimate + self.s.output_tokens, prompt, tuple(hashes))
 
     def _fixture_key(self, key):
@@ -317,8 +347,11 @@ class Client:
             self.gate.acquire()
             started, throttled, generated = time.monotonic(), False, 0
             try:
+                # Streamed, the timeout is between chunks: a slow judge still writing isn't cut off
+                # (and billed for an answer never received), only a silent connection is.
                 with urllib.request.urlopen(http, timeout=self.s.timeout) as response:
-                    result = json.load(response)
+                    streamed = "text/event-stream" in (response.headers.get("Content-Type") or "")
+                    result = read_stream(response) if streamed else json.load(response)
                 if not isinstance(result, dict):
                     raise ValueError("Response is not a JSON object")
                 usage = result.get("usage") or {}

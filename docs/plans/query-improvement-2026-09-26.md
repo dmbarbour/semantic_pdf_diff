@@ -225,7 +225,11 @@ Round 1 showed that asking the same question again often gets a different answer
 | `sheet_details` | 5: a drawing sheet's details, titled from the sheet | 28–38 images per sheet against 35; 1–23 lines cut instead of 23–79; parked after r05d |
 | `references` | 8: abbreviations defined elsewhere, cited captions | 3–15 of 8–17 chunks per report slice gain a line; r05 neutral, not accepted |
 
-**The tool's defaults** stay at the v6 queries for now, so the recorded fixture keeps replaying. The champion becomes the default at a milestone, after a few rounds, with one full re-recording (about $1).
+**The tool's defaults are the champion** (promoted 2026-09-28, the owner: "promote clear champions to defaults"):
+- **Promoted:** neighbouring text, table lead-in, the text layer with images, stems, whitespace bands, grown tiles, skipped empty tiles, merged readings and fragment quotes, with 20 claims and 4,000 output tokens per request (what every recording used).
+- **Round 0's settings** are in `benchmarks/round0.json`.
+- **Endpoint settings stay out:** context size and image-token cost describe the endpoint, not the queries, so they remain in `.env`.
+- **Re-recording:** the replay test's fixture was re-recorded under the new defaults.
 
 ## Open questions
 

@@ -1,5 +1,11 @@
-"""Answers shared by test stub models."""
+"""Answers shared by test stub models, and round 0's settings for tests of pipeline mechanics."""
+import json
 import re
+from pathlib import Path
+
+# The query settings before the improvement rounds' champion became the defaults (2026-09-28):
+# tests of mechanics (refinement, tiling, prompt layout) that don't depend on the levers use these.
+ROUND0 = json.loads((Path(__file__).resolve().parent.parent / 'benchmarks' / 'round0.json').read_text())
 
 def situating_answer(prompt):
     """A situating answer derived from the prompt, or None if it isn't a situating request."""

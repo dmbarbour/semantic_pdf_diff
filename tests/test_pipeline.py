@@ -10,7 +10,7 @@ from semantic_pdf_diff.llm import Client, BudgetExceeded, ModelFailure
 from semantic_pdf_diff.compare import candidates, numeric_check, compare
 from semantic_pdf_diff.extract import extract_pdf, split_utf8, tiles
 from semantic_pdf_diff.report import write_report
-from stubs import situating_answer
+from stubs import ROUND0, situating_answer
 
 
 def ev(id='A-1', **kw):
@@ -180,7 +180,7 @@ class Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);path=root/'test.pdf'
             doc=pymupdf.open();doc.new_page(width=500,height=500);doc.save(path);doc.close()
-            client=Extractor(Settings(refinement_depth=1))
+            client=Extractor(Settings(refinement_depth=1, **ROUND0))
             _,coverage=extract_pdf(path,'sha256:' + 'a' * 64 + '.pdf',root,client)
             self.assertTrue(any('-r' in r['task'] for r in coverage))
             self.assertTrue(all(r['status']=='partial' for r in coverage))

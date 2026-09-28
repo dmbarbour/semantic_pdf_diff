@@ -10,6 +10,7 @@ See docs/plans/query-improvement-2026-09-26.md.
 """
 import json
 import random
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -65,7 +66,12 @@ def split_units(base, var, limit=MAX_CLAIMS):
         a = base.get(key, {"claims": {}, "tasks": 0})
         b = var.get(key, {"claims": {}, "tasks": 0})
         size = max(len(a["claims"]), len(b["claims"]))
-        if size <= limit:
+        # Positions are where claims were read: a tile's box for an image claim. Cut only where both
+        # sides read the same regions; a tiling lever (grid against bands) would otherwise compare
+        # different parts of the page in each band. Uncut, judges see a declared sample instead.
+        boxes = lambda side: {tuple(c["_box"]) for c in side["claims"].values()}
+        comparable = len(boxes(a) & boxes(b)) >= 0.5 * min(len(boxes(a)), len(boxes(b)) or 1)
+        if size <= limit or not comparable:
             if key in base:
                 out_a[key] = a
             if key in var:
@@ -87,10 +93,10 @@ def split_units(base, var, limit=MAX_CLAIMS):
     return out_a, out_b
 
 def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", "visual", "page"), changed_only=True,
-               unit="family"):
+               unit="family", limit=MAX_CLAIMS):
     """Sample up to n units present in both, stratified by family (round-robin), keeping only
     units whose claims differ (identical answers can't prefer either side)."""
-    base, var = split_units(collect(baseline_dir, unit), collect(variant_dir, unit))
+    base, var = split_units(collect(baseline_dir, unit), collect(variant_dir, unit), limit)
     keys = sorted(k for k in set(base) | set(var) if k[3] in families and (k in base or k in var))
     rng = random.Random(seed)
     groups = defaultdict(list)
@@ -145,7 +151,7 @@ def _lead(doc, page, region, cache, key):
             break
     return before, " > ".join(path)
 
-def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
+def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", limit=MAX_CLAIMS):
     """Write a pairwise batch: pairs.json (with which side is the baseline) and page images."""
     from .review import render
     from .store import Store
@@ -153,7 +159,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
     import pymupdf
     folder = Path(folder)
     (folder / "images").mkdir(parents=True, exist_ok=True)
-    picked, counts = pair_units(baseline_dir, variant_dir, n, seed, unit=unit)
+    picked, counts = pair_units(baseline_dir, variant_dir, n, seed, unit=unit, limit=limit)
     rng = random.Random(seed + 1)
     items = []
     docs = {}
@@ -174,7 +180,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family"):
                 (folder / "images" / name).write_bytes(render(doc, page, region if band else None, None, 1400))
             text = doc[page - 1].get_text("text", clip=region if band else None)[:PAGE_TEXT]
             before, within = _lead(doc, page, region, docs, (run, content))
-        shown_a, shown_b = shown(a, b, rng)
+        shown_a, shown_b = shown(a, b, rng, limit)
         shared = set(a) & set(b)
         items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}" + (f"-b{part}of{parts}" if band else ""),
                       "run": run, "content": content, "page": page, "family": family,
@@ -368,6 +374,95 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
         failed_path.parent.mkdir(exist_ok=True)
         failed_path.write_text(json.dumps(failed, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return target, len(verdicts), failures
+
+# --- spot checks: people judging the same pairs as the panel ------------------------------
+
+SPOTCHECK_FORMAT = "semantic-pdf-diff-spotcheck-answers"
+BETTER = [{"name": "A", "label": "A is better"}, {"name": "B", "label": "B is better"},
+          {"name": "same", "label": "About the same"}, {"name": "unsure", "label": "Can't tell"}]
+SURE = [{"name": "high", "label": "Sure"}, {"name": "medium", "label": "Fairly sure"}, {"name": "low", "label": "Guessing"}]
+
+def write_spotcheck(folder, seed=3):
+    """spotcheck.html: a batch's units for a person, blind (each unit's sets shown as A and B in
+    a random order, recorded in spotcheck-order.json beside it), with the judges' questions."""
+    import html as markup
+    folder = Path(folder)
+    batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
+    rng = random.Random(seed)
+    order, items = {}, []
+    public = lambda claims: [{k: v for k, v in c.items() if not k.startswith("_")} for c in claims]
+    for item in batch["items"]:
+        first = rng.choice(("baseline", "variant"))
+        second = "variant" if first == "baseline" else "baseline"
+        order[item["id"]] = first
+        counts = item.get("counts") or {}
+        note = lambda side: _set_note(len(item[side]), counts.get(side, len(item[side])), item.get("hidden_shared", 0))
+        band = item.get("band")
+        document = re.sub(r"-[0-9a-f]{8}$", "", item["run"])
+        items.append({"id": item["id"], "image": item["image"], "page_text": item["page_text"],
+                      "title": f"{document}, page {item['page']}, {item['family']} content"
+                               + (f", part {band[0] + 1} of {band[1]}" if band else ""),
+                      "headings": " | ".join(item.get("sections") or ()), "before": item.get("before", ""),
+                      "within": item.get("within", ""), "A": public(item[first]), "B": public(item[second]),
+                      "a_note": note(first), "b_note": note(second)})
+    howto = PAIRWISE.split("Which set is better?")[1].split("{rubric}")[0].strip() + " " + RUBRICS["v4"]["addition"].strip()
+    data = {"format": SPOTCHECK_FORMAT, "batch": folder.name, "items": items, "howto": " ".join(howto.split()),
+            "problems": [{"name": k, "label": k, "help": v} for k, v in PAIR_PROBLEMS.items()],
+            "better": BETTER, "confidence": SURE}
+    (folder / "spotcheck-order.json").write_text(json.dumps(order, indent=2) + "\n")
+    page = (Path(__file__).with_name("spotcheck_page.html").read_text(encoding="utf-8")
+            .replace("__TITLE__", markup.escape(folder.name))
+            .replace("__DATA__", json.dumps(data, ensure_ascii=False).replace("</", "<\\/")))
+    (folder / "spotcheck.html").write_text(page, encoding="utf-8")
+    return folder / "spotcheck.html"
+
+def import_spotcheck(folder, answers_file):
+    """A person's spot-check answers as verdicts (verdicts-human/<name>.json), in the judges'
+    format: each unit judged in the one order shown; "can't tell" gives no score."""
+    from .review import reviewer_file
+    folder = Path(folder)
+    data = json.loads(Path(answers_file).read_text(encoding="utf-8"))
+    if data.get("format") != SPOTCHECK_FORMAT or data.get("batch") != folder.name:
+        raise ValueError(f"{answers_file} isn't a spot-check answers file for {folder.name}")
+    order = json.loads((folder / "spotcheck-order.json").read_text())
+    verdicts = {}
+    for a in data["answers"]:
+        first = order.get(a["item"])
+        if first is None:
+            continue
+        side = {"A": first, "B": "variant" if first == "baseline" else "baseline"}
+        better = a.get("better", "")
+        score = 0.5 if better == "same" else 1.0 if side.get(better) == "variant" else 0.0 if better in side else None
+        key = "baseline-first" if first == "baseline" else "variant-first"
+        verdicts[a["item"]] = {key: {"score": score, "better": better, "confidence": a.get("confidence", ""),
+                                     "baseline_problems": a.get(f"{'a' if first == 'baseline' else 'b'}_problems", []),
+                                     "variant_problems": a.get(f"{'a' if first == 'variant' else 'b'}_problems", []),
+                                     "note": a.get("note", ""), "remarks": a.get("note", "")}}
+    target = folder / "verdicts-human" / f"{reviewer_file(data['reviewer'])}.json"
+    target.parent.mkdir(exist_ok=True)
+    target.write_text(json.dumps({"reviewer": data["reviewer"], "verdicts": verdicts}, indent=2, ensure_ascii=False) + "\n")
+    return target
+
+def anchor(folder, human_dir="verdicts-human"):
+    """People's verdicts against the judges' on the same units: agreement on which side is
+    better, and each side's win rate over the units both judged."""
+    folder = Path(folder)
+    judges = unit_scores(folder)
+    lean = lambda s: (s > 0.5) - (s < 0.5)
+    out = {}
+    for path in sorted((folder / human_dir).glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        person = {u: next(iter(o.values()))["score"] for u, o in data["verdicts"].items()
+                  if next(iter(o.values()))["score"] is not None}
+        both = sorted(set(person) & set(judges))
+        agree = sum(lean(person[u]) == lean(judges[u]) for u in both)
+        opposite = sum(lean(person[u]) * lean(judges[u]) < 0 for u in both)
+        fmt = lambda t: None if t is None else {"mean": round(t[0], 3), "low": round(t[1], 3), "high": round(t[2], 3)}
+        out[data["reviewer"]] = {"units": len(both), "same_lean": agree, "opposite": opposite,
+                                 "person_win_rate": fmt(bootstrap([person[u] for u in both])),
+                                 "judges_win_rate": fmt(bootstrap([judges[u] for u in both])),
+                                 "disagreements": [u for u in both if lean(person[u]) * lean(judges[u]) < 0]}
+    return out
 
 def bootstrap(values, resamples=2000, level=0.90, seed=7):
     """(mean, low, high) with a percentile bootstrap interval; None for no values."""

@@ -10,18 +10,18 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 
 | Lever | Setting | Status | Best evidence |
 |---|---|---|---|
-| Neighbouring text | `context_before/after: 400` | In the champion | r01b 0.68 (0.56–0.80); with the others r02 0.68, r02h 0.71 |
-| Text layer with images | `visual_text_layer: 1500` | In the champion | r01b 0.72 (0.56–0.88) |
-| Table lead-in | `table_context: 400` | In the champion | r01b 0.71 (0.56–0.85), 15 units |
-| Numbered-item stems | `stem_context` | In the champion | r03 0.63 (0.51–0.75); r04 combined 0.64 / r04h 0.69 |
-| Whitespace bands | `tiling: bands` | In the champion | r03 0.83 (0.70–0.94) |
-| Grown tiles | `grow_tiles` | In the champion | r03 0.80 (0.70–0.89) |
-| Skip empty tiles | `skip_empty` | In the champion (cost only) | 43 of 963 tiles (4.5%) skipped on the development slices, 0 claims lost |
+| Neighbouring text | `context_before/after: 400` | Default (2026-09-28) | r01b 0.68 (0.56–0.80); with the others r02 0.68, r02h 0.71 |
+| Text layer with images | `visual_text_layer: 1500` | Default (2026-09-28) | r01b 0.72 (0.56–0.88) |
+| Table lead-in | `table_context: 400` | Default (2026-09-28) | r01b 0.71 (0.56–0.85), 15 units |
+| Numbered-item stems | `stem_context` | Default (2026-09-28) | r03 0.63 (0.51–0.75); r04 combined 0.64 / r04h 0.69 |
+| Whitespace bands | `tiling: bands` | Default (2026-09-28) | r03 0.83 (0.70–0.94) |
+| Grown tiles | `grow_tiles` | Default (2026-09-28) | r03 0.80 (0.70–0.89) |
+| Skip empty tiles | `skip_empty` | Default (2026-09-28; cost only) | 43 of 963 tiles (4.5%) skipped on the development slices, 0 claims lost |
 | Table filter | `table_filter` | Not accepted | r01b 0.41 (0.23–0.57), 12 pages |
 | References | `references` | Not accepted | r05 0.50 (0.35–0.66), 17 units |
 | Sheet details | `sheet_details` | Parked | r05–r05d: 0.64 → 0.50 → 0.48 → 0.42 |
-| Merged readings | `reconcile` | In the champion (2026-09-27) | r08 0.56 (0.45–0.67) no worse, with 13.5% fewer claims; the owner's design decision |
-| Fragment quotes | `quote_match: fragments` | In the champion (2026-09-28) | r09b 0.66 (0.53–0.77); held-out r09h 0.66 (0.50–0.81), text 0.89; visual weaker in both (0.44, 0.40) |
+| Merged readings | `reconcile` | Default (2026-09-28) | r08 0.56 (0.45–0.67) no worse, with 13.5% fewer claims; the owner's design decision |
+| Fragment quotes | `quote_match: fragments` | Default (2026-09-28) | r09b 0.66 (0.53–0.77); held-out r09h 0.66 (0.50–0.81), text 0.89; visual weaker in both (0.44, 0.40) |
 | Excerpt quotes (with an in-order window) | `quote_match: excerpts` | Not accepted | r09 0.51 (0.39–0.63); the window let chart-axis labels through as values |
 | Chart-reading rule | `visual_rules` | Not accepted | r08 0.59 (0.47–0.71); vaguer readings, out-of-range ones remain |
 | Tile locator | `tile_locator` | Parked | r06 0.49 (flawed sampling), r07 0.58 (0.47–0.68): no worse; wins on IEA and LCIT in both rounds |

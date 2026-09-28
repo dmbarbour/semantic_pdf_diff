@@ -326,9 +326,10 @@ class Settings(Strict):
     model: str = "gemma-4"
     base_url: str = "http://localhost:8000/v1"
     context_tokens: int = Field(default=8192, ge=2048)
-    output_tokens: int = Field(default=1400, ge=256)
+    output_tokens: int = Field(default=4000, ge=256)
     # Claims asked for per extraction request; raise with output_tokens (about 150 tokens per claim).
-    claims_per_request: int = Field(default=6, ge=1, le=100)
+    # 20 and 4,000 are what every recording and round used (2026-09-26 on).
+    claims_per_request: int = Field(default=20, ge=1, le=100)
     image_tokens: int = Field(default=1200, ge=1)
     safety_tokens: int = Field(default=400, ge=100)
     # A safety stop against runaway runs, not a budget: throughput is governed by rate_limits.
@@ -336,7 +337,10 @@ class Settings(Strict):
     # Stop sending once the provider-reported cost of this run reaches this many dollars.
     max_cost: float | None = Field(default=None, gt=0)
     retries: int = Field(default=2, ge=0, le=5)
+    # Seconds without data before giving up. Answers are streamed, so this is between chunks, not
+    # for the whole answer (a slow answer cut off by a total timeout is still billed).
     timeout: float = Field(default=120, gt=0)
+    stream: bool = True
     text_bytes: int = Field(default=1800, ge=200)
     image_side: int = Field(default=1000, ge=256, le=2000)
     tile_points: int = Field(default=420, ge=100)
@@ -352,26 +356,27 @@ class Settings(Strict):
     vision: bool = True
     # Read each detected figure whole, besides the tile grid (which can cut through figures).
     figure_tasks: bool = True
-    # Query levers (docs/plans/query-improvement): the defaults reproduce the baseline queries, and
-    # levers left at their defaults stay out of interpreter fingerprints, so recordings still apply.
+    # Query levers (docs/plans/query-improvement). The defaults are the champion of the improvement
+    # rounds, promoted 2026-09-28 (rounds 1-9; benchmarks/champion.json); round 0's queries are
+    # benchmarks/round0.json. Levers left at their defaults stay out of interpreter fingerprints.
     extract_prompt: str | None = None       # replaces the extraction instructions
     extract_rules: list[str] = Field(default_factory=list)  # appended to the instructions
     visual_rules: list[str] = Field(default_factory=list)   # appended for image tasks only (tiles, figures, overview)
-    context_before: int = Field(default=0, ge=0, le=20000)  # characters of preceding text, as context
-    context_after: int = Field(default=0, ge=0, le=20000)   # characters of following text, as context
-    table_context: int = Field(default=0, ge=0, le=20000)   # characters of text above a table (lead-in, caption)
-    visual_text_layer: int = Field(default=0, ge=0, le=20000)  # characters of a region's PDF text sent with its image
+    context_before: int = Field(default=400, ge=0, le=20000)  # characters of preceding text, as context
+    context_after: int = Field(default=400, ge=0, le=20000)   # characters of following text, as context
+    table_context: int = Field(default=400, ge=0, le=20000)   # characters of text above a table (lead-in, caption)
+    visual_text_layer: int = Field(default=1500, ge=0, le=20000)  # characters of a region's PDF text sent with its image
     table_filter: bool = False               # drop detected "tables" that are charts, frames or paragraphs
-    stem_context: bool = False               # tell text and table tasks which numbered items and headings they're under
-    tiling: Literal["grid", "bands"] = "grid"  # bands: full-width, cut at whitespace gaps, on report-sized pages
-    grow_tiles: bool = False                 # extend grid tiles to include every text line they cut
+    stem_context: bool = True                # tell text and table tasks which numbered items and headings they're under
+    tiling: Literal["grid", "bands"] = "bands"  # bands: full-width, cut at whitespace gaps, on report-sized pages
+    grow_tiles: bool = True                  # extend grid tiles to include every text line they cut
     sheet_details: bool = False              # cut drawing sheets into their details, titled from the sheet
-    reconcile: bool = False                  # merge readings of one fact by different tasks into one claim
+    reconcile: bool = True                   # merge readings of one fact by different tasks into one claim
     tile_locator: bool = False               # with each tile, a page thumbnail outlining where the tile sits
-    skip_empty: bool = False                 # don't send tiles with no text, drawing or image (blank paper)
+    skip_empty: bool = True                  # don't send tiles with no text, drawing or image (blank paper)
     # fragments: quotes normalized (Unicode, line-end hyphens) and made of "a ... b" or "a | b" parts;
     # excerpts: also words read in order across a pseudo-table
-    quote_match: Literal["exact", "fragments", "excerpts"] = "exact"
+    quote_match: Literal["exact", "fragments", "excerpts"] = "fragments"
     references: bool = False                 # abbreviations defined elsewhere and cited figures' captions as context
     # Situating stage: figure and section "about" statements after extraction.
     situate: bool = True

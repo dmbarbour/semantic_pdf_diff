@@ -14,6 +14,7 @@ from semantic_pdf_diff.llm import Client, ModelFailure, redact_url
 from semantic_pdf_diff.compare import numeric_check
 from semantic_pdf_diff.extract import extract_pdf, tiles
 from semantic_pdf_diff.cli import main
+from stubs import ROUND0
 
 CID = 'sha256:' + 'a' * 64 + '.pdf'
 GOOD = {'entity':'primary pump','attribute':'rated power','value':'10','unit':'kW','conditions':'',
@@ -132,6 +133,27 @@ class ResponseShapeTests(unittest.TestCase):
         self.assertEqual(seen[0]['seed'], 7)
         self.assertEqual(seen[0]['response_format']['json_schema']['schema'], Extraction.model_json_schema())
 
+    def test_streamed_answers_are_assembled_with_their_usage(self):
+        chunks = [{'choices': [{'delta': {'content': EMPTY[:15]}}]},
+                  {'choices': [{'delta': {'content': EMPTY[15:]}, 'finish_reason': 'stop'}]},
+                  {'choices': [], 'usage': {'prompt_tokens': 12, 'completion_tokens': 9, 'estimated_cost': 0.0003}}]
+        body = ''.join(f'data: {json.dumps(c)}\n\n' for c in chunks) + 'data: [DONE]\n\n'
+        with stub([(200, {'Content-Type': 'text/event-stream'}, body.encode())]) as (url, seen), \
+                tempfile.TemporaryDirectory() as d:
+            client = Client(Settings(base_url=url, retries=0), Path(d))
+            self.assertTrue(client.ask('x', Extraction).complete)
+            self.assertTrue(seen[0]['stream'])
+            self.assertEqual(seen[0]['stream_options'], {'include_usage': True})
+            self.assertAlmostEqual(client.cost, 0.0003)
+            self.assertEqual(client.usage['completion_tokens'], 9)
+
+    def test_streaming_does_not_change_what_a_cached_answer_is_found_by(self):
+        with tempfile.TemporaryDirectory() as d:
+            streamed = Client(Settings(stream=True), Path(d)).prepare('x', Extraction)
+            plain = Client(Settings(stream=False), Path(d)).prepare('x', Extraction)
+            self.assertEqual(streamed.request_hash, plain.request_hash)
+            self.assertNotEqual(streamed.raw, plain.raw)
+
     def test_http_key_warning(self):
         with tempfile.TemporaryDirectory() as d:
             for url, warned in [('http://remote.example/v1', True), ('http://127.0.0.1:8000/v1', False),
@@ -232,7 +254,8 @@ class ExtractionTests(unittest.TestCase):
             return Extraction(claims=[excerpt], complete=True)
         with tempfile.TemporaryDirectory() as d:
             path = pdf(Path(d)/'t.pdf', build)
-            exact, _ = extract_pdf(path, CID, Path(d) / 'exact', Recorder(respond, vision=False, refinement_depth=0))
+            exact, _ = extract_pdf(path, CID, Path(d) / 'exact',
+                                   Recorder(respond, vision=False, refinement_depth=0, quote_match='exact'))
             kept, _ = extract_pdf(path, CID, Path(d) / 'excerpts',
                                   Recorder(respond, vision=False, refinement_depth=0, quote_match='excerpts'))
             self.assertEqual(len(exact), 0)  # the verbatim check rejects an elided quote
@@ -291,7 +314,7 @@ class ExtractionTests(unittest.TestCase):
     def test_visual_duplicates_are_merged_across_refinement(self):
         claim = {**GOOD, 'kind':'diagram'}
         with tempfile.TemporaryDirectory() as d:
-            client = Recorder(lambda s, p: Extraction(claims=[claim], complete=False), refinement_depth=2)
+            client = Recorder(lambda s, p: Extraction(claims=[claim], complete=False), refinement_depth=2, **ROUND0)
             evidence, coverage = extract_pdf(pdf(Path(d)/'t.pdf', lambda p: None), CID, Path(d), client)
             self.assertTrue(any('-r1-r0' in r['task'] for r in coverage))
             self.assertEqual(len(evidence), 1)
@@ -316,7 +339,8 @@ class ExtractionTests(unittest.TestCase):
         def respond(source, prompt):
             return Extraction(claims=[{**GOOD, 'quote':'10 kW', 'entity':source}], complete=True)
         with tempfile.TemporaryDirectory() as d:
-            evidence, _ = extract_pdf(pdf(Path(d)/'t.pdf', build, width=800, height=300), CID, Path(d), Recorder(respond))
+            evidence, _ = extract_pdf(pdf(Path(d)/'t.pdf', build, width=800, height=300), CID, Path(d),
+                                      Recorder(respond, **ROUND0))
             self.assertTrue({'text', 'tile', 'overview'} <= {e.entity for e in evidence})
             for e in evidence:
                 x0, y0, x1, y1 = e.locator.bbox
@@ -335,8 +359,10 @@ class CliTests(unittest.TestCase):
     def test_plan_counts_even_tiles(self):
         with tempfile.TemporaryDirectory() as d:
             path = pdf(Path(d)/'t.pdf', lambda p: None, width=612, height=792)
+            config = Path(d) / 'round0.json'  # a grid over a blank page: nothing to skip, nothing to band
+            config.write_text(json.dumps(ROUND0))
             with contextlib.redirect_stdout(io.StringIO()) as out:
-                main([str(path), str(path), '--plan'])
+                main([str(path), str(path), '--plan', '--config', str(config)])
             self.assertEqual(json.loads(out.getvalue())['sources'][0]['visual_tasks'], 7)
 
     def test_url_credentials_redacted(self):

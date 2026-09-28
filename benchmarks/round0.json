@@ -1,0 +1,14 @@
+{
+  "claims_per_request": 6,
+  "output_tokens": 1400,
+  "context_before": 0,
+  "context_after": 0,
+  "table_context": 0,
+  "visual_text_layer": 0,
+  "stem_context": false,
+  "tiling": "grid",
+  "grow_tiles": false,
+  "skip_empty": false,
+  "reconcile": false,
+  "quote_match": "exact"
+}
