@@ -95,7 +95,7 @@ Reordered 2026-09-25 (see *Decisions*): a cheap hosted gemma-4 makes live record
   - They needn't be in the fixture record, unless as a secondary, less reliable identifier.
 - **Looking at queries:** "Ability to easily dump, view, and validate sample queries by a high-end model or human certainly would be good to avoid wasting time on obvious errors."
 
-The design is developed in [content-addressed queries](content-addressed-queries-2026-09-28.md). Proposed details (mine, not yet reviewed):
+The design is developed in [content-addressed queries](content-addressed-queries-2026-09-28.md), which supersedes the details below. The owner since decided that fixtures hold no query text or images in the general case, and that judge answers use the same format in separate files. Proposed details (mine, at the time):
 - **What the hash covers:**
   - the system and user text
   - each image's bytes
