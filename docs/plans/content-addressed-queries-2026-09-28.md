@@ -171,6 +171,17 @@ The run cache (`.cache`) and the committed judge caches (2,646 files) are alread
 
 Milestones 1–3 come before the next round, which waits on the owner's surveys anyway. 4–6 can go around rounds.
 
+## Progress
+
+- **Milestone 1 (2026-09-28): done.**
+  - **Classification:** `SETTING_CLASSES` in `models.py`.
+  - **Test (`tests/test_settings.py`):**
+    - Toggles each of the 57 settings through the whole pipeline (extraction, situating, comparison) on a synthetic document pair, and compares digests of what reached a stub model. About a minute.
+    - The drawing sheet is used only for the four settings that act on it.
+    - Not exercised, with reasons: `section_pages` and `dedupe_repeated` (content these documents lack), plus the source and archive limits and the endpoint URL.
+  - **Found:** `image_tokens` isn't only a budget. Situating fits its text to what's left of the context window after each image's allowance, so it shapes queries, as do `context_tokens` and `safety_tokens`.
+  - **Prune guard:** each run's use of a fixture is logged in a `session` table (not packed). Prune refuses, unless forced, when no run used the fixture since the given time, when a run since then missed requests, or when it would drop more than half the answers.
+
 ## Decisions (2026-09-28)
 
 - **Keyed by what reaches the model;** triples of model, query hash and response, with accounting for failures (the owner; record/replay decisions).

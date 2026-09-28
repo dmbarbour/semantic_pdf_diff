@@ -37,6 +37,12 @@ CREATE TABLE response (key TEXT NOT NULL, interpreter TEXT NOT NULL, responder T
 CREATE TABLE interpreter (fingerprint TEXT PRIMARY KEY, role TEXT NOT NULL, description TEXT NOT NULL);
 """
 
+# Each run's use of a fixture: what it replayed, recorded and missed. Prune reads it to refuse
+# pruning on the strength of a replay that missed (one run with the wrong responder once emptied a
+# fixture). Kept only in working files: pack leaves it out, so packed bytes don't change.
+SESSIONS = """CREATE TABLE IF NOT EXISTS session (time TEXT NOT NULL, responders TEXT NOT NULL,
+                  replayed INTEGER NOT NULL, recorded INTEGER NOT NULL, missing INTEGER NOT NULL)"""
+
 class FixtureError(RuntimeError):
     pass
 
@@ -87,7 +93,9 @@ class Fixture:
         if not version or int(version[0]) != SCHEMA_VERSION:
             self.db.close()
             raise FixtureError(f"{self.path} has fixture schema {version and version[0]}, expected {SCHEMA_VERSION}")
-        self.served, self.recorded, self.missing, self.used = 0, 0, [], set()
+        with self.db:
+            self.db.execute(SESSIONS)
+        self.served, self.recorded, self.missing, self.used, self.responders = 0, 0, [], set(), set()
 
     def close(self):
         if self.used:
@@ -96,6 +104,12 @@ class Fixture:
                 self.db.executemany("UPDATE response SET used=? WHERE key=? AND interpreter=? AND responder=?",
                                     [(now, *u) for u in sorted(self.used)])
             self.used = set()
+        if self.served or self.recorded or self.missing:
+            with self.db:
+                self.db.execute("INSERT INTO session VALUES (?, ?, ?, ?, ?)",
+                                (_now(), json.dumps(sorted(self.responders)), self.served, self.recorded,
+                                 len(self.missing)))
+            self.served, self.recorded, self.missing = 0, 0, []
         self.db.close()
         temp = getattr(self, "temp", None)  # an unpacked zip's folder
         if temp is not None:
@@ -118,12 +132,14 @@ class Fixture:
         """(answer, error) as recorded, or None. Marks the answer as used (see prune)."""
         row = self.db.execute("SELECT answer, error FROM response WHERE key=? AND interpreter=? AND responder=?",
                               (key, interpreter, responder)).fetchone()
+        self.responders.add(responder)
         if row is not None:
             self.used.add((key, interpreter, responder))  # written once, on close
         return row
 
     def record(self, key, interpreter, responder, *, kind, region, content, key_parts, prompt, images, schema,
                answer, usage=None, description=None, role="", error=None):
+        self.responders.add(responder)
         with self.db:
             self.db.execute("INSERT OR IGNORE INTO request VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             (key, interpreter, kind, region, content, json.dumps(key_parts, default=str), prompt,
@@ -136,12 +152,32 @@ class Fixture:
                                 (interpreter, role, json.dumps(description, sort_keys=True)))
         self.recorded += 1
 
-    def prune(self, before, responder=None, dry_run=False):
+    def prune(self, before, responder=None, dry_run=False, force=False):
         """Drop answers not used (replayed or recorded) since `before` (ISO time), and
-        requests left without answers. Returns the counts."""
+        requests left without answers. Returns the counts, and why it would refuse.
+
+        Refuses (FixtureError; force overrides) when no run used the fixture since `before`,
+        when a run since then missed requests (a wrong responder or settings replays nothing,
+        and every answer looks unused), or when it would drop more than half the answers."""
         where = "(used IS NULL OR used < ?)" + (" AND responder = ?" if responder else "")
         args = (before, responder) if responder else (before,)
         answers = self.db.execute(f"SELECT COUNT(*) FROM response WHERE {where}", args).fetchone()[0]
+        total = self.db.execute("SELECT COUNT(*) FROM response" + (" WHERE responder = ?" if responder else ""),
+                                (responder,) if responder else ()).fetchone()[0]
+        sessions = [(json.loads(r), m) for r, m in self.db.execute(
+            "SELECT responders, missing FROM session WHERE time >= ?", (before,))]
+        sessions = [(r, m) for r, m in sessions if not responder or responder in r]
+        refused = []
+        if not sessions:
+            refused.append(f"no run replayed or recorded {responder or 'answers'} since {before}")
+        missed = sum(m for _, m in sessions)
+        if missed:
+            refused.append(f"runs since {before} missed {missed} request(s): their answers may exist under "
+                           "another responder or settings")
+        if total and answers * 2 > total:
+            refused.append(f"it would drop {answers} of {total} answers")
+        if refused and not force and not dry_run:
+            raise FixtureError("Not pruning: " + "; ".join(refused) + " (force to prune anyway)")
         if not dry_run:
             with self.db:
                 self.db.execute(f"DELETE FROM response WHERE {where}", args)
@@ -149,7 +185,7 @@ class Fixture:
                                 "WHERE r.key = request.key AND r.interpreter = request.interpreter)")
                 self.db.execute("DELETE FROM interpreter WHERE fingerprint NOT IN (SELECT interpreter FROM request)")
             self.db.execute("VACUUM")
-        return {"answers_removed": answers, "dry_run": dry_run}
+        return {"answers_removed": answers, "dry_run": dry_run, "refused": refused if not force else []}
 
     def summary(self):
         """Requests and answers per responder, kind and interpreter, with token usage."""

@@ -451,3 +451,25 @@ class Settings(Strict):
         if self.context_tokens <= self.output_tokens + self.safety_tokens + 600:
             raise ValueError("Context must leave room for prompts after output and safety reserves")
         return self
+
+# What each setting can change about the queries sent to models (docs/plans/content-addressed-queries):
+# - endpoint: how requests travel, budgets and limits; never what any query says
+# - shaping: the content of queries (text, images, generation settings)
+# - selecting: which queries are made (tasks added or removed), and which sources are read
+# - post: what is done with answers; never an extraction query, though later stages read the result
+# tests/test_settings.py toggles each one through the whole pipeline and checks it keeps to its class.
+SETTING_CLASSES = {
+    **dict.fromkeys(("model", "base_url", "max_calls", "max_cost", "retries", "timeout", "stream",
+                     "cache_check", "concurrency", "heartbeat_seconds", "rate_limits"), "endpoint"),
+    # The token budgets shape too: situating fits its text to what's left of the context window.
+    **dict.fromkeys(("context_tokens", "safety_tokens", "image_tokens", "output_tokens", "claims_per_request", "text_bytes",
+                     "image_side", "section_depth", "section_pages", "dedupe_repeated", "extract_prompt",
+                     "extract_rules", "visual_rules", "context_before", "context_after", "table_context",
+                     "visual_text_layer", "stem_context", "grow_tiles", "tile_locator", "references",
+                     "response_format", "temperature", "seed", "max_token_field"), "shaping"),
+    **dict.fromkeys(("tile_points", "refinement_depth", "vision", "figure_tasks", "tiling", "sheet_details",
+                     "skip_empty", "table_filter", "situate", "verify_visuals", "top_k", "min_score", "max_pairs",
+                     "aliases", "rescan", "max_zip_depth", "max_source_bytes", "zip_ratio_limit",
+                     "zip_ratio_min_bytes"), "selecting"),
+    **dict.fromkeys(("reconcile", "quote_match"), "post"),
+}

@@ -375,10 +375,16 @@ def fixtures_command(argv):
     prune.add_argument('--unused-since', required=True, help='ISO time, e.g. noted before replaying every run')
     prune.add_argument('--responder')
     prune.add_argument('--dry-run', action='store_true')
+    prune.add_argument('--force', action='store_true',
+                       help='prune even if no run since then used the fixture, a run missed requests, or most answers go')
     args = parser.parse_args(argv)
     if args.command == 'prune':
         with fixtures.Fixture(args.fixture) as fixture:
-            print(json.dumps(fixture.prune(args.unused_since, args.responder, args.dry_run)))
+            try:
+                print(json.dumps(fixture.prune(args.unused_since, args.responder, args.dry_run, args.force)))
+            except fixtures.FixtureError as e:
+                print(e, file=sys.stderr)
+                return 1
         return 0
     if args.command == 'summary':
         with tempfile.TemporaryDirectory() as d:

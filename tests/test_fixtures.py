@@ -119,6 +119,27 @@ class RecordAndReplay(unittest.TestCase):
         _, report, _ = self.run_cli('again', UNREACHABLE, '--fixture', str(self.fixture))
         self.assertEqual(report['usage']['fixture']['missing'], 0)
 
+    def test_prune_refuses_on_a_replay_that_missed(self):
+        from semantic_pdf_diff.fixtures import Fixture, FixtureError, _now
+        import time
+        self.record()
+        time.sleep(1.1)
+        mark = _now()
+        time.sleep(1.1)
+        with Fixture(self.fixture) as f:  # nothing ran since the mark: every answer looks unused
+            with self.assertRaisesRegex(FixtureError, 'no run replayed'):
+                f.prune(mark)
+        # A replay under the wrong responder answers nothing, as when .env wasn't loaded (2026-09-28).
+        self.run_cli('wrong', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'someone-else')
+        with Fixture(self.fixture) as f:
+            refused = f.prune(mark, dry_run=True)['refused']
+            self.assertTrue(any('missed' in r for r in refused) and any('would drop' in r for r in refused))
+            with self.assertRaises(FixtureError):
+                f.prune(mark)
+            self.assertGreater(f.db.execute('SELECT COUNT(*) FROM response').fetchone()[0], 0)  # nothing dropped
+            f.prune(mark, force=True)
+            self.assertEqual(f.db.execute('SELECT COUNT(*) FROM response').fetchone()[0], 0)
+
     def test_running_out_of_balance_pauses_and_resumes(self):
         from semantic_pdf_diff import ledger
         ledger_path = self.root / 'ledger.jsonl'

@@ -52,8 +52,14 @@ def jittery_model():
                 claims = [{'entity': 'equipment', 'attribute': 'power', 'value': v, 'unit': 'kW', 'kind': 'text',
                            'quote': f'{v} kW', 'confidence': .9} for v in re.findall(r'(\d+) kW', data)]
                 answer = {'claims': claims, 'complete': True, 'issues': []}
+            # What reached the model, for tests of what settings change: the body without the model's
+            # name or how the answer travels (docs/plans/content-addressed-queries).
+            role = 'compare' if 'Compare exactly' in prompt else 'triage' if situating_answer(prompt) else 'extract'
+            seen = hashlib.sha256(json.dumps({k: v for k, v in body.items() if k not in ('model', 'stream', 'stream_options')},
+                                             sort_keys=True).encode()).hexdigest()
             with state['lock']:
                 state['active'] -= 1
+                state.setdefault('queries', []).append((role, seen))
             self.send_response(200); self.end_headers()
             self.wfile.write(json.dumps({'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(answer)}}],
                                          'usage': {'prompt_tokens': 100, 'completion_tokens': 20,
