@@ -189,7 +189,9 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
   - **Re-keying by replay:** `--rekey-from <schema-3 fixture>`.
     - **The replay fixture:** 3,779 queries carried over. 105 comparisons were stale: their claims had been reworded since they were recorded, and the old keys (claim IDs) had kept serving the old answers. They were recorded afresh for $0.015. All ten runs replay with 0 missing, and the zip went from 2.7 to 1.4 MB.
     - **The local master fixture** (`tests/fixtures/slices.sqlite`): the replay fixture, plus what re-keyed from the old master under the current defaults (all 12 runs, sheets included) and round 0's levers (extraction only). That's 6,501 answers from 14 documents, 14 MB against 100 MB. Everything else was let go, along with the older local fixtures.
-  - **Tests:** re-keying (answers carried with their dates, changed queries let go), two replays forming the same evidence and reports, and the new cache's guarantees.
+  - **Tests:** re-keying (answers carried with their dates, changed queries let go), two replays forming byte-identical evidence and reports, and the new cache's guarantees.
+    - **Byte-identical reports:** `SOURCE_DATE_EPOCH` fixes the time reports and review batches say they were made (the owner's suggestion).
+  - **Re-keying is temporary:** `LegacyFixture`, `--rekey-from` and its test go once nothing needs re-keying (the owner: "I doubt we'll hold onto re-keying tests for long").
   - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
   - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
 

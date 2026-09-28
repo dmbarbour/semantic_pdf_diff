@@ -5,6 +5,8 @@ SHA-256 of the bytes plus the normalized file extension. Evidence attaches to
 content, never to paths.
 """
 import hashlib
+import os
+from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import PurePath
 from . import __version__
@@ -39,6 +41,12 @@ def content_id(data, name):
 
 def text_hash(*parts):
     return hashlib.sha256("\x00".join(parts).encode()).hexdigest()[:16]
+
+def now():
+    """The time outputs are stamped with: now, or SOURCE_DATE_EPOCH (seconds since 1970, UTC) when
+    set, the reproducible-builds convention, so replays can form byte-identical reports."""
+    fixed = os.environ.get("SOURCE_DATE_EPOCH", "").strip()
+    return datetime.fromtimestamp(int(fixed), timezone.utc) if fixed else datetime.now(timezone.utc)
 
 def library_versions():
     versions = {"semantic-pdf-diff": __version__}

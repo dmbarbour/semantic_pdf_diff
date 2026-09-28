@@ -18,7 +18,7 @@ import html
 import json
 import random
 import re
-from datetime import datetime, timezone
+from .provenance import now
 from pathlib import Path
 
 from .taxonomy import (ADEQUACY, CLARITY, CONFIDENCE, CORE_FIELDS, FIELD_ANSWERS, FIELDS, MISSING, TAXONOMY, USABLE,
@@ -145,7 +145,7 @@ def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1):
             source.close()
     rng.shuffle(items)  # responders and item types interleaved
     batch = {"format": "semantic-pdf-diff-review-batch", "version": 1, "name": folder.name, "seed": seed,
-             "created": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+             "created": now().strftime("%Y-%m-%d"),
              "stores": [{"label": label, "path": str(path)} for label, path in stores], "items": items}
     (folder / "batch.json").write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     write_page(folder, batch)
@@ -668,7 +668,7 @@ def judge(folder, client, reviewer, limit=None, progress=None, stage="answers"):
                 dispatch.submit(judge_prompt(item), PanelLabel, [folder / i["src"] for i in item["images"]], None, finish)
         dispatch.drain()
     data = {"format": QUESTIONS_FORMAT if questions else FORMAT, "version": 1, "batch": batch["name"],
-            "reviewer": reviewer, "created": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "reviewer": reviewer, "created": now().strftime("%Y-%m-%d"),
             "labels": [labels[i["id"]] for i in items if i["id"] in labels]}
     target = labels_folder(folder, stage) / f"{reviewer_file(reviewer)}.json"
     if data["labels"]:  # a model that answered nothing isn't a reviewer

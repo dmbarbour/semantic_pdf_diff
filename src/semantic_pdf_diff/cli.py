@@ -10,9 +10,8 @@ import csv
 import json
 import sys
 import tempfile
-from datetime import datetime, timezone
 from pathlib import Path
-from . import fixtures, manifest
+from . import fixtures, manifest, provenance
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
 from .readings import reconcile
@@ -309,7 +308,7 @@ def run(args, settings, store, names, out, force_rescan=False):
         data = compare(left, right, store.folder, client, args.mode, progress=progress)
         progress.close()
         interpreters['compare'] = comparison_interpreter(settings).model_dump()
-        data.update(schema_version=2, created_at=datetime.now(timezone.utc).isoformat(),
+        data.update(schema_version=2, created_at=provenance.now().isoformat(),
             sources=source_data, files=file_data, interpreters=interpreters, scan_issues=scan_issues,
             file_difference=file_difference(files[names[0]], files[names[1]]),
             sections=[{'content': c, **x.model_dump()} for c, items in sorted(sections.items()) for x in items],

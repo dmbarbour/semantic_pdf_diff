@@ -52,13 +52,16 @@ class RecordAndReplay(unittest.TestCase):
 
     def test_replays_form_the_same_reports(self):
         """What a fixture is for: the sample documents and the answers to prior queries are enough to
-        form the same reports, byte for byte, but for when they were made."""
+        form the same reports, byte for byte (SOURCE_DATE_EPOCH fixes when they say they were made)."""
+        import os
+        from unittest.mock import patch
         self.record()
-        one = self.run_cli('one', UNREACHABLE, '--fixture', str(self.fixture))[1]
-        two = self.run_cli('two', UNREACHABLE, '--fixture', str(self.fixture))[1]
-        self.assertEqual((self.root / 'one' / 'evidence.json').read_bytes(), (self.root / 'two' / 'evidence.json').read_bytes())
-        one.pop('created_at'), two.pop('created_at')
-        self.assertEqual(json.dumps(one, sort_keys=True), json.dumps(two, sort_keys=True))
+        with patch.dict(os.environ, {'SOURCE_DATE_EPOCH': '1790000000'}):
+            self.run_cli('one', UNREACHABLE, '--fixture', str(self.fixture))
+            self.run_cli('two', UNREACHABLE, '--fixture', str(self.fixture))
+        for name in ('evidence.json', 'report.json', 'report.html'):
+            self.assertEqual((self.root / 'one' / name).read_bytes(), (self.root / 'two' / name).read_bytes(), name)
+        self.assertIn('"created_at": "2026-09-21T', (self.root / 'one' / 'report.json').read_text())
 
     def test_unrecorded_requests_fail_visibly(self):
         self.record()
