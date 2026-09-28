@@ -27,6 +27,8 @@ def main(argv=None):
     parser.add_argument("--run", action="append", help="only these runs (repeatable)")
     parser.add_argument("--variant", type=Path, help="settings JSON of a query variant, merged over the base settings")
     parser.add_argument("--responder", help="default: the configured model")
+    parser.add_argument("--fresh-regions", default="",
+                        help="A/A control: extraction for these regions (comma-separated) answered afresh, recorded apart")
     parser.add_argument("--out", type=Path, default=ROOT / "benchmarks/runs/scratch", help="folder for the runs' stores")
     parser.add_argument("--replay", action="store_true", help="replay only (no model calls); fails on anything unrecorded")
     parser.add_argument("--retry-failures", action="store_true",
@@ -58,6 +60,9 @@ def main(argv=None):
                     seen.append(name)
         runs = [{"name": name, "slices": [name, name]} for name in seen]
     worst = 0
+    from semantic_pdf_diff import ledger
+    tags = dict(t.split("=", 1) for t in args.tag)
+    spent_before = ledger.spent(args.ledger, **tags) if args.ledger and args.ledger.exists() else 0.0
     for run in runs:
         a, b = (ROOT / "samples/slices" / f"{name}.pdf" for name in run["slices"])
         command = [str(a), str(b), "--config", str(config), "-q"] + (["--no-situate"] if args.extract_only else [])
@@ -73,10 +78,17 @@ def main(argv=None):
             command += ["--base-url", "http://127.0.0.1:9/v1"]
         if args.responder:
             command += ["--responder", args.responder]
+        if args.fresh_regions:
+            command += ["--fresh-regions", args.fresh_regions]
         if args.ledger:
             command += ["--ledger", str(args.ledger)] + [f"--ledger-tag={t}" for t in args.tag + [f"run={run['name']}"]]
-        if args.max_cost:
-            command += ["--max-cost", str(args.max_cost)]
+        if args.max_cost:  # a cap for the whole recording, not per slice (each run's client starts at 0)
+            spent = (ledger.spent(args.ledger, **tags) - spent_before) if args.ledger and args.ledger.exists() else 0.0
+            left = args.max_cost - spent
+            if left <= 0:
+                print(f"{run['name']}: cap of ${args.max_cost} reached", flush=True)
+                return 3
+            command += ["--max-cost", f"{left:.4f}"]
         code = cli.main(command)
         print(f"{run['name']}: exit {code}", flush=True)
         if code == 3:  # out of budget: stop; rerunning resumes

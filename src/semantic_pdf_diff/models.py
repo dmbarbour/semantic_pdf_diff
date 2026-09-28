@@ -369,6 +369,7 @@ class Settings(Strict):
     reconcile: bool = False                  # merge readings of one fact by different tasks into one claim
     tile_locator: bool = False               # with each tile, a page thumbnail outlining where the tile sits
     skip_empty: bool = False                 # don't send tiles with no text, drawing or image (blank paper)
+    quote_match: Literal["exact", "excerpts"] = "exact"  # excerpts: "a ... b" quotes and Unicode variants accepted
     references: bool = False                 # abbreviations defined elsewhere and cited figures' captions as context
     # Situating stage: figure and section "about" statements after extraction.
     situate: bool = True
@@ -423,11 +424,12 @@ class Settings(Strict):
             raw = os.environ.get(name)
             if raw is None or not raw.strip():
                 continue
-            if field in ("aliases", "rate_limits"):
+            if field in ("aliases", "rate_limits", "extract_rules", "visual_rules"):
                 try:
                     values[field] = json.loads(raw)
                 except ValueError as exc:
-                    shape = "object mapping aliases to canonical names" if field == "aliases" else "list of rate-limit rules"
+                    shape = {"aliases": "object mapping aliases to canonical names",
+                             "rate_limits": "list of rate-limit rules"}.get(field, "list of strings")
                     raise ValueError(f"{name} must be a JSON {shape}") from exc
             else:
                 values[field] = raw.strip()

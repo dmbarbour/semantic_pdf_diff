@@ -85,6 +85,36 @@ class ResponseShapeTests(unittest.TestCase):
             with self.subTest(content=content):
                 self.assertTrue(self.ask([reply(content)])[0].complete)
 
+    def test_control_characters_and_trailing_notes_are_repaired(self):
+        for content in ['{"claims":[],"complete":true,"issues":["a\tb"]}',
+                        EMPTY + '\nNote: nothing else on the page.']:
+            with self.subTest(content=content):
+                self.assertTrue(self.ask([reply(content)])[0].complete)
+
+    def test_every_paid_attempt_reaches_the_ledger(self):
+        from semantic_pdf_diff.ledger import Ledger, read
+        paid = {'prompt_tokens': 10, 'completion_tokens': 5, 'estimated_cost': 0.001}
+        with tempfile.TemporaryDirectory() as d, stub([reply('not json', usage=paid), reply(EMPTY, usage=paid)]) as (url, _):
+            client = Client(Settings(base_url=url, retries=1), Path(d) / 'cache')
+            client.ledger = Ledger(Path(d) / 'ledger.jsonl', round='t')
+            with patch('semantic_pdf_diff.llm.time.sleep'):
+                client.ask('x', Extraction)
+            self.assertEqual(len(read(Path(d) / 'ledger.jsonl')), 2)  # the bad answer was paid for too
+            self.assertAlmostEqual(client.cost, 0.002)
+
+    def test_a_connection_dropped_mid_answer_is_retried(self):
+        truncated = (200, {'Content-Length': '500'}, b'{"choices": [')  # promises more than it sends
+        with patch('semantic_pdf_diff.llm.time.sleep'):
+            value, seen = self.ask([truncated, reply(EMPTY)], retries=1)
+        self.assertTrue(value.complete)
+        self.assertEqual(len(seen), 2)
+
+    def test_failure_classes(self):
+        from semantic_pdf_diff.llm import transient
+        self.assertTrue(transient('ModelFailure: TimeoutError: The read operation timed out'))
+        self.assertTrue(transient('ModelFailure: HTTP 503: Service Unavailable'))
+        self.assertFalse(transient('ModelFailure: ValidationError: 1 validation error for Extraction'))
+
     def test_retry_after_is_honoured(self):
         with patch('semantic_pdf_diff.llm.time.sleep') as sleep:
             value, seen = self.ask([(429, {'Retry-After':'5'}, b'busy'), reply(EMPTY)], retries=1)
@@ -193,6 +223,20 @@ class ExtractionTests(unittest.TestCase):
             block = [b for b in doc[0].get_text('blocks') if '10 kW' in b[4]][0]
             self.assertEqual(evidence[0].locator.bbox, tuple(block[:4]))
             self.assertTrue(evidence[0].quote_verified)
+
+    def test_excerpt_quotes_are_kept_only_when_asked(self):
+        def build(page):
+            page.insert_text((40, 40), 'The primary pump has a rated power of 10 kW at design flow.')
+        excerpt = {**GOOD, 'quote': 'primary pump ... rated power of 10 kW'}
+        def respond(source, prompt):
+            return Extraction(claims=[excerpt], complete=True)
+        with tempfile.TemporaryDirectory() as d:
+            path = pdf(Path(d)/'t.pdf', build)
+            exact, _ = extract_pdf(path, CID, Path(d) / 'exact', Recorder(respond, vision=False, refinement_depth=0))
+            kept, _ = extract_pdf(path, CID, Path(d) / 'excerpts',
+                                  Recorder(respond, vision=False, refinement_depth=0, quote_match='excerpts'))
+            self.assertEqual(len(exact), 0)  # the verbatim check rejects an elided quote
+            self.assertEqual(len(kept), 1)
 
     def test_text_refinement_splits_on_block_boundaries(self):
         def build(page):

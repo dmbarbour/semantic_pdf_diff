@@ -84,6 +84,24 @@ class RecordAndReplay(unittest.TestCase):
         with sqlite3.connect(self.fixture) as db:
             self.assertEqual(db.execute('SELECT COUNT(*) FROM response WHERE error IS NOT NULL').fetchone()[0], 0)
 
+    def test_an_aa_control_asks_its_regions_afresh_and_replays_them_apart(self):
+        import sqlite3
+        self.record()
+        with sqlite3.connect(self.fixture) as db:
+            tiles = db.execute("SELECT COUNT(*) FROM request WHERE kind='extract' AND region IN ('tile', 'overview')").fetchone()[0]
+        self.assertGreater(tiles, 0)
+        with jittery_model() as (url, state):  # only the image regions are asked; text replays
+            self.run_cli('aa', url, '--fixture', str(self.fixture), '--fixture-mode', 'record-new',
+                         '--fresh-regions', 'tile,overview', '--no-situate')
+            self.assertGreater(state['requests'], 0)
+            self.assertLessEqual(state['requests'], tiles)
+        with sqlite3.connect(self.fixture) as db:
+            fresh = db.execute("SELECT COUNT(*) FROM response WHERE responder LIKE '%#fresh'").fetchone()[0]
+        self.assertEqual(fresh, state['requests'])
+        code, report, _ = self.run_cli('aa-replay', UNREACHABLE, '--fixture', str(self.fixture),
+                                       '--fresh-regions', 'tile,overview', '--no-situate')
+        self.assertEqual(report['usage']['fixture']['missing'], 0)  # replayed from the control's own answers
+
     def test_prune_keeps_what_the_latest_runs_used(self):
         from semantic_pdf_diff.fixtures import Fixture, _now
         import time

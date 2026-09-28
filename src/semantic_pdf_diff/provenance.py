@@ -54,7 +54,7 @@ def library_versions():
 LEVERS = ("extract_prompt", "extract_rules", "context_before", "context_after", "table_context", "visual_text_layer",
           "table_filter", "stem_context", "tiling", "grow_tiles", "sheet_details",
           "references", "tile_locator", "skip_empty",
-          "visual_rules")
+          "visual_rules", "quote_match")
 
 def interpreter(role, settings, prompts, names):
     defaults = type(settings).model_fields

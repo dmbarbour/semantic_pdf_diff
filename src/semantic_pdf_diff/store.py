@@ -59,9 +59,16 @@ CREATE VIEW comparisons AS
 # (model, prompts, library versions, sampling and output options) affects them all.
 ALL_REGIONS = frozenset({"text", "table", "tile", "figure", "overview", "vision", "table-detection"})
 VISUAL = frozenset({"tile", "figure", "overview", "vision"})
+TEXTUAL = frozenset({"text", "table"})
 SETTING_REGIONS = {
     "tile_points": VISUAL, "image_side": VISUAL, "vision": VISUAL, "figure_tasks": frozenset({"figure"}),
-    "text_bytes": frozenset({"text", "table"}),
+    "text_bytes": TEXTUAL,
+    # Query levers clear only what they change (extract_prompt and extract_rules change everything).
+    "tiling": VISUAL, "grow_tiles": VISUAL, "skip_empty": VISUAL, "tile_locator": VISUAL, "visual_rules": VISUAL,
+    "visual_text_layer": VISUAL, "sheet_details": VISUAL,
+    "context_before": TEXTUAL, "context_after": TEXTUAL, "stem_context": TEXTUAL, "references": TEXTUAL,
+    "table_context": frozenset({"table"}), "table_filter": frozenset({"table", "table-detection"}),
+    "quote_match": TEXTUAL,
 }
 
 class StoreError(RuntimeError):
@@ -341,10 +348,29 @@ class Store:
                 self.db.execute("INSERT OR REPLACE INTO evidence VALUES (?, ?, ?, ?, ?)",
                                 (e.id, e.content, row["task"], region, e.model_copy(update={"occurrences": []}).model_dump_json()))
 
-    def evidence(self, content):
-        """Claims for a piece of content, with occurrences merged (order-independent)."""
-        return merge_occurrences(Evidence.model_validate_json(d) for (d,) in
-                                 self.db.execute("SELECT data FROM evidence WHERE content=?", (content,)))
+    def evidence(self, content, reconcile=None):
+        """Claims for a piece of content, with occurrences merged (order-independent), and readings
+        of one fact merged when the store's runs merge them (see set_reconcile), or as asked."""
+        claims = merge_occurrences(Evidence.model_validate_json(d) for (d,) in
+                                   self.db.execute("SELECT data FROM evidence WHERE content=?", (content,)))
+        if self.reconciles() if reconcile is None else reconcile:
+            from .readings import reconcile as merge_readings
+            claims = merge_readings(claims)
+        return claims
+
+    def reconciles(self):
+        row = self.db.execute("SELECT value FROM meta WHERE key='reconcile'").fetchone()
+        return bool(row and row[0] == "1")
+
+    def set_reconcile(self, on):
+        """Whether evidence is read with readings of one fact merged. Situating links figures to claim
+        IDs, so changing it forgets situating results. Returns what was cleared, if anything."""
+        if bool(on) == self.reconciles():
+            return {}
+        cleared = self.clear_situating() if self.db.execute("SELECT COUNT(*) FROM situation").fetchone()[0] else {}
+        with self.db:
+            self.db.execute("INSERT OR REPLACE INTO meta VALUES ('reconcile', ?)", ("1" if on else "0",))
+        return cleared
 
     def coverage(self, content):
         return [json.loads(r) for (r,) in self.db.execute("SELECT row FROM task WHERE content=? ORDER BY rowid", (content,))]

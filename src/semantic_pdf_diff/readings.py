@@ -54,15 +54,18 @@ def _near(a, b):
                 return True
     return False
 
-def same_fact(a, b):
-    if a.approximate != b.approximate or _stated(a) != _stated(b) or not _conditions_agree(a, b):
-        return False
-    # One's words within the other's: "West Module" and "East Module" are two things, and so
-    # are a tower's "fore-aft stiffness" and "side-to-side stiffness" of equal value.
+def _named_alike(a, b):
+    """One's words within the other's, for entity and attribute: "West Module" and "East Module"
+    are two things, and so are a tower's "fore-aft stiffness" and "side-to-side stiffness"."""
     for x, y in ((_words(a.entity), _words(b.entity)), (_words(a.attribute), _words(b.attribute))):
         if not (x and y and (x <= y or y <= x)):
             return False
-    return _near(a, b)
+    return True
+
+def same_fact(a, b):
+    if a.approximate != b.approximate or _stated(a) != _stated(b) or not _conditions_agree(a, b):
+        return False
+    return _named_alike(a, b) and _near(a, b)
 
 def wording(e):
     return " | ".join(x for x in [e.entity, e.attribute, f"{e.value} {e.unit}".strip(), e.conditions] if x)
@@ -84,9 +87,10 @@ def reconcile(evidence):
     clusters = []  # [representative, [members]]
     for e in claims:
         for cluster in clusters:
-            # Every reading must agree on conditions with every other, not only the representative
-            # (an unconditioned one would otherwise gather "at rated speed" and "at cut-in").
-            if same_fact(cluster[0], e) and all(_conditions_agree(m, e) for m in cluster[1]):
+            # Every reading must agree with every other, not only with the representative: a generic
+            # one ("beam", no conditions) would otherwise gather "Floor Beam @ Grid 4" and "@ Grid 5",
+            # or "at rated speed" and "at cut-in".
+            if same_fact(cluster[0], e) and all(_conditions_agree(m, e) and _named_alike(m, e) for m in cluster[1]):
                 cluster[1].append(e)
                 break
         else:

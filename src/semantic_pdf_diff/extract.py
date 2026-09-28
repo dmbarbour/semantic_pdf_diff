@@ -5,6 +5,7 @@ from collections import deque
 from dataclasses import dataclass, field
 import math
 import re
+import unicodedata
 from pathlib import Path
 import pymupdf
 from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, claim_id, merge_occurrences
@@ -62,7 +63,15 @@ def stem_index(doc):
     from collections import Counter
     def key(line):
         return re.sub(r"\d+", "#", "".join(s["text"] for s in line["spans"]).strip()), round(line["bbox"][1] / 5)
-    pages = [page.get_text("dict", sort=True)["blocks"] for page in doc]
+    def displayed(page):
+        blocks = page.get_text("dict", sort=not page.rotation)["blocks"]
+        if page.rotation:  # reading order as displayed (see reading_blocks)
+            at = lambda box: pymupdf.Rect(box) * page.rotation_matrix
+            blocks.sort(key=lambda b: (round(at(b["bbox"]).y1), at(b["bbox"]).x0))
+            for b in blocks:
+                b.get("lines", []).sort(key=lambda l: (round(at(l["bbox"]).y1), at(l["bbox"]).x0))
+        return blocks
+    pages = [displayed(page) for page in doc]
     seen, sizes = Counter(), Counter()
     for blocks in pages:
         keys = set()
@@ -192,6 +201,51 @@ def terms(text, fold=False):
 def quoted(quote, text):
     """The quote appears verbatim in text, up to whitespace."""
     return normalize(quote) in normalize(text)
+
+FOLD = str.maketrans({"‐": "-", "‑": "-", "‒": "-", "–": "-", "—": "-", "−": "-", "’": "'", "‘": "'", "“": '"',
+                      "”": '"', "·": "•", "∙": "•", "×": "x"})
+ELLIPSIS = re.compile(r"\s*(?:\.\s?\.\s?\.|…|\s\|\s)\s*")  # "a ... b", and table cells "a | b"
+
+LINE_HYPHEN = re.compile(r"(\w)-\s+(?=\w)")  # "linear-\nspring": a compound broken at a line end
+
+def _folded(text):
+    text = unicodedata.normalize("NFKC", text).replace("\u00ad", "").translate(FOLD)
+    return " ".join(LINE_HYPHEN.sub(r"\1-", text).casefold().split())
+
+def excerpted(quote, text):
+    """The quote is excerpts of text: its parts between ellipses ("...", "…") or cell bars
+    (" | ") each appear in order, up to case, whitespace, Unicode forms, line-end hyphenation
+    ("linear-\nspring") and dash, quote-mark and bullet variants; a part may also be words read
+    in order across a pseudo-table (a header and its value), within about three times its length.
+    A third of text claims were rejected by the verbatim check for such quotes (overall review,
+    2026-09-28); paraphrases and quotes from the context still fail."""
+    parts = [p for p in (_folded(p) for p in ELLIPSIS.split(quote)) if p]
+    if not parts:
+        return False
+    haystack, at = _folded(text), 0
+    for part in parts:
+        found = haystack.find(part, at)
+        end = found + len(part) if found >= 0 else _in_order(part.split(), haystack, at, 3 * len(part) + 40)
+        if end is None:
+            return False
+        at = end
+    return True
+
+def _in_order(words, haystack, start, span):
+    """End of the first place after `start` where the words appear in order within `span`
+    characters (a row header and its value read across a pseudo-table), or None."""
+    begin = haystack.find(words[0], start)
+    while begin >= 0:
+        at = begin + len(words[0])
+        for word in words[1:]:
+            at = haystack.find(word, at)
+            if at < 0 or at - begin > span:
+                break
+            at += len(word)
+        else:
+            return at
+        begin = haystack.find(words[0], begin + 1)
+    return None
 
 def covered(quote, text, fold=False):
     """Every word of the quote occurs in text; tolerates quotes spanning table cells."""
@@ -460,9 +514,20 @@ def same_form(row, header):
     pairs = [(a, b) for a, b in zip(row, header) if a not in (None, "") or b not in (None, "")]
     return bool(pairs) and sum(a == b for a, b in pairs) / len(pairs) >= 0.5
 
+def reading_blocks(page):
+    """Text-layer blocks in reading order as displayed. PyMuPDF's sort=True orders unrotated
+    coordinates, which on a rotated page (drawing sheets) is across the page as displayed; there
+    the blocks are sorted by their displayed position instead. Unrotated pages keep sort=True's
+    order exactly, so their requests keep their recorded keys."""
+    blocks = page.get_text("blocks", sort=not page.rotation)
+    if page.rotation:
+        shown = lambda b: pymupdf.Rect(b[:4]) * page.rotation_matrix
+        blocks.sort(key=lambda b: (round(shown(b).y1), shown(b).x0))
+    return blocks
+
 def text_pieces(page, text_bytes):
     pieces = []
-    for bi, block in enumerate(page.get_text("blocks", sort=True)):
+    for bi, block in enumerate(reading_blocks(page)):
         if block[6] != 0:
             continue
         for ci, chunk in enumerate(split_utf8(block[4].strip(), text_bytes)):
@@ -906,7 +971,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
     def page_blocks(page_no):
         """The page's text blocks in reading order: [(bbox, text)]."""
         if page_no not in blocks_of:
-            blocks_of[page_no] = [(tuple(b[:4]), " ".join(b[4].split())) for b in doc[page_no - 1].get_text("blocks", sort=True)
+            blocks_of[page_no] = [(tuple(b[:4]), " ".join(b[4].split())) for b in reading_blocks(doc[page_no - 1])
                                   if b[6] == 0 and b[4].strip()]
         return blocks_of[page_no]
 
@@ -936,7 +1001,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
 
     def table_top(page_no, row_box):
         for box in tables_on.get(page_no, ()):
-            if box[1] - 2 <= row_box[1] <= box[3] + 2:
+            if pymupdf.Rect(row_box) in pymupdf.Rect(box) + (-2, -2, 2, 2):
                 return box
         return row_box
 
@@ -944,7 +1009,11 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         """Text just above a table (its lead-in sentence or caption), as context."""
         if not limit:
             return ""
-        above = " ".join(t for b, t in page_blocks(page_no) if b[3] <= bbox[1] + 2)
+        page = doc[page_no - 1]
+        table = pymupdf.Rect(bbox) * page.rotation_matrix  # as displayed (rotated sheets)
+        shown = lambda b: pymupdf.Rect(b) * page.rotation_matrix
+        above = " ".join(t for b, t in page_blocks(page_no)
+                         if shown(b).y1 <= table.y0 + 2 and shown(b).x1 > table.x0 and shown(b).x0 < table.x1)
         return (CONTEXT_NOTE + "\nAbove the table: ..." + above.strip()[-limit:]) if above.strip() else ""
 
     stems = {}
@@ -990,7 +1059,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         context = with_references(context, text)
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
-        consume(page_no, union(b for b, _ in segments), task, text, check=lambda q: quoted(q, text), locate=locate,
+        match = (lambda q: quoted(q, text) or excerpted(q, text)) if s.quote_match == "excerpts" else (lambda q: quoted(q, text))
+        consume(page_no, union(b for b, _ in segments), task, text, check=match, locate=locate,
                 context=context,
                 then=lambda status: refine_text(page_no, segments, text, task, depth, status))
 
@@ -1027,10 +1097,14 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             def then(status):
                 if status != "complete" and depth < s.refinement_depth and splittable:
                     split_columns(page_no, bbox, task, header, row, columns, depth + 1, derivation)
-            consume(page_no, bbox, task, text, derivation=derivation, check=lambda q: quoted(q, text) or covered(q, flat),
-                    then=then, repeat_key=repeat_key, repeat_after=2,
-                    context=with_references(with_within(lead_in(page_no, table_top(page_no, bbox), s.table_context),
-                                                        page_no, table_top(page_no, bbox)), flat))
+            context = with_references(with_within(lead_in(page_no, table_top(page_no, bbox), s.table_context),
+                                                  page_no, table_top(page_no, bbox)), flat)
+            if repeat_key is not None and context:  # the same row under another lead-in or stem isn't a repeat
+                repeat_key += (hashlib.sha256(context.encode()).hexdigest(),)
+            loose = s.quote_match == "excerpts"
+            consume(page_no, bbox, task, text, derivation=derivation,
+                    check=lambda q: quoted(q, text) or covered(q, flat) or (loose and excerpted(q, text)),
+                    then=then, repeat_key=repeat_key, repeat_after=2, context=context)
         else:
             split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
 

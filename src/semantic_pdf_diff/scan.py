@@ -8,6 +8,7 @@ import hashlib
 import io
 import os
 import zipfile
+import zlib
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from .provenance import normalized_extension
@@ -106,8 +107,15 @@ def _disk_file(result, display, path, disk, limits, reuse, describe):
         return
     _add(result, display, path.read_bytes, disk, limits, 0, disk, stat, describe)
 
-def _add(result, display, read, origin, limits, depth, disk, stat, describe):
-    data = read()
+def _add(result, display, read, origin, limits, depth, disk, stat, describe, size=None):
+    if size is not None and result.bytes_read + size > limits.max_source_bytes:  # before decompressing it
+        result.issue(display, f"skipped: source exceeds {limits.max_source_bytes} bytes", disk)
+        return
+    try:
+        data = read()
+    except (zipfile.BadZipFile, zlib.error, NotImplementedError, EOFError) as e:  # a corrupt or unsupported member
+        result.issue(display, f"unreadable: {type(e).__name__}: {e}", disk)
+        return
     if result.bytes_read + len(data) > limits.max_source_bytes:
         result.issue(display, f"skipped: source exceeds {limits.max_source_bytes} bytes", disk)
         return
@@ -145,7 +153,7 @@ def _archive(result, display, data, origin, limits, depth, disk, stat, describe)
             result.issue(where, "skipped: compression ratio exceeds limit", disk)
             continue
         _add(result, f"{display}!/{member.as_posix()}", lambda info=info: archive.read(info),
-             origin + (member.as_posix(),), limits, depth + 1, disk, stat, describe)
+             origin + (member.as_posix(),), limits, depth + 1, disk, stat, describe, size=info.file_size)
 
 def read_origin(origin):
     """Re-read a scanned file's bytes from its origin (root, then archive members)."""

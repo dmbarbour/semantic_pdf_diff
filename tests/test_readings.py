@@ -58,6 +58,12 @@ class Readings(unittest.TestCase):
         self.assertIn('member | section | W10X12 | Structure South Elevation - Main',
                       {o.wording for o in found[0].occurrences})
 
+    def test_a_generic_reading_does_not_gather_distinct_facts(self):
+        found = reconcile([sighting('beam', 'section', 'W10X15', task='text:p1:0', region='text', bbox=(0, 0, 300, 300)),
+                           sighting('Floor Beam @ Grid 4', 'section', 'W10X15', task='tile:p1:0'),
+                           sighting('Floor Beam @ Grid 5', 'section', 'W10X15', task='tile:p1:1')])
+        self.assertEqual(len(found), 2)  # grid 4 and grid 5 stay apart
+
     def test_values_match_across_spacing_and_units_written_into_the_value(self):
         found = reconcile([sighting('pump', 'power', '10', 'kW'), sighting('pump', 'power', '10 kW', task='tile:p1:1')])
         self.assertEqual(len(found), 1)

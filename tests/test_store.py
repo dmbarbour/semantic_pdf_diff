@@ -63,6 +63,28 @@ def evidence(eid, task, region):
     return Evidence(id=eid, content='sha256:' + 'a' * 64 + '.pdf', entity='e', attribute='a', value='1', kind='text',
                     quote='q', confidence=1, locator=PdfLocator(page=1, bbox=(0, 0, 1, 1), region=region, task=task))
 
+class ReadingsInStore(unittest.TestCase):
+    def test_the_store_reads_merged_readings_and_forgets_situating_when_that_changes(self):
+        from semantic_pdf_diff.models import Claim, claim_id
+        content = 'sha256:' + 'a' * 64 + '.pdf'
+        def sighting(entity, task):
+            claim = Claim(entity=entity, attribute='material', value='2x4 cedar', kind='diagram', quote='2x4 CEDAR',
+                          confidence=.9)
+            return Evidence(**claim.model_dump(), id=claim_id(content, claim), content=content,
+                            locator=PdfLocator(page=1, bbox=(0, 0, 300, 300), region='tile', task=task))
+        with tempfile.TemporaryDirectory() as d, Store(Path(d) / 'store') as store:
+            store.db.execute("INSERT INTO content (id, size) VALUES (?, 1)", (content,))
+            for task, entity in (('tile:p1:0', 'handrails'), ('tile:p1:1', 'Handrail')):
+                store.record_task({'content': content, 'page': 1, 'task': task, 'status': 'complete', 'claims': 1},
+                                  [sighting(entity, task)])
+            self.assertEqual(len(store.evidence(content)), 2)
+            store.record_situation(content, [], [], [], [])
+            self.assertTrue(store.set_reconcile(True))  # the situation linked the unmerged claims: forgotten
+            self.assertIsNone(store.situation(content))
+            self.assertEqual(len(store.evidence(content)), 1)
+            self.assertEqual(len(store.evidence(content, reconcile=False)), 2)
+            self.assertEqual(store.set_reconcile(True), {})  # unchanged: nothing cleared
+
 class StoreBasics(unittest.TestCase):
     def test_layout_permissions_and_reopen(self):
         with tempfile.TemporaryDirectory() as d:

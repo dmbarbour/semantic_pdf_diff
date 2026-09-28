@@ -306,6 +306,56 @@ class SectionContext(unittest.TestCase):
             for task, key in keys['plain'].items():  # a fixture must never serve one's answer for the other
                 self.assertEqual(key == keys['visual'][task], task.startswith('text'))
 
+    def test_excerpt_quotes_are_accepted_and_paraphrases_are_not(self):
+        from semantic_pdf_diff.extract import excerpted
+        text = ('The structural-damping ratio was set to 1% critical in all modes of the isolated tower. '
+                'This resulted in an equivalent driveshaft linear-\nspring constant of 867,637,000 N\u2022m/rad.\n'
+                'Wind speed Rotor speed Pitch\n22.0 12.1 19.94 -105.90E+6\ngelcoat glass_uniax E1 [Pa] 3.440E+09 4.370E+10')
+        for quote in ['structural-damping ratio ... 1% critical', 'The Structural\u2013Damping Ratio was set to 1% critical',
+                      'linear-spring constant of 867,637,000 N·m/rad', '22.0 | 12.1 | 19.94 | -105.90E+6',
+                      'gelcoat E1 [Pa] 3.440E+09']:
+            with self.subTest(quote=quote):
+                self.assertTrue(excerpted(quote, text))
+        for quote in ['the damping ratio is 5% critical', '1% critical ... structural-damping ratio',
+                      'The rotor speed is 12.1 rpm at rated wind speed']:
+            with self.subTest(quote=quote):
+                self.assertFalse(excerpted(quote, text))
+
+    def rotated_sheet(self, path):
+        """A page rotated 90° (like the drawing sets): a sentence displayed above a table, a note beside it."""
+        doc = pymupdf.open()
+        page = doc.new_page(width=400, height=600)
+        page.set_rotation(90)
+        at = lambda x, y: pymupdf.Point(x, y) * page.derotation_matrix  # displayed -> unrotated
+        text = lambda x, y, t: page.insert_text(at(x, y), t, fontsize=9, rotate=90)
+        text(40, 40, 'Pump schedule for the chilled water loop.')
+        text(420, 120, 'SHEET NOTES BESIDE THE TABLE')
+        for r in range(4):
+            page.draw_line(at(40, 80 + 30 * r), at(340, 80 + 30 * r))
+        for c in range(3):
+            page.draw_line(at(40 + 150 * c, 80), at(40 + 150 * c, 170))
+        for r, (a, b) in enumerate((('Item', 'Power'), ('Pump', '10 kW'), ('Fan', '3 kW'))):
+            text(45, 100 + 30 * r, a)
+            text(195, 100 + 30 * r, b)
+        doc.save(path)
+        doc.close()
+        return path
+
+    def test_rotated_pages_read_in_displayed_order_and_tables_get_the_text_above(self):
+        from semantic_pdf_diff.extract import reading_blocks
+        with tempfile.TemporaryDirectory() as d:
+            path = self.rotated_sheet(Path(d) / 'sheet.pdf')
+            with pymupdf.open(path) as doc:
+                order = [b[4].split()[0] for b in reading_blocks(doc[0])]
+            self.assertEqual(order[0], 'Pump')  # unrotated order put the sentence last
+            self.assertLess(order.index('Item'), order.index('SHEET'))
+            client = Recorder(vision=False, table_context=400)
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+            rows = [p for p, _ in client.asked if 'Above the table' in p]
+            self.assertTrue(rows)
+            self.assertTrue(all('chilled water loop' in p.split('SOURCE DATA')[0] for p in rows))
+            self.assertFalse(any('SHEET NOTES' in p.split('SOURCE DATA')[0] for p in rows))  # beside, not above
+
     def test_table_filter_keeps_tables_and_drops_grids(self):
         from semantic_pdf_diff.extract import real_table
         doc = pymupdf.open()

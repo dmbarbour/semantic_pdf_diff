@@ -52,8 +52,11 @@ def fingerprint(interpreter):
 
     Query levers are left out too: those that change a request's content (context, a
     region's text layer) are already in its key, instruction changes are in the prompt
-    hash, and the table filter only changes which requests exist. So a variant re-records
-    only the requests it actually changes. (Stores still bind levers: see provenance.)"""
+    hash (rules for image tasks only, `visual_rules`, are in the key instead, so text tasks
+    keep replaying), and the table filter only changes which requests exist. So a variant
+    re-records only the requests it actually changes. (Stores still bind levers: see
+    provenance.) Rendering isn't in the key: a change to how crops are drawn (or a PyMuPDF
+    upgrade, which the replay test checks) replays old answers."""
     from .provenance import LEVERS
     settings = {k: v for k, v in interpreter.settings.items() if k != "model" and k not in LEVERS}
     data = json.dumps({"role": interpreter.role, "prompt_hash": interpreter.prompt_hash, "settings": settings},
