@@ -194,6 +194,12 @@ Round 1 showed that asking the same question again often gets a different answer
   - rubric v4: judges are told when a set is a sample, and see the text before the unit and the numbered items it sits under
   - an A/A control variant (`"fresh"` regions re-asked) for levers that re-ask everything
 
+**Spend accounting (2026-09-28):**
+- **The gap:** the provider's dashboard showed $54.60 spent where the ledger (plus an estimate of early panel work) gave $51.40.
+- **Most likely cause:** answers cut off by our timeouts are still billed but were never recorded. Failed judge verdicts were also re-sent on every chunk, and the ledger kept only a request's last attempt.
+- **Fixed:** every attempt is now recorded, failed verdicts are asked once more at the end, and answers are streamed, so the timeout applies between chunks and slow answers complete.
+- **For estimates:** treat the dashboard as authoritative, and allow for this known undercount in rounds 1–9.
+
 **Judging rubric v2 (the owner, 2026-09-27; from round 7):**
 - **What changes:** document administration (contacts, addresses, lot or project numbers, revision dates, copyright, logos) is neutral in pairwise judging. Neither side is preferred for including or omitting it; such claims are checked only for correctness.
 - **Why:** in round 5, crops that happened to isolate a title block swung results.

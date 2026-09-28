@@ -1,0 +1,459 @@
+{
+  "reviewer": "XiaomiMiMo/MiMo-V2.6-Pro",
+  "verdicts": {
+    "u-ken-manual-p70-79-3b80816c-p6-text": {
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets cover the same eight facts from the page (four eQuest peak-load percentage differences, the 4,350 kWh to 4,310 kWh yearly energy change with the 2 ton unit, and the R-50/R-60 insulation values), and all values, units and locations are read correctly. Differences are only in wording: A binds the R-50 option to 'SIPs' while B says 'SIPs manufacturing', and B's quote for the 4,310 kWh claim explicitly includes the 2 ton unit condition while A's quote for the 4,350 kWh claim is slightly truncated. Neither set misreads or invents anything, and neither omits an important fact the other captures.",
+        "baseline_problems": [],
+        "variant_problems": [],
+        "remarks": "Both sets label the 4,350 kWh condition as 'baseline sizing'/'baseline unit size'; the page implies this is the 2.5 ton unit (Figure 13) but never states it explicitly in the Results text, so the vague condition is understandable. The percentage differences are stated as 'higher' than the BEoptE+ sizing recommendations; both sets use 'baseline'/'vs baseline' wording, which is a mild paraphrase rather than the page's exact comparison. Both sets also leave out the qualitative finding that BEoptE+ HVAC sizing recommendations remain sufficient under the higher eQuest load estimates."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Both sets cover the same eight facts with correct values, units, conditions and supporting quotes, so the difference is in entity binding. Set A attributes the R-50 insulation resistance to 'SIPs manufacturing', whereas the page states it as an insulation resistance option of the SIPs themselves (available through manufacturing); Set B binds it to SIPs correctly. Set B's remaining entity and attribute labels are equally faithful, so it is marginally better.",
+        "baseline_problems": [
+          "misbound"
+        ],
+        "variant_problems": [],
+        "remarks": "Both sets label the 16.3/6.5/20.2/54.7% values as a difference 'vs baseline'/'from baseline'; the page only says eQuest loads are that much higher (implicitly than the BEoptE+ estimates), so the baseline wording is an interpretation neither quote fully supports. Both also omit the qualitative finding that BEoptE+ HVAC sizing recommendations remain sufficient despite the higher eQuest loads."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p6-text-b1of2": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Both sets correctly capture the CCD282 EMCCD, 163 K operating temperature, 8k×4k format, 4k×4k center imaging area, and 1.0 µm response. Set B additionally captures the broadband \"astro\" coating, which Set A omits entirely, while Set A repeats the 4k×4k center imaging area fact twice. Set B's only flaw is lumping delta doping under \"substrate modification\", a mild misbinding since delta doping is a detector modification rather than a substrate one. Overall B covers the sensor description more completely with less redundancy.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "misbound"
+        ],
+        "remarks": "Both sets ignore the thruster-firing readout condition (read out as fast as possible to keep photon count below full well) and the frame-store/readout architecture; that operational fact is missed by both. Set A's two 4k×4k claims are the same fact under two attribute names."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A covers the detector identity, operating temperature, array format, center imaging area, substrate/doping modification, and the broadband \"astro\" coating with its 1.0 µm response limit, all correctly bound and quoted. Set B duplicates the 4k×4k center imaging area claim and splits the modification into two vague claims (\"substrate | thickened\", \"doping | delta\") while omitting the coating and its spectral response context. Both sets are factually accurate on the claims they state, but A is cleaner and more complete.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "vague"
+        ],
+        "variant_problems": [],
+        "remarks": "Both sets omit the readout-during-thruster-firing requirement (keep accumulated photon count below full well) and the frame-store readout scheme, which are engineering-relevant facts on the page. Set B's splitting of the modified detector description into separate substrate/doping claims loses the fact that these are modifications of an off-the-shelf item combined with the coating."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p5-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A gives the single quantitative claim on the page correctly: approximately 100 issues and concerns from the initial LCIT reviews of the Draft Final Reports across the four mission concepts, with a supporting quote. Set B's first claim is equally correct, but its other two claims restate the same 100 figure misbound — one to 'Draft Final Reports | number of findings' and one to 'mission concepts | quantity | 100' (the concepts number four, not 100) — with spliced, non-verbatim quotes. Neither set captures the later bullets (STDT modifications, feedback, reduction of remaining issues), so both are incomplete, but B adds wrong claims rather than useful ones.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "missing",
+          "quote"
+        ],
+        "remarks": "Both sets omit the page's other facts: STDTs made significant modifications to Final Reports before public release, provided per-finding feedback and change references, and the final set of remaining issues/concerns was significantly reduced. Set B's claims 2 and 3 are essentially the same 100-count fact re-extracted under wrong entities/attributes, and their quotes are spliced fragments rather than contiguous text."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A's first claim correctly captures the ~100 issues and concerns from initial LCIT reviews across four mission concepts, but its other two claims restate the same number misbound: one attributes 100 findings to the Draft Final Reports themselves, and one claims the mission concepts have a quantity of 100 (there are four concepts; 100 is the issue count). Set B's single claim is accurate, well-bound and fully supported by its quote. Since unshown claims are identical in both sets, Set A's two extra claims are pure errors and duplicates.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "vague"
+        ],
+        "remarks": "Set A appears to have generated derivative claims by re-parsing the same sentence fragment ('Draft Final Reports resulted in approximately 100'), producing duplicate and misbound restatements of one fact. The page also states the final set of remaining issues was significantly reduced after LCIT re-review, but neither set quantifies it (no number is given on the page, so nothing is missing numerically)."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p10-table-b1of4": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B binds each ∂P/∂θ value to the correct row and keeps the full operating conditions (wind speed, rotor speed, pitch angle) that identify the operating point, with quotes that support the claims. Set A's values are read correctly, but its ∂P/∂θ claims drop the rotor-speed and pitch-angle conditions, and over a third of its shown claims are trivial (five standalone Wind Speed entries and four repeats of the constant rotor speed 12.1 rpm). B is a small but fully faithful sample; A pads with low-value and near-duplicate claims while losing needed conditions.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [],
+        "remarks": "Both sets read the numeric rows correctly. A's entity 'Baseline Blade-Pitch Controller' comes from the section heading, but wind speed, rotor speed and pitch angle are turbine operating-point properties rather than controller properties, so that binding is loose. A's four 'Rotor Speed = 12.1 rpm' claims are the same constant repeated across rows and add no engineering information."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 0,
+        "note": "Set A binds each ∂P/∂θ value to the aerodynamic power sensitivity to blade-pitch angle with the full row conditions (wind speed, rotor speed, pitch angle) and quotes that support them, and all three values match the table exactly. Set B reads the numbers correctly but attributes every column to the \"Baseline Blade-Pitch Controller\", so the ∂P/∂θ values are bound to the wrong property owner, and it pads the set with five bare wind-speed rows and four repeats of the constant rotor speed 12.1 rpm. B also drops rotor speed and pitch angle from the ∂P/∂θ conditions, which A keeps. Neither set captures the ∂P/∂θ values for rows 13.0, 14.0, 18.0 and 19.0, so A covers essentially the same engineering facts as B without the noise.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "The table's subject is ∂P/∂θ (watt/rad) as a function of wind speed, rotor speed and pitch angle; the section heading (7.3 Baseline Blade-Pitch Controller) is context, but using it as the owning entity for every column loses the property ownership and turns row variables into pseudo-properties. Both sets leave out the ∂P/∂θ rows for 13.0 (6.60, -51.66E+6), 14.0 (8.70, -58.44E+6), 18.0 (14.92, -83.94E+6) and 19.0 (16.23, -90.67E+6); B's bare \"Wind Speed = 14.0/18.0 m/s\" claims do not capture those facts. B's repeated \"Rotor Speed = 12.1 rpm\" claims are one constant table column restated per row. Set B's quotes use ellipses between header and value; the values are still supported, but full-row quotes (as in A) are more verifiable."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p8-text-b1of2": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are fully accurate against the page: every shown claim is supported, correctly bound, and keeps its conditions. Their coverage is complementary rather than one-sided — Set A uniquely captures the 3–6.98 m/s minimum-rotor-speed region, the 5 rpm minimum rotor speed, and the PI generator-torque controller, while Set B uniquely captures the DTU Basic Controller pole tuning values (0.05 Hz / 70% and 0.03 Hz / 70% critical). Each therefore omits a comparable handful of real facts the other includes, and neither contains misread, invented or misbound claims.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "Set A omits the DTU partial-load/full-load pole natural frequencies and damping (four numeric values); Set B omits the minimum rotor speed (5 rpm), the 3–6.98 m/s minimum-rotor-speed region, and the PI generator-torque controller statement. Set B's quotes use mid-sentence ellipses but still support their claims. Minor naming nit in Set A: 'rated power wind speed range' is really the above-rated (Region 3) wind-speed range."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both extractions are error-free: every value, unit, condition and quote in each set is supported by the page and correctly bound. Set A additionally captures the DTU Basic Controller pole natural frequencies and damping (0.05 Hz/70% and 0.03 Hz/70%), which Set B omits entirely, while Set B adds the 3–6.98 m/s minimum-speed region, the 5 rpm minimum rotor speed and the below-rated generator-torque PI controller, which A omits. A shows 10 correct claims and misses about 3 facts; B shows 9 correct claims and misses 4 numeric facts, so A is marginally more complete, though the two are close.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "The two sets are complementary: A covers the DTU tuning parameters (four numeric values from the last paragraph) but drops Region 1 (3 m/s ≤ U ≤ 6.98 m/s), the 5 rpm minimum rotor speed and the below-rated generator-torque PI controller; B covers all three control regions and the 5 rpm minimum speed but drops the entire DTU pole frequency/damping sentence. Neither set is wrong on anything shown."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p2-visual-b2of4": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 8,
+        "variant_wrong": 0,
+        "note": "Set A binds every table value to the correct column, row and unit (N·m² for the stiffness columns, kg·m for the inertia columns), and its mass-center and total-mass claims match the prose. Set B repeatedly gives the stiffness units as N·m³ instead of N·m², misreads the label TwFAIner as \"TwFAlner\", repeats the TwFAStif 614.34E+9 fact twice, and identifies rows only as \"row 1/row 2\". Set A's only weakness is a quote truncated at the page break for the 38.234 m mass center, whose condition is inferred from the Elevation definition.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "vague"
+        ],
+        "variant_problems": [],
+        "remarks": "The sentence giving the tower mass center is cut off at the page break ('...38.234 m along the'); the continuation is not on this page, so the condition 'along the tower centerline relative to the tower base' is a plausible completion rather than a directly quoted one. B's unit error is systematic (all TwFAStif/TwSSStif/TwGJStif claims use N·m³), suggesting a column-unit mapping bug rather than isolated OCR noise. Both sets report the TwFAcgOf/TwSScgOf = 0.0 entries, which are trivially zero for every row; neither set captures the 30% thickness increase or the density-correction factor of 7,850 kg/m³ mentioned in the prose (possibly among the unshown shared claims)."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 8,
+        "variant_wrong": 0,
+        "note": "Set B's fourteen shown claims are all faithful to Table 6-1: values, units (N·m², kg·m, N) and elevation/HtFract conditions match the source, and it captures the integrated mass center (38.234 m) that A omits. Set A repeatedly misreads the bending/torsional stiffness unit as N·m³ (six claims), misreads the TwFAIner label as \"TwFAlner\" twice, repeats the base TwFAStif fact, and identifies rows only as \"row 1/row 2\" instead of elevations. A does correctly report the TwEAStif column and the 8.76 m row, which B leaves out, but its shown error rate (8 of 15) is far higher than B's (0 of 14).",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "A's stiffness units are written N*m^3 where the table header reads (N•m2) — a systematic unit misread, and the quoted text in those claims restates the wrong unit, so the quotes do not support the claims as written. A's \"TwFAlner\" is a capital-I/lowercase-l confusion of the column label TwFAIner (2 claims); values are bound to the right column. A also states the base TwFAStif fact twice (claims 1 and 13). B's mass-center claim gives the condition \"along the tower centerline relative to the tower base\", which completes a sentence cut off at \"along the\" at the bottom of this page part; the value 38.234 m is supported, but the condition is an extrapolation beyond the visible text. Coverage gaps differ: A omits the integrated center-of-mass height and the top/base TwGJStif, TwSSStif, TwSSIner, TwFAcgOf entries; B omits the whole TwEAStif column and all 8.76 m row entries. Both sets leave TMassDen (5590.87 kg/m at the base, etc.) unclaimed in the shown samples."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p4-table-b1of4": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 0,
+        "note": "Set B binds every Table 5.5-3 value to the correct camera/channel and keeps the 'at longest λ' condition on the IWA values, while Set A binds the two IWA values to the document section ('HabEx 4-Meter Baseline Design') instead of the UV/Visible channels and adds a vague 'quantity 1×1' claim for the IR Guide detector that misreads the detector format. Set A does capture one extra correct fact (Visible science-band guide band 1.6–1.8 µm from Table 5.5-2) that B omits, but A's three defective claims outweigh that gain. Otherwise the two sets cover the same Table 5.5-3 rows with faithful quotes.",
+        "baseline_problems": [
+          "misbound",
+          "misread",
+          "missing",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "Both sets omit the detector types (CCD201 for UV/Visible, LMAPD for IR Guide) and the '-' (not applicable) entries for IR Guide FOV/telescope resolution/IWA; A's 'quantity 1×1' appears to be a fragment of the '1×1 CCD201'/'1×1 LMAPD' detector cell rather than a real quantity. B leaves out the Table 5.5-2 guide-band row visible at the top of the page (1.6–1.8 µm for the Visible science band), which A does state correctly."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 0,
+        "note": "Set A binds every Table 5.5-3 value to the correct channel and property, keeps the 'at longest λ' condition on the IWA rows, and its quotes support the claims. Set B misstates the two IWA claims by making the section heading 'HabEx 4-Meter Baseline Design' the entity and cramming the channel into the attribute, and its only detector claim (quantity 1×1) is trivial while the actual detector types (CCD201, LMAPD) are left out. B's extra claim on the Visible-science guide band (1.6–1.8 µm) is correct and supported by the preceding Table 5.5-2, but it does not offset the misbound IWA claims. Both sets omit the detector type row.",
+        "baseline_problems": [
+          "misbound",
+          "missing",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "Neither set captures the detector types (1×1 CCD201 for UV and Visible, 1×1 LMAPD for IR Guide), which are the substantive part of the Detector row; B's 'quantity 1×1' claim is a fragment of that row. Set A also mixes entity granularity ('UV camera' vs 'Starshade camera') for the same table, which is a consistency issue rather than an error."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p4-visual-b2of3": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 1,
+        "note": "Set A captures the page's core engineering facts correctly — the 2500 g martensite-phase and 2900 g austenite-phase wire forces, the 400 g total actuation force, the 15–20 C Irvine range, and the 32-of-64-louver actuation — while Set B omits all of them and offers only two claims. Set B's chart claim (Ms = -100 C at 53 at.% Ni) is not supported: the plotted point near -100 C sits around 51 at.% Ni and the quoted caption gives no value. Set A, however, misassigns the 30% load share to cooling (the text gives 30% heating and 12% cooling), claims the martensite-phase force is 'not specified' when it is 2500 g, and re-binds the Irvine 15–20 C climate range to the actuator assembly and building envelope. On balance A is better because it states many more correct, page-supported facts, despite its several binding and reading errors.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "remarks": "Both sets miss the 30%/12% heating/cooling split as stated ('30 and 12 percent ... respectively') and the fact that each bay carries two mirrored, independently acting assemblies. Set A repeats the 2900 g and 400 g facts under two entity names each. Several of Set A's quotes are truncated or paraphrased ('heating phase' for 'heated austenite phase', '2500 g' for '2500 gram load'), and the chart-derived claims in both sets rely on small plotted points that are hard to read precisely from the image."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 1,
+        "note": "Set B captures the page's core engineering facts — the 2500 g martensite and 2900 g austenite wire forces, the 400 g total actuation force, the 15–20 C Irvine range, and the 30% heating load — while Set A offers only the 64-louver count plus one chart reading. However, B is noisy: it binds 30% to cooling loads (the text gives 30% heating / 12% cooling), reports the martensite-phase force as \"not specified\" when 2500 g is stated, misbinds the Irvine ambient 15–20 C range to the actuator assembly and to the building envelope, and repeats the 400 g and 2900 g facts twice. A's chart claim (Ms = -100 C at 53 at.% Ni) is not supported by the plotted data, which ends near 51 at.% Ni, and its caption quote does not support the numeric value. On balance B is more useful because it preserves the actual specifications, despite its misbindings and duplicates.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "remarks": "Chart reading: the Ms vs Nickel Content scatter appears to stop around 51 at.% Ni, where Ms is roughly -100 C; no data support -100 C at 53 at.% Ni, so Set A's chart claim looks like a misread axis value (and its quote is only the chart caption). Both sets omit the 12 percent cooling-load figure and the fact that each bay carries two mirrored, independently acting assemblies. Several of Set B's quotes are paraphrases rather than verbatim text (e.g. 'during the heating phase' for 'during the heated austenite phase'; '2500 g' for '2500 gram load'), and the same underlying facts are stated under two entity names (Flexinol actuator / actuator assembly / specified wire), inflating the claim count."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p7-visual": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A presents three claims that are all faithfully bound to the page content, with quotes that directly support them (HabEx's science scope in UV/NIR, the coronagraph's WFIRST technology basis, and the mission concept's purpose). Set B shows no claims at all, so it offers no verifiable evidence to credit. Since unshown claims are identical in both sets, A's correct sample makes it the better set.",
+        "baseline_problems": [],
+        "variant_problems": [],
+        "remarks": "The page is qualitative (assessment strengths) rather than numeric engineering data; both sets' claims are narrative statements. Set A's claims are accurate but somewhat generic in attribute naming (e.g., 'science scope', 'technology basis'), which is acceptable given the source content."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A contains no claims at all, while Set B provides three claims that are all accurately bound to the right entities and properties with supporting quotes from the page. B correctly captures the science scope (UV/NIR astrophysics), the coronagraph's WFIRST technology basis, and the mission concept purpose. B is therefore clearly better, though it omits several other substantive assessment points on the slide.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "Set A is empty, so it captures none of the slide's assessment content. Set B's three claims are faithful, but both sets leave out other notable facts on the page: the STM being logical and complete with error-budget assessment, the detailed instrument/capability descriptions, and the credible architecture alternatives with science-impact assessments. The page is qualitative assessment prose rather than numeric engineering data, so claims here are inherently descriptive."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p4-table-b2of4": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 3,
+        "note": "Both sets correctly read the detector, array-width and FOV rows, but both misread the 'Spectrometer resolution' row as a spectrometer 'count'; Set A makes that error once (7) while Set B repeats it three times (7, 140, 40), with quotes that show only 'Spectrometer, <channel>, <value>' and so do not support the attribute. Set B does cover one fact A omits (IR detector 1×1) and states all three resolution values, but under a property the page does not give. Net, Set A delivers nine supported claims plus one mislabeled claim, versus Set B's ten supported plus three mislabeled, and A keeps the table's 'Channel' naming where B invents 'camera'. Both sets omit the IWA row (40/60 mas), the wavelength bands and the UV FOV of 10.2\".",
+        "baseline_problems": [
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "variant_problems": [
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "remarks": "Shared issues, not counted against either set in the comparison: both call the third column 'IR Guide' although the table header reads 'IR Channel' (possibly inherited from wider context), and both bind the 'Spectrometer resolution' row values (7/140/40) to a 'count' attribute, so the resolving powers are effectively lost in both extractions. Both also leave out the IWA row (40 mas, 60 mas, '-'), the three wavelength bands, and the UV FOV of 10.2\". Set B's use of 'camera' for the column entities ('UV camera', 'Visible camera') is a milder naming drift from the page's 'Channel'. The text layer interleaves the figure caption with the table rows, which likely contributed to the row-label confusion."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p6-text-b1of3": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are accurate against the page: every shown value, unit, condition and quote checks out. Set A additionally captures the peak power coefficient (0.482 at TSR 7.55 and 0.0° pitch, 8 m/s), the rated mechanical power, the Region 2½-to-3 transitional speed and the Region 2 square law, all correctly bound and conditioned. Set B's claims are also correct (rated torque, 97:1 gearbox ratio, Region 2 proportionality constant), but it splits the single Region 1½ speed-range fact into two claims, a mild redundancy, and its quotes are truncated fragments.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [],
+        "remarks": "Both extractions are faithful; the difference is only in which sample claims are shown (unshown claims are identical). Set B's min/max split of the 670–871 rpm range is a minor duplication pattern worth normalizing into one range claim. Notable facts both could capture: the 670 rpm generator minimum corresponding to the 6.9 rpm minimum rotor speed of the REpower 5M, and the 10% generator-slip percentage in Region 2½."
+      },
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are fully accurate against the page: every value, unit, binding and quote checks out, and both keep the needed region/condition qualifiers (e.g. Region 3 constant-power condition for the inverse relation, Region 1 before cut-in for zero torque). Set A uniquely captures the rated generator torque (43,093.55 N·m), the 97:1 gearbox ratio and the Region 2 optimal constant (0.0255764 N·m/rpm²); Set B uniquely captures the peak power coefficient (0.482 at TSR 7.55, 0.0° pitch, 8 m/s), rated mechanical power (5.296610 MW), the 2½-to-3 transitional speed (1,161.963 rpm) and the Region 2 square-law relation. These are equally valid, well-supported facts, so the sets are about equally good; the only mild weakness is B's region-count claim, which is of low engineering value.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "trivial"
+        ],
+        "remarks": "Both extractions are clean: quotes are verbatim and support their claims, and conditions (Region 1/2/3, 30% above 670 rpm, 99% of rated speed) are retained. B's 'number of control regions = 5' is correct but borderline trivial. Facts on the page that neither shown sample covers (e.g. generator-slip 10% in Region 2½, minimum rotor speed 6.9 rpm, rated generator speed 1173.7 rpm, 94.4% efficiency) are presumably in the unshown identical claims."
+      }
+    },
+    "u-scical-cd-p40-43-c22f3f4e-p4-text-b0of2": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "B correctly binds the 1\" CPVC and 1\" FLEX labels to the fire-sprinkler lines and also captures the dishwasher 3/4\" and cold-water (CW) 1\" facts that A omits, whereas A misbinds both CPVC and FLEX to a generic 'Water Supply' and adds an unsupported 'main supply' condition on the HW line. A's one unique fact (30 ft at the potable water reel) is plausible but its quote is a stitched-together fragment. B's main weakness is repetition of the same fire-sprinkler diameter/material under two names plus an over-broad East/West Module scope for labels that sit at the West Module.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound"
+        ],
+        "variant_problems": [
+          "conditions",
+          "invented",
+          "misbound",
+          "missing",
+          "quote",
+          "vague"
+        ],
+        "remarks": "In the drawing the '1\" CPVC' and '1\" FLEX' labels sit at/near the FIRE SPRINKLERS WEST MODULE riser and the 60-0 FT horizontal run, so A's 'Water Supply' binding is wrong while B's '(West/East Module)' scope is an over-reach for the East Module. Several quotes in both sets ('1\" D MANIFOLD', '3_ 4\" D DISHWASHER', 'HW 1\" D', 'CW 1\" D', '30 FT REEL') are concatenations of adjacent annotation runs rather than literal strings, though the underlying facts are readable in the image. Both sets leave out other readable facts (e.g. 3/4\" at toilet/bathroom sink/laundry-shower branches, 1.5\" and 2\"/3\" waste and vent sizes, 60-0 FT horizontal, 25/30 FT runs)."
+      }
+    },
+    "u-habex-interim-p80-89-52da8af4-p10-visual-b0of4": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "A binds the table values more faithfully: its Astigmatism and Tip-tilt entries land in the correct charge/column cells and it correctly states the HLC as the backup coronagraph, whereas B misreads 0.0049/0.0064 as 0.049/0.064, binds them to charge 6, and assigns the HLC's TRL 5 to the VVC. Both sets garble the table condition (\"2e-11 raw starlight suppression\" rendered as \"11-star raw stripe/straight suppression\") and mishandle the 1 mas stellar-size column (A drops it where needed, B adds it to the non-1 mas block). A's own errors are two right-block column misassignments (Defocus 4.6 nm and Tip-tilt 31 nm) plus a garbled \"optimal trading-angle\" attribute, and it pads with heading/figure fragments and a repeated two-plane label. On balance A has more correct, well-bound claims and its errors are column slips rather than values that do not exist in the source.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing"
+        ],
+        "remarks": "Table 5.5-6 has two blocks: 'Allowable RMS Wavefront Error (nm) per Mode' (charges 4/6/8/10, no 1 mas) and 'Allowable RMS Error (nm) per Mode' (charges 6/8/10, with 1 mas stellar size). Both extractions garble the caption condition '2e-11 raw starlight suppression (at 2.5-3.5 lambda/D)' and neither keeps the two blocks cleanly separated: A misassigns right-block values to the wrong charge and omits the 1 mas condition, B attaches '1 mas stellar size' to left-block values. B also splits the single 'focal plane mask can be either an HLC or a VVC' fact into three claims, and A fragments the Figure 5.5-16 optical path into four claims plus repeats the 'two-plane' label; the TRL 5 / HLC-backup sentence is a recurring misbinding target."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "A binds the key IWA spec (2.4 λ/D at 50% total off-axis throughput) correctly to the charge-6 vortex and keeps the M3 → DMs → focal-plane-mask chain straight, while B garbles that attribute as \"optimal trading-angle\" and truncates its condition. Both sets mishandle Table 5.5-6, but A's errors are two decimal slips (0.0049→0.049, 0.0064→0.064, both also bound to the wrong charge) plus assigning the HLC's TRL 5 to the VVC, whereas B misbinds two values to the wrong charge (defocus 4.6 as Charge 8, tip-tilt 31 as Charge 8) and repeats the same optical path four times. B does correctly record the HLC as the backup coronagraph, a fact A gets wrong, but B adds more duplicate and trivial claims overall.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "remarks": "Both sets garble the table condition \"2e-11 raw starlight suppression (2.5–3.5 λ/D)\" (A: \"11-star straight suppression\", B: \"11-star raw stripe dispersion\"). Both also blur the table's two column blocks: the left block (Charges 4/6/8/10) is at 2e-11 suppression, the right block (Charges 6/8/10) additionally includes a 1 mas stellar size; A stamps \"1 mas stellar size\" on left-block values and B omits it for right-block values. A's quote for the DM claim paraphrases the text layer (\"passed through\" vs. \"passed to\"). Note the figure supports the path DM1 (in pupil) → DM2 → focal plane mask → Lyot stop (in pupil); B's three fragment claims are subsets of that single sequence."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-table": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 4,
+        "note": "Both sets misbind the detail marks: A4/A1 and B4/B1 are swapped relative to the sheet (A4 = FLOOR BEAM @ GRID 2, A1 = FLOOR BEAM @ GRID 6, B1 = FLOOR BEAMNEAR GRID 5, B4 = FLOOR BEAM @ GRID 3), so each has four misbound claims. Set A adds two further defects: it truncates the C1 beam name to 'ROOF BEAM @ GRID 6', dropping '& NEAR GRID 5', and repeats the E6 roof-beam claim twice (once with and once without the E6 mark). Set B keeps the full C1 name and has no duplicate, so B is the cleaner set despite sharing the mark mix-ups.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread"
+        ],
+        "variant_problems": [
+          "misbound"
+        ],
+        "remarks": "Both extractions appear to pair each detail mark with the wrong detail title in the same way (A4/A1 and B4/B1 swapped), suggesting a systematic mark-to-title association bug rather than random error. Both also omit the 'ø 3\"' opening diameter shown on the W8X13 roof-beam details. The text layer is a flat token stream with no positional binding, so mark-to-detail pairing must come from the image."
+      }
+    }
+  }
+}
