@@ -191,6 +191,13 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
     - **The local master fixture** (`tests/fixtures/slices.sqlite`): the replay fixture, plus what re-keyed from the old master under the current defaults (all 12 runs, sheets included) and round 0's levers (extraction only). That's 6,501 answers from 14 documents, 14 MB against 100 MB. Everything else was let go, along with the older local fixtures.
   - **Tests:** re-keying (answers carried with their dates, changed queries let go), two replays forming byte-identical evidence and reports, and the new cache's guarantees.
     - **Byte-identical reports:** `SOURCE_DATE_EPOCH` fixes the time reports and review batches say they were made (the owner's suggestion).
+  - **Local run stores rebuilt by replay** (git-ignored; the owner asked): 334 of 401, including every round's baseline, the accepted levers' variants and sc01's sources.
+    - **Identical queries recovered answers:** under content addressing, many old variants' queries match queries recorded under other settings, so even variants whose own answers were let go mostly replay completely.
+    - **Kept at store schema 7 (67 stores):**
+      - variants whose lever changed queries no other recording shares (48): sheet details on drawing sheets, references, the tile locator, the chart rule
+      - the A/A control (10): its second samples weren't re-keyed
+      - the review batches' stores (9), which have no settings file to replay with
+    - **Recording scratch (`runs/*/record/`) wasn't rebuilt.**
   - **Re-keying is temporary:** `LegacyFixture`, `--rekey-from` and its test go once nothing needs re-keying (the owner: "I doubt we'll hold onto re-keying tests for long").
   - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
   - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
