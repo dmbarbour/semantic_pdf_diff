@@ -1,0 +1,1061 @@
+{
+  "reviewer": "XiaomiMiMo/MiMo-V2.6-Pro",
+  "verdicts": {
+    "u-nrel-5mw-p25-36-5eaf02be-p8-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are faithful and quote-supported, with identical claims except that Set A additionally includes the IGen definition (generator inertia relative to the high-speed shaft), which Set B omits. That is a real symbol definition on the page, so Set A covers the nomenclature paragraph more completely. Neither set has misbound or invented claims; both share the same minor duplication between the θ definition and the 'blade-pitch angle | symbol | θ' claim.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "trivial"
+        ],
+        "remarks": "Both sets omit the definitions of Ω0 (rated low-speed shaft rotational speed), Ω (low-speed shaft rotational speed), and t (simulation time) from the same nomenclature passage. The 'mechanical power | symbol | P' and 'blade-pitch angle | symbol | θ' claims are near-duplicates of the corresponding definition claims and add little engineering value. The text layer garbles some math (e.g., Eq. 7-7/7-9 argument ordering), but the image is legible and the definitions are unambiguous."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets faithfully capture the symbol definitions and the Region 3 generator-torque relationship with correct quotes and conditions. Set B additionally includes the IGen definition (generator inertia relative to the high-speed shaft), which Set A omits despite A covering the other inertia definitions. All claims shown in A are present and correct in B, so B is a strict superset in coverage. Both sets repeat the θ definition under two names and include a near-trivial symbol claim for P.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "trivial"
+        ],
+        "remarks": "Both sets omit definitions present on the page: Ω0 (rated low-speed shaft rotational speed), Ω (low-speed shaft rotational speed), t (simulation time), and KP/KI/KD (blade-pitch controller gains). The 'mechanical power | symbol | P' and 'blade-pitch angle | symbol | θ' claims are trivial symbol restatements, and the θ definition is duplicated as 'blade-pitch angle | symbol | θ' in both sets."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p4-visual": {
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Set A and Set B are essentially identical across all 18 claims; the only difference is that A gives a slightly fuller condition ('at conclusion of specified energy balance period') on the full-points threshold claim, which is a negligible distinction. Both correctly capture the 75% brightness minimum, the 15-minute neighbor visit, the 0–100% score range, and the Energy Balance scoring bands (full ≥ 0 kWh, reduced −50 to 0 kWh, no points ≤ −50 kWh). Both share the same flaws: heavy duplication of the brightness and Energy Balance threshold facts under 'Contest 10' and 'Energy Balance Contest', one misquoted line ('scored' instead of 'scaled'), and two claims whose quotes are only axis-label descriptions rather than supporting text.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "Both sets repeat the same facts up to four times (brightness twice; the three Energy Balance bands under both 'Contest 10' and 'Energy Balance Contest' names, plus separate 'threshold'/'condition'/'range' variants). Claim 13's quote reads 'Reduced points are scored linearly' but the page says 'scaled linearly'. The two 'points at net electrical energy = ...' claims quote only axis-label descriptions; the values (100 points at 0 kWh, 0 points at −50 kWh) are readable from Figure 10 but the quotes do not support them. Both sets also omit the positive/negative balance interpretation (net production vs. net consumption) and the movie-night scoring structure (three criteria, nine scores averaged)."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "The two sets are nearly identical claim-for-claim; the only substantive difference is that Set B keeps the full condition 'at conclusion of specified energy balance period' on the full-points threshold claim, while Set A drops it. Both sets correctly capture the 75% brightness minimum, the 15-minute neighbor visit, the 0–100% score range, and the three Energy Balance scoring bands. Both sets are heavily padded with duplicate restatements of the same three Energy Balance facts and the brightness fact, and both use axis-label pseudo-quotes for the figure-derived point values.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "quote"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "quote"
+        ],
+        "remarks": "Both sets repeat the same facts under multiple entity/attribute names (full points threshold vs. full points condition vs. full points requirement; reduced points range vs. condition; no points threshold vs. condition; brightness stated twice; 'linear' stated three times), so roughly half of each set is redundant. One quote is a near-miss paraphrase ('Reduced points are scored linearly' vs. source 'are scaled linearly'), and the two figure-derived point claims (100 points at 0 kWh, 0 points at -50 kWh) are supported only by axis labels rather than a real quote, though the values are consistent with Figure 10. Important facts both sets omit: positive balance = net production / negative = net consumption, the nine movie-night scores being averaged and multiplied by maximum available points, the 10:30 p.m. submission deadline, the five-neighborhood/four-house village layout, and the suspension of the Comfort Zone occupancy rule (Rule 11-1) during movie night."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p8-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the core rotor speed, pitch, and tip-speed facts correctly and with supporting quotes, and both repeat several facts under both 'rotor' and 'IEA Wind 15-MW reference wind turbine' entities. Set B additionally extracts the DTU Basic Controller pole parameters (0.05 Hz / 70% critical for the partial-load torque controller and 0.03 Hz / 70% critical for the full-load pitch controller) and the PI controller for blade pitch angles, all correctly bound and quoted. Set A omits these controller tuning facts entirely, so B covers the page more completely without introducing errors.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets state the same facts twice under 'rotor' and 'IEA Wind 15-MW reference wind turbine' (min speed, rated speed, pitch start, 0-degree pitch, positive pitch, tip speed) — a consistent duplication pattern across both extractions. The condition 'at rated rotational speed' on the 95 m/s tip-speed claim is a mild extrapolation of 'resulting in a maximum nominal tip speed of 95 m/s' but is defensible. Neither set extracts the 3 m/s ≤ U ≤ 6.98 m/s minimum-rotor-speed region range, which both leave out."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets cover the same core facts with the same quotes and the same duplication pattern (each of the 5 rpm, 7.55 rpm, 95 m/s, pitch-start and pitch-setting facts appears twice under 'rotor' and 'IEA Wind 15-MW reference wind turbine'). Set A additionally extracts five correct claims that Set B omits: the PI controller type for blade pitch angles and the DTU Basic Controller pole frequencies/damping (0.05 Hz and 70% critical for the partial-load/torque poles, 0.03 Hz and 70% critical for the full-load/pitch poles), all bound correctly per the 'respectively' pairing in the text. No claim in either set is misread, misbound or invented, so A's extra correct claims make it better.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets state the same facts twice under two entity names (rotor vs. IEA Wind 15-MW reference wind turbine) for minimum speed, rated speed, tip speed, pitch start and pitch setting — a systematic deduplication issue. Set B's omission of the DTU pole frequency/damping values and the blade-pitch PI controller type is the only substantive gap. The added condition 'at rated rotational speed' on the 95 m/s tip-speed claim is a mild inference (the text links it to 7.55 rpm at 10.59 m/s) but appears in both sets and is not clearly wrong."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p2-visual": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 6,
+        "note": "Both sets cover the same baseline mission concept facts (HabEx 4 m/4 instruments/52 m starshade, LUVOIR-A 15 m on-axis/4, LUVOIR-B 8 m off-axis/3, Lynx 3 m grazing-incidence mirror assembly with 10 m focal length/3, Origins 5.9 m/3) with essentially identical wording and quotes. The only differences are cosmetic entity naming (e.g. 'Lynx mirror assembly | focal length' vs 'Lynx | focal length', 'instrument count' vs 'science instrument count'), which do not change correctness. Both sets share the same defects: fragment entities ('n-axis telescope', 'axis telescope', 'spacecraft', 'on-axis/off-axis telescope') that lose the mission binding, the 10 m focal length misreported as a mirror-assembly 'dimension' and 'diameter', the instrument count misbound to the mirror assembly, and the starshade and Lynx mirror diameter facts duplicated.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "vague"
+        ],
+        "remarks": "Both extractions fragment sentences into generic entities ('n-axis telescope', 'axis telescope', 'spacecraft') that should be bound to LUVOIR-A, LUVOIR-B and HabEx respectively; the 'grazing incidence mirror assembly | dimension/diameter | 10 m' claims misread the 10 m focal length as a diameter (the diameter is 3 m), and the mirror assembly is wrongly credited with the three science instruments. The starshade 52 m and Lynx 3 m diameter facts appear twice in each set under two names."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 6,
+        "note": "Both sets contain essentially the same 22 claims: the same correct extractions (HabEx 4 m / 4 instruments / 52 m starshade, LUVOIR-A 15 m on-axis / 4, LUVOIR-B 8 m off-axis / 3, Lynx 3 m mirror assembly / 10 m focal length / 3, Origins 5.9 m / 3) and the same defects. The only wording differences are trivial: A says 'Lynx | focal length | 10 m' where B says 'Lynx mirror assembly | focal length | 10 m' (both acceptable, B marginally more precise), and instrument-count claims are named 'science instrument count' vs 'instrument count'. Both make the same misbindings (10 m called a dimension/diameter of the mirror assembly when it is the focal length; the three instruments attributed to the mirror assembly rather than Lynx) and the same line-break fragment entities ('n-axis telescope', 'axis telescope', 'spacecraft'), plus a duplicated starshade claim.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "remarks": "Both sets share identical defects, suggesting a common upstream extraction bug: bullet text split across line breaks produced fragment entities ('n-axis telescope', 'axis telescope', 'spacecraft') and the Lynx sentence's '10 m focal length' was re-bound as a dimension/diameter of the mirror assembly. The HabEx starshade 52 m claim is duplicated in both sets. One quote is garbled ('with a 10 m nd three science instruments') and another uses an ellipsis ('Lynx: ... and three science instruments'); both sets do this identically."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p5-text-b2of4": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 3,
+        "note": "Set A covers 25 claims and gets 22 of them right, including equipment, finish and plumbing facts (washing machine model/manufacturer, VCT and accent paint attributes, wall base material, shower valve manufacturer) that Set B omits entirely. Set B's 11 claims are all correct but leave out a large amount of important schedule data. However, A contains three serious cross-row misbindings: it assigns the floor-finish (VT) attributes 'STANDARD EXCELON' and '51899' to SHOWER VALVE and the plumbing (SV) model 'T17059' to VINYL COMPOSITE TILE. Both sets repeat the MWK04, MWK05 and MWB01 dimension facts under two names.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "vague"
+        ],
+        "remarks": "The text layer of the MILLWORK SCHEDULE is row-offset (tags appear after the description/dimension lines), so tag-to-row binding must be checked against the image; both sets bind MWK01–MWK05, MWB01–MWB03, MWD01/MWD02 correctly. The three A errors look like a row-merge failure between the PLUMBING SCHEDULE (SV) and FLOOR FINISH SCHEDULE (VT) blocks. Entity 'MWK01' in both sets is tag-only with no description, and the duplicated MWK04/MWK05/MWB01 claims are stated once with a tag condition and once with 'Millwork Schedule'."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 3,
+        "note": "Set B reproduces every one of Set A's millwork claims and additionally captures correct equipment, plumbing and finish facts (washing machine model/manufacturer, vinyl composite tile manufacturer/colour/dimensions, accent paint manufacturer/colour/finish, wall base material, shower valve manufacturer). However, B misbinds three values across schedule rows: STANDARD EXCELON and 51899 belong to the vinyl composite tile, not the shower valve, and T17059 is the Delta shower valve model, not a VCT model. Set A is clean but narrow, repeating three millwork rows verbatim and leaving out the equipment, plumbing and finish facts that B supplies. On balance B's larger body of correct, well-bound claims outweighs its three cross-row errors.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "quote"
+        ],
+        "remarks": "Both sets state each of three millwork rows twice (MWB01 vanity, MWK04 sink base cabinet, MWK05 base cabinet) - a shared redundancy pattern. The text layer scrambles the millwork rows (tags detached from descriptions, MWK01/MWK02 rows merged), so the image was needed to confirm MWK01 = BASE CABINET 2'-5 7/8\" x 2'-0 7/8\" x 2'-6 3/8\" and MWK02 = BASE CABINET (OVEN) 2'-5 7/8\" x 2'-0 3/4\" x 2'-6 3/8\"; A's MWK01 claim matches the image. Borderline in B: 'VINYL COMPOSITE TILE | texture | IMPERIAL TEXTURE' splits the style name 'STANDARD EXCELON IMPERIAL TEXTURE' into an attribute the page does not label; not counted as wrong but the attribute is inferred. Neither set covers MWK02, MWK03 or MWL01 millwork rows or the furniture schedule."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p5-table-b0of3": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets cover essentially the same 23 claims and read the values correctly, including the MWK02 oven base cabinet dimensions and the millwork quantities. Set A is slightly more faithful: it keeps the MDF material in the wall base profile claim (as a condition) and binds the accent paint colour to the tag P3, whereas Set B truncates the profile to '4\" H x 1/2\" THK' and uses the generic entity 'ACCENT PAINT'. Neither set invents values, and both omit the same large block of schedule facts (style/colour numbers, locations, several millwork rows).",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "conditions",
+          "missing",
+          "vague"
+        ],
+        "remarks": "Text layer is column-scrambled (millwork rows and quantities interleaved); the image resolves MWK01/MWK02 row assignment, and both sets match the image. Both sets omit many schedule facts: PT1/PT2 style numbers (FGEEOB412 / FGEEOB1224), GT manufacturer (Fireclay Tile), WB finish and location, GL location (shower surround), P3 colour number 33-14 and finishes, and millwork rows MWK01, MWK03, MWK04, MWB01, MWL01, MWD02. Note P3 is used as the tag for both ACCENT PAINT and ACCENT TRIM PAINT on the page, so tag-only references to P3 are ambiguous."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets are largely identical and accurate on the finish and millwork schedules, but B binds the accent paint colour to the tagged entity P3 (Accent Paint) where A leaves it as the generic 'ACCENT PAINT', and B keeps the MDF material condition on the WB wall base profile while A drops it. Both sets add an unsupported 'KITCHEN' location condition to the quartz thickness and style claims, and both loosely render GL's 'SHOWER SURROUND' location as 'BATHROOM SHOWER'. B's two claims are better bound and better conditioned, so B wins.",
+        "baseline_problems": [
+          "conditions",
+          "invented"
+        ],
+        "variant_problems": [
+          "conditions",
+          "invented",
+          "vague"
+        ],
+        "remarks": "The page gives no location for QZ (quartz); 'location: KITCHEN' in both sets is invented (2 claims each). GL's stated location is 'SHOWER SURROUND', so 'BATHROOM SHOWER' in both sets adds an unstated room. A also omits the MDF material from the wall base profile value/conditions even though its own quote contains it. Note the text layer scrambles the millwork table row order (quantities detached from tags); both sets read the image table correctly."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p9-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the same core claims about the PID-controlled rotor-speed error response, the roles of the derivative, proportional, and integral terms, and the Ref. [10] design recommendations (ωφn = 0.6 rad/s, ζφ = 0.6–0.7, neglecting the derivative gain and the generator-torque negative damping). Set A additionally includes the correct and important claim that the sensitivity of aerodynamic power to rotor-collective blade pitch (∂P/∂θ) is negative in Region 3 for an active pitch-to-feather turbine, which Set B omits. Both sets repeat the generator-torque-controller negative-damping fact twice (once as a damping effect, once as an effect on speed error response).",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets state the generator-torque-controller negative damping twice under two attribute names; that fact should appear once. Set B's omission of the ∂P/∂θ < 0 fact is notable since it is the premise for the sign reasoning that follows. The text layer is heavily garbled around Eqs. (7-11)–(7-15), but the page image renders them legibly."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets cover the same core claims and both repeat the generator-torque negative-damping fact twice (claims 1 and 10 in A, 1 and 11 in B). Set B additionally captures the important page fact that the aerodynamic power sensitivity ∂P/∂θ to rotor-collective blade pitch is negative in Region 3 for an active pitch-to-feather turbine, which Set A omits entirely. All other claims in both sets are correctly bound, conditioned and quoted, so the deciding factor is B's extra correct claim versus A's missing one.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets state the generator-torque controller negative damping twice under slightly different attribute names ('damping effect on speed error response' vs 'effect on speed error response') — a deduplication issue in both extractions. Neither set extracts the PI gain expressions (Eqs. 7-14, 7-15) or the definitions of ωφn and ζφ (Eqs. 7-12, 7-13), though those may be outside the sampled claims."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p9-visual": {
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets contain the same six claims with identical values, conditions, and quotes; the only differences are cosmetic (A keeps the Θpitch symbol in two attribute names and orders the claims differently). Both correctly bind the 4° maximum pitch to low wind speeds/Region 1.5, the ~90 m force peak to below-rated wind speeds, and the design (TSR 9.0, Θpitch 0°) versus optimal (TSR 8.5, Θpitch −1.0°) points to the right blade properties. Neither set has a misread, misbound, or invented claim, so they are effectively equivalent.",
+        "baseline_problems": [],
+        "variant_problems": [],
+        "remarks": "Both sets drop the 'approximately' qualifier on the 90 m force-peak location (minor). Both also omit other engineering facts on the page, e.g. the sharp linear force drop over the outboard 5% of the blade caused by the Prandtl tip loss model, and Region 3 behavior (torque saturated at rated torque, pitch to feather to maintain rated rotor speed); since both sets show all their claims, these are missing from both equally."
+      },
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets contain the same six claims with the same values, units, conditions and supporting quotes: max positive pitch 4° in Region 1.5, design point TSR 9.0 / pitch 0°, optimal TSR 8.5 / pitch −1.0°, and force peak near 90 m at below-rated wind speeds. All values are correctly bound to the blade and match the text layer and page image. The only difference is cosmetic: Set B keeps the Θpitch symbol in two attribute names, which is marginally more precise but not a substantive improvement. Neither set contains any wrong, invented or unsupported claim.",
+        "baseline_problems": [],
+        "variant_problems": [],
+        "remarks": "Both sets omit other quantitative facts on the page (e.g., the sharp linear force drop over the outboard 5% of the blade from the Prandtl tip loss model, and the effectively negligible Region 2.5), but since the sets are identical in content this does not differentiate them. Note the text says the design point is 'slightly below the optimal' while the optimal values are read off the CP/CT curves in Figure 3-2; both sets' 'maximum CP' condition is a reasonable but slightly interpretive gloss."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p4-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the core controller goals, operating ranges, filter type and variable definitions correctly with supporting quotes. Set A additionally covers the sole-feedback-input fact for both controllers and the important statement that nacelle-yaw control actions were not developed, which Set B omits. Set B instead adds a near-trivial claim that the baseline control system was based on the conventional design approach and repeats the nonpower-production claim under two entity names. Set A's extra coverage of an important fact outweighs its redundancy, though it repeats the feedback-input and filter-type facts several times.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Set A states the generator-torque feedback input three times and the blade-pitch feedback input twice (differing only in the conditions field), and the filter type twice; these are the same facts restated. Set B omits the nacelle-yaw-angle statement, a notable design fact on the page. Neither set extracts the filter equations (7-1, 7-2, 7-3a) or the definitions of alpha, n, Ts and fc, which are the main quantitative content of Section 7.1."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the controller goals, operating ranges, filter type and variable definitions accurately, with quotes that support the claims. Set B additionally captures two important facts Set A omits: that generator speed measurement is the sole feedback input for both controllers, and that no nacelle-yaw control actions were developed. Set A's extra claims are largely a restatement of the nonpower-production fact under a second entity name plus a near-trivial design-basis claim, while Set B's weakness is repeating the feedback-input fact twice per controller with only differing conditions.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Set A states the nonpower-production fact twice (bound to 'NREL 5-MW wind turbine' and to 'NREL 5-MW baseline control system') and the filter-type fact twice with different conditions; Set B repeats each feedback-input claim twice per controller. Neither set extracts the filter equations (7-1, 7-2) or the definitions of alpha, Ts and fc, which are the main quantitative content of Section 7.1."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p1-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "The two sets are nearly identical in content, values, and quotes; both correctly bind the dishwasher temperatures, capacity, sensor count, and the Clothes Dryer scoring thresholds. Set B's only substantive addition is the 'load of laundry' condition on the clothes-drying eligibility claim, which is supported by the quote and keeps a needed condition that Set A drops. Both sets repeat the same facts under two names (sensor count, temperatures, scoring thresholds) and both omit several page facts such as the temperature-of-record rule and cycle-completion confirmation.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "missing",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "missing",
+          "trivial"
+        ],
+        "remarks": "Both sets state each fact twice under different entity/attribute names (e.g., 'Dishwasher | sensor count' and 'dishwasher | temperature sensor count'; 'Clothes Dryer Subcontest' and 'clothes-drying task' scoring thresholds), inflating the claim count without adding information. Facts on the page that neither set captures include the higher-of-two-readings temperature-of-record rule (with the defective-sensor exception), cycle-interruption definition, cycle completion by audible/visible signal, permitted load states (empty/partial/full, soiled/clean), the two-loads-per-day requirement with separate scoring, and the Contest 9 lighting requirement. The 'dishwasher | operation mode | automatic' claim is a fragment of the fuller minimum-cycle-requirements claim."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "The two sets are substantively identical: the same 19 claims, values, units and quotes, differing only in ordering and in that Set A adds the condition 'load of laundry' to the clothes-drying eligibility claim, which is merely the subject of that claim rather than a needed condition. Both read the Figure 8 scoring thresholds (≤100, 100–110, ≥110 % of original weight) and the dishwasher temperatures (120°F/48.9°C full, 115°F/46.1°C half) correctly and bind them to the right subcontest/component. Both sets repeat the same facts under two names (sensor count, 120°F, 115°F, and the three scoring bands stated both as 'Clothes Dryer Subcontest' and 'clothes-drying task'), so both carry the same duplication overhead. Neither set is more correct or more complete than the other.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets miss several facts on the page: the temperature-of-record rule (higher of the two sensor readings, lower only if the higher-reading sensor is defective), the definition of cycle 'interruption' (8-5e), cycle completion confirmed by audible or visible signal (8-5f), the allowed load states (empty/partial/full, soiled or clean, 8-5h), the requirement to dry two loads on several days of contest week with each load scored separately (8-4d), and the requirement that towel-visible drying methods be demonstrated to the architecture and market appeal juries (8-4c). Note also that 'minimum wash and rinse cycles: 1' loosely paraphrases 'at least one wash and rinse cycle' (a single cycle containing both wash and rinse), a mild paraphrase rather than a distinct countable attribute."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p1-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets read the values, units and quotes correctly, and both bind them to the right components. Set A additionally captures the driveshaft structural-damping ratio of 5% critical with its free-free-mode condition, which Set B omits entirely. Set A's extra coverage comes at the cost of two duplicate pairs (the driveshaft spring constant and the generator inertia each appear twice, once from the prose and once from Table 5-1), so it is somewhat redundant but factually richer.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets state the same facts twice via prose and Table 5-1 under slightly different names (e.g. 'Rated Generator Speed' vs 'rated generator speed'); Set A does this for two facts it happens to include twice explicitly. Neither set captures the driveshaft natural frequency (stated only as 'same as the RECOFF turbine model', no value) or the DOWEC-derived brake torque ratio, which is reasonable since no numeric value is given on the page."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are accurate on the values they state, with quotes that support the claims and correct units and bindings. Set B adds the drivetrain structural-damping ratio of 5% critical with its free-free-mode conditions, an important fact Set A omits. However, B's three extra claims include two restatements of facts already captured (the driveshaft spring constant and generator inertia, given under slightly different names), so its advantage is one net new correct claim plus some duplication. Set A is otherwise clean but misses the damping ratio.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets heavily duplicate table and body-text statements of the same fact (efficiency, rated speeds, gearbox ratio, brake torque, damping constant), which inflates claim counts without adding information. Facts both sets miss include the DOWEC-derived 0.35 MW loss at ~6.25 MW aerodynamic power, the 5,025,500 kg•m2 DOWEC equivalent low-speed-shaft inertia, and the linear-ramp brake engagement profile over 0.6 s."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p4-text-b0of2": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "The two sets are nearly identical; Set B adds one further claim — the (1) 2-1/4\" heavy hex nut at the pin connection — which is supported by the text layer ('(1) 2-1/4\"', 'HEAVY HEX', 'NUT') and is a real engineering item. Both sets share the same flaw: the 'threaded rod | length | up to 12 in' claim misbinds the 12\" maximum elevation difference as a rod length (the rod is explicitly 'OF VARYING LENGTHS'). Both also repeat several facts under two names (neoprene pad thickness, PL3 1/2X3 1/2X1/4 size/thickness, C3X6 as both 'C3X6' and 'Channel', W8X10 as both 'W8X10' and 'beam', HSS4X4X1/4 twice).",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "missing"
+        ],
+        "remarks": "Shared misbinding: 'threaded rod | length | up to 12 in' — the 12\" is the maximum elevation difference the varying-length rod accommodates, not a length. Shared duplicates: neoprene pad thickness, PL3 1/2X3 1/2X1/4 (thickness and size), C3X6 (as 'C3X6' and 'Channel'), W8X10 (as 'W8X10' and 'beam'), HSS4X4X1/4 (size and wall thickness). Both sets omit notable items on the page: 3/4\" DIA A325 bolt, 11\" DIA x 1/2\" PL, 28\" DIA X 1/2\" PL, 4X4 TEFLON PLATE W/ 2 5/16\" HOLE, PL8X3/8\", 3/4\" PL and 3/8\" PL, keeper plate note. Set B's added nut claim labels 2-1/4\" as 'diameter' when it is the nominal nut/bolt size, and its quote is reconstructed with an ellipsis joining separate text-layer fragments; acceptable but imprecise."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "The two sets are nearly identical; Set A includes one additional claim that Set B omits: the (1) 2-1/4\" heavy hex nut at the pin connection, which the text layer supports. All other claims match exactly, including shared duplicates (neoprene pad, PL3 1/2X3 1/2X1/4, steel rod, C3X6, W8X10, HSS stated twice) and one shared misbinding: the 12\" figure is the maximum elevation difference the rod accommodates, not the rod's length. Both sets also leave out several dimensioned items on the page (3/4\" dia A325 bolt, 11\" and 28\" dia x1/2\" plates, 4x4 teflon plate with 2 5/16\" hole, PL3-1/2X3-1/2X1 with 2 1/4\" dia threaded hole, 3/4\" and 3/8\" plates, keeper plate). Set A is therefore marginally better for one more correct, non-duplicated claim.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "missing",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "missing",
+          "vague"
+        ],
+        "remarks": "Both extractions repeat the same facts under two names (e.g. 'C3X6 | section' and 'Channel | section'; 'W8X10 | section' and 'beam | section'; 'HSS | size' and 'HSS4X4X1/4 | wall thickness'; neoprene pad thickness in both \" and in). The 'threaded rod | length | up to 12 in' claim in both sets misreads 'UP TO 12\" ELEVATION DIFFERENCE' as a length. Entities like 'plate' and 'beam' are generic where the page gives specific designations. Both sets under-cover the footing/pin-connection details despite those being prominent on the page."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-visual-b1of4": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 4,
+        "note": "Set B is a strict subset of Set A: all 24 of its claims appear identically in A, and A adds one further claim — the W10X15 section for the D5 floor beam at Grid 5 — which the detail supports. That extra claim is correct and non-trivial, so A captures more of the page's engineering content with no additional errors. Both sets share the same weaknesses (vague 'beam opening'/'beam' entities, a duplicated 5'-0\"/5 ft length for the Grid 4 beam, and a couple of dimensions apparently bound to the wrong beam).",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "missing",
+          "vague"
+        ],
+        "remarks": "Shared problems in both sets: 3'-7\" appears in the B4 (FLOOR BEAM @ GRID 3) detail but is claimed for FLOOR BEAM @ GRID 5; the 10\" values are the beam depth of the W10X15 section, yet are claimed as 'opening length' (Grid 5) and 'edge distance' (beam opening); 'opening/spacing | dimension | 3 ft | segment 1' is too vague to verify; the Grid 4 beam length is stated twice (5'-0\" and 5 ft) and its 6\" height duplicates the opening-height claim. Entities like 'beam opening', 'beam', 'opening/spacing' should be tied to the specific detail (A4/B4/C4/D5/E6 etc.). The 1/2\" RADIUS edge-condition note from the general sheet notes is not claimed by either set."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 6,
+        "variant_wrong": 6,
+        "note": "Set B is identical to Set A except for one additional claim — D5 / FLOOR BEAM @ GRID 5 section W10X15 — which is supported by the D5 detail in the text layer and image. All other claims are shared, including the same misbindings (e.g., ø 3\" attributed to B1 when the ø 3\" openings appear in the W8X13 details C1/A1) and the same vague 'beam opening' claims and duplicated 5'-0\"/5 ft and 6\" claims. Since the shared claims are equally good or bad, B's one extra correct, well-bound claim makes it the better set.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "missing",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "missing",
+          "trivial",
+          "vague"
+        ],
+        "remarks": "Both sets bind ø 3\" to 'B1 FLOOR BEAM NEAR GRID 5', but the ø 3\" openings appear with the W8X13 details (C1 ROOF BEAM @ GRID 6 & NEAR GRID 5, A1 FLOOR BEAM @ GRID 6), not the W10X15 B1 detail. Both sets also duplicate the 5'-0\" length and 6\" opening dimension under two names and leave several claims as vague 'beam opening'/'opening/spacing' entities. Important fact both sets miss: the general sheet note '1/2\" RADIUS AROUND EDGES OF OPENINGS IN BEAMS', and the W8X13 sections for details C1/A1. The 3'-7\" and 5'-0\" dimensions appear in the B1/E6 detail blocks in the text layer, so their binding to GRID 5 / GRID 4 is doubtful but hard to verify from the low-resolution image alone."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p12-visual": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "low",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "The two sets are nearly identical; the only differences are two material-property claims where B binds the values to 'tower steel' and keeps the 'Table 4-1' condition, while A uses the vaguer entity 'steel' and drops the condition. Both sets share the same defects: a misread 0.18 Hz tower natural frequency alongside a 0.17 Hz claim and a 0.170 Hz claim (the same fact stated three times), and 1P/3P frequency ranges whose quotes are only legend labels. Both also leave out notable facts such as the 7% outfitting mass, the 100 t transition piece, and the stiffer-tower requirement for a floating substructure. B is marginally more faithful, but the gap is small.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "missing",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "missing",
+          "quote"
+        ],
+        "remarks": "Both sets report the tower's first natural frequency three times (0.18 Hz, 0.17 Hz, 0.170 Hz); the text states 0.170 Hz and the figure line is at ~0.17 Hz, so 0.18 Hz is a misread and the 0.17/0.170 entries are duplicates. The 1P (0.09-0.13 Hz) and 3P (0.25-0.38 Hz) ranges appear to be estimates read off the shaded bands of Figure 4-1; the quoted legend labels do not support those numeric ranges. Facts on the page that neither set captures: 7% outfitting mass beyond the cylindrical shell mass, 100 t for the transition piece, soil modeled as spring constants in a 1-D FE model (values representative of dense sand or gravel), and the note that a floating substructure requires a stiffer tower."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets are nearly identical and share the same strengths (Table 4-1 properties, 10-m monopile OD, 150-m hub height, 0.170 Hz first mode, 0.10–0.13 Hz wave range) and the same weaknesses (three claims for the tower's first natural frequency, one of which reads 0.18 Hz against the text's 0.170 Hz, and figure-derived values supported only by legend labels). Set A is marginally better because it binds the steel Young's modulus and shear modulus to 'tower steel' and keeps the Table 4-1 source condition, whereas Set B uses the vaguer entity 'steel' and drops the condition. Neither set captures the 7% outfitting mass, the 100-t transition piece mass, or the note that a floating/semisubmersible substructure requires a stiffer tower.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "missing",
+          "quote"
+        ],
+        "remarks": "The 0.18 Hz, 0.17 Hz and 0.170 Hz claims are all the same fact (text states 0.170 Hz); the 0.18 Hz value is a misread and the 0.17 Hz claim is a duplicate with a fabricated bracketed quote. Figure-derived values (1P 0.09–0.13 Hz, 3P 0.25–0.38 Hz, JONSWAP peak ~0.11 Hz, Kaimal PSD 1.00 at 0 Hz) are plausible readings of Figure 4-1 but their quotes are only legend labels, which do not support the numbers. Note the source table itself lists 'Pa' as the unit for Poisson's ratio of soil (a document error); both sets correctly omit it. Important facts both sets miss: 7% outfitting mass and 100 t transition piece in final mass values, soil modeled via spring constants representative of dense sand/gravel, and the requirement for a stiffer tower with a floating substructure."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p4-visual": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Both sets cover the same seven facts with identical values, equations, and quotes. The only difference is the feedback-input claim: Set A binds the sole feedback input to the generator-torque controller alone, while the quoted sentence covers both the generator-torque and blade-pitch controllers; Set B binds it to both controllers correctly. Set B is therefore slightly more faithful with no other differences.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "misbound"
+        ],
+        "remarks": "Both sets omit the filter-state definition x[n]=y[n-1] (Eq. 7-3a) and the variable definitions (y filtered speed, u unfiltered speed, Ts discrete time step, fc corner frequency), which would strengthen either set. The equation quotes are transcribed in ASCII rather than verbatim from the page, but the mathematics is correct."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Both sets agree on six of seven claims, and those are faithful: the controller goals with their rated-operation conditions, the filter recursion and coefficient equations, the turbine configuration, and the filter type. The difference is the feedback-input claim: Set A correctly states that both the generator-torque and blade-pitch controllers use the generator speed measurement as the sole feedback input, matching its quote. Set B binds the same quote only to the generator-torque controller, drops the 'sole' qualifier, and attaches a 'baseline control system' condition not present in the source. Set A is therefore more accurate and complete on this point.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "conditions",
+          "misbound"
+        ],
+        "remarks": "Both sets omit the filter state definition x[n]=y[n-1] (Eq. 7-3a) and the variable definitions (y, u, alpha, n, Ts, fc), though these are secondary to the main claims shown."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p8-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A and Set B contain the same substantive claims, all faithful to the page: the 40W/9W/7W light-output equivalence example, the T24 high-efficacy requirement for HARVEST HOME fixtures, the own-switch requirement for high-efficacy luminaires in kitchen/bathroom/closet/laundry, and the vacancy-sensor dimming-bypass requirement. Set B, however, repeats two claims verbatim (the 40W incandescent power and the vacancy-sensor bypass requirement), adding no information and diluting the set. Set A is therefore cleaner and equally complete on the prose content.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "Both sets omit the 'LIGHTING LEVELS' table at the top of the page, which contains engineering-relevant facts: 3 FC for general use/movement (40W bulb at half power), 5-10 FC for simple tasks (40W bulb), 30 FC for large size or high contrast ((4) 40W bulbs), and 50 FC for small size or visually complex ((6) 40W bulbs), each tied to a task (walking bedroom to bathroom, making coffee, chopping vegetable, reading the newspaper). These footcandle levels and bulb counts are arguably the most quantitative content on the page and should be extracted."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets correctly capture the 40W/9W/7W light-output equivalence, the T24 high-efficacy requirement for Harvest Home fixtures, and the vacancy-sensor dimming-bypass requirement. Set B additionally captures the Title 24 requirement that approved high efficacy luminaires be connected to their own switch in the kitchen, bathroom, closet and laundry rooms, which Set A omits. Set A instead repeats the vacancy-sensor requirement twice in near-identical wording, adding no information. Set B is therefore more complete and free of redundancy.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [],
+        "remarks": "Both sets omit the LIGHTING LEVELS table in the page image (3 FC general use/movement with 40W bulb at half power; 5-10 FC simple tasks with 40W bulb; 30 FC large size or high contrast with (4) 40W bulbs; 50 FC small size or visually complex with (6) 40W bulbs, tied to the four illustrated tasks) and the statement that the LED bulb has a higher efficacy rating because it puts out more light per watt. Set A's two vacancy-sensor claims differ only in the length of the quoted requirement value."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p7-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A covers the blade-pitch controller's design model, the gain-scheduled PI control method, the speed-error input, and the generator-torque controller's Region-3 override condition (previous blade-pitch command 1º or greater), all supported by the page. Set B's seven claims are a strict subset of A's and are all correct, but it omits these important controller facts. A's only flaw is that the gain-scheduled PI control-method claim is stated twice; B has no errors of its own but is incomplete.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Set A repeats the gain-scheduled PI control-method claim verbatim (claims 7 and 9). Both sets correctly capture the torque saturation (47,402.91 N•m = 10% above rated) and the 15,000 N•m/s rate limit; neither set extracts the equation of motion (7-5), which is arguably an important fact on the page."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are accurate on the claims they share, but B captures two important facts A omits: the single-DOF design model of the blade-pitch controller and the conditional torque logic (Region-3 torque computation whenever the previous blade-pitch command was 1° or greater). B's only flaw is that it states the gain-scheduled PI control method twice, under 'blade-pitch controller' and 'blade-pitch control system'. A is clean but incomplete, so B is the better set overall.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "B repeats the gain-scheduled PI control-method claim under two entity names ('blade-pitch controller' and 'blade-pitch control system'); deduplicating would make B clearly stronger. Both sets leave out the stated purpose of the Region-3 torque override (improved output power quality at the expense of short-term generator/gearbox overloading) and the 10%-above-rated saturation rationale, though the saturation value itself is captured."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p7-text": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Both sets capture the five chordwise-offset reference lines (pitch axis, mass, neutral, geometric, shear centers) from Figure 2-11. Set A adds a claim that axial stiffness is 1e10 N at r/R = 1.0, but 1e10 is only the y-axis scale multiplier of plot (c); the curve at r/R = 1.0 is near zero, so the value is misread and misbound to the wrong span position. Set B omits that erroneous claim and otherwise matches Set A, making it the more faithful set.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "misbound",
+          "misread"
+        ],
+        "remarks": "Both sets only extract legend labels of Figure 2-11 as 'structural property center' claims with no numeric chordwise offset values, which is thin but symmetric. Neither set extracts the mass density or edge/flap/torsional stiffness data from Figure 2-10; the axis scale factors (1e11, 1e10) are easy to mistake for data values, as Set A demonstrates."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Both sets extract only the five legend labels of Figure 2-11 as 'structural property center' claims, which are vague and carry no values or span conditions. Set B adds one extra claim, axial stiffness = 1e10 N at r/R = 1.0, but 1e10 is only the y-axis multiplier and the curve at r/R = 1.0 is near zero, so the claim misreads the plot and its quote (a splice of axis labels) does not support it. Set A therefore has no wrong claims while Set B has one, making A the better set.",
+        "baseline_problems": [
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "misbound",
+          "misread",
+          "quote",
+          "trivial",
+          "vague"
+        ],
+        "remarks": "Neither set captures any quantitative data from Figure 2-10 (mass density, edgewise/flapwise/torsional stiffness, axial stiffness vs r/R) or the chordwise offset values in Figure 2-11; only legend labels were extracted. The 'structural property center' attribute is generic — the underlying quantity is chordwise offset [m] of each center versus blade span r/R. Set B's axial-stiffness claim appears to bind the axis scale factor (1e10) as a data value at the wrong span location."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets share the same core claims and the same flaw: the sub-panel 'phase' claim binds '3 W' (the 3-wire designation) to phase, when the phase is 1~. Set B additionally extracts two correct facts from wiring schedule row 150 — the 2-1/2\" conduit size and the #4G ground conductor size — which Set A omits. Those extra claims are supported by the row text '50 AL: 3#4/0, #4G., 2-1/2\"C.' and are not contradicted anywhere on the page.",
+        "baseline_problems": [
+          "misbound",
+          "missing"
+        ],
+        "variant_problems": [
+          "misbound"
+        ],
+        "remarks": "Shared error in both sets: 'SUB-PANEL PV | phase | 3 W' — the note reads '120/240V, 1~, 3W', i.e. 1-phase, 3-wire; 3W is the wire count, not the phase. The companion 'wire count | 3 W' claim is therefore a near-duplicate of the same notation. Entity 'NEMA 3R ENCLOSURE' in the main-breaker claim is vague (it is the sub-panel PV enclosure). Set B's quotes use ellipses within the row, which is acceptable here since the row text is intact in the text layer."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Both sets share the same 14 claims, including the same error of reading '3W' as the sub-panel's phase (it is the wire count; the phase is 1φ) and the same duplication of the 50A/2P main-breaker rating under two entity names. Set A adds two further claims from wiring schedule row 150 — the #4G ground conductor size and the 2-1/2\" conduit size — both correctly bound and quoted. Since A's extras are correct and it introduces no additional errors, A is the better set.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "missing",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "missing",
+          "vague"
+        ],
+        "remarks": "Both sets misread '1~, 3W' on the SUB-PANEL PV note: 1~ is the phase (single-phase) and 3W is the wire count, so the 'phase | 3 W' claim is wrong in both. Both also state the 50A/2P main breaker twice (once as 'NEMA 3R ENCLOSURE' and once as 'SUB-PANEL PV main breaker'), use vague entities ('NFDS', 'NEMA 3R ENCLOSURE') where the page distinguishes a 60A DC NFDS from a 200A/2P NFDS, and omit the NEC 690.42 EXCEPTION note (conductor-to-ground bond made by the ground fault protection device) plus most wiring schedule rows (20, 31, 32, 33, 34, 10)."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p5-visual-b2of4": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 8,
+        "variant_wrong": 9,
+        "note": "Both sets share the same defects: truncated model values (F2 'BSP-L-65014', WC 'C454CUFG#0'), truncated locations (SV/SH 'BATHROOM' instead of BATHROOM SHOWER, F2 'BATHROOM' instead of BATHROOM VANITY), the MWD02 dimension row actually belonging to MWD01, and a vague 'Shower' location claim. Set A keeps the plumbing tags as conditions on the faucet claims (F1/F2), which matters because the two faucets have different models and locations, while Set B drops those conditions and leaves the faucet model and location claims ambiguous. Set B does bind the shower-valve manufacturer claim correctly to SHOWER VALVE where A writes only 'Shower', but A's conditioned faucet claims are the more valuable and faithful additions.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "remarks": "The text layer is heavily truncated in the FINISH SCHEDULE block (e.g. 'QU', 'FIE', 'PR', 'DE', '33', 'EG'), so finish-schedule claims cannot be verified from text alone; the image also shows a FLOOR FINISH SCHEDULE (LM/PT1/PT2/VT) that the text layer omits entirely. Several claims in both sets are duplicates of the same fact stated with a truncated and a full value (WC model, F2 model). Truncated quotes such as 'LOCATION: BATHR' and 'DESCRIPTION: SHOWE' do not fully support their claims in either set."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets cover the same plumbing, furniture and millwork facts and share the same three errors: the F2 and WC model numbers truncated (BSP-L-65014, C454CUFG#0) and the MWD02 dimension claim actually belonging to the MWD01 wall cabinet row. B is better because it keeps the tag conditions that disambiguate the two BRIZO faucets (F1 = kitchen, F2 = bathroom vanity) on its FAUCET claims, while A states those same facts without tags and is ambiguous. A's only advantage is naming SHOWER VALVE precisely where B writes the vague 'Shower', but that fact is already fully covered by the SV claims present in both sets.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "misread",
+          "quote",
+          "vague"
+        ],
+        "remarks": "The text layer emits each tag after its row's data, which is the likely source of the MWD02/MWD01 row shift (the quoted string 'MWD02 WALL CABINET 3-0 x ...' is stitched, not a real row). Both sets also truncate locations (BATHROOM for BATHROOM SHOWER / BATHROOM VANITY) and repeat the same model under a full and a cut value, and both carry the vague 'Shower' entity with the cut quote 'LOCATION: BATHR'. The finish-schedule entries in the text layer are badly truncated (QU/CA/PU/DE/EG...), so any finish claims drawn from that layer should be treated as unreliable."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p5-text-b1of4": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 4,
+        "note": "Both sets repeat the same four misbound claims (dryer model DV17540NBL00 credited to PRATT & LAMBERT, tag P3 given type TEMPERED, SHOWER SURROUND given colour number 33-14, and KITCHEN given colour name STEEL WOOL), so their error counts are equal. Set A additionally extracts 13 claims that all check out against the schedules (e.g. DRYER manufacturer BLOMBERG, ACCENT PAINT colour number 33-14, WALL BASE profile, and correctly tagged quantities for F3 SOFA, F4, F5, F6, F2 BEDSIDE TABLE, MWK02, MWK04, MWK05, MWB01, MWK03). Set B's shown claims are entirely contained in Set A's and add nothing, so it omits a large amount of correct equipment, finish, furniture and millwork data. Both share the same vague entities (bare tag F2, bare field label FINISH) and the unsupported 'KITCHEN' location on the quartz rows.",
+        "baseline_problems": [
+          "conditions",
+          "misbound",
+          "missing",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "misbound",
+          "quote",
+          "vague"
+        ],
+        "remarks": "The text layer is column-scrambled, which produced cross-row joins: 'LOCATION: KITCHEN COLOUR NAME: STEEL WOOL' and 'LOCATION: SHOWER SURROUND COLOUR NUMBER: 33-14' splice the GL/P3 rows together, and the P3 tag label lands next to the GLASS row's TYPE: TEMPERED. The QUARTZ rows carry no LOCATION field, so the added condition 'location: KITCHEN' is not supported by the page. Both extractions also miss straightforward facts such as GLASS thickness 1/2\" (shower surround) and TELEVISION size 40\" (model TBD)."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 7,
+        "variant_wrong": 7,
+        "note": "B adds thirteen further claims that are correct and well bound — equipment manufacturer (DRYER/BLOMBERG), finish data (ACCENT PAINT colour number 33-14, WALL BASE profile), and furniture/millwork quantities tied to the right tags (F2–F6, MWK02, MWK04, MWK05, MWB01, MWK03) — while A omits all of them. Both sets share the same seven defective claims caused by splicing across schedule rows (e.g. dryer model DV17540NBL00 credited to PRATT & LAMBERT, P3 given type TEMPERED, KITCHEN given colour name STEEL WOOL, SHOWER SURROUND given colour number 33-14, and QUARTZ given an invented location KITCHEN). Error rates are therefore equal, but B covers far more of the page's engineering content, so B is the better set.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "missing",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "misbound",
+          "missing",
+          "quote",
+          "vague"
+        ],
+        "remarks": "The text layer lists schedule tags in blocks separate from their rows, which is the likely source of the cross-row splicing seen in both sets (paint manufacturer attached to a dryer model, glass type attached to tag P3, paint colour attached to locations KITCHEN/SHOWER SURROUND). The GL (Glass) type=Tempered claim is factually right but its quote ('LOCATION: BATHROOM SHOWER P3 TYPE: TEMPERED') does not support it; the same tempered-glass fact is also stated under the wrong name P3, and the accent-paint colour 33-14 appears under both ACCENT PAINT and SHOWER SURROUND. 'FINISH' is an attribute label used as an entity, and 'F2' is ambiguous because tag F2 exists in both the furniture (bedside table) and plumbing (kitchen faucet) schedules. Both sets still leave out many schedule facts: appliance/plumbing models, TV size 40\", glass thickness 1/2\", tile and laminate dimensions, and wall base location/finish."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p5-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets correctly capture the corner frequency (0.25 Hz, roughly one-quarter of the blade's first edgewise natural frequency) and the discrete time step of 0.0125 s, with supporting quotes. Set B, however, states the corner-frequency claim twice as two separate claims, adding no information and diluting the set. Set A contains the same correct facts without the duplication, so it is the cleaner and better set. Neither set captures the state-space matrix definitions (A_d=α, B_d=1−α, C_d=α, D_d=1−α).",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "remarks": "Both sets omit the discrete-time state-space matrix definitions from Eq. (7-4) (A_d=α, B_d=1−α, C_d=α, D_d=1−α), which are substantive engineering facts on the page. The '-3 dB at corner frequency' claim is close to a definition/label rather than a measured property, but it is supported by the text and appears in both sets."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets read the page correctly: the -3 dB magnitude at the corner frequency, the 0.25 Hz corner frequency (roughly one-quarter of the blade's first edgewise natural frequency), and the 0.0125 s discrete time step are all supported by the text and quotes. Set A, however, states the corner-frequency fact twice (claims 2 and 3 are the same fact with slightly different quote spans), which is a duplicate. Set B contains the same three distinct facts with no duplication and no errors, so it is the cleaner and better set.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets omit the discrete-time state-space matrix definitions (A_d = alpha, B_d = 1-alpha, C_d = alpha, D_d = 1-alpha) from Eq. (7-4), which are substantive engineering facts on this page; if these are not in the shared unshown claims, they are a common gap. The Bode plot axes and curve values are readable in the image but neither set extracts them."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p10-text-b1of2": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A captures all fifteen rows of Table 7-1 with correct ∂P/∂θ values, units (watt/rad), and full wind-speed/rotor-speed/pitch-angle conditions, plus the qualitative claim that pitch sensitivity varies nearly linearly with blade-pitch angle. Set B contains only that single qualitative claim and omits the entire quantitative table, which is the main engineering content of this page part. Both sets state the one shared claim correctly and with a supporting quote, so B has no wrong claims, but it is missing the key sensitivity data. A is therefore clearly better.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [],
+        "remarks": "All 15 table rows in Set A were checked against the page text and image and match exactly, including signs and E+6 magnitudes. Both sets omit the rated mechanical power (P0 = 5.296610 MW) and rated rotor speed (Ω0 = 12.1 rpm) context and the frozen-wake linearization assumption, which are secondary but potentially useful facts on this page."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A contains only the single qualitative claim that pitch sensitivity varies nearly linearly with blade-pitch angle, omitting the entire Table 7-1 dataset of ∂P/∂θ values across Region 3. Set B includes that same qualitative claim plus all 15 table rows, each with the correct wind speed, rotor speed, pitch angle, value, unit (watt/rad) and a supporting row quote. All of B's claims match the table exactly, so B is both complete and faithful while A misses the main engineering content of the page.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [],
+        "remarks": "B's quotes are table-row fragments rather than prose, but they do support the claims. Both sets omit the rated mechanical power (P0 = 5.296610 MW) and the frozen-wake linearization assumption, which are notable facts on the page."
+      }
+    },
+    "u-lcit-report-p12-19-bb5dd36f-p2-text": {
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets cover the same 12 facts from the baseline mission concept list and bind every value to the correct mission/component and property, with the on-axis/off-axis and baseline conditions preserved. Set A gives fuller, more verbatim quotes and binds the Lynx 10 m focal length to the mirror assembly specifically, while Set B uses ellipsized quotes and binds the focal length to Lynx generally. These are minor presentational differences; no claim in either set is misread, misbound or invented, and no important fact is missing from either.",
+        "baseline_problems": [],
+        "variant_problems": [],
+        "remarks": "Set B's quotes use ellipses (e.g. 'Lynx: ...three science instruments') that cut the quote short but still support the claim; Set A's quotes are fuller and would be preferable on quote fidelity alone. Set A's entity 'Lynx mirror assembly' for the 10 m focal length is slightly more precise than Set B's 'Lynx', since the page attributes the focal length to the grazing incidence mirror assembly. Both sets omit the fact that the HabEx starshade flies in formation on a separate spacecraft (partially captured in B's starshade quote) and that these are the baselines from the STDT Reports, but neither omission is significant."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets cover the same 12 facts from the slide (aperture/diameter, instrument counts, Lynx focal length, starshade diameter) with correct values, units and baseline-concept conditions. Set B binds the 10 m focal length more precisely to the Lynx grazing-incidence mirror assembly, while Set A keeps entity context in its quotes (e.g. 'Lynx: ...three science instruments') where B's short quotes ('three science instruments', 'a 10 m focal length') lack the component context. Neither set invents or misbinds anything, and both omit the same minor condition (starshade 'flying in formation'), so the sets are effectively equivalent.",
+        "baseline_problems": [
+          "quote"
+        ],
+        "variant_problems": [],
+        "remarks": "Both sets miss the condition that the HabEx starshade spacecraft flies in formation with the telescope spacecraft, and neither notes that the starshade is a separate spacecraft. Set B's quotes for the Lynx instrument count and focal length are context-free fragments, though they still support the claims within the bullet. Set A's quotes use added prefixes ('Lynx: ...') and ellipses, which are slightly reconstructed rather than verbatim, but faithful to the text."
+      }
+    },
+    "u-dc-manual-p59-66-a157bdf0-p2-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the same core Nitinol claims accurately, with correct values, units, conditions and supporting quotes. Set A additionally includes the commercially available wire transition temperature of 90 C, which is explicitly stated in footnote 3 ('transition at temperatures of 70C and 90C') and is omitted by Set B. No claim in either set is misread, misbound or invented, so A's extra correct claim makes it the better set.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [],
+        "remarks": "Both sets faithfully reproduce the page's stated composition figures (55-65% Nickel and 44-55% Titanium), which sum to more than 100% as written in the source; this is a source-document inconsistency, not an extraction error. The 70C and 90C transition temperatures come from a footnote reference and could arguably be merged into a single range claim."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets capture the core Nitinol material and phase-transformation facts accurately and with supporting quotes. Set B additionally extracts the second commercially available wire transition temperature (90 C), which the footnote states ('transition at temperatures of 70C and 90C'), while Set A only captures 70 C and so omits an important value. Otherwise the two sets are essentially identical in binding, conditions and quotes.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "quote"
+        ],
+        "remarks": "Both sets share a slightly reworded quote for the 'material composition | nickel-titanium alloy' claim (the source reads 'The actuation, or contraction, of the Nitinol wire is a solid-state phase transformation based on atomic-level characteristic of the nickel-titanium alloy'); the claim itself is supported, so this is minor. Note the page's stated composition ranges (55-65% Ni and 44-55% Ti) sum to more than 100% — an internal inconsistency in the source, faithfully reproduced by both sets. Facts on the page neither set shows include the 1961 discovery of Nitinol and the 1930s start of SMA research (dates, largely administrative/historical)."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p9-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets are accurate on the claims they share: the Prandtl tip-loss drop over the outboard 5%, the 4° maximum pitch at low wind speeds, the ~90 m force peak below rated, and the design/optimal TSR values are all supported by the text with faithful quotes. Set A additionally captures the design-point blade pitch (0°) and the optimal blade pitch (−1.0°) at maximum CP, both directly stated in the same sentence as the TSR values, so it covers the full design-point/optimum pair without error. Set B omits these two pitch values, leaving the design point only half specified. Neither set invents or misbinds anything.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "Both sets omit other notable facts on the page, e.g. Region 3 torque saturation at rated torque with pitch-to-feather to maintain rated rotor speed, the negligible Region 2.5, and the tip-unloading/power-loss trade-off — these are absent from both so they do not differentiate the sets. The 'optimal' TSR/pitch values are described in the text as the optimum shown in the CP and CT curves of Figure 3-2; binding them to 'maximum CP' is a reasonable but slightly interpretive condition."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets read the shared claims correctly: the 4° pitch limit, the 90 m force peak, the design and optimal TSR values, and the Prandtl tip-loss drop are all faithful to the text. Set B additionally captures the design-point blade pitch Θpitch = 0° and the optimal Θpitch = −1.0°, which are genuine engineering values stated in the same sentence and omitted by Set A. Since Set A shows all of its claims and lacks these pitch values, B is the more complete and equally accurate set.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [],
+        "remarks": "Both sets state the force peak as exactly 90 m while the text says 'approximately 90 m'; minor, but the approximation qualifier is dropped. The 'optimal' TSR/pitch pair is described via the CP and CT curves in Figure 3-2, so 'maximum CP' as a condition is a reasonable but slightly simplified gloss."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p12-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set B is cleaner and captures the 7% outfitting mass allowance (plus 100 t transition piece) that Set A omits, while Set A pads its list with three duplicate pairs of the same steel properties restated with different number formatting. Set A also adds an unsupported 'typical variation' condition to the 20–30 m clearance claim from the footnote. Both sets bind the material, geometry, and frequency values correctly with supporting quotes, so B wins on fewer redundant/unsupported claims and better coverage of the mass note.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "missing",
+          "vague"
+        ],
+        "remarks": "Set A repeats steel density, Young's modulus and shear modulus twice each (only the decimal formatting differs), inflating its count. Set B's 'final mass | outfitting mass' entity is somewhat vague (the subject is the final mass values in Table 1-1). Both sets leave the table's apparent unit error for soil Poisson's ratio (listed as Pa) unflagged; the 20–30 m clearance range in the footnote is captured only by A."
+      },
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A captures the 7% outfitting mass allowance (plus the 100 t transition piece) that Set B omits, while Set B restates the steel density, Young's modulus and shear modulus three times each under slightly reformatted values. Set B's extra claim on the 20–30 m clearance range is supported by the footnote, though its 'typical variation' condition is a loose paraphrase rather than text. Both sets bind the material, geometry, frequency and mass values correctly with supporting quotes.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [],
+        "remarks": "Set B duplicates steel density (7 85E3 / 7.85E3), Young's modulus (2 00E11 / 2.00E11) and shear modulus (7 93E10 / 7.93E10) — the same table rows stated twice with different number formatting. Set B drops the 7% outfitting mass fact. Its clearance claim's condition 'typical variation' is not stated in the footnote (which only says clearances 'can vary between 20 m to 30 m' and are not specified in an official standard). Both sets omit the design constraint that the 0.170 Hz first mode lies between the 1P and 3P ranges and avoids the 0.10–0.13 Hz wave band, and the note that a stiffer tower is required for a floating/semisubmersible substructure."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p12-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 6,
+        "note": "Set A's five claims all match the text exactly: KP(θ=0º)=0.01882681 s, KI(θ=0º)=0.008068634, KD=0.0 s², and ζφ=0.7 with its stated rationale. Set B repeats those but adds six claims scraped from Figure 7-4's axis tick labels, treating tick marks as data points; these contradict the stated values (e.g. KP=0.000 s and GK=0.0 at θ=0º, when the text gives KP=0.01882681 s and the curve starts at GK=1.0). B also states KP at θ=0º twice with conflicting values (0.01882681 s and 0.020 s). A is therefore clearly more faithful despite showing fewer claims.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "misread",
+          "quote"
+        ],
+        "remarks": "B's figure-derived claims are built by concatenating legend/axis tick labels (e.g. 'Proportional Gain, s ... 0.000 ... 0') rather than reading curve values; the quotes do not support the claims. A's two ζφ = 0.7 claims are the same fact split across two condition phrasings (value plus rationale) — a mild duplication. Both sets omit the gain-scheduling law itself (GK(θ) = 1/(1 + θ/θK), dimensionless, with θK = 6.302336º from the preceding page) and the implementation detail that the previous time step's blade-pitch angle is used to compute the next step's gain-correction factor."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "",
+        "baseline_wrong": 0,
+        "variant_wrong": 5,
+        "note": "Set B's five claims all match the page text exactly (KP(θ=0º)=0.01882681 s, KI(θ=0º)=0.008068634, KD=0.0 s², ζφ=0.7 with its stated rationale). Set A repeats those same five correct claims but adds six chart-derived claims, five of which are wrong: three bind right/left axis tick labels (0.000, 0.020, 0.0) as if they were the gain or gain-correction factor at 0º, directly contradicting the correct KP/KI values and the fact that GK(0º)=1.0, and one reads the proportional gain at 20º as 0.010 s when the blue curve is near 0.005 s. Only A's gain-correction factor ≈0.2 at 20º is a defensible chart read. B is therefore clearly the better set.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "trivial"
+        ],
+        "remarks": "A's three '0.000/0.020/0.0 at 0º' claims are axis-tick artifacts of the figure's dual y-axes, not data points; the extractor paired tick labels with the x-axis origin. Both sets state ζφ = 0.7 twice (once as the upper limit of the recommended range, once with the generator-torque negative-damping rationale) - arguably one fact with two conditions. Both sets also omit the gain-scheduling law GK(θ) = 1/(1 + θ/θK) and the implementation detail that the previous time step's blade-pitch angle is used to compute the next time step's gain-correction factor. Chart-read values in A carry fabricated-looking concatenated quotes ('... 0.000 ... 0') that do not correspond to any real text span."
+      }
+    },
+    "u-rules-2013-p35-38-3c85ed49-p1-text": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Both sets capture the dishwasher temperature thresholds, capacity, sensor redundancy, and the clothes-drying weight-based scoring bands, and both repeat several facts under two names (heated drying, cycle completion, wash/rinse cycles, and the drying thresholds stated twice). Set A additionally captures the important laundry eligibility condition (complete, uninterrupted washer cycle) that Set B omits entirely. However, A also adds a claim reading the Figure 8 axis ticks 90/100/110/120 as 'points', when the figure shows those numbers on the % of original weight (x) axis and the y axis (points per clothes drying task) is unlabeled. On balance A recovers a substantive rule B misses at the cost of one misbound figure claim.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "trivial"
+        ],
+        "remarks": "Both sets duplicate the same facts under alternate attribute names (e.g., 'required temperature sensor peak' vs 'temperature sensor minimum value', 'heated drying option | status' vs 'dishwasher | heated drying option', 'cycle completion signal' vs 'cycle completion confirmation', 'clothes-drying points | scoring value' vs 'clothes-drying task | scoring criteria'), inflating both claim counts. The Figure 8 y-axis (points per clothes drying task) has no numeric tick labels in the image, so any claim assigning point values to 90-120 is unsupported; the text layer also scrambles the figure's axis labels. Neither set extracts the temperature-of-record rule (higher of two sensor readings, or lower if the higher sensor is defective) or the definition of cycle interruption."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Both sets share the same 22 dishwasher and clothes-drying claims, including the same redundancies (the 120°F/48.9°C threshold stated three times, 115°F twice, heated-drying and cycle-completion rules twice) and the same trivial Figure 8 axis-tick claim. B adds two claims: the important laundry eligibility rule (complete, uninterrupted washer cycle), which A omits entirely, and a Figure 8 'scoring function' claim listing 90, 100, 110, 120 as points, which misreads the x-axis (% of original weight) tick values as point values. A is error-free but drops an important rule; B is net more complete and faithful despite one misread figure claim.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "trivial"
+        ],
+        "remarks": "Both sets miss several substantive facts on the page: the two-loads-per-day / separately-scored rule (item d), permitted drying methods and the visibility/demonstration requirement (item c), the temperature-of-record rule (higher of two sensors unless the higher one is defective), the definition of cycle 'interruption' (item e), the 'normal'/'regular' setting selection rule (item g), and the allowed load states (empty, partial, full; soiled or clean, item h). Both sets also heavily duplicate the same facts under different attribute names (e.g., 'required temperature sensor peak', 'temperature sensor minimum value for full points', and the °C restatement all encode the 120°F threshold), which inflates claim counts without adding information. The Figure 8 y-axis (points per clothes drying task) has no numeric labels in the text layer, so any point values attributed to it are unsupported."
+      }
+    }
+  }
+}

@@ -1,0 +1,685 @@
+{
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "verdicts": {
+    "u-dc-manual-p59-66-a157bdf0-p6-visual": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A is better because it extracts formulas completely (e.g., 'Height = D*1.2') and avoids text truncation errors found in Set B (e.g., 'longit' instead of 'longitudinal'). Both sets suffer from significant redundancy, extracting the same facts (shape, bend angle, formulas) multiple times with slight variations in entity naming.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "Both sets failed to deduplicate claims, resulting in ~25% redundancy. Set B Claim 7 contains a truncated condition ('longit'), and Claim 1 extracts an incomplete formula expression."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is preferred because it contains significantly fewer duplicate claims than Set B. Set B extracts the same engineering facts (finish, bend angle, spacing algorithm, shape) multiple times under slightly varying entity names (e.g., 'louver' vs 'Harvest Shade Screen'), creating unnecessary redundancy. Set A has minor duplication and one truncated condition ('longit'), but is overall more concise and faithful.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": ""
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p4-table-b1of2": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 15,
+        "variant_wrong": 16,
+        "note": "Set B is preferred because it contains fewer claims (15 vs 16), specifically omitting the unsupported 'Steel Rod | 3 1/2\"' claim present in Set A. However, both sets suffer significantly because the provided page image and text layer (Sheet 7 Keynotes) do not contain the engineering data (S-411 details) extracted in the claims, rendering almost all claims unsupported by the designated source.",
+        "baseline_problems": [
+          "duplicates",
+          "invented"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented"
+        ],
+        "remarks": "Critical input mismatch: The provided image and 'Its text layer' show Sheet 7 (Keynotes headers), while the claims and 'Text before it' describe Sheet 4 (S-411 Structural Details). This makes it impossible to verify the claims against the provided image, as the content is entirely different. Both sets also contain duplicate claims (e.g., Teflon Plate, Column Cap Plate, Threaded Rod stated twice with minor variations)."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 14,
+        "variant_wrong": 15,
+        "note": "Both sets contain numerous claims unsupported by the provided text layer (e.g., Teflon Plate, Neoprene Pad, W10X15 are not in the text), and both suffer from duplicate entries (Teflon, Cap Plate, Threaded Rod listed twice). Set B includes an additional unsupported claim ('Steel Rod | 3 1/2\"') not found in Set A or the text, making it slightly worse. Set A is preferred for having fewer invented claims.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misread"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misread"
+        ],
+        "remarks": "The provided image shows only the keynotes column headers, while the claims derive from the 'Text before it' snippet. Most claims are unsupported by that snippet, suggesting the text provided is incomplete relative to the full page content the extractor accessed."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p4-table-b0of2": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Set A is better because it contains fewer duplicate claims. Both sets duplicate the 'First Floor' elevation and 'Threaded Rod' accommodation claims, but Set B adds an unnecessary duplicate for 'Steel Rod' (claims 1 and 11). Otherwise, the extracted content is identical.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates"
+        ],
+        "remarks": "The provided page image shows only the keynotes column headers, while the engineering claims are supported by the 'Text before it' section. This mismatch between the visible image and the text layer used for extraction makes visual verification impossible."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 16,
+        "variant_wrong": 15,
+        "note": "Both sets contain claims that are largely unsupported by the provided image (which shows only sheet margin headers) and the specific text layer, though some keywords appear in the 'Text before it' context. Set A includes an additional duplicate claim ('steel rod' claim 11 duplicates claim 1) that Set B omits. Both sets retain duplicates for 'First Floor' and 'Threaded Rod'.",
+        "baseline_problems": [
+          "duplicates",
+          "invented"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented"
+        ],
+        "remarks": "The provided image is a cut-off crop of the sheet margin (keynotes headers) and does not display the structural details (beams, rods, footings) referenced in the claims. The 'Text before it' contains fragments (e.g., '28\" DIA FOOTING', '3/4\" BOLT') but does not fully support the specific values or quotes in the claims (e.g., 'W8X10', '3 1/2\" STEEL ROD'). Consequently, most claims are technically 'invented' relative to the provided source, but Set B is objectively better for having fewer duplicate entries."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p3-visual-b2of4": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Set A is preferred because it correctly extracts the specific Laundry Millwork dimensions (height and width) which Set B omits, and it avoids the significant dimension swap error found in Set B (claiming East Island width is 3'-0\" when that is the height). Both sets suffer from duplicate claims regarding the platform height, but Set A's entity binding is generally more accurate despite one vague 'Island' label for the Laundry gable.",
+        "baseline_problems": [
+          "duplicates",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "quote"
+        ],
+        "remarks": "Set B Claim 15 misbinds the 3'-0\" vertical dimension as a width for the East Island. Set B Claim 1 contains a garbled OCR quote. Set A Claim 11 labels the Laundry Millwork gable as 'Island', which is imprecise."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 12,
+        "variant_wrong": 5,
+        "note": "Set B is preferred because it captures the Laundry Millwork dimensions (A6) which Set A misses entirely, and it avoids Set A's semantic errors (e.g., labeling East Island height as width). Set A also includes a nonsensical claim about MWB02 and duplicates a platform height claim. Set B suffers from systematic unit formatting errors (appending 'inches' or 'feet-inches' to values that already contain symbols), but the engineering data is complete and semantically accurate.",
+        "baseline_problems": [
+          "misread"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "missing"
+        ],
+        "remarks": "Set B's unit formatting issues (e.g., '12\" inches') are pervasive but mechanically correctable, whereas Set A's misbound dimensions (height vs width) and missing section data (Laundry) represent significant engineering information loss."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p1-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set A is preferred because it faithfully extracts 'NFDS' whereas Set B invents 'DC NFDS' without textual support. Both sets suffer from extensive duplication of claims (e.g., NFDS rating, Main Breaker rating, Ground connections) and miss several Wiring Schedule entries (50, 33, 10). Set A avoids the invention error present in Set B.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "missing"
+        ],
+        "remarks": ""
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set B is better because it faithfully extracts 'NFDS' without inventing the 'DC' prefix found in Set A (Claim 17), which is not present in the text or image notes. Set B also uses the more precise entity name 'Wiring Schedule 151' (Claim 18) compared to Set A's 'Wiring 151' (Claim 4). Both sets suffer from significant duplication of claims (e.g., extracting ratings and ground wires twice) and inconsistent entity naming for wiring schedule items ('Wiring' vs 'Wiring Schedule').",
+        "baseline_problems": [
+          "duplicates",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "vague"
+        ],
+        "remarks": "Both sets follow the text layer for Wiring Schedule row 34 (claiming #10G ground), which contradicts the image (showing 3#10G). This is a text layer OCR error, but since both sets match the text layer, it does not differentiate them. Set A's invention of 'DC' for the NFDS is the primary differentiator."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-visual-b3of4": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 1,
+        "note": "Set A correctly interprets the diagram tag '4' as a component identifier linked to Note 4, whereas Set B incorrectly misreads it as a 'terminal value'. Set A also makes a standard engineering inference that bubble '20' indicates wire size, while Set B labels it a 'terminal value' and includes trivial label claims. Both sets incorrectly attribute ground fault protection to the Main Breaker (Note 2) instead of the Inverter (Note 4).",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "trivial"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound"
+        ],
+        "remarks": "Both sets fail to distinguish that the 'Ground Fault' text belongs to the Inverter note (Note 4), not the Sub-Panel/Main Breaker note (Note 2), leading to a shared misbound claim."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set B is preferred because it avoids trivial label extractions (e.g., 'component 34 | label | 34') and uses more standard engineering terminology ('wire size' vs 'terminal value'). Both sets incorrectly attribute ground fault protection to the Main Breaker (it is associated with the Inverter in Note 4) and suffer from duplicate claims. Set B's interpretation of diagram numbers as wire sizes is a reasonable engineering inference, whereas Set A's 'terminal value' is vague and non-standard.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misbound"
+        ],
+        "remarks": "Both sets share a significant misbinding error regarding the Ground Fault Protection (attributing it to the Main Breaker instead of the Inverter). Set A includes several trivial claims extracting component labels as data. The provided text layer does not support the quote 'MAIN BREAKER TER WITH GROUND FAULT' found in both sets, indicating an OCR or extraction hallucination common to both."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p2-visual-b2of4": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 9,
+        "note": "Set A is significantly better because it correctly identifies dimensions as section dimensions or spans with specific grid references (e.g., 'span between grid 4 and 5'), whereas Set B vaguely mislabels most dimensions as 'Structural Member | length' (e.g., 8\", 10\", 6\"). Set B also contains specific errors, such as labeling a horizontal span (7'-6\") as a 'vertical dimension' and contradicting itself on span labels ('span 6-8' with condition 'between grid 6 and 7'). Set A's claims are more faithful to the engineering context of the drawing.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "misbound",
+          "misread",
+          "vague"
+        ],
+        "remarks": ""
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 10,
+        "note": "Set B is significantly better because it correctly classifies layout dimensions (offsets, gaps, story heights) as 'dimensions' or 'spans', whereas Set A systematically misclassifies them as 'Structural Member | length'. Set A also contains a contradictory claim ('span 6-8' with condition 'between grid 6 and 7'). Set B's claims are more faithful to the engineering semantics of the drawing.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misbound",
+          "vague"
+        ],
+        "remarks": "Set A's extraction logic appears to treat any dimension line as a 'Structural Member' length, which is incorrect for gaps and elevations. Set B distinguishes between member properties and section dimensions."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p1-visual-b1of4": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 10,
+        "variant_wrong": 2,
+        "note": "Set A correctly binds most room-specific dimensions to their respective elevations (e.g., North Living, West Bedroom), whereas Set B scrambles almost all room labels, assigning dimensions to the wrong elevations (e.g., assigning South Bedroom height to North Bedroom). Set A has two misbound room dimensions, but Set B has pervasive misbindings and includes an invented dimension (8'-4\"). Set A's use of generic 'Interior Elevation' for some claims is vague but faithful, while Set B's specific claims are largely unsupported by the drawing labels.",
+        "baseline_problems": [
+          "invented",
+          "misbound",
+          "vague"
+        ],
+        "variant_problems": [
+          "misbound",
+          "vague"
+        ],
+        "remarks": "Set B appears to have completely hallucinated the mapping between elevation titles (North, South, East, West) and their corresponding dimensions, likely due to a failure in layout analysis. Set A is significantly more reliable for engineering data extraction."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 10,
+        "variant_wrong": 2,
+        "note": "Set A attempts to extract more elevation-specific dimensions but fails significantly on binding, attributing dimensions from one elevation (e.g., South Bedroom) to another (e.g., West Bedroom) and swapping width/height for North Living. Set B extracts fewer specific claims but maintains much higher accuracy in binding dimensions to the correct elevation names (e.g., correctly identifying East Bedroom width and West Bedroom height).",
+        "baseline_problems": [
+          "misbound",
+          "misread"
+        ],
+        "variant_problems": [
+          "misbound"
+        ],
+        "remarks": ""
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p2-visual-b2of4": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Both sets incorrectly invent 'CU' as the cable material and hallucinate the quote '1. ALL CU' when the text says 'USE-2,10.G.A'. Both sets also misbind the detail marker '11' as a connection target. Set B is preferred because it includes a correct and specific claim about SA1-10's terminal polarity ('+') which Set A omits in the sample, and its connection claims (e.g., 'connection to | SA1-7') are slightly more descriptive of the engineering relationship than Set A's vague 'connection | 11'.",
+        "baseline_problems": [
+          "invented",
+          "misbound",
+          "quote",
+          "vague"
+        ],
+        "variant_problems": [
+          "invented",
+          "misbound",
+          "quote",
+          "vague"
+        ],
+        "remarks": "Both sets fail to extract the actual cable specification 'USE-2,10.G.A' correctly, substituting it with an inferred 'CU'. The detail marker '11' is treated as a component by both, which is likely a misinterpretation of a drawing detail reference."
+      },
+      "variant-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 3,
+        "note": "Both sets share identical critical errors, specifically hallucinating a 'CU' material claim with a fabricated quote ('1. ALL CU') that does not exist in the text layer (which says 'USE-2,10.G.A'). Both also misbind the module value '3' as a 'connection' for SA1-6 and SA1-7. Set A includes one extra correct terminal claim (SA1-10), while Set B explicitly models the interconnecting component '11' as an entity, whereas Set A captures it in conditions; these differences balance out.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "vague"
+        ],
+        "remarks": "Both sets fail to accurately extract the cable specification from Note 1, inventing 'CU' and a supporting quote. Both sets also duplicate claims for module values (stating both 'value | 3' and 'component value | 3' for the same modules). The text layer provided contains OCR errors (e.g., 'CA BLE'), which both sets faithfully quote for the cable ties note, but the 'CU' invention is a hallucination not supported by the text layer."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p3-visual-b0of4": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set B is preferred because it avoids unsupported inferences found in Set A (e.g., classifying the project as a 'Vehicle' which is not stated in the text) and provides more precise values (e.g., 'skirt' instead of the vague 'skirt/trim'). Set B also captures the Client and Website information correctly, whereas Set A omits them, though administrative completeness is neutral, the correctness of the included data in B is high.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "invented",
+          "vague"
+        ],
+        "remarks": ""
+      },
+      "baseline-first": {
+        "score": 0.5,
+        "better": "same",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 0,
+        "note": "Both sets extract the same core engineering claims (clearance, framing, components SK/MWK04) and miss the same important engineering facts (MDF material specification, specific dimensions like 2'-5 1/16\"). Set A includes more administrative metadata (Client, Website, Event Name) while Set B is more concise. Set A has a potential duplicate project name claim (Borealis vs Solar Decathlon), but administrative claims are neutral. Engineering performance is identical.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": "Both sets fail to extract material specs (1/2\" MDF) and key dimensions (2'-0\", 2'-5 1/16\"), which are significant engineering omissions. Set A's extra admin claims are correct but neutral per instructions."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p7-visual-b0of2": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 3,
+        "note": "Set A is better because it avoids the factual errors present in Set B's extraction of Figure 2-11. Set B misbinds blade surface coordinates to structural centers (e.g., claiming geometric center is at 2m and shear center at -4m, whereas the chart shows these centers near 0m and the values correspond to the blade outline). Both sets suffer from inconsistent duplicate claims for the stiffness and density graphs (e.g., varying values for the same condition), but Set A's omission of Figure 2-11 is preferable to Set B's hallucinated/misbound data.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "missing"
+        ],
+        "remarks": "Both sets extract multiple conflicting values for the same properties (e.g., mass density 3000 vs 3100 at r/R=0), indicating instability in graph reading. Set B's attempt to extract Figure 2-11 data confuses the airfoil boundary lines with the structural center lines defined in the legend."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Set A includes claims from Figure 2-11 (planform/centers) but misidentifies the blade planform boundaries as structural centers (geometric and shear), resulting in factually incorrect 'misbound' claims. Set B omits Figure 2-11 data entirely (missing important facts) but avoids these falsehoods. Both sets contain internal contradictions on Figure 2-10 values (e.g., multiple stiffness values for the same condition), but Set B includes some underestimates (1.2e11 vs 1.5e11) while Set A's Figure 2-10 readings are slightly more accurate. Set B is preferred as hallucinating structural properties (Set A) is more severe than omission or reading variance.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "missing"
+        ],
+        "remarks": "Both sets exhibit instability by extracting multiple contradictory values for the same data point (e.g., mass density 3000 vs 3100, torsional stiffness 0.9e11 vs 1.0e11). Set A's errors on Figure 2-11 are category errors (confusing envelope with axis), whereas Set B's errors are numerical reading errors."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p1-visual-b0of4": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 5,
+        "variant_wrong": 2,
+        "note": "Set A is more faithful to the geometric layout, correctly binding grid spacings to grid numbers (e.g., 5 to 6) and placing the 8'-8 5/8\" column dimension in the correct vertical zone (First Floor to T.O. Steel). Set B hallucinates the location of the 8'-8 5/8\" dimension (claiming it is from Grade to First Floor, which is 2'-4\") and misbinds grid dimensions to a detail callout (C4) instead of grid lines. Although Set B captures the 11'-4\" elevation and 32'-0\" width which Set A misses, the geometric errors in B are more severe.",
+        "baseline_problems": [
+          "conditions",
+          "invented",
+          "misbound"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "trivial"
+        ],
+        "remarks": "Set B's claim that the 8'-8 5/8\" height is from Grade to First Floor is a critical engineering error given the 2'-4\" floor height. Both sets struggle with the 9'-0\" dimension conditions (often attributing it to Grade level instead of First Floor), but Set A has correct claims for it as well."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 1,
+        "note": "Set B is more accurate on grid spacing, correctly identifying axes (e.g., 5 to 6) whereas Set A hallucinates grid lines from detail callouts (e.g., 'Grid 5 to C4'). Both sets contain contradictory claims regarding the 9'-0\" and 8'-8 5/8\" vertical dimensions (some claims correctly attribute them to Grade-to-T.O. Steel, others incorrectly to First Floor-to-T.O. Steel), but Set B has a higher ratio of correct attributions for the 8'-8 5/8\" dimension. Set A includes a useful total width claim (32'-0\") missing from B, but its factual errors on entity binding outweigh this.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misbound"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound"
+        ],
+        "remarks": "Both sets struggle with the contradictory dimensioning on the drawing (elevations sum differently than dimension lines), leading to internal contradictions in both claim sets. Set A's treatment of 'C4' (a detail marker) as a grid line is a clear entity extraction error."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p6-visual-b3of4": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 1,
+        "note": "Set A correctly binds the angle size to the connection label B-L1a-GF, whereas Set B incorrectly binds it to 'detail 8' (which is a reference bubble, not the detail ID D1). Set B also contains redundant claims for bolt diameter and uses vague attributes like 'dimension' instead of 'thickness'.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "vague"
+        ],
+        "remarks": ""
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 1,
+        "variant_wrong": 1,
+        "note": "Set B is preferred because it attaches more specific conditions (e.g., 'Detail C1', 'B-L1a-GF') to claims, better binding values to their specific context on the crowded page. Set A is more generic and includes a vague 'dimension' attribute where Set B uses 'thickness'. Both sets share a misbound claim regarding the continuous support plate thickness (claiming 1/4\" when the text specifies 3/8\" for the continuous plates), but Set B's improved specificity elsewhere outweighs this shared error and its single duplicate scale claim.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound"
+        ],
+        "variant_problems": [
+          "misbound",
+          "vague"
+        ],
+        "remarks": "Both sets incorrectly bind the 1/4\" callout to the 'continuous support plates' (which are 11\"x3/8\"), likely confusing it with a nearby plate. Set B's duplicate scale claim for Detail C1 is minor compared to its improved contextual binding."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-visual-b1of4": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 8,
+        "variant_wrong": 6,
+        "note": "Both sets share significant errors: misbinding the 3'-7\" dimension to Grid 5 (it belongs to Grid 2/A4), misidentifying the 6\" vertical dimension as width (it is height), misidentifying the 5'-0\" offset as beam length, and inventing a 2\" top edge distance for the E6 roof beam. However, Set B contains a specific hallucination claiming B1 (Floor Beam Near Grid 5) has 3\" diameter openings, whereas the drawing shows B1 has rectangular openings (W10X15) and only C1/E6 (W8X13) have 3\" circular openings. Set A avoids this error.",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "misread"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "misread",
+          "vague"
+        ],
+        "remarks": "Both sets struggle with distinguishing beam length from offset dimensions and opening height from width. Set B's confusion of beam types (attributing C1/E6 circular openings to B1) is a notable fidelity failure."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 2,
+        "note": "Set B is better because it avoids a significant misbound error found in Set A regarding Beam B1. Set A claims Beam B1 has a 3-inch diameter opening, but the drawing shows Beam B1 has rectangular openings (2\"-6\"-2\"), while the 3-inch diameter applies to Beams E6, A4, and C1. Both sets incorrectly claim a 2-inch top edge distance for Beam E6, which is not dimensioned on that specific detail. Both sets also suffer from duplicates and vague terminology (using 'width' for vertical height).",
+        "baseline_problems": [
+          "duplicates",
+          "invented",
+          "misbound",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "vague"
+        ],
+        "remarks": "Both sets hallucinate the 2\" vertical offset for Beam E6 (Detail E6 only shows a 3\" diameter hole without vertical offsets). Set A additionally misattributes the 3\" diameter to Beam B1. Both sets inconsistently label the 6\" vertical opening dimension as 'width' in some claims and 'height' in others, and both include duplicate claims for beam length (5'-0\" and 5 ft)."
+      }
+    },
+    "u-iea-15mw-p20-31-f7071680-p3-visual-b1of2": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 4,
+        "note": "Set B correctly identifies the vertical (x3) coordinates for all centers as 0.0 m, matching their alignment on the horizontal axis in the plot, whereas Set A incorrectly claims 0.05 m for NA, SC, and GC. Set A also misreads the SC x2 coordinate as positive (0.1 m) when the marker is clearly in the negative x2 region of the axis. Both sets fail to extract the 'Carbon UD' material visible in the stackup legend.",
+        "baseline_problems": [
+          "missing"
+        ],
+        "variant_problems": [
+          "invented",
+          "misread",
+          "missing"
+        ],
+        "remarks": "Both sets missed the 'Carbon UD' material listed in the right-hand bar. Set A's coordinate values appear to be hallucinated as they are not explicitly labeled and contradict the visual evidence (markers on the 0.0 line and in the negative x2 quadrant)."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 3,
+        "note": "Set B is better because it extracts both x2 and x3 coordinates for the structural points, which are necessary to define locations on the 2D cross-section plot, whereas Set A only extracts x3 coordinates. Set A incorrectly claims the x3 coordinate is 0.0 m for the Mass and Geometric Centers, which are visibly offset above the axis in the image, while Set B correctly identifies a non-zero offset for the Geometric Center. Both sets miss the 'Carbon UD' material clearly listed in the legend bar.",
+        "baseline_problems": [
+          "misread",
+          "missing"
+        ],
+        "variant_problems": [
+          "misread",
+          "missing"
+        ],
+        "remarks": "Both sets fail to extract the 'Carbon UD' material from the legend. Set A's omission of all x2 coordinates is a significant missing fact for a 2D plot."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-visual-b3of4": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 6,
+        "note": "Set B is slightly better because it correctly interprets the 10'-0\" dimension on Detail A1 as a 'total dimension', whereas Set A incorrectly labels it as 'distance from opening to edge'. Both sets share significant errors regarding Detail A1, such as swapping opening width and height (claiming 6\" width instead of 10\") and misidentifying the 4'-2\" offset as an opening length. Both also confuse the spacing dimension (1'-1\" belongs to A1, but both attribute it to 'Near Grid 5' in some claims). Set B provides more precise boundary descriptions for Detail B1 (e.g., distance to right edge).",
+        "baseline_problems": [
+          "conditions",
+          "misbound",
+          "misread",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "misbound",
+          "misread"
+        ],
+        "remarks": "Both sets struggle to distinguish between Detail A1 (Floor Beam @ Grid 6) and Detail B1 (Floor Beam Near Grid 5), leading to swapped attributes (width/height) and misattributed spacing (1'-1\" vs 1'-3\"). The entity name 'BEAM @ GRID 6 & NEAR GRID 5' corresponds to Detail C1 (Roof Beam, W8X13), but both sets bind W10X15 (from B1) to this name."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 13,
+        "variant_wrong": 14,
+        "note": "Both sets suffer from severe misbinding, frequently attributing dimensions from the 'Floor Beam Near Grid 5' (Detail B1) to the 'Roof Beam @ Grid 6 & Near Grid 5' (Detail C1) entity. However, Set A is slightly better because it uses more accurate attribute labels for the correctly conditioned claims (e.g., 'total dimension' for the 10'-0\" span in Detail A1 vs Set B's 'distance from opening to edge', and 'distance to left boundary' vs Set B's vague 'dimension segment'). Set A also has one fewer wrong claim overall.",
+        "baseline_problems": [
+          "conditions",
+          "misbound",
+          "misread",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "misbound",
+          "misread",
+          "vague"
+        ],
+        "remarks": "Both extractors fail to distinguish the three distinct beam details (A1, B1, C1) based on their titles, leading to systematic misbinding of dimensions (e.g., assigning W10X15 and 4'-2\" offsets to the Roof Beam which is W8X13 with 2'-6\" spacing). The text layer read error 'FLOOR BEAMNEA' appears in both."
+      }
+    },
+    "u-dc-cd-p31-38-870cc2fd-p7-visual-b0of4": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 6,
+        "note": "Set A provides cleaner value extraction, correctly separating numerical values from text labels (e.g., '1/2\" in' vs '1/2 PL TYP'), whereas Set B frequently includes label text in the value field, creating misread claims. However, Set A misses the base plate specification ('PL 4 1/2X4 1/2X1/2') which Set B correctly captures. Set A is preferred due to higher data integrity and fewer incorrect claims, despite the missing component.",
+        "baseline_problems": [
+          "duplicates",
+          "missing",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread"
+        ],
+        "remarks": "Set B's misread values (e.g., '3 DIA', '1/2 PL TYP') significantly reduce usability despite better coverage. Set A's missing base plate is a notable omission but the extracted data is more reliable."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 0,
+        "variant_wrong": 5,
+        "note": "Set B provides cleaner value extraction with proper units and conditions, whereas Set A frequently includes text labels (e.g., 'PL TYP') in the value field. Set A also suffers from excessive duplication of claims. However, Set B misses the base plate dimension (4 1/2x4 1/2x1/2) which Set A captures.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "Set A includes the base plate dimension (4 1/2x4 1/2x1/2) which is an important fact missing from Set B. However, Set A's data quality is significantly lower due to unnormalized values and high redundancy."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p2-visual-b1of4": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 8,
+        "variant_wrong": 3,
+        "note": "Both sets share significant binding errors, attributing dimensions from the West Bathroom (A6) to the North Kitchen or P3 finish (e.g., 8'-6 13/16\" height, 2'-8 9/16\" width, 7'-6\" opening). However, Set B is significantly worse due to multiple duplicate claims (e.g., Robe Hook height, MWK03, total width) and a trivial claim interpreting the graphic scale bar as \"4 ft\". Set A is more concise and avoids these redundancies.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "trivial"
+        ],
+        "variant_problems": [
+          "misbound"
+        ],
+        "remarks": "Both models struggle with separating the four distinct elevation views, likely due to the text layer ordering which mixes content from different views. The shared misbindings suggest a systemic issue with the source text alignment."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 1,
+        "note": "Both sets incorrectly bind the dimension 2'-8 9/16\" (which belongs to the West Bathroom Elevation A6) to the North Kitchen Elevation, while correctly identifying 2'-8 7/16\" for the North Kitchen elsewhere. Set A is significantly worse due to numerous duplicates (e.g., listing the same dimension and H1 claim twice), vague claims ('P3 | presence'), and trivial/incorrect claims (interpreting a graphic scale bar as 'scale | 4 ft'), whereas Set B is more concise, specific, and avoids these noise issues.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "trivial",
+          "vague"
+        ],
+        "variant_problems": [
+          "misbound"
+        ],
+        "remarks": "Both sets share a specific misbinding error regarding the 2'-8 9/16\" dimension, likely due to OCR or layout analysis confusion between the North Kitchen and West Bathroom elevations which have similar top dimensions."
+      }
+    }
+  }
+}

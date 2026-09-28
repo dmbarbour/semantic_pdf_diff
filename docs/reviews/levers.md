@@ -21,6 +21,8 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | References | `references` | Not accepted | r05 0.50 (0.35–0.66), 17 units |
 | Sheet details | `sheet_details` | Parked | r05–r05d: 0.64 → 0.50 → 0.48 → 0.42 |
 | Merged readings | `reconcile` | In the champion (2026-09-27) | r08 0.56 (0.45–0.67) no worse, with 13.5% fewer claims; the owner's design decision |
+| Fragment quotes | `quote_match: fragments` | In the champion (2026-09-28); held-out check r09h | r09b 0.66 (0.53–0.77), text 0.77; missing 44 → 16, misbound 18 → 30 |
+| Excerpt quotes (with an in-order window) | `quote_match: excerpts` | Not accepted | r09 0.51 (0.39–0.63); the window let chart-axis labels through as values |
 | Chart-reading rule | `visual_rules` | Not accepted | r08 0.59 (0.47–0.71); vaguer readings, out-of-range ones remain |
 | Tile locator | `tile_locator` | Parked | r06 0.49 (flawed sampling), r07 0.58 (0.47–0.68): no worse; wins on IEA and LCIT in both rounds |
 
@@ -64,6 +66,18 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 - **Found:** in round 5d's analysis, the model's issue notes kept saying "the image is blank".
 - **Measured without the model:** 43 of 963 champion tiles skipped on the development slices, and none of them had yielded a claim.
 - **Accepted into the champion as a pure cost saving** (2026-09-27). There are no changed answers to judge.
+
+### Quote matching (`quote_match`)
+- **Found in the overall review:** the verbatim quote check dropped a third of all text claims (2,826 of 8,661 in recorded answers). They were mostly elided quotes, line-end hyphenation, Unicode variants, and table cells joined with "|".
+- **`fragments`:**
+  - normalizes Unicode, case, dashes, quote marks and line-end hyphens
+  - accepts quotes whose "…" or "|" parts each appear, contiguous and in order
+  - recovers about 1,070 claims
+  - **Accepted in r09b:** 0.66, text 0.77. Missing fell sharply; misbound rose.
+- **`excerpts`:** also accepts words read in order across a pseudo-table. It recovers about 1,700 claims, but let chart-axis labels through as values (r09: 0.51). Not accepted.
+- **Measurement notes:**
+  - No requests change, so testing costs judging only.
+  - An A/A control in the same round (r09: 0.48 ± 0.12) gives the noise floor.
 
 ### Table filter (`table_filter`)
 - **Mechanism:** drops detected "tables" that are chart gridlines or drawing grids.

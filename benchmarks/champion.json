@@ -7,5 +7,6 @@
   "tiling": "bands",
   "grow_tiles": true,
   "skip_empty": true,
-  "reconcile": true
+  "reconcile": true,
+  "quote_match": "fragments"
 }

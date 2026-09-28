@@ -214,8 +214,9 @@ Round 1 showed that asking the same question again often gets a different answer
 | r06 | Merged readings, tile locator | 0.58 and 0.49: judges saw separately drawn samples (fixed) | $3.38 |
 | r07 | The same, re-judged (rubric v2) | 0.54 (representative embellished; reverted) and 0.58 (locator parked) | $3.38 |
 | r08 | Merged readings (local representative), chart-reading rule (rubric v3) | 0.56 (accepted with its claim reduction) and 0.59 (not accepted) | $3.55 |
+| r09 / r09b | The new method: excerpt quotes, an A/A control; fragment quotes | 0.51 (not accepted), 0.48 (the noise floor, as expected); fragments 0.66 (accepted) | $2.63 |
 
-**Champion (2026-09-27):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images, numbered-item stems, whitespace bands on report pages, tiles grown to whole lines; since 2026-09-27 also empty tiles skipped and readings of one fact merged). Later rounds compare against it.
+**Champion (2026-09-27):** `benchmarks/champion.json` (neighbouring text 400 + 400 characters, table lead-in 400, text layer 1,500 with images, numbered-item stems, whitespace bands on report pages, tiles grown to whole lines; since 2026-09-27 also empty tiles skipped and readings of one fact merged; since 2026-09-28 fragment quotes accepted). Later rounds compare against it.
 
 **Levers built, not yet judged:**
 

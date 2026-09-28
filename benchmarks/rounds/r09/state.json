@@ -1,0 +1,88 @@
+{
+  "steps": {
+    "record:baseline": "done",
+    "record:excerpts": "done",
+    "record:aa": "done",
+    "replay:baseline": "done",
+    "replay:excerpts": "done",
+    "replay:aa": "done",
+    "measure:baseline": "done",
+    "measure:excerpts": "done",
+    "measure:aa": "done",
+    "pairs:excerpts": "done",
+    "pairs:aa": "done",
+    "decide:excerpts": "done",
+    "decide:aa": "done"
+  },
+  "updated": "2026-09-28T09:05:08+00:00",
+  "judged": {
+    "excerpts": 32,
+    "aa": 32
+  },
+  "stopped": {
+    "excerpts": "complete at 32 units",
+    "aa": "complete at 32 units"
+  },
+  "failures": {
+    "judge:excerpts:XiaomiMiMo/MiMo-V2.6-Pro": 9,
+    "judge:excerpts:Qwen/Qwen3.5-397B-A17B": 0,
+    "judge:aa:XiaomiMiMo/MiMo-V2.6-Pro": 13,
+    "judge:aa:Qwen/Qwen3.5-397B-A17B": 0
+  },
+  "failure_notes": {
+    "judge:excerpts:XiaomiMiMo/MiMo-V2.6-Pro": [
+      "u-calg-cd-p62-66-e0051bec-p5-text-b2of4 baseline-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-calg-cd-p62-66-e0051bec-p5-visual-b1of4 baseline-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-dc-cd-p39-42-2523f154-p2-text baseline-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-calg-cd-p62-66-e0051bec-p5-visual-b1of4 variant-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-calg-cd-p62-66-e0051bec-p1-visual-b3of4 variant-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p62-66-e0051bec-p3-text-b0of2 baseline-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p62-66-e0051bec-p5-visual-b2of4 variant-first: TimeoutError: The read operation timed out",
+      "u-ken-cd-p95-98-f7b0008f-p3-text variant-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p39-42-2523f154-p2-text variant-first: TimeoutError: The read operation timed out"
+    ],
+    "judge:excerpts:Qwen/Qwen3.5-397B-A17B": [
+      "u-calg-cd-p62-66-e0051bec-p5-visual-b1of4 baseline-first: ValueError: Truncated model output; reduce crop/text size or increase output budget"
+    ],
+    "judge:aa:XiaomiMiMo/MiMo-V2.6-Pro": [
+      "u-dc-cd-p39-42-2523f154-p2-visual-b1of4 variant-first: ValueError: Truncated model output; reduce crop/text size or increase output budget",
+      "u-ken-cd-p95-98-f7b0008f-p2-visual-b2of4 baseline-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p62-66-e0051bec-p1-visual-b1of4 baseline-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p31-38-870cc2fd-p2-visual-b2of4 baseline-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p62-66-e0051bec-p1-visual-b1of4 variant-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p39-42-2523f154-p2-visual-b1of4 baseline-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p7-visual-b0of2 variant-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p31-38-870cc2fd-p1-visual-b0of4 baseline-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p31-38-870cc2fd-p1-visual-b0of4 variant-first: TimeoutError: The read operation timed out",
+      "u-calg-cd-p62-66-e0051bec-p2-visual-b1of4 variant-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p39-42-2523f154-p2-visual-b3of4 baseline-first: TimeoutError: The read operation timed out",
+      "u-dc-cd-p39-42-2523f154-p2-visual-b3of4 variant-first: TimeoutError: The read operation timed out",
+      "u-iea-15mw-p20-31-f7071680-p3-visual-b1of2 variant-first: TimeoutError: The read operation timed out"
+    ]
+  },
+  "escalated": {
+    "excerpts": [
+      "u-calg-cd-p62-66-e0051bec-p1-visual-b3of4",
+      "u-calg-cd-p62-66-e0051bec-p3-text-b0of2",
+      "u-calg-cd-p62-66-e0051bec-p5-text-b2of4",
+      "u-calg-cd-p62-66-e0051bec-p5-visual-b1of4",
+      "u-calg-cd-p62-66-e0051bec-p5-visual-b2of4",
+      "u-dc-cd-p39-42-2523f154-p1-text-b1of2",
+      "u-dc-cd-p39-42-2523f154-p2-text",
+      "u-ken-cd-p95-98-f7b0008f-p3-text"
+    ],
+    "aa": [
+      "u-calg-cd-p62-66-e0051bec-p1-visual-b1of4",
+      "u-calg-cd-p62-66-e0051bec-p2-visual-b1of4",
+      "u-calg-cd-p62-66-e0051bec-p3-visual-b0of4",
+      "u-dc-cd-p31-38-870cc2fd-p1-visual-b0of4",
+      "u-dc-cd-p31-38-870cc2fd-p2-visual-b2of4",
+      "u-dc-cd-p39-42-2523f154-p2-visual-b1of4",
+      "u-dc-cd-p39-42-2523f154-p2-visual-b3of4",
+      "u-dc-manual-p59-66-a157bdf0-p6-visual",
+      "u-iea-15mw-p20-31-f7071680-p3-visual-b1of2",
+      "u-iea-15mw-p20-31-f7071680-p7-visual-b0of2",
+      "u-ken-cd-p95-98-f7b0008f-p2-visual-b2of4"
+    ]
+  }
+}

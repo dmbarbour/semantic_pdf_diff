@@ -1,0 +1,331 @@
+{
+  "reviewer": "Qwen/Qwen3.5-397B-A17B",
+  "verdicts": {
+    "u-calg-cd-p62-66-e0051bec-p5-text-b2of4": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 7,
+        "note": "Set A is significantly better due to comprehensive coverage of Equipment, Plumbing, Finish, and Millwork schedules, whereas Set B omits most of the page's data (missing Equipment, Plumbing, Floor Finish). Both sets share specific misbinding errors in the Millwork schedule (incorrectly associating tags MWK04 and MWK05 with wrong descriptions/dimensions). Set A introduces additional misbinding errors where Shower Valve and Vinyl Composite Tile attributes are swapped, but its higher recall and lower error rate overall make it superior.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound"
+        ],
+        "remarks": "Both extractors fail to correctly align Millwork tags MWK03, MWK04, and MWK05 with their descriptions (e.g., labeling MWK04 as Base Cabinet Sink instead of Base Cabinet). Set A incorrectly swaps attributes between the Shower Valve and Vinyl Composite Tile (e.g., assigning Tile Style Number to Shower Valve). Set B's extreme incompleteness (12 claims vs 28) is a critical failure for an extraction task."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 3,
+        "variant_wrong": 6,
+        "note": "Set B is significantly more comprehensive, extracting claims from Equipment, Finishes, Plumbing, and Floor schedules which Set A omits entirely. However, Set B contains several misbound claims where attributes for Shower Valve and Vinyl Composite Tile are swapped (model numbers, style names). Both sets share a misread error on MWK05 (identifying it as a Base Cabinet with incorrect dimensions, likely following the garbled text layer over the image) and both include duplicate claims for the same millwork items.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "misread"
+        ],
+        "remarks": "Both sets extracted the MWK05 error (Base Cabinet vs Vanity & Sink) which appears in the provided text layer but contradicts the image; this suggests reliance on the text layer over the visual drawing. Set B's misbindings between Plumbing and Floor Finish schedules indicate a row-alignment issue in the extraction logic for those specific tables."
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p5-visual-b1of4": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 6,
+        "note": "Set B is better because it avoids several specific tag binding errors present in Set A. Set A incorrectly binds 'Vanity & Sink' to tag MWB01 (which is Horizontal Cabinet) and 'Horizontal Cabinet' quantity to tag MWK03 (which is Base Cabinet Sink). Set B extracts these facts correctly without attaching the wrong tags, though it shares errors with Set A regarding Millwork tags MWK02/MWK03 and invents a 'Kitchen' location for Quartz not found in the text.",
+        "baseline_problems": [
+          "invented",
+          "misbound",
+          "misread"
+        ],
+        "variant_problems": [
+          "invented",
+          "misbound",
+          "misread"
+        ],
+        "remarks": "Both sets truncate values ('PORCELA', 'TIERRA S') and invent a 'Kitchen' location for Quartz. Both struggle with Millwork tags MWK02 and MWK03, but Set A has additional tag binding errors for MWB01 and MWK05 in the visible claims."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p2-text": {
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 2,
+        "variant_wrong": 2,
+        "note": "Set B is better because it correctly extracts beam section properties (W10X15) for beams D5, B4, and C4, which Set A omits entirely. Both sets incorrectly attribute a 3-inch diameter opening to Beam D5 (which has rectangular openings), resulting in an equal number of factual errors. Set B provides more useful engineering data despite having a mismatched quote for the D5 section claim.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misread",
+          "quote"
+        ],
+        "remarks": "Both sets fail to distinguish that the 3-inch diameter opening applies only to beams C1 and E6, incorrectly applying it to D5. Set B's first claim has a correct value but the quote text belongs to beam B1."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 2,
+        "note": "Set A attempts to extract beam section properties which Set B omits, but Set A contains misbound labels (e.g., associating B1 with Grid 3) and unsupported quotes. Set B is factually accurate on the hole diameters and radius note it extracts but fails to capture the beam section types entirely. Set B is preferred because it has no wrong claims, adhering to the preference for fewer wrong claims over more claims.",
+        "baseline_problems": [
+          "duplicates",
+          "missing"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "quote"
+        ],
+        "remarks": "Both sets suffer from excessive duplication of the hole diameter claims. Set A's inclusion of beam sections is valuable but the execution introduces engineering errors (wrong beam tags) that reduce trust."
+      }
+    },
+    "u-ken-cd-p95-98-f7b0008f-p3-text": {
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 2,
+        "note": "Set A is more faithful, avoiding the hallucination in Set B where Lot Number 113 is incorrectly treated as a Wiring Schedule item (claim 5) with a modified quote. Set B provides better coverage of the Wiring Schedule details (conduit and ground sizes) which Set A omits, but accuracy is prioritized. Both sets incorrectly identify '3W' as 'phase' rather than '3-wire'.",
+        "baseline_problems": [
+          "misread",
+          "missing"
+        ],
+        "variant_problems": [
+          "invented",
+          "misread"
+        ],
+        "remarks": "Set B's claim 5 invents a quote ('113 AL:...' instead of '151 AL:...') by confusing the Lot Number with a schedule item. Both sets misinterpret '3W' (3-Wire) as 'phase'."
+      },
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 4,
+        "note": "Set B is better because it avoids several significant errors found in Set A, including misidentifying the Lot Number (113) as a wiring item, misreading the conductor size for item 34 (claiming 6#10 instead of 2#10), and attributing a conduit size to item 150 which is listed as armored cable. Both sets share a minor interpretation error regarding '3W' being labeled as phase.",
+        "baseline_problems": [
+          "misread"
+        ],
+        "variant_problems": [
+          "invented",
+          "misbound",
+          "misread"
+        ],
+        "remarks": ""
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p3-text-b0of2": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 4,
+        "note": "Set B is better because it captures critical engineering constraints (clearance of 12\" above and 1\" side) and specific material thicknesses (3/4\" gable) that Set A completely omits. Both sets share significant errors: they misidentify the section context (using 'D3 East Island' or 'Center Module' instead of the visible 'A6 Laundry Millwork Section') and both misread a 6\" dimension as 8\". Set B includes duplicates, but its completeness on safety clearances and material specs makes it more useful.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "misread"
+        ],
+        "variant_problems": [
+          "conditions",
+          "misread",
+          "missing"
+        ],
+        "remarks": "Both sets hallucinate the section name ('D3 East Island' / 'Center Module') despite the image clearly labeling it 'A6 LAUNDRY MILLWORK SECTION'. Both sets also extract an 8\" dimension that appears to be a misread of the 6\" dimension visible in the sink section and text layer."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 4,
+        "variant_wrong": 4,
+        "note": "Set A is better because it captures critical engineering specifications for the gable (material, thickness, finish) and clearance requirements (12\" above, 1\" side) which are clearly labeled in the drawing but completely omitted by Set B. Both sets share identical significant errors, including hallucinated condition names ('D3 East Island', 'Center Module') that contradict the visible 'A6 LAUNDRY MILLWORK' title, and both invent a non-existent '8\"' dimension. Set A's redundancy and fragmentation are less severe than Set B's failure to extract major visible components.",
+        "baseline_problems": [
+          "conditions",
+          "duplicates",
+          "invented",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "invented",
+          "missing"
+        ],
+        "remarks": "Both sets hallucinate the same condition names and the same erroneous 8\" dimension, suggesting a common source error. Set B's omission of the Gable and Clearance data is a significant failure in engineering evidence extraction."
+      }
+    },
+    "u-nrel-5mw-p25-36-5eaf02be-p12-text": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 5,
+        "note": "Set B is significantly better because it accurately extracts the precise numerical values explicitly stated in the text. Set A attempts to extract data points from Figure 7-4 but introduces multiple factual errors, such as claiming gains and correction factors are 0.000 at 0 degrees when the text and graph show they are ~0.0188, ~0.008, and 1.0 respectively. Both sets include duplicate claims regarding the damping ratio conditions.",
+        "baseline_problems": [
+          "duplicates"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misread"
+        ],
+        "remarks": "Set A's extraction from the chart is unreliable, misreading the y-axis values for multiple curves at specific x-axis points."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 0,
+        "variant_wrong": 5,
+        "note": "Set A extracts precise numerical values directly from the text with high accuracy and no errors. Set B attempts to extract data from the figure but makes multiple significant misreads (e.g., reading 0.0 for non-zero values, contradicting the text values it also extracted) and includes contradictory claims for the same parameters.",
+        "baseline_problems": [],
+        "variant_problems": [
+          "duplicates",
+          "invented",
+          "misread"
+        ],
+        "remarks": "Set B's extraction from Figure 7-4 is unreliable; it misinterprets axis scales (claiming 0.0 for values clearly >0) and contradicts the explicit text values provided in the same document section."
+      }
+    },
+    "u-dc-cd-p39-42-2523f154-p1-text-b1of2": {
+      "variant-first": {
+        "score": 1.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A provides a concise and accurate extraction of the main component specifications directly supported by the labels. Set B fragments these specifications into multiple redundant claims (e.g., separate claims for bolt diameter, length, and overall size) and incorrectly extracts a scale bar increment ('1/2\"') as a specific dimension of the deck module connection.",
+        "baseline_problems": [
+          "duplicates",
+          "misread"
+        ],
+        "variant_problems": [],
+        "remarks": "Set B's granularity leads to significant redundancy, claiming the same dimension string as 'dimensions', 'thickness', 'width', etc., simultaneously. Claim 15 in Set B misinterprets the graphical scale bar under detail B1 as a component dimension."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 1,
+        "variant_wrong": 0,
+        "note": "Set A is significantly more useful for engineering review as it captures the fastener type ('common wood nails or screws') and decomposes combined dimensions into specific attributes (bolt diameter/length, deck thickness/width), whereas Set B omits the fasteners and lacks dimension detail. Set A contains one misbound claim where a scale bar marking is interpreted as a component dimension, and exhibits redundancy by stating both composite dimensions and their individual components. Set B is accurate but too sparse, missing important specification data.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound"
+        ],
+        "variant_problems": [
+          "missing"
+        ],
+        "remarks": ""
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p1-visual-b3of4": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 6,
+        "note": "Both sets share significant misbinding errors, incorrectly attributing South Bedroom dimensions (offsets, segments) to the North Living Elevation and mislabeling the overall elevation height as 'P3 height'. However, Set B is preferred because it captures both door frame finish notes ('FIN. W/ P2' and 'FIN. W/ P4'), whereas Set A omits the P4 finish instruction visible on the North Living Elevation.",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "missing",
+          "vague"
+        ],
+        "remarks": "Both extractors consistently confuse dimensions between the two stacked elevations, likely due to proximity in the text layer. Set B demonstrates better completeness by extracting the second finish condition."
+      },
+      "baseline-first": {
+        "score": 0.0,
+        "better": "A",
+        "confidence": "high",
+        "baseline_wrong": 6,
+        "variant_wrong": 6,
+        "note": "Both sets suffer from significant misbinding errors, attributing dimensions from the South Bedroom Elevation (A1) to the North Living Elevation (C1), such as the height segments (1'-5 3/4\", 2 5/8\") and swapping the left/right offsets. Both also incorrectly bind the overall wall height to component P3 and invent an incorrect condition for the 4'-3\" dimension. Set A is preferred because it includes the finish claim for the North Living Elevation door frame (P4), which Set B omits in the visible claims.",
+        "baseline_problems": [
+          "conditions",
+          "invented",
+          "misbound"
+        ],
+        "variant_problems": [
+          "conditions",
+          "invented",
+          "misbound",
+          "missing"
+        ],
+        "remarks": ""
+      }
+    },
+    "u-calg-cd-p62-66-e0051bec-p5-visual-b2of4": {
+      "variant-first": {
+        "score": 0.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 4,
+        "variant_wrong": 5,
+        "note": "Set B is preferred because it correctly binds faucet attributes to their specific tags (F1, F2), whereas Set A leaves these claims ambiguous without tag conditions. Both sets share errors in reading the WC model number and the MWK01 quantity, and both have inconsistent location claims for plumbing fixtures (Bathroom vs Bathroom Shower). Set B has one vague entity name ('Shower' vs 'Shower Valve'), but this is less critical than the structural ambiguity in Set A's faucet claims.",
+        "baseline_problems": [
+          "duplicates",
+          "misread",
+          "vague"
+        ],
+        "variant_problems": [
+          "conditions",
+          "duplicates",
+          "misread",
+          "missing"
+        ],
+        "remarks": "Both sets incorrectly extract the MWK01 quantity as 2 (image shows 1) and misread the WC model number (C454CUFG#01). Both sets contain contradictory location claims for SV and SH (Bathroom vs Bathroom Shower). Set A fails to distinguish between the two faucet tags (F1, F2) in key claims."
+      },
+      "baseline-first": {
+        "score": 1.0,
+        "better": "B",
+        "confidence": "medium",
+        "baseline_wrong": 5,
+        "variant_wrong": 4,
+        "note": "Set B is slightly better because it uses more precise entity names ('SHOWER VALVE' vs 'Shower') and makes fewer explicit misbindings of faucet models to tags (Set A binds both models to the wrong tags, while Set B leaves one unbound). Both sets suffer from OCR-induced errors regarding faucet locations/models and furniture dimensions (F10) when compared to the clear image content, and both include duplicate/vague location claims (e.g., 'BATHROOM' vs 'BATHROOM SHOWER').",
+        "baseline_problems": [
+          "duplicates",
+          "misbound",
+          "misread",
+          "vague"
+        ],
+        "variant_problems": [
+          "duplicates",
+          "misbound",
+          "misread"
+        ],
+        "remarks": "Both sets rely heavily on the provided text layer which contains significant errors (swapped faucet locations/models, extra F10 dimension) contradicting the clear image. Claims following the text layer against the image are counted as wrong. Set B's use of 'SHOWER VALVE' is more faithful to the schedule description than Set A's 'Shower'."
+      }
+    }
+  }
+}

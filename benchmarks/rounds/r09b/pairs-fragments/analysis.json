@@ -1,0 +1,4544 @@
+{
+  "batch": "pairs-fragments",
+  "summary": {
+    "units": 32,
+    "by_document": {
+      "calg-cd-p62-66": {
+        "units": 6,
+        "mean": 0.417
+      },
+      "dc-cd-p31-38": {
+        "units": 1,
+        "mean": 1.0
+      },
+      "dc-cd-p39-42": {
+        "units": 2,
+        "mean": 0.25
+      },
+      "dc-manual-p59-66": {
+        "units": 2,
+        "mean": 1.0
+      },
+      "iea-15mw-p20-31": {
+        "units": 6,
+        "mean": 0.75
+      },
+      "ken-cd-p95-98": {
+        "units": 1,
+        "mean": 1.0
+      },
+      "lcit-report-p12-19": {
+        "units": 2,
+        "mean": 0.5
+      },
+      "nrel-5mw-p25-36": {
+        "units": 9,
+        "mean": 0.667
+      },
+      "rules-2013-p35-38": {
+        "units": 3,
+        "mean": 0.833
+      }
+    },
+    "by_family": {
+      "table": {
+        "units": 1,
+        "mean": 0.0
+      },
+      "text": {
+        "units": 22,
+        "mean": 0.773
+      },
+      "visual": {
+        "units": 9,
+        "mean": 0.444
+      }
+    },
+    "problems": {
+      "baseline": {
+        "missing": 44,
+        "conditions": 8,
+        "invented": 6,
+        "duplicates": 41,
+        "misbound": 18,
+        "misread": 10,
+        "trivial": 9,
+        "quote": 10,
+        "vague": 15
+      },
+      "variant": {
+        "conditions": 7,
+        "missing": 16,
+        "vague": 16,
+        "invented": 7,
+        "duplicates": 43,
+        "misbound": 30,
+        "quote": 15,
+        "misread": 17,
+        "trivial": 8
+      }
+    },
+    "split": [
+      "u-dc-cd-p39-42-2523f154-p2-text",
+      "u-calg-cd-p62-66-e0051bec-p5-visual-b1of4"
+    ],
+    "remarks": 66
+  },
+  "units": [
+    {
+      "id": "u-calg-cd-p62-66-e0051bec-p5-table-b0of3",
+      "run": "calg-cd-p62-66",
+      "page": 5,
+      "family": "table",
+      "image": "images/calg-cd-p62-66-e0051bec-p5-b0of3.jpg",
+      "score": 0.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 23,
+        "variant": 23,
+        "shared": 21
+      },
+      "only_baseline": [
+        {
+          "entity": "WB (Wall Base)",
+          "attribute": "profile",
+          "value": "4\" H x 1/2\" THK",
+          "unit": "",
+          "conditions": "material: MDF",
+          "quote": "PROFILE: 4\" H x 1/2\" THK MDF",
+          "_box": [
+            206.59498596191406,
+            804.780029296875,
+            678.0599975585938,
+            1409.3399658203125
+          ]
+        },
+        {
+          "entity": "P3 (Accent Paint)",
+          "attribute": "colour name",
+          "value": "Steel Wool",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: ACCENT PAINT\nP3\n...COLOUR NAME: STEEL WOOL",
+          "_box": [
+            206.59498596191406,
+            804.780029296875,
+            678.0599975585938,
+            1409.3399658203125
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "WALL BASE",
+          "attribute": "profile",
+          "value": "4\" H x 1/2\" THK",
+          "unit": "",
+          "conditions": "",
+          "quote": "PROFILE: 4\" H x 1/2\" THK MDF",
+          "_box": [
+            206.59498596191406,
+            804.780029296875,
+            678.0599975585938,
+            1409.3399658203125
+          ]
+        },
+        {
+          "entity": "ACCENT PAINT",
+          "attribute": "colour name",
+          "value": "STEEL WOOL",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: ACCENT PAINT\nP3\n...COLOUR NAME: STEEL WOOL",
+          "_box": [
+            206.59498596191406,
+            804.780029296875,
+            678.0599975585938,
+            1409.3399658203125
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "missing": 1,
+          "conditions": 1,
+          "invented": 1
+        },
+        "variant": {
+          "conditions": 2,
+          "missing": 1,
+          "vague": 2,
+          "invented": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets cover essentially the same 23 claims and read the values correctly, including the MWK02 oven base cabinet dimensions and the millwork quantities. Set A is slightly more faithful: it keeps the MDF material in the wall base profile claim (as a condition) and binds the accent paint colour to the tag P3, whereas Set B truncates the profile to '4\" H x 1/2\" THK' and uses the generic entity 'ACCENT PAINT'. Neither set invents values, and both omit the same large block of schedule facts (style/colour numbers, locations, several millwork rows)."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Both sets are largely identical and accurate on the finish and millwork schedules, but B binds the accent paint colour to the tagged entity P3 (Accent Paint) where A leaves it as the generic 'ACCENT PAINT', and B keeps the MDF material condition on the WB wall base profile while A drops it. Both sets add an unsupported 'KITCHEN' location condition to the quartz thickness and style claims, and both loosely render GL's 'SHOWER SURROUND' location as 'BATHROOM SHOWER'. B's two claims are better bound and better conditioned, so B wins."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Text layer is column-scrambled (millwork rows and quantities interleaved); the image resolves MWK01/MWK02 row assignment, and both sets match the image. Both sets omit many schedule facts: PT1/PT2 style numbers (FGEEOB412 / FGEEOB1224), GT manufacturer (Fireclay Tile), WB finish and location, GL location (shower surround), P3 colour number 33-14 and finishes, and millwork rows MWK01, MWK03, MWK04, MWB01, MWL01, MWD02. Note P3 is used as the tag for both ACCENT PAINT and ACCENT TRIM PAINT on the page, so tag-only references to P3 are ambiguous."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "The page gives no location for QZ (quartz); 'location: KITCHEN' in both sets is invented (2 claims each). GL's stated location is 'SHOWER SURROUND', so 'BATHROOM SHOWER' in both sets adds an unstated room. A also omits the MDF material from the wall base profile value/conditions even though its own quote contains it. Note the text layer scrambles the millwork table row order (quantities detached from tags); both sets read the image table correctly."
+        }
+      ]
+    },
+    {
+      "id": "u-dc-cd-p39-42-2523f154-p2-text",
+      "run": "dc-cd-p39-42",
+      "page": 2,
+      "family": "text",
+      "image": "images/dc-cd-p39-42-2523f154-p2.jpg",
+      "score": 0.5,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "variant-first": 0.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "Qwen/Qwen3.5-397B-A17B"
+      ],
+      "counts": {
+        "baseline": 5,
+        "variant": 8,
+        "shared": 5
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "FLOOR BEAM @ GRID 5",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "D5",
+          "quote": "B1 FLOOR BEAMNEAR GRID 5 ... W10X15",
+          "_box": [
+            808.2057495117188,
+            79.5050277709961,
+            1448.3204345703125,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 3",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "B1",
+          "quote": "B4 FLOOR BEAM @ GRID 3 ... W10X15",
+          "_box": [
+            808.2057495117188,
+            79.5050277709961,
+            1448.3204345703125,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "FLOOR BEAM @ GRID 4",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "C4",
+          "quote": "C4 FLOOR BEAM @ GRID 4 ... W10X15",
+          "_box": [
+            808.2057495117188,
+            79.5050277709961,
+            1448.3204345703125,
+            2353.3798828125
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "missing": 1,
+          "misbound": 1
+        },
+        "variant": {
+          "duplicates": 2,
+          "misbound": 2,
+          "quote": 2
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set A contains misbound claims where beam labels (B1) are incorrectly associated with different grid locations (Grid 5, Grid 3) or quotes that describe other beams, making those claims factually wrong. Set B is factually accurate regarding the openings and radius but misses section properties and contains duplicate claims for the same openings. Set B is preferred for having no incorrect claims, adhering to the preference for fewer wrong claims over more claims."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets incorrectly attribute a 3-inch diameter opening to beam D5 (which has rectangular openings), likely confusing it with beams C1 or E6. Set B is preferred because it correctly extracts beam section properties (W10X15) for multiple beams (D5, B4, C4) which Set A omits entirely. Set A is also highly redundant, stating the same E6 and D5 opening facts twice, whereas Set B provides more unique and useful engineering data despite sharing the D5 error."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "remark": "Both sets extract the same opening facts multiple times (e.g., D5 hole extracted twice in both sets). Set A's attempt to capture section properties introduces binding errors between grid locations and beam marks."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "remark": "Both models hallucinated the 3-inch diameter on beam D5. Set B's claim 1 has a quote mismatch (quotes B1 text for a D5 claim), but the extracted value is correct."
+        }
+      ]
+    },
+    {
+      "id": "u-calg-cd-p62-66-e0051bec-p5-visual-b1of4",
+      "run": "calg-cd-p62-66",
+      "page": 5,
+      "family": "visual",
+      "image": "images/calg-cd-p62-66-e0051bec-p5-b1of4.jpg",
+      "score": 0.5,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "Qwen/Qwen3.5-397B-A17B"
+      ],
+      "counts": {
+        "baseline": 63,
+        "variant": 64,
+        "shared": 59
+      },
+      "only_baseline": [
+        {
+          "entity": "BASE CABINET (SINK)",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "",
+          "quote": "BASE CABINET (SINK) | 2'-11 7/8\" x 2'-0 7/8\" x 2'-6 3/8\" | 1",
+          "_box": [
+            873.0,
+            1014.0,
+            1293.0,
+            1523.6412353515625
+          ]
+        },
+        {
+          "entity": "HORIZONTAL CABINET",
+          "attribute": "quantity",
+          "value": "6",
+          "unit": "",
+          "conditions": "",
+          "quote": "HORIZONTAL CABINET ... 6",
+          "_box": [
+            1164.0,
+            1014.0,
+            1584.0,
+            1522.919921875
+          ]
+        },
+        {
+          "entity": "P3 (Accent Paint)",
+          "attribute": "colour name",
+          "value": "Steel Wool",
+          "unit": "",
+          "conditions": "",
+          "quote": "P3 COLOUR NAME: STEEL WOOL",
+          "_box": [
+            571.4561157226562,
+            985.53369140625,
+            1002.0,
+            1437.60009765625
+          ]
+        },
+        {
+          "entity": "VANITY & SINK",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "",
+          "quote": "VANITY & SINK | 2'-0 3/4\" x 1'-7 1/4\" x 2'-1 1/4\" | 1",
+          "_box": [
+            873.0,
+            1014.0,
+            1293.0,
+            1523.6412353515625
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "BASE CABINET",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "dimensions 1'-11 7/8\" x 2'-0 7/8\" x 2'-6 3/8\"",
+          "quote": "BASE CABINET | 1'-11 7/8\" x 2'-0 7/8\" x 2'-6 3/8\" | 1",
+          "_box": [
+            873.0,
+            1014.0,
+            1293.0,
+            1523.6412353515625
+          ]
+        },
+        {
+          "entity": "P3",
+          "attribute": "colour name",
+          "value": "STEEL WOOL",
+          "unit": "",
+          "conditions": "",
+          "quote": "P3 COLOUR NAME: STEEL WOOL",
+          "_box": [
+            571.4561157226562,
+            985.53369140625,
+            1002.0,
+            1437.60009765625
+          ]
+        },
+        {
+          "entity": "BASE CABINET",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "Tag MWK05",
+          "quote": "BASE CABINET (SINK) | 2'-11 7/8\" x 2'-0 7/8\" x 2'-6 3/8\" | 1",
+          "_box": [
+            873.0,
+            1014.0,
+            1293.0,
+            1523.6412353515625
+          ]
+        },
+        {
+          "entity": "VANITY & SINK",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "Tag MWB01",
+          "quote": "VANITY & SINK | 2'-0 3/4\" x 1'-7 1/4\" x 2'-1 1/4\" | 1",
+          "_box": [
+            873.0,
+            1014.0,
+            1293.0,
+            1523.6412353515625
+          ]
+        },
+        {
+          "entity": "HORIZONTAL CABINET",
+          "attribute": "quantity",
+          "value": "6",
+          "unit": "",
+          "conditions": "Tag MWK03",
+          "quote": "HORIZONTAL CABINET ... 6",
+          "_box": [
+            1164.0,
+            1014.0,
+            1584.0,
+            1522.919921875
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 1,
+          "misread": 2,
+          "invented": 1,
+          "misbound": 1
+        },
+        "variant": {
+          "duplicates": 1,
+          "misbound": 2,
+          "misread": 2,
+          "invented": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set B contains a clear misbound claim where Tag MWK05 is associated with MWK04's dimensions and description ('BASE CABINET (SINK)'), whereas Set A correctly associates the data with the description. Both sets exhibit identical text truncation errors in descriptions and manufacturer names (e.g., 'GLASS T', 'TIERRA S') and duplicate extractions for Horizontal Cabinet dimensions."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets share significant binding errors in the Millwork Schedule (e.g., misbinding MWK03/MWK04 tags and descriptions, misbinding MWB01 to Vanity). Both also share truncation errors (PORCELA, GLASS T) and an invented condition for Quartz (Location: Kitchen). However, Set A correctly extracts the MWK04 Base Cabinet quantity claim with matching dimensions, whereas Set B mislabels this item as 'Base Cabinet (Sink)'. Set A's explicit tagging in conditions makes errors more traceable, and it captures one correct fact that Set B gets wrong."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "remark": "Both sets struggle with the Millwork Schedule tags, likely due to the dense layout. Set A is preferred for capturing the MWK04 Base Cabinet fact correctly in one claim, despite also having a conflicting misbound claim for MWK05."
+        }
+      ]
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p8-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 8,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p8.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 14,
+        "variant": 15,
+        "shared": 14
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "IGen",
+          "attribute": "definition",
+          "value": "generator inertia relative to the high-speed shaft",
+          "unit": "",
+          "conditions": "",
+          "quote": "IGen is the generator inertia relative to the high-speed shaft",
+          "_box": [
+            71.99993896484375,
+            70.76397705078125,
+            543.0236206054688,
+            359.3778381347656
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "missing": 2,
+          "trivial": 2
+        },
+        "variant": {
+          "duplicates": 2,
+          "trivial": 2
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets are faithful and quote-supported, with identical claims except that Set A additionally includes the IGen definition (generator inertia relative to the high-speed shaft), which Set B omits. That is a real symbol definition on the page, so Set A covers the nomenclature paragraph more completely. Neither set has misbound or invented claims; both share the same minor duplication between the θ definition and the 'blade-pitch angle | symbol | θ' claim."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets faithfully capture the symbol definitions and the Region 3 generator-torque relationship with correct quotes and conditions. Set B additionally includes the IGen definition (generator inertia relative to the high-speed shaft), which Set A omits despite A covering the other inertia definitions. All claims shown in A are present and correct in B, so B is a strict superset in coverage. Both sets repeat the θ definition under two names and include a near-trivial symbol claim for P."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets omit the definitions of Ω0 (rated low-speed shaft rotational speed), Ω (low-speed shaft rotational speed), and t (simulation time) from the same nomenclature passage. The 'mechanical power | symbol | P' and 'blade-pitch angle | symbol | θ' claims are near-duplicates of the corresponding definition claims and add little engineering value. The text layer garbles some math (e.g., Eq. 7-7/7-9 argument ordering), but the image is legible and the definitions are unambiguous."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets omit definitions present on the page: Ω0 (rated low-speed shaft rotational speed), Ω (low-speed shaft rotational speed), t (simulation time), and KP/KI/KD (blade-pitch controller gains). The 'mechanical power | symbol | P' and 'blade-pitch angle | symbol | θ' claims are trivial symbol restatements, and the θ definition is duplicated as 'blade-pitch angle | symbol | θ' in both sets."
+        }
+      ]
+    },
+    {
+      "id": "u-rules-2013-p35-38-3c85ed49-p4-visual",
+      "run": "rules-2013-p35-38",
+      "page": 4,
+      "family": "visual",
+      "image": "images/rules-2013-p35-38-3c85ed49-p4.jpg",
+      "score": 0.75,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 0.5,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 18,
+        "variant": 18,
+        "shared": 17
+      },
+      "only_baseline": [
+        {
+          "entity": "Energy Balance Contest",
+          "attribute": "full points threshold",
+          "value": "0",
+          "unit": "kWh",
+          "conditions": "net electrical energy balance",
+          "quote": "Full points: Net electrical energy ≥ 0 kWh",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Energy Balance Contest",
+          "attribute": "full points threshold",
+          "value": "0",
+          "unit": "kWh",
+          "conditions": "net electrical energy balance at conclusion of specified energy balance period",
+          "quote": "Full points: Net electrical energy ≥ 0 kWh",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "misread": 1,
+          "quote": 2,
+          "conditions": 1
+        },
+        "variant": {
+          "duplicates": 2,
+          "misread": 1,
+          "quote": 2
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.5,
+          "note": "Set A and Set B are essentially identical across all 18 claims; the only difference is that A gives a slightly fuller condition ('at conclusion of specified energy balance period') on the full-points threshold claim, which is a negligible distinction. Both correctly capture the 75% brightness minimum, the 15-minute neighbor visit, the 0–100% score range, and the Energy Balance scoring bands (full ≥ 0 kWh, reduced −50 to 0 kWh, no points ≤ −50 kWh). Both share the same flaws: heavy duplication of the brightness and Energy Balance threshold facts under 'Contest 10' and 'Energy Balance Contest', one misquoted line ('scored' instead of 'scaled'), and two claims whose quotes are only axis-label descriptions rather than supporting text."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "The two sets are nearly identical claim-for-claim; the only substantive difference is that Set B keeps the full condition 'at conclusion of specified energy balance period' on the full-points threshold claim, while Set A drops it. Both sets correctly capture the 75% brightness minimum, the 15-minute neighbor visit, the 0–100% score range, and the three Energy Balance scoring bands. Both sets are heavily padded with duplicate restatements of the same three Energy Balance facts and the brightness fact, and both use axis-label pseudo-quotes for the figure-derived point values."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets repeat the same facts up to four times (brightness twice; the three Energy Balance bands under both 'Contest 10' and 'Energy Balance Contest' names, plus separate 'threshold'/'condition'/'range' variants). Claim 13's quote reads 'Reduced points are scored linearly' but the page says 'scaled linearly'. The two 'points at net electrical energy = ...' claims quote only axis-label descriptions; the values (100 points at 0 kWh, 0 points at −50 kWh) are readable from Figure 10 but the quotes do not support them. Both sets also omit the positive/negative balance interpretation (net production vs. net consumption) and the movie-night scoring structure (three criteria, nine scores averaged)."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets repeat the same facts under multiple entity/attribute names (full points threshold vs. full points condition vs. full points requirement; reduced points range vs. condition; no points threshold vs. condition; brightness stated twice; 'linear' stated three times), so roughly half of each set is redundant. One quote is a near-miss paraphrase ('Reduced points are scored linearly' vs. source 'are scaled linearly'), and the two figure-derived point claims (100 points at 0 kWh, 0 points at -50 kWh) are supported only by axis labels rather than a real quote, though the values are consistent with Figure 10. Important facts both sets omit: positive balance = net production / negative = net consumption, the nine movie-night scores being averaged and multiplied by maximum available points, the 10:30 p.m. submission deadline, the five-neighborhood/four-house village layout, and the suspension of the Comfort Zone occupancy rule (Rule 11-1) during movie night."
+        }
+      ]
+    },
+    {
+      "id": "u-calg-cd-p62-66-e0051bec-p5-text-b2of4",
+      "run": "calg-cd-p62-66",
+      "page": 5,
+      "family": "text",
+      "image": "images/calg-cd-p62-66-e0051bec-p5-b2of4.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 11,
+        "variant": 25,
+        "shared": 11
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "WASHING MACHINE",
+          "attribute": "model",
+          "value": "WM77110NBL00",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: WASHING MACHINE ... MODEL: WM77110NBL00",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "VINYL COMPOSITE TILE",
+          "attribute": "manufacturer",
+          "value": "ARMSTRONG",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: VINYL COMPOSITE TILE ... MANUFACTURER: ARMSTRONG",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "WALL BASE",
+          "attribute": "material",
+          "value": "MDF",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: WALL BASE ... PROFILE: 4\" H x 1/2\" THK MDF",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "WASHING MACHINE",
+          "attribute": "manufacturer",
+          "value": "BLOMBERG",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: WASHING MACHINE ... MANUFACTURER: BLOMBERG",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "ACCENT PAINT",
+          "attribute": "finish",
+          "value": "EGGSHELL",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: ACCENT PAINT ... FINISH: EGGSHELL",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "ACCENT PAINT",
+          "attribute": "colour name",
+          "value": "STEEL WOOL",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: ACCENT PAINT ... COLOUR NAME: STEEL WOOL",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "SHOWER VALVE",
+          "attribute": "style name",
+          "value": "STANDARD EXCELON",
+          "unit": "",
+          "conditions": "",
+          "quote": "SV ... STYLE NAME: STANDARD EXCELON",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "VINYL COMPOSITE TILE",
+          "attribute": "texture",
+          "value": "IMPERIAL TEXTURE",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: VINYL COMPOSITE TILE ... IMPERIAL TEXTURE",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "VINYL COMPOSITE TILE",
+          "attribute": "colour name",
+          "value": "COOL WHITE",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: VINYL COMPOSITE TILE ... COLOUR NAME: COOL WHITE",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "SHOWER VALVE",
+          "attribute": "manufacturer",
+          "value": "DELTA",
+          "unit": "",
+          "conditions": "",
+          "quote": "SV ... MANUFACTURER: DELTA",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "VINYL COMPOSITE TILE",
+          "attribute": "dimensions",
+          "value": "12\"W x 12\"L",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: VINYL COMPOSITE TILE ... DIMENSIONS: 12\"W x 12\"L",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "VINYL COMPOSITE TILE",
+          "attribute": "model",
+          "value": "T17059",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: VINYL COMPOSITE TILE ... MODEL: T17059",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "ACCENT PAINT",
+          "attribute": "manufacturer",
+          "value": "PRATT & LAMBERT",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: ACCENT PAINT ... MANUFACTURER: PRATT & LAMBERT",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "SHOWER VALVE",
+          "attribute": "style number",
+          "value": "51899",
+          "unit": "",
+          "conditions": "",
+          "quote": "SV ... STYLE NUMBER: 51899",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 4,
+          "misbound": 1,
+          "missing": 4,
+          "vague": 1
+        },
+        "variant": {
+          "duplicates": 4,
+          "misbound": 4,
+          "missing": 1,
+          "vague": 1,
+          "quote": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is preferred because it extracts claims from all schedules on the page (Equipment, Plumbing, Finish, Floor, Millwork), whereas Set A only covers the Millwork Schedule, missing significant engineering data. Both sets share errors regarding the Millwork tags (identifying Base Cabinet (Sink) as MWK04 instead of MWK03) and contain duplicate claims. Set B introduces additional misbinding errors where Shower Valve and Vinyl Composite Tile attributes are swapped, but its comprehensive coverage outweighs Set A's severe omission of most page content."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is better because it extracts claims from multiple schedules (Equipment, Plumbing, Finishes, Floor Finish, Millwork), providing significantly broader coverage than Set B which is limited to Millwork. Although Set A contains three misbound claims where attributes were swapped between Shower Valve and Vinyl Composite Tile, and both sets suffer from duplicate Millwork entries, Set A's comprehensive data capture outweighs these errors. Both sets miss important facts (Furniture, most Equipment and Plumbing), but Set B's omissions are far more severe."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A covers 25 claims and gets 22 of them right, including equipment, finish and plumbing facts (washing machine model/manufacturer, VCT and accent paint attributes, wall base material, shower valve manufacturer) that Set B omits entirely. Set B's 11 claims are all correct but leave out a large amount of important schedule data. However, A contains three serious cross-row misbindings: it assigns the floor-finish (VT) attributes 'STANDARD EXCELON' and '51899' to SHOWER VALVE and the plumbing (SV) model 'T17059' to VINYL COMPOSITE TILE. Both sets repeat the MWK04, MWK05 and MWB01 dimension facts under two names."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B reproduces every one of Set A's millwork claims and additionally captures correct equipment, plumbing and finish facts (washing machine model/manufacturer, vinyl composite tile manufacturer/colour/dimensions, accent paint manufacturer/colour/finish, wall base material, shower valve manufacturer). However, B misbinds three values across schedule rows: STANDARD EXCELON and 51899 belong to the vinyl composite tile, not the shower valve, and T17059 is the Delta shower valve model, not a VCT model. Set A is clean but narrow, repeating three millwork rows verbatim and leaving out the equipment, plumbing and finish facts that B supplies. On balance B's larger body of correct, well-bound claims outweighs its three cross-row errors."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "remark": "Both sets incorrectly tag BASE CABINET (SINK) as MWK04 (text shows MWK03). Set B confuses attributes between SHOWER VALVE (Plumbing) and VINYL COMPOSITE TILE (Floor Finish)."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "The text layer of the MILLWORK SCHEDULE is row-offset (tags appear after the description/dimension lines), so tag-to-row binding must be checked against the image; both sets bind MWK01–MWK05, MWB01–MWB03, MWD01/MWD02 correctly. The three A errors look like a row-merge failure between the PLUMBING SCHEDULE (SV) and FLOOR FINISH SCHEDULE (VT) blocks. Entity 'MWK01' in both sets is tag-only with no description, and the duplicated MWK04/MWK05/MWB01 claims are stated once with a tag condition and once with 'Millwork Schedule'."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets state each of three millwork rows twice (MWB01 vanity, MWK04 sink base cabinet, MWK05 base cabinet) - a shared redundancy pattern. The text layer scrambles the millwork rows (tags detached from descriptions, MWK01/MWK02 rows merged), so the image was needed to confirm MWK01 = BASE CABINET 2'-5 7/8\" x 2'-0 7/8\" x 2'-6 3/8\" and MWK02 = BASE CABINET (OVEN) 2'-5 7/8\" x 2'-0 3/4\" x 2'-6 3/8\"; A's MWK01 claim matches the image. Borderline in B: 'VINYL COMPOSITE TILE | texture | IMPERIAL TEXTURE' splits the style name 'STANDARD EXCELON IMPERIAL TEXTURE' into an attribute the page does not label; not counted as wrong but the attribute is inferred. Neither set covers MWK02, MWK03 or MWL01 millwork rows or the furniture schedule."
+        }
+      ]
+    },
+    {
+      "id": "u-lcit-report-p12-19-bb5dd36f-p2-visual",
+      "run": "lcit-report-p12-19",
+      "page": 2,
+      "family": "visual",
+      "image": "images/lcit-report-p12-19-bb5dd36f-p2.jpg",
+      "score": 0.5,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.5,
+          "variant-first": 0.5
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 22,
+        "variant": 22,
+        "shared": 17
+      },
+      "only_baseline": [
+        {
+          "entity": "LUVOIR-A",
+          "attribute": "instrument count",
+          "value": "4",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-A: A 15 m on-axis telescope with four science instruments",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        },
+        {
+          "entity": "Lynx mirror assembly",
+          "attribute": "focal length",
+          "value": "10",
+          "unit": "m",
+          "conditions": "baseline mission concept",
+          "quote": "Lynx: A 3 m diameter grazing incidence mirror assembly with a 10 m focal length",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        },
+        {
+          "entity": "Lynx",
+          "attribute": "instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "Lynx: ... and three science instruments",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        },
+        {
+          "entity": "LUVOIR-B",
+          "attribute": "instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-B: A 8 m off-axis telescope with three science instruments",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        },
+        {
+          "entity": "Origins",
+          "attribute": "instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "Origins: A 5.9 m telescope with three science instruments",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "LUVOIR-A",
+          "attribute": "science instrument count",
+          "value": "4",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-A: A 15 m on-axis telescope with four science instruments",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        },
+        {
+          "entity": "LUVOIR-B",
+          "attribute": "science instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-B: A 8 m off-axis telescope with three science instruments",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        },
+        {
+          "entity": "Origins",
+          "attribute": "science instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "Origins: A 5.9 m telescope with three science instruments",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        },
+        {
+          "entity": "Lynx",
+          "attribute": "science instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "Lynx: ... and three science instruments",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        },
+        {
+          "entity": "Lynx",
+          "attribute": "focal length",
+          "value": "10",
+          "unit": "m",
+          "conditions": "baseline mission concept",
+          "quote": "Lynx: A 3 m diameter grazing incidence mirror assembly with a 10 m focal length",
+          "_box": [
+            0.0,
+            0.0,
+            720.0,
+            540.0
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "misbound": 2,
+          "misread": 2,
+          "vague": 2,
+          "quote": 1
+        },
+        "variant": {
+          "duplicates": 2,
+          "misbound": 2,
+          "misread": 2,
+          "vague": 2,
+          "quote": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.5,
+          "note": "Both sets cover the same baseline mission concept facts (HabEx 4 m/4 instruments/52 m starshade, LUVOIR-A 15 m on-axis/4, LUVOIR-B 8 m off-axis/3, Lynx 3 m grazing-incidence mirror assembly with 10 m focal length/3, Origins 5.9 m/3) with essentially identical wording and quotes. The only differences are cosmetic entity naming (e.g. 'Lynx mirror assembly | focal length' vs 'Lynx | focal length', 'instrument count' vs 'science instrument count'), which do not change correctness. Both sets share the same defects: fragment entities ('n-axis telescope', 'axis telescope', 'spacecraft', 'on-axis/off-axis telescope') that lose the mission binding, the 10 m focal length misreported as a mirror-assembly 'dimension' and 'diameter', the instrument count misbound to the mirror assembly, and the starshade and Lynx mirror diameter facts duplicated."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.5,
+          "note": "Both sets contain essentially the same 22 claims: the same correct extractions (HabEx 4 m / 4 instruments / 52 m starshade, LUVOIR-A 15 m on-axis / 4, LUVOIR-B 8 m off-axis / 3, Lynx 3 m mirror assembly / 10 m focal length / 3, Origins 5.9 m / 3) and the same defects. The only wording differences are trivial: A says 'Lynx | focal length | 10 m' where B says 'Lynx mirror assembly | focal length | 10 m' (both acceptable, B marginally more precise), and instrument-count claims are named 'science instrument count' vs 'instrument count'. Both make the same misbindings (10 m called a dimension/diameter of the mirror assembly when it is the focal length; the three instruments attributed to the mirror assembly rather than Lynx) and the same line-break fragment entities ('n-axis telescope', 'axis telescope', 'spacecraft'), plus a duplicated starshade claim."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both extractions fragment sentences into generic entities ('n-axis telescope', 'axis telescope', 'spacecraft') that should be bound to LUVOIR-A, LUVOIR-B and HabEx respectively; the 'grazing incidence mirror assembly | dimension/diameter | 10 m' claims misread the 10 m focal length as a diameter (the diameter is 3 m), and the mirror assembly is wrongly credited with the three science instruments. The starshade 52 m and Lynx 3 m diameter facts appear twice in each set under two names."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets share identical defects, suggesting a common upstream extraction bug: bullet text split across line breaks produced fragment entities ('n-axis telescope', 'axis telescope', 'spacecraft') and the Lynx sentence's '10 m focal length' was re-bound as a dimension/diameter of the mirror assembly. The HabEx starshade 52 m claim is duplicated in both sets. One quote is garbled ('with a 10 m nd three science instruments') and another uses an ellipsis ('Lynx: ... and three science instruments'); both sets do this identically."
+        }
+      ]
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p8-text",
+      "run": "iea-15mw-p20-31",
+      "page": 8,
+      "family": "text",
+      "image": "images/iea-15mw-p20-31-f7071680-p8.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 18,
+        "variant": 23,
+        "shared": 18
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "blade pitch angles",
+          "attribute": "controller type",
+          "value": "proportional integral (PI)",
+          "unit": "",
+          "conditions": "",
+          "quote": "two active proportional integral (PI) controllers are implemented for the ... blade pitch angles",
+          "_box": [
+            72.00006103515625,
+            279.9860534667969,
+            536.8926391601562,
+            409.4231262207031
+          ]
+        },
+        {
+          "entity": "pitch controller",
+          "attribute": "full-load poles natural frequency",
+          "value": "0.03",
+          "unit": "Hz",
+          "conditions": "DTU Basic Controller",
+          "quote": "the assumed natural frequencies and damping for... full-load poles (pitch controller) were... 0.03 Hz",
+          "_box": [
+            72.00039672851562,
+            590.7434692382812,
+            530.6162719726562,
+            764.2500610351562
+          ]
+        },
+        {
+          "entity": "pitch controller",
+          "attribute": "full-load poles damping",
+          "value": "70",
+          "unit": "% critical",
+          "conditions": "DTU Basic Controller",
+          "quote": "the assumed natural frequencies and damping for... full-load poles (pitch controller) were... 0.03 Hz, 70% critical",
+          "_box": [
+            72.00039672851562,
+            590.7434692382812,
+            530.6162719726562,
+            764.2500610351562
+          ]
+        },
+        {
+          "entity": "torque controller",
+          "attribute": "partial-load poles damping",
+          "value": "70",
+          "unit": "% critical",
+          "conditions": "DTU Basic Controller",
+          "quote": "the assumed natural frequencies and damping for the partial-load poles (torque controller)... were 0.05 Hz, 70% critical",
+          "_box": [
+            72.00039672851562,
+            590.7434692382812,
+            530.6162719726562,
+            764.2500610351562
+          ]
+        },
+        {
+          "entity": "torque controller",
+          "attribute": "partial-load poles natural frequency",
+          "value": "0.05",
+          "unit": "Hz",
+          "conditions": "DTU Basic Controller",
+          "quote": "the assumed natural frequencies and damping for the partial-load poles (torque controller)... were 0.05 Hz",
+          "_box": [
+            72.00039672851562,
+            590.7434692382812,
+            530.6162719726562,
+            764.2500610351562
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "missing": 2
+        },
+        "variant": {
+          "duplicates": 2
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets capture the core rotor speed, pitch, and tip-speed facts correctly and with supporting quotes, and both repeat several facts under both 'rotor' and 'IEA Wind 15-MW reference wind turbine' entities. Set B additionally extracts the DTU Basic Controller pole parameters (0.05 Hz / 70% critical for the partial-load torque controller and 0.03 Hz / 70% critical for the full-load pitch controller) and the PI controller for blade pitch angles, all correctly bound and quoted. Set A omits these controller tuning facts entirely, so B covers the page more completely without introducing errors."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets cover the same core facts with the same quotes and the same duplication pattern (each of the 5 rpm, 7.55 rpm, 95 m/s, pitch-start and pitch-setting facts appears twice under 'rotor' and 'IEA Wind 15-MW reference wind turbine'). Set A additionally extracts five correct claims that Set B omits: the PI controller type for blade pitch angles and the DTU Basic Controller pole frequencies/damping (0.05 Hz and 70% critical for the partial-load/torque poles, 0.03 Hz and 70% critical for the full-load/pitch poles), all bound correctly per the 'respectively' pairing in the text. No claim in either set is misread, misbound or invented, so A's extra correct claims make it better."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets state the same facts twice under 'rotor' and 'IEA Wind 15-MW reference wind turbine' (min speed, rated speed, pitch start, 0-degree pitch, positive pitch, tip speed) — a consistent duplication pattern across both extractions. The condition 'at rated rotational speed' on the 95 m/s tip-speed claim is a mild extrapolation of 'resulting in a maximum nominal tip speed of 95 m/s' but is defensible. Neither set extracts the 3 m/s ≤ U ≤ 6.98 m/s minimum-rotor-speed region range, which both leave out."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets state the same facts twice under two entity names (rotor vs. IEA Wind 15-MW reference wind turbine) for minimum speed, rated speed, tip speed, pitch start and pitch setting — a systematic deduplication issue. Set B's omission of the DTU pole frequency/damping values and the blade-pitch PI controller type is the only substantive gap. The added condition 'at rated rotational speed' on the 95 m/s tip-speed claim is a mild inference (the text links it to 7.55 rpm at 10.59 m/s) but appears in both sets and is not clearly wrong."
+        }
+      ]
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p12-visual",
+      "run": "iea-15mw-p20-31",
+      "page": 12,
+      "family": "visual",
+      "image": "images/iea-15mw-p20-31-f7071680-p12.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 18,
+        "variant": 18,
+        "shared": 16
+      },
+      "only_baseline": [
+        {
+          "entity": "steel",
+          "attribute": "Young’s modulus",
+          "value": "2.00E11",
+          "unit": "Pa",
+          "conditions": "",
+          "quote": "Young's modulus, steel E 2.00E11 Pa",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        },
+        {
+          "entity": "steel",
+          "attribute": "Shear modulus",
+          "value": "7.93E10",
+          "unit": "Pa",
+          "conditions": "",
+          "quote": "Shear modulus, steel G 7.93E10 Pa",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "tower steel",
+          "attribute": "Young's modulus",
+          "value": "2.00E11",
+          "unit": "Pa",
+          "conditions": "Table 4-1",
+          "quote": "Young's modulus, steel E 2.00E11 Pa",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        },
+        {
+          "entity": "tower steel",
+          "attribute": "Shear modulus",
+          "value": "7.93E10",
+          "unit": "Pa",
+          "conditions": "Table 4-1",
+          "quote": "Shear modulus, steel G 7.93E10 Pa",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "misread": 1,
+          "missing": 2,
+          "quote": 2,
+          "vague": 2
+        },
+        "variant": {
+          "duplicates": 2,
+          "misread": 1,
+          "missing": 2,
+          "quote": 2
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "The two sets are nearly identical; the only differences are two material-property claims where B binds the values to 'tower steel' and keeps the 'Table 4-1' condition, while A uses the vaguer entity 'steel' and drops the condition. Both sets share the same defects: a misread 0.18 Hz tower natural frequency alongside a 0.17 Hz claim and a 0.170 Hz claim (the same fact stated three times), and 1P/3P frequency ranges whose quotes are only legend labels. Both also leave out notable facts such as the 7% outfitting mass, the 100 t transition piece, and the stiffer-tower requirement for a floating substructure. B is marginally more faithful, but the gap is small."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets are nearly identical and share the same strengths (Table 4-1 properties, 10-m monopile OD, 150-m hub height, 0.170 Hz first mode, 0.10–0.13 Hz wave range) and the same weaknesses (three claims for the tower's first natural frequency, one of which reads 0.18 Hz against the text's 0.170 Hz, and figure-derived values supported only by legend labels). Set A is marginally better because it binds the steel Young's modulus and shear modulus to 'tower steel' and keeps the Table 4-1 source condition, whereas Set B uses the vaguer entity 'steel' and drops the condition. Neither set captures the 7% outfitting mass, the 100-t transition piece mass, or the note that a floating/semisubmersible substructure requires a stiffer tower."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets report the tower's first natural frequency three times (0.18 Hz, 0.17 Hz, 0.170 Hz); the text states 0.170 Hz and the figure line is at ~0.17 Hz, so 0.18 Hz is a misread and the 0.17/0.170 entries are duplicates. The 1P (0.09-0.13 Hz) and 3P (0.25-0.38 Hz) ranges appear to be estimates read off the shaded bands of Figure 4-1; the quoted legend labels do not support those numeric ranges. Facts on the page that neither set captures: 7% outfitting mass beyond the cylindrical shell mass, 100 t for the transition piece, soil modeled as spring constants in a 1-D FE model (values representative of dense sand or gravel), and the note that a floating substructure requires a stiffer tower."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "The 0.18 Hz, 0.17 Hz and 0.170 Hz claims are all the same fact (text states 0.170 Hz); the 0.18 Hz value is a misread and the 0.17 Hz claim is a duplicate with a fabricated bracketed quote. Figure-derived values (1P 0.09–0.13 Hz, 3P 0.25–0.38 Hz, JONSWAP peak ~0.11 Hz, Kaimal PSD 1.00 at 0 Hz) are plausible readings of Figure 4-1 but their quotes are only legend labels, which do not support the numbers. Note the source table itself lists 'Pa' as the unit for Poisson's ratio of soil (a document error); both sets correctly omit it. Important facts both sets miss: 7% outfitting mass and 100 t transition piece in final mass values, soil modeled via spring constants representative of dense sand/gravel, and the requirement for a stiffer tower with a floating substructure."
+        }
+      ]
+    },
+    {
+      "id": "u-dc-cd-p31-38-870cc2fd-p4-text-b0of2",
+      "run": "dc-cd-p31-38",
+      "page": 4,
+      "family": "text",
+      "image": "images/dc-cd-p31-38-870cc2fd-p4-b0of2.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 20,
+        "variant": 21,
+        "shared": 20
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "nut",
+          "attribute": "diameter",
+          "value": "2 1/4",
+          "unit": "in",
+          "conditions": "heavy hex",
+          "quote": "(1) 2-1/4\" ... HEAVY HEX NUT",
+          "_box": [
+            56.09165573120117,
+            63.60416793823242,
+            1221.88037109375,
+            2353.6201171875
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "misbound": 2,
+          "missing": 2,
+          "vague": 1
+        },
+        "variant": {
+          "duplicates": 2,
+          "misbound": 2,
+          "missing": 2,
+          "vague": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "The two sets are nearly identical; Set B adds one further claim — the (1) 2-1/4\" heavy hex nut at the pin connection — which is supported by the text layer ('(1) 2-1/4\"', 'HEAVY HEX', 'NUT') and is a real engineering item. Both sets share the same flaw: the 'threaded rod | length | up to 12 in' claim misbinds the 12\" maximum elevation difference as a rod length (the rod is explicitly 'OF VARYING LENGTHS'). Both also repeat several facts under two names (neoprene pad thickness, PL3 1/2X3 1/2X1/4 size/thickness, C3X6 as both 'C3X6' and 'Channel', W8X10 as both 'W8X10' and 'beam', HSS4X4X1/4 twice)."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "The two sets are nearly identical; Set A includes one additional claim that Set B omits: the (1) 2-1/4\" heavy hex nut at the pin connection, which the text layer supports. All other claims match exactly, including shared duplicates (neoprene pad, PL3 1/2X3 1/2X1/4, steel rod, C3X6, W8X10, HSS stated twice) and one shared misbinding: the 12\" figure is the maximum elevation difference the rod accommodates, not the rod's length. Both sets also leave out several dimensioned items on the page (3/4\" dia A325 bolt, 11\" and 28\" dia x1/2\" plates, 4x4 teflon plate with 2 5/16\" hole, PL3-1/2X3-1/2X1 with 2 1/4\" dia threaded hole, 3/4\" and 3/8\" plates, keeper plate). Set A is therefore marginally better for one more correct, non-duplicated claim."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Shared misbinding: 'threaded rod | length | up to 12 in' — the 12\" is the maximum elevation difference the varying-length rod accommodates, not a length. Shared duplicates: neoprene pad thickness, PL3 1/2X3 1/2X1/4 (thickness and size), C3X6 (as 'C3X6' and 'Channel'), W8X10 (as 'W8X10' and 'beam'), HSS4X4X1/4 (size and wall thickness). Both sets omit notable items on the page: 3/4\" DIA A325 bolt, 11\" DIA x 1/2\" PL, 28\" DIA X 1/2\" PL, 4X4 TEFLON PLATE W/ 2 5/16\" HOLE, PL8X3/8\", 3/4\" PL and 3/8\" PL, keeper plate note. Set B's added nut claim labels 2-1/4\" as 'diameter' when it is the nominal nut/bolt size, and its quote is reconstructed with an ellipsis joining separate text-layer fragments; acceptable but imprecise."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both extractions repeat the same facts under two names (e.g. 'C3X6 | section' and 'Channel | section'; 'W8X10 | section' and 'beam | section'; 'HSS | size' and 'HSS4X4X1/4 | wall thickness'; neoprene pad thickness in both \" and in). The 'threaded rod | length | up to 12 in' claim in both sets misreads 'UP TO 12\" ELEVATION DIFFERENCE' as a length. Entities like 'plate' and 'beam' are generic where the page gives specific designations. Both sets under-cover the footing/pin-connection details despite those being prominent on the page."
+        }
+      ]
+    },
+    {
+      "id": "u-rules-2013-p35-38-3c85ed49-p1-visual",
+      "run": "rules-2013-p35-38",
+      "page": 1,
+      "family": "visual",
+      "image": "images/rules-2013-p35-38-3c85ed49-p1.jpg",
+      "score": 0.75,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 0.5
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 19,
+        "variant": 19,
+        "shared": 18
+      },
+      "only_baseline": [
+        {
+          "entity": "clothes-drying points",
+          "attribute": "eligibility condition",
+          "value": "complete, uninterrupted cycle in an automatic clothes washer",
+          "unit": "",
+          "conditions": "",
+          "quote": "A load of laundry is eligible for clothes-drying points only if the load experienced a complete, uninterrupted cycle... in an automatic clothes washer.",
+          "_box": [
+            0.0,
+            30.842742919921875,
+            612.0,
+            331.9173583984375
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "clothes-drying points",
+          "attribute": "eligibility condition",
+          "value": "complete, uninterrupted cycle in an automatic clothes washer",
+          "unit": "",
+          "conditions": "load of laundry",
+          "quote": "A load of laundry is eligible for clothes-drying points only if the load experienced a complete, uninterrupted cycle... in an automatic clothes washer.",
+          "_box": [
+            0.0,
+            30.842742919921875,
+            612.0,
+            331.9173583984375
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "conditions": 1,
+          "duplicates": 2,
+          "missing": 1,
+          "trivial": 1
+        },
+        "variant": {
+          "duplicates": 2,
+          "missing": 1,
+          "trivial": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "The two sets are nearly identical in content, values, and quotes; both correctly bind the dishwasher temperatures, capacity, sensor count, and the Clothes Dryer scoring thresholds. Set B's only substantive addition is the 'load of laundry' condition on the clothes-drying eligibility claim, which is supported by the quote and keeps a needed condition that Set A drops. Both sets repeat the same facts under two names (sensor count, temperatures, scoring thresholds) and both omit several page facts such as the temperature-of-record rule and cycle-completion confirmation."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.5,
+          "note": "The two sets are substantively identical: the same 19 claims, values, units and quotes, differing only in ordering and in that Set A adds the condition 'load of laundry' to the clothes-drying eligibility claim, which is merely the subject of that claim rather than a needed condition. Both read the Figure 8 scoring thresholds (≤100, 100–110, ≥110 % of original weight) and the dishwasher temperatures (120°F/48.9°C full, 115°F/46.1°C half) correctly and bind them to the right subcontest/component. Both sets repeat the same facts under two names (sensor count, 120°F, 115°F, and the three scoring bands stated both as 'Clothes Dryer Subcontest' and 'clothes-drying task'), so both carry the same duplication overhead. Neither set is more correct or more complete than the other."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets state each fact twice under different entity/attribute names (e.g., 'Dishwasher | sensor count' and 'dishwasher | temperature sensor count'; 'Clothes Dryer Subcontest' and 'clothes-drying task' scoring thresholds), inflating the claim count without adding information. Facts on the page that neither set captures include the higher-of-two-readings temperature-of-record rule (with the defective-sensor exception), cycle-interruption definition, cycle completion by audible/visible signal, permitted load states (empty/partial/full, soiled/clean), the two-loads-per-day requirement with separate scoring, and the Contest 9 lighting requirement. The 'dishwasher | operation mode | automatic' claim is a fragment of the fuller minimum-cycle-requirements claim."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets miss several facts on the page: the temperature-of-record rule (higher of the two sensor readings, lower only if the higher-reading sensor is defective), the definition of cycle 'interruption' (8-5e), cycle completion confirmed by audible or visible signal (8-5f), the allowed load states (empty/partial/full, soiled or clean, 8-5h), the requirement to dry two loads on several days of contest week with each load scored separately (8-4d), and the requirement that towel-visible drying methods be demonstrated to the architecture and market appeal juries (8-4c). Note also that 'minimum wash and rinse cycles: 1' loosely paraphrases 'at least one wash and rinse cycle' (a single cycle containing both wash and rinse), a mild paraphrase rather than a distinct countable attribute."
+        }
+      ]
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p4-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 4,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p4.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 13,
+        "variant": 16,
+        "shared": 11
+      },
+      "only_baseline": [
+        {
+          "entity": "NREL 5-MW wind turbine",
+          "attribute": "control actions for nonpower-production operations",
+          "value": "not established",
+          "unit": "",
+          "conditions": "includes normal start-up sequences, normal shutdown sequences, and safety and protection functions",
+          "quote": "We did not establish additional control actions for nonpower-production operations, such as control actions for normal start-up sequences, normal shutdown sequences, and safety and protection functions.",
+          "_box": [
+            71.99993896484375,
+            234.57591247558594,
+            543.0120239257812,
+            333.1438293457031
+          ]
+        },
+        {
+          "entity": "NREL 5-MW wind turbine",
+          "attribute": "baseline control system design",
+          "value": "conventional design approach",
+          "unit": "",
+          "conditions": "",
+          "quote": "We based the baseline control system for the NREL 5-MW wind turbine on this conventional design approach.",
+          "_box": [
+            71.99993896484375,
+            234.57591247558594,
+            543.0120239257812,
+            333.1438293457031
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "generator-torque controller",
+          "attribute": "feedback input",
+          "value": "generator speed measurement",
+          "unit": "",
+          "conditions": "baseline control system",
+          "quote": "both the generator-torque and blade-pitch controllers use the generator speed measurement as the sole feedback input",
+          "_box": [
+            72.0,
+            410.4598083496094,
+            543.0001831054688,
+            564.9240112304688
+          ]
+        },
+        {
+          "entity": "NREL 5-MW baseline control system",
+          "attribute": "nacelle-yaw angle regulation",
+          "value": "not developed",
+          "unit": "",
+          "conditions": "",
+          "quote": "Nor did we develop control actions to regulate the nacelle-yaw angle.",
+          "_box": [
+            71.99993896484375,
+            70.8299789428711,
+            543.0236206054688,
+            400.3437805175781
+          ]
+        },
+        {
+          "entity": "blade-pitch controller",
+          "attribute": "feedback input",
+          "value": "generator speed measurement",
+          "unit": "",
+          "conditions": "sole feedback input",
+          "quote": "both the generator-torque and blade-pitch controllers use the generator speed measurement as the sole feedback input",
+          "_box": [
+            72.0,
+            410.4598083496094,
+            543.011962890625,
+            744.9240112304688
+          ]
+        },
+        {
+          "entity": "blade-pitch controller",
+          "attribute": "feedback input",
+          "value": "generator speed measurement",
+          "unit": "",
+          "conditions": "baseline control system",
+          "quote": "both the generator-torque and blade-pitch controllers use the generator speed measurement as the sole feedback input",
+          "_box": [
+            72.0,
+            410.4598083496094,
+            543.0001831054688,
+            564.9240112304688
+          ]
+        },
+        {
+          "entity": "generator-torque controller",
+          "attribute": "feedback input",
+          "value": "generator speed measurement",
+          "unit": "",
+          "conditions": "sole feedback input",
+          "quote": "both the generator-torque and blade-pitch controllers use the generator speed measurement as the sole feedback input",
+          "_box": [
+            72.0,
+            410.4598083496094,
+            543.011962890625,
+            744.9240112304688
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "missing": 2,
+          "trivial": 2
+        },
+        "variant": {
+          "duplicates": 2
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets capture the core controller goals, operating ranges, filter type and variable definitions correctly with supporting quotes. Set A additionally covers the sole-feedback-input fact for both controllers and the important statement that nacelle-yaw control actions were not developed, which Set B omits. Set B instead adds a near-trivial claim that the baseline control system was based on the conventional design approach and repeats the nonpower-production claim under two entity names. Set A's extra coverage of an important fact outweighs its redundancy, though it repeats the feedback-input and filter-type facts several times."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets capture the controller goals, operating ranges, filter type and variable definitions accurately, with quotes that support the claims. Set B additionally captures two important facts Set A omits: that generator speed measurement is the sole feedback input for both controllers, and that no nacelle-yaw control actions were developed. Set A's extra claims are largely a restatement of the nonpower-production fact under a second entity name plus a near-trivial design-basis claim, while Set B's weakness is repeating the feedback-input fact twice per controller with only differing conditions."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Set A states the generator-torque feedback input three times and the blade-pitch feedback input twice (differing only in the conditions field), and the filter type twice; these are the same facts restated. Set B omits the nacelle-yaw-angle statement, a notable design fact on the page. Neither set extracts the filter equations (7-1, 7-2, 7-3a) or the definitions of alpha, n, Ts and fc, which are the main quantitative content of Section 7.1."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Set A states the nonpower-production fact twice (bound to 'NREL 5-MW wind turbine' and to 'NREL 5-MW baseline control system') and the filter-type fact twice with different conditions; Set B repeats each feedback-input claim twice per controller. Neither set extracts the filter equations (7-1, 7-2) or the definitions of alpha, Ts and fc, which are the main quantitative content of Section 7.1."
+        }
+      ]
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p9-visual",
+      "run": "iea-15mw-p20-31",
+      "page": 9,
+      "family": "visual",
+      "image": "images/iea-15mw-p20-31-f7071680-p9.jpg",
+      "score": 0.5,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 0.5,
+          "baseline-first": 0.5
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 6,
+        "variant": 6,
+        "shared": 4
+      },
+      "only_baseline": [
+        {
+          "entity": "blade",
+          "attribute": "design point blade pitch",
+          "value": "0",
+          "unit": "°",
+          "conditions": "design point",
+          "quote": "blade pitch Θpitch = 0°",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        },
+        {
+          "entity": "blade",
+          "attribute": "optimal blade pitch",
+          "value": "-1.0",
+          "unit": "°",
+          "conditions": "maximum CP",
+          "quote": "Θpitch = −1.0°",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "blade",
+          "attribute": "optimal blade pitch Θpitch",
+          "value": "-1.0",
+          "unit": "°",
+          "conditions": "maximum CP",
+          "quote": "Θpitch = −1.0°",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        },
+        {
+          "entity": "blade",
+          "attribute": "design point blade pitch Θpitch",
+          "value": "0",
+          "unit": "°",
+          "conditions": "design point",
+          "quote": "blade pitch Θpitch = 0°",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.5,
+          "note": "Both sets contain the same six claims with identical values, conditions, and quotes; the only differences are cosmetic (A keeps the Θpitch symbol in two attribute names and orders the claims differently). Both correctly bind the 4° maximum pitch to low wind speeds/Region 1.5, the ~90 m force peak to below-rated wind speeds, and the design (TSR 9.0, Θpitch 0°) versus optimal (TSR 8.5, Θpitch −1.0°) points to the right blade properties. Neither set has a misread, misbound, or invented claim, so they are effectively equivalent."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.5,
+          "note": "Both sets contain the same six claims with the same values, units, conditions and supporting quotes: max positive pitch 4° in Region 1.5, design point TSR 9.0 / pitch 0°, optimal TSR 8.5 / pitch −1.0°, and force peak near 90 m at below-rated wind speeds. All values are correctly bound to the blade and match the text layer and page image. The only difference is cosmetic: Set B keeps the Θpitch symbol in two attribute names, which is marginally more precise but not a substantive improvement. Neither set contains any wrong, invented or unsupported claim."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets drop the 'approximately' qualifier on the 90 m force-peak location (minor). Both also omit other engineering facts on the page, e.g. the sharp linear force drop over the outboard 5% of the blade caused by the Prandtl tip loss model, and Region 3 behavior (torque saturated at rated torque, pitch to feather to maintain rated rotor speed); since both sets show all their claims, these are missing from both equally."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets omit other quantitative facts on the page (e.g., the sharp linear force drop over the outboard 5% of the blade from the Prandtl tip loss model, and the effectively negligible Region 2.5), but since the sets are identical in content this does not differentiate them. Note the text says the design point is 'slightly below the optimal' while the optimal values are read off the CP/CT curves in Figure 3-2; both sets' 'maximum CP' condition is a reasonable but slightly interpretive gloss."
+        }
+      ]
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p1-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 1,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p1.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 17,
+        "variant": 20,
+        "shared": 17
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "driveshaft",
+          "attribute": "equivalent linear-spring constant",
+          "value": "867637000",
+          "unit": "N•m/rad",
+          "conditions": "",
+          "quote": "equivalent driveshaft linear-spring constant of 867,637,000 N•m/rad",
+          "_box": [
+            71.99993896484375,
+            70.8299789428711,
+            546.0,
+            319.343994140625
+          ]
+        },
+        {
+          "entity": "driveshaft",
+          "attribute": "structural-damping ratio",
+          "value": "5",
+          "unit": "% critical",
+          "conditions": "associated with the free-free mode of a drivetrain composed of a rigid generator and rigid rotor",
+          "quote": "structural-damping ratio... of 5% critical",
+          "_box": [
+            71.99993896484375,
+            70.8299789428711,
+            546.0,
+            319.343994140625
+          ]
+        },
+        {
+          "entity": "generator",
+          "attribute": "inertia about the high-speed shaft",
+          "value": "534.116",
+          "unit": "kg•m2",
+          "conditions": "",
+          "quote": "generator inertia about the high-speed shaft was taken to be 534.116 kg•m2",
+          "_box": [
+            71.99993896484375,
+            70.8299789428711,
+            546.0,
+            319.343994140625
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "missing": 2
+        },
+        "variant": {
+          "duplicates": 2
+        }
+      },
+      "issues": {
+        "baseline": {
+          "Rejected claim with unsupported literal quote": 6
+        },
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets read the values, units and quotes correctly, and both bind them to the right components. Set A additionally captures the driveshaft structural-damping ratio of 5% critical with its free-free-mode condition, which Set B omits entirely. Set A's extra coverage comes at the cost of two duplicate pairs (the driveshaft spring constant and the generator inertia each appear twice, once from the prose and once from Table 5-1), so it is somewhat redundant but factually richer."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets are accurate on the values they state, with quotes that support the claims and correct units and bindings. Set B adds the drivetrain structural-damping ratio of 5% critical with its free-free-mode conditions, an important fact Set A omits. However, B's three extra claims include two restatements of facts already captured (the driveshaft spring constant and generator inertia, given under slightly different names), so its advantage is one net new correct claim plus some duplication. Set A is otherwise clean but misses the damping ratio."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets state the same facts twice via prose and Table 5-1 under slightly different names (e.g. 'Rated Generator Speed' vs 'rated generator speed'); Set A does this for two facts it happens to include twice explicitly. Neither set captures the driveshaft natural frequency (stated only as 'same as the RECOFF turbine model', no value) or the DOWEC-derived brake torque ratio, which is reasonable since no numeric value is given on the page."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets heavily duplicate table and body-text statements of the same fact (efficiency, rated speeds, gearbox ratio, brake torque, damping constant), which inflates claim counts without adding information. Facts both sets miss include the DOWEC-derived 0.35 MW loss at ~6.25 MW aerodynamic power, the 5,025,500 kg•m2 DOWEC equivalent low-speed-shaft inertia, and the linear-ramp brake engagement profile over 0.6 s."
+        }
+      ]
+    },
+    {
+      "id": "u-dc-cd-p39-42-2523f154-p2-visual-b1of4",
+      "run": "dc-cd-p39-42",
+      "page": 2,
+      "family": "visual",
+      "image": "images/dc-cd-p39-42-2523f154-p2-b1of4.jpg",
+      "score": 0.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 25,
+        "variant": 24,
+        "shared": 24
+      },
+      "only_baseline": [
+        {
+          "entity": "FLOOR BEAM @ GRID 5",
+          "attribute": "section",
+          "value": "W10X15",
+          "unit": "",
+          "conditions": "D5",
+          "quote": "W10X15",
+          "_box": [
+            0.0,
+            0.0,
+            1584.0,
+            2448.0
+          ]
+        }
+      ],
+      "only_variant": [],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "misbound": 2,
+          "vague": 2,
+          "missing": 1,
+          "trivial": 1
+        },
+        "variant": {
+          "duplicates": 2,
+          "misbound": 2,
+          "missing": 2,
+          "vague": 2,
+          "trivial": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set B is a strict subset of Set A: all 24 of its claims appear identically in A, and A adds one further claim — the W10X15 section for the D5 floor beam at Grid 5 — which the detail supports. That extra claim is correct and non-trivial, so A captures more of the page's engineering content with no additional errors. Both sets share the same weaknesses (vague 'beam opening'/'beam' entities, a duplicated 5'-0\"/5 ft length for the Grid 4 beam, and a couple of dimensions apparently bound to the wrong beam)."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set B is identical to Set A except for one additional claim — D5 / FLOOR BEAM @ GRID 5 section W10X15 — which is supported by the D5 detail in the text layer and image. All other claims are shared, including the same misbindings (e.g., ø 3\" attributed to B1 when the ø 3\" openings appear in the W8X13 details C1/A1) and the same vague 'beam opening' claims and duplicated 5'-0\"/5 ft and 6\" claims. Since the shared claims are equally good or bad, B's one extra correct, well-bound claim makes it the better set."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Shared problems in both sets: 3'-7\" appears in the B4 (FLOOR BEAM @ GRID 3) detail but is claimed for FLOOR BEAM @ GRID 5; the 10\" values are the beam depth of the W10X15 section, yet are claimed as 'opening length' (Grid 5) and 'edge distance' (beam opening); 'opening/spacing | dimension | 3 ft | segment 1' is too vague to verify; the Grid 4 beam length is stated twice (5'-0\" and 5 ft) and its 6\" height duplicates the opening-height claim. Entities like 'beam opening', 'beam', 'opening/spacing' should be tied to the specific detail (A4/B4/C4/D5/E6 etc.). The 1/2\" RADIUS edge-condition note from the general sheet notes is not claimed by either set."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets bind ø 3\" to 'B1 FLOOR BEAM NEAR GRID 5', but the ø 3\" openings appear with the W8X13 details (C1 ROOF BEAM @ GRID 6 & NEAR GRID 5, A1 FLOOR BEAM @ GRID 6), not the W10X15 B1 detail. Both sets also duplicate the 5'-0\" length and 6\" opening dimension under two names and leave several claims as vague 'beam opening'/'opening/spacing' entities. Important fact both sets miss: the general sheet note '1/2\" RADIUS AROUND EDGES OF OPENINGS IN BEAMS', and the W8X13 sections for details C1/A1. The 3'-7\" and 5'-0\" dimensions appear in the B1/E6 detail blocks in the text layer, so their binding to GRID 5 / GRID 4 is doubtful but hard to verify from the low-resolution image alone."
+        }
+      ]
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p9-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 9,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p9.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 10,
+        "variant": 11,
+        "shared": 10
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "aerodynamic power",
+          "attribute": "sensitivity to rotor-collective blade-pitch angle (∂P/∂θ)",
+          "value": "negative",
+          "unit": "",
+          "conditions": "active pitch-to-feather wind turbine, Region 3",
+          "quote": "the sensitivity of aerodynamic power to the rotor-collective blade-pitch angle, P θ ∂ ∂, is negative in Region 3",
+          "_box": [
+            72.0,
+            176.67601013183594,
+            543.0000610351562,
+            414.3240051269531
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "missing": 2
+        },
+        "variant": {
+          "duplicates": 2
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets capture the same core claims about the PID-controlled rotor-speed error response, the roles of the derivative, proportional, and integral terms, and the Ref. [10] design recommendations (ωφn = 0.6 rad/s, ζφ = 0.6–0.7, neglecting the derivative gain and the generator-torque negative damping). Set A additionally includes the correct and important claim that the sensitivity of aerodynamic power to rotor-collective blade pitch (∂P/∂θ) is negative in Region 3 for an active pitch-to-feather turbine, which Set B omits. Both sets repeat the generator-torque-controller negative-damping fact twice (once as a damping effect, once as an effect on speed error response)."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets cover the same core claims and both repeat the generator-torque negative-damping fact twice (claims 1 and 10 in A, 1 and 11 in B). Set B additionally captures the important page fact that the aerodynamic power sensitivity ∂P/∂θ to rotor-collective blade pitch is negative in Region 3 for an active pitch-to-feather turbine, which Set A omits entirely. All other claims in both sets are correctly bound, conditioned and quoted, so the deciding factor is B's extra correct claim versus A's missing one."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets state the generator-torque-controller negative damping twice under two attribute names; that fact should appear once. Set B's omission of the ∂P/∂θ < 0 fact is notable since it is the premise for the sign reasoning that follows. The text layer is heavily garbled around Eqs. (7-11)–(7-15), but the page image renders them legibly."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets state the generator-torque controller negative damping twice under slightly different attribute names ('damping effect on speed error response' vs 'effect on speed error response') — a deduplication issue in both extractions. Neither set extracts the PI gain expressions (Eqs. 7-14, 7-15) or the definitions of ωφn and ζφ (Eqs. 7-12, 7-13), though those may be outside the sampled claims."
+        }
+      ]
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p4-visual",
+      "run": "nrel-5mw-p25-36",
+      "page": 4,
+      "family": "visual",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p4.jpg",
+      "score": 0.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 0.0,
+          "baseline-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 7,
+        "variant": 7,
+        "shared": 6
+      },
+      "only_baseline": [
+        {
+          "entity": "generator-torque and blade-pitch controllers",
+          "attribute": "sole feedback input",
+          "value": "generator speed measurement",
+          "unit": "",
+          "conditions": "",
+          "quote": "both the generator-torque and blade-pitch controllers use the generator speed measurement as the sole feedback input",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "generator-torque controller",
+          "attribute": "feedback input",
+          "value": "generator speed measurement",
+          "unit": "",
+          "conditions": "baseline control system",
+          "quote": "both the generator-torque and blade-pitch controllers use the generator speed measurement as the sole feedback input",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {
+          "misbound": 2,
+          "conditions": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Both sets cover the same seven facts with identical values, equations, and quotes. The only difference is the feedback-input claim: Set A binds the sole feedback input to the generator-torque controller alone, while the quoted sentence covers both the generator-torque and blade-pitch controllers; Set B binds it to both controllers correctly. Set B is therefore slightly more faithful with no other differences."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets agree on six of seven claims, and those are faithful: the controller goals with their rated-operation conditions, the filter recursion and coefficient equations, the turbine configuration, and the filter type. The difference is the feedback-input claim: Set A correctly states that both the generator-torque and blade-pitch controllers use the generator speed measurement as the sole feedback input, matching its quote. Set B binds the same quote only to the generator-torque controller, drops the 'sole' qualifier, and attaches a 'baseline control system' condition not present in the source. Set A is therefore more accurate and complete on this point."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets omit the filter-state definition x[n]=y[n-1] (Eq. 7-3a) and the variable definitions (y filtered speed, u unfiltered speed, Ts discrete time step, fc corner frequency), which would strengthen either set. The equation quotes are transcribed in ASCII rather than verbatim from the page, but the mathematics is correct."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets omit the filter state definition x[n]=y[n-1] (Eq. 7-3a) and the variable definitions (y, u, alpha, n, Ts, fc), though these are secondary to the main claims shown."
+        }
+      ]
+    },
+    {
+      "id": "u-ken-cd-p95-98-f7b0008f-p3-text",
+      "run": "ken-cd-p95-98",
+      "page": 3,
+      "family": "text",
+      "image": "images/ken-cd-p95-98-f7b0008f-p3.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 14,
+        "variant": 16,
+        "shared": 14
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "Wiring 150",
+          "attribute": "conduit size",
+          "value": "2-1/2",
+          "unit": "\"C",
+          "conditions": "AL",
+          "quote": "150 AL: ... 2-1/2\"C.",
+          "_box": [
+            1021.416748046875,
+            67.3521728515625,
+            1587.0291748046875,
+            2359.885498046875
+          ]
+        },
+        {
+          "entity": "Wiring Schedule 150",
+          "attribute": "ground conductor size",
+          "value": "#4G",
+          "unit": "",
+          "conditions": "",
+          "quote": "150 AL: ... #4G.",
+          "_box": [
+            1021.416748046875,
+            67.3521728515625,
+            1587.0291748046875,
+            2359.885498046875
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "misbound": 1,
+          "missing": 2,
+          "duplicates": 1,
+          "misread": 1,
+          "vague": 1
+        },
+        "variant": {
+          "misbound": 1,
+          "duplicates": 1,
+          "misread": 1,
+          "missing": 1,
+          "vague": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets share the same core claims and the same flaw: the sub-panel 'phase' claim binds '3 W' (the 3-wire designation) to phase, when the phase is 1~. Set B additionally extracts two correct facts from wiring schedule row 150 — the 2-1/2\" conduit size and the #4G ground conductor size — which Set A omits. Those extra claims are supported by the row text '50 AL: 3#4/0, #4G., 2-1/2\"C.' and are not contradicted anywhere on the page."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets share the same 14 claims, including the same error of reading '3W' as the sub-panel's phase (it is the wire count; the phase is 1φ) and the same duplication of the 50A/2P main-breaker rating under two entity names. Set A adds two further claims from wiring schedule row 150 — the #4G ground conductor size and the 2-1/2\" conduit size — both correctly bound and quoted. Since A's extras are correct and it introduces no additional errors, A is the better set."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Shared error in both sets: 'SUB-PANEL PV | phase | 3 W' — the note reads '120/240V, 1~, 3W', i.e. 1-phase, 3-wire; 3W is the wire count, not the phase. The companion 'wire count | 3 W' claim is therefore a near-duplicate of the same notation. Entity 'NEMA 3R ENCLOSURE' in the main-breaker claim is vague (it is the sub-panel PV enclosure). Set B's quotes use ellipses within the row, which is acceptable here since the row text is intact in the text layer."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets misread '1~, 3W' on the SUB-PANEL PV note: 1~ is the phase (single-phase) and 3W is the wire count, so the 'phase | 3 W' claim is wrong in both. Both also state the 50A/2P main breaker twice (once as 'NEMA 3R ENCLOSURE' and once as 'SUB-PANEL PV main breaker'), use vague entities ('NFDS', 'NEMA 3R ENCLOSURE') where the page distinguishes a 60A DC NFDS from a 200A/2P NFDS, and omit the NEC 690.42 EXCEPTION note (conductor-to-ground bond made by the ground fault protection device) plus most wiring schedule rows (20, 31, 32, 33, 34, 10)."
+        }
+      ]
+    },
+    {
+      "id": "u-calg-cd-p62-66-e0051bec-p5-visual-b2of4",
+      "run": "calg-cd-p62-66",
+      "page": 5,
+      "family": "visual",
+      "image": "images/calg-cd-p62-66-e0051bec-p5-b2of4.jpg",
+      "score": 0.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 64,
+        "variant": 64,
+        "shared": 60
+      },
+      "only_baseline": [
+        {
+          "entity": "FAUCET",
+          "attribute": "model",
+          "value": "BSP-L-65014LF-PC",
+          "unit": "",
+          "conditions": "tag F2",
+          "quote": "MODEL: BSP-L-65014LF-PC",
+          "_box": [
+            0.0,
+            1352.0,
+            448.63262939453125,
+            1799.880126953125
+          ]
+        },
+        {
+          "entity": "FAUCET",
+          "attribute": "location",
+          "value": "KITCHEN",
+          "unit": "",
+          "conditions": "tag F1",
+          "quote": "LOCATION: KITCHEN",
+          "_box": [
+            0.0,
+            1352.0,
+            448.63262939453125,
+            1799.880126953125
+          ]
+        },
+        {
+          "entity": "FAUCET",
+          "attribute": "manufacturer",
+          "value": "BRIZO",
+          "unit": "",
+          "conditions": "tag F2",
+          "quote": "DESCRIPTION: FAUCET\nMANUFACTURER: BRIZO",
+          "_box": [
+            0.0,
+            1352.0,
+            448.63262939453125,
+            1799.880126953125
+          ]
+        },
+        {
+          "entity": "Shower",
+          "attribute": "manufacturer",
+          "value": "Delta",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: SHOWE MANUFACTURER: DELTA",
+          "_box": [
+            538.8228149414062,
+            1616.7261962890625,
+            1009.3864135742188,
+            2199.419921875
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "FAUCET",
+          "attribute": "location",
+          "value": "KITCHEN",
+          "unit": "",
+          "conditions": "",
+          "quote": "LOCATION: KITCHEN",
+          "_box": [
+            0.0,
+            1352.0,
+            448.63262939453125,
+            1799.880126953125
+          ]
+        },
+        {
+          "entity": "FAUCET",
+          "attribute": "manufacturer",
+          "value": "BRIZO",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: FAUCET\nMANUFACTURER: BRIZO",
+          "_box": [
+            0.0,
+            1352.0,
+            448.63262939453125,
+            1799.880126953125
+          ]
+        },
+        {
+          "entity": "SHOWER VALVE",
+          "attribute": "manufacturer",
+          "value": "DELTA",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: SHOWE MANUFACTURER: DELTA",
+          "_box": [
+            538.8228149414062,
+            1616.7261962890625,
+            1009.3864135742188,
+            2199.419921875
+          ]
+        },
+        {
+          "entity": "FAUCET",
+          "attribute": "model",
+          "value": "BSP-L-65014LF-PC",
+          "unit": "",
+          "conditions": "",
+          "quote": "MODEL: BSP-L-65014LF-PC",
+          "_box": [
+            0.0,
+            1352.0,
+            448.63262939453125,
+            1799.880126953125
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "misbound": 2,
+          "misread": 2,
+          "quote": 2,
+          "vague": 2,
+          "conditions": 1
+        },
+        "variant": {
+          "conditions": 2,
+          "duplicates": 2,
+          "misbound": 2,
+          "misread": 2,
+          "quote": 2,
+          "vague": 2
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets share the same defects: truncated model values (F2 'BSP-L-65014', WC 'C454CUFG#0'), truncated locations (SV/SH 'BATHROOM' instead of BATHROOM SHOWER, F2 'BATHROOM' instead of BATHROOM VANITY), the MWD02 dimension row actually belonging to MWD01, and a vague 'Shower' location claim. Set A keeps the plumbing tags as conditions on the faucet claims (F1/F2), which matters because the two faucets have different models and locations, while Set B drops those conditions and leaves the faucet model and location claims ambiguous. Set B does bind the shower-valve manufacturer claim correctly to SHOWER VALVE where A writes only 'Shower', but A's conditioned faucet claims are the more valuable and faithful additions."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Both sets cover the same plumbing, furniture and millwork facts and share the same three errors: the F2 and WC model numbers truncated (BSP-L-65014, C454CUFG#0) and the MWD02 dimension claim actually belonging to the MWD01 wall cabinet row. B is better because it keeps the tag conditions that disambiguate the two BRIZO faucets (F1 = kitchen, F2 = bathroom vanity) on its FAUCET claims, while A states those same facts without tags and is ambiguous. A's only advantage is naming SHOWER VALVE precisely where B writes the vague 'Shower', but that fact is already fully covered by the SV claims present in both sets."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "The text layer is heavily truncated in the FINISH SCHEDULE block (e.g. 'QU', 'FIE', 'PR', 'DE', '33', 'EG'), so finish-schedule claims cannot be verified from text alone; the image also shows a FLOOR FINISH SCHEDULE (LM/PT1/PT2/VT) that the text layer omits entirely. Several claims in both sets are duplicates of the same fact stated with a truncated and a full value (WC model, F2 model). Truncated quotes such as 'LOCATION: BATHR' and 'DESCRIPTION: SHOWE' do not fully support their claims in either set."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "The text layer emits each tag after its row's data, which is the likely source of the MWD02/MWD01 row shift (the quoted string 'MWD02 WALL CABINET 3-0 x ...' is stitched, not a real row). Both sets also truncate locations (BATHROOM for BATHROOM SHOWER / BATHROOM VANITY) and repeat the same model under a full and a cut value, and both carry the vague 'Shower' entity with the cut quote 'LOCATION: BATHR'. The finish-schedule entries in the text layer are badly truncated (QU/CA/PU/DE/EG...), so any finish claims drawn from that layer should be treated as unreliable."
+        }
+      ]
+    },
+    {
+      "id": "u-dc-manual-p59-66-a157bdf0-p8-text",
+      "run": "dc-manual-p59-66",
+      "page": 8,
+      "family": "text",
+      "image": "images/dc-manual-p59-66-a157bdf0-p8.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 7,
+        "variant": 6,
+        "shared": 5
+      },
+      "only_baseline": [
+        {
+          "entity": "incandescent bulb",
+          "attribute": "power",
+          "value": "40",
+          "unit": "W",
+          "conditions": "example of light output comparison",
+          "quote": "one 40W incandescent bulb",
+          "_box": [
+            35.99896240234375,
+            294.6824951171875,
+            579.1045532226562,
+            696.572509765625
+          ]
+        },
+        {
+          "entity": "vacancy sensor",
+          "attribute": "requirement",
+          "value": "bypass the dimming function to completely disconnect electricity to the fixture",
+          "unit": "",
+          "conditions": "if luminaires are connected to a vacancy sensor",
+          "quote": "if luminaires are connected to a vacancy sensor, it must be able to bypass the dimming function to completely disconnect electricity to the fixture",
+          "_box": [
+            35.99896240234375,
+            294.6824951171875,
+            579.1045532226562,
+            696.572509765625
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "high efficacy luminaires",
+          "attribute": "connection requirement",
+          "value": "own switch",
+          "unit": "",
+          "conditions": "in kitchen, bathroom, closet and laundry rooms; per Title 24",
+          "quote": "approved high efficacy luminaires... must be connected to their own switch in the kitchen, bathroom, closet and laundry rooms",
+          "_box": [
+            35.99896240234375,
+            36.32311248779297,
+            582.671875,
+            755.7447509765625
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "missing": 2
+        },
+        "variant": {
+          "missing": 1
+        }
+      },
+      "issues": {
+        "baseline": {
+          "Rejected claim with unsupported literal quote": 2
+        },
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A and Set B contain the same substantive claims, all faithful to the page: the 40W/9W/7W light-output equivalence example, the T24 high-efficacy requirement for HARVEST HOME fixtures, the own-switch requirement for high-efficacy luminaires in kitchen/bathroom/closet/laundry, and the vacancy-sensor dimming-bypass requirement. Set B, however, repeats two claims verbatim (the 40W incandescent power and the vacancy-sensor bypass requirement), adding no information and diluting the set. Set A is therefore cleaner and equally complete on the prose content."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets correctly capture the 40W/9W/7W light-output equivalence, the T24 high-efficacy requirement for Harvest Home fixtures, and the vacancy-sensor dimming-bypass requirement. Set B additionally captures the Title 24 requirement that approved high efficacy luminaires be connected to their own switch in the kitchen, bathroom, closet and laundry rooms, which Set A omits. Set A instead repeats the vacancy-sensor requirement twice in near-identical wording, adding no information. Set B is therefore more complete and free of redundancy."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets omit the 'LIGHTING LEVELS' table at the top of the page, which contains engineering-relevant facts: 3 FC for general use/movement (40W bulb at half power), 5-10 FC for simple tasks (40W bulb), 30 FC for large size or high contrast ((4) 40W bulbs), and 50 FC for small size or visually complex ((6) 40W bulbs), each tied to a task (walking bedroom to bathroom, making coffee, chopping vegetable, reading the newspaper). These footcandle levels and bulb counts are arguably the most quantitative content on the page and should be extracted."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets omit the LIGHTING LEVELS table in the page image (3 FC general use/movement with 40W bulb at half power; 5-10 FC simple tasks with 40W bulb; 30 FC large size or high contrast with (4) 40W bulbs; 50 FC small size or visually complex with (6) 40W bulbs, tied to the four illustrated tasks) and the statement that the LED bulb has a higher efficacy rating because it puts out more light per watt. Set A's two vacancy-sensor claims differ only in the length of the quoted requirement value."
+        }
+      ]
+    },
+    {
+      "id": "u-calg-cd-p62-66-e0051bec-p5-text-b1of4",
+      "run": "calg-cd-p62-66",
+      "page": 5,
+      "family": "text",
+      "image": "images/calg-cd-p62-66-e0051bec-p5-b1of4.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 13,
+        "variant": 26,
+        "shared": 13
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "SOFA",
+          "attribute": "quantity",
+          "value": "2",
+          "unit": "",
+          "conditions": "Tag F3",
+          "quote": "SOFA ... F3 2",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "DRYER",
+          "attribute": "manufacturer",
+          "value": "BLOMBERG",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: DRYER ... MANUFACTURER: BLOMBERG",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "WALL BASE",
+          "attribute": "profile",
+          "value": "4\" H x 1/2\" THK",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: WALL BASE ... PROFILE: 4\" H x 1/2\" THK MDF",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "ACCENT PAINT",
+          "attribute": "colour number",
+          "value": "33-14",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: ACCENT PAINT ... COLOUR NUMBER: 33-14",
+          "_box": [
+            482.6582336425781,
+            231.71299743652344,
+            584.3460693359375,
+            2353.6201171875
+          ]
+        },
+        {
+          "entity": "ADJUSTABLE-HEIGHT TABLE",
+          "attribute": "quantity",
+          "value": "2",
+          "unit": "",
+          "conditions": "Tag F5",
+          "quote": "ADJUSTABLE-HEIGHT TABLE ... F5 2",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "F4 ACCENT CHAIR",
+          "attribute": "quantity",
+          "value": "4",
+          "unit": "",
+          "conditions": "",
+          "quote": "ACCENT CHAIR ... F4 4",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "BASE CABINET",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "Tag MWK05",
+          "quote": "BASE CABINET ... MWK05 1",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "F2 BEDSIDE TABLE",
+          "attribute": "quantity",
+          "value": "2",
+          "unit": "",
+          "conditions": "",
+          "quote": "BEDSIDE TABLE ... F2 2",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "BASE CABINET (SINK)",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "Tag MWK04",
+          "quote": "BASE CABINET (SINK) ... MWK04 1",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "MWK02 (BASE CABINET (OVEN))",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "",
+          "quote": "BASE CABINET (OVEN) ... MWK02 1",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "DINING TABLE",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "Tag F6",
+          "quote": "DINING TABLE ... F6 1",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "VANITY & SINK",
+          "attribute": "quantity",
+          "value": "1",
+          "unit": "",
+          "conditions": "Tag MWB01",
+          "quote": "VANITY & SINK ... MWB01 1",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        },
+        {
+          "entity": "HORIZONTAL CABINET",
+          "attribute": "quantity",
+          "value": "6",
+          "unit": "",
+          "conditions": "Tag MWK03",
+          "quote": "HORIZONTAL CABINET ... MWK03 6",
+          "_box": [
+            1002.1975708007812,
+            67.08000946044922,
+            1182.12890625,
+            2353.3798828125
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "invented": 3,
+          "misbound": 4,
+          "missing": 4,
+          "vague": 3,
+          "conditions": 2,
+          "quote": 2,
+          "duplicates": 1
+        },
+        "variant": {
+          "invented": 3,
+          "misbound": 4,
+          "misread": 2,
+          "vague": 3,
+          "conditions": 2,
+          "quote": 2,
+          "duplicates": 1,
+          "missing": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is significantly better because it extracts the majority of the schedule data (Furniture, Millwork, Equipment, Finishes) correctly, whereas Set A is extremely sparse and misses most engineering content. Both sets share critical hallucination errors regarding paint/glass attributes and one equipment manufacturer, and Set B has additional millwork tag misbindings, but its coverage makes it far more useful."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is better because it extracts significantly more correct engineering data (Equipment manufacturers, Furniture quantities/dimensions, Finish details) than Set B. Set B is essentially a subset of Set A's claims and shares the same hallucinations/misbindings on the overlapping claims (e.g., Dryer model manufacturer, P3 type, Quartz location). While Set A contains errors in the Millwork schedule (misreading tags/descriptions), its correct extraction of the Equipment and Furniture schedules provides much higher utility. Set B is penalized for missing these important facts without offering better accuracy on the shared claims."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets repeat the same four misbound claims (dryer model DV17540NBL00 credited to PRATT & LAMBERT, tag P3 given type TEMPERED, SHOWER SURROUND given colour number 33-14, and KITCHEN given colour name STEEL WOOL), so their error counts are equal. Set A additionally extracts 13 claims that all check out against the schedules (e.g. DRYER manufacturer BLOMBERG, ACCENT PAINT colour number 33-14, WALL BASE profile, and correctly tagged quantities for F3 SOFA, F4, F5, F6, F2 BEDSIDE TABLE, MWK02, MWK04, MWK05, MWB01, MWK03). Set B's shown claims are entirely contained in Set A's and add nothing, so it omits a large amount of correct equipment, finish, furniture and millwork data. Both share the same vague entities (bare tag F2, bare field label FINISH) and the unsupported 'KITCHEN' location on the quartz rows."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "B adds thirteen further claims that are correct and well bound — equipment manufacturer (DRYER/BLOMBERG), finish data (ACCENT PAINT colour number 33-14, WALL BASE profile), and furniture/millwork quantities tied to the right tags (F2–F6, MWK02, MWK04, MWK05, MWB01, MWK03) — while A omits all of them. Both sets share the same seven defective claims caused by splicing across schedule rows (e.g. dryer model DV17540NBL00 credited to PRATT & LAMBERT, P3 given type TEMPERED, KITCHEN given colour name STEEL WOOL, SHOWER SURROUND given colour number 33-14, and QUARTZ given an invented location KITCHEN). Error rates are therefore equal, but B covers far more of the page's engineering content, so B is the better set."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "remark": "Both sets fail to distinguish between Finish Schedule items P3 (Paint) and GL (Glass), binding 'Tempered' and Colour Number 33-14 incorrectly. Both also hallucinate Pratt & Lambert as the manufacturer for a Blomberg dryer model. Set B has specific millwork tag/description swaps (e.g., MWK01 vs MWK02)."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "remark": "Both sets share identical errors on overlapping claims (e.g. attributing Pratt & Lambert to a Blomberg model number), suggesting a common OCR or parsing failure. Set A's additional errors are concentrated in the Millwork schedule where tags and descriptions were misaligned. Set B's main deficit is low recall on correct data."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "The text layer is column-scrambled, which produced cross-row joins: 'LOCATION: KITCHEN COLOUR NAME: STEEL WOOL' and 'LOCATION: SHOWER SURROUND COLOUR NUMBER: 33-14' splice the GL/P3 rows together, and the P3 tag label lands next to the GLASS row's TYPE: TEMPERED. The QUARTZ rows carry no LOCATION field, so the added condition 'location: KITCHEN' is not supported by the page. Both extractions also miss straightforward facts such as GLASS thickness 1/2\" (shower surround) and TELEVISION size 40\" (model TBD)."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "The text layer lists schedule tags in blocks separate from their rows, which is the likely source of the cross-row splicing seen in both sets (paint manufacturer attached to a dryer model, glass type attached to tag P3, paint colour attached to locations KITCHEN/SHOWER SURROUND). The GL (Glass) type=Tempered claim is factually right but its quote ('LOCATION: BATHROOM SHOWER P3 TYPE: TEMPERED') does not support it; the same tempered-glass fact is also stated under the wrong name P3, and the accent-paint colour 33-14 appears under both ACCENT PAINT and SHOWER SURROUND. 'FINISH' is an attribute label used as an entity, and 'F2' is ambiguous because tag F2 exists in both the furniture (bedside table) and plumbing (kitchen faucet) schedules. Both sets still leave out many schedule facts: appliance/plumbing models, TV size 40\", glass thickness 1/2\", tile and laminate dimensions, and wall base location/finish."
+        }
+      ]
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p7-text",
+      "run": "iea-15mw-p20-31",
+      "page": 7,
+      "family": "text",
+      "image": "images/iea-15mw-p20-31-f7071680-p7.jpg",
+      "score": 0.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 0.0,
+          "baseline-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 5,
+        "variant": 6,
+        "shared": 5
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "blade",
+          "attribute": "axial stiffness",
+          "value": "1e10",
+          "unit": "N",
+          "conditions": "nondimensional blade span (r/R) = 1.0",
+          "quote": "1e10 ... Axial Stiffness [N] ... 1.0 Nondimensional Blade Span (r/R)",
+          "_box": [
+            81.38398742675781,
+            244.84872436523438,
+            530.61572265625,
+            764.2500610351562
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "trivial": 1,
+          "vague": 1
+        },
+        "variant": {
+          "misbound": 2,
+          "misread": 2,
+          "quote": 1,
+          "trivial": 1,
+          "vague": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Both sets capture the five chordwise-offset reference lines (pitch axis, mass, neutral, geometric, shear centers) from Figure 2-11. Set A adds a claim that axial stiffness is 1e10 N at r/R = 1.0, but 1e10 is only the y-axis scale multiplier of plot (c); the curve at r/R = 1.0 is near zero, so the value is misread and misbound to the wrong span position. Set B omits that erroneous claim and otherwise matches Set A, making it the more faithful set."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets extract only the five legend labels of Figure 2-11 as 'structural property center' claims, which are vague and carry no values or span conditions. Set B adds one extra claim, axial stiffness = 1e10 N at r/R = 1.0, but 1e10 is only the y-axis multiplier and the curve at r/R = 1.0 is near zero, so the claim misreads the plot and its quote (a splice of axis labels) does not support it. Set A therefore has no wrong claims while Set B has one, making A the better set."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets only extract legend labels of Figure 2-11 as 'structural property center' claims with no numeric chordwise offset values, which is thin but symmetric. Neither set extracts the mass density or edge/flap/torsional stiffness data from Figure 2-10; the axis scale factors (1e11, 1e10) are easy to mistake for data values, as Set A demonstrates."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Neither set captures any quantitative data from Figure 2-10 (mass density, edgewise/flapwise/torsional stiffness, axial stiffness vs r/R) or the chordwise offset values in Figure 2-11; only legend labels were extracted. The 'structural property center' attribute is generic — the underlying quantity is chordwise offset [m] of each center versus blade span r/R. Set B's axial-stiffness claim appears to bind the axis scale factor (1e10) as a data value at the wrong span location."
+        }
+      ]
+    },
+    {
+      "id": "u-calg-cd-p62-66-e0051bec-p5-text-b0of4",
+      "run": "calg-cd-p62-66",
+      "page": 5,
+      "family": "text",
+      "image": "images/calg-cd-p62-66-e0051bec-p5-b0of4.jpg",
+      "score": 0.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 10,
+        "variant": 25,
+        "shared": 10
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "PORCELAIN GLAZED TILE",
+          "attribute": "manufacturer",
+          "value": "FIRECLAY TILE",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: PORCELAIN GLAZED TILE ... MANUFACTURER: FIRECLAY TILE",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "PT2",
+          "attribute": "colour name",
+          "value": "DANDELION",
+          "unit": "",
+          "conditions": "",
+          "quote": "PT2 ... COLOUR NAME: DANDELION",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "HOOD FAN",
+          "attribute": "location",
+          "value": "KITCHEN",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: HOOD FAN ... LOCATION: KITCHEN",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "FAUCET",
+          "attribute": "location",
+          "value": "KITCHEN",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: FAUCET ... LOCATION: KITCHEN",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "HOOD FAN",
+          "attribute": "model",
+          "value": "UXT5230AYS",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: HOOD FAN ... MODEL: UXT5230AYS",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "TIERRA SOL",
+          "attribute": "colour name",
+          "value": "DESIGNER WHITE",
+          "unit": "",
+          "conditions": "",
+          "quote": "MANUFACTURER: TIERRA SOL ... COLOUR NAME: DESIGNER WHITE",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "WALL OVEN",
+          "attribute": "manufacturer",
+          "value": "WHIRLPOOL",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: WALL OVEN ... MANUFACTURER: WHIRLPOOL",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "PT2",
+          "attribute": "colour number",
+          "value": "33-1",
+          "unit": "",
+          "conditions": "",
+          "quote": "PT2 ... COLOUR NUMBER: 33-1",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "HOOD FAN",
+          "attribute": "manufacturer",
+          "value": "WHIRLPOOL",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: HOOD FAN ... MANUFACTURER: WHIRLPOOL",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "FAUCET",
+          "attribute": "manufacturer",
+          "value": "BRIZO",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: FAUCET ... MANUFACTURER: BRIZO",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "TIERRA SOL",
+          "attribute": "style name",
+          "value": "CRUSH",
+          "unit": "",
+          "conditions": "",
+          "quote": "MANUFACTURER: TIERRA SOL ... STYLE NAME: CRUSH",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "WALL OVEN",
+          "attribute": "model",
+          "value": "WOS51EC0AS",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: WALL OVEN ... MODEL: WOS51EC0AS",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "PT2",
+          "attribute": "finish",
+          "value": "SEMI-GLOSS",
+          "unit": "",
+          "conditions": "",
+          "quote": "PT2 ... FINISH: SEMI-GLOSS",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "BATHROOM VANITY",
+          "attribute": "dimensions",
+          "value": "12\"W x 24\"L",
+          "unit": "",
+          "conditions": "",
+          "quote": "LOCATION: BATHROOM VANITY ... DIMENSIONS: 12\"W x 24\"L",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        },
+        {
+          "entity": "FAUCET",
+          "attribute": "model",
+          "value": "BSP-L-65014LF-PC",
+          "unit": "",
+          "conditions": "",
+          "quote": "DESCRIPTION: FAUCET ... MODEL: BSP-L-65014LF-PC",
+          "_box": [
+            389.3658752441406,
+            63.57828903198242,
+            492.49041748046875,
+            2181.659912109375
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "invented": 1,
+          "misbound": 2,
+          "misread": 1,
+          "missing": 1
+        },
+        "variant": {
+          "duplicates": 2,
+          "invented": 1,
+          "misbound": 2,
+          "misread": 1,
+          "missing": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is better because it contains significantly fewer incorrect claims. Both sets share specific misbinding errors (e.g., binding the refrigerator model to tag 'F1', assigning laminate dimensions to porcelain tile, and attributing tile colors to quartz), but Set B introduces numerous additional severe errors in the Finish Schedule, mixing attributes between Paint, Tile, and Glass items (e.g., assigning paint colors and finishes to tiles). While Set B extracts more correct equipment data, its high rate of hallucinated relationships makes it less reliable."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set B is preferred because it contains significantly fewer incorrect claims (3 vs 10), adhering to the preference for precision over recall. While Set A captures more correct equipment data, its high rate of misbound attributes in the finish schedule (e.g., assigning paint colors to tiles) reduces trustworthiness. Set B shares the same specific misbinding errors but limits the total noise."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "remark": "Both extractors struggle with the linearized text layer's lack of structural grouping, causing attribute bleeding between adjacent schedule items (e.g., Paint attributes binding to Tile entities). Set B's attempt at higher recall results in a disproportionately high false positive rate."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "remark": "Both sets suffer from row-alignment errors in the Finish and Furniture schedules (e.g. claiming Porcelain Tile has Laminate dimensions). Set A's broader coverage of Equipment and Plumbing is valuable but outweighed by the volume of hallucinated/misbound finish data."
+        }
+      ]
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p7-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 7,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p7.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 7,
+        "variant": 12,
+        "shared": 7
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "blade-pitch control system",
+          "attribute": "design model",
+          "value": "single-degree-of-freedom (single-DOF)",
+          "unit": "",
+          "conditions": "",
+          "quote": "We designed the blade-pitch control system using a simple single-degree-of-freedom (single-DOF) model of the wind turbine.",
+          "_box": [
+            72.00003051757812,
+            600.156005859375,
+            543.0001220703125,
+            744.9240112304688
+          ]
+        },
+        {
+          "entity": "blade-pitch control system",
+          "attribute": "control input",
+          "value": "speed error between the filtered generator speed and the rated generator speed",
+          "unit": "",
+          "conditions": "Region 3",
+          "quote": "computed using gain-scheduled proportional-integral (PI) control on the speed error between the filtered generator speed and the rated generator speed",
+          "_box": [
+            72.00003051757812,
+            521.0400390625,
+            542.9993896484375,
+            590.1240234375
+          ]
+        },
+        {
+          "entity": "generator-torque controller",
+          "attribute": "control logic condition",
+          "value": "computed as if in Region 3",
+          "unit": "",
+          "conditions": "previous blade-pitch-angle command >= 1º",
+          "quote": "the torque would be computed as if it were in Region 3—regardless of the generator speed—whenever the previous blade-pitch-angle command was 1º or greater",
+          "_box": [
+            72.0,
+            140.58262634277344,
+            543.0,
+            510.9239807128906
+          ]
+        },
+        {
+          "entity": "blade-pitch controller",
+          "attribute": "control method",
+          "value": "gain-scheduled proportional-integral (PI) control",
+          "unit": "",
+          "conditions": "Region 3",
+          "quote": "full-span rotor-collective blade-pitch-angle commands are computed using gain-scheduled proportional-integral (PI) control",
+          "_box": [
+            72.00003051757812,
+            521.0400390625,
+            543.0001220703125,
+            744.9240112304688
+          ]
+        },
+        {
+          "entity": "blade-pitch control system",
+          "attribute": "control method",
+          "value": "gain-scheduled proportional-integral (PI) control",
+          "unit": "",
+          "conditions": "Region 3",
+          "quote": "full-span rotor-collective blade-pitch-angle commands are computed using gain-scheduled proportional-integral (PI) control",
+          "_box": [
+            72.00003051757812,
+            521.0400390625,
+            542.9993896484375,
+            590.1240234375
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "missing": 2
+        },
+        "variant": {
+          "duplicates": 2
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A covers the blade-pitch controller's design model, the gain-scheduled PI control method, the speed-error input, and the generator-torque controller's Region-3 override condition (previous blade-pitch command 1º or greater), all supported by the page. Set B's seven claims are a strict subset of A's and are all correct, but it omits these important controller facts. A's only flaw is that the gain-scheduled PI control-method claim is stated twice; B has no errors of its own but is incomplete."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets are accurate on the claims they share, but B captures two important facts A omits: the single-DOF design model of the blade-pitch controller and the conditional torque logic (Region-3 torque computation whenever the previous blade-pitch command was 1° or greater). B's only flaw is that it states the gain-scheduled PI control method twice, under 'blade-pitch controller' and 'blade-pitch control system'. A is clean but incomplete, so B is the better set overall."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Set A repeats the gain-scheduled PI control-method claim verbatim (claims 7 and 9). Both sets correctly capture the torque saturation (47,402.91 N•m = 10% above rated) and the 15,000 N•m/s rate limit; neither set extracts the equation of motion (7-5), which is arguably an important fact on the page."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "B repeats the gain-scheduled PI control-method claim under two entity names ('blade-pitch controller' and 'blade-pitch control system'); deduplicating would make B clearly stronger. Both sets leave out the stated purpose of the Region-3 torque override (improved output power quality at the expense of short-term generator/gearbox overloading) and the 10%-above-rated saturation rationale, though the saturation value itself is captured."
+        }
+      ]
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p12-text",
+      "run": "iea-15mw-p20-31",
+      "page": 12,
+      "family": "text",
+      "image": "images/iea-15mw-p20-31-f7071680-p12.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 17,
+        "variant": 14,
+        "shared": 13
+      },
+      "only_baseline": [
+        {
+          "entity": "steel",
+          "attribute": "Density",
+          "value": "7.85E3",
+          "unit": "kg/m3",
+          "conditions": "",
+          "quote": "Density, steel ρ 7 85E3 kg/m3",
+          "_box": [
+            209.01699829101562,
+            562.5301513671875,
+            393.4123229980469,
+            594.2738037109375
+          ]
+        },
+        {
+          "entity": "steel",
+          "attribute": "Young’s modulus",
+          "value": "2.00E11",
+          "unit": "Pa",
+          "conditions": "",
+          "quote": "Young’s modulus, steel E 2 00E11 Pa",
+          "_box": [
+            209.01699829101562,
+            562.5301513671875,
+            393.4123229980469,
+            594.2738037109375
+          ]
+        },
+        {
+          "entity": "offshore wind turbine",
+          "attribute": "clearance",
+          "value": "20 to 30",
+          "unit": "m",
+          "conditions": "typical variation",
+          "quote": "offshore wind turbine clearances can vary between 20 m to 30 m",
+          "_box": [
+            86.44100189208984,
+            699.3416748046875,
+            515.4313354492188,
+            708.6936645507812
+          ]
+        },
+        {
+          "entity": "steel",
+          "attribute": "Shear modulus",
+          "value": "7.93E10",
+          "unit": "Pa",
+          "conditions": "",
+          "quote": "Shear modulus, steel G 7 93E10 Pa",
+          "_box": [
+            209.01699829101562,
+            562.5301513671875,
+            393.4123229980469,
+            594.2738037109375
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "final mass",
+          "attribute": "outfitting mass",
+          "value": "7%",
+          "unit": "%",
+          "conditions": "beyond the cylindrical shell mass",
+          "quote": "final mass values reported in Table 1-1 include an extra 7% of outﬁtting mass beyond the cylindrical shell mass",
+          "_box": [
+            71.99990844726562,
+            463.81640625,
+            537.1327514648438,
+            764.2500610351562
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "conditions": 2,
+          "duplicates": 2,
+          "missing": 2
+        },
+        "variant": {
+          "missing": 1,
+          "vague": 1
+        }
+      },
+      "issues": {
+        "baseline": {
+          "Rejected claim with unsupported literal quote": 2
+        },
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is cleaner and captures the 7% outfitting mass allowance (plus 100 t transition piece) that Set A omits, while Set A pads its list with three duplicate pairs of the same steel properties restated with different number formatting. Set A also adds an unsupported 'typical variation' condition to the 20–30 m clearance claim from the footnote. Both sets bind the material, geometry, and frequency values correctly with supporting quotes, so B wins on fewer redundant/unsupported claims and better coverage of the mass note."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A captures the 7% outfitting mass allowance (plus the 100 t transition piece) that Set B omits, while Set B restates the steel density, Young's modulus and shear modulus three times each under slightly reformatted values. Set B's extra claim on the 20–30 m clearance range is supported by the footnote, though its 'typical variation' condition is a loose paraphrase rather than text. Both sets bind the material, geometry, frequency and mass values correctly with supporting quotes."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Set A repeats steel density, Young's modulus and shear modulus twice each (only the decimal formatting differs), inflating its count. Set B's 'final mass | outfitting mass' entity is somewhat vague (the subject is the final mass values in Table 1-1). Both sets leave the table's apparent unit error for soil Poisson's ratio (listed as Pa) unflagged; the 20–30 m clearance range in the footnote is captured only by A."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Set B duplicates steel density (7 85E3 / 7.85E3), Young's modulus (2 00E11 / 2.00E11) and shear modulus (7 93E10 / 7.93E10) — the same table rows stated twice with different number formatting. Set B drops the 7% outfitting mass fact. Its clearance claim's condition 'typical variation' is not stated in the footnote (which only says clearances 'can vary between 20 m to 30 m' and are not specified in an official standard). Both sets omit the design constraint that the 0.170 Hz first mode lies between the 1P and 3P ranges and avoids the 0.10–0.13 Hz wave band, and the note that a stiffer tower is required for a floating/semisubmersible substructure."
+        }
+      ]
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p9-text",
+      "run": "iea-15mw-p20-31",
+      "page": 9,
+      "family": "text",
+      "image": "images/iea-15mw-p20-31-f7071680-p9.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 5,
+        "variant": 7,
+        "shared": 5
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "blade",
+          "attribute": "optimal blade pitch Θpitch",
+          "value": "-1.0",
+          "unit": "°",
+          "conditions": "maximum CP",
+          "quote": "optimal of ... Θpitch = −1.0°",
+          "_box": [
+            71.99990844726562,
+            67.13235473632812,
+            530.69677734375,
+            239.68527221679688
+          ]
+        },
+        {
+          "entity": "blade",
+          "attribute": "design point blade pitch Θpitch",
+          "value": "0",
+          "unit": "°",
+          "conditions": "design point",
+          "quote": "design point for this blade is ... blade pitch Θpitch = 0°",
+          "_box": [
+            71.99990844726562,
+            67.13235473632812,
+            530.69677734375,
+            239.68527221679688
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "missing": 2
+        },
+        "variant": {
+          "missing": 1
+        }
+      },
+      "issues": {
+        "baseline": {
+          "Rejected claim with unsupported literal quote": 4
+        },
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets are accurate on the claims they share: the Prandtl tip-loss drop over the outboard 5%, the 4° maximum pitch at low wind speeds, the ~90 m force peak below rated, and the design/optimal TSR values are all supported by the text with faithful quotes. Set A additionally captures the design-point blade pitch (0°) and the optimal blade pitch (−1.0°) at maximum CP, both directly stated in the same sentence as the TSR values, so it covers the full design-point/optimum pair without error. Set B omits these two pitch values, leaving the design point only half specified. Neither set invents or misbinds anything."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets read the shared claims correctly: the 4° pitch limit, the 90 m force peak, the design and optimal TSR values, and the Prandtl tip-loss drop are all faithful to the text. Set B additionally captures the design-point blade pitch Θpitch = 0° and the optimal Θpitch = −1.0°, which are genuine engineering values stated in the same sentence and omitted by Set A. Since Set A shows all of its claims and lacks these pitch values, B is the more complete and equally accurate set."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets omit other notable facts on the page, e.g. Region 3 torque saturation at rated torque with pitch-to-feather to maintain rated rotor speed, the negligible Region 2.5, and the tip-unloading/power-loss trade-off — these are absent from both so they do not differentiate the sets. The 'optimal' TSR/pitch values are described in the text as the optimum shown in the CP and CT curves of Figure 3-2; binding them to 'maximum CP' is a reasonable but slightly interpretive condition."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets state the force peak as exactly 90 m while the text says 'approximately 90 m'; minor, but the approximation qualifier is dropped. The 'optimal' TSR/pitch pair is described via the CP and CT curves in Figure 3-2, so 'maximum CP' as a condition is a reasonable but slightly simplified gloss."
+        }
+      ]
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p5-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 5,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p5.jpg",
+      "score": 0.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 3,
+        "variant": 4,
+        "shared": 3
+      },
+      "only_baseline": [],
+      "only_variant": [],
+      "problems": {
+        "baseline": {
+          "missing": 1
+        },
+        "variant": {
+          "duplicates": 2,
+          "missing": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets correctly capture the corner frequency (0.25 Hz, roughly one-quarter of the blade's first edgewise natural frequency) and the discrete time step of 0.0125 s, with supporting quotes. Set B, however, states the corner-frequency claim twice as two separate claims, adding no information and diluting the set. Set A contains the same correct facts without the duplication, so it is the cleaner and better set. Neither set captures the state-space matrix definitions (A_d=α, B_d=1−α, C_d=α, D_d=1−α)."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Both sets read the page correctly: the -3 dB magnitude at the corner frequency, the 0.25 Hz corner frequency (roughly one-quarter of the blade's first edgewise natural frequency), and the 0.0125 s discrete time step are all supported by the text and quotes. Set A, however, states the corner-frequency fact twice (claims 2 and 3 are the same fact with slightly different quote spans), which is a duplicate. Set B contains the same three distinct facts with no duplication and no errors, so it is the cleaner and better set."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets omit the discrete-time state-space matrix definitions from Eq. (7-4) (A_d=α, B_d=1−α, C_d=α, D_d=1−α), which are substantive engineering facts on the page. The '-3 dB at corner frequency' claim is close to a definition/label rather than a measured property, but it is supported by the text and appears in both sets."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets omit the discrete-time state-space matrix definitions (A_d = alpha, B_d = 1-alpha, C_d = alpha, D_d = 1-alpha) from Eq. (7-4), which are substantive engineering facts on this page; if these are not in the shared unshown claims, they are a common gap. The Bode plot axes and curve values are readable in the image but neither set extracts them."
+        }
+      ]
+    },
+    {
+      "id": "u-lcit-report-p12-19-bb5dd36f-p2-text",
+      "run": "lcit-report-p12-19",
+      "page": 2,
+      "family": "text",
+      "image": "images/lcit-report-p12-19-bb5dd36f-p2.jpg",
+      "score": 0.5,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.5,
+          "variant-first": 0.5
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 12,
+        "variant": 12,
+        "shared": 6
+      },
+      "only_baseline": [
+        {
+          "entity": "LUVOIR-A",
+          "attribute": "instrument count",
+          "value": "4",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-A: A 15 m on-axis telescope with four science instruments",
+          "_box": [
+            79.17266845703125,
+            259.68096923828125,
+            670.2763061523438,
+            344.63055419921875
+          ]
+        },
+        {
+          "entity": "HabEx",
+          "attribute": "science instrument count",
+          "value": "4",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "HabEx: A 4 m telescope spacecraft with four science instruments",
+          "_box": [
+            79.19268035888672,
+            178.0780792236328,
+            680.2406005859375,
+            205.43267822265625
+          ]
+        },
+        {
+          "entity": "Lynx mirror assembly",
+          "attribute": "focal length",
+          "value": "10",
+          "unit": "m",
+          "conditions": "baseline mission concept",
+          "quote": "a 10 m focal length",
+          "_box": [
+            79.17266845703125,
+            202.3665771484375,
+            676.6439819335938,
+            523.9354858398438
+          ]
+        },
+        {
+          "entity": "Lynx",
+          "attribute": "instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "three science instruments",
+          "_box": [
+            79.17266845703125,
+            259.68096923828125,
+            670.2763061523438,
+            344.63055419921875
+          ]
+        },
+        {
+          "entity": "LUVOIR-B",
+          "attribute": "instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-B: A 8 m off-axis telescope with three science instruments",
+          "_box": [
+            79.17266845703125,
+            259.68096923828125,
+            670.2763061523438,
+            344.63055419921875
+          ]
+        },
+        {
+          "entity": "Origins",
+          "attribute": "instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "Origins: A 5.9 m telescope with three science instruments",
+          "_box": [
+            79.19271850585938,
+            341.564453125,
+            569.4633178710938,
+            397.43597412109375
+          ]
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Lynx",
+          "attribute": "number of science instruments",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "Lynx: ...three science instruments",
+          "_box": [
+            43.200836181640625,
+            10.764154434204102,
+            680.2406005859375,
+            523.9354858398438
+          ]
+        },
+        {
+          "entity": "LUVOIR-B",
+          "attribute": "number of science instruments",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-B: ...three science instruments",
+          "_box": [
+            43.200836181640625,
+            10.764154434204102,
+            680.2406005859375,
+            523.9354858398438
+          ]
+        },
+        {
+          "entity": "HabEx",
+          "attribute": "number of science instruments",
+          "value": "4",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "HabEx: ...four science instruments",
+          "_box": [
+            43.200836181640625,
+            10.764154434204102,
+            680.2406005859375,
+            523.9354858398438
+          ]
+        },
+        {
+          "entity": "LUVOIR-A",
+          "attribute": "number of science instruments",
+          "value": "4",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-A: ...four science instruments",
+          "_box": [
+            43.200836181640625,
+            10.764154434204102,
+            680.2406005859375,
+            523.9354858398438
+          ]
+        },
+        {
+          "entity": "Origins",
+          "attribute": "number of science instruments",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "Origins: ...three science instruments",
+          "_box": [
+            43.200836181640625,
+            10.764154434204102,
+            680.2406005859375,
+            523.9354858398438
+          ]
+        },
+        {
+          "entity": "Lynx",
+          "attribute": "focal length",
+          "value": "10",
+          "unit": "m",
+          "conditions": "baseline mission concept",
+          "quote": "Lynx: ...a 10 m focal length",
+          "_box": [
+            43.200836181640625,
+            10.764154434204102,
+            680.2406005859375,
+            523.9354858398438
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "quote": 1
+        },
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {
+          "Rejected claim with unsupported literal quote": 7,
+          "Source text is clipped at the end of the HabEx description.": 1
+        },
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.5,
+          "note": "Both sets cover the same 12 facts from the baseline mission concept list and bind every value to the correct mission/component and property, with the on-axis/off-axis and baseline conditions preserved. Set A gives fuller, more verbatim quotes and binds the Lynx 10 m focal length to the mirror assembly specifically, while Set B uses ellipsized quotes and binds the focal length to Lynx generally. These are minor presentational differences; no claim in either set is misread, misbound or invented, and no important fact is missing from either."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.5,
+          "note": "Both sets cover the same 12 facts from the slide (aperture/diameter, instrument counts, Lynx focal length, starshade diameter) with correct values, units and baseline-concept conditions. Set B binds the 10 m focal length more precisely to the Lynx grazing-incidence mirror assembly, while Set A keeps entity context in its quotes (e.g. 'Lynx: ...three science instruments') where B's short quotes ('three science instruments', 'a 10 m focal length') lack the component context. Neither set invents or misbinds anything, and both omit the same minor condition (starshade 'flying in formation'), so the sets are effectively equivalent."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Set B's quotes use ellipses (e.g. 'Lynx: ...three science instruments') that cut the quote short but still support the claim; Set A's quotes are fuller and would be preferable on quote fidelity alone. Set A's entity 'Lynx mirror assembly' for the 10 m focal length is slightly more precise than Set B's 'Lynx', since the page attributes the focal length to the grazing incidence mirror assembly. Both sets omit the fact that the HabEx starshade flies in formation on a separate spacecraft (partially captured in B's starshade quote) and that these are the baselines from the STDT Reports, but neither omission is significant."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets miss the condition that the HabEx starshade spacecraft flies in formation with the telescope spacecraft, and neither notes that the starshade is a separate spacecraft. Set B's quotes for the Lynx instrument count and focal length are context-free fragments, though they still support the claims within the bullet. Set A's quotes use added prefixes ('Lynx: ...') and ellipses, which are slightly reconstructed rather than verbatim, but faithful to the text."
+        }
+      ]
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p12-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 12,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p12.jpg",
+      "score": 0.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 5,
+        "variant": 11,
+        "shared": 5
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "gain-correction factor",
+          "attribute": "value",
+          "value": "0.2",
+          "unit": "",
+          "conditions": "blade-pitch angle = 20º",
+          "quote": "Gain-Correction Factor, - ... 20 ... 0.2",
+          "_box": [
+            71.99996948242188,
+            72.50755310058594,
+            543.0001831054688,
+            744.9240112304688
+          ]
+        },
+        {
+          "entity": "Baseline blade-pitch controller",
+          "attribute": "Integral Gain",
+          "value": "0.000",
+          "unit": "-",
+          "conditions": "Rotor-Collective Blade-Pitch Angle = 0º",
+          "quote": "Integral Gain, - ... 0.000 ... 0",
+          "_box": [
+            72.00000762939453,
+            389.916015625,
+            543.0000610351562,
+            744.9240112304688
+          ]
+        },
+        {
+          "entity": "blade-pitch controller",
+          "attribute": "proportional gain KP",
+          "value": "0.020",
+          "unit": "s",
+          "conditions": "blade-pitch angle = 0º",
+          "quote": "Proportional Gain, s ... 0 ... 0.020",
+          "_box": [
+            71.99996948242188,
+            72.50755310058594,
+            543.0001831054688,
+            744.9240112304688
+          ]
+        },
+        {
+          "entity": "blade-pitch controller",
+          "attribute": "proportional gain KP",
+          "value": "0.010",
+          "unit": "s",
+          "conditions": "blade-pitch angle = 20º",
+          "quote": "Proportional Gain, s ... 20 ... 0.010",
+          "_box": [
+            71.99996948242188,
+            72.50755310058594,
+            543.0001831054688,
+            744.9240112304688
+          ]
+        },
+        {
+          "entity": "Baseline blade-pitch controller",
+          "attribute": "Proportional Gain",
+          "value": "0.000",
+          "unit": "s",
+          "conditions": "Rotor-Collective Blade-Pitch Angle = 0º",
+          "quote": "Proportional Gain, s ... 0.000 ... 0",
+          "_box": [
+            72.00000762939453,
+            389.916015625,
+            543.0000610351562,
+            744.9240112304688
+          ]
+        },
+        {
+          "entity": "Baseline blade-pitch controller",
+          "attribute": "Gain-Correction Factor",
+          "value": "0.0",
+          "unit": "-",
+          "conditions": "Rotor-Collective Blade-Pitch Angle = 0º",
+          "quote": "Gain-Correction Factor ... 0.0 ... 0",
+          "_box": [
+            72.00000762939453,
+            389.916015625,
+            543.0000610351562,
+            744.9240112304688
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2
+        },
+        "variant": {
+          "duplicates": 2,
+          "invented": 1,
+          "misbound": 2,
+          "misread": 2,
+          "quote": 1,
+          "trivial": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A's five claims all match the text exactly: KP(θ=0º)=0.01882681 s, KI(θ=0º)=0.008068634, KD=0.0 s², and ζφ=0.7 with its stated rationale. Set B repeats those but adds six claims scraped from Figure 7-4's axis tick labels, treating tick marks as data points; these contradict the stated values (e.g. KP=0.000 s and GK=0.0 at θ=0º, when the text gives KP=0.01882681 s and the curve starts at GK=1.0). B also states KP at θ=0º twice with conflicting values (0.01882681 s and 0.020 s). A is therefore clearly more faithful despite showing fewer claims."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set B's five claims all match the page text exactly (KP(θ=0º)=0.01882681 s, KI(θ=0º)=0.008068634, KD=0.0 s², ζφ=0.7 with its stated rationale). Set A repeats those same five correct claims but adds six chart-derived claims, five of which are wrong: three bind right/left axis tick labels (0.000, 0.020, 0.0) as if they were the gain or gain-correction factor at 0º, directly contradicting the correct KP/KI values and the fact that GK(0º)=1.0, and one reads the proportional gain at 20º as 0.010 s when the blue curve is near 0.005 s. Only A's gain-correction factor ≈0.2 at 20º is a defensible chart read. B is therefore clearly the better set."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "B's figure-derived claims are built by concatenating legend/axis tick labels (e.g. 'Proportional Gain, s ... 0.000 ... 0') rather than reading curve values; the quotes do not support the claims. A's two ζφ = 0.7 claims are the same fact split across two condition phrasings (value plus rationale) — a mild duplication. Both sets omit the gain-scheduling law itself (GK(θ) = 1/(1 + θ/θK), dimensionless, with θK = 6.302336º from the preceding page) and the implementation detail that the previous time step's blade-pitch angle is used to compute the next step's gain-correction factor."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "A's three '0.000/0.020/0.0 at 0º' claims are axis-tick artifacts of the figure's dual y-axes, not data points; the extractor paired tick labels with the x-axis origin. Both sets state ζφ = 0.7 twice (once as the upper limit of the recommended range, once with the generator-torque negative-damping rationale) - arguably one fact with two conditions. Both sets also omit the gain-scheduling law GK(θ) = 1/(1 + θ/θK) and the implementation detail that the previous time step's blade-pitch angle is used to compute the next time step's gain-correction factor. Chart-read values in A carry fabricated-looking concatenated quotes ('... 0.000 ... 0') that do not correspond to any real text span."
+        }
+      ]
+    },
+    {
+      "id": "u-dc-manual-p59-66-a157bdf0-p2-text",
+      "run": "dc-manual-p59-66",
+      "page": 2,
+      "family": "text",
+      "image": "images/dc-manual-p59-66-a157bdf0-p2.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 12,
+        "variant": 13,
+        "shared": 12
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "commercially available Nitinol wire",
+          "attribute": "transition temperature",
+          "value": "90",
+          "unit": "C",
+          "conditions": "",
+          "quote": "Commercially available wire transition at temperatures of... 90C",
+          "_box": [
+            35.99896240234375,
+            595.3049926757812,
+            578.4812622070312,
+            755.7447509765625
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "missing": 2
+        },
+        "variant": {
+          "quote": 1
+        }
+      },
+      "issues": {
+        "baseline": {
+          "Rejected claim with unsupported literal quote": 2
+        },
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets capture the same core Nitinol claims accurately, with correct values, units, conditions and supporting quotes. Set A additionally includes the commercially available wire transition temperature of 90 C, which is explicitly stated in footnote 3 ('transition at temperatures of 70C and 90C') and is omitted by Set B. No claim in either set is misread, misbound or invented, so A's extra correct claim makes it the better set."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets capture the core Nitinol material and phase-transformation facts accurately and with supporting quotes. Set B additionally extracts the second commercially available wire transition temperature (90 C), which the footnote states ('transition at temperatures of 70C and 90C'), while Set A only captures 70 C and so omits an important value. Otherwise the two sets are essentially identical in binding, conditions and quotes."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets faithfully reproduce the page's stated composition figures (55-65% Nickel and 44-55% Titanium), which sum to more than 100% as written in the source; this is a source-document inconsistency, not an extraction error. The 70C and 90C transition temperatures come from a footnote reference and could arguably be merged into a single range claim."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets share a slightly reworded quote for the 'material composition | nickel-titanium alloy' claim (the source reads 'The actuation, or contraction, of the Nitinol wire is a solid-state phase transformation based on atomic-level characteristic of the nickel-titanium alloy'); the claim itself is supported, so this is minor. Note the page's stated composition ranges (55-65% Ni and 44-55% Ti) sum to more than 100% — an internal inconsistency in the source, faithfully reproduced by both sets. Facts on the page neither set shows include the 1961 discovery of Nitinol and the 1930s start of SMA research (dates, largely administrative/historical)."
+        }
+      ]
+    },
+    {
+      "id": "u-rules-2013-p35-38-3c85ed49-p1-text",
+      "run": "rules-2013-p35-38",
+      "page": 1,
+      "family": "text",
+      "image": "images/rules-2013-p35-38-3c85ed49-p1.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 22,
+        "variant": 24,
+        "shared": 22
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "clothes-drying points",
+          "attribute": "eligibility condition",
+          "value": "complete, uninterrupted cycle in an automatic clothes washer",
+          "unit": "",
+          "conditions": "load of laundry",
+          "quote": "A load of laundry is eligible for clothes-drying points only if the load experienced a complete, uninterrupted cycle... in an automatic clothes washer.",
+          "_box": [
+            72.0,
+            34.842742919921875,
+            576.4398803710938,
+            226.55816650390625
+          ]
+        },
+        {
+          "entity": "Clothes Dryer Subcontest",
+          "attribute": "scoring function",
+          "value": "90, 100, 110, 120",
+          "unit": "points",
+          "conditions": "as a function of % of original weight",
+          "quote": "Points per clothes drying task... % of original weight... Figure 8: Scoring function for the Clothes Dryer Subcontest",
+          "_box": [
+            72.0,
+            153.4569854736328,
+            580.204345703125,
+            330.4320068359375
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "duplicates": 2,
+          "missing": 2,
+          "trivial": 2
+        },
+        "variant": {
+          "duplicates": 2,
+          "misbound": 1,
+          "trivial": 2,
+          "misread": 1
+        }
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets capture the dishwasher temperature thresholds, capacity, sensor redundancy, and the clothes-drying weight-based scoring bands, and both repeat several facts under two names (heated drying, cycle completion, wash/rinse cycles, and the drying thresholds stated twice). Set A additionally captures the important laundry eligibility condition (complete, uninterrupted washer cycle) that Set B omits entirely. However, A also adds a claim reading the Figure 8 axis ticks 90/100/110/120 as 'points', when the figure shows those numbers on the % of original weight (x) axis and the y axis (points per clothes drying task) is unlabeled. On balance A recovers a substantive rule B misses at the cost of one misbound figure claim."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets share the same 22 dishwasher and clothes-drying claims, including the same redundancies (the 120°F/48.9°C threshold stated three times, 115°F twice, heated-drying and cycle-completion rules twice) and the same trivial Figure 8 axis-tick claim. B adds two claims: the important laundry eligibility rule (complete, uninterrupted washer cycle), which A omits entirely, and a Figure 8 'scoring function' claim listing 90, 100, 110, 120 as points, which misreads the x-axis (% of original weight) tick values as point values. A is error-free but drops an important rule; B is net more complete and faithful despite one misread figure claim."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "Both sets duplicate the same facts under alternate attribute names (e.g., 'required temperature sensor peak' vs 'temperature sensor minimum value', 'heated drying option | status' vs 'dishwasher | heated drying option', 'cycle completion signal' vs 'cycle completion confirmation', 'clothes-drying points | scoring value' vs 'clothes-drying task | scoring criteria'), inflating both claim counts. The Figure 8 y-axis (points per clothes drying task) has no numeric tick labels in the image, so any claim assigning point values to 90-120 is unsupported; the text layer also scrambles the figure's axis labels. Neither set extracts the temperature-of-record rule (higher of two sensor readings, or lower if the higher sensor is defective) or the definition of cycle interruption."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "Both sets miss several substantive facts on the page: the two-loads-per-day / separately-scored rule (item d), permitted drying methods and the visibility/demonstration requirement (item c), the temperature-of-record rule (higher of two sensors unless the higher one is defective), the definition of cycle 'interruption' (item e), the 'normal'/'regular' setting selection rule (item g), and the allowed load states (empty, partial, full; soiled or clean, item h). Both sets also heavily duplicate the same facts under different attribute names (e.g., 'required temperature sensor peak', 'temperature sensor minimum value for full points', and the °C restatement all encode the 120°F threshold), which inflates claim counts without adding information. The Figure 8 y-axis (points per clothes drying task) has no numeric labels in the text layer, so any point values attributed to it are unsupported."
+        }
+      ]
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p10-text-b1of2",
+      "run": "nrel-5mw-p25-36",
+      "page": 10,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p10-b1of2.jpg",
+      "score": 1.0,
+      "scores": {
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 1,
+        "variant": 16,
+        "shared": 1
+      },
+      "only_baseline": [],
+      "only_variant": [
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-58.44E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 14.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 8.70 º",
+          "quote": "14.0 | 12.1 | 8.70 | -58.44E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-120.20E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 24.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 22.35 º",
+          "quote": "24.0 | 12.1 | 22.35 | -120.20E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-94.71E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 20.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 17.47 º",
+          "quote": "20.0 | 12.1 | 17.47 | -94.71E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-83.94E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 18.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 14.92 º",
+          "quote": "18.0 | 12.1 | 14.92 | -83.94E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-76.53E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 17.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 13.54 º",
+          "quote": "17.0 | 12.1 | 13.54 | -76.53E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-114.30E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 23.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 21.18 º",
+          "quote": "23.0 | 12.1 | 21.18 | -114.30E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-99.04E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 21.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 18.70 º",
+          "quote": "21.0 | 12.1 | 18.70 | -99.04E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-105.90E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 22.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 19.94 º",
+          "quote": "22.0 | 12.1 | 19.94 | -105.90E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-90.67E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 19.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 16.23 º",
+          "quote": "19.0 | 12.1 | 16.23 | -90.67E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-70.46E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 16.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 12.06 º",
+          "quote": "16.0 | 12.1 | 12.06 | -70.46E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-28.24E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 11.4 m/s (Rated), Rotor Speed = 12.1 rpm, Pitch Angle = 0.00 º",
+          "quote": "11.4 | 12.1 | 0.00 | -28.24E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-51.66E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 13.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 6.60 º",
+          "quote": "13.0 | 12.1 | 6.60 | -51.66E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-64.44E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 15.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 10.45 º",
+          "quote": "15.0 | 12.1 | 10.45 | -64.44E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-125.30E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 25.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 23.47 º",
+          "quote": "25.0 | 12.1 | 23.47 | -125.30E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        },
+        {
+          "entity": "Aerodynamic Power",
+          "attribute": "sensitivity to blade-pitch angle (∂P /∂θ)",
+          "value": "-43.73E+6",
+          "unit": "watt/rad",
+          "conditions": "Wind Speed = 12.0 m/s, Rotor Speed = 12.1 rpm, Pitch Angle = 3.83 º",
+          "quote": "12.0 | 12.1 | 3.83 | -43.73E+6",
+          "_box": [
+            72.0,
+            71.91600036621094,
+            547.4397583007812,
+            581.7282104492188
+          ]
+        }
+      ],
+      "problems": {
+        "baseline": {
+          "missing": 2
+        },
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A captures all fifteen rows of Table 7-1 with correct ∂P/∂θ values, units (watt/rad), and full wind-speed/rotor-speed/pitch-angle conditions, plus the qualitative claim that pitch sensitivity varies nearly linearly with blade-pitch angle. Set B contains only that single qualitative claim and omits the entire quantitative table, which is the main engineering content of this page part. Both sets state the one shared claim correctly and with a supporting quote, so B has no wrong claims, but it is missing the key sensitivity data. A is therefore clearly better."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set A contains only the single qualitative claim that pitch sensitivity varies nearly linearly with blade-pitch angle, omitting the entire Table 7-1 dataset of ∂P/∂θ values across Region 3. Set B includes that same qualitative claim plus all 15 table rows, each with the correct wind speed, rotor speed, pitch angle, value, unit (watt/rad) and a supporting row quote. All of B's claims match the table exactly, so B is both complete and faithful while A misses the main engineering content of the page."
+        }
+      ],
+      "remarks": [
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "remark": "All 15 table rows in Set A were checked against the page text and image and match exactly, including signs and E+6 magnitudes. Both sets omit the rated mechanical power (P0 = 5.296610 MW) and rated rotor speed (Ω0 = 12.1 rpm) context and the frozen-wake linearization assumption, which are secondary but potentially useful facts on this page."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "remark": "B's quotes are table-row fragments rather than prose, but they do support the claims. Both sets omit the rated mechanical power (P0 = 5.296610 MW) and the frozen-wake linearization assumption, which are notable facts on the page."
+        }
+      ]
+    }
+  ]
+}

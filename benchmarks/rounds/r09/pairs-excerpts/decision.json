@@ -1,0 +1,37 @@
+{
+  "units_judged": 31,
+  "overall": {
+    "mean": 0.508,
+    "low": 0.387,
+    "high": 0.629
+  },
+  "strata": {
+    "table": {
+      "mean": 0.25,
+      "low": 0.083,
+      "high": 0.417
+    },
+    "text": {
+      "mean": 0.617,
+      "low": 0.417,
+      "high": 0.8
+    },
+    "visual": {
+      "mean": 0.442,
+      "low": 0.288,
+      "high": 0.596
+    }
+  },
+  "strata_units": {
+    "table": 3,
+    "text": 15,
+    "visual": 13
+  },
+  "decision": "inconclusive",
+  "units": {
+    "units": 270,
+    "unchanged": 207
+  },
+  "coverage": 0.233,
+  "stopped": "complete at 32 units"
+}
