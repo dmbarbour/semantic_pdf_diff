@@ -35,8 +35,13 @@ The run cache (`.cache`) and the committed judge caches (2,646 files) are alread
 
 **1. The request object.**
 - `ModelRequest`: the role (extract, triage, compare, judge), the system text, the user text, the images (paths, with each image's SHA-256), the response schema or format, and the generation settings (output tokens, temperature, seed).
-- **`hash()`:** SHA-256 of a canonical JSON of everything above but the paths.
-  - Left out: the model, since it is the M of the triple, and transport (URL, streaming, timeouts, retries).
+- **`hash()`:** SHA-256 of a canonical JSON of what reaches the model: the system and user text, the image hashes in order, the response format as sent, and the generation settings.
+  - **Left out:**
+    - the role, which is a label for the code
+    - the parsing schema, unless it is sent as the response format
+    - the image paths
+    - the model, since it is the M of the triple
+    - transport (URL, streaming, timeouts, retries)
   - Images are hashed by their bytes. Fixtures already pin the PDF library's version, and replay tests skip under another, so the old reason for keying crops by recipe falls away.
 - **`body(model)`:** builds today's request body, so what is sent doesn't change.
 - **One builder per role** makes a `ModelRequest`. Extraction's builder takes a task (page, region, crop, text) and the context providers (item 5).
@@ -46,7 +51,7 @@ The run cache (`.cache`) and the committed judge caches (2,646 files) are alread
 
 | Table | Holds | Key |
 |---|---|---|
-| `response` | outcome (`ok`, `invalid`, `transient`), answer or error, usage, when recorded, when last used; role and region as labels, for summaries (proposed) | `(query hash, responder, sample)` |
+| `response` | outcome (`ok`, `invalid`, `transient`), answer or error, usage, when recorded, when last used; no labels (the owner: not sure about labelling answers "with anything that the model wouldn't see") | `(query hash, responder, sample)` |
 | `meta` | schema version, PDF library version | |
 
 - **Replay:** rebuild the query from the sample documents, hash it, and look up `(responder, hash, sample)`.
@@ -127,8 +132,8 @@ The run cache (`.cache`) and the committed judge caches (2,646 files) are alread
   - These are what the weighted quality estimates consume. Retry policy and failure counts live in one place.
 - **Golden tests for every rubric's prompt (v2–v6)** before any rubric refactor. A byte change in a judge prompt re-pays judging, which was 88% of spend.
 
-**8. Judge answers in the same format** (the owner: "Judge requests can use the same format, though perhaps a separate .db file"):
-- **Each batch folder gets its own judge fixture:** `(query hash, judge, sample)`, answers only, packed reproducibly like the replay fixture. It replaces the `.judge-cache` folders. Spot checks likewise.
+**8. Judge answers in the same format** (the owner: "Judge requests can use the same format, though perhaps a separate .db file"; "Batch per round for judge files is good"):
+- **Each batch folder in a round gets its own judge fixture:** `(query hash, judge, sample)`, answers only, packed reproducibly like the replay fixture. It replaces the `.judge-cache` folders. Spot checks likewise.
 - **Migration by replay:** rebuild each batch's judge prompts from `pairs.json` and its rubric, find each answer under its old cache hash, and store it under the new hash. Answers with no match are dropped.
 - **Verdict files stay as they are:** rounds can still be re-decided offline without any fixture.
 
@@ -162,12 +167,17 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
 - **Keyed by what reaches the model;** triples of model, query hash and response, with accounting for failures (the owner; record/replay decisions).
 - **Levers only for diagnostics:** recorded per query if useful, never in the hash, and not needed in the fixture record except as a secondary, less reliable identifier (the owner).
 - **Fixtures hold no query text or images in the general case;** storing a few samples for quality judgements is reasonable (the owner). Everything should be deterministic enough, from the samples and the responses to prior queries, to form the same reports (the owner).
-- **Judge answers use the same format, in separate files** (the owner).
+- **Judge answers use the same format, in separate files,** one per batch within each round (the owner: "Batch per round for judge files is good").
 - **Stale answers without an obvious transition via replay are let go** (the owner).
 - **Checker models left to Claude** (the owner). Chosen: Claude, Gemini 3.1 Pro, Qwen3.5-397B and Kimi-K3, with 30 queries per variant and at most $2 per round.
 - **A strong-model pass on queries each round,** by Claude and a few others (the owner).
 
 ## Open questions
 
-- **Labels on answers:** role and region on each response row, for fixture summaries. They aren't query text, but they aren't needed for replay either. Proposed yes.
-- **Judge fixtures per batch or per round?** Proposed per batch, as the caches are now.
+- **Fixture summaries** (the owner: not sure about labelling answers with anything the model wouldn't see, but "Having a partial description of each query might be a useful table"). Options, discussed 2026-09-28:
+  - **A. Replay only:** no descriptions in the fixture. Summaries replay the runs and join the run stores' recipes to the answers by hash.
+  - **B. A description table of what the model saw:** per query hash, facts about its own content (template, the "Source type" line, sizes of text and context, image count and pixel sizes, response format), so it can't disagree with the query.
+  - **C. A table of partial recipes:** document, page, kind, task. Not seen by the model, and possibly several per query; never used for lookup.
+  - **D. A text summary written next to the packed zip** by the replay that precedes packing: per responder, role, document and source type, the answers, failures and tokens. Readable in git history; derived, not part of the fixture.
+  - **Also:** the fixture's `meta` lists the documents it was recorded from, a fact about the fixture rather than any answer. The replay test uses it to skip under other slices.
+  - **Proposed:** B, D and the `meta` list.
