@@ -37,7 +37,7 @@ What we've learned so far shapes this:
 3. **Record.** Run each variant on the evaluation inputs through the live pipeline with the fixture attached (a new interpreter fingerprint, the same responder). Unchanged requests replay for free.
 4. **Judge.** The panel judges, per sampled input:
    - **Pairwise:** the baseline's answer against the variant's, in both orders (to cancel position bias): which is better, or equal, and why.
-   - **Absolute checks:** the per-field right/wrong/unsure on each output's claims.
+   - **Per-output checks:** the per-field right/wrong/unsure on each output's claims, weighed across raters (no rater is ground truth).
    - **The question itself, blind,** when the variant changed the input.
 
    Claims identical in both outputs (same claim ID) keep their labels and aren't re-judged. Claude labels a small anchor subset each round, answering blind where the stage calls for it. The owner spot-checks when results stabilise or before a top-up, not every round (see *Decisions*).
@@ -46,7 +46,7 @@ What we've learned so far shapes this:
 
 ## Measuring on the same inputs (paired)
 
-The unit of evaluation is an **input** (an extraction task, a situating request, a comparison), not a claim. Both variants answer the same inputs, so differences come from the variant, not from sampling. This is far more sensitive than comparing batches of different claims. Pairwise preferences are also judged more consistently than absolute scores (the research on LLM judges and human raters agrees on this).
+The unit of evaluation is an **input** (an extraction task, a situating request, a comparison), not a claim. Both variants answer the same inputs, so differences come from the variant, not from sampling. This is far more sensitive than comparing batches of different claims. Pairwise preferences are also judged more consistently than scores given to one output at a time (the research on LLM judges and human raters agrees on this).
 
 Inputs are sampled **stratified**:
 - by request kind (text, table row, tile, figure, overview, figure about, section about, comparison)
@@ -69,7 +69,7 @@ The split is by document, not by page, so nothing leaks between sets.
 | Mechanical (every run, free) | Failed or unparseable answers; partial rate; refinement depth; claims per task; quote found in the page's text layer; section attribution rate; values in "abouts"; tokens and latency per page | None |
 | Questions (when inputs change) | Share of inputs judged enough / partly / not enough; what's missing | About $0.03 per input across 4–6 judges |
 | Answers, pairwise | Variant's win rate against the baseline, overall and per stratum, with bootstrap confidence intervals | About $0.03–0.06 per input |
-| Answers, absolute | Usable-claim rate (Dawid–Skene consensus); per-field correctness; hallucination rate (value not in source) | Included in the pairwise judging |
+| Answers, per set | Usable-claim rate (Dawid–Skene consensus, weighting raters by estimated reliability); per-field correctness; hallucination rate (value not in source) | Included in the pairwise judging |
 | Recall | Claims a careful reader would extract but the model didn't: blind answers from the question stage (people and panel), matched mechanically, with leftovers adjudicated | People's time; a few inputs per round |
 | Human anchor | Panel-vs-person agreement on a spot-check subset; panel weights re-estimated if they drift | About 15 items per round |
 
@@ -117,7 +117,7 @@ Every step appends its figures to `benchmarks/history.jsonl`, one record per mea
 - metric, value, interval, sample size
 - the cost of producing it, and a timestamp
 
-That includes the mechanical metrics after recording, adequacy after question judging, win rates and absolute rates after answer judging, the decision, and the ledger totals. The report page draws every graph from this file, so a partial or paused round still shows what it measured.
+That includes the mechanical metrics after recording, adequacy after question judging, win rates and per-set rates after answer judging, the decision, and the ledger totals. The report page draws every graph from this file, so a partial or paused round still shows what it measured.
 
 ## Budget
 
@@ -155,7 +155,7 @@ Every round prints an estimate before spending (tokens × the provider's listed 
 
 1. Query sets and context levers as settings; the missing-heading slicing fix; more slices, split into sets. One re-recording of the baseline.
 2. Pairwise items, input-level sampling, statistics and acceptance rules.
-3. Round 0: the baseline's absolute metrics on both sets; panel calibration against about 30 of the owner's labels; judges chosen by reliability per dollar.
+3. Round 0: the baseline's per-set metrics on both sets; panel calibration against about 30 of the owner's labels; judges chosen by reliability per dollar.
 4. Rounds 1–3: one lever per variant, starting with what the panel said was missing most (surrounding text, then other-page context, then legends).
 5. The report page and history.
 6. Later: model-proposed variants from failure clusters, with the owner approving what runs.
