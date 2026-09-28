@@ -4,7 +4,8 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 
 - **Detail:** each round's review in this folder.
 - **Per-unit clues:** `benchmarks/rounds/<round>/pairs-<variant>/analysis.json`, browsable as `insights.html` in the round folder (regenerate with `scripts/run_round.py <round> --only report`).
-- **Win rates:** the variant's share of pairwise preferences against the baseline, judged in both orders, with a 90% bootstrap interval.
+- **Win rates:** the variant's share of pairwise preferences against the baseline, judged in both orders, with a 90% interval (a bootstrap until 2026-09-28; since then cluster-robust, by page region).
+- **This index is the lever catalogue** (the owner, 2026-09-28): every lever idea gets a row when it's raised, built or not. Levers not accepted or parked are tried again against later champions, and other ways of doing one idea are tried as its variants.
 
 ## Status at a glance
 
@@ -13,7 +14,7 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Neighbouring text | `context_before/after: 400` | Default (2026-09-28) | r01b 0.68 (0.56–0.80); with the others r02 0.68, r02h 0.71 |
 | Text layer with images | `visual_text_layer: 1500` | Default (2026-09-28) | r01b 0.72 (0.56–0.88) |
 | Table lead-in | `table_context: 400` | Default (2026-09-28) | r01b 0.71 (0.56–0.85), 15 units |
-| Numbered-item stems | `stem_context` | Default (2026-09-28) | r03 0.63 (0.51–0.75); r04 combined 0.64 / r04h 0.69 |
+| Numbered-item stems | `stem_context` | Default (2026-09-28) | r03 0.63 (0.51–0.75), borderline; r04 combined 0.64 / r04h 0.69. Measured with table values taken for numbered items (fixed 2026-09-28); the fixed version is unmeasured |
 | Whitespace bands | `tiling: bands` | Default (2026-09-28) | r03 0.83 (0.70–0.94) |
 | Grown tiles | `grow_tiles` | Default (2026-09-28) | r03 0.80 (0.70–0.89) |
 | Skip empty tiles | `skip_empty` | Default (2026-09-28; cost only) | 43 of 963 tiles (4.5%) skipped on the development slices, 0 claims lost |
@@ -21,7 +22,7 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | References | `references` | Not accepted | r05 0.50 (0.35–0.66), 17 units |
 | Sheet details | `sheet_details` | Parked | r05–r05d: 0.64 → 0.50 → 0.48 → 0.42 |
 | Merged readings | `reconcile` | Default (2026-09-28) | r08 0.56 (0.45–0.67) no worse, with 13.5% fewer claims; the owner's design decision |
-| Fragment quotes | `quote_match: fragments` | Default (2026-09-28) | r09b 0.66 (0.53–0.77); held-out r09h 0.66 (0.50–0.81), text 0.89; visual weaker in both (0.44, 0.40) |
+| Fragment quotes | `quote_match: fragments` | Default (2026-09-28) | r09b 0.66 (0.53–0.77); held-out r09h 0.66 (0.50–0.81), borderline, text 0.89; visual weaker in both (0.44, 0.40), mostly from merged claims' wording shown in visual units (the statistics audit) |
 | Excerpt quotes (with an in-order window) | `quote_match: excerpts` | Not accepted | r09 0.51 (0.39–0.63); the window let chart-axis labels through as values |
 | Chart-reading rule | `visual_rules` | Not accepted | r08 0.59 (0.47–0.71); vaguer readings, out-of-range ones remain |
 | Tile locator | `tile_locator` | Parked | r06 0.49 (flawed sampling), r07 0.58 (0.47–0.68): no worse; wins on IEA and LCIT in both rounds |

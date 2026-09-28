@@ -219,6 +219,22 @@ Round 1 showed that asking the same question again often gets a different answer
   - Shared claims' marks count for both sides. Rounds using v6 run `add_context` on each batch.
 - **Unpriced responses:** a streamed answer cut off before its last chunk comes without usage, yet may be billed. The ledger used to drop it; it now records it as "unpriced", and rounds report how many.
 
+**On the audit's proposals (the owner, 2026-09-28):**
+- **Promotion (A, approved):**
+  - A lever reaches the defaults only after a combination round and a held-out check. The held-out criterion is written into `round.json` before judging (e.g. mean above 0.5 and no stratum loss), and the held-out effect is the one quoted, since development figures of accepted levers are inflated by selection.
+  - "No worse" needs a gain named in advance, with its metric and threshold.
+  - **No lever is forgotten:** the [lever index](../reviews/levers.md) is the catalogue.
+    - Every idea gets a row when it's raised, built or not.
+    - Levers not accepted or parked are tried again against later champions, since a baseline that moved can change the answer.
+    - Other ways of doing one idea are tried as its variants; there may be subtleties a first version misses (quotes: exact, excerpts, fragments; stems: as in r03, as fixed).
+  - **Later:** a search closer to genetic programming, combining and mutating levers to get out of the local optima that one lever at a time finds (plans index: *Lever search*).
+- **Levers that act on part of a page (B):**
+  - **The problem:** a rule added to every image prompt (the chart rule) re-asks every image, so the few units it acts on are judged among many that changed only by chance.
+  - **The fix:** a lever acts only on the requests it applies to (tiles with charts, say), and the rest replay unchanged.
+  - **The owner's condition:** the choice of requests must be robust and easy to review. It must be mechanical and deterministic, and each variant lists the requests it changes, with page thumbnails, to be looked over before judging.
+- **Spot checks (C):** mix close calls and clear ones, drawn from a decided round's batch and stratified by closeness (close, flipped with the order, clear), for more robust quality estimates.
+- **Measurements owed (D):** agreed, after the owner's surveys.
+
 **Judging rubric v2 (the owner, 2026-09-27; from round 7):**
 - **What changes:** document administration (contacts, addresses, lot or project numbers, revision dates, copyright, logos) is neutral in pairwise judging. Neither side is preferred for including or omitting it; such claims are checked only for correctness.
 - **Why:** in round 5, crops that happened to isolate a title block swung results.
