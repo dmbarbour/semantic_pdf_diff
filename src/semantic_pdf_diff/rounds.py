@@ -265,7 +265,7 @@ RUBRICS = {
                        "not shown are identical in both sets, so they aren't missing from either.",
            "tags": True, "sections": True, "context": True},
     # The owner, 2026-09-28: claims marked one by one (as on the spot-check page), so judges and
-    # people can be compared claim by claim, and each side gets an absolute share of wrong claims.
+    # people can be compared claim by claim, and each side gets its own share of claims marked wrong.
     "v5": {"addition": "\nDocument administration (contacts, addresses, lot or project numbers, revision dates, "
                        "copyright, logos) is neutral: don't prefer a set for including or omitting it; judge such "
                        "claims only for correctness.\nEntity names and conditions may come from the context given "
@@ -533,8 +533,8 @@ def anchor(folder, human_dir="verdicts-human"):
         agree = sum(lean(person[u]) == lean(judges[u]) for u in both)
         opposite = sum(lean(person[u]) * lean(judges[u]) < 0 for u in both)
         fmt = lambda t: None if t is None else {"mean": round(t[0], 3), "low": round(t[1], 3), "high": round(t[2], 3)}
-        # Claims marked one by one: the share marked wrong on each side (an absolute measure, which
-        # a preference between two sets isn't).
+        # Claims marked one by one: the share marked wrong on each side, a measure of each set on its
+        # own (a preference between two sets isn't); one rater's view, weighed like any other.
         marked = {"baseline": Counter(), "variant": Counter()}
         for orders in data["verdicts"].values():
             for side, claims in (next(iter(orders.values())).get("claims") or {}).items():

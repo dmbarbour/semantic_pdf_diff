@@ -123,14 +123,14 @@
 - **The judges are consistent with each other and with themselves.** Most of the noise comes from re-extraction: every re-asked request is a fresh sample, and per-document directions wobble between rounds. Judge disagreement is the smaller part.
 - **Levers that re-ask everything need an A/A control:** the baseline's changed requests re-asked once, to measure the noise floor in the same round. Prompt levers do this (charts; any rule), and so did r01 by accident.
 - **Win rates are conditional on changed units.** A lever that changes 8 of 176 units and one that changes 91 aren't comparable, and decisions don't weigh coverage. The report joins series across rounds by variant name even though the baselines differ.
-- **Pairwise preference can't see shared failures, and those dominate.** In r07–r08, 70% of verdicts tag both sides with duplicates. The 375 remarks most often name a fact both sides miss (159), duplicates (147) and text-layer or OCR trouble (131). The champion's absolute quality isn't tracked anywhere, and no round unit has a human label.
+- **Pairwise preference can't see shared failures, and those dominate.** In r07–r08, 70% of verdicts tag both sides with duplicates. The 375 remarks most often name a fact both sides miss (159), duplicates (147) and text-layer or OCR trouble (131). No per-set quality estimate for the champion is tracked anywhere, and no round unit has a human label.
 - **The held-out set has been used twice.** The current champion's newest parts (skip empty, merged readings) haven't had a held-out check.
 
 ## Where the project stands against its plans
 
 - **Four plans are active at once:** scheduling and triage, record/replay, evaluation benchmarks, query improvement.
 - **The main use case hasn't started.** Criteria-first comparison is next in line after scheduling, and every round so far ran extraction only.
-- **Evaluation benchmarks:** the review batches and panel exist. Its milestones 1–4 aren't built: scoring against answer keys, synthetic documents with keys, expected-claim lists, retrieval scoring. Those are what would give an absolute quality measure.
+- **Evaluation benchmarks:** the review batches and panel exist. Its milestones 1–4 aren't built: scoring against answer keys, synthetic documents with keys, expected-claim lists, retrieval scoring. Those are what would give a quality measure for each set on its own (weighted over raters, not ground truth).
 - **Query improvement:**
   - Milestone 3's panel calibration against the owner's labels was done on s01/s02, not on round units.
   - Milestone 6 (variants proposed from failure clusters) has effectively begun through the remarks.
@@ -149,7 +149,7 @@
    - an A/A control for levers that re-ask everything
 3. **Cut judging cost:** MiMo as the primary judge, with Qwen only on split or low-confidence units. Smaller units: cap claims per unit, or judge per region. Together these would roughly halve the cost per decision.
 4. **Promote the champion to the tool's defaults,** with the measured runtime settings (claims per request, token budgets). One full re-record, then a held-out check of the whole champion (about $2–3).
-5. **Measure absolute quality:**
+5. **Estimate quality for each set on its own:**
    - log tag rates for the champion each round
    - build the answer-key scoring from the evaluation plan
    - the owner's spot check at the top-up, picked to show what changed

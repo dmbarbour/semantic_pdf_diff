@@ -59,7 +59,7 @@ A spot check puts you in a judge's place. The items are the same page regions th
 
 Then `python scripts/spotcheck.py import <folder> <answers file>`, and `compare` shows:
 - where you and the panel agree and differ
-- the share of each side's claims you marked wrong (an absolute measure, which a preference between two sets isn't)
+- the share of each side's claims you marked wrong: a measure of each set on its own, which a preference between two sets isn't. Like every rater's, your marks are weighed as evidence, not taken as ground truth.
 - claim by claim, how often you and the judges agree, when the judges also mark claims (rubric v5)
 
 Your verdicts are the anchor for the panel's: they say whether the round decisions track what a person would decide.
