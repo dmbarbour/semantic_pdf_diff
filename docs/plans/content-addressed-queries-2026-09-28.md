@@ -49,10 +49,19 @@ The run cache (`.cache`) and the committed judge caches (2,646 files) are alread
 **2. The fixture holds answers only** (schema version 4):
 - **The owner:** "I'm not sure I'd want to store images or query text in test fixtures in the general case... the idea with the test fixture is that everything should be deterministic enough, i.e. based on samples and responses to prior queries, to form the same reports."
 
+- **The owner:** "the main fixture table - the (model, query-hash, repeat-index, response) - should be pretty close to pure. Other tables can hold whatever is convenient, so long as we don't compromise the main lookup."
+
 | Table | Holds | Key |
 |---|---|---|
-| `response` | outcome (`ok`, `invalid`, `transient`), answer or error, usage, when recorded, when last used; no labels (the owner: not sure about labelling answers "with anything that the model wouldn't see") | `(query hash, responder, sample)` |
-| `meta` | schema version, PDF library version | |
+| `response` (the main table) | outcome (`ok`, `invalid`, `transient`), answer or error, usage, when recorded, when last used | `(query hash, responder, sample)` |
+| `description` | facts about each query's own content: template, its "Source type" line, text and context sizes, image count and pixel sizes, response format | query hash |
+| `recipe` | partial recipes: document, page, kind, task; possibly several per query; no query text | `(query hash, hash of the recipe)` |
+| `meta` | schema version, PDF library version, the documents recorded from | |
+
+- **Only the main table is ever used for lookup.** A test replays with every other table dropped and must get identical results.
+- **Summaries** read the side tables: answers, failures and tokens per responder, role, document and source type.
+  - **At pack time,** they're written as text beside the zip, so git history shows what changed.
+  - `meta`'s document list is what the replay test's skip needs.
 
 - **Replay:** rebuild the query from the sample documents, hash it, and look up `(responder, hash, sample)`.
   - `ok` returns the answer. `invalid` replays the failure, so variants differ only where they change requests.
@@ -62,7 +71,7 @@ The run cache (`.cache`) and the committed judge caches (2,646 files) are alread
   - each query's recipe: role, document, kind, page, task, crop and overlays, code version
   - its text
   - the lever notes
-  - Recipes get a table of their own there, normalised as the owner suggested for a recipes table.
+  - The fixture's `recipe` table keeps only the partial recipe (no text), for summaries.
   - **How a query changed** is a report comparing two runs' recipes and queries, e.g. a variant against its baseline.
 - **Samples for quality checks** (the owner: "Storing a few samples for quality judgements is reasonable"): the queries dumped each round (item 6), with text and images, are kept in the round's folder. Rounds run on public slices only.
 - **The spot check's "read from"** takes a claim's input from the run's store at build time, instead of from the fixture's stored prompt.
@@ -133,7 +142,7 @@ The run cache (`.cache`) and the committed judge caches (2,646 files) are alread
 - **Golden tests for every rubric's prompt (v2–v6)** before any rubric refactor. A byte change in a judge prompt re-pays judging, which was 88% of spend.
 
 **8. Judge answers in the same format** (the owner: "Judge requests can use the same format, though perhaps a separate .db file"; "Batch per round for judge files is good"):
-- **Each batch folder in a round gets its own judge fixture:** `(query hash, judge, sample)`, answers only, packed reproducibly like the replay fixture. It replaces the `.judge-cache` folders. Spot checks likewise.
+- **Each batch folder in a round gets its own judge fixture,** kept out of the main test fixture (the owner: "whatever makes the most sense here, just so long as it's kept out of our main test fixture"): `(query hash, judge, sample)`, answers only, packed reproducibly like the replay fixture. It replaces the `.judge-cache` folders. Spot checks likewise.
 - **Migration by replay:** rebuild each batch's judge prompts from `pairs.json` and its rubric, find each answer under its old cache hash, and store it under the new hash. Answers with no match are dropped.
 - **Verdict files stay as they are:** rounds can still be re-decided offline without any fixture.
 
@@ -167,17 +176,12 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
 - **Keyed by what reaches the model;** triples of model, query hash and response, with accounting for failures (the owner; record/replay decisions).
 - **Levers only for diagnostics:** recorded per query if useful, never in the hash, and not needed in the fixture record except as a secondary, less reliable identifier (the owner).
 - **Fixtures hold no query text or images in the general case;** storing a few samples for quality judgements is reasonable (the owner). Everything should be deterministic enough, from the samples and the responses to prior queries, to form the same reports (the owner).
-- **Judge answers use the same format, in separate files,** one per batch within each round (the owner: "Batch per round for judge files is good").
+- **Judge answers use the same format, in separate files kept out of the main test fixture** (the owner). One per batch within each round (Claude's choice, which the owner left open).
+- **The main table is close to pure:** (model, query hash, repeat index, response). Other tables hold whatever is convenient, provided they never compromise the main lookup (the owner).
 - **Stale answers without an obvious transition via replay are let go** (the owner).
 - **Checker models left to Claude** (the owner). Chosen: Claude, Gemini 3.1 Pro, Qwen3.5-397B and Kimi-K3, with 30 queries per variant and at most $2 per round.
 - **A strong-model pass on queries each round,** by Claude and a few others (the owner).
 
 ## Open questions
 
-- **Fixture summaries** (the owner: not sure about labelling answers with anything the model wouldn't see, but "Having a partial description of each query might be a useful table"). Options, discussed 2026-09-28:
-  - **A. Replay only:** no descriptions in the fixture. Summaries replay the runs and join the run stores' recipes to the answers by hash.
-  - **B. A description table of what the model saw:** per query hash, facts about its own content (template, the "Source type" line, sizes of text and context, image count and pixel sizes, response format), so it can't disagree with the query.
-  - **C. A table of partial recipes:** document, page, kind, task. Not seen by the model, and possibly several per query; never used for lookup.
-  - **D. A text summary written next to the packed zip** by the replay that precedes packing: per responder, role, document and source type, the answers, failures and tokens. Readable in git history; derived, not part of the fixture.
-  - **Also:** the fixture's `meta` lists the documents it was recorded from, a fact about the fixture rather than any answer. The replay test uses it to skip under other slices.
-  - **Proposed:** B, D and the `meta` list.
+None at present.
