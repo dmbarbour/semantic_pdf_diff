@@ -47,6 +47,32 @@ def extraction_template(s):
 # Numbered markers, from outer to inner: "Contest 9.", "9-2." or "3.1", "c.", "(iii)", "4.".
 STEM = re.compile(r"^\s*(Contest \d+\.|\d+-\d+\.|\d+(?:\.\d+)+\.?|[a-z]\.|\((?:[ivx]+|\d+|[a-z])\)\.?|\d+\.)(?=\s|$)")
 
+TITLED = re.compile(r"\s*[-–—:]?\s*[A-Z]")  # a title: a capitalised word, after any dash or colon
+
+def _section(marker):
+    """(3, 2, 1) for "3.2.1", or None when the marker isn't digits and dots with at least one inner dot."""
+    return tuple(int(n) for n in marker.rstrip(".").split(".")) if re.fullmatch(r"\d+(?:\.\d+)+\.?", marker) else None
+
+def _follows(number, before):
+    """Whether section `number` can come next after `before`: its first child (3.2 → 3.2.1), or the next at
+    some level, then first children (3.2.1 → 3.2.2, 3.3, 4.1; a first child may be numbered 0 or 1)."""
+    return any(number[:k] == before[:k] and number[k] == before[k] + 1 and all(n in (0, 1) for n in number[k + 1:])
+               for k in range(min(len(number), len(before)))) or (
+        len(number) == len(before) + 1 and number[:-1] == before and number[-1] in (0, 1))
+
+def _numbered(marker, title, styled=False, before=()):
+    """Whether digits and dots ("3.2", "12.") start a numbered item with this title, rather than being
+    a value in a table ("3.83 -43.73E+6", "0.6 s", "1.35 Partial safety factor"), where the next cell
+    would become the item's "title". A list item ("4.") takes any word. A section number takes a
+    capitalised title, never starts at 0, and is set as a heading (`styled`) or follows one of the
+    section numbers `before` (the ones it sits under, and the last one seen). Other markers ("c.",
+    "(ii)") always count."""
+    number = _section(marker)
+    if number is None:
+        return not re.fullmatch(r"\d+\.", marker) or bool(re.match(r"\s*[-–—:]?\s*[^\W\d_]", title))
+    return (number[0] > 0 and bool(TITLED.match(title))
+            and (styled or any(_follows(number, b) for b in before)))
+
 def _stem_level(marker):
     if marker.startswith("Contest"):
         return 0
@@ -83,7 +109,11 @@ def stem_index(doc):
         seen.update(keys)
     margins = {k for k, n in seen.items() if n >= max(2, len(doc) // 2) and k[0]}
     body = sizes.most_common(1)[0][0] if sizes else 10
-    stack, pending, index = [], None, {}
+    stack, pending, last, index = [], None, None, {}
+    def push(level, marker, title):
+        while stack and stack[-1][0] >= level:
+            stack.pop()
+        stack.append((level, marker, title))
     for number, (page, blocks) in enumerate(zip(doc, pages), 1):
         rows = index.setdefault(number, [])
         for block in blocks:
@@ -93,17 +123,27 @@ def stem_index(doc):
                     continue
                 first = line["spans"][0]
                 heading = (first["size"] > body + 0.5 or (first["flags"] & 16 and len(text) < 60)) and len(text) < 90
+                styled = heading and first["size"] > body - 0.5  # not a chart's axis labels
+                before = [n for n in (*(_section(m) for _, m, _ in stack), last) if n]
                 match = STEM.match(text)
+                if match and text[match.end():].strip():
+                    if not _numbered(match.group(1), text[match.end():], styled, before):
+                        match = None
+                    last = _section(STEM.match(text).group(1)) or last
+                if pending is not None and _numbered(pending[1], text, pending[2] or styled, before):
+                    # A marker alone on its line opens its item once the next line shows it's one: a title
+                    # ("3.2.2" / "Insulation Analysis"). A lone value ("23.47" / "-125.30E+6") closes nothing.
+                    push(pending[0], pending[1], "" if match else text)
+                pending = None
                 if match:
                     level = _stem_level(match.group(1))
                     level = 1 if heading and level > 1 else level
-                    while stack and stack[-1][0] >= level:
-                        stack.pop()
                     rest = text[match.end():].strip()
-                    stack.append([level, match.group(1), rest])
-                    pending = stack[-1] if not rest else None  # a marker alone: its text is the next line
-                elif pending is not None:
-                    pending[2], pending = text, None
+                    if rest:
+                        push(level, match.group(1), rest)
+                    else:
+                        pending = (level, match.group(1), styled)
+                        last = _section(match.group(1)) or last
                 rows.append((display_y(page, line["bbox"]), [f"{m} {t[:70]}".strip() for _, m, t in stack]))
     return index
 

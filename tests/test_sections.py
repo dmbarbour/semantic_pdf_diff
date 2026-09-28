@@ -240,6 +240,22 @@ class SectionContext(unittest.TestCase):
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), plain)
             self.assertFalse(any('Within:' in p for p, _ in plain.asked))
 
+    def test_stem_context_skips_values_in_tables(self):
+        from semantic_pdf_diff.extract import stem_index
+        doc = pymupdf.open()
+        page = doc.new_page(width=400, height=500)
+        lines = (('7.3 Baseline Blade-Pitch Controller', 14), ('3.83 -43.73E+6', 9), ('0.6 s', 9),
+                 ('7.4 - Final Screen', 9), ('2. install the pump', 9), ('7.4.1', 9), ('Insulation Analysis', 9),
+                 ('1.35', 9), ('Partial safety factor', 9), ('23.47', 9), ('-125.30E+6', 9), ('12.5', 9), ('3.1', 9),
+                 ('The pump runs at night.', 9))
+        for y, (text, size) in enumerate(lines):
+            page.insert_text((40, 30 + 20 * y), text, fontsize=size)
+        paths = [parents[-1] for _, parents in stem_index(doc)[1]]
+        self.assertEqual(paths[1:3], ['7.3 Baseline Blade-Pitch Controller'] * 2)  # "3.83" is a value, not an item
+        self.assertEqual(paths[3:5], ['7.4 - Final Screen', '2. install the pump'])  # titled, and next after 7.3
+        self.assertEqual(paths[6], '7.4.1 Insulation Analysis')  # a title on the next line
+        self.assertEqual(set(paths[7:]), {'7.4.1 Insulation Analysis'})  # a table row, and lone values, aren't items
+
     def test_references_bring_definitions_and_cited_captions(self):
         from semantic_pdf_diff.extract import _long_form, glossary
         self.assertEqual(_long_form('LCOE', 'we report the levelized cost of energy'), 'levelized cost of energy')
