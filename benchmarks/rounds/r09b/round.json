@@ -1,0 +1,25 @@
+{
+  "name": "r09b",
+  "set": "dev",
+  "note": "Excerpt quotes without the in-order window, which let chart-axis labels through as values in r09.",
+  "baseline": "variants/baseline.json",
+  "variants": {
+    "fragments": "variants/fragments.json"
+  },
+  "extract_only": true,
+  "units": 32,
+  "chunk": 8,
+  "cap": 3.0,
+  "judge_timeout": 450,
+  "judge_retries": 0,
+  "rubric": "v4",
+  "judges": [
+    "XiaomiMiMo/MiMo-V2.6-Pro"
+  ],
+  "escalate": [
+    "Qwen/Qwen3.5-397B-A17B"
+  ],
+  "confirm_judges": [],
+  "confirm_units": 16,
+  "hypotheses": "docs/reviews/round-09-2026-09-28.md"
+}

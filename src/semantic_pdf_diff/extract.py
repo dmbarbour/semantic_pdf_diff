@@ -212,11 +212,12 @@ def _folded(text):
     text = unicodedata.normalize("NFKC", text).replace("\u00ad", "").translate(FOLD)
     return " ".join(LINE_HYPHEN.sub(r"\1-", text).casefold().split())
 
-def excerpted(quote, text):
+def excerpted(quote, text, in_order=True):
     """The quote is excerpts of text: its parts between ellipses ("...", "…") or cell bars
     (" | ") each appear in order, up to case, whitespace, Unicode forms, line-end hyphenation
-    ("linear-\nspring") and dash, quote-mark and bullet variants; a part may also be words read
-    in order across a pseudo-table (a header and its value), within about three times its length.
+    ("linear-\nspring") and dash, quote-mark and bullet variants; with in_order, a part may also
+    be words read in order across a pseudo-table (a header and its value), within about three
+    times its length (round 9: that window let chart-axis labels through as values).
     A third of text claims were rejected by the verbatim check for such quotes (overall review,
     2026-09-28); paraphrases and quotes from the context still fail."""
     parts = [p for p in (_folded(p) for p in ELLIPSIS.split(quote)) if p]
@@ -225,7 +226,8 @@ def excerpted(quote, text):
     haystack, at = _folded(text), 0
     for part in parts:
         found = haystack.find(part, at)
-        end = found + len(part) if found >= 0 else _in_order(part.split(), haystack, at, 3 * len(part) + 40)
+        end = found + len(part) if found >= 0 else (_in_order(part.split(), haystack, at, 3 * len(part) + 40)
+                                                     if in_order else None)
         if end is None:
             return False
         at = end
@@ -1059,7 +1061,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         context = with_references(context, text)
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
-        match = (lambda q: quoted(q, text) or excerpted(q, text)) if s.quote_match == "excerpts" else (lambda q: quoted(q, text))
+        loose = s.quote_match != "exact"
+        match = lambda q: quoted(q, text) or (loose and excerpted(q, text, in_order=s.quote_match == "excerpts"))
         consume(page_no, union(b for b, _ in segments), task, text, check=match, locate=locate,
                 context=context,
                 then=lambda status: refine_text(page_no, segments, text, task, depth, status))
@@ -1101,9 +1104,10 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                                                   page_no, table_top(page_no, bbox)), flat)
             if repeat_key is not None and context:  # the same row under another lead-in or stem isn't a repeat
                 repeat_key += (hashlib.sha256(context.encode()).hexdigest(),)
-            loose = s.quote_match == "excerpts"
+            loose = s.quote_match != "exact"
             consume(page_no, bbox, task, text, derivation=derivation,
-                    check=lambda q: quoted(q, text) or covered(q, flat) or (loose and excerpted(q, text)),
+                    check=lambda q: quoted(q, text) or covered(q, flat)
+                    or (loose and excerpted(q, text, in_order=s.quote_match == "excerpts")),
                     then=then, repeat_key=repeat_key, repeat_after=2, context=context)
         else:
             split_columns(page_no, bbox, task, header, row, columns, depth, derivation)

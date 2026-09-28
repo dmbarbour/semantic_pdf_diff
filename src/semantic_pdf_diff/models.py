@@ -369,7 +369,9 @@ class Settings(Strict):
     reconcile: bool = False                  # merge readings of one fact by different tasks into one claim
     tile_locator: bool = False               # with each tile, a page thumbnail outlining where the tile sits
     skip_empty: bool = False                 # don't send tiles with no text, drawing or image (blank paper)
-    quote_match: Literal["exact", "excerpts"] = "exact"  # excerpts: "a ... b" quotes and Unicode variants accepted
+    # fragments: quotes normalized (Unicode, line-end hyphens) and made of "a ... b" or "a | b" parts;
+    # excerpts: also words read in order across a pseudo-table
+    quote_match: Literal["exact", "fragments", "excerpts"] = "exact"
     references: bool = False                 # abbreviations defined elsewhere and cited figures' captions as context
     # Situating stage: figure and section "about" statements after extraction.
     situate: bool = True

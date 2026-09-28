@@ -320,6 +320,8 @@ class SectionContext(unittest.TestCase):
                       'The rotor speed is 12.1 rpm at rated wind speed']:
             with self.subTest(quote=quote):
                 self.assertFalse(excerpted(quote, text))
+        self.assertFalse(excerpted('gelcoat E1 [Pa] 3.440E+09', text, in_order=False))  # fragments only
+        self.assertTrue(excerpted('22.0 | 12.1 | 19.94 | -105.90E+6', text, in_order=False))
 
     def rotated_sheet(self, path):
         """A page rotated 90° (like the drawing sets): a sentence displayed above a table, a note beside it."""
