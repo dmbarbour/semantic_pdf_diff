@@ -51,6 +51,7 @@ def collect(runs_dir, unit="family"):
                             claim = {k: getattr(e, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
                             claim["quote"] = o.quote
                             claim["_box"] = list(o.locator.bbox)  # where it was read (splitting units)
+                            claim["_task"] = o.locator.task       # which request read it (its input, for reviewers)
                             units[(folder.name, content, o.locator.page, family)]["claims"][e.id] = claim
     return dict(units)
 
@@ -423,6 +424,69 @@ BETTER = [{"name": "A", "label": "A is better"}, {"name": "B", "label": "B is be
           {"name": "same", "label": "About the same"}, {"name": "unsure", "label": "Can't tell"}]
 SURE = [{"name": "high", "label": "Sure"}, {"name": "medium", "label": "Fairly sure"}, {"name": "low", "label": "Guessing"}]
 
+def _ident(c):
+    return tuple(str(c.get(k, "")) for k in ("entity", "attribute", "value", "unit", "conditions", "quote"))
+
+def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, fixture=None):
+    """Give a batch's units what a reviewer needs to judge them (the owner, 2026-09-28: a band of
+    a table without its header can't be judged; "missing" can't be judged from a sample):
+    - every claim of both sets, the unshown ones appended after those shown (so marks already
+      made on the shown ones stay attached to the same claims);
+    - the whole page with the unit's region outlined, and the page's whole text layer;
+    - for text and table claims, the input their request was given (from the recording).
+    Units are recomputed exactly as build_batch sampled them."""
+    import pymupdf
+    import sqlite3
+    from .review import render
+    from .scan import read_origin
+    from .store import Store
+    folder = Path(folder)
+    batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
+    picked, _ = pair_units(baseline_dir, variant_dir, n, seed, limit=limit)
+    db = sqlite3.connect(fixture) if fixture and Path(fixture).exists() else None
+    sources, docs = {}, {}
+
+    def source(content, task):
+        if db is None or not task or not task.startswith(("text", "table")):
+            return None
+        if (content, task) not in sources:
+            row = db.execute("SELECT prompt FROM request WHERE content=? AND kind='extract' AND key_parts LIKE ? LIMIT 1",
+                             (content, f'%"{task}"%')).fetchone()
+            sources[(content, task)] = row[0].split("SOURCE DATA:\n", 1)[1].strip() if row and "SOURCE DATA:\n" in row[0] else None
+        return sources[(content, task)]
+
+    by_id = {i["id"]: i for i in batch["items"]}
+    for (run, content, page, family, *band), a, b in picked:
+        item = by_id.get(f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}"
+                         + (f"-b{band[0][0]}of{band[0][1]}" if band else ""))
+        if item is None:
+            continue
+        for side, claims in (("baseline", a), ("variant", b)):
+            full = {_ident(c): c for c in claims.values()}
+            shown = {_ident(c) for c in item[side]}
+            for c in item[side]:  # the task each shown claim was read by
+                c.setdefault("_task", full.get(_ident(c), {}).get("_task"))
+            item[side] += [c for key, c in full.items() if key not in shown]
+        item["hidden_shared"] = 0
+        item["counts"] = {"baseline": len(item["baseline"]), "variant": len(item["variant"]),
+                          "shared": len({_ident(c) for c in item["baseline"]} & {_ident(c) for c in item["variant"]})}
+        item["sources"] = {c["_task"]: text for side in ("baseline", "variant") for c in item[side]
+                           if (text := source(content, c.get("_task")))}
+        if (run, content) not in docs:
+            with Store(Path(baseline_dir) / run) as store:
+                file = next(f for f in store.files() if f.content == content)
+                docs[(run, content)] = read_origin(store.origin(file.source, file.path))
+        with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
+            unrotated = doc[page - 1].rect * doc[page - 1].derotation_matrix
+            y0, y1 = (band[0][2], band[0][3]) if band else (unrotated.y0, unrotated.y1)
+            region = pymupdf.Rect(unrotated.x0, max(unrotated.y0, y0 - 12), unrotated.x1, min(unrotated.y1, y1 + 12))
+            name = item["image"].replace(".jpg", "-page.jpg")
+            (folder / name).write_bytes(render(doc, page, None, region if band else None, 1400))
+            item["page_image"] = name
+            item["page_text_full"] = doc[page - 1].get_text("text")[:PAGE_TEXT]
+    (folder / "pairs.json").write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return batch
+
 def write_spotcheck(folder, seed=3):
     """spotcheck.html: a batch's units for a person, blind (each unit's sets shown as A and B in
     a random order, recorded in spotcheck-order.json beside it), with the judges' questions."""
@@ -431,7 +495,20 @@ def write_spotcheck(folder, seed=3):
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     rng = random.Random(seed)
     order, items = {}, []
-    public = lambda claims: [{k: v for k, v in c.items() if not k.startswith("_")} for c in claims]
+    def public(item, claims, other):
+        """Claims for the page: without internals, with the input a text or table claim was read
+        from, and the position of the same claim in the other set (marked together)."""
+        twins = {_ident(c): k for k, c in enumerate(item[other])}
+        out = []
+        for c in claims:
+            shown = {k: v for k, v in c.items() if not k.startswith("_")}
+            task = c.get("_task") or ""
+            read = (item.get("sources") or {}).get(task)
+            shown["source"] = read if read else ("read from an image of this part of the page"
+                                                 if task.startswith(("tile", "figure", "overview")) else "")
+            shown["twin"] = twins.get(_ident(c))
+            out.append(shown)
+        return out
     for item in batch["items"]:
         first = rng.choice(("baseline", "variant"))
         second = "variant" if first == "baseline" else "baseline"
@@ -444,7 +521,9 @@ def write_spotcheck(folder, seed=3):
                       "title": f"{document}, page {item['page']}, {item['family']} content"
                                + (f", part {band[0] + 1} of {band[1]}" if band else ""),
                       "headings": " | ".join(item.get("sections") or ()), "before": item.get("before", ""),
-                      "within": item.get("within", ""), "A": public(item[first]), "B": public(item[second]),
+                      "within": item.get("within", ""), "A": public(item, item[first], second),
+                      "B": public(item, item[second], first), "page_image": item.get("page_image", ""),
+                      "page_text_full": item.get("page_text_full", ""),
                       "a_note": note(first), "b_note": note(second)})
     howto = PAIRWISE.split("Which set is better?")[1].split("{rubric}")[0].strip() + " " + RUBRICS["v4"]["addition"].strip()
     data = {"format": SPOTCHECK_FORMAT, "batch": folder.name, "items": items, "howto": " ".join(howto.split()),

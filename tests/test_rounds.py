@@ -255,6 +255,27 @@ class Rounds(unittest.TestCase):
         self.assertEqual(result['claims_marked'][order[item['id']]]['ok'], 1)
         self.assertIsNone(result['claim_agreement_with_judges'])  # the judges' two orders disagreed there: unsure
 
+    def test_context_completes_the_sets_without_moving_marked_claims(self):
+        import sqlite3
+        folder = self.root / 'spot-context'
+        batch = rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=3, limit=1)
+        before = {i['id']: [rounds._ident(c) for c in i['baseline']] for i in batch['items']}
+        fixture = self.root / 'fixture.sqlite'  # the recorded requests, for what each claim was read from
+        with sqlite3.connect(fixture) as db:
+            db.execute('CREATE TABLE request (content TEXT, kind TEXT, key_parts TEXT, prompt TEXT)')
+            for item in batch['items']:
+                for c in item['baseline'] + item['variant']:
+                    db.execute('INSERT INTO request VALUES (?, ?, ?, ?)', (item['content'], 'extract',
+                               json.dumps(['extract', 'text', item['content'], c['_task']]), 'rules\nSOURCE DATA:\nPump 10 kW'))
+        after = rounds.add_context(folder, self.root / 'baseline', self.root / 'variant', n=3, limit=1, fixture=fixture)
+        for item in after['items']:
+            shown = [rounds._ident(c) for c in item['baseline']]
+            self.assertEqual(shown[:len(before[item['id']])], before[item['id']])  # earlier positions kept
+            self.assertEqual(item['hidden_shared'], 0)
+            self.assertTrue((folder / item['page_image']).exists())
+        page = rounds.write_spotcheck(folder).read_text()
+        self.assertIn('Pump 10 kW', page)  # a text claim's input, shown with it
+
     def test_bootstrap_and_rules(self):
         mean, low, high = rounds.bootstrap([1.0] * 40 + [0.0] * 10)
         self.assertAlmostEqual(mean, 0.8)

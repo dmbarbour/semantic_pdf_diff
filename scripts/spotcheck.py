@@ -18,6 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 LEDGER = ROOT / "benchmarks/ledger.jsonl"
+FIXTURE = ROOT / "tests/fixtures/slices.sqlite"  # the recorded requests: what each claim was read from
 
 def combine(dirs, target):
     """One folder of runs (symlinks) from several round folders, with the first one's settings."""
@@ -41,6 +42,11 @@ def main(argv=None):
     build.add_argument("--units", type=int, default=16)
     build.add_argument("--claims", type=int, default=15, help="claims per unit before it's cut into bands")
     build.add_argument("--seed", type=int, default=1)
+    context = sub.add_parser("context", help="add full context to an existing spot check (same units)")
+    context.add_argument("folder", type=Path)
+    context.add_argument("--units", type=int, default=16)
+    context.add_argument("--claims", type=int, default=15)
+    context.add_argument("--seed", type=int, default=1)
     judge = sub.add_parser("judge", help="the panel's verdicts on the same units (rubric v4)")
     judge.add_argument("folder", type=Path)
     judge.add_argument("--judge", action="append", default=[])
@@ -63,7 +69,13 @@ def main(argv=None):
                 if p.is_symlink() and p.name not in shared:
                     p.unlink()
         batch = rounds.build_batch(base, var, args.folder, n=args.units, seed=args.seed, limit=args.claims)
+        rounds.add_context(args.folder, base, var, n=args.units, seed=args.seed, limit=args.claims, fixture=FIXTURE)
         print(f"{len(batch['items'])} units; page: {rounds.write_spotcheck(args.folder)}")
+    elif args.command == "context":
+        sources = args.folder / "sources"
+        rounds.add_context(args.folder, sources / "baseline", sources / "variant", n=args.units, seed=args.seed,
+                           limit=args.claims, fixture=FIXTURE)
+        print(f"Context added; page: {rounds.write_spotcheck(args.folder)}")
     elif args.command == "judge":
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff.llm import Client

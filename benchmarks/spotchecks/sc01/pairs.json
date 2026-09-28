@@ -41,7 +41,8 @@
             583.7550048828125,
             537.869384765625,
             595.2112426757812
-          ]
+          ],
+          "_task": "table:p4:1:11"
         },
         {
           "entity": "Visible channel",
@@ -55,7 +56,8 @@
             617.7449951171875,
             537.869384765625,
             629.219970703125
-          ]
+          ],
+          "_task": "table:p4:1:16"
         },
         {
           "entity": "IR Guide channel",
@@ -69,7 +71,8 @@
             572.4600219726562,
             537.869384765625,
             583.7550048828125
-          ]
+          ],
+          "_task": "table:p4:1:10"
         },
         {
           "entity": "UV Detector",
@@ -83,7 +86,8 @@
             561.239990234375,
             537.869384765625,
             572.4600219726562
-          ]
+          ],
+          "_task": "table:p4:1:9"
         },
         {
           "entity": "Spectrometer",
@@ -97,7 +101,8 @@
             651.7349853515625,
             537.869384765625,
             663.0
-          ]
+          ],
+          "_task": "table:p4:1:19"
         },
         {
           "entity": "Visible channel",
@@ -111,7 +116,8 @@
             572.4600219726562,
             537.869384765625,
             583.7550048828125
-          ]
+          ],
+          "_task": "table:p4:1:10"
         },
         {
           "entity": "UV array",
@@ -125,7 +131,8 @@
             583.7550048828125,
             537.869384765625,
             595.2112426757812
-          ]
+          ],
+          "_task": "table:p4:1:11"
         },
         {
           "entity": "Visible Detector",
@@ -139,7 +146,8 @@
             561.239990234375,
             537.869384765625,
             572.4600219726562
-          ]
+          ],
+          "_task": "table:p4:1:9"
         },
         {
           "entity": "IR Guide channel",
@@ -153,7 +161,8 @@
             617.7449951171875,
             537.869384765625,
             629.219970703125
-          ]
+          ],
+          "_task": "table:p4:1:16"
         },
         {
           "entity": "IR Guide array",
@@ -167,7 +176,8 @@
             583.7550048828125,
             537.869384765625,
             595.2112426757812
-          ]
+          ],
+          "_task": "table:p4:1:11"
         }
       ],
       "variant": [
@@ -183,7 +193,8 @@
             572.4600219726562,
             537.869384765625,
             583.7550048828125
-          ]
+          ],
+          "_task": "table:p4:1:10"
         },
         {
           "entity": "Spectrometer",
@@ -197,7 +208,8 @@
             651.7349853515625,
             537.869384765625,
             663.0
-          ]
+          ],
+          "_task": "table:p4:1:19"
         },
         {
           "entity": "Visible camera",
@@ -211,7 +223,8 @@
             617.7449951171875,
             537.869384765625,
             629.219970703125
-          ]
+          ],
+          "_task": "table:p4:1:16"
         },
         {
           "entity": "IR Guide camera",
@@ -225,7 +238,8 @@
             583.7550048828125,
             537.869384765625,
             595.2112426757812
-          ]
+          ],
+          "_task": "table:p4:1:11"
         },
         {
           "entity": "Spectrometer",
@@ -239,7 +253,8 @@
             651.7349853515625,
             537.869384765625,
             663.0
-          ]
+          ],
+          "_task": "table:p4:1:19"
         },
         {
           "entity": "UV Detector",
@@ -253,7 +268,8 @@
             561.239990234375,
             537.869384765625,
             572.4600219726562
-          ]
+          ],
+          "_task": "table:p4:1:9"
         },
         {
           "entity": "UV camera",
@@ -267,7 +283,8 @@
             572.4600219726562,
             537.869384765625,
             583.7550048828125
-          ]
+          ],
+          "_task": "table:p4:1:10"
         },
         {
           "entity": "Visible Detector",
@@ -281,7 +298,8 @@
             561.239990234375,
             537.869384765625,
             572.4600219726562
-          ]
+          ],
+          "_task": "table:p4:1:9"
         },
         {
           "entity": "Visible camera",
@@ -295,7 +313,8 @@
             583.7550048828125,
             537.869384765625,
             595.2112426757812
-          ]
+          ],
+          "_task": "table:p4:1:11"
         },
         {
           "entity": "IR Guide camera",
@@ -309,7 +328,8 @@
             617.7449951171875,
             537.869384765625,
             629.219970703125
-          ]
+          ],
+          "_task": "table:p4:1:16"
         },
         {
           "entity": "Spectrometer",
@@ -323,7 +343,8 @@
             651.7349853515625,
             537.869384765625,
             663.0
-          ]
+          ],
+          "_task": "table:p4:1:19"
         },
         {
           "entity": "IR Guide Detector",
@@ -337,7 +358,8 @@
             561.239990234375,
             537.869384765625,
             572.4600219726562
-          ]
+          ],
+          "_task": "table:p4:1:9"
         },
         {
           "entity": "Visible camera",
@@ -351,7 +373,8 @@
             572.4600219726562,
             537.869384765625,
             583.7550048828125
-          ]
+          ],
+          "_task": "table:p4:1:10"
         }
       ],
       "hidden_shared": 0,
@@ -359,7 +382,16 @@
         "baseline": 10,
         "variant": 13,
         "shared": 0
-      }
+      },
+      "sources": {
+        "table:p4:1:11": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"Array width (pixels)\", \"1024\", \"1024\", \"256\"]",
+        "table:p4:1:16": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"FOV\", \"10.2\\\"\", \"1.9\\\"\", \"3.8\\\"\"]",
+        "table:p4:1:10": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"\", \"CCD201\", \"CCD201\", \"LMAPD\"]",
+        "table:p4:1:9": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"Detector\", \"1×1\", \"1×1\", \"1×1\"]",
+        "table:p4:1:19": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"Spectrometer\", \"7\", \"140\", \"40\"]"
+      },
+      "page_image": "images/habex-interim-p80-89-52da8af4-p4-b2of4-page.jpg",
+      "page_text_full": " \n5—HabEx 4-Meter Baseline Design \n5-15 \nand spectrograph properties are shown in \nTable 5.5-3. The UV channel carries a simple slit \nspectrograph employing a grism with R = 7. The \nvisible channel carries a broadband integral field \nspectrograph (IFS) capable of covering the \nwavelength range from 0.45 to 1.0 µm, plus an \nimaging camera for more rapid and wide-field \nsystem imaging. The infrared channel carries an IFS \nwith R = 40 to enable disc and object spectroscopy. \nStarshade Guiding \nThe ultraviolet and infrared channels have \nguide camera modes, which project a pupil image \nonto the focal plane. With a selected channel in \nscience mode, an optic is introduced into the \ncorresponding guide channel to place an image of \nthe pupil on the guide CCD. The starshade’s \nlateral position is sensed from an image of the \nlight distribution at the telescope entrance pupil \n(see Figure 5.5-9) so that the pixel resolution is \ngiven in centimeters in Table 5.5-3. At the \nentrance pupil, the starshade shadow has some \nstructure, typically with a much diminished “spot \nof Arago” at the center. The lateral position of the \ntelescope is sensed by imaging this structure onto \nthe focal plane and comparing with a library of \nexpected images. Figure 5.5-9 shows an image of \nthe starshade shadow structure in infrared light \nwhen the starshade is set up for visible science. \nThe central dot appears directly on the line-of-\nsight between the center of the starshade and the \nstar and thus forms the target for the guide \nsystem. Outside this core, there are two faint rings \nand then the flux increases with a monotonic \nslope towards the edge. Outside this region, a \nreflective pattern of the starshade geometry \nappears with, in this case, 24 peaks around a \ncircumference, the HabEx starshade design \nhaving 24 petals. The central peak has a diameter \nൌ݀\nߣ\nܦௌௌ\n \nwhere d is the separation distance between the \nstarshade and the telescope, λ is the wavelength, \nand DSS is the starshade diameter. In the case \nmodeled, the central peak is about 3 m in diameter. \nThe diameter of the smooth, sloping region is \napproximately 40 m and beyond this a pronounced \npattern exists for about another 40 m.  \nTable 5.5-2. HabEx starshade science bands and working \ndistances with corresponding guide bands. \nScience Band \nUV \nVisible \nIR \nWavelength band (μm) \n0.2–0.67 \n0.3–1.0 \n0.54–1.8 \nStarshade separation (km) \n186,000 \n124,000 \n69,000 \nIWA (mas) \n40 \n60 \n108 \nGuide band (μm) \n1.6–1.8 \n1.6–1.8 \n0.3–0.45 \n \n \n \nFigure 5.5-8. Top: The starshade instrument. Bottom: The \nprincipal components of the starshade instrument. \nTable 5.5-3. Starshade camera specifications. \nCameras \nUV \nChannel \nVisible  \nChannel \nIR Guide \nChannel \nFOV \n10.2\" \n11.9\" \n- \nWavelength bands \n0.2–0.45 \nµm \n0.45–1.0 \nµm \n0.975–1.8 \nµm \nPixel resolution \n14.2 mas \n14.2 mas \n12 cm \nTelescope resolution \n21 mas \n21 mas \n- \nIWA (at longest λ) \n40 mas \n60 mas \n- \nDetector  \n1×1 \nCCD201 \n1×1 \nCCD201 \n1×1 \nLMAPD \nArray width (pixels) \n1024 \n1024 \n256 \nSpectrometers \nUV \nChannel \nVisible  \nChannel \nIR  \nChannel \nFOV \n10.2\" \n1.9\" \n3.8\" \nWavelength bands \n0.2–0.45 \nµm \n0.45–1.0  \nµm \n0.975–1.8 \nµm \nSpectrometer \nresolution \n7 \n140 \n40 \nSpectrometer type \nSlit/grism \nIFS \nIFS \nDetector  \n1×1 \nCCD201 \n1×1 \nCCD282 \n2×2 LMAPD \nArray width (pixels) \n1024 \n4,096 \n2,048 \n \n"
     },
     {
       "id": "u-ken-manual-p70-79-3b80816c-p6-text",
@@ -388,7 +420,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "HVAC system",
@@ -402,7 +435,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "eQuest calculated peak cooling load",
@@ -416,7 +450,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "ceiling",
@@ -430,7 +465,8 @@
             615.4465942382812,
             574.51708984375,
             678.618408203125
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "eQuest calculated peak cooling load",
@@ -444,7 +480,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "HVAC system",
@@ -458,7 +495,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "SIPs manufacturing",
@@ -472,7 +510,8 @@
             615.4465942382812,
             574.51708984375,
             678.618408203125
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "eQuest calculated peak heating load",
@@ -486,7 +525,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         }
       ],
       "variant": [
@@ -502,7 +542,8 @@
             615.4465942382812,
             574.51708984375,
             678.618408203125
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "HVAC system",
@@ -516,7 +557,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "HVAC system",
@@ -530,7 +572,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "eQuest peak heating load",
@@ -544,7 +587,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "ceiling",
@@ -558,7 +602,8 @@
             615.4465942382812,
             574.51708984375,
             678.618408203125
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "eQuest peak cooling load",
@@ -572,7 +617,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "eQuest peak heating load",
@@ -586,7 +632,8 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         },
         {
           "entity": "eQuest peak cooling load",
@@ -600,15 +647,21 @@
             487.2565612792969,
             573.8618774414062,
             615.476318359375
-          ]
+          ],
+          "_task": "text:p6:0.0-51.0"
         }
       ],
       "hidden_shared": 0,
       "counts": {
         "baseline": 8,
         "variant": 8,
-        "shared": 1
-      }
+        "shared": 0
+      },
+      "sources": {
+        "text:p6:0.0-51.0": "Vent. Fans\n\nHP Supp.\n\nMWh\n\nSpace Heat\n\nSpace Cool\n\n0\n0.1\n0.2\n0.3\n0.4\n0.5\n0.6\n0.7\n0.8\n\nJul\n\nApr\n\nOct\n\nJan\n\nJun\n\nFeb\n\nAug\n\nSep\n\nNov\n\nDec\n\nMar\n\nMay\n\nFigure 13. Yearly HVAC energy usage for 2.5 ton unit calculated by eQuest for\n\nLouisville, KY.\n\n0.8\n\n0.7\n\n0.6\n\n0.5\n\nVent. Fans\n\n0.4\n\nHP Supp.\n\nMWh\n\n0.3\n\nSpace Heat\n\n0.2\n\nSpace Cool\n\n0.1\n\n0\n\nJul\n\nApr\n\nOct\n\nJan\n\nJun\n\nFeb\n\nAug\n\nSep\n\nNov\n\nDec\n\nMar\n\nMay\n\nFigure 14. Yearly HVAC energy usage by 2 ton unit calculated by eQuest for\n\nLouisville, KY.\n\n3.4.3 \nResults\n\nThe results from eQuest analysis show higher peak loads for heating and cooling throughout the year in both \nLouisville, KY and Irvine, CA. In Louisville, eQuest’s calculated peak loads are 16.3% higher for heating and 6.5% \nhigher for cooling. In Irvine, the calculated loads are 20.2% higher for heating and 54.7% higher for cooling. BEoptE+ \nrecommendations for HVAC sizing are sufficient to heat and cool the house even with higher load estimates provided \nby eQuest. Additional analysis of HVAC sizing showed that using a 2 ton unit had a positive effect on lowering energy \nusage, dropping yearly use from 4,350 kWh to 4,310 kWh while maintaining capacity to meet heating and cooling \nloads.  \n \n3.5 Cost Optimization \n3.5.1 \nDesign and Assumptions\n\nDevelopment of the house design led to SIPs being the best construction material choice for building the roof. \nAn insulation resistance option of approximately R-50 was possible with available SIPs manufacturing, leading to \nadditional, expensive insulation being necessary to reach the target of R-60 for the ceiling. Analysis was conducted to \ndetermine the effect on heating and cooling loads, along with annual energy usage, of using only the R-50 SIPs for \nconstruction of the ceiling."
+      },
+      "page_image": "images/ken-manual-p70-79-3b80816c-p6-page.jpg",
+      "page_text_full": " \nAs Built \n \n Page  - 75 \nU.S. D.O.E. Solar Decathlon 2011 \n \nPublished 8/22/2013  \n Energy Analysis \nFigure 13. Yearly HVAC energy usage for 2.5 ton unit calculated by eQuest for \nLouisville, KY. \n \n \nFigure 14. Yearly HVAC energy usage by 2 ton unit calculated by eQuest for \nLouisville, KY. \n \n3.4.3 \nResults \nThe results from eQuest analysis show higher peak loads for heating and cooling throughout the year in both \nLouisville, KY and Irvine, CA. In Louisville, eQuest’s calculated peak loads are 16.3% higher for heating and 6.5% \nhigher for cooling. In Irvine, the calculated loads are 20.2% higher for heating and 54.7% higher for cooling. BEoptE+ \nrecommendations for HVAC sizing are sufficient to heat and cool the house even with higher load estimates provided \nby eQuest. Additional analysis of HVAC sizing showed that using a 2 ton unit had a positive effect on lowering energy \nusage, dropping yearly use from 4,350 kWh to 4,310 kWh while maintaining capacity to meet heating and cooling \nloads.  \n \n3.5 Cost Optimization \n3.5.1 \nDesign and Assumptions \nDevelopment of the house design led to SIPs being the best construction material choice for building the roof. \nAn insulation resistance option of approximately R-50 was possible with available SIPs manufacturing, leading to \nadditional, expensive insulation being necessary to reach the target of R-60 for the ceiling. Analysis was conducted to \ndetermine the effect on heating and cooling loads, along with annual energy usage, of using only the R-50 SIPs for \nconstruction of the ceiling. \n \n0\n0.1\n0.2\n0.3\n0.4\n0.5\n0.6\n0.7\n0.8\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec\nMWh \n Vent. Fans\n HP Supp.\n Space Heat\n Space Cool\n0\n0.1\n0.2\n0.3\n0.4\n0.5\n0.6\n0.7\n0.8\nJan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec\nMWh \n Vent. Fans\n HP Supp.\n Space Heat\n Space Cool\n"
     },
     {
       "id": "u-lcit-report-p12-19-bb5dd36f-p5-visual",
@@ -637,7 +690,8 @@
             0.0,
             720.0,
             540.0
-          ]
+          ],
+          "_task": "overview:p5"
         }
       ],
       "variant": [
@@ -653,7 +707,8 @@
             0.0,
             720.0,
             540.0
-          ]
+          ],
+          "_task": "overview:p5"
         },
         {
           "entity": "Draft Final Reports",
@@ -667,7 +722,8 @@
             0.0,
             720.0,
             420.0
-          ]
+          ],
+          "_task": "tile:p5:1"
         },
         {
           "entity": "mission concepts",
@@ -681,7 +737,8 @@
             120.0,
             720.0,
             540.0
-          ]
+          ],
+          "_task": "tile:p5:3"
         }
       ],
       "hidden_shared": 0,
@@ -689,7 +746,10 @@
         "baseline": 1,
         "variant": 3,
         "shared": 0
-      }
+      },
+      "sources": {},
+      "page_image": "images/lcit-report-p12-19-bb5dd36f-p5-page.jpg",
+      "page_text_full": "3.0 LCIT Process (2)\n•\nThe initial LCIT reviews of the Draft Final Reports resulted in approximately 100 \nissues and concerns across the four mission concepts. These findings were \nprovided to the STDTs for their use in improving, correcting, and clarifying their \nFinal Reports before public release.\n•\nThe STDTs received the findings and recommendations from the LCIT and their \nown internal Red Team reviews and made significant modifications to their Final \nReports before public release. \n•\nThe STDTs also provided feedback to the LCIT for each finding as well a summary of \nchanges to address the finding and references to where changes appear in the \nFinal Reports.\n•\nThe LCIT reviewed the STDT Final Reports to see if LCIT findings (issues and \nconcerns) had been adequately addressed. As a result, the final set of remaining \nissues and concerns was significantly reduced.\nLCIT FINAL Report\n16\nFor Public Release \n"
     },
     {
       "id": "u-nrel-5mw-p25-36-5eaf02be-p10-table-b1of4",
@@ -723,7 +783,8 @@
             367.83551025390625,
             433.31243896484375,
             380.1871337890625
-          ]
+          ],
+          "_task": "table:p10:0:7"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -737,7 +798,8 @@
             343.1322021484375,
             433.31243896484375,
             355.48388671875
-          ]
+          ],
+          "_task": "table:p10:0:5"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -751,7 +813,8 @@
             343.1322021484375,
             433.31243896484375,
             355.48388671875
-          ]
+          ],
+          "_task": "table:p10:0:5"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -765,7 +828,8 @@
             367.83551025390625,
             433.31243896484375,
             380.1871337890625
-          ]
+          ],
+          "_task": "table:p10:0:7"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -779,7 +843,8 @@
             330.78057861328125,
             433.31243896484375,
             343.1322021484375
-          ]
+          ],
+          "_task": "table:p10:0:4"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -793,7 +858,8 @@
             343.1322021484375,
             433.31243896484375,
             355.48388671875
-          ]
+          ],
+          "_task": "table:p10:0:5"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -807,7 +873,8 @@
             355.48388671875,
             433.31243896484375,
             367.83551025390625
-          ]
+          ],
+          "_task": "table:p10:0:6"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -821,7 +888,8 @@
             330.78057861328125,
             433.31243896484375,
             343.1322021484375
-          ]
+          ],
+          "_task": "table:p10:0:4"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -835,7 +903,8 @@
             318.428955078125,
             433.31243896484375,
             330.78057861328125
-          ]
+          ],
+          "_task": "table:p10:0:3"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -849,7 +918,8 @@
             343.1322021484375,
             433.31243896484375,
             355.48388671875
-          ]
+          ],
+          "_task": "table:p10:0:5"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -863,7 +933,8 @@
             330.78057861328125,
             433.31243896484375,
             343.1322021484375
-          ]
+          ],
+          "_task": "table:p10:0:4"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -877,7 +948,8 @@
             355.48388671875,
             433.31243896484375,
             367.83551025390625
-          ]
+          ],
+          "_task": "table:p10:0:6"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -891,7 +963,8 @@
             355.48388671875,
             433.31243896484375,
             367.83551025390625
-          ]
+          ],
+          "_task": "table:p10:0:6"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -905,7 +978,8 @@
             355.48388671875,
             433.31243896484375,
             367.83551025390625
-          ]
+          ],
+          "_task": "table:p10:0:6"
         },
         {
           "entity": "Baseline Blade-Pitch Controller",
@@ -919,7 +993,23 @@
             330.78057861328125,
             433.31243896484375,
             343.1322021484375
-          ]
+          ],
+          "_task": "table:p10:0:4"
+        },
+        {
+          "entity": "Baseline Blade-Pitch Controller",
+          "attribute": "Pitch Angle",
+          "value": "8.70",
+          "unit": "º",
+          "conditions": "Wind Speed = 14.0 m/s",
+          "quote": "Pitch Angle\n(º) ... 8.70",
+          "_box": [
+            178.4232635498047,
+            318.428955078125,
+            433.31243896484375,
+            330.78057861328125
+          ],
+          "_task": "table:p10:0:3"
         }
       ],
       "variant": [
@@ -935,7 +1025,8 @@
             355.48388671875,
             433.31243896484375,
             367.83551025390625
-          ]
+          ],
+          "_task": "table:p10:0:6"
         },
         {
           "entity": "Aerodynamic Power",
@@ -949,7 +1040,8 @@
             343.1322021484375,
             433.31243896484375,
             355.48388671875
-          ]
+          ],
+          "_task": "table:p10:0:5"
         },
         {
           "entity": "Aerodynamic Power",
@@ -963,7 +1055,8 @@
             330.78057861328125,
             433.31243896484375,
             343.1322021484375
-          ]
+          ],
+          "_task": "table:p10:0:4"
         }
       ],
       "hidden_shared": 0,
@@ -971,7 +1064,16 @@
         "baseline": 16,
         "variant": 3,
         "shared": 0
-      }
+      },
+      "sources": {
+        "table:p10:0:7": "Header: [\"Wind Speed\\n(m/s)\", \"Rotor Speed\\n(rpm)\", \"Pitch Angle\\n(º)\", \"∂P /∂θ\\n(watt/rad)\"]\nRow: [\"18.0\", \"12.1\", \"14.92\", \"-83.94E+6\"]",
+        "table:p10:0:5": "Header: [\"Wind Speed\\n(m/s)\", \"Rotor Speed\\n(rpm)\", \"Pitch Angle\\n(º)\", \"∂P /∂θ\\n(watt/rad)\"]\nRow: [\"16.0\", \"12.1\", \"12.06\", \"-70.46E+6\"]",
+        "table:p10:0:4": "Header: [\"Wind Speed\\n(m/s)\", \"Rotor Speed\\n(rpm)\", \"Pitch Angle\\n(º)\", \"∂P /∂θ\\n(watt/rad)\"]\nRow: [\"15.0\", \"12.1\", \"10.45\", \"-64.44E+6\"]",
+        "table:p10:0:6": "Header: [\"Wind Speed\\n(m/s)\", \"Rotor Speed\\n(rpm)\", \"Pitch Angle\\n(º)\", \"∂P /∂θ\\n(watt/rad)\"]\nRow: [\"17.0\", \"12.1\", \"13.54\", \"-76.53E+6\"]",
+        "table:p10:0:3": "Header: [\"Wind Speed\\n(m/s)\", \"Rotor Speed\\n(rpm)\", \"Pitch Angle\\n(º)\", \"∂P /∂θ\\n(watt/rad)\"]\nRow: [\"14.0\", \"12.1\", \"8.70\", \"-58.44E+6\"]"
+      },
+      "page_image": "images/nrel-5mw-p25-36-5eaf02be-p10-b1of4-page.jpg",
+      "page_text_full": " 23 \nof given, steady, and uniform wind speeds; at the rated rotor speed (\n0\nΩ = 12.1 rpm); and at the \ncorresponding blade-pitch angles that produce the rated mechanical power (P0 = 5.296610 MW).  \nThe linearization analysis involves perturbing the rotor-collective blade-pitch angle at each \noperating point and measuring the resulting variation in aerodynamic power.  Within FAST, the \npartial derivative is computed using the central-difference-perturbation numerical technique.  We \ncreated a slightly customized copy of FAST with AeroDyn so that the linearization procedure \nwould invoke the frozen-wake assumption, in which the induced wake velocities are held \nconstant while the blade-pitch angle is perturbed.  This gives a more accurate linearization for \nheavily loaded rotors (i.e., for operating points in Region 3 closest to rated).  Table 7-1 presents \nthe results. \nAs Table 7-1 shows, the sensitivity of aerodynamic power to rotor-collective blade pitch varies \nconsiderably over Region 3, so constant PI gains are not adequate for effective speed control.  \nThe pitch sensitivity, though, varies nearly linearly with blade-pitch angle: \n \n(\n)\n(\n)\nK\nP\n0\nP\nP\n0\nθ\nθ\nθ\nθ\nθ\nθ\nθ\n∂\n\n\n=\n\n\n∂\n∂\n\n\n∂\n=\n+\n=\n\n\n\n\n∂\n∂\n\n\n\n\n\n\n \n(7-16a) \n \nor \n \n(\n)\nK\n1\n1\nP\nP\n0\n1\nθ\nθ\nθ\nθ\nθ\n=\n∂\n\n\n∂\n=\n+\n\n\n∂\n∂\n\n\n, \n(7-16b) \nTable 7-1.  Sensitivity of Aerodynamic Power to Blade \nPitch in Region 3 \nWind Speed\nRotor Speed\nPitch Angle\n∂P /∂θ\n(m/s)\n(rpm)\n(º)\n(watt/rad)\n11.4 - Rated\n12.1\n0.00\n-28.24E+6\n12.0\n12.1\n3.83\n-43.73E+6\n13.0\n12.1\n6.60\n-51.66E+6\n14.0\n12.1\n8.70\n-58.44E+6\n15.0\n12.1\n10.45\n-64.44E+6\n16.0\n12.1\n12.06\n-70.46E+6\n17.0\n12.1\n13.54\n-76.53E+6\n18.0\n12.1\n14.92\n-83.94E+6\n19.0\n12.1\n16.23\n-90.67E+6\n20.0\n12.1\n17.47\n-94.71E+6\n21.0\n12.1\n18.70\n-99.04E+6\n22.0\n12.1\n19.94\n-105.90E+6\n23.0\n12.1\n21.18\n-114.30E+6\n24.0\n12.1\n22.35\n-120.20E+6\n25.0\n12.1\n23.47\n-125.30E+6 \n"
     },
     {
       "id": "u-habex-interim-p80-89-52da8af4-p6-text-b1of2",
@@ -1005,7 +1107,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1019,7 +1122,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0:r0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1033,7 +1137,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0:r0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1047,7 +1152,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0:r0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1061,7 +1167,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0:r0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1075,7 +1182,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0:r0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1089,7 +1197,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0:r0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1103,7 +1212,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0:r0"
         }
       ],
       "variant": [
@@ -1119,7 +1229,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1133,7 +1244,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1147,7 +1259,8 @@
             500.02801513671875,
             532.455078125,
             752.1106567382812
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1161,7 +1274,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1175,7 +1289,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1189,7 +1304,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0"
         },
         {
           "entity": "HabEx IFS focal plane",
@@ -1203,7 +1319,8 @@
             500.02801513671875,
             303.36077880859375,
             716.0159912109375
-          ]
+          ],
+          "_task": "text:p6:13.0-15.0"
         }
       ],
       "hidden_shared": 0,
@@ -1211,7 +1328,13 @@
         "baseline": 8,
         "variant": 7,
         "shared": 3
-      }
+      },
+      "sources": {
+        "text:p6:13.0-15.0": "The HabEx IFS’s focal plane consists of a \nlarge \nsingle \nelectron \nmultiplying \nCCD \n(Teledyne/e2v CCD282) operated at 163K. The \nchosen type is a modified version of the off-the-\nshelf item with delta doping and a thickened \nsubstrate together with a broadband “astro” \ncoating giving response out to 1.0 µm. The pixel \nscale is as shown in Table 5.5-3. The format is an \n8k×4k array with frame store areas at both sides \nof the 8k length, and a 4k×4k center imaging area. \nThe spectral images are produced on the 4k \nsquare center area and moved into the frame \nstores before readout at high EMCCD gain. \nDuring a thruster firing, the sensor is read out as \nfast as possible to keep the accumulated photon \ncount appreciably below full well.\n\nFigure 5.5-12. Starshade instrument schematic layout of UV \nchannel.\n\n5-17",
+        "text:p6:13.0-15.0:r0": "The HabEx IFS’s focal plane consists of a \nlarge \nsingle \nelectron \nmultiplying \nCCD \n(Teledyne/e2v CCD282) operated at 163K. The \nchosen type is a modified version of the off-the-\nshelf item with delta doping and a thickened \nsubstrate together with a broadband “astro” \ncoating giving response out to 1.0 µm. The pixel \nscale is as shown in Table 5.5-3. The format is an \n8k×4k array with frame store areas at both sides \nof the 8k length, and a 4k×4k center imaging area. \nThe spectral images are produced on the 4k \nsquare center area and moved into the frame \nstores before readout at high EMCCD gain. \nDuring a thruster firing, the sensor is read out as \nfast as possible to keep the accumulated photon \ncount appreciably below full well."
+      },
+      "page_image": "images/habex-interim-p80-89-52da8af4-p6-b1of2-page.jpg",
+      "page_text_full": " \n5—HabEx 4-Meter Baseline Design \n5-17 \nvisualized thus: for each microlens array element, a \nspectrum is produced on the focal plane. The \noptical geometry involving the MLA ensures that \nthe spectra do not overlap or interfere with each \nother. An image can be formed of the scene at one \nwavelength by using all the pixels on the focal \nplane that correspond to the same wavelength. A \nseries of images known as “slices” can be \nassembled into a “data cube” with sides \ncorresponding to the directions of the field of view \nand height corresponding to wavelength. Thus, the \nscene is reproduced in a stack of images \nrepresenting narrow wavelength bands. To \ncalibrate the images, it is necessary to provide a \ncalibration source with at least one known \nwavelength in the band, and that illuminates the \nentire MLA. The calibration source light is injected \nwhen required through the fold mirror, which has \na small leakage ~2%.  \nThe HabEx IFS’s focal plane consists of a \nlarge \nsingle \nelectron \nmultiplying \nCCD \n(Teledyne/e2v CCD282) operated at 163K. The \nchosen type is a modified version of the off-the-\nshelf item with delta doping and a thickened \nsubstrate together with a broadband “astro” \ncoating giving response out to 1.0 µm. The pixel \nscale is as shown in Table 5.5-3. The format is an \n8k×4k array with frame store areas at both sides \nof the 8k length, and a 4k×4k center imaging area. \nThe spectral images are produced on the 4k \nsquare center area and moved into the frame \nstores before readout at high EMCCD gain. \nDuring a thruster firing, the sensor is read out as \nfast as possible to keep the accumulated photon \ncount appreciably below full well. \nUltraviolet Channel \nThis channel (Figure 5.5-12) carries a \nlow-resolution spectrometer and is also used as \nthe guide channel for IR science. Light from the \ntelescope M3 strikes the fold mirror and then the \nFSM at the entrance to the starshade instrument. \nIt then reaches a dichroic optic that reflects the \nUV light to an off-axis paraboloidal mirror and \nthence through a field stop to an ellipsoidal \nmirror. Following the ellipse is a filter wheel to \nallow filter selection as shown in Table 5.5-4. \nTwo field stops are provided, one to allow a field \nof view up to 10.2\" diameter, and another with \n0.02\" diameter to select individual objects. The \nfield stops are mounted on a piezoelectric stage to \nallow selection and positioning. The beam is then \nrefocused to the focal plane, passing through a \nfilter placed at the intermediate exit pupil which \nremoves light of wavelengths longer than 450 nm. \nAlso at this exit pupil, a grism can be introduced \nfor low-resolution spectroscopy. With the grism \nremoved, the camera forms an undispersed \nimage. With the introduction of a mirror further \ndownstream, the exit pupil is relayed to the focal \n \nFigure 5.5-11. Schematic form of the PISCES IFS from McElwain et al. (2016) showing the lenslet array, pinhole mask array, \narrayed spectra on the focal plane and the resulting “data cube” illustrating a coronagraph image. \n \nFigure 5.5-12. Starshade instrument schematic layout of UV \nchannel. \nDichroic\nOAP\nCollimated\ninput from FSM\nFilters\nGrism\nGuide\nmode\nEllipse\nField\nstops\nEMCCD\n"
     },
     {
       "id": "u-nrel-5mw-p25-36-5eaf02be-p2-visual-b2of4",
@@ -1245,7 +1368,8 @@
             567.1798095703125,
             550.5800170898438,
             728.0
-          ]
+          ],
+          "_task": "figure:p2:0"
         },
         {
           "entity": "Tower",
@@ -1259,7 +1383,8 @@
             567.1798095703125,
             550.5800170898438,
             728.0
-          ]
+          ],
+          "_task": "figure:p2:0"
         },
         {
           "entity": "tower",
@@ -1273,7 +1398,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:5"
         },
         {
           "entity": "tower",
@@ -1287,7 +1413,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:5"
         },
         {
           "entity": "tower",
@@ -1301,7 +1428,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:5"
         },
         {
           "entity": "tower",
@@ -1315,7 +1443,8 @@
             372.0,
             420.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:4"
         },
         {
           "entity": "tower",
@@ -1329,7 +1458,8 @@
             372.0,
             420.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:4"
         },
         {
           "entity": "tower",
@@ -1343,7 +1473,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:5"
         },
         {
           "entity": "tower",
@@ -1357,7 +1488,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:5"
         },
         {
           "entity": "tower",
@@ -1371,7 +1503,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:5"
         },
         {
           "entity": "tower",
@@ -1385,7 +1518,8 @@
             372.0,
             420.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:4"
         },
         {
           "entity": "tower",
@@ -1399,7 +1533,8 @@
             372.0,
             420.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:4"
         },
         {
           "entity": "tower",
@@ -1413,7 +1548,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:5"
         },
         {
           "entity": "tower",
@@ -1427,7 +1563,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:5"
         },
         {
           "entity": "tower",
@@ -1441,7 +1578,68 @@
             372.0,
             420.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p2:4"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwEAStif",
+          "value": "138.13E+9",
+          "unit": "N",
+          "conditions": "Elevation = 0.00 m, HtFract = 0.0",
+          "quote": "Elevation (m) 0.00 ... TwEAStif (N) 138.13E+9",
+          "_box": [
+            0.0,
+            372.0,
+            420.0,
+            792.0
+          ],
+          "_task": "tile:p2:4"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAStif",
+          "value": "115.82E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 87.60 m",
+          "quote": "87.60 1.0 2536.27 115.82E+9",
+          "_box": [
+            62.0,
+            567.1798095703125,
+            550.5800170898438,
+            728.0
+          ],
+          "_task": "figure:p2:0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TMassDen",
+          "value": "2536.27",
+          "unit": "kg/m",
+          "conditions": "Elevation = 87.60 m",
+          "quote": "87.60 1.0 2536.27",
+          "_box": [
+            62.0,
+            567.1798095703125,
+            550.5800170898438,
+            728.0
+          ],
+          "_task": "figure:p2:0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAIner",
+          "value": "4688.0",
+          "unit": "kg•m",
+          "conditions": "Elevation = 87.60 m",
+          "quote": "87.60 1.0 2536.27 115.82E+9 115.82E+9 89.13E+9 62.66E+9 4688.0",
+          "_box": [
+            62.0,
+            567.1798095703125,
+            550.5800170898438,
+            728.0
+          ],
+          "_task": "figure:p2:0"
         }
       ],
       "variant": [
@@ -1457,7 +1655,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1471,7 +1670,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1485,7 +1685,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1499,7 +1700,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1513,7 +1715,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1527,7 +1730,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1541,7 +1745,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1555,7 +1760,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1569,7 +1775,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1583,7 +1790,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1597,7 +1805,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1611,7 +1820,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1625,7 +1835,8 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
         },
         {
           "entity": "tower",
@@ -1639,15 +1850,79 @@
             476.159912109375,
             547.0241088867188,
             748.9240112304688
-          ]
+          ],
+          "_task": "tile:p2:0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwEAStif",
+          "value": "138.13E+9",
+          "unit": "N",
+          "conditions": "Elevation = 0.00 m, HtFract = 0.0",
+          "quote": "Elevation (m) 0.00 ... TwEAStif (N) 138.13E+9",
+          "_box": [
+            67.99989318847656,
+            476.159912109375,
+            547.0241088867188,
+            748.9240112304688
+          ],
+          "_task": "tile:p2:0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAStif",
+          "value": "115.82E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 87.60 m",
+          "quote": "87.60 1.0 2536.27 115.82E+9",
+          "_box": [
+            62.0,
+            567.1798095703125,
+            550.5800170898438,
+            728.0
+          ],
+          "_task": "figure:p2:0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TMassDen",
+          "value": "2536.27",
+          "unit": "kg/m",
+          "conditions": "Elevation = 87.60 m",
+          "quote": "Elevation (m) 87.60 ... TMassDen (kg/m) 2536.27",
+          "_box": [
+            67.99989318847656,
+            476.159912109375,
+            547.0241088867188,
+            748.9240112304688
+          ],
+          "_task": "tile:p2:0"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAIner",
+          "value": "4688.0",
+          "unit": "kg•m",
+          "conditions": "Elevation = 87.60 m",
+          "quote": "87.60 1.0 2536.27 115.82E+9 115.82E+9 89.13E+9 62.66E+9 4688.0",
+          "_box": [
+            62.0,
+            567.1798095703125,
+            550.5800170898438,
+            728.0
+          ],
+          "_task": "figure:p2:0"
         }
       ],
-      "hidden_shared": 4,
+      "hidden_shared": 0,
       "counts": {
         "baseline": 19,
         "variant": 18,
-        "shared": 4
-      }
+        "shared": 3
+      },
+      "sources": {},
+      "page_image": "images/nrel-5mw-p25-36-5eaf02be-p2-b2of4-page.jpg",
+      "page_text_full": " 15 \n6  Tower Properties \nThe properties of the tower for the NREL offshore 5-MW baseline wind turbine will depend on \nthe type support structure used to carry the rotor-nacelle assembly.  The type of support structure \nwill, in turn, depend on the installation site, whose properties vary significantly through \ndifferences in water depth, soil type, and wind and wave severity.  Offshore support-structure \ntypes include fixed-bottom monopiles, gravity bases, and space-frames—such as tripods, \nquadpods, and lattice frames (e.g., “jackets”)—and floating structures.  This section documents \nthe tower properties for the equivalent land-based version of the NREL 5-MW baseline wind \nturbine.  These properties provide a basis with which to design towers for site-specific offshore \nsupport structures.  For example, different types of offshore support structures for the NREL 5-\nMW baseline wind turbine have been designed for—and investigated in—separate phases of the \nOC3 project [13,25]. \nWe based the distributed properties of the land-based tower for the NREL 5-MW baseline wind \nturbine on the base diameter (6 m) and thickness (0.027 m), top diameter (3.87 m) and thickness \n(0.019 m), and effective mechanical steel properties of the tower used in the DOWEC study (as \ngiven in Table 9 on page 31 of Ref. [14]).  The Young’s modulus was taken to be 210 GPa, the \nshear modulus was taken to be 80.8 GPa, and the effective density of the steel was taken to be \n8,500 kg/m3.  The density of 8,500 kg/m3 was meant to be an increase above steel’s typical value \nof 7,850 kg/m3 to account for paint, bolts, welds, and flanges that are not accounted for in the \ntower thickness data.  The radius and thickness of the tower were assumed to be linearly tapered \nfrom the tower base to tower top.  Because the REpower 5M machine had a larger tower-top \nmass than the DOWEC wind turbine, we scaled up the thickness of the tower relative to the \nvalues given earlier in this paragraph to strengthen the tower.  We chose an increase of 30% to \nensure that the first fore-aft and side-to-side tower frequencies were placed between the one- and \nthree-per-rev frequencies throughout the operational range of the wind turbine in a Campbell \ndiagram.  Table 6-1 gives the resulting distributed tower properties. \nThe entries in the first column, “Elevation,” are the vertical locations along the tower centerline \nrelative to the tower base.  “HtFract” is the fractional height along the tower centerline from the \ntower base (0.0) to the tower top (1.0).  The rest of columns are similar to those described for the \ndistributed blade properties presented in Table 2-1. \nThe resulting overall (integrated) tower mass is 347,460 kg and is centered at 38.234 m along the \nTable 6-1.  Distributed Tower Properties \nElevation\nHtFract\nTMassDen\nTwFAStif\nTwSSStif\nTwGJStif\nTwEAStif TwFAIner TwSSIner TwFAcgOf TwSScgOf\n(m)\n(-)\n(kg/m)\n(N•m2)\n(N•m2)\n(N•m2)\n(N)\n(kg•m)\n(kg•m)\n(m)\n(m)\n0.00\n0.0\n5590.87\n614.34E+9\n614.34E+9\n472.75E+9\n138.13E+9\n24866.3\n24866.3\n0.0\n0.0\n8.76\n0.1\n5232.43\n534.82E+9\n534.82E+9\n411.56E+9\n129.27E+9\n21647.5\n21647.5\n0.0\n0.0\n17.52\n0.2\n4885.76\n463.27E+9\n463.27E+9\n356.50E+9\n120.71E+9\n18751.3\n18751.3\n0.0\n0.0\n26.28\n0.3\n4550.87\n399.13E+9\n399.13E+9\n307.14E+9\n112.43E+9\n16155.3\n16155.3\n0.0\n0.0\n35.04\n0.4\n4227.75\n341.88E+9\n341.88E+9\n263.09E+9\n104.45E+9\n13838.1\n13838.1\n0.0\n0.0\n43.80\n0.5\n3916.41\n291.01E+9\n291.01E+9\n223.94E+9\n96.76E+9\n11779.0\n11779.0\n0.0\n0.0\n52.56\n0.6\n3616.83\n246.03E+9\n246.03E+9\n189.32E+9\n89.36E+9\n9958.2\n9958.2\n0.0\n0.0\n61.32\n0.7\n3329.03\n206.46E+9\n206.46E+9\n158.87E+9\n82.25E+9\n8356.6\n8356.6\n0.0\n0.0\n70.08\n0.8\n3053.01\n171.85E+9\n171.85E+9\n132.24E+9\n75.43E+9\n6955.9\n6955.9\n0.0\n0.0\n78.84\n0.9\n2788.75\n141.78E+9\n141.78E+9\n109.10E+9\n68.90E+9\n5738.6\n5738.6\n0.0\n0.0\n87.60\n1.0\n2536.27\n115.82E+9\n115.82E+9\n89.13E+9\n62.66E+9\n4688.0\n4688.0\n0.0\n0.0 \n"
     },
     {
       "id": "u-dc-cd-p39-42-2523f154-p2-table",
@@ -1676,7 +1951,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "ROOF BEAM @ GRID 2,3,4,5",
@@ -1690,7 +1966,8 @@
             324.76806640625,
             438.135009765625,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:1"
         },
         {
           "entity": "ROOF BEAM @ GRID 6",
@@ -1704,7 +1981,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "FLOOR BEAM @ GRID 6",
@@ -1718,7 +1996,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "FLOOR BEAM @ GRID 2",
@@ -1732,7 +2011,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "FLOOR BEAM NEAR GRID 5",
@@ -1746,7 +2026,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "FLOOR BEAM @ GRID 3",
@@ -1760,7 +2041,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "Roof Beam @ Grid 2,3,4,5",
@@ -1774,7 +2056,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "beam openings",
@@ -1788,7 +2071,8 @@
             324.76806640625,
             408.239990234375,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:0"
         },
         {
           "entity": "FLOOR BEAM @ GRID 4",
@@ -1802,7 +2086,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         }
       ],
       "variant": [
@@ -1818,7 +2103,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "ROOF BEAM @ GRID 6 & NEAR GRID 5",
@@ -1832,7 +2118,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "FLOOR BEAM @ GRID 6",
@@ -1846,7 +2133,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "FLOOR BEAM @ GRID 2",
@@ -1860,7 +2148,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "FLOOR BEAM NEAR GRID 5",
@@ -1874,7 +2163,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "FLOOR BEAM @ GRID 3",
@@ -1888,7 +2178,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "ROOF BEAM @ GRID 2,3,4,5",
@@ -1902,7 +2193,8 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "beam openings",
@@ -1916,7 +2208,8 @@
             324.76806640625,
             408.239990234375,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:0"
         },
         {
           "entity": "FLOOR BEAM @ GRID 4",
@@ -1930,15 +2223,23 @@
             324.76806640625,
             861.4080200195312,
             611.8800048828125
-          ]
+          ],
+          "_task": "table:p2:0:3"
         }
       ],
       "hidden_shared": 0,
       "counts": {
         "baseline": 10,
         "variant": 9,
-        "shared": 8
-      }
+        "shared": 7
+      },
+      "sources": {
+        "table:p2:0:3": "Header: [\"B A\\n3'-0\\\" 3'-0\\\" 3'-0\\\" 3'-0\\\"\\nø 3\\\"\\nW8X13\\nROOF BEAM @ GRID 2,3,4,5 T.O. STEEL\\nE6\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\n2'-1\\\" 8\\\" 9'-3\\\"\\n2\\\"\\n6\\\"\\n2\\\"\\nW10X15\\nFLOOR BEAM @ GRID 5\\nD5\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\nD C\\n3'-7\\\" 10\\\" 5'-3\\\" 8\\\" 1'-8\\\"\\n2'-6\\\" 2'-6\\\" 2'-6\\\" 2'-6\\\"\\n2\\\" 2\\\"\\nø 3 \\\"\\n6\\\" 6\\\"\\n2\\\" 2\\\"\\nW8X13\\nW10X15\\nROOF BEAM @ GRID 6 & NEAR GRID 5 FLOOR BEAM @ GRID 4\\nC1 C4\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3' 3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\nD C\\n4'-2\\\" 10\\\" 1'-3\\\" 8\\\" 3'-1\\\" 5'-0\\\" 10\\\" 10\\\" 10\\\" 10\\\" 8\\\" 3'-0\\\"\\n2\\\" 2\\\"\\n6\\\" 6\\\"\\n2\\\" 2\\\"\\nW10X15 W10X15\\nFLOOR BEAM @ GRID 3\\nFLOOR BEAMNEAR GRID 5 B4\\nB1 3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\nD C\\n10'-0\\\"\\n5'-1\\\" 8\\\" 11\\\" 10\\\" 4'-6\\\"\\n4'-2\\\" 10\\\" 1'-1\\\" 10\\\" 3'-1\\\"\\n2\\\" 2\\\"\\n6\\\" 6\\\"\\n2\\\" 2\\\"\\nW10X15\\nFLOOR BEAM @ GRID 2\\nFLOOR BEAM @ GRID 6\\nA4\\nA1\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\", \"GENERAL SHEET NOTES\"]\nRow: [null, \"SHEET KEYNOTES\"]",
+        "table:p2:0:1": "Header: [\"B A\\n3'-0\\\" 3'-0\\\" 3'-0\\\" 3'-0\\\"\\nø 3\\\"\\nW8X13\\nROOF BEAM @ GRID 2,3,4,5 T.O. STEEL\\nE6\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\n2'-1\\\" 8\\\" 9'-3\\\"\\n2\\\"\\n6\\\"\\n2\\\"\\nW10X15\\nFLOOR BEAM @ GRID 5\\nD5\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\nD C\\n3'-7\\\" 10\\\" 5'-3\\\" 8\\\" 1'-8\\\"\\n2'-6\\\" 2'-6\\\" 2'-6\\\" 2'-6\\\"\\n2\\\" 2\\\"\\nø 3 \\\"\\n6\\\" 6\\\"\\n2\\\" 2\\\"\\nW8X13\\nW10X15\\nROOF BEAM @ GRID 6 & NEAR GRID 5 FLOOR BEAM @ GRID 4\\nC1 C4\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3' 3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\nD C\\n4'-2\\\" 10\\\" 1'-3\\\" 8\\\" 3'-1\\\" 5'-0\\\" 10\\\" 10\\\" 10\\\" 10\\\" 8\\\" 3'-0\\\"\\n2\\\" 2\\\"\\n6\\\" 6\\\"\\n2\\\" 2\\\"\\nW10X15 W10X15\\nFLOOR BEAM @ GRID 3\\nFLOOR BEAMNEAR GRID 5 B4\\nB1 3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\nD C\\n10'-0\\\"\\n5'-1\\\" 8\\\" 11\\\" 10\\\" 4'-6\\\"\\n4'-2\\\" 10\\\" 1'-1\\\" 10\\\" 3'-1\\\"\\n2\\\" 2\\\"\\n6\\\" 6\\\"\\n2\\\" 2\\\"\\nW10X15\\nFLOOR BEAM @ GRID 2\\nFLOOR BEAM @ GRID 6\\nA4\\nA1\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\", \"GENERAL SHEET NOTES\"]\nRow: [null, \"REFERENCE KEYNOTES\"]",
+        "table:p2:0:0": "Header: [\"B A\\n3'-0\\\" 3'-0\\\" 3'-0\\\" 3'-0\\\"\\nø 3\\\"\\nW8X13\\nROOF BEAM @ GRID 2,3,4,5 T.O. STEEL\\nE6\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\n2'-1\\\" 8\\\" 9'-3\\\"\\n2\\\"\\n6\\\"\\n2\\\"\\nW10X15\\nFLOOR BEAM @ GRID 5\\nD5\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\nD C\\n3'-7\\\" 10\\\" 5'-3\\\" 8\\\" 1'-8\\\"\\n2'-6\\\" 2'-6\\\" 2'-6\\\" 2'-6\\\"\\n2\\\" 2\\\"\\nø 3 \\\"\\n6\\\" 6\\\"\\n2\\\" 2\\\"\\nW8X13\\nW10X15\\nROOF BEAM @ GRID 6 & NEAR GRID 5 FLOOR BEAM @ GRID 4\\nC1 C4\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3' 3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\nD C\\n4'-2\\\" 10\\\" 1'-3\\\" 8\\\" 3'-1\\\" 5'-0\\\" 10\\\" 10\\\" 10\\\" 10\\\" 8\\\" 3'-0\\\"\\n2\\\" 2\\\"\\n6\\\" 6\\\"\\n2\\\" 2\\\"\\nW10X15 W10X15\\nFLOOR BEAM @ GRID 3\\nFLOOR BEAMNEAR GRID 5 B4\\nB1 3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\nB A\\nD C\\n10'-0\\\"\\n5'-1\\\" 8\\\" 11\\\" 10\\\" 4'-6\\\"\\n4'-2\\\" 10\\\" 1'-1\\\" 10\\\" 3'-1\\\"\\n2\\\" 2\\\"\\n6\\\" 6\\\"\\n2\\\" 2\\\"\\nW10X15\\nFLOOR BEAM @ GRID 2\\nFLOOR BEAM @ GRID 6\\nA4\\nA1\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\\n3/4\\\" = 1'-0\\\" 0 1' 2' 3'\", \"GENERAL SHEET NOTES\"]\nRow: [null, \"1/2\\\" RADIUS AROUND EDGES OF OPENINGS IN BEAMS\"]"
+      },
+      "page_image": "images/dc-cd-p39-42-2523f154-p2-page.jpg",
+      "page_text_full": "B\nA\n5'-1\"\n8\"\n11\"\n10\"\n4'-6\"\n2\"\n6\"\n2\"\nW10X15\nB\nA\n5'-0\"\n10\"\n10\"\n10\"\n10\"\n8\"\n3'-0\"\n2\"\n6\"\n2\"\nW10X15\nB\nA\n3'-7\"\n10\"\n5'-3\"\n8\"\n1'-8\"\n2\"\n6\"\n2\"\n2\"\n6\"\n2\"\nW10X15\nB\nA\n2'-1\"\n8\"\n9'-3\"\n2\"\n6\"\n2\"\nW10X15\nD\nC\n4'-2\"\n10\"\n1'-3\"\n8\"\n3'-1\"\nW10X15\n2\"\n6\"\n2\"\nD\nC\n2'-6\"\n2'-6\"\n2'-6\"\n2'-6\"\nW8X13\nø 3\"\nD\nC\n10'-0\"\n4'-2\"\n10\"\n1'-1\"\n10\"\n3'-1\"\n2\"\n6\"\n2\"\nB\nA\n3'-0\"\n3'-0\"\n3'-0\"\n3'-0\"\nW8X13\nø 3\"\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nSHEET TITLE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCLIENT\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nTEAM NAME:\nADDRESS:\nNONE: PROJECT IS\nPUBLIC DOMAIN\nARCHITECT OF RECORD\nWILLIAM JELEN, AIA\n620 MICHIGAN AVE NE\nCROUGH CENTER\nWASHINGTON, DC 20064\nTEL: 202.344.5513\nSTRUCTURAL ENGINEER\nBOB ALLISON, PE\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nMEP ENGINEER\nARUP ENGINEERING\n1120 CONNECTICUT\nAVENUE, NW., SUITE 200\nWASHINGTON, DC 20036\nTEL: 202.729.8220\nTEAM CAPITOL DC\nTEAM CAPITOL DC\n8/22/2013 4:48:11 PM\nS-601\nBEAM OPENINGS\n115\nTeam Capitol dc\nTHE CATHOLIC UNIVERSITY OF AMERICA\nSCHOOL OF ARCHITECTURE\n620 MICHIGAN AVENUE, NE.\nWASHINGTON, DC 20064\n 3/4\" = 1'-0\"\nA4\nFLOOR BEAM @ GRID 2\n 3/4\" = 1'-0\"\nB4\nFLOOR BEAM @ GRID 3\n 3/4\" = 1'-0\"\nC4\nFLOOR BEAM @ GRID 4\n 3/4\" = 1'-0\"\nD5\nFLOOR BEAM @ GRID 5\n 3/4\" = 1'-0\"\nB1\nFLOOR BEAMNEAR GRID 5\n 3/4\" = 1'-0\"\nC1\nROOF BEAM @ GRID 6 & NEAR GRID 5\n 3/4\" = 1'-0\"\nA1\nFLOOR BEAM @ GRID 6\n 3/4\" = 1'-0\"\nE6\nROOF BEAM @ GRID 2,3,4,5 T.O. STEEL\nREFERENCE KEYNOTES\nSHEET KEYNOTES\nGENERAL SHEET NOTES\n0\n2'\n3'\n1'\n1/2\" RADIUS AROUND EDGES OF OPENINGS IN BEAMS\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\n0\n2'\n3'\n1'\nMARK\nDATE\nDESCRIPTION\n1\n2012.10.11\n80% DD Submission\n2\n2012.11.20\n80% DD Revisions\n3\n2013.02.04\n100% CD Submission\n4\n2013.08.22\nAs-Built Submission\n"
     },
     {
       "id": "u-iea-15mw-p20-31-f7071680-p8-text-b1of2",
@@ -1973,7 +2274,8 @@
             501.0794982910156,
             537.8897705078125,
             582.7730712890625
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         },
         {
           "entity": "rotor",
@@ -1987,7 +2289,8 @@
             446.921875,
             528.3948364257812,
             493.1091003417969
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         },
         {
           "entity": "turbine",
@@ -2001,7 +2304,8 @@
             339.3249206542969,
             536.5519409179688,
             409.4231262207031
-          ]
+          ],
+          "_task": "text:p8:2.0-6.0"
         },
         {
           "entity": "blade pitch angle",
@@ -2015,7 +2319,8 @@
             446.921875,
             528.3948364257812,
             493.1091003417969
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         },
         {
           "entity": "rotor",
@@ -2029,7 +2334,8 @@
             417.03387451171875,
             534.1025390625,
             439.3111267089844
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         },
         {
           "entity": "turbine",
@@ -2043,7 +2349,8 @@
             339.3249206542969,
             536.5519409179688,
             409.4231262207031
-          ]
+          ],
+          "_task": "text:p8:2.0-6.0:r1"
         },
         {
           "entity": "generator torque",
@@ -2057,7 +2364,8 @@
             417.03387451171875,
             534.1025390625,
             439.3111267089844
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         },
         {
           "entity": "DTU Basic Controller",
@@ -2071,7 +2379,8 @@
             590.7434692382812,
             529.296875,
             660.4820556640625
-          ]
+          ],
+          "_task": "text:p8:10.0-11.0:r0"
         },
         {
           "entity": "rotor",
@@ -2085,7 +2394,8 @@
             446.921875,
             528.3948364257812,
             493.1091003417969
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         }
       ],
       "variant": [
@@ -2101,7 +2411,8 @@
             446.921875,
             528.3948364257812,
             493.1091003417969
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         },
         {
           "entity": "blade pitch angles",
@@ -2115,7 +2426,8 @@
             279.9860534667969,
             536.8926391601562,
             409.4231262207031
-          ]
+          ],
+          "_task": "text:p8:2.0-6.0:r1"
         },
         {
           "entity": "rotor",
@@ -2129,7 +2441,8 @@
             417.03387451171875,
             534.1025390625,
             439.3111267089844
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         },
         {
           "entity": "IEA Wind 15-MW turbine",
@@ -2143,7 +2456,8 @@
             501.0794982910156,
             537.8897705078125,
             582.7730712890625
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         },
         {
           "entity": "rotor",
@@ -2157,7 +2471,8 @@
             446.921875,
             528.3948364257812,
             493.1091003417969
-          ]
+          ],
+          "_task": "text:p8:7.0-9.0"
         },
         {
           "entity": "pitch controller",
@@ -2171,7 +2486,8 @@
             590.7434692382812,
             530.6162719726562,
             764.2500610351562
-          ]
+          ],
+          "_task": "text:p8:10.0-11.0"
         },
         {
           "entity": "pitch controller",
@@ -2185,7 +2501,8 @@
             590.7434692382812,
             530.6162719726562,
             764.2500610351562
-          ]
+          ],
+          "_task": "text:p8:10.0-11.0"
         },
         {
           "entity": "torque controller",
@@ -2199,7 +2516,8 @@
             590.7434692382812,
             530.6162719726562,
             764.2500610351562
-          ]
+          ],
+          "_task": "text:p8:10.0-11.0"
         },
         {
           "entity": "DTU Basic Controller",
@@ -2213,7 +2531,8 @@
             590.7434692382812,
             529.296875,
             660.4820556640625
-          ]
+          ],
+          "_task": "text:p8:10.0-11.0"
         },
         {
           "entity": "torque controller",
@@ -2227,7 +2546,8 @@
             590.7434692382812,
             530.6162719726562,
             764.2500610351562
-          ]
+          ],
+          "_task": "text:p8:10.0-11.0"
         }
       ],
       "hidden_shared": 0,
@@ -2235,7 +2555,16 @@
         "baseline": 9,
         "variant": 10,
         "shared": 3
-      }
+      },
+      "sources": {
+        "text:p8:7.0-9.0": "6.98 m/s ≤ U ≤ 10.59 m/s; optimal TSR. In below-rated wind speeds, the rotor speed is regulated to operate at the \nturbine’s optimal TSR with a PI controller on the generator torque.\n\n10.59 m/s ≤ U ≤ 25 m/s; rated power In above-rated wind speeds, the rotor speed is regulated via a PI controller \non the blade pitch angle. The objective of the blade pitch controller is to regulate the rotor speed to its rated \nvalue, 7.55 rpm. For ﬂoating applications, the constant-power setting is traditionally replaced by constant \ngenerator torque.\n\nIn ROSCO, an extended Kalman-ﬁlter-based wind speed estimator is employed to estimate the optimal rotor speeds \nin below-rated operation and to deﬁne minimum blade pitch angles during minimum rotor speed operation. In \nRegion 2.5, instead of the linear constant speed approach used by the NREL 5-MW reference turbine, the ROSCO \ncontrol uses a setpoint-smoothing methodology [39] to ensure smooth transitions between control regions. As a \nresult of the design optimization process, the IEA Wind 15-MW turbine has a negligible Region 2.5, since the rated \nrotor speed is reached at rated torque. The PI gains for the generator torque and blade pitch controllers are calculated \nusing the ROSCO generic tuning methodology [39] and included in the accompanying OpenFAST input ﬁles.",
+        "text:p8:2.0-6.0": "3.1 \nController Properties\n\nTwo controllers are provided for the IEA Wind 15-MW reference wind turbine: the NREL Reference OpenSource \nController (ROSCO) [37] and the DTU Basic Controller [38], which are implemented in OpenFAST and HAWC2, \nrespectively. The rotor operates with a minimum rotational speed of 5 rpm to avoid 3-period (3P) interference with \nthe tower/monopile natural frequency, and reaches a rated rotational speed of 7.55 rpm at 10.59 m/s, resulting in \na maximum nominal tip speed of 95 m/s. The rotor operates with a pitch setting of 0° at the design tip-speed ratio \n(TSR), but operates with positive pitch at low wind speeds to track maximum power while maintaining the minimum \nrotor speed. The rotor starts pitching at the rated wind speed of 10.59 m/s.\n\n3.1.1 \nController Methodology\n\nIn both controllers, two active proportional integral (PI) controllers are implemented for the generator torque and \nblade pitch angles. Saturation limits on rotor speeds and blade pitch angles are implemented to ensure turbine opera- \ntion within the design constraints. The controller operation can be distinguished by three regions:\n\n3 m/s ≤ U ≤ 6.98 m/s; minimum rotor speed. A PI controller on the generator torque is used to regulate the tur- \nbine to the turbine’s minimum rotor speed, 5 rpm. In ROSCO, the minimum blade pitch angle is deﬁned based \non a wind speed estimate, such that CP is maximized. The CP-maximizing minimum blade pitch angles are \nfound a-priori using steady-state blade element momentum analysis, provided by CCBlade [14]. For the DTU \nBasic Controller, a PI controller is applied to the torque controller to regulate the rated wind speed. The pitch \nangles are determined using a look-up table scheduled on the ﬁltered hub-height wind speed.",
+        "text:p8:2.0-6.0:r1": "3.1.1 \nController Methodology\n\nIn both controllers, two active proportional integral (PI) controllers are implemented for the generator torque and \nblade pitch angles. Saturation limits on rotor speeds and blade pitch angles are implemented to ensure turbine opera- \ntion within the design constraints. The controller operation can be distinguished by three regions:\n\n3 m/s ≤ U ≤ 6.98 m/s; minimum rotor speed. A PI controller on the generator torque is used to regulate the tur- \nbine to the turbine’s minimum rotor speed, 5 rpm. In ROSCO, the minimum blade pitch angle is deﬁned based \non a wind speed estimate, such that CP is maximized. The CP-maximizing minimum blade pitch angles are \nfound a-priori using steady-state blade element momentum analysis, provided by CCBlade [14]. For the DTU \nBasic Controller, a PI controller is applied to the torque controller to regulate the rated wind speed. The pitch \nangles are determined using a look-up table scheduled on the ﬁltered hub-height wind speed.",
+        "text:p8:10.0-11.0:r0": "The parameters for the DTU Basic Controller were determined using HAWCStab2’s controller tuning feature. The \nassumed natural frequencies and damping for the partial-load poles (torque controller) and full-load poles (pitch \ncontroller) were 0.05 Hz, 70% critical, and 0.03 Hz, 70% critical, respectively. Quadratic gain scheduling was used \nwith an assumption of constant power. The resulting controller parameters are found in the HAWC2 input ﬁles \nand the deﬁnitions for all parameters and Regions 1, 2, and 3 are consistent with the deﬁnitions in the DTU Basic \nController report [38].",
+        "text:p8:10.0-11.0": "The parameters for the DTU Basic Controller were determined using HAWCStab2’s controller tuning feature. The \nassumed natural frequencies and damping for the partial-load poles (torque controller) and full-load poles (pitch \ncontroller) were 0.05 Hz, 70% critical, and 0.03 Hz, 70% critical, respectively. Quadratic gain scheduling was used \nwith an assumption of constant power. The resulting controller parameters are found in the HAWC2 input ﬁles \nand the deﬁnitions for all parameters and Regions 1, 2, and 3 are consistent with the deﬁnitions in the DTU Basic \nController report [38].\n\n17 \nThis report is available at no cost from the National Renewable Energy Laboratory at www.nrel.gov/publications"
+      },
+      "page_image": "images/iea-15mw-p20-31-f7071680-p8-b1of2-page.jpg",
+      "page_text_full": "3 \nRotor Performance \nRotor performance is tightly coupled with the controller behavior and pitch schedule to reach the desired shaft \nrevolutions per minute (rpm), torque, and thrust. The controller is described before presenting rotor performance \ndata. \n3.1 \nController Properties \nTwo controllers are provided for the IEA Wind 15-MW reference wind turbine: the NREL Reference OpenSource \nController (ROSCO) [37] and the DTU Basic Controller [38], which are implemented in OpenFAST and HAWC2, \nrespectively. The rotor operates with a minimum rotational speed of 5 rpm to avoid 3-period (3P) interference with \nthe tower/monopile natural frequency, and reaches a rated rotational speed of 7.55 rpm at 10.59 m/s, resulting in \na maximum nominal tip speed of 95 m/s. The rotor operates with a pitch setting of 0° at the design tip-speed ratio \n(TSR), but operates with positive pitch at low wind speeds to track maximum power while maintaining the minimum \nrotor speed. The rotor starts pitching at the rated wind speed of 10.59 m/s. \n3.1.1 \nController Methodology \nIn both controllers, two active proportional integral (PI) controllers are implemented for the generator torque and \nblade pitch angles. Saturation limits on rotor speeds and blade pitch angles are implemented to ensure turbine opera- \ntion within the design constraints. The controller operation can be distinguished by three regions: \n3 m/s ≤ U ≤ 6.98 m/s; minimum rotor speed. A PI controller on the generator torque is used to regulate the tur- \nbine to the turbine’s minimum rotor speed, 5 rpm. In ROSCO, the minimum blade pitch angle is deﬁned based \non a wind speed estimate, such that CP is maximized. The CP-maximizing minimum blade pitch angles are \nfound a-priori using steady-state blade element momentum analysis, provided by CCBlade [14]. For the DTU \nBasic Controller, a PI controller is applied to the torque controller to regulate the rated wind speed. The pitch \nangles are determined using a look-up table scheduled on the ﬁltered hub-height wind speed. \n6.98 m/s ≤ U ≤ 10.59 m/s; optimal TSR. In below-rated wind speeds, the rotor speed is regulated to operate at the \nturbine’s optimal TSR with a PI controller on the generator torque. \n10.59 m/s ≤ U ≤ 25 m/s; rated power In above-rated wind speeds, the rotor speed is regulated via a PI controller \non the blade pitch angle. The objective of the blade pitch controller is to regulate the rotor speed to its rated \nvalue, 7.55 rpm. For ﬂoating applications, the constant-power setting is traditionally replaced by constant \ngenerator torque. \nIn ROSCO, an extended Kalman-ﬁlter-based wind speed estimator is employed to estimate the optimal rotor speeds \nin below-rated operation and to deﬁne minimum blade pitch angles during minimum rotor speed operation. In \nRegion 2.5, instead of the linear constant speed approach used by the NREL 5-MW reference turbine, the ROSCO \ncontrol uses a setpoint-smoothing methodology [39] to ensure smooth transitions between control regions. As a \nresult of the design optimization process, the IEA Wind 15-MW turbine has a negligible Region 2.5, since the rated \nrotor speed is reached at rated torque. The PI gains for the generator torque and blade pitch controllers are calculated \nusing the ROSCO generic tuning methodology [39] and included in the accompanying OpenFAST input ﬁles. \nThe parameters for the DTU Basic Controller were determined using HAWCStab2’s controller tuning feature. The \nassumed natural frequencies and damping for the partial-load poles (torque controller) and full-load poles (pitch \ncontroller) were 0.05 Hz, 70% critical, and 0.03 Hz, 70% critical, respectively. Quadratic gain scheduling was used \nwith an assumption of constant power. The resulting controller parameters are found in the HAWC2 input ﬁles \nand the deﬁnitions for all parameters and Regions 1, 2, and 3 are consistent with the deﬁnitions in the DTU Basic \nController report [38]. \n17 \nThis report is available at no cost from the National Renewable Energy Laboratory at www.nrel.gov/publications\n"
     },
     {
       "id": "u-habex-interim-p80-89-52da8af4-p10-visual-b0of4",
@@ -2269,7 +2598,8 @@
             65.67997741699219,
             510.6742248535156,
             246.99423217773438
-          ]
+          ],
+          "_task": "figure:p10:0"
         },
         {
           "entity": "coronagraph",
@@ -2283,7 +2613,8 @@
             0.0,
             612.0,
             420.0
-          ]
+          ],
+          "_task": "tile:p10:1"
         },
         {
           "entity": "focal plane mask",
@@ -2297,7 +2628,8 @@
             186.0,
             612.0,
             606.0
-          ]
+          ],
+          "_task": "tile:p10:3"
         },
         {
           "entity": "HabEx 4 m off-axis architecture",
@@ -2311,7 +2643,8 @@
             186.0,
             420.0,
             606.0
-          ]
+          ],
+          "_task": "tile:p10:2"
         },
         {
           "entity": "HabEx 4 m coronagraph",
@@ -2325,7 +2658,8 @@
             186.0,
             612.0,
             606.0
-          ]
+          ],
+          "_task": "tile:p10:3"
         },
         {
           "entity": "Astigmatism",
@@ -2339,7 +2673,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "Tip-tilt",
@@ -2353,7 +2688,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "Defocus",
@@ -2367,7 +2703,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "Tip-tilt",
@@ -2381,7 +2718,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "Classical Lyot-type two-plane coronagraph",
@@ -2395,7 +2733,8 @@
             0.0,
             420.0,
             420.0
-          ]
+          ],
+          "_task": "tile:p10:0"
         },
         {
           "entity": "Tip-tilt",
@@ -2409,7 +2748,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "HabEx Baseline Design",
@@ -2423,7 +2763,8 @@
             0.0,
             612.0,
             420.0
-          ]
+          ],
+          "_task": "tile:p10:1"
         },
         {
           "entity": "Classical Lyot-type two-plane coronagraph",
@@ -2437,7 +2778,8 @@
             0.0,
             420.0,
             420.0
-          ]
+          ],
+          "_task": "tile:p10:0"
         },
         {
           "entity": "Classical Lyot-type two-plane coronagraph",
@@ -2451,7 +2793,8 @@
             0.0,
             420.0,
             420.0
-          ]
+          ],
+          "_task": "tile:p10:0"
         },
         {
           "entity": "coronagraph",
@@ -2465,7 +2808,308 @@
             65.67997741699219,
             510.6742248535156,
             246.99423217773438
-          ]
+          ],
+          "_task": "figure:p10:0"
+        },
+        {
+          "entity": "Lyot stop",
+          "attribute": "location",
+          "value": "in pupil",
+          "unit": "",
+          "conditions": "",
+          "quote": "Lyot stop (in pupil)",
+          "_box": [
+            63.279998779296875,
+            65.67997741699219,
+            510.6742248535156,
+            246.99423217773438
+          ],
+          "_task": "figure:p10:0"
+        },
+        {
+          "entity": "DM1",
+          "attribute": "location",
+          "value": "in pupil",
+          "unit": "",
+          "conditions": "",
+          "quote": "DM1 (in pupil)",
+          "_box": [
+            63.279998779296875,
+            65.67997741699219,
+            510.6742248535156,
+            246.99423217773438
+          ],
+          "_task": "figure:p10:0"
+        },
+        {
+          "entity": "hybrid Lyot/vortex coronagraph",
+          "attribute": "input light source",
+          "value": "telescope's M3 mirror",
+          "unit": "",
+          "conditions": "collimated",
+          "quote": "Collimated light from the telescope’s M3 mirror enters the coronagraph instrument",
+          "_box": [
+            192.0,
+            0.0,
+            612.0,
+            420.0
+          ],
+          "_task": "tile:p10:1"
+        },
+        {
+          "entity": "Classical Lyot-type two-plane coronagraph",
+          "attribute": "component",
+          "value": "Lyot stop",
+          "unit": "",
+          "conditions": "in pupil",
+          "quote": "Lyot stop (in pupil)",
+          "_box": [
+            0.0,
+            0.0,
+            420.0,
+            420.0
+          ],
+          "_task": "tile:p10:0"
+        },
+        {
+          "entity": "Classical Lyot-type two-plane coronagraph",
+          "attribute": "component",
+          "value": "DM2",
+          "unit": "",
+          "conditions": "",
+          "quote": "DM2",
+          "_box": [
+            0.0,
+            0.0,
+            420.0,
+            420.0
+          ],
+          "_task": "tile:p10:0"
+        },
+        {
+          "entity": "coronagraph",
+          "attribute": "wavefront correction component",
+          "value": "pair of DMs",
+          "unit": "",
+          "conditions": "",
+          "quote": "The collimated beam is then passed to a pair of DMs needed for wavefront correction.",
+          "_box": [
+            192.0,
+            0.0,
+            612.0,
+            420.0
+          ],
+          "_task": "tile:p10:1"
+        },
+        {
+          "entity": "FSM",
+          "attribute": "function",
+          "value": "pointing control and jitter suppression",
+          "unit": "",
+          "conditions": "within the instrument",
+          "quote": "The FSM is used for pointing control and jitter suppression within the instrument.",
+          "_box": [
+            192.0,
+            0.0,
+            612.0,
+            420.0
+          ],
+          "_task": "tile:p10:1"
+        },
+        {
+          "entity": "coronagraph optical path",
+          "attribute": "sequence",
+          "value": "DM1 -> Focal plane mask -> Lyot stop",
+          "unit": "",
+          "conditions": "",
+          "quote": "DM1 (in pupil) ... Focal plane mask ... Lyot stop (in pupil)",
+          "_box": [
+            192.0,
+            0.0,
+            612.0,
+            420.0
+          ],
+          "_task": "tile:p10:1"
+        },
+        {
+          "entity": "coronagraph",
+          "attribute": "beam convergence component",
+          "value": "parabolic mirror",
+          "unit": "",
+          "conditions": "following the DMs",
+          "quote": "Following the DMs, the beam is converged to a focal point using a parabolic mirror.",
+          "_box": [
+            192.0,
+            0.0,
+            612.0,
+            420.0
+          ],
+          "_task": "tile:p10:1"
+        },
+        {
+          "entity": "focal plane mask",
+          "attribute": "option 1",
+          "value": "HLC",
+          "unit": "",
+          "conditions": "",
+          "quote": "The focal plane mask can be either an HLC or a VVC.",
+          "_box": [
+            192.0,
+            0.0,
+            612.0,
+            420.0
+          ],
+          "_task": "tile:p10:1"
+        },
+        {
+          "entity": "Classical Lyot-type two-plane coronagraph",
+          "attribute": "component",
+          "value": "DM1",
+          "unit": "",
+          "conditions": "in pupil",
+          "quote": "DM1 (in pupil)",
+          "_box": [
+            0.0,
+            0.0,
+            420.0,
+            420.0
+          ],
+          "_task": "tile:p10:0"
+        },
+        {
+          "entity": "focal plane mask",
+          "attribute": "option 2",
+          "value": "VVC",
+          "unit": "",
+          "conditions": "",
+          "quote": "The focal plane mask can be either an HLC or a VVC.",
+          "_box": [
+            192.0,
+            0.0,
+            612.0,
+            420.0
+          ],
+          "_task": "tile:p10:1"
+        },
+        {
+          "entity": "Classical Lyot-type two-plane coronagraph",
+          "attribute": "component",
+          "value": "Focal plane mask",
+          "unit": "",
+          "conditions": "",
+          "quote": "Focal plane mask",
+          "_box": [
+            0.0,
+            0.0,
+            420.0,
+            420.0
+          ],
+          "_task": "tile:p10:0"
+        },
+        {
+          "entity": "vortex coronagraph (topological charge 6)",
+          "attribute": "inner working angle",
+          "value": "2.4",
+          "unit": "λ/D",
+          "conditions": "at 50% throughput",
+          "quote": "Topological charge 6 presents the optimal trade-off between inner working angle (2.4 λ/D at 50% throughput)",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ],
+          "_task": "overview:p10"
+        },
+        {
+          "entity": "FSM",
+          "attribute": "function",
+          "value": "pointing control and jitter suppression",
+          "unit": "",
+          "conditions": "",
+          "quote": "The FSM is used for pointing control and jitter suppression within the instrument.",
+          "_box": [
+            192.0,
+            186.0,
+            612.0,
+            606.0
+          ],
+          "_task": "tile:p10:3"
+        },
+        {
+          "entity": "Defocus",
+          "attribute": "Allowable RMS Error (Charge 8)",
+          "value": "15",
+          "unit": "nm",
+          "conditions": "n=2, m=0, 11-star raw stripe dispersion (2.5-3.5 λ/D)",
+          "quote": "Defocus | 2 | 0 | 15",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ],
+          "_task": "overview:p10"
+        },
+        {
+          "entity": "Defocus",
+          "attribute": "Allowable RMS Wavefront Error (Charge 6)",
+          "value": "0.8",
+          "unit": "nm",
+          "conditions": "n=2, m=0, 11-star raw stripe dispersion (2.5-3.5 λ/D)",
+          "quote": "Defocus | 2 | 0 | 0.8",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ],
+          "_task": "overview:p10"
+        },
+        {
+          "entity": "Defocus",
+          "attribute": "Allowable RMS Error (Charge 6)",
+          "value": "4.6",
+          "unit": "nm",
+          "conditions": "n=2, m=0, 11-star raw stripe dispersion (2.5-3.5 λ/D)",
+          "quote": "Defocus | 2 | 0 | 4.6",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ],
+          "_task": "overview:p10"
+        },
+        {
+          "entity": "mask implementation",
+          "attribute": "mechanism",
+          "value": "mask wheel",
+          "unit": "",
+          "conditions": "at the focal point",
+          "quote": "both coronagraphs can be implemented in the same optical train by installing a mask wheel at the focal point",
+          "_box": [
+            192.0,
+            186.0,
+            612.0,
+            606.0
+          ],
+          "_task": "tile:p10:3"
+        },
+        {
+          "entity": "HabEx 4-Meter Baseline Design",
+          "attribute": "optimal coronagraph",
+          "value": "vortex coronagraph of topological charge 6",
+          "unit": "",
+          "conditions": "off-axis architecture",
+          "quote": "The optimal coronagraph for the HabEx 4 m, off-axis architecture was identified to be the vortex coronagraph of topological charge 6.",
+          "_box": [
+            0.0,
+            0.0,
+            612.0,
+            792.0
+          ],
+          "_task": "overview:p10"
         }
       ],
       "variant": [
@@ -2481,7 +3125,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "hybrid Lyot/vortex coronagraph",
@@ -2495,7 +3140,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "Focal plane mask",
@@ -2509,7 +3155,8 @@
             24.559986114501953,
             547.0843505859375,
             240.7811279296875
-          ]
+          ],
+          "_task": "tile:p10:0"
         },
         {
           "entity": "vortex coronagraph (charge 8)",
@@ -2523,7 +3170,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "Focal plane mask",
@@ -2537,7 +3185,8 @@
             65.67997741699219,
             510.6742248535156,
             246.99423217773438
-          ]
+          ],
+          "_task": "figure:p10:0"
         },
         {
           "entity": "vortex coronagraph (charge 6)",
@@ -2551,7 +3200,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "vortex coronagraph (charge 6)",
@@ -2565,7 +3215,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "Focal plane mask",
@@ -2579,7 +3230,8 @@
             65.67997741699219,
             510.6742248535156,
             246.99423217773438
-          ]
+          ],
+          "_task": "figure:p10:0"
         },
         {
           "entity": "hybrid Lyot/vortex coronagraph",
@@ -2593,7 +3245,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "vortex coronagraph (charge 10)",
@@ -2607,7 +3260,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p10"
         },
         {
           "entity": "Classical Lyot-type two-plane coronagraph",
@@ -2621,7 +3275,8 @@
             24.559986114501953,
             547.0843505859375,
             240.7811279296875
-          ]
+          ],
+          "_task": "tile:p10:0"
         },
         {
           "entity": "VVC",
@@ -2635,15 +3290,79 @@
             65.67997741699219,
             510.6742248535156,
             246.99423217773438
-          ]
+          ],
+          "_task": "figure:p10:0"
+        },
+        {
+          "entity": "Classical Lyot-type two-plane coronagraph",
+          "attribute": "component",
+          "value": "Lyot stop",
+          "unit": "",
+          "conditions": "in pupil",
+          "quote": "Lyot stop (in pupil)",
+          "_box": [
+            66.31999969482422,
+            24.559986114501953,
+            547.0843505859375,
+            240.7811279296875
+          ],
+          "_task": "tile:p10:0"
+        },
+        {
+          "entity": "Classical Lyot-type two-plane coronagraph",
+          "attribute": "component",
+          "value": "DM2",
+          "unit": "",
+          "conditions": "",
+          "quote": "DM2",
+          "_box": [
+            66.31999969482422,
+            24.559986114501953,
+            547.0843505859375,
+            240.7811279296875
+          ],
+          "_task": "tile:p10:0"
+        },
+        {
+          "entity": "Classical Lyot-type two-plane coronagraph",
+          "attribute": "component",
+          "value": "DM1",
+          "unit": "",
+          "conditions": "in pupil",
+          "quote": "DM1 (in pupil)",
+          "_box": [
+            66.31999969482422,
+            24.559986114501953,
+            547.0843505859375,
+            240.7811279296875
+          ],
+          "_task": "tile:p10:0"
+        },
+        {
+          "entity": "Classical Lyot-type two-plane coronagraph",
+          "attribute": "component",
+          "value": "Focal plane mask",
+          "unit": "",
+          "conditions": "",
+          "quote": "Focal plane mask",
+          "_box": [
+            66.31999969482422,
+            24.559986114501953,
+            547.0843505859375,
+            240.7811279296875
+          ],
+          "_task": "tile:p10:0"
         }
       ],
-      "hidden_shared": 4,
+      "hidden_shared": 0,
       "counts": {
         "baseline": 35,
         "variant": 16,
         "shared": 4
-      }
+      },
+      "sources": {},
+      "page_image": "images/habex-interim-p80-89-52da8af4-p10-b0of4-page.jpg",
+      "page_text_full": " \n5—HabEx 4-Meter Baseline Design \n5-21 \nThe VVC has been particularly popular on \nland-based adaptively corrected telescopes. Its \nsmall \nIWA, \nlayout \nsimplicity, \nintrinsic \nachromaticity, and high throughput makes it an \nattractive solution for high contrast imagers. The \nvortex coronagraph is currently in operations at \nPalomar (Serabyn, Mawet, and Burruss 2010, \nMawet, Serabyn, et al. 2010, Mawet et al. 2011, \nBottom et al. 2015, Bottom et al. 2016), VLT \n(Mawet et al. 2013, Absil et al. 2013), Subaru \n(Kühn et al. 2017), Keck (Absil et al. 2016, \nSerabyn et al. 2017, Mawet et al. 2017, Reggiani \nand TEAM 2017), and the Large Binocular \nTelescopes (Defrere et al. 2014).  \nThe optimal coronagraph for the HabEx 4 m, \noff-axis architecture was identified to be the \nvortex coronagraph of topological charge 6. \nTopological charge 6 presents the optimal trade-\noff between inner working angle (2.4 λ/D at 50% \ntotal off-axis throughput), and immunity to low-\norder aberrations (tip-tilt, defocus, astigmatism, \ncoma, spherical, see Table 5.5-6). No other \ncoronagraph architecture for an off-axis telescope \nthat was considered for this report has matched \nthe charge 6 vortex’s optimal trade-off. However, \nthe HLC is also considered as a backup due to its \nhigh \ntechnology \nreadiness \n(TRL 5) \nand \ntraceability to the WFIRST CGI.   \nThe \nnotional \nhybrid \nLyot/vortex \ncoronagraph design can be described as follows. \nCollimated light from the telescope’s M3 mirror \nenters the coronagraph instrument, creating a \npupil image at the FSM. The FSM is used for \npointing control and jitter suppression within the \ninstrument. The collimated beam is then passed \nto a pair of DMs needed for wavefront \ncorrection. Following the DMs, the beam is \nconverged to a focal point using a parabolic \nmirror. Focal plane masks are introduced into the \nbeam at the focal point. Since the primary \ndifference between the HLC and the VVC is the \nmask, both coronagraphs can be implemented in \nthe same optical train by installing a mask wheel \nat the focal point, allowing either mask to be \nintroduced into the coronagraph configuration. \nBoth the HLC and VVC masks have a small \nreflective dot at the center of their masks that will \nreflect the mask-rejected light to the Low-Order \nWavefront Sensor (LOWFS). LOWFS is used in \nconjunction with the DMs and FSM to correct \nwavefront error and drift. Light not rejected by \nthe mask is recollimated with a second parabolic \nTable 5.5-6. Aberration sensitivity of the vortex coronagraph charge 4 to 10, at 2e-11 raw starlight suppression (at 2.5–3.5 λ/D). \nThe table on the right shows how the aberration sensitivity is affected by stellar size of 1 mas. \nAberration \nIndices \nAllowable RMS Wavefront Error (nm) per Mode \n \nAllowable RMS Error (nm) per Mode \n \nn \nm \nCharge 4 \nCharge 6 \nCharge 8 \nCharge 10  \nCharge 6 \nCharge 8 \nCharge 10 \nTip-tilt \n1 \n±1 \n1.1 \n6.1 \n16 \n29 \n \n5.5 \n18 \n31 \nDefocus \n2 \n0 \n0.8 \n4.6 \n13 \n32 \n \n4.6 \n15 \n36 \nAstigmatism \n2 \n±2 \n0.0068 \n1.1 \n0.92 \n4.8 \n \n0.36 \n1.0 \n4.6 \nComa \n3 \n±1 \n0.0064 \n0.69 \n0.84 \n5.4 \n \n0.44 \n0.95 \n5.5 \nSpherical \n4 \n0 \n0.0049 \n0.53 \n0.75 \n7 \n \n0.32 \n0.81 \n6.7 \nTrefoil \n3 \n±3 \n0.0073 \n0.0064 \n0.59 \n0.68 \n \n0.0065 \n0.35 \n0.71 \n \n \nFigure 5.5-16. Classical Lyot-type two-plane coronagraph. The focal plane mask can either be an HLC or a VVC. \n"
     },
     {
       "id": "u-habex-interim-p80-89-52da8af4-p10-table-b2of3",
@@ -2677,7 +3396,8 @@
             708.239990234375,
             377.239990234375,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:0:6"
         },
         {
           "entity": "HabEx 4-Meter Baseline Design",
@@ -2691,7 +3411,8 @@
             708.239990234375,
             538.47998046875,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:1:6"
         },
         {
           "entity": "Trefoil aberration",
@@ -2705,7 +3426,8 @@
             708.239990234375,
             377.239990234375,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:0:6"
         },
         {
           "entity": "Spherical Aberration",
@@ -2719,7 +3441,8 @@
             696.7485961914062,
             377.239990234375,
             708.239990234375
-          ]
+          ],
+          "_task": "table:p10:0:5"
         },
         {
           "entity": "HabEx 4-Meter Baseline Design",
@@ -2733,7 +3456,8 @@
             696.7485961914062,
             538.47998046875,
             708.239990234375
-          ]
+          ],
+          "_task": "table:p10:1:5"
         },
         {
           "entity": "HabEx 4-Meter Baseline Design",
@@ -2747,7 +3471,8 @@
             696.7485961914062,
             538.47998046875,
             708.239990234375
-          ]
+          ],
+          "_task": "table:p10:1:5"
         },
         {
           "entity": "HabEx 4-Meter Baseline Design",
@@ -2761,7 +3486,8 @@
             696.7485961914062,
             538.47998046875,
             708.239990234375
-          ]
+          ],
+          "_task": "table:p10:1:5"
         },
         {
           "entity": "HabEx 4-Meter Baseline Design",
@@ -2775,7 +3501,8 @@
             708.239990234375,
             538.47998046875,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:1:6"
         },
         {
           "entity": "HabEx 4-Meter Baseline Design",
@@ -2789,7 +3516,8 @@
             708.239990234375,
             538.47998046875,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:1:6"
         },
         {
           "entity": "HabEx 4-Meter Baseline Design",
@@ -2803,7 +3531,8 @@
             685.260009765625,
             538.47998046875,
             696.7485961914062
-          ]
+          ],
+          "_task": "table:p10:1:4"
         }
       ],
       "variant": [
@@ -2819,7 +3548,8 @@
             696.7485961914062,
             377.239990234375,
             708.239990234375
-          ]
+          ],
+          "_task": "table:p10:0:5"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2833,7 +3563,8 @@
             708.239990234375,
             538.47998046875,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:1:6"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2847,7 +3578,8 @@
             708.239990234375,
             538.47998046875,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:1:6"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2861,7 +3593,8 @@
             696.7485961914062,
             538.47998046875,
             708.239990234375
-          ]
+          ],
+          "_task": "table:p10:1:5"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2875,7 +3608,8 @@
             708.239990234375,
             377.239990234375,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:0:6"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2889,7 +3623,8 @@
             696.7485961914062,
             538.47998046875,
             708.239990234375
-          ]
+          ],
+          "_task": "table:p10:1:5"
         },
         {
           "entity": "vortex coronagraph charge 4",
@@ -2903,7 +3638,8 @@
             696.7485961914062,
             377.239990234375,
             708.239990234375
-          ]
+          ],
+          "_task": "table:p10:0:5"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2917,7 +3653,8 @@
             696.7485961914062,
             538.47998046875,
             708.239990234375
-          ]
+          ],
+          "_task": "table:p10:1:5"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2931,7 +3668,8 @@
             708.239990234375,
             377.239990234375,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:0:6"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2945,7 +3683,8 @@
             685.260009765625,
             377.239990234375,
             696.7485961914062
-          ]
+          ],
+          "_task": "table:p10:0:4"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2959,7 +3698,8 @@
             685.260009765625,
             538.47998046875,
             696.7485961914062
-          ]
+          ],
+          "_task": "table:p10:1:4"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2973,7 +3713,8 @@
             708.239990234375,
             538.47998046875,
             719.6000366210938
-          ]
+          ],
+          "_task": "table:p10:1:6"
         },
         {
           "entity": "vortex coronagraph charge 4 to 10",
@@ -2987,7 +3728,8 @@
             685.260009765625,
             377.239990234375,
             696.7485961914062
-          ]
+          ],
+          "_task": "table:p10:0:4"
         }
       ],
       "hidden_shared": 0,
@@ -2995,7 +3737,17 @@
         "baseline": 10,
         "variant": 13,
         "shared": 0
-      }
+      },
+      "sources": {
+        "table:p10:0:6": "Header: [\"Aberration\", \"Indices\", null, \"Allowable RMS Wavefront Error (nm) per Mode\", null, null, null]\nRow: [\"Trefoil\", \"3\", \"±3\", \"0.0073\", \"0.0064\", \"0.59\", \"0.68\"]",
+        "table:p10:1:6": "Header: [\"Allowable RMS Error (nm) per Mode\", null, null]\nRow: [\"0.0065\", \"0.35\", \"0.71\"]",
+        "table:p10:0:5": "Header: [\"Aberration\", \"Indices\", null, \"Allowable RMS Wavefront Error (nm) per Mode\", null, null, null]\nRow: [\"Spherical\", \"4\", \"0\", \"0.0049\", \"0.53\", \"0.75\", \"7\"]",
+        "table:p10:1:5": "Header: [\"Allowable RMS Error (nm) per Mode\", null, null]\nRow: [\"0.32\", \"0.81\", \"6.7\"]",
+        "table:p10:1:4": "Header: [\"Allowable RMS Error (nm) per Mode\", null, null]\nRow: [\"0.44\", \"0.95\", \"5.5\"]",
+        "table:p10:0:4": "Header: [\"Aberration\", \"Indices\", null, \"Allowable RMS Wavefront Error (nm) per Mode\", null, null, null]\nRow: [\"Coma\", \"3\", \"±1\", \"0.0064\", \"0.69\", \"0.84\", \"5.4\"]"
+      },
+      "page_image": "images/habex-interim-p80-89-52da8af4-p10-b2of3-page.jpg",
+      "page_text_full": " \n5—HabEx 4-Meter Baseline Design \n5-21 \nThe VVC has been particularly popular on \nland-based adaptively corrected telescopes. Its \nsmall \nIWA, \nlayout \nsimplicity, \nintrinsic \nachromaticity, and high throughput makes it an \nattractive solution for high contrast imagers. The \nvortex coronagraph is currently in operations at \nPalomar (Serabyn, Mawet, and Burruss 2010, \nMawet, Serabyn, et al. 2010, Mawet et al. 2011, \nBottom et al. 2015, Bottom et al. 2016), VLT \n(Mawet et al. 2013, Absil et al. 2013), Subaru \n(Kühn et al. 2017), Keck (Absil et al. 2016, \nSerabyn et al. 2017, Mawet et al. 2017, Reggiani \nand TEAM 2017), and the Large Binocular \nTelescopes (Defrere et al. 2014).  \nThe optimal coronagraph for the HabEx 4 m, \noff-axis architecture was identified to be the \nvortex coronagraph of topological charge 6. \nTopological charge 6 presents the optimal trade-\noff between inner working angle (2.4 λ/D at 50% \ntotal off-axis throughput), and immunity to low-\norder aberrations (tip-tilt, defocus, astigmatism, \ncoma, spherical, see Table 5.5-6). No other \ncoronagraph architecture for an off-axis telescope \nthat was considered for this report has matched \nthe charge 6 vortex’s optimal trade-off. However, \nthe HLC is also considered as a backup due to its \nhigh \ntechnology \nreadiness \n(TRL 5) \nand \ntraceability to the WFIRST CGI.   \nThe \nnotional \nhybrid \nLyot/vortex \ncoronagraph design can be described as follows. \nCollimated light from the telescope’s M3 mirror \nenters the coronagraph instrument, creating a \npupil image at the FSM. The FSM is used for \npointing control and jitter suppression within the \ninstrument. The collimated beam is then passed \nto a pair of DMs needed for wavefront \ncorrection. Following the DMs, the beam is \nconverged to a focal point using a parabolic \nmirror. Focal plane masks are introduced into the \nbeam at the focal point. Since the primary \ndifference between the HLC and the VVC is the \nmask, both coronagraphs can be implemented in \nthe same optical train by installing a mask wheel \nat the focal point, allowing either mask to be \nintroduced into the coronagraph configuration. \nBoth the HLC and VVC masks have a small \nreflective dot at the center of their masks that will \nreflect the mask-rejected light to the Low-Order \nWavefront Sensor (LOWFS). LOWFS is used in \nconjunction with the DMs and FSM to correct \nwavefront error and drift. Light not rejected by \nthe mask is recollimated with a second parabolic \nTable 5.5-6. Aberration sensitivity of the vortex coronagraph charge 4 to 10, at 2e-11 raw starlight suppression (at 2.5–3.5 λ/D). \nThe table on the right shows how the aberration sensitivity is affected by stellar size of 1 mas. \nAberration \nIndices \nAllowable RMS Wavefront Error (nm) per Mode \n \nAllowable RMS Error (nm) per Mode \n \nn \nm \nCharge 4 \nCharge 6 \nCharge 8 \nCharge 10  \nCharge 6 \nCharge 8 \nCharge 10 \nTip-tilt \n1 \n±1 \n1.1 \n6.1 \n16 \n29 \n \n5.5 \n18 \n31 \nDefocus \n2 \n0 \n0.8 \n4.6 \n13 \n32 \n \n4.6 \n15 \n36 \nAstigmatism \n2 \n±2 \n0.0068 \n1.1 \n0.92 \n4.8 \n \n0.36 \n1.0 \n4.6 \nComa \n3 \n±1 \n0.0064 \n0.69 \n0.84 \n5.4 \n \n0.44 \n0.95 \n5.5 \nSpherical \n4 \n0 \n0.0049 \n0.53 \n0.75 \n7 \n \n0.32 \n0.81 \n6.7 \nTrefoil \n3 \n±3 \n0.0073 \n0.0064 \n0.59 \n0.68 \n \n0.0065 \n0.35 \n0.71 \n \n \nFigure 5.5-16. Classical Lyot-type two-plane coronagraph. The focal plane mask can either be an HLC or a VVC. \n"
     },
     {
       "id": "u-scical-cd-p40-43-c22f3f4e-p4-text-b0of2",
@@ -3029,7 +3781,8 @@
             598.4921264648438,
             1526.6943359375,
             609.0439453125
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r1"
         },
         {
           "entity": "Fire Sprinkler line",
@@ -3043,7 +3796,8 @@
             658.6119384765625,
             1152.720703125,
             669.1637573242188
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r1"
         },
         {
           "entity": "Fire Sprinkler line",
@@ -3057,7 +3811,8 @@
             658.6119384765625,
             1152.720703125,
             669.1637573242188
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r1"
         },
         {
           "entity": "Fire Sprinklers (West/East Module)",
@@ -3071,7 +3826,8 @@
             598.4921264648438,
             1526.6943359375,
             609.0439453125
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0"
         },
         {
           "entity": "Fire Sprinkler line",
@@ -3085,7 +3841,8 @@
             598.4921264648438,
             1526.6943359375,
             609.0439453125
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r1"
         },
         {
           "entity": "Fire Sprinklers (West/East Module)",
@@ -3099,7 +3856,8 @@
             598.4921264648438,
             1526.6943359375,
             609.0439453125
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0"
         },
         {
           "entity": "Manifold line",
@@ -3113,7 +3871,8 @@
             56.391605377197266,
             2388.95849609375,
             505.7237854003906
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r0"
         },
         {
           "entity": "Dishwasher line",
@@ -3127,7 +3886,8 @@
             56.391605377197266,
             2388.95849609375,
             505.7237854003906
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r0"
         },
         {
           "entity": "Hot Water (HW) line",
@@ -3141,7 +3901,8 @@
             286.91180419921875,
             1337.0869140625,
             302.3949279785156
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0"
         },
         {
           "entity": "Cold Water (CW) line",
@@ -3155,7 +3916,8 @@
             56.391605377197266,
             2388.95849609375,
             1107.485107421875
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0"
         }
       ],
       "variant": [
@@ -3171,7 +3933,8 @@
             56.391605377197266,
             2388.95849609375,
             505.7237854003906
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r0"
         },
         {
           "entity": "Water Supply line",
@@ -3185,7 +3948,8 @@
             658.6119384765625,
             1152.720703125,
             669.1637573242188
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0"
         },
         {
           "entity": "Reel line",
@@ -3199,7 +3963,8 @@
             56.391605377197266,
             2388.95849609375,
             505.7237854003906
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r0"
         },
         {
           "entity": "Water Supply",
@@ -3213,7 +3978,8 @@
             498.65191650390625,
             1677.1927490234375,
             509.6240539550781
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r1"
         },
         {
           "entity": "Fire Sprinklers line",
@@ -3227,7 +3993,8 @@
             598.4921264648438,
             1526.6943359375,
             609.0439453125
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0"
         },
         {
           "entity": "Water Supply",
@@ -3241,7 +4008,8 @@
             598.4921264648438,
             1526.6943359375,
             609.0439453125
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0:r1"
         },
         {
           "entity": "Fire Sprinklers line",
@@ -3255,7 +4023,8 @@
             598.4921264648438,
             1526.6943359375,
             609.0439453125
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0"
         },
         {
           "entity": "Potable Hot Water (HW) line",
@@ -3269,7 +4038,8 @@
             286.91180419921875,
             1337.0869140625,
             302.3949279785156
-          ]
+          ],
+          "_task": "text:p4:0.0-110.0"
         }
       ],
       "hidden_shared": 0,
@@ -3277,7 +4047,14 @@
         "baseline": 10,
         "variant": 8,
         "shared": 0
-      }
+      },
+      "sources": {
+        "text:p4:0.0-110.0:r1": "D\n\n1\" D\n1\" D\n\n1\" D\n\nD\n\nscical2013@gmail.com\nwww.scical2013.com\n\nFIRE SPRINKLERS\nWEST MODULE\n\nFIRE SPRINKLERS\nEAST MODULE\n\nCONSULTANTS\n\nBFP\n\n8 FT\n8 FT\n\n1\" CPVC\n\n1\" D\n\nSTRUCTURAL ENGINEERS\nBURO HAPPOLD CONSULTING\nENGINEERS, INC.\n9601 JEFFERSON BLVD. STE B\nCULVER CITY, CA  90232.\nTEL: 310.945.4800\n\n1\" FLEX\n\n60-0 FT HORIZONTAL\n\nBUILDING CONSTRUCTION\nRJC BUILDERS, INC.\n3509 W 6TH ST.\nLOS ANGELES, CA 90020\nTEL: 213.388.9327\n\nNTS\nC1\nWATER SUPPLY SCHEMATIC\n\nC\n\nC\n\nSYMBOLS\n\n2-WAY BALL VALVE\n\nSUBMISSIONS:\n\nC\n\n1.5\" D VENT\n\nDOMESTIC HOT WATER HEATER\n\nDESIGN DOCUMENTATION SET \n10/11/2012\n\n1.5\" D VENT\n\n30 FT\n1_\n4\" DROP PER 1 FT\n\nSHEET KEYNOTES\n\nH\n\nCONSTRUCTION DOCUMENTATION SET \n02/14/2013\n\nPOTABLE COLD WATER\n\nCW\n\n1\" D\n\n1\" D\n\nPOTABLE HOT WATER\n\nHW\n\nAS-BUILT SET \n08/22/2013\n\n8 FT\n8 FT\nH\nF\n\nIN-LINECIRCULATING PUMP\n\nKITCHEN\nSINK\n\n2\n\n2\" D\n\nBATHROOM\nSINK\n\nREVISIONS:\n\nMUNICIPALN WATER SUPPLY TANK\nWI\n\n1.5\"\nD\n\nGDP\n\nDISHWASHER\n\nB\n\n1.5\" D\nST\n\nR\n\nTOILET\n\nB\n\n22 12 23.01\n22 05 29.02\n22 13 00.1\nMAC\n3\" D\n\nPENDANT\nHEADSPRINKLERS",
+        "text:p4:0.0-110.0": "1\n2\n3\n4\n5\n6\n7\n\nGENERAL SHEET NOTES\n\nDynamic Augmented Living Environment\n\nE\n\nE\n\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\n\nTEAM SCI-ARC / CALTECH\n\n25 FT\n3 FT\n\n1\" D\n\n3_\n4\" D\n\nCW\n\nHW\n1\" D\n\n1\" D\n\n3_\n4\" D\n\nCW\n\n3_\n4\" D\n\n3_\n4\" D\n\n3_\n4\" D\n\n8 FT\n8 FT\n\nHW\n\n4 FT\n\nSHOWER\n\nSOUTHERN CALIFORNIA INSTITUTE OF\nARCHITECTURE\n\n3_\n4\" D\n\nREFERENCE KEYNOTES\n\nKITCHEN\nSINK\n\n960 EAST 3RD STREET\nLOS ANGELES, CA 90013\n\n1\" D\n\nTOILET\n\nLAUNDRY\n\n3_\n4\" D\n\nDISHWASHER\n\nBATHROOM\nSINK\n\nDHW\nTANK\n\nBATHROOM GROUP\n\n22 33 00\n\nTYPE A\n\nKITCHEN\nGROUP\n\nCALIFORNIA INSTITUTE OF TECHNOLOGY\n\n1\" D\n\nST\n\nFM\n\nR\n\n1200 EAST CALIFORNIA BOULEVARD\nPASADENA, CA 91125\n\n1\" D\n1\" D\n1\" D\n\n1\" D\n\nMANIFOLD\n\n22 12 23.01\n\n30 FT\n\n30 FT\n\nREEL\n\nPUMP\nPOTABLE WATER\n\nFLOW\nMETER\nBOOSTER\n\nEXTERIOR\n\n22 05 29.01\n22 11 23\n\nD\n\n1\" D\n1\" D\n\n1\" D\n\nD\n\nscical2013@gmail.com\nwww.scical2013.com\n\nFIRE SPRINKLERS\nWEST MODULE\n\nFIRE SPRINKLERS\nEAST MODULE\n\nCONSULTANTS\n\nBFP\n\n8 FT\n8 FT\n\n1\" CPVC\n\n1\" D\n\nSTRUCTURAL ENGINEERS\nBURO HAPPOLD CONSULTING\nENGINEERS, INC.\n9601 JEFFERSON BLVD. STE B\nCULVER CITY, CA  90232.\nTEL: 310.945.4800\n\n1\" FLEX\n\n60-0 FT HORIZONTAL\n\nBUILDING CONSTRUCTION\nRJC BUILDERS, INC.\n3509 W 6TH ST.\nLOS ANGELES, CA 90020\nTEL: 213.388.9327\n\nNTS\nC1\nWATER SUPPLY SCHEMATIC\n\nC\n\nC\n\nSYMBOLS\n\n2-WAY BALL VALVE\n\nSUBMISSIONS:\n\nC\n\n1.5\" D VENT\n\nDOMESTIC HOT WATER HEATER\n\nDESIGN DOCUMENTATION SET \n10/11/2012\n\n1.5\" D VENT\n\n30 FT\n1_\n4\" DROP PER 1 FT\n\nSHEET KEYNOTES\n\nH\n\nCONSTRUCTION DOCUMENTATION SET \n02/14/2013\n\nPOTABLE COLD WATER\n\nCW\n\n1\" D\n\n1\" D\n\nPOTABLE HOT WATER\n\nHW\n\nAS-BUILT SET \n08/22/2013\n\n8 FT\n8 FT\nH\nF\n\nIN-LINECIRCULATING PUMP\n\nKITCHEN\nSINK\n\n2\n\n2\" D\n\nBATHROOM\nSINK\n\nREVISIONS:\n\nMUNICIPALN WATER SUPPLY TANK\nWI\n\n1.5\"\nD\n\nGDP\n\nDISHWASHER\n\nB\n\n1.5\" D\nST\n\nR\n\nTOILET\n\nB\n\n22 12 23.01\n22 05 29.02\n22 13 00.1\nMAC\n3\" D\n\nPENDANT\nHEADSPRINKLERS",
+        "text:p4:0.0-110.0:r0": "1\n2\n3\n4\n5\n6\n7\n\nGENERAL SHEET NOTES\n\nDynamic Augmented Living Environment\n\nE\n\nE\n\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\n\nTEAM SCI-ARC / CALTECH\n\n25 FT\n3 FT\n\n1\" D\n\n3_\n4\" D\n\nCW\n\nHW\n1\" D\n\n1\" D\n\n3_\n4\" D\n\nCW\n\n3_\n4\" D\n\n3_\n4\" D\n\n3_\n4\" D\n\n8 FT\n8 FT\n\nHW\n\n4 FT\n\nSHOWER\n\nSOUTHERN CALIFORNIA INSTITUTE OF\nARCHITECTURE\n\n3_\n4\" D\n\nREFERENCE KEYNOTES\n\nKITCHEN\nSINK\n\n960 EAST 3RD STREET\nLOS ANGELES, CA 90013\n\n1\" D\n\nTOILET\n\nLAUNDRY\n\n3_\n4\" D\n\nDISHWASHER\n\nBATHROOM\nSINK\n\nDHW\nTANK\n\nBATHROOM GROUP\n\n22 33 00\n\nTYPE A\n\nKITCHEN\nGROUP\n\nCALIFORNIA INSTITUTE OF TECHNOLOGY\n\n1\" D\n\nST\n\nFM\n\nR\n\n1200 EAST CALIFORNIA BOULEVARD\nPASADENA, CA 91125\n\n1\" D\n1\" D\n1\" D\n\n1\" D\n\nMANIFOLD\n\n22 12 23.01\n\n30 FT\n\n30 FT\n\nREEL\n\nPUMP\nPOTABLE WATER\n\nFLOW\nMETER\nBOOSTER\n\nEXTERIOR\n\n22 05 29.01\n22 11 23"
+      },
+      "page_image": "images/scical-cd-p40-43-c22f3f4e-p4-b0of2-page.jpg",
+      "page_text_full": "22 12 23.01\n22 05 29.02\n22 13 00.1\nMAC\n3\" D\n2\" D\n1.5\" D VENT\nGDP\n2\nR\n1\" D\n1.5\"\nD\n1\" D\n1.5\" D VENT\nSHOWER\nTOILET\nKITCHEN\nGROUP\nDISHWASHER\nKITCHEN\nSINK\n1.5\" D\nST\n30 FT\n1_\n4\" DROP PER 1 FT\n8 FT\n8 FT\nH\nF\n2\" D\nBATHROOM\nSINK\nLAUNDRY\nSYMBOLS\nPENDANT\nHEADSPRINKLERS\nMODULE SPLIT FITTING\nDOMESTIC HOT WATER HEATER\nIN-LINECIRCULATING PUMP\n2-WAY BALL VALVE\nPOTABLE COLD WATER\nPOTABLE HOT WATER\nAIR ADMITANCE VALVE\nHW\nH\nMUNICIPALN WATER SUPPLY TANK\nWI\nHEAT EXCHANGER\nC\nCW\nMS\nAAV\n22 12 23.01\n22 05 29.01\n22 11 23\n22 33 00\nR\n1\" D\n1\" D\n1\" D\n1\" D\n1\" D\n1\" D\n1\" D\n1\" D\n1\" D\n3_\n4\" D\n3_\n4\" D\n3_\n4\" D\nFM\nKITCHEN\nGROUP\nBATHROOM GROUP\nFIRE SPRINKLERS\nEAST MODULE\nFLOW\nMETER\nBOOSTER\nPUMP\nPOTABLE WATER\nREEL\nFIRE SPRINKLERS\nWEST MODULE\nMANIFOLD\nBFP\nST\nDHW\nTANK\n8 FT\n8 FT\n60-0 FT HORIZONTAL\n30 FT\n25 FT\n3 FT\n8 FT\n8 FT\n4 FT\n30 FT\nEXTERIOR\nTYPE A\n1\" D\n1\" D\n1\" D\n 1\" CPVC\n 1\" FLEX\nKITCHEN\nSINK\nDISHWASHER\n3_\n4\" D\nLAUNDRY\nSHOWER\nCW\nHW\nCW\nHW\n1\" D\n3_\n4\" D\n3_\n4\" D\nBATHROOM\nSINK\nTOILET\n3_\n4\" D\n1\n2\n3\n4\n5\n6\n7\nA\nB\nC\nD\nE\nLOT NUMBER:\nDRAWN BY:\nCHECKED BY:\nCOPYRIGHT:\nCONSULTANTS\nNONE\nU.S. DEPARTMENT OF ENERGY\nSOLAR DECATHLON 2013\nWWW.SOLARDECATHLON.GOV\nSOUTHERN CALIFORNIA INSTITUTE OF\nARCHITECTURE\nscical2013@gmail.com\nwww.scical2013.com\nSCI-ARC / CALTECH\n#101\nDATE:\n08.22.2013\nSUBMISSIONS:\nCALIFORNIA INSTITUTE OF TECHNOLOGY\nTEAM SCI-ARC / CALTECH\n960 EAST 3RD STREET\nLOS ANGELES, CA 90013\n1200 EAST CALIFORNIA BOULEVARD\nPASADENA, CA 91125\nSTRUCTURAL ENGINEERS\nBURO HAPPOLD CONSULTING\nENGINEERS, INC.\n9601 JEFFERSON BLVD. STE B\nCULVER CITY, CA  90232.\nTEL: 310.945.4800\nBUILDING CONSTRUCTION\nRJC BUILDERS, INC.\n3509 W 6TH ST.\nLOS ANGELES, CA 90020\nTEL: 213.388.9327\nREVISIONS:\nDESIGN DOCUMENTATION SET \n10/11/2012\nDynamic Augmented Living Environment\nSHEET TITLE\nA\nB\nC\nD\nE\n1\n2\n3\n4\n5\n6\n7\nCONSTRUCTION DOCUMENTATION SET \n02/14/2013\nAS-BUILT SET \n08/22/2013\n8/22/2013 1:42:54 PM\nP-601\nDOMESTIC\nSUPPLY/WASTE\nSCHEMATIC &\nSCHEDULE\nANDREW GONG\nNTS\nA1\nWASTE WATER SCHEMATIC\nREFERENCE KEYNOTES\nSHEET KEYNOTES\nGENERAL SHEET NOTES\nNTS\nC1\nWATER SUPPLY SCHEMATIC\n"
     },
     {
       "id": "u-dc-manual-p59-66-a157bdf0-p4-visual-b2of3",
@@ -3311,7 +4088,8 @@
             372.0,
             420.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p4:4"
         },
         {
           "entity": "Flexinol® wire",
@@ -3325,7 +4103,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p4:5"
         },
         {
           "entity": "Flexinol actuator",
@@ -3339,7 +4118,8 @@
             372.0,
             420.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p4:4"
         },
         {
           "entity": "Flexinol actuator",
@@ -3353,7 +4133,8 @@
             372.0,
             420.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p4:4"
         },
         {
           "entity": "Irvine, Ca",
@@ -3367,7 +4148,8 @@
             384.0,
             612.0,
             606.0
-          ]
+          ],
+          "_task": "tile:p4:3-r1"
         },
         {
           "entity": "Dynalloy Inc. specified wire",
@@ -3381,7 +4163,8 @@
             384.0,
             612.0,
             606.0
-          ]
+          ],
+          "_task": "tile:p4:3-r1"
         },
         {
           "entity": "residential building",
@@ -3395,7 +4178,8 @@
             384.0,
             612.0,
             606.0
-          ]
+          ],
+          "_task": "tile:p4:3-r1"
         },
         {
           "entity": "residential building",
@@ -3409,7 +4193,8 @@
             384.0,
             612.0,
             606.0
-          ]
+          ],
+          "_task": "tile:p4:3-r1"
         },
         {
           "entity": "Flexinol actuator",
@@ -3423,7 +4208,8 @@
             372.0,
             420.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p4:4"
         },
         {
           "entity": "Dynalloy Inc. specified wire",
@@ -3437,7 +4223,8 @@
             384.0,
             612.0,
             606.0
-          ]
+          ],
+          "_task": "tile:p4:3-r1"
         },
         {
           "entity": "Flexinol actuator assembly",
@@ -3451,7 +4238,8 @@
             186.0,
             420.0,
             606.0
-          ]
+          ],
+          "_task": "tile:p4:2"
         },
         {
           "entity": "Flexinol actuator assembly",
@@ -3465,7 +4253,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p4"
         },
         {
           "entity": "building envelope",
@@ -3479,7 +4268,8 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p4:5"
         },
         {
           "entity": "Nitinol",
@@ -3493,7 +4283,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p4"
         },
         {
           "entity": "specified wire",
@@ -3507,7 +4298,38 @@
             372.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "tile:p4:5"
+        },
+        {
+          "entity": "Flexinol® wire",
+          "attribute": "actuation target",
+          "value": "32 of the 64 louvers",
+          "unit": "",
+          "conditions": "per each [unit]",
+          "quote": "allowed a single Flexinol® wire to actuate the 32 of the 64 louvers on each",
+          "_box": [
+            192.0,
+            384.0,
+            612.0,
+            606.0
+          ],
+          "_task": "tile:p4:3-r1"
+        },
+        {
+          "entity": "specified wire",
+          "attribute": "load",
+          "value": "2500",
+          "unit": "gram",
+          "conditions": "martensite phase",
+          "quote": "The specified wire allowed a 2500 gram",
+          "_box": [
+            192.0,
+            372.0,
+            612.0,
+            792.0
+          ],
+          "_task": "tile:p4:5"
         }
       ],
       "variant": [
@@ -3523,7 +4345,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p4"
         },
         {
           "entity": "operable screen bay",
@@ -3537,7 +4360,8 @@
             0.0,
             612.0,
             792.0
-          ]
+          ],
+          "_task": "overview:p4"
         }
       ],
       "hidden_shared": 0,
@@ -3545,7 +4369,10 @@
         "baseline": 17,
         "variant": 2,
         "shared": 0
-      }
+      },
+      "sources": {},
+      "page_image": "images/dc-manual-p59-66-a157bdf0-p4-b2of3-page.jpg",
+      "page_text_full": "Harvest \nTeam Capitol dc \nwww.teamcapitoldc.org \n \nConstruction Documents Project Manual \n \nPublished 8/22/2013 \nU.S. D.O.E. Solar Decathlon 2013 \n Page  ‐ 62 \n \n                                     \n \n                                   Hysteresis Diagram                                                              Chart Depicting Temperature Transformation Point \n                                                                                                                                              Relative To Nickel-Titanium Ratio \n \nACTIVE PASSIVE - The use of Flexinol® actuated passive shading screen introduces novel approaches \nprogrammable material for optimal energy building skins. While the screens static passive system is designed \nto ensure adequate shading without the closure of the louvered façade during the October competition period, \nthe capacity for increase insulation through automated closure for peak radiation period for the continuum of \nthe year ensure optimal thermal protection.  Furthermore, research into environmentally controlled kinetic \nshading devices introduces new horizons for intelligent building skins. In the case the HARVEST HOME, the \nresidential building typology and end-user provide a unique opportunity to condition both space and place. In \nthe context of skin loaded residential building energy consumption for heating and cooling loads represent 30 \nand 12 percent of total energy loads, respectively.6 Residential builds also represent an occupancy type that is \ntypically uninhabited during peak radiant gains. The capacity for a shade screen that can actively respond to \nincreased radiant loads by closing and open during low temperature periods when heat gain is required without \neither a human actuated closure, or an energy consuming electronic motion radically shift the perception of a \n‘smart building,’ or ‘building automation system.’ As described by Doris Kim Sung of University of Southern \nCalifornia in reference to her own work in SMA building skins, “when you’re tired of opening and closing those \nblinds day after day, when you’re on vacation and there’s no one there on the weekend to be turning on and off \nthe controls, or there’s a power outage and you no electricity to rely on, SMA interactive facades will still be \nworking tirelessly, efficiently and endlessly.”7 \n \nFLEXINOL® ACTUATOR - Through extensive collaboration with engineers at Dynalloy Inc. a fully integrated \nFlexinol® actuator assembly was developed. As stated earlier, the 15-20C temperature range for Irvine, Ca, \nfell within an existing wire specification manufactured by Dynalloy Inc. The specified wire allowed a 2500 gram \nforce during the cool, martensite phase, and a 2900 gram force during the heated austenite phase, resulting in \na total actuation force of 400 grams.  In order to produce a rotational movement with limited friction an inline \npulley system was developed that allowed a single Flexinol® wire to actuate the 32 of the 64 louvers on each \noperable screen bay. Each bay then carries two mirrored assemblies that act independent of the other. The \ninline pulleys work by applying a strain force, carried by a single spring that runs the length of the assembly, \nthe spring ensures the Flexinol® wire remains under the prescribed 2500 gram load during the martensite \n                                                           \n6 “Energy Efficiency Trends in Residential and Commercial Buildings” U.S. Department of Energy, October 2008 \n7 Doris Kim Sung: Metal That Breathes. TED Conferences, LLC, Oct. 2012. Web. 26 Nov. 2012. \n<http://www.ted.com/talks/doris_kim_sung_metal_that_breathes.html?utm_source=email>. \n"
     },
     {
       "id": "u-habex-interim-p80-89-52da8af4-p4-table-b1of4",
@@ -3579,7 +4406,8 @@
             492.7349853515625,
             537.869384765625,
             504.239990234375
-          ]
+          ],
+          "_task": "table:p4:1:3"
         },
         {
           "entity": "IR Guide Detector",
@@ -3593,7 +4421,8 @@
             561.239990234375,
             537.869384765625,
             572.4600219726562
-          ]
+          ],
+          "_task": "table:p4:1:9"
         },
         {
           "entity": "UV channel",
@@ -3607,7 +4436,8 @@
             492.7349853515625,
             537.869384765625,
             504.239990234375
-          ]
+          ],
+          "_task": "table:p4:1:3"
         },
         {
           "entity": "HabEx 4-Meter Baseline Design",
@@ -3621,7 +4451,8 @@
             549.719970703125,
             537.869384765625,
             561.239990234375
-          ]
+          ],
+          "_task": "table:p4:1:8"
         },
         {
           "entity": "UV band",
@@ -3635,7 +4466,8 @@
             504.239990234375,
             537.869384765625,
             515.4599609375
-          ]
+          ],
+          "_task": "table:p4:1:4"
         },
         {
           "entity": "Visible channel",
@@ -3649,7 +4481,8 @@
             526.7550048828125,
             537.869384765625,
             538.228271484375
-          ]
+          ],
+          "_task": "table:p4:1:6"
         },
         {
           "entity": "Telescope",
@@ -3663,7 +4496,8 @@
             538.228271484375,
             537.869384765625,
             549.719970703125
-          ]
+          ],
+          "_task": "table:p4:1:7"
         },
         {
           "entity": "IR Guide",
@@ -3677,7 +4511,8 @@
             526.7550048828125,
             537.869384765625,
             538.228271484375
-          ]
+          ],
+          "_task": "table:p4:1:6"
         },
         {
           "entity": "HabEx 4-Meter Baseline Design",
@@ -3691,7 +4526,8 @@
             549.719970703125,
             537.869384765625,
             561.239990234375
-          ]
+          ],
+          "_task": "table:p4:1:8"
         },
         {
           "entity": "UV channel",
@@ -3705,7 +4541,8 @@
             526.7550048828125,
             537.869384765625,
             538.228271484375
-          ]
+          ],
+          "_task": "table:p4:1:6"
         },
         {
           "entity": "Telescope",
@@ -3719,7 +4556,8 @@
             538.228271484375,
             537.869384765625,
             549.719970703125
-          ]
+          ],
+          "_task": "table:p4:1:7"
         },
         {
           "entity": "IR Guide band",
@@ -3733,7 +4571,8 @@
             504.239990234375,
             537.869384765625,
             515.4599609375
-          ]
+          ],
+          "_task": "table:p4:1:4"
         },
         {
           "entity": "Visible band",
@@ -3747,7 +4586,8 @@
             504.239990234375,
             537.869384765625,
             515.4599609375
-          ]
+          ],
+          "_task": "table:p4:1:4"
         },
         {
           "entity": "Guide band",
@@ -3761,7 +4601,8 @@
             142.08334350585938,
             299.3699951171875,
             153.55384826660156
-          ]
+          ],
+          "_task": "table:p4:0:3"
         }
       ],
       "variant": [
@@ -3777,7 +4618,8 @@
             492.7349853515625,
             537.869384765625,
             504.239990234375
-          ]
+          ],
+          "_task": "table:p4:1:3"
         },
         {
           "entity": "Starshade camera",
@@ -3791,7 +4633,8 @@
             504.239990234375,
             537.869384765625,
             515.4599609375
-          ]
+          ],
+          "_task": "table:p4:1:4"
         },
         {
           "entity": "Visible camera",
@@ -3805,7 +4648,8 @@
             492.7349853515625,
             537.869384765625,
             504.239990234375
-          ]
+          ],
+          "_task": "table:p4:1:3"
         },
         {
           "entity": "Telescope",
@@ -3819,7 +4663,8 @@
             538.228271484375,
             537.869384765625,
             549.719970703125
-          ]
+          ],
+          "_task": "table:p4:1:7"
         },
         {
           "entity": "Starshade camera",
@@ -3833,7 +4678,8 @@
             526.7550048828125,
             537.869384765625,
             538.228271484375
-          ]
+          ],
+          "_task": "table:p4:1:6"
         },
         {
           "entity": "Starshade camera",
@@ -3847,7 +4693,8 @@
             504.239990234375,
             537.869384765625,
             515.4599609375
-          ]
+          ],
+          "_task": "table:p4:1:4"
         },
         {
           "entity": "Visible camera",
@@ -3861,7 +4708,8 @@
             549.719970703125,
             537.869384765625,
             561.239990234375
-          ]
+          ],
+          "_task": "table:p4:1:8"
         },
         {
           "entity": "UV camera",
@@ -3875,7 +4723,8 @@
             549.719970703125,
             537.869384765625,
             561.239990234375
-          ]
+          ],
+          "_task": "table:p4:1:8"
         },
         {
           "entity": "Starshade camera",
@@ -3889,7 +4738,8 @@
             526.7550048828125,
             537.869384765625,
             538.228271484375
-          ]
+          ],
+          "_task": "table:p4:1:6"
         },
         {
           "entity": "Starshade camera",
@@ -3903,7 +4753,8 @@
             526.7550048828125,
             537.869384765625,
             538.228271484375
-          ]
+          ],
+          "_task": "table:p4:1:6"
         },
         {
           "entity": "Telescope",
@@ -3917,7 +4768,8 @@
             538.228271484375,
             537.869384765625,
             549.719970703125
-          ]
+          ],
+          "_task": "table:p4:1:7"
         },
         {
           "entity": "Starshade camera",
@@ -3931,15 +4783,27 @@
             504.239990234375,
             537.869384765625,
             515.4599609375
-          ]
+          ],
+          "_task": "table:p4:1:4"
         }
       ],
       "hidden_shared": 0,
       "counts": {
         "baseline": 14,
         "variant": 12,
-        "shared": 2
-      }
+        "shared": 0
+      },
+      "sources": {
+        "table:p4:1:3": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"FOV\", \"10.2\\\"\", \"11.9\\\"\", \"-\"]",
+        "table:p4:1:9": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"Detector\", \"1×1\", \"1×1\", \"1×1\"]",
+        "table:p4:1:8": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"IWA (at longest λ)\", \"40 mas\", \"60 mas\", \"-\"]",
+        "table:p4:1:4": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"Wavelength bands\", \"0.2–0.45\", \"0.45–1.0\", \"0.975–1.8\"]",
+        "table:p4:1:6": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"Pixel resolution\", \"14.2 mas\", \"14.2 mas\", \"12 cm\"]",
+        "table:p4:1:7": "Header: [\"\", \"UV\", \"Visible\", \"IR Guide\"]\nRow: [\"Telescope resolution\", \"21 mas\", \"21 mas\", \"-\"]",
+        "table:p4:0:3": "Header: [\"Science Band\", \"UV\", \"Visible\", \"IR\"]\nRow: [\"Guide band (μm)\", \"1.6–1.8\", \"1.6–1.8\", \"0.3–0.45\"]"
+      },
+      "page_image": "images/habex-interim-p80-89-52da8af4-p4-b1of4-page.jpg",
+      "page_text_full": " \n5—HabEx 4-Meter Baseline Design \n5-15 \nand spectrograph properties are shown in \nTable 5.5-3. The UV channel carries a simple slit \nspectrograph employing a grism with R = 7. The \nvisible channel carries a broadband integral field \nspectrograph (IFS) capable of covering the \nwavelength range from 0.45 to 1.0 µm, plus an \nimaging camera for more rapid and wide-field \nsystem imaging. The infrared channel carries an IFS \nwith R = 40 to enable disc and object spectroscopy. \nStarshade Guiding \nThe ultraviolet and infrared channels have \nguide camera modes, which project a pupil image \nonto the focal plane. With a selected channel in \nscience mode, an optic is introduced into the \ncorresponding guide channel to place an image of \nthe pupil on the guide CCD. The starshade’s \nlateral position is sensed from an image of the \nlight distribution at the telescope entrance pupil \n(see Figure 5.5-9) so that the pixel resolution is \ngiven in centimeters in Table 5.5-3. At the \nentrance pupil, the starshade shadow has some \nstructure, typically with a much diminished “spot \nof Arago” at the center. The lateral position of the \ntelescope is sensed by imaging this structure onto \nthe focal plane and comparing with a library of \nexpected images. Figure 5.5-9 shows an image of \nthe starshade shadow structure in infrared light \nwhen the starshade is set up for visible science. \nThe central dot appears directly on the line-of-\nsight between the center of the starshade and the \nstar and thus forms the target for the guide \nsystem. Outside this core, there are two faint rings \nand then the flux increases with a monotonic \nslope towards the edge. Outside this region, a \nreflective pattern of the starshade geometry \nappears with, in this case, 24 peaks around a \ncircumference, the HabEx starshade design \nhaving 24 petals. The central peak has a diameter \nൌ݀\nߣ\nܦௌௌ\n \nwhere d is the separation distance between the \nstarshade and the telescope, λ is the wavelength, \nand DSS is the starshade diameter. In the case \nmodeled, the central peak is about 3 m in diameter. \nThe diameter of the smooth, sloping region is \napproximately 40 m and beyond this a pronounced \npattern exists for about another 40 m.  \nTable 5.5-2. HabEx starshade science bands and working \ndistances with corresponding guide bands. \nScience Band \nUV \nVisible \nIR \nWavelength band (μm) \n0.2–0.67 \n0.3–1.0 \n0.54–1.8 \nStarshade separation (km) \n186,000 \n124,000 \n69,000 \nIWA (mas) \n40 \n60 \n108 \nGuide band (μm) \n1.6–1.8 \n1.6–1.8 \n0.3–0.45 \n \n \n \nFigure 5.5-8. Top: The starshade instrument. Bottom: The \nprincipal components of the starshade instrument. \nTable 5.5-3. Starshade camera specifications. \nCameras \nUV \nChannel \nVisible  \nChannel \nIR Guide \nChannel \nFOV \n10.2\" \n11.9\" \n- \nWavelength bands \n0.2–0.45 \nµm \n0.45–1.0 \nµm \n0.975–1.8 \nµm \nPixel resolution \n14.2 mas \n14.2 mas \n12 cm \nTelescope resolution \n21 mas \n21 mas \n- \nIWA (at longest λ) \n40 mas \n60 mas \n- \nDetector  \n1×1 \nCCD201 \n1×1 \nCCD201 \n1×1 \nLMAPD \nArray width (pixels) \n1024 \n1024 \n256 \nSpectrometers \nUV \nChannel \nVisible  \nChannel \nIR  \nChannel \nFOV \n10.2\" \n1.9\" \n3.8\" \nWavelength bands \n0.2–0.45 \nµm \n0.45–1.0  \nµm \n0.975–1.8 \nµm \nSpectrometer \nresolution \n7 \n140 \n40 \nSpectrometer type \nSlit/grism \nIFS \nIFS \nDetector  \n1×1 \nCCD201 \n1×1 \nCCD282 \n2×2 LMAPD \nArray width (pixels) \n1024 \n4,096 \n2,048 \n \n"
     },
     {
       "id": "u-nrel-5mw-p25-36-5eaf02be-p6-text-b1of3",
@@ -3974,7 +4838,8 @@
             465.6956787109375,
             543.0000610351562,
             674.6640014648438
-          ]
+          ],
+          "_task": "text:p6:3.0-4.0:r0"
         },
         {
           "entity": "Region 1½",
@@ -3988,7 +4853,8 @@
             465.6956787109375,
             543.0000610351562,
             674.6640014648438
-          ]
+          ],
+          "_task": "text:p6:3.0-4.0:r0"
         },
         {
           "entity": "generator",
@@ -4002,7 +4868,8 @@
             465.6956787109375,
             543.0000610351562,
             674.6640014648438
-          ]
+          ],
+          "_task": "text:p6:3.0-4.0:r0"
         },
         {
           "entity": "gearbox",
@@ -4016,7 +4883,8 @@
             465.6956787109375,
             543.0000610351562,
             674.6640014648438
-          ]
+          ],
+          "_task": "text:p6:3.0-4.0:r0"
         },
         {
           "entity": "generator torque",
@@ -4030,7 +4898,8 @@
             288.15582275390625,
             547.85986328125,
             455.7236633300781
-          ]
+          ],
+          "_task": "text:p6:1.0-2.0"
         },
         {
           "entity": "Region 2 control law",
@@ -4044,7 +4913,8 @@
             465.6956787109375,
             543.0000610351562,
             674.6640014648438
-          ]
+          ],
+          "_task": "text:p6:3.0-4.0:r0"
         },
         {
           "entity": "generator torque",
@@ -4058,7 +4928,8 @@
             288.15582275390625,
             547.85986328125,
             455.7236633300781
-          ]
+          ],
+          "_task": "text:p6:1.0-2.0"
         },
         {
           "entity": "Region 1½",
@@ -4072,7 +4943,8 @@
             288.15582275390625,
             547.85986328125,
             455.7236633300781
-          ]
+          ],
+          "_task": "text:p6:1.0-2.0"
         }
       ],
       "variant": [
@@ -4088,7 +4960,8 @@
             465.6956787109375,
             543.0000610351562,
             674.6640014648438
-          ]
+          ],
+          "_task": "text:p6:3.0-4.0"
         },
         {
           "entity": "Region 1½",
@@ -4102,7 +4975,8 @@
             288.15582275390625,
             547.85986328125,
             455.7236633300781
-          ]
+          ],
+          "_task": "text:p6:1.0-2.0:r1"
         },
         {
           "entity": "mechanical power",
@@ -4116,7 +4990,8 @@
             465.6956787109375,
             543.0000610351562,
             674.6640014648438
-          ]
+          ],
+          "_task": "text:p6:3.0-4.0"
         },
         {
           "entity": "power coefficient",
@@ -4130,7 +5005,8 @@
             465.6956787109375,
             543.0000610351562,
             674.6640014648438
-          ]
+          ],
+          "_task": "text:p6:3.0-4.0"
         },
         {
           "entity": "generator torque controller",
@@ -4144,7 +5020,8 @@
             288.15582275390625,
             547.85986328125,
             455.7236633300781
-          ]
+          ],
+          "_task": "text:p6:1.0-2.0:r1"
         },
         {
           "entity": "generator",
@@ -4158,7 +5035,8 @@
             465.6956787109375,
             543.0000610351562,
             674.6640014648438
-          ]
+          ],
+          "_task": "text:p6:3.0-4.0"
         },
         {
           "entity": "generator torque",
@@ -4172,7 +5050,8 @@
             288.15582275390625,
             547.85986328125,
             455.7236633300781
-          ]
+          ],
+          "_task": "text:p6:1.0-2.0:r1"
         },
         {
           "entity": "generator torque",
@@ -4186,7 +5065,8 @@
             288.15582275390625,
             547.85986328125,
             455.7236633300781
-          ]
+          ],
+          "_task": "text:p6:1.0-2.0:r1"
         },
         {
           "entity": "generator torque",
@@ -4200,7 +5080,8 @@
             288.15582275390625,
             547.85986328125,
             455.7236633300781
-          ]
+          ],
+          "_task": "text:p6:1.0-2.0:r1"
         }
       ],
       "hidden_shared": 0,
@@ -4208,7 +5089,15 @@
         "baseline": 8,
         "variant": 9,
         "shared": 1
-      }
+      },
+      "sources": {
+        "text:p6:3.0-4.0:r0": "We found the peak of the power coefficient as a function of the tip-speed ratio and blade-pitch \nsurface by running FAST with AeroDyn simulations at a number of given rotor speeds and a \nnumber of given rotor-collective blade-pitch angles at a fixed wind speed of 8 m/s.  From these \nsimulations, we found that the peak power coefficient of 0.482 occurred at a tip-speed ratio of \n7.55 and a rotor-collective blade-pitch angle of 0.0˚.  With the 97:1 gearbox ratio, this resulted in \nan optimal constant of proportionality of 0.0255764 N•m/rpm2 in the Region 2 control law.  With \nthe rated generator speed of 1173.7 rpm, rated electric power of 5 MW, and a generator \nefficiency of 94.4%, the rated mechanical power is 5.296610 MW and the rated generator torque \nis 43,093.55 N•m.  We defined Region 1½ to span the range of generator speeds between 670 \nrpm and 30% above this value (or 871 rpm).  The minimum generator speed of 670 rpm \ncorresponds to the minimum rotor speed of 6.9 rpm used by the actual REpower 5M machine \n[26].  We took the transitional generator speed between Regions 2½ and 3 to be 99% of the rated \ngenerator speed, or 1,161.963 rpm.  The generator-slip percentage in Region 2½ was taken to be \n10%, in accordance with the value used in the DOWEC study (see page 24 of Ref. [14]).  Figure \n7-2 shows the resulting generator-torque versus generator speed response curve.",
+        "text:p6:1.0-2.0": "7.2  Baseline Generator-Torque Controller\n\nThe generator torque is computed as a tabulated function of the filtered generator speed, \nincorporating five control regions: 1, 1½, 2, 2½, and 3. Region 1 is a control region before cut-in \nwind speed, where the generator torque is zero and no power is extracted from the wind; instead, \nthe wind is used to accelerate the rotor for start-up.  Region 2 is a control region for optimizing \npower capture.  Here, the generator torque is proportional to the square of the filtered generator \nspeed to maintain a constant (optimal) tip-speed ratio.  In Region 3, the generator power is held \nconstant so that the generator torque is inversely proportional to the filtered generator speed.  \nRegion 1½, a start-up region, is a linear transition between Regions 1 and 2.  This region is used \nto place a lower limit on the generator speed to limit the wind turbine’s operational speed range.  \nRegion 2½ is a linear transition between Regions 2 and 3 with a torque slope corresponding to \nthe slope of an induction machine.  Region 2½ is typically needed (as is the case for my 5-MW \nturbine) to limit tip speed (and hence noise emissions) at rated power.",
+        "text:p6:3.0-4.0": "We found the peak of the power coefficient as a function of the tip-speed ratio and blade-pitch \nsurface by running FAST with AeroDyn simulations at a number of given rotor speeds and a \nnumber of given rotor-collective blade-pitch angles at a fixed wind speed of 8 m/s.  From these \nsimulations, we found that the peak power coefficient of 0.482 occurred at a tip-speed ratio of \n7.55 and a rotor-collective blade-pitch angle of 0.0˚.  With the 97:1 gearbox ratio, this resulted in \nan optimal constant of proportionality of 0.0255764 N•m/rpm2 in the Region 2 control law.  With \nthe rated generator speed of 1173.7 rpm, rated electric power of 5 MW, and a generator \nefficiency of 94.4%, the rated mechanical power is 5.296610 MW and the rated generator torque \nis 43,093.55 N•m.  We defined Region 1½ to span the range of generator speeds between 670 \nrpm and 30% above this value (or 871 rpm).  The minimum generator speed of 670 rpm \ncorresponds to the minimum rotor speed of 6.9 rpm used by the actual REpower 5M machine \n[26].  We took the transitional generator speed between Regions 2½ and 3 to be 99% of the rated \ngenerator speed, or 1,161.963 rpm.  The generator-slip percentage in Region 2½ was taken to be \n10%, in accordance with the value used in the DOWEC study (see page 24 of Ref. [14]).  Figure \n7-2 shows the resulting generator-torque versus generator speed response curve.\n\n19",
+        "text:p6:1.0-2.0:r1": "The generator torque is computed as a tabulated function of the filtered generator speed, \nincorporating five control regions: 1, 1½, 2, 2½, and 3. Region 1 is a control region before cut-in \nwind speed, where the generator torque is zero and no power is extracted from the wind; instead, \nthe wind is used to accelerate the rotor for start-up.  Region 2 is a control region for optimizing \npower capture.  Here, the generator torque is proportional to the square of the filtered generator \nspeed to maintain a constant (optimal) tip-speed ratio.  In Region 3, the generator power is held \nconstant so that the generator torque is inversely proportional to the filtered generator speed.  \nRegion 1½, a start-up region, is a linear transition between Regions 1 and 2.  This region is used \nto place a lower limit on the generator speed to limit the wind turbine’s operational speed range.  \nRegion 2½ is a linear transition between Regions 2 and 3 with a torque slope corresponding to \nthe slope of an induction machine.  Region 2½ is typically needed (as is the case for my 5-MW \nturbine) to limit tip speed (and hence noise emissions) at rated power."
+      },
+      "page_image": "images/nrel-5mw-p25-36-5eaf02be-p6-b1of3-page.jpg",
+      "page_text_full": " 19 \nin the time domain.  The drawbacks to this filter are its gentle roll-off in the stop band (-6 \ndB/octave) and the magnitude and nonlinearity of its phase lag in the pass band [30].  We \nconsidered other linear low-pass filters, such as Butterworth, Chebyshev, Elliptic, and Bessel \nfilters because of their inherent advantages relative to the chosen filter.  Like the chosen filter, a \nButterworth filter has a frequency response that is flat in the pass band, but the Butterworth filter \noffers steeper roll-off in the stop band.  Chebyshev filters offer even steeper roll-off in the stop \nband at the expense of equalized-ripple (equiripple) in the pass band (Type 1) or stop band (Type \n2), respectively.  Elliptic filters offer the steepest roll-off of any linear filter, but have equiripple \nin both the pass and stop bands.  Bessel filters offer the flattest group delay (linear phase lag) in \nthe pass band.  We designed and tested examples of each of these other low-pass filter types, \nconsidering state-space representations of up to fourth order (four states).  None were found to \ngive superior performance in the overall system response, however, so they did not warrant the \nadded complexity of implementation. \n7.2  Baseline Generator-Torque Controller \nThe generator torque is computed as a tabulated function of the filtered generator speed, \nincorporating five control regions: 1, 1½, 2, 2½, and 3. Region 1 is a control region before cut-in \nwind speed, where the generator torque is zero and no power is extracted from the wind; instead, \nthe wind is used to accelerate the rotor for start-up.  Region 2 is a control region for optimizing \npower capture.  Here, the generator torque is proportional to the square of the filtered generator \nspeed to maintain a constant (optimal) tip-speed ratio.  In Region 3, the generator power is held \nconstant so that the generator torque is inversely proportional to the filtered generator speed.  \nRegion 1½, a start-up region, is a linear transition between Regions 1 and 2.  This region is used \nto place a lower limit on the generator speed to limit the wind turbine’s operational speed range.  \nRegion 2½ is a linear transition between Regions 2 and 3 with a torque slope corresponding to \nthe slope of an induction machine.  Region 2½ is typically needed (as is the case for my 5-MW \nturbine) to limit tip speed (and hence noise emissions) at rated power. \nWe found the peak of the power coefficient as a function of the tip-speed ratio and blade-pitch \nsurface by running FAST with AeroDyn simulations at a number of given rotor speeds and a \nnumber of given rotor-collective blade-pitch angles at a fixed wind speed of 8 m/s.  From these \nsimulations, we found that the peak power coefficient of 0.482 occurred at a tip-speed ratio of \n7.55 and a rotor-collective blade-pitch angle of 0.0˚.  With the 97:1 gearbox ratio, this resulted in \nan optimal constant of proportionality of 0.0255764 N•m/rpm2 in the Region 2 control law.  With \nthe rated generator speed of 1173.7 rpm, rated electric power of 5 MW, and a generator \nefficiency of 94.4%, the rated mechanical power is 5.296610 MW and the rated generator torque \nis 43,093.55 N•m.  We defined Region 1½ to span the range of generator speeds between 670 \nrpm and 30% above this value (or 871 rpm).  The minimum generator speed of 670 rpm \ncorresponds to the minimum rotor speed of 6.9 rpm used by the actual REpower 5M machine \n[26].  We took the transitional generator speed between Regions 2½ and 3 to be 99% of the rated \ngenerator speed, or 1,161.963 rpm.  The generator-slip percentage in Region 2½ was taken to be \n10%, in accordance with the value used in the DOWEC study (see page 24 of Ref. [14]).  Figure \n7-2 shows the resulting generator-torque versus generator speed response curve. \n"
     },
     {
       "id": "u-lcit-report-p12-19-bb5dd36f-p7-visual",
@@ -4237,7 +5126,8 @@
             0.0,
             720.0,
             540.0
-          ]
+          ],
+          "_task": "overview:p7"
         },
         {
           "entity": "HabEx coronagraph instrument",
@@ -4251,7 +5141,8 @@
             0.0,
             720.0,
             540.0
-          ]
+          ],
+          "_task": "overview:p7"
         },
         {
           "entity": "HabEx",
@@ -4265,7 +5156,8 @@
             0.0,
             720.0,
             540.0
-          ]
+          ],
+          "_task": "overview:p7"
         }
       ],
       "variant": [],
@@ -4274,7 +5166,10 @@
         "baseline": 3,
         "variant": 0,
         "shared": 0
-      }
+      },
+      "sources": {},
+      "page_image": "images/lcit-report-p12-19-bb5dd36f-p7-page.jpg",
+      "page_text_full": "4.1 LCIT assessment – HabEx (1)\nStrength\n•\nHabEx represents a well thought out mission concept to address high priority \nscience questions relative to exoplanets and their potential for habitability. \n•\nThe concept report also addresses other priority astrophysics science questions in \nthe UV and NIR.  \n•\nThe concept report provided very detailed descriptions of the instruments, \ncapability, and supporting analyses are provided. \n•\nThe Science Traceability Matrix is logical and complete, and the mission system \narchitecture is responsive to the STM and includes assessment of error budgets to \nsupport and demonstrate system level implications. \n•\nThe coronagraph instrument benefits from the WFIRST technology demonstration \ncoronagraph. \n•\nThe study offers several credible alternatives to the baseline architecture with \nassessments of the science impact.\nLCIT FINAL Report\n18\nFor Public Release \n"
     },
     {
       "id": "u-nrel-5mw-p25-36-5eaf02be-p2-table-b1of4",
@@ -4308,7 +5203,8 @@
             646.4443359375,
             539.1607055664062,
             656.0471801757812
-          ]
+          ],
+          "_task": "table:p2:0:4"
         },
         {
           "entity": "Tower",
@@ -4322,7 +5218,8 @@
             656.0471801757812,
             539.1607055664062,
             665.6499633789062
-          ]
+          ],
+          "_task": "table:p2:0:5"
         },
         {
           "entity": "Tower",
@@ -4336,7 +5233,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "Tower",
@@ -4350,7 +5248,8 @@
             656.0471801757812,
             539.1607055664062,
             665.6499633789062
-          ]
+          ],
+          "_task": "table:p2:0:5"
         },
         {
           "entity": "Tower",
@@ -4364,7 +5263,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "Tower",
@@ -4378,7 +5278,8 @@
             656.0471801757812,
             539.1607055664062,
             665.6499633789062
-          ]
+          ],
+          "_task": "table:p2:0:5"
         },
         {
           "entity": "Tower",
@@ -4392,7 +5293,8 @@
             627.2385864257812,
             539.1607055664062,
             636.8414916992188
-          ]
+          ],
+          "_task": "table:p2:0:2"
         },
         {
           "entity": "Tower",
@@ -4406,7 +5308,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "Tower",
@@ -4420,7 +5323,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "Tower",
@@ -4434,7 +5338,8 @@
             646.4443359375,
             539.1607055664062,
             656.0471801757812
-          ]
+          ],
+          "_task": "table:p2:0:4"
         },
         {
           "entity": "Tower",
@@ -4448,7 +5353,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "Tower",
@@ -4462,7 +5368,8 @@
             646.4443359375,
             539.1607055664062,
             656.0471801757812
-          ]
+          ],
+          "_task": "table:p2:0:4"
         },
         {
           "entity": "Tower",
@@ -4476,7 +5383,8 @@
             627.2385864257812,
             539.1607055664062,
             636.8414916992188
-          ]
+          ],
+          "_task": "table:p2:0:2"
         },
         {
           "entity": "Tower",
@@ -4490,7 +5398,8 @@
             646.4443359375,
             539.1607055664062,
             656.0471801757812
-          ]
+          ],
+          "_task": "table:p2:0:4"
         },
         {
           "entity": "Tower",
@@ -4504,7 +5413,203 @@
             627.2385864257812,
             539.1607055664062,
             636.8414916992188
-          ]
+          ],
+          "_task": "table:p2:0:2"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAIner",
+          "value": "16155.3",
+          "unit": "kg•m",
+          "conditions": "Elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwFAIner (kg•m) 16155.3",
+          "_box": [
+            72.59838104248047,
+            636.8414916992188,
+            539.1607055664062,
+            646.4443359375
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwSSStif",
+          "value": "399.13E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwSSStif (N•m2) 399.13E+9",
+          "_box": [
+            72.59838104248047,
+            636.8414916992188,
+            539.1607055664062,
+            646.4443359375
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwGJStif",
+          "value": "307.14E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwGJStif (N•m2) 307.14E+9",
+          "_box": [
+            72.59838104248047,
+            636.8414916992188,
+            539.1607055664062,
+            646.4443359375
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAcgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwFAcgOf (m) 0.0",
+          "_box": [
+            72.59838104248047,
+            636.8414916992188,
+            539.1607055664062,
+            646.4443359375
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAStif",
+          "value": "341.88E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TwFAStif (N•m2) 341.88E+9",
+          "_box": [
+            72.59838104248047,
+            646.4443359375,
+            539.1607055664062,
+            656.0471801757812
+          ],
+          "_task": "table:p2:0:4"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwEAStif",
+          "value": "104.45E+9",
+          "unit": "N",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TwEAStif (N) 104.45E+9",
+          "_box": [
+            72.59838104248047,
+            646.4443359375,
+            539.1607055664062,
+            656.0471801757812
+          ],
+          "_task": "table:p2:0:4"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwSScgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TwSScgOf (m) 0.0",
+          "_box": [
+            72.59838104248047,
+            646.4443359375,
+            539.1607055664062,
+            656.0471801757812
+          ],
+          "_task": "table:p2:0:4"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwGJStif",
+          "value": "263.09E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TwGJStif (N•m2) 263.09E+9",
+          "_box": [
+            72.59838104248047,
+            646.4443359375,
+            539.1607055664062,
+            656.0471801757812
+          ],
+          "_task": "table:p2:0:4"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TMassDen",
+          "value": "4227.75",
+          "unit": "kg/m",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TMassDen (kg/m) 4227.75",
+          "_box": [
+            72.59838104248047,
+            646.4443359375,
+            539.1607055664062,
+            656.0471801757812
+          ],
+          "_task": "table:p2:0:4"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwSScgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "Elevation (m) 43.80, HtFract (-) 0.5, TwSScgOf (m) 0.0",
+          "_box": [
+            72.59838104248047,
+            656.0471801757812,
+            539.1607055664062,
+            665.6499633789062
+          ],
+          "_task": "table:p2:0:5"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TMassDen",
+          "value": "3916.41",
+          "unit": "kg/m",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "Elevation (m) 43.80, HtFract (-) 0.5, TMassDen (kg/m) 3916.41",
+          "_box": [
+            72.59838104248047,
+            656.0471801757812,
+            539.1607055664062,
+            665.6499633789062
+          ],
+          "_task": "table:p2:0:5"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAcgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "Elevation (m) 43.80, HtFract (-) 0.5, TwFAcgOf (m) 0.0",
+          "_box": [
+            72.59838104248047,
+            656.0471801757812,
+            539.1607055664062,
+            665.6499633789062
+          ],
+          "_task": "table:p2:0:5"
+        },
+        {
+          "entity": "Tower",
+          "attribute": "TwFAStif",
+          "value": "291.01E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "Elevation (m) 43.80, HtFract (-) 0.5, TwFAStif (N•m2) 291.01E+9",
+          "_box": [
+            72.59838104248047,
+            656.0471801757812,
+            539.1607055664062,
+            665.6499633789062
+          ],
+          "_task": "table:p2:0:5"
         }
       ],
       "variant": [
@@ -4520,7 +5625,8 @@
             646.4443359375,
             539.1607055664062,
             656.0471801757812
-          ]
+          ],
+          "_task": "table:p2:0:4"
         },
         {
           "entity": "tower",
@@ -4534,7 +5640,8 @@
             646.4443359375,
             539.1607055664062,
             656.0471801757812
-          ]
+          ],
+          "_task": "table:p2:0:4"
         },
         {
           "entity": "tower",
@@ -4548,7 +5655,8 @@
             646.4443359375,
             539.1607055664062,
             656.0471801757812
-          ]
+          ],
+          "_task": "table:p2:0:4"
         },
         {
           "entity": "tower",
@@ -4562,7 +5670,8 @@
             646.4443359375,
             539.1607055664062,
             656.0471801757812
-          ]
+          ],
+          "_task": "table:p2:0:4"
         },
         {
           "entity": "tower",
@@ -4576,7 +5685,8 @@
             646.4443359375,
             539.1607055664062,
             656.0471801757812
-          ]
+          ],
+          "_task": "table:p2:0:4"
         },
         {
           "entity": "tower",
@@ -4590,7 +5700,8 @@
             656.0471801757812,
             539.1607055664062,
             665.6499633789062
-          ]
+          ],
+          "_task": "table:p2:0:5"
         },
         {
           "entity": "tower",
@@ -4604,7 +5715,8 @@
             656.0471801757812,
             539.1607055664062,
             665.6499633789062
-          ]
+          ],
+          "_task": "table:p2:0:5"
         },
         {
           "entity": "tower",
@@ -4618,7 +5730,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "tower",
@@ -4632,7 +5745,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "tower",
@@ -4646,7 +5760,8 @@
             656.0471801757812,
             539.1607055664062,
             665.6499633789062
-          ]
+          ],
+          "_task": "table:p2:0:5"
         },
         {
           "entity": "tower",
@@ -4660,7 +5775,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "tower",
@@ -4674,7 +5790,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "tower",
@@ -4688,7 +5805,8 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
         },
         {
           "entity": "tower",
@@ -4702,7 +5820,8 @@
             627.2385864257812,
             539.1607055664062,
             636.8414916992188
-          ]
+          ],
+          "_task": "table:p2:0:2"
         },
         {
           "entity": "tower",
@@ -4716,7 +5835,173 @@
             636.8414916992188,
             539.1607055664062,
             646.4443359375
-          ]
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft stiffness",
+          "value": "399.13E+9",
+          "unit": "N•m2",
+          "conditions": "HtFract = 0.3",
+          "quote": "399.13E+9",
+          "_box": [
+            72.59838104248047,
+            636.8414916992188,
+            539.1607055664062,
+            646.4443359375
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "axial stiffness",
+          "value": "112.43E+9",
+          "unit": "N",
+          "conditions": "HtFract = 0.3",
+          "quote": "112.43E+9",
+          "_box": [
+            72.59838104248047,
+            636.8414916992188,
+            539.1607055664062,
+            646.4443359375
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft inertia",
+          "value": "16155.3",
+          "unit": "kg•m",
+          "conditions": "HtFract = 0.3",
+          "quote": "16155.3",
+          "_box": [
+            72.59838104248047,
+            636.8414916992188,
+            539.1607055664062,
+            646.4443359375
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fractional height",
+          "value": "0.3",
+          "unit": "-",
+          "conditions": "elevation = 26.28 m",
+          "quote": "0.3",
+          "_box": [
+            72.59838104248047,
+            636.8414916992188,
+            539.1607055664062,
+            646.4443359375
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "399.13E+9",
+          "unit": "N•m2",
+          "conditions": "HtFract = 0.3",
+          "quote": "399.13E+9",
+          "_box": [
+            72.59838104248047,
+            636.8414916992188,
+            539.1607055664062,
+            646.4443359375
+          ],
+          "_task": "table:p2:0:3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "mass density",
+          "value": "4227.75",
+          "unit": "kg/m",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "TMassDen (kg/m) ... 4227.75",
+          "_box": [
+            72.59838104248047,
+            646.4443359375,
+            539.1607055664062,
+            656.0471801757812
+          ],
+          "_task": "table:p2:0:4"
+        },
+        {
+          "entity": "tower",
+          "attribute": "torsional stiffness",
+          "value": "263.09E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "TwGJStif (N•m2) ... 263.09E+9",
+          "_box": [
+            72.59838104248047,
+            646.4443359375,
+            539.1607055664062,
+            656.0471801757812
+          ],
+          "_task": "table:p2:0:4"
+        },
+        {
+          "entity": "tower",
+          "attribute": "forward-aft stiffness",
+          "value": "341.88E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "TwFAStif (N•m2) ... 341.88E+9",
+          "_box": [
+            72.59838104248047,
+            646.4443359375,
+            539.1607055664062,
+            656.0471801757812
+          ],
+          "_task": "table:p2:0:4"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 35.04 m, HtFract = 0.4",
+          "quote": "TwSScgOf (m) ... 0.0",
+          "_box": [
+            72.59838104248047,
+            646.4443359375,
+            539.1607055664062,
+            656.0471801757812
+          ],
+          "_task": "table:p2:0:4"
+        },
+        {
+          "entity": "tower",
+          "attribute": "axial stiffness",
+          "value": "96.76E+9",
+          "unit": "N",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "43.80, 0.5, 96.76E+9",
+          "_box": [
+            72.59838104248047,
+            656.0471801757812,
+            539.1607055664062,
+            665.6499633789062
+          ],
+          "_task": "table:p2:0:5"
+        },
+        {
+          "entity": "tower",
+          "attribute": "torsional stiffness",
+          "value": "223.94E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "43.80, 0.5, 223.94E+9",
+          "_box": [
+            72.59838104248047,
+            656.0471801757812,
+            539.1607055664062,
+            665.6499633789062
+          ],
+          "_task": "table:p2:0:5"
         }
       ],
       "hidden_shared": 0,
@@ -4724,7 +6009,15 @@
         "baseline": 28,
         "variant": 26,
         "shared": 0
-      }
+      },
+      "sources": {
+        "table:p2:0:4": "Header: [\"Elevation\\n(m)\", \"HtFract\\n(-)\", \"TMassDen\\n(kg/m)\", \"TwFAStif\\n(N•m2)\", \"TwSSStif\\n(N•m2)\", \"TwGJStif\\n(N•m2)\", \"TwEAStif\\n(N)\", \"TwFAIner\\n(kg•m)\", \"TwSSIner\\n(kg•m)\", \"TwFAcgOf\\n(m)\", \"TwSScgOf\\n(m)\"]\nRow: [\"35.04\", \"0.4\", \"4227.75\", \"341.88E+9\", \"341.88E+9\", \"263.09E+9\", \"104.45E+9\", \"13838.1\", \"13838.1\", \"0.0\", \"0.0\"]",
+        "table:p2:0:5": "Header: [\"Elevation\\n(m)\", \"HtFract\\n(-)\", \"TMassDen\\n(kg/m)\", \"TwFAStif\\n(N•m2)\", \"TwSSStif\\n(N•m2)\", \"TwGJStif\\n(N•m2)\", \"TwEAStif\\n(N)\", \"TwFAIner\\n(kg•m)\", \"TwSSIner\\n(kg•m)\", \"TwFAcgOf\\n(m)\", \"TwSScgOf\\n(m)\"]\nRow: [\"43.80\", \"0.5\", \"3916.41\", \"291.01E+9\", \"291.01E+9\", \"223.94E+9\", \"96.76E+9\", \"11779.0\", \"11779.0\", \"0.0\", \"0.0\"]",
+        "table:p2:0:3": "Header: [\"Elevation\\n(m)\", \"HtFract\\n(-)\", \"TMassDen\\n(kg/m)\", \"TwFAStif\\n(N•m2)\", \"TwSSStif\\n(N•m2)\", \"TwGJStif\\n(N•m2)\", \"TwEAStif\\n(N)\", \"TwFAIner\\n(kg•m)\", \"TwSSIner\\n(kg•m)\", \"TwFAcgOf\\n(m)\", \"TwSScgOf\\n(m)\"]\nRow: [\"26.28\", \"0.3\", \"4550.87\", \"399.13E+9\", \"399.13E+9\", \"307.14E+9\", \"112.43E+9\", \"16155.3\", \"16155.3\", \"0.0\", \"0.0\"]",
+        "table:p2:0:2": "Header: [\"Elevation\\n(m)\", \"HtFract\\n(-)\", \"TMassDen\\n(kg/m)\", \"TwFAStif\\n(N•m2)\", \"TwSSStif\\n(N•m2)\", \"TwGJStif\\n(N•m2)\", \"TwEAStif\\n(N)\", \"TwFAIner\\n(kg•m)\", \"TwSSIner\\n(kg•m)\", \"TwFAcgOf\\n(m)\", \"TwSScgOf\\n(m)\"]\nRow: [\"17.52\", \"0.2\", \"4885.76\", \"463.27E+9\", \"463.27E+9\", \"356.50E+9\", \"120.71E+9\", \"18751.3\", \"18751.3\", \"0.0\", \"0.0\"]"
+      },
+      "page_image": "images/nrel-5mw-p25-36-5eaf02be-p2-b1of4-page.jpg",
+      "page_text_full": " 15 \n6  Tower Properties \nThe properties of the tower for the NREL offshore 5-MW baseline wind turbine will depend on \nthe type support structure used to carry the rotor-nacelle assembly.  The type of support structure \nwill, in turn, depend on the installation site, whose properties vary significantly through \ndifferences in water depth, soil type, and wind and wave severity.  Offshore support-structure \ntypes include fixed-bottom monopiles, gravity bases, and space-frames—such as tripods, \nquadpods, and lattice frames (e.g., “jackets”)—and floating structures.  This section documents \nthe tower properties for the equivalent land-based version of the NREL 5-MW baseline wind \nturbine.  These properties provide a basis with which to design towers for site-specific offshore \nsupport structures.  For example, different types of offshore support structures for the NREL 5-\nMW baseline wind turbine have been designed for—and investigated in—separate phases of the \nOC3 project [13,25]. \nWe based the distributed properties of the land-based tower for the NREL 5-MW baseline wind \nturbine on the base diameter (6 m) and thickness (0.027 m), top diameter (3.87 m) and thickness \n(0.019 m), and effective mechanical steel properties of the tower used in the DOWEC study (as \ngiven in Table 9 on page 31 of Ref. [14]).  The Young’s modulus was taken to be 210 GPa, the \nshear modulus was taken to be 80.8 GPa, and the effective density of the steel was taken to be \n8,500 kg/m3.  The density of 8,500 kg/m3 was meant to be an increase above steel’s typical value \nof 7,850 kg/m3 to account for paint, bolts, welds, and flanges that are not accounted for in the \ntower thickness data.  The radius and thickness of the tower were assumed to be linearly tapered \nfrom the tower base to tower top.  Because the REpower 5M machine had a larger tower-top \nmass than the DOWEC wind turbine, we scaled up the thickness of the tower relative to the \nvalues given earlier in this paragraph to strengthen the tower.  We chose an increase of 30% to \nensure that the first fore-aft and side-to-side tower frequencies were placed between the one- and \nthree-per-rev frequencies throughout the operational range of the wind turbine in a Campbell \ndiagram.  Table 6-1 gives the resulting distributed tower properties. \nThe entries in the first column, “Elevation,” are the vertical locations along the tower centerline \nrelative to the tower base.  “HtFract” is the fractional height along the tower centerline from the \ntower base (0.0) to the tower top (1.0).  The rest of columns are similar to those described for the \ndistributed blade properties presented in Table 2-1. \nThe resulting overall (integrated) tower mass is 347,460 kg and is centered at 38.234 m along the \nTable 6-1.  Distributed Tower Properties \nElevation\nHtFract\nTMassDen\nTwFAStif\nTwSSStif\nTwGJStif\nTwEAStif TwFAIner TwSSIner TwFAcgOf TwSScgOf\n(m)\n(-)\n(kg/m)\n(N•m2)\n(N•m2)\n(N•m2)\n(N)\n(kg•m)\n(kg•m)\n(m)\n(m)\n0.00\n0.0\n5590.87\n614.34E+9\n614.34E+9\n472.75E+9\n138.13E+9\n24866.3\n24866.3\n0.0\n0.0\n8.76\n0.1\n5232.43\n534.82E+9\n534.82E+9\n411.56E+9\n129.27E+9\n21647.5\n21647.5\n0.0\n0.0\n17.52\n0.2\n4885.76\n463.27E+9\n463.27E+9\n356.50E+9\n120.71E+9\n18751.3\n18751.3\n0.0\n0.0\n26.28\n0.3\n4550.87\n399.13E+9\n399.13E+9\n307.14E+9\n112.43E+9\n16155.3\n16155.3\n0.0\n0.0\n35.04\n0.4\n4227.75\n341.88E+9\n341.88E+9\n263.09E+9\n104.45E+9\n13838.1\n13838.1\n0.0\n0.0\n43.80\n0.5\n3916.41\n291.01E+9\n291.01E+9\n223.94E+9\n96.76E+9\n11779.0\n11779.0\n0.0\n0.0\n52.56\n0.6\n3616.83\n246.03E+9\n246.03E+9\n189.32E+9\n89.36E+9\n9958.2\n9958.2\n0.0\n0.0\n61.32\n0.7\n3329.03\n206.46E+9\n206.46E+9\n158.87E+9\n82.25E+9\n8356.6\n8356.6\n0.0\n0.0\n70.08\n0.8\n3053.01\n171.85E+9\n171.85E+9\n132.24E+9\n75.43E+9\n6955.9\n6955.9\n0.0\n0.0\n78.84\n0.9\n2788.75\n141.78E+9\n141.78E+9\n109.10E+9\n68.90E+9\n5738.6\n5738.6\n0.0\n0.0\n87.60\n1.0\n2536.27\n115.82E+9\n115.82E+9\n89.13E+9\n62.66E+9\n4688.0\n4688.0\n0.0\n0.0 \n"
     }
   ]
 }

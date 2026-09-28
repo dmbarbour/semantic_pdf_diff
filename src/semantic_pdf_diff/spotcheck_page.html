@@ -28,7 +28,9 @@ h2{font-size:15px;margin:0 0 6px}h3{font-size:13px;text-transform:uppercase;lett
 .marks{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;height:fit-content}
 .marks button{border:0;border-radius:0;padding:2px 8px;min-width:28px;background:var(--card)}.marks button+button{border-left:1px solid var(--line)}
 .marks button.on[data-m=ok]{background:var(--ok);color:#fff}.marks button.on[data-m=wrong]{background:var(--bad);color:#fff}.marks button.on[data-m=unsure]{background:var(--unsure);color:#fff}
-.claimtags{grid-column:2;font-size:12px}.claimtags summary{color:var(--muted)}.claimtags label{display:inline-block;margin:2px 6px 0 0;cursor:pointer}
+.claimtags{grid-column:2;font-size:12px}.source{grid-column:2;font-size:12px}.source pre{max-height:180px;margin:4px 0 0}
+.both{font-size:11px;border:1px solid var(--line);border-radius:10px;padding:0 6px;margin-left:6px;color:var(--muted)}
+.pages{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px}@media(max-width:900px){.pages{grid-template-columns:1fr}}.claimtags summary{color:var(--muted)}.claimtags label{display:inline-block;margin:2px 6px 0 0;cursor:pointer}
 .setsum{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .tally{font-size:13px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;margin-left:6px}
 .bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--line);margin:4px 0 8px}.bar span{display:block}
@@ -99,7 +101,11 @@ function claims(side, list, a) {
     return `<li class="${got.mark}"><span class="marks" data-side="${side}" data-k="${k}">` + MARKS.map(m =>
         `<button type="button" data-m="${m.m}" title="${esc(m.help)}" class="${got.mark === m.m ? 'on' : ''}">${m.label}</button>`).join('') + '</span>'
       + `<div><span class="n">${side}${k + 1}</span><span class="v">${esc(c.entity)} · ${esc(c.attribute)} = ${esc(c.value)}${c.unit ? ' ' + esc(c.unit) : ''}</span>`
-      + (c.conditions ? ` <span class="muted">(${esc(c.conditions)})</span>` : '') + `<span class="q">“${esc(c.quote)}”</span></div>`
+      + (c.conditions ? ` <span class="muted">(${esc(c.conditions)})</span>` : '')
+      + (c.twin !== null && c.twin !== undefined ? `<span class="both" title="The same claim is in the other set as ${side === 'A' ? 'B' : 'A'}${c.twin + 1}; marks apply to both">in both sets</span>` : '')
+      + `<span class="q">“${esc(c.quote)}”</span></div>`
+      + (c.source ? (c.source.startsWith('read from an image') ? `<div class="source muted">${esc(c.source)}</div>`
+                     : fold(`src:${side}${k}`, '<span class="muted">what it was read from</span>', `<pre>${esc(c.source)}</pre>`, 'source')) : '')
       + fold(`tags:${side}${k}`, 'problems' + (got.problems.length ? ': ' + esc(got.problems.join(', ')) : ''), tags, 'claimtags') + '</li>';
   }).join('') + '</ol>';
 }
@@ -107,6 +113,11 @@ function claims(side, list, a) {
 const OPEN = new Set();
 const fold = (key, summary, body, cls = '') =>
   `<details class="${cls}" data-key="${esc(current().id + '|' + key)}" ${OPEN.has(current().id + '|' + key) ? 'open' : ''}><summary>${summary}</summary>${body}</details>`;
+// A claim in both sets is one claim: its marks and problems are copied to its twin.
+function twin(a, side, k, c) {
+  const j = current()[side][k].twin, other = side === 'A' ? 'B' : 'A';
+  if (j !== null && j !== undefined) a.claims[other][j] = {mark: c.mark, problems: [...c.problems]};
+}
 function choice(name, options, value) {
   return '<div class="opts">' + options.map(o => `<label title="${esc(o.help || '')}"><input type="radio" name="${name}" value="${o.name}" ${value === o.name ? 'checked' : ''}>${esc(o.label)}</label>`).join('') + '</div>';
 }
@@ -130,11 +141,13 @@ function setSummary(side, it, a) {
 function show() {
   const it = current(), a = answer();
   let html = `<h2>Item ${state.at + 1} of ${DATA.items.length}: ${esc(it.title)}</h2>`
-    + `<div class="top"><div><img src="${esc(it.image)}" alt="the part of the page read"><div class="muted">Click to enlarge.</div></div><div>`
+    + `<div class="top"><div class="pages"><div><img src="${esc(it.image)}" alt="the part of the page read"><div class="muted">The part of the page read. Click to enlarge.</div></div>`
+    + (it.page_image ? `<div><img src="${esc(it.page_image)}" alt="the whole page, the part read outlined"><div class="muted">The whole page (the part read outlined, if it's a part), for headers and captions.</div></div>` : '')
+    + '</div><div>'
     + (it.headings ? `<div class="muted">Under the headings: ${esc(it.headings)}</div>` : '')
     + (it.within ? `<div class="muted">Within: ${esc(it.within)}</div>` : '')
     + (it.before ? fold('before', '<span class="muted">Text just before it</span>', `<pre>…${esc(it.before)}</pre>`) : '')
-    + fold('layer', '<span class="muted">Its text layer (what the PDF says in text)</span>', `<pre>${esc(it.page_text)}</pre>`) + '</div></div>'
+    + fold('layer', '<span class="muted">The page\'s text layer (what the PDF says in text)</span>', `<pre>${esc(it.page_text_full || it.page_text)}</pre>`) + '</div></div>'
     + `<div class="sets" style="margin-top:12px">` + ['A', 'B'].map(side => {
         const t = tally(side, it[side], a);
         return `<div class="set"><h3>Set ${side} (${esc(side === 'A' ? it.a_note : it.b_note)})<span class="tally">${t.text}</span></h3>${t.bar}${claims(side, it[side], a)}</div>`;
@@ -156,6 +169,7 @@ $('#item').addEventListener('change', e => {
   else if (t.dataset.side) {
     const c = a.claims[t.dataset.side][t.dataset.k] || (a.claims[t.dataset.side][t.dataset.k] = {mark: '', problems: []});
     c.problems = [...document.querySelectorAll(`input[data-side="${t.dataset.side}"][data-k="${t.dataset.k}"]:checked`)].map(x => x.value);
+    twin(a, t.dataset.side, t.dataset.k, c);
   }
   save(); show();
 });
@@ -171,6 +185,7 @@ $('#item').addEventListener('click', e => {
   const a = answer(), {side, k} = b.parentElement.dataset;
   const c = a.claims[side][k] || (a.claims[side][k] = {mark: '', problems: []});
   c.mark = c.mark === b.dataset.m ? '' : b.dataset.m;  // click again to clear
+  twin(a, side, k, c);
   save(); show();
 });
 $('#zoom').onclick = () => $('#zoom').style.display = 'none';
