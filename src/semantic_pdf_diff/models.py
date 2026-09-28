@@ -192,6 +192,8 @@ class PairVerdict(Lenient):
     a_problems: list[str] = Field(default_factory=list)  # rubric v2 on (rounds.PAIR_PROBLEMS)
     b_problems: list[str] = Field(default_factory=list)
     remarks: str = Field(default="", max_length=1500)    # for the maintainers, optional
+    a_claims: list[dict] = Field(default_factory=list)   # rubric v5: each claim's mark, by number
+    b_claims: list[dict] = Field(default_factory=list)
 
 class Reference(Strict):
     """A sentence citing a figure (or table, sheet, exhibit) by label."""

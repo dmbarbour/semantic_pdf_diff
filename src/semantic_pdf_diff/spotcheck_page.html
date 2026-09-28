@@ -4,8 +4,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Spot check: __TITLE__</title>
 <style>
-:root{--bg:#f3f5f7;--card:#fff;--ink:#1b2733;--muted:#5b6b7a;--line:#d5dde4;--accent:#1f6f9f;--sel:#e6f1f8}
-@media (prefers-color-scheme:dark){:root{--bg:#12171c;--card:#1b232b;--ink:#e3e9ee;--muted:#9aa9b6;--line:#2f3b46;--accent:#6fb3de;--sel:#223444}}
+:root{--bg:#f3f5f7;--card:#fff;--ink:#1b2733;--muted:#5b6b7a;--line:#d5dde4;--accent:#1f6f9f;--sel:#e6f1f8;
+  --ok:#1d7a46;--bad:#b3261e;--unsure:#8a6100;--okbg:#e5f4ea;--badbg:#fbe7e5;--unsurebg:#fbf1dc}
+@media (prefers-color-scheme:dark){:root{--bg:#12171c;--card:#1b232b;--ink:#e3e9ee;--muted:#9aa9b6;--line:#2f3b46;--accent:#6fb3de;--sel:#223444;
+  --ok:#5cc58a;--bad:#f07a70;--unsure:#e0b04f;--okbg:#1c3326;--badbg:#3a2220;--unsurebg:#3a3019}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,sans-serif}
 header{position:sticky;top:0;z-index:2;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 header h1{font-size:16px;margin:0 8px 0 0}header input{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
@@ -19,8 +21,16 @@ main{max-width:1500px;margin:auto;padding:16px;display:grid;gap:16px}
 h2{font-size:15px;margin:0 0 6px}h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 0 6px}
 .muted{color:var(--muted);font-size:13px}.question{background:var(--sel);border-radius:8px;padding:8px 10px;margin-bottom:8px}
 .sets{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:900px){.sets{grid-template-columns:1fr}}
-.set h3{margin-top:0}.set ol{margin:0;padding-left:22px}.set li{margin:0 0 6px;overflow-wrap:anywhere}
-.set .q{display:block;color:var(--muted);font-size:13px}.set .v{font-weight:600}
+.set h3{margin-top:0}.set ol{margin:0;padding:0;list-style:none}
+.set li{margin:0 0 6px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere;display:grid;grid-template-columns:auto 1fr;gap:4px 10px}
+.set li.ok{background:var(--okbg);border-color:var(--ok)}.set li.wrong{background:var(--badbg);border-color:var(--bad)}.set li.unsure{background:var(--unsurebg);border-color:var(--unsure)}
+.set .q{display:block;color:var(--muted);font-size:13px}.set .v{font-weight:600}.set .n{color:var(--muted);font-size:12px;margin-right:4px}
+.marks{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;height:fit-content}
+.marks button{border:0;border-radius:0;padding:2px 8px;min-width:28px;background:var(--card)}.marks button+button{border-left:1px solid var(--line)}
+.marks button.on[data-m=ok]{background:var(--ok);color:#fff}.marks button.on[data-m=wrong]{background:var(--bad);color:#fff}.marks button.on[data-m=unsure]{background:var(--unsure);color:#fff}
+.claimtags{grid-column:2;font-size:12px}.claimtags summary{color:var(--muted)}.claimtags label{display:inline-block;margin:2px 6px 0 0;cursor:pointer}
+.tally{font-size:13px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;margin-left:6px}
+.bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--line);margin:4px 0 8px}.bar span{display:block}
 .opts{display:flex;flex-wrap:wrap;gap:6px}.opts label{border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
 .opts label:has(input:checked){background:var(--sel);border-color:var(--accent)}.opts input{margin-right:4px}
 .tags label{font-size:13px}
@@ -39,7 +49,7 @@ details summary{cursor:pointer}
 </header>
 <main>
   <section class="card">
-    <div class="question">Two sets of claims were read from the same part of a page. Which set is better?</div>
+    <div class="question">Two sets of claims were read from the same part of a page. Mark each claim (✓ right, ✗ wrong, ? unsure) if that helps, then say which set is better.</div>
     <details><summary class="muted">How to judge (the same instructions the model judges get)</summary><div id="howto"></div></details>
   </section>
   <section class="card" id="item"></section>
@@ -61,14 +71,36 @@ const save = () => { store.people[state.reviewer] = state; store.last = state.re
   try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
 const current = () => DATA.items[state.at];
 // Nothing is preset: an unanswered question stays unanswered.
-const answer = () => state.answers[current().id] || (state.answers[current().id] = {better: '', a_problems: [], b_problems: [], confidence: '', note: ''});
-const answered = a => a && (a.better || a.a_problems.length || a.b_problems.length || a.confidence || a.note.trim());
+const answer = () => {
+  const a = state.answers[current().id] || (state.answers[current().id] = {better: '', a_problems: [], b_problems: [], confidence: '', note: ''});
+  a.claims = a.claims || {A: {}, B: {}};  // per claim: {mark: ok|wrong|unsure, problems: [...]}, by position in its set
+  return a;
+};
+const marked = a => a && a.claims && ['A', 'B'].some(s => Object.values(a.claims[s]).some(c => c.mark || c.problems.length));
+const answered = a => a && (a.better || a.a_problems.length || a.b_problems.length || a.confidence || a.note.trim() || marked(a));
 $('#howto').innerHTML = `<p>${esc(DATA.howto)}</p><ul>` + DATA.problems.map(p => `<li><b>${esc(p.label)}</b>: ${esc(p.help)}</li>`).join('') + '</ul>';
 
-function claims(list) {
-  return list.length ? '<ol>' + list.map(c => `<li><span class="v">${esc(c.entity)} · ${esc(c.attribute)} = ${esc(c.value)}${c.unit ? ' ' + esc(c.unit) : ''}</span>`
-    + (c.conditions ? ` <span class="muted">(${esc(c.conditions)})</span>` : '') + `<span class="q">“${esc(c.quote)}”</span></li>`).join('') + '</ol>'
-    : '<p class="muted">(no claims)</p>';
+const MARKS = [{m: 'ok', label: '✓', help: 'right: a faithful reading, bound to the right thing'},
+               {m: 'wrong', label: '✗', help: 'wrong: misread, misbound, invented or otherwise not what the page says'},
+               {m: 'unsure', label: '?', help: 'unsure: can\'t tell from what is shown'}];
+function tally(side, list, a) {
+  const got = Object.values(a.claims[side]).map(c => c.mark);
+  const n = m => got.filter(x => x === m).length, open = list.length - n('ok') - n('wrong') - n('unsure');
+  const pct = k => list.length ? 100 * k / list.length : 0;
+  return {text: `✓ ${n('ok')} · ✗ ${n('wrong')} · ? ${n('unsure')}` + (open ? ` · ${open} unmarked` : ''),
+          bar: `<div class="bar"><span style="width:${pct(n('ok'))}%;background:var(--ok)"></span><span style="width:${pct(n('wrong'))}%;background:var(--bad)"></span><span style="width:${pct(n('unsure'))}%;background:var(--unsure)"></span></div>`};
+}
+function claims(side, list, a) {
+  if (!list.length) return '<p class="muted">(no claims)</p>';
+  return '<ol>' + list.map((c, k) => {
+    const got = a.claims[side][k] || {mark: '', problems: []};
+    const tags = DATA.claim_problems.map(p => `<label title="${esc(p.help)}"><input type="checkbox" data-side="${side}" data-k="${k}" value="${p.name}" ${got.problems.includes(p.name) ? 'checked' : ''}> ${esc(p.label)}</label>`).join('');
+    return `<li class="${got.mark}"><span class="marks" data-side="${side}" data-k="${k}">` + MARKS.map(m =>
+        `<button type="button" data-m="${m.m}" title="${esc(m.help)}" class="${got.mark === m.m ? 'on' : ''}">${m.label}</button>`).join('') + '</span>'
+      + `<div><span class="n">${side}${k + 1}</span><span class="v">${esc(c.entity)} · ${esc(c.attribute)} = ${esc(c.value)}${c.unit ? ' ' + esc(c.unit) : ''}</span>`
+      + (c.conditions ? ` <span class="muted">(${esc(c.conditions)})</span>` : '') + `<span class="q">“${esc(c.quote)}”</span></div>`
+      + `<details class="claimtags" ${got.problems.length ? 'open' : ''}><summary>problems${got.problems.length ? ': ' + esc(got.problems.join(', ')) : ''}</summary>${tags}</details></li>`;
+  }).join('') + '</ol>';
 }
 function choice(name, options, value) {
   return '<div class="opts">' + options.map(o => `<label title="${esc(o.help || '')}"><input type="radio" name="${name}" value="${o.name}" ${value === o.name ? 'checked' : ''}>${esc(o.label)}</label>`).join('') + '</div>';
@@ -84,8 +116,10 @@ function show() {
     + (it.within ? `<div class="muted">Within: ${esc(it.within)}</div>` : '')
     + (it.before ? `<details><summary class="muted">Text just before it</summary><pre>…${esc(it.before)}</pre></details>` : '')
     + `<details><summary class="muted">Its text layer (what the PDF says in text)</summary><pre>${esc(it.page_text)}</pre></details></div></div>`
-    + `<div class="sets" style="margin-top:12px"><div class="set"><h3>Set A (${esc(it.a_note)})</h3>${claims(it.A)}</div>`
-    + `<div class="set"><h3>Set B (${esc(it.b_note)})</h3>${claims(it.B)}</div></div>`
+    + `<div class="sets" style="margin-top:12px">` + ['A', 'B'].map(side => {
+        const t = tally(side, it[side], a);
+        return `<div class="set"><h3>Set ${side} (${esc(side === 'A' ? it.a_note : it.b_note)})<span class="tally">${t.text}</span></h3>${t.bar}${claims(side, it[side], a)}</div>`;
+      }).join('') + '</div>' 
     + `<h3>Which set is better?</h3>` + choice('better', DATA.better, a.better)
     + `<h3>Problems in set A (any)</h3>` + tags('a_problems', a.a_problems)
     + `<h3>Problems in set B (any)</h3>` + tags('b_problems', a.b_problems)
@@ -101,10 +135,22 @@ $('#item').addEventListener('change', e => {
   if (t.name === 'better') a.better = t.value;
   else if (t.name === 'confidence') a.confidence = t.value;
   else if (t.name === 'a_problems' || t.name === 'b_problems') a[t.name] = [...document.querySelectorAll(`input[name=${t.name}]:checked`)].map(x => x.value);
+  else if (t.dataset.side) {
+    const c = a.claims[t.dataset.side][t.dataset.k] || (a.claims[t.dataset.side][t.dataset.k] = {mark: '', problems: []});
+    c.problems = [...document.querySelectorAll(`input[data-side="${t.dataset.side}"][data-k="${t.dataset.k}"]:checked`)].map(x => x.value);
+  }
   save(); show();
 });
 $('#item').addEventListener('input', e => { if (e.target.name === 'note') { answer().note = e.target.value; save(); } });
-$('#item').addEventListener('click', e => { if (e.target.tagName === 'IMG') { $('#zoom img').src = e.target.src; $('#zoom').style.display = 'block'; } });
+$('#item').addEventListener('click', e => {
+  if (e.target.tagName === 'IMG') { $('#zoom img').src = e.target.src; $('#zoom').style.display = 'block'; return; }
+  const b = e.target.closest('.marks button');
+  if (!b) return;
+  const a = answer(), {side, k} = b.parentElement.dataset;
+  const c = a.claims[side][k] || (a.claims[side][k] = {mark: '', problems: []});
+  c.mark = c.mark === b.dataset.m ? '' : b.dataset.m;  // click again to clear
+  save(); show();
+});
 $('#zoom').onclick = () => $('#zoom').style.display = 'none';
 function go(n) { state.at = Math.max(0, Math.min(DATA.items.length - 1, n)); save(); show(); window.scrollTo(0, 0); }
 $('#prev').onclick = () => go(state.at - 1); $('#next').onclick = () => go(state.at + 1);
@@ -118,8 +164,14 @@ $('#reviewer').onchange = e => {
   save(); show();
 };
 function answersFile() {  // only what was answered
-  const out = DATA.items.filter(i => answered(state.answers[i.id])).map(i => ({item: i.id, ...state.answers[i.id]}));
-  return JSON.stringify({format: DATA.format, version: 1, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
+  const out = DATA.items.filter(i => answered(state.answers[i.id])).map(i => {
+    const a = state.answers[i.id], claims = {};
+    for (const side of ['A', 'B']) {
+      claims[side] = Object.fromEntries(Object.entries(a.claims[side] || {}).filter(([, c]) => c.mark || c.problems.length));
+    }
+    return {item: i.id, ...a, claims};
+  });
+  return JSON.stringify({format: DATA.format, version: 2, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
     created: new Date().toISOString().slice(0, 10), answers: out}, null, 2);
 }
 $('#download').onclick = () => {

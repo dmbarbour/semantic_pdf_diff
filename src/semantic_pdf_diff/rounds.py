@@ -11,7 +11,7 @@ See docs/plans/query-improvement-2026-09-26.md.
 import json
 import random
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 FAMILY = {"text": "text", "table": "table", "tile": "visual", "figure": "visual", "overview": "visual"}
@@ -232,6 +232,11 @@ PAIR_PROBLEMS = {
     "trivial": "trivial claims (labels, indices, fragments) of no engineering use",
 }
 
+# What can be wrong with one claim (a set can also miss facts, which no one claim shows).
+CLAIM_PROBLEMS = {k: v for k, v in PAIR_PROBLEMS.items() if k != "missing"} | {
+    "duplicates": "the same fact as another claim in its set"}
+CLAIM_MARKS = ("ok", "wrong", "unsure")
+
 # Rubric versions. v1 keeps earlier rounds' prompts, and so their cached verdicts.
 RUBRICS = {
     "v1": {"addition": "", "tags": False},
@@ -259,6 +264,16 @@ RUBRICS = {
                        "aren't invented.\nA set may be a sample of its claims: each says how many it shows; claims "
                        "not shown are identical in both sets, so they aren't missing from either.",
            "tags": True, "sections": True, "context": True},
+    # The owner, 2026-09-28: claims marked one by one (as on the spot-check page), so judges and
+    # people can be compared claim by claim, and each side gets an absolute share of wrong claims.
+    "v5": {"addition": "\nDocument administration (contacts, addresses, lot or project numbers, revision dates, "
+                       "copyright, logos) is neutral: don't prefer a set for including or omitting it; judge such "
+                       "claims only for correctness.\nEntity names and conditions may come from the context given "
+                       "with the page (its headings, the text before it, the numbered items it sits under): those "
+                       "aren't invented.\nA set may be a sample of its claims: each says how many it shows; claims "
+                       "not shown are identical in both sets, so they aren't missing from either.\nMark every "
+                       "claim first (A1, A2, ..., B1, ...), then decide which set is better.",
+           "tags": True, "sections": True, "context": True, "claims": True},
 }
 
 V1_OUTPUT = """Return only JSON, reasoning first: {{"note": "...", "better": "A|B|same", "a_wrong": 0, "b_wrong": 0, "confidence": "high|medium|low"}}
@@ -274,10 +289,14 @@ V2_OUTPUT = ("""Return only JSON, reasoning first: {{"note": "...", "better": "A
   you notice, suggestions. Leave it empty when there is nothing worth saying.
 """)
 
+V5_OUTPUT = (V2_OUTPUT.replace(', "remarks": ""}}',
+                              ', "a_claims": [{{"n": 1, "mark": "ok|wrong|unsure", "problems": []}}], "b_claims": [], "remarks": ""}}')
+             .replace("- remarks:", "- a_claims, b_claims: one entry per claim of each set, by its number: ok (a faithful\n  reading, bound to the right thing), wrong, or unsure; and its problems, from the list above but for missing.\n- remarks:"))
+
 def pairwise_prompt(rubric):
     """The pairwise template for a rubric version (placeholders: page, family, page_text, a, b)."""
     spec = RUBRICS[rubric]
-    template = PAIRWISE.replace(V1_OUTPUT, V2_OUTPUT) if spec["tags"] else PAIRWISE
+    template = PAIRWISE.replace(V1_OUTPUT, V5_OUTPUT if spec.get("claims") else V2_OUTPUT) if spec["tags"] else PAIRWISE
     if spec.get("sections"):
         template = template.replace("PAGE {page} ({family} content). Its text layer:",
                                     "PAGE {page} ({family} content), under the headings: {sections}. Its text layer:")
@@ -291,10 +310,26 @@ def _set_note(shown, total, hidden):
     return (f"all {total} claims" if shown >= total else
             f"{shown} of its {total} claims; {hidden} shared claims not shown are identical in both sets")
 
-def _claims_text(claims):
-    return "\n".join(f"- {c['entity']} | {c['attribute']} | {c['value']}{' ' + c['unit'] if c.get('unit') else ''}"
+def _claims_text(claims, letter=None):
+    """One line per claim; numbered (A1, A2, ...) when judges mark them one by one."""
+    mark = (lambda k: f"{letter}{k + 1}. ") if letter else (lambda k: "- ")
+    return "\n".join(f"{mark(k)}{c['entity']} | {c['attribute']} | {c['value']}{' ' + c['unit'] if c.get('unit') else ''}"
                      f"{' | conditions: ' + c['conditions'] if c.get('conditions') else ''} | quote: {c['quote']}"
-                     for c in claims) or "(no claims)"
+                     for k, c in enumerate(claims)) or "(no claims)"
+
+def _claim_marks(entries, shown):
+    """A judge's marks for the claims of one set shown to it: [{index, claim, mark, problems}]."""
+    out = []
+    for entry in entries or ():
+        try:
+            k = int(entry.get("n")) - 1
+        except (TypeError, ValueError, AttributeError):
+            continue
+        if 0 <= k < len(shown) and entry.get("mark") in CLAIM_MARKS:
+            out.append({"index": k, "claim": {f: x for f, x in shown[k].items() if not f.startswith("_")},
+                        "mark": entry["mark"],
+                        "problems": sorted({str(p).lower() for p in entry.get("problems") or ()} & set(CLAIM_PROBLEMS))})
+    return out
 
 def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1", only=None, retry_failed=False,
                 verdicts_dir="verdicts"):
@@ -333,8 +368,10 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
                          for side in ("baseline", "variant")}
                 first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
                 band = item.get("band")
+                numbered = RUBRICS[rubric].get("claims")
                 prompt = template.format(page=item["page"], family=item["family"], page_text=item["page_text"],
-                                         a=_claims_text(a), b=_claims_text(b),
+                                         a=_claims_text(a, "A" if numbered else None),
+                                         b=_claims_text(b, "B" if numbered else None),
                                          sections=" | ".join(item.get("sections") or ()) or "none",
                                          part=f", part {band[0] + 1} of {band[1]} (the image shows that part)" if band else "",
                                          before=item.get("before") or "(start of the document)",
@@ -363,6 +400,10 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
                             baseline_problems=first if order == "baseline-first" else second,
                             variant_problems=second if order == "baseline-first" else first,
                             remarks=v.get("remarks", "").strip())
+                    if RUBRICS[rubric].get("claims"):  # each claim's mark, by side (A is the first set shown)
+                        first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
+                        verdicts[item["id"]][order]["claims"] = {first: _claim_marks(v.get("a_claims"), a),
+                                                                 second: _claim_marks(v.get("b_claims"), b)}
                 progress.add()
                 dispatch.submit(prompt, PairVerdict, [folder / item["image"]], None, finish)
         dispatch.drain()
@@ -408,6 +449,8 @@ def write_spotcheck(folder, seed=3):
     howto = PAIRWISE.split("Which set is better?")[1].split("{rubric}")[0].strip() + " " + RUBRICS["v4"]["addition"].strip()
     data = {"format": SPOTCHECK_FORMAT, "batch": folder.name, "items": items, "howto": " ".join(howto.split()),
             "problems": [{"name": k, "label": k, "help": v} for k, v in PAIR_PROBLEMS.items()],
+            "claim_problems": [{"name": k, "label": "duplicate" if k == "duplicates" else k, "help": v}
+                               for k, v in CLAIM_PROBLEMS.items()],
             "better": BETTER, "confidence": SURE}
     (folder / "spotcheck-order.json").write_text(json.dumps(order, indent=2) + "\n")
     page = (Path(__file__).with_name("spotcheck_page.html").read_text(encoding="utf-8")
@@ -425,23 +468,55 @@ def import_spotcheck(folder, answers_file):
     if data.get("format") != SPOTCHECK_FORMAT or data.get("batch") != folder.name:
         raise ValueError(f"{answers_file} isn't a spot-check answers file for {folder.name}")
     order = json.loads((folder / "spotcheck-order.json").read_text())
+    items = {i["id"]: i for i in json.loads((folder / "pairs.json").read_text(encoding="utf-8"))["items"]}
     verdicts = {}
     for a in data["answers"]:
         first = order.get(a["item"])
         if first is None:
             continue
         side = {"A": first, "B": "variant" if first == "baseline" else "baseline"}
+        marks = {"baseline": [], "variant": []}  # each marked claim, with the claim itself (A1 is baseline[0] or variant[0])
+        for letter, claims in (a.get("claims") or {}).items():
+            shown = items[a["item"]][side[letter]]
+            for k, c in sorted(claims.items(), key=lambda kv: int(kv[0])):
+                if int(k) < len(shown) and (c.get("mark") in CLAIM_MARKS or c.get("problems")):
+                    claim = {f: v for f, v in shown[int(k)].items() if not f.startswith("_")}
+                    marks[side[letter]].append({"index": int(k), "claim": claim, "mark": c.get("mark", ""),
+                                                "problems": sorted(set(c.get("problems") or ()) & set(CLAIM_PROBLEMS))})
         better = a.get("better", "")
         score = 0.5 if better == "same" else 1.0 if side.get(better) == "variant" else 0.0 if better in side else None
         key = "baseline-first" if first == "baseline" else "variant-first"
         verdicts[a["item"]] = {key: {"score": score, "better": better, "confidence": a.get("confidence", ""),
                                      "baseline_problems": a.get(f"{'a' if first == 'baseline' else 'b'}_problems", []),
                                      "variant_problems": a.get(f"{'a' if first == 'variant' else 'b'}_problems", []),
-                                     "note": a.get("note", ""), "remarks": a.get("note", "")}}
+                                     "note": a.get("note", ""), "remarks": a.get("note", ""), "claims": marks}}
     target = folder / "verdicts-human" / f"{reviewer_file(data['reviewer'])}.json"
     target.parent.mkdir(exist_ok=True)
     target.write_text(json.dumps({"reviewer": data["reviewer"], "verdicts": verdicts}, indent=2, ensure_ascii=False) + "\n")
     return target
+
+def _judge_claim_marks(folder):
+    """{(unit, side, index): mark} from judges who marked claims (rubric v5); a claim marked
+    differently by judges or orders is taken as unsure."""
+    marks = defaultdict(set)
+    for path in sorted((Path(folder) / "verdicts").glob("*.json")):
+        for unit, orders in json.loads(path.read_text(encoding="utf-8"))["verdicts"].items():
+            for v in orders.values():
+                for side, claims in (v.get("claims") or {}).items():
+                    for c in claims:
+                        marks[(unit, side, c["index"])].add(c["mark"])
+    return {k: next(iter(m)) if len(m) == 1 else "unsure" for k, m in marks.items()}
+
+def claim_shares(folder, verdicts_dir="verdicts"):
+    """Judges' marks per side (rubric v5): counts, and the share of marked claims that are wrong."""
+    counts = {"baseline": Counter(), "variant": Counter()}
+    for path in sorted((Path(folder) / verdicts_dir).glob("*.json")):
+        for orders in json.loads(path.read_text(encoding="utf-8"))["verdicts"].values():
+            for v in orders.values():
+                for side, claims in (v.get("claims") or {}).items():
+                    counts[side].update(c["mark"] for c in claims)
+    return {side: {**dict(c), "wrong_share": round(c["wrong"] / sum(c.values()), 3) if sum(c.values()) else None}
+            for side, c in counts.items()}
 
 def anchor(folder, human_dir="verdicts-human"):
     """People's verdicts against the judges' on the same units: agreement on which side is
@@ -458,7 +533,23 @@ def anchor(folder, human_dir="verdicts-human"):
         agree = sum(lean(person[u]) == lean(judges[u]) for u in both)
         opposite = sum(lean(person[u]) * lean(judges[u]) < 0 for u in both)
         fmt = lambda t: None if t is None else {"mean": round(t[0], 3), "low": round(t[1], 3), "high": round(t[2], 3)}
-        out[data["reviewer"]] = {"units": len(both), "same_lean": agree, "opposite": opposite,
+        # Claims marked one by one: the share marked wrong on each side (an absolute measure, which
+        # a preference between two sets isn't).
+        marked = {"baseline": Counter(), "variant": Counter()}
+        for orders in data["verdicts"].values():
+            for side, claims in (next(iter(orders.values())).get("claims") or {}).items():
+                marked[side].update(c["mark"] for c in claims if c["mark"])
+        wrong = {side: {**dict(c), "wrong_share": round(c["wrong"] / sum(c.values()), 3) if sum(c.values()) else None}
+                 for side, c in marked.items()}
+        # Where a judge marked claims too (rubric v5): agreement claim by claim, "unsure" left out.
+        judged = _judge_claim_marks(folder)
+        pairs = [(c["mark"], judged[(u, side, c["index"])]) for u, orders in data["verdicts"].items()
+                 for side, claims in (next(iter(orders.values())).get("claims") or {}).items() for c in claims
+                 if (u, side, c["index"]) in judged and "unsure" not in (c["mark"], judged[(u, side, c["index"])])
+                 and c["mark"]]
+        claim_agreement = {"claims": len(pairs), "same": sum(a == b for a, b in pairs)} if pairs else None
+        out[data["reviewer"]] = {"units": len(both), "same_lean": agree, "opposite": opposite, "claims_marked": wrong,
+                                 "claim_agreement_with_judges": claim_agreement,
                                  "person_win_rate": fmt(bootstrap([person[u] for u in both])),
                                  "judges_win_rate": fmt(bootstrap([judges[u] for u in both])),
                                  "disagreements": [u for u in both if lean(person[u]) * lean(judges[u]) < 0]}

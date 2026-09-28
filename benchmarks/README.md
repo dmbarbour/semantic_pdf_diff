@@ -47,13 +47,22 @@ Batches are kept small (about 15–20 items, 10–20 minutes) so a session fits 
 A spot check puts you in a judge's place. The items are the same page regions the panel compares. Two sets of claims read from one region are shown as A and B, in random order: one from round 0's queries, the other from the current champion. You aren't told which is which.
 
 1. Open `spotchecks/<name>/spotcheck.html` in a browser and type your name.
-2. For each item, say which set is better, tick the problems you see in each, and say how sure you are. A note is optional.
+2. For each item:
+   - **Mark the claims one by one** if that helps: ✓ right, ✗ wrong, ? unsure; click again to clear.
+     - Each claim can also carry its own problems.
+     - Each set's header keeps a tally and a colour bar, so you can judge from the columns rather than holding 10–20 claims in your head.
+   - **Then say which set is better,** tick the problems you see in each set (including missing facts), and say how sure you are. A note is optional.
    - The picture is the part of the page that was read; click it to enlarge.
    - The page's text layer and the text just before it are folded under the picture.
 3. Answer as many or as few as you like: nothing is preset, and your answers are saved in the browser.
 4. **Download answers** and put the file in the spot check's folder.
 
-Then `python scripts/spotcheck.py import <folder> <answers file>`, and `compare` shows where you and the panel agree and differ. Your verdicts are the anchor for the panel's: they say whether the round decisions track what a person would decide.
+Then `python scripts/spotcheck.py import <folder> <answers file>`, and `compare` shows:
+- where you and the panel agree and differ
+- the share of each side's claims you marked wrong (an absolute measure, which a preference between two sets isn't)
+- claim by claim, how often you and the judges agree, when the judges also mark claims (rubric v5)
+
+Your verdicts are the anchor for the panel's: they say whether the round decisions track what a person would decide.
 
 ## Panels of people (and sensitive documents)
 

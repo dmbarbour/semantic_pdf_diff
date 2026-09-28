@@ -215,6 +215,46 @@ class Rounds(unittest.TestCase):
         result = rounds.anchor(folder)['Dana Q']
         self.assertEqual(result['units'], 1)
 
+    def test_claims_are_marked_one_by_one_by_people_and_judges(self):
+        folder = self.root / 'spot-claims'
+        batch = rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=3, limit=5)
+        rounds.write_spotcheck(folder)
+        order = json.loads((folder / 'spotcheck-order.json').read_text())
+
+        class Marker(Judge):  # marks every claim of the first set shown wrong, the second right
+            def ask(self, prompt, schema, images=(), key=None):
+                self.prompts.append(prompt)
+                count = lambda letter: sum(1 for line in prompt.splitlines() if line.startswith(letter) and '. ' in line[:4])
+                return PairVerdict(better='B', note='marked', a_claims=[{'n': k + 1, 'mark': 'wrong', 'problems': ['misread']}
+                                                                       for k in range(count('A'))],
+                                   b_claims=[{'n': k + 1, 'mark': 'ok'} for k in range(count('B'))])
+        judge = Marker()
+        rounds.judge_pairs(folder, judge, 'marker', rubric='v5')
+        self.assertTrue(all('A1. ' in p for p in judge.prompts if 'SET A (all 0' not in p))
+        verdicts = json.loads((folder / 'verdicts' / 'marker.json').read_text())['verdicts']
+        some = next(u for u in verdicts if batch['items'][0]['id'] == u)
+        first = verdicts[some]['baseline-first']['claims']
+        self.assertTrue(all(c['mark'] == 'wrong' for c in first['baseline']))  # A was the baseline in that order
+        self.assertTrue(all(c['mark'] == 'ok' for c in first['variant']))
+        shares = rounds.claim_shares(folder)
+        for side in ('baseline', 'variant'):  # each claim was in set A once (wrong) and in set B once (right)
+            self.assertEqual(shares[side]['wrong'], shares[side]['ok'])
+            self.assertEqual(shares[side]['wrong_share'], 0.5)
+        # a person marks the first claim of set A right
+        item = batch['items'][0]
+        answers = [{'item': item['id'], 'better': 'A', 'a_problems': [], 'b_problems': [], 'confidence': 'low', 'note': '',
+                    'claims': {'A': {'0': {'mark': 'ok', 'problems': []}}, 'B': {}}}]
+        file = self.root / 'claim-answers.json'
+        file.write_text(json.dumps({'format': rounds.SPOTCHECK_FORMAT, 'batch': 'spot-claims', 'reviewer': 'Kim',
+                                    'answers': answers}))
+        mine = json.loads(rounds.import_spotcheck(folder, file).read_text())['verdicts'][item['id']]
+        marked = next(iter(mine.values()))['claims'][order[item['id']]]
+        self.assertEqual((marked[0]['index'], marked[0]['mark']), (0, 'ok'))
+        self.assertEqual(marked[0]['claim'], {k: v for k, v in item[order[item['id']]][0].items() if not k.startswith('_')})
+        result = rounds.anchor(folder)['Kim']
+        self.assertEqual(result['claims_marked'][order[item['id']]]['ok'], 1)
+        self.assertIsNone(result['claim_agreement_with_judges'])  # the judges' two orders disagreed there: unsure
+
     def test_bootstrap_and_rules(self):
         mean, low, high = rounds.bootstrap([1.0] * 40 + [0.0] * 10)
         self.assertAlmostEqual(mean, 0.8)
