@@ -51,7 +51,8 @@ A spot check puts you in a judge's place. The items are the same page regions th
    - **Mark the claims one by one** if that helps: ✓ right, ✗ wrong, ? unsure; click again to clear.
      - Each claim can also carry its own problems.
      - Each set's header keeps a tally and a colour bar, so you can judge from the columns rather than holding 10–20 claims in your head.
-   - **Then say which set is better,** tick the problems you see in each set (including missing facts), and say how sure you are. A note is optional.
+   - **Below the claims, each set's totals are computed from your marks.** That covers ✓/✗/? and each problem's count. The only thing to tick for a whole set is whether important facts are missing from it, since no single claim shows that.
+   - **Then say which set is better** and how sure you are. A note is optional. Folds you open stay open while you answer.
    - The picture is the part of the page that was read; click it to enlarge.
    - The page's text layer and the text just before it are folded under the picture.
 3. Answer as many or as few as you like: nothing is preset, and your answers are saved in the browser.

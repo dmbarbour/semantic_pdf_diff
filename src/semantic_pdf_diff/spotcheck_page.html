@@ -29,6 +29,7 @@ h2{font-size:15px;margin:0 0 6px}h3{font-size:13px;text-transform:uppercase;lett
 .marks button{border:0;border-radius:0;padding:2px 8px;min-width:28px;background:var(--card)}.marks button+button{border-left:1px solid var(--line)}
 .marks button.on[data-m=ok]{background:var(--ok);color:#fff}.marks button.on[data-m=wrong]{background:var(--bad);color:#fff}.marks button.on[data-m=unsure]{background:var(--unsure);color:#fff}
 .claimtags{grid-column:2;font-size:12px}.claimtags summary{color:var(--muted)}.claimtags label{display:inline-block;margin:2px 6px 0 0;cursor:pointer}
+.setsum{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .tally{font-size:13px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;margin-left:6px}
 .bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--line);margin:4px 0 8px}.bar span{display:block}
 .opts{display:flex;flex-wrap:wrap;gap:6px}.opts label{border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
@@ -99,14 +100,32 @@ function claims(side, list, a) {
         `<button type="button" data-m="${m.m}" title="${esc(m.help)}" class="${got.mark === m.m ? 'on' : ''}">${m.label}</button>`).join('') + '</span>'
       + `<div><span class="n">${side}${k + 1}</span><span class="v">${esc(c.entity)} · ${esc(c.attribute)} = ${esc(c.value)}${c.unit ? ' ' + esc(c.unit) : ''}</span>`
       + (c.conditions ? ` <span class="muted">(${esc(c.conditions)})</span>` : '') + `<span class="q">“${esc(c.quote)}”</span></div>`
-      + `<details class="claimtags" ${got.problems.length ? 'open' : ''}><summary>problems${got.problems.length ? ': ' + esc(got.problems.join(', ')) : ''}</summary>${tags}</details></li>`;
+      + fold(`tags:${side}${k}`, 'problems' + (got.problems.length ? ': ' + esc(got.problems.join(', ')) : ''), tags, 'claimtags') + '</li>';
   }).join('') + '</ol>';
 }
+// Folds you open stay open while you answer (every answer redraws the item).
+const OPEN = new Set();
+const fold = (key, summary, body, cls = '') =>
+  `<details class="${cls}" data-key="${esc(current().id + '|' + key)}" ${OPEN.has(current().id + '|' + key) ? 'open' : ''}><summary>${summary}</summary>${body}</details>`;
 function choice(name, options, value) {
   return '<div class="opts">' + options.map(o => `<label title="${esc(o.help || '')}"><input type="radio" name="${name}" value="${o.name}" ${value === o.name ? 'checked' : ''}>${esc(o.label)}</label>`).join('') + '</div>';
 }
-function tags(name, chosen) {
-  return '<div class="opts tags">' + DATA.problems.map(p => `<label title="${esc(p.help)}"><input type="checkbox" name="${name}" value="${p.name}" ${chosen.includes(p.name) ? 'checked' : ''}>${esc(p.label)}</label>`).join('') + '</div>';
+// Each set's problems are totalled from its claims' tags; only missing facts, which no claim
+// shows, are ticked for the set (plus anything ticked for the set before the totals existed).
+function claimProblems(a, side) {
+  const counts = {};
+  Object.values(a.claims[side]).forEach(c => c.problems.forEach(p => counts[p] = (counts[p] || 0) + 1));
+  return counts;
+}
+function setSummary(side, it, a) {
+  const key = side === 'A' ? 'a_problems' : 'b_problems', counts = claimProblems(a, side);
+  const totals = Object.keys(counts).length ? Object.entries(counts).map(([p, n]) => `${esc(p)} ×${n}`).join(' · ') : 'none tagged yet';
+  const shown = DATA.problems.filter(p => p.name === 'missing' || a[key].includes(p.name));
+  return `<div class="setsum"><b>Set ${side}</b> <span class="tally">${tally(side, it[side], a).text}</span>`
+    + `<div class="muted">Problems tagged on its claims: ${totals}</div><div class="opts tags">` + shown.map(p =>
+      `<label title="${esc(p.help)}"><input type="checkbox" name="${key}" value="${p.name}" ${a[key].includes(p.name) ? 'checked' : ''}>`
+      + (p.name === 'missing' ? 'important facts are missing from this set' : `${esc(p.label)} (ticked for the whole set)`) + '</label>').join('')
+    + '</div></div>';
 }
 function show() {
   const it = current(), a = answer();
@@ -114,15 +133,14 @@ function show() {
     + `<div class="top"><div><img src="${esc(it.image)}" alt="the part of the page read"><div class="muted">Click to enlarge.</div></div><div>`
     + (it.headings ? `<div class="muted">Under the headings: ${esc(it.headings)}</div>` : '')
     + (it.within ? `<div class="muted">Within: ${esc(it.within)}</div>` : '')
-    + (it.before ? `<details><summary class="muted">Text just before it</summary><pre>…${esc(it.before)}</pre></details>` : '')
-    + `<details><summary class="muted">Its text layer (what the PDF says in text)</summary><pre>${esc(it.page_text)}</pre></details></div></div>`
+    + (it.before ? fold('before', '<span class="muted">Text just before it</span>', `<pre>…${esc(it.before)}</pre>`) : '')
+    + fold('layer', '<span class="muted">Its text layer (what the PDF says in text)</span>', `<pre>${esc(it.page_text)}</pre>`) + '</div></div>'
     + `<div class="sets" style="margin-top:12px">` + ['A', 'B'].map(side => {
         const t = tally(side, it[side], a);
         return `<div class="set"><h3>Set ${side} (${esc(side === 'A' ? it.a_note : it.b_note)})<span class="tally">${t.text}</span></h3>${t.bar}${claims(side, it[side], a)}</div>`;
       }).join('') + '</div>' 
+    + `<h3>Each set, from your marks</h3><div class="sets">${setSummary('A', it, a)}${setSummary('B', it, a)}</div>`
     + `<h3>Which set is better?</h3>` + choice('better', DATA.better, a.better)
-    + `<h3>Problems in set A (any)</h3>` + tags('a_problems', a.a_problems)
-    + `<h3>Problems in set B (any)</h3>` + tags('b_problems', a.b_problems)
     + `<h3>How sure are you?</h3>` + choice('confidence', DATA.confidence, a.confidence)
     + `<h3>Note (optional): anything we should know</h3><textarea name="note" placeholder="What decided it, what both sets miss, what was hard to judge…">${esc(a.note)}</textarea>`;
   $('#item').innerHTML = html;
@@ -141,6 +159,10 @@ $('#item').addEventListener('change', e => {
   }
   save(); show();
 });
+$('#item').addEventListener('toggle', e => {
+  const key = e.target.dataset && e.target.dataset.key;
+  if (key) e.target.open ? OPEN.add(key) : OPEN.delete(key);
+}, true);
 $('#item').addEventListener('input', e => { if (e.target.name === 'note') { answer().note = e.target.value; save(); } });
 $('#item').addEventListener('click', e => {
   if (e.target.tagName === 'IMG') { $('#zoom img').src = e.target.src; $('#zoom').style.display = 'block'; return; }
@@ -169,7 +191,8 @@ function answersFile() {  // only what was answered
     for (const side of ['A', 'B']) {
       claims[side] = Object.fromEntries(Object.entries(a.claims[side] || {}).filter(([, c]) => c.mark || c.problems.length));
     }
-    return {item: i.id, ...a, claims};
+    const union = (side, ticked) => [...new Set([...ticked, ...Object.keys(claimProblems(a, side))])];
+    return {item: i.id, ...a, a_problems: union('A', a.a_problems), b_problems: union('B', a.b_problems), claims};
   });
   return JSON.stringify({format: DATA.format, version: 2, batch: DATA.batch, reviewer: state.reviewer || 'anonymous',
     created: new Date().toISOString().slice(0, 10), answers: out}, null, 2);
