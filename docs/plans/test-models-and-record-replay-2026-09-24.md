@@ -84,11 +84,36 @@ Reordered 2026-09-25 (see *Decisions*): a cheap hosted gemma-4 makes live record
 5. Collection rounds (`collect` mode, export work lists, import answers) for a Claude table and the weak local VLM.
 6. *Deferred:* the **recording kit** and a table recorded in-house, if the in-house deployment's answers differ enough from hosted gemma-4 to matter.
 
+## Decisions (2026-09-28)
+
+**Requests are keyed by what reaches the model** (the owner: "it roughly allows us to treat queries as content-addressed, and essentially build triples of 'how model M responded to query HASH' for replay, albeit with some extra accounting for failures").
+- **Supersedes the semantic keys and fingerprint above.** The [meta-audit](../reviews/meta-audit-2026-09-28.md) found them kept in step with the prompt by hand: a lever that added a slot needed its own key suffix (the chart rules nearly weren't keyed), the locator thumbnail still isn't keyed, and table numbers are keyed without reaching the model.
+- **The owner on why this is better:** it is robust not only to whether a lever applies to a query, but to how it applies.
+- **Levers:** tracking which levers contribute to which queries is needed only for diagnostics.
+  - Per query, the levers observed while building it may be recorded.
+  - They don't affect the query's hash.
+  - They needn't be in the fixture record, unless as a secondary, less reliable identifier.
+- **Looking at queries:** "Ability to easily dump, view, and validate sample queries by a high-end model or human certainly would be good to avoid wasting time on obvious errors."
+
+Proposed details (mine, not yet reviewed):
+- **What the hash covers:**
+  - the system and user text
+  - each image's bytes
+  - the response schema or format
+  - generation settings (output tokens, temperature, seed)
+  - Not the model (it's the M of the triple) nor transport (streaming, timeouts).
+- **Images by bytes:** fixtures already pin the PDF library's version and replay tests skip under another, so the semantic keys' reason for keying crops by their recipe mostly falls away.
+- **Failures:** each response records its outcome. Permanent failures (invalid answers) replay; transient ones (timeouts, 5xx) are asked again, as `record-new` does now.
+- **Repeated answers:** a sample number, (M, hash, n), replaces the A/A control's `#fresh` responder suffix.
+- **Labels, not identity:** kind, region, content, page and task stay as columns for summaries, pruning and lookups (the spot check's "read from").
+- **Migration without re-recording:** only a hash of the system prompt is stored, so re-key by replaying. Each request is rebuilt; an answer whose rebuilt prompt and images match the recorded ones is stored under its new key. Mismatches are stale and dropped.
+- **Checks:** a drift check on every replay (the rebuilt request equals the recorded one), and every setting classified (endpoint, request-shaping, request-selecting, post-processing).
+
 ## Decisions (2026-09-25)
 
 - **Hosted gemma-4 for recording.** The owner bought pay-go access to `google/gemma-4-31B-it` on DeepInfra (OpenAI-compatible; about $0.13 per million input tokens). A 24-page slice pair with comparisons cost about $0.26. It is slow per request (about 13 generated tokens/s), so recording runs at high concurrency.
 - **Record by running the pipeline live** (`--fixture-mode replay-or-record`): one run records every adaptive round (refinement, re-asks, comparisons), so rounds of collection aren't needed for callable models.
-- **Fixture keys:** the response cache's semantic key (the comparison key without its settings hash) plus an interpreter *fingerprint*: prompts and output-shaping settings, without the model (the responder stands for it) or library versions. Fixtures record the PyMuPDF version; replay tests skip under another version, since text and renderings may differ.
+- **Fixture keys** (superseded 2026-09-28: keyed by what reaches the model): the response cache's semantic key (the comparison key without its settings hash) plus an interpreter *fingerprint*: prompts and output-shaping settings, without the model (the responder stands for it) or library versions. Fixtures record the PyMuPDF version; replay tests skip under another version, since text and renderings may differ.
 - **Slices, not whole documents,** for recording cost and replay-test speed. Cutting is byte-deterministic for a given PyMuPDF version, pinned in `slices.json`.
 - **Iterating on prompts:** after a change, top up with `replay-or-record` (only requests whose key or fingerprint changed are asked), then `fixtures prune --unused-since <time before the runs>` drops answers no current run uses, and `fixtures pack`. Last-use times aren't packed, so the zip changes only when answers do.
 - **The in-house recording kit is deferred:** hosted gemma-4 covers realistic answers; the kit returns if the in-house deployment's answers differ enough to matter.
