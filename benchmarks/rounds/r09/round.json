@@ -1,0 +1,33 @@
+{
+  "name": "r09",
+  "set": "dev",
+  "note": "The first round with the revised method (fixed samples, MiMo with Qwen escalation, rubric v4, banded units): excerpt quotes kept, and an A/A control re-asking the champion's image tasks.",
+  "baseline": "variants/baseline.json",
+  "variants": {
+    "excerpts": "variants/excerpts.json",
+    "aa": {
+      "settings": "variants/baseline.json",
+      "fresh": [
+        "tile",
+        "figure",
+        "overview"
+      ]
+    }
+  },
+  "extract_only": true,
+  "units": 32,
+  "chunk": 8,
+  "cap": 5.0,
+  "judge_timeout": 450,
+  "judge_retries": 0,
+  "rubric": "v4",
+  "judges": [
+    "XiaomiMiMo/MiMo-V2.6-Pro"
+  ],
+  "escalate": [
+    "Qwen/Qwen3.5-397B-A17B"
+  ],
+  "confirm_judges": [],
+  "confirm_units": 16,
+  "hypotheses": "docs/reviews/round-09-2026-09-28.md"
+}
