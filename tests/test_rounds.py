@@ -166,6 +166,36 @@ class Rounds(unittest.TestCase):
             decision = rounds.decide(folder)
             self.assertEqual(decision['strata_units']['table'], 2)
             self.assertTrue(decision['decision'].startswith('accepted'))  # two lost tables don't block
+            self.assertEqual(decision['borderline'], [])
+
+    def test_document_families_are_strata_too(self):
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            items = [{'id': f'r{i}', 'family': 'text', 'run': 'report-a'} for i in range(14)] + \
+                    [{'id': f'd{i}', 'family': 'text', 'run': 'sheets-b'} for i in range(6)]
+            (folder / 'pairs.json').write_text(json.dumps({'items': items, 'units': {'units': 20, 'unchanged': 0}}))
+            (folder / 'verdicts').mkdir()
+            win = {'baseline-first': {'score': 1.0}, 'variant-first': {'score': 1.0}}
+            loss = {'baseline-first': {'score': 0.0}, 'variant-first': {'score': 0.0}}
+            (folder / 'verdicts' / 'j.json').write_text(json.dumps({'reviewer': 'j', 'verdicts': {
+                **{f'r{i}': win for i in range(14)}, **{f'd{i}': loss for i in range(6)}}}))
+            self.assertEqual(rounds.decide(folder)['decision'], 'accepted: wins')  # the kinds alone: all text
+            decision = rounds.decide(folder, documents={'report-a': 'reports', 'sheets-b': 'drawings'})
+            self.assertEqual(decision['decision'], 'rejected: loses in drawings')
+            self.assertEqual(decision['strata_units'], {'text': 20, 'drawings': 6, 'reports': 14})
+
+    def test_a_bound_near_its_threshold_is_flagged(self):
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            outcomes = [1.0] * 13 + [0.5] * 6 + [0.0] * 5  # low bound 0.524: a win, but only just
+            items = [{'id': f't{i}', 'family': 'text'} for i in range(len(outcomes))]
+            (folder / 'pairs.json').write_text(json.dumps({'items': items, 'units': {'units': 24, 'unchanged': 0}}))
+            (folder / 'verdicts').mkdir()
+            (folder / 'verdicts' / 'j.json').write_text(json.dumps({'reviewer': 'j', 'verdicts': {
+                f't{i}': {'baseline-first': {'score': x}, 'variant-first': {'score': x}} for i, x in enumerate(outcomes)}}))
+            decision = rounds.decide(folder)
+            self.assertEqual(decision['decision'], 'accepted: wins')
+            self.assertEqual(decision['borderline'], ['overall low 0.524 near 0.5'])
 
     def test_failed_verdicts_are_not_asked_again_until_the_retry(self):
         folder = self.root / 'batch-retry'
@@ -276,11 +306,84 @@ class Rounds(unittest.TestCase):
         page = rounds.write_spotcheck(folder).read_text()
         self.assertIn('Pump 10 kW', page)  # a text claim's input, shown with it
 
-    def test_bootstrap_and_rules(self):
-        mean, low, high = rounds.bootstrap([1.0] * 40 + [0.0] * 10)
+    def test_judges_see_the_whole_page_and_every_claim_grouped(self):
+        folder = self.root / 'spot-whole'
+        rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=4, limit=1)
+        with self.assertRaises(ValueError):  # v6 needs the whole page first
+            rounds.judge_pairs(folder, Judge(), 'early', rubric='v6')
+        batch = rounds.add_context(folder, self.root / 'baseline', self.root / 'variant', n=4, limit=1)
+
+        class Grouped(Judge):  # shared claims right, A's own wrong, B's own unsure
+            def ask(self, prompt, schema, images=(), key=None):
+                self.prompts.append(prompt)
+                self.images = getattr(self, 'images', []) + [list(images)]
+                count = lambda letter: sum(1 for line in prompt.splitlines() if line.startswith(letter) and '. ' in line[:4])
+                marks = lambda letter, mark: [{'n': k + 1, 'mark': mark} for k in range(count(letter))]
+                return PairVerdict(better='B', s_claims=marks('S', 'ok'), a_claims=marks('A', 'wrong'),
+                                   b_claims=marks('B', 'unsure'))
+        judge = Grouped()
+        rounds.judge_pairs(folder, judge, 'grouped', rubric='v6')
+        self.assertTrue(all('CLAIMS IN BOTH SETS' in p and "The whole page's text layer" in p for p in judge.prompts))
+        for prompt, images in zip(judge.prompts, judge.images):  # a band: its crop, then the page with it outlined
+            self.assertEqual(len(images), 2 if 'The first image shows this part' in prompt else 1)
+        self.assertEqual(any(len(i) == 2 for i in judge.images), any(i['band'] for i in batch['items']))
+        verdicts = json.loads((folder / 'verdicts' / 'grouped.json').read_text())['verdicts']
+        for item in batch['items']:
+            shared = {rounds._ident(c) for c in item['baseline']} & {rounds._ident(c) for c in item['variant']}
+            for order, v in verdicts[item['id']].items():
+                own = {'baseline': 'wrong', 'variant': 'unsure'} if order == 'baseline-first' else \
+                      {'variant': 'wrong', 'baseline': 'unsure'}
+                for side in ('baseline', 'variant'):
+                    self.assertEqual(sorted(m['index'] for m in v['claims'][side]), list(range(len(item[side]))))
+                    for m in v['claims'][side]:  # each mark lands on its own claim, at the side's own index
+                        claim = item[side][m['index']]
+                        self.assertEqual(m['claim'], {k: x for k, x in claim.items() if not k.startswith('_')})
+                        self.assertEqual(m['mark'], 'ok' if rounds._ident(claim) in shared else own[side])
+
+    def test_units_show_each_reading_as_its_own_task_gave_it(self):
+        from types import SimpleNamespace
+        from semantic_pdf_diff.models import Claim, Evidence, PdfLocator, claim_id
+        from semantic_pdf_diff.store import Store
+        content = 'sha256:' + 'a' * 64 + '.pdf'
+        def reading(entity, attribute, task, region):
+            claim = Claim(entity=entity, attribute=attribute, value='10', unit='kW', kind='text', quote='10 kW',
+                          confidence=.9)
+            return Evidence(**claim.model_dump(), id=claim_id(content, claim), content=content,
+                            locator=PdfLocator(page=1, bbox=(0, 0, 300, 300), region=region, task=task))
+        with tempfile.TemporaryDirectory() as d, \
+                patch.object(Store, 'files', lambda self, source=None: [SimpleNamespace(content=content)]):
+            # A text lever rewords the text reading; the tile's reading of the same fact is untouched.
+            for side, words in (('base', ('Pump', 'power')), ('var', ('Pump P-1', 'power'))):
+                with Store(Path(d) / side / 'run1') as store:
+                    store.db.execute("INSERT INTO content (id, size) VALUES (?, 1)", (content,))
+                    for task, region, (entity, attribute) in (('text:p1:0', 'text', words),
+                                                               ('tile:p1:0', 'tile', ('pump P-1', 'rated power'))):
+                        store.record_task({'content': content, 'page': 1, 'task': task, 'status': 'complete', 'claims': 1},
+                                          [reading(entity, attribute, task, region)])
+                    store.set_reconcile(True)
+                    self.assertEqual(len(store.evidence(content)), 1)  # one fact, two readings
+            base, var = rounds.collect(Path(d) / 'base'), rounds.collect(Path(d) / 'var')
+            visual = ('run1', content, 1, 'visual')
+            self.assertEqual(base[visual]['claims'], var[visual]['claims'])  # unchanged: not a changed unit
+            self.assertEqual(next(iter(var[visual]['claims'].values()))['entity'], 'pump P-1')  # the tile's own words
+            text = ('run1', content, 1, 'text')
+            self.assertNotEqual(set(base[text]['claims']), set(var[text]['claims']))
+
+    def test_intervals_and_rules(self):
+        mean, low, high = rounds.interval([1.0] * 40 + [0.0] * 10)
         self.assertAlmostEqual(mean, 0.8)
         self.assertTrue(0.65 < low < 0.8 < high < 0.92)
-        self.assertIsNone(rounds.bootstrap([]))
+        self.assertIsNone(rounds.interval([]))
+        self.assertEqual(rounds.interval([1.0, 0.0], clusters=['r', 'r']), (0.5, 0.0, 1.0))  # one region: no information
+        self.assertAlmostEqual(rounds._t_quantile(0.90, 10), 1.812, places=3)
+        # Bands of one region move together: counted as one, the interval widens.
+        values = [1.0] * 24 + [0.0] * 8
+        regions = [f'u-r-p{i // 4}-table' for i in range(32)]  # 8 regions of 4 bands, all alike within
+        _, low, high = rounds.interval(values)
+        _, clustered_low, clustered_high = rounds.interval(values, clusters=regions)
+        self.assertLess(clustered_low, low - 0.08)
+        self.assertGreater(clustered_high, high)
+        self.assertEqual(rounds.region('u-habex-52da8af4-p4-table-b2of4'), 'u-habex-52da8af4-p4-table')
 
 class Report(unittest.TestCase):
     def test_every_recorded_figure_is_drawn(self):

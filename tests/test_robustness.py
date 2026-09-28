@@ -103,6 +103,20 @@ class ResponseShapeTests(unittest.TestCase):
             self.assertEqual(len(read(Path(d) / 'ledger.jsonl')), 2)  # the bad answer was paid for too
             self.assertAlmostEqual(client.cost, 0.002)
 
+    def test_a_stream_cut_off_before_its_usage_is_marked_unpriced(self):
+        from semantic_pdf_diff.ledger import Ledger, read, unpriced
+        cut = f'data: {json.dumps({"choices": [{"delta": {"content": EMPTY[:15]}}]})}\n\n'  # no usage, no [DONE]
+        paid = {'prompt_tokens': 10, 'completion_tokens': 5, 'estimated_cost': 0.001}
+        with tempfile.TemporaryDirectory() as d, \
+                stub([(200, {'Content-Type': 'text/event-stream'}, cut.encode()), reply(EMPTY, usage=paid)]) as (url, _):
+            client = Client(Settings(base_url=url, retries=1, max_cost=1.0), Path(d) / 'cache')
+            client.ledger = Ledger(Path(d) / 'ledger.jsonl', round='t')
+            with patch('semantic_pdf_diff.llm.time.sleep'), self.assertLogs('semantic_pdf_diff', 'WARNING'):
+                self.assertTrue(client.ask('x', Extraction).complete)
+            rows = read(Path(d) / 'ledger.jsonl')
+            self.assertEqual([r.get('unpriced', False) for r in rows], [True, False])
+            self.assertEqual((client.unpriced, unpriced(Path(d) / 'ledger.jsonl', round='t')), (1, 1))
+
     def test_a_connection_dropped_mid_answer_is_retried(self):
         truncated = (200, {'Content-Length': '500'}, b'{"choices": [')  # promises more than it sends
         with patch('semantic_pdf_diff.llm.time.sleep'):

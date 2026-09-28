@@ -7,7 +7,7 @@ A round is a folder, e.g. benchmarks/rounds/r01/, holding round.json:
                   "aa": {"settings": "variants/baseline.json", "fresh": ["tile", "figure", "overview"]}},
      "set": "dev", "units": 32, "cap": 10.0,     # every variant judged to "units" and decided once
      "judge_timeout": 450, "judge_retries": 0,   # a stalled judge otherwise holds a chunk for 30 minutes
-     "rubric": "v4",                             # judging rubric (rounds.RUBRICS); default v1
+     "rubric": "v6",                             # judging rubric (rounds.RUBRICS); default v1
      "escalate": ["Qwen/Qwen3.5-397B-A17B"],     # second opinions on units the main judges leave unsettled
      "confirm_judges": [], "confirm_units": 16,  # expensive judges for accepted variants, when wanted
      "judges": ["XiaomiMiMo/MiMo-V2.6-Pro"]}    # the main judges see every unit
@@ -30,6 +30,8 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(Path(__file__).parent))
 
 FIXTURE = ROOT / "tests/fixtures/slices.sqlite"
+# Each slice's document family (reports, drawings, manuals, rules): strata alongside the kinds of region.
+DOCUMENTS = {s["name"]: s.get("family") for s in json.loads((ROOT / "scripts/slices.json").read_text())["slices"]}
 LEDGER = ROOT / "benchmarks/ledger.jsonl"
 HISTORY = ROOT / "benchmarks/history.jsonl"
 REPORT = ROOT / "benchmarks/report.html"
@@ -67,6 +69,8 @@ def main(argv=None):
 
     def spent_figure(step):
         figure("spent", ledger.spent(LEDGER, round=name, step=step), step=step)
+        if (n := ledger.unpriced(LEDGER, round=name, step=step)):  # responses whose cost wasn't reported
+            figure("unpriced_responses", n, step=step)
 
     # A variant is a settings path, or {"settings": path, "unit": "page"} for variants that move claims between kinds.
     settings_of = lambda value: value["settings"] if isinstance(value, dict) else value
@@ -141,6 +145,9 @@ def main(argv=None):
         if wanted("pairs") and not done(f"pairs:{v}") and done(f"replay:{v}") and done("replay:baseline"):
             built = rounds.build_batch(runs_root / "baseline", runs_root / v, batch, n=int(spec.get("units", 60)),
                                        unit=unit_of(spec["variants"][v]))
+            if rounds.RUBRICS[spec.get("rubric", "v1")].get("whole"):  # the whole page and every claim (v6)
+                rounds.add_context(batch, runs_root / "baseline", runs_root / v, n=int(spec.get("units", 60)),
+                                   fixture=FIXTURE, unit=unit_of(spec["variants"][v]))
             figure("units_changed", built["units"]["units"] - built["units"]["unchanged"], variant=v, step="pairs")
             figure("units_total", built["units"]["units"], variant=v, step="pairs")
             mark(f"pairs:{v}", "done")
@@ -190,25 +197,30 @@ def main(argv=None):
         client.ledger = Ledger(LEDGER, round=name, step=step, variant=v, judge=model)
         _, _, failures = rounds.judge_pairs(batch, client, model, limit=upto, rubric=rubric, only=only,
                                             retry_failed=retry_failed, verdicts_dir=verdicts_dir)
-        state.setdefault("failures", {})[f"{step}:{v}:{model}"] = len(failures)
+        # Failed verdicts over the whole round, not the last call's (the audit, 2026-09-28: each call
+        # overwrote the count, so an escalation judge's failures read 0).
+        key = f"{step}:{v}:{model}"
+        state.setdefault("failures", {})[key] = state["failures"].get(key, 0) + len(failures)
         if failures:  # why, for diagnosis (a judge that times out on long units, say)
-            state.setdefault("failure_notes", {})[f"{step}:{v}:{model}"] = [f[:300] for f in failures]
+            notes = state.setdefault("failure_notes", {})
+            notes[key] = (notes.get(key, []) + [f[:300] for f in failures])[-50:]
         if client.out_of_budget:
             raise Paused(f"{client.out_of_budget} while judging {v}")
 
-    def settle(v, upto):
-        """Second opinions where the main judges leave units unsettled."""
+    def settle(v, upto, retry_failed=False):
+        """Second opinions where the main judges leave units unsettled; retry_failed asks the second
+        judges' failed verdicts once more, as the main judges' are (these are the long, hard units)."""
         if escalate:
             only = rounds.unsettled(folder / f"pairs-{v}", judges, upto)
             state.setdefault("escalated", {})[v] = sorted(only)
             for model in escalate:
                 if only:
-                    ask(v, model, upto, only=only)
+                    ask(v, model, upto, only=only, retry_failed=retry_failed)
 
     def finish_variant(v, reason):
         batch = folder / f"pairs-{v}"
         stopped[v] = reason
-        result = rounds.decide(batch, judged[v])
+        result = rounds.decide(batch, judged[v], documents=DOCUMENTS)
         (batch / "decision.json").write_text(json.dumps({**result, "stopped": reason}, indent=2) + "\n")
         insights.analyse(batch, judged[v])  # the clues to why: agreement, changes, issues, tags, remarks
         if result["overall"]:
@@ -229,7 +241,7 @@ def main(argv=None):
         units = min(int(spec.get("confirm_units", 16)), judged[v])
         for model in judges_:
             ask(v, model, units, step="confirm", verdicts_dir="verdicts-confirm")
-        result = rounds.decide(batch, units, verdicts_dir="verdicts-confirm")
+        result = rounds.decide(batch, units, verdicts_dir="verdicts-confirm", documents=DOCUMENTS)
         (batch / "decision-confirm.json").write_text(json.dumps({**result, "judges": judges_}, indent=2) + "\n")
         if result["overall"]:
             figure("win_rate_confirm", result["overall"], variant=v, stratum="all", step="confirm", units=units)
@@ -249,7 +261,7 @@ def main(argv=None):
                     judged[v] = upto
                     state.pop("paused", None)
                     save_state()
-                    result = rounds.decide(batch, upto)
+                    result = rounds.decide(batch, upto, documents=DOCUMENTS)
                     if result["overall"]:
                         figure("win_rate_interim", result["overall"], variant=v, stratum="all", step="judge", units=upto)
                     if early and upto >= minimum and result["decision"].startswith(("accepted", "rejected")):
@@ -257,7 +269,7 @@ def main(argv=None):
                     elif upto >= min(target, available):
                         for model in judges:  # failed verdicts, once more
                             ask(v, model, upto, retry_failed=True)
-                        settle(v, upto)
+                        settle(v, upto, retry_failed=True)
                         finish_variant(v, f"complete at {upto} units")
                     if v in stopped:
                         active.remove(v)

@@ -191,6 +191,7 @@ class Client:
         self.out_of_budget = None   # why sending stopped, once it has
         self.ledger = None          # a ledger.Ledger to record every paid attempt's cost
         self.warned_cost = False
+        self.unpriced = 0           # responses without a reported cost (see Ledger.add)
         self.lock = threading.Lock()
         self.limiter = RateLimiter(settings.rate_limits)
         self.gate = AdaptiveGate(settings.concurrency)
@@ -362,11 +363,17 @@ class Client:
                                      if isinstance(usage.get(k), (int, float))}
                     with self.lock:  # every attempt is paid for, including ones retried after a bad answer
                         self.cost += float(request.usage.get("estimated_cost") or 0.0)
-                        if self.ledger is not None and request.usage:
+                        if self.ledger is not None:  # without a cost too: marked unpriced, not left out
                             self.ledger.add(self.s.model, request.key[0] if request.key else "raw", request.usage)
-                        if self.s.max_cost is not None and "estimated_cost" not in request.usage and not self.warned_cost:
-                            self.warned_cost = True
-                            log.warning("The endpoint reports no cost in its usage: --max-cost can't be enforced")
+                        if "estimated_cost" not in request.usage:
+                            self.unpriced += 1
+                            if self.s.max_cost is not None and not self.warned_cost:
+                                self.warned_cost = True
+                                shape = {"keys": sorted(result), "finish": ((result.get("choices") or [{}])[0] or {}).get(
+                                    "finish_reason"), "usage": usage}
+                                log.warning("A response came without a cost (%s): it may still be billed, so the "
+                                            "cost cap can be overrun; the ledger marks such responses unpriced",
+                                            json.dumps(shape, default=str)[:300])
                 with self.lock:
                     for k in self.usage:
                         n = int(usage.get(k) or 0) if isinstance(usage, dict) else 0

@@ -192,6 +192,7 @@ class PairVerdict(Lenient):
     a_problems: list[str] = Field(default_factory=list)  # rubric v2 on (rounds.PAIR_PROBLEMS)
     b_problems: list[str] = Field(default_factory=list)
     remarks: str = Field(default="", max_length=1500)    # for the maintainers, optional
+    s_claims: list[dict] = Field(default_factory=list)   # rubric v6: claims both sets make, marked once
     a_claims: list[dict] = Field(default_factory=list)   # rubric v5: each claim's mark, by number
     b_claims: list[dict] = Field(default_factory=list)
 

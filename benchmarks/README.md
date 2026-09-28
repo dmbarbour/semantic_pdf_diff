@@ -61,7 +61,9 @@ A spot check puts you in a judge's place. The items are the same page regions th
 Then `python scripts/spotcheck.py import <folder> <answers file>`, and `compare` shows:
 - where you and the panel agree and differ
 - the share of each side's claims you marked wrong: a measure of each set on its own, which a preference between two sets isn't. Like every rater's, your marks are weighed as evidence, not taken as ground truth.
-- claim by claim, how often you and the judges agree, when the judges also mark claims (rubric v5)
+- claim by claim, how often you and the judges agree, when the judges also mark claims (rubric v5 or v6)
+
+`judge --rubric v6` asks the panel again with what the page shows you: the whole page with the part outlined, the whole page's text, and every claim, those in both sets listed once. Its verdicts go to `verdicts-v6/`, beside the first ones; `compare --rubric v6` compares against them.
 
 Your verdicts are the anchor for the panel's: they say whether the round decisions track what a person would decide.
 

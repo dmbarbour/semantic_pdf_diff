@@ -5,10 +5,11 @@ and overviews) in one document. Each variant's claims for a unit come from its o
 store, so variants that change chunking or tiling still compare page for page. Panel models
 judge each unit twice, with the two claim sets in both orders (cancelling position bias).
 A unit scores 1 when the variant wins, 0.5 for a tie, 0 when the baseline wins; results
-get bootstrap intervals, overall and per stratum, and acceptance rules decide the round.
+get intervals (clustered by page region), overall and per stratum, and acceptance rules decide the round.
 See docs/plans/query-improvement-2026-09-26.md.
 """
 import json
+import math
 import random
 import re
 from collections import Counter, defaultdict
@@ -25,11 +26,19 @@ def _reader(runs_dir):
     settings = json.loads(path.read_text()) if path.exists() else {}
     return lambda store, content: store.evidence(content, reconcile=True if settings.get("reconcile") else None)
 
+UNIT_CLAIMS = "own readings"  # how collect words a unit's claims (batches record it; see collect)
+
 def collect(runs_dir, unit="family"):
     """{(run, content, page, family): {"claims": {id: claim}, "tasks": n}} for every store under runs_dir.
 
     unit="page" merges a page's kinds into one unit ("page"): for variants that move claims
-    between kinds (e.g. dropping false tables whose facts the tiles also read)."""
+    between kinds (e.g. dropping false tables whose facts the tiles also read).
+
+    With readings of one fact merged, a unit shows each merged claim once, as its own tasks read
+    it: the first sighting in the unit, in that sighting's own words and under that reading's ID.
+    Until 2026-09-28 a unit showed the merged claim's representative wording (often a text
+    reading's), so a text lever changed visual units whose readings hadn't changed (the audit:
+    4-7 of 9-14 visual units in r09's batches), and counted one change in two units."""
     family_of = (lambda region: FAMILY.get(region)) if unit == "family" else (lambda region: "page" if region in FAMILY else None)
     from .store import Store
     units = defaultdict(lambda: {"claims": {}, "tasks": 0})
@@ -44,15 +53,26 @@ def collect(runs_dir, unit="family"):
                     family = family_of(row["task"].split(":")[0])
                     if family and row.get("page"):
                         units[(folder.name, content, row["page"], family)]["tasks"] += 1
-                for e in read(store, content):
+                from .readings import wording
+                merged = read(store, content)
+                readings = {}  # (task, quote, wording) -> the reading as its task gave it
+                for r in (store.evidence(content, reconcile=False) if any(e.occurrences for e in merged) else merged):
+                    for o in r.occurrences or [r]:
+                        readings.setdefault((o.locator.task, o.quote, wording(r)), r)
+                for e in merged:
+                    seen = set()  # units this claim already appears in
                     for o in e.occurrences or [e]:
                         family = family_of(o.locator.region)
-                        if family:
-                            claim = {k: getattr(e, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
-                            claim["quote"] = o.quote
-                            claim["_box"] = list(o.locator.bbox)  # where it was read (splitting units)
-                            claim["_task"] = o.locator.task       # which request read it (its input, for reviewers)
-                            units[(folder.name, content, o.locator.page, family)]["claims"][e.id] = claim
+                        key = (folder.name, content, o.locator.page, family)
+                        if not family or key in seen:
+                            continue
+                        seen.add(key)
+                        own = readings.get((o.locator.task, o.quote, o.wording or wording(e)), e)
+                        claim = {k: getattr(own, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
+                        claim["quote"] = o.quote
+                        claim["_box"] = list(o.locator.bbox)  # where it was read (splitting units)
+                        claim["_task"] = o.locator.task       # which request read it (its input, for reviewers)
+                        units[key]["claims"][own.id] = claim
     return dict(units)
 
 MAX_BANDS = 4  # a unit is cut into at most this many bands
@@ -71,7 +91,8 @@ def split_units(base, var, limit=MAX_CLAIMS):
         # sides read the same regions; a tiling lever (grid against bands) would otherwise compare
         # different parts of the page in each band. Uncut, judges see a declared sample instead.
         boxes = lambda side: {tuple(c["_box"]) for c in side["claims"].values()}
-        comparable = len(boxes(a) & boxes(b)) >= 0.5 * min(len(boxes(a)), len(boxes(b)) or 1)
+        # An empty side reads nothing to compare, so bands follow the other (either way round).
+        comparable = not boxes(a) or not boxes(b) or len(boxes(a) & boxes(b)) >= 0.5 * min(len(boxes(a)), len(boxes(b)))
         if size <= limit or not comparable:
             if key in base:
                 out_a[key] = a
@@ -115,7 +136,8 @@ def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", 
                 picked.append(groups[family].pop())
     same = sum(1 for k in keys if set(base.get(k, {"claims": {}})["claims"]) == set(var.get(k, {"claims": {}})["claims"]))
     return [(k, base.get(k, {"claims": {}})["claims"], var.get(k, {"claims": {}})["claims"]) for k in picked], \
-        {"units": len(keys), "unchanged": same}
+        {"units": len(keys), "unchanged": same, "changed_by_kind": {f: len(g) + sum(k[3] == f for k in picked)
+                                                                    for f, g in groups.items()}}
 
 def shown(a, b, rng, limit=MAX_CLAIMS):
     """Claim IDs of each side to show judges, at most `limit` each: every claim only one side has
@@ -192,7 +214,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
                       "hidden_shared": len(shared - set(shown_a)),
                       "counts": {"baseline": len(a), "variant": len(b), "shared": len(shared)}})
     batch = {"format": "semantic-pdf-diff-pairwise-batch", "version": 1, "baseline": str(baseline_dir),
-             "variant": str(variant_dir), "seed": seed, "units": counts, "items": items}
+             "variant": str(variant_dir), "seed": seed, "unit_claims": UNIT_CLAIMS, "units": counts, "items": items}
     (folder / "pairs.json").write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return batch
 
@@ -275,6 +297,19 @@ RUBRICS = {
                        "not shown are identical in both sets, so they aren't missing from either.\nMark every "
                        "claim first (A1, A2, ..., B1, ...), then decide which set is better.",
            "tags": True, "sections": True, "context": True, "claims": True},
+    # The owner, 2026-09-28 (spot check item 4: claims about rows the band's crop didn't show): judges
+    # see what a person now sees. The whole page with the part outlined, the whole page's text, and
+    # every claim, grouped: those in both sets once, then each set's own, so the difference is plain
+    # and "missing" can be judged against everything a set has. Needs the batch's add_context.
+    "v6": {"addition": "\nDocument administration (contacts, addresses, lot or project numbers, revision dates, "
+                       "copyright, logos) is neutral: don't prefer a set for including or omitting it; judge such "
+                       "claims only for correctness.\nEntity names and conditions may come from the context given "
+                       "with the page (its headings, the text before it, the numbered items it sits under, the rest "
+                       "of the page): those aren't invented.\nClaims both sets make are listed once (S1, S2, ...); "
+                       "set A is those plus A's own (A1, ...), set B those plus B's own (B1, ...). Shared claims "
+                       "can't make one set better, but a set's own claim may repeat one, and a fact both miss is "
+                       "missing from both.\nMark every claim first, then decide which set is better.",
+           "tags": True, "sections": True, "context": True, "claims": True, "whole": True},
 }
 
 V1_OUTPUT = """Return only JSON, reasoning first: {{"note": "...", "better": "A|B|same", "a_wrong": 0, "b_wrong": 0, "confidence": "high|medium|low"}}
@@ -294,10 +329,17 @@ V5_OUTPUT = (V2_OUTPUT.replace(', "remarks": ""}}',
                               ', "a_claims": [{{"n": 1, "mark": "ok|wrong|unsure", "problems": []}}], "b_claims": [], "remarks": ""}}')
              .replace("- remarks:", "- a_claims, b_claims: one entry per claim of each set, by its number: ok (a faithful\n  reading, bound to the right thing), wrong, or unsure; and its problems, from the list above but for missing.\n- remarks:"))
 
+V6_OUTPUT = (V5_OUTPUT.replace('"a_claims": [', '"s_claims": [{{"n": 1, "mark": "ok|wrong|unsure", "problems": []}}], "a_claims": [')
+             .replace("- a_claims, b_claims: one entry per claim of each set, by its number:",
+                      "- s_claims, a_claims, b_claims: one entry per claim, by its number (S1 is 1 in s_claims):")
+             .replace("- a_wrong, b_wrong: how many claims in each set are wrong",
+                      "- a_wrong, b_wrong: how many of each set's own claims (A1..., B1...) are wrong"))
+
 def pairwise_prompt(rubric):
     """The pairwise template for a rubric version (placeholders: page, family, page_text, a, b)."""
     spec = RUBRICS[rubric]
-    template = PAIRWISE.replace(V1_OUTPUT, V5_OUTPUT if spec.get("claims") else V2_OUTPUT) if spec["tags"] else PAIRWISE
+    output = V6_OUTPUT if spec.get("whole") else V5_OUTPUT if spec.get("claims") else V2_OUTPUT
+    template = PAIRWISE.replace(V1_OUTPUT, output) if spec["tags"] else PAIRWISE
     if spec.get("sections"):
         template = template.replace("PAGE {page} ({family} content). Its text layer:",
                                     "PAGE {page} ({family} content), under the headings: {sections}. Its text layer:")
@@ -305,6 +347,9 @@ def pairwise_prompt(rubric):
         template = (template.replace("PAGE {page} ({family} content)", "PAGE {page}{part} ({family} content)")
                     .replace(". Its text layer:", ".\nText before it: ...{before}\nIt sits under: {within}\nIts text layer:")
                     .replace("SET A:", "SET A ({a_note}):").replace("SET B:", "SET B ({b_note}):"))
+    if spec.get("whole"):
+        template = (template.replace("Its text layer:\n{page_text}", "{page_view}")
+                    .replace("SET A ({a_note}):\n{a}\n\nSET B ({b_note}):\n{b}\n", "{claims}\n"))
     return template.replace("{rubric}", spec["addition"])
 
 def _set_note(shown, total, hidden):
@@ -317,6 +362,33 @@ def _claims_text(claims, letter=None):
     return "\n".join(f"{mark(k)}{c['entity']} | {c['attribute']} | {c['value']}{' ' + c['unit'] if c.get('unit') else ''}"
                      f"{' | conditions: ' + c['conditions'] if c.get('conditions') else ''} | quote: {c['quote']}"
                      for k, c in enumerate(claims)) or "(no claims)"
+
+def _ident(c):
+    return tuple(str(c.get(k, "")) for k in ("entity", "attribute", "value", "unit", "conditions", "quote"))
+
+def _grouped(a, b):
+    """Two claim lists as ([(index in a, index in b)] shared, [index in a] only in a, [index in b] only in b)."""
+    where = {}
+    for k, c in enumerate(b):
+        where.setdefault(_ident(c), k)
+    shared, only_a = [], []
+    for k, c in enumerate(a):
+        (shared.append((k, where[_ident(c)])) if _ident(c) in where else only_a.append(k))
+    paired = {j for _, j in shared}
+    return shared, only_a, [k for k in range(len(b)) if k not in paired]
+
+def _whole_view(item, a, b):
+    """Rubric v6's page text and grouped claims, and each group's claims in order (to map marks back)."""
+    shared, only_a, only_b = _grouped(a, b)
+    groups = {"S": [a[i] for i, _ in shared], "A": [a[i] for i in only_a], "B": [b[i] for i in only_b]}
+    titles = {"S": "CLAIMS IN BOTH SETS", "A": "CLAIMS ONLY IN SET A", "B": "CLAIMS ONLY IN SET B"}
+    claims = "\n\n".join(f"{titles[g]} ({len(c)}):\n{_claims_text(c, g)}" for g, c in groups.items())
+    whole = item.get("page_text_full") or item["page_text"]
+    view = f"The whole page's text layer:\n{whole}"
+    if item.get("band"):
+        view = ("The first image shows this part of the page; the second, the whole page with this part "
+                f"outlined.\n{view}\n\nThis part's text layer:\n{item['page_text']}")
+    return view, claims, (shared, only_a, only_b)
 
 def _claim_marks(entries, shown):
     """A judge's marks for the claims of one set shown to it: [{index, claim, mark, problems}]."""
@@ -370,16 +442,23 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
                 first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
                 band = item.get("band")
                 numbered = RUBRICS[rubric].get("claims")
+                whole = RUBRICS[rubric].get("whole")
+                if whole and "page_image" not in item:
+                    raise ValueError(f"rubric {rubric} needs the whole page: run rounds.add_context on {folder} first")
+                view, grouped, groups = _whole_view(item, a, b) if whole else ("", "", None)
+                images = [folder / item["image"]] + ([folder / item["page_image"]] if whole and band else [])
                 prompt = template.format(page=item["page"], family=item["family"], page_text=item["page_text"],
+                                         page_view=view, claims=grouped,
                                          a=_claims_text(a, "A" if numbered else None),
                                          b=_claims_text(b, "B" if numbered else None),
                                          sections=" | ".join(item.get("sections") or ()) or "none",
-                                         part=f", part {band[0] + 1} of {band[1]} (the image shows that part)" if band else "",
+                                         part=(f", part {band[0] + 1} of {band[1]}" + ("" if whole else " (the image shows that part)"))
+                                         if band else "",
                                          before=item.get("before") or "(start of the document)",
                                          within=item.get("within") or "nothing numbered",
                                          a_note=notes[first], b_note=notes[second])
 
-                def finish(value, error, item=item, order=order):
+                def finish(value, error, item=item, order=order, a=a, b=b, groups=groups):
                     progress.finish("failed" if error else "complete")
                     if error is not None:
                         failures.append(f"{item['id']} {order}: {error}")
@@ -403,10 +482,17 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
                             remarks=v.get("remarks", "").strip())
                     if RUBRICS[rubric].get("claims"):  # each claim's mark, by side (A is the first set shown)
                         first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
-                        verdicts[item["id"]][order]["claims"] = {first: _claim_marks(v.get("a_claims"), a),
-                                                                 second: _claim_marks(v.get("b_claims"), b)}
+                        if groups is None:
+                            marks = {first: _claim_marks(v.get("a_claims"), a), second: _claim_marks(v.get("b_claims"), b)}
+                        else:  # v6: a shared claim's mark counts for both sides, at each side's own index
+                            shared, only_a, only_b = groups
+                            at = lambda entries, index, claims: [
+                                {**m, "index": index[m["index"]]} for m in _claim_marks(entries, [claims[i] for i in index])]
+                            marks = {first: at(v.get("s_claims"), [i for i, _ in shared], a) + at(v.get("a_claims"), only_a, a),
+                                     second: at(v.get("s_claims"), [j for _, j in shared], b) + at(v.get("b_claims"), only_b, b)}
+                        verdicts[item["id"]][order]["claims"] = marks
                 progress.add()
-                dispatch.submit(prompt, PairVerdict, [folder / item["image"]], None, finish)
+                dispatch.submit(prompt, PairVerdict, images, None, finish)
         dispatch.drain()
     if verdicts:
         target.parent.mkdir(exist_ok=True)
@@ -424,10 +510,7 @@ BETTER = [{"name": "A", "label": "A is better"}, {"name": "B", "label": "B is be
           {"name": "same", "label": "About the same"}, {"name": "unsure", "label": "Can't tell"}]
 SURE = [{"name": "high", "label": "Sure"}, {"name": "medium", "label": "Fairly sure"}, {"name": "low", "label": "Guessing"}]
 
-def _ident(c):
-    return tuple(str(c.get(k, "")) for k in ("entity", "attribute", "value", "unit", "conditions", "quote"))
-
-def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, fixture=None):
+def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, fixture=None, unit="family"):
     """Give a batch's units what a reviewer needs to judge them (the owner, 2026-09-28: a band of
     a table without its header can't be judged; "missing" can't be judged from a sample):
     - every claim of both sets, the unshown ones appended after those shown (so marks already
@@ -442,7 +525,10 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
     from .store import Store
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    picked, _ = pair_units(baseline_dir, variant_dir, n, seed, limit=limit)
+    if batch.get("unit_claims") != UNIT_CLAIMS:  # units recomputed another way wouldn't match the batch's
+        raise ValueError(f"{folder}'s units were built by an earlier collect ({batch.get('unit_claims', 'merged wording')}); "
+                         "rebuild the batch to add context")
+    picked, _ = pair_units(baseline_dir, variant_dir, n, seed, unit=unit, limit=limit)
     db = sqlite3.connect(fixture) if fixture and Path(fixture).exists() else None
     sources, docs = {}, {}
 
@@ -574,11 +660,11 @@ def import_spotcheck(folder, answers_file):
     target.write_text(json.dumps({"reviewer": data["reviewer"], "verdicts": verdicts}, indent=2, ensure_ascii=False) + "\n")
     return target
 
-def _judge_claim_marks(folder):
-    """{(unit, side, index): mark} from judges who marked claims (rubric v5); a claim marked
+def _judge_claim_marks(folder, verdicts_dir="verdicts"):
+    """{(unit, side, index): mark} from judges who marked claims (rubric v5 on); a claim marked
     differently by judges or orders is taken as unsure."""
     marks = defaultdict(set)
-    for path in sorted((Path(folder) / "verdicts").glob("*.json")):
+    for path in sorted((Path(folder) / verdicts_dir).glob("*.json")):
         for unit, orders in json.loads(path.read_text(encoding="utf-8"))["verdicts"].items():
             for v in orders.values():
                 for side, claims in (v.get("claims") or {}).items():
@@ -597,11 +683,11 @@ def claim_shares(folder, verdicts_dir="verdicts"):
     return {side: {**dict(c), "wrong_share": round(c["wrong"] / sum(c.values()), 3) if sum(c.values()) else None}
             for side, c in counts.items()}
 
-def anchor(folder, human_dir="verdicts-human"):
-    """People's verdicts against the judges' on the same units: agreement on which side is
-    better, and each side's win rate over the units both judged."""
+def anchor(folder, human_dir="verdicts-human", verdicts_dir="verdicts"):
+    """People's verdicts against the judges' (in verdicts_dir) on the same units: agreement on
+    which side is better, and each side's win rate over the units both judged."""
     folder = Path(folder)
-    judges = unit_scores(folder)
+    judges = unit_scores(folder, verdicts_dir=verdicts_dir)
     lean = lambda s: (s > 0.5) - (s < 0.5)
     out = {}
     for path in sorted((folder / human_dir).glob("*.json")):
@@ -621,7 +707,7 @@ def anchor(folder, human_dir="verdicts-human"):
         wrong = {side: {**dict(c), "wrong_share": round(c["wrong"] / sum(c.values()), 3) if sum(c.values()) else None}
                  for side, c in marked.items()}
         # Where a judge marked claims too (rubric v5): agreement claim by claim, "unsure" left out.
-        judged = _judge_claim_marks(folder)
+        judged = _judge_claim_marks(folder, verdicts_dir)
         pairs = [(c["mark"], judged[(u, side, c["index"])]) for u, orders in data["verdicts"].items()
                  for side, claims in (next(iter(orders.values())).get("claims") or {}).items() for c in claims
                  if (u, side, c["index"]) in judged and "unsure" not in (c["mark"], judged[(u, side, c["index"])])
@@ -629,28 +715,67 @@ def anchor(folder, human_dir="verdicts-human"):
         claim_agreement = {"claims": len(pairs), "same": sum(a == b for a, b in pairs)} if pairs else None
         out[data["reviewer"]] = {"units": len(both), "same_lean": agree, "opposite": opposite, "claims_marked": wrong,
                                  "claim_agreement_with_judges": claim_agreement,
-                                 "person_win_rate": fmt(bootstrap([person[u] for u in both])),
-                                 "judges_win_rate": fmt(bootstrap([judges[u] for u in both])),
+                                 "person_win_rate": fmt(interval([person[u] for u in both], clusters=list(map(region, both)))),
+                                 "judges_win_rate": fmt(interval([judges[u] for u in both], clusters=list(map(region, both)))),
                                  "disagreements": [u for u in both if lean(person[u]) * lean(judges[u]) < 0]}
     return out
 
-def bootstrap(values, resamples=2000, level=0.90, seed=7):
-    """(mean, low, high) with a percentile bootstrap interval; None for no values."""
+def _t_quantile(level, df):
+    """t with P(|T| < t) = level for Student's t with integer df, by bisection on the closed-form
+    distribution (Abramowitz & Stegun 26.7.3–4)."""
+    def inside(t):
+        theta = math.atan(t / math.sqrt(df))
+        c2, s = math.cos(theta) ** 2, math.sin(theta)
+        term = total = 1.0
+        if df % 2:
+            if df == 1:
+                return 2 * theta / math.pi
+            for k in range(1, (df - 1) // 2):
+                term *= c2 * 2 * k / (2 * k + 1)
+                total += term
+            return 2 / math.pi * (theta + s * math.cos(theta) * total)
+        for k in range(1, df // 2):
+            term *= c2 * (2 * k - 1) / (2 * k)
+            total += term
+        return s * total
+    low, high = 0.0, 1000.0
+    for _ in range(100):
+        mid = (low + high) / 2
+        low, high = (mid, high) if inside(mid) < level else (low, mid)
+    return (low + high) / 2
+
+def interval(values, clusters=None, level=0.90):
+    """(mean, low, high): the mean with a cluster-robust t interval (CR1: G/(G-1) correction, t with
+    G-1 degrees of freedom, G the number of clusters); None for no values. It replaced a percentile
+    bootstrap (2026-09-28): with 20-30 regions of which few hold several bands, the bootstrap's
+    interval moved by 0.03 with how those bands happened to split (r09h), and percentile intervals
+    run narrow at such sizes. Clusters are page regions: bands cut from one region share a crop,
+    a reading and often a judge's mood. Bounded to [0, 1]; one cluster says nothing: (mean, 0, 1)."""
     if not values:
         return None
-    rng = random.Random(seed)
-    n = len(values)
-    means = sorted(sum(rng.choice(values) for _ in range(n)) / n for _ in range(resamples))
-    tail = (1 - level) / 2
-    return (sum(values) / n, means[int(tail * resamples)], means[min(resamples - 1, int((1 - tail) * resamples))])
+    groups = defaultdict(lambda: [0.0, 0])
+    for value, key in zip(values, clusters or range(len(values))):
+        groups[key][0] += value
+        groups[key][1] += 1
+    n, g = len(values), len(groups)
+    mean = sum(values) / n
+    if g < 2:
+        return (mean, 0.0, 1.0)
+    variance = g / (g - 1) * sum((total - mean * k) ** 2 for total, k in groups.values()) / n ** 2
+    half = _t_quantile(level, g - 1) * math.sqrt(variance)
+    return (mean, max(0.0, mean - half), min(1.0, mean + half))
 
-def unsettled(folder, reviewers, limit=None):
+def region(unit):
+    """The page region a unit was cut from: its id without the band ("…-p4-table-b2of4" → "…-p4-table")."""
+    return re.sub(r"-b\d+of\d+$", "", unit)
+
+def unsettled(folder, reviewers, limit=None, verdicts_dir="verdicts"):
     """Units (of the first `limit`) that the given judges leave unsettled, for a second judge:
     one of them lacks an order (a failed verdict), flipped with the order, or they disagree."""
     from .review import reviewer_file
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    files = [folder / "verdicts" / f"{reviewer_file(r)}.json" for r in reviewers]
+    files = [folder / verdicts_dir / f"{reviewer_file(r)}.json" for r in reviewers]
     verdicts = [json.loads(f.read_text(encoding="utf-8"))["verdicts"] if f.exists() else {} for f in files]
     out = set()
     for item in batch["items"][:limit]:
@@ -689,20 +814,27 @@ WIN_LOW = 0.50          # the overall interval must lie above this to call it a 
 NONINFERIOR_LOW = 0.45  # ...or at least above this for "no worse" (then it needs another gain, e.g. cost)
 STRATUM_LOSS_HIGH = 0.45  # a stratum whose interval lies entirely below this blocks the variant...
 STRATUM_MIN_UNITS = 6     # ...if it has at least this many units (two lost units would otherwise block)
+BORDERLINE = 0.03         # a bound this close to its threshold marks the call borderline
+WATCH_MIN_UNITS = 10      # a non-blocking stratum with a mean below STRATUM_LOSS_HIGH on this many units is watched
 
-def decide(folder, limit=None, verdicts_dir="verdicts"):
-    """Win rates with intervals, overall and per family, and the acceptance decision
-    (over the first `limit` units when judging is still in progress)."""
+def decide(folder, limit=None, verdicts_dir="verdicts", documents=None):
+    """Win rates with intervals, overall and per stratum, and the acceptance decision
+    (over the first `limit` units when judging is still in progress).
+
+    Strata are the kinds of region (text, table, visual) and, given `documents` ({slice name:
+    family}, from scripts/slices.json), the document families (reports, drawings, ...), as the
+    plan stratifies; either kind of stratum can block."""
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     scores = unit_scores(folder, limit, verdicts_dir)
     family = {i["id"]: i["family"] for i in batch["items"]}
-    overall = bootstrap(list(scores.values()))
+    document = {i["id"]: (documents or {}).get(i.get("run")) for i in batch["items"]}
+    overall = interval(list(scores.values()), clusters=[region(u) for u in scores])
     strata, sizes = {}, {}
-    for f in sorted(set(family.values())):
-        values = [s for u, s in scores.items() if family.get(u) == f]
-        if values:
-            strata[f], sizes[f] = bootstrap(values), len(values)
+    for f in sorted(set(family.values())) + sorted({d for d in document.values() if d}):
+        units = [u for u in scores if f in (family.get(u), document.get(u))]
+        if units:
+            strata[f], sizes[f] = interval([scores[u] for u in units], clusters=[region(u) for u in units]), len(units)
     losing = [f for f, (_, _, high) in strata.items() if high < STRATUM_LOSS_HIGH and sizes[f] >= STRATUM_MIN_UNITS]
     if overall is None:
         verdict = "no data"
@@ -716,12 +848,31 @@ def decide(folder, limit=None, verdicts_dir="verdicts"):
         verdict = "rejected: loses"
     else:
         verdict = "inconclusive"
+    # A bound this close to a threshold could fall either side with a few more units, another
+    # judge or another interval method: such calls are reported, not trusted on their own.
+    near = lambda x, threshold: abs(x - threshold) < BORDERLINE
+    borderline = [] if overall is None else (
+        [f"overall low {overall[1]:.3f} near {t}" for t in (WIN_LOW, NONINFERIOR_LOW) if near(overall[1], t)]
+        + ([f"overall high {overall[2]:.3f} near {WIN_LOW}"] if near(overall[2], WIN_LOW) else [])
+        + [f"{f} high {high:.3f} near {STRATUM_LOSS_HIGH}" for f, (_, _, high) in strata.items()
+           if sizes[f] >= STRATUM_MIN_UNITS and near(high, STRATUM_LOSS_HIGH)])
+    # Strata that don't block but lean to a loss on enough units to look into (the stratum rule has
+    # little power: a stratum at 0.35-0.40 is blocked only 14-25% of the time at 6-13 units).
+    watch = [f for f, (mean, _, _) in strata.items() if mean < STRATUM_LOSS_HIGH and sizes[f] >= WATCH_MIN_UNITS
+             and f not in losing]
+    # Sampling is round-robin over kinds, so small kinds are over-represented; this weighs each kind's
+    # mean by how many of its units changed, as an estimate over all changed units.
+    by_kind = batch["units"].get("changed_by_kind") or {}
+    kinds = {f: strata[f][0] for f in set(family.values()) if f in strata and by_kind.get(f)}
+    weighted = (sum(by_kind[f] * m for f, m in kinds.items()) / sum(by_kind[f] for f in kinds)) if kinds else None
     fmt = lambda t: None if t is None else {"mean": round(t[0], 3), "low": round(t[1], 3), "high": round(t[2], 3)}
     units = batch["units"]
     changed = units["units"] - units["unchanged"]
     # Win rates are over changed units only: coverage says how much of the output a lever touches.
-    return {"units_judged": len(scores), "overall": fmt(overall), "strata": {f: fmt(t) for f, t in strata.items()},
-            "strata_units": sizes, "decision": verdict, "units": units,
+    return {"units_judged": len(scores), "regions_judged": len({region(u) for u in scores}), "overall": fmt(overall),
+            "strata": {f: fmt(t) for f, t in strata.items()},
+            "strata_units": sizes, "decision": verdict, "borderline": borderline, "watch": watch,
+            "overall_weighted_by_changed": None if weighted is None else round(weighted, 3), "units": units,
             "coverage": round(changed / units["units"], 3) if units["units"] else None}
 
 # --- mechanical figures (free: from the replay stores and the fixture) ---------------------

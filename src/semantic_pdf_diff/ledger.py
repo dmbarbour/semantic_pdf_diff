@@ -33,15 +33,23 @@ class Ledger:
         self.lock = threading.Lock()
 
     def add(self, model, kind, usage):
+        """usage as the server reported it; empty for a response that came without one (a stream
+        cut off before its last chunk): recorded as "unpriced", since it may still be billed."""
         record = {"time": _now(), "model": model, "kind": kind, **self.tags,
                   "prompt_tokens": int(usage.get("prompt_tokens") or 0),
                   "completion_tokens": int(usage.get("completion_tokens") or 0),
                   "cost": float(usage.get("estimated_cost") or 0.0)}
+        if "estimated_cost" not in usage:
+            record["unpriced"] = True
         with self.lock:
             _append(self.path, record)
 
+def unpriced(path, **match):
+    """How many ledger records matching the given tags came without a reported cost."""
+    return sum(1 for r in read(path) if r.get("unpriced") and all(r.get(k) == v for k, v in match.items()))
+
 def spent(path, **match):
-    """Total reported cost of ledger records matching the given tags."""
+    """Total reported cost of ledger records matching the given tags (unpriced ones count 0: see unpriced)."""
     return round(sum(r.get("cost", 0.0) for r in read(path) if all(r.get(k) == v for k, v in match.items())), 6)
 
 def figure(path, *, metric, value, **fields):

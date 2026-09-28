@@ -68,7 +68,7 @@ The split is by document, not by page, so nothing leaks between sets.
 |---|---|---|
 | Mechanical (every run, free) | Failed or unparseable answers; partial rate; refinement depth; claims per task; quote found in the page's text layer; section attribution rate; values in "abouts"; tokens and latency per page | None |
 | Questions (when inputs change) | Share of inputs judged enough / partly / not enough; what's missing | About $0.03 per input across 4–6 judges |
-| Answers, pairwise | Variant's win rate against the baseline, overall and per stratum, with bootstrap confidence intervals | About $0.03–0.06 per input |
+| Answers, pairwise | Variant's win rate against the baseline, overall and per stratum, with confidence intervals clustered by page region | About $0.03–0.06 per input |
 | Answers, per set | Usable-claim rate (Dawid–Skene consensus, weighting raters by estimated reliability); per-field correctness; hallucination rate (value not in source) | Included in the pairwise judging |
 | Recall | Claims a careful reader would extract but the model didn't: blind answers from the question stage (people and panel), matched mechanically, with leftovers adjudicated | People's time; a few inputs per round |
 | Human anchor | Panel-vs-person agreement on a spot-check subset; panel weights re-estimated if they drift | About 15 items per round |
@@ -146,7 +146,7 @@ Every round prints an estimate before spending (tokens × the provider's listed 
 2. **Context levers** behind settings: surrounding paragraph, caption and legend, table header per row, heading always shown (even "none"), tile size per page type.
 3. **Input-level sampling** from fixtures, stratified, with development, held-out and regression sets defined in files.
 4. **A pairwise item type** in the review pages and panel: one input, two outputs, randomised order, "which is better, and why", plus per-field checks on each.
-5. **Statistics:** bootstrap intervals, stratified win rates, sequential stopping, and the acceptance rules as code.
+5. **Statistics:** intervals (clustered by page region since 2026-09-28), stratified win rates, sequential stopping, and the acceptance rules as code.
 6. **A round runner:** estimate cost, record variants, sample, judge, decide, log (`benchmarks/rounds/<n>/` with variant definitions, inputs, labels and results; `benchmarks/history.json`).
 7. **The report page** with the graphs above.
 8. **More slices,** cut at section boundaries, split into development and held-out sets.
@@ -199,6 +199,25 @@ Round 1 showed that asking the same question again often gets a different answer
 - **Most likely cause:** answers cut off by our timeouts are still billed but were never recorded. Failed judge verdicts were also re-sent on every chunk, and the ledger kept only a request's last attempt.
 - **Fixed:** every attempt is now recorded, failed verdicts are asked once more at the end, and answers are streamed, so the timeout applies between chunks and slow answers complete.
 - **For estimates:** treat the dashboard as authoritative, and allow for this known undercount in rounds 1–9.
+
+**Statistics and review fixes (the owner, 2026-09-28: "improve known flaws in our statistics and review to find more of them"; details in the [statistics audit](../reviews/statistics-audit-2026-09-28.md)):**
+- **Intervals are clustered by page region:** bands cut from one region share a crop, a reading and often a judge's mood, so they aren't independent.
+  - **The method:** a cluster-robust t interval replaces the percentile bootstrap. It's deterministic and corrected for small samples.
+  - **Past rounds:** no decision in rounds 1–9 changes.
+  - **Borderline calls:** decisions list any bound within 0.03 of its threshold. Four wins are borderline: r01 neighbours, r02, r03 stems and r09h, at 0.501–0.512.
+- **Units show each reading in its own words:** a merged claim used to appear in its representative's words (often a text reading's), so text levers changed visual units. r09b's changed visual units drop from 9 to 2.
+- **Document families are strata** (reports, drawings, manuals, rules, set in `scripts/slices.json`), as this plan always said. A non-blocking **watch** list names strata with a mean below 0.45 on 10 or more units.
+- **Escalation judges' failed verdicts are retried once,** and failures are counted over the whole round.
+- **Stems from table values (a bug, found in the spot check):** a value such as "3.83" at the start of a table line was taken for a numbered item, so the extractor's "Within:" line and the judges' "It sits under:" named table cells ("3.83 -43.73E+6").
+  - **Fixed:** a section number needs a capitalised title, can't start at 0, and must be set as a heading or follow the section numbers before it (3.2.1 → 3.2.2, 3.3, 4.1).
+  - **What it touched:** lines whose path lost a table value or regained its real heading: HabEx 719, NREL 613, IEA-15 381, calG sheets 39–42 192, Ken manual 158, IEA-22 52. The rules, LCIT, DC manual and the other drawing slices changed by 2 lines at most.
+  - **Stems were accepted in r03 (0.63) as implemented then,** junk included; the fixed version hasn't been measured on its own.
+- **Rubric v6:** judges see what a person sees on the spot-check page:
+  - the whole page, with the part outlined (a second image, for bands)
+  - the whole page's text layer, as well as the part's
+  - every claim, with those in both sets listed once (S1, ...) and then each set's own (A1, ..., B1, ...), so "missing" can be judged against everything a set has
+  - Shared claims' marks count for both sides. Rounds using v6 run `add_context` on each batch.
+- **Unpriced responses:** a streamed answer cut off before its last chunk comes without usage, yet may be billed. The ledger used to drop it; it now records it as "unpriced", and rounds report how many.
 
 **Judging rubric v2 (the owner, 2026-09-27; from round 7):**
 - **What changes:** document administration (contacts, addresses, lot or project numbers, revision dates, copyright, logos) is neutral in pairwise judging. Neither side is preferred for including or omitting it; such claims are checked only for correctness.
