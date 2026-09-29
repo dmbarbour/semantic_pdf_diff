@@ -1,6 +1,6 @@
 # Content-addressed queries, checks and records
 
-- **Status:** Active (2026-09-28): milestones 1–2 done.
+- **Status:** Active (2026-09-28): milestones 1–3 done.
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md), whose keys this replaces; [query improvement](query-improvement-2026-09-26.md), whose rounds get the checks.
 - **Feeds:** every later round; the [weighted quality estimates](README.md) (judgement records); a lever search (plans index).
 - **Why:**
@@ -119,9 +119,15 @@ The run cache (`.cache`) and the committed judge caches (2,646 files) are alread
   - Answers: ok, or problem tags with a note.
   - **Checkers** (chosen by Claude; the owner left the choice to me):
     - Claude in session, reading the dump
-    - `google/gemini-3.1-pro`, `Qwen/Qwen3.5-397B-A17B` and `moonshotai/Kimi-K3`, the s01 panel: three different families, all with images, about $0.70 per pass over s01's batch
+    - `google/gemini-3.1-pro` and `XiaomiMiMo/MiMo-V2.6-Pro`: two families, both reading images
     - Gemini shares a family with the extractor, gemma. That matters little here: the queries are built by our code, not written by gemma.
-    - **Size and cap:** 30 queries per variant (40 for the baseline), and at most $2 per round (`round.json`: `query_check_cap`).
+    - **Why these two:** a trial (2026-09-28, 20 queries) planned the s01 panel of Gemini, Qwen3.5-397B and Kimi-K3.
+      - Gemini answered all 20 at $0.011 each.
+      - Qwen and Kimi reasoned past a 4,000-token output budget on most queries: $0.47 for 4 answers and $1.23 for 9.
+      - The trial cost $1.92, four times the estimate.
+      - Checks now allow 16,000 output tokens and run 4 at a time, so a cap overshoots little.
+    - **Size and cap:** 30 queries per variant, at most $2 per round (`round.json`: `query_checks`).
+  - **Only problems in what the variant changed hold a round.** For a changed query, checkers also say whether its problem lies in the change (`in_change`); older problems are listed as leads for other levers.
 - **When:** after recording and before judging. Judging waits until flagged problems are fixed or accepted, and the results are kept in the round's folder.
 - **When a lever is built:** dump what it adds for every development document (the meta-audit's lesson 5).
 
@@ -199,6 +205,13 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
       - the review batches' stores (9), which have no settings file to replay with
     - **Recording scratch (`runs/*/record/`) wasn't rebuilt.**
   - **Re-keying is temporary:** `LegacyFixture`, `--rekey-from` and its test go once nothing needs re-keying (the owner: "I doubt we'll hold onto re-keying tests for long").
+- **Milestone 3 (2026-09-28): done.**
+  - **Lever notes:** `extract.lever_notes` finds the lines each lever added to a query from the markers its builder writes. They're computed when dumping, from the store's query log: nothing stored, nothing in the hash. A test checks every builder against its mark.
+  - **`queries dump`:** samples a folder of runs' queries, going round the documents and each document's kinds of region. Against a baseline it shows only changed, added or removed queries, as diffs; `--lever` narrows it to one lever. It writes a page, JSONL and the images each query was sent.
+  - **`queries check`:** checker models look for obvious errors against a short list of problems, and say whether each lies in what the variant changed.
+  - **Rounds:** `query_checks` in `round.json` adds a step after replay. It dumps each variant against the baseline, runs the checkers within a cap, and holds the round (exit 4) on flags in what changed, until fixed or accepted (`--accept-checks`).
+  - **Checkers:** Gemini 3.1 Pro and MiMo-V2.6-Pro, after a trial. Both flagged real problems in the stems lever (figure panel labels taken for numbered items; section and stem disagreeing), plus the same false positive. Leads outside the change went into the [lever index](../reviews/levers.md) as ideas.
+  - **Spend:** the trials cost $2.11.
   - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
   - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
 
@@ -210,7 +223,7 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
 - **Judge answers use the same format, in separate files kept out of the main test fixture** (the owner). One per batch within each round (Claude's choice, which the owner left open).
 - **The main table is close to pure:** (model, query hash, repeat index, response). Other tables hold whatever is convenient, provided they never compromise the main lookup (the owner).
 - **Stale answers without an obvious transition via replay are let go** (the owner).
-- **Checker models left to Claude** (the owner). Chosen: Claude, Gemini 3.1 Pro, Qwen3.5-397B and Kimi-K3, with 30 queries per variant and at most $2 per round.
+- **Checker models left to Claude** (the owner). Chosen after a trial: Claude, Gemini 3.1 Pro and MiMo-V2.6-Pro, with 30 queries per variant and at most $2 per round.
 - **A strong-model pass on queries each round,** by Claude and a few others (the owner).
 
 ## Open questions

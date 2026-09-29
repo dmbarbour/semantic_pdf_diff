@@ -52,6 +52,12 @@ def main(argv=None):
     settings = dict(BASE_SETTINGS)
     if args.variant:
         settings.update(json.loads(args.variant.read_text()))
+    # Every setting that can change a query, resolved (defaults and environment filled in): a replay
+    # then means the same thing after defaults move. Rounds 1-9 saved only the settings they changed,
+    # so the 2026-09-28 promotion silently changed what their settings.json meant.
+    from semantic_pdf_diff.models import SETTING_CLASSES, Settings
+    resolved = Settings.from_env(**settings).model_dump(mode="json")
+    settings = {k: v for k, v in resolved.items() if SETTING_CLASSES[k] != "endpoint"}
     args.out.mkdir(parents=True, exist_ok=True)
     config = args.out / "settings.json"
     config.write_text(json.dumps(settings, indent=2))

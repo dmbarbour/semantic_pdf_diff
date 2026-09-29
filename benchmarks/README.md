@@ -67,6 +67,25 @@ Then `python scripts/spotcheck.py import <folder> <answers file>`, and `compare`
 
 Your verdicts are the anchor for the panel's: they say whether the round decisions track what a person would decide.
 
+## Query checks (before judging)
+
+Before a round spends money judging answers, it looks at the queries themselves. Obvious errors are cheaper to catch there: junk context, a wrong heading, cut-off text, a bad crop.
+
+- **What each variant changed:** `queries-<variant>/index.html` in the round folder. It samples queries whose text or images differ from the baseline's, as diffs, spread over documents and kinds of region. Each shows the lines each lever added ("lever notes": the text before and after, the lead-in, the "Within:" path, the text layer, and so on) and the images sent.
+- **Who looks:**
+  - Claude, reading the page.
+  - Two strong models from other families, Gemini 3.1 Pro and MiMo-V2.6-Pro. They check each query against a short list of problems, capped per round (`query_checks` in `round.json`).
+  - Anyone else who wants to.
+- **A flag on what a variant changed holds the round** before sampling and judging (exit 4): fix the lever, or accept with `run_round.py <round> --accept-checks`.
+  - Problems that were there before the change are shown greyed. They don't hold the round, but they're leads for other levers.
+- **Outside rounds,** for a lever being built:
+
+```bash
+pdf-semantic-diff queries dump benchmarks/runs/<round>/<variant> --out /tmp/stems --lever stem_context --sample 40
+pdf-semantic-diff queries dump benchmarks/runs/<round>/<variant> --against benchmarks/runs/<round>/baseline --out /tmp/diff
+pdf-semantic-diff queries check /tmp/diff --model google/gemini-3.1-pro --max-cost 0.5
+```
+
 ## Panels of people (and sensitive documents)
 
 The same method works with no model and nobody as referee:

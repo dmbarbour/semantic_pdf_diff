@@ -45,6 +45,8 @@ def main(argv=None):
             return fixtures_command(argv[1:])
         if argv and argv[0] == 'review':
             return review_command(argv[1:])
+        if argv and argv[0] == 'queries':
+            return queries_command(argv[1:])
         return shortcut_command(argv)
     except (OSError, ValueError, RuntimeError) as e:
         print(f'Error: {e}', file=sys.stderr)
@@ -403,6 +405,51 @@ def fixtures_command(argv):
     else:
         fixtures.pack(args.fixture, args.target)
         print(f'Packed {args.target}')
+    return 0
+
+def queries_command(argv):
+    from . import queries
+    parser = argparse.ArgumentParser(prog='pdf-semantic-diff queries',
+        description='Queries as the model saw them: dump a sample from runs, and have strong models check them.')
+    sub = parser.add_subparsers(dest='command', required=True)
+    dump = sub.add_parser('dump', help="Sample queries from a folder of runs (their stores' query logs) into a page")
+    dump.add_argument('runs', type=Path, help='A folder of runs (each with its store), e.g. benchmarks/runs/r09/excerpts')
+    dump.add_argument('--out', type=Path, required=True, help='Folder to write the dump to')
+    dump.add_argument('--against', type=Path, help="A baseline's runs: show only what changed, as diffs")
+    dump.add_argument('--sample', type=int, default=30)
+    dump.add_argument('--seed', type=int, default=1)
+    dump.add_argument('--lever', help='Only queries where this lever added something (see extract.LEVER_MARKS)')
+    dump.add_argument('--role', choices=['extract', 'triage', 'compare', 'all'], default='extract')
+    check = sub.add_parser('check', help='Checker models look for obvious errors in a dump\'s queries')
+    check.add_argument('folder', type=Path)
+    check.add_argument('--model', action='append', required=True, help='Checker model; repeatable')
+    add_budget_options(check)
+    add_log_options(check)
+    args = parser.parse_args(argv)
+    if args.command == 'dump':
+        summary = queries.dump(args.runs, args.out, args.against, args.sample, args.seed, args.lever, args.role)
+        print(f"{summary['shown']} of {summary['candidates']} queries -> {args.out / 'index.html'}")
+        return 0
+    start_logging(args)
+    for model in args.model:
+        # Reasoning models think at length: 4,000 output tokens truncated most of Qwen's and Kimi's
+        # answers in the first trial (paid for, and lost). Few at a time, so a cap overshoots little.
+        settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000, image_tokens=3000,
+                                     concurrency=4, timeout=600, retries=1,
+                                     **({'max_cost': args.max_cost} if args.max_cost else {}))
+        client = attach_ledger(Client(settings, args.folder / '.check-cache'), args)
+        progress = Progress(f'check {model}', client, heartbeat=settings.heartbeat_seconds)
+        target, count, failures = queries.check(args.folder, client, model, progress)
+        progress.close()
+        for failure in failures[:5]:
+            log.warning(f'{model}: {failure}')
+        print(f"{model}: {count} checks -> {target}; ${client.cost:.3f}")
+        note = budget_note(client)
+        if note:
+            log.warning(note)
+            return 3
+    flagged, in_change = queries.flagged(args.folder), queries.flagged(args.folder, in_change=True)
+    print(f"{len(flagged)} flagged, {len(in_change)} in what changed: {args.folder / 'index.html'}")
     return 0
 
 def review_command(argv):

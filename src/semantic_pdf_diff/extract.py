@@ -536,6 +536,32 @@ LOCATOR_SIDE = 384  # pixels: the page thumbnail that shows where a tile sits
 LOCATOR_NOTE = ("The last image is the whole page, small, with this region outlined in red: it shows where the "
                 "region sits, for orientation only.")
 
+# What each lever added to a query, found by the lines its builder writes. For diagnostics only
+# (the queries dump, docs/plans/content-addressed-queries-2026-09-28.md): a query is found by its
+# hash, never by these. tests/test_sections.py checks each builder against its mark.
+LEVER_MARKS = (
+    ("section", re.compile(r"^Section: (.+)$", re.M)),                      # headings (always on)
+    ("context_before", re.compile(r"^Before: \.\.\.(.*)$", re.M)),
+    ("context_after", re.compile(r"^After: (.*)\.\.\.$", re.M)),
+    ("table_context", re.compile(r"^Above the table: \.\.\.(.*)$", re.M)),
+    ("stem_context", re.compile(r"^Within: (.+)$", re.M)),
+    ("references", re.compile(r"^((?:Defined elsewhere|Cited): .+)$", re.M)),
+    ("figure_tasks", re.compile(r"^Caption: (.+)$", re.M)),
+    ("sheet_details", re.compile(r"^(Sheet .+ Detail .+)$", re.M)),
+    ("visual_text_layer", re.compile("^" + re.escape(LAYER_NOTE) + "\n(.*)$", re.M)),
+    ("tile_locator", re.compile("^(" + re.escape(LOCATOR_NOTE) + ")$", re.M)),
+)
+
+def lever_notes(prompt):
+    """{lever: what it added (shortened)} for the levers whose lines a query's text holds."""
+    notes = {}
+    for lever, mark in LEVER_MARKS:
+        found = [m.group(1).strip() for m in mark.finditer(prompt)]
+        if found:
+            joined = " | ".join(found)
+            notes[lever] = joined if len(joined) <= 240 else joined[:237] + "..."
+    return notes
+
 def render_locator(page, rect, target, side=LOCATOR_SIDE, width=3):
     """The whole page, small, with rect (displayed coordinates) outlined in red."""
     scale = side / max(page.rect.width, page.rect.height)

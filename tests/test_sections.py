@@ -247,6 +247,31 @@ class SectionContext(unittest.TestCase):
         self.assertEqual(paths[6], '7.4.1 Insulation Analysis')  # a title on the next line
         self.assertEqual(set(paths[7:]), {'7.4.1 Insulation Analysis'})  # a table row, and lone values, aren't items
 
+    def test_each_lever_leaves_its_mark(self):
+        """lever_notes (the queries dump's diagnostics) finds what each lever's builder writes: with the
+        lever off no query carries its note, with it on some query does."""
+        from semantic_pdf_diff.extract import lever_notes
+        from test_robustness import Recorder
+        from test_settings import document
+        off = {'context_before': 0, 'context_after': 0, 'table_context': 0, 'stem_context': False,
+               'references': False, 'figure_tasks': False, 'sheet_details': False, 'visual_text_layer': 0,
+               'tile_locator': False}
+        on = {'context_before': 300, 'context_after': 300, 'table_context': 300, 'stem_context': True,
+              'references': True, 'figure_tasks': True, 'sheet_details': True, 'visual_text_layer': 1500,
+              'tile_locator': True}
+        with tempfile.TemporaryDirectory() as d:
+            paths = {sheet: document(Path(d) / f'doc-{sheet}.pdf', 10, sheet) for sheet in (False, True)}
+            def notes(settings, sheet=False):
+                client = Recorder(lambda source, prompt: Extraction(claims=[], complete=True), **settings)
+                path = paths[sheet]
+                extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d) / 'out', client)
+                return set().union(*(lever_notes(prompt) for _, prompt, _ in client.tasks))
+            none = notes(off)
+            self.assertEqual(none, {'section'})  # headings come from the outline, whatever the levers
+            for lever in on:
+                with self.subTest(lever=lever):
+                    self.assertIn(lever, notes({**off, lever: on[lever]}, sheet=lever == 'sheet_details'))
+
     def test_references_bring_definitions_and_cited_captions(self):
         from semantic_pdf_diff.extract import _long_form, glossary
         self.assertEqual(_long_form('LCOE', 'we report the levelized cost of energy'), 'levelized cost of energy')

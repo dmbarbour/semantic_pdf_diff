@@ -8,6 +8,8 @@ A round is a folder, e.g. benchmarks/rounds/r01/, holding round.json:
      "set": "dev", "units": 32, "cap": 10.0,     # every variant judged to "units" and decided once
      "judge_timeout": 450, "judge_retries": 0,   # a stalled judge otherwise holds a chunk for 30 minutes
      "rubric": "v6",                             # judging rubric (rounds.RUBRICS); default v1
+     "query_checks": {"sample": 30, "cap": 2.0}, # strong models check what each variant changed first
+                                                 # (models: QUERY_CHECKERS unless given); held until accepted
      "escalate": ["Qwen/Qwen3.5-397B-A17B"],     # second opinions on units the main judges leave unsettled
      "confirm_judges": [], "confirm_units": 16,  # expensive judges for accepted variants, when wanted
      "judges": ["XiaomiMiMo/MiMo-V2.6-Pro"]}    # the main judges see every unit
@@ -15,7 +17,9 @@ A round is a folder, e.g. benchmarks/rounds/r01/, holding round.json:
 Variant files are settings (query levers) merged over the recording's base settings.
 Every step is checkpointed in state.json and records its figures in benchmarks/history.jsonl.
 When the provider balance or the round's cap runs out, the step pauses (exit 3); running the
-same command again resumes without repeating paid work. See docs/plans/query-improvement-2026-09-26.md.
+same command again resumes without repeating paid work. When checkers flag queries, the round is
+held before sampling and judging (exit 4) until they're fixed or accepted (--accept-checks).
+See docs/plans/query-improvement-2026-09-26.md.
 
     python scripts/run_round.py benchmarks/rounds/r09
 """
@@ -34,12 +38,20 @@ FIXTURE = ROOT / "tests/fixtures/slices.sqlite"
 DOCUMENTS = {s["name"]: s.get("family") for s in json.loads((ROOT / "scripts/slices.json").read_text())["slices"]}
 LEDGER = ROOT / "benchmarks/ledger.jsonl"
 HISTORY = ROOT / "benchmarks/history.jsonl"
+# Checkers of each round's queries (query_checks in round.json): two families, both reading images,
+# with Claude reading the dump. Gemini shares Google with the extractor (gemma), which matters little
+# for checking queries our code builds. Chosen by Claude, who the owner left the choice to: in a trial
+# (2026-09-28) Gemini answered all 20 queries at $0.011 each, while Qwen3.5-397B and Kimi-K3 reasoned
+# past their output budget on most ($0.012 and $0.053 a call, mostly lost); MiMo judges at $0.004.
+QUERY_CHECKERS = ["google/gemini-3.1-pro", "XiaomiMiMo/MiMo-V2.6-Pro"]
 REPORT = ROOT / "benchmarks/report.html"
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("round", type=Path)
-    parser.add_argument("--only", choices=["record", "replay", "measure", "pairs", "judge", "decide", "report"])
+    parser.add_argument("--only", choices=["record", "replay", "measure", "check", "pairs", "judge", "decide", "report"])
+    parser.add_argument("--accept-checks", action="store_true",
+                        help="the query checks' flags were looked over and accepted: go on to sampling and judging")
     args = parser.parse_args(argv)
     from semantic_pdf_diff import insights, ledger, rounds
     import record_runs
@@ -131,6 +143,59 @@ def main(argv=None):
                 for metric, value in values.items():
                     figure(metric, value, variant=v, stratum=stratum, step="measure")
             mark(step, "done")
+
+    # 3b. Queries checked before any money goes on judging (docs/plans/content-addressed-queries):
+    #     a sample of what each variant changed is dumped (queries-<variant>/index.html) for people
+    #     and Claude to look over, and strong models from other families check it for obvious errors.
+    #     A flagged query holds the round until it's fixed or the flags are accepted (--accept-checks).
+    checks = spec.get("query_checks")
+    if checks and wanted("check"):
+        from semantic_pdf_diff import queries
+        from semantic_pdf_diff.ledger import Ledger
+        from semantic_pdf_diff.llm import Client
+        from semantic_pdf_diff.models import Settings
+        cap = float(checks.get("cap", 2.0))
+        for v in spec["variants"]:
+            step = f"check:{v}"
+            if done(step) or not (done(f"replay:{v}") and done("replay:baseline")):
+                continue
+            dump_dir = folder / f"queries-{v}"
+            summary = queries.dump(runs_root / v, dump_dir, against=runs_root / "baseline",
+                                   sample=int(checks.get("sample", 30)))
+            for model in checks.get("models", QUERY_CHECKERS):
+                left = min(remaining(), cap - ledger.spent(LEDGER, round=name, step="check"))
+                if left <= 0:
+                    state["paused"] = f"the query checks' cap (${cap:.2f}) reached while checking {v}"
+                    save_state()
+                    print(f"Paused: {state['paused']}")
+                    return 3
+                settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000, image_tokens=3000,
+                                             concurrency=4, timeout=600, retries=1, max_cost=left)
+                client = Client(settings, dump_dir / ".check-cache")
+                client.ledger = Ledger(LEDGER, round=name, step="check", variant=v, judge=model)
+                _, _, failures = queries.check(dump_dir, client, model)
+                if failures:
+                    state.setdefault("failure_notes", {})[f"check:{v}:{model}"] = [f[:300] for f in failures]
+                if client.out_of_budget:
+                    state["paused"] = f"{client.out_of_budget} while checking {v}"
+                    save_state()
+                    print(f"Paused: {state['paused']}")
+                    return 3
+            flags = queries.flagged(dump_dir, in_change=True)  # what the variant changed; older problems are leads
+            state.setdefault("query_flags", {})[v] = sorted(flags)
+            figure("query_flags", len(flags), variant=v, step="check", shown=summary["shown"],
+                   changed=summary["candidates"], flagged_before=len(queries.flagged(dump_dir)) - len(flags))
+            mark(step, "done")
+        spent_figure("check")
+    if args.accept_checks:
+        state["checks_accepted"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        save_state()
+    held = [v for v, flags in state.get("query_flags", {}).items() if flags]
+    if checks and held and not state.get("checks_accepted") and (wanted("pairs") or wanted("judge")):
+        print("Held: checkers flagged queries in " + ", ".join(f"{v} ({len(state['query_flags'][v])})" for v in held)
+              + ". Look them over in " + ", ".join(str(folder / f"queries-{v}" / "index.html") for v in held)
+              + "; fix the lever, or rerun with --accept-checks.")
+        return 4
 
     judges = spec.get("judges", [])
     chunk, target, minimum = int(spec.get("chunk", 8)), int(spec.get("units", 60)), int(spec.get("min_units", 16))

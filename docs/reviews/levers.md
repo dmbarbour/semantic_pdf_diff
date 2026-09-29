@@ -49,7 +49,12 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 ### Numbered-item stems (`stem_context`)
 - **Mechanism:** "Within: Contest 9 > 9-2. Cooking > c. …" on text and table tasks, carried across pages.
 - **Got:** text 0.69, tables neutral. **Loses on IEA-15** in r03 and r04 (0.31): judges said entities and attributes were built from the path.
-- **Next:** give the stem as the parent only, not a full path, where the path is long or not numbered.
+- **Found since:**
+  - Table values were taken for numbered items (fixed 2026-09-28).
+  - Query checks (2026-09-28) found two more problems:
+    - figure panel labels ("(a) Mass density", "(e) Chordwise offset") taken for numbered items, so charts parsed as tables get "Within: (e) ..."
+    - a text chunk's "Section:" and "Within:" disagreeing (IEA-15: 3.2 Steady-State Performance against 3.1.1 Controller Methodology)
+- **Next:** give the stem as the parent only, not a full path, where the path is long or not numbered; skip parenthesised letters inside figures.
 
 ### Whitespace bands (`tiling: bands`)
 - **Mechanism:** on report-sized pages, full-width bands cut at whitespace gaps, skipping bands with no graphics.
@@ -135,6 +140,18 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
   - a larger sample on report pages only
   - a larger thumbnail on sheets
   - the thumbnail only for tiles that cut a figure
+
+## Ideas not built yet
+
+Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so none is forgotten.
+
+| Idea | Raised by | Evidence |
+|---|---|---|
+| Leave page furniture (running headers, footers, page numbers) out of neighbouring text and text layers | Query checks, 2026-09-28 | Gemini flagged it in 5 of 8 sampled queries (DC manual, NREL, HabEx) |
+| Cut text chunks at sentence ends, and text layers at word ends | Query checks, 2026-09-28 | "This focus is" ending a HabEx chunk; "defined in the W" ending an IEA-22 text layer |
+| Send a one-row table's row without repeating it as its header | Query checks, 2026-09-28 | Ken manual "AC Rating ... 6.4 kW", and an NREL "table" made of equation debris |
+| Drop text tasks that hold only a watermark or title-block boilerplate | Query checks, 2026-09-28 | A ken-cd text task holding only "PRODUCED BY AN AUTODESK STUDENT PRODUCT" |
+| Recognise charts parsed as tables (axis labels, legends, empty cells) | Query checks, 2026-09-28; the table filter lever (r01b) | IEA-15 airfoil polar legends sent as tables; the table filter was inconclusive in r01b |
 
 ## Measurement notes (affect how to read the table)
 
