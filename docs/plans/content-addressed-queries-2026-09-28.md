@@ -197,13 +197,11 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
     - **The local master fixture** (`tests/fixtures/slices.sqlite`): the replay fixture, plus what re-keyed from the old master under the current defaults (all 12 runs, sheets included) and round 0's levers (extraction only). That's 6,501 answers from 14 documents, 14 MB against 100 MB. Everything else was let go, along with the older local fixtures.
   - **Tests:** re-keying (answers carried with their dates, changed queries let go), two replays forming byte-identical evidence and reports, and the new cache's guarantees.
     - **Byte-identical reports:** `SOURCE_DATE_EPOCH` fixes the time reports and review batches say they were made (the owner's suggestion).
-  - **Local run stores rebuilt by replay** (git-ignored; the owner asked): 334 of 401, including every round's baseline, the accepted levers' variants and sc01's sources.
-    - **Identical queries recovered answers:** under content addressing, many old variants' queries match queries recorded under other settings, so even variants whose own answers were let go mostly replay completely.
-    - **Kept at store schema 7 (67 stores):**
-      - variants whose lever changed queries no other recording shares (48): sheet details on drawing sheets, references, the tile locator, the chart rule
-      - the A/A control (10): its second samples weren't re-keyed
-      - the review batches' stores (9), which have no settings file to replay with
-    - **Recording scratch (`runs/*/record/`) wasn't rebuilt.**
+  - **Local run stores rebuilt by replay** (git-ignored; the owner asked): 281 of the rounds' 392 replay stores.
+    - **A first attempt was wrong and was undone.** Runs' `settings.json` held only the settings a round changed, so replaying them under the promoted defaults turned old baselines into champion runs; they "replayed completely" for that reason. The original stores were restored.
+    - **The rebuild that stands** replays each run with its settings as they were (round 0's levers, the defaults until the promotion, overlaid by its `settings.json`). It re-keys from the old master fixture wherever today's code rebuilds the same query: 5,132 answers carried over, and the master now holds 10,574 queries. The A/A control's second samples came along too.
+    - **Kept at store schema 7 (111):** runs where today's code builds some query differently (the stem fix, the rotated-sheet fixes), so a replay can't be complete without re-recording. The review batches' stores (9) weren't touched: they have no settings file. Neither was the recording scratch (`runs/*/record/`).
+    - **Recordings now save every setting that can change a query, resolved** (`record_runs.py`), so a replay means the same thing after defaults move.
   - **Re-keying is temporary:** `LegacyFixture`, `--rekey-from` and its test go once nothing needs re-keying (the owner: "I doubt we'll hold onto re-keying tests for long").
 - **Milestone 3 (2026-09-28): done.**
   - **Lever notes:** `extract.lever_notes` finds the lines each lever added to a query from the markers its builder writes. They're computed when dumping, from the store's query log: nothing stored, nothing in the hash. A test checks every builder against its mark.
