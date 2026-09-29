@@ -355,6 +355,56 @@ class SectionContext(unittest.TestCase):
         self.assertFalse(excerpted('gelcoat E1 [Pa] 3.440E+09', text, in_order=False))  # fragments only
         self.assertTrue(excerpted('22.0 | 12.1 | 19.94 | -105.90E+6', text, in_order=False))
 
+    def displayed_page(self, path, rotated):
+        """One page as displayed (600 x 400): a heading, a paragraph, a lead-in over a ruled table, a note
+        beside it, a figure with text around it. Stored upright, or sideways with /Rotate 90."""
+        doc = pymupdf.open()
+        page = doc.new_page(width=400, height=600) if rotated else doc.new_page(width=600, height=400)
+        if rotated:
+            page.set_rotation(90)
+        at = (lambda x, y: pymupdf.Point(x, y) * page.derotation_matrix) if rotated else pymupdf.Point
+        text = lambda x, y, t, size=9: page.insert_text(at(x, y), t, fontsize=size, rotate=90 if rotated else 0)
+        text(40, 30, '3.1 Pumps', 12)
+        text(40, 50, 'The pumps serve the chilled water loop and run at night.')
+        text(40, 70, 'Pump schedule for the chilled water loop:')
+        for r in range(4):
+            page.draw_line(at(40, 80 + 30 * r), at(340, 80 + 30 * r))
+        for c in range(3):
+            page.draw_line(at(40 + 150 * c, 80), at(40 + 150 * c, 170))
+        for r, (a, b) in enumerate((('Item', 'Power'), ('Pump', '10 kW'), ('Fan', '3 kW'))):
+            text(45, 100 + 30 * r, a)
+            text(195, 100 + 30 * r, b)
+        text(420, 120, 'SHEET NOTES BESIDE THE TABLE')
+        text(40, 250, 'Text above the figure describes the pump curve.')
+        for i in range(12):  # a figure: a cluster of drawings
+            x, y = 60 + (i % 4) * 40, 270 + (i // 4) * 30
+            page.draw_rect(pymupdf.Rect(at(x, y), at(x + 25, y + 18)))
+        text(40, 380, 'Text below the figure gives the duty point.')
+        doc.set_toc([[1, '3.1 Pumps', 1]])
+        doc.save(path)
+        doc.close()
+        return path
+
+    def test_a_page_reads_the_same_upright_or_rotated(self):
+        """Metamorphic: the same page as displayed, stored upright or sideways (/Rotate), gets the same
+        queries and the same situating context (one owner of page coordinates: pages.py)."""
+        from semantic_pdf_diff.situate import surroundings
+        with tempfile.TemporaryDirectory() as d:
+            prompts, around = {}, {}
+            for rotated in (False, True):
+                path = self.displayed_page(Path(d) / f'page-{rotated}.pdf', rotated)
+                client = Recorder(vision=False, table_context=400, context_before=400, context_after=400)
+                extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+                prompts[rotated] = sorted(p for p, _ in client.asked)
+                with pymupdf.open(path) as doc:
+                    page = doc[0]
+                    figure = pymupdf.Rect(pymupdf.Point(55, 265) * page.derotation_matrix,
+                                          pymupdf.Point(225, 353) * page.derotation_matrix)  # the figure's box, unrotated
+                    around[rotated] = surroundings(page, tuple(figure))
+            self.assertTrue(any('Above the table: ...' in p and 'Pump schedule for the chilled water loop:' in p
+                                for p in prompts[False]))
+            self.assertEqual(prompts[False], prompts[True])
+
     def rotated_sheet(self, path):
         """A page rotated 90° (like the drawing sets): a sentence displayed above a table, a note beside it."""
         doc = pymupdf.open()

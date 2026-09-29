@@ -7,6 +7,7 @@ requests that write "about" statements build on it.
 import math
 import re
 from .models import Figure, Reference
+from .pages import native_page, shown
 
 KINDS = {"figure": "figure", "figures": "figure", "fig": "figure", "figs": "figure", "table": "table",
          "tables": "table", "sheet": "sheet", "sheets": "sheet", "drawing": "sheet", "drawings": "sheet",
@@ -60,7 +61,7 @@ def model_label(text, kind):
 
 def native_rect(page):
     """The page in unrotated coordinates, like text, drawings and figure boxes."""
-    return page.rect * page.derotation_matrix
+    return native_page(page)
 
 def is_sheet(drawings, characters):
     return drawings >= SHEET_PATHS and drawings >= characters / 2
@@ -86,8 +87,7 @@ def title_block(page):
     size, number, box = max(numbers, key=lambda x: x[0])
     centre = lambda b: ((b[0] + b[2]) / 2, (b[1] + b[3]) / 2)
     near = [x for x in spans if 0.35 * size <= x[0] <= 0.7 * size and math.dist(centre(box), centre(x[2])) <= 6 * size]
-    import pymupdf
-    near.sort(key=lambda x: (lambda r: (round(r.y0), r.x0))(pymupdf.Rect(x[2]) * page.rotation_matrix))
+    near.sort(key=lambda x: (lambda r: (round(r.y0), r.x0))(shown(page, x[2])))
     return label_of("sheet", number), " ".join(text for _, text, _ in near)[:200]
 
 def _area(b):
@@ -303,10 +303,9 @@ def surroundings(page, bbox, limit=1500):
 def position(page, figure):
     if figure.kind == "sheet" and _area(figure.bbox) >= 0.9 * _area(tuple(page.rect)):
         return "the whole page"
-    import pymupdf
-    shown = pymupdf.Rect(figure.bbox) * page.rotation_matrix  # as the page is displayed
+    box = shown(page, figure.bbox)  # as the page is displayed
     top, bottom = page.rect.y0, page.rect.y1
-    third = ((shown.y0 + shown.y1) / 2 - top) / max(bottom - top, 1)
+    third = ((box.y0 + box.y1) / 2 - top) / max(bottom - top, 1)
     return "top of the page" if third < 1 / 3 else "middle of the page" if third < 2 / 3 else "bottom of the page"
 
 def figure_map(doc, evidence):
@@ -449,7 +448,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
 
     def render(page_no, rect, name):
         page = doc[page_no - 1]
-        rect = pymupdf.Rect(rect) * page.rotation_matrix  # figure boxes are unrotated; rendering isn't
+        rect = shown(page, rect)  # figure boxes are unrotated; rendering isn't
         whole = abs(rect & page.rect) >= 0.99 * abs(page.rect)
         scale = min(2.5, side / max(rect.width, rect.height, 1))
         page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=None if whole else rect, alpha=False).save(assets / name)

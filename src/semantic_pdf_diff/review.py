@@ -18,9 +18,10 @@ import html
 import json
 import random
 import re
-from .provenance import now
 from pathlib import Path
 
+from .pages import native_page, shown
+from .provenance import now
 from .taxonomy import (ADEQUACY, CLARITY, CONFIDENCE, CORE_FIELDS, FIELD_ANSWERS, FIELDS, MISSING, TAXONOMY, USABLE,
                        USEFULNESS, WORTH, field_names, flag_names)
 
@@ -39,14 +40,14 @@ def render(doc, page_no, rect=None, highlight=None, side=CROP_SIDE):
     highlighted rectangle, drawn on the pixels so the PDF is never modified."""
     import pymupdf
     page = doc[page_no - 1]
-    clip = (pymupdf.Rect(rect) * page.rotation_matrix) & page.rect if rect is not None else page.rect
+    clip = shown(page, rect) & page.rect if rect is not None else page.rect
     if clip.is_empty or clip.width < 2 or clip.height < 2:  # a box off the page: show the page instead
         clip = page.rect
     zoom = min(3.0, side / max(clip.width, clip.height, 1))
     pix = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), clip=clip, alpha=False)
     if highlight is not None:
         # A clipped pixmap keeps the clip's origin: its pixel coordinates start at (pix.x, pix.y).
-        box = pymupdf.Rect(highlight) * page.rotation_matrix * pymupdf.Matrix(zoom, zoom)
+        box = shown(page, highlight) * pymupdf.Matrix(zoom, zoom)
         x0, y0, x1, y1 = int(box.x0), int(box.y0), int(box.x1), int(box.y1)
         x0, y0 = max(x0, pix.x), max(y0, pix.y)
         x1, y1 = min(x1, pix.x + pix.width - 1), min(y1, pix.y + pix.height - 1)
@@ -221,7 +222,7 @@ def _claim_views(source, folder, e, prefix):
     loc = e["locator"]
     with source.doc(e["content"]) as doc:
         page = doc[loc["page"] - 1]
-        native = tuple(page.rect * page.derotation_matrix)
+        native = tuple(native_page(page))
         visual = loc["region"] in ("tile", "overview")
         if visual:  # the model's image outlined within its surroundings
             b = loc["bbox"]

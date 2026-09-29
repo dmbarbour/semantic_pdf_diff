@@ -14,6 +14,7 @@ import random
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
+from .pages import native_page
 
 FAMILY = {"text": "text", "table": "table", "tile": "visual", "figure": "visual", "overview": "visual"}
 MAX_CLAIMS = 25     # claims shown per side (sampled when there are more)
@@ -155,24 +156,21 @@ LEAD = 400  # characters of text before a unit shown to judges (as the extractor
 
 def _lead(doc, page, region, cache, key):
     """(text just before the region, the numbered items and headings it sits under), as the
-    extractor saw them in its context (neighbouring text, "Within:" stems)."""
-    from .extract import display_y, reading_blocks, stem_index
-    if key + ("stems",) not in cache:
+    extractor saw them in its context (neighbouring text, "Within:" stems): the stems from the
+    extractor's own provider (extract.Context.stem_path)."""
+    from .extract import Context, stem_index
+    from .pages import display_y, reading_blocks
+    if key + ("stems",) not in cache:  # the document is opened afresh per unit; its stem index is kept
         cache[key + ("stems",)] = stem_index(doc)
-    stems = cache[key + ("stems",)]
+    context = Context(doc, None)  # only its stem path is used
+    context.stems = cache[key + ("stems",)]
     here = doc[page - 1]
     top = display_y(here, tuple(region))
     above = [b[4] for b in reading_blocks(here) if b[6] == 0 and display_y(here, tuple(b[:4])) < top - 1]
     if not above and page > 1:
         above = [b[4] for b in reading_blocks(doc[page - 2]) if b[6] == 0]
     before = " ".join(" ".join(above).split())[-LEAD:]
-    path = []
-    for number in range(page, 0, -1):
-        rows = [p for y, p in stems.get(number, []) if number < page or y < top - 1]
-        if rows:
-            path = rows[-1]
-            break
-    return before, " > ".join(path)
+    return before, " > ".join(context.stem_path(page, tuple(region)))
 
 def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", limit=MAX_CLAIMS):
     """Write a pairwise batch: pairs.json (with which side is the baseline) and page images."""
@@ -195,7 +193,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
         headings = [" > ".join(x.heading_path) for x in docs[(run, content, "sections")]
                     if x.heading_path and x.first_page <= page <= x.last_page]
         with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
-            unrotated = doc[page - 1].rect * doc[page - 1].derotation_matrix
+            unrotated = native_page(doc[page - 1])
             part, parts, y0, y1 = band[0] if band else (0, 1, unrotated.y0, unrotated.y1)
             region = pymupdf.Rect(unrotated.x0, max(unrotated.y0, y0 - 12), unrotated.x1, min(unrotated.y1, y1 + 12))
             name = f"{run}-{content.split(':')[1][:8]}-p{page}" + (f"-b{part}of{parts}" if band else "") + ".jpg"
@@ -564,7 +562,7 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
                 file = next(f for f in store.files() if f.content == content)
                 docs[(run, content)] = read_origin(store.origin(file.source, file.path))
         with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
-            unrotated = doc[page - 1].rect * doc[page - 1].derotation_matrix
+            unrotated = native_page(doc[page - 1])
             y0, y1 = (band[0][2], band[0][3]) if band else (unrotated.y0, unrotated.y1)
             region = pymupdf.Rect(unrotated.x0, max(unrotated.y0, y0 - 12), unrotated.x1, min(unrotated.y1, y1 + 12))
             name = item["image"].replace(".jpg", "-page.jpg")
