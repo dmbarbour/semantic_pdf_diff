@@ -1,1 +1,0 @@
-{"better":"same","a_wrong":3,"b_wrong":3,"confidence":"high","note":"Both sets extract the same claims with the same errors. Both incorrectly identify the entity as 'Blade-Pitch Controller' for some claims, which is not supported by the text. Both also misread the variable 'θ_k' as 'θ' in their extractions and quotes."}

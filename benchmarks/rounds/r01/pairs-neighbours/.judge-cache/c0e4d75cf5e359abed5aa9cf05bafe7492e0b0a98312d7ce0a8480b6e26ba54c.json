@@ -1,1 +1,0 @@
-{"better":"B","a_wrong":2,"b_wrong":2,"confidence":"high","note":"Both sets extract information from the wiring schedule well. Set B is slightly better because it captures more of the conduit sizes (e.g., for items 20 and 31) that Set A misses. Both sets occasionally infer 'AWG' which is not explicitly in the text but is standard."}

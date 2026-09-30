@@ -14,6 +14,7 @@ Nobody is ground truth here. Each reviewer (you, Claude in a session, and a pane
 | `runs/<responder>/<run>/` | no | Stores replayed offline from the recorded fixtures, which batches sample from |
 | `spotchecks/<name>/` | yes (not the page) | Spot checks: a person judges the same pairs as the panel (`scripts/spotcheck.py`) |
 | `rounds/<name>/` | yes | Query-improvement rounds (`scripts/run_round.py`); `champion.json` is the current best settings, `round0.json` the original ones |
+| `*/replay.zip` in a round's batch, a spot check or a review batch | yes (not for review batches) | Every model answer that folder's evaluation asked for (judges, query checkers, the post-mortem's analyst), keyed by query like the main fixture. A rerun pays only for what's missing, and tests judge committed batches again offline |
 
 ## Reviewing a batch (for people)
 

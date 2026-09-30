@@ -105,7 +105,7 @@ def main(argv=None):
     def wanted(step):
         return args.only in (None, step)
 
-    # 0. Rounds commit page images, page text and claims (pairs-*/, judge caches), so they run on
+    # 0. Rounds commit page images, page text and claims (pairs-*/, replay fixtures), so they run on
     #    slices marked public only: a sensitive document must never reach the repository.
     manifest = json.loads(record_runs.MANIFEST.read_text())
     wanted_set = spec.get("set", "dev")
@@ -159,8 +159,8 @@ def main(argv=None):
     if checks and wanted("check"):
         from semantic_pdf_diff import queries
         from semantic_pdf_diff.ledger import Ledger
-        from semantic_pdf_diff.llm import Client
-        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.llm import folder_client
+        from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
         cap = float(checks.get("cap", 2.0))
         for v in spec["variants"]:
             step = f"check:{v}"
@@ -176,11 +176,11 @@ def main(argv=None):
                     save_state()
                     print(f"Paused: {state['paused']}")
                     return 3
-                settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000, image_tokens=3000,
+                settings = Settings.from_env(model=model, **EVALUATOR_SETTINGS,
                                              concurrency=4, timeout=600, retries=1, max_cost=left)
-                client = Client(settings, dump_dir / ".check-cache")
-                client.ledger = Ledger(LEDGER, round=name, step="check", variant=v, judge=model)
-                _, _, failures = queries.check(dump_dir, client, model)
+                with folder_client(dump_dir, settings) as client:
+                    client.ledger = Ledger(LEDGER, round=name, step="check", variant=v, judge=model)
+                    _, _, failures = queries.check(dump_dir, client, model)
                 if failures:
                     state.setdefault("failure_notes", {})[f"check:{v}:{model}"] = [f[:300] for f in failures]
                 if client.out_of_budget:
@@ -278,20 +278,19 @@ def main(argv=None):
 
     def ask(v, model, upto, only=None, retry_failed=False, step="judge", verdicts_dir="verdicts"):
         """One judge over a variant's first `upto` units; raises Paused at the cap or out of budget."""
-        from semantic_pdf_diff.llm import Client
+        from semantic_pdf_diff.llm import folder_client
         from semantic_pdf_diff.ledger import Ledger
-        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
         batch = folder / f"pairs-{v}"
         if remaining() <= 0:
             raise Paused(f"round cap reached while judging {v} ({model}, units to {upto})")
-        settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000,
-                                     image_tokens=3000, concurrency=16,
+        settings = Settings.from_env(model=model, **EVALUATOR_SETTINGS, concurrency=16,
                                      timeout=int(spec.get("judge_timeout", 600)),
                                      retries=int(spec.get("judge_retries", 2)), max_cost=remaining())
-        client = Client(settings, batch / ".judge-cache")
-        client.ledger = Ledger(LEDGER, round=name, step=step, variant=v, judge=model)
-        _, _, failures = rounds.judge_pairs(batch, client, model, limit=upto, rubric=rubric, only=only,
-                                            retry_failed=retry_failed, verdicts_dir=verdicts_dir)
+        with folder_client(batch, settings) as client:
+            client.ledger = Ledger(LEDGER, round=name, step=step, variant=v, judge=model)
+            _, _, failures = rounds.judge_pairs(batch, client, model, limit=upto, rubric=rubric, only=only,
+                                                retry_failed=retry_failed, verdicts_dir=verdicts_dir)
         # Failed verdicts over the whole round, not the last call's (the audit, 2026-09-28: each call
         # overwrote the count, so an escalation judge's failures read 0).
         key = f"{step}:{v}:{model}"
@@ -332,17 +331,18 @@ def main(argv=None):
         partitions, and the analyst's reading; Claude writes the round's review from it."""
         from semantic_pdf_diff import postmortem
         from semantic_pdf_diff.ledger import Ledger
-        from semantic_pdf_diff.llm import Client
-        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.llm import folder_client
+        from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
         batch, pm = folder / f"pairs-{v}", spec["postmortem"]
-        client = None
         left = min(remaining(), pm["cap"] - ledger.spent(LEDGER, round=name, step="postmortem"))
         if pm["analyst"] and left > 0:
-            settings = Settings.from_env(model=pm["analyst"], context_tokens=262144, output_tokens=16000, image_tokens=3000,
+            settings = Settings.from_env(model=pm["analyst"], **EVALUATOR_SETTINGS,
                                          concurrency=1, timeout=600, retries=1, max_cost=left)
-            client = Client(settings, batch / ".postmortem-cache")
-            client.ledger = Ledger(LEDGER, round=name, step="postmortem", variant=v, judge=pm["analyst"])
-        postmortem.write(batch, DOCUMENTS, client, units=pm["units"])
+            with folder_client(batch, settings) as client:
+                client.ledger = Ledger(LEDGER, round=name, step="postmortem", variant=v, judge=pm["analyst"])
+                postmortem.write(batch, DOCUMENTS, client, units=pm["units"])
+        else:
+            postmortem.write(batch, DOCUMENTS, None, units=pm["units"])
         print(f"Post-mortem: {batch / 'postmortem.html'}")
 
     def confirm(v):

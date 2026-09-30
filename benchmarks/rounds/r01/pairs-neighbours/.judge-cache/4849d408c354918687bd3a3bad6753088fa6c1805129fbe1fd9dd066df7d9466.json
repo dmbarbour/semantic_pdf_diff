@@ -1,1 +1,0 @@
-{"better":"A","a_wrong":5,"b_wrong":6,"confidence":"high","note":"Both sets struggle with matching the correct detail callout (e.g., A1, A4, B1, B4) to the corresponding beam title, resulting in several mismatched conditions. Set B includes a duplicate extraction for the roof beam at grids 2, 3, 4, and 5. Set A is slightly better because it avoids this duplication."}

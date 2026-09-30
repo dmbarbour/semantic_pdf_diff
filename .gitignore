@@ -10,7 +10,7 @@ tests/fixtures/*.sqlite
 benchmarks/runs/
 benchmarks/batches/*/images/
 benchmarks/batches/*/review.html
-benchmarks/batches/*/.judge-cache/
+benchmarks/batches/*/replay.zip
 benchmarks/batches/*/questions.html
 benchmarks/report.html
 benchmarks/rounds/*/insights.html

@@ -1,1 +1,0 @@
-{"better":"B","a_wrong":3,"b_wrong":5,"confidence":"high","note":"Set B successfully extracts claims for the LUVOIR-B mission concept, which Set A completely misses. However, both sets struggle with hyphenated words, creating invalid entities like 'n-axis telescope' and 'axis telescope'. Set B also incorrectly extracts the 10 m focal length as a 'size' for the mirror assembly."}

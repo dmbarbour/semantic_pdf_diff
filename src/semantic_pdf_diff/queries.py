@@ -195,7 +195,8 @@ def check(folder, client, model, progress=None):
                                       # a changed query's problem is the change's unless the checker says otherwise
                                       "in_change": None if ok or not item["diff"] else value.in_change is not False}
             progress.add()
-            dispatch.submit(check_prompt(item), QueryCheck, [folder / i for i in item["images"]], None, finish)
+            dispatch.submit(check_prompt(item), QueryCheck, [folder / i for i in item["images"]], ("check", item["id"]),
+                            finish)
         dispatch.drain()
     target.parent.mkdir(exist_ok=True)
     target.write_text(json.dumps({"model": model, "checks": checks}, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

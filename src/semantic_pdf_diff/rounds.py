@@ -461,11 +461,43 @@ def _claim_marks(entries, shown):
                         "problems": sorted({str(p).lower() for p in entry.get("problems") or ()} & set(CLAIM_PROBLEMS))})
     return out
 
+def pair_requests(folder, batch, rubric="v1"):
+    """Every judge request a batch makes under a rubric, in order: (item, order, prompt, images,
+    a, b, groups), a and b being the claim sets as shown (A first) and groups v6's grouping (or None).
+    The prompts are the queries judges answer; re-keying old answers rebuilds them from here."""
+    folder = Path(folder)
+    template = pairwise_prompt(rubric)
+    numbered = RUBRICS[rubric].get("claims")
+    whole = RUBRICS[rubric].get("whole")
+    for item in batch["items"]:
+        for order in ("baseline-first", "variant-first"):
+            a, b = (item["baseline"], item["variant"]) if order == "baseline-first" else (item["variant"], item["baseline"])
+            counts = item.get("counts") or {}
+            notes = {side: _set_note(len(item[side]), counts.get(side, len(item[side])), item.get("hidden_shared", 0))
+                     for side in ("baseline", "variant")}
+            first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
+            band = item.get("band")
+            if whole and "page_image" not in item:
+                raise ValueError(f"rubric {rubric} needs the whole page: run rounds.add_context on {folder} first")
+            view, grouped, groups = _whole_view(item, a, b) if whole else ("", "", None)
+            images = [folder / item["image"]] + ([folder / item["page_image"]] if whole and band else [])
+            prompt = template.format(page=item["page"], family=item["family"], page_text=item["page_text"],
+                                     page_view=view, claims=grouped,
+                                     a=_claims_text(a, "A" if numbered else None),
+                                     b=_claims_text(b, "B" if numbered else None),
+                                     sections=" | ".join(item.get("sections") or ()) or "none",
+                                     part=(f", part {band[0] + 1} of {band[1]}" + ("" if whole else " (the image shows that part)"))
+                                     if band else "",
+                                     before=item.get("before") or "(start of the document)",
+                                     within=item.get("within") or "nothing numbered",
+                                     a_note=notes[first], b_note=notes[second])
+            yield item, order, prompt, images, a, b, groups
+
 def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1", only=None, retry_failed=False,
                 verdicts_dir="verdicts"):
     """Ask one model to compare every unit (or only those in `only`), in both orders; merges
-    into verdicts/<reviewer>.json. Answers are cached in the batch folder, so a rerun (e.g. after
-    a budget pause) pays only for what's missing.
+    into verdicts/<reviewer>.json. Answers are recorded in the batch's replay fixture (see
+    fixtures.folder_fixture), so a rerun (e.g. after a budget pause) pays only for what's missing.
 
     A verdict that fails (a judge timing out on a long unit) isn't asked again on later calls,
     which used to hold every later chunk for another timeout; retry_failed asks such verdicts
@@ -482,74 +514,50 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
     failed_path = folder / "failures" / f"{reviewer_file(reviewer)}.json"
     failed = json.loads(failed_path.read_text(encoding="utf-8")) if failed_path.exists() else {}
     failures = []
-    template = pairwise_prompt(rubric)
     tags = lambda values: sorted({str(t).strip().lower() for t in values or ()} & set(PAIR_PROBLEMS))
+    included = {i["id"] for i in batch["items"][:limit]}
     with Dispatcher(client) as dispatch:
-        for item in batch["items"][:limit]:
-            if only is not None and item["id"] not in only:
+        for item, order, prompt, images, a, b, groups in pair_requests(folder, batch, rubric):
+            if item["id"] not in included or only is not None and item["id"] not in only:
                 continue
-            for order in ("baseline-first", "variant-first"):
-                attempts = failed.get(f"{item['id']}|{order}", 0)
-                if order in verdicts.get(item["id"], {}) or (attempts and not (retry_failed and attempts == 1)):
-                    continue  # judged already, or failed and not (or no longer) retried
-                a, b = (item["baseline"], item["variant"]) if order == "baseline-first" else (item["variant"], item["baseline"])
-                counts = item.get("counts") or {}
-                notes = {side: _set_note(len(item[side]), counts.get(side, len(item[side])), item.get("hidden_shared", 0))
-                         for side in ("baseline", "variant")}
-                first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
-                band = item.get("band")
-                numbered = RUBRICS[rubric].get("claims")
-                whole = RUBRICS[rubric].get("whole")
-                if whole and "page_image" not in item:
-                    raise ValueError(f"rubric {rubric} needs the whole page: run rounds.add_context on {folder} first")
-                view, grouped, groups = _whole_view(item, a, b) if whole else ("", "", None)
-                images = [folder / item["image"]] + ([folder / item["page_image"]] if whole and band else [])
-                prompt = template.format(page=item["page"], family=item["family"], page_text=item["page_text"],
-                                         page_view=view, claims=grouped,
-                                         a=_claims_text(a, "A" if numbered else None),
-                                         b=_claims_text(b, "B" if numbered else None),
-                                         sections=" | ".join(item.get("sections") or ()) or "none",
-                                         part=(f", part {band[0] + 1} of {band[1]}" + ("" if whole else " (the image shows that part)"))
-                                         if band else "",
-                                         before=item.get("before") or "(start of the document)",
-                                         within=item.get("within") or "nothing numbered",
-                                         a_note=notes[first], b_note=notes[second])
-
-                def finish(value, error, item=item, order=order, a=a, b=b, groups=groups):
-                    progress.finish("failed" if error else "complete")
-                    if error is not None:
-                        failures.append(f"{item['id']} {order}: {error}")
-                        failed[f"{item['id']}|{order}"] = failed.get(f"{item['id']}|{order}", 0) + 1
-                        return
-                    failed.pop(f"{item['id']}|{order}", None)
-                    v = value.model_dump()
-                    better = v.get("better")
-                    variant_is = "B" if order == "baseline-first" else "A"
-                    score = 0.5 if better not in ("A", "B") else 1.0 if better == variant_is else 0.0
-                    verdicts.setdefault(item["id"], {})[order] = {
-                        "score": score, "better": better, "confidence": v.get("confidence", ""),
-                        "baseline_wrong": v.get("a_wrong") if order == "baseline-first" else v.get("b_wrong"),
-                        "variant_wrong": v.get("b_wrong") if order == "baseline-first" else v.get("a_wrong"),
-                        "note": v.get("note", "")}
-                    if RUBRICS[rubric]["tags"]:
-                        first, second = tags(v.get("a_problems")), tags(v.get("b_problems"))
-                        verdicts[item["id"]][order].update(
-                            baseline_problems=first if order == "baseline-first" else second,
-                            variant_problems=second if order == "baseline-first" else first,
-                            remarks=v.get("remarks", "").strip())
-                    if RUBRICS[rubric].get("claims"):  # each claim's mark, by side (A is the first set shown)
-                        first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
-                        if groups is None:
-                            marks = {first: _claim_marks(v.get("a_claims"), a), second: _claim_marks(v.get("b_claims"), b)}
-                        else:  # v6: a shared claim's mark counts for both sides, at each side's own index
-                            shared, only_a, only_b = groups
-                            at = lambda entries, index, claims: [
-                                {**m, "index": index[m["index"]]} for m in _claim_marks(entries, [claims[i] for i in index])]
-                            marks = {first: at(v.get("s_claims"), [i for i, _ in shared], a) + at(v.get("a_claims"), only_a, a),
-                                     second: at(v.get("s_claims"), [j for _, j in shared], b) + at(v.get("b_claims"), only_b, b)}
-                        verdicts[item["id"]][order]["claims"] = marks
-                progress.add()
-                dispatch.submit(prompt, PairVerdict, images, None, finish)
+            attempts = failed.get(f"{item['id']}|{order}", 0)
+            if order in verdicts.get(item["id"], {}) or (attempts and not (retry_failed and attempts == 1)):
+                continue  # judged already, or failed and not (or no longer) retried
+            def finish(value, error, item=item, order=order, a=a, b=b, groups=groups):
+                progress.finish("failed" if error else "complete")
+                if error is not None:
+                    failures.append(f"{item['id']} {order}: {error}")
+                    failed[f"{item['id']}|{order}"] = failed.get(f"{item['id']}|{order}", 0) + 1
+                    return
+                failed.pop(f"{item['id']}|{order}", None)
+                v = value.model_dump()
+                better = v.get("better")
+                variant_is = "B" if order == "baseline-first" else "A"
+                score = 0.5 if better not in ("A", "B") else 1.0 if better == variant_is else 0.0
+                verdicts.setdefault(item["id"], {})[order] = {
+                    "score": score, "better": better, "confidence": v.get("confidence", ""),
+                    "baseline_wrong": v.get("a_wrong") if order == "baseline-first" else v.get("b_wrong"),
+                    "variant_wrong": v.get("b_wrong") if order == "baseline-first" else v.get("a_wrong"),
+                    "note": v.get("note", "")}
+                if RUBRICS[rubric]["tags"]:
+                    first, second = tags(v.get("a_problems")), tags(v.get("b_problems"))
+                    verdicts[item["id"]][order].update(
+                        baseline_problems=first if order == "baseline-first" else second,
+                        variant_problems=second if order == "baseline-first" else first,
+                        remarks=v.get("remarks", "").strip())
+                if RUBRICS[rubric].get("claims"):  # each claim's mark, by side (A is the first set shown)
+                    first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
+                    if groups is None:
+                        marks = {first: _claim_marks(v.get("a_claims"), a), second: _claim_marks(v.get("b_claims"), b)}
+                    else:  # v6: a shared claim's mark counts for both sides, at each side's own index
+                        shared, only_a, only_b = groups
+                        at = lambda entries, index, claims: [
+                            {**m, "index": index[m["index"]]} for m in _claim_marks(entries, [claims[i] for i in index])]
+                        marks = {first: at(v.get("s_claims"), [i for i, _ in shared], a) + at(v.get("a_claims"), only_a, a),
+                                 second: at(v.get("s_claims"), [j for _, j in shared], b) + at(v.get("b_claims"), only_b, b)}
+                    verdicts[item["id"]][order]["claims"] = marks
+            progress.add()
+            dispatch.submit(prompt, PairVerdict, images, ("judge", item["id"], rubric, order), finish)
         dispatch.drain()
     if verdicts:
         target.parent.mkdir(exist_ok=True)

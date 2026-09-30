@@ -1,1 +1,0 @@
-{"better":"A","a_wrong":1,"b_wrong":5,"confidence":"high","note":"Set A extracts the valid Design Point CP value and one trivial claim about the x-axis labels. Set B extracts the CP value twice (duplicate) and includes four useless claims with 'not specified' values based only on the legend labels. Both sets missed the Design Point CT value, but Set A is much cleaner."}

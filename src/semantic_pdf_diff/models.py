@@ -533,6 +533,11 @@ class RoundSpec(Strict):
 # - selecting: which queries are made (tasks added or removed), and which sources are read
 # - post: what is done with answers; never an extraction query, though later stages read the result
 # tests/test_settings.py toggles each one through the whole pipeline and checks it keeps to its class.
+# What every evaluating model (judges, query checkers, the post-mortem's analyst) is asked with.
+# Its answers are recorded by query, so these must be the same wherever a folder is judged; the
+# transport (concurrency, timeouts, retries, caps) varies by caller and never changes a query.
+EVALUATOR_SETTINGS = {"context_tokens": 262144, "output_tokens": 16000, "image_tokens": 3000}
+
 SETTING_CLASSES = {
     **dict.fromkeys(("model", "base_url", "max_calls", "max_cost", "retries", "timeout", "stream",
                      "concurrency", "heartbeat_seconds", "rate_limits"), "endpoint"),

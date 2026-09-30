@@ -1,1 +1,0 @@
-{"better":"B","a_wrong":6,"b_wrong":4,"confidence":"high","note":"Both sets contain several hallucinated values not present in the source text (e.g., '2 x 6 x 12 in', '5/4 x 6 x 12 in', '4.5 in', '1.5 ft'). Set B is slightly better as it has fewer completely invented claims compared to Set A, though both struggle with assigning dimensions to the correct detail sections."}

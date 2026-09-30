@@ -1,1 +1,0 @@
-{"better":"B","a_wrong":1,"b_wrong":0,"confidence":"high","note":"Both sets extract a high volume of accurate claims from the Wiring Schedule. Set B is slightly better because it handles the formatting of item 10 ('#12/2WG') more naturally as a single type string, whereas Set A splits it into '12 AWG' and '2 WG', which is slightly inaccurate as 'WG' stands for 'with ground'."}

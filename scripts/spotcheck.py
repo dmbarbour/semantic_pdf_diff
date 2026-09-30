@@ -84,17 +84,17 @@ def main(argv=None):
         print(f"Context added; page: {rounds.write_spotcheck(args.folder)}")
     elif args.command == "judge":
         from semantic_pdf_diff.ledger import Ledger
-        from semantic_pdf_diff.llm import Client
-        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.llm import folder_client
+        from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
         judges = args.judge or ["XiaomiMiMo/MiMo-V2.6-Pro"]
         escalate = args.escalate or ["Qwen/Qwen3.5-397B-A17B"]
         def ask(model, only=None, retry_failed=False):
-            settings = Settings.from_env(model=model, context_tokens=262144, output_tokens=16000, image_tokens=3000,
+            settings = Settings.from_env(model=model, **EVALUATOR_SETTINGS,
                                          concurrency=16, timeout=900, retries=0, max_cost=args.max_cost)
-            client = Client(settings, args.folder / ".judge-cache")
-            client.ledger = Ledger(LEDGER, round="spotcheck", step="judge", variant=args.folder.name, judge=model)
-            return rounds.judge_pairs(args.folder, client, model, rubric=args.rubric, only=only, retry_failed=retry_failed,
-                                      verdicts_dir=verdicts(args.rubric))
+            with folder_client(args.folder, settings) as client:
+                client.ledger = Ledger(LEDGER, round="spotcheck", step="judge", variant=args.folder.name, judge=model)
+                return rounds.judge_pairs(args.folder, client, model, rubric=args.rubric, only=only,
+                                          retry_failed=retry_failed, verdicts_dir=verdicts(args.rubric))
         for model in judges:
             ask(model)
             ask(model, retry_failed=True)

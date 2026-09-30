@@ -1,1 +1,0 @@
-{"better":"same","a_wrong":0,"b_wrong":0,"confidence":"high","note":"Both sets correctly extract the elevation markers for the finished floor and grade level, associating them with the rooms shown in the respective sections. Set A uses slightly more precise attribute names ('elevation'), while Set B adds a reasonable but inferred condition. Both are acceptable."}

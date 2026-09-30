@@ -641,7 +641,7 @@ def clean_question_label(item, answer):
 def judge(folder, client, reviewer, limit=None, progress=None, stage="answers"):
     """Ask one model to review every item in a batch; writes labels/<reviewer>.json.
 
-    Answers are cached in the batch folder (by request bytes), so a rerun costs nothing."""
+    Answers are recorded in the batch's replay fixture (fixtures.folder_fixture), so a rerun costs nothing."""
     from .dispatch import Dispatcher
     from .models import PanelLabel
     from .progress import NoProgress
@@ -664,9 +664,10 @@ def judge(folder, client, reviewer, limit=None, progress=None, stage="answers"):
             progress.add()
             if questions:
                 images = [folder / i["src"] for i in item["request"]["images"]]
-                dispatch.submit(question_prompt(item), PanelQuestionLabel, images, None, finish)
+                dispatch.submit(question_prompt(item), PanelQuestionLabel, images, ("review", item["id"], stage), finish)
             else:
-                dispatch.submit(judge_prompt(item), PanelLabel, [folder / i["src"] for i in item["images"]], None, finish)
+                dispatch.submit(judge_prompt(item), PanelLabel, [folder / i["src"] for i in item["images"]],
+                                ("review", item["id"], stage), finish)
         dispatch.drain()
     data = {"format": QUESTIONS_FORMAT if questions else FORMAT, "version": 1, "batch": batch["name"],
             "reviewer": reviewer, "created": now().strftime("%Y-%m-%d"),

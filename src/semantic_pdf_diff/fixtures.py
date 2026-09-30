@@ -28,6 +28,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA_VERSION = 4  # 2: failures recorded; 3: response.used; 4: keyed by the query's hash (see above)
+# Each folder evaluated by models (a round's batch, a spot check, a review batch) keeps the answers
+# its evaluation asked for (judges, escalation, confirmation, the post-mortem's analyst, query
+# checks) in a fixture of its own, packed, out of the main one (the owner: "just so long as it's
+# kept out of our main test fixture").
+FOLDER_FIXTURE = "replay.zip"
 MODES = ("replay", "replay-or-record", "record-new")
 OUTCOMES = ("ok", "invalid", "transient")
 
@@ -86,6 +91,8 @@ class Fixture:
         with self.db:
             self.db.execute(SESSIONS)
         self.served, self.recorded, self.missing, self.used, self.responders = 0, 0, [], set(), set()
+        self.changed = False     # anything recorded since opening (a packed fixture is packed again)
+        self.packed_to = None    # the zip an unpacked fixture came from (see folder_fixture)
 
     def close(self):
         if self.used:
@@ -101,6 +108,8 @@ class Fixture:
                                  len(self.missing)))
             self.served, self.recorded, self.missing = 0, 0, []
         self.db.close()
+        if self.packed_to is not None and self.changed:
+            pack(self.path, self.packed_to)
         legacy = getattr(self, "legacy", None)  # a schema-3 fixture being re-keyed into this one
         if legacy is not None:
             legacy.close()
@@ -147,6 +156,7 @@ class Fixture:
         if recipe is not None:
             self.note_recipe(query, recipe)
         self.recorded += 1
+        self.changed = True
 
     def note_recipe(self, query, recipe):
         """A way the pipeline built a query (for summaries; several recipes may build one query)."""
@@ -297,6 +307,18 @@ def _dump(db):  # pragma: no cover - Python < 3.11 lacks Connection.serialize
         db.backup(copy)
         copy.close()
         return (Path(d) / "f.sqlite").read_bytes()
+
+def folder_fixture(folder):
+    """A folder's own fixture (FOLDER_FIXTURE), open for use: unpacked to a temporary file, and
+    packed back on close when anything was recorded. Packing is reproducible, so a run that
+    only replays leaves the zip's bytes as they were."""
+    import tempfile
+    archive = Path(folder) / FOLDER_FIXTURE
+    temp = tempfile.TemporaryDirectory(prefix="folder-fixture-")
+    path = unpack(archive, temp.name) if archive.exists() else Path(temp.name) / "replay.sqlite"
+    fixture = Fixture(path, create=True)
+    fixture.temp, fixture.packed_to = temp, archive
+    return fixture
 
 def unpack(archive, folder):
     """Extract a zipped fixture's database into folder; returns its path."""

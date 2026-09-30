@@ -1,1 +1,0 @@
-{"better":"same","a_wrong":0,"b_wrong":0,"confidence":"high","note":"Both sets extract highly accurate and faithful claims from the text. Set A provides slightly better attribute names (e.g., 'louver movement type', 'sensing method'), while Set B includes 'location'. Neither set contains invented or unsupported claims, making them equally strong overall."}

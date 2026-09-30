@@ -1,1 +1,0 @@
-{"better":"B","a_wrong":0,"b_wrong":0,"confidence":"high","note":"Set B is more comprehensive, extracting claims from both the text and the table. It also correctly captures 'critical' as part of the unit/value for the structural-damping ratio from the text, whereas Set A omits it. Both sets correctly extract the table values."}

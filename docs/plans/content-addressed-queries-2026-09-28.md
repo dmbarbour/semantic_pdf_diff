@@ -1,6 +1,6 @@
 # Content-addressed queries, checks and records
 
-- **Status:** Active (2026-09-30): milestones 1–5 done.
+- **Status:** Active (2026-09-30): milestones 1–5 done; 6 under way.
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md), whose keys this replaces; [query improvement](query-improvement-2026-09-26.md), whose rounds get the checks.
 - **Feeds:** every later round; the [weighted quality estimates](README.md) (judgement records); a lever search (plans index).
 - **Why:**
@@ -233,6 +233,17 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
     - At true rates of 0.65 and 0.70, it promotes 47% and 73% of the time.
   - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
   - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
+
+- **Milestone 6 (2026-09-30): under way.**
+  - **Golden judge prompts:** every rubric's pairwise prompt (v1–v6) and the review panel's prompts, byte for byte, on fixed items (`tests/golden/`).
+  - **Folder fixtures:** each round batch, spot check and review batch keeps every model answer its evaluation asked for in its own `replay.zip`, keyed like the main fixture. That covers judges, escalation, confirmation, query checks and the post-mortem's analyst. A rerun pays only for what's missing; packing is reproducible, so a replay leaves the zip's bytes alone.
+  - **One set of evaluator settings** (`models.EVALUATOR_SETTINGS`): judging live and replaying ask the same queries.
+  - **Re-keyed by rebuilding the requests** (`scripts/rekey_judge_caches.py`, temporary). The old cache names hashed the whole request, answer schema included, so each request was tried under the four schemas the code has had (from git).
+    - **Rounds:** 2,647 of 2,648 answers carried over. The one left is the post-mortem's first reading, whose prompt has since changed.
+    - **sc01:** 25 of 37 carried; the rest were for units whose prompts changed when context was added after judging.
+    - **Review batches s01 and s02** (local only): 35 of 469 carried; their prompts have changed since.
+    - The 2,685 cache files are gone from the tree; 29 zips of 1.2 MB replace them.
+  - **Checked:** judging every round batch again offline gives its committed verdicts exactly. Tests do this for a batch of each rubric (v1–v4) and for the post-mortem's reading.
 
 ## Decisions (2026-09-28)
 

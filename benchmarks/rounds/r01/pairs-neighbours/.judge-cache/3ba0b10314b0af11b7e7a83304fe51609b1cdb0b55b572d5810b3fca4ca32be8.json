@@ -1,1 +1,0 @@
-{"better":"A","a_wrong":5,"b_wrong":6,"confidence":"medium","note":"Both sets suffer from significant redundancy, extracting the same facts multiple times with slightly different entity or attribute names. Set A is slightly better because Set B invents a 'building' entity for one of its redundant claims, whereas Set A sticks closer to the text."}

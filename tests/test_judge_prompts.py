@@ -1,16 +1,21 @@
-"""Golden judge prompts: every rubric's prompt, byte for byte, on fixed items.
+"""Judge prompts, golden and replayed.
 
 A byte change in a judge prompt changes its query hash, so every recorded verdict misses and
-judging is paid again (88% of spend). These goldens make such a change deliberate: it shows here
+judging is paid again (88% of spend). The goldens make such a change deliberate: it shows here
 as a diff. After an intended change, regenerate with GOLDEN_UPDATE=1 and review the diff.
+
+The replays judge committed round batches again from their own fixtures (replay.zip), offline,
+and must reproduce the committed verdicts: the answers are found by the queries rebuilt today.
 """
 import json
 import os
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
-from semantic_pdf_diff import review, rounds
-from semantic_pdf_diff.models import PairVerdict
+from semantic_pdf_diff import postmortem, review, rounds
+from semantic_pdf_diff.llm import folder_client
+from semantic_pdf_diff.models import EVALUATOR_SETTINGS, PairVerdict, Settings
 
 GOLDEN = Path(__file__).resolve().parent / "golden"
 UPDATE = bool(os.environ.get("GOLDEN_UPDATE"))
@@ -83,6 +88,74 @@ class GoldenPrompts(unittest.TestCase):
                                                  "query": "Pump P-1 10 kW"}}
         asked.append((review.question_prompt(question), []))
         self.check("review-panel", transcript(asked))
+
+ROUNDS = Path(__file__).resolve().parent.parent / "benchmarks" / "rounds"
+REPLAYED = {"v1": "r05/pairs-details", "v2": "r07/pairs-locator", "v3": "r08/pairs-charts", "v4": "r09h/pairs-fragments"}
+
+class RecordedJudging(unittest.TestCase):
+    def test_committed_batches_judge_again_to_the_same_verdicts(self):
+        for rubric, name in REPLAYED.items():
+            folder = ROUNDS / name
+            self.assertEqual(json.loads((folder.parent / "round.json").read_text()).get("rubric", "v1"), rubric)
+            for path in sorted((folder / "verdicts").glob("*.json")):
+                committed = json.loads(path.read_text(encoding="utf-8"))
+                with self.subTest(batch=name, judge=committed["reviewer"]), tempfile.TemporaryDirectory() as d:
+                    copy = Path(d)
+                    for f in ("pairs.json", "replay.zip"):
+                        shutil.copy(folder / f, copy / f)
+                    (copy / "images").symlink_to(folder / "images")
+                    settings = Settings(model=committed["reviewer"], **EVALUATOR_SETTINGS)
+                    with folder_client(copy, settings, mode="replay") as client:
+                        rounds.judge_pairs(copy, client, committed["reviewer"], rubric=rubric)
+                    again = json.loads((copy / "verdicts" / path.name).read_text(encoding="utf-8"))["verdicts"]
+                    self.assertEqual(again, committed["verdicts"])
+                    self.assertEqual((copy / "replay.zip").read_bytes(), (folder / "replay.zip").read_bytes())
+
+    def test_a_folder_records_its_answers_once_and_packs_them(self):
+        import http.server, threading
+        asked = []
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def log_message(self, *args): pass
+            def do_POST(self):
+                asked.append(json.loads(self.rfile.read(int(self.headers["Content-Length"]))))
+                answer = {"better": "B", "note": "stub"}
+                body = json.dumps({"choices": [{"message": {"content": json.dumps(answer)}, "finish_reason": "stop"}],
+                                   "usage": {"prompt_tokens": 10, "completion_tokens": 5, "estimated_cost": 0.001}})
+                self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers()
+                self.wfile.write(body.encode())
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        settings = Settings(model="judge", base_url=f"http://127.0.0.1:{server.server_port}/v1", retries=0,
+                            **EVALUATOR_SETTINGS)
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            (folder / "images").mkdir()
+            for item in ITEMS:
+                (folder / item["image"]).write_bytes(item["id"].encode())
+            (folder / "pairs.json").write_text(json.dumps({"items": ITEMS}))
+            with folder_client(folder, settings) as client:
+                rounds.judge_pairs(folder, client, "judge", rubric="v4")
+            self.assertEqual(len(asked), 4)  # two units, both orders
+            packed = (folder / "replay.zip").read_bytes()
+            shutil.rmtree(folder / "verdicts")
+            with folder_client(folder, settings) as client:  # judged again: every answer is recorded
+                rounds.judge_pairs(folder, client, "judge", rubric="v4")
+            self.assertEqual(len(asked), 4)
+            self.assertEqual((folder / "replay.zip").read_bytes(), packed)  # nothing new: the same bytes
+            with folder_client(folder, settings, mode="replay") as client:  # another rubric: other queries
+                _, count, failures = rounds.judge_pairs(folder, client, "judge", rubric="v3", verdicts_dir="v3")
+            self.assertEqual((len(asked), count, len(failures)), (4, 0, 4))
+
+    def test_the_post_mortem_reading_is_replayed(self):
+        folder = ROUNDS / "r09b" / "pairs-fragments"
+        recorded = json.loads((folder / "postmortem.json").read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as d:
+            shutil.copy(folder / "replay.zip", Path(d) / "replay.zip")
+            with folder_client(d, Settings(model="google/gemini-3.1-pro", **EVALUATOR_SETTINGS), mode="replay") as client:
+                reading = postmortem.read(recorded, client)
+        self.assertEqual(reading.model_dump(), recorded["reading"])
 
 if __name__ == "__main__":
     unittest.main()

@@ -14,6 +14,7 @@ import urllib.request
 from datetime import datetime, timezone
 from http.client import HTTPException  # a connection dropped mid-answer (IncompleteRead); not an OSError
 from pathlib import Path
+from contextlib import contextmanager
 from dataclasses import dataclass
 from .models import Settings
 from .throttle import AdaptiveGate, RateLimiter
@@ -175,11 +176,24 @@ class Request:
     query: str = ""            # the query's hash (query_hash): the name answers are recorded and cached under
     description: dict | None = None  # facts about the query's content (describe)
 
+@contextmanager
+def folder_client(folder, settings, mode="replay-or-record"):
+    """A client whose answers are recorded in a folder's own fixture (fixtures.folder_fixture):
+    judges, the post-mortem's analyst and query checkers, each folder apart from the main fixture.
+    Answers already recorded are served; the rest are asked (in replay mode: fail as unrecorded)."""
+    from .fixtures import folder_fixture
+    fixture = folder_fixture(folder)
+    try:
+        yield Client(settings, None, fixture=fixture, mode=mode)
+    finally:
+        fixture.close()
+
 class Client:
     """Chat Completions client with a response cache.
 
     `cache` is either a Store, whose response cache is keyed by the query that reached the
-    model and the model, or a folder for a byte-keyed file cache (for library use without a store).
+    model and the model, or a folder for a byte-keyed file cache (for library use without a store),
+    or None when a fixture holds every answer (see folder_client).
     """
     def __init__(self, settings: Settings, cache, api_key: str | None = None, fixture=None, mode="replay",
                  responder=None, fresh_regions=None, rekey_from=None):
@@ -195,8 +209,8 @@ class Client:
         # of the same query, so a round can measure how much re-asking alone moves results.
         self.fresh_regions = frozenset(fresh_regions or ())
         self.rekey_from = rekey_from
-        self.store = None if isinstance(cache, (str, Path)) else cache
-        self.cache = Path(cache) if self.store is None else None
+        self.store = None if cache is None or isinstance(cache, (str, Path)) else cache
+        self.cache = Path(cache) if isinstance(cache, (str, Path)) else None
         if self.cache is not None:
             self.cache.mkdir(parents=True, exist_ok=True)
         self.api_key = api_key if api_key is not None else os.getenv("OPENAI_API_KEY", "")
@@ -443,6 +457,8 @@ class Client:
         return hashlib.sha256((self.s.model + "\x00" + request.query).encode()).hexdigest()
 
     def _lookup(self, request):
+        if self.store is None and self.cache is None:
+            return None
         if self.store is None:
             target = self.cache / (request.request_hash + ".json")
             if not target.exists():
@@ -462,6 +478,8 @@ class Client:
             return None
 
     def _save(self, request, value):
+        if self.store is None and self.cache is None:
+            return
         if self.store is None:
             target = self.cache / (request.request_hash + ".json")
             temp = target.with_suffix(".tmp")

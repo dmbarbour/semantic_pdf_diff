@@ -1,1 +1,0 @@
-{"better":"A","a_wrong":2,"b_wrong":6,"confidence":"high","note":"Set A is much better because it accurately extracts the values and uses faithful quotes. Set B contains several fabricated quotes (e.g., 'The design point for this rotor pitch', 'The design tip speed ratio for this blade') and misreads the optimal pitch as 1.0 deg instead of -1.0 deg."}

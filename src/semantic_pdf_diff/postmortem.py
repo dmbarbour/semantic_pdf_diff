@@ -162,7 +162,7 @@ def read(evidence, client):
     """A strong model's reading of the evidence (Reading)."""
     text = json.dumps({k: evidence.get(k) for k in ("described", "decision", "overall", "partitions", "samples")},
                       ensure_ascii=False, indent=1)
-    return client.ask(ANALYST.format(evidence=text), Reading)
+    return client.ask(ANALYST.format(evidence=text), Reading, key=("postmortem", evidence.get("batch") or ""))
 
 def write(folder, documents=None, client=None, units=5, seed=1):
     """Build the post-mortem, ask the analyst if a client is given, and write postmortem.json and .html."""
