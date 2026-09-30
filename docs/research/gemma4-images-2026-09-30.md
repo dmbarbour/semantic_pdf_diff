@@ -30,6 +30,8 @@
 - **Every image costs the default budget, whatever its size:** a square from 64 × 64 to 2000 × 2000 costs 258 tokens (256 pooled, plus 2). 4:1 (either way round) costs 266, 10:1 costs 262, and 2:1 costs 255. Exactly what transformers and vLLM predict at 280.
   - My earlier note ("a flat ~284 tokens") counted some prompt overhead with the image.
 - **Neither setting changes it:** a 1000 × 1000 image costs 258 with `mm_processor_kwargs: {"max_soft_tokens": 1120}` and with `detail: "high"`. Both are silently ignored.
+  - **Also through the OpenAI SDK** (openai 3.22.1, 2026-09-30, at the owner's request): `extra_body={"mm_processor_kwargs": {"max_soft_tokens": 1120}}` puts the field at the top level of the request body, as the direct probe did. The image still cost 258 tokens, at 1120 and at 70 alike.
+  - `--mm-processor-kwargs` is a flag for launching a vLLM server; only the host can set it.
 - **Images are cheap here:** 258 tokens cost about $0.00003. Output tokens dominate a query's cost.
 
 ## What this means for us
