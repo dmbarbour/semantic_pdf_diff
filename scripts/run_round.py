@@ -209,7 +209,14 @@ def main(argv=None):
                 state["steps"].pop(f"pairs:{v}")
         if wanted("pairs") and not done(f"pairs:{v}") and done(f"replay:{v}") and done("replay:baseline"):
             built = rounds.build_batch(runs_root / "baseline", runs_root / v, batch, n=int(spec.get("units", 60)),
-                                       unit=unit_of(spec["variants"][v]))
+                                       unit=unit_of(spec["variants"][v]), documents=DOCUMENTS)
+            checks = built["units"]["checks"]
+            state.setdefault("batch_checks", {})[v] = checks
+            for problem, found in (("unique claims hidden by sampling", checks["hidden_unique_claims"]),
+                                   ("changed units outside the lever's reach", checks["changed_out_of_scope"]),
+                                   ("runs of no document family", len(checks.get("without_family", [])))):
+                if found:
+                    print(f"{v}: {found} {problem} (pairs-{v}/pairs.json: units.checks)")
             if rounds.RUBRICS[spec.get("rubric", "v1")].get("whole"):  # the whole page and every claim (v6)
                 rounds.add_context(batch, runs_root / "baseline", runs_root / v, n=int(spec.get("units", 60)),
                                    unit=unit_of(spec["variants"][v]))

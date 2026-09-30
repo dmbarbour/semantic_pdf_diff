@@ -338,29 +338,57 @@ class Rounds(unittest.TestCase):
         from semantic_pdf_diff.models import Claim, Evidence, PdfLocator, claim_id
         from semantic_pdf_diff.store import Store
         content = 'sha256:' + 'a' * 64 + '.pdf'
-        def reading(entity, attribute, task, region):
-            claim = Claim(entity=entity, attribute=attribute, value='10', unit='kW', kind='text', quote='10 kW',
+        def reading(entity, attribute, task, region, quote='10 kW'):
+            claim = Claim(entity=entity, attribute=attribute, value='10', unit='kW', kind='text', quote=quote,
                           confidence=.9)
             return Evidence(**claim.model_dump(), id=claim_id(content, claim), content=content,
                             locator=PdfLocator(page=1, bbox=(0, 0, 300, 300), region=region, task=task))
         with tempfile.TemporaryDirectory() as d, \
                 patch.object(Store, 'files', lambda self, source=None: [SimpleNamespace(content=content)]):
             # A text lever rewords the text reading; the tile's reading of the same fact is untouched.
-            for side, words in (('base', ('Pump', 'power')), ('var', ('Pump P-1', 'power'))):
+            # A third run's tile reads the same fact but quotes it differently: that unit has changed.
+            for side, words, tile_quote in (('base', ('Pump', 'power'), '10 kW'), ('var', ('Pump P-1', 'power'), '10 kW'),
+                                            ('quoted', ('Pump', 'power'), 'Pump P-1 10 kW')):
                 with Store(Path(d) / side / 'run1') as store:
                     store.db.execute("INSERT INTO content (id, size) VALUES (?, 1)", (content,))
-                    for task, region, (entity, attribute) in (('text:p1:0', 'text', words),
-                                                               ('tile:p1:0', 'tile', ('pump P-1', 'rated power'))):
+                    for task, region, (entity, attribute), quote in (('text:p1:0', 'text', words, '10 kW'),
+                                                                     ('tile:p1:0', 'tile', ('pump P-1', 'rated power'), tile_quote)):
                         store.record_task({'content': content, 'page': 1, 'task': task, 'status': 'complete', 'claims': 1},
-                                          [reading(entity, attribute, task, region)])
+                                          [reading(entity, attribute, task, region, quote)])
                     store.set_reconcile(True)
                     self.assertEqual(len(store.evidence(content)), 1)  # one fact, two readings
             base, var = rounds.collect(Path(d) / 'base'), rounds.collect(Path(d) / 'var')
             visual = ('run1', content, 1, 'visual')
-            self.assertEqual(base[visual]['claims'], var[visual]['claims'])  # unchanged: not a changed unit
+            self.assertEqual(set(base[visual]['claims']), set(var[visual]['claims']))  # unchanged: not a changed unit
+            (claim,) = var[visual]['claims'].values()
+            self.assertNotEqual(claim['_claim'], next(iter(base[visual]['claims'].values()))['_claim'])  # merged anew
             self.assertEqual(next(iter(var[visual]['claims'].values()))['entity'], 'pump P-1')  # the tile's own words
             text = ('run1', content, 1, 'text')
             self.assertNotEqual(set(base[text]['claims']), set(var[text]['claims']))
+            quoted = rounds.collect(Path(d) / 'quoted')
+            self.assertNotEqual(set(base[visual]['claims']), set(quoted[visual]['claims']))  # only the quote differs
+
+    def test_batches_record_their_checks(self):
+        folder = self.root / 'checked-batch'
+        batch = rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=6, limit=1,
+                                   documents={'nothing': 'reports'})
+        checks = batch['units']['checks']
+        self.assertEqual((checks['asymmetric_units'], checks['foreign_readings']), (0, 0))
+        self.assertIsNone(checks['scope'])  # no settings.json beside these runs: scope unknown, not checked
+        self.assertEqual(checks['without_family'], ['run1'])  # the run isn't a known slice
+        self.assertGreaterEqual(checks['hidden_unique_claims'], 0)
+
+    def test_bands_do_not_depend_on_which_side_is_the_baseline(self):
+        claim = lambda y, task='tile:p1:0': {'_box': [0, y, 100, y + 10], '_task': task}
+        # 30 claims each, 20 shared; three shared ones were read at different heights by each side.
+        a = {('r', 'c', 1, 'visual'): {'claims': {f's{i}': claim(10 * i) for i in range(20)}
+                                       | {f'a{i}': claim(300 + 10 * i) for i in range(10)}, 'tasks': 1}}
+        b = {('r', 'c', 1, 'visual'): {'claims': {f's{i}': claim(10 * i + (97 if i < 3 else 0)) for i in range(20)}
+                                       | {f'b{i}': claim(300 + 10 * i) for i in range(10)}, 'tasks': 1}}
+        one, two = rounds.split_units(a, b, limit=10)
+        three, four = rounds.split_units(b, a, limit=10)
+        self.assertEqual((set(one), set(two)), (set(four), set(three)))
+        self.assertGreater(len(one), 1)  # cut into bands
 
     def test_intervals_and_rules(self):
         mean, low, high = rounds.interval([1.0] * 40 + [0.0] * 10)

@@ -8,6 +8,7 @@ A unit scores 1 when the variant wins, 0.5 for a tie, 0 when the baseline wins; 
 get intervals (clustered by page region), overall and per stratum, and acceptance rules decide the round.
 See docs/plans/query-improvement-2026-09-26.md.
 """
+import hashlib
 import json
 import math
 import random
@@ -27,7 +28,7 @@ def _reader(runs_dir):
     settings = json.loads(path.read_text()) if path.exists() else {}
     return lambda store, content: store.evidence(content, reconcile=True if settings.get("reconcile") else None)
 
-UNIT_CLAIMS = "own readings"  # how collect words a unit's claims (batches record it; see collect)
+UNIT_CLAIMS = "own readings, quoted"  # how collect words and identifies a unit's claims (batches record it)
 
 def collect(runs_dir, unit="family"):
     """{(run, content, page, family): {"claims": {id: claim}, "tasks": n}} for every store under runs_dir.
@@ -39,7 +40,11 @@ def collect(runs_dir, unit="family"):
     it: the first sighting in the unit, in that sighting's own words and under that reading's ID.
     Until 2026-09-28 a unit showed the merged claim's representative wording (often a text
     reading's), so a text lever changed visual units whose readings hadn't changed (the audit:
-    4-7 of 9-14 visual units in r09's batches), and counted one change in two units."""
+    4-7 of 9-14 visual units in r09's batches), and counted one change in two units.
+
+    A claim's identity in a unit (its key, and `_id`) is its reading's ID and its quote: what judges
+    and people are shown, so a lever that changes only quotes changes its units. `_claim` is the
+    merged claim's ID (the evidence it belongs to). The meta-audit found three identities in use."""
     family_of = (lambda region: FAMILY.get(region)) if unit == "family" else (lambda region: "page" if region in FAMILY else None)
     from .store import Store
     units = defaultdict(lambda: {"claims": {}, "tasks": 0})
@@ -73,7 +78,9 @@ def collect(runs_dir, unit="family"):
                         claim["quote"] = o.quote
                         claim["_box"] = list(o.locator.bbox)  # where it was read (splitting units)
                         claim["_task"] = o.locator.task       # which request read it (its input, for reviewers)
-                        units[key]["claims"][own.id] = claim
+                        claim["_id"] = identity = own.id + "~" + hashlib.sha256(o.quote.encode()).hexdigest()[:8]
+                        claim["_claim"] = e.id
+                        units[key]["claims"][identity] = claim
     return dict(units)
 
 MAX_BANDS = 4  # a unit is cut into at most this many bands
@@ -100,26 +107,62 @@ def split_units(base, var, limit=MAX_CLAIMS):
             if key in var:
                 out_b[key] = b
             continue
-        claims = {**b["claims"], **a["claims"]}
-        centre = lambda i: (claims[i]["_box"][1] + claims[i]["_box"][3]) / 2
-        order = sorted(claims, key=lambda i: (centre(i), i))
+        # Where each claim was read; a claim both sides have takes the same position either way
+        # round (the lesser box), so bands don't depend on which side is the baseline.
+        position = {}
+        for side in (a, b):
+            for i, c in side["claims"].items():
+                position[i] = min(position[i], tuple(c["_box"])) if i in position else tuple(c["_box"])
+        centre = lambda i: (position[i][1] + position[i][3]) / 2
+        order = sorted(position, key=lambda i: (centre(i), i))
         k = min(MAX_BANDS, -(-size // limit))
         for part in range(k):
             ids = order[part * len(order) // k:(part + 1) * len(order) // k]
             if not ids:
                 continue
-            y0 = min(claims[i]["_box"][1] for i in ids)
-            y1 = max(claims[i]["_box"][3] for i in ids)
+            y0 = min(position[i][1] for i in ids)
+            y1 = max(position[i][3] for i in ids)
             band = key + ((part, k, round(y0, 1), round(y1, 1)),)
             out_a[band] = {"claims": {i: a["claims"][i] for i in ids if i in a["claims"]}, "tasks": a["tasks"]}
             out_b[band] = {"claims": {i: b["claims"][i] for i in ids if i in b["claims"]}, "tasks": b["tasks"]}
     return out_a, out_b
 
+def lever_scope(baseline_dir, variant_dir, unit="family"):
+    """The kinds of unit the settings that differ between two runs' folders can change (from
+    store.SETTING_REGIONS), or None when none differ (an A/A control, a code change) or a folder
+    has no settings.json."""
+    from .store import ALL_REGIONS, SETTING_REGIONS
+    paths = [Path(d) / "settings.json" for d in (baseline_dir, variant_dir)]
+    if not all(p.exists() for p in paths):
+        return None
+    a, b = (json.loads(p.read_text()) for p in paths)
+    differing = {k for k in set(a) | set(b) if a.get(k) != b.get(k)}
+    if not differing:
+        return None
+    regions = set().union(*(SETTING_REGIONS.get(k, ALL_REGIONS) for k in differing))
+    families = {FAMILY[r] for r in regions if r in FAMILY}
+    return ({"page"} if families else set()) if unit == "page" else families
+
+def _unit_of(task, unit):
+    region = (task or "").split(":")[0]
+    return FAMILY.get(region) if unit == "family" else ("page" if region in FAMILY else None)
+
 def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", "visual", "page"), changed_only=True,
                unit="family", limit=MAX_CLAIMS):
     """Sample up to n units present in both, stratified by family (round-robin), keeping only
-    units whose claims differ (identical answers can't prefer either side)."""
-    base, var = split_units(collect(baseline_dir, unit), collect(variant_dir, unit), limit)
+    units whose claims differ (identical answers can't prefer either side).
+
+    counts["checks"]: what must hold of the units (the meta-audit: invariants checked when a batch
+    is built). Swapping the sides gives the same units; every claim was read by a task of its
+    unit's kind; and changed units stay within what the differing settings can touch."""
+    base_units, var_units = collect(baseline_dir, unit), collect(variant_dir, unit)
+    base, var = split_units(base_units, var_units, limit)
+    mirror_var, mirror_base = split_units(var_units, base_units, limit)
+    scope = lever_scope(baseline_dir, variant_dir, unit)
+    checks = {"asymmetric_units": len(set(base) ^ set(mirror_base)) + len(set(var) ^ set(mirror_var)),
+              "foreign_readings": sum(1 for units in (base_units, var_units) for k, u in units.items()
+                                      for c in u["claims"].values() if _unit_of(c.get("_task"), unit) != k[3]),
+              "scope": sorted(scope) if scope is not None else None}
     keys = sorted(k for k in set(base) | set(var) if k[3] in families and (k in base or k in var))
     rng = random.Random(seed)
     groups = defaultdict(list)
@@ -136,9 +179,10 @@ def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", 
             if groups[family] and len(picked) < n:
                 picked.append(groups[family].pop())
     same = sum(1 for k in keys if set(base.get(k, {"claims": {}})["claims"]) == set(var.get(k, {"claims": {}})["claims"]))
+    changed_by_kind = {f: len(g) + sum(k[3] == f for k in picked) for f, g in groups.items()}
+    checks["changed_out_of_scope"] = 0 if scope is None else sum(n for f, n in changed_by_kind.items() if f not in scope)
     return [(k, base.get(k, {"claims": {}})["claims"], var.get(k, {"claims": {}})["claims"]) for k in picked], \
-        {"units": len(keys), "unchanged": same, "changed_by_kind": {f: len(g) + sum(k[3] == f for k in picked)
-                                                                    for f, g in groups.items()}}
+        {"units": len(keys), "unchanged": same, "changed_by_kind": changed_by_kind, "checks": checks}
 
 def shown(a, b, rng, limit=MAX_CLAIMS):
     """Claim IDs of each side to show judges, at most `limit` each: every claim only one side has
@@ -172,8 +216,13 @@ def _lead(doc, page, region, cache, key):
     before = " ".join(" ".join(above).split())[-LEAD:]
     return before, " > ".join(context.stem_path(page, tuple(region)))
 
-def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", limit=MAX_CLAIMS):
-    """Write a pairwise batch: pairs.json (with which side is the baseline) and page images."""
+def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", limit=MAX_CLAIMS, documents=None):
+    """Write a pairwise batch: pairs.json (with which side is the baseline) and page images.
+
+    Its checks (batch["units"]["checks"]; see pair_units) raise when units depend on which side is
+    the baseline or hold claims read by another kind of task: those are bugs. Others are recorded:
+    unique claims a sample hides, changed units a lever shouldn't touch, units of no document family
+    (documents: {slice name: family})."""
     from .review import render
     from .store import Store
     from .scan import read_origin
@@ -181,9 +230,14 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
     folder = Path(folder)
     (folder / "images").mkdir(parents=True, exist_ok=True)
     picked, counts = pair_units(baseline_dir, variant_dir, n, seed, unit=unit, limit=limit)
+    checks = counts["checks"]
+    if checks["asymmetric_units"] or checks["foreign_readings"]:
+        raise ValueError(f"batch checks failed for {folder}: {checks['asymmetric_units']} units depend on which side "
+                         f"is the baseline, {checks['foreign_readings']} claims sit in units of another kind")
     rng = random.Random(seed + 1)
     items = []
     docs = {}
+    hidden_unique = 0  # claims only one side has that a unit's sample leaves out (rubric v4 says there are none)
     for (run, content, page, family, *band), a, b in picked:
         if (run, content) not in docs:
             with Store(Path(baseline_dir) / run) as store:
@@ -203,6 +257,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
             before, within = _lead(doc, page, region, docs, (run, content))
         shown_a, shown_b = shown(a, b, rng, limit)
         shared = set(a) & set(b)
+        hidden_unique += len((set(a) - set(b)) - set(shown_a)) + len((set(b) - set(a)) - set(shown_b))
         items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}" + (f"-b{part}of{parts}" if band else ""),
                       "run": run, "content": content, "page": page, "family": family,
                       "band": [part, parts, y0, y1] if band else None,
@@ -211,6 +266,9 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
                       "baseline": [a[i] for i in shown_a], "variant": [b[i] for i in shown_b],
                       "hidden_shared": len(shared - set(shown_a)),
                       "counts": {"baseline": len(a), "variant": len(b), "shared": len(shared)}})
+    checks["hidden_unique_claims"] = hidden_unique
+    if documents is not None:
+        checks["without_family"] = sorted({i["run"] for i in items if not documents.get(i["run"])})
     batch = {"format": "semantic-pdf-diff-pairwise-batch", "version": 1, "baseline": str(baseline_dir),
              "variant": str(variant_dir), "seed": seed, "unit_claims": UNIT_CLAIMS, "units": counts, "items": items}
     (folder / "pairs.json").write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -362,7 +420,8 @@ def _claims_text(claims, letter=None):
                      for k, c in enumerate(claims)) or "(no claims)"
 
 def _ident(c):
-    return tuple(str(c.get(k, "")) for k in ("entity", "attribute", "value", "unit", "conditions", "quote"))
+    """A claim's identity (see collect); batches from before 2026-09-30 carry none: their exact text."""
+    return c.get("_id") or tuple(str(c.get(k, "")) for k in ("entity", "attribute", "value", "unit", "conditions", "quote"))
 
 def _grouped(a, b):
     """Two claim lists as ([(index in a, index in b)] shared, [index in a] only in a, [index in b] only in b)."""

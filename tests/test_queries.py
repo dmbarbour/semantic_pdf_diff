@@ -72,5 +72,39 @@ class Dumps(unittest.TestCase):
         self.assertEqual(len(checker.prompts), shown)
         self.assertIn('Before: holds table cells', (out / 'index.html').read_text())
 
+class LeverScope(unittest.TestCase):
+    """Changed units stay within what the differing settings can touch; a batch says when they don't."""
+    @classmethod
+    def setUpClass(cls):
+        cls.dir = tempfile.TemporaryDirectory()
+        root = cls.root = Path(cls.dir.name)
+        a, b = document(root / 'a.pdf', 10), document(root / 'b.pdf', 12)
+        with jittery_model() as (url, _), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            for side, settings in (('base', {}), ('variant', {'visual_text_layer': 0})):
+                config = root / f'{side}.json'
+                config.write_text(json.dumps({**settings, 'situate': False}))
+                cli.main([str(a), str(b), '--out', str(root / side / 'run1'), '--base-url', url, '--config', str(config)])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.dir.cleanup()
+
+    def checks(self, variant_settings):
+        from semantic_pdf_diff import rounds
+        (self.root / 'base' / 'settings.json').write_text(json.dumps({}))
+        (self.root / 'variant' / 'settings.json').write_text(json.dumps(variant_settings))
+        return rounds.pair_units(self.root / 'base', self.root / 'variant', n=20)[1]
+
+    def test_changes_stay_within_the_levers_reach(self):
+        counts = self.checks({'visual_text_layer': 0})  # what really differs: image queries
+        self.assertEqual(counts['checks']['scope'], ['visual'])
+        self.assertGreater(counts['changed_by_kind'].get('visual', 0), 0)
+        self.assertEqual(counts['checks']['changed_out_of_scope'], 0)
+
+    def test_changes_outside_the_levers_reach_are_counted(self):
+        counts = self.checks({'context_before': 0})  # settings that claim only text differs
+        self.assertEqual(counts['checks']['scope'], ['table', 'text'])
+        self.assertGreater(counts['checks']['changed_out_of_scope'], 0)
+
 if __name__ == '__main__':
     unittest.main()

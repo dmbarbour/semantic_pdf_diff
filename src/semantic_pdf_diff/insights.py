@@ -34,8 +34,9 @@ def _issues(runs_dir, run, content, page, family):
     return dict(found)
 
 def _claim_key(c):
-    return (c["entity"].casefold(), c["attribute"].casefold(), str(c["value"]).casefold(), c.get("unit", ""),
-            c.get("conditions", "").casefold())
+    """A claim's identity, as rounds.collect gives it; batches from before 2026-09-30 carry none."""
+    return c.get("_id") or (c["entity"].casefold(), c["attribute"].casefold(), str(c["value"]).casefold(),
+                            c.get("unit", ""), c.get("conditions", "").casefold())
 
 def analyse(folder, limit=None):
     """Per-unit clues for a batch (the first `limit` units); writes and returns analysis.json."""
