@@ -48,6 +48,8 @@ This project **does not judge content produced by external tools**, including th
 
 ### Tables and spreadsheets
 
+Tables from every source now go through [one table model](one-table-model-2026-09-30.md) (2026-09-30): the interpretation below becomes its rules, applied to PDF tables too. What follows stays for what is specific to spreadsheets (regions and sheet maps, formulas, hidden sheets).
+
 One claim per cell is not right in general: adjacent cells often compose into one claim (value and uncertainty, value and unit, min/nominal/max, a condition column). And a very large sheet can't simply be sampled: if one column lists requirement names, every row matters. So each table gets a **model interpretation step**:
 
 0. **Find the tables first.** A sheet may hold several tables plopped down in different places, plus notes, titles and stray cells, and a CSV may carry preamble lines or blank-line-separated blocks. Detect candidate regions heuristically:
