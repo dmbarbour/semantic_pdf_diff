@@ -368,6 +368,34 @@ class Rounds(unittest.TestCase):
             quoted = rounds.collect(Path(d) / 'quoted')
             self.assertNotEqual(set(base[visual]['claims']), set(quoted[visual]['claims']))  # only the quote differs
 
+    def test_every_lever_gets_a_post_mortem(self):
+        from semantic_pdf_diff import postmortem
+        from semantic_pdf_diff.models import Settings
+        folder = self.root / 'post-mortem'
+        rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=8)
+        rounds.judge_pairs(folder, Judge(), 'counter')
+        (folder / 'decision.json').write_text(json.dumps(rounds.decide(folder)))
+
+        class Analyst:
+            s, calls, cache_hits, usage = Settings(), 0, 0, {}
+            def ask(self, prompt, schema, images=(), key=None):
+                self.prompt = prompt
+                return schema(patterns=['wins read the pump rating'], tweaks=['keep it'], partitions=[], next=[])
+        analyst = Analyst()
+        evidence = postmortem.write(folder, client=analyst, units=2)
+        self.assertEqual(evidence['reading']['patterns'], ['wins read the pump rating'])
+        self.assertIn('kind of region', evidence['partitions'])
+        self.assertEqual(set(evidence['samples']), {'won', 'lost', 'split'})
+        self.assertTrue(all(len(v) <= 2 for v in evidence['samples'].values()))
+        self.assertIn('"partitions"', analyst.prompt)
+        self.assertTrue((folder / 'postmortem.html').exists())
+
+        class Broken(Analyst):
+            def ask(self, prompt, schema, images=(), key=None):
+                raise RuntimeError('no answer')
+        again = postmortem.write(folder, client=Broken())  # the evidence stands without the reading
+        self.assertIn('no answer', again['reading_failed'])
+
     def test_gains_are_measured_against_the_baseline(self):
         measured = rounds.gains(self.root / 'baseline', self.root / 'variant')
         base = rounds.mechanical(self.root / 'baseline')['all']['distinct_claims']

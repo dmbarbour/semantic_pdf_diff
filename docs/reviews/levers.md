@@ -80,6 +80,9 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
   - accepts quotes whose "…" or "|" parts each appear, contiguous and in order
   - recovers about 1,070 claims
   - **Accepted in r09b:** 0.66, text 0.77. Missing fell sharply; misbound rose.
+- **Post-mortem (2026-09-30, Gemini reading r09b's samples):** "…" may join distant fragments (separate axis labels, far-apart table cells), so it can verify a misbound claim. That fits misbound rising.
+  - **Next:** cap how far "…" may reach (no crossing a blank line or another block), or accept "|" joins only in tables and "…" only in prose.
+  - The weak visual partition in that batch (0.44) was mostly merged-claim wording shown in visual units (a bug since fixed), which the analyst couldn't know.
 - **`excerpts`:** also accepts words read in order across a pseudo-table. It recovers about 1,700 claims, but let chart-axis labels through as values (r09: 0.51). Not accepted.
 - **Measurement notes:**
   - No requests change, so testing costs judging only.

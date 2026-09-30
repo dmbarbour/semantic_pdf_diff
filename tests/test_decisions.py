@@ -61,8 +61,13 @@ class UnderTheNull(unittest.TestCase):
     def test_several_variants_raise_the_chance_of_a_false_win(self):
         r = rates(400, variants=5, held_out=Criteria(role="held-out"))
         self.assertTrue(0.15 <= r["any"] <= 0.35, r)  # about one round in four accepts a lever with no effect
-        # The owner's example held-out rule (mean above 0.5, no stratum loss) promotes one in about eight...
-        self.assertLessEqual(r["promoted"], 0.18)
+        # The default held-out rule (the owner's choice: mean above 0.5, lower bound at least 0.45, no stratum
+        # loss) promotes one in about twenty...
+        self.assertLessEqual(r["promoted"], 0.07)
+        # ...the owner's first example (the mean alone) about one in eight...
+        loose = rates(400, variants=5, held_out=Criteria(role="held-out", held_out_low=0.0))
+        self.assertLessEqual(loose["promoted"], 0.18)
+        self.assertGreater(loose["promoted"], r["promoted"])
         # ...and requiring the held-out round to win again, about one in seventy.
         stricter = rates(400, variants=5, held_out=Criteria(role="combination"))
         self.assertLessEqual(stricter["promoted"], 0.04)
@@ -103,7 +108,8 @@ class RoundSpecs(unittest.TestCase):
         held = rounds.decide_scores(*args, Criteria(role='held-out'))
         developed = rounds.decide_scores(*args)
         mean = held['overall']['mean']
-        self.assertEqual(held['accepted'], mean > 0.5 and not held['decision'].startswith('rejected: loses in'))
+        self.assertEqual(held['accepted'], mean > 0.5 and held['overall']['low'] >= 0.45
+                         and not held['decision'].startswith('rejected: loses in'))
         self.assertEqual(held['role'], 'held-out')
         self.assertEqual(developed['overall'], held['overall'])  # the same measurement, another rule
 

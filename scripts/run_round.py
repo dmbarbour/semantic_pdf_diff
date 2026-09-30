@@ -10,6 +10,7 @@ A round is a folder, e.g. benchmarks/rounds/r01/, holding round.json:
      "rubric": "v6",                             # judging rubric (rounds.RUBRICS); default v1
      "query_checks": {"sample": 30, "cap": 2.0}, # strong models check what each variant changed first
                                                  # (models: QUERY_CHECKERS unless given); held until accepted
+     "postmortem": {"units": 5},                 # every lever's post-mortem (defaults: analyst Gemini, $0.25)
      "criteria": {"role": "development",         # how the round decides (models.Criteria), set before
                   "gain": {"metric": "tokens", "change": -0.10}},  # judging and locked once it starts
      "escalate": ["Qwen/Qwen3.5-397B-A17B"],     # second opinions on units the main judges leave unsettled
@@ -51,7 +52,8 @@ REPORT = ROOT / "benchmarks/report.html"
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("round", type=Path)
-    parser.add_argument("--only", choices=["record", "replay", "measure", "check", "pairs", "judge", "decide", "report"])
+    parser.add_argument("--only", choices=["record", "replay", "measure", "check", "pairs", "judge", "decide", "postmortem",
+                                           "report"])
     parser.add_argument("--accept-checks", action="store_true",
                         help="the query checks' flags were looked over and accepted: go on to sampling and judging")
     args = parser.parse_args(argv)
@@ -316,6 +318,7 @@ def main(argv=None):
         result = rounds.decide(batch, judged[v], documents=DOCUMENTS, criteria=criteria, gains=gains_of(v))
         (batch / "decision.json").write_text(json.dumps({**result, "stopped": reason}, indent=2) + "\n")
         insights.analyse(batch, judged[v])  # the clues to why: agreement, changes, issues, tags, remarks
+        postmortem_of(v)
         if result["overall"]:
             figure("win_rate", result["overall"], variant=v, stratum="all", step="decide", units=result["units_judged"])
         for stratum, value in result["strata"].items():
@@ -323,6 +326,24 @@ def main(argv=None):
                 figure("win_rate", value, variant=v, stratum=stratum, step="decide", units=result["units_judged"])
         figure("decision", f"{result['decision']} ({reason})", variant=v, step="decide")
         mark(f"decide:{v}", "done")
+
+    def postmortem_of(v):
+        """Every lever's post-mortem after its round (the owner, 2026-09-30): samples of wins and losses,
+        partitions, and the analyst's reading; Claude writes the round's review from it."""
+        from semantic_pdf_diff import postmortem
+        from semantic_pdf_diff.ledger import Ledger
+        from semantic_pdf_diff.llm import Client
+        from semantic_pdf_diff.models import Settings
+        batch, pm = folder / f"pairs-{v}", spec["postmortem"]
+        client = None
+        left = min(remaining(), pm["cap"] - ledger.spent(LEDGER, round=name, step="postmortem"))
+        if pm["analyst"] and left > 0:
+            settings = Settings.from_env(model=pm["analyst"], context_tokens=262144, output_tokens=16000, image_tokens=3000,
+                                         concurrency=1, timeout=600, retries=1, max_cost=left)
+            client = Client(settings, batch / ".postmortem-cache")
+            client.ledger = Ledger(LEDGER, round=name, step="postmortem", variant=v, judge=pm["analyst"])
+        postmortem.write(batch, DOCUMENTS, client, units=pm["units"])
+        print(f"Post-mortem: {batch / 'postmortem.html'}")
 
     def confirm(v):
         """Expensive judges on an accepted variant's first units: a separate check, recorded apart."""
@@ -379,6 +400,10 @@ def main(argv=None):
     for v in spec["variants"]:  # variants finished in an earlier run, before chunked judging
         if v in stopped and not done(f"decide:{v}") and judged.get(v):
             finish_variant(v, stopped[v])
+    if args.only == "postmortem":  # decided variants from before post-mortems: write theirs
+        for v in spec["variants"]:
+            if done(f"decide:{v}") and not (folder / f"pairs-{v}" / "postmortem.json").exists():
+                postmortem_of(v)
 
     # 7. Report.
     if wanted("report"):

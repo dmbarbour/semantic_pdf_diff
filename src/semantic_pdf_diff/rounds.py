@@ -910,8 +910,8 @@ def decide_scores(scores, family, document, units, criteria=None, gains=None):
     elif losing:
         verdict = "rejected: loses in " + ", ".join(losing)
     elif c.role == "held-out":
-        verdict = ("accepted: holds out" if overall[0] > c.held_out_mean
-                   else f"rejected: doesn't hold out (mean {overall[0]:.3f})")
+        verdict = ("accepted: holds out" if overall[0] > c.held_out_mean and overall[1] >= c.held_out_low
+                   else f"rejected: doesn't hold out (mean {overall[0]:.3f}, low {overall[1]:.3f})")
     elif overall[1] > c.win_low:
         verdict = "accepted: wins"
     elif overall[1] >= c.noninferior_low:

@@ -1,0 +1,3828 @@
+{
+  "batch": "pairs-stem",
+  "summary": {
+    "units": 24,
+    "by_document": {
+      "calg-cd-p39-42": {
+        "units": 3,
+        "mean": 0.667
+      },
+      "dc-manual-p59-66": {
+        "units": 5,
+        "mean": 0.8
+      },
+      "iea-15mw-p20-31": {
+        "units": 4,
+        "mean": 0.312
+      },
+      "ken-cd-p95-98": {
+        "units": 2,
+        "mean": 0.5
+      },
+      "lcit-report-p12-19": {
+        "units": 1,
+        "mean": 1.0
+      },
+      "nrel-5mw-p25-36": {
+        "units": 7,
+        "mean": 0.69
+      },
+      "rules-2013-p35-38": {
+        "units": 2,
+        "mean": 0.5
+      }
+    },
+    "by_family": {
+      "table": {
+        "units": 8,
+        "mean": 0.51
+      },
+      "text": {
+        "units": 16,
+        "mean": 0.688
+      }
+    },
+    "problems": {
+      "baseline": {},
+      "variant": {}
+    },
+    "split": [
+      "u-dc-manual-p59-66-a157bdf0-p8-text",
+      "u-dc-manual-p59-66-a157bdf0-p3-text",
+      "u-rules-2013-p35-38-3c85ed49-p2-table",
+      "u-nrel-5mw-p25-36-5eaf02be-p11-table",
+      "u-dc-manual-p59-66-a157bdf0-p6-text",
+      "u-calg-cd-p39-42-9a895974-p4-table",
+      "u-nrel-5mw-p25-36-5eaf02be-p2-table",
+      "u-nrel-5mw-p25-36-5eaf02be-p5-text",
+      "u-calg-cd-p39-42-9a895974-p2-table",
+      "u-nrel-5mw-p25-36-5eaf02be-p6-text"
+    ],
+    "remarks": 0
+  },
+  "units": [
+    {
+      "id": "u-ken-cd-p95-98-f7b0008f-p4-table",
+      "run": "ken-cd-p95-98",
+      "page": 4,
+      "family": "table",
+      "image": "images/ken-cd-p95-98-f7b0008f-p4.jpg",
+      "score": 0.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 33,
+        "variant": 53,
+        "shared": 16
+      },
+      "only_baseline": [
+        {
+          "entity": "SPARE",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 24",
+          "quote": "24... 20... A... SPARE"
+        },
+        {
+          "entity": "ERV RECT, MECH ROOM CONV. RECT. & LIGHT",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "20 A ERV RECT, MECH ROOM CONV. RECT. & LIGHT"
+        },
+        {
+          "entity": "Circuit 34",
+          "attribute": "rating",
+          "value": "15",
+          "unit": "A",
+          "conditions": "WISER POWER METER (X2) VOLTAGE SENSING AND CONTROL POWER",
+          "quote": "34 15A WISER POWER METER (X2) VOLTAGE SENSING AND CONTROL POWER"
+        },
+        {
+          "entity": "KITCHEN RECEPTACLES N & E WALL circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 14",
+          "quote": "14... 20A... KITCHEN RECEPTACLES N & E WALL"
+        },
+        {
+          "entity": "DISHWASHER",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 15",
+          "quote": "DISHWASHER...20A...15"
+        },
+        {
+          "entity": "KITCHEN LIGHTING",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 23",
+          "quote": "KITCHEN LIGHTING... 20A... 23"
+        },
+        {
+          "entity": "GREY WATER PUMP circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 12",
+          "quote": "12... 20 A... GREY WATER PUMP"
+        },
+        {
+          "entity": "OVEN",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 6",
+          "quote": "6...20A...OVEN"
+        },
+        {
+          "entity": "DISHWASHER circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 15",
+          "quote": "DISHWASHER... 20A... 15"
+        },
+        {
+          "entity": "OUTDOOR LIGHTING N WALL & DECK LIGHTING",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 26",
+          "quote": "26... 20A... OUTDOOR LIGHTING N WALL & DECK LIGHTING"
+        },
+        {
+          "entity": "REFRIGERATOR circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 11",
+          "quote": "REFRIGERATOR... 20A... 11"
+        },
+        {
+          "entity": "COOKTOP",
+          "attribute": "rating",
+          "value": "50",
+          "unit": "A",
+          "conditions": "circuit number 2",
+          "quote": "2...50A...COOKTOP"
+        },
+        {
+          "entity": "BATHROOM RECEPTACLE",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 29",
+          "quote": "BATHROOM RECEPTACLE... 20A... 29"
+        },
+        {
+          "entity": "POTABLE WATER PUMP",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 10",
+          "quote": "10... 20A... POTABLE WATER PUMP"
+        },
+        {
+          "entity": "HVAC CONDESER",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 5",
+          "quote": "HVAC CONDESER...20A...5"
+        },
+        {
+          "entity": "WATER HEATER",
+          "attribute": "circuit breaker rating",
+          "value": "30",
+          "unit": "A",
+          "conditions": "circuit number 31",
+          "quote": "WATER HEATER... 30A... 31"
+        },
+        {
+          "entity": "INVERTER FEED",
+          "attribute": "rating",
+          "value": "50",
+          "unit": "A",
+          "conditions": "",
+          "quote": "INVERTER FEED... 50A"
+        },
+        {
+          "entity": "ERV RECT, MECH ROOM CONV. RECT. & LIGHT",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit 28",
+          "quote": "28 ... 20 ... A ... ERV RECT, MECH ROOM CONV. RECT. & LIGHT"
+        },
+        {
+          "entity": "MICROWAVE RECEPTACLE",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit 17",
+          "quote": "MICROWAVE RECEPTACLE...20A...17"
+        },
+        {
+          "entity": "OUTDOOR LIGHTING S WALL & WALL WASH LIGHTS",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit 18",
+          "quote": "18...20A...OUTDOOR LIGHTING S WALL & WALL WASH LIGHTS"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "WISER POWER METER (X2) VOLTAGE SENSING AND CONTROL POWER",
+          "attribute": "circuit breaker rating",
+          "value": "15",
+          "unit": "A",
+          "conditions": "",
+          "quote": "15A, WISER POWER METER (X2) VOLTAGE SENSING AND CONTROL POWER"
+        },
+        {
+          "entity": "KITCHEN LIGHTING",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "KITCHEN LIGHTING 20 A"
+        },
+        {
+          "entity": "SPARE",
+          "attribute": "circuit number",
+          "value": "24",
+          "unit": "",
+          "conditions": "",
+          "quote": "24... SPARE"
+        },
+        {
+          "entity": "Circuit 11",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "REFRIGERATOR ... 20A ... 11"
+        },
+        {
+          "entity": "POTABLE WATER PUMP",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 10",
+          "quote": "10... 20A... POTABLE WATER PUMP"
+        },
+        {
+          "entity": "OVEN",
+          "attribute": "circuit breaker rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 6",
+          "quote": "6...20A...OVEN"
+        },
+        {
+          "entity": "BATHROOM, PANTRY & LAUNDRY LIGHTS",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "20 A BATHROOM, PANTRY & LAUNDRY LIGHTS"
+        },
+        {
+          "entity": "HVAC FURNACE circuit",
+          "attribute": "rating",
+          "value": "15",
+          "unit": "A",
+          "conditions": "circuit number 1",
+          "quote": "HVAC FURNACE...15A...1"
+        },
+        {
+          "entity": "Circuit 13",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "Clothes Washer",
+          "quote": "CLOTHES WASHER... 20A... 13"
+        },
+        {
+          "entity": "KITCHEN LIGHTING",
+          "attribute": "circuit number",
+          "value": "23",
+          "unit": "",
+          "conditions": "",
+          "quote": "KITCHEN LIGHTING...23"
+        },
+        {
+          "entity": "OUTDOOR LIGHTING N WALL & DECK LIGHTING circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 26",
+          "quote": "26... 20A... OUTDOOR LIGHTING N WALL & DECK LIGHTING"
+        },
+        {
+          "entity": "Circuit 11",
+          "attribute": "description",
+          "value": "REFRIGERATOR",
+          "unit": "",
+          "conditions": "",
+          "quote": "REFRIGERATOR ... 20A ... 11"
+        },
+        {
+          "entity": "Circuit 34",
+          "attribute": "description",
+          "value": "WISER POWER METER (X2) VOLTAGE SENSING AND CONTROL POWER",
+          "unit": "",
+          "conditions": "",
+          "quote": "34, WISER POWER METER (X2) VOLTAGE SENSING AND CONTROL POWER"
+        },
+        {
+          "entity": "MASTER BEDROOM R",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "MASTER BEDROOM R 20 A"
+        },
+        {
+          "entity": "SPARE",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "20 A SPARE"
+        },
+        {
+          "entity": "Kitchen Receptacles (Island, S Wall & Smoke Alarm) circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 16",
+          "quote": "16... 20 A... KITCHEN RECEPTACLES ISLAND, S WALL & SM OKE ALARM"
+        },
+        {
+          "entity": "Circuit 14",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "Kitchen Receptacles N & E Wall",
+          "quote": "14... 20A... KITCHEN RECEPTACLES N & E WALL"
+        },
+        {
+          "entity": "OUTDOOR LIGHTING S WALL & WALL WASH LIGHTS",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 18",
+          "quote": "18...20A...OUTDOOR LIGHTING S WALL & WALL WASH LIGHTS"
+        },
+        {
+          "entity": "DATA RACK, WISER CONTROL POWER circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "",
+          "quote": "DATA RACK, WISER CONTROL POWER, 20A"
+        },
+        {
+          "entity": "SHOWER LIGHT circuit",
+          "attribute": "rating",
+          "value": "20",
+          "unit": "A",
+          "conditions": "circuit number 25",
+          "quote": "SHOWER LIGHT... 20A... 25"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {
+          "Source data contains only contact information and a URL; no engineering claims found in the provided table rows.": 1,
+          "Source data contains no engineering claims; only a header and a 'CLIENT' label.": 1,
+          "Source data contains no engineering claims; it consists only of a website URL.": 1,
+          "Source data contains only document metadata (ID, date, status) and no engineering claims.": 1,
+          "Source data contains only document metadata (date, document type) and no engineering claims.": 1,
+          "Source data contains only document revision history (date and status), no engineering claims found.": 1,
+          "Source data contains only headers and no engineering values or claims.": 1,
+          "The provided source data contains only header and title information with no engineering values or circuit breaker specifications to extract.": 1,
+          "Source data contains no engineering claims; only a panel identifier 'E-607' with no associated attributes or values.": 1,
+          "The provided source data contains only headers and a row with circuit numbers, but no actual engineering values, ratings, or descriptions to extract.": 1,
+          "The provided source data contains only headers and circuit numbers without associated ratings or descriptions.": 1,
+          "Rejected claim with unsupported literal quote": 9,
+          "The provided source data contains a header and a single row with no associated values for rating or circuit details.": 1,
+          "The provided source data contains only headers and circuit numbers (39, 40) without associated ratings or descriptions.": 1
+        }
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets suffer from significant errors in circuit number bindings for the middle section of the table, likely due to misalignment in the provided text layer compared to the image (e.g., both claim Circuit 14 for Kitchen Receptacles N&E, but the image shows Circuit 10). However, Set A is better because it correctly extracted more specific claims from the sections where the text layer aligned with the image, such as Cooktop (Circuit 2), ERV Rect (Circuit 28), Bathroom Receptacle (Circuit 29), Water Heater (Circuit 31), and Inverter Feed. Set B missed these correct data points and had fewer correct circuit bindings overall (3 vs 6)."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set B is significantly more complete, capturing critical high-amperage circuits (Cooktop 50A, Inverter Feed 50A, Water Heater 30A) that Set A misses entirely. Set A includes vague or invented abbreviations (e.g., 'MASTER BEDROOM R') and splits related attributes into separate claims, whereas Set B binds them correctly. Both sets follow the provided text layer for circuit numbers which conflicts with the image in several places (e.g., Refrigerator circuit), but Set B's comprehensive extraction of components and ratings makes it the superior engineering record."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A binds 25 rating claims to the correct circuit numbers and descriptions with no misreadings, including COOKTOP 50A, WATER HEATER 30A, INVERTER FEED 50A and MAIN BREAKER 150A; its only blemish is a duplicated DISHWASHER entry. Set B is largely accurate too and adds a few circuits A misses (HVAC FURNACE 1, CLOTHES WASHER 13, SHOWER LIGHT 25, DATA RACK 9), but it truncates the entity to 'MASTER BEDROOM R' with a truncated quote, gives an ambiguous 'SPARE' rating claim that cannot be bound to circuit 22 or 24, and spends four claims on trivial circuit-number/description attributes. Both sets omit several rows (e.g., CLOTHES DRYER 30A, LIVING ROOM RECEPTACLES, OUTDOOR RECEPTACLES), so coverage is comparable, but A's claims are uniformly correct and substantive while B mixes in vague and misread items."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-dc-manual-p59-66-a157bdf0-p8-text",
+      "run": "dc-manual-p59-66",
+      "page": 8,
+      "family": "text",
+      "image": "images/dc-manual-p59-66-a157bdf0-p8.jpg",
+      "score": 0.75,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "Qwen/Qwen3.5-397B-A17B"
+      ],
+      "counts": {
+        "baseline": 10,
+        "variant": 8,
+        "shared": 7
+      },
+      "only_baseline": [
+        {
+          "entity": "vacancy sensor",
+          "attribute": "functional requirement",
+          "value": "bypass the dimming function to completely disconnect electricity to the fixture",
+          "unit": "",
+          "conditions": "if luminaires are connected to a vacancy sensor",
+          "quote": "if luminaires are connected to a vacancy sensor, it must be able to bypass the dimming function to completely disconnect electricity to the fixture"
+        },
+        {
+          "entity": "LED bulb",
+          "attribute": "power",
+          "value": "7",
+          "unit": "W",
+          "conditions": "example of light output equivalence",
+          "quote": "one 40W incandescent bulb outputs the same amount of light as a 9W compact fluorescent bulb and a 7W LED bulb"
+        },
+        {
+          "entity": "compact fluorescent bulb",
+          "attribute": "power",
+          "value": "9",
+          "unit": "W",
+          "conditions": "example of light output equivalence",
+          "quote": "one 40W incandescent bulb outputs the same amount of light as a 9W compact fluorescent bulb and a 7W LED bulb"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "vacancy sensor",
+          "attribute": "requirement",
+          "value": "bypass dimming function to completely disconnect electricity",
+          "unit": "",
+          "conditions": "if luminaires are connected to a vacancy sensor",
+          "quote": "if luminaires are connected to a vacancy sensor, it must be able to bypass the dimming function to completely disconnect electricity to the fixture"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is better because its primary claims regarding bulb power equivalence include full sentence quotes that actually support the 'equivalence' condition, whereas Set B uses fragment quotes (e.g., 'a 7W LED bulb') that do not evidence the equivalence claim. Both sets suffer from significant redundancy (duplicate claims), but Set A captures the core engineering facts with faithful evidence in at least half its entries, while Set B leaves key conditions unsupported by the provided quotes."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is better because it contains fewer redundant claims than Set B. Set B extracts every unique fact twice (e.g., the vacancy sensor requirement and bulb wattages appear in duplicate pairs), creating unnecessary noise. While Set B often provides more complete quotes that better support the stated conditions, the excessive duplication violates the preference for fewer trivial claims. Both sets miss the specific room constraints for high efficacy luminaires (kitchen, bathroom, etc.) mentioned in the second paragraph."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets capture the same five core facts (40W incandescent, 9W CFL, 7W LED, the T24 high-efficacy requirement for HARVEST HOME fixtures, and the vacancy-sensor dimming bypass), and all quotes and bindings are supported by the page. Set A is more redundant, repeating every fact twice (10 claims for 5 facts), while Set B repeats only three facts (8 claims for 5 facts), so B adds less trivial clutter. Neither set captures the Title 24 requirement that high-efficacy luminaires be on their own switch in kitchen, bathroom, closet and laundry rooms, so both are equally incomplete there. Set B's abbreviated vacancy-sensor value ('bypass dimming function to completely disconnect electricity') is still faithful to the source."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets correctly capture the 40W/9W/7W light-output equivalence, the T24 high-efficacy requirement for HARVEST HOME fixtures, and the vacancy-sensor bypass requirement with its conditional clause. However, both are padded with near-duplicate claims: Set A repeats the incandescent 40W and vacancy-sensor claims, while Set B repeats nearly every claim (incandescent, CFL, LED, T24 requirement, vacancy sensor), giving it 10 claims for only about 5 distinct facts. Neither set captures the LIGHTING LEVELS table values (3 FC, 5-10 FC, 30 FC, 50 FC and bulb counts) shown on the page, so that omission is shared. Set A is the leaner, less redundant version of essentially the same correct content."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-rules-2013-p35-38-3c85ed49-p1-table",
+      "run": "rules-2013-p35-38",
+      "page": 1,
+      "family": "table",
+      "image": "images/rules-2013-p35-38-3c85ed49-p1.jpg",
+      "score": 0.5,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.5,
+          "variant-first": 0.5
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.5,
+          "variant-first": 0.5
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 3,
+        "variant": 3,
+        "shared": 0
+      },
+      "only_baseline": [
+        {
+          "entity": "clothes drying task",
+          "attribute": "full points condition",
+          "value": "≤ 100",
+          "unit": "% of original weight",
+          "conditions": "",
+          "quote": "Full points: % of original weight ≤ 100"
+        },
+        {
+          "entity": "clothes drying task",
+          "attribute": "reduced points condition",
+          "value": "100 < x < 110",
+          "unit": "% of original weight",
+          "conditions": "",
+          "quote": "Reduced points: 100 < % of original weight < 110"
+        },
+        {
+          "entity": "clothes drying task",
+          "attribute": "no points condition",
+          "value": "≥ 110",
+          "unit": "% of original weight",
+          "conditions": "",
+          "quote": "No points: % of original weight ≥ 110"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "clothes drying",
+          "attribute": "scoring criterion (No points)",
+          "value": "≥ 110",
+          "unit": "% of original weight",
+          "conditions": "scoring for laundry loads",
+          "quote": "No points: % of original weight ≥ 110"
+        },
+        {
+          "entity": "clothes drying",
+          "attribute": "scoring criterion (Reduced points)",
+          "value": "100 < x < 110",
+          "unit": "% of original weight",
+          "conditions": "scoring for laundry loads",
+          "quote": "Reduced points: 100 < % of original weight < 110"
+        },
+        {
+          "entity": "clothes drying",
+          "attribute": "scoring criterion (Full points)",
+          "value": "≤ 100",
+          "unit": "% of original weight",
+          "conditions": "scoring for laundry loads",
+          "quote": "Full points: % of original weight ≤ 100"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {
+          "The provided source data contains fragmented text and headers that do not contain engineering claims, specifications, or measurable properties. The content appears to be a set of contest rules/instructions rather than engineering evidence.": 1,
+          "The source data provided is fragmented, contains non-engineering text (contest rules), and the table rows/headers do not contain extractable engineering claims or coherent technical data.": 1,
+          "The provided source data contains fragmented text and a reference to a figure (Figure 8), but does not contain any actual engineering claims, data tables, or technical specifications.": 1,
+          "The provided source data contains fragmented text and a header/row structure that does not contain engineering claims, properties, or values. It appears to be a fragment of a contest rulebook rather than a technical specification.": 1
+        },
+        "variant": {
+          "The provided source data contains fragmented text and null values that do not constitute engineering claims, specifications, or measurable properties.": 1,
+          "The provided source data contains fragmented text and numeric values that do not form coherent engineering claims or identifiable component attributes.": 1,
+          "The provided source data contains fragmented text and a figure caption, but no actual engineering data, tables, or charts to extract claims from.": 1,
+          "The provided source data contains fragmented text and a row label '8-5. Dishwasher' but contains no engineering claims, properties, or values to extract.": 1
+        }
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.5,
+          "note": "Both sets accurately extract the three scoring conditions from Figure 8 with correct quotes and values. Set A uses a slightly more precise entity ('clothes drying task' matching the Y-axis label), while Set B adds a context condition ('scoring for laundry loads') derived from the surrounding text. Both normalize the inequality syntax in the value field identically (introducing 'x'), and neither contains factual errors."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.5,
+          "note": "Both sets accurately extract the three scoring criteria from Figure 8 regarding clothes drying weight percentages, with correct values, inequalities, and supporting quotes. Set A includes a generic 'conditions' field while Set B uses a slightly more precise entity name ('clothes drying task' matching the axis label), but these differences are negligible. Both sets omit the textual claims regarding Dishwasher and Lighting found on the same page, resulting in equal coverage and correctness."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.5,
+          "note": "Both sets extract the same three scoring thresholds from Figure 8 with accurate quotes and correct binding to the clothes drying (laundry) scoring function. Set A names the entity as 'clothes drying task', matching the figure's y-axis label, while Set B adds the condition 'scoring for laundry loads', which is supported by the surrounding text on laundry loads being scored. Neither set misreads a threshold or invents values, and both omit the same surrounding facts, so they are effectively equivalent in correctness."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.5,
+          "note": "Both sets extract the same three clothes-dryer scoring thresholds from Figure 8 with accurate quotes and correct inequality bounds (≤100 full, 100–110 reduced, ≥110 none). Set A adds a generic 'scoring for laundry loads' condition and labels the entity 'clothes drying', while Set B uses 'clothes drying task' with 'full/reduced/no points condition' attributes; neither misbinds or invents anything. The only minor quibble is that both render the reduced-points variable as 'x' rather than '% of original weight', which is equally trivial in both. Coverage and fidelity are effectively identical."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-dc-manual-p59-66-a157bdf0-p3-text",
+      "run": "dc-manual-p59-66",
+      "page": 3,
+      "family": "text",
+      "image": "images/dc-manual-p59-66-a157bdf0-p3.jpg",
+      "score": 0.5,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 0.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "Qwen/Qwen3.5-397B-A17B",
+        "XiaomiMiMo/MiMo-V2.6-Pro"
+      ],
+      "counts": {
+        "baseline": 6,
+        "variant": 6,
+        "shared": 4
+      },
+      "only_baseline": [
+        {
+          "entity": "Flexinol® wire",
+          "attribute": "martensite transformation temperature range",
+          "value": "200C to cryogenic temperatures",
+          "unit": "",
+          "conditions": "theoretical capability via nickel to titanium ratio",
+          "quote": "allowing a martensite transformation from 200C to cryogenic temperatures"
+        },
+        {
+          "entity": "Flexinol® wire",
+          "attribute": "austenite temperature range",
+          "value": "15-20",
+          "unit": "C",
+          "conditions": "existing wire specification manufactured by Dynalloy Inc.",
+          "quote": "the established austenite temperature range, 15-20C, fell within an existing wire specification manufactured by Dynalloy Inc."
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Flexinol® wire",
+          "attribute": "established austenite temperature range",
+          "value": "15-20",
+          "unit": "C",
+          "conditions": "based on annual temperature data for Irvine, CA during competition period",
+          "quote": "the established austenite temperature range, 15-20C"
+        },
+        {
+          "entity": "Flexinol® wire",
+          "attribute": "martensite transformation temperature range",
+          "value": "200C to cryogenic",
+          "unit": "",
+          "conditions": "theoretical capability via nickel to titanium ratio",
+          "quote": "allowing a martensite transformation from 200C to cryogenic temperatures"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B correctly identifies the 15-20C range as an 'established' design parameter based on climate data, whereas Set A ambiguously labels it a wire property conditioned on wire specification availability. Set B's extraction reflects the causal logic of the text (climate data determined the range, which then matched a wire spec) more accurately than Set A. Both sets accurately extract the force values and theoretical transformation ranges."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set B is better because its quotes are more complete and directly support the stated conditions, particularly for the austenite temperature range claim where the quote includes the wire specification context matching the condition. Set A's quote for that claim is a fragment that does not evidence its condition (Irvine data), which appears in a different sentence. Set B also preserves the full value text ('cryogenic temperatures') more faithfully than Set A."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets capture the same six facts with correct bindings, but Set A's austenite-range claim is better supported: its quote explicitly ties 15-20 C to the existing Dynalloy wire specification, whereas Set B attaches the Irvine, CA annual-temperature condition to a truncated quote that does not support it. Set A also gives the complete value '200C to cryogenic temperatures' while Set B drops the unit word. Otherwise the pull-force, actuation-force and louver claims are equivalent."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets cover the same six facts with accurate values and supporting quotes, including the 2500/2900 g pull forces, 400 g total actuation force, 10 g per-louver limit, and the 200C-to-cryogenic transformation range. The only substantive difference is the condition attached to the 15-20C austenite range: A correctly ties it to the annual Irvine, CA temperature data used to establish it, while B attributes it to the Dynalloy wire specification, which the text only says the range fell within. That misbinding makes B's condition misleading, so A is slightly more faithful overall."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-rules-2013-p35-38-3c85ed49-p2-table",
+      "run": "rules-2013-p35-38",
+      "page": 2,
+      "family": "table",
+      "image": "images/rules-2013-p35-38-3c85ed49-p2.jpg",
+      "score": 0.5,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "Qwen/Qwen3.5-397B-A17B",
+        "XiaomiMiMo/MiMo-V2.6-Pro"
+      ],
+      "counts": {
+        "baseline": 8,
+        "variant": 11,
+        "shared": 7
+      },
+      "only_baseline": [
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "2.721",
+          "unit": "kg",
+          "conditions": "minimum",
+          "quote": "starting water weight shall be at least 96.00 oz (2.721 kg)"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "96.00",
+          "unit": "oz",
+          "conditions": "minimum requirement for vaporizing task",
+          "quote": "starting water weight shall be at least 96.00 oz"
+        },
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "96.00",
+          "unit": "oz",
+          "conditions": "Contest 9-2 Cooking; vaporized in a single task",
+          "quote": "the starting water weight shall be at least 96.00 oz"
+        },
+        {
+          "entity": "vaporized water",
+          "attribute": "weight",
+          "value": "16 to 80",
+          "unit": "oz",
+          "conditions": "reduced points range",
+          "quote": "Reduced points: 16 oz (450 g) < Weight < 80 oz (2300 g)"
+        },
+        {
+          "entity": "starting water",
+          "attribute": "weight",
+          "value": "2.721",
+          "unit": "kg",
+          "conditions": "minimum requirement for vaporizing task",
+          "quote": "(2.721 kg)"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is better because its quotes fully support the entity-value bindings, specifically including the text 'starting water weight' for the metric values, whereas Set B uses fragmentary quotes like '(2.721 kg)' that do not independently verify the entity. Set A is also less redundant, avoiding multiple claims for the same starting water requirement with only minor condition label variations found in Set B. While Set B captures the reduced points range well, the poor quote quality for the starting water metric values and excessive redundancy make it inferior."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is preferred because it extracts the 'reduced points' weight range (16 to 80 oz) from Figure 9, which is a key part of the scoring function that Set B omits entirely. Both sets exhibit redundancy by creating multiple separate claims for the starting water weight (96.00 oz and 2.721 kg) with slightly varying conditions, but Set A's completeness regarding the scoring logic outweighs this verbosity. Neither set contains factually incorrect values or misbound attributes relative to the provided text and image."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets correctly capture the 96.00 oz (2.721 kg) minimum starting water weight and the Figure 9 thresholds (80 oz/2300 g full points, 16 oz/450 g no points). Set B adds a useful reduced-points range claim, but it is padded with five near-duplicate claims about the same 96 oz minimum and two claims whose quote is only the fragment \"(2.721 kg)\", which does not support the stated claim. Set A covers the same substantive facts with less redundancy and no unsupported quotes, so it is the cleaner, more faithful extraction."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets are heavily redundant, repeating the 96.00 oz starting-water minimum and the Figure 9 thresholds several times. Set A additionally captures the reduced-points range (16–80 oz vaporized), a key scoring fact that Set B omits entirely, and its quotes are generally supported. However, Set A misstates the single-container condition as 'vaporized in a single task' and includes a fragmentary quote '(2.721 kg)', while Set B is cleaner with fuller quotes but incomplete coverage. On balance Set A covers more of the page's engineering content despite one misread."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p12-text",
+      "run": "iea-15mw-p20-31",
+      "page": 12,
+      "family": "text",
+      "image": "images/iea-15mw-p20-31-f7071680-p12.jpg",
+      "score": 0.125,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 0.5
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 19,
+        "variant": 20,
+        "shared": 18
+      },
+      "only_baseline": [
+        {
+          "entity": "offshore wind turbine",
+          "attribute": "clearance",
+          "value": "20 to 30",
+          "unit": "m",
+          "conditions": "typical range",
+          "quote": "offshore wind turbine clearances can vary between 20 m to 30 m"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "offshore wind turbine",
+          "attribute": "clearance",
+          "value": "20 to 30",
+          "unit": "m",
+          "conditions": "typical variation",
+          "quote": "offshore wind turbine clearances can vary between 20 m to 30 m"
+        },
+        {
+          "entity": "transition piece",
+          "attribute": "mass",
+          "value": "100",
+          "unit": "t",
+          "conditions": "",
+          "quote": "100 t for the transition piece"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets extract the same key engineering facts accurately, including material properties, dimensions, and frequencies. However, both sets contain significant redundancy with duplicate claims for the same properties. Set A is slightly better because it has fewer trivial duplicate claims (19 total vs 20 in Set B), specifically avoiding the extra duplicate entry for the transition piece mass found in Set B."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.5,
+          "note": "Both sets extract the same core engineering data with high accuracy and faithfulness to the source text and table, including material properties, dimensions, and frequency constraints. Both sets exhibit significant redundancy with duplicate claims for properties like density and modulus, though Set A contains one additional duplicate entry compared to Set B. Given the negligible difference in content, accuracy, and overall quality, the sets are considered equally effective."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets cover the same core facts from the page — steel and soil properties from Table 4-1, the 0.170 Hz first tower-monopile mode, the 0.10–0.13 Hz wave range, 150 m hub height, 30 m clearance with 120-m blades, 10-m monopile outer diameter, and 100 t transition piece — with quotes that support them and no invented values. Both also carry redundant duplicate entries (steel density, Young's modulus, shear modulus, soil shear modulus and Poisson's ratio each appear twice), which are trivial rather than wrong. The only substantive difference is that Set B adds a second, condition-less duplicate of the transition piece 100 t claim, making it slightly more redundant than Set A. Otherwise the two sets are essentially identical in correctness and coverage."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Both sets capture the same core facts faithfully: material properties from Table 4-1, the 0.170 Hz first tower-monopile mode, the 0.10–0.13 Hz wave range, 150 m hub height, 120 m blades, 30 m clearance, 10 m monopile diameter, and the 100 t transition piece, with quotes that support each claim. The only substantive difference is that Set A repeats the transition-piece mass claim a second time without its condition, adding a redundant, less complete entry. Set B is otherwise identical in content and accuracy, so it wins only on avoiding that trivial duplicate."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p11-table",
+      "run": "nrel-5mw-p25-36",
+      "page": 11,
+      "family": "table",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p11.jpg",
+      "score": 0.75,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "Qwen/Qwen3.5-397B-A17B"
+      ],
+      "counts": {
+        "baseline": 4,
+        "variant": 4,
+        "shared": 3
+      },
+      "only_baseline": [
+        {
+          "entity": "NREL 5-MW baseline wind turbine",
+          "attribute": "best-fit line intercept (θ)",
+          "value": "6.302336",
+          "unit": "º",
+          "conditions": "best-fit line for pitch sensitivity",
+          "quote": "θ = 6.302336º"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "NREL 5-MW baseline wind turbine",
+          "attribute": "theta (θ)",
+          "value": "6.302336",
+          "unit": "º",
+          "conditions": "",
+          "quote": "θ = 6.302336º"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is preferred because it avoids the exact duplicate claims found in Set B (claims 2 and 3 are identical in B). Although Set A incorrectly labels the parameter $\theta_K$ as a 'best-fit line intercept' in one claim, it provides more distinct attribute descriptions and correctly links the value to the 'best-fit line' context mentioned in the text. Both sets share the same unit typo ('watt/ra') in one claim and fail to capture the 'K' subscript in the attribute or quote for the second value."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets contain a unit typo ('watt/ra' instead of 'watt/rad') in the first claim and misquote the symbol 'θk' as 'θ' in the claims regarding the 6.3 degree value. However, Set B incorrectly labels the 6.3 degree value as the 'best-fit line intercept', which contradicts the graph (x-intercept is >20º) and the text definition (angle where sensitivity doubles), whereas Set A uses a vague but not factually incorrect attribute ('theta'). Both sets include redundant duplicate claims for the theta value."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets capture the same two figure values (pitch sensitivity at θ=0° and the 6.302336° angle) and both duplicate the pitch-sensitivity claim, and both omit the important definition that θK is the blade-pitch angle at which pitch sensitivity has doubled. Set A, however, misbinds 6.302336° as the 'best-fit line intercept', whereas the text states the intercept is the second term in square brackets of Eq. (7-16a) and 6.302336° is θK. Set B labels that value only as 'theta (θ)', which is vague but not misbound, so it makes no outright error. Neither set distinguishes θK from a generic θ, so both are weak on the defining condition."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets capture the two figure values (pitch sensitivity at θ=0° and θK = 6.302336°) and both duplicate the θK value under a generic 'θ' attribute, misbinding it since the text defines θK as the blade-pitch angle at which pitch sensitivity has doubled. Set B adds an extra misbinding by labeling 6.302336° as the 'best-fit line intercept', when the text states the intercept is the ∂P/∂θ(θ=0) term (-25.52E+6 watt/rad). Set A's remaining claims are otherwise faithful with correct conditions and supporting quotes, so A is slightly better despite its own duplicate/misbound θK claim."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-dc-manual-p59-66-a157bdf0-p6-text",
+      "run": "dc-manual-p59-66",
+      "page": 6,
+      "family": "text",
+      "image": "images/dc-manual-p59-66-a157bdf0-p6.jpg",
+      "score": 0.75,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "XiaomiMiMo/MiMo-V2.6-Pro"
+      ],
+      "counts": {
+        "baseline": 8,
+        "variant": 8,
+        "shared": 6
+      },
+      "only_baseline": [
+        {
+          "entity": "louver",
+          "attribute": "structural bend angle",
+          "value": "25",
+          "unit": "degree",
+          "conditions": "along the louver longitude",
+          "quote": "a 25-degree structural bend was placed along the louver longit"
+        },
+        {
+          "entity": "louver",
+          "attribute": "structural bend angle",
+          "value": "25",
+          "unit": "degree",
+          "conditions": "along the louver longitudinal",
+          "quote": "a 25-degree structural bend was placed along the louver longit"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Harvest Shade Screen",
+          "attribute": "solar altitude",
+          "value": "50",
+          "unit": "degrees",
+          "conditions": "fall equinox at 12pm",
+          "quote": "The solar altitude, 50 degrees, was established by using the fall equinox at 12pm"
+        },
+        {
+          "entity": "louver",
+          "attribute": "structural bend angle",
+          "value": "25",
+          "unit": "degree",
+          "conditions": "along the louver longit",
+          "quote": "a 25-degree structural bend was placed along the louver longit"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {
+          "Text is clipped at the end of the source data ('longit')": 1
+        },
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is better because it avoids the semantic error found in Set A, where Claim 1 incorrectly identifies the bend condition as 'longitude' instead of 'longitudinal' (text: 'longitudinal section'). Set B also provides a more contextually appropriate entity binding for the solar altitude claim ('Harvest Shade Screen') in Claim 4, although it redundantly includes the variable-based claim in Claim 7. Both sets suffer from unnecessary duplication (e.g., shape claims in both, solar altitude in B, bend in A), but Set A's factual misread makes it inferior."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is better because it avoids the semantic error found in Set B where 'longitudinal' is misread as 'longitude' (a geographic coordinate) in the first claim. Both sets suffer from quote truncation (e.g., 'windo' instead of 'window azimuth') and include redundant claims (duplicate shape entries, vague 'solar altitude | value' entry), but Set B's hallucination of 'longitude' makes it less faithful to the engineering text."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets cover the same core facts (window azimuth 0, truncated isosceles triangle shape, 25-degree bend, the depth-to-height algorithm, 50-degree solar altitude at fall equinox 12pm, and 1:1 ratio) and both contain duplicated claims. Set A's duplicates (shape, bend) are at least faithful to the text, whereas Set B duplicates the solar altitude claim and misbinds one instance to 'Harvest Shade Screen' as if the 50-degree solar altitude were a property of the screen rather than a site-specific design input. Set A also keeps the bend condition wording fuller ('along the louver longitude'). Overall Set A is marginally more faithful with one fewer misbound claim."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets capture the core facts (window azimuth 0, truncated isosceles triangle louver shape, 25-degree bend, the depth-to-height algorithm, and the 1:1 ratio) and both include a vague claim where 'solar altitude' is used as the entity rather than a component. Set A additionally binds the 50-degree solar altitude correctly to the Harvest Shade Screen with the fall equinox at 12pm condition, which Set B omits. Set B instead duplicates the bend claim with a misread condition ('along the louver longitude' instead of the longitudinal section), giving it one more defect than A."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p4-table",
+      "run": "calg-cd-p39-42",
+      "page": 4,
+      "family": "table",
+      "image": "images/calg-cd-p39-42-9a895974-p4.jpg",
+      "score": 0.625,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.5,
+          "variant-first": 0.0
+        }
+      },
+      "judges_disagree": true,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 4,
+        "variant": 4,
+        "shared": 2
+      },
+      "only_baseline": [
+        {
+          "entity": "Kitchen",
+          "attribute": "grade level",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL\n0' - 0\""
+        },
+        {
+          "entity": "Bedroom",
+          "attribute": "grade level",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL\n0' - 0\""
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Kitchen",
+          "attribute": "grade level height",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL\n0' - 0\""
+        },
+        {
+          "entity": "Bedroom",
+          "attribute": "grade level height",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL\n0' - 0\""
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {
+          "Source data contains only a partial header/title 'DINING ROOM SECTIO' and no engineering data or claims to extract.": 1
+        }
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets correctly identify the entities (Kitchen, Bedroom) and their respective elevations (Finished Floor and Grade Level) based on the section labels and elevation markers. Set B is better because its quotes are more precise and specific to each claim; Set A includes extraneous text (the Grade Level information) in the quotes for the Finished Floor claims, making the evidence binding less clean."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is preferred because its quotes are more precise, binding only the relevant text to each claim (e.g., separating finished floor and grade level text), whereas Set B includes the grade level text within the quotes for finished floor height claims, creating redundancy and less precise evidence binding. Both sets correctly extract the values and entities (Kitchen/Bedroom) from the drawing labels."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.5,
+          "note": "Both sets cover the same four facts from the two section markers: finished floor at 2' - 9 1/2\" and grade level datum at 0' - 0\" for the kitchen (dining room) and bedroom sections, with the finished floor correctly conditioned relative to grade level. Set A's finished floor quotes include the grade level line, which better supports the stated condition, while Set B's shorter quotes omit it and label the datum 'grade level height'. These are only minor wording and quote-boundary differences; neither set misbinds a value or invents content, and both omit nothing important shown on the page."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Both sets cover the same four facts from the section level markers, with values correctly read. Set B's quotes for the finished-floor claims include the GRADE LEVEL 0'-0\" datum, which supports the stated 'relative to grade level' condition, whereas Set A's quotes omit that reference. Set A also labels the datum as a 'grade level height' of the rooms, a slightly misbound attribute, while Set B keeps it as the grade level datum. Otherwise the sets are near-equivalent."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p12-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 12,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p12.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 8,
+        "variant": 5,
+        "shared": 4
+      },
+      "only_baseline": [
+        {
+          "entity": "baseline blade-pitch controller",
+          "attribute": "derivative gain KD",
+          "value": "0.0",
+          "unit": "s2",
+          "conditions": "",
+          "quote": "KD = 0.0 s2"
+        },
+        {
+          "entity": "baseline blade-pitch controller",
+          "attribute": "damping ratio zeta_phi",
+          "value": "0.7",
+          "unit": "",
+          "conditions": "used to compensate for neglecting negative damping from the generator-torque controller",
+          "quote": "upper limit of the recommended damping ratio range, ζφ = 0.7"
+        },
+        {
+          "entity": "baseline blade-pitch controller",
+          "attribute": "integral gain KI",
+          "value": "0.008068634",
+          "unit": "",
+          "conditions": "theta = 0º",
+          "quote": "KI(θ = 0º) = 0.008068634"
+        },
+        {
+          "entity": "baseline blade-pitch controller",
+          "attribute": "proportional gain KP",
+          "value": "0.01882681",
+          "unit": "s",
+          "conditions": "theta = 0º",
+          "quote": "KP(θ = 0º) = 0.01882681 s"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "blade-pitch controller",
+          "attribute": "damping ratio zeta_phi",
+          "value": "0.7",
+          "unit": "",
+          "conditions": "used to compensate for neglecting negative damping from the generator-torque controller",
+          "quote": "upper limit of the recommended damping ratio range, ζφ = 0.7"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set A duplicates every claim, listing them once with 'blade-pitch controller' and again with 'baseline blade-pitch controller', creating significant redundancy. Set B is more concise, extracting the gains and damping ratio without full duplication, although it splits the damping ratio conditions into two separate claims. Set B is preferred for avoiding trivial duplicate claims while maintaining accuracy."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is better because it provides a concise and non-redundant extraction of the engineering claims. Set B contains significant duplication, extracting the same gain and damping values twice with slightly varying entity names (e.g., 'blade-pitch controller' vs 'baseline blade-pitch controller'), which creates trivial claims without adding information. Both sets accurately capture the values and conditions from the text, but Set A's organization is much cleaner."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets capture the correct gain values (KP = 0.01882681 s, KI = 0.008068634 at θ = 0º, KD = 0.0 s²) and the damping ratio ζφ = 0.7 with its compensating condition, all supported by the text. Set A, however, duplicates every claim under a 'baseline' entity variant, yielding four redundant entries that add no new information. Set B contains the same substantive content with only one duplicated damping-ratio entry (split across two condition phrasings), so it is the cleaner, more faithful set. Neither set invents values, but Set A's redundancy counts as trivial claims."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets capture the four key values (KP, KI, KD, ζφ) with correct units, conditions and supporting quotes, and neither invents anything. However, Set B duplicates every claim under a near-identical 'baseline blade-pitch controller' entity, adding four redundant, trivial entries without any new information. Set A presents the same correct content in five non-duplicated claims, so it is the cleaner and better set. Neither set misreads the source, so no claims are counted as outright wrong."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p2-table",
+      "run": "nrel-5mw-p25-36",
+      "page": 2,
+      "family": "table",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p2.jpg",
+      "score": 0.333,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "Qwen/Qwen3.5-397B-A17B"
+      ],
+      "counts": {
+        "baseline": 100,
+        "variant": 112,
+        "shared": 22
+      },
+      "only_baseline": [
+        {
+          "entity": "tower",
+          "attribute": "torsional stiffness",
+          "value": "89.13E+9",
+          "unit": "N•m2",
+          "conditions": "elevation = 87.60 m",
+          "quote": "TwGJStif (N•m2) ... 89.13E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 61.32 m, HtFract = 0.7",
+          "quote": "61.32, 0.7, 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "mass density",
+          "value": "3616.83",
+          "unit": "kg/m",
+          "conditions": "elevation = 52.56 m, HtFract = 0.6",
+          "quote": "Elevation (m) 52.56, HtFract (-) 0.6, TMassDen (kg/m) 3616.83"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side inertia",
+          "value": "24866.3",
+          "unit": "kg•m",
+          "conditions": "Elevation = 0.00 m",
+          "quote": "Elevation (m) 0.00 ... TwSSIner (kg•m) 24866.3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 17.52 m, HtFract = 0.2",
+          "quote": "TwFAcgOf (m) ... 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "TwSScgOf (m) ... 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft stiffness",
+          "value": "341.88E+9",
+          "unit": "N•m2",
+          "conditions": "elevation = 35.04 m, HtFract = 0.4",
+          "quote": "Elevation (m) 35.04, HtFract (-) 0.4, TwFAStif (N•m2) 341.88E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "axial stiffness",
+          "value": "112.43E+9",
+          "unit": "N",
+          "conditions": "elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwEAStif (N) 112.43E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "614.34E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 0.00 m",
+          "quote": "Elevation (m) 0.00 ... TwSSStif (N•m2) 614.34E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "axial stiffness",
+          "value": "68.90E+9",
+          "unit": "N",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "TwEAStif (N) ... 68.90E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwEAStif",
+          "value": "75.43E+9",
+          "unit": "N",
+          "conditions": "Elevation = 70.08 m, HtFract = 0.8",
+          "quote": "70.08, 0.8, ..., 75.43E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "141.78E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "TwSSStif (N•m2) ... 141.78E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "axial stiffness",
+          "value": "120.71E+9",
+          "unit": "N",
+          "conditions": "Elevation = 17.52 m, HtFract = 0.2",
+          "quote": "TwEAStif (N) ... 120.71E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "mass density",
+          "value": "4550.87",
+          "unit": "kg/m",
+          "conditions": "elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TMassDen (kg/m) 4550.87"
+        },
+        {
+          "entity": "tower",
+          "attribute": "axial stiffness",
+          "value": "82.25E+9",
+          "unit": "N",
+          "conditions": "Elevation = 61.32 m, HtFract = 0.7",
+          "quote": "61.32, 0.7, 82.25E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "115.82E+9",
+          "unit": "N•m2",
+          "conditions": "elevation = 87.60 m",
+          "quote": "TwSSStif (N•m2) ... 115.82E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side inertia",
+          "value": "16155.3",
+          "unit": "kg•m",
+          "conditions": "elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwSSIner (kg•m) 16155.3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft inertia",
+          "value": "8356.6",
+          "unit": "kg•m",
+          "conditions": "Elevation = 61.32 m, HtFract = 0.7",
+          "quote": "61.32, 0.7, 8356.6"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft inertia",
+          "value": "16155.3",
+          "unit": "kg•m",
+          "conditions": "elevation = 26.28 m, HtFract = 0.3",
+          "quote": "Elevation (m) 26.28, HtFract (-) 0.3, TwFAIner (kg•m) 16155.3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "forward-aft center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "TwFAcgOf (m) ... 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "246.03E+9",
+          "unit": "N•m2",
+          "conditions": "elevation = 52.56 m, HtFract = 0.6",
+          "quote": "Elevation (m) 52.56, HtFract (-) 0.6, TwSSStif (N•m2) 246.03E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 0.00 m",
+          "quote": "Elevation (m) 0.00 ... TwFAcgOf (m) 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft inertia",
+          "value": "9958.2",
+          "unit": "kg•m",
+          "conditions": "elevation = 52.56 m, HtFract = 0.6",
+          "quote": "Elevation (m) 52.56, HtFract (-) 0.6, TwFAIner (kg•m) 9958.2"
+        },
+        {
+          "entity": "tower",
+          "attribute": "forward-aft stiffness",
+          "value": "141.78E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 78.84 m, HtFract = 0.9",
+          "quote": "TwFAStif (N•m2) ... 141.78E+9"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "tower",
+          "attribute": "TwSScgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "Elevation = 17.52 m, HtFract = 0.2",
+          "quote": "17.52, 0.2, 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwFAcgOf",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "HtFract = 0.6",
+          "quote": "TwFAcgOf\n(m) 0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwEAStif",
+          "value": "120.71E+9",
+          "unit": "N",
+          "conditions": "Elevation = 17.52 m, HtFract = 0.2",
+          "quote": "17.52, 0.2, 120.71E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "elevation",
+          "value": "52.56",
+          "unit": "m",
+          "conditions": "HtFract = 0.6",
+          "quote": "Elevation\n(m) 52.56"
+        },
+        {
+          "entity": "tower",
+          "attribute": "mass density",
+          "value": "3916.41",
+          "unit": "kg/m",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "43.80, 0.5, 3916.41"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft inertia",
+          "value": "8356.6",
+          "unit": "kg•m",
+          "conditions": "HtFract = 0.7",
+          "quote": "8356.6"
+        },
+        {
+          "entity": "tower",
+          "attribute": "mass density (TMassDen)",
+          "value": "2788.75",
+          "unit": "kg/m",
+          "conditions": "at elevation 78.84 m",
+          "quote": "2788.75"
+        },
+        {
+          "entity": "tower",
+          "attribute": "torsional stiffness",
+          "value": "223.94E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "43.80, 0.5, 223.94E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "axial stiffness",
+          "value": "82.25E+9",
+          "unit": "N",
+          "conditions": "HtFract = 0.7",
+          "quote": "82.25E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "mass density",
+          "value": "3053.01",
+          "unit": "kg/m",
+          "conditions": "elevation = 70.08 m",
+          "quote": "3053.01"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft stiffness (TwFAStif)",
+          "value": "141.78E+9",
+          "unit": "N•m2",
+          "conditions": "at elevation 78.84 m",
+          "quote": "141.78E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fractional height (HtFract)",
+          "value": "0.9",
+          "unit": "-",
+          "conditions": "",
+          "quote": "0.9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "534.82E+9",
+          "unit": "N•m2",
+          "conditions": "HtFract = 0.1",
+          "quote": "534.82E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "HtFract = 0.3",
+          "quote": "0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fore-aft inertia (TwFAIner)",
+          "value": "5738.6",
+          "unit": "kg•m",
+          "conditions": "at elevation 78.84 m",
+          "quote": "5738.6"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side center of gravity offset",
+          "value": "0.0",
+          "unit": "m",
+          "conditions": "elevation = 70.08 m",
+          "quote": "0.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwFAIner",
+          "value": "18751.3",
+          "unit": "kg•m",
+          "conditions": "Elevation = 17.52 m, HtFract = 0.2",
+          "quote": "17.52, 0.2, 18751.3"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side inertia",
+          "value": "6955.9",
+          "unit": "kg•m",
+          "conditions": "elevation = 70.08 m",
+          "quote": "6955.9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "elevation",
+          "value": "61.32",
+          "unit": "m",
+          "conditions": "HtFract = 0.7",
+          "quote": "61.32"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side stiffness",
+          "value": "399.13E+9",
+          "unit": "N•m2",
+          "conditions": "HtFract = 0.3",
+          "quote": "399.13E+9"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side inertia",
+          "value": "11779.0",
+          "unit": "kg•m",
+          "conditions": "Elevation = 43.80 m, HtFract = 0.5",
+          "quote": "43.80, 0.5, 11779.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "side-to-side inertia",
+          "value": "4688.0",
+          "unit": "kg•m",
+          "conditions": "elevation = 87.60 m",
+          "quote": "4688.0"
+        },
+        {
+          "entity": "tower",
+          "attribute": "fractional height",
+          "value": "0.8",
+          "unit": "-",
+          "conditions": "elevation = 70.08 m",
+          "quote": "0.8"
+        },
+        {
+          "entity": "tower",
+          "attribute": "TwGJStif",
+          "value": "472.75E+9",
+          "unit": "N•m2",
+          "conditions": "Elevation = 0.00 m, HtFract = 0.0",
+          "quote": "0.00, 0.0, ..., 472.75E+9"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is better structured with consistent conditions (Elevation and HtFract) and normalized attribute names, avoiding trivial metadata extractions. Set B includes trivial claims (extracting index columns like 'elevation' and 'fractional height' as properties) and inconsistent attribute naming. Set A has one value discrepancy (68.90E+9 vs 62.66E+9 at 78.84m) due to an OCR error in the provided text layer compared to the image, but its overall fidelity to engineering claim structure is superior."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is slightly better as it adheres more closely to the source terminology ('fore-aft' vs Set B's 'forward-aft' in two claims). Set A has one claim (fractional height) missing a row condition, making it semantically vague, while Set B has two claims with incorrect attribute names. Both sets extract numerical values accurately from the table."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both extractions bind the Table 6-1 values to the correct rows, and neither contains a misread or invented number. Set A consistently translates the columns into plain property names (fore-aft/side-to-side stiffness and inertia, axial stiffness, torsional stiffness, mass density, cg offsets) and its quotes carry the column headers plus row coordinates that actually support each claim. Set B instead leaves raw column labels (TwSScgOf, TwEAStif, TwFAIner, TwGJStif) and spends four claims on trivial row coordinates (elevation 52.56/61.32 m, HtFract 0.8/0.9) that are conditions rather than tower properties, with bare-number quotes that give no context. Set A is thus the more faithful and informative extraction, though its few naming slips (\"TwEAStif\", \"forward-aft\") are minor."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p5-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 5,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p5.jpg",
+      "score": 0.25,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "XiaomiMiMo/MiMo-V2.6-Pro"
+      ],
+      "counts": {
+        "baseline": 3,
+        "variant": 4,
+        "shared": 1
+      },
+      "only_baseline": [
+        {
+          "entity": "low-pass filter",
+          "attribute": "discrete time step",
+          "value": "0.0125",
+          "unit": "s",
+          "conditions": "",
+          "quote": "For a discrete time step of 0.0125 s, the frequency response of the resulting filter is shown in the Bode plot of Figure 7-1."
+        },
+        {
+          "entity": "low-pass filter",
+          "attribute": "corner frequency",
+          "value": "0.25",
+          "unit": "Hz",
+          "conditions": "roughly one-quarter of the blade’s first edgewise natural frequency",
+          "quote": "We set the corner frequency (the -3 dB point in Figure 7-1) of the low-pass filter to be roughly one-quarter of the blade’s first edgewise natural frequency (see Section 9) or 0.25 Hz."
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "generator speed low-pass filter",
+          "attribute": "magnitude",
+          "value": "-3",
+          "unit": "dB",
+          "conditions": "at corner frequency",
+          "quote": "the corner frequency (the -3 dB point in Figure 7-1)"
+        },
+        {
+          "entity": "Baseline Control-Measurement Filter",
+          "attribute": "corner frequency",
+          "value": "0.25",
+          "unit": "Hz",
+          "conditions": "roughly one-quarter of the blade’s first edgewise natural frequency",
+          "quote": "We set the corner frequency (the -3 dB point in Figure 7-1) of the low-pass filter to be roughly one-quarter of the blade’s first edgewise natural frequency (see Section 9) or 0.25 Hz."
+        },
+        {
+          "entity": "Baseline Control-Measurement Filter",
+          "attribute": "discrete time step",
+          "value": "0.0125",
+          "unit": "s",
+          "conditions": "for the frequency response shown in Figure 7-1",
+          "quote": "For a discrete time step of 0.0125 s, the frequency response of the resulting filter is shown in the Bode plot of Figure 7-1."
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is more faithful to the provided page, using the entity name 'low-pass filter' which appears in the text, whereas Set B predominantly uses 'Baseline Control-Measurement Filter' which is not found in the provided text or image captions. Set B also includes a redundant duplicate claim regarding the discrete time step. While Set B correctly identifies the full filter name from the figure caption in its first claim, its subsequent claims rely on the unsupported entity name."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set B is more faithful to the provided text, correctly binding the corner frequency and time step to the 'low-pass filter' entity mentioned in the text. Set A invents the entity name 'Baseline Control-Measurement Filter' for three of its four claims, which is not supported by the page content (text or caption). While Set A correctly extracts the -3 dB magnitude definition using the figure caption, Set B captures the primary engineering parameters with accurate entity binding, making it the better set overall."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A correctly binds the 0.0125 s discrete time step and the 0.25 Hz corner frequency (with the one-quarter-of-edgewise-natural-frequency condition) to the low-pass filter described on the page. Set B's only fully clean claim is the -3 dB magnitude at the corner frequency for the generator speed low-pass filter, but its remaining three claims bind values to a 'Baseline Control-Measurement Filter' entity that does not appear anywhere in the page text or figure caption. Set B also duplicates the 0.0125 s time step claim twice under that invented entity. Set A has one such misbound claim; Set B has three, so A is the better set."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A captures the -3 dB definition of the corner frequency and keeps the condition tying the 0.0125 s time step to the Figure 7-1 frequency response, both supported by the page. Set B omits the -3 dB fact and its third claim is a redundant repeat of the time step bound to the entity name 'Baseline Control-Measurement Filter', which does not appear on this page (the page names it the generator speed low-pass filter). Both sets contain a duplicated time-step claim, but A's duplication at least stays on the same entity and retains the condition. A therefore has more correct, better-bound claims with fewer unsupported bindings."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p2-table",
+      "run": "calg-cd-p39-42",
+      "page": 2,
+      "family": "table",
+      "image": "images/calg-cd-p39-42-9a895974-p2.jpg",
+      "score": 0.375,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.5,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": true,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 7,
+        "variant": 7,
+        "shared": 2
+      },
+      "only_baseline": [
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "Section - East Module",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "Section - West Module",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "Section - East Module",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "grade level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "Section - West Module",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0",
+          "unit": "ft",
+          "conditions": "",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "West Module",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Grade Level",
+          "attribute": "elevation",
+          "value": "0' - 0\"",
+          "unit": "",
+          "conditions": "East Module",
+          "quote": "GRADE LEVEL 0' - 0\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "East Module",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        },
+        {
+          "entity": "Finished Floor",
+          "attribute": "elevation",
+          "value": "2' - 9 1/2\"",
+          "unit": "",
+          "conditions": "West Module",
+          "quote": "FINISHED FLOOR 2' - 9 1/2\""
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {
+          "Source data contains no extractable engineering claims; it consists of null values and decorative separators.": 1
+        }
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is better because it maintains exact fidelity to the source text for values (e.g., '0' - 0\"' instead of normalizing to '0 ft' as in Set B Claim 1). Set A also uses more precise condition names that match the drawing labels ('Section - East Module' vs 'East Module'). Both sets capture the key elevation data for both modules accurately, but Set A's consistency between extracted values and quotes is higher."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set B is more faithful to the source text, preserving the exact elevation format '0' - 0\"' in all claims, whereas Set A normalizes one claim to '0 ft' which is an inference not strictly in the text. Set B also uses more precise condition labels ('Section - West Module') that match the drawing titles better than Set A's shortened versions ('West Module'). Both sets contain redundant unconditioned claims, but Set A's unconditioned claim involves the value normalization error."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.5,
+          "note": "Both sets capture the same core facts: grade level at 0'-0\" and finished floor at 2'-9 1/2\" (2'-9 1/2\" above grade) for both the East and West Module sections, with quotes that support the claims. Set A adds a redundant, condition-less grade level claim that is trivial duplication of its other claims. Set B avoids that duplication but renders the grade elevation as '0 ft', a unit conversion not stated in the quoted text (0' - 0\"). Each set has one minor defect and otherwise equivalent coverage and binding accuracy."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets correctly capture grade level at 0'-0\" and finished floor at 2'-9 1/2\" for both the West and East Module sections, with quotes supported by the drawing labels. Set A binds each elevation to its specific module section consistently and keeps the relative-to-grade condition on the height claims. Set B adds an unconditioned 'grade level' claim that duplicates the conditioned ones without saying which section it applies to, making it vague and redundant. Otherwise the two sets are nearly identical in content and accuracy."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p10-text",
+      "run": "iea-15mw-p20-31",
+      "page": 10,
+      "family": "text",
+      "image": "images/iea-15mw-p20-31-f7071680-p10.jpg",
+      "score": 0.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 0.0,
+          "variant-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 3,
+        "variant": 2,
+        "shared": 2
+      },
+      "only_baseline": [
+        {
+          "entity": "Controller regulation trajectory",
+          "attribute": "Wind Speed range",
+          "value": "3 to 25",
+          "unit": "m/s",
+          "conditions": "Region 1.5, 2, 3",
+          "quote": "3 5 10 15 20 25 Wind Speed [m/s]"
+        }
+      ],
+      "only_variant": [],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is better because it extracts the wind speed range (3 to 25 m/s) from the controller regulation trajectory plot, which is valid engineering data present in the source but missing from Set B. Both sets contain a duplicate claim with a minor formatting error in the value ('0.489 -'), counting as one wrong claim each. Set A provides more correct and faithful claims overall by including the operational range."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set B is better because it extracts an additional valid claim regarding the wind speed range (3 to 25 m/s) for the controller regulation trajectory, which Set A misses. Both sets correctly identify the Design Point Power Coefficient (0.489), but both also include a duplicate/malformed claim with the value '0.489 -' which is not supported by the text. Set B provides more useful engineering data without increasing the error count."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Both sets correctly capture the design-point power coefficient CP = 0.489 and both redundantly repeat it as a second claim with a '-' unit, which adds no information. Set A additionally extracts the wind speed range of 3 to 25 m/s for the controller regulation trajectory, which is supported by the axis ticks and region labels in panel (a). Neither set captures the design-point thrust coefficient CT = 0.804 shown alongside CP, so both are incomplete, but A covers more of the page's content correctly."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Both sets correctly capture the design-point power coefficient CP = 0.489 for the 15-MW rotor (with the redundant dimensionless-unit variant appearing in both). Set B additionally extracts the wind-speed axis range of 3 to 25 m/s across Regions 1.5, 2 and 3, which is supported by the plotted axis ticks and region bands in subplots (a)-(c). Neither set invents values or misbinds properties, so B's extra supported claim gives it the edge, though the duplicated CP claim is trivial in both."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-ken-cd-p95-98-f7b0008f-p3-table",
+      "run": "ken-cd-p95-98",
+      "page": 3,
+      "family": "table",
+      "image": "images/ken-cd-p95-98-f7b0008f-p3.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 29,
+        "variant": 36,
+        "shared": 13
+      },
+      "only_baseline": [
+        {
+          "entity": "Circuit 50",
+          "attribute": "conductor quantity and size",
+          "value": "3#6",
+          "unit": "",
+          "conditions": "",
+          "quote": "50 ... 3#6"
+        },
+        {
+          "entity": "Wiring Schedule 31",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule 150",
+          "attribute": "conductor count and size",
+          "value": "3#4/0",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#4/0"
+        },
+        {
+          "entity": "Circuit 20",
+          "attribute": "ground conductor size",
+          "value": "#12G",
+          "unit": "",
+          "conditions": "",
+          "quote": "20 ... #12G."
+        },
+        {
+          "entity": "Circuit 20",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "20 ... CU"
+        },
+        {
+          "entity": "Circuit 50",
+          "attribute": "ground conductor size",
+          "value": "#8G",
+          "unit": "",
+          "conditions": "",
+          "quote": "50 ... #8G."
+        },
+        {
+          "entity": "Circuit 50",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "50 ... 1\"C."
+        },
+        {
+          "entity": "Wiring Schedule 151",
+          "attribute": "conductor quantity and size",
+          "value": "3#4/0",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#4/0"
+        },
+        {
+          "entity": "Wiring Schedule 31",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "in",
+          "conditions": "",
+          "quote": "3/4\"C."
+        },
+        {
+          "entity": "Circuit 32",
+          "attribute": "wiring",
+          "value": "2#10USE-2",
+          "unit": "",
+          "conditions": "material: CU",
+          "quote": "32 ... CU: 2#10USE-2"
+        },
+        {
+          "entity": "Circuit 20",
+          "attribute": "conductor count and size",
+          "value": "3#12",
+          "unit": "",
+          "conditions": "",
+          "quote": "20 ... 3#12"
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring Schedule 31",
+          "attribute": "conductor quantity and size",
+          "value": "2#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "2#10"
+        },
+        {
+          "entity": "Wiring Schedule 151",
+          "attribute": "conductor material",
+          "value": "AL",
+          "unit": "",
+          "conditions": "",
+          "quote": "AL"
+        },
+        {
+          "entity": "Wiring Schedule Item 34",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "C.",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring Schedule 31",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "#10G."
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Wiring Schedule Item 10",
+          "attribute": "conductor size",
+          "value": "12",
+          "unit": "AWG",
+          "conditions": "",
+          "quote": "#12"
+        },
+        {
+          "entity": "Wiring Schedule Item 20",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 32",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 50",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 31",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "31, CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 10",
+          "attribute": "conductor material",
+          "value": "CU",
+          "unit": "",
+          "conditions": "",
+          "quote": "10, CU"
+        },
+        {
+          "entity": "Wiring Schedule Item 10",
+          "attribute": "conductor count",
+          "value": "2",
+          "unit": "WG",
+          "conditions": "",
+          "quote": "2WG"
+        },
+        {
+          "entity": "Wiring Schedule Item 31",
+          "attribute": "ground conductor size",
+          "value": "#10G",
+          "unit": "",
+          "conditions": "",
+          "quote": "31, #10G."
+        },
+        {
+          "entity": "Wiring Schedule Item 31",
+          "attribute": "conductor quantity and size",
+          "value": "2#10",
+          "unit": "",
+          "conditions": "",
+          "quote": "31, 2#10"
+        },
+        {
+          "entity": "Wiring Schedule Item 32",
+          "attribute": "conductor specification",
+          "value": "2#10USE-2",
+          "unit": "",
+          "conditions": "",
+          "quote": "2#10USE-2"
+        },
+        {
+          "entity": "Wiring Schedule 151",
+          "attribute": "cable material",
+          "value": "AL",
+          "unit": "",
+          "conditions": "",
+          "quote": "151 ... AL"
+        },
+        {
+          "entity": "Wiring Schedule Item 31",
+          "attribute": "conduit size",
+          "value": "3/4",
+          "unit": "in",
+          "conditions": "",
+          "quote": "31, 3/4\"C."
+        },
+        {
+          "entity": "Wiring Schedule Item 20",
+          "attribute": "conductor count and size",
+          "value": "3#12",
+          "unit": "AWG",
+          "conditions": "",
+          "quote": "3#12"
+        },
+        {
+          "entity": "Wiring Schedule Item 34",
+          "attribute": "ground conductor count and size",
+          "value": "3#10G.",
+          "unit": "",
+          "conditions": "",
+          "quote": "3#10G."
+        },
+        {
+          "entity": "Wiring Schedule Item 50",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "1\"C."
+        },
+        {
+          "entity": "Wiring Schedule Item 33",
+          "attribute": "conduit size",
+          "value": "1",
+          "unit": "\"",
+          "conditions": "",
+          "quote": "1\"C."
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {
+          "Source data contains only table headers with no engineering values or claims to extract.": 1,
+          "The provided source data contains only header and title information ('SHEET TITLE') and no engineering data, values, or technical claims to extract.": 1,
+          "Rejected claim with unsupported literal quote": 2
+        }
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is slightly better because it correctly identifies and extracts claims for Wiring Schedule Item 10 (conductor size, material, count), whereas Set A misattributes Item 10's #12 conductor to Circuit 20. Both sets struggle with distinguishing between symbols 31, 32, 33, and 34, and both incorrectly attribute the ground conductor of Item 50 to Item 150. Set B has fewer total misbindings (approx. 10 vs 12)."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is preferred because it extracts data for Wiring Schedule Item 10 which Set B misses entirely. Set B makes more severe errors on Item 50, incorrectly assigning Item 20's conductor size (3#6) and ground size (#8G) to Item 50 (which is 3#4/0, #4G), whereas Set A only errs on Item 50's material and conduit size. Both sets struggle with the OCR confusion between items 31, 32, and 34, and both incorrectly assign a conduit size to Item 150 (Armored Cable), but Set A's overall claim count includes valid extractions (Item 10) that Set B omits."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p11-text",
+      "run": "iea-15mw-p20-31",
+      "page": 11,
+      "family": "text",
+      "image": "images/iea-15mw-p20-31-f7071680-p11.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 10,
+        "variant": 3,
+        "shared": 0
+      },
+      "only_baseline": [
+        {
+          "entity": "blade",
+          "attribute": "normal force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 9 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "tangential force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 9 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "normal force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 6 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "normal force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 7 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "tangential force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 7 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "normal force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 8 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "normal force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 10 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "tangential force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 10 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "tangential force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 8 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "tangential force",
+          "value": "approximate",
+          "unit": "N/m",
+          "conditions": "U = 6 m/s, spanwise distribution",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "blade",
+          "attribute": "spanwise tangential force",
+          "value": "plotted",
+          "unit": "N/m",
+          "conditions": "U = 6 m/s to 10 m/s",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "blade",
+          "attribute": "spanwise normal force",
+          "value": "plotted",
+          "unit": "N/m",
+          "conditions": "U = 6 m/s to 10 m/s",
+          "quote": "Figure 3-3. Spanwise forces on the blade as a function of wind speed"
+        },
+        {
+          "entity": "15-MW rotor",
+          "attribute": "aerodynamic power and thrust coefficient surfaces",
+          "value": "function of blade pitch and TSR",
+          "unit": "",
+          "conditions": "steady-state blade element momentum",
+          "quote": "Figure 3-2. CCBlade steady-state blade element momentum aerodynamic power and thrust coefﬁcient surfaces as a function of blade pitch and TSR"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is better because it extracts claims from both figures on the page, whereas Set A completely ignores Figure 3-2 (Power and Thrust Coefficients). Set B also summarizes the wind speed conditions (6 m/s to 10 m/s) concisely, avoiding the excessive repetition in Set A which generates 10 trivial claims for the same plot. However, Set B includes one unsupported entity ('15-MW rotor') not present in the text or image captions, while Set A is faithful but incomplete."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is preferred because it captures the engineering data from both Figure 3-2 (coefficients) and Figure 3-3 (forces), whereas Set B completely omits the power and thrust coefficient data from the top half of the page. Set A concisely summarizes the wind speed range conditions, avoiding the excessive redundancy found in Set B's ten claims for a single figure. Although Set A hallucinates the '15-MW rotor' entity which is not present in the provided text or image, its comprehensive coverage of the page's actual content makes it significantly more useful."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set A splits Figure 3-3 into ten near-duplicate claims whose value field is only the placeholder \"approximate N/m\" — no actual force values are given, so the claims are vague and trivial, and Set A omits Figure 3-2 (power/thrust coefficient surfaces and the design point) entirely. Set B keeps the correct wind-speed range condition and unit for both spanwise force plots and additionally captures the Figure 3-2 content with its steady-state BEM condition and supporting quote. Set B's only defect is binding the Figure 3-2 surfaces to a \"15-MW rotor,\" an entity not stated anywhere on this page. Overall B conveys more of the page's engineering content with fewer redundant, value-less claims."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A captures both figures faithfully: the spanwise normal and tangential force plots over U = 6–10 m/s and the CCBlade steady-state BEM power/thrust coefficient surfaces as functions of blade pitch and TSR, with supporting quotes. Set B omits the Figure 3-2 coefficient-surface claim entirely and instead splits Figure 3-3 into ten per-wind-speed claims that carry no actual values ('approximate N/m'), making them vague and trivial. A's only defect is binding the coefficient surfaces to a '15-MW rotor', which is not stated anywhere on this page. Overall A is more correct and complete despite that one unsupported entity."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-lcit-report-p12-19-bb5dd36f-p2-text",
+      "run": "lcit-report-p12-19",
+      "page": 2,
+      "family": "text",
+      "image": "images/lcit-report-p12-19-bb5dd36f-p2.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 16,
+        "variant": 16,
+        "shared": 8
+      },
+      "only_baseline": [
+        {
+          "entity": "LUVOIR-B",
+          "attribute": "number of science instruments",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-B: A 8 m off-axis telescope with three science instruments"
+        },
+        {
+          "entity": "HabEx",
+          "attribute": "number of science instruments",
+          "value": "4",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "HabEx: A 4 m telescope spacecraft with four science instruments"
+        },
+        {
+          "entity": "LUVOIR-A",
+          "attribute": "number of science instruments",
+          "value": "4",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-A: A 15 m on-axis telescope with four science instruments"
+        },
+        {
+          "entity": "LUVOIR-A telescope",
+          "attribute": "aperture",
+          "value": "15",
+          "unit": "m",
+          "conditions": "baseline mission concept, on-axis",
+          "quote": "LUVOIR-A: A 15 m on-axis telescope"
+        },
+        {
+          "entity": "Origins",
+          "attribute": "number of science instruments",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "Origins: A 5.9 m telescope with three science instruments"
+        },
+        {
+          "entity": "HabEx telescope",
+          "attribute": "aperture",
+          "value": "4",
+          "unit": "m",
+          "conditions": "baseline mission concept",
+          "quote": "HabEx: A 4 m telescope spacecraft"
+        },
+        {
+          "entity": "Origins telescope",
+          "attribute": "aperture",
+          "value": "5.9",
+          "unit": "m",
+          "conditions": "baseline mission concept",
+          "quote": "Origins: A 5.9 m telescope"
+        },
+        {
+          "entity": "LUVOIR-B telescope",
+          "attribute": "aperture",
+          "value": "8",
+          "unit": "m",
+          "conditions": "baseline mission concept, off-axis",
+          "quote": "LUVOIR-B: A 8 m off-axis telescope"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Lynx",
+          "attribute": "grazing incidence mirror assembly diameter",
+          "value": "3",
+          "unit": "m",
+          "conditions": "baseline mission concept",
+          "quote": "Lynx: A 3 m diameter grazing incidence mirror assembly"
+        },
+        {
+          "entity": "LUVOIR-B",
+          "attribute": "telescope diameter",
+          "value": "8",
+          "unit": "m",
+          "conditions": "baseline mission concept, off-axis",
+          "quote": "LUVOIR-B: A 8 m off-axis telescope"
+        },
+        {
+          "entity": "LUVOIR-A",
+          "attribute": "instrument count",
+          "value": "4",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-A: A 15 m on-axis telescope with four science instruments"
+        },
+        {
+          "entity": "Origins",
+          "attribute": "telescope diameter",
+          "value": "5.9",
+          "unit": "m",
+          "conditions": "baseline mission concept",
+          "quote": "Origins: A 5.9 m telescope"
+        },
+        {
+          "entity": "LUVOIR-A",
+          "attribute": "telescope diameter",
+          "value": "15",
+          "unit": "m",
+          "conditions": "baseline mission concept, on-axis",
+          "quote": "LUVOIR-A: A 15 m on-axis telescope"
+        },
+        {
+          "entity": "Lynx",
+          "attribute": "instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "three science instruments"
+        },
+        {
+          "entity": "LUVOIR-B",
+          "attribute": "instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "LUVOIR-B: A 8 m off-axis telescope with three science instruments"
+        },
+        {
+          "entity": "Origins",
+          "attribute": "instrument count",
+          "value": "3",
+          "unit": "",
+          "conditions": "baseline mission concept",
+          "quote": "Origins: A 5.9 m telescope with three science instruments"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is better because it captures the Lynx instrument count (3 science instruments) which Set B completely misses. Set A also adheres strictly to the text vocabulary (using 'diameter'), whereas Set B infers 'aperture' for four claims which is not explicitly stated in the source text. Both sets contain redundant duplicate claims, but Set B has more redundancy and includes unsupported attribute terminology."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is better because it captures the instrument count for Lynx (3), which Set A omits despite extracting other Lynx parameters like diameter and focal length. Both sets contain significant redundancy (e.g., extracting both 'diameter' and 'aperture' or duplicate claims for the same value), but Set B is more complete regarding the science instrument counts for all five mission concepts. Neither set contains factually incorrect claims based on the provided text."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets are largely accurate and both contain redundant duplicate claims, but Set A covers every fact on the page, including Lynx's three science instruments, which Set B omits entirely. Set B instead adds four near-duplicate claims restating telescope sizes as 'aperture', a property name not stated in the text (the page only gives the telescope sizes), while Set A keeps the stated diameter wording. Set A's duplicates (Lynx, Origins, LUVOIR-A, LUVOIR-B diameters) are redundant but not incorrect, so A is the more complete and faithful extraction."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets are factually accurate against the page and both contain redundant near-duplicate claims (e.g., diameter/aperture restatements of the same value). Set B covers every fact on the page, including Lynx's three science instruments, which Set A omits entirely. Set A's only gap is that Lynx instrument count, while its remaining claims are all correctly bound with supporting quotes. Set B's Lynx instrument-count quote is a short fragment but is supported by the source sentence, so B is slightly better on completeness."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-iea-15mw-p20-31-f7071680-p7-text",
+      "run": "iea-15mw-p20-31",
+      "page": 7,
+      "family": "text",
+      "image": "images/iea-15mw-p20-31-f7071680-p7.jpg",
+      "score": 0.125,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "variant-first": 0.0,
+          "baseline-first": 0.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 0.0,
+          "baseline-first": 0.5
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 5,
+        "variant": 5,
+        "shared": 0
+      },
+      "only_baseline": [
+        {
+          "entity": "blade",
+          "attribute": "structural property",
+          "value": "mass center",
+          "unit": "",
+          "conditions": "chordwise position",
+          "quote": "Mass center"
+        },
+        {
+          "entity": "blade",
+          "attribute": "structural property",
+          "value": "neutral center",
+          "unit": "",
+          "conditions": "chordwise position",
+          "quote": "Neutral center"
+        },
+        {
+          "entity": "blade",
+          "attribute": "structural property",
+          "value": "shear center",
+          "unit": "",
+          "conditions": "chordwise position",
+          "quote": "Shear center"
+        },
+        {
+          "entity": "blade",
+          "attribute": "structural property",
+          "value": "geometric center",
+          "unit": "",
+          "conditions": "chordwise position",
+          "quote": "Geometric center"
+        },
+        {
+          "entity": "blade",
+          "attribute": "structural property",
+          "value": "pitch axis",
+          "unit": "",
+          "conditions": "chordwise position",
+          "quote": "Pitch axis"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "blade",
+          "attribute": "structural property center",
+          "value": "Mass center",
+          "unit": "",
+          "conditions": "blade planform",
+          "quote": "Mass center"
+        },
+        {
+          "entity": "blade",
+          "attribute": "structural property center",
+          "value": "Pitch axis",
+          "unit": "",
+          "conditions": "blade planform",
+          "quote": "Pitch axis"
+        },
+        {
+          "entity": "blade",
+          "attribute": "structural property center",
+          "value": "Shear center",
+          "unit": "",
+          "conditions": "blade planform",
+          "quote": "Shear center"
+        },
+        {
+          "entity": "blade",
+          "attribute": "structural property center",
+          "value": "Geometric center",
+          "unit": "",
+          "conditions": "blade planform",
+          "quote": "Geometric center"
+        },
+        {
+          "entity": "blade",
+          "attribute": "structural property center",
+          "value": "Neutral center",
+          "unit": "",
+          "conditions": "blade planform",
+          "quote": "Neutral center"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Set B is better because it correctly categorizes 'Pitch axis' as a 'structural property' rather than a 'structural property center' as Set A does (an axis is not a center). Set B also provides a more precise condition ('chordwise position') derived from the Y-axis label of Figure 2-11, whereas Set A uses the broader figure caption context. Both sets miss the data from Figure 2-10, but Set B's claims regarding Figure 2-11 are more technically accurate."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is better because it uses attribute names and conditions directly grounded in the text labels (attribute 'structural property' from caption, condition 'chordwise position' from y-axis label). Set B invents a compound attribute 'structural property center' which does not appear in the document, and uses a vaguer condition ('blade planform') derived from the caption rather than the specific axis variable."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 0.0,
+          "note": "Both sets simply restate the five legend entries of Figure 2-11 (pitch axis, mass center, neutral center, geometric center, shear center), so neither invents values and both are rather trivial. Set B binds the condition to the chordwise position actually plotted on the y-axis (Chordwise [m] vs blade span r/R), which is the more faithful conditioning of the claim. Set A instead uses the figure caption wording 'blade planform' and an awkward attribute 'structural property center', making its claims slightly less precisely bound. Neither set captures any of the quantitative data in Figure 2-10 (mass density, stiffness, axial stiffness), so both are incomplete in the same way."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.5,
+          "note": "Both sets extract the same five legend entries (pitch axis, mass center, neutral center, geometric center, shear center) from Figure 2-11, with identical short quotes and no numeric values or units. Set A's condition 'chordwise position' reflects the plotted y-axis quantity, while Set B's 'blade planform' reflects the figure caption; both are defensible readings of the same figure and neither invents values. Set B's attribute 'structural property center' is slightly more specific, but Set A's condition is slightly more precise, so the sets are effectively equivalent in correctness and completeness."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p6-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 6,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p6.jpg",
+      "score": 0.5,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 0.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 0.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [
+        "Qwen/Qwen3.5-397B-A17B",
+        "XiaomiMiMo/MiMo-V2.6-Pro"
+      ],
+      "counts": {
+        "baseline": 30,
+        "variant": 24,
+        "shared": 16
+      },
+      "only_baseline": [
+        {
+          "entity": "Chebyshev filter Type 2",
+          "attribute": "stop band response",
+          "value": "equalized-ripple (equiripple)",
+          "unit": "",
+          "conditions": "",
+          "quote": "Chebyshev filters offer even steeper roll-off in the stop band at the expense of equalized-ripple (equiripple) in the pass band (Type 1) or stop band (Type 2), respectively"
+        },
+        {
+          "entity": "Butterworth filter",
+          "attribute": "pass band frequency response",
+          "value": "flat",
+          "unit": "",
+          "conditions": "",
+          "quote": "a Butterworth filter has a frequency response that is flat in the pass band"
+        },
+        {
+          "entity": "alternative low-pass filters",
+          "attribute": "state-space representation order",
+          "value": "up to 4",
+          "unit": "states",
+          "conditions": "designed and tested examples",
+          "quote": "considering state-space representations of up to fourth order (four states)"
+        },
+        {
+          "entity": "generator torque",
+          "attribute": "relationship to filtered generator speed",
+          "value": "proportional to the square",
+          "unit": "",
+          "conditions": "Region 2 (optimizing power capture)",
+          "quote": "Here, the generator torque is proportional to the square of the filtered generator speed"
+        },
+        {
+          "entity": "Chebyshev filter Type 1",
+          "attribute": "pass band response",
+          "value": "equalized-ripple (equiripple)",
+          "unit": "",
+          "conditions": "",
+          "quote": "Chebyshev filters offer even steeper roll-off in the stop band at the expense of equalized-ripple (equiripple) in the pass band (Type 1)"
+        },
+        {
+          "entity": "Chebyshev filter",
+          "attribute": "stop band roll-off",
+          "value": "steeper",
+          "unit": "",
+          "conditions": "relative to Butterworth filter",
+          "quote": "Chebyshev filters offer even steeper roll-off in the stop band"
+        },
+        {
+          "entity": "Bessel filter",
+          "attribute": "pass band group delay",
+          "value": "flattest",
+          "unit": "",
+          "conditions": "",
+          "quote": "Bessel filters offer the flattest group delay (linear phase lag) in the pass band"
+        },
+        {
+          "entity": "Butterworth filter",
+          "attribute": "stop band roll-off",
+          "value": "steeper",
+          "unit": "",
+          "conditions": "relative to the chosen filter",
+          "quote": "the Butterworth filter offers steeper roll-off in the stop band"
+        },
+        {
+          "entity": "generator torque",
+          "attribute": "computation method",
+          "value": "tabulated function of the filtered generator speed",
+          "unit": "",
+          "conditions": "baseline generator-torque controller",
+          "quote": "The generator torque is computed as a tabulated function of the filtered generator speed"
+        },
+        {
+          "entity": "Region 1½",
+          "attribute": "transition type",
+          "value": "linear transition between Regions 1 and 2",
+          "unit": "",
+          "conditions": "start-up region",
+          "quote": "Region 1½, a start-up region, is a linear transition between Regions 1 and 2"
+        },
+        {
+          "entity": "Elliptic filter",
+          "attribute": "stop band roll-off",
+          "value": "steepest",
+          "unit": "",
+          "conditions": "relative to any linear filter",
+          "quote": "Elliptic filters offer the steepest roll-off of any linear filter"
+        },
+        {
+          "entity": "chosen filter",
+          "attribute": "stop band roll-off",
+          "value": "-6",
+          "unit": "dB/octave",
+          "conditions": "",
+          "quote": "The drawbacks to this filter are its gentle roll-off in the stop band (-6 dB/octave)"
+        },
+        {
+          "entity": "Elliptic filter",
+          "attribute": "pass and stop band response",
+          "value": "equiripple",
+          "unit": "",
+          "conditions": "",
+          "quote": "Elliptic filters offer the steepest roll-off of any linear filter, but have equiripple in both the pass and stop bands"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "chosen filter",
+          "attribute": "pass band frequency response",
+          "value": "flat",
+          "unit": "",
+          "conditions": "",
+          "quote": "Like the chosen filter, a Butterworth filter has a frequency response that is flat in the pass band"
+        },
+        {
+          "entity": "Region 2½",
+          "attribute": "transition type",
+          "value": "linear transition between Regions 2 and 3",
+          "unit": "",
+          "conditions": "",
+          "quote": "Region 2½ is a linear transition between Regions 2 and 3"
+        },
+        {
+          "entity": "generator torque",
+          "attribute": "computation method",
+          "value": "tabulated function of the filtered generator speed",
+          "unit": "",
+          "conditions": "",
+          "quote": "The generator torque is computed as a tabulated function of the filtered generator speed"
+        },
+        {
+          "entity": "Region 1½",
+          "attribute": "transition type",
+          "value": "linear transition between Regions 1 and 2",
+          "unit": "",
+          "conditions": "",
+          "quote": "Region 1½, a start-up region, is a linear transition between Regions 1 and 2"
+        },
+        {
+          "entity": "chosen filter",
+          "attribute": "stop band roll-off",
+          "value": "-6",
+          "unit": "dB/octave",
+          "conditions": "time domain",
+          "quote": "The drawbacks to this filter are its gentle roll-off in the stop band (-6 dB/octave)"
+        },
+        {
+          "entity": "alternative low-pass filters",
+          "attribute": "maximum state-space order",
+          "value": "4",
+          "unit": "states",
+          "conditions": "designed and tested examples",
+          "quote": "considering state-space representations of up to fourth order (four states)"
+        },
+        {
+          "entity": "mechanical power",
+          "attribute": "rated value",
+          "value": "5.296610",
+          "unit": "MW",
+          "conditions": "",
+          "quote": "rated mechanical power is 5.296610 MW"
+        },
+        {
+          "entity": "generator torque controller",
+          "attribute": "number of control regions",
+          "value": "5",
+          "unit": "",
+          "conditions": "",
+          "quote": "incorporating five control regions: 1, 1½, 2, 2½, and 3"
+        },
+        {
+          "entity": "Region 2 control law",
+          "attribute": "optimal constant of proportionality",
+          "value": "0.0255764",
+          "unit": "N•m/rpm2",
+          "conditions": "",
+          "quote": "optimal constant of proportionality of 0.0255764 N•m/rpm2 in the Region 2 control law"
+        },
+        {
+          "entity": "generator torque",
+          "attribute": "relationship to filtered generator speed",
+          "value": "inversely proportional",
+          "unit": "",
+          "conditions": "Region 3 (generator power held constant)",
+          "quote": "In Region 3, the generator power is held constant so that the generator torque is inversely proportional to the filtered generator speed"
+        },
+        {
+          "entity": "generator torque",
+          "attribute": "relationship to filtered generator speed",
+          "value": "proportional to the square",
+          "unit": "",
+          "conditions": "Region 2",
+          "quote": "Here, the generator torque is proportional to the square of the filtered generator speed"
+        },
+        {
+          "entity": "electric power",
+          "attribute": "rated value",
+          "value": "5",
+          "unit": "MW",
+          "conditions": "",
+          "quote": "rated electric power of 5 MW"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A is better because it accurately extracts the filter characteristics without structural errors, whereas Set B incorrectly binds 'time domain' as a condition for the filter roll-off (it is a fragment from the previous sentence) and includes a duplicate claim. Set A provides a more detailed breakdown of the specific filter types (Chebyshev Type 1/2, Elliptic, Bessel) compared to Set B's generic 'chosen filter' entry for that section. Although Set B captures some rated power values that Set A misses, the presence of wrong bindings and duplicates makes it less faithful."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is better because it captures critical design parameters of the implemented controller (rated mechanical/electric power, Region 2 constant, number of control regions) which Set B omits. Set B focuses extensively on the characteristics of rejected filter alternatives (Chebyshev, Elliptic, Bessel) which are less important than the baseline controller specifications. Set A contains one duplicate claim (claims 17 and 18), but its coverage of the primary engineering data is superior."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets correctly capture the core Region 1/1½/2/2½/3 controller numbers (670–871 rpm, 1,161.963 rpm, 10% slip, 1173.7 rpm, 94.4%, 43,093.55 N•m, 97:1, Cp 0.482 at TSR 7.55 and 0.0°). A additionally captures key quantitative design results B omits entirely: rated mechanical power 5.296610 MW, the Region 2 optimal constant 0.0255764 N•m/rpm², the five control regions, rated electric power 5 MW, and the Region 2½ linear transition. B is cleaner (no wrong claims) and covers the filter-comparison paragraph (Chebyshev Type 1/2, Elliptic, Bessel, Butterworth) that A largely skips, but it drops several important numeric facts of the section. A's flaws are minor: an unsupported 'time domain' condition on the -6 dB/octave roll-off, a claim about the chosen filter's flat pass band quoted from a Butterworth sentence, and one duplicated Region 3 claim."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 0.0,
+          "note": "Set A covers the filter-comparison paragraph thoroughly and correctly (Chebyshev Type 1/Type 2 equiripple, Butterworth flat pass band and steeper roll-off, Elliptic steepest roll-off with equiripple in both bands, Bessel flattest group delay), all bound to the right component with supporting quotes. Set B omits that entire paragraph and instead duplicates the Region 3 torque claim twice and attaches a 'time domain' condition to the -6 dB/octave stop-band roll-off, which is a frequency-domain property. B does capture a few controller numbers A misses (rated mechanical power 5.296610 MW, rated electric power 5 MW, the 0.0255764 N•m/rpm² Region 2 constant, five control regions), but its coverage is thinner overall and it contains one misbound condition plus one redundant claim."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-dc-manual-p59-66-a157bdf0-p5-text",
+      "run": "dc-manual-p59-66",
+      "page": 5,
+      "family": "text",
+      "image": "images/dc-manual-p59-66-a157bdf0-p5.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 8,
+        "variant": 10,
+        "shared": 7
+      },
+      "only_baseline": [
+        {
+          "entity": "Flexinol® actuator assembly",
+          "attribute": "actuation mechanism",
+          "value": "threaded connection at the base",
+          "unit": "",
+          "conditions": "to add strain to the wire",
+          "quote": "By placing a threaded connection at the base of the Flexinol® actuator assembly, additional strain can be placed on the wire."
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Flexinol® actuator assembly",
+          "attribute": "actuation mechanism",
+          "value": "threaded connection at the base",
+          "unit": "",
+          "conditions": "to add strain",
+          "quote": "By placing a threaded connection at the base of the Flexinol® actuator assembly, additional strain can be placed on the wire"
+        },
+        {
+          "entity": "pulley assembly parts",
+          "attribute": "material",
+          "value": "ABS",
+          "unit": "",
+          "conditions": "3D printing",
+          "quote": "custom manufacturing of parts through 3D ABS printing"
+        },
+        {
+          "entity": "rotational closure of the louver",
+          "attribute": "speed effect",
+          "value": "slows",
+          "unit": "",
+          "conditions": "large hysteresis period",
+          "quote": "the large hysteresis period both slows the rotational closure of the louver"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is more comprehensive, capturing two valid engineering claims that Set B omits: the effect of hysteresis on rotational closure speed and the specific material (ABS) of the pulley parts. Both sets accurately extract the core fabrication parameters and design relationships without inventing data, but Set A's inclusion of the hysteresis behavior makes it more complete regarding the system's performance characteristics."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is better because it extracts two additional correct claims found in the text that Set A misses: the slowing effect of the hysteresis period on louver closure and the ABS material of the pulley parts. Both sets are accurate on their overlapping claims, with no misreadings or unsupported values detected in either. Set B provides a more complete representation of the engineering data on the page."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets are accurate on the shared claims: the 15–30C transformation range, the strain/transition-temperature relationship, the 250 louvers cut on a 3-Axis-CNC mill, the 32 aluminum rods, the threaded connection at the actuator base, and the no-additional-energy behavior are all correctly bound and quoted. Set A additionally captures two supported facts B omits: the pulley-assembly parts being ABS (via 3D printing) and the large hysteresis period slowing the rotational closure of the louver. Neither set contains misread or invented claims, so A wins on completeness rather than correctness."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets are accurate on the shared claims: the 15–30C transformation range, the strain/transition-temperature relationship, the 250 louvers and 32 aluminum rods, CNC milling, 3D ABS printing, and the no-additional-energy behavior are all correctly bound with supporting quotes. Set B adds two further claims that are also supported by the page: the pulley assembly parts' ABS material (corroborated by the '3D ABS printing' text and the 'ABS PULLEY WITH SET SCREW' diagram label) and the large hysteresis period slowing rotational closure of the louver. Neither set contains misread or invented claims, so B's advantage is simply fuller coverage of the page's engineering facts."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-dc-manual-p59-66-a157bdf0-p2-text",
+      "run": "dc-manual-p59-66",
+      "page": 2,
+      "family": "text",
+      "image": "images/dc-manual-p59-66-a157bdf0-p2.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 14,
+        "variant": 12,
+        "shared": 8
+      },
+      "only_baseline": [
+        {
+          "entity": "Nitinol wire",
+          "attribute": "material",
+          "value": "nickel-titanium alloy",
+          "unit": "",
+          "conditions": "",
+          "quote": "Nitinol wire is a solid-state phase transformation based on atomic-level characteristic of the nickel-titanium alloy"
+        },
+        {
+          "entity": "Nitinol wire",
+          "attribute": "crystal structure",
+          "value": "martensite",
+          "unit": "",
+          "conditions": "at low temperatures",
+          "quote": "At low temperatures the Nitinol wire is in a martensite crystal structure"
+        },
+        {
+          "entity": "Nitinol",
+          "attribute": "behavior when heated",
+          "value": "contract",
+          "unit": "",
+          "conditions": "",
+          "quote": "The nickel-titanium chemical make-up of Nitinol allows the material to contract when heated."
+        },
+        {
+          "entity": "commercially available wire",
+          "attribute": "transition temperature",
+          "value": "70",
+          "unit": "C",
+          "conditions": "",
+          "quote": "Commercially available wire transition at temperatures of 70C"
+        },
+        {
+          "entity": "Nitinol wire",
+          "attribute": "transition temperature range",
+          "value": "15 to 30",
+          "unit": "C",
+          "conditions": "in the context of the linear diffuser",
+          "quote": "In the context of the linear diffuser, chemical engineering of the Nitinol wire allows for transition temperatures ranging from 15C to 30C"
+        },
+        {
+          "entity": "Nitinol wire",
+          "attribute": "transition temperature range",
+          "value": "15 to 30",
+          "unit": "C",
+          "conditions": "linear diffuser context, chemical engineering",
+          "quote": "In the context of the linear diffuser, chemical engineering of the Nitinol wire allows for transition temperatures ranging from 15C to 30C"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "Nitinol wire",
+          "attribute": "crystal structure",
+          "value": "martensite",
+          "unit": "",
+          "conditions": "low temperatures",
+          "quote": "At low temperatures the Nitinol wire is in a martensite crystal structure"
+        },
+        {
+          "entity": "Nitinol wire",
+          "attribute": "material composition",
+          "value": "nickel-titanium alloy",
+          "unit": "",
+          "conditions": "",
+          "quote": "Nitinol wire is a solid-state phase transformation based on atomic-level characteristic of the nickel-titanium alloy"
+        },
+        {
+          "entity": "linear diffuser Nitinol wire",
+          "attribute": "transition temperature range",
+          "value": "15 to 30",
+          "unit": "C",
+          "conditions": "chemical engineering of the Nitinol wire",
+          "quote": "In the context of the linear diffuser, chemical engineering of the Nitinol wire allows for transition temperatures ranging from 15C to 30C"
+        },
+        {
+          "entity": "Nitinol",
+          "attribute": "behavior",
+          "value": "contract",
+          "unit": "",
+          "conditions": "when heated",
+          "quote": "The nickel-titanium chemical make-up of Nitinol allows the material to contract when heated."
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {
+          "The provided source data contains only document metadata (title, date, project name, page number) and no engineering claims.": 1
+        },
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is better because it avoids the redundant claims present in Set B. Set B duplicates the extraction for commercially available wire transition temperature (claims 2 and 7) and linear diffuser transition temperature range (claims 10 and 12), which counts as trivial repetition. Both sets share a minor quote inaccuracy regarding the material composition definition (attributing 'solid-state phase transformation' to the wire rather than its actuation), but Set A is more concise and faithful to the unique information density."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is better because it captures the same technical information as Set A without the redundant duplicate claims (Set A duplicates the transition temperature claims twice). Both sets share minor inaccuracies, including a truncated quote that alters the sentence subject and an incomplete extraction of the '70C and 90C' temperature range, but Set B's lack of duplication makes it more concise and faithful."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets capture the same core facts (composition ranges, 4-5% strain, 2-5% typical contraction, >25,000 PSI force, martensite/austenite structures, 25-50C hysteresis, 15-30C engineered transition temperature) with faithful quotes and correct conditions. Set A, however, repeats two claims verbatim (the 70C commercial transition temperature and the 15-30C diffuser transition range), adding redundant, trivial entries without new information. Set B is otherwise equivalent in accuracy, binding values to the right components and keeping conditions such as 'when heated' and 'low temperatures'. Both sets incompletely report the commercial transition temperature (source states 70C and 90C), so neither gains an advantage there."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets capture the same core facts (composition ranges, 4–5% strain, 2–5% typical contraction, 25,000 PSI force, hysteresis 25–50C, martensite/austenite structures, 15–30C diffuser transition). Set B, however, repeats two claims verbatim (the 70C commercial transition temperature and the 15–30C diffuser range), adding trivial redundancy, and folds the 'when heated' condition into the attribute rather than keeping it as a condition. Both share one paraphrased, non-verbatim quote for the nickel-titanium material claim, and both drop the 'and 90C' part of the commercial transition statement. Set A is the cleaner, non-redundant set with conditions preserved."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p9-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 9,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p9.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 11,
+        "variant": 10,
+        "shared": 6
+      },
+      "only_baseline": [
+        {
+          "entity": "blade-pitch controller proportional term",
+          "attribute": "effect on system",
+          "value": "adds damping",
+          "unit": "",
+          "conditions": "positive control gains, Region 3",
+          "quote": "the proportional term adds damping"
+        },
+        {
+          "entity": "blade-pitch controller",
+          "attribute": "negative damping from generator-torque controller",
+          "value": "ignored",
+          "unit": "",
+          "conditions": "design recommendation",
+          "quote": "ignoring the negative damping from the generator-torque controller"
+        },
+        {
+          "entity": "blade-pitch controller derivative term",
+          "attribute": "effect on drivetrain",
+          "value": "increase effective inertia",
+          "unit": "",
+          "conditions": "positive control gains, Region 3",
+          "quote": "With positive control gains, then, the derivative term acts to increase the effective inertia of the drivetrain"
+        },
+        {
+          "entity": "rotor-speed error",
+          "attribute": "response type",
+          "value": "second-order system",
+          "unit": "",
+          "conditions": "idealized PID-controlled",
+          "quote": "the idealized PID-controlled rotor-speed error will respond as a second-order system"
+        },
+        {
+          "entity": "blade-pitch controller integral term",
+          "attribute": "effect on system",
+          "value": "adds restoring",
+          "unit": "",
+          "conditions": "positive control gains, Region 3",
+          "quote": "the integral term adds restoring"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "blade-pitch controller derivative term",
+          "attribute": "effect",
+          "value": "increase effective inertia of the drivetrain",
+          "unit": "",
+          "conditions": "positive control gains, Region 3",
+          "quote": "the derivative term acts to increase the effective inertia of the drivetrain"
+        },
+        {
+          "entity": "blade-pitch controller",
+          "attribute": "generator-torque controller negative damping",
+          "value": "ignored",
+          "unit": "",
+          "conditions": "design recommendation",
+          "quote": "ignoring the negative damping from the generator-torque controller"
+        },
+        {
+          "entity": "blade-pitch controller integral term",
+          "attribute": "effect",
+          "value": "adds restoring",
+          "unit": "",
+          "conditions": "positive control gains, Region 3",
+          "quote": "the integral term adds restoring"
+        },
+        {
+          "entity": "blade-pitch controller proportional term",
+          "attribute": "effect",
+          "value": "adds damping",
+          "unit": "",
+          "conditions": "positive control gains, Region 3",
+          "quote": "the proportional term adds damping"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets accurately extract the key engineering claims regarding the PID controller design, natural frequency, damping ratio, and term effects. However, Set A contains redundant claims: it extracts the 'second-order system' response twice (claims 3 and 10) with identical quotes and values, whereas Set B extracts this only once. Both sets contain a similar redundancy regarding the generator-torque controller's negative damping effect, but Set A's additional duplication makes it less concise."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is better because it avoids the exact duplicate claim found in Set B (claims 3 and 10 in B are identical in content, quote, and conditions). While Set A has some redundancy between claims 1 and 10 regarding negative damping, claim 10 adds specific conditions not present in claim 1, making it informative rather than trivial. Both sets accurately capture the engineering parameters and design recommendations from the text."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Both sets cover essentially the same supported facts from the page (second-order response, ωφn = 0.6 rad/s, ζφ = 0.6–0.7, Ref. [10] design recommendations, and the three PID term effects), with quotes that match the text and no invented values. Set B, however, repeats two claims verbatim in substance (the generator-torque negative damping claim and the rotor-speed second-order response claim), adding trivial redundancy, whereas Set A duplicates only the generator-torque negative damping claim. Set B's derivative-term claim quotes the fuller sentence including the positive-gains condition, but this small gain does not offset the extra redundancy. Neither set captures the compensation requirement (∂P/∂θ negative in Region 3 and negative damping must be compensated by the proportional term), so both are equally incomplete there."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets capture the same core claims faithfully: negative damping from the generator-torque controller in Region 3, the derivative/proportional/integral term effects under positive control gains, the second-order response, and the Ref. [10] design recommendations (neglect derivative gain, ignore generator negative damping, ωφn = 0.6 rad/s, ζφ = 0.6–0.7). Set A, however, contains an exact duplicate claim (rotor-speed error / second-order system listed twice) and a near-duplicate of the generator-torque negative-damping claim, making it more redundant and trivial. Set B covers the same content with one fewer redundant claim, so it is slightly cleaner and better. Both equally omit the blade-pitch sensitivity facts (∂P/∂θ negative in Region 3; depends on wind speed, rotor speed and blade-pitch angle) and the statement that the negative damping must be compensated by the proportional term."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-calg-cd-p39-42-9a895974-p1-text",
+      "run": "calg-cd-p39-42",
+      "page": 1,
+      "family": "text",
+      "image": "images/calg-cd-p39-42-9a895974-p1.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "variant-first": 1.0,
+          "baseline-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 12,
+        "variant": 9,
+        "shared": 6
+      },
+      "only_baseline": [
+        {
+          "entity": "handrail",
+          "attribute": "material",
+          "value": "2x4 cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "2x4 CEDAR HANDRAILS"
+        },
+        {
+          "entity": "solar thermal array",
+          "attribute": "configuration",
+          "value": "2 X APSE-20 (40 tubes)",
+          "unit": "",
+          "conditions": "",
+          "quote": "2 X APSE-20 (40 TUBES)"
+        },
+        {
+          "entity": "flatbar",
+          "attribute": "material",
+          "value": "steel",
+          "unit": "",
+          "conditions": "",
+          "quote": "STEEL FLATBAR"
+        },
+        {
+          "entity": "cladding",
+          "attribute": "material/dimension",
+          "value": "1x4 tongue & groove cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "1x4 TONNGUE & GROOVE CEDAR CLADDING"
+        },
+        {
+          "entity": "handrails",
+          "attribute": "material/dimension",
+          "value": "2x4 cedar",
+          "unit": "",
+          "conditions": "",
+          "quote": "2x4 CEDAR HANDRAILS"
+        },
+        {
+          "entity": "evacuated solar thermal tubes",
+          "attribute": "quantity",
+          "value": "2 x APSE-20 (40 tubes)",
+          "unit": "",
+          "conditions": "",
+          "quote": "2 X APSE-20 (40 TUBES)"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "building",
+          "attribute": "height from grade to finished floor",
+          "value": "2",
+          "unit": "' - 9 1/2\"",
+          "conditions": "West and South Elevations",
+          "quote": "2' - 9 1/2\""
+        },
+        {
+          "entity": "solar thermal tubes",
+          "attribute": "configuration",
+          "value": "2 X APSE-20 (40 tubes)",
+          "unit": "",
+          "conditions": "",
+          "quote": "2 X APSE-20 (40 TUBES)"
+        },
+        {
+          "entity": "building",
+          "attribute": "height from grade to solar envelope",
+          "value": "18",
+          "unit": "' - 0\"",
+          "conditions": "West and South Elevations",
+          "quote": "18' - 0\""
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {
+          "Rejected claim with unsupported literal quote": 4
+        }
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is superior because it captures critical dimensional data (heights from grade to finished floor and solar envelope) that appear in the text layer and image, which Set B completely omits. Set B contains significant redundancy, extracting the same claims for handrails, cladding, and solar tubes multiple times with slight attribute variations. Set A provides a concise, non-redundant list that faithfully represents the engineering specifications found in the document."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is better because it captures critical dimensional data (Finished Floor height and Solar Envelope height) that Set A completely omits, which are key engineering facts on an elevation drawing. Set A also contains significant redundancy, extracting the same handrail, cladding, and solar tube specifications multiple times as separate claims, whereas Set B is concise and comprehensive. Both sets accurately transcribe the material specifications and text layer typos (e.g., 'TONNGUE')."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B captures the two vertical dimensions (finished floor at 2'-9 1/2\" and solar envelope at 18'-0\" above grade) that Set A omits entirely, while keeping the same material and configuration claims. Set A is padded with several duplicate handrail and cladding claims and mislabels the '2 X APSE-20 (40 TUBES)' note as a quantity rather than a configuration. Both sets share the same slightly stitched 'RAILING POSTS STEEL FLATBAR' quote, but Set B is otherwise cleaner and more complete."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A captures the two elevation height facts (finished floor at 2'-9 1/2\" and solar envelope at 18'-0\" above grade) with the correct elevation conditions, which Set B omits entirely. Set B is padded with three near-identical handrail claims and a duplicate cladding claim, plus a trivial bare 'flatbar | steel' claim and a misbound 'quantity' claim where the quote actually gives array configuration. Set A's claims are all supported by the quoted labels and correctly bound to components and properties."
+        }
+      ],
+      "remarks": []
+    },
+    {
+      "id": "u-nrel-5mw-p25-36-5eaf02be-p7-text",
+      "run": "nrel-5mw-p25-36",
+      "page": 7,
+      "family": "text",
+      "image": "images/nrel-5mw-p25-36-5eaf02be-p7.jpg",
+      "score": 1.0,
+      "scores": {
+        "Qwen/Qwen3.5-397B-A17B": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "baseline-first": 1.0,
+          "variant-first": 1.0
+        }
+      },
+      "judges_disagree": false,
+      "order_flipped": [],
+      "counts": {
+        "baseline": 11,
+        "variant": 7,
+        "shared": 6
+      },
+      "only_baseline": [
+        {
+          "entity": "generator-torque controller",
+          "attribute": "maximum torque saturation",
+          "value": "47,402.91",
+          "unit": "N•m",
+          "conditions": "to avoid excessive overloading",
+          "quote": "we saturated the torque to a maximum of 10% above rated, or 47,402.91 N•m"
+        },
+        {
+          "entity": "baseline generator-torque controller",
+          "attribute": "drivetrain torsional vibration control loop",
+          "value": "not incorporated",
+          "unit": "",
+          "conditions": "due to high intrinsic structural damping of the drivetrain",
+          "quote": "we did not need to incorporate a control loop for damping drivetrain torsional vibration in our baseline generator-torque controller"
+        },
+        {
+          "entity": "generator",
+          "attribute": "rated speed",
+          "value": "1173.7",
+          "unit": "rpm",
+          "conditions": "baseline",
+          "quote": "rated generator speed (1173.7 rpm)"
+        },
+        {
+          "entity": "blade-pitch control system",
+          "attribute": "regulation goal",
+          "value": "generator speed",
+          "unit": "",
+          "conditions": "",
+          "quote": "the goal of the blade-pitch control system is to regulate the generator speed"
+        },
+        {
+          "entity": "variable-speed controller",
+          "attribute": "generator torque",
+          "value": "50,000",
+          "unit": "N•m",
+          "conditions": "generator speed approx 1,200 rpm",
+          "quote": "Figure 7-2. Torque-versus-speed response of the variable-speed controller"
+        }
+      ],
+      "only_variant": [
+        {
+          "entity": "generator-torque controller",
+          "attribute": "drivetrain torsional vibration control loop",
+          "value": "not incorporated",
+          "unit": "",
+          "conditions": "baseline controller",
+          "quote": "we did not need to incorporate a control loop for damping drivetrain torsional vibration in our baseline generator-torque controller"
+        }
+      ],
+      "problems": {
+        "baseline": {},
+        "variant": {}
+      },
+      "issues": {
+        "baseline": {},
+        "variant": {}
+      },
+      "notes": [
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Set B is superior because it avoids the factual error in Set A regarding the generator torque (Set A claims 50,000 N•m based on the graph axis limit, whereas the text explicitly states 47,402.91 N•m). Additionally, Set A contains multiple redundant duplicate claims (e.g., maximum torque and control goal appear twice), whereas Set B presents a concise, non-repetitive list of accurate extractions."
+        },
+        {
+          "judge": "Qwen/Qwen3.5-397B-A17B",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A is concise and accurate, capturing all key text specifications without redundancy. Set B includes multiple duplicate claims (e.g., rated speed, control goal, saturation torque) and incorrectly extracts the graph axis limit (50,000 N•m) as a controller value, contradicting the text specification of 47,402.91 N•m."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "baseline-first",
+          "score": 1.0,
+          "note": "Both sets correctly capture the torque saturation of 47,402.91 N•m, the 15,000 N•m/s rate limit, the high drivetrain damping rationale, the single-DOF shaft rotation, the rated generator speed of 1173.7 rpm, and the blade-pitch control goal. Set A adds several redundant duplicates and two problematic claims: one attaches an unsupported 'baseline' condition to the rated-speed claim, and one reads 50,000 N•m at ~1,200 rpm from Figure 7-2, which is only the axis maximum and is not supported by the caption quote or the plotted curve. Set B keeps the same substantive facts with no misread or unsupported claims, so it is the cleaner and more faithful set."
+        },
+        {
+          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
+          "order": "variant-first",
+          "score": 1.0,
+          "note": "Set A's seven claims are all faithful and correctly bound, including the 47,402.91 N·m torque saturation, the 15,000 N·m/s rate limit, and the 1173.7 rpm rated generator speed. Set B covers the same ground but adds several redundant duplicates (the torque saturation and blade-pitch goal each appear twice, rated speed twice) and one unsupported claim: it asserts a generator torque of 50,000 N·m at ~1,200 rpm from Figure 7-2, where the variable-speed curve is well below 50,000 N·m and the caption quote supports no such value. B's 'baseline' condition on rated speed is also a misbound condition. A is therefore cleaner and more accurate."
+        }
+      ],
+      "remarks": []
+    }
+  ]
+}

@@ -20,12 +20,16 @@ from .rounds import FAMILY
 
 def _issues(runs_dir, run, content, page, family):
     """{issue: tasks} the model reported for one unit's tasks, from a replay store."""
-    from .store import Store
+    from .store import Store, StoreError
     folder = Path(runs_dir) / run
     if not (folder / "store.sqlite").exists():
         return {}
     found = Counter()
-    with Store(folder) as store:
+    try:
+        store = Store(folder)
+    except StoreError:  # a store kept at an older schema (rounds before 2026-09-28): no issues to show
+        return {}
+    with store:
         for row in store.coverage(content):
             region = FAMILY.get(row["task"].split(":")[0])
             if row.get("page") == page and region and family in (region, "page"):

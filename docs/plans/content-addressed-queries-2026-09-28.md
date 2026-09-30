@@ -228,7 +228,9 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
     - promotion through the example held-out rule (mean above 0.5, no stratum loss) happens in 12.5% of rounds; through a held-out that must win again, in 1.4%
     - a real effect with a true rate of 0.60, 0.65 or 0.70 is found 35%, 58% or 78% of the time at 32 units
   - **Typed round spec:** `models.RoundSpec` validates `round.json`, so a typo fails. Criteria (role, thresholds, a named gain, the held-out rule) are fixed when judging starts, and the runner refuses a later change. Gains (tokens, distinct claims) are measured against the baseline.
-  - **Open for the owner:** which held-out rule is the default. The example rule is cheap to pass (12.5% false promotion with five variants); winning again is strict (1.4%), and costs power.
+  - **The held-out default** (the owner, 2026-09-30: "Use middle rule"): mean above 0.5 and a lower bound of at least 0.45 (`Criteria.held_out_low`), with no stratum loss.
+    - With five null variants per round, it promotes one in 4.5% of rounds; the mean alone does in 12.5%, and winning again in 1.0–1.4%.
+    - At true rates of 0.65 and 0.70, it promotes 47% and 73% of the time.
   - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
   - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
 

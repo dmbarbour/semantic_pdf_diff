@@ -467,7 +467,10 @@ class Criteria(Strict):
     gain: Gain | None = None                                  # and this gain is met (none: not accepted)
     stratum_loss_high: float = Field(default=0.45, ge=0, le=1)  # a stratum whose interval lies below this...
     stratum_min_units: int = Field(default=6, ge=1)           # ...on at least this many units blocks
-    held_out_mean: float = Field(default=0.50, ge=0, le=1)    # held-out: the overall mean must exceed this
+    # Held-out: the overall mean must exceed held_out_mean and its interval's lower bound reach held_out_low
+    # (the owner, 2026-09-30: the middle rule; simulated, 4.5% of rounds of five null variants promote one).
+    held_out_mean: float = Field(default=0.50, ge=0, le=1)
+    held_out_low: float = Field(default=0.45, ge=0, le=1)
     borderline: float = Field(default=0.03, ge=0)             # a bound this near its threshold is flagged
     watch_min_units: int = Field(default=10, ge=1)            # a stratum below the loss line on this many is watched
 
@@ -483,6 +486,13 @@ class QueryChecks(Strict):
     models: list[str] | None = None  # default: run_round.QUERY_CHECKERS
     sample: int = Field(default=30, ge=1)
     cap: float = Field(default=2.0, ge=0)
+
+class PostMortem(Strict):
+    """Every lever gets a post-mortem after its round, won, lost or no different (the owner, 2026-09-30):
+    random samples of wins and losses, win rates by partition, and a strong model's reading."""
+    units: int = Field(default=5, ge=1)              # units sampled from each of wins, losses and splits
+    analyst: str | None = "google/gemini-3.1-pro"    # None: the evidence only, no model
+    cap: float = Field(default=0.25, ge=0)           # dollars per round for the analyst
 
 class RoundSpec(Strict):
     """A round's round.json, validated: a typo in a key fails instead of silently taking a default
@@ -506,6 +516,7 @@ class RoundSpec(Strict):
     judge_retries: int = Field(default=2, ge=0)
     early_stop: bool = False       # rounds 1-8 stopped early; decided once at a fixed sample since
     criteria: Criteria = Field(default_factory=Criteria)
+    postmortem: PostMortem = Field(default_factory=PostMortem)
     hypotheses: str = ""
     note: str = ""
 

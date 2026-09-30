@@ -223,7 +223,14 @@ Round 1 showed that asking the same question again often gets a different answer
 - **Promotion (A, approved):**
   - A lever reaches the defaults only after a combination round and a held-out check. The held-out criterion is written into `round.json` before judging (e.g. mean above 0.5 and no stratum loss), and the held-out effect is the one quoted, since development figures of accepted levers are inflated by selection.
   - "No worse" needs a gain named in advance, with its metric and threshold.
-  - **Built (2026-09-30):** `criteria` in `round.json` (`models.Criteria`: role, thresholds, named gain, held-out rule), fixed when judging starts. Simulated rates are in the [content-addressed queries plan](content-addressed-queries-2026-09-28.md). The default held-out rule is open.
+  - **Built (2026-09-30):** `criteria` in `round.json` (`models.Criteria`: role, thresholds, named gain, held-out rule), fixed when judging starts. Simulated rates are in the [content-addressed queries plan](content-addressed-queries-2026-09-28.md).
+  - **The held-out rule** (the owner, 2026-09-30: "Use middle rule"): the held-out mean above 0.5, its interval's lower bound at least 0.45, and no stratum loss.
+    - Simulated with five null variants per round, 4.5% of rounds promote one, against 12.8% for the mean alone and 1.0% for winning again.
+    - A lever with a true rate of 0.65 is promoted 47% of the time.
+- **A post-mortem for every lever after every round** (the owner, 2026-09-30: "always have a post-mortem analysis/review for levers after each round (whether good or bad or useless), e.g. based on judging/inspecting a random subset of positive and negative results, with attention to whether there's any obvious direction to tweak or partition them"):
+  - **Built:** `postmortem.py`, run by `run_round` for each decided variant (`postmortem` in `round.json`). `--only postmortem` backfills older rounds.
+  - **What it gives:** random samples of units won, lost and split; win rates by kind of region, document family, band or whole, and whether the lever added a line; what the lever added in each sampled unit; and a strong model's reading, told each lever's class and mechanism.
+  - **Claude writes each round's review from it,** with tweaks and partitions to try; new lever ideas go into the lever index.
   - **No lever is forgotten:** the [lever index](../reviews/levers.md) is the catalogue.
     - Every idea gets a row when it's raised, built or not.
     - Levers not accepted or parked are tried again against later champions, since a baseline that moved can change the answer.
