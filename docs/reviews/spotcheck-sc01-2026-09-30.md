@@ -55,13 +55,16 @@
    - With rubric v6 (the whole page, "missing" against everything), judges will see this too.
 4. **The right context is often in another reader's region** (item 2): the caption names what the text calls "baseline unit size".
 
+- **The owner's clarification of "visualization of tables when building rules" (2026-09-30):** "that's based on our prior discussion of how to process tables, e.g. for CSV or .xlsx files. We ask a model how to turn table rows into claims, and we might look for exceptions to this. It seems we're using a different tactic for PDFs, but I don't believe medium should be a severe differentiater here."
+  - Claude first read it as a diagnostic view of parsed tables; that reading is withdrawn.
+
 ## Proposals
 
 - **Lever ideas** (rows in the [lever index](levers.md)):
   - repair table structure before extraction
   - send table bands with the full header block
   - show the table's image with its text
-  - a table view with hazards for building rules (the owner's idea)
+  - showing the model the table clearly, with its hazards named, when it builds the table's rules (the owner's idea)
   - entity against conditions in the instructions
   - captions of the page's figures and tables as context for its text
 - **For evaluation, needing the owner's review:** show a unit's claims from the page's other readers (figures, tables, tiles) as context beside its own, marked by reader.
