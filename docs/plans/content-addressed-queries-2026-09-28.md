@@ -1,6 +1,6 @@
 # Content-addressed queries, checks and records
 
-- **Status:** Active (2026-09-30): milestones 1–6 done. Left: removing the re-keying code once nothing needs it.
+- **Status:** Completed (2026-09-30): milestones 1–6, and the re-keying code removed.
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md), whose keys this replaces; [query improvement](query-improvement-2026-09-26.md), whose rounds get the checks.
 - **Feeds:** every later round; the [weighted quality estimates](README.md) (judgement records); a lever search (plans index).
 - **Why:**
@@ -202,7 +202,7 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
     - **The rebuild that stands** replays each run with its settings as they were (round 0's levers, the defaults until the promotion, overlaid by its `settings.json`). It re-keys from the old master fixture wherever today's code rebuilds the same query: 5,132 answers carried over, and the master now holds 10,574 queries. The A/A control's second samples came along too.
     - **Kept at store schema 7 (111):** runs where today's code builds some query differently (the stem fix, the rotated-sheet fixes), so a replay can't be complete without re-recording. The review batches' stores (9) weren't touched: they have no settings file. Neither was the recording scratch (`runs/*/record/`).
     - **Recordings now save every setting that can change a query, resolved** (`record_runs.py`), so a replay means the same thing after defaults move.
-  - **Re-keying is temporary:** `LegacyFixture`, `--rekey-from` and its test go once nothing needs re-keying (the owner: "I doubt we'll hold onto re-keying tests for long").
+  - **Re-keying was temporary** (the owner: "I doubt we'll hold onto re-keying tests for long"). `LegacyFixture`, `--rekey-from`, its test and the judge caches' script were removed on 2026-09-30, once no schema-3 fixture or old cache was left; they remain in git history.
 - **Milestone 3 (2026-09-28): done.**
   - **Lever notes:** `extract.lever_notes` finds the lines each lever added to a query from the markers its builder writes. They're computed when dumping, from the store's query log: nothing stored, nothing in the hash. A test checks every builder against its mark.
   - **`queries dump`:** samples a folder of runs' queries, going round the documents and each document's kinds of region. Against a baseline it shows only changed, added or removed queries, as diffs; `--lever` narrows it to one lever. It writes a page, JSONL and the images each query was sent.

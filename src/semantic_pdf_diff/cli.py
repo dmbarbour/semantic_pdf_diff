@@ -82,9 +82,6 @@ def add_run_options(parser):
     parser.add_argument('--fresh-regions', default='', metavar='REGIONS',
                         help='A/A control: answer extraction for these regions (e.g. tile,figure,overview) afresh, '
                              'as a second sample of each query')
-    parser.add_argument('--rekey-from', type=Path, metavar='FIXTURE',
-                        help='carry answers from a fixture keyed the old way (schema 3) into --fixture when the query '
-                             'rebuilt now is the one recorded (re-keying by replay; no model calls in replay mode)')
     add_budget_options(parser)
     parser.add_argument('--plan', action='store_true', help='Inspect sources and estimate visual tasks without API calls')
     parser.add_argument('--reset', action='store_true',
@@ -344,9 +341,8 @@ def make_client(args, settings, store):
                 raise ValueError('record into a .sqlite fixture, then pack it: pdf-semantic-diff fixtures pack')
             temp = tempfile.TemporaryDirectory(prefix='fixture-')
             path = fixtures.unpack(path, temp.name)
-        rekey = getattr(args, 'rekey_from', None) is not None
-        fixture = fixtures.Fixture(path, create=args.fixture_mode != 'replay' or rekey)
-        if args.fixture_mode != 'replay' or rekey:  # text and rendering depend on it: replay tests compare versions
+        fixture = fixtures.Fixture(path, create=args.fixture_mode != 'replay')
+        if args.fixture_mode != 'replay':  # text and rendering depend on it: replay tests compare versions
             import pymupdf
             fixture.note('pymupdf', pymupdf.VersionBind)
         if path is not args.fixture:
@@ -354,11 +350,8 @@ def make_client(args, settings, store):
     if fixture is None:
         return attach_ledger(Client(settings, store), args)
     fresh = [r for r in getattr(args, 'fresh_regions', '').split(',') if r]
-    legacy = fixtures.LegacyFixture(args.rekey_from) if getattr(args, 'rekey_from', None) else None
-    if legacy is not None:
-        fixture.legacy = legacy  # closed with the fixture
     return attach_ledger(Client(settings, store, fixture=fixture, mode=args.fixture_mode, responder=args.responder,
-                                fresh_regions=fresh, rekey_from=legacy), args)
+                                fresh_regions=fresh), args)
 
 def fixture_usage(client):
     f = getattr(client, 'fixture', None)  # test doubles have none
@@ -366,12 +359,9 @@ def fixture_usage(client):
         return {}
     if f.missing:
         log.warning(f"Replay: {len(f.missing)} request(s) have no answer from {client.responder}; first: {f.missing[0]}")
-    legacy = getattr(client, 'rekey_from', None)
-    log.info(f"Fixture {f.path.name}: {f.served} answers replayed, {f.recorded} recorded, {len(f.missing)} missing"
-             + (f"; re-keyed {legacy.matched}, stale {legacy.stale}" if legacy else ""))
+    log.info(f"Fixture {f.path.name}: {f.served} answers replayed, {f.recorded} recorded, {len(f.missing)} missing")
     return {'fixture': {'path': str(f.path), 'responder': client.responder, 'mode': client.mode,
-                        'replayed': f.served, 'recorded': f.recorded, 'missing': len(f.missing),
-                        **({'rekeyed': legacy.matched, 'stale': legacy.stale} if legacy else {})}}
+                        'replayed': f.served, 'recorded': f.recorded, 'missing': len(f.missing)}}
 
 def fixtures_command(argv):
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff fixtures', description='Replay fixtures of recorded answers.')

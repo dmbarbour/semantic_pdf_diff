@@ -196,19 +196,17 @@ class Client:
     or None when a fixture holds every answer (see folder_client).
     """
     def __init__(self, settings: Settings, cache, api_key: str | None = None, fixture=None, mode="replay",
-                 responder=None, fresh_regions=None, rekey_from=None):
+                 responder=None, fresh_regions=None):
         """fixture: an open fixtures.Fixture. In `replay` mode answers come only from it and
         unrecorded requests fail; in `replay-or-record` mode unrecorded requests (and recorded
         failures) go to the model and are recorded under `responder` (default: the model name);
         `record-new` is the same but replays the model's failures as failures (transient ones
-        are asked again). rekey_from: a fixtures.LegacyFixture whose answers are carried into
-        `fixture` when the query rebuilt now is the one recorded (re-keying by replay)."""
+        are asked again)."""
         self.s = settings
         self.fixture, self.mode, self.responder = fixture, mode, responder or settings.model
         # A/A control: extraction requests for these regions are answered afresh, as another sample
         # of the same query, so a round can measure how much re-asking alone moves results.
         self.fresh_regions = frozenset(fresh_regions or ())
-        self.rekey_from = rekey_from
         self.store = None if cache is None or isinstance(cache, (str, Path)) else cache
         self.cache = Path(cache) if isinstance(cache, (str, Path)) else None
         if self.cache is not None:
@@ -303,8 +301,6 @@ class Client:
         if self.fixture is not None:
             sample = self._sample(request)
             row = self.fixture.answer(request.query, self.responder, sample)
-            if row is None and self.rekey_from is not None and request.key is not None:
-                row = self._rekey(request, sample)
             if row is not None and request.key is not None:
                 self.fixture.note_recipe(request.query, request.key)
             if row is not None and row[0] != "ok" and (self.mode == "replay"
@@ -326,18 +322,6 @@ class Client:
         if value is not None:
             self.cache_hits += 1
         return value
-
-    def _rekey(self, request, sample):
-        """Carry an answer from a schema-3 fixture when the query rebuilt now is the one recorded."""
-        found = self.rekey_from.lookup(request.key, self.s, sample, self.responder, request.prompt, request.images)
-        if found is None:
-            return None
-        answer, error, usage, recorded = found
-        outcome = "ok" if error is None else "transient" if transient(error) else "invalid"
-        self.fixture.record(request.query, self.responder, sample, outcome=outcome, answer=answer, error=error,
-                            usage=usage, recorded=recorded, description=request.description, recipe=request.key)
-        self.fixture.recorded -= 1  # re-keyed, not recorded
-        return outcome, answer, error
 
     def save(self, request, value):
         """Cache a response (main thread); in record mode, also record it in the fixture."""

@@ -465,7 +465,7 @@ def _claim_marks(entries, shown):
 def pair_requests(folder, batch, rubric="v1"):
     """Every judge request a batch makes under a rubric, in order: (item, order, prompt, images,
     a, b, groups), a and b being the claim sets as shown (A first) and groups v6's grouping (or None).
-    The prompts are the queries judges answer; re-keying old answers rebuilds them from here."""
+    The prompts are the queries judges answer, and what the folder's fixture finds answers by."""
     folder = Path(folder)
     template = pairwise_prompt(rubric)
     numbered = RUBRICS[rubric].get("claims")

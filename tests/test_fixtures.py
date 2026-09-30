@@ -156,67 +156,6 @@ class RecordAndReplay(unittest.TestCase):
             f.prune(mark, force=True)
             self.assertEqual(f.db.execute('SELECT COUNT(*) FROM response').fetchone()[0], 0)
 
-    def legacy_fixture(self, run, path):
-        """A schema-3 fixture of a recorded run, keyed the old way (tuple and fingerprint), built
-        from the run's query log and the new fixture's answers."""
-        import hashlib
-        from semantic_pdf_diff import provenance
-        from semantic_pdf_diff.fixtures import _legacy_fingerprint
-        from semantic_pdf_diff.models import Settings
-        from semantic_pdf_diff.store import Store
-        settings = Settings(**json.loads((self.root / f'{run}.json').read_text()))
-        make = {'extract': provenance.extraction_interpreter, 'triage': provenance.triage_interpreter,
-                'compare': provenance.comparison_interpreter}
-        old = sqlite3.connect(path)
-        old.executescript("""
-            CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-            CREATE TABLE request (key TEXT, interpreter TEXT, kind TEXT, region TEXT, content TEXT, key_parts TEXT,
-                                  prompt TEXT, images TEXT, schema TEXT, PRIMARY KEY (key, interpreter));
-            CREATE TABLE response (key TEXT, interpreter TEXT, responder TEXT, answer TEXT, usage TEXT, recorded TEXT,
-                                   error TEXT, used TEXT, PRIMARY KEY (key, interpreter, responder));
-            CREATE TABLE interpreter (fingerprint TEXT PRIMARY KEY, role TEXT, description TEXT);
-            INSERT INTO meta VALUES ('schema_version', '3');""")
-        answers = dict((q, (a, e)) for q, a, e in sqlite3.connect(self.fixture).execute(
-            'SELECT query, answer, error FROM response WHERE sample = 0'))
-        with Store(self.root / run) as store:
-            for q in store.queries():
-                parts = list(q['recipe'])
-                fingerprint = _legacy_fingerprint(make[parts[0]](settings))
-                keyed = list(parts)
-                if keyed[0] == 'compare':
-                    keyed[2] = ''
-                key = hashlib.sha256(json.dumps(keyed, sort_keys=True, default=str).encode()).hexdigest()
-                old.execute('INSERT OR IGNORE INTO request VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                            (key, fingerprint, parts[0], parts[1], '', json.dumps(parts), q['prompt'],
-                             json.dumps(q['images']), ''))
-                answer, error = answers[q['hash']]
-                old.execute('INSERT OR IGNORE INTO response VALUES (?, ?, ?, ?, ?, ?, ?, NULL)',
-                            (key, fingerprint, 'gemma-4', answer, '{}', '2026-09-01', error))
-        old.commit()
-        old.close()
-
-    def test_old_fixtures_are_re_keyed_by_replay(self):
-        _, live, _ = self.record()
-        legacy = self.root / 'v3.sqlite'
-        self.legacy_fixture('live', legacy)
-        rekeyed = self.root / 'v4.sqlite'
-        _, replayed, _ = self.run_cli('rekey', UNREACHABLE, '--fixture', str(rekeyed), '--rekey-from', str(legacy))
-        self.assertEqual(replayed['usage']['fixture']['missing'], 0)
-        self.assertEqual(replayed['usage']['fixture']['stale'], 0)
-        self.assertEqual(self.outcome(replayed), self.outcome(live))
-        with sqlite3.connect(rekeyed) as db:  # the original dates come along
-            self.assertEqual({d for (d,) in db.execute('SELECT recorded FROM response')}, {'2026-09-01'})
-        _, again, _ = self.run_cli('rekeyed', UNREACHABLE, '--fixture', str(rekeyed))  # now on its own
-        self.assertEqual(again['usage']['fixture']['missing'], 0)
-        # An answer recorded for a query that's since changed has no obvious transition: it's let go.
-        with sqlite3.connect(legacy) as db:
-            db.execute("UPDATE request SET prompt = prompt || ' (older wording)' WHERE kind = 'triage' AND rowid = "
-                       "(SELECT MIN(rowid) FROM request WHERE kind = 'triage')")
-        _, stale, _ = self.run_cli('rekey2', UNREACHABLE, '--fixture', str(self.root / 'v4b.sqlite'),
-                                   '--rekey-from', str(legacy))
-        self.assertEqual(stale['usage']['fixture']['stale'], 1)
-        self.assertGreaterEqual(stale['usage']['fixture']['missing'], 1)
-
     def test_running_out_of_balance_pauses_and_resumes(self):
         from semantic_pdf_diff import ledger
         ledger_path = self.root / 'ledger.jsonl'

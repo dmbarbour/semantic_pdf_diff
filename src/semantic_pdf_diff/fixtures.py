@@ -86,8 +86,7 @@ class Fixture:
         version = self.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
         if not version or int(version[0]) != SCHEMA_VERSION:
             self.db.close()
-            hint = " (keyed the old way: re-key it by replaying with --rekey-from)" if version and version[0] == "3" else ""
-            raise FixtureError(f"{self.path} has fixture schema {version and version[0]}, expected {SCHEMA_VERSION}{hint}")
+            raise FixtureError(f"{self.path} has fixture schema {version and version[0]}, expected {SCHEMA_VERSION}")
         with self.db:
             self.db.execute(SESSIONS)
         self.served, self.recorded, self.missing, self.used, self.responders = 0, 0, [], set(), set()
@@ -110,9 +109,6 @@ class Fixture:
         self.db.close()
         if self.packed_to is not None and self.changed:
             pack(self.path, self.packed_to)
-        legacy = getattr(self, "legacy", None)  # a schema-3 fixture being re-keyed into this one
-        if legacy is not None:
-            legacy.close()
         temp = getattr(self, "temp", None)  # an unpacked zip's folder
         if temp is not None:
             temp.cleanup()
@@ -142,7 +138,7 @@ class Fixture:
     def record(self, query, responder, sample=0, *, outcome, answer="", error=None, usage=None, recorded=None,
                description=None, recipe=None):
         """Record an answer (or a failure: outcome `invalid` or `transient`, with its error), with
-        the side tables' facts about the query. `recorded` keeps a re-keyed answer's original date."""
+        the side tables' facts about the query. `recorded` keeps a carried answer's original date."""
         if outcome not in OUTCOMES:
             raise ValueError(f"outcome {outcome!r} is not one of {OUTCOMES}")
         self.responders.add(responder)
@@ -215,63 +211,6 @@ class Fixture:
                          "prompt_tokens": p or 0, "completion_tokens": c or 0}
                         for responder, role, outcome, n, p, c in rows],
         }
-
-class LegacyFixture:
-    """A schema-3 fixture (keyed by a hand-picked tuple and an interpreter fingerprint), read only
-    to re-key its answers: Client(rekey_from=...) replays runs, finds each query here under its old
-    key, and keeps the answer when the prompt and images it rebuilt are the ones recorded."""
-
-    def __init__(self, path):
-        self.path = Path(path)
-        self.temp = None
-        if self.path.suffix == ".zip":
-            import tempfile
-            self.temp = tempfile.TemporaryDirectory(prefix="fixture-v3-")
-            self.path = unpack(self.path, self.temp.name)
-        self.db = sqlite3.connect(f"file:{self.path}?mode=ro", uri=True)
-        version = self.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
-        if not version or version[0] != "3":
-            raise FixtureError(f"{path}: not a schema-3 fixture")
-        self.fingerprints = {}
-        self.matched, self.stale = 0, 0
-
-    def close(self):
-        self.db.close()
-        if self.temp is not None:
-            self.temp.cleanup()
-
-    def lookup(self, recipe, settings, sample, responder, prompt, images):
-        """(answer, error, usage, recorded) recorded for this recipe, if the recorded prompt and
-        image hashes are exactly what the query now sends; else None (stale, or never recorded)."""
-        role = recipe[0]
-        if role not in self.fingerprints:
-            from . import provenance
-            make = {"extract": provenance.extraction_interpreter, "triage": provenance.triage_interpreter,
-                    "compare": provenance.comparison_interpreter}.get(role)
-            self.fingerprints[role] = _legacy_fingerprint(make(settings)) if make else ""
-        parts = list(recipe)
-        if parts[0] == "compare":  # the comparison's settings hash was left out of fixture keys
-            parts[2] = ""
-        key = hashlib.sha256(json.dumps(parts, sort_keys=True, default=str).encode()).hexdigest()
-        row = self.db.execute(
-            "SELECT q.prompt, q.images, r.answer, r.error, r.usage, r.recorded FROM request q JOIN response r "
-            "ON r.key = q.key AND r.interpreter = q.interpreter WHERE q.key=? AND q.interpreter=? AND r.responder=?",
-            (key, self.fingerprints[role], responder + ("#fresh" if sample else ""))).fetchone()
-        if row is None:
-            return None
-        if row[0] != prompt or json.loads(row[1]) != list(images):
-            self.stale += 1
-            return None
-        self.matched += 1
-        return row[2], row[3], json.loads(row[4] or "{}"), row[5]
-
-def _legacy_fingerprint(interpreter):
-    """Schema 3's interpreter fingerprint: prompts and settings, without the model or the levers."""
-    from .provenance import LEVERS
-    settings = {k: v for k, v in interpreter.settings.items() if k != "model" and k not in LEVERS}
-    data = json.dumps({"role": interpreter.role, "prompt_hash": interpreter.prompt_hash, "settings": settings},
-                      sort_keys=True)
-    return hashlib.sha256(data.encode()).hexdigest()[:16]
 
 def pack(fixture, target):
     """Zip a fixture reproducibly: rows in key order, last-use times and sessions left out, fixed
