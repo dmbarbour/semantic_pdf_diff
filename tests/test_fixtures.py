@@ -225,3 +225,42 @@ class RecordAndReplay(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class FolderFixtures(unittest.TestCase):
+    def test_answers_survive_a_crash_and_are_packed_later(self):
+        from semantic_pdf_diff.fixtures import FOLDER_FIXTURE, FOLDER_WORKING, folder_fixture
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            f = folder_fixture(folder)
+            f.record('q1', 'judge', outcome='ok', answer='{"better": "A"}')
+            f.close()
+            packed = (folder / FOLDER_FIXTURE).read_bytes()
+            crashed = folder_fixture(folder)
+            crashed.record('q2', 'judge', outcome='ok', answer='{"better": "B"}')
+            crashed.db.close()  # the process dies: nothing is packed
+            self.assertEqual((folder / FOLDER_FIXTURE).read_bytes(), packed)
+            again = folder_fixture(folder)  # the next run finds the paid answer, and packs it
+            self.assertEqual(again.answer('q2', 'judge')[1], '{"better": "B"}')
+            again.close()
+            self.assertNotEqual((folder / FOLDER_FIXTURE).read_bytes(), packed)
+            (folder / FOLDER_WORKING).unlink()  # a fresh clone: the zip alone
+            fresh = folder_fixture(folder)
+            self.assertEqual({q for (q,) in fresh.db.execute('SELECT query FROM response')}, {'q1', 'q2'})
+            fresh.close()
+
+    def test_answers_pulled_into_the_zip_are_merged(self):
+        import shutil
+        from semantic_pdf_diff.fixtures import FOLDER_FIXTURE, folder_fixture
+        with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
+            here, there = Path(a), Path(b)
+            f = folder_fixture(here)
+            f.record('q1', 'judge', outcome='ok', answer='{}')
+            f.close()
+            shutil.copy(here / FOLDER_FIXTURE, there / FOLDER_FIXTURE)
+            g = folder_fixture(there)
+            g.record('q2', 'judge', outcome='ok', answer='{}')
+            g.close()
+            shutil.copy(there / FOLDER_FIXTURE, here / FOLDER_FIXTURE)  # pulled: the working file lacks q2
+            h = folder_fixture(here)
+            self.assertIsNotNone(h.answer('q2', 'judge'))
+            h.close()

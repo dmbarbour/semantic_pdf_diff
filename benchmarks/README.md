@@ -15,6 +15,7 @@ Nobody is ground truth here. Each reviewer (you, Claude in a session, and a pane
 | `spotchecks/<name>/` | yes (not the page) | Spot checks: a person judges the same pairs as the panel (`scripts/spotcheck.py`) |
 | `rounds/<name>/` | yes | Query-improvement rounds (`scripts/run_round.py`); `champion.json` is the current best settings, `round0.json` the original ones |
 | `eyetest/` | yes (not `images/`) | Eye tests for vision models (`scripts/eye_test.py`): random codes and numbers at known sizes, scored exactly. `results.json` and `report.html` compare the models; `replay.zip` holds their answers; the images are drawn again on demand |
+| `pagetest/` | yes (not `images/`) | Page tests (`scripts/page_test.py`): synthetic pages at real sizes read by slicing, shrinking, or close-ups the model asks for; recall by font size against queries and tokens |
 | `*/replay.zip` in a round's batch, a spot check or a review batch | yes (not for review batches) | Every model answer that folder's evaluation asked for (judges, query checkers, the post-mortem's analyst), keyed by query like the main fixture. A rerun pays only for what's missing, and tests judge committed batches again offline |
 
 ## Reviewing a batch (for people)

@@ -97,21 +97,21 @@ class Asking(unittest.TestCase):
     @unittest.skipUnless((FOLDER / "replay.zip").exists(), "no recorded eye tests")
     def test_recorded_answers_replay(self):
         import pymupdf
-        from semantic_pdf_diff.fixtures import folder_fixture
+        from semantic_pdf_diff.fixtures import Fixture, unpack
         from semantic_pdf_diff.llm import folder_client
         from semantic_pdf_diff.models import Settings
-        fixture = folder_fixture(FOLDER)
-        recorded = fixture.meta().get("pymupdf")
-        fixture.close()
+        with tempfile.TemporaryDirectory() as d, Fixture(unpack(FOLDER / "replay.zip", d)) as fixture:
+            recorded = fixture.meta().get("pymupdf")
         if recorded != pymupdf.VersionBind:
             self.skipTest(f"recorded with PyMuPDF {recorded}; images differ under {pymupdf.VersionBind}")
         data = json.loads((FOLDER / "results.json").read_text(encoding="utf-8"))
         model = "google/gemma-4-31B-it"
         cards = [c for c in eyetest.suite(data["suite"]) if c.id in data["models"][model]["cards"]][::7]
-        with tempfile.TemporaryDirectory() as d, \
-                folder_client(FOLDER, Settings(model=model, base_url="http://127.0.0.1:9/v1", **eyetest.EYE_SETTINGS),
-                              mode="replay") as client:
-            answers = eyetest.ask(d, client, cards)
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "replay.zip").write_bytes((FOLDER / "replay.zip").read_bytes())
+            with folder_client(d, Settings(model=model, base_url="http://127.0.0.1:9/v1", **eyetest.EYE_SETTINGS),
+                               mode="replay") as client:
+                answers = eyetest.ask(d, client, cards)
         for card in cards:
             self.assertEqual(answers[card.id], data["models"][model]["cards"][card.id]["answer"])
 

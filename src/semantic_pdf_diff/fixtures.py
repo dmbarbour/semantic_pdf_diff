@@ -33,6 +33,7 @@ SCHEMA_VERSION = 4  # 2: failures recorded; 3: response.used; 4: keyed by the qu
 # checks) in a fixture of its own, packed, out of the main one (the owner: "just so long as it's
 # kept out of our main test fixture").
 FOLDER_FIXTURE = "replay.zip"
+FOLDER_WORKING = "replay.sqlite"  # the working copy beside it (git-ignored)
 MODES = ("replay", "replay-or-record", "record-new")
 OUTCOMES = ("ok", "invalid", "transient")
 
@@ -248,15 +249,28 @@ def _dump(db):  # pragma: no cover - Python < 3.11 lacks Connection.serialize
         return (Path(d) / "f.sqlite").read_bytes()
 
 def folder_fixture(folder):
-    """A folder's own fixture (FOLDER_FIXTURE), open for use: unpacked to a temporary file, and
-    packed back on close when anything was recorded. Packing is reproducible, so a run that
-    only replays leaves the zip's bytes as they were."""
+    """A folder's own fixture, open for use. Answers are recorded in a working file beside the zip
+    (FOLDER_WORKING, git-ignored), so each is kept the moment it's paid for: a crash once lost a run's
+    answers from a temporary copy. On opening, answers the zip holds that the working file lacks
+    (pulled from elsewhere) are merged in; on closing, the zip is packed again when the working file
+    holds answers it lacks. Packing is reproducible: a run that only replays leaves the zip's bytes."""
     import tempfile
-    archive = Path(folder) / FOLDER_FIXTURE
-    temp = tempfile.TemporaryDirectory(prefix="folder-fixture-")
-    path = unpack(archive, temp.name) if archive.exists() else Path(temp.name) / "replay.sqlite"
-    fixture = Fixture(path, create=True)
-    fixture.temp, fixture.packed_to = temp, archive
+    archive, working = Path(folder) / FOLDER_FIXTURE, Path(folder) / FOLDER_WORKING
+    working.parent.mkdir(parents=True, exist_ok=True)
+    fixture = Fixture(working, create=True)
+    packed = 0
+    if archive.exists():
+        with tempfile.TemporaryDirectory(prefix="folder-fixture-") as temp:
+            path = unpack(archive, temp)
+            with fixture.db:
+                fixture.db.execute("ATTACH DATABASE ? AS packed", (str(path),))
+                for table in ("response", "description", "recipe"):
+                    fixture.db.execute(f"INSERT OR IGNORE INTO main.{table} SELECT * FROM packed.{table}")
+                packed = fixture.db.execute("SELECT COUNT(*) FROM packed.response").fetchone()[0]
+            fixture.db.execute("DETACH DATABASE packed")
+    held = fixture.db.execute("SELECT COUNT(*) FROM response").fetchone()[0]
+    fixture.changed = held > packed  # answers recorded before a crash, or never packed
+    fixture.packed_to = archive
     return fixture
 
 def unpack(archive, folder):
