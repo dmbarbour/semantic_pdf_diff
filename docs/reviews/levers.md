@@ -152,6 +152,10 @@ Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so no
 | Send a one-row table's row without repeating it as its header | Query checks, 2026-09-28 | Ken manual "AC Rating ... 6.4 kW", and an NREL "table" made of equation debris |
 | Drop text tasks that hold only a watermark or title-block boilerplate | Query checks, 2026-09-28 | A ken-cd text task holding only "PRODUCED BY AN AUTODESK STUDENT PRODUCT" |
 | Recognise charts parsed as tables (axis labels, legends, empty cells) | Query checks, 2026-09-28; the table filter lever (r01b) | IEA-15 airfoil polar legends sent as tables; the table filter was inconclusive in r01b |
+| Render every image at gemma-4's budget size (about 645,000 px, sides in multiples of 48): 768 × 768 tiles, 1584 × 396 for 4:1 bands | [How gemma-4 sees images](../research/gemma4-images-2026-09-30.md) | Bands rendered at 1000 px wide are enlarged to 1584 px: ~250,000 real pixels against ~590,000 for a tile |
+| Smaller tiles on drawings (e.g. 280 points) | The same note | 1.5 × the linear detail at 2.25 × the tiles; small dimension text misread on sheets |
+| Images before the text in each query | Google's guidance for gemma-4 | Not yet measured |
+| A higher image budget (560 or 1120 tokens) | The same note | Document reading improves markedly at 1120 in Google's report. DeepInfra ignores the setting (measured), so this needs a host that sets it, e.g. the in-house deployment |
 
 ## Measurement notes (affect how to read the table)
 
