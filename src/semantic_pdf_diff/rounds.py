@@ -15,6 +15,7 @@ import random
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
+from . import judgements
 from .pages import native_page
 
 FAMILY = {"text": "text", "table": "table", "tile": "visual", "figure": "visual", "overview": "visual"}
@@ -493,6 +494,36 @@ def pair_requests(folder, batch, rubric="v1"):
                                      a_note=notes[first], b_note=notes[second])
             yield item, order, prompt, images, a, b, groups
 
+def pair_verdict(rubric, v, order, a, b, groups=None):
+    """A judge's answer (a PairVerdict's fields, `v`) as the verdict recorded for one order: its
+    score for the variant (1 when the variant is better), and wrong counts, problems and claim marks
+    by side. a and b are the claim sets as shown (A first), groups v6's grouping (pair_requests)."""
+    tags = lambda values: sorted({str(t).strip().lower() for t in values or ()} & set(PAIR_PROBLEMS))
+    better = v.get("better")
+    variant_is = "B" if order == "baseline-first" else "A"
+    score = 0.5 if better not in ("A", "B") else 1.0 if better == variant_is else 0.0
+    verdict = {"score": score, "better": better, "confidence": v.get("confidence", ""),
+               "baseline_wrong": v.get("a_wrong") if order == "baseline-first" else v.get("b_wrong"),
+               "variant_wrong": v.get("b_wrong") if order == "baseline-first" else v.get("a_wrong"),
+               "note": v.get("note", "")}
+    if RUBRICS[rubric]["tags"]:
+        first, second = tags(v.get("a_problems")), tags(v.get("b_problems"))
+        verdict.update(baseline_problems=first if order == "baseline-first" else second,
+                       variant_problems=second if order == "baseline-first" else first,
+                       remarks=v.get("remarks", "").strip())
+    if RUBRICS[rubric].get("claims"):  # each claim's mark, by side (A is the first set shown)
+        first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
+        if groups is None:
+            marks = {first: _claim_marks(v.get("a_claims"), a), second: _claim_marks(v.get("b_claims"), b)}
+        else:  # v6: a shared claim's mark counts for both sides, at each side's own index
+            shared, only_a, only_b = groups
+            at = lambda entries, index, claims: [
+                {**m, "index": index[m["index"]]} for m in _claim_marks(entries, [claims[i] for i in index])]
+            marks = {first: at(v.get("s_claims"), [i for i, _ in shared], a) + at(v.get("a_claims"), only_a, a),
+                     second: at(v.get("s_claims"), [j for _, j in shared], b) + at(v.get("b_claims"), only_b, b)}
+        verdict["claims"] = marks
+    return verdict
+
 def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1", only=None, retry_failed=False,
                 verdicts_dir="verdicts"):
     """Ask one model to compare every unit (or only those in `only`), in both orders; merges
@@ -501,7 +532,8 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
 
     A verdict that fails (a judge timing out on a long unit) isn't asked again on later calls,
     which used to hold every later chunk for another timeout; retry_failed asks such verdicts
-    once more (run_round does, when a variant's judging ends). failures/<reviewer>.json counts them."""
+    once more (run_round does, when a variant's judging ends): judgements.ask_again. They're
+    counted in failures/<reviewer>.json (failures-<x>/ for verdicts-<x>/)."""
     from .dispatch import Dispatcher
     from .models import PairVerdict
     from .progress import NoProgress
@@ -511,17 +543,16 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     target = folder / verdicts_dir / f"{reviewer_file(reviewer)}.json"
     verdicts = json.loads(target.read_text(encoding="utf-8"))["verdicts"] if target.exists() else {}
-    failed_path = folder / "failures" / f"{reviewer_file(reviewer)}.json"
+    failed_path = folder / judgements.failures_folder(verdicts_dir) / f"{reviewer_file(reviewer)}.json"
     failed = json.loads(failed_path.read_text(encoding="utf-8")) if failed_path.exists() else {}
     failures = []
-    tags = lambda values: sorted({str(t).strip().lower() for t in values or ()} & set(PAIR_PROBLEMS))
     included = {i["id"] for i in batch["items"][:limit]}
     with Dispatcher(client) as dispatch:
         for item, order, prompt, images, a, b, groups in pair_requests(folder, batch, rubric):
             if item["id"] not in included or only is not None and item["id"] not in only:
                 continue
             attempts = failed.get(f"{item['id']}|{order}", 0)
-            if order in verdicts.get(item["id"], {}) or (attempts and not (retry_failed and attempts == 1)):
+            if order in verdicts.get(item["id"], {}) or not judgements.ask_again(attempts, retry_failed):
                 continue  # judged already, or failed and not (or no longer) retried
             def finish(value, error, item=item, order=order, a=a, b=b, groups=groups):
                 progress.finish("failed" if error else "complete")
@@ -530,32 +561,7 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
                     failed[f"{item['id']}|{order}"] = failed.get(f"{item['id']}|{order}", 0) + 1
                     return
                 failed.pop(f"{item['id']}|{order}", None)
-                v = value.model_dump()
-                better = v.get("better")
-                variant_is = "B" if order == "baseline-first" else "A"
-                score = 0.5 if better not in ("A", "B") else 1.0 if better == variant_is else 0.0
-                verdicts.setdefault(item["id"], {})[order] = {
-                    "score": score, "better": better, "confidence": v.get("confidence", ""),
-                    "baseline_wrong": v.get("a_wrong") if order == "baseline-first" else v.get("b_wrong"),
-                    "variant_wrong": v.get("b_wrong") if order == "baseline-first" else v.get("a_wrong"),
-                    "note": v.get("note", "")}
-                if RUBRICS[rubric]["tags"]:
-                    first, second = tags(v.get("a_problems")), tags(v.get("b_problems"))
-                    verdicts[item["id"]][order].update(
-                        baseline_problems=first if order == "baseline-first" else second,
-                        variant_problems=second if order == "baseline-first" else first,
-                        remarks=v.get("remarks", "").strip())
-                if RUBRICS[rubric].get("claims"):  # each claim's mark, by side (A is the first set shown)
-                    first, second = ("baseline", "variant") if order == "baseline-first" else ("variant", "baseline")
-                    if groups is None:
-                        marks = {first: _claim_marks(v.get("a_claims"), a), second: _claim_marks(v.get("b_claims"), b)}
-                    else:  # v6: a shared claim's mark counts for both sides, at each side's own index
-                        shared, only_a, only_b = groups
-                        at = lambda entries, index, claims: [
-                            {**m, "index": index[m["index"]]} for m in _claim_marks(entries, [claims[i] for i in index])]
-                        marks = {first: at(v.get("s_claims"), [i for i, _ in shared], a) + at(v.get("a_claims"), only_a, a),
-                                 second: at(v.get("s_claims"), [j for _, j in shared], b) + at(v.get("b_claims"), only_b, b)}
-                    verdicts[item["id"]][order]["claims"] = marks
+                verdicts.setdefault(item["id"], {})[order] = pair_verdict(rubric, value.model_dump(), order, a, b, groups)
             progress.add()
             dispatch.submit(prompt, PairVerdict, images, ("judge", item["id"], rubric, order), finish)
         dispatch.drain()
@@ -733,22 +739,15 @@ def _judge_claim_marks(folder, verdicts_dir="verdicts"):
     """{(unit, side, index): mark} from judges who marked claims (rubric v5 on); a claim marked
     differently by judges or orders is taken as unsure."""
     marks = defaultdict(set)
-    for path in sorted((Path(folder) / verdicts_dir).glob("*.json")):
-        for unit, orders in json.loads(path.read_text(encoding="utf-8"))["verdicts"].items():
-            for v in orders.values():
-                for side, claims in (v.get("claims") or {}).items():
-                    for c in claims:
-                        marks[(unit, side, c["index"])].add(c["mark"])
+    for r in judgements.answered(judgements.read(folder, verdicts_dir), "claim"):
+        marks[(r.unit, r.side, r.index)].add(r.answer["mark"])
     return {k: next(iter(m)) if len(m) == 1 else "unsure" for k, m in marks.items()}
 
 def claim_shares(folder, verdicts_dir="verdicts"):
     """Judges' marks per side (rubric v5): counts, and the share of marked claims that are wrong."""
     counts = {"baseline": Counter(), "variant": Counter()}
-    for path in sorted((Path(folder) / verdicts_dir).glob("*.json")):
-        for orders in json.loads(path.read_text(encoding="utf-8"))["verdicts"].values():
-            for v in orders.values():
-                for side, claims in (v.get("claims") or {}).items():
-                    counts[side].update(c["mark"] for c in claims)
+    for r in judgements.answered(judgements.read(folder, verdicts_dir), "claim"):
+        counts[r.side][r.answer["mark"]] += 1
     return {side: {**dict(c), "wrong_share": round(c["wrong"] / sum(c.values()), 3) if sum(c.values()) else None}
             for side, c in counts.items()}
 
@@ -759,9 +758,10 @@ def anchor(folder, human_dir="verdicts-human", verdicts_dir="verdicts"):
     judges = unit_scores(folder, verdicts_dir=verdicts_dir)
     lean = lambda s: (s > 0.5) - (s < 0.5)
     out = {}
-    for path in sorted((folder / human_dir).glob("*.json")):
-        data = json.loads(path.read_text(encoding="utf-8"))
-        person = {u: next(iter(o.values()))["score"] for u, o in data["verdicts"].items()
+    records = judgements.read(folder, human_dir)
+    for name, verdicts in judgements.by_rater(records).items():
+        claims = [r for r in judgements.answered(records, "claim") if r.rater == name]  # a person sees one order
+        person = {u: next(iter(o.values()))["score"] for u, o in verdicts.items()
                   if next(iter(o.values()))["score"] is not None}
         both = sorted(set(person) & set(judges))
         agree = sum(lean(person[u]) == lean(judges[u]) for u in both)
@@ -770,19 +770,18 @@ def anchor(folder, human_dir="verdicts-human", verdicts_dir="verdicts"):
         # Claims marked one by one: the share marked wrong on each side, a measure of each set on its
         # own (a preference between two sets isn't); one rater's view, weighed like any other.
         marked = {"baseline": Counter(), "variant": Counter()}
-        for orders in data["verdicts"].values():
-            for side, claims in (next(iter(orders.values())).get("claims") or {}).items():
-                marked[side].update(c["mark"] for c in claims if c["mark"])
+        for r in claims:
+            if r.answer["mark"]:
+                marked[r.side][r.answer["mark"]] += 1
         wrong = {side: {**dict(c), "wrong_share": round(c["wrong"] / sum(c.values()), 3) if sum(c.values()) else None}
                  for side, c in marked.items()}
         # Where a judge marked claims too (rubric v5): agreement claim by claim, "unsure" left out.
         judged = _judge_claim_marks(folder, verdicts_dir)
-        pairs = [(c["mark"], judged[(u, side, c["index"])]) for u, orders in data["verdicts"].items()
-                 for side, claims in (next(iter(orders.values())).get("claims") or {}).items() for c in claims
-                 if (u, side, c["index"]) in judged and "unsure" not in (c["mark"], judged[(u, side, c["index"])])
-                 and c["mark"]]
+        pairs = [(r.answer["mark"], judged[(r.unit, r.side, r.index)]) for r in claims
+                 if (r.unit, r.side, r.index) in judged and r.answer["mark"]
+                 and "unsure" not in (r.answer["mark"], judged[(r.unit, r.side, r.index)])]
         claim_agreement = {"claims": len(pairs), "same": sum(a == b for a, b in pairs)} if pairs else None
-        out[data["reviewer"]] = {"units": len(both), "same_lean": agree, "opposite": opposite, "claims_marked": wrong,
+        out[name] = {"units": len(both), "same_lean": agree, "opposite": opposite, "claims_marked": wrong,
                                  "claim_agreement_with_judges": claim_agreement,
                                  "person_win_rate": fmt(interval([person[u] for u in both], clusters=list(map(region, both)))),
                                  "judges_win_rate": fmt(interval([judges[u] for u in both], clusters=list(map(region, both)))),
@@ -841,11 +840,10 @@ def region(unit):
 def unsettled(folder, reviewers, limit=None, verdicts_dir="verdicts"):
     """Units (of the first `limit`) that the given judges leave unsettled, for a second judge:
     one of them lacks an order (a failed verdict), flipped with the order, or they disagree."""
-    from .review import reviewer_file
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    files = [folder / verdicts_dir / f"{reviewer_file(r)}.json" for r in reviewers]
-    verdicts = [json.loads(f.read_text(encoding="utf-8"))["verdicts"] if f.exists() else {} for f in files]
+    judged = judgements.by_rater(judgements.read(folder, verdicts_dir))
+    verdicts = [judged.get(r, {}) for r in reviewers]
     out = set()
     for item in batch["items"][:limit]:
         leanings = set()
@@ -870,8 +868,8 @@ def unit_scores(folder, limit=None, verdicts_dir="verdicts"):
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     allowed = {i["id"] for i in batch["items"][:limit]}
     scores = defaultdict(list)
-    for path in sorted((folder / verdicts_dir).glob("*.json")):
-        for unit, orders in json.loads(path.read_text(encoding="utf-8"))["verdicts"].items():
+    for judge in judgements.by_rater(judgements.read(folder, verdicts_dir)).values():
+        for unit, orders in judge.items():
             # Each judge's two orders first, so its position bias cancels; a judge with one order
             # only (the other failed) would bring its bias in, so it sits that unit out.
             if unit in allowed and len(orders) == 2:

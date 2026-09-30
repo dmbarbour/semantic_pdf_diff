@@ -278,6 +278,7 @@ def main(argv=None):
 
     def ask(v, model, upto, only=None, retry_failed=False, step="judge", verdicts_dir="verdicts"):
         """One judge over a variant's first `upto` units; raises Paused at the cap or out of budget."""
+        from semantic_pdf_diff.judgements import ModelJudge
         from semantic_pdf_diff.llm import folder_client
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
@@ -289,8 +290,9 @@ def main(argv=None):
                                      retries=int(spec.get("judge_retries", 2)), max_cost=remaining())
         with folder_client(batch, settings) as client:
             client.ledger = Ledger(LEDGER, round=name, step=step, variant=v, judge=model)
-            _, _, failures = rounds.judge_pairs(batch, client, model, limit=upto, rubric=rubric, only=only,
-                                                retry_failed=retry_failed, verdicts_dir=verdicts_dir)
+            judge = ModelJudge(client, model, rubric, verdicts_dir)
+            judge.rate(batch, limit=upto, only=only, retry_failed=retry_failed)
+            failures = judge.errors
         # Failed verdicts over the whole round, not the last call's (the audit, 2026-09-28: each call
         # overwrote the count, so an escalation judge's failures read 0).
         key = f"{step}:{v}:{model}"

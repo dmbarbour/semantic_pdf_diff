@@ -1,6 +1,6 @@
 # Content-addressed queries, checks and records
 
-- **Status:** Active (2026-09-30): milestones 1–5 done; 6 under way.
+- **Status:** Active (2026-09-30): milestones 1–6 done. Left: removing the re-keying code once nothing needs it.
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md), whose keys this replaces; [query improvement](query-improvement-2026-09-26.md), whose rounds get the checks.
 - **Feeds:** every later round; the [weighted quality estimates](README.md) (judgement records); a lever search (plans index).
 - **Why:**
@@ -234,7 +234,7 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
   - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
   - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
 
-- **Milestone 6 (2026-09-30): under way.**
+- **Milestone 6 (2026-09-30): done.**
   - **Golden judge prompts:** every rubric's pairwise prompt (v1–v6) and the review panel's prompts, byte for byte, on fixed items (`tests/golden/`).
   - **Folder fixtures:** each round batch, spot check and review batch keeps every model answer its evaluation asked for in its own `replay.zip`, keyed like the main fixture. That covers judges, escalation, confirmation, query checks and the post-mortem's analyst. A rerun pays only for what's missing; packing is reproducible, so a replay leaves the zip's bytes alone.
   - **One set of evaluator settings** (`models.EVALUATOR_SETTINGS`): judging live and replaying ask the same queries.
@@ -244,6 +244,14 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
     - **Review batches s01 and s02** (local only): 35 of 469 carried; their prompts have changed since.
     - The 2,685 cache files are gone from the tree; 29 zips of 1.2 MB replace them.
   - **Checked:** judging every round batch again offline gives its committed verdicts exactly. Tests do this for a batch of each rubric (v1–v4) and for the post-mortem's reading.
+  - **Judgement records** (`judgements.py`): each record has a rater and its kind (model, person, check), a question (pair, claim, quote), a target (unit, order, side, claim index), an answer, and a status with attempts.
+    - Verdict files keep their layout, so rounds can still be re-decided from them alone. The adapter is the one reader of that layout: unit scores, unsettled units, claim marks, the people-against-judges comparison and insights all read records now.
+    - The same outputs, byte for byte, on all 31 committed batches before and after.
+  - **Raters:** `ModelJudge` (the round runner and spot checks use it), `Person` (spot-check imports), and `QuoteCheck`.
+    - The quote check is a mechanical rater: is each claim's quote on its page, read as extraction's quote matching reads excerpts? It's a heuristic, weighed as one.
+  - **The rule for asking again after a failure lives in one place** (`judgements.ask_again`).
+  - **Found and fixed:** every verdicts folder shared one failures file per judge. A unit that failed twice under one rubric would never have been asked under another. sc01 has seven such verdicts for MiMo (five units), so its v6 re-judge would have skipped them. Failures are now kept per verdicts folder (`failures-v6/` for `verdicts-v6/`).
+  - **The rubric object: not worth it now** (Claude's call). A rubric is data (`RUBRICS`) plus two pure functions: `pair_requests` builds its queries and `pair_verdict` reads its answers. The goldens and replays hold both, so a class would add nothing yet.
 
 ## Decisions (2026-09-28)
 

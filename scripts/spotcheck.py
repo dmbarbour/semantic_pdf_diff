@@ -83,6 +83,7 @@ def main(argv=None):
                            limit=args.claims)
         print(f"Context added; page: {rounds.write_spotcheck(args.folder)}")
     elif args.command == "judge":
+        from semantic_pdf_diff.judgements import ModelJudge
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff.llm import folder_client
         from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
@@ -93,8 +94,8 @@ def main(argv=None):
                                          concurrency=16, timeout=900, retries=0, max_cost=args.max_cost)
             with folder_client(args.folder, settings) as client:
                 client.ledger = Ledger(LEDGER, round="spotcheck", step="judge", variant=args.folder.name, judge=model)
-                return rounds.judge_pairs(args.folder, client, model, rubric=args.rubric, only=only,
-                                          retry_failed=retry_failed, verdicts_dir=verdicts(args.rubric))
+                return ModelJudge(client, model, args.rubric, verdicts(args.rubric)).rate(args.folder, only=only,
+                                                                                         retry_failed=retry_failed)
         for model in judges:
             ask(model)
             ask(model, retry_failed=True)
@@ -105,7 +106,11 @@ def main(argv=None):
                 ask(model, only=unsettled, retry_failed=True)
         print(json.dumps(rounds.decide(args.folder, verdicts_dir=verdicts(args.rubric), documents=DOCUMENTS), indent=2))
     elif args.command == "import":
-        print(f"Imported: {rounds.import_spotcheck(args.folder, args.answers)}")
+        from semantic_pdf_diff.judgements import Person
+        person = Person(args.answers)
+        records = person.rate(args.folder)
+        print(f"Imported {person.name}: {sum(r.question == 'pair' for r in records)} units, "
+              f"{sum(r.question == 'claim' for r in records)} claims marked")
     else:
         print(json.dumps(rounds.anchor(args.folder, verdicts_dir=verdicts(args.rubric)), indent=2))
     return 0

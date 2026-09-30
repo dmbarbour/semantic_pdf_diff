@@ -16,6 +16,7 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from . import judgements
 from .rounds import FAMILY
 
 def _issues(runs_dir, run, content, page, family):
@@ -47,10 +48,7 @@ def analyse(folder, limit=None):
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     items = batch["items"][:limit]
-    verdicts = {}
-    for path in sorted((folder / "verdicts").glob("*.json")):
-        data = json.loads(path.read_text(encoding="utf-8"))
-        verdicts[data["reviewer"]] = data["verdicts"]
+    verdicts = judgements.by_rater(judgements.read(folder))
     units = []
     for item in items:
         by_judge = {j: v[item["id"]] for j, v in verdicts.items() if item["id"] in v}
