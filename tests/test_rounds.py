@@ -368,6 +368,13 @@ class Rounds(unittest.TestCase):
             quoted = rounds.collect(Path(d) / 'quoted')
             self.assertNotEqual(set(base[visual]['claims']), set(quoted[visual]['claims']))  # only the quote differs
 
+    def test_gains_are_measured_against_the_baseline(self):
+        measured = rounds.gains(self.root / 'baseline', self.root / 'variant')
+        base = rounds.mechanical(self.root / 'baseline')['all']['distinct_claims']
+        var = rounds.mechanical(self.root / 'variant')['all']['distinct_claims']
+        self.assertAlmostEqual(measured['claims'], round((var - base) / base, 4))
+        self.assertIsNone(measured['tokens'])  # no fixture: tokens can't be measured
+
     def test_batches_record_their_checks(self):
         folder = self.root / 'checked-batch'
         batch = rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=6, limit=1,

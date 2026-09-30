@@ -10,6 +10,8 @@ A round is a folder, e.g. benchmarks/rounds/r01/, holding round.json:
      "rubric": "v6",                             # judging rubric (rounds.RUBRICS); default v1
      "query_checks": {"sample": 30, "cap": 2.0}, # strong models check what each variant changed first
                                                  # (models: QUERY_CHECKERS unless given); held until accepted
+     "criteria": {"role": "development",         # how the round decides (models.Criteria), set before
+                  "gain": {"metric": "tokens", "change": -0.10}},  # judging and locked once it starts
      "escalate": ["Qwen/Qwen3.5-397B-A17B"],     # second opinions on units the main judges leave unsettled
      "confirm_judges": [], "confirm_units": 16,  # expensive judges for accepted variants, when wanted
      "judges": ["XiaomiMiMo/MiMo-V2.6-Pro"]}    # the main judges see every unit
@@ -56,8 +58,11 @@ def main(argv=None):
     from semantic_pdf_diff import insights, ledger, rounds
     import record_runs
 
+    from semantic_pdf_diff.models import Criteria, RoundSpec
     folder = args.round.resolve()
-    spec = json.loads((folder / "round.json").read_text())
+    # Validated: a mistyped key fails here rather than taking a default. Kept as a dict (with every
+    # default filled in) for the steps below.
+    spec = RoundSpec.model_validate_json((folder / "round.json").read_text()).model_dump()
     name = spec["name"]
     state_path = folder / "state.json"
     state = json.loads(state_path.read_text()) if state_path.exists() else {"steps": {}}
@@ -162,7 +167,7 @@ def main(argv=None):
             dump_dir = folder / f"queries-{v}"
             summary = queries.dump(runs_root / v, dump_dir, against=runs_root / "baseline",
                                    sample=int(checks.get("sample", 30)))
-            for model in checks.get("models", QUERY_CHECKERS):
+            for model in checks.get("models") or QUERY_CHECKERS:
                 left = min(remaining(), cap - ledger.spent(LEDGER, round=name, step="check"))
                 if left <= 0:
                     state["paused"] = f"the query checks' cap (${cap:.2f}) reached while checking {v}"
@@ -233,6 +238,22 @@ def main(argv=None):
     #    unsettled (a failed verdict, a flip with the order, disagreement); failed verdicts are
     #    asked once more when a variant's sample is done. "confirm_judges" (expensive) judge the
     #    first "confirm_units" units of an accepted variant, as a separate check.
+    # The criteria are set in advance: fixed when judging starts, and a later change is refused.
+    if judges and wanted("judge"):
+        try:
+            rounds.lock_criteria(state, spec["criteria"])
+        except ValueError as e:
+            print(f"Refusing: {e}")
+            return 2
+        save_state()
+    criteria = Criteria.model_validate(state.get("criteria") or spec["criteria"])
+    measured = {}
+
+    def gains_of(v):  # measured once per variant, for a gain named in the criteria
+        if v not in measured:
+            measured[v] = rounds.gains(runs_root / "baseline", runs_root / v, FIXTURE) if criteria.gain else {}
+        return measured[v]
+
     judged = state.setdefault("judged", {})    # variant -> units judged by every judge
     stopped = state.setdefault("stopped", {})  # variant -> why judging stopped
     rubric = spec.get("rubric", "v1")
@@ -292,7 +313,7 @@ def main(argv=None):
     def finish_variant(v, reason):
         batch = folder / f"pairs-{v}"
         stopped[v] = reason
-        result = rounds.decide(batch, judged[v], documents=DOCUMENTS)
+        result = rounds.decide(batch, judged[v], documents=DOCUMENTS, criteria=criteria, gains=gains_of(v))
         (batch / "decision.json").write_text(json.dumps({**result, "stopped": reason}, indent=2) + "\n")
         insights.analyse(batch, judged[v])  # the clues to why: agreement, changes, issues, tags, remarks
         if result["overall"]:
@@ -313,7 +334,8 @@ def main(argv=None):
         units = min(int(spec.get("confirm_units", 16)), judged[v])
         for model in judges_:
             ask(v, model, units, step="confirm", verdicts_dir="verdicts-confirm")
-        result = rounds.decide(batch, units, verdicts_dir="verdicts-confirm", documents=DOCUMENTS)
+        result = rounds.decide(batch, units, verdicts_dir="verdicts-confirm", documents=DOCUMENTS, criteria=criteria,
+                               gains=gains_of(v))
         (batch / "decision-confirm.json").write_text(json.dumps({**result, "judges": judges_}, indent=2) + "\n")
         if result["overall"]:
             figure("win_rate_confirm", result["overall"], variant=v, stratum="all", step="confirm", units=units)
@@ -333,7 +355,7 @@ def main(argv=None):
                     judged[v] = upto
                     state.pop("paused", None)
                     save_state()
-                    result = rounds.decide(batch, upto, documents=DOCUMENTS)
+                    result = rounds.decide(batch, upto, documents=DOCUMENTS, criteria=criteria, gains=gains_of(v))
                     if result["overall"]:
                         figure("win_rate_interim", result["overall"], variant=v, stratum="all", step="judge", units=upto)
                     if early and upto >= minimum and result["decision"].startswith(("accepted", "rejected")):

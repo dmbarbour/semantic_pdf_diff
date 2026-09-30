@@ -1,6 +1,6 @@
 # Content-addressed queries, checks and records
 
-- **Status:** Active (2026-09-29): milestones 1–4 done.
+- **Status:** Active (2026-09-30): milestones 1–5 done.
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md), whose keys this replaces; [query improvement](query-improvement-2026-09-26.md), whose rounds get the checks.
 - **Feeds:** every later round; the [weighted quality estimates](README.md) (judgement records); a lever search (plans index).
 - **Why:**
@@ -217,6 +217,18 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
   - **A test** builds one page stored upright and again sideways with /Rotate, and checks it gets the same queries and the same situating context.
   - **The latent situating bug is fixed:** a figure's surroundings were split into before and after by stored, not displayed, position, so rotated sheets got the wrong side. It's a separate commit. Its snapshot shows it changed no query on the slices: their rotated sheets' figures are whole sheets, which have no surroundings. The test shows the fix on a figure inside a rotated page.
   - **Two meta-audit items were already fixed by milestone 2:** table numbering (task IDs are only labels now) and the locator thumbnail (its bytes are in the hash).
+- **Milestone 5 (2026-09-30): done.**
+  - **One claim identity:** a unit's claim is its reading's ID plus its quote (`_id`), used by sampling, the v6 grouping, spot-check matching and insights alike. A lever that changes only quotes now changes its units. `_claim` links the merged claim.
+  - **Batch checks:** units are the same whichever side is the baseline, and every claim was read by a task of its unit's kind; either failing raises. Bands now take a shared claim's position symmetrically. Also recorded, and reported by the runner: unique claims a sample hides, changed units outside the differing settings' reach, and units of no document family.
+  - **Decision rules are pure:** `rounds.decide_scores`, under `models.Criteria`.
+  - **They're simulated in the tests** (`tests/test_decisions.py`), with round 9's A/A unit scores as the null:
+    - a lever with no effect is accepted 5.8% of the time, and lands on "no worse" 11%
+    - "no worse" is accepted only when a gain named in advance is met
+    - with five variants in a round, some null lever is accepted in 26% of rounds
+    - promotion through the example held-out rule (mean above 0.5, no stratum loss) happens in 12.5% of rounds; through a held-out that must win again, in 1.4%
+    - a real effect with a true rate of 0.60, 0.65 or 0.70 is found 35%, 58% or 78% of the time at 32 units
+  - **Typed round spec:** `models.RoundSpec` validates `round.json`, so a typo fails. Criteria (role, thresholds, a named gain, the held-out rule) are fixed when judging starts, and the runner refuses a later change. Gains (tokens, distinct claims) are measured against the baseline.
+  - **Open for the owner:** which held-out rule is the default. The example rule is cheap to pass (12.5% false promotion with five variants); winning again is strict (1.4%), and costs power.
   - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
   - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
 

@@ -870,71 +870,128 @@ def unit_scores(folder, limit=None, verdicts_dir="verdicts"):
                 scores[unit].append(sum(v["score"] for v in orders.values()) / 2)
     return {u: sum(s) / len(s) for u, s in scores.items() if s}
 
-# Acceptance (docs/plans/query-improvement): win clearly overall, lose clearly nowhere.
-WIN_LOW = 0.50          # the overall interval must lie above this to call it a win...
-NONINFERIOR_LOW = 0.45  # ...or at least above this for "no worse" (then it needs another gain, e.g. cost)
-STRATUM_LOSS_HIGH = 0.45  # a stratum whose interval lies entirely below this blocks the variant...
-STRATUM_MIN_UNITS = 6     # ...if it has at least this many units (two lost units would otherwise block)
-BORDERLINE = 0.03         # a bound this close to its threshold marks the call borderline
-WATCH_MIN_UNITS = 10      # a non-blocking stratum with a mean below STRATUM_LOSS_HIGH on this many units is watched
+# Acceptance (docs/plans/query-improvement): win clearly overall, lose clearly nowhere; the thresholds
+# are a round's criteria (models.Criteria), set in round.json before judging.
 
-def decide(folder, limit=None, verdicts_dir="verdicts", documents=None):
-    """Win rates with intervals, overall and per stratum, and the acceptance decision
-    (over the first `limit` units when judging is still in progress).
+def decide(folder, limit=None, verdicts_dir="verdicts", documents=None, criteria=None, gains=None):
+    """Win rates with intervals, overall and per stratum, and the decision under `criteria` (over the
+    first `limit` units when judging is still in progress): decide_scores on a batch's files.
 
     Strata are the kinds of region (text, table, visual) and, given `documents` ({slice name:
     family}, from scripts/slices.json), the document families (reports, drawings, ...), as the
-    plan stratifies; either kind of stratum can block."""
+    plan stratifies; either kind of stratum can block. gains: measured changes, for a named gain."""
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     scores = unit_scores(folder, limit, verdicts_dir)
     family = {i["id"]: i["family"] for i in batch["items"]}
     document = {i["id"]: (documents or {}).get(i.get("run")) for i in batch["items"]}
+    return decide_scores(scores, family, document, batch["units"], criteria, gains)
+
+def decide_scores(scores, family, document, units, criteria=None, gains=None):
+    """The decision on unit scores ({unit id: score}), pure: family and document give each unit's
+    strata, units the batch's counts (units, unchanged, changed_by_kind), gains the measured
+    relative changes by metric. tests/test_decisions.py simulates it under the null."""
+    from .models import Criteria
+    c = criteria or Criteria()
     overall = interval(list(scores.values()), clusters=[region(u) for u in scores])
     strata, sizes = {}, {}
     for f in sorted(set(family.values())) + sorted({d for d in document.values() if d}):
-        units = [u for u in scores if f in (family.get(u), document.get(u))]
-        if units:
-            strata[f], sizes[f] = interval([scores[u] for u in units], clusters=[region(u) for u in units]), len(units)
-    losing = [f for f, (_, _, high) in strata.items() if high < STRATUM_LOSS_HIGH and sizes[f] >= STRATUM_MIN_UNITS]
+        ids = [u for u in scores if f in (family.get(u), document.get(u))]
+        if ids:
+            strata[f], sizes[f] = interval([scores[u] for u in ids], clusters=[region(u) for u in ids]), len(ids)
+    losing = [f for f, (_, _, high) in strata.items() if high < c.stratum_loss_high and sizes[f] >= c.stratum_min_units]
+    gain = None
+    if c.gain is not None and (gains or {}).get(c.gain.metric) is not None:
+        measured = gains[c.gain.metric]
+        gain = {"metric": c.gain.metric, "change": measured,
+                "met": measured <= c.gain.change if c.gain.change < 0 else measured >= c.gain.change}
     if overall is None:
         verdict = "no data"
     elif losing:
         verdict = "rejected: loses in " + ", ".join(losing)
-    elif overall[1] > WIN_LOW:
+    elif c.role == "held-out":
+        verdict = ("accepted: holds out" if overall[0] > c.held_out_mean
+                   else f"rejected: doesn't hold out (mean {overall[0]:.3f})")
+    elif overall[1] > c.win_low:
         verdict = "accepted: wins"
-    elif overall[1] >= NONINFERIOR_LOW:
-        verdict = "no worse: accept only with another gain (e.g. cost)"
-    elif overall[2] < WIN_LOW:
+    elif overall[1] >= c.noninferior_low:
+        verdict = (f"accepted: no worse, with its gain ({gain['metric']} {gain['change']:+.1%})" if gain and gain["met"]
+                   else "no worse: accept only with a gain named in advance")
+    elif overall[2] < c.win_low:
         verdict = "rejected: loses"
     else:
         verdict = "inconclusive"
     # A bound this close to a threshold could fall either side with a few more units, another
     # judge or another interval method: such calls are reported, not trusted on their own.
-    near = lambda x, threshold: abs(x - threshold) < BORDERLINE
+    near = lambda x, threshold: abs(x - threshold) < c.borderline
     borderline = [] if overall is None else (
-        [f"overall low {overall[1]:.3f} near {t}" for t in (WIN_LOW, NONINFERIOR_LOW) if near(overall[1], t)]
-        + ([f"overall high {overall[2]:.3f} near {WIN_LOW}"] if near(overall[2], WIN_LOW) else [])
-        + [f"{f} high {high:.3f} near {STRATUM_LOSS_HIGH}" for f, (_, _, high) in strata.items()
-           if sizes[f] >= STRATUM_MIN_UNITS and near(high, STRATUM_LOSS_HIGH)])
+        [f"overall low {overall[1]:.3f} near {t}" for t in (c.win_low, c.noninferior_low) if near(overall[1], t)]
+        + ([f"overall high {overall[2]:.3f} near {c.win_low}"] if near(overall[2], c.win_low) else [])
+        + [f"{f} high {high:.3f} near {c.stratum_loss_high}" for f, (_, _, high) in strata.items()
+           if sizes[f] >= c.stratum_min_units and near(high, c.stratum_loss_high)])
     # Strata that don't block but lean to a loss on enough units to look into (the stratum rule has
     # little power: a stratum at 0.35-0.40 is blocked only 14-25% of the time at 6-13 units).
-    watch = [f for f, (mean, _, _) in strata.items() if mean < STRATUM_LOSS_HIGH and sizes[f] >= WATCH_MIN_UNITS
+    watch = [f for f, (mean, _, _) in strata.items() if mean < c.stratum_loss_high and sizes[f] >= c.watch_min_units
              and f not in losing]
     # Sampling is round-robin over kinds, so small kinds are over-represented; this weighs each kind's
     # mean by how many of its units changed, as an estimate over all changed units.
-    by_kind = batch["units"].get("changed_by_kind") or {}
+    by_kind = units.get("changed_by_kind") or {}
     kinds = {f: strata[f][0] for f in set(family.values()) if f in strata and by_kind.get(f)}
     weighted = (sum(by_kind[f] * m for f, m in kinds.items()) / sum(by_kind[f] for f in kinds)) if kinds else None
     fmt = lambda t: None if t is None else {"mean": round(t[0], 3), "low": round(t[1], 3), "high": round(t[2], 3)}
-    units = batch["units"]
     changed = units["units"] - units["unchanged"]
     # Win rates are over changed units only: coverage says how much of the output a lever touches.
     return {"units_judged": len(scores), "regions_judged": len({region(u) for u in scores}), "overall": fmt(overall),
             "strata": {f: fmt(t) for f, t in strata.items()},
-            "strata_units": sizes, "decision": verdict, "borderline": borderline, "watch": watch,
+            "strata_units": sizes, "decision": verdict, "accepted": verdict.startswith("accepted"),
+            "role": c.role, "gain": gain, "borderline": borderline, "watch": watch,
             "overall_weighted_by_changed": None if weighted is None else round(weighted, 3), "units": units,
             "coverage": round(changed / units["units"], 3) if units["units"] else None}
+
+def lock_criteria(state, criteria):
+    """Criteria are fixed when judging starts (the owner's decision A: set in advance): the first call
+    records them in the round's state, later ones refuse any change (ValueError)."""
+    fixed = state.get("criteria")
+    if fixed is None:
+        state["criteria"] = criteria
+    elif fixed != criteria:
+        changed = sorted(k for k in set(fixed) | set(criteria) if fixed.get(k) != criteria.get(k))
+        raise ValueError(f"the round's criteria changed after judging started ({', '.join(changed)}); "
+                         "they're set in advance: start a new round to decide by others")
+    return state["criteria"]
+
+def gains(baseline_dir, variant_dir, fixture=None):
+    """Measured relative changes a named gain can refer to (models.Gain): "claims" (distinct claims)
+    and, given the fixture the runs were replayed from, "tokens" (prompt and completion tokens of the
+    queries the runs made). None where it can't be measured."""
+    import sqlite3
+    from .store import Store
+    def claims(runs_dir):
+        return mechanical(runs_dir).get("all", {}).get("distinct_claims")
+    def tokens(runs_dir):
+        if not fixture or not Path(fixture).exists():
+            return None
+        queries = set()
+        for folder in (p for p in Path(runs_dir).iterdir() if (p / "store.sqlite").exists()):
+            with Store(folder) as store:
+                queries |= {q["hash"] for q in store.queries()}
+        db = sqlite3.connect(f"file:{fixture}?mode=ro", uri=True)
+        total = 0
+        for query in queries:
+            row = db.execute("SELECT usage FROM response WHERE query=? AND sample=0 ORDER BY rowid LIMIT 1", (query,)).fetchone()
+            if row:
+                usage = json.loads(row[0])
+                total += int(usage.get("prompt_tokens") or 0) + int(usage.get("completion_tokens") or 0)
+        db.close()
+        return total
+    out = {}
+    for metric, measure in (("claims", claims), ("tokens", tokens)):
+        try:
+            a, b = measure(baseline_dir), measure(variant_dir)
+        except Exception:  # stores from before a schema change, for instance
+            a = b = None
+        out[metric] = round((b - a) / a, 4) if a and b is not None else None
+    return out
 
 # --- mechanical figures (free: from the replay stores and the fixture) ---------------------
 

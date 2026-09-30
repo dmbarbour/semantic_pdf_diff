@@ -223,6 +223,7 @@ Round 1 showed that asking the same question again often gets a different answer
 - **Promotion (A, approved):**
   - A lever reaches the defaults only after a combination round and a held-out check. The held-out criterion is written into `round.json` before judging (e.g. mean above 0.5 and no stratum loss), and the held-out effect is the one quoted, since development figures of accepted levers are inflated by selection.
   - "No worse" needs a gain named in advance, with its metric and threshold.
+  - **Built (2026-09-30):** `criteria` in `round.json` (`models.Criteria`: role, thresholds, named gain, held-out rule), fixed when judging starts. Simulated rates are in the [content-addressed queries plan](content-addressed-queries-2026-09-28.md). The default held-out rule is open.
   - **No lever is forgotten:** the [lever index](../reviews/levers.md) is the catalogue.
     - Every idea gets a row when it's raised, built or not.
     - Levers not accepted or parked are tried again against later champions, since a baseline that moved can change the answer.
