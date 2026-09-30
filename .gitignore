@@ -14,5 +14,6 @@ benchmarks/batches/*/replay.zip
 benchmarks/batches/*/questions.html
 benchmarks/report.html
 benchmarks/rounds/*/insights.html
+benchmarks/eyetest/images/
 benchmarks/spotchecks/*/spotcheck.html
 benchmarks/spotchecks/*/sources/

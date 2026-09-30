@@ -177,14 +177,15 @@ class Request:
     description: dict | None = None  # facts about the query's content (describe)
 
 @contextmanager
-def folder_client(folder, settings, mode="replay-or-record"):
+def folder_client(folder, settings, mode="replay-or-record", responder=None):
     """A client whose answers are recorded in a folder's own fixture (fixtures.folder_fixture):
     judges, the post-mortem's analyst and query checkers, each folder apart from the main fixture.
-    Answers already recorded are served; the rest are asked (in replay mode: fail as unrecorded)."""
+    Answers already recorded are served; the rest are asked (in replay mode: fail as unrecorded).
+    responder: whose answers they are (default: the model's name), e.g. a model at another host."""
     from .fixtures import folder_fixture
     fixture = folder_fixture(folder)
     try:
-        yield Client(settings, None, fixture=fixture, mode=mode)
+        yield Client(settings, None, fixture=fixture, mode=mode, responder=responder)
     finally:
         fixture.close()
 
