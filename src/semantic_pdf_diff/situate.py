@@ -289,15 +289,20 @@ def resolve(figures, unresolved):
     return gained, still
 
 def surroundings(page, bbox, limit=1500):
-    """(text before, text after) a figure on its page, outside it, in reading order."""
+    """(text before, text after) a figure on its page, outside it, in reading order as displayed:
+    on a rotated sheet, "before" is above the figure as a reader sees it, not above it in the
+    page's stored coordinates (the meta-audit, 2026-09-28; upright pages are unchanged)."""
+    from .pages import reading_blocks
     before, after = [], []
-    middle = (bbox[1] + bbox[3]) / 2
-    for block in page.get_text("blocks", sort=True):
+    figure = shown(page, bbox)
+    middle = (figure.y0 + figure.y1) / 2
+    for block in reading_blocks(page):
         text = " ".join(block[4].split()) if block[6] == 0 else ""
         box = tuple(block[:4])
         if not text or _overlap(box, bbox) > 0.5 * _area(box):
             continue
-        (before if (box[1] + box[3]) / 2 < middle else after).append(text)
+        at = shown(page, box)
+        (before if (at.y0 + at.y1) / 2 < middle else after).append(text)
     return " ".join(before)[-limit:], " ".join(after)[:limit]
 
 def position(page, figure):

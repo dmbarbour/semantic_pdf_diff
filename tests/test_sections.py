@@ -404,6 +404,8 @@ class SectionContext(unittest.TestCase):
             self.assertTrue(any('Above the table: ...' in p and 'Pump schedule for the chilled water loop:' in p
                                 for p in prompts[False]))
             self.assertEqual(prompts[False], prompts[True])
+            self.assertIn('Text above the figure', around[False][0])
+            self.assertEqual(around[False], around[True])  # a figure's surroundings too (situating)
 
     def rotated_sheet(self, path):
         """A page rotated 90° (like the drawing sets): a sentence displayed above a table, a note beside it."""

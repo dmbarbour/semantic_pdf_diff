@@ -1,6 +1,6 @@
 # Content-addressed queries, checks and records
 
-- **Status:** Active (2026-09-28): milestones 1–3 done.
+- **Status:** Active (2026-09-29): milestones 1–4 done.
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md), whose keys this replaces; [query improvement](query-improvement-2026-09-26.md), whose rounds get the checks.
 - **Feeds:** every later round; the [weighted quality estimates](README.md) (judgement records); a lever search (plans index).
 - **Why:**
@@ -210,6 +210,13 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
   - **Rounds:** `query_checks` in `round.json` adds a step after replay. It dumps each variant against the baseline, runs the checkers within a cap, and holds the round (exit 4) on flags in what changed, until fixed or accepted (`--accept-checks`).
   - **Checkers:** Gemini 3.1 Pro and MiMo-V2.6-Pro, after a trial. Both flagged real problems in the stems lever (figure panel labels taken for numbered items; section and stem disagreeing), plus the same false positive. Leads outside the change went into the [lever index](../reviews/levers.md) as ideas.
   - **Spend:** the trials cost $2.11.
+- **Milestone 4 (2026-09-29): done.**
+  - **`pages.py` owns page coordinates:** the stored (unrotated) and displayed frames, display position, reading order. Every conversion in extract, situate, review and rounds goes through it.
+  - **`extract.Context`:** one provider per lever (neighbouring text, table lead-in, stems, references, the tile locator), composed in the order queries always had. The judges' "It sits under:" line now comes from the extractor's own stem path instead of a copy.
+  - **No query changed:** `scripts/query_snapshot.py` records every query under three configurations (the defaults, round 0's levers, every optional lever on). 11,695 queries came out identical before and after.
+  - **A test** builds one page stored upright and again sideways with /Rotate, and checks it gets the same queries and the same situating context.
+  - **The latent situating bug is fixed:** a figure's surroundings were split into before and after by stored, not displayed, position, so rotated sheets got the wrong side. It's a separate commit. Its snapshot shows it changed no query on the slices: their rotated sheets' figures are whole sheets, which have no surroundings. The test shows the fix on a figure inside a rotated page.
+  - **Two meta-audit items were already fixed by milestone 2:** table numbering (task IDs are only labels now) and the locator thumbnail (its bytes are in the hash).
   - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
   - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
 
