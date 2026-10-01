@@ -56,6 +56,10 @@
   - split the table before row *i*
   - column *j* labels the rows
 - **Mechanical checks:** edits only restructure existing cells, so no text can be added or lost. A repair that leaves hazards unresolved is recorded, and those rows fall back to row-by-row reading.
+- **Checking the cell text by vision** (the owner: "Perhaps assume it is, but verify at least one row via vision"):
+  - The repair query also transcribes at least one row from the image: the first body row, and a row with symbols, units or the longest cell.
+  - Compared with the text layer's cells (folded for case, whitespace and dash and quote forms), a mismatch is a hazard ("text layer and image disagree"). The table's rows are then read one by one with the image, and the case is kept for review.
+  - Hazards found this way include missing glyphs (∂, θ, ±), ligatures, text drawn as outlines, overlapping text, and a column read out of place.
 - **Scans without a text layer** stay with the vision tiles for now.
 
 **3. Spreadsheets, CSV, and later `.docx` and `.pptx` tables:** their adapters fill the same representation. Cells and spans are native; regions come from the multi-format plan's region detection and sheet maps. Their hazards are the same list.
@@ -71,7 +75,7 @@
     - free text (a cell needs reading)
   - **Roles:** where the entity, attribute, value, unit and conditions come from: a column, a row label, a header path, a section row, the caption, or a constant.
   - **Composites:** composite columns (value ± uncertainty; min, nominal, max) and cells holding several values.
-  - **A strategy:** iterate (apply to every row), per-row (read each row), or summarise (statistics over columns, marked derived).
+  - **A strategy:** iterate (apply to every row) or per-row (read each row). Summarise (statistics over columns, marked derived) is deferred.
   - **Example claims** for three sample rows.
 - **Applied mechanically:**
   - Each claim's quote is its cells' text, and its locator the cells' boxes or references.
@@ -98,7 +102,8 @@
    - No model calls yet.
    - The rendering is shown in query dumps beside each table's crop.
    - Measured by structure recovered on the synthetic tables. A query snapshot shows which real row queries change when wrapped rows merge.
-2. **Model repair of PDF table structure,** with its mechanical checks. Measured on the synthetic tables and on the real tables of the development slices.
+2. **Model repair of PDF table structure,** with its mechanical checks and the vision check of cell text. Measured on the synthetic tables and on the real tables of the development slices.
+   - **Is cell text adequate?** The owner: "we should generally investigate whether cell text is adequate." Every development-slice table gets its sampled rows transcribed by vision, and the disagreements are counted per document and per kind of hazard. That rate decides whether one checked row per table is enough.
 3. **The rules and their mechanical application,** with checks and row-by-row fallback. Behind the `table_model` setting, judged in a round against today's row queries.
 4. **Spreadsheets and CSV through the same path** (the multi-format plan's `.csv`/`.xlsx` milestone), with the medium test. `.docx` and `.pptx` tables follow those adapters.
 
@@ -113,8 +118,17 @@
 - **Levers that stay as they are:** entity against conditions in the instructions (the rules query gets the same guidance), and captions as context.
 - **Today's table levers carry over as context providers:** the lead-in (`table_context`), stems, and the real-table filter.
 
+## Decisions (2026-09-30)
+
+1. **Cell text comes from the text layer, checked by vision.** The owner: "I think we should generally investigate whether cell text is adequate. Perhaps assume it is, but verify at least one row via vision? Something to gain confidence."
+   - The repair query transcribes sample rows from the image, and disagreements are hazards (design item 2).
+   - Milestone 2 measures how often they occur. Scans stay with the vision tiles for now.
+2. **A case table's default claims:** one claim per output cell, with the row's input cells as conditions. The owner: "default claims seem fine, esp. if we can recognize the "input" conditions, but I'm not sure how we'd recognize which columns represent entites or input conditions without already asking a model for a claims rule."
+   - **Recognising inputs:** they can't be told apart without a model. The rules query is where the model classifies the layout and each column's role (entity, input, output, unit).
+   - **The default** is guidance in that query: for a case table, one claim per output cell with that row's inputs as conditions. It isn't something found before asking.
+   - **Heuristics as hints only:** evenly stepped values in the first columns (wind speed 14, 15, 16…) look like inputs. They're shown to the model as hints and never decide alone.
+3. **Summarise is deferred.** The owner: "we can defer summary strategies if that's the plan." The plan builds iterate and per-row first. Summarise comes after milestone 4, if long logs turn up.
+
 ## Open questions
 
-1. **Cell text from the text layer only** (the model repairs structure, never text), with scans left to the vision tiles for now? Proposed: yes.
-2. **The default shape of a case table's claims:** one claim per output cell, with the row's input cells as conditions (as the champion wrote NREL p10's claims), rather than one claim per cell? The rules can say otherwise per table, but the default decides most comparisons between sources. Proposed: one claim per output cell, inputs as conditions.
-3. **Summarise for long logs** (the multi-format plan's third strategy): its statistics are derived claims marked as such. Kept, but only after iterate and per-row work? Proposed: yes, last.
+None at present.
