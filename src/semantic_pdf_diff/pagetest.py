@@ -291,7 +291,8 @@ def run_static(folder, client, sheet, strategies=None):
     return out
 
 def run_zoom(folder, client, sheet, variant, threshold=None):
-    """[(key, page region, depth, items read, regions asked for, error)]: an overview, then the
+    """[(key, page region, depth, items read, regions asked for, error, requests that gave no close-up with
+    why)]: an overview, then the
     close-ups the model asks for, depth-first within MAX_DEPTH and QUOTA. threshold(w, h): the
     model's reading threshold in px for an image of that size (for "informed")."""
     import pymupdf
@@ -317,14 +318,19 @@ def run_zoom(folder, client, sheet, variant, threshold=None):
 
             def finish(value, error, rect=rect, depth=depth, path_id=path_id, cells=cells, key=key):
                 if error is not None:
-                    log.append((key[1], tuple(rect), depth, [], [], str(error)[:200]))
+                    log.append((key[1], tuple(rect), depth, [], [], str(error)[:200], []))
                     return
-                regions = []
-                for request in (value.zoom or [])[:MAX_ZOOMS] if depth < MAX_DEPTH else []:
-                    region = _region(request, rect, cells, page.rect)
-                    if region is not None and not any((region & r).get_area() > 0.8 * region.get_area() for r in regions):
+                regions, unused = [], []  # unused: requests that gave no close-up, kept so none vanish unseen
+                requests = list(value.zoom or []) if depth < MAX_DEPTH else []
+                for n, request in enumerate(requests):
+                    region = _region(request, rect, cells, page.rect) if n < MAX_ZOOMS else None
+                    if region is None:
+                        unused.append((str(request)[:60], "over the limit" if n >= MAX_ZOOMS else "not a usable region"))
+                    elif any((region & r).get_area() > 0.8 * region.get_area() for r in regions):
+                        unused.append((str(request)[:60], "repeats another"))
+                    else:
                         regions.append(region)
-                log.append((key[1], tuple(rect), depth, list(value.items), [tuple(r) for r in regions], None))
+                log.append((key[1], tuple(rect), depth, list(value.items), [tuple(r) for r in regions], None, unused))
                 for k, region in enumerate(regions):
                     ask(region, depth + 1, f"{path_id}.{k}")
             dispatch.submit(prompt, Found, [file], key, finish)
@@ -442,7 +448,8 @@ def results(static, zooms, tokens, threshold=None):
             answers = [a for e in log for a in e[3]]
             out["zoom"].setdefault(sid, {})[variant] = {
                 **score(sheet, answers), **_cost([e[0] for e in log], tokens),
-                "failed": sum(1 for e in log if e[5]), "depths": {d: sum(1 for e in log if e[2] == d) for d in range(MAX_DEPTH + 1)},
+                "failed": sum(1 for e in log if e[5]),
+                "zooms_unused": sum(len(e[6]) for e in log if len(e) > 6), "depths": {d: sum(1 for e in log if e[2] == d) for d in range(MAX_DEPTH + 1)},
                 **zoom_quality(sheet, log, threshold)}
     return out
 

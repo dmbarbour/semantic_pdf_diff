@@ -83,6 +83,7 @@ class Reading(unittest.TestCase):
         self.assertGreater(result["free-boxes"]["recall"], result["none"]["recall"])
         self.assertEqual(result["free-boxes"]["first_zooms_useful"], 1.0)
         self.assertEqual(result["none"]["queries"], 1)
+        self.assertEqual(result["free-boxes"]["zooms_unused"], 0)
         detail = pagetest.Sheet("archd-detail", 1)
         with tempfile.TemporaryDirectory() as d:
             log = pagetest.run_zoom(d, Reader(detail), detail, "free-boxes")
