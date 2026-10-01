@@ -39,6 +39,7 @@
 - **Facts:** entity, attribute, value, unit, conditions, and basis (required, proposed, measured, calculated).
   - Entities have invented names and tags ("Glenmore Pump Station", `P-101A`), with the aliases a reader may fairly use.
   - Relations: part of (a camera's detector), alternative to (the 2-ton unit against the baseline), supersedes (revision B's value).
+  - **Relational facts, without a number** (needed for schematics): a subject, a relation and an object, such as "DM1 precedes DM2 on the light path", "the Lyot stop is in a pupil plane", "the focal plane mask is an HLC or a VC", "the filter wheel is movable".
 - **Values drawn from the seed** within plausible ranges, so they can't be guessed. They're written in the forms documents use: `1,250`, `0.075`, `±0.05`, `4–6`, `≥ 3`, `2'-9 1/2"`, `-43.73E+6`.
 - **Distractors in the key, marked as such:** another component's value of the same kind, superseded values, negations ("not rated for…"), ranges and inequalities.
 
@@ -49,6 +50,17 @@
   - with the table plan's hazards as knobs
 - **Charts:** bars, stacked bars with legends, lines with operating points; printed values or axis-only; panels labelled (a)–(f).
 - **Drawings:** sheets at real sizes (rotated as stored), labelled components, arrows, dimensions in feet and inches, callouts, details with grid-referenced titles, title blocks and revision tables, line work.
+- **Schematics and concept diagrams** (the owner, 2026-10-01: "things like the figures and concept drawings in items 5 and 9 of the spotcheck. These are full of useful claims and often have references to them"):
+  - **What they show:**
+    - labelled components joined by a path (light, flow or signal), in order
+    - annotations on components ("in pupil")
+    - movable or insertable parts (double arrows)
+    - alternatives on one component ("HLC or VC")
+    - branches for modes ("Guide mode")
+    - stages of a process drawn left to right (lenslets, mask, dispersed images, data cube)
+    - insets and colour scales
+  - **Cited from the text** ("(Figure 5.5-12)"), which walks part of the path in words.
+  - **Each fact placed in the figure only, the text only, or both,** so recall by form shows whether figures are used as a source, and both forms test corroboration (sc01 items 2, 5 and 9).
 - **Page furniture:** running headers and footers, page numbers, watermarks, list-of-figures entries.
 - **The text layer:**
   - normal; rasterised, like a scan
@@ -79,6 +91,15 @@
   - **A claim whose value is printed but filed under another fact's entity or attribute** is **misbound.**
   - **A claim whose value is printed in a non-fact role** (a page number as a value) is **misread.**
   - **The rest are printed values the key doesn't list as facts** (a fair claim the key lacks, or a combination). They're counted and sampled for review, and the key grows when they're fair.
+- **Relational facts are scored by names,** since there's no number to find the fact by:
+  - The claim's entity and attribute are matched against the fact's subject and relation, and its value's words against the object, by the same rare-word fit as numbers' bindings.
+  - **A path given as a sequence** ("DM1 -> DM2 -> Focal plane mask -> Lyot stop", as item 9's readers wrote) stands for its adjacent pairs.
+  - **Outcomes:**
+    - right
+    - reversed (the pair's order swapped, as the eye tests' arrows)
+    - misbound (a component on the wrong path, or the wrong component's annotation)
+    - invented (components or links the figure doesn't have)
+  - Every label drawn is logged, as every number is.
 - **Comparison, on revision pairs:** the report's changed, added and removed facts against the key's changes.
 - **The key is exact for these documents only.** Their scores are one strong rater among others, never the measure of real-document quality (no ground truth).
 
@@ -147,6 +168,18 @@ Each row is a situation met in this project's documents, with where it was recor
 | Dense sheets | 100–300 claims per unit; an illegible page thumbnail | overall; r06, r07 |
 | Fake bold | Text drawn twice, offset | situate |
 
+**Schematics and concept diagrams**
+
+| Knob | Situation | Seen in |
+|---|---|---|
+| Facts only in a figure | "Item 5 again ignores the figure as a source": a text unit has none of its page's figure readings | sc01 items 2 and 5 |
+| Text that walks a figure's path, citing it | HabEx Figure 5.5-12: the UV channel's path in the figure and in the paragraph beside it | sc01 item 5 |
+| Paths as sequences | Readers wrote "DM1 -> DM2 -> Focal plane mask -> Lyot stop" and its fragments as separate claims | sc01 item 9 |
+| Alternatives on one component | "The focal plane mask can either be an HLC or a VVC" (caption and figure) | sc01 item 9 |
+| Annotations as locations or conditions | "DM1 (in pupil)", "Lyot stop (in pupil)" | sc01 item 9 |
+| Stages of a process | Lenslets, pinhole mask, dispersed images, data cube | sc01 item 5 (Figure 5.5-11) |
+| Movable parts and modes | Double arrows on filters, grism and field stops; a "Guide mode" branch | sc01 item 5 (Figure 5.5-12) |
+
 **Prose**
 
 | Knob | Situation | Seen in |
@@ -192,7 +225,10 @@ Each row is a situation met in this project's documents, with where it was recor
    - The scorer is checked on perfect and deliberately flawed claim sets.
    - The pipeline reads the corpus with gemma-4, recorded (a few cents).
 2. **The table, layout and prose knobs,** shared with the table plan's milestone 1 (its table eye tests become sweeps here).
-3. **Charts, drawings and rasterised pages,** reusing the eye and page tests' drawing.
+3. **Charts, schematics, drawings and rasterised pages,** reusing the eye and page tests' drawing:
+   - 3a: charts and scanned pages (done)
+   - 3b: schematics and concept diagrams, with relational facts scored (next)
+   - 3c: drawing sheets
 4. **Revision pairs and comparison scoring.**
 5. **Into rounds:** the controlled stratum reported beside judged win rates, exactly scored.
 6. **New failures become knobs:** each round's review and post-mortem adds the situations it finds.
@@ -325,7 +361,11 @@ Each row is a situation met in this project's documents, with where it was recor
     - *Inferred:* the extraction prompt doesn't ask for careful reading against the axis. The lever index has a row.
   - **The legend only in the caption** cost nothing alone. On the scanned page the image reader named series by colour 4 times ("May value (dark blue series)"). With every knob on, it missed Option 2's September bar.
   - **Checked by hand:** every misbound and inexact claim, and the loose ones.
-  - **Not yet:** drawings (dimension strings, tags with leaders, title blocks), stacked bars, line charts, and noise on scans. Those come in milestone 3b.
+  - **Not yet:**
+    - schematics and concept diagrams (milestone 3b)
+    - drawing sheets (3c)
+    - stacked bars and line charts (3c, with the drawing sheets)
+    - noise on scans
 
 ## Decisions (2026-10-01)
 
