@@ -34,6 +34,7 @@ INCHES = ("1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8")
 SERIES_COLORS = ((0.12, 0.47, 0.71), (1.0, 0.5, 0.05), (0.17, 0.63, 0.17))
 FAMILIES = ("read", "pairs", "table", "graph", "chart-values", "chart-axis")
 PASS = 0.9  # a glyph height is read when 90% of its items are
+LARGE = 16  # glyphs above this (px) measure a ceiling, and stay out of the threshold fit
 
 # --- answers ------------------------------------------------------------------------------------
 
@@ -483,6 +484,9 @@ def suite(name="standard"):
         for w, h in SQUARES + SHAPES:
             cards += [Card("read", w, h, g, seed=seed) for g in (4, 5, 6, 7, 8, 10, 12, 16)]
     cards += [Card("read", 1024, 1024, g, font=f) for f in ("cour", "tiro") for g in (5, 6, 8, 10)]
+    # Large glyphs: how far a model may be magnified. Qwen3-VL broke 14-point text into pieces in 144-point
+    # tiles at 1536 px (capitals about 100 px tall; docs/research/page-tests-2026-09-30.md).
+    cards += [Card("read", 1024, 1024, g, seed=seed) for seed in (1, 2) for g in (24, 32, 48, 64)]
     for layout in ("inline", "columns", "stacked"):
         cards += [Card("pairs", 1024, 1024, g, layout=layout) for g in (6, 8, 12)]
         cards += [Card("pairs", 2048, 2048, g, layout=layout) for g in (8, 12)]
@@ -729,7 +733,12 @@ def summarise(entries):
                                    "failed": sum(1 for e in mine if e.get("score") is None),
                                    "items": sum(e.get("items", 0) for e in mine), "errors": errors,
                                    "by_glyph": {f"{g:g}": _mean(s) for g, s in sorted(by_glyph.items())}}
-    reads = [e for e in entries if e["family"] == "read" and e["font"] == "helv"]
+    reads = [e for e in entries if e["family"] == "read" and e["font"] == "helv" and e["glyph"] <= LARGE]
+    large = {}
+    for e in entries:  # the ceiling: reading only gets harder past some size for some models
+        if e["family"] == "read" and e["font"] == "helv" and e["glyph"] > LARGE:
+            large.setdefault(f"{e['glyph']:g}", []).append(_scored(e))
+    out["large"] = {g: _mean(v) for g, v in sorted(large.items(), key=lambda kv: float(kv[0]))}
     for size in sorted({(e["w"], e["h"]) for e in reads}, key=lambda s: (s[0] * s[1], s)):
         cells = {}
         for e in reads:
@@ -825,6 +834,15 @@ def page(folder, data):
             values = [data["models"][m]["summary"][field].get(size) for m in models]
             out.append(f"<tr><td>{esc(size)}</td>" + "".join(f"<td>{'–' if v is None else f'{v:g}'}</td>" for v in values)
                        + "</tr>")
+        out.append("</table></div>")
+    large = sorted({g for m in models for g in data["models"][m]["summary"].get("large", {})}, key=float)
+    if large:
+        out.append("<h2>Large glyphs (1024 × 1024, share read)</h2><p class='muted'>How far a model may be magnified: "
+                   "some read large text worse than small.</p><div class='scroll'><table><tr><th>Glyph</th>" +
+                   "".join(f"<th>{esc(m)}</th>" for m in models) + "</tr>")
+        for g in large:
+            out.append(f"<tr><td>{esc(g)} px</td>" + "".join(_cell(data["models"][m]["summary"].get("large", {}).get(g))
+                                                            for m in models) + "</tr>")
         out.append("</table></div>")
     for m in models:
         acuity = data["models"][m]["summary"]["acuity"]
