@@ -589,7 +589,7 @@ def suite(name="standard"):
     cards += [Card("read", 1024, 1024, g, font=f) for f in ("cour", "tiro") for g in (5, 6, 8, 10)]
     # Large glyphs: how far a model may be magnified. Qwen3-VL broke 14-point text into pieces in 144-point
     # tiles at 1536 px (capitals about 100 px tall; docs/research/page-tests-2026-09-30.md).
-    cards += [Card("read", 1024, 1024, g, seed=seed) for seed in (1, 2) for g in (24, 32, 48, 64)]
+    cards += [Card("read", 1024, 1024, g, seed=seed) for seed in (1, 2) for g in (24, 32, 40, 48, 64)]
     # Words and pseudo-words at the codes' sizes and glyphs (one seed): what meaning and word shape add.
     cards += [Card("words", w, h, g) for w, h in SQUARES[1:] for g in (4, 5, 6, 7, 8, 10, 12)]
     cards += [Card("confusable", w, h, g) for w, h in SQUARES[1:] for g in (4, 5, 6, 7, 8, 10, 12)]
