@@ -44,7 +44,12 @@ class Sheets(unittest.TestCase):
         box = pagetest._region([100, 100, 300, 200], clip, {}, page)
         self.assertTrue(box.contains(pymupdf.Rect(100, 100, 300, 200)))
         self.assertEqual(pagetest._region("[100, 100, 300, 200]", clip, {}, page), box)  # a box sent as text
-        self.assertIsNotNone(pagetest._region("b2", clip, {"B2": pymupdf.Rect(250, 0, 500, 333)}, page))
+        cells = {"B2": pymupdf.Rect(250, 0, 500, 333), "C3": pymupdf.Rect(500, 333, 750, 666)}
+        self.assertIsNotNone(pagetest._region("b2", clip, cells, page))
+        span = pagetest._region("B2:C3", clip, cells, page)  # a rectangle of cells
+        self.assertTrue(span.contains(pymupdf.Rect(250, 0, 750, 666)))
+        self.assertEqual(pagetest._region("B2 to C3", clip, cells, page), span)
+        self.assertIsNone(pagetest._region("B2:Z9", clip, cells, page))
         self.assertIsNone(pagetest._region([0, 0, 1000, 1000], clip, {}, page))  # no closer than the image
         self.assertIsNone(pagetest._region("Z9", clip, {}, page))
         tiny = pagetest._region([500, 500, 501, 501], clip, {}, page)

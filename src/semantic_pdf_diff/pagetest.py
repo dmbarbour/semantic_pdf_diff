@@ -21,6 +21,7 @@ requested regions held the text too small to read.
 import json
 import math
 import random
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from pydantic import Field
@@ -52,7 +53,8 @@ CROP_PX = 768               # the long side of each close-up
 MAX_DEPTH, MAX_ZOOMS, QUOTA = 2, 6, 40
 GRID_CELLS = 12             # about this many cells in a labelled grid
 GRID_RED = (0.85, 0.1, 0.1)
-VARIANTS = ("free-boxes", "free-cells", "informed-boxes", "informed-cells")
+VARIANTS = ("free-boxes", "free-cells", "informed-boxes", "informed-cells", "informed-ranges")
+GRIDDED = ("cells", "ranges")  # variants naming regions by a labelled grid drawn over the image
 
 class Found(_Answer):
     items: list[str] = Field(default_factory=list)
@@ -198,11 +200,13 @@ def static_prompt(whole):
     return _base(whole) + '\nReturn only JSON: {"items": ["..."]}'
 
 def zoom_prompt(whole, variant, threshold=None, can_zoom=True):
-    informed, cells = variant.startswith("informed"), variant.endswith("cells")
+    informed, cells, ranges = variant.startswith("informed"), variant.endswith(GRIDDED), variant.endswith("ranges")
     text = _base(whole)
     if can_zoom:
-        where = ('name each by its grid cell, as labelled in red (e.g. "B2"; the red grid and its labels are drawn '
-                 'over the page to name regions, and aren\'t part of it)' if cells else
+        grid_note = "the red grid and its labels are drawn over the page to name regions, and aren't part of it"
+        where = (f'name each by its grid cell (e.g. "B2") or a rectangle of cells (e.g. "B2:C3"), as labelled in red; '
+                 f'{grid_note}' if ranges else
+                 f'name each by its grid cell, as labelled in red (e.g. "B2"; {grid_note})' if cells else
                  "give each as a box [x0, y0, x1, y1] in coordinates from 0 to 1000 across and down the image")
         if informed and threshold:
             text += (f" This page has text too small to read at this scale: text under about {threshold:.0f} pixels "
@@ -211,7 +215,7 @@ def zoom_prompt(whole, variant, threshold=None, can_zoom=True):
         else:
             text += (" If some text is too small to read here, ask for close-ups of the regions where it is: "
                      f"{where}. At most {MAX_ZOOMS}, or none if you've read everything.")
-        example = '["B2", "C3"]' if cells else "[[100, 200, 350, 420]]"
+        example = '["B2", "C3:D4"]' if ranges else '["B2", "C3"]' if cells else "[[100, 200, 350, 420]]"
         return text + f'\nReturn only JSON: {{"items": ["..."], "zoom": {example}}}'
     return text + '\nReturn only JSON: {"items": ["..."]}'
 
@@ -226,9 +230,10 @@ def _region(request, clip, cells, page_rect):
         except ValueError:
             return None
     if isinstance(request, str):
-        rect = cells.get(request.strip().upper())
-        if rect is None:
+        ends = [e.strip().upper() for e in re.split(r"\s*(?::|-|–|—|\bto\b)\s*", request.strip(), maxsplit=1)]
+        if not all(e in cells for e in ends):
             return None
+        rect = pymupdf.Rect(cells[ends[0]]) | cells[ends[-1]]  # one cell, or the rectangle of cells between two
     else:
         values = request.get("box") if isinstance(request, dict) else request
         try:
@@ -300,7 +305,7 @@ def run_zoom(folder, client, sheet, variant, threshold=None):
     doc, page, _ = draw(sheet)
     target = Path(folder) / "images"
     target.mkdir(parents=True, exist_ok=True)
-    grid = variant.endswith("cells")
+    grid = variant.endswith(GRIDDED)
     log, asked = [], [0]
 
     with Dispatcher(client) as dispatch:
