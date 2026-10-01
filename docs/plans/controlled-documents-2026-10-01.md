@@ -1,0 +1,183 @@
+# Controlled documents with known facts
+
+- **Status:** Planned (2026-10-01), for the owner's review.
+- **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](one-table-model-2026-09-30.md) (table hazards; its table eye tests become part of this); [content-addressed queries](content-addressed-queries-2026-09-28.md) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
+- **Why:**
+  - **The owner (2026-10-01):** "similar to the eye test as a controlled test, we could have controlled PDF tests, i.e. where you generate a few PDFs with known facts to extract for fictional projects. This might provide a more robust control without relying on yours or my ability to extract facts."
+  - **And:** "pseudo-random so we can still leverage caching and fast testing. We can include things like the stacked tables as another difficulty knob, and generally build a list of troublesome and messy scenarios we've already encountered, mitigating some weaknesses of this approach."
+
+## Goal
+
+- **Documents generated from a fact sheet and a seed:** the same seed gives the same PDF, byte for byte. So the pipeline asks the same queries, recorded answers replay, and tests run offline and fast.
+- **Every fact's form and place known,** so extraction is scored exactly (right, misbound, misread, missed), and comparison is scored on revision pairs with known changes.
+- **The messy situations we've met reproduced as knobs** (catalogue below), so the control isn't a test of clean documents only. Every failure met later in a round or spot check gets a knob too.
+
+## Design
+
+**1. Fact sheets (the answer key).**
+- **A fictional project per domain** we read, each written in its documents' own conventions:
+  - a pump station or HVAC plant (schedules, data sheets, notes)
+  - a wind turbine (properties, operating points, controller gains)
+  - a space instrument (channels, detectors, bands)
+  - a small building (drawing sheets, details, title blocks)
+- **Facts:** entity, attribute, value, unit, conditions, and basis (required, proposed, measured, calculated).
+  - Entities have invented names and tags ("Glenmore Pump Station", `P-101A`), with the aliases a reader may fairly use.
+  - Relations: part of (a camera's detector), alternative to (the 2-ton unit against the baseline), supersedes (revision B's value).
+- **Values drawn from the seed** within plausible ranges, so they can't be guessed. They're written in the forms documents use: `1,250`, `0.075`, `±0.05`, `4–6`, `≥ 3`, `2'-9 1/2"`, `-43.73E+6`.
+- **Distractors in the key, marked as such:** another component's value of the same kind, superseded values, negations ("not rated for…"), ranges and inequalities.
+
+**2. Renderers: each fact in one or more forms, at a known place** (PyMuPDF, as the eye and page tests draw):
+- **Prose:** templated sentences in several phrasings, conditions in clauses, a section and numbered-item structure, captions and cross-references ("see Table 3").
+- **Tables:**
+  - layouts: items in rows or in columns, case tables, matrices
+  - with the table plan's hazards as knobs
+- **Charts:** bars, stacked bars with legends, lines with operating points; printed values or axis-only; panels labelled (a)–(f).
+- **Drawings:** sheets at real sizes (rotated as stored), labelled components, arrows, dimensions in feet and inches, callouts, details with grid-referenced titles, title blocks and revision tables, line work.
+- **Page furniture:** running headers and footers, page numbers, watermarks, list-of-figures entries.
+- **The text layer:**
+  - normal; rasterised, like a scan
+  - text drawn as outlines, later, since it needs glyph outlines
+- **Each placement is recorded:** page, box, form, the scenarios in force.
+
+**3. Determinism and caching:**
+- Generation depends only on the seed and the code. PyMuPDF's version is noted, as the eye tests do, and replays are skipped under another.
+- Queries are named by what reaches the model, so a corpus read twice is paid for once, and tests replay from a fixture.
+
+**4. The corpus:**
+- **A small fixed set:** about six projects, each with two revisions, 4–12 pages. Together they cover every scenario at least once.
+- **Sweeps generated on demand:** one knob at a time (font size, a stacked table, density) against a clean document.
+
+**5. Scoring:**
+- **Extracted claims are matched to the key:** entity by alias, attribute by the key's synonyms, value and unit normalised (numbers parsed, unit forms folded).
+  - **Outcomes:**
+    - right
+    - misbound (a key value under another fact's entity or attribute)
+    - misread (the right fact, the wrong value)
+    - missed
+    - conditions kept or lost
+    - basis right or wrong
+  - Reported by form, scenario and knob.
+- **Spurious claims:** a key can't list every claim a reader may fairly make. So only conflicting claims (a key entity and attribute with another value) count as errors; the rest are counted, and sampled for review.
+- **Comparison, on revision pairs:** the report's changed, added and removed facts against the key's changes.
+- **The key is exact for these documents only.** Their scores are one strong rater among others, never the measure of real-document quality (no ground truth).
+
+**6. Uses:**
+- **Regression tests,** replayed free.
+- **An exactly scored stratum in every round,** beside the judged real documents. It costs no judging, which is 88% of spend.
+- **Model profiles and selection,** beside the eye tests.
+- **The table plan's medium test:** the same tables rendered here as PDFs, and written as CSV and XLSX.
+
+## Scenario catalogue (knobs)
+
+Each row is a situation met in this project's documents, with where it was recorded. Short names:
+- **Reviews:** sc01 = [spot check sc01](../reviews/spotcheck-sc01-2026-09-30.md); s01 = [evaluation s01](../reviews/evaluation-s01-2026-09-25.md); rNN = round reviews; overall = [overall review](../reviews/overall-review-2026-09-28.md); levers = [lever index](../reviews/levers.md).
+- **Research:** eye = [eye tests](../research/eye-tests-2026-09-30.md); RH = [round-01 heuristics](../research/round-01-context-heuristics-2026-09-26.md).
+- **Code:** extract and situate = their modules' comments.
+
+**Tables**
+
+| Knob | Situation | Seen in |
+|---|---|---|
+| Stacked tables | Two tables in one grid, split by a styled header row; the second header lost, rows bound to the first | sc01 item 1 (HabEx p4) |
+| Multi-level headers | "Cameras > UV Channel" cut to "UV" | sc01 |
+| Wrapped cells | A cell's second line arrives as an unlabelled row; "Spectrometer resolution" read as counts | sc01 |
+| Several values in a cell | `1×1 CCD201` (format and model) | the table plan |
+| Components of components | A camera's detector; how to name a part of a part | sc01 |
+| Dense tables | 20 rows: values from the same row or column, though legible | eye |
+| Case tables | Operating points (wind speed 14, 15, 16…) as inputs, not properties | s01; NREL p10 |
+| Subject above the table | Rows that need the lead-in ("Module A", "NREL 5-MW baseline") | r01; levers |
+| Continued across pages | A repeated header, and a false continuation (the next day's schedule of the same form) | store m4 review; extract |
+| False tables | Chart gridlines, sheet frames, boxed paragraphs, equation debris; a borderless real table missed | RH; levers |
+| One-row tables | The only row sent as its own header | levers |
+| Values taken for numbered items | Rows starting "3.83 -43.73E+6" read as section numbers | query improvement; extract |
+| Schedules on rotated sheets | Wiring schedules; their lead-in the title block | r03; overall |
+| Pseudo-tables in text | Table-like text in a text chunk; misbinding rose under loose quote matching | r09 |
+| Quotes spanning cells | Cells joined with "\|", a header read with its value | r09 |
+| Wide rows | Split by column; a split that separated header from values | extract; robustness baseline |
+| Units in headers, totals rows, ± columns, min/nominal/max, footnote markers | Planned hazards | the table plan |
+
+**Charts**
+
+| Knob | Situation | Seen in |
+|---|---|---|
+| Readings off the axis | Values at 23° and 25° on an axis ending at 20° | r07, r08 |
+| Trends for readings | Curves that peak and fall described as "increasing" | r08 |
+| Stacked series and legends | Series swapped; legends split from charts by tiles | r07; r03 |
+| Axis labels and multipliers as values | "0" and "1e10" read as stiffness | r09 |
+| Stacked bars across alternatives | Monthly use for a 2-ton and a 2.5-ton unit; readings selective | sc01 item 2 |
+| Panel labels | "(a) Mass density" taken for a numbered item | levers; extract |
+| Printed values on grouped bars | Another bar's value; a category code as a value | eye |
+| Unfamiliar conventions, signs | A minus sign dropped on re-asking | s01; r01 |
+
+**Drawings and sheets**
+
+| Knob | Situation | Seen in |
+|---|---|---|
+| Rotated sheets | Context taken from beside a table; before and after swapped | overall; meta-audit |
+| Small dimension text | 2'-9 1/2" read as 2'-3" from an overview | s01; gemma-4 images research |
+| Labels cut at tile edges | "2x4 CEDAR HANDRAILS" as "2x4 CED" | s01; RH |
+| Close details | Values bound to the wrong module, grid line or detail; titles misattached | r05 |
+| Title blocks and revision tables | Read as administration only, or switched extraction off; small print in large crops | r05; extract |
+| Watermarks, blank tiles | "PRODUCED BY AN AUTODESK STUDENT PRODUCT"; "the image is blank" | levers; extract |
+| Grid-referenced details | "B4" titles; detail markers that aren't figures | RH; extract |
+| Single-letter identifiers | Module A merged with Module B | r08 |
+| Distinct facts sharing a value | Door D1 and window W2, both 1.02 | duplicate-claims research |
+| Arrows | Direction reversed (gemma-4: 15 of 118) | eye |
+| Dense sheets | 100–300 claims per unit; an illegible page thumbnail | overall; r06, r07 |
+| Fake bold | Text drawn twice, offset | situate |
+
+**Prose**
+
+| Knob | Situation | Seen in |
+|---|---|---|
+| Alternatives as conditions | "2 ton unit" and "baseline unit size" as conditions | sc01 item 2 |
+| Scope as a condition | "across the four mission concepts"; a count bound to the wrong noun | sc01 item 3 |
+| Context in a caption only | The baseline's size named only in a figure caption | sc01 |
+| Conditions lost or mixed in | "during the cool, martensite phase" dropped; attribute and condition run together | r07; s01 |
+| Part stated as the whole | One layer's material as the composition | s01 |
+| Quantity roles | Clearance read as depth; an elevation as a length | s01 |
+| Abbreviations defined elsewhere, one entity under two names | "PI = proportional-integral"; "baseline blade-pitch controller" | levers; r03 |
+| Quote forms | Elided quotes, line-end hyphenation, Unicode variants, paraphrase | r09 |
+| Requirements, negation, ranges, inequalities | "shall not exceed 60 C" as "is 60 C"; "<= 85 dBA" as 85 dBA | extract (guarded); taxonomy examples |
+
+**Layout, furniture and the text layer**
+
+| Knob | Situation | Seen in |
+|---|---|---|
+| Running headers and footers, page numbers | In context in 5 of 8 sampled queries | levers |
+| Text cut mid-sentence | "This focus is", "defined in the W" | levers |
+| Numbered items across pages | "Contest 9 > 9-3 > k. > (iii)"; a heading split over lines | RH; extract |
+| Several sections on one page | Rules attributed to the next section, which starts lower on the page | s01 |
+| Boxed headings | Taken for figures | s01 |
+| Caption traps | "Table 5-1 summarizes…", "Figure 1 shows…", list-of-figures entries, M201 against M-201 | s01; situate |
+| Equations | Garbled, one character per line | RH |
+| Scans | Images with little text | situate |
+| Two columns, no outline | Layouts the samples lack | RH; store m4 review |
+
+**Across pages and documents**
+
+| Knob | Situation | Seen in |
+|---|---|---|
+| A caption on another page | Filter values bound only through a cited caption | r05 |
+| Missing context, as judges saw it | Surrounding text 68, another page 36, legend 20, table header 16, heading 15, caption 13 | s01 |
+| Two teams' designs | One design's datum used for the other | s01 |
+| Units by case | `mW` as megawatts; "ton", kVA against kW, gauge against absolute (planned) | robustness baseline; units plan |
+| Synonyms across documents | "P-101" against "primary pump" | store plan; retrieval plan |
+| Superseded values | A hidden superseded sheet; errata (planned) | synthetic workbook |
+
+## Milestones
+
+1. **The fact model, the key and the scorer;** prose and plain tables; two projects generated deterministically.
+   - The scorer is checked on perfect and deliberately flawed claim sets.
+   - The pipeline reads the corpus with gemma-4, recorded (a few cents).
+2. **The table, layout and prose knobs,** shared with the table plan's milestone 1 (its table eye tests become sweeps here).
+3. **Charts, drawings and rasterised pages,** reusing the eye and page tests' drawing.
+4. **Revision pairs and comparison scoring.**
+5. **Into rounds:** the controlled stratum reported beside judged win rates, exactly scored.
+6. **New failures become knobs:** each round's review and post-mortem adds the situations it finds.
+
+## Open questions
+
+1. **Domains:** mirror the development slices' domains (wind turbines, a space instrument, buildings and their drawings, an HVAC plant), as proposed?
+2. **Spurious claims:** count only conflicting claims as errors, and sample the rest for review, as proposed?
+3. **Rounds:** report the controlled stratum first, and add it to rounds' decision criteria only once its scores are seen to track judged quality?
