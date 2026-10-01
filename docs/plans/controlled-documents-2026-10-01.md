@@ -1,6 +1,6 @@
 # Controlled documents with known facts
 
-- **Status:** Active (2026-10-01): milestones 1 and 2a (table knobs) done.
+- **Status:** Active (2026-10-01): milestones 1, 2a (table knobs) and 2b (prose traps and layout knobs) done.
 - **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](one-table-model-2026-09-30.md) (table hazards; its table eye tests become part of this); [content-addressed queries](content-addressed-queries-2026-09-28.md) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
 - **Why:**
   - **The owner (2026-10-01):** "similar to the eye test as a controlled test, we could have controlled PDF tests, i.e. where you generate a few PDFs with known facts to extract for fictional projects. This might provide a more robust control without relying on yours or my ability to extract facts."
@@ -221,17 +221,21 @@ Each row is a situation met in this project's documents, with where it was recor
     - **continued:** split across a page break with the header repeated
     - **all:** every knob together
   - Story can split a table across pages on its own. Such tables now start on a new page, so only the "continued" knob splits one.
+    - **Corrected in milestone 2b:** the check saw only where a table opened, so in 9 of the 14 documents a table still ran over a page break (on the coaster's dense schedule, 14 rows on one page and the rest on the next). Each table's last row is now marked too, and those documents were drawn and read again; the table below is the corrected one.
   - **gemma-4 read all 14 documents for $0.29.** Rows identical across variants are the same queries, so their answers served every variant.
 
-    | Knob | WTP: recall / right / misbound | WTP misbound by reader (table, text, image) | Coaster: recall / right / misbound | Coaster misbound by reader (table, text, image) |
+    | Knob | WTP: recall / right / misbound / loose | WTP misbound by reader (table, text, image) | Coaster: recall / right / misbound / loose | Coaster misbound by reader (table, text, image) |
     |---|---|---|---|---|
-    | clean | 1.00 / 84 / 6 | 0, 0, 6 | 1.00 / 92 / 18 | 0, 18, 0 |
-    | stacked | 1.00 / 84 / 9 | 3, 0, 6 | 1.00 / 88 / 9 | 9, 0, 0 |
-    | multilevel | 1.00 / 84 / 6 | 3, 0, 3 | 1.00 / 92 / 44 | 12, 32, 0 |
-    | multivalue | 1.00 / 84 / 0 | 0, 0, 0 | 0.94 / 86 / 28 | 6, 14, 12 |
-    | dense | 1.00 / 84 / 6 | 0, 0, 6 | 1.00 / 91 / 0 | 0, 0, 0 |
-    | continued | 1.00 / 84 / 6 | 0, 0, 6 | 1.00 / 92 / 15 | 0, 15, 0 |
-    | all | 1.00 / 84 / 6 | 6, 0, 0 | 1.00 / 82 / 11 | 2, 6, 3 |
+    | clean | 1.00 / 84 / 6 / 27 | 0, 0, 6 | 1.00 / 92 / 18 / 49 | 0, 18, 0 |
+    | stacked | 1.00 / 84 / 9 / 27 | 3, 0, 6 | 1.00 / 88 / 9 / 52 | 9, 0, 0 |
+    | multilevel | 1.00 / 84 / 6 / 15 | 3, 0, 3 | 1.00 / 92 / 20 / 38 | 10, 10, 0 |
+    | multivalue | 1.00 / 84 / 0 / 18 | 0, 0, 0 | 0.94 / 86 / 25 / 16 | 6, 13, 12 |
+    | dense | 1.00 / 84 / 0 / 29 | 0, 0, 0 | 1.00 / 92 / 0 / 39 | 0, 0, 0 |
+    | continued | 1.00 / 84 / 6 / 18 | 0, 0, 6 | 1.00 / 92 / 15 / 34 | 0, 15, 0 |
+    | all | 1.00 / 84 / 6 / 6 | 6, 0, 0 | 1.00 / 86 / 21 / 59 | 2, 16, 3 |
+
+    - **Before the correction,** WTP dense had 6 misbound; coaster multilevel 44 (12, 32, 0), multivalue 28, and all 11 with 82 right. The findings below held either way.
+    - **Loose** claims fit more than one fact, or none, by their words. They're the image reader's on every schedule (15–45 per document: "V-319 | column 2 value", rows read without their header). The table reader's appear only under grouped headers (14 on the coaster's multilevel, 22 on all), naming the group: "E3 | Dynamics | 57.5" is E3's entry speed.
 
   - **Every fact is found by some reader** (recall); misbinding is where the knobs show.
   - **The table reader misbinds only under a knob,** never on the clean, dense or continued schedules.
@@ -242,6 +246,46 @@ Each row is a situation met in this project's documents, with where it was recor
   - **Checked by hand:** the misbound and hallucinated claims were the model's errors.
     - One scorer flaw, found that way, was fixed: words from the conditions (where a model put the section's name) outweighed the attribute's. Attribute words now count most, entity words next, conditions only to break ties.
   - **One seed, one sample per query:** these are counts to compare between knobs, not rates to quote.
+
+- **Milestone 2b, prose traps and layout knobs (2026-10-01): done.**
+  - **A third project:** a convention centre expansion's design basis (Lakeshore Hall C, 23 facts), written to the prose traps of spot check sc01 and earlier reviews. Each fact has a plain and a trap phrasing:
+    - **alternatives compared:** chilled beams against a VAV baseline, in one sentence (sc01 item 2's "2 ton unit")
+    - **a scope:** a total "across the four halls" (sc01 item 3)
+    - **context in a caption only:** the meeting rooms' table names its hall only in the caption
+    - **requirements and negations:** "shall not exceed 45 dBA", "no less than", "not rated for snow loads above"
+    - **a range:** "held between 66 and 75 °F"
+    - **a part of a part:** AHU-3's supply fan motor
+  - **Knobs:**
+    - **clean:** the plain phrasings
+    - **traps:** the trap phrasings
+    - **furniture:** a running header of a document number and a date, logged as numbers that aren't facts
+    - **two-column:** the page in two columns
+    - **all:** every knob together
+  - Number-free prose fills two pages, so columns and running headers matter without printing numbers a reader could mistake for facts.
+  - **The scorer, extended:**
+    - **A range claim** ("66 to 75 °F") stands for both its bounds. Feet and inches ("2'-9 1/2\"") stay one value.
+    - **A limit counts as kept** however it's put: in words ("not to exceed", "no less than") or signs ("<= 39 psf"), in the conditions, entity, attribute or value.
+    - **A claim read twice,** by two readers or overlapping tiles, counts once. Either reading may keep its conditions.
+    - Units like "ft²" are no longer logged as printed numbers.
+    - Conditions kept are reported by reader.
+  - **Tables are kept whole** across pages and columns (the milestone 2a correction above).
+  - **gemma-4 read the five documents for $0.021,** and the nine corrected table documents again for $0.116.
+
+    | Knob | Recall | Right | Misbound | Conditions kept | Kept by the table reader |
+    |---|---|---|---|---|---|
+    | clean | 1.00 | 23 | 0 | 12 / 12 | 8 / 8 |
+    | traps | 1.00 | 23 | 0 | 12 / 12 | **0 / 8** |
+    | furniture | 1.00 | 23 | 0 | 12 / 12 | 8 / 8 |
+    | two-column | 1.00 | 23 | 0 | 12 / 12 | 8 / 8 |
+    | all | 1.00 | 23 | 0 | 12 / 12 | **0 / 8** |
+
+  - **The prose traps didn't trip gemma-4** in these phrasings.
+    - It named the alternatives as entities ("Chilled beam option | first cost | 20.8 M$"), the scope in the entity ("four halls"), and the limits ("maximum snow load rating", "<= 39 psf").
+    - Neither the running header nor two columns cost a fact.
+    - *Inferred:* sc01's failures came from real documents' context (the alternative named in a figure caption, far from the value), which these short, self-contained sentences don't reproduce. Harder phrasings are a backlog item for milestone 6.
+  - **The caption trap shows by reader.** With the hall named only in the caption, the table reader dropped it for all 8 room values ("Room 101"). The text and image readers kept it ("Room 101", conditions "Hall C"). The lever index has a row.
+  - **The scorer's own flaws, found by reading the claims by hand:** the range and the signs above, and claims dropped as repeats before their conditions were checked.
+  - **Not yet:** text cut mid-sentence, numbered items across pages, boxed headings, caption traps ("Table 5-1 summarizes…"), equations and scans. They come with milestone 3's drawing tools, or as milestone 6 finds them.
 
 ## Decisions (2026-10-01)
 

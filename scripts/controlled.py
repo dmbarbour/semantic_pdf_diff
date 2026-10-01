@@ -107,22 +107,28 @@ def main(argv=None):
                        for f in sorted({c["_family"] for c in found})}
             result["by_reader"] = {f: r["recall"] for f, r in readers.items()}
             result["outcomes_by_reader"] = {f: r["outcomes"] for f, r in readers.items()}
+            result["conditions_by_reader"] = {f: r["conditions_kept"] for f, r in readers.items()}
             results.setdefault(which, {})[run] = result
     (FOLDER / "results.json").write_text(json.dumps(results, indent=1) + "\n", encoding="utf-8")
-    for which, runs in results.items():  # each table project's knobs beside its clean version
-        for project in controlled.TABLE_PROJECTS:
-            mine = {run.rsplit("-", 1)[1]: r for run, r in runs.items() if run.startswith(project + "-s")}
+    knobbed = [(p, controlled.TABLE_KNOBS) for p in controlled.TABLE_PROJECTS] + \
+              [(p, controlled.PROSE_KNOBS) for p in controlled.PROSE_PROJECTS]
+    for which, runs in results.items():  # each knobbed project's knobs beside its clean version
+        for project, knobs in knobbed:
+            mine = {run[len(project) + 1:].partition("-")[2]: r for run, r in runs.items() if run.startswith(project + "-s")}
             if not mine:
                 continue
             print(f"\n{which} {project}: knob      recall  right  loose  misbound  misread  hallucinated  claims"
-                  "   misbound by reader")
-            for knob in controlled.TABLE_KNOBS:
+                  "  conditions   misbound by reader; conditions kept by reader")
+            for knob in knobs:
                 r = mine.get(knob)
                 if r:
                     o = r["outcomes"]
                     print(f"  {knob:12s} {r['recall']:7.3f} {r['found_right']:6d} {o.get('loose', 0):6d} "
-                          f"{o.get('misbound', 0):9d} {o.get('misread', 0):8d} {o.get('hallucinated', 0):13d} {r['claims']:7d}   "
-                          + " ".join(f"{f} {x.get('misbound', 0)}" for f, x in r["outcomes_by_reader"].items()))
+                          f"{o.get('misbound', 0):9d} {o.get('misread', 0):8d} {o.get('hallucinated', 0):13d} {r['claims']:7d}"
+                          f"  {r['conditions_kept']:>10s}   "
+                          + " ".join(f"{f} {x.get('misbound', 0)}" for f, x in r["outcomes_by_reader"].items())
+                          + ("; " + " ".join(f"{f} {k}" for f, k in r["conditions_by_reader"].items())
+                             if r["conditions_kept"] != "0/0" else ""))
     print()
     for which, runs in results.items():
         for run, r in runs.items():

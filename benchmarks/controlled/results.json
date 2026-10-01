@@ -36,45 +36,55 @@
      "right": 29,
      "text": 1
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "2/2",
+    "visual": "2/2"
    }
   },
   "coaster-tables-s1-all": {
    "facts": 92,
    "found": 92,
    "recall": 1.0,
-   "found_right": 82,
+   "found_right": 86,
    "missed": [],
-   "claims": 203,
+   "claims": 211,
    "outcomes": {
-    "loose": 69,
-    "misbound": 11,
-    "right": 123
+    "loose": 59,
+    "misbound": 21,
+    "right": 131
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.913,
-    "text": 0.7826,
-    "visual": 0.9022
+    "table": 0.9783,
+    "text": 0.6739,
+    "visual": 0.9783
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 28,
+     "loose": 22,
      "misbound": 2,
-     "right": 56
+     "right": 68
     },
     "text": {
-     "loose": 4,
-     "misbound": 6,
-     "right": 73
+     "loose": 2,
+     "misbound": 16,
+     "right": 64
     },
     "visual": {
-     "loose": 43,
+     "loose": 35,
      "misbound": 3,
-     "right": 62
+     "right": 65
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "coaster-tables-s1-clean": {
@@ -113,6 +123,11 @@
      "loose": 45,
      "right": 93
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "coaster-tables-s1-continued": {
@@ -148,43 +163,50 @@
      "loose": 34,
      "right": 79
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "coaster-tables-s1-dense": {
    "facts": 92,
    "found": 92,
    "recall": 1.0,
-   "found_right": 91,
+   "found_right": 92,
    "missed": [],
-   "claims": 174,
+   "claims": 140,
    "outcomes": {
-    "hallucinated": 2,
-    "loose": 78,
-    "right": 94
+    "loose": 39,
+    "right": 101
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.8587,
-    "text": 0.3696,
-    "visual": 0.9457
+    "table": 1.0,
+    "text": 0.5217,
+    "visual": 0.9239
    },
    "outcomes_by_reader": {
     "table": {
-     "hallucinated": 2,
-     "loose": 8,
-     "right": 71
+     "right": 92
     },
     "text": {
-     "loose": 1,
-     "right": 33
+     "loose": 7,
+     "right": 47
     },
     "visual": {
-     "loose": 69,
-     "right": 61
+     "loose": 32,
+     "right": 53
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "coaster-tables-s1-multilevel": {
@@ -193,36 +215,41 @@
    "recall": 1.0,
    "found_right": 92,
    "missed": [],
-   "claims": 215,
+   "claims": 174,
    "outcomes": {
-    "loose": 44,
-    "misbound": 44,
-    "right": 127
+    "loose": 38,
+    "misbound": 20,
+    "right": 116
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.837,
-    "text": 0.3261,
+    "table": 0.8913,
+    "text": 0.3913,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 17,
-     "misbound": 12,
-     "right": 60
+     "loose": 14,
+     "misbound": 10,
+     "right": 68
     },
     "text": {
-     "loose": 3,
-     "misbound": 32,
-     "right": 27
+     "loose": 8,
+     "misbound": 10,
+     "right": 28
     },
     "visual": {
-     "loose": 24,
+     "loose": 16,
      "right": 92
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "coaster-tables-s1-multivalue": {
@@ -238,11 +265,11 @@
     "BR3.brake fins",
     "BR3.exit speed"
    ],
-   "claims": 174,
+   "claims": 158,
    "outcomes": {
-    "loose": 33,
-    "misbound": 28,
-    "right": 113
+    "loose": 16,
+    "misbound": 25,
+    "right": 117
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -250,7 +277,7 @@
    },
    "by_reader": {
     "table": 0.9348,
-    "text": 0.663,
+    "text": 0.6739,
     "visual": 0.9348
    },
    "outcomes_by_reader": {
@@ -259,15 +286,20 @@
      "right": 86
     },
     "text": {
-     "loose": 8,
-     "misbound": 14,
-     "right": 53
+     "loose": 11,
+     "misbound": 13,
+     "right": 52
     },
     "visual": {
-     "loose": 25,
+     "loose": 5,
      "misbound": 12,
-     "right": 88
+     "right": 86
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "coaster-tables-s1-stacked": {
@@ -304,6 +336,200 @@
      "loose": 35,
      "right": 89
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "lcc-s1-all": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 32,
+   "outcomes": {
+    "right": 28,
+    "text": 4
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 23
+    },
+    "visual": {
+     "right": 25,
+     "text": 4
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/8",
+    "text": "12/12",
+    "visual": "12/12"
+   }
+  },
+  "lcc-s1-clean": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 25,
+   "outcomes": {
+    "right": 25
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.8261,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 19
+    },
+    "visual": {
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "8/8",
+    "visual": "12/12"
+   }
+  },
+  "lcc-s1-furniture": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 24,
+   "outcomes": {
+    "right": 24
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.913,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 21
+    },
+    "visual": {
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "10/10",
+    "visual": "12/12"
+   }
+  },
+  "lcc-s1-traps": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 29,
+   "outcomes": {
+    "right": 29
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 23
+    },
+    "visual": {
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/8",
+    "text": "10/12",
+    "visual": "12/12"
+   }
+  },
+  "lcc-s1-two-column": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 30,
+   "outcomes": {
+    "right": 27,
+    "text": 3
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 23,
+     "text": 3
+    },
+    "visual": {
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "12/12",
+    "visual": "12/12"
    }
   },
   "wtp-s1": {
@@ -317,7 +543,7 @@
     "right": 35,
     "text": 2
    },
-   "conditions_kept": "8/11",
+   "conditions_kept": "11/11",
    "recall_by_form": {
     "prose": 1.0,
     "table": 1.0
@@ -339,6 +565,11 @@
      "right": 30,
      "text": 2
     }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9",
+    "visual": "11/11"
    }
   },
   "wtp-tables-s1-all": {
@@ -374,6 +605,11 @@
      "loose": 6,
      "right": 64
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "wtp-tables-s1-clean": {
@@ -382,9 +618,9 @@
    "recall": 1.0,
    "found_right": 84,
    "missed": [],
-   "claims": 114,
+   "claims": 117,
    "outcomes": {
-    "loose": 24,
+    "loose": 27,
     "misbound": 6,
     "right": 84
    },
@@ -393,23 +629,27 @@
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.9643,
+    "table": 1.0,
     "text": 0.7381,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 12,
-     "right": 69
+     "right": 84
     },
     "text": {
      "right": 62
     },
     "visual": {
-     "loose": 12,
+     "loose": 27,
      "misbound": 6,
      "right": 84
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "wtp-tables-s1-continued": {
@@ -445,6 +685,11 @@
      "misbound": 6,
      "right": 64
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "wtp-tables-s1-dense": {
@@ -453,10 +698,9 @@
    "recall": 1.0,
    "found_right": 84,
    "missed": [],
-   "claims": 129,
+   "claims": 113,
    "outcomes": {
-    "loose": 39,
-    "misbound": 6,
+    "loose": 29,
     "right": 84
    },
    "conditions_kept": "0/0",
@@ -464,23 +708,26 @@
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.9643,
-    "text": 0.5595,
-    "visual": 0.7024
+    "table": 1.0,
+    "text": 0.5476,
+    "visual": 0.881
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 12,
-     "right": 69
+     "right": 84
     },
     "text": {
-     "right": 47
+     "right": 46
     },
     "visual": {
-     "loose": 27,
-     "misbound": 6,
-     "right": 44
+     "loose": 29,
+     "right": 45
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "wtp-tables-s1-multilevel": {
@@ -489,35 +736,39 @@
    "recall": 1.0,
    "found_right": 84,
    "missed": [],
-   "claims": 133,
+   "claims": 120,
    "outcomes": {
-    "loose": 16,
+    "loose": 15,
     "misbound": 6,
-    "right": 111
+    "right": 99
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.9286,
-    "text": 0.6667,
+    "table": 0.9643,
+    "text": 0.5119,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 1,
      "misbound": 3,
-     "right": 77
+     "right": 81
     },
     "text": {
-     "right": 56
+     "right": 43
     },
     "visual": {
      "loose": 15,
      "misbound": 3,
      "right": 87
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "wtp-tables-s1-multivalue": {
@@ -536,22 +787,26 @@
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.9643,
-    "text": 0.8095,
+    "table": 1.0,
+    "text": 0.5714,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 3,
-     "right": 78
+     "right": 84
     },
     "text": {
-     "right": 68
+     "right": 48
     },
     "visual": {
-     "loose": 15,
+     "loose": 18,
      "right": 84
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   },
   "wtp-tables-s1-stacked": {
@@ -571,24 +826,28 @@
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.9286,
-    "text": 0.6667,
+    "table": 0.9643,
+    "text": 0.5952,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 6,
      "misbound": 3,
-     "right": 72
+     "right": 81
     },
     "text": {
-     "right": 56
+     "right": 50
     },
     "visual": {
-     "loose": 21,
+     "loose": 27,
      "misbound": 6,
      "right": 81
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
    }
   }
  },
@@ -629,6 +888,11 @@
      "right": 29,
      "text": 1
     }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "2/2",
+    "visual": "2/2"
    }
   },
   "wtp-s1": {
@@ -642,7 +906,7 @@
     "right": 35,
     "text": 2
    },
-   "conditions_kept": "8/11",
+   "conditions_kept": "11/11",
    "recall_by_form": {
     "prose": 1.0,
     "table": 1.0
@@ -664,6 +928,11 @@
      "right": 30,
      "text": 2
     }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9",
+    "visual": "11/11"
    }
   }
  }

@@ -81,7 +81,13 @@ class Project:
     title: str
     facts: list
     sections: list    # [(heading, [blocks])]; a block is ("p", text), ("table", caption, header, rows) or ("schedule", Schedule)
-    knob: str = "clean"  # how schedules are drawn (TABLE_KNOBS)
+    knob: str = "clean"  # how schedules are drawn (TABLE_KNOBS), or prose and pages (PROSE_KNOBS)
+    texts: dict = None   # prose projects: {name: (plain, trap)} phrasings, filled from values
+    values: dict = None
+
+    def has(self, knob):
+        """Whether a prose or layout knob applies: "all" applies every knob of the project's kind."""
+        return bool(self.texts) and knob in PROSE_KNOBS and self.knob in (knob, "all")
 
     def fact(self, fact_id):
         return next(f for f in self.facts if f.id == fact_id)
@@ -357,16 +363,136 @@ def track_schedules(seed=1):
 
 TABLE_PROJECTS = {"wtp-tables": equipment_schedules, "coaster-tables": track_schedules}
 
+# --- prose and layout knobs (milestone 2b) -----------------------------------------------------------
+# Traps from the spot check (sc01 items 1-3) and earlier reviews, as phrasings: alternatives under comparison
+# (the "2 ton unit" read as a condition), a scope phrase ("across the four mission concepts"), a table whose
+# subject is named only in its caption, a requirement and a negation, a range, an abbreviation defined in another
+# section, and a component of a component. Each fact has a plain phrasing (clean) and the trap's (traps). Layout
+# knobs: page furniture (a running header of numbers that aren't facts) and two columns.
+PROSE_KNOBS = ("clean", "traps", "furniture", "two-column", "all")
+
+def convention_center(seed=1):
+    """A convention centre expansion's design basis, written to the traps above."""
+    d = Draw(f"lcc-{seed}")
+    F = []
+    add = lambda *a, **k: F.append(Fact(*a, **k)) or F[-1]
+    hall = ("Hall C", ("Hall C", "exhibit hall C", "the new hall", "Hall C exhibit hall"))
+    area = add("hallc.area", *hall, "exhibit floor area", ("floor area", "exhibit area", "area"), d.number(90000, 160000), "ft²")
+    height = add("hallc.height", *hall, "clear ceiling height", ("ceiling height", "clear height"), d.number(28, 45), "ft")
+    occupancy = add("hallc.occupancy", *hall, "occupant load", ("occupancy", "capacity", "occupants"),
+                    d.number(6000, 14000), "persons")
+    total = add("halls.area", "Halls A to D", ("Halls A-D", "the four halls", "all halls", "convention center"),
+                "total exhibit area", ("combined exhibit area", "total area"), d.number(400000, 600000), "ft²",
+                "across the four halls")
+    noise = add("hallc.noise", *hall, "background noise limit", ("noise level", "background noise", "noise criterion"),
+                d.number(38, 48), "dBA", "maximum", basis="required")
+    live = add("hallc.liveload", *hall, "floor live load", ("live load", "design live load"), d.number(250, 400), "psf",
+               "minimum", basis="required")
+    snow = add("roof.snow", "Existing roof", ("existing roof", "roof", "the roof"), "snow load rating",
+               ("rated snow load", "snow load", "snow rating"), d.number(25, 40), "psf", "maximum", basis="required")
+    t_low = add("hallc.tmin", *hall, "minimum indoor design temperature", ("indoor temperature", "design temperature"),
+                d.number(66, 70), "°F")
+    t_high = add("hallc.tmax", *hall, "maximum indoor design temperature", ("indoor temperature", "design temperature"),
+                 d.number(74, 78), "°F")
+    ahu = ("AHU-3", ("air handling unit 3", "AHU 3", "air handler 3"))
+    airflow = add("ahu3.airflow", *ahu, "supply airflow", ("airflow", "air flow", "supply air"), d.number(40000, 90000), "cfm")
+    motor = add("ahu3.fanmotor", "AHU-3 supply fan motor", ("supply fan motor", "AHU-3 supply fan", "fan motor"),
+                "motor power", ("power", "motor rating", "rating"), d.number(60, 200), "hp")
+    beams = ("Option 1, chilled beams", ("Option 1", "chilled beams", "chilled beam option"))
+    vav = ("Option 2, VAV baseline", ("Option 2", "VAV", "VAV baseline", "variable air volume"))
+    beams_load = add("opt1.load", *beams, "peak cooling load", ("cooling load", "peak load"), d.number(700, 1000), "tons")
+    vav_load = add("opt2.load", *vav, "peak cooling load", ("cooling load", "peak load"), d.number(1050, 1400), "tons")
+    beams_cost = add("opt1.cost", *beams, "first cost", ("cost", "capital cost"), d.number(14.0, 22.0, 1), "$M")
+    vav_cost = add("opt2.cost", *vav, "first cost", ("cost", "capital cost"), d.number(9.0, 13.5, 1), "$M")
+    rooms = []
+    for r in ("101", "102", "103", "104"):
+        room = (f"Hall C meeting room {r}", (f"room {r}", f"meeting room {r}", r))
+        rooms.append((r, add(f"room{r}.seats", *room, "seated capacity", ("capacity", "seats", "seating"),
+                             d.number(60, 480), "persons", "Hall C"),  # under traps, named only in the caption
+                      add(f"room{r}.area", *room, "floor area", ("area",), d.number(1500, 6000), "ft²", "Hall C")))
+    texts = {  # (plain, trap)
+        "intro": ("Hall C adds an exhibit floor area of {area} ft² to the convention center, with a clear ceiling height "
+                  "of {height} ft and an occupant load of {occ} persons. The four halls together will offer {total} ft² "
+                  "of exhibit space.",
+                  "Hall C adds {area} ft² of exhibit floor under a {height} ft clear ceiling, for {occ} occupants. Across "
+                  "the four halls, the total exhibit area becomes {total} ft²."),
+        "criteria": ("Hall C's background noise limit is {noise} dBA. Its floor live load is at least {live} psf. The "
+                     "existing roof's snow load rating is {snow} psf, and no higher. Hall C's indoor design temperature "
+                     "ranges from {tmin} °F to {tmax} °F.",
+                     "Background noise in Hall C shall not exceed {noise} dBA, and its floor shall carry a live load of "
+                     "no less than {live} psf. The existing roof is not rated for snow loads above {snow} psf. Indoor "
+                     "conditions are held between {tmin} and {tmax} °F."),
+        "ahu": ("Air handling units (AHUs) serve the hall. AHU-3 supplies {airflow} cfm. The AHU-3 supply fan motor is "
+                "rated {motor} hp.",
+                "Air handling units (AHUs) serve the hall. {airflow} cfm comes from AHU-3, whose supply fan is driven by "
+                "a {motor} hp motor."),
+        "options": ("Option 1, chilled beams: peak cooling load {l1} tons, first cost ${c1}M. Option 2, a VAV baseline: "
+                    "peak cooling load {l2} tons, first cost ${c2}M.",
+                    "With chilled beams the peak cooling load drops to {l1} tons, against {l2} tons for the VAV baseline, "
+                    "though their first cost of ${c1}M exceeds the baseline's ${c2}M."),
+    }
+    values = dict(area=area.value, height=height.value, occ=occupancy.value, total=total.value, noise=noise.value,
+                  live=live.value, snow=snow.value, tmin=t_low.value, tmax=t_high.value, airflow=airflow.value,
+                  motor=motor.value, l1=beams_load.value, l2=vav_load.value, c1=beams_cost.value, c2=vav_cost.value)
+    room_rows = [[f"Room {r}", s.value, a.value] for r, s, a in rooms]
+    sections = [
+        ("1 Project Description", [("text", "intro"), ("p", LCC_PROSE["site"]), ("p", LCC_PROSE["program"])]),
+        ("2 Design Criteria", [("text", "criteria"), ("p", LCC_PROSE["criteria"])]),
+        ("3 Mechanical", [("p", LCC_PROSE["mechanical"]), ("text", "ahu"), ("p", LCC_PROSE["controls"])]),
+        ("4 Cooling Options", [("p", LCC_PROSE["options"]), ("text", "options"), ("p", LCC_PROSE["choice"])]),
+        ("5 Meeting Rooms", [("p", LCC_PROSE["rooms"]),
+            ("rooms", ("Table 1. Meeting rooms in Hall C", "Table 1. Meeting rooms"),
+             ["Room", "Seated capacity", "Area (ft²)"], room_rows)]),
+        ("6 Construction Phasing", [("p", LCC_PROSE["phasing"])]),
+    ]
+    return Project(f"lcc-s{seed}", "Lakeshore Convention Center Expansion: Design Basis", F, sections, texts=texts,
+                   values=values)
+
+# Number-free prose around the facts: it fills pages (so columns and running headers matter) without printing a
+# number a reader could mistake for a fact.
+LCC_PROSE = {
+    "site": "The expansion occupies the former surface parking east of the existing building, between the lakefront "
+            "promenade and the service road. Hall C connects to the existing concourse through a glazed link at the "
+            "upper level, and its loading docks share the existing marshalling yard. The site slopes gently toward the "
+            "lake, so the hall floor steps down from the concourse by a short ramp that meets accessibility guidance.",
+    "program": "The program asks for column-free exhibit space that can be divided by operable walls, a block of "
+               "flexible meeting rooms above the loading docks, and back-of-house corridors wide enough for forklifts. "
+               "Food service is shared with the existing kitchens. Public circulation is kept on the lake side, where "
+               "the façade is glazed and shaded by a deep roof overhang.",
+    "criteria": "Criteria in this section govern the design of the new hall only. Where the existing building is "
+                "affected, as at the roof of the glazed link, the existing documents govern unless this basis says "
+                "otherwise. Acoustic criteria apply with the hall empty and all building systems running.",
+    "mechanical": "The mechanical design favours few large air handling units on the roof, with ducts dropped through "
+                  "the long-span trusses. Units are sized for a full hall on a design summer day, with outdoor air "
+                  "set by occupancy sensors so that the units turn down when the hall is lightly used.",
+    "controls": "All units report to the existing building automation system. Sequences are written so that one unit "
+                "can be taken out of service for maintenance during move-in days without losing the hall.",
+    "options": "Two cooling approaches were compared for the exhibit floor. Both use the existing central plant, "
+               "extended with new chillers in the plant's spare bay.",
+    "choice": "The design team recommends the chilled beam option for its lower plant load and quieter operation, "
+              "subject to the owner's review of the first cost. A final choice is due at the end of schematic design.",
+    "rooms": "The meeting rooms sit on a mezzanine above the loading docks, reached from the concourse by stairs and "
+             "two passenger lifts. Rooms can be combined in pairs.",
+    "phasing": "Construction proceeds while the existing halls stay open. The glazed link is built last, behind a "
+               "temporary wall, so that events in the existing halls are not disturbed. Noisy work is scheduled "
+               "outside show hours, and deliveries use the service road only.",
+}
+
+PROSE_PROJECTS = {"lcc": convention_center}
+RUNNING_HEADER = "Lakeshore Convention Center · Doc LCC-HC-DB-004 · Rev C · 2026-03-14"
+
 def corpus(seeds=(1,), knobs=False):
-    """The clean corpus; with knobs, also each table project under every table knob (ids "<project>-<knob>")."""
+    """The clean corpus; with knobs, also each table project under every table knob, and each prose project under
+    every prose knob (ids "<project>-<knob>")."""
     out = [make(seed) for make in PROJECTS.values() for seed in seeds]
     if knobs:
-        for make in TABLE_PROJECTS.values():
-            for seed in seeds:
-                for knob in TABLE_KNOBS:
-                    p = make(seed)
-                    p.id, p.knob = f"{p.id}-{knob}", knob
-                    out.append(p)
+        for makers, all_knobs in ((TABLE_PROJECTS, TABLE_KNOBS), (PROSE_PROJECTS, PROSE_KNOBS)):
+            for make in makers.values():
+                for seed in seeds:
+                    for knob in all_knobs:
+                        p = make(seed)
+                        p.id, p.knob = f"{p.id}-{knob}", knob
+                        out.append(p)
     return out
 
 # --- rendering ---------------------------------------------------------------------------------
@@ -421,7 +547,8 @@ def schedule_html(sched, knob, counter, breaks=()):
         out = (PAGE_BREAK if number in breaks else "") + f"<p class='caption'>{_esc(caption)}</p><table id='schedule-{number}'>"
         for k, (title, columns, rows) in enumerate(parts):
             out += header(title, columns, k == 0)
-            out += "".join(f"<tr><td>{_esc(tag)}</td>{cells(list(values))}</tr>" for tag, values in rows)
+            out += "".join(f"<tr{_last(number, k == len(parts) - 1 and r == len(rows) - 1)}><td>{_esc(tag)}</td>"
+                           f"{cells(list(values))}</tr>" for r, (tag, values) in enumerate(rows))
         return out + "</table>"
 
     sections = [(title, columns, rows) for title, _, columns, rows in sched.sections]
@@ -442,6 +569,10 @@ def schedule_html(sched, knob, counter, breaks=()):
                 table(f"{sched.caption.split('.')[0]} (continued)", [(title, columns, rows[half:])]))
     return table(sched.caption, [(title, columns, rows)])
 
+def _last(number, last):
+    """A table's last row is marked, so layout sees where the table ends (Story notes a table only where it opens)."""
+    return f" id='schedule-{number}-end'" if last else ""
+
 def html(project, breaks=()):
     import itertools
     esc, counter = _esc, itertools.count(1)
@@ -453,6 +584,22 @@ def html(project, breaks=()):
                 out.append(f"<p>{esc(block[1])}</p>")
             elif block[0] == "schedule":
                 out.append(schedule_html(block[1], project.knob, counter, breaks))
+            elif block[0] == "text":
+                plain, trap = project.texts[block[1]]
+                text = (trap if project.has("traps") else plain).format(**project.values)
+                out.append(f"<p>{esc(text)}</p>")
+            elif block[0] == "rooms":  # the table's subject: in every row (clean), or only in the caption (traps)
+                _, (caption_trap, caption_plain), header, rows = block
+                trap = project.has("traps")
+                caption = caption_trap if trap else caption_plain
+                shown = rows if trap else [[f"Hall C {row[0].lower()}"] + row[1:] for row in rows]
+                number = next(counter)
+                out.append((PAGE_BREAK if number in breaks else "") +
+                           f"<p class='caption'>{esc(caption)}</p><table id='schedule-{number}'><tr>" +
+                           "".join(f"<th>{esc(h)}</th>" for h in header) + "</tr>" +
+                           "".join(f"<tr{_last(number, r == len(shown) - 1)}>" + "".join(f"<td>{esc(c)}</td>" for c in row)
+                                   + "</tr>" for r, row in enumerate(shown)) +
+                           "</table>")
             else:
                 _, caption, header, rows = block
                 out.append(f"<p class='caption'>{esc(caption)}</p><table><tr>" +
@@ -469,34 +616,45 @@ def render(project, page_size="letter"):
     for _ in range(5):  # lay out; start any table Story split across pages on a new page; again
         buffer = io.BytesIO()
         writer = pymupdf.DocumentWriter(buffer)
-        placed, pages = {}, {}  # page: schedule tables' boxes; table id: the pages it opened and closed on
+        placed, pages = {}, {}  # page: schedule tables' boxes; table id: the (page, column)s it was drawn in
 
         def note(position):
             ident = getattr(position, "id", "") or ""
             if ident.startswith("schedule-"):
-                pages.setdefault(ident, set()).add(position.page)
-                if position.open_close & 1:
+                pages.setdefault(ident.removesuffix("-end"), set()).add((position.page, position.column))
+                if position.open_close & 1 and not ident.endswith("-end"):
                     placed.setdefault(position.page, []).append(tuple(position.rect))
         page = 0
+        two = project.has("two-column")
+        body = rect + (54, 54, -54, -72)
+        columns = [pymupdf.Rect(body.x0, body.y0, body.x0 + body.width / 2 - 9, body.y1),
+                   pymupdf.Rect(body.x0 + body.width / 2 + 9, body.y0, body.x1, body.y1)] if two else [body]
         for part in html(project, breaks).split(PAGE_BREAK):  # a page break starts the next part on a new page
             story = pymupdf.Story(html=part, user_css=CSS)
             more = True
             while more:
                 page += 1
                 device = writer.begin_page(rect)
-                more, _ = story.place(rect + (54, 54, -54, -72))
-                story.element_positions(note, {"page": page})
-                story.draw(device)
+                for c, column in enumerate(columns):  # one column, or two side by side
+                    if not more:
+                        break
+                    more, _ = story.place(column)
+                    story.element_positions(note, {"page": page, "column": c})
+                    story.draw(device)
                 writer.end_page()
         writer.close()
         split = {int(i.split("-")[1]) for i, p in pages.items() if len(p) > 1} - breaks
         if not split:
             break
         breaks |= split
+    else:
+        raise ValueError(f"{project.id}: tables still split across pages after {len(breaks)} page breaks")
     doc = pymupdf.open("pdf", buffer.getvalue())
     for n, page in enumerate(doc, 1):  # page numbers: printed, so logged
         page.insert_text((rect.width / 2 - 20, rect.height - 36), f"Page {n} of {doc.page_count}", fontname="helv",
                          fontsize=8)
+        if project.has("furniture"):  # a running header of numbers that aren't facts
+            page.insert_text((54, 36), RUNNING_HEADER, fontname="helv", fontsize=8)
     doc.set_metadata({})
     data = doc.tobytes(garbage=3, deflate=True, no_new_id=True)
     return data, locate(project, pymupdf.open("pdf", data), placed)
@@ -513,10 +671,10 @@ def locate(project, doc, placed=None):
         table_boxes = [t.bbox for t in page.find_tables().tables] + list((placed or {}).get(n, []))
         for w in page.get_text("words"):
             text = w[4].strip(",.;:()°")
-            number = parse_number(text)
+            number = parse_number(text) if re.search(r"[0-9]", text) else None  # "ft²" is a unit, not a 2
             if number is None:
                 continue
-            facts = by_value.get(number, []) if re.match(r"[-+±]?\d", text) else []
+            facts = by_value.get(number, []) if re.match(r"[-+±$]?\d", text) else []  # "$15.2M" is printed money
             inside_table = any(b[0] - 1 <= w[0] and w[2] <= b[2] + 1 and b[1] - 1 <= w[1] and w[3] <= b[3] + 1
                                for b in table_boxes)
             for f in facts:
@@ -631,6 +789,36 @@ def classify(claim, facts, printed):
         return "misread", None
     return "hallucinated", None
 
+# A limit, however it's put: a requirement ("shall not exceed"), a negation ("not rated above"), a bound.
+BOUNDS = {"maximum": ("maximum", "max", "not exceed", "not to exceed", "no more than", "at most", "up to", "limit",
+                      "not rated above", "not rated for", "no higher", "or less", "upper"),
+          "minimum": ("minimum", "min", "at least", "no less than", "not less than", "or more", "lower")}
+
+SIGNS = {"maximum": ("<", "≤", "⩽"), "minimum": (">", "≥", "⩾")}
+
+def bounds(text):
+    """The bounds a text states ({"maximum"}, {"minimum"}, both or neither), in words or signs ("<= 39 psf")."""
+    raw = str(text)
+    text = " ".join(unicodedata.normalize("NFKC", raw).casefold().replace("-", " ").split())
+    return {bound for bound, phrases in BOUNDS.items()
+            if any(re.search(rf"\b{p}\b", text) for p in phrases) or any(sign in raw for sign in SIGNS[bound])}
+
+NUMBER = r"[-+]?\d[\d,]*(?:\.\d+)?"
+RANGE = re.compile(rf"^\s*({NUMBER})\s*(?:[^\d\s'\"]{{0,4}}\s+)?(?:to|–|—|and|-)\s*({NUMBER})(?!\s*/)\s*(\D*)$")
+
+def ranges(claims):
+    """Claims as scored: one whose value is a range ("66 to 75 °F") stands for its two bounds, a minimum and a
+    maximum, each a claim of its own (feet and inches, "2'-9 1/2\"", aren't ranges)."""
+    for c in claims:
+        m = RANGE.match(str(c.get("value", "")))
+        low, high = (parse_number(m.group(1)), parse_number(m.group(2))) if m else (None, None)
+        if low is None or high is None or not low < high:
+            yield c
+            continue
+        for bound, value in (("minimum", m.group(1)), ("maximum", m.group(2))):
+            yield {**c, "value": f"{value} {m.group(3).strip()}".strip(),
+                   "attribute": f"{bound} {c.get('attribute', '')}".strip()}
+
 def score(key_data, claims):
     """Each claim classed, facts found and missed, and conditions kept, from a key and extracted claims (dicts
     with entity, attribute, value, unit, conditions)."""
@@ -638,21 +826,22 @@ def score(key_data, claims):
              for f in key_data["facts"]]
     by_id = {f.id: f for f in facts}
     outcomes, found, conditions = {}, {}, {}
-    seen = set()
-    for c in claims:
+    seen = {}
+    for c in ranges(claims):
         ident = (str(c.get("entity", "")).casefold(), str(c.get("attribute", "")).casefold(), str(c.get("value", "")))
-        if ident in seen:
-            continue  # the same claim read twice (overlapping tiles) counts once
-        seen.add(ident)
-        outcome, fid = classify(c, facts, key_data["printed"])
-        outcomes[outcome] = outcomes.get(outcome, 0) + 1
+        if ident in seen:  # the same claim read twice (overlapping tiles, other readers) counts once,
+            outcome, fid = seen[ident]  # but either reading may keep its conditions
+        else:
+            outcome, fid = seen[ident] = classify(c, facts, key_data["printed"])
+            outcomes[outcome] = outcomes.get(outcome, 0) + 1
         if outcome in ("right", "loose") and fid:
             found.setdefault(fid, outcome)
             if outcome == "right":
                 found[fid] = "right"
             want = by_id[fid].conditions
             if want and fid not in conditions or conditions.get(fid) is False:
-                conditions[fid] = bool(tokens(want) & tokens(c.get("conditions", "")))
+                text = " ".join(str(c.get(k, "")) for k in ("conditions", "entity", "attribute", "value"))
+                conditions[fid] = bool(tokens(want) & (tokens(text) | bounds(text)))
     real = [f for f in facts if f.role == "fact"]
     by_form = {}
     for f in real:

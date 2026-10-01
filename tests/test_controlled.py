@@ -24,6 +24,34 @@ class Generation(unittest.TestCase):
         pump = project.fact("P-101A.capacity")
         self.assertEqual([x["form"] for x in pump.forms], ["table"])
 
+class Knobs(unittest.TestCase):
+    def test_prose_traps_and_layouts_place_every_fact(self):
+        texts = {}
+        for knob in controlled.PROSE_KNOBS:
+            project = controlled.convention_center(1)
+            project.knob = knob
+            data, log = controlled.render(project)
+            self.assertTrue(all(f.forms for f in project.facts))
+            texts[knob] = data
+            if knob in ("furniture", "all"):  # the running header's numbers are logged, as structure
+                self.assertIn("LCC-HC-DB-004", [p["text"] for p in log if p["role"] == "structure"])
+        self.assertEqual(len(set(texts.values())), len(texts))  # each knob draws a different document
+
+    def test_tables_are_never_split_across_pages_or_columns(self):
+        for make, knob, prefix in ((controlled.equipment_schedules, "dense", "V-3"),
+                                   (controlled.track_schedules, "dense", "C-"),
+                                   (controlled.convention_center, "two-column", "room")):
+            project = make(1)
+            project.knob = knob
+            controlled.render(project)
+            pages = {x["page"] for f in project.facts if f.id.startswith(prefix) for x in f.forms}
+            self.assertEqual(len(pages), 1, f"{project.id}-{knob}: {prefix} on pages {pages}")
+
+    def test_prose_knobs_leave_table_projects_alone(self):
+        project = controlled.equipment_schedules(1)
+        project.knob = "all"
+        self.assertFalse(project.has("two-column") or project.has("furniture"))
+
 def claim(fact, **change):
     c = {"entity": fact.entity, "attribute": fact.attribute, "value": f"{fact.value}", "unit": fact.unit,
          "conditions": fact.conditions}
@@ -78,6 +106,36 @@ class Scoring(unittest.TestCase):
         pressure = project.fact("B-401.discharge pressure")
         s = controlled.score(controlled.key(project, log), [claim(pressure, entity="B-401", attribute="TDH")])
         self.assertEqual(s["outcomes"], {"misbound": 1})
+
+    def test_a_limit_is_kept_however_it_is_put(self):
+        self.assertEqual(controlled.bounds("shall not exceed"), {"maximum"})
+        self.assertEqual(controlled.bounds("not rated for snow loads above"), {"maximum"})
+        self.assertEqual(controlled.bounds("no less than"), {"minimum"})
+        self.assertEqual(controlled.bounds("design flow"), set())
+        project = controlled.convention_center(1)
+        _, log = controlled.render(project)
+        noise = project.fact("hallc.noise")
+        claims = [claim(noise, attribute="maximum background noise", conditions=""),
+                  claim(project.fact("hallc.liveload"), conditions="no less than"),
+                  claim(project.fact("roof.snow"), conditions="")]
+        s = controlled.score(controlled.key(project, log), claims)
+        self.assertEqual(s["conditions_kept"], "2/3")  # the snow load's limit was dropped
+        signed = [claim(project.fact("roof.snow"), value=f"<= {project.fact('roof.snow').value}", conditions="")]
+        self.assertEqual(controlled.score(controlled.key(project, log), signed)["conditions_kept"], "1/1")
+        room = project.fact("room101.seats")  # one reader drops the caption's hall, another keeps it
+        twice = [claim(room, entity="Room 101", conditions=""), claim(room, entity="Room 101", conditions="Hall C")]
+        s = controlled.score(controlled.key(project, log), twice)
+        self.assertEqual((s["claims"], s["conditions_kept"]), (1, "1/1"))
+
+    def test_a_range_stands_for_both_its_bounds(self):
+        project = controlled.convention_center(1)
+        _, log = controlled.render(project)
+        low, high = project.fact("hallc.tmin"), project.fact("hallc.tmax")
+        s = controlled.score(controlled.key(project, log), [
+            {"entity": "Hall C", "attribute": "indoor design temperature", "value": f"{low.value} to {high.value} °F"},
+            {"entity": "Hall C", "attribute": "clear height", "value": "17'-9 1/2\""}])  # feet and inches: one value, printed nowhere
+        self.assertEqual(s["outcomes"], {"right": 2, "hallucinated": 1})
+        self.assertNotIn("hallc.tmax", s["missed"])
 
     def test_a_superseded_value_reported_as_current_is_a_distractor(self):
         project = controlled.roller_coaster(1)
