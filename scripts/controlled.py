@@ -132,6 +132,23 @@ def main(argv=None):
                           + " ".join(f"{f} {x.get('misbound', 0)}" for f, x in r["outcomes_by_reader"].items())
                           + ("; " + " ".join(f"{f} {k}" for f, k in r["conditions_by_reader"].items())
                              if r["conditions_kept"] != "0/0" else ""))
+    from semantic_pdf_diff import schematics
+    for which, runs in results.items():  # schematics: relations and numbers apart
+        for project in schematics.SCHEMATIC_PROJECTS:
+            mine = {run[len(project) + 2:].partition("-")[2]: r for run, r in runs.items()
+                    if run.startswith(project + "-s") and run[len(project) + 2:].partition("-")[0].isdigit()}
+            if not mine:
+                continue
+            print(f"\n{which} {project}: knob      relations found  numbers found   right  implied  reversed  wrong  "
+                  "invented  unscored   number outcomes")
+            for knob in schematics.SCHEMATIC_KNOBS:
+                r = mine.get(knob)
+                if r:
+                    o, k = r["relations"], r["recall_by_kind"]
+                    number = "-" if k["number"] is None else f"{k['number']:.3f}"
+                    print(f"  {knob:12s} {k['relation']:15.3f} {number:>14s} {o.get('right', 0):7d} "
+                          f"{o.get('implied', 0):8d} {o.get('reversed', 0):9d} {o.get('wrong', 0):6d} "
+                          f"{o.get('invented', 0):9d} {o.get('unscored', 0):9d}   {r['outcomes']}")
     print()
     for which, runs in results.items():
         for run, r in runs.items():

@@ -66,6 +66,46 @@ class Knobs(unittest.TestCase):
                 self.assertEqual(text == "", knob in ("scan", "all"))  # a scan has no text layer
                 self.assertEqual(july.value in text, knob in ("clean", "legend-caption"))  # vector, values printed
 
+    def test_schematics_place_every_relation_where_each_knob_says(self):
+        from semantic_pdf_diff import schematics
+        for make in schematics.SCHEMATIC_PROJECTS.values():
+            for knob in schematics.SCHEMATIC_KNOBS:
+                project = make(1)
+                project.knob = knob
+                data, log = controlled.render(project)
+                with self.subTest(project=project.id, knob=knob):
+                    again = make(1)
+                    again.knob = knob
+                    self.assertEqual(controlled.render(again)[0], data)  # byte for byte
+                    system = project.schematic["system"]
+                    links = [f for f in project.facts if f.relation]
+                    described = {links[i].id for i, l in enumerate(system.links) if l.kind == "intro"}
+                    drawable = [f for f in links if f.id not in described]
+                    forms = {x["form"] for f in drawable for x in f.forms}
+                    want = {"clean": {"figure", "prose"}, "prose": {"prose"}, "prose-hard": {"prose"},
+                            "all": {"figure", "prose"}}.get(knob, {"figure"})
+                    self.assertEqual(forms, want)
+                    self.assertTrue(all({x["form"] for x in f.forms} == {"prose"} for f in links if f.id in described))
+                    if knob == "all":  # half the relations told in words too, the rest only drawn
+                        told = sum(1 for f in drawable if any(x["form"] == "prose" for x in f.forms))
+                        self.assertEqual(told, len(drawable) // 2)
+
+    def test_no_line_crosses_a_part_in_any_layout(self):
+        from semantic_pdf_diff import schematics as S
+        for make in S.SCHEMATIC_PROJECTS.values():
+            system = make(1).schematic["system"]
+            for folded in (False, True):
+                pos, _ = S.layout(system, 504, folded)
+                box_w = min(S.BOX_W, 504 / (4 if folded else len(system.path)) - 12)
+                box = lambda c: (c[0] - box_w / 2 - 2, c[1] - S.BOX_H / 2 - 2, c[0] + box_w / 2 + 2, c[1] + S.BOX_H / 2 + 2)
+                ids = {p.id for p in system.parts}
+                for l in system.links:
+                    if l.object in ids and l.kind not in ("member", "intro"):  # drawn as lines
+                        for q, c in pos.items():
+                            if q not in (l.subject, l.object):
+                                with self.subTest(system=system.id, folded=folded, link=(l.subject, l.object), part=q):
+                                    self.assertFalse(S._crosses(pos[l.subject], pos[l.object], box(c)))
+
     def test_prose_knobs_leave_table_projects_alone(self):
         project = controlled.equipment_schedules(1)
         project.knob = "all"
@@ -175,6 +215,34 @@ class Scoring(unittest.TestCase):
         s = controlled.score(key, [{"entity": "Exhibit floor", "attribute": "peak cooling load", "value": exhibit.value}])
         self.assertEqual(s["outcomes"], {"right": 1})
         self.assertNotIn("zone.exhibit", s["missed"])
+
+    def test_relations_score_by_names_from_either_side(self):
+        from semantic_pdf_diff import schematics
+        project = schematics.ahu_drawing(1)
+        project.knob = "clean"
+        _, log = controlled.render(project)
+        key = controlled.key(project, log)
+        claim = lambda e, a, v: {"entity": e, "attribute": a, "value": v}
+        cases = [
+            (claim("cooling coil", "upstream of", "supply fan"), {"right": 1}),
+            (claim("supply fan", "position", "after the cooling coil"), {"right": 1}),       # the inverse, in words
+            (claim("AHU-3", "air path", "mixing box -> filter bank -> cooling coil"), {"right": 2}),  # a path: pairs
+            (claim("filter bank", "upstream of", "supply fan"), {"implied": 1}),            # true, two steps on
+            (claim("supply fan", "upstream of", "cooling coil"), {"reversed": 1}),
+            (claim("motor M-3", "drives", "return fan"), {"wrong": 1}),
+            (claim("AHU-3", "components", "mixing box, humidifier"), {"right": 1, "invented": 1}),
+            (claim("supply fan", "function", "moves air through the hall"), {"unscored": 1}),
+            (claim("Hall C", "served by", "panel LP-2"), {"wrong": 1}),  # (on the air loop, everything is upstream)
+            (claim("motor M-3", "drives", "AHU-3"), {"implied": 1}),     # it drives a part of AHU-3
+            (claim("panel LP-2", "connects to", "motor M-3"), {"implied": 1}),  # a link, its kind not said
+            (claim("panel LP-2", "connects to", "motor M-3 (power)"), {"right": 1}),  # ...and said
+        ]
+        for c, want in cases:
+            with self.subTest(claim=c):
+                self.assertEqual(controlled.score(key, [c])["relations"], want)
+        both = controlled.score(key, [claim("cooling coil", "upstream of", "supply fan"),
+                                      claim("supply fan", "downstream of", "cooling coil")])
+        self.assertEqual(both["relations"], {"right": 1})  # one fact, read twice in two ways, counts once
 
     def test_a_superseded_value_reported_as_current_is_a_distractor(self):
         project = controlled.roller_coaster(1)

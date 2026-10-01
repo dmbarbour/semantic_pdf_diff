@@ -1,6 +1,6 @@
 # Controlled documents with known facts
 
-- **Status:** Active (2026-10-01): milestones 1, 2a (table knobs), 2b (prose traps and layout knobs) and 3a (charts and scanned pages) done.
+- **Status:** Active (2026-10-01): milestones 1, 2a (table knobs), 2b (prose traps and layout knobs), 3a (charts and scanned pages) and 3b (schematics and relations) done.
 - **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](one-table-model-2026-09-30.md) (table hazards; its table eye tests become part of this); [content-addressed queries](content-addressed-queries-2026-09-28.md) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
 - **Why:**
   - **The owner (2026-10-01):** "similar to the eye test as a controlled test, we could have controlled PDF tests, i.e. where you generate a few PDFs with known facts to extract for fictional projects. This might provide a more robust control without relying on yours or my ability to extract facts."
@@ -40,6 +40,20 @@
   - Entities have invented names and tags ("Glenmore Pump Station", `P-101A`), with the aliases a reader may fairly use.
   - Relations: part of (a camera's detector), alternative to (the 2-ton unit against the baseline), supersedes (revision B's value).
   - **Relational facts, without a number** (needed for schematics): a subject, a relation and an object, such as "DM1 precedes DM2 on the light path", "the Lyot stop is in a pupil plane", "the focal plane mask is an HLC or a VC", "the filter wheel is movable".
+    - **The owner (2026-10-01):** "We'll need to develop a fairly wide array of 'relations', e.g. component of, within, attached to, etc. and a lot of control docs that present relations in different ways, with varying levels of difficulty."
+    - **The vocabulary:** each relation has the phrasings a reader may use and its inverse ("drives" against "driven by"), so a claim from either side scores. It grows as documents need it:
+      - structure: part of, within, mounted on
+      - flow: precedes (upstream of, feeds)
+      - mechanism: drives, powered from
+      - control: controls, measures, connected to (signals)
+      - service: serves
+      - alternatives and options
+      - places: located at (a pupil, a focal plane)
+      - states: movable, insertable
+    - **Presentations, by difficulty:**
+      - prose stated plainly, or inversely, passively, by possessive ("the fan's motor"), or narrated along a path
+      - figures drawn as labelled boxes, or as symbols with leader labels; a path straight, or folded back with crossings; links labelled, or told apart only by line styles in a legend
+      - each relation in the figure, the text, or both
 - **Values drawn from the seed** within plausible ranges, so they can't be guessed. They're written in the forms documents use: `1,250`, `0.075`, `±0.05`, `4–6`, `≥ 3`, `2'-9 1/2"`, `-43.73E+6`.
 - **Distractors in the key, marked as such:** another component's value of the same kind, superseded values, negations ("not rated for…"), ranges and inequalities.
 
@@ -227,8 +241,8 @@ Each row is a situation met in this project's documents, with where it was recor
 2. **The table, layout and prose knobs,** shared with the table plan's milestone 1 (its table eye tests become sweeps here).
 3. **Charts, schematics, drawings and rasterised pages,** reusing the eye and page tests' drawing:
    - 3a: charts and scanned pages (done)
-   - 3b: schematics and concept diagrams, with relational facts scored (next)
-   - 3c: drawing sheets
+   - 3b: schematics and concept diagrams, with relational facts scored (done)
+   - 3c: drawing sheets (next)
 4. **Revision pairs and comparison scoring.**
 5. **Into rounds:** the controlled stratum reported beside judged win rates, exactly scored.
 6. **New failures become knobs:** each round's review and post-mortem adds the situations it finds.
@@ -362,10 +376,66 @@ Each row is a situation met in this project's documents, with where it was recor
   - **The legend only in the caption** cost nothing alone. On the scanned page the image reader named series by colour 4 times ("May value (dark blue series)"). With every knob on, it missed Option 2's September bar.
   - **Checked by hand:** every misbound and inexact claim, and the loose ones.
   - **Not yet:**
-    - schematics and concept diagrams (milestone 3b)
+    - schematics and concept diagrams (milestone 3b, since done)
     - drawing sheets (3c)
     - stacked bars and line charts (3c, with the drawing sheets)
     - noise on scans
+
+- **Milestone 3b, schematics and relations (2026-10-01): done.**
+  - **Relations** (`relations.py`): about 30, each with the phrasings a reader may use and its inverse.
+    - **A claim is read into triples:**
+      - its names matched to the document's parts and places
+      - its relation found from the words left over
+      - a path ("A -> B -> C") split into pairs, a list into its members, "between A and B" into two steps
+    - **Each triple is classed:**
+      - **right:** a fact, from either side
+      - **implied:** true but not a stated fact, such as two steps upstream, a part of a part, a link whose kind isn't said, or a motor driving the unit its fan is part of
+      - **reversed**
+      - **wrong**
+      - **invented:** a name the document doesn't have
+      - **unscored:** no relation named, as when a function is described
+  - **Two systems** (`schematics.py`), each a description of parts, a path, the parts hung off it, enclosures and links:
+    - **AHU-3:** a recirculating air path, a casing round four parts, a motor and its panel, a controller, and a sensor on the duct (19 relations, 2 numbers)
+    - **The Kestrel UV channel:** a light path, a guide-mode branch at the dichroic, focal and pupil planes, movable parts, and a field stop with two options (22 relations)
+  - **Eight knobs:**
+    - **clean:** labelled boxes and links, with every relation also stated plainly
+    - **prose** and **prose-hard:** no figure; plain, or inverse, passive and narrated phrasings
+    - **figure-only:** the text cites the figure
+    - **leaders:** symbols with their names on leader lines
+    - **folded:** the path snaking back in rows
+    - **legend:** link kinds told only by line style
+    - **all:** leaders, folded and legend, with half the relations also told in hard prose
+  - **Drawn fairly:** a layout search places the parts off the path so no line crosses a box, and no two lines run together or leave a part at one angle (a test checks every layout). Labels never overlap.
+  - **gemma-4 read the 16 documents for $0.048:**
+
+    | Knob | AHU-3: relations found | AHU-3: wrong / implied | UV channel: relations found | UV channel: wrong / implied |
+    |---|---|---|---|---|
+    | clean | 1.00 | 0 / 0 | 1.00 | 0 / 2 |
+    | prose | 1.00 | 0 / 0 | 0.91 | 0 / 0 |
+    | prose-hard | 1.00 | 0 / 0 | 1.00 | 0 / 0 |
+    | figure-only | 0.95 | 4 / 1 | 0.91 | 3 / 3 |
+    | leaders | 0.95 | 5 / 8 | 0.86 | 11 / 3 |
+    | folded | 1.00 | 4 / 2 | 1.00 | 7 / 2 |
+    | legend | 0.89 | 4 / 11 | 0.82 | 6 / 2 |
+    | all | 0.89 | 4 / 3 | 0.91 | 5 / 14 |
+
+  - **Relations stated in words are read almost perfectly,** plainly or not. The one miss: the UV channel's two stop options, stated in one sentence, which no reader extracted.
+  - **Figures cost a few relations each, and harder drawings more wrong ones:**
+    - **Leader labels:** notes went to a neighbouring part ("EMCCD | plane | pupil plane", "narrow stop | mobility | movable"), and one name was read as "Ha".
+    - **Legend-only line styles:** the image reader mostly wrote "connected to" without the kind (11 implied on AHU-3), and traced a control line to the wrong part.
+    - **Outlines:** parts drawn outside a casing or channel outline (the outdoor air damper, the dichroic) were credited to it.
+    - **Small marks:** the sensor's stem to its duct was missed whenever only the figure showed it.
+  - **The scorer, found wanting by reading every claim that wasn't right, and fixed before these figures:**
+    - **Phrasings readers used that the vocabulary lacked:**
+      - paths: "airflow destination", "flow target", "output connection", "input source", "drive target", "power target"
+      - membership: "system membership"
+      - states: "selectability"
+    - **Generic links:** "connected to" or "directed connection" now take their kind from beside them ("control signal", "drive shaft", "air or light"), and are implied without one.
+    - **A part named as the attribute** ("UV channel | detector | EMCCD") reads as membership.
+    - **Fair inferences counted wrong:** the duct serving the hall, a motor driving the unit, a sensor "located in" its duct.
+    - **A fact missing from the key:** the description's "AHU-3, which conditions Hall C".
+    - **A limit:** on a recirculating loop, everything is upstream of everything, so loop claims can only be implied, never wrong.
+  - **Next:** more relations and more systems that present them in different ways (the owner's direction), within drawing sheets (3c) and beyond. Mechanical assemblies (attached to, mounted on, supported by) are the gap that stands out.
 
 ## Decisions (2026-10-01)
 

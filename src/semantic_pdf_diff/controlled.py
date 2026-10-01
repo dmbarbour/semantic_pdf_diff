@@ -39,10 +39,13 @@ class Fact:
     forms: list = field(default_factory=list)  # where it's printed: [{"form", "page", "box"}]
     drawn: str = ""                   # the form it was drawn in, when fixed ("table" for a schedule's cells)
     tolerance: float = 0.0            # a value read against a chart's axis: how far off still counts (else exact)
+    relation: str = ""                # a relational fact (relations.RELATIONS): entity, relation, value (the object)
+    object_aliases: tuple = ()        # the object's other names
+    accepts: tuple = ()               # other relations that state it fairly
 
     @property
     def number(self):
-        return parse_number(self.value)
+        return None if self.relation else parse_number(self.value)
 
 def parse_number(text):
     """The first number in a value as printed ("1,250" → 1250.0, "-0.8" → -0.8, "±0.05" → 0.05), or None."""
@@ -96,7 +99,8 @@ class Project:
     knob: str = "clean"  # how schedules are drawn (TABLE_KNOBS), or prose, pages and charts (kinds)
     texts: dict = None   # {name: (plain, trap)} phrasings, filled from values
     values: dict = None
-    kinds: tuple = ()    # the knobs a prose or chart project is drawn under (PROSE_KNOBS, CHART_KNOBS)
+    kinds: tuple = ()    # the knobs a prose, chart or schematic project is drawn under
+    things: list = None  # the named parts a schematic shows: [(name, aliases)]
 
     def has(self, knob):
         """Whether a prose, layout or chart knob applies: "all" applies every knob of the project's kind."""
@@ -656,8 +660,9 @@ def corpus(seeds=(1,), knobs=False):
     every prose knob (ids "<project>-<knob>")."""
     out = [make(seed) for make in PROJECTS.values() for seed in seeds]
     if knobs:
+        from .schematics import SCHEMATIC_KNOBS, SCHEMATIC_PROJECTS
         for makers, all_knobs in ((TABLE_PROJECTS, TABLE_KNOBS), (PROSE_PROJECTS, PROSE_KNOBS),
-                                  (CHART_PROJECTS, CHART_KNOBS)):
+                                  (CHART_PROJECTS, CHART_KNOBS), (SCHEMATIC_PROJECTS, SCHEMATIC_KNOBS)):
             for make in makers.values():
                 for seed in seeds:
                     for knob in all_knobs:
@@ -759,6 +764,21 @@ def html(project, breaks=()):
                 plain, trap = project.texts[block[1]]
                 text = (trap if project.has("traps") else plain).format(**project.values)
                 out.append(f"<p>{esc(text)}</p>")
+            elif block[0] == "intro":  # a schematic's description
+                from .schematics import intro_html
+                out.append(intro_html(block[1], esc))
+            elif block[0] == "relations":  # a schematic's arrangement in words
+                from .schematics import prose_html
+                out.append(prose_html(project, block[1], esc))
+            elif block[0] == "schematic":  # room for the figure, drawn after layout; its caption below
+                from .schematics import figure_height, figure_style, has_figure
+                if has_figure(project):
+                    style = figure_style(project)
+                    number = next(figures)
+                    height = figure_height(block[1], 504, style["folded"], style["legend"])
+                    out.append((PAGE_BREAK if f"figure-{number}" in breaks else "") +
+                               f"<div id='figure-{number}' style='height:{height:g}pt'></div>"
+                               f"<p class='caption'>{esc(block[1].caption)}</p>")
             elif block[0] == "chart":  # room for the chart, drawn after layout; its caption below
                 chart = block[1]
                 caption = chart.caption + (f" ({chart.legend_words})" if chart.legend_words and project.has("legend-caption")
@@ -797,9 +817,14 @@ def render(project, page_size="letter"):
         writer = pymupdf.DocumentWriter(buffer)
         placed, pages = {}, {}  # page: schedule tables' boxes; table id: the (page, column)s it was drawn in
         figures = {}  # figure number: (page, the room left for it)
+        spans = {}    # a sentence's links (by index): {page: its words' box}
 
         def note(position):
             ident = getattr(position, "id", "") or ""
+            if ident.startswith("rel-"):
+                at = spans.setdefault(ident, {})
+                r = pymupdf.Rect(position.rect)
+                at[position.page] = at[position.page] | r if position.page in at else r
             if ident.startswith("figure-") and position.open_close & 1:
                 figures[int(ident.split("-")[1])] = (position.page, pymupdf.Rect(position.rect))
             if ident.startswith("schedule-"):
@@ -841,6 +866,8 @@ def render(project, page_size="letter"):
         if project.has("furniture"):  # a running header of numbers that aren't facts
             page.insert_text((54, 36), RUNNING_HEADER, fontname="helv", fontsize=8)
     drawn = draw_charts(project, doc, figures)
+    if getattr(project, "schematic", None):
+        drawn = draw_schematics(project, doc, figures, spans)
     doc.set_metadata({})
     data = doc.tobytes(garbage=3, deflate=True, no_new_id=True)
     log = locate(project, pymupdf.open("pdf", data), placed, drawn)
@@ -866,7 +893,26 @@ def draw_charts(project, doc, figures):
             bars, numbers = [(f, shift(b)) for f, b in bars], [(t, fs, shift(b)) for t, fs, b in numbers]
         else:
             bars, numbers = draw(page, box)
-        out.setdefault(page_no, []).append((box, bars, numbers))
+        out.setdefault(page_no, []).append((box, bars, numbers, "chart"))
+    return out
+
+def draw_schematics(project, doc, figures, spans):
+    """Draw the schematic into its room, and place the facts stated in words where their sentences fell. Returns
+    {page: [(figure box or None, [(fact, box)], [(number, facts, box)], form)]}, as draw_charts."""
+    from .schematics import draw_system, figure_style, has_figure
+    info = project.schematic
+    system = info["system"]
+    link_facts = [f for f in project.facts if f.relation]
+    out = {}
+    if has_figure(project):
+        page_no, box = figures[1]
+        placements, numbers = draw_system(doc[page_no - 1], box, system, link_facts, info["notes"],
+                                          **figure_style(project))
+        out.setdefault(page_no, []).append((box, placements, numbers, "figure"))
+    for ident, pages in spans.items():
+        links = [int(i) for i in ident.split("-")[1:]]
+        for page_no, r in sorted(pages.items()):
+            out.setdefault(page_no, []).append((None, [(link_facts[i], r) for i in links], [], "prose"))
     return out
 
 def locate(project, doc, placed=None, drawn=None):
@@ -874,16 +920,18 @@ def locate(project, doc, placed=None, drawn=None):
     its role: fact or distractor (by id), or structure (section, table and page numbers, anything else)."""
     by_value = {}
     for f in project.facts:
-        by_value.setdefault(parse_number(f.value), []).append(f)
+        if not f.relation:  # relations are placed by their drawer and their sentences, not found by number
+            by_value.setdefault(parse_number(f.value), []).append(f)
         f.forms = []
     log = []
     for n, page in enumerate(doc, 1):
         table_boxes = [t.bbox for t in page.find_tables().tables] + list((placed or {}).get(n, []))
         chart_boxes = []
-        for box, bars, numbers in (drawn or {}).get(n, []):  # charts: placed and logged as drawn
-            chart_boxes.append(box)
+        for box, bars, numbers, form in (drawn or {}).get(n, []):  # figures: placed and logged as drawn
+            if box is not None:
+                chart_boxes.append(box)
             for fact, bar in bars:
-                fact.forms.append({"form": "chart", "page": n, "box": [round(v, 1) for v in bar]})
+                fact.forms.append({"form": form, "page": n, "box": [round(v, 1) for v in bar]})
             for text, facts, _ in numbers:
                 log.append({"text": text, "page": n, "role": facts[0].role if facts else "structure",
                             "facts": [f.id for f in facts]})
@@ -909,8 +957,12 @@ def locate(project, doc, placed=None, drawn=None):
 
 def key(project, log):
     """The answer key: facts with their forms, and the printed numbers with their roles."""
-    exact = lambda f: {k: v for k, v in asdict(f).items() if k != "tolerance" or v}  # read exactly: no field
-    return {"project": project.id, "title": project.title, "facts": [exact(f) for f in project.facts], "printed": log}
+    optional = ("tolerance", "relation", "object_aliases", "accepts")  # left out when unused
+    fields = lambda f: {k: v for k, v in asdict(f).items() if k not in optional or v}
+    out = {"project": project.id, "title": project.title, "facts": [fields(f) for f in project.facts], "printed": log}
+    if project.things:
+        out["parts"] = [{"name": n, "aliases": list(a)} for n, a in project.things]
+    return out
 
 def write(project, folder):
     """Write <id>.pdf and <id>.key.json into folder; returns the PDF's path."""
@@ -1060,20 +1112,45 @@ def ranges(claims):
             yield {**c, "value": f"{value} {m.group(3).strip()}".strip(),
                    "attribute": f"{bound} {c.get('attribute', '')}".strip()}
 
+NUMERIC_VALUE = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥$])?\s*[-+±]?\$?\d")
+
 def score(key_data, claims):
     """Each claim classed, facts found and missed, and conditions kept, from a key and extracted claims (dicts
     with entity, attribute, value, unit, conditions)."""
     facts = [Fact(**{k: (tuple(v) if k in ("aliases", "synonyms") else v) for k, v in f.items()})
              for f in key_data["facts"]]
     by_id = {f.id: f for f in facts}
-    outcomes, found, conditions = {}, {}, {}
-    seen = {}
+    numeric = [f for f in facts if not f.relation]
+    related = [f for f in key_data["facts"] if f.get("relation")]
+    outcomes, found, conditions, relation_outcomes = {}, {}, {}, {}
+    if related:  # relations are scored by names (relations.py)
+        from . import relations
+        index = relations.Index(related)
+        things = [relations.Thing(p["name"], tuple(p.get("aliases", ()))) for p in key_data.get("parts", [])]
+        literal = {}
+        for f in related:
+            if relations.RELATIONS[f["relation"]].literal:
+                literal.setdefault(f["value"], set()).update(f.get("object_aliases") or ())
+        things += [relations.Thing(name, tuple(sorted(aliases)), True) for name, aliases in sorted(literal.items())]
+    seen, seen_triples = {}, set()
     for c in ranges(claims):
         ident = (str(c.get("entity", "")).casefold(), str(c.get("attribute", "")).casefold(), str(c.get("value", "")))
+        if related and not NUMERIC_VALUE.match(str(c.get("value", ""))):  # a relation: one outcome per triple
+            if ident in seen:
+                continue
+            seen[ident] = None
+            for outcome, fid, triple in relations.classify_claim(c, things, index):
+                if triple is not None and triple in seen_triples:
+                    continue  # read twice, by other readers or in other words
+                seen_triples.add(triple)
+                relation_outcomes[outcome] = relation_outcomes.get(outcome, 0) + 1
+                if outcome == "right":
+                    found[fid] = "right"
+            continue
         if ident in seen:  # the same claim read twice (overlapping tiles, other readers) counts once,
             outcome, fid = seen[ident]  # but either reading may keep its conditions
         else:
-            outcome, fid = seen[ident] = classify(c, facts, key_data["printed"])
+            outcome, fid = seen[ident] = classify(c, numeric, key_data["printed"])
             outcomes[outcome] = outcomes.get(outcome, 0) + 1
         if outcome in ("right", "loose") and fid:
             found.setdefault(fid, outcome)
@@ -1096,4 +1173,9 @@ def score(key_data, claims):
             "missed": sorted(f.id for f in real if f.id not in found),
             "claims": sum(outcomes.values()), "outcomes": dict(sorted(outcomes.items())),
             "conditions_kept": f"{sum(conditions.values())}/{len(conditions)}",
-            "recall_by_form": {k: round(v[0] / v[1], 4) for k, v in sorted(by_form.items())}}
+            "recall_by_form": {k: round(v[0] / v[1], 4) for k, v in sorted(by_form.items())},
+            **({"relations": dict(sorted(relation_outcomes.items())),
+                "recall_by_kind": {kind: round(sum(1 for f in mine if f.id in found) / len(mine), 4) if mine else None
+                                   for kind, mine in (("number", [f for f in real if not f.relation]),
+                                                      ("relation", [f for f in real if f.relation]))}}
+               if related else {})}
