@@ -76,3 +76,38 @@ class Scoring(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class Replay(unittest.TestCase):
+    """The committed corpus, read again from its recorded answers, scores as committed."""
+    def test_the_corpus_reads_again_to_the_recorded_scores(self):
+        import contextlib, io, json, tempfile
+        from pathlib import Path
+        import pymupdf
+        from semantic_pdf_diff import cli, fixtures, rounds
+        folder = Path(__file__).resolve().parent.parent / "benchmarks" / "controlled"
+        if not (folder / "replay.zip").exists():
+            self.skipTest("no recorded corpus")
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            with fixtures.Fixture(fixtures.unpack(folder / "replay.zip", d)) as f:
+                recorded_with = f.meta().get("pymupdf")
+                responder = f.db.execute("SELECT DISTINCT responder FROM response").fetchone()[0]
+            if recorded_with != pymupdf.VersionBind:
+                self.skipTest(f"recorded with PyMuPDF {recorded_with}; documents differ under {pymupdf.VersionBind}")
+            committed = json.loads((folder / "results.json").read_text())["recorded"]
+            for project in controlled.corpus():
+                pdf = controlled.write(project, d / "docs")
+                self.assertEqual(pdf.read_bytes(), (folder / "docs" / pdf.name).read_bytes())  # generated alike
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                    code = cli.main([str(pdf), str(pdf), "--config", str(folder / "settings.json"), "-q", "--no-situate",
+                                     "--out", str(d / "runs" / project.id), "--fixture", str(folder / "replay.zip"),
+                                     "--fixture-mode", "replay", "--base-url", "http://127.0.0.1:9/v1",
+                                     "--responder", responder])
+                self.assertIn(code, (0, 2))
+            claims = {}
+            for (run, _, _, _), unit in rounds.collect(d / "runs").items():
+                claims.setdefault(run, []).extend(unit["claims"].values())
+            for run, found in claims.items():
+                key = json.loads((d / "docs" / f"{run}.key.json").read_text())
+                result = controlled.score(key, found)
+                self.assertEqual((result["recall"], result["outcomes"]), (committed[run]["recall"], committed[run]["outcomes"]))

@@ -204,8 +204,9 @@ def roller_coaster(seed=1):
                 d.number(3.6, 4.6, 1), "g", basis="calculated")
     trains = ("Trains", ("train", "ride vehicles", "trains"))
     n_trains = add("trains.count", *trains, "number of trains", ("count", "trains"), d.number(2, 3), "")
-    cars = add("trains.cars", *trains, "cars per train", ("cars",), d.number(5, 8), "")
-    riders = add("trains.riders", *trains, "riders per car", ("riders", "seats per car"), d.number(4, 6), "")
+    cars = add("trains.cars", *trains, "cars per train", ("cars", "car count", "number of cars"), d.number(5, 8), "")
+    riders = add("trains.riders", "Cars", ("car", "train", "trains"), "riders per car",
+                 ("riders", "seats per car", "seating capacity", "seats"), d.number(4, 6), "")
     mass = add("trains.mass", *trains, "empty train mass", ("train mass", "empty mass", "mass"),
                d.number(9000, 14000), "lb")
     capacity = add("ride.capacity", *ride, "hourly capacity", ("capacity", "throughput", "riders per hour"),
@@ -343,60 +344,77 @@ def write(project, folder):
 # --- scoring -----------------------------------------------------------------------------------
 
 # Not "a": single letters name things (Option A, Module B, detail B4).
-STOP = {"the", "an", "of", "for", "per", "each", "at", "in", "on", "to", "and", "with", "is", "value"}
+STOP = {"the", "an", "of", "for", "per", "each", "at", "in", "on", "to", "and", "with", "is", "value", "by", "its"}
+# Words a reader may fairly use for one another (domain-neutral; a project's own synonyms are in its facts).
+SAME = {"weight": "mass", "number": "count", "quantity": "count", "qty": "count", "velocity": "speed",
+        "seating": "seat", "rider": "seat", "tonnage": "ton", "max": "maximum", "min": "minimum",
+        "dia": "diameter", "temp": "temperature", "rated": "rating"}
 
 def tokens(text):
+    """A name's words: case-folded, hyphens split, stop words dropped, plurals and synonyms folded."""
     text = unicodedata.normalize("NFKC", str(text)).casefold().replace("-", " ")
-    return {t for t in re.findall(r"[a-z0-9]+", text) if t not in STOP}
+    out = set()
+    for t in re.findall(r"[a-z0-9]+", text):
+        if t in STOP:
+            continue
+        if len(t) > 3 and t.endswith("s") and not t.endswith("ss"):
+            t = t[:-1]
+        out.add(SAME.get(t, t))
+    return out
 
-def names(text, options):
-    """Whether a claim's name matches one of the options: one's words all appear in the other's."""
-    got = tokens(text)
-    return bool(got) and any((want := tokens(o)) and (want <= got or got <= want) for o in options)
+def vocabulary(fact):
+    """Every word naming a fact: its entity and aliases, attribute and synonyms, and conditions."""
+    return set().union(*(tokens(o) for o in (fact.entity, fact.attribute, fact.conditions) + tuple(fact.aliases)
+                         + tuple(fact.synonyms)))
 
-def named(text, facts):
-    """The entities a claim's entity name fits best: a name holding a whole alias fits by that alias's length;
-    a name that's part of an alias fits more weakly. One entity is specific; a tie (a bare "pump" among three
-    pumps) is vague; none is an unknown name."""
-    got = tokens(text)
-    if not got:
-        return set()
-    fit = {}
+def fit(claim, fact, weights):
+    """How well a claim's words (entity, attribute and conditions together, however it split them) describe a fact:
+    the weighted share of them among the fact's words, rare words counting more (weights: see rarity)."""
+    words = tokens(claim.get("entity", "")) | tokens(claim.get("attribute", "")) | tokens(claim.get("conditions", ""))
+    total = sum(weights.get(w, weights[None]) for w in words)
+    return sum(weights.get(w, weights[None]) for w in words & vocabulary(fact)) / total if total else 0.0
+
+def rarity(facts):
+    """{word: weight}: log(1 + facts / facts using the word); None for words no fact uses."""
+    import math
+    counts = {}
     for f in facts:
-        for option in (f.entity,) + tuple(f.aliases):
-            want = tokens(option)
-            if want and want <= got:
-                weight = len(want)
-            elif want and got <= want:
-                weight = len(got) - 0.5
-            else:
-                continue
-            fit[f.entity] = max(fit.get(f.entity, 0), weight)
-    if not fit:
-        return set()
-    best = max(fit.values())
-    return {e for e, w in fit.items() if w == best}
+        for w in vocabulary(f):
+            counts[w] = counts.get(w, 0) + 1
+    n = len(facts)
+    return {**{w: math.log(1 + n / c) for w, c in counts.items()}, None: math.log(1 + n)}
 
 def same_number(a, b):
     return a is not None and b is not None and abs(a - b) <= 1e-9 * max(1.0, abs(a), abs(b))
 
 def classify(claim, facts, printed):
-    """(outcome, fact id or None) for one claim: right, loose, distractor, misbound, misread, hallucinated, or
-    text (a value without a number, not scored yet)."""
+    """(outcome, fact id or None) for one claim.
+
+    A printed value names one fact (values are unique in a document), so the question is the binding: which fact
+    the claim's names describe best. Right: the value's own fact fits best, alone. Loose: it ties for best (a bare
+    "pump" among three pumps), or no name fits at all. Misbound: another fact fits better (the value filed under
+    another entity or attribute). Distractor: a superseded or otherwise wrong value, bound to its own fact.
+    Misread: a printed number that isn't a fact (a page or section number). Hallucinated: printed nowhere.
+    Text: a value without a number, not scored yet."""
     number = parse_number(claim.get("value", ""))
     if number is None:
         return "text", None
-    entity, attribute = claim.get("entity", ""), claim.get("attribute", "")
     holders = [f for f in facts if same_number(f.number, number)]
     if holders:
-        fitted = named(entity, facts)
-        for f in holders:
-            if names(attribute, (f.attribute,) + tuple(f.synonyms)):
-                if fitted == {f.entity}:
-                    return ("right" if f.role == "fact" else "distractor"), f.id
-                if not fitted or f.entity in fitted:
-                    return "loose", f.id  # the fact's value and attribute, under a vague or unknown name
-        return "misbound", holders[0].id  # the value bound to another entity or attribute
+        holder = holders[0]
+        weights = rarity(facts)
+        scores = {f.id: fit(claim, f, weights) for f in facts}
+        best = max(scores.values())
+        top = [i for i, v in scores.items() if v == best]
+        by_id = {f.id: f for f in facts}
+        if holder.id in top and all((by_id[i].entity, by_id[i].attribute) == (holder.entity, holder.attribute)
+                                    for i in top):
+            top = [holder.id]  # facts named alike (a superseded value and its successor): the value decides
+        if best == 0 or (holder.id in top and len(top) > 1):
+            return "loose", holder.id
+        if top == [holder.id]:
+            return ("right" if holder.role == "fact" else "distractor"), holder.id
+        return "misbound", holder.id
     if any(same_number(parse_number(p["text"]), number) for p in printed):
         return "misread", None
     return "hallucinated", None

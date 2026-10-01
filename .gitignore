@@ -12,6 +12,7 @@ benchmarks/batches/*/images/
 benchmarks/batches/*/review.html
 benchmarks/batches/*/replay.zip
 benchmarks/**/replay.sqlite
+benchmarks/controlled/fixture.sqlite
 benchmarks/batches/*/questions.html
 benchmarks/report.html
 benchmarks/rounds/*/insights.html

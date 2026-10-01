@@ -1,0 +1,96 @@
+{
+ "recorded": {
+  "coaster-s1": {
+   "facts": 30,
+   "found": 30,
+   "recall": 1.0,
+   "found_right": 29,
+   "missed": [],
+   "claims": 42,
+   "outcomes": {
+    "loose": 2,
+    "right": 38,
+    "text": 2
+   },
+   "conditions_kept": "2/2",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.5,
+    "text": 0.9,
+    "visual": 1.0
+   }
+  },
+  "wtp-s1": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 37,
+   "outcomes": {
+    "right": 35,
+    "text": 2
+   },
+   "conditions_kept": "8/11",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3939,
+    "text": 0.8485,
+    "visual": 0.9091
+   }
+  }
+ },
+ "replay": {
+  "coaster-s1": {
+   "facts": 30,
+   "found": 30,
+   "recall": 1.0,
+   "found_right": 29,
+   "missed": [],
+   "claims": 42,
+   "outcomes": {
+    "loose": 2,
+    "right": 38,
+    "text": 2
+   },
+   "conditions_kept": "2/2",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.5,
+    "text": 0.9,
+    "visual": 1.0
+   }
+  },
+  "wtp-s1": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 37,
+   "outcomes": {
+    "right": 35,
+    "text": 2
+   },
+   "conditions_kept": "8/11",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3939,
+    "text": 0.8485,
+    "visual": 0.9091
+   }
+  }
+ }
+}
