@@ -514,6 +514,7 @@ class Chart:
     top: float
     legend_words: str = ""       # the series named in words, for a legend in the caption
     height: float = 210.0        # points
+    kind: str = "grouped"        # grouped bars, stacked bars (each series a segment), or lines with markers
 
 def energy_study(seed=1):
     """Hall C's cooling energy study: monthly energy of two options in a grouped bar chart, peak load by zone in
@@ -574,7 +575,55 @@ def energy_study(seed=1):
     return Project(f"lcc-energy-s{seed}", "Lakeshore Hall C: Cooling Energy Study", F, sections,
                    texts={k: (v, v) for k, v in plain.items()}, values=values, kinds=CHART_KNOBS)
 
-CHART_PROJECTS = {"lcc-energy": energy_study}
+def end_use_study(seed=1):
+    """Hall C's energy by end use: monthly energy stacked by use (cooling, fans, lighting; sc01 item 2's stacked
+    bars), the options' monthly peak loads as lines, and the season's totals in the text."""
+    d = Draw(f"lcc-enduse-{seed}")
+    F = []
+    add = lambda *a, **k: F.append(Fact(*a, **k)) or F[-1]
+    months = ("May", "June", "July", "August", "September", "October")
+    season = (0.45, 0.75, 1.0, 0.95, 0.7, 0.4)
+    uses = (("Cooling", (260, 340), ("cooling energy", "Hall C cooling", "space cooling")),
+            ("Fans", (70, 100), ("fan energy", "Hall C fans", "fan")),
+            ("Lighting", (40, 60), ("lighting energy", "Hall C lighting", "lights")))
+    grid = lambda near, step: f"{max(step, round(near / step) * step):g}"  # bars read to half a step; may repeat
+    stacked = []
+    for use, (lo, hi), aliases in uses:
+        peak = d.rng.uniform(lo, hi)
+        stacked.append((use, [add(f"{use.lower()}.{m.lower()}", use, aliases, "energy use",
+                                  ("energy", "monthly energy", "consumption", "energy consumption", "monthly use"),
+                                  grid(peak * k * d.rng.uniform(0.9, 1.1), 25), "MWh", m, drawn="chart")
+                              for m, k in zip(months, season)]))
+    options = (("Option 1, chilled beams", ("Option 1", "chilled beams", "chilled beam option")),
+               ("Option 2, VAV baseline", ("Option 2", "VAV", "VAV baseline", "variable air volume")))
+    lines_ = []
+    for (name, aliases), short, peak in zip(options, ("opt1", "opt2"), (d.rng.uniform(600, 700), d.rng.uniform(800, 900))):
+        lines_.append((name, [add(f"{short}.{m.lower()}", name, aliases, "peak cooling load",
+                                  ("cooling load", "peak load", "monthly peak load"),
+                                  d.slot(peak * k * d.rng.uniform(0.94, 1.06), 50), "tons", m, drawn="chart")
+                              for m, k in zip(months, season)]))
+    totals = {}
+    for use, facts in stacked:
+        text = f"{sum(f.number for f in facts):,.0f}"
+        d.used.add(text)
+        totals[use] = add(f"{use.lower()}.season", use, dict((u, a) for u, _, a in uses)[use], "energy use",
+                          ("energy", "season total", "seasonal energy", "total energy", "consumption"), text, "MWh",
+                          "season")  # named as the months are, the season telling it apart ("cooling season" would
+                                     # make every use's total a cooling one)
+    use_chart = Chart("Figure 1. Hall C monthly energy by end use, May to October", list(months), stacked, "MWh", 50,
+                      600, "dark: cooling; light: fans; orange: lighting", kind="stacked")
+    load_chart = Chart("Figure 2. Monthly peak cooling load of the two options", list(months), lines_, "tons", 100,
+                       1000, "circles: Option 1, chilled beams; squares: Option 2, VAV baseline", kind="line")
+    plain = {"totals": "Over the cooling season, Hall C's cooling uses {c} MWh, its fans {f} MWh and its lighting {l} "
+                       "MWh, as Figure 1 shows month by month. Figure 2 compares the two cooling options' peak loads."}
+    values = dict(c=totals["Cooling"].value, f=totals["Fans"].value, l=totals["Lighting"].value)
+    sections = [("1 Energy by End Use", [("text", "totals"), ("chart", use_chart)]),
+                ("2 Peak Loads", [("p", "The two options' peak loads follow the season, rising to midsummer and "
+                                        "falling after it."), ("chart", load_chart)])]  # true of any seed
+    return Project(f"lcc-enduse-s{seed}", "Lakeshore Hall C: Energy by End Use", F, sections,
+                   texts={k: (v, v) for k, v in plain.items()}, values=values, kinds=CHART_KNOBS)
+
+CHART_PROJECTS = {"lcc-energy": energy_study, "lcc-enduse": end_use_study}
 
 def charts(project):
     """The project's charts, in order (figure-1, figure-2, ...)."""
@@ -608,20 +657,59 @@ def draw_chart(page, rect, chart, values=True, legend=True, size=7.5):
     text(rect.x0, rect.y0 + size, chart.axis)  # the axis's title, above it
     group = plot.width / len(chart.categories)
     bar = group * 0.75 / len(chart.series)
-    for i, category in enumerate(chart.categories):
+
+    def label(fact, x, y, color=None):  # a value printed where it belongs, logged as drawn
+        if color is None:
+            text(x, y, fact.value)  # as grouped bars always were, so their pages draw byte for byte alike
+        else:
+            page.insert_text((x, y), fact.value, fontname="helv", fontsize=size, color=color)
+        drawn.append((fact.value, [fact], pymupdf.Rect(x, y - size, x + width(fact.value), y)))
+
+    if chart.kind == "line":  # each series a line through its points, marked; values beside the marks
         for s, (_, facts) in enumerate(chart.series):
+            points = [(plot.x0 + (i + 0.5) * group, plot.y1 - f.number * scale) for i, f in enumerate(facts)]
+            shape = page.new_shape()
+            shape.draw_polyline(points)
+            shape.finish(color=SERIES_FILL[s], width=1.4, closePath=False)
+            for (x, y) in points:
+                if s == 0:
+                    shape.draw_circle((x, y), 2.6)
+                else:
+                    shape.draw_rect(pymupdf.Rect(x - 2.6, y - 2.6, x + 2.6, y + 2.6))
+            shape.finish(color=SERIES_FILL[s], fill=SERIES_FILL[s], width=0.5)
+            shape.commit()
+            for i, (f, (x, y)) in enumerate(zip(facts, points)):
+                bars.append((f, pymupdf.Rect(x - 3, y - 3, x + 3, y + 3)))
+                if values:  # outside the lines: the higher point's value above it, the lower's below
+                    others = [fs[i].number for _, fs in chart.series if fs[i] is not f]
+                    above = all(f.number >= o for o in others)
+                    label(f, x - width(f.value) / 2, y - 4 if above else y + size + 3)
+    for i, category in enumerate(chart.categories):
+        base = 0.0
+        for s, (_, facts) in enumerate(chart.series):
+            if chart.kind == "line":
+                break
             fact = facts[i]
-            x0 = plot.x0 + i * group + group * 0.125 + s * bar
-            box = pymupdf.Rect(x0, plot.y1 - fact.number * scale, x0 + bar * 0.9, plot.y1)
+            if chart.kind == "stacked":  # one bar a category, each series a segment on the last
+                x0 = plot.x0 + i * group + group * 0.25
+                box = pymupdf.Rect(x0, plot.y1 - (base + fact.number) * scale, x0 + group * 0.5, plot.y1 - base * scale)
+                base += fact.number
+            else:
+                x0 = plot.x0 + i * group + group * 0.125 + s * bar
+                box = pymupdf.Rect(x0, plot.y1 - fact.number * scale, x0 + bar * 0.9, plot.y1)
             shape = page.new_shape()
             shape.draw_rect(box)
-            shape.finish(color=None, fill=SERIES_FILL[s], width=0)
+            if chart.kind == "stacked":  # segments parted by thin white lines
+                shape.finish(color=(1, 1, 1), fill=SERIES_FILL[s], width=0.6)
+            else:
+                shape.finish(color=None, fill=SERIES_FILL[s], width=0)
             shape.commit()
             bars.append((fact, box))
-            if values:
-                x, y = box.x0 + box.width / 2 - width(fact.value) / 2, box.y0 - 2
-                text(x, y, fact.value)
-                drawn.append((fact.value, [fact], pymupdf.Rect(x, y - size, x + width(fact.value), y)))
+            if values and chart.kind == "stacked":  # inside the segment, light on dark
+                label(fact, box.x0 + box.width / 2 - width(fact.value) / 2, box.y0 + box.height / 2 + size / 3,
+                      (1, 1, 1) if s == 0 else None)
+            elif values:
+                label(fact, box.x0 + box.width / 2 - width(fact.value) / 2, box.y0 - 2)
         text(plot.x0 + (i + 0.5) * group - width(category) / 2, plot.y1 + 1.5 * size, category)
     if legend and len(chart.series) > 1:
         x = plot.x1
@@ -661,8 +749,10 @@ def corpus(seeds=(1,), knobs=False):
     out = [make(seed) for make in PROJECTS.values() for seed in seeds]
     if knobs:
         from .schematics import SCHEMATIC_KNOBS, SCHEMATIC_PROJECTS
+        from .sheets import SHEET_KNOBS, SHEET_PROJECTS
         for makers, all_knobs in ((TABLE_PROJECTS, TABLE_KNOBS), (PROSE_PROJECTS, PROSE_KNOBS),
-                                  (CHART_PROJECTS, CHART_KNOBS), (SCHEMATIC_PROJECTS, SCHEMATIC_KNOBS)):
+                                  (CHART_PROJECTS, CHART_KNOBS), (SCHEMATIC_PROJECTS, SCHEMATIC_KNOBS),
+                                  (SHEET_PROJECTS, SHEET_KNOBS)):
             for make in makers.values():
                 for seed in seeds:
                     for knob in all_knobs:
@@ -810,6 +900,9 @@ def html(project, breaks=()):
 def render(project, page_size="letter"):
     """(pdf bytes, the printed numbers' log): the same project gives the same bytes."""
     import pymupdf
+    if getattr(project, "sheet", None):  # a drawing sheet, drawn directly (sheets.py)
+        from .sheets import render as render_sheet
+        return render_sheet(project)
     rect = pymupdf.paper_rect(page_size)
     breaks = set()
     for _ in range(5):  # lay out; start any table Story split across pages on a new page; again
@@ -921,7 +1014,7 @@ def locate(project, doc, placed=None, drawn=None):
     by_value = {}
     for f in project.facts:
         if not f.relation:  # relations are placed by their drawer and their sentences, not found by number
-            by_value.setdefault(parse_number(f.value), []).append(f)
+            by_value.setdefault(printed_value(f.value), []).append(f)
         f.forms = []
     log = []
     for n, page in enumerate(doc, 1):
@@ -939,7 +1032,7 @@ def locate(project, doc, placed=None, drawn=None):
             if any(b[0] - 1 <= w[0] and w[2] <= b[2] + 1 and b[1] - 1 <= w[1] and w[3] <= b[3] + 1 for b in chart_boxes):
                 continue
             text = w[4].strip(",.;:()°")
-            number = parse_number(text) if re.search(r"[0-9]", text) else None  # "ft²" is a unit, not a 2
+            number = printed_value(text) if re.search(r"[0-9]", text) else None  # "ft²" is a unit, not a 2
             if number is None:
                 continue
             facts = by_value.get(number, []) if re.match(r"[-+±$]?\d", text) else []  # "$15.2M" is printed money
@@ -1028,6 +1121,20 @@ def rarity(facts):
     n = len(facts)
     return {**{w: math.log(1 + n / c) for w, c in counts.items()}, None: math.log(1 + n)}
 
+DATE = re.compile(r"^\s*(\d{4})-(\d{2})-(\d{2})\s*$")
+
+def printed_value(text):
+    """A printed number, for finding values on the page: lengths in feet and inches as inches (38'-6" is 462, not
+    38), dates as dates (2026-01-10, not 2026), anything else as parse_number reads it."""
+    if DATE.match(str(text)):
+        return ("date", str(text).strip())
+    if "'" in str(text):
+        from .sheets import inches
+        length = inches(text)
+        if length is not None:
+            return ("in", length)
+    return parse_number(text)
+
 def same_number(a, b):
     return a is not None and b is not None and abs(a - b) <= 1e-9 * max(1.0, abs(a), abs(b))
 
@@ -1053,7 +1160,18 @@ def classify(claim, facts, printed):
     number = parse_number(claim.get("value", ""))
     if number is None:
         return "text", None
-    holders = [f for f in facts if holds(f, number)]
+    from .sheets import inches
+    value, unit = str(claim.get("value", "")), str(claim.get("unit", "") or "")
+    length = inches(value, unit)
+    if length is None and unit.strip().startswith("'"):
+        length = inches(value + unit)  # "26" with "'-6\"" as its unit
+    date = DATE.match(value) and value.strip()
+    if date:  # a date: the same date
+        holders = [f for f in facts if f.value.strip() == date]
+    elif length is not None and any(f.unit == "ft-in" for f in facts):  # a length: lengths, in inches
+        holders = [f for f in facts if f.unit == "ft-in" and abs(inches(f.value) - length) < 0.01]
+    else:
+        holders = [f for f in facts if f.unit != "ft-in" and not DATE.match(f.value) and holds(f, number)]
     weights = rarity(facts) if holders or any(f.tolerance for f in facts) else None
     scores = {f.id: fit(claim, f, weights) for f in facts} if weights else {}
     if any(f.tolerance for f in facts):  # read against an axis: the names pick the bar, its height is checked
@@ -1077,7 +1195,18 @@ def classify(claim, facts, printed):
             return "loose", holder.id
         if top == [holder.id]:
             return ("right" if holder.role == "fact" else "distractor"), holder.id
+        said = tokens(claim.get("entity", ""))
+        named = lambda f: any(tokens(n) and tokens(n) <= said for n in (f.entity,) + tuple(f.aliases))
+        rivals = [by_id[i] for i in top]
+        if named(holder) and all(f.entity != holder.entity and named(f) for f in rivals):
+            return "loose", holder.id  # two things named, the value's own among them ("D104 MEETING 104"): vague
         return "misbound", holder.id
+    if date:
+        return ("misread", None) if any(printed_value(p["text"]) == ("date", date) for p in printed) else ("hallucinated", None)
+    if length is not None and any(f.unit == "ft-in" for f in facts):
+        if any(printed_value(p["text"]) == ("in", length) for p in printed):
+            return "misread", None
+        return "hallucinated", None
     if any(same_number(parse_number(p["text"]), number) for p in printed):
         return "misread", None
     return "hallucinated", None
@@ -1147,10 +1276,11 @@ def score(key_data, claims):
                 if outcome == "right":
                     found[fid] = "right"
             continue
-        if ident in seen:  # the same claim read twice (overlapping tiles, other readers) counts once,
-            outcome, fid = seen[ident]  # but either reading may keep its conditions
-        else:
-            outcome, fid = seen[ident] = classify(c, numeric, key_data["printed"])
+        # the same reading twice (overlapping tiles, other readers) counts once, but either may keep its conditions;
+        # a value that repeats ("25 MWh" in June and in July) is two readings, told apart by the fact each names
+        outcome, fid = classify(c, numeric, key_data["printed"])
+        if (ident, fid or outcome) not in seen:
+            seen[(ident, fid or outcome)] = True
             outcomes[outcome] = outcomes.get(outcome, 0) + 1
         if outcome in ("right", "loose") and fid:
             found.setdefault(fid, outcome)

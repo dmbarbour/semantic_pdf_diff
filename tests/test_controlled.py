@@ -49,22 +49,25 @@ class Knobs(unittest.TestCase):
 
     def test_charts_under_every_knob(self):
         import pymupdf
-        for knob in controlled.CHART_KNOBS:
-            project = controlled.energy_study(1)
-            project.knob = knob
-            data, log = controlled.render(project)
-            with self.subTest(knob=knob):
-                again = controlled.energy_study(1)
-                again.knob = knob
-                self.assertEqual(controlled.render(again)[0], data)  # scans too, byte for byte
-                july = project.fact("opt1.july")
-                self.assertEqual([x["form"] for x in july.forms], ["chart"])  # placed by the drawer, whatever's printed
-                printed = {p["text"] for p in log if p["facts"] == ["opt1.july"]}
-                self.assertEqual(printed, set() if knob in ("axis", "all") else {july.value})  # axis: not printed
-                self.assertEqual(july.tolerance, 12.5 if knob in ("axis", "all") else 0.0)  # a quarter of a 50 step
-                text = "".join(page.get_text() for page in pymupdf.open("pdf", data))
-                self.assertEqual(text == "", knob in ("scan", "all"))  # a scan has no text layer
-                self.assertEqual(july.value in text, knob in ("clean", "legend-caption"))  # vector, values printed
+        # grouped bars (energy), stacked bars and lines (end use): a fact of each, and its chart's step
+        for make, fid, step in ((controlled.energy_study, "opt1.july", 50), (controlled.end_use_study, "fans.july", 50),
+                                (controlled.end_use_study, "opt2.july", 100)):
+            for knob in controlled.CHART_KNOBS:
+                project = make(1)
+                project.knob = knob
+                data, log = controlled.render(project)
+                with self.subTest(project=project.id, fact=fid, knob=knob):
+                    again = make(1)
+                    again.knob = knob
+                    self.assertEqual(controlled.render(again)[0], data)  # scans too, byte for byte
+                    self.assertTrue(all(f.forms for f in project.facts))
+                    fact = project.fact(fid)
+                    self.assertEqual({x["form"] for x in fact.forms}, {"chart"})  # placed by the drawer
+                    printed = {p["text"] for p in log if fid in p["facts"]}
+                    self.assertEqual(printed, set() if knob in ("axis", "all") else {fact.value})  # axis: not printed
+                    self.assertEqual(fact.tolerance, step / 4 if knob in ("axis", "all") else 0.0)
+                    text = "".join(page.get_text() for page in pymupdf.open("pdf", data))
+                    self.assertEqual(text == "", knob in ("scan", "all"))  # a scan has no text layer
 
     def test_schematics_place_every_relation_where_each_knob_says(self):
         from semantic_pdf_diff import schematics
@@ -105,6 +108,24 @@ class Knobs(unittest.TestCase):
                             if q not in (l.subject, l.object):
                                 with self.subTest(system=system.id, folded=folded, link=(l.subject, l.object), part=q):
                                     self.assertFalse(S._crosses(pos[l.subject], pos[l.object], box(c)))
+
+    def test_sheets_under_every_knob(self):
+        import pymupdf
+        from semantic_pdf_diff import sheets
+        for knob in sheets.SHEET_KNOBS:
+            project = sheets.plan_sheet(1)
+            project.knob = knob
+            data, log = controlled.render(project)
+            with self.subTest(knob=knob):
+                again = sheets.plan_sheet(1)
+                again.knob = knob
+                self.assertEqual(controlled.render(again)[0], data)
+                page = pymupdf.open("pdf", data)[0]
+                self.assertEqual(page.rect.width * page.rect.height, 2592 * 1728)  # ARCH D
+                self.assertEqual(page.rotation, 90 if knob in ("rotated", "all") else 0)
+                self.assertTrue(all(f.forms for f in project.facts))
+                width = project.fact("room101.width")
+                self.assertEqual([x["form"] for x in width.forms], ["drawing"])
 
     def test_prose_knobs_leave_table_projects_alone(self):
         project = controlled.equipment_schedules(1)
@@ -244,6 +265,34 @@ class Scoring(unittest.TestCase):
                                       claim("supply fan", "downstream of", "cooling coil")])
         self.assertEqual(both["relations"], {"right": 1})  # one fact, read twice in two ways, counts once
 
+    def test_lengths_compare_in_inches_however_written(self):
+        from semantic_pdf_diff import sheets
+        for text, unit, want in (("58'-6\"", "", 702), ("58' 6\"", "", 702), ("58 ft 6 in", "", 702),
+                                 ("58.5 ft", "", 702), ("702 in", "", 702), ("58.5", "ft", 702), ("58.5", "", None)):
+            self.assertEqual(sheets.inches(text, unit), want, text)
+        project = sheets.plan_sheet(1)
+        _, log = controlled.render(project)
+        key = controlled.key(project, log)
+        room = project.fact("room101.width")
+        feet = sheets.inches(room.value) / 12
+        claim = lambda **c: {"entity": "Meeting 101", "attribute": "width", **c}
+        self.assertEqual(controlled.score(key, [claim(value=f"{feet:g}", unit="ft")])["outcomes"], {"right": 1})
+        self.assertEqual(controlled.score(key, [claim(value=room.value)])["outcomes"], {"right": 1})
+        depth = project.fact("room101.depth")
+        self.assertEqual(controlled.score(key, [claim(value=depth.value)])["outcomes"], {"misbound": 1})  # its depth
+        s = controlled.score(key, [{"entity": "D101", "attribute": "room", "value": "MEETING 101"}])
+        self.assertEqual(s["relations"], {"right": 1})  # the schedule's room column: the door is in that room
+        door = project.fact("D104.width")
+        s = controlled.score(key, [{"entity": "D104 MEETING 104", "attribute": "dimension", "value": door.value}])
+        self.assertEqual(s["outcomes"], {"loose": 1})  # the door and its room both named: vague, not misbound
+        split = {"entity": "Meeting 101", "attribute": "width", "value": room.value.split("'")[0],
+                 "unit": "'" + room.value.split("'", 1)[1]}  # "23" with "'-0\"" as its unit
+        self.assertEqual(controlled.score(key, [split])["outcomes"], {"right": 1})
+        date = lambda rev, d: {"entity": f"Revision {rev}", "attribute": "date", "value": d}
+        self.assertEqual(controlled.score(key, [date("B", "2026-02-20")])["outcomes"], {"right": 1})
+        self.assertEqual(controlled.score(key, [date("A", "2026-02-20")])["outcomes"], {"misbound": 1})
+        self.assertEqual(controlled.score(key, [date("A", "2026-02-21")])["outcomes"], {"hallucinated": 1})
+
     def test_a_superseded_value_reported_as_current_is_a_distractor(self):
         project = controlled.roller_coaster(1)
         _, log = controlled.render(project)
@@ -289,3 +338,24 @@ class Replay(unittest.TestCase):
                 key = json.loads((d / "docs" / f"{run}.key.json").read_text())
                 result = controlled.score(key, found)
                 self.assertEqual((result["recall"], result["outcomes"]), (committed[run]["recall"], committed[run]["outcomes"]))
+
+class Corpus(unittest.TestCase):
+    """Every committed document is generated again byte for byte, so recorded answers keep replaying (a drawing
+    change that moved one chart's bytes once went unnoticed until a run had started)."""
+    def test_every_committed_document_is_generated_alike(self):
+        import tempfile
+        from pathlib import Path
+        import pymupdf
+        from semantic_pdf_diff import fixtures
+        folder = Path(__file__).resolve().parent.parent / "benchmarks" / "controlled"
+        if not (folder / "replay.zip").exists():
+            self.skipTest("no recorded corpus")
+        with tempfile.TemporaryDirectory() as d, fixtures.Fixture(fixtures.unpack(folder / "replay.zip", d)) as f:
+            recorded_with = f.meta().get("pymupdf")
+        if recorded_with != pymupdf.VersionBind:
+            self.skipTest(f"recorded with PyMuPDF {recorded_with}; documents differ under {pymupdf.VersionBind}")
+        for project in controlled.corpus(knobs=True):
+            committed = folder / "docs" / f"{project.id}.pdf"
+            if committed.exists():
+                with self.subTest(document=project.id):
+                    self.assertEqual(controlled.render(project)[0], committed.read_bytes())

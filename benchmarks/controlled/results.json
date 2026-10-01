@@ -675,6 +675,216 @@
     "visual": "0/0"
    }
   },
+  "lcc-enduse-s1-all": {
+   "facts": 33,
+   "found": 27,
+   "recall": 0.8182,
+   "found_right": 27,
+   "missed": [
+    "cooling.june",
+    "cooling.may",
+    "fans.may",
+    "lighting.august",
+    "lighting.october",
+    "opt1.september"
+   ],
+   "claims": 48,
+   "outcomes": {
+    "inexact": 11,
+    "right": 37
+   },
+   "conditions_kept": "27/27",
+   "recall_by_form": {
+    "chart": 0.8,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "visual": 0.8182
+   },
+   "outcomes_by_reader": {
+    "visual": {
+     "inexact": 11,
+     "right": 37
+    }
+   },
+   "conditions_by_reader": {
+    "visual": "27/27"
+   }
+  },
+  "lcc-enduse-s1-axis": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 63,
+   "outcomes": {
+    "inexact": 10,
+    "right": 53
+   },
+   "conditions_kept": "33/33",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0909,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "inexact": 2,
+     "right": 3
+    },
+    "visual": {
+     "inexact": 8,
+     "right": 53
+    }
+   },
+   "conditions_by_reader": {
+    "text": "3/3",
+    "visual": "33/33"
+   }
+  },
+  "lcc-enduse-s1-clean": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 56,
+   "outcomes": {
+    "misbound": 5,
+    "right": 51
+   },
+   "conditions_kept": "33/33",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.1212,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "misbound": 5,
+     "right": 4
+    },
+    "visual": {
+     "right": 50
+    }
+   },
+   "conditions_by_reader": {
+    "text": "4/4",
+    "visual": "33/33"
+   }
+  },
+  "lcc-enduse-s1-legend-caption": {
+   "facts": 33,
+   "found": 31,
+   "recall": 0.9394,
+   "found_right": 31,
+   "missed": [
+    "opt1.september",
+    "opt2.september"
+   ],
+   "claims": 54,
+   "outcomes": {
+    "misbound": 6,
+    "right": 48
+   },
+   "conditions_kept": "31/31",
+   "recall_by_form": {
+    "chart": 0.9333,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0909,
+    "visual": 0.9394
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "misbound": 4,
+     "right": 3
+    },
+    "visual": {
+     "misbound": 2,
+     "right": 48
+    }
+   },
+   "conditions_by_reader": {
+    "text": "3/3",
+    "visual": "31/31"
+   }
+  },
+  "lcc-enduse-s1-raster": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 53,
+   "outcomes": {
+    "misbound": 2,
+    "misread": 1,
+    "right": 50
+   },
+   "conditions_kept": "33/33",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0909,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    },
+    "visual": {
+     "misbound": 2,
+     "misread": 1,
+     "right": 50
+    }
+   },
+   "conditions_by_reader": {
+    "text": "3/3",
+    "visual": "33/33"
+   }
+  },
+  "lcc-enduse-s1-scan": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 51,
+   "outcomes": {
+    "loose": 9,
+    "misread": 1,
+    "right": 41
+   },
+   "conditions_kept": "33/33",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "visual": {
+     "loose": 9,
+     "misread": 1,
+     "right": 41
+    }
+   },
+   "conditions_by_reader": {
+    "visual": "33/33"
+   }
+  },
   "lcc-energy-s1-all": {
    "facts": 21,
    "found": 20,
@@ -683,9 +893,9 @@
    "missed": [
     "opt2.september"
    ],
-   "claims": 40,
+   "claims": 43,
    "outcomes": {
-    "inexact": 11,
+    "inexact": 14,
     "misbound": 2,
     "right": 25,
     "text": 2
@@ -700,7 +910,7 @@
    },
    "outcomes_by_reader": {
     "visual": {
-     "inexact": 11,
+     "inexact": 14,
      "misbound": 2,
      "right": 25,
      "text": 2
@@ -716,9 +926,9 @@
    "recall": 1.0,
    "found_right": 21,
    "missed": [],
-   "claims": 40,
+   "claims": 42,
    "outcomes": {
-    "inexact": 9,
+    "inexact": 11,
     "loose": 2,
     "right": 28,
     "text": 1
@@ -738,7 +948,7 @@
      "right": 2
     },
     "visual": {
-     "inexact": 9,
+     "inexact": 11,
      "right": 26,
      "text": 1
     }
@@ -885,6 +1095,286 @@
    },
    "conditions_by_reader": {
     "visual": "19/19"
+   }
+  },
+  "lcc-plan-s1-all": {
+   "facts": 45,
+   "found": 44,
+   "recall": 0.9778,
+   "found_right": 32,
+   "missed": [
+    "room104.depth"
+   ],
+   "claims": 100,
+   "outcomes": {
+    "loose": 32,
+    "misbound": 19,
+    "misread": 2,
+    "right": 47
+   },
+   "conditions_kept": "3/3",
+   "recall_by_form": {
+    "drawing": 0.9643,
+    "table": 1.0
+   },
+   "relations": {
+    "right": 13,
+    "unscored": 4,
+    "wrong": 1
+   },
+   "recall_by_kind": {
+    "number": 0.9737,
+    "relation": 1.0
+   },
+   "by_reader": {
+    "table": 0.6444,
+    "text": 0.4222,
+    "visual": 0.9778
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 15,
+     "misbound": 1,
+     "right": 24
+    },
+    "text": {
+     "loose": 3,
+     "misbound": 7,
+     "right": 16
+    },
+    "visual": {
+     "loose": 17,
+     "misbound": 11,
+     "misread": 2,
+     "right": 28
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "3/3"
+   }
+  },
+  "lcc-plan-s1-clean": {
+   "facts": 45,
+   "found": 45,
+   "recall": 1.0,
+   "found_right": 43,
+   "missed": [],
+   "claims": 73,
+   "outcomes": {
+    "loose": 26,
+    "misbound": 6,
+    "misread": 1,
+    "right": 40
+   },
+   "conditions_kept": "3/3",
+   "recall_by_form": {
+    "drawing": 1.0,
+    "table": 1.0
+   },
+   "relations": {
+    "reversed": 1,
+    "right": 7,
+    "unscored": 3
+   },
+   "recall_by_kind": {
+    "number": 1.0,
+    "relation": 1.0
+   },
+   "by_reader": {
+    "table": 0.6222,
+    "text": 0.2222,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 12,
+     "misbound": 1,
+     "right": 20
+    },
+    "text": {
+     "right": 10
+    },
+    "visual": {
+     "loose": 14,
+     "misbound": 5,
+     "misread": 1,
+     "right": 40
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "3/3"
+   }
+  },
+  "lcc-plan-s1-rotated": {
+   "facts": 45,
+   "found": 45,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 95,
+   "outcomes": {
+    "loose": 32,
+    "misbound": 17,
+    "misread": 4,
+    "right": 42
+   },
+   "conditions_kept": "3/3",
+   "recall_by_form": {
+    "drawing": 1.0,
+    "table": 1.0
+   },
+   "relations": {
+    "right": 13,
+    "unscored": 4,
+    "wrong": 1
+   },
+   "recall_by_kind": {
+    "number": 1.0,
+    "relation": 1.0
+   },
+   "by_reader": {
+    "table": 0.6,
+    "text": 0.5333,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 9,
+     "misbound": 2,
+     "right": 34
+    },
+    "text": {
+     "loose": 5,
+     "misbound": 5,
+     "misread": 1,
+     "right": 19
+    },
+    "visual": {
+     "loose": 20,
+     "misbound": 10,
+     "misread": 3,
+     "right": 27
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "3/3"
+   }
+  },
+  "lcc-plan-s1-small": {
+   "facts": 45,
+   "found": 45,
+   "recall": 1.0,
+   "found_right": 41,
+   "missed": [],
+   "claims": 82,
+   "outcomes": {
+    "loose": 32,
+    "misbound": 6,
+    "misread": 2,
+    "right": 42
+   },
+   "conditions_kept": "3/3",
+   "recall_by_form": {
+    "drawing": 1.0,
+    "table": 1.0
+   },
+   "relations": {
+    "reversed": 4,
+    "right": 7,
+    "unscored": 4
+   },
+   "recall_by_kind": {
+    "number": 1.0,
+    "relation": 1.0
+   },
+   "by_reader": {
+    "table": 0.6889,
+    "text": 0.4444,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 15,
+     "misbound": 1,
+     "right": 20
+    },
+    "text": {
+     "right": 20
+    },
+    "visual": {
+     "loose": 17,
+     "misbound": 5,
+     "misread": 2,
+     "right": 38
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "3/3"
+   }
+  },
+  "lcc-plan-s1-vertical": {
+   "facts": 45,
+   "found": 44,
+   "recall": 0.9778,
+   "found_right": 41,
+   "missed": [
+    "D111.part-of.room111"
+   ],
+   "claims": 63,
+   "outcomes": {
+    "loose": 16,
+    "misbound": 8,
+    "misread": 1,
+    "right": 38
+   },
+   "conditions_kept": "3/3",
+   "recall_by_form": {
+    "drawing": 0.9643,
+    "table": 0.9583
+   },
+   "relations": {
+    "reversed": 3,
+    "right": 6,
+    "unscored": 2
+   },
+   "recall_by_kind": {
+    "number": 1.0,
+    "relation": 0.8571
+   },
+   "by_reader": {
+    "table": 0.4889,
+    "text": 0.4222,
+    "visual": 0.9778
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "misbound": 2,
+     "right": 20
+    },
+    "text": {
+     "misbound": 1,
+     "right": 19
+    },
+    "visual": {
+     "loose": 14,
+     "misbound": 5,
+     "misread": 1,
+     "right": 38
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "3/3"
    }
   },
   "lcc-s1-all": {

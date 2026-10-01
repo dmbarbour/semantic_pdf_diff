@@ -1,6 +1,6 @@
 # Controlled documents with known facts
 
-- **Status:** Active (2026-10-01): milestones 1, 2a (table knobs), 2b (prose traps and layout knobs), 3a (charts and scanned pages) and 3b (schematics and relations) done.
+- **Status:** Active (2026-10-01): milestones 1, 2 (table, prose and layout knobs) and 3 (charts, scans, schematics, relations and drawing sheets) done.
 - **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](one-table-model-2026-09-30.md) (table hazards; its table eye tests become part of this); [content-addressed queries](content-addressed-queries-2026-09-28.md) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
 - **Why:**
   - **The owner (2026-10-01):** "similar to the eye test as a controlled test, we could have controlled PDF tests, i.e. where you generate a few PDFs with known facts to extract for fictional projects. This might provide a more robust control without relying on yours or my ability to extract facts."
@@ -242,7 +242,7 @@ Each row is a situation met in this project's documents, with where it was recor
 3. **Charts, schematics, drawings and rasterised pages,** reusing the eye and page tests' drawing:
    - 3a: charts and scanned pages (done)
    - 3b: schematics and concept diagrams, with relational facts scored (done)
-   - 3c: drawing sheets (next)
+   - 3c: drawing sheets, stacked bars and line charts (done)
 4. **Revision pairs and comparison scoring.**
 5. **Into rounds:** the controlled stratum reported beside judged win rates, exactly scored.
 6. **New failures become knobs:** each round's review and post-mortem adds the situations it finds.
@@ -436,6 +436,62 @@ Each row is a situation met in this project's documents, with where it was recor
     - **A fact missing from the key:** the description's "AHU-3, which conditions Hall C".
     - **A limit:** on a recirculating loop, everything is upstream of everything, so loop claims can only be implied, never wrong.
   - **Next:** more relations and more systems that present them in different ways (the owner's direction), within drawing sheets (3c) and beyond. Mechanical assemblies (attached to, mounted on, supported by) are the gap that stands out.
+
+- **Milestone 3c, drawing sheets, stacked bars and line charts (2026-10-01): done.**
+  - **A floor plan sheet** (`sheets.py`), an ARCH D sheet (36 × 24 in) at 1/8" = 1'-0", drawn as a drafter would:
+    - a structural grid with lettered and numbered bubbles
+    - seven rooms tagged with name, number and area
+    - width and depth dimension strings in feet and inches
+    - doors with swings and tags
+    - a door schedule, general notes, a title block and a revision table
+  - **Facts (45):** each room's width, depth and area; each door's width, height and room; each revision's date.
+  - **Knobs:**
+    - **clean**
+    - **small:** dimension text at 4.5 pt
+    - **vertical:** depth dimensions written sideways
+    - **rotated:** the sheet stored turned 90°
+    - **all:** small, vertical and rotated together
+  - **Lengths are compared in inches,** however written: 58'-6", 58 ft 6 in, 58.5 ft, 702 in, or "58" with "'-6\"" as its unit. Dates are compared as dates.
+  - **Stacked bars and line charts:** Hall C's energy by end use (cooling, fans and lighting stacked by month), the options' monthly peak loads as lines, and the season totals in the text (33 facts), under the chart knobs.
+  - **gemma-4 read the 11 documents for $0.075:**
+
+    | Sheet knob | Recall | Found right | Loose | Misbound | Relations right / reversed |
+    |---|---|---|---|---|---|
+    | clean | 1.00 | 43 | 26 | 6 | 7 / 1 |
+    | small | 1.00 | 41 | 32 | 6 | 7 / 4 |
+    | vertical | 0.98 | 41 | 16 | 8 | 6 / 3 |
+    | rotated | 1.00 | 31 | 32 | 17 | 13 / 0 |
+    | all | 0.98 | 32 | 32 | 19 | 13 / 0 |
+
+    | End-use knob | Recall | Found right | Misbound | Inexact | Loose |
+    |---|---|---|---|---|---|
+    | clean | 1.00 | 33 | 5 | 0 | 0 |
+    | axis | 1.00 | 33 | 0 | 10 | 0 |
+    | raster | 1.00 | 33 | 2 | 0 | 0 |
+    | legend-caption | 0.94 | 31 | 6 | 0 | 0 |
+    | scan | 1.00 | 33 | 0 | 0 | 9 |
+    | all | 0.82 | 27 | 0 | 11 | 0 |
+
+  - **Sheets: every value is read, but binding suffers.**
+    - **Rotation costs binding, not reading:** facts read right fall from 43 to 31, and misbound claims rise from 6 to 17. The text reader's misbound claims go from none to 5–7. The lever index has a row.
+    - The image reader often gives a dimension without its room ("dimension | length | 23'-0\" | between grid lines"): 16–32 loose claims per sheet.
+    - Door sizes from the schedule were filed under room names (the schedule's ROOM column), and once a depth was read as a width.
+    - The table reader took room outlines for tables.
+  - **Stacked bars and lines:**
+    - Printed values: the image reader read them all right. The text reader paired the lines' labels with the wrong months (5 misbound), as on 3a's bars.
+    - With the legend only in the caption, the image reader swapped the options where the lines cross.
+    - On the scanned page it named segments by position ("top segment"): 9 loose.
+    - Against the axis, 10–11 readings were off by more than a quarter step.
+  - **The scorer, from reading the claims by hand:**
+    - lengths and dates as above
+    - "length" dropped as a synonym of width, since a room's length isn't its east-west side
+    - a claim naming two things, the value's own among them ("D104 MEETING 104"), is loose, not misbound
+    - **a value that repeats** (25 MWh in four months, a door width) **was counted once:** claims are now told apart by the fact each resolves to
+    - season totals named like the months, the season telling them apart
+    - door phrasings ("door identifier")
+    - the corridor as a named thing
+  - **A correction caught before any reading:** extending the chart drawer changed two committed chart PDFs' bytes. It was restored, and a test now generates every committed document again, byte for byte.
+  - **Not covered:** the drawing scale is a fair claim the key lacks (1–4 misread per sheet); details, callouts and sections; noise on scans.
 
 ## Decisions (2026-10-01)
 

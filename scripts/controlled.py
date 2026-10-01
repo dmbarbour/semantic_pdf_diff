@@ -110,9 +110,11 @@ def main(argv=None):
             result["conditions_by_reader"] = {f: r["conditions_kept"] for f, r in readers.items()}
             results.setdefault(which, {})[run] = result
     (FOLDER / "results.json").write_text(json.dumps(results, indent=1) + "\n", encoding="utf-8")
+    from semantic_pdf_diff import sheets
     knobbed = [(p, controlled.TABLE_KNOBS) for p in controlled.TABLE_PROJECTS] + \
               [(p, controlled.PROSE_KNOBS) for p in controlled.PROSE_PROJECTS] + \
-              [(p, controlled.CHART_KNOBS) for p in controlled.CHART_PROJECTS]
+              [(p, controlled.CHART_KNOBS) for p in controlled.CHART_PROJECTS] + \
+              [(p, sheets.SHEET_KNOBS) for p in sheets.SHEET_PROJECTS]
     for which, runs in results.items():  # each knobbed project's knobs beside its clean version
         for project, knobs in knobbed:
             mine = {run[len(project) + 2:].partition("-")[2]: r for run, r in runs.items()
