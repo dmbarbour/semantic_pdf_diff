@@ -32,7 +32,8 @@ CAP = {"helv": 0.718, "cour": 0.562, "tiro": 0.662}  # cap height per em (the fo
 LETTERS = "ABCDEFGHJKLMNPRSTUVWXYZ"                    # no I, O or Q, as drawings avoid them
 INCHES = ("1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8")
 SERIES_COLORS = ((0.12, 0.47, 0.71), (1.0, 0.5, 0.05), (0.17, 0.63, 0.17))
-FAMILIES = ("read", "pairs", "table", "graph", "chart-values", "chart-axis")
+FAMILIES = ("read", "words", "pseudo", "pairs", "table", "graph", "chart-values", "chart-axis")
+READING = ("read", "words", "pseudo")  # families scored as transcribed lines
 PASS = 0.9  # a glyph height is read when 90% of its items are
 LARGE = 16  # glyphs above this (px) measure a ceiling, and stay out of the threshold fit
 
@@ -66,7 +67,7 @@ class Arrow(_Answer):
 class Arrows(_Answer):
     edges: list[Arrow] = Field(default_factory=list)
 
-SCHEMAS = {"read": Lines, "pairs": Pairs, "table": Lookups, "graph": Arrows, "chart-values": Lookups,
+SCHEMAS = {"read": Lines, "words": Lines, "pseudo": Lines, "pairs": Pairs, "table": Lookups, "graph": Arrows, "chart-values": Lookups,
            "chart-axis": Lookups}
 
 # --- random content -----------------------------------------------------------------------------
@@ -95,6 +96,46 @@ def number(rng, plain=False):
         return f"±0.{str(rng.randint(1, 99)).zfill(2).rstrip('0')}"
     fraction = f" {rng.choice(INCHES)}" if rng.random() < 0.6 else ""
     return f"{rng.randint(0, 40)}'-{rng.randint(0, 11)}{fraction}\""
+
+# Meaningful words read differently from random codes (the owner, 2026-09-30: "We can expect gemma-4 etc.
+# to do slightly better on meaningful words than on random texts and numbers. But only when it's meaningful
+# to gemma-4. Shape of word, for example."). Pseudo-words keep a word's shape without its meaning, and show
+# whether a model "corrects" what it can't quite see into a word it knows.
+WORDS = tuple("""
+about above across actual adjust after again agent air align allow alloy along also amount angle annual anchor
+answer apply area argue arrange assembly assume attach average axial balance basic batch beam bearing below bending
+between blade block board boiler bolt bottom bracket branch brief bright broad budget building cable capacity carbon
+casing ceiling center chamber change channel charge check circuit clamp clear close coating coil column combine
+common compact concrete condition conduit connect contain control cooling copper corner correct cost cover crane
+current curve cycle damper damage define degree demand density depth design detail device diameter direct
+discharge distance double drawing drive duct early edge effect electric element energy engine equal error exhaust
+expansion factor failure fan feature field filter final finish fitting fixed flange flat floor flow fluid force
+format frame frequency friction front fuel future gasket gauge general glass grade gravel ground guide handle
+header heater height hinge housing humid impact input inside install joint keyway ladder layer leakage length
+level limit linear liquid load local lower machine main manual margin material maximum measure metal meter method
+minimum model module motor mount nominal normal nozzle number offset opening operate option outlet output outside
+panel partial passage pattern piping pitch plate point pressure process profile pulley pump quality radius range
+rated rating ratio reactor record reduce relief remote repair return rigid rotor rubber safety sample screen seal
+section sensor service shaft sheet shield signal single sleeve slope socket solid source space speed spring square
+stage standard steel storage strain stress structure supply support surface switch system tank target thermal
+thread tolerance torque total tower transfer tube turbine unit upper valve vapor velocity vent vessel voltage wall
+washer water weight welding width winding window wire""".split())
+VOWELS = "aeiou"
+
+def word(rng):
+    w = rng.choice(WORDS)
+    return w.capitalize() if rng.random() < 0.3 else w
+
+def pseudo(rng):
+    """(pseudo-word, the word it came from): one inner letter changed for another of its kind, so it stays
+    pronounceable, and isn't a word in the list."""
+    while True:
+        w = rng.choice([w for w in WORDS if len(w) >= 5])
+        k = rng.randrange(1, len(w) - 1)
+        pool = VOWELS if w[k] in VOWELS else "bcdfghklmnprstvz"
+        p = w[:k] + rng.choice([ch for ch in pool if ch != w[k]]) + w[k + 1:]
+        if p not in WORDS:
+            return (p.capitalize(), w.capitalize()) if rng.random() < 0.3 else (p, w)
 
 def unique(rng, make, n, taken=()):
     seen, out = set(taken), []
@@ -184,16 +225,18 @@ def render(card, image=True):
 JSON_ONLY = "Return only JSON: "
 RANDOM = "Everything written in it is random: nothing can be guessed or corrected from context, so read it."
 
-def _read(card, rng, c):
+def _lines(card, rng, c, make):
+    """Lines of tokens from make(rng), placed as a block at a random spot; (lines, the tokens' sources)."""
     n, gap, room = card.count or 5, c.size * 1.6, c.w - 2 * c.margin
-    lines = []
+    lines, sources = [], []
     for _ in range(n):
         tokens = []
         while len(tokens) < 8:
-            token = code(rng) if rng.random() < 0.5 else number(rng)
+            token, source = make(rng)
             if c.width("   ".join(tokens + [token])) > room:
                 break
             tokens.append(token)
+            sources.append(source)
         if tokens:
             lines.append("   ".join(tokens))
     if not lines or gap * len(lines) > c.h - 2 * c.margin:
@@ -203,10 +246,27 @@ def _read(card, rng, c):
     y0 = c.margin + rng.random() * max(0.0, c.h - 2 * c.margin - block_h)
     for k, line in enumerate(lines):
         c.text(x0, y0 + c.glyph + k * gap, line)
+    return lines, sources
+
+def _read(card, rng, c):
+    lines, _ = _lines(card, rng, c, lambda r: ((code(r) if r.random() < 0.5 else number(r)), None))
     prompt = ("The image shows a few lines of codes and numbers. " + RANDOM + " Transcribe every line exactly as "
               "printed, top to bottom, keeping the order of the items in each line. Write ? for each character "
               "you can't read.\n" + JSON_ONLY + '{"lines": ["first line", "second line"]}')
     return {"lines": lines}, prompt, lines
+
+WORDS_PROMPT = ("The image shows a few lines of words. Transcribe every line exactly as printed, letter by letter, "
+                "top to bottom; don't correct spelling. Write ? for each character you can't read.\n" + JSON_ONLY +
+                '{"lines": ["first line", "second line"]}')
+
+def _words(card, rng, c):
+    lines, _ = _lines(card, rng, c, lambda r: (word(r), None))
+    return {"lines": lines}, WORDS_PROMPT, lines
+
+def _pseudo(card, rng, c):
+    """The same prompt as real words: whether a model reads what's printed or the word it expects."""
+    lines, sources = _lines(card, rng, c, pseudo)
+    return {"lines": lines, "sources": sources}, WORDS_PROMPT, lines
 
 def _pairs(card, rng, c):
     n, layout = card.count or 12, card.layout or "inline"
@@ -462,7 +522,7 @@ def _chart_axis(card, rng, c):
                            for k, cat in enumerate(categories)], "cells": values}
     return truth, prompt, categories + ticks
 
-DRAW = {"read": _read, "pairs": _pairs, "table": _table, "graph": _graph, "chart-values": _chart_values,
+DRAW = {"read": _read, "words": _words, "pseudo": _pseudo, "pairs": _pairs, "table": _table, "graph": _graph, "chart-values": _chart_values,
         "chart-axis": _chart_axis}
 
 # --- suites -------------------------------------------------------------------------------------
@@ -487,6 +547,9 @@ def suite(name="standard"):
     # Large glyphs: how far a model may be magnified. Qwen3-VL broke 14-point text into pieces in 144-point
     # tiles at 1536 px (capitals about 100 px tall; docs/research/page-tests-2026-09-30.md).
     cards += [Card("read", 1024, 1024, g, seed=seed) for seed in (1, 2) for g in (24, 32, 48, 64)]
+    # Words and pseudo-words at the codes' sizes and glyphs (one seed): what meaning and word shape add.
+    for family in ("words", "pseudo"):
+        cards += [Card(family, w, h, g) for w, h in SQUARES[1:] for g in (4, 5, 6, 7, 8, 10, 12)]
     for layout in ("inline", "columns", "stacked"):
         cards += [Card("pairs", 1024, 1024, g, layout=layout) for g in (6, 8, 12)]
         cards += [Card("pairs", 2048, 2048, g, layout=layout) for g in (8, 12)]
@@ -528,13 +591,16 @@ def _number(text):
 def score(card, truth, answer):
     """{"score": the share of items right, and counts by kind of error} for one answer (a dict)."""
     family = card.family if isinstance(card, Card) else card
-    if family == "read":
+    if family in READING:
         expected = [norm(t) for line in truth["lines"] for t in line.split()]
         given = [norm(t) for line in answer.get("lines") or () for t in str(line).split()]
         matched = sum(b.size for b in SequenceMatcher(None, expected, given, autojunk=False).get_matching_blocks())
         want, got = "".join(expected), "".join(given)
-        return {"score": round(matched / len(expected), 4), "items": len(expected), "right": matched,
-                "cer": round(min(1.0, edit_distance(want, got) / len(want)), 4), "unread": got.count("?")}
+        out = {"score": round(matched / len(expected), 4), "items": len(expected), "right": matched,
+               "cer": round(min(1.0, edit_distance(want, got) / len(want)), 4), "unread": got.count("?")}
+        if truth.get("sources"):  # pseudo-words read as the word they came from
+            out["autocorrected"] = sum(1 for t in given if t in {norm(w) for w in truth["sources"]})
+        return out
     if family == "pairs":
         expected = {compact(k): compact(v) for k, v in truth["pairs"].items()}
         owner = {v: k for k, v in expected.items()}
@@ -606,7 +672,7 @@ def score(card, truth, answer):
 def perfect(card, truth):
     """The answer a model that read everything right would give (for tests)."""
     family = card.family
-    if family == "read":
+    if family in READING:
         return {"lines": list(truth["lines"])}
     if family == "pairs":
         return {"pairs": [{"name": k, "value": v} for k, v in truth["pairs"].items()]}
@@ -726,7 +792,7 @@ def summarise(entries):
         errors = {}
         for e in mine:
             for k, v in e.items():
-                if k in ("misbound", "misread", "declined", "missed", "reversed", "label_misbound", "label_misread",
+                if k in ("autocorrected", "misbound", "misread", "declined", "missed", "reversed", "label_misbound", "label_misread",
                          "ends_wrong", "spurious", "unknown_name", "same_row_or_column") and isinstance(v, int):
                     errors[k] = errors.get(k, 0) + v
         out["families"][family] = {"cards": len(mine), "score": _mean(_scored(e) for e in mine),
@@ -751,6 +817,19 @@ def summarise(entries):
         # Per 1000 px of the image's side (the square root of its area): constant across sizes when the host
         # shrinks every image to a fixed budget (rendering larger gains nothing); falling when it doesn't.
         out["relative"][key] = None if t is None else round(t * 1000 / math.sqrt(size[0] * size[1]), 2)
+    # Codes against words against pseudo-words, size by size: the smallest glyph read at 90%.
+    out["by_kind"] = {}
+    for family in ("words", "pseudo"):
+        mine = [e for e in entries if e["family"] == family]
+        for size in sorted({(e["w"], e["h"]) for e in mine}, key=lambda s: (s[0] * s[1], s)):
+            cells = {}
+            for e in mine:
+                if (e["w"], e["h"]) == size:
+                    cells.setdefault(e["glyph"], []).append(_scored(e))
+            t = threshold([(g, _mean(v)) for g, v in sorted(cells.items()) if _mean(v) is not None])
+            out["by_kind"].setdefault(f"{size[0]}x{size[1]}", {})[family] = t
+    for key in out["by_kind"]:
+        out["by_kind"][key]["codes"] = out["thresholds"].get(key)
     tokens = {}
     for e in entries:
         if e.get("prompt_tokens") and e["family"] == "read":
@@ -834,6 +913,18 @@ def page(folder, data):
             values = [data["models"][m]["summary"][field].get(size) for m in models]
             out.append(f"<tr><td>{esc(size)}</td>" + "".join(f"<td>{'–' if v is None else f'{v:g}'}</td>" for v in values)
                        + "</tr>")
+        out.append("</table></div>")
+    kinds = [(m, data["models"][m]["summary"].get("by_kind", {})) for m in models]
+    sizes_k = sorted({s for _, k in kinds for s in k}, key=lambda s: math.prod(map(int, s.split("x"))))
+    if sizes_k:
+        out.append("<h2>Codes, words and pseudo-words: smallest glyph read (px)</h2><p class='muted'>Real words have "
+                   "shape and meaning; pseudo-words (one letter changed) keep the shape only. Lower is better.</p>"
+                   "<div class='scroll'><table><tr><th>Image</th>" + "".join(
+                       f"<th>{esc(m)}: {k}</th>" for m in models for k in ("codes", "words", "pseudo")) + "</tr>")
+        for size in sizes_k:
+            out.append(f"<tr><td>{esc(size)}</td>" + "".join(
+                f"<td>{'–' if k.get(size, {}).get(f) is None else f'{k[size][f]:g}'}</td>"
+                for _, k in kinds for f in ("codes", "words", "pseudo")) + "</tr>")
         out.append("</table></div>")
     large = sorted({g for m in models for g in data["models"][m]["summary"].get("large", {})}, key=float)
     if large:

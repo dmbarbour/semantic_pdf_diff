@@ -43,6 +43,15 @@ class Scoring(unittest.TestCase):
         self.assertAlmostEqual(wrong["score"], 2 / 6, places=3)
         self.assertGreater(wrong["cer"], 0)
 
+    def test_pseudo_words_read_as_the_words_they_came_from_count_as_autocorrected(self):
+        card = Card("pseudo", 1024, 1024, 8)
+        _, truth, prompt = eyetest.render(card, image=False)
+        self.assertTrue(all(eyetest.norm(t) not in eyetest.WORDS for line in truth["lines"] for t in line.split()))
+        self.assertEqual(prompt, eyetest.render(Card("words", 1024, 1024, 8), image=False)[2])  # the same instructions
+        corrected = eyetest.score(card, truth, {"lines": [" ".join(truth["sources"])]})
+        self.assertEqual((corrected["score"], corrected["autocorrected"]), (0.0, len(truth["sources"])))
+        self.assertEqual(eyetest.score(card, truth, eyetest.perfect(card, truth))["autocorrected"], 0)
+
     def test_pairs_tell_misbound_from_misread(self):
         truth = {"pairs": {"K7Q": "4.75", "HX-402": "88", "P-17B": "1250"}}
         answer = {"pairs": [{"name": "K7Q", "value": "88"}, {"name": "HX-402", "value": "4.75"},
