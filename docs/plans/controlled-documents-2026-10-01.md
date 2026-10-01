@@ -1,6 +1,6 @@
 # Controlled documents with known facts
 
-- **Status:** Planned (2026-10-01), for the owner's review.
+- **Status:** Active (2026-10-01): milestone 1 done.
 - **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](one-table-model-2026-09-30.md) (table hazards; its table eye tests become part of this); [content-addressed queries](content-addressed-queries-2026-09-28.md) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
 - **Why:**
   - **The owner (2026-10-01):** "similar to the eye test as a controlled test, we could have controlled PDF tests, i.e. where you generate a few PDFs with known facts to extract for fictional projects. This might provide a more robust control without relying on yours or my ability to extract facts."
@@ -196,6 +196,20 @@ Each row is a situation met in this project's documents, with where it was recor
 4. **Revision pairs and comparison scoring.**
 5. **Into rounds:** the controlled stratum reported beside judged win rates, exactly scored.
 6. **New failures become knobs:** each round's review and post-mortem adds the situations it finds.
+
+## Progress
+
+- **Milestone 1 (2026-10-01): done.**
+  - **Code:** `controlled.py` and `scripts/controlled.py`. The corpus (PDFs and answer keys) is in `benchmarks/controlled/docs`, its recorded answers in `replay.zip`, and the scores in `results.json`.
+  - **Two projects:** the water treatment plant (33 facts) and the roller coaster (31, one a superseded lift height), as prose and plain tables laid out by PyMuPDF's Story. The same seed gives the same PDF bytes.
+  - **Every printed number is logged with its role,** and every fact located on its page.
+  - **Binding is decided by words.** A printed value names one fact, so the question is which fact the claim's words describe best: entity, attribute and conditions taken together, rare words counting more, plurals and a few synonyms folded.
+    - Matching names exactly was too brittle: 9 of the coaster's claims were marked misbound, though by hand most were right ("train | car count | 6").
+    - **A ruling against leniency:** a test keeps true misbindings misbound (one pump's capacity under another's tag, or as its head).
+  - **gemma-4 on the clean corpus** ($0.012): recall 1.0 on both documents, nothing misbound, 10 of 13 conditions kept.
+    - Checked by hand: a sample of the "right" claims were right.
+    - Expected for clean prose and tables. The knobs (milestone 2) are where failures should show.
+  - **A test** generates the corpus again (byte-identical to the committed PDFs), replays the pipeline from the fixture, and gets the committed scores.
 
 ## Decisions (2026-10-01)
 
