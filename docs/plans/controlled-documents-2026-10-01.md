@@ -15,11 +15,27 @@
 ## Design
 
 **1. Fact sheets (the answer key).**
-- **A fictional project per domain** we read, each written in its documents' own conventions:
-  - a pump station or HVAC plant (schedules, data sheets, notes)
-  - a wind turbine (properties, operating points, controller gains)
-  - a space instrument (channels, detectors, bands)
-  - a small building (drawing sheets, details, title blocks)
+- **Fictional projects, each written in its kind of documents' own conventions.** The owner: "You could pick a new domain, e.g. roller coasters, water treatment, city traffic control, convention center design, etc.. but it's fine to use the current domains if that's easier... just find some inspirations and run with it, perhaps log a few more as backups."
+  - **The first four** (new domains, so no real project's familiarity helps, plus one beside the development slices):
+    - **A water treatment plant** ("Harrow Creek WTP"):
+      - design criteria (flows, detention times, dosing)
+      - equipment schedules (`P-101A`, blowers, filters)
+      - a process flow diagram whose arrows matter
+      - requirements and limits ("shall not exceed 0.3 NTU")
+      - two disinfection options compared
+    - **A steel roller coaster** ("Ridgeback"):
+      - ride specifications (height, speed, length, g-forces)
+      - train and car data
+      - a track element table stacked with its supports
+      - g-force and speed charts
+      - an elevation sheet with dimensions
+      - a revision that raises the lift hill
+    - **A convention centre expansion** ("Lakeshore Hall C"):
+      - drawing sheets (plans with room tags, door and window schedules, rotated sheets, small dimension text, grid references)
+      - HVAC loads per hall under occupancy cases
+      - electrical panel schedules
+    - **A 3 MW wind turbine,** beside the development slices: properties, operating-point tables, controller gains, a blade's structural charts.
+  - **Backups:** city traffic control (signal timing plans, intersection diagrams, volume counts), a district heating network, an observatory instrument, a micro-hydro plant, a ferry terminal, a data centre's cooling plant, a ski lift.
 - **Facts:** entity, attribute, value, unit, conditions, and basis (required, proposed, measured, calculated).
   - Entities have invented names and tags ("Glenmore Pump Station", `P-101A`), with the aliases a reader may fairly use.
   - Relations: part of (a camera's detector), alternative to (the 2-ton unit against the baseline), supersedes (revision B's value).
@@ -57,7 +73,12 @@
     - conditions kept or lost
     - basis right or wrong
   - Reported by form, scenario and knob.
-- **Spurious claims:** a key can't list every claim a reader may fairly make. So only conflicting claims (a key entity and attribute with another value) count as errors; the rest are counted, and sampled for review.
+- **Claims the key doesn't hold.** A key can't list every claim a reader may fairly make, but a generated document is known in full. The owner: "You should probably also account for hallucinated but viable claims that do not conflict?"
+  - **Every printed number and label is logged with its role:** fact, distractor, a section or page number, a date, or a drawing's grid reference.
+  - **A claim whose value isn't printed anywhere** (nor follows by unit conversion from a printed one) is **hallucinated.** It's an error, whether it conflicts or merely looks viable. So is a claim about an entity the document never names.
+  - **A claim whose value is printed but filed under another fact's entity or attribute** is **misbound.**
+  - **A claim whose value is printed in a non-fact role** (a page number as a value) is **misread.**
+  - **The rest are printed values the key doesn't list as facts** (a fair claim the key lacks, or a combination). They're counted and sampled for review, and the key grows when they're fair.
 - **Comparison, on revision pairs:** the report's changed, added and removed facts against the key's changes.
 - **The key is exact for these documents only.** Their scores are one strong rater among others, never the measure of real-document quality (no ground truth).
 
@@ -176,8 +197,17 @@ Each row is a situation met in this project's documents, with where it was recor
 5. **Into rounds:** the controlled stratum reported beside judged win rates, exactly scored.
 6. **New failures become knobs:** each round's review and post-mortem adds the situations it finds.
 
+## Decisions (2026-10-01)
+
+1. **Domains:** new ones for inspiration, with backups logged (design item 1); the owner left the choice open.
+2. **Hallucinated claims count, viable or not:** the full log of printed content makes them exact (design item 5).
+3. **The controlled stratum's weight in rounds.** The owner, on Claude's "join the decision criteria only once its scores track judged quality": "Not sure exactly what ... means, but if you mean that it's given extra weight because we have a clear standard then sure."
+   - **Claude meant:** first only report it, and give it a role in accepting levers once it's seen to agree with judged quality on real documents, so a lever can't win by fitting the generator.
+   - **The role proposed, for the owner's review:**
+     - **An exact loss on the controlled stratum blocks a lever,** like a losing stratum: a regression against a clear standard is a real defect.
+     - **An exact gain can serve as a "no worse" lever's named gain.**
+     - **A gain there alone never promotes a lever** that the judged real documents don't support.
+
 ## Open questions
 
-1. **Domains:** mirror the development slices' domains (wind turbines, a space instrument, buildings and their drawings, an HVAC plant), as proposed?
-2. **Spurious claims:** count only conflicting claims as errors, and sample the rest for review, as proposed?
-3. **Rounds:** report the controlled stratum first, and add it to rounds' decision criteria only once its scores are seen to track judged quality?
+1. **The controlled stratum's role in accepting levers** (decision 3): blocking on exact losses, and serving as a named gain, as proposed?
