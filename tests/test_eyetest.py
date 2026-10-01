@@ -54,7 +54,7 @@ class Scoring(unittest.TestCase):
 
     def test_pseudo_word_levels_keep_or_change_the_height_profile(self):
         import random
-        outline = lambda w: "".join(eyetest.height(ch)[0] for ch in w.lower())
+        outline = lambda w: tuple(eyetest.height(ch) for ch in w.lower())
         rng = random.Random(1)
         for level in eyetest.PSEUDO_LEVELS:
             for _ in range(50):
@@ -65,6 +65,17 @@ class Scoring(unittest.TestCase):
                 if level == "close":
                     self.assertIn(new, eyetest.CLOSE[old])
                 self.assertEqual(outline(fake) == outline(real), level != "shape", (level, fake, real))
+
+    def test_confusable_codes_count_look_alikes_swapped(self):
+        card = Card("confusable", 1024, 1024, 8)
+        _, truth, _ = eyetest.render(card, image=False)
+        tokens = [t for line in truth["lines"] for t in line.split()]
+        self.assertTrue(all(ch in "".join(eyetest.CONFUSABLE_GROUPS) + "-" for t in tokens for ch in t))
+        swap = {ch: sorted(eyetest.CONFUSABLE[ch])[0] for g in eyetest.CONFUSABLE_GROUPS for ch in g}
+        misread = [t[:-1] + swap[t[-1]] for t in tokens]  # each token's last character for a look-alike
+        s = eyetest.score(card, truth, {"lines": [" ".join(misread)]})
+        self.assertEqual((s["score"], s["confused"]), (0.0, len(tokens)))
+        self.assertEqual(eyetest.score(card, truth, eyetest.perfect(card, truth))["confused"], 0)
 
     def test_pairs_tell_misbound_from_misread(self):
         truth = {"pairs": {"K7Q": "4.75", "HX-402": "88", "P-17B": "1250"}}

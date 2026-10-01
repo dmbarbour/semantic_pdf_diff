@@ -32,8 +32,8 @@ CAP = {"helv": 0.718, "cour": 0.562, "tiro": 0.662}  # cap height per em (the fo
 LETTERS = "ABCDEFGHJKLMNPRSTUVWXYZ"                    # no I, O or Q, as drawings avoid them
 INCHES = ("1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8")
 SERIES_COLORS = ((0.12, 0.47, 0.71), (1.0, 0.5, 0.05), (0.17, 0.63, 0.17))
-FAMILIES = ("read", "words", "pseudo", "pairs", "table", "graph", "chart-values", "chart-axis")
-READING = ("read", "words", "pseudo")  # families scored as transcribed lines
+FAMILIES = ("read", "confusable", "words", "pseudo", "pairs", "table", "graph", "chart-values", "chart-axis")
+READING = ("read", "confusable", "words", "pseudo")  # families scored as transcribed lines
 PASS = 0.9  # a glyph height is read when 90% of its items are
 LARGE = 16  # glyphs above this (px) measure a ceiling, and stay out of the threshold fit
 
@@ -67,7 +67,7 @@ class Arrow(_Answer):
 class Arrows(_Answer):
     edges: list[Arrow] = Field(default_factory=list)
 
-SCHEMAS = {"read": Lines, "words": Lines, "pseudo": Lines, "pairs": Pairs, "table": Lookups, "graph": Arrows, "chart-values": Lookups,
+SCHEMAS = {"read": Lines, "confusable": Lines, "words": Lines, "pseudo": Lines, "pairs": Pairs, "table": Lookups, "graph": Arrows, "chart-values": Lookups,
            "chart-axis": Lookups}
 
 # --- random content -----------------------------------------------------------------------------
@@ -141,6 +141,19 @@ def substitutes(letter, level):
     if level == "profile":
         return [c for c in same if c not in CLOSE.get(letter, "") and c not in "ij"]
     return [c for k, v in HEIGHTS.items() if k not in (height(letter), "dotted") for c in v]
+
+# Characters often mistaken for each other in codes (lists of common misreadings: O/0/D/Q, I/l/1, S/5, B/8,
+# Z/2, G/6/C). Confusable codes are built from them, in the forms the ordinary codes take.
+CONFUSABLE_GROUPS = ("O0DQ", "Il1", "S5", "B8", "Z2", "G6C")
+CONFUSABLE = {a: set(g) - {a} for g in CONFUSABLE_GROUPS for a in g}
+
+def confusable_code(rng):
+    """A code made mostly of look-alike characters: "B8-0D5", "S5Z2", "lI1-O0"."""
+    pick = lambda n: "".join(rng.choice(rng.choice(CONFUSABLE_GROUPS)) for _ in range(n))
+    kind = rng.random()
+    if kind < 0.4:
+        return pick(rng.randint(1, 3)) + "-" + pick(rng.randint(2, 3))
+    return pick(rng.randint(3, 6))
 
 def word(rng):
     w = rng.choice(WORDS)
@@ -276,6 +289,14 @@ def _read(card, rng, c):
               "printed, top to bottom, keeping the order of the items in each line. Write ? for each character "
               "you can't read.\n" + JSON_ONLY + '{"lines": ["first line", "second line"]}')
     return {"lines": lines}, prompt, lines
+
+def _confusable(card, rng, c):
+    """The ordinary codes' prompt: whether a model tells look-alikes apart when nothing else tells them."""
+    lines, _ = _lines(card, rng, c, lambda r: (confusable_code(r), None))
+    prompt = ("The image shows a few lines of codes and numbers. " + RANDOM + " Transcribe every line exactly as "
+              "printed, top to bottom, keeping the order of the items in each line. Write ? for each character "
+              "you can't read.\n" + JSON_ONLY + '{"lines": ["first line", "second line"]}')
+    return {"lines": lines, "confusable": True}, prompt, lines
 
 WORDS_PROMPT = ("The image shows a few lines of words. Transcribe every line exactly as printed, letter by letter, "
                 "top to bottom; don't correct spelling. Write ? for each character you can't read.\n" + JSON_ONLY +
@@ -544,7 +565,7 @@ def _chart_axis(card, rng, c):
                            for k, cat in enumerate(categories)], "cells": values}
     return truth, prompt, categories + ticks
 
-DRAW = {"read": _read, "words": _words, "pseudo": _pseudo, "pairs": _pairs, "table": _table, "graph": _graph, "chart-values": _chart_values,
+DRAW = {"read": _read, "confusable": _confusable, "words": _words, "pseudo": _pseudo, "pairs": _pairs, "table": _table, "graph": _graph, "chart-values": _chart_values,
         "chart-axis": _chart_axis}
 
 # --- suites -------------------------------------------------------------------------------------
@@ -571,6 +592,7 @@ def suite(name="standard"):
     cards += [Card("read", 1024, 1024, g, seed=seed) for seed in (1, 2) for g in (24, 32, 48, 64)]
     # Words and pseudo-words at the codes' sizes and glyphs (one seed): what meaning and word shape add.
     cards += [Card("words", w, h, g) for w, h in SQUARES[1:] for g in (4, 5, 6, 7, 8, 10, 12)]
+    cards += [Card("confusable", w, h, g) for w, h in SQUARES[1:] for g in (4, 5, 6, 7, 8, 10, 12)]
     cards += [Card("pseudo", w, h, g, layout=level) for level in PSEUDO_LEVELS for w, h in SQUARES[1:]
               for g in (4, 5, 6, 7, 8, 10, 12)]
     for layout in ("inline", "columns", "stacked"):
@@ -621,6 +643,16 @@ def score(card, truth, answer):
         want, got = "".join(expected), "".join(given)
         out = {"score": round(matched / len(expected), 4), "items": len(expected), "right": matched,
                "cer": round(min(1.0, edit_distance(want, got) / len(want)), 4), "unread": got.count("?")}
+        if truth.get("confusable"):  # look-alikes swapped, counted where a token was read at its length
+            raw_expected = [t for line in truth["lines"] for t in line.split()]
+            raw_given = [t for line in answer.get("lines") or () for t in str(line).split()]
+            swaps = 0
+            for op, i1, i2, j1, j2 in SequenceMatcher(None, expected, given, autojunk=False).get_opcodes():
+                if op == "replace":
+                    for a, b in zip(raw_expected[i1:i2], raw_given[j1:j2]):
+                        if len(a) == len(b):
+                            swaps += sum(1 for x, y in zip(a, b) if x != y and y in CONFUSABLE.get(x, ()))
+            out["confused"] = swaps
         if truth.get("sources"):  # pseudo-words read as the word they came from
             out["autocorrected"] = sum(1 for t in given if t in {norm(w) for w in truth["sources"]})
         return out
@@ -815,7 +847,7 @@ def summarise(entries):
         errors = {}
         for e in mine:
             for k, v in e.items():
-                if k in ("autocorrected", "misbound", "misread", "declined", "missed", "reversed", "label_misbound", "label_misread",
+                if k in ("autocorrected", "confused", "misbound", "misread", "declined", "missed", "reversed", "label_misbound", "label_misread",
                          "ends_wrong", "spurious", "unknown_name", "same_row_or_column") and isinstance(v, int):
                     errors[k] = errors.get(k, 0) + v
         out["families"][family] = {"cards": len(mine), "score": _mean(_scored(e) for e in mine),
@@ -843,8 +875,8 @@ def summarise(entries):
     # Codes against words against pseudo-words, size by size: the smallest glyph read at 90%.
     out["by_kind"] = {}
     kind_of = lambda e: e["family"] if e["family"] != "pseudo" else f"pseudo-{e.get('layout') or 'close'}"
-    for family in ("words",) + tuple(f"pseudo-{level}" for level in PSEUDO_LEVELS):
-        mine = [e for e in entries if e["family"] in ("words", "pseudo") and kind_of(e) == family]
+    for family in ("confusable", "words") + tuple(f"pseudo-{level}" for level in PSEUDO_LEVELS):
+        mine = [e for e in entries if e["family"] in ("confusable", "words", "pseudo") and kind_of(e) == family]
         for size in sorted({(e["w"], e["h"]) for e in mine}, key=lambda s: (s[0] * s[1], s)):
             cells = {}
             for e in mine:
@@ -939,10 +971,11 @@ def page(folder, data):
                        + "</tr>")
         out.append("</table></div>")
     kinds = [(m, data["models"][m]["summary"].get("by_kind", {})) for m in models]
-    KINDS = ("codes", "words") + tuple(f"pseudo-{level}" for level in PSEUDO_LEVELS)
+    KINDS = ("codes", "confusable", "words") + tuple(f"pseudo-{level}" for level in PSEUDO_LEVELS)
     sizes_k = sorted({s for _, k in kinds for s in k}, key=lambda s: math.prod(map(int, s.split("x"))))
     if sizes_k:
-        out.append("<h2>Codes, words and pseudo-words: smallest glyph read (px)</h2><p class='muted'>Real words have "
+        out.append("<h2>Codes, words and pseudo-words: smallest glyph read (px)</h2><p class='muted'>Confusable codes "
+                   "are made of look-alikes (O/0/D/Q, I/l/1, S/5, B/8, Z/2, G/6/C). Real words have "
                    "shape and meaning. Pseudo-words change one letter: for a look-alike of the same height (close), "
                    "another letter of the same height (profile), or a letter of another height (shape). Lower is "
                    "better; the families table counts pseudo-words read as the word they came from (autocorrected).</p>"
