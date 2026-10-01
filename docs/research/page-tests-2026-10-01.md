@@ -6,7 +6,8 @@
   - "how good vision models are at asking for close-up views of a regions (and identifying those regions) when (a) prompted to do so as needed, and (b) we know when it's needed based on prior test results. Sort of an investigative test."
   - "ensure at least one such eye test has tiny illegible text across multiple cells in the range. Perhaps stick it on a four corners."
 - **Code:** `src/semantic_pdf_diff/pagetest.py`; run with `scripts/page_test.py`.
-- **Results:** `benchmarks/pagetest/results.json` and `report.html`. Answers are in `replay.zip`, and the report is rebuilt offline.
+- **Results:** `benchmarks/pagetest/results.json` and `report.html`. Answers are in `replay.zip`, and the report is rebuilt offline. The planner table is printed by `scripts/check_profiles.py`.
+- **Measured and inferred:** every figure is computed by the test code, from exact comparisons of answers with the generated answer keys. Statements marked *inferred* are Claude's interpretation of those figures. Figures marked *computed* were worked out by Claude from measured ones.
 - **Spend:** $0.72 (gemma-4 $0.15 over 2,195 queries, Qwen3-VL $0.56 over 1,383). It includes $0.12 of Qwen answers lost in a crash, before folder fixtures kept their working copy beside the zip.
 - **Follows:** the card [eye tests](eye-tests-2026-09-30.md), which measure what a model reads in an image of a given size.
 
@@ -54,18 +55,20 @@
 - **A letter page shrinks well for Qwen** (97% in one query at 1536 px), and for gemma-4 down to about 6-point text.
 - **gemma-4 needs tiles,** rendered at about its budget:
   - 420-point tiles read 4-point text on both page kinds; 576-point tiles read 5-point text with 40% fewer queries.
-  - Rendering at 1536 rather than 768 costs gemma-4 nothing (the host shrinks it to the same tokens), and it reads a little better: a sharp image shrunk beats a small one enlarged.
+  - Rendering at 1536 rather than 768 costs gemma-4 nothing (the same tokens), and it reads a little better.
+    - *Inferred:* the host shrinks both to its budget, and a sharp image shrunk beats a small one enlarged.
 - **Qwen trades queries for tokens.** It reads an ARCH D sheet in 12 tiles at 1536 px, against gemma-4's 40, but at 29k prompt tokens against 16k, and slowly.
 - **Too much magnification breaks Qwen.**
   - With 144-point tiles at 1536 px (14-point capitals about 100 px tall), it read 33% of a letter page, breaking large text into pieces ("MLK-58" as "MLK", "C-1", "A", "G").
   - The eye test's new large-glyph cards put its ceiling between 32 px (read perfectly) and 48 px (not at all). The other five models read 64-px capitals.
-  - gemma-4 is protected by its own budget: the host shrinks what we magnify.
+  - gemma-4 read every large glyph. *Inferred:* the host shrinks what we magnify, so its budget protects it.
 - **Too fine a slicing also cuts large text.** On the ARCH D detail sheets, 288-point tiles held only 90% of the 48-point items whole, and recall fell to 0.94.
 
 ## The cards predict the pages
 
 - **Prediction:** a profile from the card test (the smallest glyph read per 1000 px of side, at the nearest image size) predicts the smallest font a plan reads.
-- **gemma-4 reads pages about 10% smaller than predicted** (calibration 0.90 from 16 plans): isolated items are easier than the cards' dense lines.
+- **gemma-4 reads pages about 10% smaller than predicted** (calibration 0.90 from 16 plans).
+  - *Inferred:* isolated items are easier than the cards' dense lines.
 - **Qwen matches the prediction** (1.01, from 13 plans).
 - **The planner** (`profiles.py`) picks the fewest tiles, then the smallest render, that read a page's smallest text without magnifying its largest past the model's ceiling. Checked against the measured plans:
 
@@ -97,7 +100,7 @@ Results are averaged per sheet over two seeds of each kind. "Clusters" is the sh
 - **Prompted only to zoom "as needed", neither model does.**
   - gemma-4 asked in a handful of runs, Qwen in none.
   - Instead they list what they think they see. From an ARCH D overview, gemma-4 listed 30–55 items while reading 3–17% correctly, and its spurious items ran to 26–37 per sheet.
-  - **A model doesn't know what it can't read.**
+  - *Inferred:* a model doesn't know what it can't read.
 - **Told that small text is there, and given a labelled grid, both find it.**
   - gemma-4 found every cluster on every detail and corner sheet, in 5–6.5 queries. Qwen found most, and spent more queries going two levels deep.
   - With grid cells it always asks; with boxes it rarely answers.
@@ -110,7 +113,7 @@ Results are averaged per sheet over two seeds of each kind. "Clusters" is the sh
   - With tiny text across four cells, both named the cells around it one by one, which covered 75–100% of the corner cluster.
 - **Nothing was dropped:** every request was a usable region.
 - **Static tiling still reads more,** at more queries: 24 tiles read the ARCH D detail sheets fully, against gemma-4's 79% from 5 close-ups.
-  - Close-ups pay where small text is localised on a large page, and its sizes are unknown (no text layer to plan from).
+  - *Inferred:* close-ups pay where small text is localised on a large page, and its sizes are unknown (no text layer to plan from).
   - gemma-4 uses its second level of close-ups too little.
 - **Grid labels drawn on images were read as page text** in the deepest close-ups, until those carried no grid and the prompt said the grid isn't part of the page.
 
