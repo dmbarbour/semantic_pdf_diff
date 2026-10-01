@@ -47,6 +47,25 @@ class Knobs(unittest.TestCase):
             pages = {x["page"] for f in project.facts if f.id.startswith(prefix) for x in f.forms}
             self.assertEqual(len(pages), 1, f"{project.id}-{knob}: {prefix} on pages {pages}")
 
+    def test_charts_under_every_knob(self):
+        import pymupdf
+        for knob in controlled.CHART_KNOBS:
+            project = controlled.energy_study(1)
+            project.knob = knob
+            data, log = controlled.render(project)
+            with self.subTest(knob=knob):
+                again = controlled.energy_study(1)
+                again.knob = knob
+                self.assertEqual(controlled.render(again)[0], data)  # scans too, byte for byte
+                july = project.fact("opt1.july")
+                self.assertEqual([x["form"] for x in july.forms], ["chart"])  # placed by the drawer, whatever's printed
+                printed = {p["text"] for p in log if p["facts"] == ["opt1.july"]}
+                self.assertEqual(printed, set() if knob in ("axis", "all") else {july.value})  # axis: not printed
+                self.assertEqual(july.tolerance, 12.5 if knob in ("axis", "all") else 0.0)  # a quarter of a 50 step
+                text = "".join(page.get_text() for page in pymupdf.open("pdf", data))
+                self.assertEqual(text == "", knob in ("scan", "all"))  # a scan has no text layer
+                self.assertEqual(july.value in text, knob in ("clean", "legend-caption"))  # vector, values printed
+
     def test_prose_knobs_leave_table_projects_alone(self):
         project = controlled.equipment_schedules(1)
         project.knob = "all"
@@ -136,6 +155,26 @@ class Scoring(unittest.TestCase):
             {"entity": "Hall C", "attribute": "clear height", "value": "17'-9 1/2\""}])  # feet and inches: one value, printed nowhere
         self.assertEqual(s["outcomes"], {"right": 2, "hallucinated": 1})
         self.assertNotIn("hallc.tmax", s["missed"])
+
+    def test_bars_read_against_an_axis_count_within_a_quarter_step(self):
+        project = controlled.energy_study(1)
+        project.knob = "axis"
+        _, log = controlled.render(project)
+        key = controlled.key(project, log)
+        july = project.fact("opt1.july")
+        bar = lambda v, **k: {"entity": "Option 1, chilled beams", "attribute": "cooling energy",
+                              "value": f"{v:g}", "conditions": "July", **k}
+        s = controlled.score(key, [bar(july.number + 10)])  # within 12.5
+        self.assertEqual(s["outcomes"], {"right": 1})
+        s = controlled.score(key, [bar(july.number + 40)])  # the bar named, its height misread
+        self.assertEqual((s["outcomes"], s["found"]), ({"inexact": 1}, 0))
+        # July's height filed under August is judged against August's bar: to the eye, a misjudged height
+        s = controlled.score(key, [bar(july.number, conditions="August")])
+        self.assertEqual(s["outcomes"], {"inexact": 1})
+        exhibit = project.fact("zone.exhibit")  # bars of two charts near one value: the names choose
+        s = controlled.score(key, [{"entity": "Exhibit floor", "attribute": "peak cooling load", "value": exhibit.value}])
+        self.assertEqual(s["outcomes"], {"right": 1})
+        self.assertNotIn("zone.exhibit", s["missed"])
 
     def test_a_superseded_value_reported_as_current_is_a_distractor(self):
         project = controlled.roller_coaster(1)

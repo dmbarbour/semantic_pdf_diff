@@ -38,6 +38,7 @@ class Fact:
     role: str = "fact"                # fact, or distractor (a superseded value, say)
     forms: list = field(default_factory=list)  # where it's printed: [{"form", "page", "box"}]
     drawn: str = ""                   # the form it was drawn in, when fixed ("table" for a schedule's cells)
+    tolerance: float = 0.0            # a value read against a chart's axis: how far off still counts (else exact)
 
     @property
     def number(self):
@@ -73,6 +74,17 @@ class Draw:
     def pick(self, options):
         return self.rng.choice(list(options))
 
+    def slot(self, near, grid):
+        """The unused multiple of `grid` nearest to `near` (bars read against an axis, to half its step)."""
+        base = round(near / grid)
+        for k in sorted(range(-40, 41), key=abs):
+            v = (base + k) * grid
+            text = f"{v:,g}"
+            if v > 0 and text not in self.used:
+                self.used.add(text)
+                return text
+        raise ValueError(f"no unused slot near {near}")
+
 # --- projects ----------------------------------------------------------------------------------
 
 @dataclass
@@ -81,13 +93,14 @@ class Project:
     title: str
     facts: list
     sections: list    # [(heading, [blocks])]; a block is ("p", text), ("table", caption, header, rows) or ("schedule", Schedule)
-    knob: str = "clean"  # how schedules are drawn (TABLE_KNOBS), or prose and pages (PROSE_KNOBS)
-    texts: dict = None   # prose projects: {name: (plain, trap)} phrasings, filled from values
+    knob: str = "clean"  # how schedules are drawn (TABLE_KNOBS), or prose, pages and charts (kinds)
+    texts: dict = None   # {name: (plain, trap)} phrasings, filled from values
     values: dict = None
+    kinds: tuple = ()    # the knobs a prose or chart project is drawn under (PROSE_KNOBS, CHART_KNOBS)
 
     def has(self, knob):
-        """Whether a prose or layout knob applies: "all" applies every knob of the project's kind."""
-        return bool(self.texts) and knob in PROSE_KNOBS and self.knob in (knob, "all")
+        """Whether a prose, layout or chart knob applies: "all" applies every knob of the project's kind."""
+        return knob in self.kinds and self.knob in (knob, "all")
 
     def fact(self, fact_id):
         return next(f for f in self.facts if f.id == fact_id)
@@ -446,7 +459,7 @@ def convention_center(seed=1):
         ("6 Construction Phasing", [("p", LCC_PROSE["phasing"])]),
     ]
     return Project(f"lcc-s{seed}", "Lakeshore Convention Center Expansion: Design Basis", F, sections, texts=texts,
-                   values=values)
+                   values=values, kinds=PROSE_KNOBS)
 
 # Number-free prose around the facts: it fills pages (so columns and running headers matter) without printing a
 # number a reader could mistake for a fact.
@@ -479,6 +492,163 @@ LCC_PROSE = {
 }
 
 PROSE_PROJECTS = {"lcc": convention_center}
+
+# --- charts (milestone 3a) -----------------------------------------------------------------------
+# sc01 item 2: monthly use of two alternatives in a bar chart, and the text that summarises it. Knobs: the values
+# printed above the bars (clean) or only readable against the axis; the chart as vector drawing or as an image;
+# the legend in the chart or only in the caption; the whole page scanned (an image, no text layer).
+CHART_KNOBS = ("clean", "axis", "raster", "legend-caption", "scan", "all")
+SERIES_FILL = ((0.12, 0.23, 0.36), (0.55, 0.70, 0.86), (0.85, 0.55, 0.20))
+
+@dataclass
+class Chart:
+    caption: str                 # "Figure 1. Monthly cooling energy"
+    categories: list             # the labels under the axis
+    series: list                 # [(name, [a Fact per category])]
+    axis: str                    # the axis's title (its unit)
+    step: float                  # the axis's labelled step; bars sit on multiples of half of it
+    top: float
+    legend_words: str = ""       # the series named in words, for a legend in the caption
+    height: float = 210.0        # points
+
+def energy_study(seed=1):
+    """Hall C's cooling energy study: monthly energy of two options in a grouped bar chart, peak load by zone in
+    another, and the text's totals."""
+    d = Draw(f"lcc-energy-{seed}")
+    F = []
+    add = lambda *a, **k: F.append(Fact(*a, **k)) or F[-1]
+    beams = ("Option 1, chilled beams", ("Option 1", "chilled beams", "chilled beam option", "chilled beam design"))
+    vav = ("Option 2, VAV baseline", ("Option 2", "VAV", "VAV baseline", "variable air volume"))
+    months = ("May", "June", "July", "August", "September", "October")
+    season = (0.45, 0.75, 1.0, 0.95, 0.7, 0.4)
+    series = []
+    for (name, aliases), short, peak in ((beams, "opt1", d.rng.uniform(330, 420)), (vav, "opt2", d.rng.uniform(470, 560))):
+        facts = [add(f"{short}.{m.lower()}", name, aliases, "cooling energy",
+                     ("monthly cooling energy", "energy use", "cooling energy use", "energy", "monthly energy"),
+                     d.slot(peak * k * d.rng.uniform(0.92, 1.08), 25), "MWh", m, drawn="chart")
+                 for m, k in zip(months, season)]
+        series.append((name, facts))
+    zones = (("Exhibit floor", 150, 190), ("Meeting rooms", 60, 110), ("Concourse", 30, 70), ("Kitchens", 20, 50),
+             ("Loading docks", 10, 30))
+    zone_facts = [add(f"zone.{z.split()[0].lower()}", z, (z.lower(), f"{z.lower()} zone"), "peak cooling load",
+                      ("cooling load", "peak load", "design cooling load"), d.slot(d.rng.uniform(lo, hi), 10), "tons",
+                      "chilled beam design", drawn="chart") for z, lo, hi in zones]
+    totals = []
+    for (name, aliases), (_, facts), short in zip((beams, vav), series, ("opt1", "opt2")):
+        text = f"{sum(f.number for f in facts):,.0f}"
+        d.used.add(text)
+        totals.append(add(f"{short}.season", name, aliases, "cooling season energy",
+                          ("seasonal cooling energy", "total cooling energy", "season total", "cooling energy"),
+                          text, "MWh", "cooling season"))  # not "May to October": no month's words
+    demand = [add("opt1.demand", *beams, "peak electrical demand", ("peak demand", "electrical demand", "demand"),
+                  d.number(900, 1250), "kW"),
+              add("opt2.demand", *vav, "peak electrical demand", ("peak demand", "electrical demand", "demand"),
+                  d.number(1300, 1700), "kW")]
+    energy = Chart("Figure 1. Monthly cooling energy, May to October", list(months), series, "MWh", 50, 600,
+                   "dark bars: Option 1, chilled beams; light bars: Option 2, VAV baseline")
+    loads = Chart("Figure 2. Peak cooling load by zone, chilled beam design", [z for z, _, _ in zones],
+                  [("Option 1, chilled beams", zone_facts)], "tons", 20, 200)
+    plain = {
+        "energy": "Figure 1 compares the two cooling options month by month over the cooling season, from May to "
+                  "October. Over the season, chilled beams use {t1} MWh of cooling energy against {t2} MWh for the "
+                  "VAV baseline.",
+        "demand": "Peak electrical demand for cooling is {d1} kW with chilled beams and {d2} kW with the VAV baseline. "
+                  "Figure 2 breaks the chilled beam design's peak cooling load down by zone.",
+    }
+    values = dict(t1=totals[0].value, t2=totals[1].value, d1=demand[0].value, d2=demand[1].value)
+    sections = [
+        ("1 Purpose", [("p", "This study estimates the cooling energy of the two options compared in the design "
+                             "basis, to support the choice due at the end of schematic design. Both options were "
+                             "modelled with the same weather file, schedules and internal gains.")]),
+        ("2 Monthly Cooling Energy", [("text", "energy"), ("chart", energy),
+                                      ("p", "The difference is largest in the peak months, when the VAV baseline moves "
+                                            "the most air to meet the hall's sensible load.")]),
+        ("3 Peak Loads", [("text", "demand"), ("chart", loads)]),
+        ("4 Conclusions", [("p", "Chilled beams use less cooling energy in every month of the season. The saving "
+                                 "should be weighed against their higher first cost, reported in the design basis.")]),
+    ]
+    return Project(f"lcc-energy-s{seed}", "Lakeshore Hall C: Cooling Energy Study", F, sections,
+                   texts={k: (v, v) for k, v in plain.items()}, values=values, kinds=CHART_KNOBS)
+
+CHART_PROJECTS = {"lcc-energy": energy_study}
+
+def charts(project):
+    """The project's charts, in order (figure-1, figure-2, ...)."""
+    return [block[1] for _, blocks in project.sections for block in blocks if block[0] == "chart"]
+
+def draw_chart(page, rect, chart, values=True, legend=True, size=7.5):
+    """Draw a bar chart into rect on a PyMuPDF page: an axis from 0 to its top, grouped bars, the categories under
+    them, values printed above the bars (or not), a legend (or not). Returns [(fact, bar rect)] and the numbers
+    drawn: [(text, facts, rect)]."""
+    import pymupdf
+    width = lambda t: pymupdf.get_text_length(t, fontname="helv", fontsize=size)
+    text = lambda x, y, t: page.insert_text((x, y), t, fontname="helv", fontsize=size)
+    ticks = [f"{k * chart.step:g}" for k in range(int(round(chart.top / chart.step)) + 1)]
+    left = rect.x0 + max(width(t) for t in ticks) + 8
+    plot = pymupdf.Rect(left, rect.y0 + 2.6 * size, rect.x1 - 4, rect.y1 - 2.2 * size)
+    scale = plot.height / chart.top
+    drawn, bars = [], []
+    shape = page.new_shape()
+    for t in ticks:
+        y = plot.y1 - float(t) * scale
+        shape.draw_line((plot.x0 - 3, y), (plot.x1, y))
+    shape.finish(color=(0.78, 0.78, 0.78), width=0.5, closePath=False)
+    shape.draw_line((plot.x0, plot.y0), (plot.x0, plot.y1))
+    shape.draw_line((plot.x0, plot.y1), (plot.x1, plot.y1))
+    shape.finish(color=(0, 0, 0), width=0.8, closePath=False)
+    shape.commit()
+    for t in ticks:
+        x, y = plot.x0 - 5 - width(t), plot.y1 - float(t) * scale + size * 0.35
+        text(x, y, t)
+        drawn.append((t, [], pymupdf.Rect(x, y - size, x + width(t), y)))
+    text(rect.x0, rect.y0 + size, chart.axis)  # the axis's title, above it
+    group = plot.width / len(chart.categories)
+    bar = group * 0.75 / len(chart.series)
+    for i, category in enumerate(chart.categories):
+        for s, (_, facts) in enumerate(chart.series):
+            fact = facts[i]
+            x0 = plot.x0 + i * group + group * 0.125 + s * bar
+            box = pymupdf.Rect(x0, plot.y1 - fact.number * scale, x0 + bar * 0.9, plot.y1)
+            shape = page.new_shape()
+            shape.draw_rect(box)
+            shape.finish(color=None, fill=SERIES_FILL[s], width=0)
+            shape.commit()
+            bars.append((fact, box))
+            if values:
+                x, y = box.x0 + box.width / 2 - width(fact.value) / 2, box.y0 - 2
+                text(x, y, fact.value)
+                drawn.append((fact.value, [fact], pymupdf.Rect(x, y - size, x + width(fact.value), y)))
+        text(plot.x0 + (i + 0.5) * group - width(category) / 2, plot.y1 + 1.5 * size, category)
+    if legend and len(chart.series) > 1:
+        x = plot.x1
+        for s in reversed(range(len(chart.series))):
+            name = chart.series[s][0]
+            x -= width(name) + 2.2 * size
+            shape = page.new_shape()
+            shape.draw_rect(pymupdf.Rect(x, rect.y0 + 0.2 * size, x + size, rect.y0 + 1.2 * size))
+            shape.finish(color=None, fill=SERIES_FILL[s], width=0)
+            shape.commit()
+            text(x + 1.4 * size, rect.y0 + 1.1 * size, name)
+    return bars, drawn
+
+def raster(page, rect, draw, dpi=150):
+    """Draw onto a page of rect's size, and place the drawing on `page` as an image (a chart pasted as a picture)."""
+    import pymupdf
+    scratch = pymupdf.open()
+    canvas = scratch.new_page(width=rect.width, height=rect.height)
+    result = draw(canvas, pymupdf.Rect(0, 0, rect.width, rect.height))
+    page.insert_image(rect, stream=canvas.get_pixmap(dpi=dpi, alpha=False).tobytes("png"))
+    return result
+
+def scanned(data, dpi=150):
+    """The PDF as images only, one per page (a scan): no text layer."""
+    import pymupdf
+    src, out = pymupdf.open("pdf", data), pymupdf.open()
+    for page in src:
+        new = out.new_page(width=page.rect.width, height=page.rect.height)
+        new.insert_image(new.rect, stream=page.get_pixmap(dpi=dpi, alpha=False).tobytes("png"))
+    out.set_metadata({})
+    return out.tobytes(garbage=3, deflate=True, no_new_id=True)
 RUNNING_HEADER = "Lakeshore Convention Center · Doc LCC-HC-DB-004 · Rev C · 2026-03-14"
 
 def corpus(seeds=(1,), knobs=False):
@@ -486,7 +656,8 @@ def corpus(seeds=(1,), knobs=False):
     every prose knob (ids "<project>-<knob>")."""
     out = [make(seed) for make in PROJECTS.values() for seed in seeds]
     if knobs:
-        for makers, all_knobs in ((TABLE_PROJECTS, TABLE_KNOBS), (PROSE_PROJECTS, PROSE_KNOBS)):
+        for makers, all_knobs in ((TABLE_PROJECTS, TABLE_KNOBS), (PROSE_PROJECTS, PROSE_KNOBS),
+                                  (CHART_PROJECTS, CHART_KNOBS)):
             for make in makers.values():
                 for seed in seeds:
                     for knob in all_knobs:
@@ -575,7 +746,7 @@ def _last(number, last):
 
 def html(project, breaks=()):
     import itertools
-    esc, counter = _esc, itertools.count(1)
+    esc, counter, figures = _esc, itertools.count(1), itertools.count(1)
     out = [f"<h1>{esc(project.title)}</h1>"]
     for heading, blocks in project.sections:
         out.append(f"<h2>{esc(heading)}</h2>")
@@ -588,6 +759,14 @@ def html(project, breaks=()):
                 plain, trap = project.texts[block[1]]
                 text = (trap if project.has("traps") else plain).format(**project.values)
                 out.append(f"<p>{esc(text)}</p>")
+            elif block[0] == "chart":  # room for the chart, drawn after layout; its caption below
+                chart = block[1]
+                caption = chart.caption + (f" ({chart.legend_words})" if chart.legend_words and project.has("legend-caption")
+                                           else "")
+                number = next(figures)
+                out.append((PAGE_BREAK if f"figure-{number}" in breaks else "") +
+                           f"<div id='figure-{number}' style='height:{chart.height:g}pt'></div>"
+                           f"<p class='caption'>{esc(caption)}</p>")
             elif block[0] == "rooms":  # the table's subject: in every row (clean), or only in the caption (traps)
                 _, (caption_trap, caption_plain), header, rows = block
                 trap = project.has("traps")
@@ -617,9 +796,12 @@ def render(project, page_size="letter"):
         buffer = io.BytesIO()
         writer = pymupdf.DocumentWriter(buffer)
         placed, pages = {}, {}  # page: schedule tables' boxes; table id: the (page, column)s it was drawn in
+        figures = {}  # figure number: (page, the room left for it)
 
         def note(position):
             ident = getattr(position, "id", "") or ""
+            if ident.startswith("figure-") and position.open_close & 1:
+                figures[int(ident.split("-")[1])] = (position.page, pymupdf.Rect(position.rect))
             if ident.startswith("schedule-"):
                 pages.setdefault(ident.removesuffix("-end"), set()).add((position.page, position.column))
                 if position.open_close & 1 and not ident.endswith("-end"):
@@ -644,6 +826,9 @@ def render(project, page_size="letter"):
                 writer.end_page()
         writer.close()
         split = {int(i.split("-")[1]) for i, p in pages.items() if len(p) > 1} - breaks
+        # Story doesn't move a box of fixed height (a chart's room) to the next page: it overflows, and what
+        # follows is lost. Such a box starts a page instead.
+        split |= {f"figure-{n}" for n, (_, box) in figures.items() if box.y1 > body.y1 + 1} - breaks
         if not split:
             break
         breaks |= split
@@ -655,11 +840,36 @@ def render(project, page_size="letter"):
                          fontsize=8)
         if project.has("furniture"):  # a running header of numbers that aren't facts
             page.insert_text((54, 36), RUNNING_HEADER, fontname="helv", fontsize=8)
+    drawn = draw_charts(project, doc, figures)
     doc.set_metadata({})
     data = doc.tobytes(garbage=3, deflate=True, no_new_id=True)
-    return data, locate(project, pymupdf.open("pdf", data), placed)
+    log = locate(project, pymupdf.open("pdf", data), placed, drawn)
+    return (scanned(data) if project.has("scan") else data), log
 
-def locate(project, doc, placed=None):
+def draw_charts(project, doc, figures):
+    """Draw each chart into the room left for it, as a drawing or a picture (raster), with or without its values
+    (axis) and legend (legend-caption). Returns {page: [(chart box, [(fact, box)], [(number, facts, box)])]}: what
+    was drawn where, since the drawer knows which number is a tick and which a value."""
+    import pymupdf
+    out = {}
+    for number, chart in enumerate(charts(project), 1):
+        page_no, box = figures[number]
+        page = doc[page_no - 1]
+        for _, facts in chart.series:
+            for f in facts:
+                f.tolerance = chart.step / 4 if project.has("axis") else 0.0
+        draw = lambda pg, r, chart=chart: draw_chart(pg, r, chart, values=not project.has("axis"),
+                                                      legend=not project.has("legend-caption"))
+        if project.has("raster"):
+            bars, numbers = raster(page, box, draw)
+            shift = lambda r: pymupdf.Rect(r) + (box.x0, box.y0, box.x0, box.y0)
+            bars, numbers = [(f, shift(b)) for f, b in bars], [(t, fs, shift(b)) for t, fs, b in numbers]
+        else:
+            bars, numbers = draw(page, box)
+        out.setdefault(page_no, []).append((box, bars, numbers))
+    return out
+
+def locate(project, doc, placed=None, drawn=None):
     """Find each fact's printed value on its pages (setting fact.forms), and log every number on the pages with
     its role: fact or distractor (by id), or structure (section, table and page numbers, anything else)."""
     by_value = {}
@@ -669,7 +879,17 @@ def locate(project, doc, placed=None):
     log = []
     for n, page in enumerate(doc, 1):
         table_boxes = [t.bbox for t in page.find_tables().tables] + list((placed or {}).get(n, []))
+        chart_boxes = []
+        for box, bars, numbers in (drawn or {}).get(n, []):  # charts: placed and logged as drawn
+            chart_boxes.append(box)
+            for fact, bar in bars:
+                fact.forms.append({"form": "chart", "page": n, "box": [round(v, 1) for v in bar]})
+            for text, facts, _ in numbers:
+                log.append({"text": text, "page": n, "role": facts[0].role if facts else "structure",
+                            "facts": [f.id for f in facts]})
         for w in page.get_text("words"):
+            if any(b[0] - 1 <= w[0] and w[2] <= b[2] + 1 and b[1] - 1 <= w[1] and w[3] <= b[3] + 1 for b in chart_boxes):
+                continue
             text = w[4].strip(",.;:()°")
             number = parse_number(text) if re.search(r"[0-9]", text) else None  # "ft²" is a unit, not a 2
             if number is None:
@@ -689,8 +909,8 @@ def locate(project, doc, placed=None):
 
 def key(project, log):
     """The answer key: facts with their forms, and the printed numbers with their roles."""
-    return {"project": project.id, "title": project.title, "facts": [asdict(f) for f in project.facts],
-            "printed": log}
+    exact = lambda f: {k: v for k, v in asdict(f).items() if k != "tolerance" or v}  # read exactly: no field
+    return {"project": project.id, "title": project.title, "facts": [exact(f) for f in project.facts], "printed": log}
 
 def write(project, folder):
     """Write <id>.pdf and <id>.key.json into folder; returns the PDF's path."""
@@ -730,6 +950,8 @@ def vocabulary(fact):
                          + tuple(fact.synonyms)))
 
 FIT_WEIGHTS = {"attribute": 2.0, "entity": 1.0, "conditions": 0.25}  # conditions only break ties
+# A reference to where a value was read isn't a name: "Figure 1" mustn't pick "Option 1".
+REFERENCE = re.compile(r"\b(?:figure|fig\.?|table|section|page|sheet)\s*[-.]?\s*\d+[a-z]?\b", re.I)
 
 def fit(claim, fact, weights):
     """How well a claim's names describe a fact: the rare-word-weighted share of its attribute's words, entity's
@@ -738,7 +960,7 @@ def fit(claim, fact, weights):
     vocab = vocabulary(fact)
     score = 0.0
     for part, weight in FIT_WEIGHTS.items():
-        words = tokens(claim.get(part, ""))
+        words = tokens(REFERENCE.sub(" ", str(claim.get(part, ""))))
         total = sum(weights.get(w, weights[None]) for w in words)
         if total:
             score += weight * sum(weights.get(w, weights[None]) for w in words & vocab) / total
@@ -757,6 +979,12 @@ def rarity(facts):
 def same_number(a, b):
     return a is not None and b is not None and abs(a - b) <= 1e-9 * max(1.0, abs(a), abs(b))
 
+def holds(fact, number):
+    """Whether a value is the fact's: the same number, or within its tolerance (a bar read against an axis)."""
+    return same_number(fact.number, number) or bool(fact.tolerance and abs(fact.number - number) <= fact.tolerance)
+
+INEXACT_STEPS = 10  # how many tolerances off a reading bound to a bar may be and still count as that bar's, misread
+
 def classify(claim, facts, printed):
     """(outcome, fact id or None) for one claim.
 
@@ -765,15 +993,28 @@ def classify(claim, facts, printed):
     "pump" among three pumps), or no name fits at all. Misbound: another fact fits better (the value filed under
     another entity or attribute). Distractor: a superseded or otherwise wrong value, bound to its own fact.
     Misread: a printed number that isn't a fact (a page or section number). Hallucinated: printed nowhere.
-    Text: a value without a number, not scored yet."""
+    Inexact: a bar's value read against the axis, outside its tolerance, the bar named alone. Text: a value
+    without a number, not scored yet.
+
+    Read against an axis, a claim naming one bar is judged against that bar (a height read wrong and another
+    bar's height read look alike); otherwise several bars may hold a value, and the names choose among them."""
     number = parse_number(claim.get("value", ""))
     if number is None:
         return "text", None
-    holders = [f for f in facts if same_number(f.number, number)]
+    holders = [f for f in facts if holds(f, number)]
+    weights = rarity(facts) if holders or any(f.tolerance for f in facts) else None
+    scores = {f.id: fit(claim, f, weights) for f in facts} if weights else {}
+    if any(f.tolerance for f in facts):  # read against an axis: the names pick the bar, its height is checked
+        best = max(scores.values())
+        top = [f for f in facts if scores[f.id] == best]
+        if best > 0 and len(top) == 1 and top[0].tolerance:
+            bar = top[0]
+            if holds(bar, number):
+                return "right", bar.id
+            if abs(bar.number - number) <= INEXACT_STEPS * bar.tolerance:
+                return "inexact", bar.id  # its height misjudged, or another bar's read: alike to the eye
     if holders:
-        holder = holders[0]
-        weights = rarity(facts)
-        scores = {f.id: fit(claim, f, weights) for f in facts}
+        holder = max(holders, key=lambda f: scores[f.id])  # the first, of equals
         best = max(scores.values())
         top = [i for i, v in scores.items() if v == best]
         by_id = {f.id: f for f in facts}

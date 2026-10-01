@@ -1,6 +1,6 @@
 # Controlled documents with known facts
 
-- **Status:** Active (2026-10-01): milestones 1, 2a (table knobs) and 2b (prose traps and layout knobs) done.
+- **Status:** Active (2026-10-01): milestones 1, 2a (table knobs), 2b (prose traps and layout knobs) and 3a (charts and scanned pages) done.
 - **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](one-table-model-2026-09-30.md) (table hazards; its table eye tests become part of this); [content-addressed queries](content-addressed-queries-2026-09-28.md) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
 - **Why:**
   - **The owner (2026-10-01):** "similar to the eye test as a controlled test, we could have controlled PDF tests, i.e. where you generate a few PDFs with known facts to extract for fictional projects. This might provide a more robust control without relying on yours or my ability to extract facts."
@@ -286,6 +286,46 @@ Each row is a situation met in this project's documents, with where it was recor
   - **The caption trap shows by reader.** With the hall named only in the caption, the table reader dropped it for all 8 room values ("Room 101"). The text and image readers kept it ("Room 101", conditions "Hall C"). The lever index has a row.
   - **The scorer's own flaws, found by reading the claims by hand:** the range and the signs above, and claims dropped as repeats before their conditions were checked.
   - **Not yet:** text cut mid-sentence, numbered items across pages, boxed headings, caption traps ("Table 5-1 summarizes…"), equations and scans. They come with milestone 3's drawing tools, or as milestone 6 finds them.
+
+- **Milestone 3a, charts and scanned pages (2026-10-01): done.**
+  - **A fourth document:** Hall C's cooling energy study (21 facts). It has two charts and the text's totals:
+    - **Figure 1:** the two options' monthly cooling energy, May to October, as grouped bars (sc01 item 2)
+    - **Figure 2:** peak cooling load by zone, one series
+    - **prose:** the season totals (the sums of the bars) and the peak demand
+  - **Charts are drawn** into room Story leaves for them, after layout.
+    - The drawer logs every number it draws: tick labels as structure, bar values as facts. So a bar's value and a tick label of the same number aren't confused.
+    - Story lets a fixed-height box overflow the page, losing what follows it. Such a chart now starts a page.
+  - **Knobs:**
+    - **clean:** a vector chart, values printed above the bars
+    - **axis:** no printed values, so bars are read against the axis
+    - **raster:** the chart pasted as an image
+    - **legend-caption:** the series named only in the caption ("dark bars: Option 1…")
+    - **scan:** every page an image, with no text layer
+    - **all:** every knob together
+  - **The scorer, extended for bars read against an axis:**
+    - A reading within a quarter of the axis's step is right.
+    - A claim naming one bar is judged against that bar. Outside its tolerance (up to 10 tolerances off), it's **inexact**: a height misjudged and another bar's height read look alike to the eye.
+    - References like "Figure 1" are no longer read as names. One had matched "Option 1".
+    - **A limit:** a season total stated "over the cooling season (May to October)" ties with the May and October bars, so 2 right readings per document count as loose.
+  - **gemma-4 read the six documents for $0.022:**
+
+    | Knob | Recall | Right | Loose | Misbound | Inexact | Misread |
+    |---|---|---|---|---|---|---|
+    | clean | 1.00 | 21 | 0 | 7 | 0 | 1 |
+    | axis | 1.00 | 21 | 2 | 0 | 9 | 0 |
+    | raster | 1.00 | 21 | 2 | 0 | 0 | 0 |
+    | legend-caption | 1.00 | 21 | 0 | 0 | 0 | 0 |
+    | scan | 1.00 | 21 | 4 | 0 | 0 | 0 |
+    | all | 0.95 | 20 | 0 | 2 | 11 | 0 |
+
+  - **Printed values:** the image reader read every bar right. The text reader read the chart's values from the text layer and paired them with the wrong months (7 misbound), and took a tick label ("200") for a value. The lever index has a row.
+  - **Values only against the axis:** 9 of the image reader's readings, of 8 of the 12 monthly bars, were off by more than a quarter step. With every knob on, 11 readings of 8 bars were off, up to 125 MWh (July's 375 read as 250).
+    - Another reading of each bar (from another tile or reader) was right, so recall hides this; the inexact count shows it.
+    - The eye test's axis cards read 100% when asked bar by bar.
+    - *Inferred:* the extraction prompt doesn't ask for careful reading against the axis. The lever index has a row.
+  - **The legend only in the caption** cost nothing alone. On the scanned page the image reader named series by colour 4 times ("May value (dark blue series)"). With every knob on, it missed Option 2's September bar.
+  - **Checked by hand:** every misbound and inexact claim, and the loose ones.
+  - **Not yet:** drawings (dimension strings, tags with leaders, title blocks), stacked bars, line charts, and noise on scans. Those come in milestone 3b.
 
 ## Decisions (2026-10-01)
 

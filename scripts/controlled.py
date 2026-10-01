@@ -111,20 +111,23 @@ def main(argv=None):
             results.setdefault(which, {})[run] = result
     (FOLDER / "results.json").write_text(json.dumps(results, indent=1) + "\n", encoding="utf-8")
     knobbed = [(p, controlled.TABLE_KNOBS) for p in controlled.TABLE_PROJECTS] + \
-              [(p, controlled.PROSE_KNOBS) for p in controlled.PROSE_PROJECTS]
+              [(p, controlled.PROSE_KNOBS) for p in controlled.PROSE_PROJECTS] + \
+              [(p, controlled.CHART_KNOBS) for p in controlled.CHART_PROJECTS]
     for which, runs in results.items():  # each knobbed project's knobs beside its clean version
         for project, knobs in knobbed:
-            mine = {run[len(project) + 1:].partition("-")[2]: r for run, r in runs.items() if run.startswith(project + "-s")}
+            mine = {run[len(project) + 2:].partition("-")[2]: r for run, r in runs.items()
+                    if run.startswith(project + "-s") and run[len(project) + 2:].partition("-")[0].isdigit()}
             if not mine:
                 continue
-            print(f"\n{which} {project}: knob      recall  right  loose  misbound  misread  hallucinated  claims"
+            print(f"\n{which} {project}: knob      recall  right  loose  misbound  inexact  misread  hallucinated  claims"
                   "  conditions   misbound by reader; conditions kept by reader")
             for knob in knobs:
                 r = mine.get(knob)
                 if r:
                     o = r["outcomes"]
                     print(f"  {knob:12s} {r['recall']:7.3f} {r['found_right']:6d} {o.get('loose', 0):6d} "
-                          f"{o.get('misbound', 0):9d} {o.get('misread', 0):8d} {o.get('hallucinated', 0):13d} {r['claims']:7d}"
+                          f"{o.get('misbound', 0):9d} {o.get('inexact', 0):8d} {o.get('misread', 0):8d} "
+                          f"{o.get('hallucinated', 0):13d} {r['claims']:7d}"
                           f"  {r['conditions_kept']:>10s}   "
                           + " ".join(f"{f} {x.get('misbound', 0)}" for f, x in r["outcomes_by_reader"].items())
                           + ("; " + " ".join(f"{f} {k}" for f, k in r["conditions_by_reader"].items())

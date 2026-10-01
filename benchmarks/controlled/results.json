@@ -343,6 +343,218 @@
     "visual": "0/0"
    }
   },
+  "lcc-energy-s1-all": {
+   "facts": 21,
+   "found": 20,
+   "recall": 0.9524,
+   "found_right": 20,
+   "missed": [
+    "opt2.september"
+   ],
+   "claims": 40,
+   "outcomes": {
+    "inexact": 11,
+    "misbound": 2,
+    "right": 25,
+    "text": 2
+   },
+   "conditions_kept": "18/18",
+   "recall_by_form": {
+    "chart": 0.9412,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "visual": 0.9524
+   },
+   "outcomes_by_reader": {
+    "visual": {
+     "inexact": 11,
+     "misbound": 2,
+     "right": 25,
+     "text": 2
+    }
+   },
+   "conditions_by_reader": {
+    "visual": "18/18"
+   }
+  },
+  "lcc-energy-s1-axis": {
+   "facts": 21,
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 21,
+   "missed": [],
+   "claims": 40,
+   "outcomes": {
+    "inexact": 9,
+    "loose": 2,
+    "right": 28,
+    "text": 1
+   },
+   "conditions_kept": "19/19",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.1905,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "loose": 2,
+     "right": 2
+    },
+    "visual": {
+     "inexact": 9,
+     "right": 26,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "19/19"
+   }
+  },
+  "lcc-energy-s1-clean": {
+   "facts": 21,
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 21,
+   "missed": [],
+   "claims": 35,
+   "outcomes": {
+    "misbound": 7,
+    "misread": 1,
+    "right": 26,
+    "text": 1
+   },
+   "conditions_kept": "19/19",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.2381,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "misbound": 7,
+     "misread": 1,
+     "right": 5
+    },
+    "visual": {
+     "right": 21,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "text": "3/3",
+    "visual": "19/19"
+   }
+  },
+  "lcc-energy-s1-legend-caption": {
+   "facts": 21,
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 21,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "right": 25,
+    "text": 1
+   },
+   "conditions_kept": "19/19",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.1905,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 4
+    },
+    "visual": {
+     "right": 21,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "19/19"
+   }
+  },
+  "lcc-energy-s1-raster": {
+   "facts": 21,
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 21,
+   "missed": [],
+   "claims": 25,
+   "outcomes": {
+    "loose": 2,
+    "right": 21,
+    "text": 2
+   },
+   "conditions_kept": "19/19",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.1905,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "loose": 2,
+     "right": 2
+    },
+    "visual": {
+     "right": 21,
+     "text": 2
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "19/19"
+   }
+  },
+  "lcc-energy-s1-scan": {
+   "facts": 21,
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 21,
+   "missed": [],
+   "claims": 27,
+   "outcomes": {
+    "loose": 4,
+    "right": 21,
+    "text": 2
+   },
+   "conditions_kept": "19/19",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "visual": {
+     "loose": 4,
+     "right": 21,
+     "text": 2
+    }
+   },
+   "conditions_by_reader": {
+    "visual": "19/19"
+   }
+  },
   "lcc-s1-all": {
    "facts": 23,
    "found": 23,
