@@ -76,6 +76,8 @@ class Scoring(unittest.TestCase):
         s = eyetest.score(card, truth, {"lines": [" ".join(misread)]})
         self.assertEqual((s["score"], s["confused"]), (0.0, len(tokens)))
         self.assertEqual(eyetest.score(card, truth, eyetest.perfect(card, truth))["confused"], 0)
+        as_capitals = {"lines": [line.replace("l", "I") for line in truth["lines"]]}  # one glyph in Helvetica
+        self.assertEqual(eyetest.score(card, truth, as_capitals)["score"], 1.0)
 
     def test_pairs_tell_misbound_from_misread(self):
         truth = {"pairs": {"K7Q": "4.75", "HX-402": "88", "P-17B": "1250"}}

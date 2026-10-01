@@ -60,7 +60,7 @@
 - **Qwen trades queries for tokens.** It reads an ARCH D sheet in 12 tiles at 1536 px, against gemma-4's 40, but at 29k prompt tokens against 16k, and slowly.
 - **Too much magnification breaks Qwen.**
   - With 144-point tiles at 1536 px (14-point capitals about 100 px tall), it read 33% of a letter page, breaking large text into pieces ("MLK-58" as "MLK", "C-1", "A", "G").
-  - The eye test's new large-glyph cards put its ceiling between 32 px (read perfectly) and 48 px (not at all). The other five models read 64-px capitals.
+  - The eye test's large-glyph cards put its ceiling at 40 px (96% read; none at 48 or 64 px). The other five models read 64-px capitals.
   - gemma-4 read every large glyph. *Inferred:* the host shrinks what we magnify, so its budget protects it.
 - **Too fine a slicing also cuts large text.** On the ARCH D detail sheets, 288-point tiles held only 90% of the 48-point items whole, and recall fell to 0.94.
 
@@ -74,15 +74,15 @@
 
 | Sheet | gemma-4: planned | gemma-4: cheapest that read every size | Qwen3-VL: planned | Qwen3-VL: cheapest that read every size |
 |---|---|---|---|---|
-| letter | 420 pt (6 tiles) | 420 pt (6) | 288 pt at 768 (12) | 420 pt at 1536 (6) |
+| letter | 420 pt (6 tiles) | 420 pt (6) | 420 pt at 1536 (6) | 420 pt at 1536 (6) |
 | archd | 420 pt (40) | 420 pt (40) | 576 pt at 1536 (24) | 576 pt at 1536 (24) |
-| letter-detail | 420 pt (6) | 420 pt (6) | 288 pt at 768 (12) | 288 pt at 768 (12) |
+| letter-detail | 420 pt (6) | 420 pt (6) | 420 pt at 1536 (6) | 288 pt at 768 (12) |
 | archd-detail | 420 pt (40) | 576 pt (24) | none | none |
 
-- **The plan matches or is one step cautious** on every sheet, and every plan it chose read at least 97.5% of items.
+- **The plan matches, or is one step cautious,** on every sheet but one, and every plan it chose read at least 97.5% of items.
+  - The exception is Qwen on letter-detail, once its ceiling was measured at 40 px. The plan is 6 tiles; they read 7 of the 8 4-point items, one short of 90%, on the one seed Qwen was given.
 - **"None" is the right answer** on the ARCH D detail sheets for Qwen: no single tiling reads both its 5-point clusters and its 48-point titles within Qwen's ceiling.
   - Reading such a page in two passes, one per band of text sizes, is the next step for the planner.
-  - Cards at 40 px would narrow Qwen's ceiling.
 
 ## Close-ups
 

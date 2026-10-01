@@ -146,6 +146,9 @@ def substitutes(letter, level):
 # Z/2, G/6/C). Confusable codes are built from them, in the forms the ordinary codes take.
 CONFUSABLE_GROUPS = ("O0DQ", "Il1", "S5", "B8", "Z2", "G6C")
 CONFUSABLE = {a: set(g) - {a} for g in CONFUSABLE_GROUPS for a in g}
+# Helvetica draws a lowercase l and a capital I as the same stroke (only their spacing differs), so no eye can tell
+# them apart: on look-alike cards they're scored as one character. Every model's most common "swap" was l read as I.
+SAME_GLYPH = str.maketrans({"l": "I"})
 
 def confusable_code(rng):
     """A code made mostly of look-alike characters: "B8-0D5", "S5Z2", "lI1-O0"."""
@@ -637,15 +640,16 @@ def score(card, truth, answer):
     """{"score": the share of items right, and counts by kind of error} for one answer (a dict)."""
     family = card.family if isinstance(card, Card) else card
     if family in READING:
-        expected = [norm(t) for line in truth["lines"] for t in line.split()]
-        given = [norm(t) for line in answer.get("lines") or () for t in str(line).split()]
+        lines = lambda ls: [str(line).translate(SAME_GLYPH) if truth.get("confusable") else str(line) for line in ls or ()]
+        expected = [norm(t) for line in lines(truth["lines"]) for t in line.split()]
+        given = [norm(t) for line in lines(answer.get("lines")) for t in line.split()]
         matched = sum(b.size for b in SequenceMatcher(None, expected, given, autojunk=False).get_matching_blocks())
         want, got = "".join(expected), "".join(given)
         out = {"score": round(matched / len(expected), 4), "items": len(expected), "right": matched,
                "cer": round(min(1.0, edit_distance(want, got) / len(want)), 4), "unread": got.count("?")}
         if truth.get("confusable"):  # look-alikes swapped, counted where a token was read at its length
-            raw_expected = [t for line in truth["lines"] for t in line.split()]
-            raw_given = [t for line in answer.get("lines") or () for t in str(line).split()]
+            raw_expected = [t for line in lines(truth["lines"]) for t in line.split()]
+            raw_given = [t for line in lines(answer.get("lines")) for t in line.split()]
             swaps = 0
             for op, i1, i2, j1, j2 in SequenceMatcher(None, expected, given, autojunk=False).get_opcodes():
                 if op == "replace":
