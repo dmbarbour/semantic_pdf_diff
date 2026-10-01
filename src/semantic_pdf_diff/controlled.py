@@ -37,6 +37,7 @@ class Fact:
     basis: str = "proposed"           # required, proposed, measured, calculated
     role: str = "fact"                # fact, or distractor (a superseded value, say)
     forms: list = field(default_factory=list)  # where it's printed: [{"form", "page", "box"}]
+    drawn: str = ""                   # the form it was drawn in, when fixed ("table" for a schedule's cells)
 
     @property
     def number(self):
@@ -79,7 +80,8 @@ class Project:
     id: str
     title: str
     facts: list
-    sections: list    # [(heading, [blocks])]; a block is ("p", text) or ("table", caption, header, rows)
+    sections: list    # [(heading, [blocks])]; a block is ("p", text), ("table", caption, header, rows) or ("schedule", Schedule)
+    knob: str = "clean"  # how schedules are drawn (TABLE_KNOBS)
 
     def fact(self, fact_id):
         return next(f for f in self.facts if f.id == fact_id)
@@ -251,8 +253,121 @@ def roller_coaster(seed=1):
 
 PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster}
 
-def corpus(seeds=(1,)):
-    return [make(seed) for make in PROJECTS.values() for seed in seeds]
+# --- table knobs (milestone 2) -------------------------------------------------------------------
+# Schedules rendered clean or with one knob, the same facts either way, so a knob's effect is the difference.
+# The situations come from documents read so far (the plan's catalogue): a second table stacked under a
+# section row that relabels the columns (spot check sc01, HabEx p4), grouped headers, two values in a cell,
+# dense tables (the eye tests), and tables continued across a page break.
+TABLE_KNOBS = ("clean", "stacked", "multilevel", "multivalue", "dense", "continued", "all")
+
+@dataclass
+class Column:
+    label: str          # the leaf label, unit included: "Capacity (gpm)"
+    attribute: str      # the fact's attribute
+    synonyms: tuple = ()
+    unit: str = ""
+    group: str = ""     # a spanning header above it (multilevel)
+
+@dataclass
+class Schedule:
+    """A table of rows by section: each section has its own columns (a stacked section row relabels them)."""
+    caption: str
+    sections: list      # [(title, entity kind, [Column], [(tag, [value cells])])]
+    merge: tuple = ()   # (i, j, label): two columns shown as one cell, "a<br/>b" (multivalue)
+    split: int = 0      # rows per small table when clean (a dense schedule split up)
+
+def _schedule_facts(d, sections, F):
+    """Draw each cell's value as a fact; returns the sections with values filled in."""
+    out = []
+    for title, kind, columns, tags, ranges in sections:
+        rows = []
+        for tag in tags:
+            name = f"{kind} {tag}"
+            cells = []
+            for col, (lo, hi, dec) in zip(columns, ranges):
+                f = Fact(f"{tag}.{col.attribute}", name, (tag, f"{kind.lower()} {tag}"), col.attribute, col.synonyms,
+                         d.number(lo, hi, dec), col.unit, drawn="table")
+                F.append(f)
+                cells.append(f.value)
+            rows.append((tag, cells))
+        out.append((title, kind, columns, rows))
+    return out
+
+def equipment_schedules(seed=1):
+    """The water treatment plant's equipment schedules: pumps with blowers stacked under them, and valves."""
+    d = Draw(f"wtp-tables-{seed}")
+    F = []
+    pump_cols = [Column("Capacity (gpm)", "capacity", ("flow", "rated flow", "rated capacity"), "gpm", "Rated point"),
+                 Column("TDH (ft)", "total dynamic head", ("TDH", "head", "rated head"), "ft", "Rated point"),
+                 Column("Power (hp)", "motor power", ("power", "motor", "motor rating"), "hp", "Motor"),
+                 Column("Speed (rpm)", "motor speed", ("speed", "rpm"), "rpm", "Motor")]
+    blower_cols = [Column("Airflow (scfm)", "airflow", ("flow", "air flow", "capacity"), "scfm", "Rated point"),
+                   Column("Pressure (psig)", "discharge pressure", ("pressure", "outlet pressure"), "psig", "Rated point"),
+                   Column("Power (hp)", "motor power", ("power", "motor", "motor rating"), "hp", "Motor"),
+                   Column("Speed (rpm)", "motor speed", ("speed", "rpm"), "rpm", "Motor")]
+    valve_cols = [Column("Cv", "flow coefficient", ("Cv", "valve coefficient"), ""),
+                  Column("Rating (psi)", "pressure rating", ("rating", "pressure class"), "psi"),
+                  Column("Stroke time (s)", "stroke time", ("opening time", "closing time"), "s")]
+    pumps = _schedule_facts(d, [
+        ("Raw water pumps", "Pump", pump_cols, ["P-101A", "P-101B", "P-101C"],
+         [(4000, 9000, 0), (60, 140, 1), (100, 300, 0), (1150, 1790, 0)]),
+        ("Process air blowers", "Blower", blower_cols, ["B-401", "B-402", "B-403"],
+         [(1500, 4000, 0), (6, 9, 2), (40, 99, 0), (3000, 3600, 0)])], F)
+    valves = _schedule_facts(d, [
+        ("Valves", "Valve", valve_cols, [f"V-3{k:02d}" for k in range(1, 21)],
+         [(150, 4800, 0), (125, 300, 0), (10, 90, 1)])], F)
+    sections = [
+        ("1 Equipment", [
+            ("p", "The schedules below list the plant's pumps, blowers and valves at their rated points."),
+            ("schedule", Schedule("Table 1. Pumps and blowers", pumps, merge=(2, 3, "Motor (hp / rpm)"))),
+            ("schedule", Schedule("Table 2. Valve schedule", valves, split=5)),
+        ])]
+    return Project(f"wtp-tables-s{seed}", "Harrow Creek WTP: Equipment Schedules", F, sections)
+
+def track_schedules(seed=1):
+    """The roller coaster's schedules: track elements with brakes stacked under them, and support columns."""
+    d = Draw(f"coaster-tables-{seed}")
+    F = []
+    element_cols = [Column("Height (ft)", "height", ("element height", "top height"), "ft", "Geometry"),
+                    Column("Entry speed (mph)", "entry speed", ("speed", "entrance speed"), "mph", "Dynamics"),
+                    Column("Vertical g", "peak vertical g", ("vertical g", "peak g", "g-force"), "g", "Dynamics"),
+                    Column("Lateral g", "peak lateral g", ("lateral g", "side g"), "g", "Dynamics")]
+    brake_cols = [Column("Length (ft)", "length", ("brake length", "section length"), "ft", "Geometry"),
+                  Column("Entry speed (mph)", "entry speed", ("speed", "entrance speed"), "mph", "Dynamics"),
+                  Column("Exit speed (mph)", "exit speed", ("leaving speed", "final speed"), "mph", "Dynamics"),
+                  Column("Fins", "brake fins", ("fins", "fin count", "number of fins"), "", "Dynamics")]
+    column_cols = [Column("Footing (ft)", "footing width", ("footing", "footing size"), "ft"),
+                   Column("Load (kips)", "design load", ("load", "column load"), "kips"),
+                   Column("Base elev. (ft)", "base elevation", ("elevation", "base"), "ft")]
+    elements = _schedule_facts(d, [
+        ("Track elements", "Element", element_cols, ["E1", "E2", "E3", "E4", "E5"],
+         [(40, 175, 0), (40, 64, 1), (1.5, 4.5, 2), (0.3, 1.4, 2)]),
+        ("Brakes", "Brake", brake_cols, ["BR1", "BR2", "BR3"],
+         [(30, 120, 0), (20, 60, 1), (5, 19, 1), (12, 48, 0)])], F)
+    columns = _schedule_facts(d, [
+        ("Support columns", "Column", column_cols, [f"C-{k:02d}" for k in range(1, 21)],
+         [(4, 12, 1), (50, 400, 0), (700, 760, 1)])], F)
+    sections = [
+        ("1 Track and Structure", [
+            ("p", "Element heights are above the station platform; speeds are design values at the element's entry."),
+            ("schedule", Schedule("Table 1. Track elements and brakes", elements, merge=(2, 3, "g (vertical / lateral)"))),
+            ("schedule", Schedule("Table 2. Support columns", columns, split=5)),
+        ])]
+    return Project(f"coaster-tables-s{seed}", "Ridgeback: Track and Structure Schedules", F, sections)
+
+TABLE_PROJECTS = {"wtp-tables": equipment_schedules, "coaster-tables": track_schedules}
+
+def corpus(seeds=(1,), knobs=False):
+    """The clean corpus; with knobs, also each table project under every table knob (ids "<project>-<knob>")."""
+    out = [make(seed) for make in PROJECTS.values() for seed in seeds]
+    if knobs:
+        for make in TABLE_PROJECTS.values():
+            for seed in seeds:
+                for knob in TABLE_KNOBS:
+                    p = make(seed)
+                    p.id, p.knob = f"{p.id}-{knob}", knob
+                    out.append(p)
+    return out
 
 # --- rendering ---------------------------------------------------------------------------------
 
@@ -260,14 +375,84 @@ CSS = ("body {font-family: sans-serif; font-size: 10pt; line-height: 1.35} h1 {f
        "table {border-collapse: collapse; margin: 6pt 0} td, th {border: 1px solid #888; padding: 2px 6px} "
        "th {background-color: #1f3b5c; color: white} .caption {font-weight: bold; margin-top: 8pt}")
 
-def html(project):
-    esc = lambda s: str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+PAGE_BREAK = "<!--page-->"
+
+def _esc(s):
+    return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+def schedule_html(sched, knob, counter, breaks=()):
+    """A schedule as HTML under a knob (see TABLE_KNOBS). counter numbers its tables across the document;
+    breaks: the numbers of tables to start on a new page (so none is split but on purpose)."""
+    on = lambda k: knob in (k, "all")
+    merge = sched.merge if on("multivalue") else ()
+
+    def cells(values):
+        if merge:
+            i, j, _ = merge
+            values = values[:i] + [f"{_esc(values[i])}<br/>{_esc(values[j])}"] + values[j + 1:]
+            return "".join(f"<td>{v}</td>" for v in values)
+        return "".join(f"<td>{_esc(v)}</td>" for v in values)
+
+    def labels(columns):
+        names = [c.label for c in columns]
+        if merge:
+            i, j, label = merge
+            names = names[:i] + [label] + names[j + 1:]
+        return names
+
+    def header(title, columns, first):
+        names = labels(columns)
+        if on("multilevel") and any(c.group for c in columns):
+            groups, spans = [], []
+            for c in columns if not merge else columns[:merge[0]] + [columns[merge[0]]] + columns[merge[1] + 1:]:
+                if groups and groups[-1] == c.group:
+                    spans[-1] += 1
+                else:
+                    groups.append(c.group)
+                    spans.append(1)
+            top = f"<tr><th rowspan='2'>{_esc(title)}</th>" + "".join(
+                f"<th colspan='{n}'>{_esc(g)}</th>" for g, n in zip(groups, spans)) + "</tr>"
+            return top + "<tr>" + "".join(f"<th>{_esc(n)}</th>" for n in names) + "</tr>"
+        return f"<tr><th>{_esc(title)}</th>" + "".join(f"<th>{_esc(n)}</th>" for n in names) + "</tr>"
+
+    def table(caption, parts):
+        """parts: [(title, columns, rows)], drawn in one table, each under its own header row (stacked)."""
+        number = next(counter)
+        out = (PAGE_BREAK if number in breaks else "") + f"<p class='caption'>{_esc(caption)}</p><table id='schedule-{number}'>"
+        for k, (title, columns, rows) in enumerate(parts):
+            out += header(title, columns, k == 0)
+            out += "".join(f"<tr><td>{_esc(tag)}</td>{cells(list(values))}</tr>" for tag, values in rows)
+        return out + "</table>"
+
+    sections = [(title, columns, rows) for title, _, columns, rows in sched.sections]
+    if len(sections) > 1:
+        if on("stacked"):
+            return table(sched.caption, sections)
+        number, _, _ = sched.caption.partition(". ")  # clean: each section its own table, "Table 1a: Raw water pumps"
+        return "".join(table(f"{number}{'abcdefgh'[k]}. {part[0]}", [part]) for k, part in enumerate(sections))
+    title, columns, rows = sections[0]
+    if sched.split and not (on("dense") or on("continued")):  # clean: small tables
+        number, _, name = sched.caption.partition(". ")
+        return "".join(table(f"{number}{'abcdefgh'[k]}. {name} ({k + 1} of {len(rows) // sched.split})",
+                             [(title, columns, rows[i:i + sched.split])])
+                       for k, i in enumerate(range(0, len(rows), sched.split)))
+    if on("continued"):
+        half = len(rows) // 2
+        return (table(sched.caption, [(title, columns, rows[:half])]) + PAGE_BREAK +
+                table(f"{sched.caption.split('.')[0]} (continued)", [(title, columns, rows[half:])]))
+    return table(sched.caption, [(title, columns, rows)])
+
+def html(project, breaks=()):
+    import itertools
+    esc, counter = _esc, itertools.count(1)
     out = [f"<h1>{esc(project.title)}</h1>"]
     for heading, blocks in project.sections:
         out.append(f"<h2>{esc(heading)}</h2>")
         for block in blocks:
             if block[0] == "p":
                 out.append(f"<p>{esc(block[1])}</p>")
+            elif block[0] == "schedule":
+                out.append(schedule_html(block[1], project.knob, counter, breaks))
             else:
                 _, caption, header, rows = block
                 out.append(f"<p class='caption'>{esc(caption)}</p><table><tr>" +
@@ -279,44 +464,63 @@ def html(project):
 def render(project, page_size="letter"):
     """(pdf bytes, the printed numbers' log): the same project gives the same bytes."""
     import pymupdf
-    buffer = io.BytesIO()
-    story = pymupdf.Story(html=html(project), user_css=CSS)
-    writer = pymupdf.DocumentWriter(buffer)
     rect = pymupdf.paper_rect(page_size)
-    more = True
-    while more:
-        device = writer.begin_page(rect)
-        more, _ = story.place(rect + (54, 54, -54, -72))
-        story.draw(device)
-        writer.end_page()
-    writer.close()
+    breaks = set()
+    for _ in range(5):  # lay out; start any table Story split across pages on a new page; again
+        buffer = io.BytesIO()
+        writer = pymupdf.DocumentWriter(buffer)
+        placed, pages = {}, {}  # page: schedule tables' boxes; table id: the pages it opened and closed on
+
+        def note(position):
+            ident = getattr(position, "id", "") or ""
+            if ident.startswith("schedule-"):
+                pages.setdefault(ident, set()).add(position.page)
+                if position.open_close & 1:
+                    placed.setdefault(position.page, []).append(tuple(position.rect))
+        page = 0
+        for part in html(project, breaks).split(PAGE_BREAK):  # a page break starts the next part on a new page
+            story = pymupdf.Story(html=part, user_css=CSS)
+            more = True
+            while more:
+                page += 1
+                device = writer.begin_page(rect)
+                more, _ = story.place(rect + (54, 54, -54, -72))
+                story.element_positions(note, {"page": page})
+                story.draw(device)
+                writer.end_page()
+        writer.close()
+        split = {int(i.split("-")[1]) for i, p in pages.items() if len(p) > 1} - breaks
+        if not split:
+            break
+        breaks |= split
     doc = pymupdf.open("pdf", buffer.getvalue())
     for n, page in enumerate(doc, 1):  # page numbers: printed, so logged
         page.insert_text((rect.width / 2 - 20, rect.height - 36), f"Page {n} of {doc.page_count}", fontname="helv",
                          fontsize=8)
     doc.set_metadata({})
     data = doc.tobytes(garbage=3, deflate=True, no_new_id=True)
-    return data, locate(project, pymupdf.open("pdf", data))
+    return data, locate(project, pymupdf.open("pdf", data), placed)
 
-def locate(project, doc):
+def locate(project, doc, placed=None):
     """Find each fact's printed value on its pages (setting fact.forms), and log every number on the pages with
     its role: fact or distractor (by id), or structure (section, table and page numbers, anything else)."""
     by_value = {}
     for f in project.facts:
-        by_value.setdefault(f.value, []).append(f)
+        by_value.setdefault(parse_number(f.value), []).append(f)
         f.forms = []
     log = []
     for n, page in enumerate(doc, 1):
-        table_boxes = [t.bbox for t in page.find_tables().tables]
+        table_boxes = [t.bbox for t in page.find_tables().tables] + list((placed or {}).get(n, []))
         for w in page.get_text("words"):
             text = w[4].strip(",.;:()°")
-            if parse_number(text) is None:
+            number = parse_number(text)
+            if number is None:
                 continue
-            facts = by_value.get(text, [])
+            facts = by_value.get(number, []) if re.match(r"[-+±]?\d", text) else []
             inside_table = any(b[0] - 1 <= w[0] and w[2] <= b[2] + 1 and b[1] - 1 <= w[1] and w[3] <= b[3] + 1
                                for b in table_boxes)
             for f in facts:
-                f.forms.append({"form": "table" if inside_table else "prose", "page": n,
+                f.forms.append({"form": f.drawn or ("table" if inside_table else "prose"), "page": n,
                                 "box": [round(v, 1) for v in w[:4]]})
             log.append({"text": text, "page": n, "role": facts[0].role if facts else "structure",
                         "facts": [f.id for f in facts]})
@@ -367,12 +571,20 @@ def vocabulary(fact):
     return set().union(*(tokens(o) for o in (fact.entity, fact.attribute, fact.conditions) + tuple(fact.aliases)
                          + tuple(fact.synonyms)))
 
+FIT_WEIGHTS = {"attribute": 2.0, "entity": 1.0, "conditions": 0.25}  # conditions only break ties
+
 def fit(claim, fact, weights):
-    """How well a claim's words (entity, attribute and conditions together, however it split them) describe a fact:
-    the weighted share of them among the fact's words, rare words counting more (weights: see rarity)."""
-    words = tokens(claim.get("entity", "")) | tokens(claim.get("attribute", "")) | tokens(claim.get("conditions", ""))
-    total = sum(weights.get(w, weights[None]) for w in words)
-    return sum(weights.get(w, weights[None]) for w in words & vocabulary(fact)) / total if total else 0.0
+    """How well a claim's names describe a fact: the rare-word-weighted share of its attribute's words, entity's
+    words and conditions' words found among the fact's words (all of them, however the claim split its names),
+    the attribute counting most and the conditions least (a model may put a table's section name there)."""
+    vocab = vocabulary(fact)
+    score = 0.0
+    for part, weight in FIT_WEIGHTS.items():
+        words = tokens(claim.get(part, ""))
+        total = sum(weights.get(w, weights[None]) for w in words)
+        if total:
+            score += weight * sum(weights.get(w, weights[None]) for w in words & vocab) / total
+    return score
 
 def rarity(facts):
     """{word: weight}: log(1 + facts / facts using the word); None for words no fact uses."""

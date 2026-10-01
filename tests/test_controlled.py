@@ -66,6 +66,19 @@ class Scoring(unittest.TestCase):
         self.assertIn("P-101B.capacity", s["missed"])
         self.assertNotIn("P-101A.capacity", s["missed"])  # found, loosely
 
+    def test_conditions_only_break_ties(self):
+        project = controlled.equipment_schedules(1)
+        _, log = controlled.render(project)
+        power = project.fact("B-402.motor power")
+        # the section's name in conditions ("Process air blower") mustn't pull the value to the blower's airflow
+        s = controlled.score(controlled.key(project, log), [claim(power, entity="B-402", attribute="Power",
+                                                                   conditions="Process air blower")])
+        self.assertEqual(s["outcomes"], {"right": 1})
+        # the pump table's label on a blower's value is a misbinding (the stacked table's hazard)
+        pressure = project.fact("B-401.discharge pressure")
+        s = controlled.score(controlled.key(project, log), [claim(pressure, entity="B-401", attribute="TDH")])
+        self.assertEqual(s["outcomes"], {"misbound": 1})
+
     def test_a_superseded_value_reported_as_current_is_a_distractor(self):
         project = controlled.roller_coaster(1)
         _, log = controlled.render(project)

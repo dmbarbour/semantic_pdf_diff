@@ -1,6 +1,6 @@
 # Controlled documents with known facts
 
-- **Status:** Active (2026-10-01): milestone 1 done.
+- **Status:** Active (2026-10-01): milestones 1 and 2a (table knobs) done.
 - **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](one-table-model-2026-09-30.md) (table hazards; its table eye tests become part of this); [content-addressed queries](content-addressed-queries-2026-09-28.md) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
 - **Why:**
   - **The owner (2026-10-01):** "similar to the eye test as a controlled test, we could have controlled PDF tests, i.e. where you generate a few PDFs with known facts to extract for fictional projects. This might provide a more robust control without relying on yours or my ability to extract facts."
@@ -210,6 +210,38 @@ Each row is a situation met in this project's documents, with where it was recor
     - Checked by hand: a sample of the "right" claims were right.
     - Expected for clean prose and tables. The knobs (milestone 2) are where failures should show.
   - **A test** generates the corpus again (byte-identical to the committed PDFs), replays the pipeline from the fixture, and gets the committed scores.
+
+- **Milestone 2a, the table knobs (2026-10-01): done.**
+  - **Two schedule documents per project:** WTP equipment (84 facts: pumps with blowers stacked under them, and 20 valves) and coaster track and structure (92 facts: elements with brakes under them, and 20 support columns).
+  - **Each is drawn clean and under one knob at a time,** with the same facts either way:
+    - **stacked:** a section row relabels the columns, as in HabEx p4
+    - **multilevel:** grouped headers
+    - **multivalue:** "hp / rpm" in one cell
+    - **dense:** a 20-row table
+    - **continued:** split across a page break with the header repeated
+    - **all:** every knob together
+  - Story can split a table across pages on its own. Such tables now start on a new page, so only the "continued" knob splits one.
+  - **gemma-4 read all 14 documents for $0.29.** Rows identical across variants are the same queries, so their answers served every variant.
+
+    | Knob | WTP: recall / right / misbound | WTP misbound by reader (table, text, image) | Coaster: recall / right / misbound | Coaster misbound by reader (table, text, image) |
+    |---|---|---|---|---|
+    | clean | 1.00 / 84 / 6 | 0, 0, 6 | 1.00 / 92 / 18 | 0, 18, 0 |
+    | stacked | 1.00 / 84 / 9 | 3, 0, 6 | 1.00 / 88 / 9 | 9, 0, 0 |
+    | multilevel | 1.00 / 84 / 6 | 3, 0, 3 | 1.00 / 92 / 44 | 12, 32, 0 |
+    | multivalue | 1.00 / 84 / 0 | 0, 0, 0 | 0.94 / 86 / 28 | 6, 14, 12 |
+    | dense | 1.00 / 84 / 6 | 0, 0, 6 | 1.00 / 91 / 0 | 0, 0, 0 |
+    | continued | 1.00 / 84 / 6 | 0, 0, 6 | 1.00 / 92 / 15 | 0, 15, 0 |
+    | all | 1.00 / 84 / 6 | 6, 0, 0 | 1.00 / 82 / 11 | 2, 6, 3 |
+
+  - **Every fact is found by some reader** (recall); misbinding is where the knobs show.
+  - **The table reader misbinds only under a knob,** never on the clean, dense or continued schedules.
+    - Under stacked and grouped headers, the brakes' values were filed under the track elements' labels ("BR1 | Vertical g | 33.5" is its entry speed). The blowers' pressures were filed as the pumps' TDH.
+    - That's spot check sc01 item 1, reproduced and exactly scored.
+  - **The text reader misbinds most on the coaster's schedules,** shifting columns in a table's text-layer chunk. The lever index has a new row for it.
+  - **The image reader** now and then mislabels a row: pump P-101A's motor called "blower 1".
+  - **Checked by hand:** the misbound and hallucinated claims were the model's errors.
+    - One scorer flaw, found that way, was fixed: words from the conditions (where a model put the section's name) outweighed the attribute's. Attribute words now count most, entity words next, conditions only to break ties.
+  - **One seed, one sample per query:** these are counts to compare between knobs, not rates to quote.
 
 ## Decisions (2026-10-01)
 

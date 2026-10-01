@@ -52,7 +52,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     from semantic_pdf_diff import controlled, fixtures
     if args.command == "generate":
-        for project in controlled.corpus(tuple(args.seed or (1,))):
+        for project in controlled.corpus(tuple(args.seed or (1,)), knobs=True):
             print(f"{controlled.write(project, DOCS)}: {len(project.facts)} facts")
         return 0
     if args.command == "run":
@@ -103,10 +103,27 @@ def main(argv=None):
         for run, found in sorted(claims.items()):
             key = json.loads((DOCS / f"{run}.key.json").read_text(encoding="utf-8"))
             result = controlled.score(key, found)
-            result["by_reader"] = {f: controlled.score(key, [c for c in found if c["_family"] == f])["recall"]
-                                   for f in sorted({c["_family"] for c in found})}
+            readers = {f: controlled.score(key, [c for c in found if c["_family"] == f])
+                       for f in sorted({c["_family"] for c in found})}
+            result["by_reader"] = {f: r["recall"] for f, r in readers.items()}
+            result["outcomes_by_reader"] = {f: r["outcomes"] for f, r in readers.items()}
             results.setdefault(which, {})[run] = result
     (FOLDER / "results.json").write_text(json.dumps(results, indent=1) + "\n", encoding="utf-8")
+    for which, runs in results.items():  # each table project's knobs beside its clean version
+        for project in controlled.TABLE_PROJECTS:
+            mine = {run.rsplit("-", 1)[1]: r for run, r in runs.items() if run.startswith(project + "-s")}
+            if not mine:
+                continue
+            print(f"\n{which} {project}: knob      recall  right  loose  misbound  misread  hallucinated  claims"
+                  "   misbound by reader")
+            for knob in controlled.TABLE_KNOBS:
+                r = mine.get(knob)
+                if r:
+                    o = r["outcomes"]
+                    print(f"  {knob:12s} {r['recall']:7.3f} {r['found_right']:6d} {o.get('loose', 0):6d} "
+                          f"{o.get('misbound', 0):9d} {o.get('misread', 0):8d} {o.get('hallucinated', 0):13d} {r['claims']:7d}   "
+                          + " ".join(f"{f} {x.get('misbound', 0)}" for f, x in r["outcomes_by_reader"].items()))
+    print()
     for which, runs in results.items():
         for run, r in runs.items():
             print(f"{which} {run}: recall {r['recall']} ({r['found']}/{r['facts']}, {r['found_right']} right) "
