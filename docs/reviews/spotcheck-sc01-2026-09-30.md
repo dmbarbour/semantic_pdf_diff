@@ -58,6 +58,8 @@
 - **The owner's clarification of "visualization of tables when building rules" (2026-09-30):** "that's based on our prior discussion of how to process tables, e.g. for CSV or .xlsx files. We ask a model how to turn table rows into claims, and we might look for exceptions to this. It seems we're using a different tactic for PDFs, but I don't believe medium should be a severe differentiater here."
   - Claude first read it as a diagnostic view of parsed tables; that reading is withdrawn.
 
+- **The owner on what judges should see (2026-09-30):** unsure, and suggested showing both queries without revealing which answer set came from which. Recorded as an open rubric v7 candidate in the [query-improvement plan](../plans/query-improvement-2026-09-26.md).
+
 ## Proposals
 
 - **Lever ideas** (rows in the [lever index](levers.md)):

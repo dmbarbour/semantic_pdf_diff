@@ -217,6 +217,17 @@ Round 1 showed that asking the same question again often gets a different answer
   - the whole page's text layer, as well as the part's
   - every claim, with those in both sets listed once (S1, ...) and then each set's own (A1, ..., B1, ...), so "missing" can be judged against everything a set has
   - Shared claims' marks count for both sides. Rounds using v6 run `add_context` on each batch.
+- **A rubric v7 candidate, open** (from spot check sc01, items 2 and 5: judges and people see the whole page, while a unit holds only one reader's claims):
+  - **The owner (2026-09-30):** "TBH, I'm not sure what judges should be shown. I guess it depends on what needs to be blind, and how you need to trace issues back to sources. But it should be clear to judges when they're only comparing claims from text vs. from charts or figures vs. from tables if we're going to talk about missing facts. Perhaps there's some way to tell the judge both queries without revealing which answer set corresponds to which query, so it's still blind, while doubly emphasizing that the judge's job is not to answer those queries but to compare answer sets."
+  - **Claude's reading, for the owner's review:**
+    - **A scope line for every unit, at no risk to blinding:** "These claims were read from the page's text only (not its figures or tables): judge missing facts against the text."
+    - **The owner's idea, the two queries:** shown in an order drawn apart from the order of sets A and B, with the reminder twice: compare the answer sets, don't answer the queries.
+    - **Its costs:**
+      - longer prompts (judging is 88% of spend)
+      - images for figure and tile queries
+      - a partial reveal where the queries differ visibly: a lever's added context can show which set used it
+      - A diff of the queries would be shorter, but reveals the same.
+  - **How it would be judged:** like any rubric change. An A/A control, agreement with the owner's sc01 verdicts against v6, and golden prompts, after the survey.
 - **Unpriced responses:** a streamed answer cut off before its last chunk comes without usage, yet may be billed. The ledger used to drop it; it now records it as "unpriced", and rounds report how many.
 
 **On the audit's proposals (the owner, 2026-09-28):**
