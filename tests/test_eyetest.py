@@ -52,6 +52,20 @@ class Scoring(unittest.TestCase):
         self.assertEqual((corrected["score"], corrected["autocorrected"]), (0.0, len(truth["sources"])))
         self.assertEqual(eyetest.score(card, truth, eyetest.perfect(card, truth))["autocorrected"], 0)
 
+    def test_pseudo_word_levels_keep_or_change_the_height_profile(self):
+        import random
+        outline = lambda w: "".join(eyetest.height(ch)[0] for ch in w.lower())
+        rng = random.Random(1)
+        for level in eyetest.PSEUDO_LEVELS:
+            for _ in range(50):
+                fake, real = eyetest.pseudo(rng, level)
+                changed = [(a, b) for a, b in zip(fake.lower(), real.lower()) if a != b]
+                self.assertEqual(len(changed), 1)
+                (new, old), = changed
+                if level == "close":
+                    self.assertIn(new, eyetest.CLOSE[old])
+                self.assertEqual(outline(fake) == outline(real), level != "shape", (level, fake, real))
+
     def test_pairs_tell_misbound_from_misread(self):
         truth = {"pairs": {"K7Q": "4.75", "HX-402": "88", "P-17B": "1250"}}
         answer = {"pairs": [{"name": "K7Q", "value": "88"}, {"name": "HX-402", "value": "4.75"},

@@ -120,20 +120,42 @@ section sensor service shaft sheet shield signal single sleeve slope socket soli
 stage standard steel storage strain stress structure supply support surface switch system tank target thermal
 thread tolerance torque total tower transfer tube turbine unit upper valve vapor velocity vent vessel voltage wall
 washer water weight welding width winding window wire""".split())
-VOWELS = "aeiou"
+# Letters by height profile, the outline that gives a word its shape (Bouma 1971: ascending and descending
+# parts, slenderness and outer parts are the cues readers confuse letters by).
+HEIGHTS = {"x-height": "acemnorsuvwxz", "ascender": "bdfhklt", "descender": "gpqy", "dotted": "ij"}
+# Look-alikes within a height class: letter confusion studies and lists of common misreadings (a/o, c/e/o,
+# n/u, g/q, b/d; rn/m, cl/d and vv/w are multi-letter, left out to keep words' lengths).
+CLOSE = {"a": "oe", "o": "aec", "e": "coa", "c": "eo", "n": "ur", "u": "nv", "r": "n", "v": "u",
+         "b": "dh", "d": "b", "h": "bk", "k": "h", "f": "t", "t": "f", "g": "q", "q": "gp", "p": "q"}
+PSEUDO_LEVELS = ("close", "profile", "shape")  # trickiest first; "shape" changes the outline (the owner's r → h)
+
+def height(letter):
+    return next(k for k, v in HEIGHTS.items() if letter in v)
+
+def substitutes(letter, level):
+    """Letters that can replace `letter` at a level: a look-alike of the same height (close), another letter of
+    the same height (profile), or a letter of another height (shape)."""
+    same = [c for c in HEIGHTS[height(letter)] if c != letter]
+    if level == "close":
+        return list(CLOSE.get(letter, ""))
+    if level == "profile":
+        return [c for c in same if c not in CLOSE.get(letter, "") and c not in "ij"]
+    return [c for k, v in HEIGHTS.items() if k not in (height(letter), "dotted") for c in v]
 
 def word(rng):
     w = rng.choice(WORDS)
     return w.capitalize() if rng.random() < 0.3 else w
 
-def pseudo(rng):
-    """(pseudo-word, the word it came from): one inner letter changed for another of its kind, so it stays
-    pronounceable, and isn't a word in the list."""
+def pseudo(rng, level="close"):
+    """(pseudo-word, the word it came from): one inner letter replaced at a level of trickiness (see
+    substitutes), giving a string that isn't a word in the list."""
     while True:
         w = rng.choice([w for w in WORDS if len(w) >= 5])
-        k = rng.randrange(1, len(w) - 1)
-        pool = VOWELS if w[k] in VOWELS else "bcdfghklmnprstvz"
-        p = w[:k] + rng.choice([ch for ch in pool if ch != w[k]]) + w[k + 1:]
+        spots = [k for k in range(1, len(w) - 1) if w[k] in "".join(HEIGHTS.values()) and substitutes(w[k], level)]
+        if not spots:
+            continue
+        k = rng.choice(spots)
+        p = w[:k] + rng.choice(substitutes(w[k], level)) + w[k + 1:]
         if p not in WORDS:
             return (p.capitalize(), w.capitalize()) if rng.random() < 0.3 else (p, w)
 
@@ -265,8 +287,8 @@ def _words(card, rng, c):
 
 def _pseudo(card, rng, c):
     """The same prompt as real words: whether a model reads what's printed or the word it expects."""
-    lines, sources = _lines(card, rng, c, pseudo)
-    return {"lines": lines, "sources": sources}, WORDS_PROMPT, lines
+    lines, sources = _lines(card, rng, c, lambda r: pseudo(r, card.layout or "close"))
+    return {"lines": lines, "sources": sources, "level": card.layout or "close"}, WORDS_PROMPT, lines
 
 def _pairs(card, rng, c):
     n, layout = card.count or 12, card.layout or "inline"
@@ -548,8 +570,9 @@ def suite(name="standard"):
     # tiles at 1536 px (capitals about 100 px tall; docs/research/page-tests-2026-09-30.md).
     cards += [Card("read", 1024, 1024, g, seed=seed) for seed in (1, 2) for g in (24, 32, 48, 64)]
     # Words and pseudo-words at the codes' sizes and glyphs (one seed): what meaning and word shape add.
-    for family in ("words", "pseudo"):
-        cards += [Card(family, w, h, g) for w, h in SQUARES[1:] for g in (4, 5, 6, 7, 8, 10, 12)]
+    cards += [Card("words", w, h, g) for w, h in SQUARES[1:] for g in (4, 5, 6, 7, 8, 10, 12)]
+    cards += [Card("pseudo", w, h, g, layout=level) for level in PSEUDO_LEVELS for w, h in SQUARES[1:]
+              for g in (4, 5, 6, 7, 8, 10, 12)]
     for layout in ("inline", "columns", "stacked"):
         cards += [Card("pairs", 1024, 1024, g, layout=layout) for g in (6, 8, 12)]
         cards += [Card("pairs", 2048, 2048, g, layout=layout) for g in (8, 12)]
@@ -819,8 +842,9 @@ def summarise(entries):
         out["relative"][key] = None if t is None else round(t * 1000 / math.sqrt(size[0] * size[1]), 2)
     # Codes against words against pseudo-words, size by size: the smallest glyph read at 90%.
     out["by_kind"] = {}
-    for family in ("words", "pseudo"):
-        mine = [e for e in entries if e["family"] == family]
+    kind_of = lambda e: e["family"] if e["family"] != "pseudo" else f"pseudo-{e.get('layout') or 'close'}"
+    for family in ("words",) + tuple(f"pseudo-{level}" for level in PSEUDO_LEVELS):
+        mine = [e for e in entries if e["family"] in ("words", "pseudo") and kind_of(e) == family]
         for size in sorted({(e["w"], e["h"]) for e in mine}, key=lambda s: (s[0] * s[1], s)):
             cells = {}
             for e in mine:
@@ -915,16 +939,19 @@ def page(folder, data):
                        + "</tr>")
         out.append("</table></div>")
     kinds = [(m, data["models"][m]["summary"].get("by_kind", {})) for m in models]
+    KINDS = ("codes", "words") + tuple(f"pseudo-{level}" for level in PSEUDO_LEVELS)
     sizes_k = sorted({s for _, k in kinds for s in k}, key=lambda s: math.prod(map(int, s.split("x"))))
     if sizes_k:
         out.append("<h2>Codes, words and pseudo-words: smallest glyph read (px)</h2><p class='muted'>Real words have "
-                   "shape and meaning; pseudo-words (one letter changed) keep the shape only. Lower is better.</p>"
+                   "shape and meaning. Pseudo-words change one letter: for a look-alike of the same height (close), "
+                   "another letter of the same height (profile), or a letter of another height (shape). Lower is "
+                   "better; the families table counts pseudo-words read as the word they came from (autocorrected).</p>"
                    "<div class='scroll'><table><tr><th>Image</th>" + "".join(
-                       f"<th>{esc(m)}: {k}</th>" for m in models for k in ("codes", "words", "pseudo")) + "</tr>")
+                       f"<th>{esc(m)}: {k}</th>" for m in models for k in KINDS) + "</tr>")
         for size in sizes_k:
             out.append(f"<tr><td>{esc(size)}</td>" + "".join(
                 f"<td>{'–' if k.get(size, {}).get(f) is None else f'{k[size][f]:g}'}</td>"
-                for _, k in kinds for f in ("codes", "words", "pseudo")) + "</tr>")
+                for _, k in kinds for f in KINDS) + "</tr>")
         out.append("</table></div>")
     large = sorted({g for m in models for g in data["models"][m]["summary"].get("large", {})}, key=float)
     if large:
