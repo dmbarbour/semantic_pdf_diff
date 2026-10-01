@@ -69,6 +69,15 @@ None currently.
 - DeepInfra hosts embedding models too (e.g. google/embeddinggemma-300m), on the same pay-go account used for recording; they are candidates alongside the local text-embeddings-inference models, via the same `/v1/embeddings` shape (the owner's suggestion).
 - The first real run showed why this plan matters: on the turbine slices, 704 of 1,000 compared pairs were judged unrelated, and the pair limit left 3,308 candidates untried.
 
+## Notes (2026-10-01)
+
+- **Rerankers in the target environment** (the owner, 2026-10-01): `dev/BAAI/bge-reranker-v2-m3`, `dev/cross-encoder/ms-marco-TinyBERT-L-2-v2`, `dev/cross-encoder/ms-marco-MiniLM-L-12-v2`.
+  - **Where they'd fit:** a second stage that scores the hybrid candidates (claim to claim, claim to criterion) before pairs reach the comparison model. The pair limit and the unrelated pairs above are the problem it addresses.
+  - **Benchmark candidates, not defaults.** The ms-marco cross-encoders were trained on search queries against web passages, a different task from "are these two claims about the same thing". bge-reranker-v2-m3 is multilingual.
+  - **To check:** whether the local text-embeddings-inference server runs them too (it serves rerankers on a `/rerank` endpoint), so development matches the deployment as it does for embeddings.
+- **BM25 for the lexical side** (the owner read that BM25 beats simple embedders): the design above says TF-IDF. BM25 joins the benchmark as the lexical candidate; tags like `P-101` favour lexical matching either way.
+- **Known matches for the benchmark:** [controlled documents](controlled-documents-2026-10-01.md)' revision pairs (its milestone 4) will hold the same facts in two documents, so retrieval recall can be scored exactly there, beside the judged real documents.
+
 ## Decisions (2026-09-23)
 
 - **Available models:** listed above.
