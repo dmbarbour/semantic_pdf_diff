@@ -208,6 +208,8 @@ Each row is a situation met in this project's documents, with where it was recor
      - **An exact gain can serve as a "no worse" lever's named gain.**
      - **A gain there alone never promotes a lever** that the judged real documents don't support.
 
+   - **The owner (2026-10-01):** "We can try this rule, though it may be a bit rigid. We should probably contemplate tracking multiple 'cursors' for leading configurations of levers to mitigate the local minima/maxima traps that we might run into with rigid rules." The cursors idea is recorded with the lever search (plans index).
+
 ## Open questions
 
-1. **The controlled stratum's role in accepting levers** (decision 3): blocking on exact losses, and serving as a named gain, as proposed?
+None at present.
