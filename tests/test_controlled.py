@@ -1,0 +1,78 @@
+"""Controlled documents: generated the same way every time, every fact placed, claims classed exactly."""
+import unittest
+from semantic_pdf_diff import controlled
+
+class Generation(unittest.TestCase):
+    def test_the_same_seed_gives_the_same_pdf_and_every_fact_is_placed(self):
+        for name, make in controlled.PROJECTS.items():
+            with self.subTest(project=name):
+                project = make(1)
+                data, log = controlled.render(project)
+                self.assertEqual(controlled.render(make(1))[0], data)  # byte for byte
+                self.assertNotEqual(controlled.render(make(2))[0], data)  # another seed, other values
+                self.assertTrue(all(f.forms for f in project.facts))  # raises in render otherwise, too
+                values = [f.value for f in project.facts]
+                self.assertEqual(len(values), len(set(values)))  # a value names one fact
+                roles = {p["role"] for p in log}
+                self.assertTrue({"fact", "structure"} <= roles)
+
+    def test_facts_are_found_in_prose_and_tables(self):
+        project = controlled.water_treatment(1)
+        controlled.render(project)
+        forms = {x["form"] for f in project.facts for x in f.forms}
+        self.assertEqual(forms, {"prose", "table"})
+        pump = project.fact("P-101A.capacity")
+        self.assertEqual([x["form"] for x in pump.forms], ["table"])
+
+def claim(fact, **change):
+    c = {"entity": fact.entity, "attribute": fact.attribute, "value": f"{fact.value}", "unit": fact.unit,
+         "conditions": fact.conditions}
+    c.update(change)
+    return c
+
+class Scoring(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.project = controlled.water_treatment(1)
+        _, log = controlled.render(cls.project)
+        cls.key = controlled.key(cls.project, log)
+
+    def test_a_perfect_reading_scores_every_fact(self):
+        claims = [claim(f) for f in self.project.facts if f.role == "fact"]
+        s = controlled.score(self.key, claims + claims)  # read twice: counted once
+        self.assertEqual((s["recall"], s["found_right"], s["missed"]), (1.0, s["facts"], []))
+        self.assertEqual(s["outcomes"], {"right": s["facts"]})
+        kept, total = map(int, s["conditions_kept"].split("/"))
+        self.assertEqual(kept, total)
+
+    def test_each_kind_of_error_is_classed(self):
+        p = self.project
+        a, b = p.fact("P-101A.capacity"), p.fact("P-101B.capacity")
+        page = next(x["text"] for x in self.key["printed"] if x["role"] == "structure")
+        claims = [
+            claim(a, entity="pump"),                         # vague: three pumps fit "pump"
+            claim(a, entity=b.entity),                       # A's capacity filed under B: misbound
+            claim(a, attribute="total dynamic head"),        # A's capacity as its head: misbound
+            claim(b, value=page),                            # a structural number as a value: misread
+            claim(b, value="12,345.6"),                      # printed nowhere: hallucinated
+            claim(b, value="9,876", entity="Raw water pump P-101Z"),  # a viable invention: hallucinated
+            claim(p.fact("plant.design_flow"), conditions=""),  # right, its condition dropped
+            {"entity": "Alum feed", "attribute": "coagulant", "value": "aluminum sulfate"},  # no number: not scored
+        ]
+        s = controlled.score(self.key, claims)
+        self.assertEqual(s["outcomes"], {"hallucinated": 2, "loose": 1, "misbound": 2, "misread": 1, "right": 1,
+                                         "text": 1})
+        self.assertEqual(s["conditions_kept"], "0/1")
+        self.assertIn("P-101B.capacity", s["missed"])
+        self.assertNotIn("P-101A.capacity", s["missed"])  # found, loosely
+
+    def test_a_superseded_value_reported_as_current_is_a_distractor(self):
+        project = controlled.roller_coaster(1)
+        _, log = controlled.render(project)
+        old = project.fact("ride.lift_old")
+        s = controlled.score(controlled.key(project, log), [claim(old, conditions="")])
+        self.assertEqual(s["outcomes"], {"distractor": 1})
+        self.assertEqual(s["found"], 0)
+
+if __name__ == "__main__":
+    unittest.main()
