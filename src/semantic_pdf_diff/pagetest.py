@@ -24,12 +24,28 @@ import random
 from dataclasses import dataclass
 from pathlib import Path
 from pydantic import Field
-from .eyetest import CAP, _Answer, code, compact, number
+from .eyetest import CAP, _Answer, code, compact, number, threshold
 
 PAGES = {"letter": (612, 792), "archd": (2592, 1728)}
 FONT_PT = (4, 5, 6, 7, 8, 10, 12, 14)
-PER_SIZE = {"letter": 5, "archd": 12}
 TILES = {"letter": (420, 288, 204, 144), "archd": (864, 576, 420, 288)}
+# What each kind of sheet holds: items per font size scattered over it, and clusters of small text
+# (count, size in points, items per font size). Detail sheets have body text an overview can read
+# and small text only in their clusters (callouts on a drawing, small print on a page), so there
+# is a right answer to where a close-up is needed.
+LAYOUTS = {
+    "letter": {"scattered": dict.fromkeys(FONT_PT, 5)},
+    "archd": {"scattered": dict.fromkeys(FONT_PT, 12)},
+    "letter-detail": {"scattered": {10: 8, 12: 8, 14: 8}, "clusters": (2, (170, 110), {4: 4, 5: 4})},
+    "archd-detail": {"scattered": {24: 6, 32: 6, 48: 6}, "clusters": (3, (380, 250), {5: 2, 6: 2, 7: 2, 8: 2})},
+}
+
+def paper(kind):
+    return kind.split("-")[0]
+
+def fonts(kind):
+    layout = LAYOUTS[kind]
+    return sorted(set(layout["scattered"]) | set((layout.get("clusters") or (0, 0, {}))[2]))
 RENDER_PX = (768, 1536)
 OVERVIEW_PX = 1024          # the long side of a close-up run's overview
 CROP_PX = 768               # the long side of each close-up
@@ -52,7 +68,7 @@ class Sheet:
         return f"{self.kind}-s{self.seed}"
 
 def sheets():
-    return [Sheet(k, s) for k in ("letter", "archd") for s in (1, 2)]
+    return [Sheet(k, s) for k in LAYOUTS for s in (1, 2)]
 
 # --- drawing ------------------------------------------------------------------------------------
 
@@ -69,29 +85,49 @@ def draw(sheet):
     on drawing sheets keeps clear of the items; every item is checked against the text layer."""
     import pymupdf
     rng = random.Random(sheet.id)
-    w, h = PAGES[sheet.kind]
+    w, h = PAGES[paper(sheet.kind)]
+    layout = LAYOUTS[sheet.kind]
     doc = pymupdf.open()
     page = doc.new_page(width=w, height=h)
-    margin = 54 if sheet.kind == "archd" else 36
-    blocked = [(w - 700, h - 280, w - margin, h - margin)] if sheet.kind == "archd" else []  # a title block
+    drawing = paper(sheet.kind) == "archd"
+    margin = 54 if drawing else 36
+    blocked = [(w - 700, h - 280, w - margin, h - margin)] if drawing else []  # a title block
     items, seen = [], set()
-    for pt in FONT_PT:
-        placed = 0
-        while placed < PER_SIZE[sheet.kind]:
+    overlaps = lambda a, b, pad: not (a[2] + pad <= b[0] or b[2] + pad <= a[0] or a[3] + pad <= b[1] or b[3] + pad <= a[1])
+
+    def place(pt, area, cluster=None):
+        while True:
             text = code(rng) if rng.random() < 0.5 else number(rng)
             if compact(text) in seen:
                 continue
             width, cap = pymupdf.get_text_length(text, fontname="helv", fontsize=pt), CAP["helv"] * pt
-            x, y = rng.uniform(margin, w - margin - width), rng.uniform(margin + cap, h - margin - 0.3 * pt)
+            if width > area[2] - area[0]:
+                continue
+            x, y = rng.uniform(area[0], area[2] - width), rng.uniform(area[1] + cap, area[3] - 0.3 * pt)
             box = (x, y - cap, x + width, y + 0.25 * pt)
-            if any(not (box[2] + pt <= b[0] or b[2] + pt <= box[0] or box[3] + pt <= b[1] or b[3] + pt <= box[1])
-                   for b in blocked + [i["box"] for i in items]):
+            others = [i["box"] for i in items] + blocked + ([] if cluster is not None else clusters)
+            if any(overlaps(box, b, pt) for b in others):
                 continue
             page.insert_text((x, y), text, fontname="helv", fontsize=pt)
-            items.append({"text": text, "pt": pt, "box": box})
+            items.append({"text": text, "pt": pt, "box": box, "cluster": cluster})
             seen.add(compact(text))
-            placed += 1
-    if sheet.kind == "archd":
+            return
+
+    clusters = []
+    count, (cw, ch), per_size = layout.get("clusters") or (0, (0, 0), {})
+    while len(clusters) < count:
+        x, y = rng.uniform(margin, w - margin - cw), rng.uniform(margin, h - margin - ch)
+        rect = (x, y, x + cw, y + ch)
+        if not any(overlaps(rect, b, 60) for b in clusters + blocked):
+            clusters.append(rect)
+    for k, rect in enumerate(clusters):
+        for pt, n in per_size.items():
+            for _ in range(n):
+                place(pt, rect, cluster=k)
+    for pt, n in layout["scattered"].items():
+        for _ in range(n):
+            place(pt, (margin, margin, w - margin, h - margin))
+    if drawing:
         shape = page.new_shape()
         shape.draw_rect(pymupdf.Rect(margin / 2, margin / 2, w - margin / 2, h - margin / 2))
         shape.draw_rect(pymupdf.Rect(*blocked[0]))
@@ -165,7 +201,8 @@ def zoom_prompt(whole, variant, threshold=None, can_zoom=True):
     informed, cells = variant.startswith("informed"), variant.endswith("cells")
     text = _base(whole)
     if can_zoom:
-        where = ('name each by its grid cell, as labelled in red (e.g. "B2")' if cells else
+        where = ('name each by its grid cell, as labelled in red (e.g. "B2"; the red grid and its labels are drawn '
+                 'over the page to name regions, and aren\'t part of it)' if cells else
                  "give each as a box [x0, y0, x1, y1] in coordinates from 0 to 1000 across and down the image")
         if informed and threshold:
             text += (f" This page has text too small to read at this scale: text under about {threshold:.0f} pixels "
@@ -213,6 +250,16 @@ def _region(request, clip, cells, page_rect):
         return None  # nothing, or no closer than what was seen
     return rect
 
+def plans(sheet, max_tiles=None):
+    """A sheet's static plans: (tile side in points, or None for the whole page; render px), leaving
+    out those of more than max_tiles tiles."""
+    import pymupdf
+    from .extract import tiles
+    rect = pymupdf.Rect(0, 0, *PAGES[paper(sheet.kind)])
+    sides = [t for t in (None,) + TILES[paper(sheet.kind)]
+             if max_tiles is None or t is None or len(list(tiles(rect, t))) <= max_tiles]
+    return [(t, px) for t in sides for px in RENDER_PX]
+
 def run_static(folder, client, sheet, strategies=None):
     """{strategy: [(key, items read)]}: each plan's queries. Strategies are (tile side in points or
     None for the whole page, render px)."""
@@ -220,7 +267,7 @@ def run_static(folder, client, sheet, strategies=None):
     from .dispatch import Dispatcher
     from .extract import tiles
     doc, page, _ = draw(sheet)
-    strategies = strategies or [(t, px) for t in (None,) + TILES[sheet.kind] for px in RENDER_PX]
+    strategies = strategies or plans(sheet)
     target = Path(folder) / "images"
     target.mkdir(parents=True, exist_ok=True)
     out = {}
@@ -261,7 +308,7 @@ def run_zoom(folder, client, sheet, variant, threshold=None):
                 return
             asked[0] += 1
             px = OVERVIEW_PX if depth == 0 else CROP_PX
-            png, size, cells = picture(page, rect, px, grid=grid)
+            png, size, cells = picture(page, rect, px, grid=grid and depth < MAX_DEPTH)  # no grid where no zooming
             file = target / f"{sheet.id}-{variant}-{path_id}.png"
             file.write_bytes(png)
             t = threshold(*size) if threshold else None
@@ -328,9 +375,13 @@ def zoom_quality(sheet, log, threshold):
     first = [pymupdf.Rect(r) for r in overview[0][4]]
     covered = sum(any(r.contains(pymupdf.Rect(i["box"])) for r in regions) for i in small)
     useful = sum(any(r.contains(pymupdf.Rect(i["box"])) for i in small) for r in first)
+    clusters = {i["cluster"] for i in items if i.get("cluster") is not None}
+    found = {i["cluster"] for i in items if i.get("cluster") is not None
+             and any(r.intersects(pymupdf.Rect(i["box"])) for r in first)}
     return {"small_items": len(small), "small_covered": round(covered / len(small), 3) if small else None,
             "first_zooms": len(first), "first_zooms_useful": round(useful / len(first), 3) if first else None,
-            "threshold_px": round(t, 1)}
+            "threshold_px": round(t, 1),
+            **({"clusters_found": round(len(found) / len(clusters), 3)} if clusters else {})}
 
 def acuity(results_path, model):
     """threshold(w, h) in px from the eye test's cards for this model: its threshold per 1000 px of
@@ -372,9 +423,12 @@ def results(static, zooms, tokens, threshold=None):
     {sheet id: {variant: run_zoom's log}}."""
     by_id = {s.id: s for s in sheets()}
     out = {"static": {}, "zoom": {}}
-    for sid, plans in static.items():
+    unasked = lambda error: bool(error) and error.startswith("No recorded answer")  # replayed, never asked
+    for sid, runs in static.items():
         sheet = by_id[sid]
-        for name, queries in plans.items():
+        for name, queries in runs.items():
+            if queries and all(unasked(q[2]) for q in queries):
+                continue
             side = None if name.startswith("whole") else int(name.split("-")[0][1:])
             answers = [a for _, items, _ in queries for a in items]
             out["static"].setdefault(sid, {})[name] = {
@@ -383,6 +437,8 @@ def results(static, zooms, tokens, threshold=None):
     for sid, runs in zooms.items():
         sheet = by_id[sid]
         for variant, log in runs.items():
+            if not log or any(e[2] == 0 and unasked(e[5]) for e in log):
+                continue
             answers = [a for e in log for a in e[3]]
             out["zoom"].setdefault(sid, {})[variant] = {
                 **score(sheet, answers), **_cost([e[0] for e in log], tokens),
@@ -412,11 +468,16 @@ def pooled(model_results):
                 for k in list(acc):
                     if k == "by_pt":
                         acc[k] = {pt: round(sum(v) / len(v), 3) for pt, v in acc[k].items()}
-                    elif k in ("recall", "whole_in_tiles", "small_covered", "first_zooms_useful", "threshold_px"):
+                        acc["min_pt"] = threshold([(float(pt), v) for pt, v in acc[k].items()])  # read at 90%
+                    elif k in ("recall", "whole_in_tiles", "small_covered", "first_zooms_useful", "threshold_px",
+                               "clusters_found"):
                         acc[k] = round(acc[k] / n, 3)
                     else:
                         acc[k] = round(acc[k] / n, 1)  # per sheet
     return out
+
+def _num(value):
+    return "–" if value is None else f"{value:g}"
 
 def page(folder, data):
     """report.html: for each kind of sheet, every plan's recall by font size and its cost, per model."""
@@ -431,23 +492,26 @@ def page(folder, data):
            "Close-up runs start from an overview and follow the close-ups the model asks for (free: as it sees fit; "
            "informed: told the page has text below its measured threshold). Figures are per sheet, averaged over "
            "seeds; recall is the share of items read exactly.</p>"]
-    for kind in PAGES:
-        out.append(f"<h2>{esc(kind)} ({PAGES[kind][0]} × {PAGES[kind][1]} pt)</h2>")
+    for kind in LAYOUTS:
+        w, h = PAGES[paper(kind)]
+        out.append(f"<h2>{esc(kind)} ({w} × {h} pt)</h2>")
         for model, r in data["models"].items():
             pooled_ = r["pooled"].get(kind, {})
             for part in ("static", "zoom"):
                 plans = pooled_.get(part)
                 if not plans:
                     continue
-                pts = [f"{p:g}" for p in FONT_PT]
-                extra = ["whole_in_tiles"] if part == "static" else ["small_covered", "first_zooms", "first_zooms_useful"]
+                pts = [f"{p:g}" for p in fonts(kind)]
+                extra = ["whole_in_tiles"] if part == "static" else ["small_covered", "first_zooms", "first_zooms_useful",
+                                                                     "clusters_found"]
                 out.append(f"<h3>{esc(model)}: {'static plans' if part == 'static' else 'close-ups'}</h3>"
                            "<div class='scroll'><table><tr><th>Plan</th>" + "".join(f"<th>{p} pt</th>" for p in pts) +
-                           "<th>All</th><th>Spurious</th><th>Queries</th><th>Prompt tokens</th>" +
+                           "<th>All</th><th>Smallest read (pt)</th><th>Spurious</th><th>Queries</th><th>Prompt tokens</th>" +
                            "".join(f"<th>{esc(e)}</th>" for e in extra) + "</tr>")
                 for name, acc in plans.items():
                     out.append(f"<tr><td>{esc(name)}</td>" + "".join(_cell(acc.get("by_pt", {}).get(p)) for p in pts) +
-                               _cell(acc.get("recall")) + f"<td>{acc.get('spurious', 0):g}</td><td>{acc.get('queries', 0):g}</td>"
+                               _cell(acc.get("recall")) + f"<td>{_num(acc.get('min_pt'))}</td>"
+                               f"<td>{acc.get('spurious', 0):g}</td><td>{acc.get('queries', 0):g}</td>"
                                f"<td>{acc.get('prompt_tokens', 0):g}</td>" +
                                "".join(f"<td>{'–' if acc.get(e) is None else f'{acc[e]:g}'}</td>" for e in extra) + "</tr>")
                 out.append("</table></div>")

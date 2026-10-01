@@ -31,7 +31,9 @@ class Sheets(unittest.TestCase):
     def test_every_sheet_draws_its_items_the_same_way(self):
         for sheet in pagetest.sheets():
             _, page, items = pagetest.draw(sheet)  # raises when an item is missing from the text layer
-            self.assertEqual(len(items), len(pagetest.FONT_PT) * pagetest.PER_SIZE[sheet.kind])
+            layout = pagetest.LAYOUTS[sheet.kind]
+            count, _, per_size = layout.get("clusters") or (0, None, {})
+            self.assertEqual(len(items), sum(layout["scattered"].values()) + count * sum(per_size.values()))
             _, page2, _ = pagetest.draw(sheet)
             self.assertEqual(pagetest.picture(page, page.rect, 512)[0], pagetest.picture(page2, page2.rect, 512)[0])
 
@@ -61,6 +63,14 @@ class Reading(unittest.TestCase):
         self.assertLess(whole["by_pt"]["4"], 1.0)
         self.assertEqual(whole["whole_in_tiles"], 1.0)
 
+    def test_detail_sheets_keep_small_text_in_their_clusters(self):
+        import pymupdf
+        for kind in ("letter-detail", "archd-detail"):
+            _, page, items = pagetest.draw(pagetest.Sheet(kind, 1))
+            scale = pagetest.OVERVIEW_PX / max(page.rect.width, page.rect.height)
+            for i in items:  # body text readable in the overview (6 px caps), cluster text not
+                self.assertEqual(i["cluster"] is None, CAP["helv"] * i["pt"] * scale >= 6, (kind, i))
+
     def test_close_ups_reach_text_too_small_for_the_overview(self):
         sheet = pagetest.Sheet("archd", 1)
         with tempfile.TemporaryDirectory() as d:
@@ -73,6 +83,11 @@ class Reading(unittest.TestCase):
         self.assertGreater(result["free-boxes"]["recall"], result["none"]["recall"])
         self.assertEqual(result["free-boxes"]["first_zooms_useful"], 1.0)
         self.assertEqual(result["none"]["queries"], 1)
+        detail = pagetest.Sheet("archd-detail", 1)
+        with tempfile.TemporaryDirectory() as d:
+            log = pagetest.run_zoom(d, Reader(detail), detail, "free-boxes")
+        quality = pagetest.results({}, {detail.id: {"free-boxes": log}}, {})["zoom"][detail.id]["free-boxes"]
+        self.assertEqual(quality["clusters_found"], 1.0)  # the reader asks only where small text is
 
 if __name__ == "__main__":
     unittest.main()

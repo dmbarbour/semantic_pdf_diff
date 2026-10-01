@@ -19,13 +19,15 @@ FOLDER = ROOT / "benchmarks/pagetest"
 EYES = ROOT / "benchmarks/eyetest/results.json"
 LEDGER = ROOT / "benchmarks/ledger.jsonl"
 
-def read_all(client, model, only=("static", "zoom")):
+def read_all(client, model, only=("static", "zoom"), seeds=None, max_tiles=None):
     from semantic_pdf_diff import pagetest
     threshold = pagetest.acuity(EYES, model)
     static, zooms = {}, {}
     for sheet in pagetest.sheets():
+        if seeds and sheet.seed not in seeds:
+            continue
         if "static" in only:
-            static[sheet.id] = pagetest.run_static(FOLDER, client, sheet)
+            static[sheet.id] = pagetest.run_static(FOLDER, client, sheet, pagetest.plans(sheet, max_tiles))
         if "zoom" in only:
             zooms[sheet.id] = {v: pagetest.run_zoom(FOLDER, client, sheet, v, threshold) for v in pagetest.VARIANTS}
     return static, zooms, threshold
@@ -39,6 +41,9 @@ def main(argv=None):
     run.add_argument("--only", choices=["static", "zoom"])
     run.add_argument("--base-url")
     run.add_argument("--responder")
+    run.add_argument("--seed", type=int, action="append", help="only sheets of these seeds (default: all)")
+    run.add_argument("--max-tiles", type=int, help="leave out static plans with more tiles than this")
+    run.add_argument("--concurrency", type=int, default=8)
     sub.add_parser("report", help="score what's recorded; write results.json and report.html (offline)")
     args = parser.parse_args(argv)
     import pymupdf
@@ -49,12 +54,13 @@ def main(argv=None):
         for model in args.model:
             name = args.responder or model
             before = ledger.spent(LEDGER, round="pagetest", judge=name)
-            settings = Settings.from_env(model=model, **eyetest.EYE_SETTINGS, concurrency=8, timeout=300, retries=2,
+            settings = Settings.from_env(model=model, **eyetest.EYE_SETTINGS, concurrency=args.concurrency, timeout=300,
+                                         retries=2,
                                          max_cost=args.max_cost, **({"base_url": args.base_url} if args.base_url else {}))
             with folder_client(FOLDER, settings, responder=name) as client:
                 client.fixture.note("pymupdf", pymupdf.VersionBind)
                 client.ledger = ledger.Ledger(LEDGER, round="pagetest", step=args.only or "all", judge=name)
-                read_all(client, name, (args.only,) if args.only else ("static", "zoom"))
+                read_all(client, name, (args.only,) if args.only else ("static", "zoom"), args.seed, args.max_tiles)
             print(f"{name}: ${ledger.spent(LEDGER, round='pagetest', judge=name) - before:.3f}", flush=True)
             if client.out_of_budget:
                 print(f"Paused: {client.out_of_budget}")
