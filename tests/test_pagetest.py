@@ -76,6 +76,22 @@ class Reading(unittest.TestCase):
             for i in items:  # body text readable in the overview (6 px caps), cluster text not
                 self.assertEqual(i["cluster"] is None, CAP["helv"] * i["pt"] * scale >= 6, (kind, i))
 
+    def test_corner_sheets_put_a_cluster_across_four_cells(self):
+        import pymupdf
+        for kind in pagetest.ZOOM_ONLY:
+            sheet = pagetest.Sheet(kind, 1)
+            _, page, items = pagetest.draw(sheet)
+            w, h = page.rect.width, page.rect.height
+            cols, rows = pagetest.grid_shape(w, h)
+            corner = [i for i in items if i["cluster"] == 0]
+            box = pymupdf.Rect(min(i["box"][0] for i in corner), min(i["box"][1] for i in corner),
+                               max(i["box"][2] for i in corner), max(i["box"][3] for i in corner))
+            cells = {(int(x * cols / w), int(y * rows / h)) for i in corner
+                     for x, y in ((i["box"][0], i["box"][1]), (i["box"][2], i["box"][3]))}
+            self.assertGreaterEqual(len(cells), 3, (kind, cells))  # the corner cluster spans cells
+            other = [i for i in items if i["cluster"] == 1]
+            self.assertEqual(len({(int(i["box"][0] * cols / w), int(i["box"][1] * rows / h)) for i in other}), 1, kind)
+
     def test_close_ups_reach_text_too_small_for_the_overview(self):
         sheet = pagetest.Sheet("archd", 1)
         with tempfile.TemporaryDirectory() as d:

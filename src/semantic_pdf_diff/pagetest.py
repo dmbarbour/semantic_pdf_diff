@@ -39,7 +39,19 @@ LAYOUTS = {
     "archd": {"scattered": dict.fromkeys(FONT_PT, 12)},
     "letter-detail": {"scattered": {10: 8, 12: 8, 14: 8}, "clusters": (2, (170, 110), {4: 4, 5: 4})},
     "archd-detail": {"scattered": {24: 6, 32: 6, 48: 6}, "clusters": (3, (380, 250), {5: 2, 6: 2, 7: 2, 8: 2})},
+    # Corner sheets (the owner, 2026-09-30: "tiny illegible text across multiple cells ... Perhaps stick it on a
+    # four corners"): one cluster centred where four cells of the overview's grid meet, so one close-up of a
+    # range of cells covers it, and one inside a single cell for contrast. Read only by close-ups.
+    "letter-corner": {"scattered": {10: 8, 12: 8, 14: 8}, "clusters": (2, (170, 110), {4: 4, 5: 4}), "corner": True},
+    "archd-corner": {"scattered": {24: 6, 32: 6, 48: 6}, "clusters": (2, (380, 250), {5: 2, 6: 2, 7: 2, 8: 2}),
+                     "corner": True},
 }
+ZOOM_ONLY = ("letter-corner", "archd-corner")
+
+def grid_shape(width, height):
+    """(columns, rows) of the labelled grid drawn over an image of this shape (about GRID_CELLS cells)."""
+    cols = max(1, round(math.sqrt(GRID_CELLS * width / height)))
+    return cols, max(1, round(GRID_CELLS / cols))
 
 def paper(kind):
     return kind.split("-")[0]
@@ -54,7 +66,8 @@ MAX_DEPTH, MAX_ZOOMS, QUOTA = 2, 6, 40
 GRID_CELLS = 12             # about this many cells in a labelled grid
 GRID_RED = (0.85, 0.1, 0.1)
 VARIANTS = ("free-boxes", "free-cells", "informed-boxes", "informed-cells", "informed-ranges")
-GRIDDED = ("cells", "ranges")  # variants naming regions by a labelled grid drawn over the image
+GRIDDED = ("cells", "ranges")
+RANGE = re.compile(r"[A-K]\d+\s*(?::|-|–|—|\bto\b)\s*[A-K]\d+", re.I)  # a request naming a rectangle of cells  # variants naming regions by a labelled grid drawn over the image
 
 class Found(_Answer):
     items: list[str] = Field(default_factory=list)
@@ -117,6 +130,27 @@ def draw(sheet):
 
     clusters = []
     count, (cw, ch), per_size = layout.get("clusters") or (0, (0, 0), {})
+    if layout.get("corner"):  # the first cluster sits on an inner corner of the overview's grid
+        cols, rows = grid_shape(w, h)
+        corners = [(w * i / cols, h * j / rows) for i in range(1, cols) for j in range(1, rows)]
+        cx, cy = rng.choice([c for c in corners if not any(overlaps((c[0] - cw / 2, c[1] - ch / 2, c[0] + cw / 2,
+                                                                       c[1] + ch / 2), b, 60) for b in blocked)])
+        clusters.append((cx - cw / 2, cy - ch / 2, cx + cw / 2, cy + ch / 2))
+        cell_w, cell_h, pad = w / cols, h / rows, 10
+        if cw + 2 * pad > cell_w or ch + 2 * pad > cell_h:
+            raise ValueError(f"{sheet.id}: a cluster can't fit inside one cell")
+        for _ in range(500):  # the rest each inside one cell
+            if len(clusters) >= count:
+                break
+            i, j = rng.randrange(cols), rng.randrange(rows)
+            x = rng.uniform(i * cell_w + pad, (i + 1) * cell_w - pad - cw)
+            y = rng.uniform(j * cell_h + pad, (j + 1) * cell_h - pad - ch)
+            rect = (x, y, x + cw, y + ch)
+            if not any(overlaps(rect, b, 30) for b in clusters + blocked) and \
+                    margin <= x and x + cw <= w - margin and margin <= y and y + ch <= h - margin:
+                clusters.append(rect)
+        if len(clusters) < count:
+            raise ValueError(f"{sheet.id}: no room for a cluster inside one cell")
     while len(clusters) < count:
         x, y = rng.uniform(margin, w - margin - cw), rng.uniform(margin, h - margin - ch)
         rect = (x, y, x + cw, y + ch)
@@ -166,8 +200,7 @@ def picture(page, clip, px, grid=False):
     png, size = pix.tobytes("png"), (pix.width, pix.height)
     if not grid:
         return png, size, {}
-    cols = max(1, round(math.sqrt(GRID_CELLS * clip.width / clip.height)))
-    rows = max(1, round(GRID_CELLS / cols))
+    cols, rows = grid_shape(clip.width, clip.height)
     doc = pymupdf.open()
     canvas = doc.new_page(width=size[0], height=size[1])
     canvas.insert_image(canvas.rect, stream=png)
@@ -289,7 +322,7 @@ def run_static(folder, client, sheet, strategies=None):
 
                 def finish(value, error, name=name, key=key):
                     out[name].append((key[1], [] if error is not None else list(value.items), None if error is None
-                                      else str(error)[:200]))
+                                      else str(error)[:200], key[2]))
                 dispatch.submit(static_prompt(side is None), Found, [path], key, finish)
         dispatch.drain()
     doc.close()
@@ -297,7 +330,7 @@ def run_static(folder, client, sheet, strategies=None):
 
 def run_zoom(folder, client, sheet, variant, threshold=None):
     """[(key, page region, depth, items read, regions asked for, error, requests that gave no close-up with
-    why)]: an overview, then the
+    why, every request as given)]: an overview, then the
     close-ups the model asks for, depth-first within MAX_DEPTH and QUOTA. threshold(w, h): the
     model's reading threshold in px for an image of that size (for "informed")."""
     import pymupdf
@@ -323,7 +356,7 @@ def run_zoom(folder, client, sheet, variant, threshold=None):
 
             def finish(value, error, rect=rect, depth=depth, path_id=path_id, cells=cells, key=key):
                 if error is not None:
-                    log.append((key[1], tuple(rect), depth, [], [], str(error)[:200], []))
+                    log.append((key[1], tuple(rect), depth, [], [], str(error)[:200], [], []))
                     return
                 regions, unused = [], []  # unused: requests that gave no close-up, kept so none vanish unseen
                 requests = list(value.zoom or []) if depth < MAX_DEPTH else []
@@ -335,7 +368,8 @@ def run_zoom(folder, client, sheet, variant, threshold=None):
                         unused.append((str(request)[:60], "repeats another"))
                     else:
                         regions.append(region)
-                log.append((key[1], tuple(rect), depth, list(value.items), [tuple(r) for r in regions], None, unused))
+                log.append((key[1], tuple(rect), depth, list(value.items), [tuple(r) for r in regions], None, unused,
+                            [str(r)[:60] for r in requests]))
                 for k, region in enumerate(regions):
                     ask(region, depth + 1, f"{path_id}.{k}")
             dispatch.submit(prompt, Found, [file], key, finish)
@@ -411,23 +445,28 @@ def acuity(results_path, model):
     return threshold
 
 def usage(folder, responder):
-    """{query label: (prompt tokens, completion tokens)} as the host reported them, from the fixture."""
+    """{(query label, region): (prompt tokens, completion tokens)} as the host reported them, from the fixture.
+    Labels alone are ambiguous: a query leaves out the model, so models asking for the same close-up share it,
+    each run labelling it by its own numbering."""
     from .fixtures import folder_fixture
     fixture = folder_fixture(folder)
     try:
-        rows = fixture.db.execute("SELECT r.region, s.usage FROM response s JOIN recipe r ON r.query = s.query "
+        rows = fixture.db.execute("SELECT r.region, r.parts, s.usage FROM response s JOIN recipe r ON r.query = s.query "
                                   "WHERE s.responder = ? AND r.role = 'pagetest'", (responder,)).fetchall()
     finally:
         fixture.close()
     out = {}
-    for label, used in rows:
+    for label, parts, used in rows:
         u = json.loads(used or "{}")
-        out[label] = (u.get("prompt_tokens") or 0, u.get("completion_tokens") or 0)
+        region = tuple(round(v, 1) for v in json.loads(parts)[2])  # recorded at 2 decimals; matched at 1
+        out[(label, region)] = (u.get("prompt_tokens") or 0, u.get("completion_tokens") or 0)
     return out
 
-def _cost(labels, tokens):
-    return {"queries": len(labels), "prompt_tokens": sum(tokens.get(l, (0, 0))[0] for l in labels),
-            "completion_tokens": sum(tokens.get(l, (0, 0))[1] for l in labels)}
+def _cost(queries, tokens):
+    """queries: [(label, page region)]."""
+    found = [tokens.get((label, tuple(round(round(v, 2), 1) for v in rect)), (0, 0)) for label, rect in queries]
+    return {"queries": len(queries), "prompt_tokens": sum(f[0] for f in found),
+            "completion_tokens": sum(f[1] for f in found)}
 
 def results(static, zooms, tokens, threshold=None):
     """Per sheet and plan: scores and costs. static: {sheet id: run_static's output}; zooms:
@@ -441,9 +480,9 @@ def results(static, zooms, tokens, threshold=None):
             if queries and all(unasked(q[2]) for q in queries):
                 continue
             side = None if name.startswith("whole") else int(name.split("-")[0][1:])
-            answers = [a for _, items, _ in queries for a in items]
+            answers = [a for q in queries for a in q[1]]
             out["static"].setdefault(sid, {})[name] = {
-                **score(sheet, answers), **_cost([q[0] for q in queries], tokens),
+                **score(sheet, answers), **_cost([(q[0], q[3]) for q in queries], tokens),
                 "failed": sum(1 for q in queries if q[2]), "whole_in_tiles": whole_in_tiles(sheet, side)}
     for sid, runs in zooms.items():
         sheet = by_id[sid]
@@ -452,9 +491,10 @@ def results(static, zooms, tokens, threshold=None):
                 continue
             answers = [a for e in log for a in e[3]]
             out["zoom"].setdefault(sid, {})[variant] = {
-                **score(sheet, answers), **_cost([e[0] for e in log], tokens),
+                **score(sheet, answers), **_cost([(e[0], e[1]) for e in log], tokens),
                 "failed": sum(1 for e in log if e[5]),
-                "zooms_unused": sum(len(e[6]) for e in log if len(e) > 6), "depths": {d: sum(1 for e in log if e[2] == d) for d in range(MAX_DEPTH + 1)},
+                "zooms_unused": sum(len(e[6]) for e in log if len(e) > 6),
+                "ranges_asked": sum(1 for e in log if len(e) > 7 for r in e[7] if RANGE.search(r)), "depths": {d: sum(1 for e in log if e[2] == d) for d in range(MAX_DEPTH + 1)},
                 **zoom_quality(sheet, log, threshold)}
     return out
 

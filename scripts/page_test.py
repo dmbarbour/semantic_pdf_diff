@@ -26,7 +26,7 @@ def read_all(client, model, only=("static", "zoom"), seeds=None, max_tiles=None)
     for sheet in pagetest.sheets():
         if seeds and sheet.seed not in seeds:
             continue
-        if "static" in only:
+        if "static" in only and sheet.kind not in pagetest.ZOOM_ONLY:
             static[sheet.id] = pagetest.run_static(FOLDER, client, sheet, pagetest.plans(sheet, max_tiles))
         if "zoom" in only:
             zooms[sheet.id] = {v: pagetest.run_zoom(FOLDER, client, sheet, v, threshold) for v in pagetest.VARIANTS}
