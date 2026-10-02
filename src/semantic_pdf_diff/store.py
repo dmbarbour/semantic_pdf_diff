@@ -11,7 +11,8 @@ import json
 import os
 import sqlite3
 from pathlib import Path
-from .models import Evidence, Figure, FileRef, Interpreter, Section, Source, merge_occurrences
+from .levers import ALL_REGIONS, TEXTUAL, VISUAL, setting_regions  # noqa: F401 (the region names, for callers)
+from .models import Evidence, Figure, FileRef, Interpreter, Section, Settings, Source, merge_occurrences
 
 SCHEMA_VERSION = 8  # 8: responses cached by query hash and model; the query log
 
@@ -64,21 +65,9 @@ CREATE VIEW comparisons AS
     FROM comparison;
 """
 
-# Extraction regions that a changed extraction setting affects; anything not listed
+# Extraction regions that a changed extraction setting affects (levers.Declared regions); anything not listed
 # (model, prompts, library versions, sampling and output options) affects them all.
-ALL_REGIONS = frozenset({"text", "table", "tile", "figure", "overview", "vision", "table-detection"})
-VISUAL = frozenset({"tile", "figure", "overview", "vision"})
-TEXTUAL = frozenset({"text", "table"})
-SETTING_REGIONS = {
-    "tile_points": VISUAL, "image_side": VISUAL, "vision": VISUAL, "figure_tasks": frozenset({"figure"}),
-    "text_bytes": TEXTUAL,
-    # Query levers clear only what they change (extract_prompt and extract_rules change everything).
-    "tiling": VISUAL, "grow_tiles": VISUAL, "skip_empty": VISUAL, "tile_locator": VISUAL, "visual_rules": VISUAL,
-    "visual_text_layer": VISUAL, "sheet_details": VISUAL,
-    "context_before": TEXTUAL, "context_after": TEXTUAL, "stem_context": TEXTUAL, "references": TEXTUAL,
-    "table_context": frozenset({"table"}), "table_filter": frozenset({"table", "table-detection"}),
-    "quote_match": TEXTUAL,
-}
+SETTING_REGIONS = setting_regions(Settings)
 
 class StoreError(RuntimeError):
     pass

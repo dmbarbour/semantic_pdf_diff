@@ -1,8 +1,10 @@
 import hashlib
 import json
 import os
-from typing import Literal
+from functools import lru_cache
+from typing import Annotated, Literal, get_origin
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from .levers import DEFAULT_LEVERS, EVERY_ROLE, Declared, compose, setting_classes
 
 class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -325,83 +327,41 @@ class RateRule(Strict):
     tokens_per_minute: int | None = Field(default=None, ge=1)
     requests_per_minute: int | None = Field(default=None, ge=1)
 
-class Settings(Strict):
-    model: str = "gemma-4"
-    base_url: str = "http://localhost:8000/v1"
-    # Model-neutral defaults (the owner, 2026-10-02): a context most current vision models offer, and a
-    # generous per-image bound. config.example.json holds gemma-4's measured profile (262,144 and 300).
-    context_tokens: int = Field(default=32768, ge=2048)
-    output_tokens: int = Field(default=4000, ge=256)
-    # Claims asked for per extraction request; raise with output_tokens (about 150 tokens per claim).
-    # 20 and 4,000 are what every recording and round used (2026-09-26 on).
-    claims_per_request: int = Field(default=20, ge=1, le=100)
-    image_tokens: int = Field(default=1200, ge=1)
-    safety_tokens: int = Field(default=400, ge=100)
+class Endpoint(Strict):
+    """How requests travel, budgets and limits: never what a query says, so never part of a configuration
+    (levers.Platform). The model is the exception: its answers depend on it, so every role binds it."""
+    model: Annotated[str, Declared("endpoint", EVERY_ROLE)] = "gemma-4"
+    base_url: Annotated[str, Declared("endpoint")] = "http://localhost:8000/v1"
     # A safety stop against runaway runs, not a budget: throughput is governed by rate_limits.
-    max_calls: int = Field(default=100_000, ge=1)
+    max_calls: Annotated[int, Declared("endpoint")] = Field(default=100_000, ge=1)
     # Stop sending once the provider-reported cost of this run reaches this many dollars.
-    max_cost: float | None = Field(default=None, gt=0)
-    retries: int = Field(default=2, ge=0, le=5)
+    max_cost: Annotated[float | None, Declared("endpoint")] = Field(default=None, gt=0)
+    retries: Annotated[int, Declared("endpoint")] = Field(default=2, ge=0, le=5)
     # Seconds without data before giving up. Answers are streamed, so this is between chunks, not
     # for the whole answer (a slow answer cut off by a total timeout is still billed).
-    timeout: float = Field(default=120, gt=0)
-    stream: bool = True
-    text_bytes: int = Field(default=1800, ge=200)
-    image_side: int = Field(default=1000, ge=256, le=2000)
-    tile_points: int = Field(default=420, ge=100)
-    refinement_depth: int = Field(default=1, ge=0, le=3)
-    # Sections come from the PDF outline down to this depth, else fixed page ranges.
-    section_depth: int = Field(default=2, ge=1, le=6)
-    section_pages: int = Field(default=20, ge=1, le=1000)
-    # Extract exactly repeated table rows (same cells, same table position, 3+ pages) once.
-    dedupe_repeated: bool = True
-    top_k: int = Field(default=4, ge=1, le=30)
-    min_score: float = Field(default=0.10, ge=0, le=1)
-    max_pairs: int = Field(default=1000, ge=1)
-    vision: bool = True
-    # Read each detected figure whole, besides the tile grid (which can cut through figures).
-    figure_tasks: bool = True
-    # Query levers (docs/plans/query-improvement). The defaults are the champion of the improvement
-    # rounds, promoted 2026-09-28 (rounds 1-9; benchmarks/champion.json); round 0's queries are
-    # benchmarks/round0.json. Levers left at their defaults stay out of stores' interpreter bindings.
-    extract_prompt: str | None = None       # replaces the extraction instructions
-    extract_rules: list[str] = Field(default_factory=list)  # appended to the instructions
-    visual_rules: list[str] = Field(default_factory=list)   # appended for image tasks only (tiles, figures, overview)
-    context_before: int = Field(default=400, ge=0, le=20000)  # characters of preceding text, as context
-    context_after: int = Field(default=400, ge=0, le=20000)   # characters of following text, as context
-    table_context: int = Field(default=400, ge=0, le=20000)   # characters of text above a table (lead-in, caption)
-    visual_text_layer: int = Field(default=1500, ge=0, le=20000)  # characters of a region's PDF text sent with its image
-    table_filter: bool = False               # drop detected "tables" that are charts, frames or paragraphs
-    stem_context: bool = True                # tell text and table tasks which numbered items and headings they're under
-    tiling: Literal["grid", "bands"] = "bands"  # bands: full-width, cut at whitespace gaps, on report-sized pages
-    grow_tiles: bool = True                  # extend grid tiles to include every text line they cut
-    sheet_details: bool = False              # cut drawing sheets into their details, titled from the sheet
-    reconcile: bool = True                   # merge readings of one fact by different tasks into one claim
-    tile_locator: bool = False               # with each tile, a page thumbnail outlining where the tile sits
-    skip_empty: bool = True                  # don't send tiles with no text, drawing or image (blank paper)
-    # fragments: quotes normalized (Unicode, line-end hyphens) and made of "a ... b" or "a | b" parts;
-    # excerpts: also words read in order across a pseudo-table
-    quote_match: Literal["exact", "fragments", "excerpts"] = "fragments"
-    references: bool = False                 # abbreviations defined elsewhere and cited figures' captions as context
-    # Situating stage: figure and section "about" statements after extraction.
-    situate: bool = True
-    verify_visuals: bool = True
-    response_format: Literal["none", "json_object", "json_schema"] = "none"
-    seed: int | None = None
-    max_token_field: Literal["max_tokens", "max_completion_tokens"] = "max_tokens"
-    aliases: dict[str, str] = Field(default_factory=dict)
+    timeout: Annotated[float, Declared("endpoint")] = Field(default=120, gt=0)
+    stream: Annotated[bool, Declared("endpoint")] = True
     # Throughput: requests in flight at most (adaptive below this), and rate-limit rules.
-    concurrency: int = Field(default=4, ge=1, le=64)
+    concurrency: Annotated[int, Declared("endpoint")] = Field(default=4, ge=1, le=64)
     # Seconds between progress lines when output isn't a terminal.
-    heartbeat_seconds: float = Field(default=30.0, gt=0)
-    rate_limits: list[RateRule] = Field(default_factory=list)
-    # Sources: rescan roots on every run ("auto") or only on `source update` ("manual").
-    rescan: Literal["auto", "manual"] = "auto"
-    # Archive safety backstops: generous, and anything they stop is reported.
-    max_zip_depth: int = Field(default=8, ge=4)
-    max_source_bytes: int = Field(default=50 * 1024 ** 3, ge=1)
-    zip_ratio_limit: float = Field(default=1000.0, gt=1)
-    zip_ratio_min_bytes: int = Field(default=100 * 1024 ** 2, ge=0)
+    heartbeat_seconds: Annotated[float, Declared("endpoint")] = Field(default=30.0, gt=0)
+    rate_limits: Annotated[list[RateRule], Declared("endpoint")] = Field(default_factory=list)
+
+class SettingsBase(Strict):
+    """Loading: the environment, then a file's or a caller's settings. A settings file may name its levers in
+    order ("levers"); without, the default configuration (levers.DEFAULT_LEVERS)."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def own_levers(cls, data):
+        # A configuration's data names its levers; a class composed of others can't hold it.
+        if isinstance(data, dict) and "levers" in data:
+            data = dict(data)
+            levers = tuple(data.pop("levers"))
+            if levers != cls.levers:
+                raise ValueError(f"these settings are for levers {list(cls.levers)}, not {list(levers)}: "
+                                 "build them with Settings.configured(levers=...) or from_env")
+        return data
 
     @model_validator(mode="before")
     @classmethod
@@ -416,24 +376,31 @@ class Settings(Strict):
         return data
 
     @classmethod
+    def configured(cls, levers=None, **values):
+        """Settings for a configuration: its levers in order (None: the default) and its values."""
+        return (cls if levers is None else settings_class(tuple(levers)))(**values)
+
+    @classmethod
     def from_env(cls, **overrides):
         """Load environment defaults, then explicit file/CLI/programmatic overrides.
 
         Keep plain Settings() deterministic for library callers and fixtures.
         Empty environment values are treated as unset.
         """
+        levers = overrides.pop("levers", None)
+        target = cls if levers is None else settings_class(tuple(levers))
         values = {}
         names = {"base_url": "OPENAI_BASE_URL", "model": "OPENAI_MODEL"}
         # An explicit legacy json_mode must beat an environment response_format.
         explicit = set(overrides) | ({"response_format"} if "json_mode" in overrides else set())
-        for field in [*cls.model_fields, "json_mode"]:
+        for field in [*target.model_fields, "json_mode"]:
             if field in explicit:
                 continue
             name = names.get(field, "PDF_DIFF_" + field.upper())
             raw = os.environ.get(name)
             if raw is None or not raw.strip():
                 continue
-            if field in ("aliases", "rate_limits", "extract_rules", "visual_rules"):
+            if field in target.model_fields and get_origin(target.model_fields[field].annotation) in (list, dict):
                 try:
                     values[field] = json.loads(raw)
                 except ValueError as exc:
@@ -443,13 +410,14 @@ class Settings(Strict):
             else:
                 values[field] = raw.strip()
         values.update(overrides)
-        return cls(**values)
+        return target(**values)
 
-    @model_validator(mode="after")
-    def capacity(self):
-        if self.context_tokens <= self.output_tokens + self.safety_tokens + 600:
-            raise ValueError("Context must leave room for prompts after output and safety reserves")
-        return self
+@lru_cache(maxsize=None)
+def settings_class(levers=DEFAULT_LEVERS):
+    """The settings for an ordered list of levers: endpoint settings beside the composed platform."""
+    return type("Settings", (SettingsBase, Endpoint, compose(levers)), {"__module__": __name__})
+
+Settings = settings_class()
 
 class Gain(Strict):
     """A gain that lets a "no worse" variant through, named before judging: a mechanical figure
@@ -528,29 +496,10 @@ class RoundSpec(Strict):
             raise ValueError(f"rubric {self.rubric!r} is not one of {sorted(RUBRICS)}")
         return self
 
-# What each setting can change about the queries sent to models (docs/plans/content-addressed-queries):
-# - endpoint: how requests travel, budgets and limits; never what any query says
-# - shaping: the content of queries (text, images, generation settings)
-# - selecting: which queries are made (tasks added or removed), and which sources are read
-# - post: what is done with answers; never an extraction query, though later stages read the result
-# tests/test_settings.py toggles each one through the whole pipeline and checks it keeps to its class.
 # What every evaluating model (judges, query checkers, the post-mortem's analyst) is asked with.
 # Its answers are recorded by query, so these must be the same wherever a folder is judged; the
 # transport (concurrency, timeouts, retries, caps) varies by caller and never changes a query.
 EVALUATOR_SETTINGS = {"context_tokens": 262144, "output_tokens": 16000, "image_tokens": 3000}
 
-SETTING_CLASSES = {
-    **dict.fromkeys(("model", "base_url", "max_calls", "max_cost", "retries", "timeout", "stream",
-                     "concurrency", "heartbeat_seconds", "rate_limits"), "endpoint"),
-    # The token budgets shape too: situating fits its text to what's left of the context window.
-    **dict.fromkeys(("context_tokens", "safety_tokens", "image_tokens", "output_tokens", "claims_per_request", "text_bytes",
-                     "image_side", "section_depth", "section_pages", "dedupe_repeated", "extract_prompt",
-                     "extract_rules", "visual_rules", "context_before", "context_after", "table_context",
-                     "visual_text_layer", "stem_context", "grow_tiles", "tile_locator", "references",
-                     "response_format", "seed", "max_token_field"), "shaping"),
-    **dict.fromkeys(("tile_points", "refinement_depth", "vision", "figure_tasks", "tiling", "sheet_details",
-                     "skip_empty", "table_filter", "situate", "verify_visuals", "top_k", "min_score", "max_pairs",
-                     "aliases", "rescan", "max_zip_depth", "max_source_bytes", "zip_ratio_limit",
-                     "zip_ratio_min_bytes"), "selecting"),
-    **dict.fromkeys(("reconcile", "quote_match"), "post"),
-}
+# Each setting's class (levers.Declared), read off the declarations.
+SETTING_CLASSES = setting_classes(Settings)

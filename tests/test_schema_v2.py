@@ -93,7 +93,7 @@ class InterpreterTests(unittest.TestCase):
     def test_interpreters_hold_only_output_affecting_settings(self):
         s = Settings(timeout=5, max_calls=3, base_url='http://user:secret@host/v1')
         extract = extraction_interpreter(s)
-        self.assertEqual(set(extract.settings), set(EXTRACTION_SETTINGS))
+        self.assertEqual(set(extract.settings), set(EXTRACTION_SETTINGS) | {'levers'})  # every one, and their order
         self.assertNotIn('secret', extract.model_dump_json())
         self.assertIn('PyMuPDF', extract.versions)
         self.assertEqual(set(comparison_interpreter(s).settings), set(COMPARISON_SETTINGS))

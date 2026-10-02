@@ -153,32 +153,35 @@ class SettingsKeepToTheirClass(unittest.TestCase):
                     self.assertNotEqual(queries, base, f"{name} ({kind}) changed no query: dead, or misfiled")
 
 
-class SettingsTablesAgree(unittest.TestCase):
-    """The tables that say what each setting does are kept by hand until they're generated from the levers'
-    declarations (architecture clean-up, milestone 3). Until then they must agree."""
-    # Known gaps, each with its fix: remove an entry when it's fixed.
-    UNBOUND = {}  # image_tokens and safety_tokens were, until clean-up milestone 2 (review item 3)
+class Declarations(unittest.TestCase):
+    """What each setting does is declared once, on its field (levers.Declared); the tables once kept by hand
+    are read off the declarations (architecture clean-up, milestone 3). The declarations must make sense."""
+    def test_every_setting_is_declared_once(self):
+        from semantic_pdf_diff.levers import Declared
+        for name, field in Settings.model_fields.items():
+            self.assertEqual(sum(isinstance(m, Declared) for m in field.metadata), 1, name)
 
     def test_shaping_settings_are_bound_by_a_role(self):
-        from semantic_pdf_diff import provenance as P
-        bound = set(P.EXTRACTION_SETTINGS) | set(P.TRIAGE_SETTINGS) | set(P.COMPARISON_SETTINGS) | set(P.LEVERS)
-        shaping = {k for k, v in SETTING_CLASSES.items() if v == "shaping"}
-        self.assertEqual(shaping - bound, set(self.UNBOUND))  # a new unbound one fails; so does a fixed one left listed
+        from semantic_pdf_diff.levers import declared
+        unbound = {n for n, k in SETTING_CLASSES.items() if k == "shaping" and not declared(Settings, n).roles}
+        self.assertEqual(unbound, set())  # image_tokens and safety_tokens were, until clean-up milestone 2
 
     def test_interpreters_hold_no_transport(self):
-        from semantic_pdf_diff import provenance as P
-        bound = set(P.EXTRACTION_SETTINGS) | set(P.TRIAGE_SETTINGS) | set(P.COMPARISON_SETTINGS) | set(P.LEVERS)
+        from semantic_pdf_diff.levers import declared
+        bound = {n for n in Settings.model_fields if declared(Settings, n).roles}
         self.assertEqual({k for k in bound if SETTING_CLASSES[k] == "endpoint"}, {"model"})  # the model answers
 
-    def test_levers_scopes_and_marks_name_real_settings(self):
-        from semantic_pdf_diff import extract, provenance as P, store
-        self.assertLessEqual(set(P.LEVERS), set(Settings.model_fields))
-        self.assertLessEqual(set(store.SETTING_REGIONS), set(Settings.model_fields))
+    def test_scopes_and_marks(self):
+        from semantic_pdf_diff import extract, levers, store
         self.assertFalse({k for k in store.SETTING_REGIONS if SETTING_CLASSES[k] == "endpoint"})
-        # a lever without a scope clears every region when changed: only the instructions should
-        self.assertEqual(set(P.LEVERS) - set(store.SETTING_REGIONS), {"extract_prompt", "extract_rules"})
-        marks = {name for name, _ in extract.LEVER_MARKS}
-        self.assertLessEqual(marks - set(P.LEVERS), {"figure_tasks", "section"})  # notes that aren't levers
+        # a bound lever setting without a scope clears every region when changed: only the instructions should,
+        # and the row dedupe (it can drop rows from any task's text)
+        from semantic_pdf_diff.levers import declared
+        unscoped = {n for n in levers.lever_settings() if declared(Settings, n).roles and n not in store.SETTING_REGIONS}
+        self.assertEqual(unscoped, {"extract_prompt", "extract_rules", "dedupe_repeated"})
+        for name, _ in extract.LEVER_MARKS:  # each mark is its lever's own setting, or the headings
+            self.assertTrue(name == "section" or any(name in c.model_fields and name in c.marks
+                                                     for c in levers.LEVER_CLASSES), name)
 
 class DefaultsFitTheirBudget(unittest.TestCase):
     """The shipped defaults must fit their own context budget: once, 4,000 output tokens left 3,792 of an

@@ -10,7 +10,8 @@ from pathlib import Path
 import pymupdf
 from .pages import (display_y, lines as _lines, native, native_page, reading_blocks, reading_dict_blocks, shown,
                     shown_by_matrix, shown_point, top_by_matrix)
-from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, claim_id, merge_occurrences
+from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, Settings, claim_id, merge_occurrences
+from .levers import LAYER_NOTE, LOCATOR_NOTE, lever_marks
 from .situate import page_figures
 from .dispatch import Dispatcher
 from .llm import CallLimitReached, NotRecorded
@@ -206,7 +207,6 @@ def references(text, terms, figures):
     return "\n".join(lines)
 
 CONTEXT_NOTE = "CONTEXT (for reference only: do not extract claims from it):"
-LAYER_NOTE = "TEXT LAYER OF THIS REGION (from the PDF, may be partial; use it to read small labels):"
 
 # Text shorter than this is not split further during refinement.
 MIN_REFINE_BYTES = 400
@@ -517,8 +517,6 @@ def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=Fa
     return regions + [("overview", page.rect, "")]
 
 LOCATOR_SIDE = 384  # pixels: the page thumbnail that shows where a tile sits
-LOCATOR_NOTE = ("The last image is the whole page, small, with this region outlined in red: it shows where the "
-                "region sits, for orientation only.")
 
 class Context:
     """The context lines a document's queries get, one provider per lever: each returns its lines
@@ -627,21 +625,10 @@ class Context:
     def locator(self, tag):
         return [LOCATOR_NOTE] if self.s.tile_locator and tag.startswith("tile") else []
 
-# What each lever added to a query, found by the lines its builder writes. For diagnostics only
-# (the queries dump, docs/plans/content-addressed-queries-2026-09-28.md): a query is found by its
-# hash, never by these. tests/test_sections.py checks each builder against its mark.
-LEVER_MARKS = (
-    ("section", re.compile(r"^Section: (.+)$", re.M)),                      # headings (always on)
-    ("context_before", re.compile(r"^Before: \.\.\.(.*)$", re.M)),
-    ("context_after", re.compile(r"^After: (.*)\.\.\.$", re.M)),
-    ("table_context", re.compile(r"^Above the table: \.\.\.(.*)$", re.M)),
-    ("stem_context", re.compile(r"^Within: (.+)$", re.M)),
-    ("references", re.compile(r"^((?:Defined elsewhere|Cited): .+)$", re.M)),
-    ("figure_tasks", re.compile(r"^Caption: (.+)$", re.M)),
-    ("sheet_details", re.compile(r"^(Sheet .+ Detail .+)$", re.M)),
-    ("visual_text_layer", re.compile("^" + re.escape(LAYER_NOTE) + "\n(.*)$", re.M)),
-    ("tile_locator", re.compile("^(" + re.escape(LOCATOR_NOTE) + ")$", re.M)),
-)
+# What each lever added to a query, found by the lines its builder writes (the levers' marks). For
+# diagnostics only (the queries dump, docs/plans/content-addressed-queries-2026-09-28.md): a query is found by
+# its hash, never by these. tests/test_sections.py checks each builder against its mark.
+LEVER_MARKS = lever_marks(Settings)
 
 def lever_notes(prompt):
     """{lever: what it added (shortened)} for the levers whose lines a query's text holds."""

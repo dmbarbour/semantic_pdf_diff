@@ -30,7 +30,10 @@ For Python callers, use `Settings.from_env(...)` to get the same environment def
 
 ## Settings
 
-Settings are in `config.example.json`; all omitted settings have defaults in `models.py`.
+Settings are in `config.example.json`; all omitted settings have defaults in `models.py` and `levers.py`.
+
+- **Levers** are the settings that shape how documents are read (context lines, tiling, quote matching and so on). Each is a mixin in `levers.py` that declares its settings, the stores' bindings it is part of, and the regions a change clears. A settings file may name its levers in order (`"levers": [...]`); without, the default order. `benchmarks/round0.json` and `benchmarks/champion.json` name theirs. For now every lever must be present; their order changes nothing yet.
+- **A store binds every setting that shapes its results,** resolved, and the levers' order. A store made before 2026-10-02 bound only levers changed from the defaults of its day, so it asks for `--reset` once; recorded answers replay.
 
 - `response_format` is `none` by default because some compatible servers do not support it; `json_object` requests JSON mode and `json_schema` sends the response schema for guided decoding (vLLM, llama.cpp, and similar), which is strongly recommended for small models where supported. The 0.1 `json_mode: true` setting still maps to `json_object`.
 - Every request is sent at temperature 0, for reproducible answers; it isn't a setting. `seed` is sent when set.

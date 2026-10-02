@@ -31,12 +31,10 @@ SETTINGS = FOLDER / "settings.json"  # every setting that shapes a query, resolv
 
 def settings_file():
     """The corpus's settings: written once, then kept, so replays ask exactly the recorded queries."""
-    from semantic_pdf_diff.models import SETTING_CLASSES, Settings
+    from semantic_pdf_diff.models import Settings
     if not SETTINGS.exists():
-        resolved = Settings.from_env(**BASE_SETTINGS).model_dump(mode="json")
         SETTINGS.parent.mkdir(parents=True, exist_ok=True)
-        SETTINGS.write_text(json.dumps({k: v for k, v in resolved.items() if SETTING_CLASSES[k] != "endpoint"},
-                                       indent=2) + "\n")
+        SETTINGS.write_text(json.dumps(Settings.from_env(**BASE_SETTINGS).configuration(), indent=2) + "\n")
     return SETTINGS
 
 def main(argv=None):

@@ -226,3 +226,37 @@ None now. The owner's reading of the full review may add some.
       - no recall changed
       - the conditions, "located in" and fraction slips occur in no recorded claim; only their tests show them
   - 318 tests pass.
+- **Milestone 3, the lever platform (2026-10-02): done.** Requests unchanged: the golden requests pass, and a query snapshot of every slice under three profiles matches HEAD's.
+  - **`levers.py`:**
+    - **Declarations:** every setting is a field annotated with its declaration (`Declared`: class, roles bound, regions cleared).
+    - **Levers:** each is a pydantic mixin (`Lever`) with its settings, its marks in a prompt, and whether it's parked. There are 18, in five stages: instructions, context, segmentation, inclusion and matching.
+    - **The platform** (`Platform`) holds the settings no lever owns and runs the assumptions.
+    - **`compose()`** builds a configuration's class with `type()`, cached, and checks its hooks.
+  - **The five tables are read off the declarations:**
+    - `SETTING_CLASSES`
+    - the role tuples
+    - `LEVERS`
+    - `SETTING_REGIONS`
+    - `LEVER_MARKS`
+    - `from_env`'s JSON fields (by annotation)
+
+    Settings' fields, defaults and bounds, and every table, match HEAD's exactly.
+  - **`Settings`** is the default configuration's class: the endpoint settings (`Endpoint`) beside the composed platform.
+    - Call sites keep one object until the client split (milestone 7).
+    - Endpoint settings stay outside the configuration: not bound, hashed or searched.
+  - **Hooks:**
+    - *chained*: every provider calls `super()` first, so a list's order is its parts' order
+    - *chosen*: one lever at most
+    - the platform-wide check refuses a second chooser, or a chained provider that doesn't call `super()`
+
+    Exercised by test levers. The pipeline's first real hooks come with milestone 4.
+  - **Assumptions:** each class's own `assumptions()` runs once on the final type, at validation.
+    - The platform's: the context leaves room (once a validator); every lever whose behaviour the pipeline still reads directly is present.
+    - Any order composes; it changes nothing yet.
+  - **`explain()`:** the levers in order with their settings; each hook's providers in parts order, or its chooser.
+  - **Configurations:**
+    - `configuration()` gives the levers in order plus every platform setting; `digest()` hashes it.
+    - A settings file may name its levers (`"levers"`); `Settings.configured()` and `from_env` compose them.
+    - `record_runs` and the controlled corpus write `configuration()`.
+  - **Store binding (item 4):** every resolved setting of a role, and extraction's lever order. Existing stores ask for `--reset` once; answers replay.
+  - **Named configurations:** `benchmarks/round0.json` and `champion.json` pin their lever order. A test holds the champion equal to the defaults, so a default can't move without a round.

@@ -10,21 +10,17 @@ from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import PurePath
 from . import __version__
-from .models import Interpreter
+from .levers import lever_settings, role_settings
+from .models import Interpreter, Settings
 
 # Only aliases known to share an interpretation collapse.
 EXTENSION_ALIASES = {".jpeg": ".jpg", ".tif": ".tiff", ".htm": ".html", ".yml": ".yaml", ".markdown": ".md"}
 
-# Settings that shape what extraction sends to the model or how content is chunked.
-# Timeouts, retries, call limits, credentials and the endpoint URL are excluded.
-EXTRACTION_SETTINGS = ("model", "context_tokens", "output_tokens", "image_tokens", "safety_tokens", "text_bytes", "image_side", "tile_points",
-                       "refinement_depth", "claims_per_request", "figure_tasks", "section_depth", "section_pages", "dedupe_repeated", "vision", "response_format",
-                       "seed", "max_token_field")
-TRIAGE_SETTINGS = ("model", "context_tokens", "output_tokens", "image_tokens", "safety_tokens", "image_side",
-                   "response_format",
-                   "seed", "max_token_field")
-COMPARISON_SETTINGS = ("model", "top_k", "min_score", "max_pairs", "verify_visuals", "aliases",
-                       "response_format", "seed", "output_tokens", "max_token_field")
+# The settings each role's stored results depend on (levers.Declared roles): what shapes what it sends to the
+# model or how content is chunked. Timeouts, retries, call limits, credentials and the endpoint URL are excluded.
+EXTRACTION_SETTINGS = role_settings(Settings, "extract")
+TRIAGE_SETTINGS = role_settings(Settings, "triage")
+COMPARISON_SETTINGS = role_settings(Settings, "compare")
 
 def normalized_extension(name):
     """Lowercase extension with known aliases collapsed, or None if there is none."""
@@ -58,18 +54,16 @@ def library_versions():
             versions[package] = "unknown"
     return versions
 
-# Query levers: included in an interpreter only when changed from their defaults, so adding a
-# lever doesn't rebind existing stores. (Recorded answers don't depend on this: fixtures and caches are
-# keyed by the query that reached the model; docs/plans/content-addressed-queries-2026-09-28.md.)
-LEVERS = ("extract_prompt", "extract_rules", "context_before", "context_after", "table_context", "visual_text_layer",
-          "table_filter", "stem_context", "tiling", "grow_tiles", "sheet_details",
-          "references", "tile_locator", "skip_empty",
-          "visual_rules", "quote_match")
+LEVERS = lever_settings()  # the settings levers own (levers.py)
 
 def interpreter(role, settings, prompts, names):
-    defaults = type(settings).model_fields
-    values = {name: getattr(settings, name) for name in names
-              if name not in LEVERS or getattr(settings, name) != defaults[name].get_default(call_default_factory=True)}
+    """A role's binding: every setting it depends on, resolved. Levers were once bound only when they differed
+    from the defaults of the day, so a moved default went unnoticed and old evidence was served as current
+    (code review 2026-10-01, item 4). Extraction binds its levers' order too. (Recorded answers don't depend on
+    this: fixtures and caches are keyed by the query that reached the model.)"""
+    values = {name: getattr(settings, name) for name in names}
+    if role == "extract":
+        values["levers"] = list(type(settings).levers)
     return Interpreter(role=role, model=settings.model, prompt_hash=text_hash(*prompts), settings=values,
                        versions=library_versions())
 
@@ -77,15 +71,15 @@ def extraction_interpreter(settings):
     from .extract import PROMPT_VERSION, extraction_template
     from .llm import SYSTEM
     return interpreter("extract", settings, (SYSTEM, extraction_template(settings), f"v{PROMPT_VERSION}"),
-                       EXTRACTION_SETTINGS + LEVERS)
+                       role_settings(type(settings), "extract"))
 
 def triage_interpreter(settings):
     from .situate import PROMPT_VERSION, SITUATE_FIGURE, SITUATE_SECTION
     from .llm import SYSTEM
     return interpreter("triage", settings, (SYSTEM, SITUATE_FIGURE, SITUATE_SECTION, f"v{PROMPT_VERSION}"),
-                       TRIAGE_SETTINGS)
+                       role_settings(type(settings), "triage"))
 
 def comparison_interpreter(settings):
     from .compare import COMPARE, PROMPT_VERSION
     from .llm import SYSTEM
-    return interpreter("compare", settings, (SYSTEM, COMPARE, f"v{PROMPT_VERSION}"), COMPARISON_SETTINGS)
+    return interpreter("compare", settings, (SYSTEM, COMPARE, f"v{PROMPT_VERSION}"), role_settings(type(settings), "compare"))
