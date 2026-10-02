@@ -294,3 +294,14 @@ None now. The owner's reading of the full review may add some.
     - Round 0 and the champion name it in their order.
     - Extraction's binding lists only the levers that act on extraction, so a comparison lever doesn't rebind extraction stores.
   - **Situating** has no choices to move: it reads only the platform's budgets, and its prompts are fixed. A situating lever would come with its hooks.
+- **Milestone 6, single owners outside the levers (2026-10-02): in progress,** in parts.
+  - **6a, the request's structure: done.**
+    - **`extract.ExtractQuery`** owns the extraction prompt's layout both ways. `prompt()` is the bytes sent; `read()` takes a logged prompt back into its parts.
+      - A test round-trips every extraction prompt of the three golden profiles.
+      - `add_context` and the review's request view read through it, instead of splitting at markers.
+    - **Comparison and situating** name their instructions (`compare.instructions(mode)`, `situate.instructions(kind)`). The review's view uses those, not the first `"\nA="` or blank line.
+    - **Recipes:** `llm.RECIPES` names the recipe tuple's positions by role, and `recipe_fields()` reads them.
+      - The review's request index uses it, and a test checks every logged recipe has its role's fields.
+      - A fixture description's source type now comes from the recipe, not the prompt's text.
+    - **The sheet-details mark** missed a detail noted without a sheet label ("Drawing sheet. Detail B4", as the review found). It's fixed and tested.
+    - No store or fixture format changed. Requests are unchanged (golden requests).

@@ -156,6 +156,10 @@ def file_difference(files_a, files_b):
 # Provenance stays out of the model's view; it sees the claims and any source crops.
 PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences"}
 
+def instructions(mode):
+    """A comparison prompt's instructions (the rest is the two claims and the numeric check)."""
+    return COMPARE + MODE_CONTEXT[mode]
+
 def compare(left, right, output, client, mode, dispatcher=None, progress=None):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
 
@@ -223,7 +227,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None):
                     images += extra
                 payload.append(p)
             calc = numeric_check(a,b)
-            prompt = COMPARE + MODE_CONTEXT[mode] + "\nA=" + json.dumps(payload[0],ensure_ascii=False) + "\nB=" + json.dumps(payload[1],ensure_ascii=False)
+            prompt = instructions(mode) + "\nA=" + json.dumps(payload[0],ensure_ascii=False) + "\nB=" + json.dumps(payload[1],ensure_ascii=False)
             prompt += "\nNumeric check=" + json.dumps(calc)
             progress.add()
             dispatch.submit(prompt, Judgment, images, ("compare", mode, settings_key, a.id, b.id),

@@ -29,8 +29,9 @@ GOLDEN = Path(__file__).resolve().parent / "golden"
 UPDATE = bool(os.environ.get("GOLDEN_UPDATE"))
 PROFILES = {"defaults": ({}, False), "round0": (ROUND0, False), "defaults-sheet": ({}, True)}
 
-def transcript(settings, sheet):
-    """The golden text of one comparison's requests."""
+def requests(settings, sheet, logged=False):
+    """One comparison's requests [(role, prompt, image hashes, params)], and (logged) its store's query log."""
+    from semantic_pdf_diff.store import Store
     with tempfile.TemporaryDirectory() as d, jittery_model() as (url, state):
         root = Path(d)
         a, b = document(root / "a.pdf", 10, sheet), document(root / "b.pdf", 12, sheet)
@@ -38,8 +39,15 @@ def transcript(settings, sheet):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             cli.main([str(a), str(b), "--out", str(root / "out"), "--base-url", url,
                       "--config", str(root / "settings.json")])
+        if logged:
+            with Store(root / "out") as store:
+                return state["transcript"], store.queries()
+    return state["transcript"]
+
+def transcript(settings, sheet):
+    """The golden text of one comparison's requests."""
     lines, first = [], {}
-    for role, prompt, images, params in state["transcript"]:
+    for role, prompt, images, params in requests(settings, sheet):
         digest = hashlib.sha256(json.dumps({"prompt": prompt, "images": images, "params": params},
                                            sort_keys=True).encode()).hexdigest()
         lines.append(f"{role} {digest} images={len(images)}")
@@ -63,6 +71,26 @@ class GoldenRequests(unittest.TestCase):
                 if recorded_with != f"# PyMuPDF {pymupdf.VersionBind}":
                     self.skipTest(f"golden {recorded_with[2:]}; images differ under PyMuPDF {pymupdf.VersionBind}")
                 self.assertEqual(text, golden, f"{name}: requests changed, so recorded answers to them would miss")
+
+class Structure(unittest.TestCase):
+    """A request's layout has one owner per role (code review 2026-10-01, A1): readers don't split at markers."""
+    def test_every_extraction_prompt_reads_back_into_its_parts(self):
+        from semantic_pdf_diff.extract import ExtractQuery
+        from semantic_pdf_diff.llm import RECIPES, recipe_fields
+        for name, (settings, sheet) in PROFILES.items():
+            with self.subTest(profile=name):
+                sent, logged = requests(settings, sheet, logged=True)
+                prompts = [p for role, p, _, _ in sent if role == "extract"]
+                self.assertTrue(prompts)
+                for prompt in prompts:
+                    asked = ExtractQuery.read(prompt)
+                    self.assertEqual(asked.prompt(), prompt)
+                    self.assertTrue(asked.request.startswith("Source type: " + asked.region))
+                for q in logged:  # every recipe has its role's named fields
+                    fields = recipe_fields(q["recipe"])
+                    self.assertLessEqual(set(RECIPES.get(fields["role"], ())), set(fields), q["recipe"])
+                    if fields["role"] == "extract":
+                        self.assertEqual((fields["content"], fields["task"]), (q["content"], q["task"]))
 
 class AbsentIsOff(unittest.TestCase):
     """Every lever acts through its hooks, so a configuration may leave it out, and a lever left out asks exactly

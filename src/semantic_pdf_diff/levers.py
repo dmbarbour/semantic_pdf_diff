@@ -274,7 +274,7 @@ class GrowTiles(Lever):
 
 class SheetDetails(Lever):
     lever_name, stage, parked, off = "sheet_details", "segmentation", True, {"sheet_details": False}
-    marks = {"sheet_details": re.compile(r"^(Sheet .+ Detail .+)$", re.M)}
+    marks = {"sheet_details": re.compile(r"^(.+\. Detail [A-H]\d{1,2}\b.*)$", re.M)}  # "Drawing sheet. Detail B4: ..."
     # cut drawing sheets into their details, titled from the sheet
     sheet_details: Annotated[bool, _selecting(VISUAL)] = False
 

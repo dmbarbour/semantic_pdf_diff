@@ -420,6 +420,10 @@ def figure_material(doc, figure, index, by_id, text_by_page):
     part["claims extracted from it"] = "\n".join(claim_line(by_id[i]) for i in figure.claims[:MAX_FIGURE_CLAIMS] if i in by_id)
     return part
 
+def instructions(kind):
+    """A situating prompt's instructions, for a figure or a section (the rest is its material)."""
+    return {"figure": SITUATE_FIGURE, "section": SITUATE_SECTION}[kind]
+
 def figure_prompt(part, scale):
     limits = {"text on the sheet": SHEET_TEXT, "text before it": AROUND, "text after it": AROUND,
               "paragraphs citing it": MAX_CITATIONS * PARAGRAPH, "claims extracted from it": 6000}

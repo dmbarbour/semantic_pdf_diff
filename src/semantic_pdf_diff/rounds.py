@@ -519,7 +519,8 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
                 sources[(side_dir, run, content)] = {q["task"]: q["prompt"] for q in store.queries(content=content,
                                                                                                     role="extract")}
         prompt = sources[(side_dir, run, content)].get(task)
-        return prompt.split("SOURCE DATA:\n", 1)[1].strip() if prompt and "SOURCE DATA:\n" in prompt else None
+        from .extract import ExtractQuery
+        return ExtractQuery.read(prompt).data.strip() if prompt else None
 
     by_id = {i["id"]: i for i in batch["items"]}
     for (run, content, page, family, *band), a, b in picked:

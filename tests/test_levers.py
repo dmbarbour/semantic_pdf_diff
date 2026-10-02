@@ -193,6 +193,13 @@ class Rubrics(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "doesn't hold"):
             R._swap("PAGE {page}", "SET A:", "SET A ({a_note}):")
 
+class Marks(unittest.TestCase):
+    def test_a_detail_noted_without_a_sheet_label_is_found(self):
+        from semantic_pdf_diff.extract import lever_notes  # the review: "Drawing sheet. Detail B4" was missed
+        self.assertIn("sheet_details", lever_notes("SOURCE DATA:\nDrawing sheet. Detail B4: FOOTING PLAN"))
+        self.assertIn("sheet_details", lever_notes("SOURCE DATA:\nSheet S-522 Deck Details. Detail C1: ELEVATION"))
+        self.assertNotIn("sheet_details", lever_notes("SOURCE DATA:\nSee the detail on sheet S-522."))
+
 class Comparison(unittest.TestCase):
     def test_retrieval_is_the_platforms_and_images_are_a_lever(self):
         from semantic_pdf_diff.compare import candidates

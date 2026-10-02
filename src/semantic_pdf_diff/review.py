@@ -157,15 +157,16 @@ class Requests:
 
     def __init__(self, store):
         self.index = {}
+        from .llm import recipe_fields
         for q in store.queries():
-            parts = q["recipe"]
-            if parts[0] == "extract":
-                ident = ("extract", parts[2], parts[3])        # content, task
-            elif parts[0] == "triage":
-                ident = ("triage", parts[2], parts[1], parts[3])  # content, figure or section, id
+            r = recipe_fields(q["recipe"])
+            if r["role"] == "extract":
+                ident = ("extract", r["content"], r["task"])
+            elif r["role"] == "triage":
+                ident = ("triage", r["content"], r["kind"], r["id"])
             else:
-                ident = ("compare", parts[3], parts[4])        # a, b
-            self.index[ident] = (parts, q["prompt"], len(q["images"]))
+                ident = ("compare", r["a"], r["b"])
+            self.index[ident] = (r, q["prompt"], len(q["images"]))
 
     def describe(self, item, source, folder):
         """{summary, instructions, query, images} for an item, or None if it wasn't recorded."""
@@ -180,29 +181,32 @@ class Requests:
             found = self.index.get(("compare", item["target"]["a"], item["target"]["b"]))
         if found is None:
             return None
-        parts, prompt, sent = found
-        split = {"extract": "\nSource type:", "compare": "\nA="}.get(parts[0])
-        if split and split in prompt:
-            at = prompt.index(split)
-            instructions, query = prompt[:at], prompt[at + 1:]
-        else:  # situating: the instructions are the template, which ends before the first blank line
-            instructions, _, query = prompt.partition("\n\n")
+        r, prompt, sent = found
+        if r["role"] == "extract":
+            from .extract import ExtractQuery
+            asked = ExtractQuery.read(prompt)
+            instructions, query = asked.instructions, asked.request
+        else:  # the role's instructions, known, then what this request was given
+            from .compare import instructions as comparing
+            from .situate import instructions as situating
+            instructions = comparing(r["mode"] or "proposals") if r["role"] == "compare" else situating(r["kind"])
+            query = prompt[len(instructions):] if prompt.startswith(instructions) else prompt
         images = []
-        if parts[0] == "extract" and parts[5]:
-            rect, side = parts[5]
+        if r["role"] == "extract" and r["crop"]:
+            rect, side = r["crop"]
             content, page_no = item["target"].get("content") or e["content"], e["locator"]["page"]
             images.append({"src": self._render(source, folder, content, page_no, rect, side, item["id"]),
                            "caption": "The image the model was sent"})
-        elif sent and parts[0] == "triage":  # the figure's crop (re-rendered for review)
+        elif sent and r["role"] == "triage":  # the figure's crop (re-rendered for review)
             images.append(dict(item["images"][0], caption="The figure image the model was sent (re-rendered)"))
         elif sent:  # comparisons: each claim's source crop
             images += [dict(i, caption=i["caption"] + " (the model was sent its source image)")
                        for i in item["images"] if "crop" in i["src"]][:sent]
-        kind = parts[1] if parts[0] != "compare" else parts[1] or "proposals"
-        described = {"summary": REQUEST_SUMMARIES.get((parts[0], kind), parts[0]), "instructions": instructions.strip(),
+        kind = r.get("region") or r.get("kind") or r.get("mode") or "proposals"
+        described = {"summary": REQUEST_SUMMARIES.get((r["role"], kind), r["role"]), "instructions": instructions.strip(),
                      "query": query.strip(), "images": images}
-        if parts[0] == "extract":  # the key records the heading the model was given
-            described["heading"] = parts[6] or "(none)"
+        if r["role"] == "extract":  # the key records the heading the model was given
+            described["heading"] = r["heading"] or "(none)"
         return described
 
     def _render(self, source, folder, content, page_no, rect, side, stem):

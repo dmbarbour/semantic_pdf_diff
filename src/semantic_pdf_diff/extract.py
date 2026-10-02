@@ -42,6 +42,36 @@ If you are not sure how to read a chart, diagram or drawing convention, say so i
 readings approximate; do not guess what an unexplained symbol, colour or line style means.
 '''
 
+@dataclass(frozen=True)
+class ExtractQuery:
+    """An extraction request's text in parts: the one owner of its layout (code review 2026-10-01, A1: prompts were
+    assembled inline and parsed back at markers in three places). prompt() is the bytes sent; read() takes a logged
+    prompt back into its parts, so no reader splits at markers of its own."""
+    instructions: str  # the template with its claim cap filled, then the rules (the configuration's, the region's)
+    region: str
+    heading: str = ""  # the headings the region falls under
+    context: str = ""  # CONTEXT_NOTE and the levers' lines
+    data: str = ""     # the source data: text, a table row, or an image task's note and text layer
+
+    def prompt(self):
+        return (self.instructions + "\nSource type: " + self.region + (f"\nSection: {self.heading}" if self.heading else "")
+                + (f"\n{self.context}" if self.context else "") + "\nSOURCE DATA:\n" + self.data)
+
+    @property
+    def request(self):
+        """The part after the instructions: what this task, not every task, was given."""
+        return self.prompt()[len(self.instructions) + 1:]
+
+    @classmethod
+    def read(cls, prompt):
+        instructions, _, rest = prompt.partition("\nSource type: ")
+        head, _, data = rest.partition("\nSOURCE DATA:\n")
+        region, _, tail = head.partition("\n")
+        heading = ""
+        if tail.startswith("Section: "):
+            heading, _, tail = tail[len("Section: "):].partition("\n")
+        return cls(instructions, region, heading, tail, data)
+
 def extraction_template(s):
     """The extraction instructions in force: the baseline, or a variant's (with {max_claims} unfilled)."""
     return s.instructions(EXTRACT)
@@ -795,10 +825,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         heading = " | ".join(" > ".join(x.heading_path) for x in page_section.spanned_box(page_no, bbox)
                              if x.heading_path)
         rules = s.region_rules(region)
-        prompt = (extraction_template(s).replace("{max_claims}", str(s.claims_per_request)) + rules
-                  + "\nSource type: " + region
-                  + (f"\nSection: {heading}" if heading else "") + (f"\n{context}" if context else "")
-                  + "\nSOURCE DATA:\n" + text)
+        prompt = ExtractQuery(extraction_template(s).replace("{max_claims}", str(s.claims_per_request)) + rules,
+                              region, heading, context, text).prompt()
         key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
         if context:  # only then, so requests without context keep their recorded keys
             key += (hashlib.sha256(context.encode()).hexdigest(),)

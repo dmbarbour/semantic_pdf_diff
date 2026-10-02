@@ -162,11 +162,24 @@ def query_hash(prompt, image_hashes, params):
     canonical = {"system": SYSTEM, "user": prompt, "images": list(image_hashes), "params": params}
     return hashlib.sha256(json.dumps(canonical, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
-def describe(prompt, image_sizes, params):
+# A recipe (the caller's key tuple: how the pipeline built a query; labels only, never how answers are found) is
+# read by position; these name the positions, by role. What follows the named ones is the role's extras.
+RECIPES = {"extract": ("region", "content", "task", "text", "crop", "heading"),
+           "triage": ("kind", "content", "id", "inputs"),
+           "compare": ("mode", "settings", "a", "b")}
+
+def recipe_fields(parts):
+    """{role, its named fields, extras} of a recipe."""
+    parts = list(parts or ())
+    role = parts[0] if parts else ""
+    names = RECIPES.get(role, ())
+    return {"role": role, **dict(zip(names, parts[1:])), "extras": parts[1 + len(names):]}
+
+def describe(prompt, image_sizes, params, key=None):
     """Facts about a query's own content, for fixture summaries: nothing the model didn't see."""
-    source = re.search(r"^Source type: (\S+)", prompt, re.MULTILINE)
+    fields = recipe_fields(key)
     return {"template": hashlib.sha256(prompt.split("\n", 1)[0].encode()).hexdigest()[:12],
-            "source_type": source.group(1) if source else "", "text_chars": len(prompt),
+            "source_type": fields.get("region", "") if fields["role"] == "extract" else "", "text_chars": len(prompt),
             "image_bytes": list(image_sizes), "params": params}
 
 @dataclass
@@ -326,7 +339,7 @@ class Client:
             body.update(stream=True, stream_options={"include_usage": True})
         raw = json.dumps(body).encode()
         return Request(raw, request_hash, key, schema, estimate + self.s.output_tokens, prompt, tuple(hashes),
-                       query=query, description=describe(prompt, sizes, params))
+                       query=query, description=describe(prompt, sizes, params, key))
 
     def _sample(self, request):
         """Which answer to a query this run wants: 0, or 1 for the A/A control's fresh regions."""
