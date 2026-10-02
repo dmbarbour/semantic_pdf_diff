@@ -371,3 +371,15 @@ None now. The owner's reading of the full review may add some.
     - `NO_MODEL` names the address nothing answers (once a literal in nine places).
     - The CLI parses arguments into these. `controlled.py`, `record_runs.py` and `query_snapshot.py` call the pipeline instead of building command lines. `--plan` stays a CLI feature.
     - A replay of one development run through the converted `record_runs` gives HEAD's counts (1,121 replayed, 107 unrecorded) and the same findings.
+  - **7d, the `RoundRunner`: done.** Milestone 7 is done.
+    - `scripts/run_round.py`'s 330-line closure is a class. Each step is a method returning an exit code to stop at (2 refused, 3 paused, 4 held) or `None` to go on:
+      - refuse private slices, record, replay, measure, check, pairs, judge, leftovers, report
+    - Judging's parts are methods too: ask, settle, finish a variant, post-mortem, confirm.
+    - The paths, the manifest, the recorder and `client_for()` (a model client over a folder's fixture) are attributes, so tests drive the steps with stubs.
+    - `tests/test_round_runner.py` covers:
+      - a private slice refused before anything runs
+      - every variant recorded, then replayed, with its settings and the A/A control's fresh regions, and nothing repeated on resuming
+      - recording paused at the round's cap
+      - flagged queries holding the round until accepted
+      - criteria changed after judging began, refused
+    - `--only decide` is still accepted and checked by no step, as the review noted. It's left for the owner's word on whether to drop it.
