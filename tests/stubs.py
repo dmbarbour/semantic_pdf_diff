@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import unittest
 from pathlib import Path
 
 # Tests run with a clean environment: PDF_DIFF_* and OPENAI_* exported in a shell (the scripts say to source .env)
@@ -9,6 +10,14 @@ from pathlib import Path
 # module imports this module.
 for _name in [n for n in os.environ if n.startswith(("PDF_DIFF_", "OPENAI_"))]:
     del os.environ[_name]
+
+# A quick run for iterating (QUICK=1 python -m unittest discover -s tests): the slowest tests skipped, about two thirds
+# of the time (docs/plans/quick-wins-2026-10-02.md). Every commit is still checked by the full suite.
+QUICK = bool(os.environ.get("QUICK"))
+
+def slow(item):
+    """Mark a test, or a class whose setup is the slow part, to be skipped in a quick run."""
+    return unittest.skipIf(QUICK, "slow: skipped in a quick run (QUICK=1)")(item)
 
 # The query settings before the improvement rounds' champion became the defaults (2026-09-28):
 # tests of mechanics (refinement, tiling, prompt layout) that don't depend on the levers use these.

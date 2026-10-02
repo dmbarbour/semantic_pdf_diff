@@ -13,7 +13,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import pymupdf
 from semantic_pdf_diff import cli
-from stubs import situating_answer
+from stubs import situating_answer, slow
 
 @contextlib.contextmanager
 def jittery_model():
@@ -86,6 +86,7 @@ def make_pdf(path, pages):
     doc.save(path); doc.close()
     return path
 
+@slow
 class Determinism(unittest.TestCase):
     def run_with(self, root, a, b, url, workers):
         config = root / f'config-{workers}.json'

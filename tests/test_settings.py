@@ -4,6 +4,7 @@ extraction query, and a shaping or selecting one changes some query (else it's d
 See docs/plans/content-addressed-queries-2026-09-28.md, milestone 1.
 """
 import stubs  # noqa: F401 (a clean environment)
+from stubs import slow
 import contextlib
 import io
 import json
@@ -100,6 +101,7 @@ def saved(doc, path):
     doc.close()
     return path
 
+@slow
 class SettingsKeepToTheirClass(unittest.TestCase):
     longMessage = False  # the sets of digests say nothing; the counts in each message do
     @classmethod

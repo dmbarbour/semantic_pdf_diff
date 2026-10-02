@@ -20,7 +20,7 @@ import unittest
 from pathlib import Path
 import pymupdf
 import stubs
-from stubs import ROUND0
+from stubs import ROUND0, slow
 from semantic_pdf_diff import cli
 from test_concurrency import jittery_model
 from test_settings import document
@@ -112,6 +112,7 @@ class AbsentIsOff(unittest.TestCase):
                 **{k: v for k, v in ROUND0.items() if k != "levers" and k not in fields}}
         self.assertEqual(transcript(lean, False), self.golden("round0"), f"without {off}")
 
+    @slow
     def test_every_lever_off_is_no_lever_at_all(self):
         from semantic_pdf_diff.levers import LEVER_CLASSES
         off = {f: v for lever in LEVER_CLASSES for f, v in lever.off.items()}

@@ -7,6 +7,7 @@ The product is `src/semantic_pdf_diff`. The lab, how it's measured and improved 
 ```bash
 pip install -e '.[dev]' -e lab
 python -m unittest discover -s tests -v
+QUICK=1 python -m unittest discover -s tests    # skips the slowest tests (marked @slow): for iterating, not for commits
 python examples/demo.py
 ```
 

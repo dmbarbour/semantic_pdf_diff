@@ -1,5 +1,6 @@
 """Controlled documents: generated the same way every time, every fact placed, claims classed exactly."""
 import stubs  # noqa: F401 (a clean environment)
+from stubs import slow
 import unittest
 from semantic_pdf_diff_lab.bench import controlled
 
@@ -402,6 +403,7 @@ class Replay(unittest.TestCase):
                 result = controlled.score(key, found)
                 self.assertEqual((result["recall"], result["outcomes"]), (committed[run]["recall"], committed[run]["outcomes"]))
 
+@slow
 class Corpus(unittest.TestCase):
     """Every committed document is generated again byte for byte, so recorded answers keep replaying (a drawing
     change that moved one chart's bytes once went unnoticed until a run had started)."""

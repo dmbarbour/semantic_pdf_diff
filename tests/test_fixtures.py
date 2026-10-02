@@ -1,4 +1,5 @@
 import stubs  # noqa: F401 (a clean environment)
+from stubs import slow
 import contextlib
 import io
 import json
@@ -123,6 +124,7 @@ class RecordAndReplay(unittest.TestCase):
             self.assertEqual((self.root / 'one' / name).read_bytes(), (self.root / 'two' / name).read_bytes(), name)
         self.assertIn('"created_at": "2026-09-21T', (self.root / 'one' / 'report.json').read_text())
 
+    @slow
     def test_unrecorded_requests_fail_visibly(self):
         self.record()
         with sqlite3.connect(self.fixture) as db:
@@ -140,6 +142,7 @@ class RecordAndReplay(unittest.TestCase):
         self.assertTrue(all('No recorded answer' in r['issues'][0] for r in unreached))
         self.assertFalse([r for r in report['coverage'] if r['status'] == 'failed'])
 
+    @slow
     def test_recorded_failures_replay_as_failures_and_are_retried_when_recording(self):
         self.record()
         with sqlite3.connect(self.fixture) as db:
@@ -161,6 +164,7 @@ class RecordAndReplay(unittest.TestCase):
         with sqlite3.connect(self.fixture) as db:
             self.assertEqual(db.execute('SELECT COUNT(*) FROM response WHERE error IS NOT NULL').fetchone()[0], 0)
 
+    @slow
     def test_an_aa_control_asks_its_regions_afresh_and_replays_them_apart(self):
         import sqlite3
         self.record()
@@ -180,6 +184,7 @@ class RecordAndReplay(unittest.TestCase):
                                        '--fresh-regions', 'tile,overview', '--no-situate')
         self.assertEqual(report['usage']['fixture']['missing'], 0)  # replayed from the control's own answers
 
+    @slow
     def test_prune_keeps_what_the_latest_runs_used(self):
         from semantic_pdf_diff.fixtures import Fixture, _now
         import time
@@ -197,6 +202,7 @@ class RecordAndReplay(unittest.TestCase):
         _, report, _ = self.run_cli('again', UNREACHABLE, '--fixture', str(self.fixture))
         self.assertEqual(report['usage']['fixture']['missing'], 0)
 
+    @slow
     def test_prune_refuses_on_a_replay_that_missed(self):
         from semantic_pdf_diff.fixtures import Fixture, FixtureError, _now
         import time
@@ -248,6 +254,7 @@ class RecordAndReplay(unittest.TestCase):
             self.assertLessEqual(state['requests'], 5 + 4)  # the cap, plus requests already in flight
             self.assertTrue(any(r['status'] == 'not_reached' for r in report['coverage']))
 
+    @slow
     def test_responders_and_changed_queries_are_kept_apart(self):
         self.record('--responder', 'model-a')
         _, other, _ = self.run_cli('b', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-b')

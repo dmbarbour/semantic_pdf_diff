@@ -5,6 +5,7 @@ and the same PyMuPDF version the fixture was recorded with; otherwise it skips. 
 differ between responders, so outcomes are checked for shape, not exact content.
 """
 import stubs  # noqa: F401 (a clean environment)
+from stubs import slow
 import contextlib
 import io
 import json
@@ -38,6 +39,7 @@ def unavailable():
     return None
 
 @unittest.skipIf(unavailable(), unavailable())
+@slow
 class ReplaySlices(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
