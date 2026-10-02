@@ -245,30 +245,54 @@ def folder_client(folder, settings, mode="replay-or-record", responder=None):
     finally:
         client.close()
 
-class Client:
-    """Chat Completions client with a response cache.
+def build_request(s, prompt, schema, images=(), key=None):
+    """A request for a `schema` object under settings s: its body, its hashes (what it asks), and facts about it
+    (main thread: reads image files). Raises BudgetExceeded if it would overrun the context budget."""
+    # UTF-8 bytes deliberately overestimate typical text tokenization. Image tokens
+    # are provider-specific: the operator must configure their upper bound.
+    estimate = len((SYSTEM + prompt).encode()) + len(images) * s.image_tokens + 128
+    if estimate + s.output_tokens + s.safety_tokens > s.context_tokens:
+        raise BudgetExceeded(f"Request exceeds configured context budget ({estimate} estimated input tokens)")
+    content = [{"type": "text", "text": prompt}]
+    hashes, sizes = [], []
+    for path in images:
+        raw_image = Path(path).read_bytes()
+        hashes.append(hashlib.sha256(raw_image).hexdigest())
+        sizes.append(len(raw_image))
+        data = base64.b64encode(raw_image).decode()
+        content.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + data}})
+    body = {"model": s.model, "messages": [
+        {"role": "system", "content": SYSTEM}, {"role": "user", "content": content}],
+        s.max_token_field: s.output_tokens}
+    body["temperature"] = TEMPERATURE
+    if s.seed is not None:
+        body["seed"] = s.seed
+    if s.response_format == "json_object":
+        body["response_format"] = {"type": "json_object"}
+    elif s.response_format == "json_schema":
+        body["response_format"] = {"type": "json_schema", "json_schema": {
+            "name": schema.__name__, "schema": schema.model_json_schema()}}
+    # The hash names what is asked; how the answer travels (streamed or not) isn't part of it,
+    # so cached answers still match.
+    request_hash = hashlib.sha256(s.base_url.encode() + json.dumps(body).encode()
+                                  + json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()
+    params = {k: v for k, v in body.items() if k not in ("model", "messages")}
+    query = query_hash(prompt, hashes, params)
+    if s.stream:
+        body.update(stream=True, stream_options={"include_usage": True})
+    raw = json.dumps(body).encode()
+    return Request(raw, request_hash, key, schema, estimate + s.output_tokens, prompt, tuple(hashes),
+                   query=query, description=describe(prompt, sizes, params, key))
 
-    `cache` is either a Store, whose response cache is keyed by the query that reached the
-    model and the model, or a folder for a byte-keyed file cache (for library use without a store),
-    or None when a fixture holds every answer (see folder_client).
-    """
-    def __init__(self, settings: Settings, cache, api_key: str | None = None, fixture=None, mode="replay",
-                 responder=None, fresh_regions=None):
-        """fixture: an open fixtures.Fixture, replayed under its policy (fixtures.Replayer: mode, responder,
-        fresh_regions). In `replay` mode answers come only from it and unrecorded requests fail; in
-        `replay-or-record` mode unrecorded requests (and recorded failures) go to the model and are recorded under
-        `responder` (default: the model name); `record-new` is the same but replays the model's failures as
-        failures (transient ones are asked again)."""
-        from .fixtures import Replayer
+class Transport:
+    """Sending requests to the endpoint: retries, rate limits and adaptive concurrency, streamed answers, usage and
+    cost, and the budget's stops (code review 2026-10-01, A4: llm.Client was request building, transport and
+    answers in one). Thread-safe."""
+
+    def __init__(self, settings, api_key=None):
         self.s = settings
-        self.replay = None if fixture is None else Replayer(fixture, mode, responder or settings.model, fresh_regions)
-        self.store = None if cache is None or isinstance(cache, (str, Path)) else cache
-        self.cache = Path(cache) if isinstance(cache, (str, Path)) else None
-        if self.cache is not None:
-            self.cache.mkdir(parents=True, exist_ok=True)
         self.api_key = api_key if api_key is not None else os.getenv("OPENAI_API_KEY", "")
         self.calls = 0
-        self.cache_hits = 0
         self.usage = {"prompt_tokens": 0, "completion_tokens": 0}
         self.cost = 0.0             # as the provider reports it (usage.estimated_cost)
         self.out_of_budget = None   # why sending stopped, once it has
@@ -282,127 +306,8 @@ class Client:
             print(f"Warning: sending OPENAI_API_KEY over unencrypted HTTP to {redact_url(settings.base_url)}",
                   file=sys.stderr)
 
-    def ask(self, prompt, schema, images=(), key=None):
-        """Ask the model for a `schema` object: prepare, look up, send and save in one call.
-
-        key: the recipe, a tuple (kind, region, *parts) saying how the query was built (content,
-        locator, input hash, crop). It labels the query in fixtures and the store's query log;
-        answers are found by the query itself (query_hash), never by the recipe.
-        """
-        request = self.prepare(prompt, schema, images, key)
-        cached = self.cached(request)
-        if cached is not None:
-            return cached
-        try:
-            value = self.send(request)
-        except ModelFailure as e:
-            self.failed(request, e)
-            raise
-        self.save(request, value)
-        return value
-
-    def prepare(self, prompt, schema, images=(), key=None):
-        """Build a request (main thread: reads image files). Raises BudgetExceeded if too large."""
-        # UTF-8 bytes deliberately overestimate typical text tokenization. Image tokens
-        # are provider-specific: the operator must configure their upper bound.
-        estimate = len((SYSTEM + prompt).encode()) + len(images) * self.s.image_tokens + 128
-        if estimate + self.s.output_tokens + self.s.safety_tokens > self.s.context_tokens:
-            raise BudgetExceeded(f"Request exceeds configured context budget ({estimate} estimated input tokens)")
-        content = [{"type": "text", "text": prompt}]
-        hashes, sizes = [], []
-        for path in images:
-            raw_image = Path(path).read_bytes()
-            hashes.append(hashlib.sha256(raw_image).hexdigest())
-            sizes.append(len(raw_image))
-            data = base64.b64encode(raw_image).decode()
-            content.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + data}})
-        body = {"model": self.s.model, "messages": [
-            {"role": "system", "content": SYSTEM}, {"role": "user", "content": content}],
-            self.s.max_token_field: self.s.output_tokens}
-        body["temperature"] = TEMPERATURE
-        if self.s.seed is not None:
-            body["seed"] = self.s.seed
-        if self.s.response_format == "json_object":
-            body["response_format"] = {"type": "json_object"}
-        elif self.s.response_format == "json_schema":
-            body["response_format"] = {"type": "json_schema", "json_schema": {
-                "name": schema.__name__, "schema": schema.model_json_schema()}}
-        # The hash names what is asked; how the answer travels (streamed or not) isn't part of it,
-        # so cached answers still match.
-        request_hash = hashlib.sha256(self.s.base_url.encode() + json.dumps(body).encode()
-                                      + json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()
-        params = {k: v for k, v in body.items() if k not in ("model", "messages")}
-        query = query_hash(prompt, hashes, params)
-        if self.s.stream:
-            body.update(stream=True, stream_options={"include_usage": True})
-        raw = json.dumps(body).encode()
-        return Request(raw, request_hash, key, schema, estimate + self.s.output_tokens, prompt, tuple(hashes),
-                       query=query, description=describe(prompt, sizes, params, key))
-
-    @property
-    def fixture(self):
-        return self.replay and self.replay.fixture
-
-    @property
-    def mode(self):
-        return self.replay.mode if self.replay else None
-
-    @property
-    def responder(self):
-        return self.replay.responder if self.replay else self.s.model
-
-    def close(self):
-        """Close the fixture, if any, logging this run's use of it."""
-        if self.replay is not None:
-            self.replay.close()
-
-    @staticmethod
-    def _recorded(text, schema):
-        try:
-            return schema.model_validate_json(text)
-        except ValueError as e:
-            raise ModelFailure(f"Recorded answer no longer fits {schema.__name__}: {e}") from e
-
-    def cached(self, request):
-        """The cached response, or None (main thread: the store is single-threaded).
-
-        With a fixture, only the fixture answers: the store's cache may hold another
-        responder's answers. Either way, a store keeps the query's recipe and text, to see
-        what each task was asked (diagnostics; never used for lookup)."""
-        if self.store is not None and request.key is not None:
-            self.store.note_query(request.query, request.key, request.prompt, request.images)
-        if self.replay is not None:
-            kind, value = self.replay.lookup(request.query, request.key,
-                                             lambda text: self._recorded(text, request.schema))
-            if kind == "failure":
-                raise ModelFailure(f"Recorded failure: {value}")
-            request.unrecorded = kind == "unrecorded"
-            return value
-        value = self._lookup(request)
-        if value is not None:
-            self.cache_hits += 1
-        return value
-
-    def save(self, request, value):
-        """Cache a response (main thread); in record mode, also record it in the fixture."""
-        self._save(request, value)
-        self._record(request, value.model_dump_json(), None)
-
-    def failed(self, request, error):
-        """Note a failed request (main thread): in record mode, the model's failure is recorded
-        so replay reproduces it. Unrecorded answers and call limits aren't the model's doing."""
-        if not isinstance(error, (NotRecorded, CallLimitReached)):
-            self._record(request, "", f"{type(error).__name__}: {error}")
-
-    def _record(self, request, answer, error):
-        if self.replay is not None:
-            self.replay.record(request.query, request.key, answer, error, request.usage, request.description)
-
     def send(self, request):
-        """Call the model, with retries (thread-safe; touches neither the cache nor the store)."""
-        if request.unrecorded:
-            raise NotRecorded(f"No recorded answer from {self.responder} for "
-                              f"{request.key[:2] + request.key[3:4] if request.key else request.query}")
+        """Call the model, with retries (thread-safe)."""
         last = "Unknown model failure"
         for attempt in range(self.s.retries + 1):
             with self.lock:
@@ -493,6 +398,130 @@ class Client:
             if attempt < self.s.retries:
                 time.sleep(wait)
         raise ModelFailure(last)
+
+class Client:
+    """Chat Completions client with a response cache.
+
+    `cache` is either a Store, whose response cache is keyed by the query that reached the
+    model and the model, or a folder for a byte-keyed file cache (for library use without a store),
+    or None when a fixture holds every answer (see folder_client).
+    """
+    def __init__(self, settings: Settings, cache, api_key: str | None = None, fixture=None, mode="replay",
+                 responder=None, fresh_regions=None):
+        """fixture: an open fixtures.Fixture, replayed under its policy (fixtures.Replayer: mode, responder,
+        fresh_regions). In `replay` mode answers come only from it and unrecorded requests fail; in
+        `replay-or-record` mode unrecorded requests (and recorded failures) go to the model and are recorded under
+        `responder` (default: the model name); `record-new` is the same but replays the model's failures as
+        failures (transient ones are asked again)."""
+        from .fixtures import Replayer
+        self.s = settings
+        self.replay = None if fixture is None else Replayer(fixture, mode, responder or settings.model, fresh_regions)
+        self.store = None if cache is None or isinstance(cache, (str, Path)) else cache
+        self.cache = Path(cache) if isinstance(cache, (str, Path)) else None
+        if self.cache is not None:
+            self.cache.mkdir(parents=True, exist_ok=True)
+        self.cache_hits = 0
+        self.transport = Transport(settings, api_key)
+
+    def ask(self, prompt, schema, images=(), key=None):
+        """Ask the model for a `schema` object: prepare, look up, send and save in one call.
+
+        key: the recipe, a tuple (kind, region, *parts) saying how the query was built (content,
+        locator, input hash, crop). It labels the query in fixtures and the store's query log;
+        answers are found by the query itself (query_hash), never by the recipe.
+        """
+        request = self.prepare(prompt, schema, images, key)
+        cached = self.cached(request)
+        if cached is not None:
+            return cached
+        try:
+            value = self.send(request)
+        except ModelFailure as e:
+            self.failed(request, e)
+            raise
+        self.save(request, value)
+        return value
+
+    def prepare(self, prompt, schema, images=(), key=None):
+        """Build a request (build_request, under this client's settings)."""
+        return build_request(self.s, prompt, schema, images, key)
+
+    # What the transport counts, as the client's (callers read and set these on the client).
+    calls = property(lambda self: self.transport.calls)
+    usage = property(lambda self: self.transport.usage)
+    cost = property(lambda self: self.transport.cost)
+    unpriced = property(lambda self: self.transport.unpriced)
+    out_of_budget = property(lambda self: self.transport.out_of_budget)
+    limiter = property(lambda self: self.transport.limiter)
+    gate = property(lambda self: self.transport.gate)
+    api_key = property(lambda self: self.transport.api_key)
+    ledger = property(lambda self: self.transport.ledger, lambda self, ledger: setattr(self.transport, "ledger", ledger))
+
+    @property
+    def fixture(self):
+        return self.replay and self.replay.fixture
+
+    @property
+    def mode(self):
+        return self.replay.mode if self.replay else None
+
+    @property
+    def responder(self):
+        return self.replay.responder if self.replay else self.s.model
+
+    def close(self):
+        """Close the fixture, if any, logging this run's use of it."""
+        if self.replay is not None:
+            self.replay.close()
+
+    @staticmethod
+    def _recorded(text, schema):
+        try:
+            return schema.model_validate_json(text)
+        except ValueError as e:
+            raise ModelFailure(f"Recorded answer no longer fits {schema.__name__}: {e}") from e
+
+    def cached(self, request):
+        """The cached response, or None (main thread: the store is single-threaded).
+
+        With a fixture, only the fixture answers: the store's cache may hold another
+        responder's answers. Either way, a store keeps the query's recipe and text, to see
+        what each task was asked (diagnostics; never used for lookup)."""
+        if self.store is not None and request.key is not None:
+            self.store.note_query(request.query, request.key, request.prompt, request.images)
+        if self.replay is not None:
+            kind, value = self.replay.lookup(request.query, request.key,
+                                             lambda text: self._recorded(text, request.schema))
+            if kind == "failure":
+                raise ModelFailure(f"Recorded failure: {value}")
+            request.unrecorded = kind == "unrecorded"
+            return value
+        value = self._lookup(request)
+        if value is not None:
+            self.cache_hits += 1
+        return value
+
+    def save(self, request, value):
+        """Cache a response (main thread); in record mode, also record it in the fixture."""
+        self._save(request, value)
+        self._record(request, value.model_dump_json(), None)
+
+    def failed(self, request, error):
+        """Note a failed request (main thread): in record mode, the model's failure is recorded
+        so replay reproduces it. Unrecorded answers and call limits aren't the model's doing."""
+        if not isinstance(error, (NotRecorded, CallLimitReached)):
+            self._record(request, "", f"{type(error).__name__}: {error}")
+
+    def _record(self, request, answer, error):
+        if self.replay is not None:
+            self.replay.record(request.query, request.key, answer, error, request.usage, request.description)
+
+    def send(self, request):
+        """Call the model through the transport (thread-safe; touches neither the cache nor the store)."""
+        if request.unrecorded:
+            raise NotRecorded(f"No recorded answer from {self.responder} for "
+                              f"{request.key[:2] + request.key[3:4] if request.key else request.query}")
+        return self.transport.send(request)
 
     def _cache_key(self, request):
         """The store cache's key: the query and the model answering it."""

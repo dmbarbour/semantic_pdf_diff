@@ -119,7 +119,7 @@ class DocumentTypes(unittest.TestCase):
 class CliTests(unittest.TestCase):
     def run_cli(self, root, a, b):
         client = Recorder(vision=False)
-        with patch('semantic_pdf_diff.cli.Client', lambda settings, cache: client), \
+        with patch('semantic_pdf_diff.pipeline.Client', lambda settings, cache: client), \
              contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
             code = main([str(a), str(b), '--out', str(root / 'out'), '--no-vision'])
         return code, client

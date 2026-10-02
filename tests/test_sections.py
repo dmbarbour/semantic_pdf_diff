@@ -560,7 +560,7 @@ class Provenance(unittest.TestCase):
             b = make_pdf(root / 'b.pdf', ['Pump rated power 12 kW'])
             for _ in range(2):
                 client = Recorder(vision=False)
-                with patch('semantic_pdf_diff.cli.Client', lambda settings, store: client), \
+                with patch('semantic_pdf_diff.pipeline.Client', lambda settings, store: client), \
                      contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                     cli.main([str(a), str(b), '--out', str(root / 'out'), '--no-vision'])
                 report = json.loads((root / 'out/report.json').read_text())

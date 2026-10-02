@@ -360,3 +360,14 @@ None now. The owner's reading of the full review may add some.
     - `sections`: the section index and section text
 
     `extract` keeps the prompt, `ExtractQuery`, text grouping and the extraction pipeline (1,070 lines to 554), and re-exports the names callers import from it. A move: requests unchanged (golden requests, a query snapshot of every slice).
+  - **7b, `llm.Client` split: done.**
+    - `build_request()` builds a request from settings (once `Client.prepare`); request bodies are byte for byte as before.
+    - `Transport` sends it: retries, rate limits, the adaptive gate, streaming, usage, cost, the budget's stops, the ledger.
+    - `Client` keeps the cache and the replay and composes the two. Its counters stay readable as properties, and the ledger settable.
+  - **7c, `pipeline.py` out of the CLI: done.**
+    - The run moved from the CLI: binding, scanning, extracting, situating, comparing and reporting.
+    - `RunOptions` holds what a run takes besides settings: mode, reset, dry run, fixture and its mode, responder, fresh regions, ledger.
+    - `compare_paths()` is the shortcut comparison; `settings_from()` gives settings as `--config` does; `attempt()` reports errors as the CLI does.
+    - `NO_MODEL` names the address nothing answers (once a literal in nine places).
+    - The CLI parses arguments into these. `controlled.py`, `record_runs.py` and `query_snapshot.py` call the pipeline instead of building command lines. `--plan` stays a CLI feature.
+    - A replay of one development run through the converted `record_runs` gives HEAD's counts (1,121 replayed, 107 unrecorded) and the same findings.

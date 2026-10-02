@@ -33,7 +33,9 @@ CONFIGS = {  # name: (settings over the recording's base, whole pipeline or extr
 }
 
 def take(target, fixture):
-    from semantic_pdf_diff import cli
+    from semantic_pdf_diff import pipeline
+    from semantic_pdf_diff.progress import setup_logging
+    setup_logging(quiet=True)
     from semantic_pdf_diff.store import Store
     manifest = json.loads(record_runs.MANIFEST.read_text())
     snapshot = {}
@@ -45,11 +47,11 @@ def take(target, fixture):
                     else [(s["name"], [s["name"], s["name"]]) for s in manifest["slices"]])
             for run, slices in runs:
                 out = Path(d) / name / run
-                command = [str(ROOT / "samples/slices" / f"{s}.pdf") for s in slices] + [
-                    "--config", str(config), "-q", "--out", str(out), "--fixture", str(fixture),
-                    "--fixture-mode", "replay", "--base-url", "http://127.0.0.1:9/v1"] + ([] if whole else ["--no-situate"])
+                a, b = (ROOT / "samples/slices" / f"{s}.pdf" for s in slices)
+                settings = pipeline.settings_from(config, base_url=pipeline.NO_MODEL, **({} if whole else {"situate": False}))
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                    cli.main(command)
+                    pipeline.attempt(pipeline.compare_paths, a, b, out, settings,
+                                     pipeline.RunOptions(fixture=Path(fixture), fixture_mode="replay"))
                 with Store.open(out) as store:
                     for q in store.queries():
                         snapshot[f"{name}|{run}|{q['role']}|{q['content'][7:19]}|{q['task']}"] = q["hash"]

@@ -42,7 +42,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     sys.path.insert(0, str(ROOT / "src"))
-    from semantic_pdf_diff import cli
+    from semantic_pdf_diff import cli, pipeline
+    from semantic_pdf_diff.progress import setup_logging
+    setup_logging(quiet=True)
 
     manifest = json.loads(MANIFEST.read_text())
     runs = [r for r in manifest["runs"] if (args.set == "all" or r["set"] == args.set) and (not args.run or r["name"] in args.run)]
@@ -77,24 +79,23 @@ def main(argv=None):
                 cli.main(command + ["--plan"])
             print(run["name"], json.dumps(json.loads(buffer.getvalue())["total"]))
             continue
-        command += ["--out", str(args.out / run["name"]), "--fixture", str(args.fixture),
-                    "--fixture-mode", "replay" if args.replay else "replay-or-record" if args.retry_failures else "record-new"]
+        overrides = {"situate": False} if args.extract_only else {}
         if args.replay:
-            command += ["--base-url", "http://127.0.0.1:9/v1"]
-        if args.responder:
-            command += ["--responder", args.responder]
-        if args.fresh_regions:
-            command += ["--fresh-regions", args.fresh_regions]
-        if args.ledger:
-            command += ["--ledger", str(args.ledger)] + [f"--ledger-tag={t}" for t in args.tag + [f"run={run['name']}"]]
+            overrides["base_url"] = pipeline.NO_MODEL
         if args.max_cost:  # a cap for the whole recording, not per slice (each run's client starts at 0)
             spent = (ledger.spent(args.ledger, **tags) - spent_before) if args.ledger and args.ledger.exists() else 0.0
             left = args.max_cost - spent
             if left <= 0:
                 print(f"{run['name']}: cap of ${args.max_cost} reached", flush=True)
                 return 3
-            command += ["--max-cost", f"{left:.4f}"]
-        code = cli.main(command)
+            overrides["max_cost"] = round(left, 4)
+        options = pipeline.RunOptions(
+            fixture=args.fixture, responder=args.responder,
+            fixture_mode="replay" if args.replay else "replay-or-record" if args.retry_failures else "record-new",
+            fresh_regions=tuple(r for r in (args.fresh_regions or "").split(",") if r),
+            ledger=args.ledger, ledger_tags={**tags, "run": run["name"]} if args.ledger else {})
+        code = pipeline.attempt(pipeline.compare_paths, a, b, args.out / run["name"], pipeline.settings_from(config, **overrides),
+                                options)
         print(f"{run['name']}: exit {code}", flush=True)
         if code == 3:  # out of budget: stop; rerunning resumes
             return 3

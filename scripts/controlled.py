@@ -54,7 +54,8 @@ def main(argv=None):
             print(f"{controlled.write(project, DOCS)}: {len(project.facts)} facts")
         return 0
     if args.command == "run":
-        from semantic_pdf_diff import cli, ledger
+        from semantic_pdf_diff import ledger, pipeline
+        from semantic_pdf_diff.progress import setup_logging
         out = RUNS / ("replay" if args.replay else "recorded")
         if args.replay and not args.responder:  # the responder the fixture holds, whatever the environment says
             with fixtures.open(PACKED, "read") as f:
@@ -65,22 +66,20 @@ def main(argv=None):
         config = settings_file()
         before = ledger.spent(LEDGER, round="controlled") if LEDGER.exists() else 0.0
         worst = 0
+        setup_logging(quiet=True)
         for pdf in sorted(DOCS.glob("*.pdf")):
-            command = [str(pdf), str(pdf), "--config", str(config), "-q", "--no-situate", "--out", str(out / pdf.stem),
-                       "--fixture", str(PACKED if args.replay else WORKING),
-                       "--fixture-mode", "replay" if args.replay else "record-new"]
+            options = pipeline.RunOptions(fixture=PACKED if args.replay else WORKING,
+                                          fixture_mode="replay" if args.replay else "record-new", responder=args.responder)
             if args.replay:
-                command += ["--base-url", "http://127.0.0.1:9/v1"]
+                settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL)
             else:
                 left = args.max_cost - (ledger.spent(LEDGER, round="controlled") - before)
                 if left <= 0:
                     print(f"cap of ${args.max_cost} reached")
                     return 3
-                command += ["--max-cost", f"{left:.4f}", "--ledger", str(LEDGER), "--ledger-tag=round=controlled",
-                            f"--ledger-tag=run={pdf.stem}"]
-            if args.responder:
-                command += ["--responder", args.responder]
-            code = cli.main(command)
+                settings = pipeline.settings_from(config, situate=False, max_cost=round(left, 4))
+                options.ledger, options.ledger_tags = LEDGER, {"round": "controlled", "run": pdf.stem}
+            code = pipeline.attempt(pipeline.compare_paths, pdf, pdf, out / pdf.stem, settings, options)
             print(f"{pdf.stem}: exit {code}", flush=True)
             worst = max(worst, code)
         if not args.replay:
