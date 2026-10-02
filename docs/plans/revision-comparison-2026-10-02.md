@@ -1,6 +1,6 @@
 # Comparing revisions: align items, then explain differences
 
-- **Status:** Active (2026-10-02): milestone 1 (research) done. The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
+- **Status:** Active (2026-10-02): milestones 1 (research) and 2 (alignment, a first version) done. The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
 - **From:** [controlled documents](controlled-documents-2026-10-01.md) milestone 4, where every change was found but most "different" findings weren't changes.
 - **Depends on:**
   - controlled documents (revision pairs, exact comparison scoring)
@@ -262,6 +262,54 @@ Claude's reading of where proposals mode begins to make sense:
     - greedy best-first rather than optimal assignment
     - no new dependency
   - **Caveat:** the sketches were built while looking at these pairs; development evidence (decision 7).
+- **Milestone 2, alignment, a first version (2026-10-02): done.** The owner: "Nice job! Please proceed."
+  - **Code:**
+    - `align.py`: items, their correspondence, assignment with a margin, claims within items
+    - the `align` lever, on for revisions mode; proposals keep retrieval
+    - a chosen hook, `correspondence`, through which comparison asks which claims to judge and which are settled
+  - **The report:**
+    - settled findings are marked "settled without a model"
+    - a claim whose item has no counterpart is listed as "unaligned" (possibly added or removed)
+    - `retrieval` carries the alignment's summary
+  - **How it decides, as built:**
+    - **Items** are a tag in the entity, else its words. A claim named by position ("blower 5") joins the tagged item whose values it clearly repeats.
+    - **Item pairs** are scored as 0.6 shared values (rare ones counting more), 0.3 name, 0.1 attributes. A name counts only if its identifiers agree: "Room 104" isn't "Room 105", nor "Revision C" "Revision D", nor "Option 1" "Option 2".
+    - **Assignment** is best first, needing a margin of 0.15 over the next candidate and a floor of 0.3. Near-ties go to the judge.
+    - **Leftover items find a home:** a reader may split one thing into two items, or file three revisions' dates under one. A leftover attaches to the item, or the group of items, uniquely holding most of its values, else to the item of its exact name (decision 11's "favoured, not assumed", in a simple form).
+    - **Claims within matched items:**
+      - A value's readings form a group: settled if any of them agree on conditions across the revisions (readers phrase conditions differently), judged if none do.
+      - The rest pair by attribute, each claim with its best partner.
+      - Identifiers and generic words ("dimension 2") don't name an attribute; such claims pair only by value.
+  - **On the six pairs** (seed 1, development evidence; recorded and replayed alike):
+
+    | Measure | Before alignment | With alignment |
+    |---|---|---|
+    | Changes found | 22 / 22 | 22 / 22 |
+    | Additions found | 10 / 13 | 13 / 13 |
+    | Removals found | 7 / 7 | 7 / 7 |
+    | Unchanged facts confirmed | 198 / 198 | 198 / 198 |
+    | "Different" findings that are changes | 41 / 120 | 31 / 33 |
+    | Pairs judged by the model | 1,798 | 58 |
+    | Pairs settled without a model | 0 | 336 |
+    | Uncertain findings | 66 | 4 |
+
+    - The two "different" findings that aren't scored as changes are P-101B's real power change, read by the image reader as "blower 2": an extraction naming error.
+    - Every pair judged had been judged before or nearly so: $0.0016 of new recordings in all.
+  - **Fixed by inspection along the way:**
+    - a value inside words ("ROOM 102 ENLARGED") read as the number 102
+    - "a" dropped as a stop word, so "valve A" became "valve"
+    - one-to-one forced on items a reader had split
+    - conditions phrased differently by readers blocking settlements
+    - generic attributes pairing a room's width with its depth
+  - **Left as they are** (decision 1's kind):
+    - three floor plan readings under generic names ("component", "dimension line 2") with no counterpart
+    - readings of a changed value under a generic attribute, left unpaired
+    - The report lists them as unmatched.
+  - **Not yet:**
+    - split and merge findings with several members (a report schema change, for the owner)
+    - calibrated confidences
+    - the new knobs (design item 7)
+    - BM25F; it wasn't needed on these pairs
 
 ## Open questions
 

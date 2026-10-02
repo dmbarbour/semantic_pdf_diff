@@ -41,9 +41,10 @@ def write_report(data, output, assets=None):
     rows = []
     for f in data['findings']:
         numeric = '<pre>'+esc(json.dumps(f['numeric'],indent=2))+'</pre>' if f.get('numeric') else ''
-        rows.append(f'''<article data-relation="{esc(f['relation'])}"><h2>{esc(f['relation'].title())}</h2>
+        title = f['relation'].title() + (' (settled without a model)' if f.get('settled') else '')
+        rows.append(f'''<article data-relation="{esc(f['relation'])}"><h2>{esc(title)}</h2>
         <p>{esc(f['rationale'])}</p><div class="pair">{card(f['a'])}{card(f['b'])}</div>
-        <details><summary>Calculation and matching details</summary>{numeric}<p>Retrieval score {f['retrieval_score']}; model confidence {f['confidence']}</p></details></article>''')
+        <details><summary>Calculation and matching details</summary>{numeric}<p>Retrieval score {f['retrieval_score']}; {'alignment' if f.get('settled') else 'model'} confidence {f['confidence']}</p></details></article>''')
     unmatched = ''.join('<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched'])
     shared = ''.join(card(eid) for eid in data.get('shared', []))
     issues_found = ''.join('<tr><td>'+esc(i['source'])+'</td><td>'+esc(i['path'])+'</td><td>'+esc(i['reason'])+'</td></tr>' for i in data.get('scan_issues', []))

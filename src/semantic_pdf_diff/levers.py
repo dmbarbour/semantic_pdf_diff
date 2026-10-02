@@ -370,6 +370,18 @@ class Reconcile(Lever):
     def reconciles(self):
         return self.reconcile
 
+class Align(Lever):
+    lever_name, stage, off = "align", "comparison", {"align": False}
+    # revisions: decide which items correspond across the two revisions before any value is judged, and settle equal
+    # values without a model (align.py; docs/plans/revision-comparison-2026-10-02.md); proposals keep retrieval
+    align: Annotated[bool, _selecting(roles=COMPARE)] = True
+
+    def correspondence(self, left, right, mode):
+        if not self.align or mode != "revisions":
+            return super().correspondence(left, right, mode)
+        from .align import align
+        return align(left, right)
+
 class VerifyVisuals(Lever):
     lever_name, stage, off = "verify_visuals", "comparison", {"verify_visuals": False}
     # send a claim's crop with it when it's compared, so the judgment can check the reading
@@ -392,7 +404,7 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, VisualTextLayer, TableFilter,
-                 QuoteMatch, Reconcile, DedupeRepeated, VerifyVisuals)
+                 QuoteMatch, Reconcile, DedupeRepeated, Align, VerifyVisuals)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -521,6 +533,13 @@ class Platform(Composable):
         (compare.candidates); another retrieval (BM25, a reranker) would be a lever choosing otherwise."""
         from .compare import candidates
         return candidates(left, right, self)
+
+    @chosen
+    def correspondence(self, left, right, mode):
+        """Which claims are compared, and which are settled without a model (align.Correspondence). The platform's:
+        every retrieval candidate judged, none settled; the alignment lever decides otherwise for revisions."""
+        from .align import Correspondence
+        return Correspondence(self.candidates(left, right))
 
     @chained
     def comparison_images(self, evidence, output):

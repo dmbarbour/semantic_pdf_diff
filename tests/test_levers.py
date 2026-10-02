@@ -221,7 +221,8 @@ class Binding(unittest.TestCase):
         from semantic_pdf_diff.store import affected_regions, interpreter_differences
         bound = extraction_interpreter(Settings()).settings
         self.assertEqual(bound["context_before"], 400)  # at its default, still bound
-        self.assertEqual(bound["levers"], [n for n in L.DEFAULT_LEVERS if n not in ("reconcile", "verify_visuals")])  # extraction's
+        # extraction's: matching's merge and comparison's levers aren't
+        self.assertEqual(bound["levers"], [n for n in L.DEFAULT_LEVERS if n not in ("reconcile", "align", "verify_visuals")])
         backwards = extraction_interpreter(settings_class(tuple(reversed(L.DEFAULT_LEVERS)))()).model_dump()
         differences = interpreter_differences(extraction_interpreter(Settings()).model_dump(), backwards)
         self.assertEqual(set(differences), {"settings.levers"})

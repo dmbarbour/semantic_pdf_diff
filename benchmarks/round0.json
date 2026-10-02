@@ -18,6 +18,7 @@
     "quote_match",
     "reconcile",
     "dedupe_repeated",
+    "align",
     "verify_visuals"
   ],
   "claims_per_request": 6,

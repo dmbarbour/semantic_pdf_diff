@@ -18,6 +18,7 @@
     "quote_match",
     "reconcile",
     "dedupe_repeated",
+    "align",
     "verify_visuals"
   ],
   "context_before": 400,

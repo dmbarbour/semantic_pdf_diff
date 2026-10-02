@@ -133,6 +133,11 @@ def file_difference(files_a, files_b):
     result["added"] = sorted(path for path, _ in rest_b.values())
     return result
 
+# How a settled finding and an unaligned claim read in the report (align.py: revisions mode only).
+SETTLED = ("Settled without a model: the same value in corresponding items of the two revisions, with conditions "
+           "that agree.")
+UNALIGNED = "No corresponding item in the other revision (by shared values, names and attributes): possibly added or removed."
+
 # Provenance stays out of the model's view; it sees the claims and any source crops.
 PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences"}
 
@@ -155,11 +160,19 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None):
     findings, matched, attempted = [], set(), set()
     left = [e for e in left if e.id not in shared_ids]
     right = [e for e in right if e.id not in shared_ids]
-    scored = {}
+    scored, settled, unaligned, alignment = {}, {}, set(), []
     for a_side, b_side in ((left, right + shared), (shared, right)):
-        for i, j, score in client.s.candidates(a_side, b_side):
+        if not a_side or not b_side:
+            continue
+        found = client.s.correspondence(a_side, b_side, mode)
+        for i, j, score in found.judge:
             a, b = a_side[i], b_side[j]
             scored[a.id, b.id] = (max(score, scored.get((a.id, b.id), (0,))[0]), a, b)
+        for i, j, score in found.settled:
+            settled.setdefault((a_side[i].id, b_side[j].id), (score, a_side[i], b_side[j]))
+        unaligned |= {a_side[i].id for i in found.unaligned[0]} | {b_side[j].id for j in found.unaligned[1]}
+        if found.summary:
+            alignment.append(found.summary)
     pairs = sorted(scored.values(), key=lambda x: (-x[0], x[1].id, x[2].id))
     results = {}
     progress = progress or NoProgress()
@@ -213,12 +226,30 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None):
             dispatch.submit(prompt, Judgment, images, ("compare", mode, settings_key, a.id, b.id),
                             judged(index, score, a, b, calc))
         dispatch.drain()
-    # Findings keep the order of their pairs, however requests complete.
+    # Findings keep the order of their pairs, however requests complete; settled ones follow.
     findings.extend(results[i] for i in sorted(results))
-    unmatched = [{"id":e.id,"status":"no_confirmed_counterpart" if e.id in attempted else "not_compared",
-                  "note":"No confirmed counterpart in retrieved evidence; this does not establish absence."}
-                 for e in left+right if e.id not in matched]
-    return {"mode":mode,"findings":findings,"unmatched":unmatched,"shared":sorted(shared_ids),
-            "retrieval":{"shared_evidence":len(shared_ids),"candidate_pairs":len(pairs),"attempted_pairs":min(len(pairs),client.s.max_pairs),
-                         "omitted_by_pair_limit":max(0,len(pairs)-client.s.max_pairs),
-                         "strategy":"bidirectional sparse TF-IDF top-k union; lexical recall is not guaranteed"}}
+    for (aid, bid), (score, a, b) in sorted(settled.items()):
+        if (aid, bid) in scored:
+            continue
+        approximate = " Approximate readings, equal as read." if a.approximate or b.approximate else ""
+        findings.append({"a": aid, "b": bid, "retrieval_score": round(score, 4), "relation": "equivalent",
+                         "rationale": SETTLED + approximate, "confidence": round(score, 4), "same_conditions": True,
+                         "numeric": numeric_check(a, b), "settled": True})
+        matched.update((aid, bid))
+    def status(e):
+        if e.id in attempted:
+            return "no_confirmed_counterpart"
+        return "unaligned" if e.id in unaligned else "not_compared"
+    unmatched = [{"id": e.id, "status": status(e),
+                  "note": UNALIGNED if status(e) == "unaligned" else
+                          "No confirmed counterpart in retrieved evidence; this does not establish absence."}
+                 for e in left + right if e.id not in matched]
+    retrieval = {"shared_evidence": len(shared_ids), "candidate_pairs": len(pairs),
+                 "attempted_pairs": min(len(pairs), client.s.max_pairs),
+                 "omitted_by_pair_limit": max(0, len(pairs) - client.s.max_pairs),
+                 "strategy": "bidirectional sparse TF-IDF top-k union; lexical recall is not guaranteed"}
+    if alignment:
+        retrieval.update(strategy=alignment[0]["strategy"], settled_pairs=sum(1 for f in findings if f.get("settled")),
+                         alignment=[{k: v for k, v in x.items() if k != "strategy"} for x in alignment])
+    return {"mode": mode, "findings": findings, "unmatched": unmatched, "shared": sorted(shared_ids),
+            "retrieval": retrieval}
