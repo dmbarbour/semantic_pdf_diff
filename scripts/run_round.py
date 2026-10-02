@@ -61,7 +61,7 @@ class RoundRunner:
     query_checkers = QUERY_CHECKERS
 
     def __init__(self, folder, only=None, accept_checks=False):
-        from semantic_pdf_diff.models import RoundSpec
+        from semantic_pdf_diff_lab.eval.models import RoundSpec
         self.folder, self.only, self.accept_checks = Path(folder).resolve(), only, accept_checks
         # Validated: a mistyped key fails here rather than taking a default. Kept as a dict (with every default filled
         # in) for the steps below.
@@ -150,7 +150,7 @@ class RoundRunner:
     def refuse_private(self):
         """0. Rounds commit page images, page text and claims (pairs-*/, replay fixtures), so they run on slices marked
         public only: a sensitive document must never reach the repository."""
-        from semantic_pdf_diff import rounds
+        from semantic_pdf_diff_lab.eval import rounds
         manifest = self.manifest()
         wanted_set = self.spec.get("set", "dev")
         private = rounds.private_slices([r["name"] for r in manifest["runs"] if wanted_set == "all" or r["set"] == wanted_set],
@@ -190,7 +190,7 @@ class RoundRunner:
 
     def measure(self):
         """3. Free, mechanical figures."""
-        from semantic_pdf_diff import rounds
+        from semantic_pdf_diff_lab.eval import rounds
         for v in self.variants:
             step = f"measure:{v}"
             if self.wanted("measure") and not self.done(step) and self.done(f"replay:{v}"):
@@ -207,7 +207,7 @@ class RoundRunner:
         from semantic_pdf_diff import ledger
         checks = self.spec.get("query_checks")
         if checks and self.wanted("check"):
-            from semantic_pdf_diff import queries
+            from semantic_pdf_diff_lab.eval import queries
             from semantic_pdf_diff.ledger import Ledger
             from semantic_pdf_diff.llm import evaluator_settings
             cap = float(checks.get("cap", 2.0))
@@ -248,7 +248,7 @@ class RoundRunner:
 
     def pairs(self):
         """4. Sample units where each variant's answers differ from the baseline's."""
-        from semantic_pdf_diff import rounds
+        from semantic_pdf_diff_lab.eval import rounds
         for v in self.spec["variants"]:
             batch = self.folder / f"pairs-{v}"
             if self.done(f"pairs:{v}"):  # "units" raised past the sample: resample (the first units stay the same)
@@ -282,8 +282,8 @@ class RoundRunner:
         order, disagreement); failed verdicts are asked once more when a variant's sample is done. "confirm_judges"
         (expensive) judge the first "confirm_units" units of an accepted variant, as a separate check. The criteria
         are set in advance: fixed when judging starts, and a later change is refused."""
-        from semantic_pdf_diff import rounds
-        from semantic_pdf_diff.models import Criteria
+        from semantic_pdf_diff_lab.eval import rounds
+        from semantic_pdf_diff_lab.eval.models import Criteria
         if self.judges and self.wanted("judge"):
             try:
                 rounds.lock_criteria(self.state, self.spec["criteria"])
@@ -359,7 +359,8 @@ class RoundRunner:
     def report(self):
         """7. Report."""
         if self.wanted("report"):
-            from semantic_pdf_diff import insights, ledger, rounds
+            from semantic_pdf_diff_lab.eval import insights, rounds
+            from semantic_pdf_diff import ledger
             self.figure("spent_total", ledger.spent(self.ledger_path, round=self.name), step="report")
             rounds.report(self.history, self.report_path)
             print(f"Report: {self.report_path}")
@@ -372,7 +373,7 @@ class RoundRunner:
 
     def gains_of(self, v):
         """Measured once per variant, for a gain named in the criteria."""
-        from semantic_pdf_diff import rounds
+        from semantic_pdf_diff_lab.eval import rounds
         if v not in self.measured:
             self.measured[v] = (rounds.gains(self.runs_root / "baseline", self.runs_root / v, self.fixture)
                                 if self.criteria.gain else {})
@@ -385,7 +386,7 @@ class RoundRunner:
 
     def ask(self, v, model, upto, only=None, retry_failed=False, step="judge", verdicts_dir="verdicts"):
         """One judge over a variant's first `upto` units; raises Paused at the cap or out of budget."""
-        from semantic_pdf_diff.judgements import ModelJudge
+        from semantic_pdf_diff_lab.eval.judgements import ModelJudge
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff.llm import evaluator_settings
         batch = self.folder / f"pairs-{v}"
@@ -411,7 +412,7 @@ class RoundRunner:
     def settle(self, v, upto, retry_failed=False):
         """Second opinions where the main judges leave units unsettled; retry_failed asks the second judges' failed
         verdicts once more, as the main judges' are (these are the long, hard units)."""
-        from semantic_pdf_diff import rounds
+        from semantic_pdf_diff_lab.eval import rounds
         if self.escalate:
             only = rounds.unsettled(self.folder / f"pairs-{v}", self.judges, upto)
             self.state.setdefault("escalated", {})[v] = sorted(only)
@@ -420,7 +421,7 @@ class RoundRunner:
                     self.ask(v, model, upto, only=only, retry_failed=retry_failed)
 
     def finish_variant(self, v, reason):
-        from semantic_pdf_diff import insights, rounds
+        from semantic_pdf_diff_lab.eval import insights, rounds
         batch = self.folder / f"pairs-{v}"
         judged = self.state["judged"]
         self.state["stopped"][v] = reason
@@ -439,7 +440,8 @@ class RoundRunner:
     def postmortem_of(self, v):
         """Every lever's post-mortem after its round (the owner, 2026-09-30): samples of wins and losses, partitions,
         and the analyst's reading; Claude writes the round's review from it."""
-        from semantic_pdf_diff import ledger, postmortem
+        from semantic_pdf_diff import ledger
+        from semantic_pdf_diff_lab.eval import postmortem
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff.llm import evaluator_settings
         batch, pm = self.folder / f"pairs-{v}", self.spec["postmortem"]
@@ -456,7 +458,7 @@ class RoundRunner:
 
     def confirm(self, v):
         """Expensive judges on an accepted variant's first units: a separate check, recorded apart."""
-        from semantic_pdf_diff import rounds
+        from semantic_pdf_diff_lab.eval import rounds
         judges = self.spec.get("confirm_judges", [])
         batch = self.folder / f"pairs-{v}"
         decision = json.loads((batch / "decision.json").read_text())

@@ -9,14 +9,14 @@ images, index.html, and checks/<model>.json. (docs/plans/content-addressed-queri
 """
 import difflib
 import hashlib
-from .html_pages import esc
+from semantic_pdf_diff.html_pages import esc
 import json
 import random
 import shutil
 from collections import defaultdict
 from pathlib import Path
 from pydantic import Field
-from .models import Lenient
+from semantic_pdf_diff.models import Lenient
 
 PROBLEMS = {
     "junk-context": "context that is junk (table cells, page furniture) or comes from elsewhere on the page",
@@ -71,8 +71,8 @@ class QueryCheck(Lenient):
 def collect(runs_dir, role="extract"):
     """{(run, content, task): query} for every run under runs_dir, each with its document's name,
     its lever notes and the paths of the images it was sent."""
-    from .extract import lever_notes
-    from .store import Store
+    from semantic_pdf_diff.extract import lever_notes
+    from semantic_pdf_diff.store import Store
     out = {}
     for folder in sorted(p for p in Path(runs_dir).iterdir() if (p / "store.sqlite").exists()):
         assets = {}

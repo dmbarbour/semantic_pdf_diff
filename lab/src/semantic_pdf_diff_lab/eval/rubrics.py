@@ -13,7 +13,7 @@ prompt, so a changed prompt means judging again.
 """
 from typing import ClassVar
 
-from .levers import Composable, Lever, chained, chosen, compose
+from semantic_pdf_diff.levers import Composable, Lever, chained, chosen, compose
 
 PAIRWISE = """You are one reviewer on a panel comparing two automated extractions of engineering claims
 (entity, attribute, value, unit, conditions, quote) from the same part of a document page.

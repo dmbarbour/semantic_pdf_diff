@@ -9,7 +9,7 @@ serves.
 """
 import re
 from dataclasses import dataclass, field
-from .values import FEET_INCHES, INCH, _inch, ft_in, inches  # noqa: F401 (values.py)
+from semantic_pdf_diff.values import FEET_INCHES, INCH, _inch, ft_in, inches  # noqa: F401 (values.py)
 
 SHEET_KNOBS = ("clean", "small", "vertical", "rotated", "all")
 ARCH_D = (2592.0, 1728.0)       # 36 x 24 in, landscape
@@ -71,7 +71,7 @@ def floor_plan(d):
 
 def plan_sheet(seed=1):
     """A controlled project whose one page is the floor plan sheet."""
-    from .controlled import Draw, Fact, Project
+    from .corpus import Draw, Fact, Project
     d = Draw(f"lcc-plan-{seed}")
     plan = floor_plan(d)
     facts = []
@@ -114,7 +114,7 @@ REVISIONS = (("A", "2026-01-10", "ISSUED FOR REVIEW"), ("B", "2026-02-20", "REVI
 def render(project):
     """(pdf bytes, the printed numbers' log), like controlled.render, for a sheet drawn directly."""
     import pymupdf
-    from .controlled import locate
+    from .corpus import locate
     plan = project.sheet
     small, vertical, rotated = (project.has(k) for k in ("small", "vertical", "rotated"))
     tag_size, dim_size = (6.0, 4.5) if small else (10.0, 8.0)

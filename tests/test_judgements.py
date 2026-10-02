@@ -4,9 +4,9 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from semantic_pdf_diff import judgements, rounds
+from semantic_pdf_diff_lab.eval import judgements, rounds
 from semantic_pdf_diff.llm import ModelFailure
-from semantic_pdf_diff.models import PairVerdict
+from semantic_pdf_diff_lab.eval.models import PairVerdict
 from test_judge_prompts import ITEMS
 
 class Judge:
@@ -81,7 +81,7 @@ class OneScore(unittest.TestCase):
     """A unit's score has one definition (code review 2026-10-01, item 11): the analysis once averaged
     every verdict flat, so a unit the decision scored 1.0 showed as 0.667 and was sampled as split."""
     def test_the_decision_and_the_analysis_agree(self):
-        from semantic_pdf_diff import insights
+        from semantic_pdf_diff_lab.eval import insights
         with tempfile.TemporaryDirectory() as d:
             folder = Path(d)
             items = [dict(i, baseline=[], variant=[], run="r", content="sha256:" + "a" * 64, page=1, image="x.jpg")
@@ -129,7 +129,7 @@ class Files(unittest.TestCase):
                 judgements.UnitVerdicts.read(folder)
 
     def test_one_loop_rates_and_keeps_failures_apart(self):
-        from semantic_pdf_diff.models import PairVerdict
+        from semantic_pdf_diff_lab.eval.models import PairVerdict
         answers, errors = judgements.rate(Judge(failing={"u2"}), [
             ("one", "A1. x\nB1. y", PairVerdict, [], ("judge", "u1")),
             ("two", "A1. x", PairVerdict, [], ("judge", "u2"))])

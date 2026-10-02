@@ -1,4 +1,4 @@
-"""Eye tests for vision models: known answers that can't be guessed in context (src/semantic_pdf_diff/eyetest.py).
+"""Eye tests for vision models: known answers that can't be guessed in context (lab/src/semantic_pdf_diff_lab/bench/eyetest.py).
 
     set -a; . ./.env; set +a                   # the endpoint and key (git-ignored)
     python scripts/eye_test.py run --model google/gemma-4-31B-it --max-cost 0.5
@@ -35,7 +35,8 @@ def main(argv=None):
     report = sub.add_parser("report", help="score what's recorded and write results.json and report.html (offline)")
     report.add_argument("--suite", default="standard", choices=["standard", "quick"])
     args = parser.parse_args(argv)
-    from semantic_pdf_diff import eyetest, ledger
+    from semantic_pdf_diff_lab.bench import eyetest
+    from semantic_pdf_diff import ledger
     from semantic_pdf_diff.llm import evaluator_settings, folder_client
     from semantic_pdf_diff.models import Settings
     from semantic_pdf_diff.progress import Progress

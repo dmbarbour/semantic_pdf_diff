@@ -14,14 +14,14 @@ over to later runs that produce the same results.
 import base64
 from collections import Counter
 import hashlib
-from .html_pages import fill
+from semantic_pdf_diff.html_pages import fill
 import json
 import random
 import re
 from pathlib import Path
 
-from .pages import native_page, shown
-from .provenance import now
+from semantic_pdf_diff.pages import native_page, shown
+from semantic_pdf_diff.provenance import now
 from .taxonomy import (ADEQUACY, CLARITY, CONFIDENCE, CORE_FIELDS, FIELD_ANSWERS, FIELDS, MISSING, TAXONOMY, USABLE,
                        USEFULNESS, WORTH, field_names, flag_names)
 
@@ -74,7 +74,7 @@ class Source:
     """One replay store: a responder's results, and the PDFs they came from."""
 
     def __init__(self, label, folder):
-        from .store import Store
+        from semantic_pdf_diff.store import Store
         self.label, self.folder = label, Path(folder)
         self.store = Store.open(self.folder)
         self.docs, self.names = {}, {}
@@ -84,7 +84,7 @@ class Source:
 
     def doc(self, content):
         import pymupdf
-        from .scan import read_origin
+        from semantic_pdf_diff.scan import read_origin
         source, path = self.docs[content]
         return pymupdf.open(stream=read_origin(self.store.origin(source, path)), filetype="pdf")
 
@@ -157,7 +157,7 @@ class Requests:
 
     def __init__(self, store):
         self.index = {}
-        from .llm import recipe_fields
+        from semantic_pdf_diff.llm import recipe_fields
         for q in store.queries():
             r = recipe_fields(q["recipe"])
             if r["role"] == "extract":
@@ -183,12 +183,12 @@ class Requests:
             return None
         r, prompt, sent = found
         if r["role"] == "extract":
-            from .extract import ExtractQuery
+            from semantic_pdf_diff.extract import ExtractQuery
             asked = ExtractQuery.read(prompt)
             instructions, query = asked.instructions, asked.request
         else:  # the role's instructions, known, then what this request was given
-            from .compare import instructions as comparing
-            from .situate import instructions as situating
+            from semantic_pdf_diff.compare import instructions as comparing
+            from semantic_pdf_diff.situate import instructions as situating
             instructions = comparing(r["mode"] or "proposals") if r["role"] == "compare" else situating(r["kind"])
             query = prompt[len(instructions):] if prompt.startswith(instructions) else prompt
         images = []
@@ -211,7 +211,7 @@ class Requests:
 
     def _render(self, source, folder, content, page_no, rect, side, stem):
         import pymupdf
-        from .extract import render
+        from semantic_pdf_diff.extract import render
         target = folder / "images" / f"{stem}-input.png"
         with source.doc(content) as doc:
             render(doc[page_no - 1], pymupdf.Rect(rect), target, side)

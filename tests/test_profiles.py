@@ -1,8 +1,8 @@
 """Vision profiles: predictions scale with what reaches the model, and plans are the cheapest that read."""
 import stubs  # noqa: F401 (a clean environment)
 import unittest
-from semantic_pdf_diff import profiles
-from semantic_pdf_diff.profiles import Profile
+from semantic_pdf_diff_lab.bench import profiles
+from semantic_pdf_diff_lab.bench.profiles import Profile
 
 BUDGET = {(512, 512): 8.8, (768, 768): 7.4, (1024, 1024): 6.8, (1536, 1536): 6.5, (2048, 2048): 7.7}  # gemma-4-like
 NATIVE = {(512, 512): 11.9, (768, 768): 7.3, (1024, 1024): 5.7, (1536, 1536): 3.9, (2048, 2048): 3.0}  # Qwen3-VL-like

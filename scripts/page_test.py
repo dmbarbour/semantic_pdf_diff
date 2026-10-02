@@ -1,5 +1,5 @@
 """Page tests: reading whole pages by slicing or shrinking them, and by asking for close-ups
-(src/semantic_pdf_diff/pagetest.py).
+(lab/src/semantic_pdf_diff_lab/bench/pagetest.py).
 
     set -a; . ./.env; set +a
     python scripts/page_test.py run --model google/gemma-4-31B-it --max-cost 0.5
@@ -20,7 +20,7 @@ EYES = ROOT / "benchmarks/eyetest/results.json"
 LEDGER = ROOT / "benchmarks/ledger.jsonl"
 
 def read_all(client, model, only=("static", "zoom"), seeds=None, max_tiles=None):
-    from semantic_pdf_diff import pagetest
+    from semantic_pdf_diff_lab.bench import pagetest
     threshold = pagetest.acuity(EYES, model)
     static, zooms = {}, {}
     for sheet in pagetest.sheets():
@@ -47,7 +47,8 @@ def main(argv=None):
     sub.add_parser("report", help="score what's recorded; write results.json and report.html (offline)")
     args = parser.parse_args(argv)
     import pymupdf
-    from semantic_pdf_diff import eyetest, ledger, pagetest
+    from semantic_pdf_diff_lab.bench import eyetest, pagetest
+    from semantic_pdf_diff import ledger
     from semantic_pdf_diff.llm import evaluator_settings, folder_client
     from semantic_pdf_diff.models import Settings
     if args.command == "run":

@@ -26,7 +26,7 @@ from dataclasses import asdict, dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
 from pydantic import ConfigDict, Field
-from .models import Lenient
+from semantic_pdf_diff.models import Lenient
 
 CAP = {"helv": 0.718, "cour": 0.562, "tiro": 0.662}  # cap height per em (the fonts' metrics)
 LETTERS = "ABCDEFGHJKLMNPRSTUVWXYZ"                    # no I, O or Q, as drawings avoid them
@@ -757,8 +757,8 @@ def images(folder, cards):
 def ask(folder, client, cards, progress=None):
     """Ask the client's model every card; {card id: answer dict, or {"error": ...}}. Answers are
     recorded by query in the folder's fixture (llm.folder_client), so asking again is free."""
-    from .dispatch import Dispatcher
-    from .progress import NoProgress
+    from semantic_pdf_diff.dispatch import Dispatcher
+    from semantic_pdf_diff.progress import NoProgress
     progress = progress or NoProgress()
     drawn, answers = images(folder, cards), {}
     with Dispatcher(client) as dispatch:
@@ -775,7 +775,7 @@ def ask(folder, client, cards, progress=None):
 
 def prompt_tokens(folder, responder):
     """{card id: prompt tokens the host reported}, from the folder's fixture (where it reported any)."""
-    from .fixtures import folder_fixture
+    from semantic_pdf_diff.fixtures import folder_fixture
     fixture = folder_fixture(folder)
     try:
         rows = fixture.db.execute("SELECT r.region, s.usage FROM response s JOIN recipe r ON r.query = s.query "
@@ -902,7 +902,7 @@ EYE_SETTINGS = {"context_tokens": 131072, "output_tokens": 4000, "image_tokens":
 
 def responders(folder):
     """The models whose answers the folder's fixture holds."""
-    from .fixtures import folder_fixture
+    from semantic_pdf_diff.fixtures import folder_fixture
     fixture = folder_fixture(folder)
     try:
         return [r for (r,) in fixture.db.execute("SELECT DISTINCT responder FROM response ORDER BY responder")]
@@ -940,7 +940,7 @@ def _cell(value):
 
 def page(folder, data):
     """report.html: the models side by side (acuity, thresholds, binding), then every card."""
-    from .html_pages import esc
+    from semantic_pdf_diff.html_pages import esc
     models = list(data["models"])
     out = [f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' "
            f"content='width=device-width, initial-scale=1'><title>Eye tests</title><style>{STYLE}</style></head><body>",

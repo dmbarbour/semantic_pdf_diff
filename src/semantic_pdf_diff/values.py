@@ -70,6 +70,17 @@ def inches(value, unit=""):
         return float(m.group(1))
     return None
 
+def printed_value(text):
+    """A printed number, for finding values on the page: lengths in feet and inches as inches (38'-6" is 462, not
+    38), dates as dates (2026-01-10, not 2026), anything else as parse_number reads it."""
+    if DATE.match(str(text)):
+        return ("date", str(text).strip())
+    if "'" in str(text):
+        length = inches(text)
+        if length is not None:
+            return ("in", length)
+    return parse_number(text)
+
 # --- units: the product's
 
 # Deliberately small, explicit dimensional conversions. Unknown units abstain.

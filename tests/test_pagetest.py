@@ -2,8 +2,8 @@
 import stubs  # noqa: F401 (a clean environment)
 import tempfile
 import unittest
-from semantic_pdf_diff import pagetest
-from semantic_pdf_diff.eyetest import CAP
+from semantic_pdf_diff_lab.bench import pagetest
+from semantic_pdf_diff_lab.bench.eyetest import CAP
 
 class Reader:
     """A simulated model: reads the items wholly inside its image whose capitals are at least 6 px

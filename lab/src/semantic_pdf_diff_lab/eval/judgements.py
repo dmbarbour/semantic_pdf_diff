@@ -64,8 +64,8 @@ def rate(client, requests, progress=None):
     """Ask a model each request once, concurrently: requests are (ident, prompt, schema, images, key). Returns
     ({ident: answer}, {ident: error}), each in the order requests finished. The loop the model raters share
     (judges, the review panel, query checkers), once written three times."""
-    from .dispatch import Dispatcher
-    from .progress import NoProgress
+    from semantic_pdf_diff.dispatch import Dispatcher
+    from semantic_pdf_diff.progress import NoProgress
     progress = progress or NoProgress()
     answers, errors = {}, {}
     with Dispatcher(client) as dispatch:
@@ -219,7 +219,7 @@ class QuoteCheck:
     kind, name = "check", "quote-check"
 
     def rate(self, folder):
-        from .extract import excerpted
+        from semantic_pdf_diff.extract import excerpted
         batch = json.loads((Path(folder) / "pairs.json").read_text(encoding="utf-8"))
         out = []
         for item in batch["items"]:

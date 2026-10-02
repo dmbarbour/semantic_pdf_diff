@@ -292,7 +292,7 @@ def plans(sheet, max_tiles=None):
     """A sheet's static plans: (tile side in points, or None for the whole page; render px), leaving
     out those of more than max_tiles tiles."""
     import pymupdf
-    from .extract import tiles
+    from semantic_pdf_diff.extract import tiles
     rect = pymupdf.Rect(0, 0, *PAGES[paper(sheet.kind)])
     sides = [t for t in (None,) + TILES[paper(sheet.kind)]
              if max_tiles is None or t is None or len(list(tiles(rect, t))) <= max_tiles]
@@ -302,8 +302,8 @@ def run_static(folder, client, sheet, strategies=None):
     """{strategy: [(key, items read)]}: each plan's queries. Strategies are (tile side in points or
     None for the whole page, render px)."""
     import pymupdf
-    from .dispatch import Dispatcher
-    from .extract import tiles
+    from semantic_pdf_diff.dispatch import Dispatcher
+    from semantic_pdf_diff.extract import tiles
     doc, page, _ = draw(sheet)
     strategies = strategies or plans(sheet)
     target = Path(folder) / "images"
@@ -334,7 +334,7 @@ def run_zoom(folder, client, sheet, variant, threshold=None):
     close-ups the model asks for, depth-first within MAX_DEPTH and QUOTA. threshold(w, h): the
     model's reading threshold in px for an image of that size (for "informed")."""
     import pymupdf
-    from .dispatch import Dispatcher
+    from semantic_pdf_diff.dispatch import Dispatcher
     doc, page, _ = draw(sheet)
     target = Path(folder) / "images"
     target.mkdir(parents=True, exist_ok=True)
@@ -397,7 +397,7 @@ def score(sheet, answers):
 def whole_in_tiles(sheet, side):
     """Share of items lying wholly inside at least one tile of a plan (the rest are cut by tile edges)."""
     import pymupdf
-    from .extract import tiles
+    from semantic_pdf_diff.extract import tiles
     doc, page, items = draw(sheet)
     rects = [page.rect] if side is None else list(tiles(page.rect, side))
     doc.close()
@@ -448,7 +448,7 @@ def usage(folder, responder):
     """{(query label, region): (prompt tokens, completion tokens)} as the host reported them, from the fixture.
     Labels alone are ambiguous: a query leaves out the model, so models asking for the same close-up share it,
     each run labelling it by its own numbering."""
-    from .fixtures import folder_fixture
+    from semantic_pdf_diff.fixtures import folder_fixture
     fixture = folder_fixture(folder)
     try:
         rows = fixture.db.execute("SELECT r.region, r.parts, s.usage FROM response s JOIN recipe r ON r.query = s.query "
@@ -533,7 +533,7 @@ def _num(value):
 
 def page(folder, data):
     """report.html: for each kind of sheet, every plan's recall by font size and its cost, per model."""
-    from .html_pages import esc
+    from semantic_pdf_diff.html_pages import esc
     from .eyetest import STYLE, _cell
     out = [f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' "
            f"content='width=device-width, initial-scale=1'><title>Page tests</title><style>{STYLE}</style></head><body>",

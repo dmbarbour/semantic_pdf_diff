@@ -5,9 +5,11 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from semantic_pdf_diff import cli, review
-from semantic_pdf_diff.models import PanelLabel, Settings
-from semantic_pdf_diff.taxonomy import CLARITY, CONFIDENCE, FIELDS, TAXONOMY, flag_names, suggested_verdict
+from semantic_pdf_diff import cli
+from semantic_pdf_diff_lab.eval import review
+from semantic_pdf_diff.models import Settings
+from semantic_pdf_diff_lab.eval.models import PanelLabel
+from semantic_pdf_diff_lab.eval.taxonomy import CLARITY, CONFIDENCE, FIELDS, TAXONOMY, flag_names, suggested_verdict
 from test_concurrency import jittery_model, make_pdf
 
 class Fields(unittest.TestCase):
@@ -19,7 +21,7 @@ class Fields(unittest.TestCase):
         self.assertIsNone(suggested_verdict('about', {}))
 
     def test_panel_answers_given_as_lists_become_lines(self):
-        from semantic_pdf_diff.models import PanelQuestionLabel
+        from semantic_pdf_diff_lab.eval.models import PanelQuestionLabel
         self.assertEqual(PanelQuestionLabel.model_validate({'blind': ['a fact', 'another']}).blind, 'a fact\nanother')
 
 class Alpha(unittest.TestCase):

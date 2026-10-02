@@ -92,7 +92,7 @@ def plan(profile, page_w, page_h, smallest_pt, largest_pt=None, sides=SIDES, ren
     margin × the page's smallest, and that doesn't magnify its largest text past the model's ceiling.
     Returns {"side", "px", "tiles", "predicted_pt", "largest_cap_px"}, or None when nothing qualifies."""
     import pymupdf
-    from .extract import tiles
+    from semantic_pdf_diff.extract import tiles
     page = pymupdf.Rect(0, 0, page_w, page_h)
     options = []
     for side in sides:

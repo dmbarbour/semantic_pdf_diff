@@ -5,7 +5,8 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from semantic_pdf_diff import cli, queries
+from semantic_pdf_diff import cli
+from semantic_pdf_diff_lab.eval import queries
 from semantic_pdf_diff.models import Settings
 from test_concurrency import jittery_model
 from test_settings import document
@@ -91,7 +92,7 @@ class LeverScope(unittest.TestCase):
         cls.dir.cleanup()
 
     def checks(self, variant_settings):
-        from semantic_pdf_diff import rounds
+        from semantic_pdf_diff_lab.eval import rounds
         (self.root / 'base' / 'settings.json').write_text(json.dumps({}))
         (self.root / 'variant' / 'settings.json').write_text(json.dumps(variant_settings))
         return rounds.pair_units(self.root / 'base', self.root / 'variant', n=20)[1]

@@ -13,13 +13,13 @@ For one decided batch (pairs-<variant>/):
 Written as postmortem.json and postmortem.html beside pairs.json. Claude writes the round's review
 from it (docs/reviews/round-*.md).
 """
-from .html_pages import esc
+from semantic_pdf_diff.html_pages import esc
 import json
 import random
 from collections import defaultdict
 from pathlib import Path
 from pydantic import Field
-from .models import Lenient
+from semantic_pdf_diff.models import Lenient
 
 WON, LOST = 0.75, 0.25  # a unit clearly won or lost (its mean score over judges and orders)
 
@@ -48,13 +48,13 @@ Return only JSON: {{"patterns": [], "tweaks": [], "partitions": [], "next": [], 
 {evidence}
 """
 
-LEVER_INDEX = Path(__file__).resolve().parents[2] / "docs/reviews/levers.md"
+LEVER_INDEX = Path(__file__).resolve().parents[4] / "docs/reviews/levers.md"  # lab/src/<package>/eval/
 
 def describe(levers, index=LEVER_INDEX):
     """[{lever, class, mechanism}]: what each lever does, from models.SETTING_CLASSES and the lever
     index's "Mechanism:" lines (so the analyst doesn't guess)."""
     import re
-    from .models import SETTING_CLASSES
+    from semantic_pdf_diff.models import SETTING_CLASSES
     text = Path(index).read_text(encoding="utf-8") if Path(index).exists() else ""
     out = []
     for lever in levers:
@@ -81,7 +81,7 @@ def lever_names(baseline_dir, variant_dir):
 
 def _unit_queries(runs_dir, item, side):
     """{task: prompt} for the tasks that read a unit's claims on one side, from that run's query log."""
-    from .store import Store
+    from semantic_pdf_diff.store import Store
     folder = Path(runs_dir) / item["run"]
     tasks = {c.get("_task") for c in item[side] if c.get("_task")}
     if not tasks or not (folder / "store.sqlite").exists():
@@ -94,7 +94,7 @@ def _unit_queries(runs_dir, item, side):
 
 def build(folder, documents=None, units=5, seed=1):
     """The post-mortem's evidence for one decided batch (no model calls)."""
-    from .extract import lever_notes
+    from semantic_pdf_diff.extract import lever_notes
     from .rounds import interval, region, unit_scores
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))

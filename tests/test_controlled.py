@@ -1,7 +1,7 @@
 """Controlled documents: generated the same way every time, every fact placed, claims classed exactly."""
 import stubs  # noqa: F401 (a clean environment)
 import unittest
-from semantic_pdf_diff import controlled
+from semantic_pdf_diff_lab.bench import controlled
 
 class Generation(unittest.TestCase):
     def test_the_same_seed_gives_the_same_pdf_and_every_fact_is_placed(self):
@@ -71,7 +71,7 @@ class Knobs(unittest.TestCase):
                     self.assertEqual(text == "", knob in ("scan", "all"))  # a scan has no text layer
 
     def test_schematics_place_every_relation_where_each_knob_says(self):
-        from semantic_pdf_diff import schematics
+        from semantic_pdf_diff_lab.bench.controlled import schematics
         for make in schematics.SCHEMATIC_PROJECTS.values():
             for knob in schematics.SCHEMATIC_KNOBS:
                 project = make(1)
@@ -95,7 +95,7 @@ class Knobs(unittest.TestCase):
                         self.assertEqual(told, len(drawable) // 2)
 
     def test_no_line_crosses_a_part_in_any_layout(self):
-        from semantic_pdf_diff import schematics as S
+        from semantic_pdf_diff_lab.bench.controlled import schematics as S
         for make in S.SCHEMATIC_PROJECTS.values():
             system = make(1).schematic["system"]
             for folded in (False, True):
@@ -112,7 +112,7 @@ class Knobs(unittest.TestCase):
 
     def test_sheets_under_every_knob(self):
         import pymupdf
-        from semantic_pdf_diff import sheets
+        from semantic_pdf_diff_lab.bench.controlled import sheets
         for knob in sheets.SHEET_KNOBS:
             project = sheets.plan_sheet(1)
             project.knob = knob
@@ -239,7 +239,7 @@ class Scoring(unittest.TestCase):
         self.assertNotIn("zone.exhibit", s["missed"])
 
     def test_relations_score_by_names_from_either_side(self):
-        from semantic_pdf_diff import schematics
+        from semantic_pdf_diff_lab.bench.controlled import schematics
         project = schematics.ahu_drawing(1)
         project.knob = "clean"
         _, log = controlled.render(project)
@@ -267,7 +267,7 @@ class Scoring(unittest.TestCase):
         self.assertEqual(both["relations"], {"right": 1})  # one fact, read twice in two ways, counts once
 
     def test_lengths_compare_in_inches_however_written(self):
-        from semantic_pdf_diff import sheets
+        from semantic_pdf_diff_lab.bench.controlled import sheets
         for text, unit, want in (("58'-6\"", "", 702), ("58' 6\"", "", 702), ("58 ft 6 in", "", 702),
                                  ("58.5 ft", "", 702), ("702 in", "", 702), ("58.5", "ft", 702), ("58.5", "", None)):
             self.assertEqual(sheets.inches(text, unit), want, text)
@@ -335,7 +335,7 @@ class Scoring(unittest.TestCase):
     def test_located_in_is_a_place_or_a_part_by_what_follows(self):
         """"located in" and "in" are phrases of both within and located at; the tie left them unscored (code review
         2026-10-01, item 10)."""
-        from semantic_pdf_diff import relations
+        from semantic_pdf_diff_lab.bench.controlled import relations
         part, place = relations.Thing("AHU-3"), relations.Thing("pupil plane", literal=True)
         fan, stop = relations.Thing("supply fan"), relations.Thing("Lyot stop")
         things = [part, place, fan, stop]
@@ -345,7 +345,7 @@ class Scoring(unittest.TestCase):
         self.assertEqual(triple("supply fan", "in", "AHU-3"), [(fan, "within", part)])
 
     def test_fractions_of_an_inch(self):
-        from semantic_pdf_diff import sheets
+        from semantic_pdf_diff_lab.bench.controlled import sheets
         for text, want in (("2'-9 1/2\"", 33.5), ("2'-9-1/2\"", 33.5), ("9 1/2\"", 9.5), ("1/2\"", 0.5),
                            ("58 ft 6 1/2 in", 702.5), ("2'-0 1/0\"", None), ("1/8\" = 1'-0\"", None)):
             self.assertEqual(sheets.inches(text), want, text)
@@ -372,7 +372,8 @@ class Replay(unittest.TestCase):
         import contextlib, io, json, tempfile
         from pathlib import Path
         import pymupdf
-        from semantic_pdf_diff import cli, fixtures, rounds
+        from semantic_pdf_diff import cli, fixtures
+        from semantic_pdf_diff_lab.eval import rounds
         folder = Path(__file__).resolve().parent.parent / "benchmarks" / "controlled"
         if not (folder / "replay.zip").exists():
             self.skipTest("no recorded corpus")

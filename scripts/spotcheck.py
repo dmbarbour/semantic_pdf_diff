@@ -64,7 +64,7 @@ def main(argv=None):
     compare.add_argument("folder", type=Path)
     compare.add_argument("--rubric", default="v4", help="the panel's verdicts under this rubric")
     args = parser.parse_args(argv)
-    from semantic_pdf_diff import rounds
+    from semantic_pdf_diff_lab.eval import rounds
     verdicts = lambda rubric: "verdicts" if rubric == "v4" else f"verdicts-{rubric}"
 
     if args.command == "build":
@@ -90,7 +90,7 @@ def main(argv=None):
                            limit=args.claims)
         print(f"Context added; page: {rounds.write_spotcheck(args.folder)}")
     elif args.command == "judge":
-        from semantic_pdf_diff.judgements import ModelJudge
+        from semantic_pdf_diff_lab.eval.judgements import ModelJudge
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff.llm import folder_client
         from semantic_pdf_diff.llm import Budget, evaluator_settings
@@ -127,7 +127,7 @@ def main(argv=None):
             return 3
         print(json.dumps(rounds.decide(args.folder, verdicts_dir=verdicts(args.rubric), documents=DOCUMENTS), indent=2))
     elif args.command == "import":
-        from semantic_pdf_diff.judgements import Person
+        from semantic_pdf_diff_lab.eval.judgements import Person
         person = Person(args.answers)
         records = person.rate(args.folder)
         print(f"Imported {person.name}: {sum(r.question == 'pair' for r in records)} units, "

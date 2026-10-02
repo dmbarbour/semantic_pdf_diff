@@ -1,5 +1,5 @@
 """Controlled documents: generate the corpus, read it with the pipeline, and score extraction exactly
-(src/semantic_pdf_diff/controlled.py; docs/plans/controlled-documents-2026-10-01.md).
+(lab/src/semantic_pdf_diff_lab/bench/controlled.py; docs/plans/controlled-documents-2026-10-01.md).
 
     python scripts/controlled.py generate                    # PDFs and answer keys into benchmarks/controlled/docs
     set -a; . ./.env; set +a
@@ -48,7 +48,8 @@ def main(argv=None):
     run.add_argument("--max-cost", type=float, default=0.2)
     sub.add_parser("score", help="score each run against its key (offline)")
     args = parser.parse_args(argv)
-    from semantic_pdf_diff import controlled, fixtures
+    from semantic_pdf_diff_lab.bench import controlled
+    from semantic_pdf_diff import fixtures
     if args.command == "generate":
         for project in controlled.corpus(tuple(args.seed or (1,)), knobs=True):
             print(f"{controlled.write(project, DOCS)}: {len(project.facts)} facts")
@@ -86,7 +87,7 @@ def main(argv=None):
             fixtures.pack(WORKING, PACKED)
             print(f"packed {PACKED}; spent ${ledger.spent(LEDGER, round='controlled') - before:.3f}")
         return worst
-    from semantic_pdf_diff import rounds
+    from semantic_pdf_diff_lab.eval import rounds
     results = {}
     for which in ("recorded", "replay"):
         runs = RUNS / which
@@ -106,7 +107,7 @@ def main(argv=None):
             result["conditions_by_reader"] = {f: r["conditions_kept"] for f, r in readers.items()}
             results.setdefault(which, {})[run] = result
     (FOLDER / "results.json").write_text(json.dumps(results, indent=1) + "\n", encoding="utf-8")
-    from semantic_pdf_diff import sheets
+    from semantic_pdf_diff_lab.bench.controlled import sheets
     knobbed = [(p, controlled.TABLE_KNOBS) for p in controlled.TABLE_PROJECTS] + \
               [(p, controlled.PROSE_KNOBS) for p in controlled.PROSE_PROJECTS] + \
               [(p, controlled.CHART_KNOBS) for p in controlled.CHART_PROJECTS] + \
@@ -130,7 +131,7 @@ def main(argv=None):
                           + " ".join(f"{f} {x.get('misbound', 0)}" for f, x in r["outcomes_by_reader"].items())
                           + ("; " + " ".join(f"{f} {k}" for f, k in r["conditions_by_reader"].items())
                              if r["conditions_kept"] != "0/0" else ""))
-    from semantic_pdf_diff import schematics
+    from semantic_pdf_diff_lab.bench.controlled import schematics
     for which, runs in results.items():  # schematics: relations and numbers apart
         for project in schematics.SCHEMATIC_PROJECTS:
             mine = {run[len(project) + 2:].partition("-")[2]: r for run, r in runs.items()

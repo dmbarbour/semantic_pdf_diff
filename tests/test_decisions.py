@@ -10,8 +10,8 @@ import stubs  # noqa: F401 (a clean environment)
 import collections
 import random
 import unittest
-from semantic_pdf_diff import rounds
-from semantic_pdf_diff.models import Criteria
+from semantic_pdf_diff_lab.eval import rounds
+from semantic_pdf_diff_lab.eval.models import Criteria
 
 NULL = [(0.0, 10), (0.125, 0.5), (0.25, 1), (0.375, 0.5), (0.5, 8), (0.625, 0.5), (0.75, 1), (0.875, 0.5), (1.0, 10)]
 VALUES, WEIGHTS = zip(*NULL)
@@ -83,7 +83,7 @@ class RoundSpecs(unittest.TestCase):
         import json
         from pathlib import Path
         from pydantic import ValidationError
-        from semantic_pdf_diff.models import RoundSpec
+        from semantic_pdf_diff_lab.eval.models import RoundSpec
         specs = sorted(Path(__file__).resolve().parent.parent.glob('benchmarks/rounds/*/round.json'))
         self.assertGreater(len(specs), 10)
         for path in specs:

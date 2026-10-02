@@ -76,7 +76,9 @@ The `--out` folder is an evidence **store** (`store.sqlite` plus rendered crops)
 
 ## Tests
 
+The tests cover the lab too: the evaluation and bench tooling, its own distribution in `lab/` (`semantic-pdf-diff[lab]` once published), which adds the `review` and `queries` commands.
+
 ```bash
-pip install -e '.[dev]'
+pip install -e '.[dev]' -e lab
 python -m unittest discover -s tests -v
 ```

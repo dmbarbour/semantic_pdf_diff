@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "semantic-pdf-diff-lab"
+version = "0.2.0"
+description = "Evaluation and bench tooling for semantic-pdf-diff: improvement rounds, judges, review panels, spot checks, controlled documents, eye and page tests"
+requires-python = ">=3.10"
+dependencies = ["semantic-pdf-diff==0.2.0"]
+
+# Commands added to `pdf-semantic-diff` (semantic_pdf_diff.cli.lab_commands).
+[project.entry-points."semantic_pdf_diff.commands"]
+review = "semantic_pdf_diff_lab.eval.commands:review_command"
+queries = "semantic_pdf_diff_lab.eval.commands:queries_command"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"semantic_pdf_diff_lab.eval" = ["*.html"]

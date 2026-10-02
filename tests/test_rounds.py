@@ -6,10 +6,12 @@ import tempfile
 import pymupdf
 import unittest
 from pathlib import Path
-from semantic_pdf_diff import cli, rounds
+from semantic_pdf_diff import cli
+from semantic_pdf_diff_lab.eval import rounds
 from unittest.mock import patch
 from semantic_pdf_diff.llm import ModelFailure
-from semantic_pdf_diff.models import PairVerdict, Settings
+from semantic_pdf_diff.models import Settings
+from semantic_pdf_diff_lab.eval.models import PairVerdict
 from test_concurrency import jittery_model, make_pdf
 
 class Judge:
@@ -69,7 +71,7 @@ class Rounds(unittest.TestCase):
         self.assertIn('overall', decision)
 
     def test_rubric_v2_tags_problems_and_keeps_remarks_for_the_insights_page(self):
-        from semantic_pdf_diff import insights
+        from semantic_pdf_diff_lab.eval import insights
         folder = self.root / 'batch-v2'
         batch = rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=4)
         (folder / 'round.json').parent.mkdir(exist_ok=True)
@@ -177,7 +179,7 @@ class Rounds(unittest.TestCase):
             (folder / 'verdicts' / 'j2.json').write_text(json.dumps({'reviewer': 'j2', 'verdicts': {
                 'u1': {'baseline-first': {'score': 1.0}, 'variant-first': {'score': 1.0}}}}))
             self.assertEqual(rounds.unit_scores(folder), {'u1': 0.75})
-            with patch('semantic_pdf_diff.review.reviewer_file', lambda r: r):
+            with patch('semantic_pdf_diff_lab.eval.review.reviewer_file', lambda r: r):
                 self.assertEqual(rounds.unsettled(folder, ['j1']), {'u1', 'u2'})  # flipped; failed an order
             self.assertEqual(rounds.decide(folder)['coverage'], 0.2)
 
@@ -398,7 +400,7 @@ class Rounds(unittest.TestCase):
             self.assertNotEqual(set(base[visual]['claims']), set(quoted[visual]['claims']))  # only the quote differs
 
     def test_every_lever_gets_a_post_mortem(self):
-        from semantic_pdf_diff import postmortem
+        from semantic_pdf_diff_lab.eval import postmortem
         from semantic_pdf_diff.models import Settings
         folder = self.root / 'post-mortem'
         rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=8)

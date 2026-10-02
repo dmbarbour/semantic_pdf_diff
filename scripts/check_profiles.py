@@ -18,7 +18,7 @@ def name(side, px):
     return f"{'whole' if side is None else f't{side}'}-{px}"
 
 def main():
-    from semantic_pdf_diff import pagetest, profiles
+    from semantic_pdf_diff_lab.bench import pagetest, profiles
     pages = json.loads(PAGES.read_text(encoding="utf-8"))["models"]
     for model, measured in pages.items():
         profile = profiles.load(model, EYES, PAGES)

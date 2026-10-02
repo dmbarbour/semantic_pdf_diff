@@ -12,12 +12,11 @@ dependencies = ["PyMuPDF>=1.24.3,<2", "pydantic>=2.7,<3", "tqdm>=4.60,<5"]
 [project.optional-dependencies]
 # Synthetic sample generation and its tests.
 dev = ["openpyxl>=3.1,<4"]
+# The evaluation and bench tooling, and the commands it adds (review, queries): lab/, its own distribution.
+lab = ["semantic-pdf-diff-lab==0.2.0"]
 
 [project.scripts]
 pdf-semantic-diff = "semantic_pdf_diff.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.setuptools.package-data]
-semantic_pdf_diff = ["*.html"]

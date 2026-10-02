@@ -11,17 +11,17 @@ blind (the owner, 2026-09-27):
     analyse(batch_folder, limit)  -> writes analysis.json beside pairs.json
     page(round_folder)            -> writes insights.html in the round folder
 """
-from .html_pages import esc
+from semantic_pdf_diff.html_pages import esc
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
 from . import judgements
-from .regions import family_of
+from semantic_pdf_diff.regions import family_of
 
 def _issues(runs_dir, run, content, page, family):
     """{issue: tasks} the model reported for one unit's tasks, from a replay store."""
-    from .store import Store, StoreError
+    from semantic_pdf_diff.store import Store, StoreError
     folder = Path(runs_dir) / run
     if not (folder / "store.sqlite").exists():
         return {}

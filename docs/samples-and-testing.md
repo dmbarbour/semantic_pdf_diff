@@ -2,8 +2,10 @@
 
 ## Tests and demo
 
+The product is `src/semantic_pdf_diff`. The lab, how it's measured and improved (rounds, judges, review panels, spot checks, controlled documents, eye and page tests), is its own distribution in `lab/` (`semantic_pdf_diff_lab`), installed beside it. It adds its commands to `pdf-semantic-diff` through entry points. `tests/test_boundaries.py` keeps the product from importing it.
+
 ```bash
-pip install -e '.[dev]'
+pip install -e '.[dev]' -e lab
 python -m unittest discover -s tests -v
 python examples/demo.py
 ```

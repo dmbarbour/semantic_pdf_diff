@@ -4,8 +4,8 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from semantic_pdf_diff import eyetest
-from semantic_pdf_diff.eyetest import Card
+from semantic_pdf_diff_lab.bench import eyetest
+from semantic_pdf_diff_lab.bench.eyetest import Card
 
 FOLDER = Path(__file__).resolve().parent.parent / "benchmarks" / "eyetest"
 

@@ -4,7 +4,7 @@ import stubs  # noqa: F401 (a clean environment)
 import os
 import unittest
 from unittest.mock import patch
-from semantic_pdf_diff import rounds
+from semantic_pdf_diff_lab.eval import rounds
 from semantic_pdf_diff.llm import Budget, evaluator_settings
 from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
 
