@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import PurePath
 from . import __version__
-from .levers import lever_settings, role_settings
+from .levers import declared, lever_settings, role_settings
 from .models import Interpreter, Settings
 
 # Only aliases known to share an interpretation collapse.
@@ -62,8 +62,10 @@ def interpreter(role, settings, prompts, names):
     (code review 2026-10-01, item 4). Extraction binds its levers' order too. (Recorded answers don't depend on
     this: fixtures and caches are keyed by the query that reached the model.)"""
     values = {name: getattr(settings, name) for name in names}
-    if role == "extract":
-        values["levers"] = list(type(settings).levers)
+    if role == "extract":  # the levers that act on extraction, in order (a comparison lever doesn't rebind it)
+        cls = type(settings)
+        values["levers"] = [lever.lever_name for lever in cls.lever_classes
+                            if any(role in declared(cls, f).roles for f in lever.model_fields)]
     return Interpreter(role=role, model=settings.model, prompt_hash=text_hash(*prompts), settings=values,
                        versions=library_versions())
 

@@ -281,3 +281,16 @@ None now. The owner's reading of the full review may add some.
     - Every lever off asks what no lever at all asks, on reports and on sheets.
   - **Order** now orders a stage's lines: a test swaps neighbours and stems and sees their context lines swap.
   - **Parked levers** stay settings and stay in the default configuration, off. Off, they no longer branch through the main path; their hooks return what's below them.
+- **Milestone 5, situating, comparison and judging on the same model (2026-10-02): done.** Requests unchanged: the golden requests and judge prompts pass, and a query snapshot of every slice matches HEAD's.
+  - **Judges' rubrics** (`rubrics.py`): each version is a named configuration, an ordered list of clause mixins composed on a `Rubric` platform.
+    - **Structural clauses** change the template and what a verdict holds: tags, claim marks, sections, context, whole page. `tagged()`, `numbered()` and `whole()` are chosen hooks.
+    - **Wording clauses** each add a sentence to the guidance: administration neutral, names from headings, context or the page, the sample note, mark first, the shared listing.
+    - **Each clause's change must find its mark exactly once.** A clause out of order is refused, not silently ignored (the review's "chains of `str.replace` that fail silently").
+    - **Each clause names the clauses it needs before it,** checked on the final type. Examples: the whole page needs claim marks and context; names from headings need the headings shown.
+    - **All six versions** match their old prompts byte for byte, with the same flags and guidance.
+  - **Comparison:**
+    - **Retrieval** is a chosen hook (`candidates`), today's sparse TF-IDF the platform's. BM25 or a reranker (the owner's asides) would be a lever choosing otherwise.
+    - **`verify_visuals`** is a lever (`comparison_images`).
+    - Round 0 and the champion name it in their order.
+    - Extraction's binding lists only the levers that act on extraction, so a comparison lever doesn't rebind extraction stores.
+  - **Situating** has no choices to move: it reads only the platform's budgets, and its prompts are fixed. A situating lever would come with its hooks.

@@ -177,7 +177,8 @@ class Declarations(unittest.TestCase):
         # a bound lever setting without a scope clears every region when changed: only the instructions should,
         # and the row dedupe (it can drop rows from any task's text)
         from semantic_pdf_diff.levers import declared
-        unscoped = {n for n in levers.lever_settings() if declared(Settings, n).roles and n not in store.SETTING_REGIONS}
+        unscoped = {n for n in levers.lever_settings() if "extract" in declared(Settings, n).roles
+                    and n not in store.SETTING_REGIONS}  # (regions are extraction's)
         self.assertEqual(unscoped, {"extract_prompt", "extract_rules", "dedupe_repeated"})
         for name, _ in extract.LEVER_MARKS:  # each mark is its lever's own setting, or the headings
             self.assertTrue(name == "section" or any(name in c.model_fields and name in c.marks

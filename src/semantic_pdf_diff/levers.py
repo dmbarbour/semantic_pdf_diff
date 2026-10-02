@@ -371,6 +371,15 @@ class Reconcile(Lever):
     def reconciles(self):
         return self.reconcile
 
+class VerifyVisuals(Lever):
+    lever_name, stage, off = "verify_visuals", "comparison", {"verify_visuals": False}
+    # send a claim's crop with it when it's compared, so the judgment can check the reading
+    verify_visuals: Annotated[bool, _selecting(roles=COMPARE)] = True
+
+    def comparison_images(self, evidence, output):
+        images = super().comparison_images(evidence, output)
+        return images + ([output / evidence.image] if self.verify_visuals and evidence.image else [])
+
 class DedupeRepeated(Lever):
     lever_name, stage, off = "dedupe_repeated", "matching", {"dedupe_repeated": False}
     # extract exactly repeated table rows (same cells, same table position, 3+ pages) once
@@ -384,7 +393,7 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, VisualTextLayer, TableFilter,
-                 QuoteMatch, Reconcile, DedupeRepeated)
+                 QuoteMatch, Reconcile, DedupeRepeated, VerifyVisuals)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -411,8 +420,8 @@ class Composable(BaseModel):
         hierarchy is otherwise harder to read than a branch)."""
         lines = []
         for lever in cls.lever_classes:
-            lines.append(f"{lever.lever_name} ({lever.stage or 'lever'}{', parked' if lever.parked else ''}): "
-                         + ", ".join(f"{f} [{declared(cls, f).kind}]" if any(isinstance(m, Declared) for m in
+            lines.append(f"{lever.lever_name} ({lever.stage or 'lever'}{', parked' if lever.parked else ''})"
+                         + (": " if lever.model_fields else "") + ", ".join(f"{f} [{declared(cls, f).kind}]" if any(isinstance(m, Declared) for m in
                                                                               cls.model_fields[f].metadata) else f
                                      for f in lever.model_fields))
         for hook, kind in hooks(cls).items():
@@ -448,7 +457,6 @@ class Platform(Composable):
     vision: Annotated[bool, _selecting(VISUAL)] = True
     # Situating stage: figure and section "about" statements after extraction.
     situate: Annotated[bool, _selecting(roles=())] = True
-    verify_visuals: Annotated[bool, _selecting(roles=COMPARE)] = True
     response_format: Annotated[Literal["none", "json_object", "json_schema"], _shaping(roles=EVERY_ROLE)] = "none"
     seed: Annotated[int | None, _shaping(roles=EVERY_ROLE)] = None
     max_token_field: Annotated[Literal["max_tokens", "max_completion_tokens"], _shaping(roles=EVERY_ROLE)] = "max_tokens"
@@ -504,6 +512,20 @@ class Platform(Composable):
     @chained
     def tile_images(self, reader, page, rect, tag):
         """Images sent after an image task's own (paths under the store)."""
+        return []
+
+    # --- comparison: which claims are compared, and what a comparison is sent
+
+    @chosen
+    def candidates(self, left, right):
+        """Pairs worth comparing, [(i, j, score)]: the platform's are a sparse TF-IDF bidirectional top-k union
+        (compare.candidates); another retrieval (BM25, a reranker) would be a lever choosing otherwise."""
+        from .compare import candidates
+        return candidates(left, right, self)
+
+    @chained
+    def comparison_images(self, evidence, output):
+        """Images sent with a claim being compared (paths)."""
         return []
 
     # --- matching: how answers are checked and kept

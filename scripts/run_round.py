@@ -223,7 +223,7 @@ def main(argv=None):
                                    ("runs of no document family", len(checks.get("without_family", [])))):
                 if found:
                     print(f"{v}: {found} {problem} (pairs-{v}/pairs.json: units.checks)")
-            if rounds.RUBRICS[spec.get("rubric", "v1")].get("whole"):  # the whole page and every claim (v6)
+            if rounds.rubric_of(spec.get("rubric", "v1")).whole():  # the whole page and every claim (v6)
                 rounds.add_context(batch, runs_root / "baseline", runs_root / v, n=int(spec.get("units", 60)),
                                    unit=unit_of(spec["variants"][v]))
             figure("units_changed", built["units"]["units"] - built["units"]["unchanged"], variant=v, step="pairs")

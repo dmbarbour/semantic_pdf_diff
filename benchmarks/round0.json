@@ -17,7 +17,8 @@
     "table_filter",
     "quote_match",
     "reconcile",
-    "dedupe_repeated"
+    "dedupe_repeated",
+    "verify_visuals"
   ],
   "claims_per_request": 6,
   "output_tokens": 1400,

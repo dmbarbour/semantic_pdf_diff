@@ -17,7 +17,8 @@
     "table_filter",
     "quote_match",
     "reconcile",
-    "dedupe_repeated"
+    "dedupe_repeated",
+    "verify_visuals"
   ],
   "context_before": 400,
   "context_after": 400,

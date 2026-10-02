@@ -173,7 +173,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None):
     right = [e for e in right if e.id not in shared_ids]
     scored = {}
     for a_side, b_side in ((left, right + shared), (shared, right)):
-        for i, j, score in candidates(a_side, b_side, client.s):
+        for i, j, score in client.s.candidates(a_side, b_side):
             a, b = a_side[i], b_side[j]
             scored[a.id, b.id] = (max(score, scored.get((a.id, b.id), (0,))[0]), a, b)
     pairs = sorted(scored.values(), key=lambda x: (-x[0], x[1].id, x[2].id))
@@ -217,9 +217,10 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None):
             images, payload = [], []
             for e in (a,b):
                 p = e.model_dump(exclude=PROVENANCE_FIELDS)
-                if client.s.verify_visuals and e.image:
+                extra = client.s.comparison_images(e, output)
+                if extra:
                     p["source_image"] = len(images) + 1
-                    images.append(output / e.image)
+                    images += extra
                 payload.append(p)
             calc = numeric_check(a,b)
             prompt = COMPARE + MODE_CONTEXT[mode] + "\nA=" + json.dumps(payload[0],ensure_ascii=False) + "\nB=" + json.dumps(payload[1],ensure_ascii=False)

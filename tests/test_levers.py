@@ -167,6 +167,46 @@ class Configurations(unittest.TestCase):
         self.assertEqual(Settings.configured(**champion).configuration(), Settings().configuration())
         self.assertEqual(Settings.configured(**round0).tiling, "grid")
 
+class Rubrics(unittest.TestCase):
+    """Judges' rubrics on the same model (rubrics.py; milestone 5): each version an ordered list of clauses. The
+    versions' bytes are pinned by tests/golden/pairwise-*.txt (test_judge_prompts)."""
+    def test_each_version_composes_from_its_clauses(self):
+        from semantic_pdf_diff import rubrics as R
+        v6 = R.rubric("v6")
+        self.assertEqual((v6.tagged(), v6.numbered(), v6.whole()), (True, True, True))
+        self.assertEqual((R.rubric("v2").numbered(), R.rubric("v1").tagged()), (False, False))
+        self.assertIn("hook template (chained): platform -> tags -> claim_marks -> sections -> context -> whole",
+                      type(v6).explain())
+
+    def test_a_clause_out_of_order_or_alone_is_refused(self):
+        from semantic_pdf_diff import rubrics as R
+        for clauses, problem in (((R.Tags, R.Sections, R.Whole, R.Context), "whole needs claim_marks before it"),
+                                 ((R.Context, R.Sections), "context needs sections before it"),
+                                 ((R.Tags, R.HeadingNames), "heading_names needs sections before it"),
+                                 ((R.ClaimMarks,), "claim_marks needs tags before it")):
+            with self.subTest(clauses=[c.lever_name for c in clauses]):
+                with self.assertRaisesRegex(ValidationError, problem):
+                    L.compose(clauses, R.Rubric)()
+
+    def test_a_change_that_misses_its_mark_says_so(self):
+        from semantic_pdf_diff import rubrics as R
+        with self.assertRaisesRegex(ValueError, "doesn't hold"):
+            R._swap("PAGE {page}", "SET A:", "SET A ({a_note}):")
+
+class Comparison(unittest.TestCase):
+    def test_retrieval_is_the_platforms_and_images_are_a_lever(self):
+        from semantic_pdf_diff.compare import candidates
+        from semantic_pdf_diff.models import Evidence, PdfLocator
+        ev = lambda i, v: Evidence(id=i, content="sha256:" + "a" * 64 + ".pdf", entity="pump", attribute="power",
+                                   value=v, unit="kW", kind="table", quote=v, confidence=0.9, image="assets/x.png",
+                                   locator=PdfLocator(page=1, bbox=(0, 0, 1, 1), region="table", task="table:0"))
+        a, b = [ev("A-1", "10")], [ev("B-1", "12")]
+        self.assertEqual(Settings().candidates(a, b), candidates(a, b, Settings()))
+        self.assertEqual(Settings().comparison_images(a[0], Path("out")), [Path("out/assets/x.png")])
+        self.assertEqual(Settings(verify_visuals=False).comparison_images(a[0], Path("out")), [])
+        without = settings_class(tuple(n for n in L.DEFAULT_LEVERS if n != "verify_visuals"))()
+        self.assertEqual(without.comparison_images(a[0], Path("out")), [])
+
 class Binding(unittest.TestCase):
     """Levers were bound only when they differed from the defaults of the day, so a moved default went
     unnoticed and old evidence was served as current (code review 2026-10-01, item 4)."""
@@ -174,7 +214,7 @@ class Binding(unittest.TestCase):
         from semantic_pdf_diff.store import affected_regions, interpreter_differences
         bound = extraction_interpreter(Settings()).settings
         self.assertEqual(bound["context_before"], 400)  # at its default, still bound
-        self.assertEqual(bound["levers"], list(L.DEFAULT_LEVERS))
+        self.assertEqual(bound["levers"], [n for n in L.DEFAULT_LEVERS if n not in ("reconcile", "verify_visuals")])  # extraction's
         backwards = extraction_interpreter(settings_class(tuple(reversed(L.DEFAULT_LEVERS)))()).model_dump()
         differences = interpreter_differences(extraction_interpreter(Settings()).model_dump(), backwards)
         self.assertEqual(set(differences), {"settings.levers"})
