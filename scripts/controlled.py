@@ -121,14 +121,14 @@ def main(argv=None):
                     if run.startswith(project + "-s") and run[len(project) + 2:].partition("-")[0].isdigit()}
             if not mine:
                 continue
-            print(f"\n{which} {project}: knob      recall  right  loose  misbound  inexact  misread  hallucinated  claims"
+            print(f"\n{which} {project}: knob      recall  right  loose  misbound  inexact  wrong unit  misread  hallucinated  claims"
                   "  conditions   misbound by reader; conditions kept by reader")
             for knob in knobs:
                 r = mine.get(knob)
                 if r:
                     o = r["outcomes"]
                     print(f"  {knob:12s} {r['recall']:7.3f} {r['found_right']:6d} {o.get('loose', 0):6d} "
-                          f"{o.get('misbound', 0):9d} {o.get('inexact', 0):8d} {o.get('misread', 0):8d} "
+                          f"{o.get('misbound', 0):9d} {o.get('inexact', 0):8d} {o.get('wrong unit', 0):11d} {o.get('misread', 0):8d} "
                           f"{o.get('hallucinated', 0):13d} {r['claims']:7d}"
                           f"  {r['conditions_kept']:>10s}   "
                           + " ".join(f"{f} {x.get('misbound', 0)}" for f, x in r["outcomes_by_reader"].items())

@@ -16,8 +16,8 @@ from .compare import compare, file_difference
 from .dispatch import Dispatcher
 from .readings import reconcile
 from .extract import EXTRACT, Job, pdf_sections, run_jobs, text_groups, visual_regions
-from .llm import SYSTEM, Client, folder_client, redact_url
-from .models import EVALUATOR_SETTINGS, Settings, Source
+from .llm import SYSTEM, Budget, Client, evaluator_settings, folder_client, redact_url
+from .models import Settings, Source
 from .progress import Progress, log, setup_logging
 from .throttle import RateLimiter
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
@@ -421,17 +421,20 @@ def queries_command(argv):
         print(f"{summary['shown']} of {summary['candidates']} queries -> {args.out / 'index.html'}")
         return 0
     start_logging(args)
+    budget = Budget(args.max_cost)  # for the whole command, not each model
     for model in args.model:
+        if budget.exhausted():
+            log.warning(f'cost cap of ${args.max_cost:.2f} reached before checking with {model}')
+            return 3
         # Reasoning models think at length: 4,000 output tokens truncated most of Qwen's and Kimi's
         # answers in the first trial (paid for, and lost). Few at a time, so a cap overshoots little.
-        settings = Settings.from_env(model=model, **EVALUATOR_SETTINGS,
-                                     concurrency=4, timeout=600, retries=1,
-                                     **({'max_cost': args.max_cost} if args.max_cost else {}))
+        settings = evaluator_settings(model, concurrency=4, timeout=600, retries=1, **budget.settings())
         with folder_client(args.folder, settings) as client:
             attach_ledger(client, args)
             progress = Progress(f'check {model}', client, heartbeat=settings.heartbeat_seconds)
             target, count, failures = queries.check(args.folder, client, model, progress)
             progress.close()
+        budget.add(client)
         for failure in failures[:5]:
             log.warning(f'{model}: {failure}')
         print(f"{model}: {count} checks -> {target}; ${client.cost:.3f}")
@@ -496,15 +499,18 @@ def review_command(argv):
             print(f'{count} labels from {path} -> {target}')
     elif args.command == 'judge':
         start_logging(args)
+        budget = Budget(args.max_cost)  # for the whole command, not each model
         for model in args.model:
-            settings = Settings.from_env(model=model, **EVALUATOR_SETTINGS,
-                                         concurrency=16, timeout=600, retries=2,
-                                         **({'max_cost': args.max_cost} if args.max_cost else {}))
+            if budget.exhausted():
+                log.warning(f'cost cap of ${args.max_cost:.2f} reached before judging with {model}')
+                return 3
+            settings = evaluator_settings(model, concurrency=16, timeout=600, retries=2, **budget.settings())
             with folder_client(args.batch, settings) as client:
                 attach_ledger(client, args)
                 progress = Progress(f'judge {model}', client, heartbeat=settings.heartbeat_seconds)
                 target, count, failures = review.judge(args.batch, client, model, args.limit, progress, args.stage)
                 progress.close()
+            budget.add(client)
             for failure in failures[:5]:
                 log.warning(f'{model}: {failure}')
             print(f"{model}: {count} labels -> {target}; {client.calls} calls, "

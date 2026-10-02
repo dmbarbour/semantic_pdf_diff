@@ -48,13 +48,13 @@ def main(argv=None):
     args = parser.parse_args(argv)
     import pymupdf
     from semantic_pdf_diff import eyetest, ledger, pagetest
-    from semantic_pdf_diff.llm import folder_client
+    from semantic_pdf_diff.llm import evaluator_settings, folder_client
     from semantic_pdf_diff.models import Settings
     if args.command == "run":
         for model in args.model:
             name = args.responder or model
             before = ledger.spent(LEDGER, round="pagetest", judge=name)
-            settings = Settings.from_env(model=model, **eyetest.EYE_SETTINGS, concurrency=args.concurrency, timeout=300,
+            settings = evaluator_settings(model, eyetest.EYE_SETTINGS, concurrency=args.concurrency, timeout=300,
                                          retries=2,
                                          max_cost=args.max_cost, **({"base_url": args.base_url} if args.base_url else {}))
             with folder_client(FOLDER, settings, responder=name) as client:

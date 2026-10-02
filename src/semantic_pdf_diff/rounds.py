@@ -16,11 +16,21 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 from . import judgements
-from .pages import native_page
+from .pages import native, shown_by_matrix
 
 FAMILY = {"text": "text", "table": "table", "tile": "visual", "figure": "visual", "overview": "visual"}
 MAX_CLAIMS = 25     # claims shown per side (sampled when there are more)
 PAGE_TEXT = 6000    # characters of the page's text layer shown to judges
+
+
+def private_slices(runs, manifest):
+    """The slices behind these runs (by run name, as in scripts/slices.json) not marked public. Rounds and
+    spot checks commit page images, page text and claims, so they refuse any: a sensitive document must
+    never reach the repository."""
+    slices = {s["name"]: s for s in manifest["slices"]}
+    names = {n for r in manifest["runs"] if r["name"] in set(runs) for n in r["slices"]} | (set(runs) & set(slices))
+    unknown = sorted(set(runs) - {r["name"] for r in manifest["runs"]} - set(slices))
+    return sorted(n for n in names if not slices.get(n, {}).get("public")) + unknown
 
 def _reader(runs_dir):
     """Evidence as the runs present it: the store says whether readings are merged; stores from
@@ -85,12 +95,39 @@ def collect(runs_dir, unit="family"):
     return dict(units)
 
 MAX_BANDS = 4  # a unit is cut into at most this many bands
+BANDS = "as displayed"  # how a band's y0, y1 are measured (batches record it; before 2026-10-02, unrotated)
 
-def split_units(base, var, limit=MAX_CLAIMS):
+def rotations(runs_dir):
+    """rotation(run, content, page): the page's rotation matrix (None: upright), from the document
+    the run's store read; each document is opened once."""
+    import pymupdf
+    from .scan import read_origin
+    from .store import Store
+    cache = {}
+    def rotation(run, content, page):
+        if (run, content) not in cache:
+            with Store(Path(runs_dir) / run) as store:
+                file = next(f for f in store.files() if f.content == content)
+                data = read_origin(store.origin(file.source, file.path))
+            with pymupdf.open(stream=data, filetype="pdf") as doc:
+                cache[(run, content)] = [p.rotation_matrix if p.rotation else None for p in doc]
+        return cache[(run, content)][page - 1]
+    return rotation
+
+def band_region(page, band):
+    """The part of a page a band shows: its y0..y1 as displayed, padded, across the page, in
+    unrotated coordinates (what render and get_text clip by)."""
+    import pymupdf
+    full = page.rect
+    return native(page, pymupdf.Rect(full.x0, max(full.y0, band[2] - 12), full.x1, min(full.y1, band[3] + 12)))
+
+def split_units(base, var, limit=MAX_CLAIMS, rotation=None):
     """Units with more than `limit` claims on either side, cut into bands of the page by where the
     claims were read (the meta-analysis of rounds 1–8: half of all units, three quarters of visual
-    ones, had more, and gave weaker verdicts). Keys gain a band (index, count, y0, y1), in
-    unrotated page coordinates; unchanged bands then drop out like unchanged units."""
+    ones, had more, and gave weaker verdicts). Keys gain a band (index, count, y0, y1), measured as
+    the page is displayed (rotation: see `rotations`; none, every page upright), so a turned sheet
+    is cut across as it's read (code review 2026-10-01, item 15); unchanged bands then drop out like
+    unchanged units."""
     out_a, out_b = {}, {}
     for key in set(base) | set(var):
         a = base.get(key, {"claims": {}, "tasks": 0})
@@ -110,10 +147,12 @@ def split_units(base, var, limit=MAX_CLAIMS):
             continue
         # Where each claim was read; a claim both sides have takes the same position either way
         # round (the lesser box), so bands don't depend on which side is the baseline.
+        turn = rotation(*key[:3]) if rotation else None
         position = {}
         for side in (a, b):
             for i, c in side["claims"].items():
-                position[i] = min(position[i], tuple(c["_box"])) if i in position else tuple(c["_box"])
+                box = tuple(shown_by_matrix(turn, c["_box"]))
+                position[i] = min(position[i], box) if i in position else box
         centre = lambda i: (position[i][1] + position[i][3]) / 2
         order = sorted(position, key=lambda i: (centre(i), i))
         k = min(MAX_BANDS, -(-size // limit))
@@ -157,8 +196,9 @@ def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", 
     is built). Swapping the sides gives the same units; every claim was read by a task of its
     unit's kind; and changed units stay within what the differing settings can touch."""
     base_units, var_units = collect(baseline_dir, unit), collect(variant_dir, unit)
-    base, var = split_units(base_units, var_units, limit)
-    mirror_var, mirror_base = split_units(var_units, base_units, limit)
+    rotation = rotations(baseline_dir)
+    base, var = split_units(base_units, var_units, limit, rotation)
+    mirror_var, mirror_base = split_units(var_units, base_units, limit, rotation)
     scope = lever_scope(baseline_dir, variant_dir, unit)
     checks = {"asymmetric_units": len(set(base) ^ set(mirror_base)) + len(set(var) ^ set(mirror_var)),
               "foreign_readings": sum(1 for units in (base_units, var_units) for k, u in units.items()
@@ -248,14 +288,13 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
         headings = [" > ".join(x.heading_path) for x in docs[(run, content, "sections")]
                     if x.heading_path and x.first_page <= page <= x.last_page]
         with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
-            unrotated = native_page(doc[page - 1])
-            part, parts, y0, y1 = band[0] if band else (0, 1, unrotated.y0, unrotated.y1)
-            region = pymupdf.Rect(unrotated.x0, max(unrotated.y0, y0 - 12), unrotated.x1, min(unrotated.y1, y1 + 12))
+            part, parts, y0, y1 = band[0] if band else (0, 1, None, None)
+            region = band_region(doc[page - 1], band[0]) if band else None
             name = f"{run}-{content.split(':')[1][:8]}-p{page}" + (f"-b{part}of{parts}" if band else "") + ".jpg"
             if not (folder / "images" / name).exists():  # a band is shown as its own crop, at full size
-                (folder / "images" / name).write_bytes(render(doc, page, region if band else None, None, 1400))
-            text = doc[page - 1].get_text("text", clip=region if band else None)[:PAGE_TEXT]
-            before, within = _lead(doc, page, region, docs, (run, content))
+                (folder / "images" / name).write_bytes(render(doc, page, region, None, 1400))
+            text = doc[page - 1].get_text("text", clip=region)[:PAGE_TEXT]
+            before, within = _lead(doc, page, region or native(doc[page - 1], doc[page - 1].rect), docs, (run, content))
         shown_a, shown_b = shown(a, b, rng, limit)
         shared = set(a) & set(b)
         hidden_unique += len((set(a) - set(b)) - set(shown_a)) + len((set(b) - set(a)) - set(shown_b))
@@ -271,7 +310,8 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
     if documents is not None:
         checks["without_family"] = sorted({i["run"] for i in items if not documents.get(i["run"])})
     batch = {"format": "semantic-pdf-diff-pairwise-batch", "version": 1, "baseline": str(baseline_dir),
-             "variant": str(variant_dir), "seed": seed, "unit_claims": UNIT_CLAIMS, "units": counts, "items": items}
+             "variant": str(variant_dir), "seed": seed, "unit_claims": UNIT_CLAIMS, "bands": BANDS, "units": counts,
+             "items": items}
     (folder / "pairs.json").write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return batch
 
@@ -635,11 +675,11 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
                 file = next(f for f in store.files() if f.content == content)
                 docs[(run, content)] = read_origin(store.origin(file.source, file.path))
         with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
-            unrotated = native_page(doc[page - 1])
-            y0, y1 = (band[0][2], band[0][3]) if band else (unrotated.y0, unrotated.y1)
-            region = pymupdf.Rect(unrotated.x0, max(unrotated.y0, y0 - 12), unrotated.x1, min(unrotated.y1, y1 + 12))
+            if band and doc[page - 1].rotation and batch.get("bands") != BANDS:
+                raise ValueError(f"{folder}'s bands were cut by unrotated y; rebuild the batch to add context")
+            region = band_region(doc[page - 1], band[0]) if band else None
             name = item["image"].replace(".jpg", "-page.jpg")
-            (folder / name).write_bytes(render(doc, page, None, region if band else None, 1400))
+            (folder / name).write_bytes(render(doc, page, None, region, 1400))
             item["page_image"] = name
             item["page_text_full"] = doc[page - 1].get_text("text")[:PAGE_TEXT]
     (folder / "pairs.json").write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -842,39 +882,15 @@ def unsettled(folder, reviewers, limit=None, verdicts_dir="verdicts"):
     one of them lacks an order (a failed verdict), flipped with the order, or they disagree."""
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    judged = judgements.by_rater(judgements.read(folder, verdicts_dir))
-    verdicts = [judged.get(r, {}) for r in reviewers]
-    out = set()
-    for item in batch["items"][:limit]:
-        leanings = set()
-        for judge in verdicts:
-            orders = judge.get(item["id"], {})
-            scores = [v["score"] for v in orders.values()]
-            if len(scores) < 2 or {0.0, 1.0} <= set(scores):
-                out.add(item["id"])
-                break
-            mean = sum(scores) / 2
-            leanings.add((mean > 0.5) - (mean < 0.5))
-        if len(leanings - {0}) > 1:
-            out.add(item["id"])
-    return out
+    verdicts = judgements.UnitVerdicts.read(folder, verdicts_dir, raters=set(reviewers))
+    return {i["id"] for i in batch["items"][:limit] if verdicts.unsettled(i["id"], reviewers)}
 
 def unit_scores(folder, limit=None, verdicts_dir="verdicts"):
-    """{unit id: score in [0, 1]}: each judge's two orders averaged, then the judges (1 = variant better).
-
-    limit: only the batch's first `limit` units (the ones every judge has seen when judging
-    proceeds in chunks)."""
+    """{unit id: score in [0, 1]} (judgements.UnitVerdicts), of the batch's first `limit` units
+    (the ones every judge has seen when judging proceeds in chunks)."""
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    allowed = {i["id"] for i in batch["items"][:limit]}
-    scores = defaultdict(list)
-    for judge in judgements.by_rater(judgements.read(folder, verdicts_dir)).values():
-        for unit, orders in judge.items():
-            # Each judge's two orders first, so its position bias cancels; a judge with one order
-            # only (the other failed) would bring its bias in, so it sits that unit out.
-            if unit in allowed and len(orders) == 2:
-                scores[unit].append(sum(v["score"] for v in orders.values()) / 2)
-    return {u: sum(s) / len(s) for u, s in scores.items() if s}
+    return judgements.UnitVerdicts.read(folder, verdicts_dir).scores([i["id"] for i in batch["items"][:limit]])
 
 # Acceptance (docs/plans/query-improvement): win clearly overall, lose clearly nowhere; the thresholds
 # are a round's criteria (models.Criteria), set in round.json before judging.
@@ -1049,12 +1065,22 @@ def report(history_path, target, title="Query improvement"):
     rounds = sorted({r.get("round", "") for r in records})
     esc = lambda x: html.escape(str(x))
 
-    def chart(series, ylabel, lo=0.0, hi=1.0, height=220, band=None):
-        """series: {name: [(round, value, low, high)]} drawn over rounds; band draws a line at y."""
+    def chart(series, ylabel, lo=0.0, hi=1.0, height=220, band=None, legend=None):
+        """series: {name: [(round, value, low, high)]} drawn over rounds; band draws a line at y.
+        legend: a series' legend entry and colour, from its name (default: the name); series sharing
+        one aren't joined by lines (the rounds report, item 14 of the 2026-10-01 code review)."""
+        legend = legend or (lambda name: name)
+        keys = sorted({legend(name) for name in series})
         width, left, bottom, top = 720, 48, 28, 26
-        xs = {r: left + (i + 0.5) * (width - left - 10) / max(len(rounds), 1) for i, r in enumerate(rounds)}
+        height = max(height, top + 14 * len(keys) + bottom)
+        column = (width - left - 10) / max(len(rounds), 1)
+        xs = {r: left + (i + 0.5) * column for i, r in enumerate(rounds)}
         y = lambda v: top + (height - bottom - top) * (1 - (v - lo) / ((hi - lo) or 1))
-        spread = 14  # series in the same round sit side by side, not on top of each other
+        # Series in the same round sit side by side, not on top of each other, within the round's column.
+        present = {r: sorted(name for name, points in series.items() if any(p[0] == r for p in points)) for r in rounds}
+        def shift(name, r):
+            m = len(present[r])
+            return (present[r].index(name) - (m - 1) / 2) * min(14, 0.8 * column / max(m, 1))
         colours = ["#1f6f9f", "#b3261e", "#1d7a46", "#8a6100", "#6b3fa0", "#00796b", "#c2185b", "#455a64"]
         parts = [f'<svg viewBox="0 0 {width} {height}" role="img" aria-label="{esc(ylabel)}">',
                  f'<text x="4" y="12" class="axis">{esc(ylabel)}</text>']
@@ -1065,31 +1091,33 @@ def report(history_path, target, title="Query improvement"):
             parts.append(f'<line x1="{left}" x2="{width - 10}" y1="{y(band):.1f}" y2="{y(band):.1f}" class="band"/>')
         for r, x in xs.items():
             parts.append(f'<text x="{x:.1f}" y="{height - 8}" class="axis" text-anchor="middle">{esc(r)}</text>')
-        count = len(series)
-        for n, (name, points) in enumerate(sorted(series.items())):
-            colour = colours[n % len(colours)]
-            shift = (n - (count - 1) / 2) * spread
-            pts = [(xs[r] + shift, y(v), None if a is None else y(a), None if b is None else y(b))
+        joined = len(keys) == len(series)
+        for name, points in sorted(series.items()):
+            colour = colours[keys.index(legend(name)) % len(colours)]
+            pts = [(xs[r] + shift(name, r), y(v), None if a is None else y(a), None if b is None else y(b))
                    for r, v, a, b in points if r in xs]
-            if len(pts) > 1:
+            if joined and len(pts) > 1:
                 parts.append('<polyline fill="none" stroke="%s" stroke-width="2" points="%s"/>'
                              % (colour, " ".join(f"{px:.1f},{py:.1f}" for px, py, _, _ in pts)))
             for px, py, a, b in pts:
                 if a is not None and b is not None:
                     parts.append(f'<line x1="{px:.1f}" x2="{px:.1f}" y1="{a:.1f}" y2="{b:.1f}" stroke="{colour}" stroke-width="2"/>')
                 parts.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="4" fill="{colour}"><title>{esc(name)}</title></circle>')
+        for n, key in enumerate(keys):
             parts.append(f'<text x="{width - 12}" y="{top + 12 + 14 * n}" class="legend" text-anchor="end" '
-                         f'style="fill:{colour}">{esc(name)}</text>')
+                         f'style="fill:{colours[n % len(colours)]}">{esc(key)}</text>')
         return "".join(parts) + "</svg>"
 
     def series(metric, by="variant", where=None, per_round=False):
         """The latest value per series and round (steps may record a figure more than once).
-        per_round: one series per round and variant, since a variant's name in another round
+        by: the field, or fields, naming a series.
+        per_round: one series per round as well, since a variant's name in another round
         is measured against another baseline (joining them would draw a trend that isn't one)."""
+        fields = (("round",) if per_round else ()) + ((by,) if isinstance(by, str) else tuple(by))
         latest = {}
         for r in records:
             if r["metric"] == metric and (where is None or where(r)) and r["value"] is not None:
-                name = f"{r.get('round', '')} {r.get(by, '')}" if per_round else r.get(by, "")
+                name = " ".join(str(r.get(f, "")) for f in fields)
                 latest[(name, r.get("round", ""))] = r["value"]
         out = defaultdict(list)
         for (name, rnd), value in sorted(latest.items(), key=lambda kv: rounds.index(kv[0][1])):
@@ -1102,8 +1130,9 @@ def report(history_path, target, title="Query improvement"):
     sections = [
         ("Variant win rate against the baseline (1 = variant always better; interval 90%)",
          chart(series("win_rate", where=lambda r: r.get("stratum") == "all", per_round=True), "win rate", band=0.5)),
-        ("Win rate by kind of input", chart(series("win_rate", by="stratum", where=lambda r: r.get("stratum") != "all"),
-                                            "win rate", band=0.5)),
+        ("Win rate by kind of input (each point a round's variant; hover for its name)",
+         chart(series("win_rate", by=("variant", "stratum"), where=lambda r: r.get("stratum") != "all", per_round=True),
+               "win rate", band=0.5, legend=lambda name: name.rsplit(" ", 1)[-1])),
         ("Task outcomes (share partial)", chart(series("partial_rate", where=lambda r: r.get("stratum") == "all"), "partial")),
         ("Claims per task", chart(series("claims_per_task", where=lambda r: r.get("stratum") == "all"), "claims", hi=10)),
         ("Quotes verified against the text layer", chart(series("verified_quote_rate", where=lambda r: r.get("stratum") == "all"),

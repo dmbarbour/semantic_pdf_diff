@@ -1,7 +1,7 @@
 {
   "batch": "pairs-reconcile",
   "summary": {
-    "units": 32,
+    "units": 31,
     "by_document": {
       "calg-cd-p39-42": {
         "units": 1,
@@ -9,11 +9,11 @@
       },
       "calg-cd-p62-66": {
         "units": 2,
-        "mean": 0.084
+        "mean": 0.0
       },
       "dc-cd-p31-38": {
-        "units": 5,
-        "mean": 0.258
+        "units": 4,
+        "mean": 0.281
       },
       "dc-cd-p39-42": {
         "units": 2,
@@ -42,8 +42,8 @@
     },
     "by_family": {
       "table": {
-        "units": 11,
-        "mean": 0.47
+        "units": 10,
+        "mean": 0.5
       },
       "text": {
         "units": 11,
@@ -51,30 +51,30 @@
       },
       "visual": {
         "units": 10,
-        "mean": 0.542
+        "mean": 0.525
       }
     },
     "problems": {
       "baseline": {
         "conditions": 13,
         "duplicates": 90,
-        "misread": 29,
-        "vague": 30,
-        "misbound": 31,
+        "misread": 28,
+        "vague": 29,
+        "misbound": 29,
         "invented": 11,
-        "missing": 49,
-        "quote": 25,
+        "missing": 48,
+        "quote": 23,
         "trivial": 14
       },
       "variant": {
         "conditions": 18,
         "duplicates": 78,
-        "invented": 31,
-        "misread": 33,
-        "vague": 26,
-        "misbound": 30,
-        "missing": 53,
-        "quote": 25,
+        "invented": 29,
+        "misread": 32,
+        "vague": 25,
+        "misbound": 28,
+        "missing": 52,
+        "quote": 23,
         "trivial": 9
       }
     },
@@ -87,7 +87,7 @@
       "u-dc-cd-p31-38-870cc2fd-p4-visual",
       "u-ken-cd-p95-98-f7b0008f-p1-table"
     ],
-    "remarks": 98
+    "remarks": 96
   },
   "units": [
     {
@@ -1190,7 +1190,7 @@
       "page": 5,
       "family": "table",
       "image": "images/calg-cd-p62-66-e0051bec-p5.jpg",
-      "score": 0.167,
+      "score": 0.0,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "baseline-first": 0.0,
@@ -3607,176 +3607,6 @@
       ]
     },
     {
-      "id": "u-dc-cd-p31-38-870cc2fd-p3-table",
-      "run": "dc-cd-p31-38",
-      "page": 3,
-      "family": "table",
-      "image": "images/dc-cd-p31-38-870cc2fd-p3.jpg",
-      "score": 0.0,
-      "scores": {
-        "Qwen/Qwen3.5-397B-A17B": {
-          "baseline-first": 0.0
-        },
-        "XiaomiMiMo/MiMo-V2.6-Pro": {
-          "baseline-first": 0.0
-        }
-      },
-      "judges_disagree": false,
-      "order_flipped": [],
-      "counts": {
-        "baseline": 15,
-        "variant": 15,
-        "shared": 9
-      },
-      "only_baseline": [
-        {
-          "entity": "fastener",
-          "attribute": "type",
-          "value": "#10 TEK SCREWS",
-          "unit": "",
-          "conditions": "typical",
-          "quote": "#10 TEK SCREWS (TYP)"
-        },
-        {
-          "entity": "pipe",
-          "attribute": "diameter",
-          "value": "3",
-          "unit": "\"",
-          "conditions": "standard pipe",
-          "quote": "3\" DIAM STD. PIPE"
-        },
-        {
-          "entity": "HSS member",
-          "attribute": "section",
-          "value": "HSS4X4X1/4",
-          "unit": "",
-          "conditions": "",
-          "quote": "HSS4X4X1/4"
-        },
-        {
-          "entity": "plate",
-          "attribute": "section",
-          "value": "PL5x4x3/8",
-          "unit": "",
-          "conditions": "typical",
-          "quote": "PL5x4x3/8 TYP"
-        },
-        {
-          "entity": "footing",
-          "attribute": "diameter",
-          "value": "28",
-          "unit": "\"",
-          "conditions": "foundation detail",
-          "quote": "28\" DIA FOOTING"
-        },
-        {
-          "entity": "beam",
-          "attribute": "section",
-          "value": "W6X20",
-          "unit": "",
-          "conditions": "",
-          "quote": "W6X20"
-        }
-      ],
-      "only_variant": [
-        {
-          "entity": "PV attachment plate",
-          "attribute": "section",
-          "value": "PL5x4x3/8",
-          "unit": "",
-          "conditions": "typical",
-          "quote": "PL5x4x3/8 TYP"
-        },
-        {
-          "entity": "footing",
-          "attribute": "diameter",
-          "value": "28",
-          "unit": "\"",
-          "conditions": "foundation detail typ",
-          "quote": "28\" DIA FOOTING"
-        },
-        {
-          "entity": "member",
-          "attribute": "section profile",
-          "value": "HSS4X4X1/4",
-          "unit": "",
-          "conditions": "BEAM TO BEAM DETAIL A1",
-          "quote": "HSS4X4X1/4"
-        },
-        {
-          "entity": "deck opening reinforcement fastener",
-          "attribute": "type",
-          "value": "#10 TEK SCREWS",
-          "unit": "",
-          "conditions": "typical",
-          "quote": "#10 TEK SCREWS (TYP)"
-        },
-        {
-          "entity": "beam",
-          "attribute": "section",
-          "value": "W6X20",
-          "unit": "",
-          "conditions": "upper level",
-          "quote": "W6X20"
-        },
-        {
-          "entity": "PV attachment pipe",
-          "attribute": "diameter",
-          "value": "3",
-          "unit": "\"",
-          "conditions": "standard pipe",
-          "quote": "3\" DIAM STD. PIPE"
-        }
-      ],
-      "problems": {
-        "baseline": {
-          "misbound": 2,
-          "misread": 1,
-          "quote": 2,
-          "missing": 1,
-          "vague": 1
-        },
-        "variant": {
-          "invented": 2,
-          "misbound": 2,
-          "misread": 1,
-          "quote": 2,
-          "missing": 1,
-          "vague": 1
-        }
-      },
-      "issues": {
-        "baseline": {},
-        "variant": {}
-      },
-      "notes": [
-        {
-          "judge": "Qwen/Qwen3.5-397B-A17B",
-          "order": "baseline-first",
-          "score": 0.0,
-          "note": "Set A is better because it avoids inventing specific conditions that are factually incorrect, such as Set B's claim that the HSS member is in 'DETAIL A1' (it is in A3) or that the beam is on the 'upper level'. Both sets share significant errors: misbinding the 3/4\" holes to the deck opening plate instead of the PV attachment base, and misreading the '1\\'-0\" MIN' dimension as a maximum. Set A's vaguer entity names are preferable to Set B's specific but wrong conditions."
-        },
-        {
-          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
-          "order": "baseline-first",
-          "score": 0.0,
-          "note": "Both sets capture the same 15 dimensional facts and share the same core errors: the bolt note is quoted as '3/4\" BOLT NUT WELDED 3\" TO WIDE FLANGE' although the page reads 'WELDED TO WIDE FLANGE' (the 3\" is a separate dimension callout), and the (4) 3/4\" dia holes are bound to the deck opening plate / deck reinforcement detail when they belong to the foundation (A3) wide-flange connection. Set B improves three bindings — PV attachment pipe, PV attachment plate, and deck opening reinforcement fastener — where Set A leaves generic entities ('pipe', 'plate', 'fastener'). However, B adds two conditions the page does not support: 'BEAM TO BEAM DETAIL A1' for the HSS4X4X1/4 (A1 is the PV ATTACHMENT DETAIL and the HSS appears in the FOUNDATION DETAIL) and 'upper level' for the W6X20. Since B asserts false detail references while A stays faithful to the page, A is the better set despite its vaguer entities."
-        }
-      ],
-      "remarks": [
-        {
-          "judge": "Qwen/Qwen3.5-397B-A17B",
-          "order": "baseline-first",
-          "remark": "Both sets incorrectly extract the quote for the bolt connection (inserting '3\"' into the text) and misattribute the 3/4\" holes from the PV Attachment detail (A1) to the Deck Opening plate (A5/B5). Both also misread '1\\'-0\" MIN' as a maximum opening dimension."
-        },
-        {
-          "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
-          "order": "baseline-first",
-          "remark": "Both sets miss the GENERAL SHEET NOTE 'TYPICAL DECK REINFORCEMENT FOR DECK OPENING GREATER THAN 6\" DIA.', which is the applicability condition for the 14 ga / 16 ga deck reinforcement details; both instead attach only detail-name conditions. Several quotes in both sets are stitched from adjacent text fragments rather than verbatim strings: '3/4\" BOLT NUT WELDED 3\" TO WIDE FLANGE', '3/8\" FITTED STIFFENER' (page has 'FITTED STIFFENER' and 'PL5X3/8' as separate labels), '1'-0\" MAX OPENING', and '16 GAUGE PLATE OF OPENING' (the 'OF OPENING' belongs to '6\" MIN EACH SIDE OF OPENING'). The text layer is heavily jumbled (dimension fragments '1\" 2\"', '3\"', '1 1/4\"', four '3/8\" TYP' entries are unassigned), so detail-to-label binding must be done from the image; the (4) 3/4\" holes and the 3/4\" bolt/nut sit in the A3 foundation detail, not the deck opening details. 'upper level' for W6X20 could not be found in either the text layer or the visible labels, but the image resolution leaves slight residual doubt, hence medium confidence."
-        }
-      ]
-    },
-    {
       "id": "u-nrel-5mw-p25-36-5eaf02be-p9-text",
       "run": "nrel-5mw-p25-36",
       "page": 9,
@@ -4309,7 +4139,7 @@
       "page": 4,
       "family": "visual",
       "image": "images/dc-cd-p31-38-870cc2fd-p4.jpg",
-      "score": 0.667,
+      "score": 0.5,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "variant-first": 1.0,

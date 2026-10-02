@@ -170,9 +170,9 @@ def strip_things(text, found):
         text = text[:s] + " " + text[e:]
     return " ".join(text.split())
 
-def relation_of(*texts):
+def relation_of(*texts, tie=None):
     """(relation, phrase) the words name, by the longest phrase found: the attribute's words before the value's.
-    (None, "") when two relations tie, or none is named."""
+    (None, "") when two relations tie, or none is named. tie: given the relations that tie, the one meant (or None)."""
     for text in texts:
         text, best, length = norm(text), {}, 0
         for relation in RELATIONS.values():
@@ -184,6 +184,9 @@ def relation_of(*texts):
                         best[relation.name] = phrase
         if len(best) == 1:
             return next(iter(best.items()))
+        chosen = tie(set(best)) if best and tie else None
+        if chosen:
+            return chosen, best[chosen]
         if best:
             return None, ""
     return None, ""
@@ -232,12 +235,16 @@ def triples(claim, things, path_nodes=(), ancestors=None):
     if subject is not None and len(objects) == 2 and re.search(r"\bbetween\b", value_left):
         a, b = objects[0][2], objects[1][2]  # "between the filter bank and the supply fan": a step on the path
         return [(a, "precedes", subject), (subject, "precedes", b)]
+    # "located in", "in": within a part, or located at a place or state; the object's kind says which (code
+    # review 2026-10-01, item 10: the tie left such claims unscored)
+    place = "located at" if any(t.literal for _, _, t in objects or find_things(attribute, things)) else "within"
+    tie = lambda tied: place if tied == {"within", "located at"} else None
     # the attribute read whole and with its names taken out ("input source": "input" is also a part's name);
     # the longer phrase wins, then the value's words
-    whole, left = relation_of(attribute), relation_of(attribute_left)
+    whole, left = relation_of(attribute, tie=tie), relation_of(attribute_left, tie=tie)
     relation, phrase = max((whole, left), key=lambda x: len(x[1]))
     if relation is None:
-        relation, phrase = relation_of(value_left)
+        relation, phrase = relation_of(value_left, tie=tie)
     if relation is None and len(objects) >= 2 and re.search(r"\bor\b|/", value):  # "type | wide stop / narrow stop"
         relation, phrase = "has option", "options"
     if relation is None and len(objects) == 1:  # "UV channel | detector | EMCCD": a part named, as what it is

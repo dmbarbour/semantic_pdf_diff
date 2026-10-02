@@ -91,7 +91,6 @@ class Fixture:
         with self.db:
             self.db.execute(SESSIONS)
         self.served, self.recorded, self.missing, self.used, self.responders = 0, 0, [], set(), set()
-        self.changed = False     # anything recorded since opening (a packed fixture is packed again)
         self.packed_to = None    # the zip an unpacked fixture came from (see folder_fixture)
 
     def close(self):
@@ -108,8 +107,10 @@ class Fixture:
                                  len(self.missing)))
             self.served, self.recorded, self.missing = 0, 0, []
         self.db.close()
-        if self.packed_to is not None and self.changed:
-            pack(self.path, self.packed_to)
+        if self.packed_to is not None:  # packed again when its packed bytes would differ (packing is reproducible):
+            data = packed(self.path)      # an answer that replaced a recorded failure counts, not only new rows
+            if not self.packed_to.exists() or self.packed_to.read_bytes() != data:
+                self.packed_to.write_bytes(data)
         temp = getattr(self, "temp", None)  # an unpacked zip's folder
         if temp is not None:
             temp.cleanup()
@@ -153,7 +154,6 @@ class Fixture:
         if recipe is not None:
             self.note_recipe(query, recipe)
         self.recorded += 1
-        self.changed = True
 
     def note_recipe(self, query, recipe):
         """A way the pipeline built a query (for summaries; several recipes may build one query)."""
@@ -216,6 +216,10 @@ class Fixture:
 def pack(fixture, target):
     """Zip a fixture reproducibly: rows in key order, last-use times and sessions left out, fixed
     timestamps, so re-packing unchanged answers gives identical bytes (and a quiet git history)."""
+    Path(target).write_bytes(packed(fixture))
+
+def packed(fixture):
+    """The bytes pack writes."""
     source = sqlite3.connect(fixture)
     memory = sqlite3.connect(":memory:")
     memory.executescript(SCHEMA)
@@ -235,7 +239,7 @@ def pack(fixture, target):
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w") as archive:
         archive.writestr(info, bytes(data))
-    Path(target).write_bytes(buffer.getvalue())
+    return buffer.getvalue()
 
 def _now():
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -253,12 +257,12 @@ def folder_fixture(folder):
     (FOLDER_WORKING, git-ignored), so each is kept the moment it's paid for: a crash once lost a run's
     answers from a temporary copy. On opening, answers the zip holds that the working file lacks
     (pulled from elsewhere) are merged in; on closing, the zip is packed again when the working file
-    holds answers it lacks. Packing is reproducible: a run that only replays leaves the zip's bytes."""
+    holds anything the zip lacks (compared as packed bytes). Packing is reproducible: a run that only replays
+    leaves the zip's bytes."""
     import tempfile
     archive, working = Path(folder) / FOLDER_FIXTURE, Path(folder) / FOLDER_WORKING
     working.parent.mkdir(parents=True, exist_ok=True)
     fixture = Fixture(working, create=True)
-    packed = 0
     if archive.exists():
         with tempfile.TemporaryDirectory(prefix="folder-fixture-") as temp:
             path = unpack(archive, temp)
@@ -266,10 +270,7 @@ def folder_fixture(folder):
                 fixture.db.execute("ATTACH DATABASE ? AS packed", (str(path),))
                 for table in ("response", "description", "recipe"):
                     fixture.db.execute(f"INSERT OR IGNORE INTO main.{table} SELECT * FROM packed.{table}")
-                packed = fixture.db.execute("SELECT COUNT(*) FROM packed.response").fetchone()[0]
             fixture.db.execute("DETACH DATABASE packed")
-    held = fixture.db.execute("SELECT COUNT(*) FROM response").fetchone()[0]
-    fixture.changed = held > packed  # answers recorded before a crash, or never packed
     fixture.packed_to = archive
     return fixture
 

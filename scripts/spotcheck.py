@@ -21,7 +21,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 LEDGER = ROOT / "benchmarks/ledger.jsonl"
-DOCUMENTS = {s["name"]: s.get("family") for s in json.loads((ROOT / "scripts/slices.json").read_text())["slices"]}
+MANIFEST = json.loads((ROOT / "scripts/slices.json").read_text())
+DOCUMENTS = {s["name"]: s.get("family") for s in MANIFEST["slices"]}
 
 def combine(dirs, target):
     """One folder of runs (symlinks) from several round folders, with the first one's settings."""
@@ -67,6 +68,12 @@ def main(argv=None):
     verdicts = lambda rubric: "verdicts" if rubric == "v4" else f"verdicts-{rubric}"
 
     if args.command == "build":
+        # spot checks commit their units' page images and claims, like rounds: public slices only
+        private = rounds.private_slices([p.name for d in args.baseline + args.variant for p in d.iterdir()
+                                         if (p / "store.sqlite").exists()], MANIFEST)
+        if private:
+            print(f"Refusing: slices not marked public in scripts/slices.json: {', '.join(private)}")
+            return 2
         base = combine(args.baseline, args.folder / "sources" / "baseline")
         var = combine(args.variant, args.folder / "sources" / "variant")
         shared = {p.name for p in base.iterdir()} & {p.name for p in var.iterdir()}
@@ -86,24 +93,38 @@ def main(argv=None):
         from semantic_pdf_diff.judgements import ModelJudge
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff.llm import folder_client
-        from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
+        from semantic_pdf_diff.llm import Budget, evaluator_settings
         judges = args.judge or ["XiaomiMiMo/MiMo-V2.6-Pro"]
         escalate = args.escalate or ["Qwen/Qwen3.5-397B-A17B"]
+        budget = Budget(args.max_cost)  # for the whole command: every judge and escalation shares it
+
+        class Paused(Exception):
+            pass
+
         def ask(model, only=None, retry_failed=False):
-            settings = Settings.from_env(model=model, **EVALUATOR_SETTINGS,
-                                         concurrency=16, timeout=900, retries=0, max_cost=args.max_cost)
+            if budget.exhausted():
+                raise Paused(f"the cap of ${args.max_cost:.2f} is spent")
+            settings = evaluator_settings(model, concurrency=16, timeout=900, retries=0, **budget.settings())
             with folder_client(args.folder, settings) as client:
                 client.ledger = Ledger(LEDGER, round="spotcheck", step="judge", variant=args.folder.name, judge=model)
-                return ModelJudge(client, model, args.rubric, verdicts(args.rubric)).rate(args.folder, only=only,
-                                                                                         retry_failed=retry_failed)
-        for model in judges:
-            ask(model)
-            ask(model, retry_failed=True)
-        unsettled = rounds.unsettled(args.folder, judges, verdicts_dir=verdicts(args.rubric))
-        for model in escalate:
-            if unsettled:
-                ask(model, only=unsettled)
-                ask(model, only=unsettled, retry_failed=True)
+                records = ModelJudge(client, model, args.rubric, verdicts(args.rubric)).rate(
+                    args.folder, only=only, retry_failed=retry_failed)
+            budget.add(client)
+            if client.out_of_budget:
+                raise Paused(client.out_of_budget)
+            return records
+        try:
+            for model in judges:
+                ask(model)
+                ask(model, retry_failed=True)
+            unsettled = rounds.unsettled(args.folder, judges, verdicts_dir=verdicts(args.rubric))
+            for model in escalate:
+                if unsettled:
+                    ask(model, only=unsettled)
+                    ask(model, only=unsettled, retry_failed=True)
+        except Paused as why:  # no decision on partial verdicts: rerunning resumes, answers already paid replay
+            print(f"Paused: {why}")
+            return 3
         print(json.dumps(rounds.decide(args.folder, verdicts_dir=verdicts(args.rubric), documents=DOCUMENTS), indent=2))
     elif args.command == "import":
         from semantic_pdf_diff.judgements import Person

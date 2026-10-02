@@ -76,6 +76,57 @@ def read(folder, verdicts_dir="verdicts"):
 def answered(records, question="pair"):
     return [r for r in records if r.question == question and r.status == "answered"]
 
+def _lean(score):
+    return (score > 0.5) - (score < 0.5)
+
+class UnitVerdicts:
+    """The one definition of a unit's score and of its agreement, from pair records (code review
+    2026-10-01, item 11: the decision, the analysis and the post-mortem had three).
+
+    A judge's two orders are averaged first, so its position bias cancels; a judge with one order
+    (the other failed) would bring its bias in, so it sits that unit out. A unit's score is the mean
+    over its judges (1 = the variant better); a unit no judge saw in both orders has none."""
+
+    def __init__(self, records, raters=None):
+        self.orders = {}  # {unit: {rater: {order: score}}}
+        for r in answered(records):
+            if raters is None or r.rater in raters:
+                self.orders.setdefault(r.unit, {}).setdefault(r.rater, {})[r.order] = r.answer["score"]
+
+    @classmethod
+    def read(cls, folder, verdicts_dir="verdicts", raters=None):
+        return cls(read(folder, verdicts_dir), raters)
+
+    def judges(self, unit):
+        """{rater: the mean of its two orders}, for the raters that saw both."""
+        return {j: sum(o.values()) / 2 for j, o in self.orders.get(unit, {}).items() if len(o) == 2}
+
+    def score(self, unit):
+        means = list(self.judges(unit).values())
+        return sum(means) / len(means) if means else None
+
+    def scores(self, units=None):
+        """{unit: score} for the units scored, of `units` if given."""
+        out = {u: self.score(u) for u in (self.orders if units is None else units) if u in self.orders}
+        return {u: s for u, s in out.items() if s is not None}
+
+    def flipped(self, unit):
+        """The judges whose verdict turned over with the order (one side in one order, the other in the other)."""
+        return sorted(j for j, o in self.orders.get(unit, {}).items() if len(o) == 2 and {0.0, 1.0} <= set(o.values()))
+
+    def disagree(self, unit):
+        """Whether two judges lean to opposite sides."""
+        return len({_lean(m) for m in self.judges(unit).values()} - {0}) > 1
+
+    def split(self, unit):
+        """Ambiguous: the judges disagree, or one flipped with the order."""
+        return self.disagree(unit) or bool(self.flipped(unit))
+
+    def unsettled(self, unit, raters):
+        """For a second judge: one of `raters` lacks an order (a failed verdict), or the unit is split."""
+        seen = self.orders.get(unit, {})
+        return any(len(seen.get(r, {})) < 2 for r in raters) or self.split(unit)
+
 def by_rater(records):
     """{rater: {unit: {order: answer}}} of answered pair records, raters and units in record order."""
     out = {}

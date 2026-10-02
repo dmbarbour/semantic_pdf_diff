@@ -25,7 +25,7 @@
       },
       "nrel-5mw-p25-36": {
         "units": 7,
-        "mean": 0.69
+        "mean": 0.714
       },
       "rules-2013-p35-38": {
         "units": 2,
@@ -35,7 +35,7 @@
     "by_family": {
       "table": {
         "units": 8,
-        "mean": 0.51
+        "mean": 0.531
       },
       "text": {
         "units": 16,
@@ -1357,7 +1357,7 @@
       "page": 2,
       "family": "table",
       "image": "images/nrel-5mw-p25-36-5eaf02be-p2.jpg",
-      "score": 0.333,
+      "score": 0.5,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "baseline-first": 0.0,

@@ -13,25 +13,39 @@ from dataclasses import dataclass, field
 SHEET_KNOBS = ("clean", "small", "vertical", "rotated", "all")
 ARCH_D = (2592.0, 1728.0)       # 36 x 24 in, landscape
 SCALE = 9.0                     # points per foot: 1/8" = 1'-0"
-FEET_INCHES = re.compile(r"^\s*(\d+)\s*'\s*-?\s*(\d+(?:\.\d+)?)?\s*(?:\"|'')?\s*$")
+# Inches as a drafter writes them: 6, 6.5, 6 1/2 or 1/2 (a fraction, as on dimension strings).
+INCH = r"(?:(\d+(?:\.\d+)?)(?:\s*-?\s*(\d+)\s*/\s*(\d+))?|(\d+)\s*/\s*(\d+))"
+FEET_INCHES = re.compile(rf"^\s*(\d+)\s*'\s*-?\s*{INCH}?\s*(?:\"|'')?\s*$")
 
 def ft_in(inches):
     """Inches as a drafter writes them: 702 -> 58'-6\"."""
     feet, rest = divmod(int(round(inches)), 12)
     return f"{feet}'-{rest}\""
 
+def _inch(groups):
+    """Inches from INCH's five groups (whole, numerator, denominator; or a bare fraction's two)."""
+    whole, num, den, bare_num, bare_den = groups
+    if bare_num:
+        return int(bare_num) / int(bare_den) if int(bare_den) else None
+    if num and not int(den):
+        return None
+    return float(whole or 0) + (int(num) / int(den) if num else 0.0)
+
 def inches(value, unit=""):
-    """A length in inches, from 58'-6\", 58 ft 6 in, 58.5 ft, 702 in or 58.5 with unit ft; None if it isn't one."""
+    """A length in inches, from 58'-6\", 2'-9 1/2\", 58 ft 6 in, 58.5 ft, 702 in, 9 1/2" or 58.5 with unit ft; None
+    if it isn't one. (Fractions were read as their whole part, or not at all: code review 2026-10-01, item 10.)"""
     text = str(value).strip().replace("′", "'").replace("″", '"').replace("’", "'").replace("”", '"')
     m = FEET_INCHES.match(text)
     if m:
-        return int(m.group(1)) * 12 + float(m.group(2) or 0)
-    m = re.match(r"^\s*(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\.?\s*(?:(\d+(?:\.\d+)?)\s*(?:in|inch|inches)\.?)?\s*$", text, re.I)
+        rest = _inch(m.groups()[1:])
+        return None if rest is None else int(m.group(1)) * 12 + rest
+    m = re.match(rf"^\s*(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\.?\s*(?:{INCH}\s*(?:in|inch|inches)\.?)?\s*$", text, re.I)
     if m:
-        return float(m.group(1)) * 12 + float(m.group(2) or 0)
-    m = re.match(r"^\s*(\d+(?:\.\d+)?)\s*(?:in|inch|inches|\")\.?\s*$", text, re.I)
+        rest = _inch(m.groups()[1:])
+        return None if rest is None else float(m.group(1)) * 12 + rest
+    m = re.match(rf"^\s*{INCH}\s*(?:in|inch|inches|\")\.?\s*$", text, re.I)
     if m:
-        return float(m.group(1))
+        return _inch(m.groups())
     m = re.match(r"^\s*(\d+(?:\.\d+)?)\s*$", text)
     if m and str(unit).strip().lower() in ("ft", "feet", "foot", "'"):
         return float(m.group(1)) * 12

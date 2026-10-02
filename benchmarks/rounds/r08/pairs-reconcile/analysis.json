@@ -9,7 +9,7 @@
       },
       "calg-cd-p62-66": {
         "units": 1,
-        "mean": 0.167
+        "mean": 0.0
       },
       "dc-cd-p31-38": {
         "units": 5,
@@ -29,7 +29,7 @@
       },
       "ken-cd-p95-98": {
         "units": 5,
-        "mean": 0.392
+        "mean": 0.375
       },
       "lcit-report-p12-19": {
         "units": 1,
@@ -47,7 +47,7 @@
     "by_family": {
       "table": {
         "units": 11,
-        "mean": 0.5
+        "mean": 0.477
       },
       "text": {
         "units": 11,
@@ -490,7 +490,7 @@
       "page": 3,
       "family": "table",
       "image": "images/ken-cd-p95-98-f7b0008f-p3.jpg",
-      "score": 0.167,
+      "score": 0.25,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "baseline-first": 0.0,
@@ -952,7 +952,7 @@
       "page": 5,
       "family": "table",
       "image": "images/calg-cd-p62-66-e0051bec-p5.jpg",
-      "score": 0.167,
+      "score": 0.0,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "baseline-first": 0.0,
@@ -2488,7 +2488,7 @@
       "page": 1,
       "family": "table",
       "image": "images/ken-cd-p95-98-f7b0008f-p1.jpg",
-      "score": 0.167,
+      "score": 0.0,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "baseline-first": 0.0,

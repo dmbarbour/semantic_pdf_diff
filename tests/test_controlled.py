@@ -294,6 +294,69 @@ class Scoring(unittest.TestCase):
         self.assertEqual(controlled.score(key, [date("A", "2026-02-20")])["outcomes"], {"misbound": 1})
         self.assertEqual(controlled.score(key, [date("A", "2026-02-21")])["outcomes"], {"hallucinated": 1})
 
+    def test_values_carry_their_units(self):
+        """Units were ignored: a fact's number in a unit of another kind or size was right (code review 2026-10-01,
+        item 10). Now it's a wrong unit when bound to its own fact; one kind compares by magnitude; a unit the
+        scorer doesn't know abstains."""
+        project = controlled.equipment_schedules(1)
+        _, log = controlled.render(project)
+        key = controlled.key(project, log)
+        air, power = project.fact("B-401.airflow"), project.fact("B-401.motor power")
+        outcome = lambda **c: controlled.score(key, [claim(air, **c)])["outcomes"]
+        self.assertEqual(outcome(unit="gpm"), {"wrong unit": 1})       # the pump table's unit on a blower
+        self.assertEqual(outcome(unit="ft"), {"wrong unit": 1})        # another kind altogether
+        self.assertEqual(outcome(unit="SCFM"), {"right": 1})
+        self.assertEqual(outcome(unit="", value=f"{air.value} scfm"), {"right": 1})  # the unit in the value
+        self.assertEqual(outcome(unit="furlongs"), {"right": 1})        # unknown: the number decides
+        kilowatts = f"{power.number * 0.7457:.4g}"                     # hp as kW, rounded as a reader would
+        self.assertEqual(controlled.score(key, [claim(power, value=kilowatts, unit="kW")])["outcomes"], {"right": 1})
+        s = controlled.score(key, [claim(air), claim(air, unit="gpm")])  # two readings: one right, one not
+        self.assertEqual((s["outcomes"], s["found_right"]), ({"right": 1, "wrong unit": 1}, 1))
+        s = controlled.score(key, [claim(air, entity="Blower B-402", unit="gpm")])  # bound elsewhere: misbound first
+        self.assertEqual(s["outcomes"], {"misbound": 1})
+
+    def test_a_condition_is_kept_by_its_distinctive_words(self):
+        """A condition was kept on any shared word ("maximum day" kept "average day"; naming the filters kept
+        "with one filter out of service"): code review 2026-10-01, item 10."""
+        kept = lambda project, fact, **c: controlled.score(controlled.key(project, controlled.render(project)[1]),
+                                                           [claim(fact, **c)])["conditions_kept"]
+        plant = controlled.water_treatment(1)
+        flow = plant.fact("plant.design_flow")  # "average day"; the peak flow's is "maximum day"
+        self.assertEqual(kept(plant, flow, conditions="maximum day"), "0/1")
+        self.assertEqual(kept(plant, flow, conditions="avg. day"), "1/1")
+        self.assertEqual(kept(plant, plant.fact("chem.alum"), conditions=""), "1/1")  # "average dose" says it
+        rate = plant.fact("filters.rate")
+        self.assertEqual(kept(plant, rate, conditions=""), "0/1")
+        self.assertEqual(kept(plant, rate, conditions="one unit out of service"), "1/1")
+        center = controlled.convention_center(1)
+        area = center.fact("halls.area")  # an alias carrying the scope says it
+        self.assertEqual(kept(center, area, entity="four halls", attribute="total exhibit space", conditions=""), "1/1")
+
+    def test_located_in_is_a_place_or_a_part_by_what_follows(self):
+        """"located in" and "in" are phrases of both within and located at; the tie left them unscored (code review
+        2026-10-01, item 10)."""
+        from semantic_pdf_diff import relations
+        part, place = relations.Thing("AHU-3"), relations.Thing("pupil plane", literal=True)
+        fan, stop = relations.Thing("supply fan"), relations.Thing("Lyot stop")
+        things = [part, place, fan, stop]
+        triple = lambda e, a, v: relations.triples({"entity": e, "attribute": a, "value": v}, things)
+        self.assertEqual(triple("supply fan", "located in", "AHU-3"), [(fan, "within", part)])
+        self.assertEqual(triple("Lyot stop", "located in", "pupil plane"), [(stop, "located at", place)])
+        self.assertEqual(triple("supply fan", "in", "AHU-3"), [(fan, "within", part)])
+
+    def test_fractions_of_an_inch(self):
+        from semantic_pdf_diff import sheets
+        for text, want in (("2'-9 1/2\"", 33.5), ("2'-9-1/2\"", 33.5), ("9 1/2\"", 9.5), ("1/2\"", 0.5),
+                           ("58 ft 6 1/2 in", 702.5), ("2'-0 1/0\"", None), ("1/8\" = 1'-0\"", None)):
+            self.assertEqual(sheets.inches(text), want, text)
+        project = sheets.plan_sheet(1)
+        _, log = controlled.render(project)
+        room = project.fact("room101.width")
+        half = sheets.inches(room.value) + 0.5
+        written = f"{int(half // 12)}'-{int(half % 12)} 1/2\""
+        s = controlled.score(controlled.key(project, log), [{"entity": "Meeting 101", "attribute": "width", "value": written}])
+        self.assertEqual(s["outcomes"], {"hallucinated": 1})  # half an inch off: not the room's width, nor 23 feet
+
     def test_a_superseded_value_reported_as_current_is_a_distractor(self):
         project = controlled.roller_coaster(1)
         _, log = controlled.render(project)

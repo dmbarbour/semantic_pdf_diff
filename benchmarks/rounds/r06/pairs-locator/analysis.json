@@ -25,7 +25,7 @@
       },
       "iea-15mw-p20-31": {
         "units": 8,
-        "mean": 0.818
+        "mean": 0.859
       },
       "ken-cd-p95-98": {
         "units": 1,
@@ -43,7 +43,7 @@
     "by_family": {
       "visual": {
         "units": 32,
-        "mean": 0.493
+        "mean": 0.504
       }
     },
     "problems": {
@@ -57,7 +57,6 @@
       "u-calg-cd-p62-66-e0051bec-p3-visual",
       "u-calg-cd-p39-42-9a895974-p1-visual",
       "u-dc-cd-p39-42-2523f154-p1-visual",
-      "u-iea-15mw-p20-31-f7071680-p5-visual",
       "u-iea-15mw-p20-31-f7071680-p11-visual"
     ],
     "remarks": 0
@@ -7369,7 +7368,7 @@
       "page": 5,
       "family": "visual",
       "image": "images/iea-15mw-p20-31-f7071680-p5.jpg",
-      "score": 0.667,
+      "score": 1.0,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "baseline-first": 1.0,
@@ -7379,7 +7378,7 @@
           "baseline-first": 0.0
         }
       },
-      "judges_disagree": true,
+      "judges_disagree": false,
       "order_flipped": [],
       "counts": {
         "baseline": 34,

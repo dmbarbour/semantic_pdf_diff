@@ -183,6 +183,42 @@ class Request:
     query: str = ""            # the query's hash (query_hash): the name answers are recorded and cached under
     description: dict | None = None  # facts about the query's content (describe)
 
+def evaluator_settings(model, base=None, **runtime):
+    """Settings for a judge, checker or analyst. What shapes its queries is fixed (`base`, by default
+    EVALUATOR_SETTINGS) and never read from the environment: an exported PDF_DIFF_RESPONSE_FORMAT or
+    PDF_DIFF_SEED would otherwise change every judge query, every recorded verdict would miss, and judging would
+    be paid again (code review 2026-10-01, item 2). Only endpoint settings (URL, timeouts, concurrency, rate
+    limits, cost cap) come from the environment, and `runtime` may set only those."""
+    from .models import EVALUATOR_SETTINGS, SETTING_CLASSES, Settings
+    shaping = sorted(k for k in runtime if SETTING_CLASSES[k] != "endpoint")
+    if shaping:
+        raise ValueError(f"evaluator runtime settings must be endpoint settings, not {shaping}")
+    env = Settings.from_env(model=model)
+    endpoint = {k: getattr(env, k) for k, kind in SETTING_CLASSES.items() if kind == "endpoint" and k != "model"}
+    return Settings(**{**endpoint, **(EVALUATOR_SETTINGS if base is None else base), **runtime, "model": model})
+
+class Budget:
+    """One cost cap for a whole command, shared by the clients it makes one after another (one per model): the
+    cap was once each client's, so a command with three models could spend three times it."""
+    def __init__(self, cap):
+        if cap is not None and cap <= 0:
+            raise ValueError("a cost cap must be more than $0 (leave it unset for none)")
+        self.cap, self.spent = cap, 0.0
+
+    def left(self):
+        """Dollars left, or None for no cap."""
+        return None if self.cap is None else max(self.cap - self.spent, 0.0)
+
+    def exhausted(self):
+        return self.cap is not None and self.left() <= 0
+
+    def settings(self):
+        """The `max_cost` keyword for the next client: what's left, or nothing without a cap."""
+        return {} if self.cap is None else {"max_cost": self.left()}
+
+    def add(self, client):
+        self.spent += client.cost
+
 @contextmanager
 def folder_client(folder, settings, mode="replay-or-record", responder=None):
     """A client whose answers are recorded in a folder's own fixture (fixtures.folder_fixture):

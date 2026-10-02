@@ -1,15 +1,15 @@
 {
   "batch": "pairs-excerpts",
   "summary": {
-    "units": 32,
+    "units": 31,
     "by_document": {
       "calg-cd-p39-42": {
         "units": 3,
         "mean": 0.667
       },
       "calg-cd-p62-66": {
-        "units": 9,
-        "mean": 0.315
+        "units": 8,
+        "mean": 0.375
       },
       "dc-cd-p39-42": {
         "units": 6,
@@ -25,7 +25,7 @@
       },
       "ken-cd-p95-98": {
         "units": 1,
-        "mean": 0.333
+        "mean": 0.0
       },
       "lcit-report-p12-19": {
         "units": 2,
@@ -47,44 +47,43 @@
       },
       "text": {
         "units": 15,
-        "mean": 0.639
+        "mean": 0.617
       },
       "visual": {
-        "units": 14,
-        "mean": 0.399
+        "units": 13,
+        "mean": 0.442
       }
     },
     "problems": {
       "baseline": {
         "duplicates": 47,
-        "misbound": 22,
+        "misbound": 21,
         "missing": 34,
         "quote": 6,
         "trivial": 11,
         "vague": 22,
-        "misread": 17,
-        "invented": 7,
-        "conditions": 8
+        "misread": 16,
+        "conditions": 8,
+        "invented": 6
       },
       "variant": {
         "duplicates": 38,
-        "misbound": 26,
+        "misbound": 25,
         "missing": 24,
         "quote": 14,
-        "misread": 24,
+        "misread": 23,
         "trivial": 7,
         "vague": 13,
         "conditions": 11,
-        "invented": 14
+        "invented": 13
       }
     },
     "split": [
-      "u-ken-cd-p95-98-f7b0008f-p3-text",
       "u-dc-cd-p39-42-2523f154-p2-text",
       "u-calg-cd-p62-66-e0051bec-p5-visual-b2of4",
       "u-dc-cd-p39-42-2523f154-p1-text-b1of2"
     ],
-    "remarks": 69
+    "remarks": 68
   },
   "units": [
     {
@@ -831,271 +830,6 @@
           "judge": "XiaomiMiMo/MiMo-V2.6-Pro",
           "order": "variant-first",
           "remark": "Both sets state four millwork rows (MWK04, MWK05, MWB02, MWB03) twice, differing only in the condition label ('Tag ...' vs 'Millwork Schedule') — a duplication pattern worth suppressing. The text layer reorders rows within the Furniture and Millwork schedules, so tag-to-row binding must be checked against the image; here the millwork bindings in both sets match the image. A's 'VINYL COMPOSITE TILE | texture | IMPERIAL TEXTURE' also invents an attribute: the page lists IMPERIAL TEXTURE as part of the style name 'STANDARD EXCELON IMPERIAL TEXTURE'."
-        }
-      ]
-    },
-    {
-      "id": "u-calg-cd-p62-66-e0051bec-p5-visual-b1of4",
-      "run": "calg-cd-p62-66",
-      "page": 5,
-      "family": "visual",
-      "image": "images/calg-cd-p62-66-e0051bec-p5-b1of4.jpg",
-      "score": 0.0,
-      "scores": {
-        "Qwen/Qwen3.5-397B-A17B": {
-          "variant-first": 0.0
-        }
-      },
-      "judges_disagree": false,
-      "order_flipped": [],
-      "counts": {
-        "baseline": 61,
-        "variant": 62,
-        "shared": 54
-      },
-      "only_baseline": [
-        {
-          "entity": "BASE CABINET (SINK)",
-          "attribute": "quantity",
-          "value": "1",
-          "unit": "",
-          "conditions": "",
-          "quote": "BASE CABINET (SINK) | 2'-11 7/8\" x 2'-0 7/8\" x 2'-6 3/8\" | 1",
-          "_box": [
-            873.0,
-            1014.0,
-            1293.0,
-            1523.6412353515625
-          ]
-        },
-        {
-          "entity": "QZ",
-          "attribute": "edge profile",
-          "value": "EASED",
-          "unit": "",
-          "conditions": "",
-          "quote": "EDGE PROFILE: EASED",
-          "_box": [
-            0.0,
-            1162.41845703125,
-            426.0672607421875,
-            1434.0
-          ]
-        },
-        {
-          "entity": "HORIZONTAL CABINET",
-          "attribute": "quantity",
-          "value": "6",
-          "unit": "",
-          "conditions": "",
-          "quote": "HORIZONTAL CABINET ... 6",
-          "_box": [
-            1164.0,
-            1014.0,
-            1584.0,
-            1522.919921875
-          ]
-        },
-        {
-          "entity": "DISHWASHER",
-          "attribute": "manufacturer",
-          "value": "BOSCH",
-          "unit": "",
-          "conditions": "",
-          "quote": "DESCRIPTION: DISHWASHER MANUFACTURER: BOSCH",
-          "_box": [
-            0.0,
-            0.0,
-            1584.0,
-            2448.0
-          ]
-        },
-        {
-          "entity": "P3 (Accent Paint)",
-          "attribute": "colour name",
-          "value": "Steel Wool",
-          "unit": "",
-          "conditions": "",
-          "quote": "P3 COLOUR NAME: STEEL WOOL",
-          "_box": [
-            571.4561157226562,
-            985.53369140625,
-            1002.0,
-            1437.60009765625
-          ]
-        },
-        {
-          "entity": "QUARTZ",
-          "attribute": "manufacturer",
-          "value": "CAESARSTONE",
-          "unit": "",
-          "conditions": "",
-          "quote": "DESCRIPTION: QUARTZ MANUFACTURER: CAESARSTONE",
-          "_box": [
-            0.0,
-            0.0,
-            1584.0,
-            2448.0
-          ]
-        },
-        {
-          "entity": "VANITY & SINK",
-          "attribute": "quantity",
-          "value": "1",
-          "unit": "",
-          "conditions": "",
-          "quote": "VANITY & SINK | 2'-0 3/4\" x 1'-7 1/4\" x 2'-1 1/4\" | 1",
-          "_box": [
-            873.0,
-            1014.0,
-            1293.0,
-            1523.6412353515625
-          ]
-        }
-      ],
-      "only_variant": [
-        {
-          "entity": "BASE CABINET",
-          "attribute": "quantity",
-          "value": "1",
-          "unit": "",
-          "conditions": "dimensions 1'-11 7/8\" x 2'-0 7/8\" x 2'-6 3/8\"",
-          "quote": "BASE CABINET | 1'-11 7/8\" x 2'-0 7/8\" x 2'-6 3/8\" | 1",
-          "_box": [
-            873.0,
-            1014.0,
-            1293.0,
-            1523.6412353515625
-          ]
-        },
-        {
-          "entity": "QZ",
-          "attribute": "manufacturer",
-          "value": "CAESARSTONE",
-          "unit": "",
-          "conditions": "",
-          "quote": "MANUFACTURER: CAESARSTONE",
-          "_box": [
-            0.0,
-            1162.41845703125,
-            426.0672607421875,
-            1434.0
-          ]
-        },
-        {
-          "entity": "QZ (Quartz)",
-          "attribute": "edge profile",
-          "value": "Eased",
-          "unit": "",
-          "conditions": "",
-          "quote": "EDGE PROFILE: EASED",
-          "_box": [
-            0.0,
-            1162.41845703125,
-            426.0672607421875,
-            1434.0
-          ]
-        },
-        {
-          "entity": "P3",
-          "attribute": "colour name",
-          "value": "STEEL WOOL",
-          "unit": "",
-          "conditions": "",
-          "quote": "P3 COLOUR NAME: STEEL WOOL",
-          "_box": [
-            571.4561157226562,
-            985.53369140625,
-            1002.0,
-            1437.60009765625
-          ]
-        },
-        {
-          "entity": "BASE CABINET",
-          "attribute": "quantity",
-          "value": "1",
-          "unit": "",
-          "conditions": "Tag MWK05",
-          "quote": "BASE CABINET (SINK) | 2'-11 7/8\" x 2'-0 7/8\" x 2'-6 3/8\" | 1",
-          "_box": [
-            873.0,
-            1014.0,
-            1293.0,
-            1523.6412353515625
-          ]
-        },
-        {
-          "entity": "DISHWASHER",
-          "attribute": "manufacturer",
-          "value": "BOSCH",
-          "unit": "",
-          "conditions": "location: KITCHEN",
-          "quote": "DESCRIPTION: DISHWASHER MANUFACTURER: BOSCH",
-          "_box": [
-            0.0,
-            0.0,
-            1584.0,
-            2448.0
-          ]
-        },
-        {
-          "entity": "VANITY & SINK",
-          "attribute": "quantity",
-          "value": "1",
-          "unit": "",
-          "conditions": "Tag MWB01",
-          "quote": "VANITY & SINK | 2'-0 3/4\" x 1'-7 1/4\" x 2'-1 1/4\" | 1",
-          "_box": [
-            873.0,
-            1014.0,
-            1293.0,
-            1523.6412353515625
-          ]
-        },
-        {
-          "entity": "HORIZONTAL CABINET",
-          "attribute": "quantity",
-          "value": "6",
-          "unit": "",
-          "conditions": "Tag MWK03",
-          "quote": "HORIZONTAL CABINET ... 6",
-          "_box": [
-            1164.0,
-            1014.0,
-            1584.0,
-            1522.919921875
-          ]
-        }
-      ],
-      "problems": {
-        "baseline": {
-          "invented": 1,
-          "misbound": 1,
-          "misread": 1
-        },
-        "variant": {
-          "invented": 1,
-          "misbound": 1,
-          "misread": 1
-        }
-      },
-      "issues": {
-        "baseline": {},
-        "variant": {}
-      },
-      "notes": [
-        {
-          "judge": "Qwen/Qwen3.5-397B-A17B",
-          "order": "variant-first",
-          "score": 0.0,
-          "note": "Set B is better because it avoids several specific tag binding errors present in Set A. Set A incorrectly binds 'Vanity & Sink' to tag MWB01 (which is Horizontal Cabinet) and 'Horizontal Cabinet' quantity to tag MWK03 (which is Base Cabinet Sink). Set B extracts these facts correctly without attaching the wrong tags, though it shares errors with Set A regarding Millwork tags MWK02/MWK03 and invents a 'Kitchen' location for Quartz not found in the text."
-        }
-      ],
-      "remarks": [
-        {
-          "judge": "Qwen/Qwen3.5-397B-A17B",
-          "order": "variant-first",
-          "remark": "Both sets truncate values ('PORCELA', 'TIERRA S') and invent a 'Kitchen' location for Quartz. Both struggle with Millwork tags MWK02 and MWK03, but Set A has additional tag binding errors for MWB01 and MWK05 in the visible claims."
         }
       ]
     },
@@ -2048,7 +1782,7 @@
       "page": 3,
       "family": "text",
       "image": "images/ken-cd-p95-98-f7b0008f-p3.jpg",
-      "score": 0.333,
+      "score": 0.0,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "baseline-first": 0.0,
@@ -2058,7 +1792,7 @@
           "baseline-first": 1.0
         }
       },
-      "judges_disagree": true,
+      "judges_disagree": false,
       "order_flipped": [],
       "counts": {
         "baseline": 14,
@@ -3603,7 +3337,7 @@
       "page": 5,
       "family": "visual",
       "image": "images/calg-cd-p62-66-e0051bec-p5-b2of4.jpg",
-      "score": 0.333,
+      "score": 0.5,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "variant-first": 0.0,

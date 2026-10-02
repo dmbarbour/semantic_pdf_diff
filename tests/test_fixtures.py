@@ -249,6 +249,24 @@ class FolderFixtures(unittest.TestCase):
             self.assertEqual({q for (q,) in fresh.db.execute('SELECT query FROM response')}, {'q1', 'q2'})
             fresh.close()
 
+    def test_an_answer_that_replaced_a_failure_is_packed_after_a_crash(self):
+        """Packing once followed the count of answers; a replaced failure kept the count, so the paid answer
+        never reached the zip (code review 2026-10-01, item 8)."""
+        from semantic_pdf_diff.fixtures import FOLDER_FIXTURE, folder_fixture, unpack
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            f = folder_fixture(folder)
+            f.record('q1', 'judge', outcome='invalid', answer='', error='ValueError: bad JSON')
+            f.close()
+            asked = folder_fixture(folder)
+            asked.record('q1', 'judge', outcome='ok', answer='{"better": "A"}')  # asked again, and answered
+            asked.db.close()  # the process dies before packing
+            folder_fixture(folder).close()  # the next run packs it
+            with tempfile.TemporaryDirectory() as e:
+                import sqlite3
+                with sqlite3.connect(unpack(folder / FOLDER_FIXTURE, e)) as db:
+                    self.assertEqual(db.execute("SELECT outcome FROM response WHERE query='q1'").fetchone(), ('ok',))
+
     def test_answers_pulled_into_the_zip_are_merged(self):
         import shutil
         from semantic_pdf_diff.fixtures import FOLDER_FIXTURE, folder_fixture

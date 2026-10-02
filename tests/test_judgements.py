@@ -77,6 +77,41 @@ class Records(unittest.TestCase):
         self.assertFalse(found[(items[0]["id"], "variant", 0)])
         self.assertTrue(all(r.kind == "check" and r.question == "quote" for r in records))
 
+class OneScore(unittest.TestCase):
+    """A unit's score has one definition (code review 2026-10-01, item 11): the analysis once averaged
+    every verdict flat, so a unit the decision scored 1.0 showed as 0.667 and was sampled as split."""
+    def test_the_decision_and_the_analysis_agree(self):
+        from semantic_pdf_diff import insights
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            items = [dict(i, baseline=[], variant=[], run="r", content="sha256:" + "a" * 64, page=1, image="x.jpg")
+                     for i in ITEMS[:2]]
+            (folder / "pairs.json").write_text(json.dumps({"items": items, "baseline": d, "variant": d}))
+            (folder / "verdicts").mkdir()
+            one, two = items[0]["id"], items[1]["id"]
+            both = {"baseline-first": {"score": 1.0}, "variant-first": {"score": 1.0}}
+            (folder / "verdicts" / "j1.json").write_text(json.dumps({"reviewer": "j1", "verdicts": {one: both}}))
+            (folder / "verdicts" / "j2.json").write_text(json.dumps({"reviewer": "j2", "verdicts": {
+                one: {"variant-first": {"score": 0.0}}, two: {"baseline-first": {"score": 0.0}}}}))  # one order each
+            self.assertEqual(rounds.unit_scores(folder), {one: 1.0})
+            analysis = insights.analyse(folder)
+            self.assertEqual({u["id"]: u["score"] for u in analysis["units"]}, {one: 1.0})  # not 0.667; two unscored
+            self.assertEqual(analysis["summary"]["split"], [])
+            self.assertEqual(rounds.unsettled(folder, ["j1"]), {two})  # j1 never saw it
+            self.assertEqual(rounds.unsettled(folder, ["j2"]), {one, two})  # an order each failed
+
+    def test_flips_and_disagreements(self):
+        flip = {"baseline-first": {"score": 1.0}, "variant-first": {"score": 0.0}}
+        tie = {"baseline-first": {"score": 0.5}, "variant-first": {"score": 1.0}}
+        lose = {"baseline-first": {"score": 0.0}, "variant-first": {"score": 0.0}}
+        records = [judgements.Record(rater, "model", "pair", unit, order=o, answer=v)
+                   for rater, verdicts in (("j1", {"u1": flip, "u2": tie}), ("j2", {"u2": lose}))
+                   for unit, orders in verdicts.items() for o, v in orders.items()]
+        v = judgements.UnitVerdicts(records)
+        self.assertEqual((v.score("u1"), v.flipped("u1"), v.split("u1")), (0.5, ["j1"], True))
+        self.assertEqual((v.score("u2"), v.flipped("u2"), v.disagree("u2")), (0.375, [], True))  # 0.75 against 0.0
+        self.assertIsNone(v.score("u3"))
+
 class Raters(unittest.TestCase):
     def test_a_model_judge_rates_and_keeps_its_errors(self):
         with tempfile.TemporaryDirectory() as d:

@@ -3,6 +3,7 @@ import contextlib
 import io
 import json
 import tempfile
+import pymupdf
 import unittest
 from pathlib import Path
 from semantic_pdf_diff import cli, rounds
@@ -136,6 +137,33 @@ class Rounds(unittest.TestCase):
         top = bands[0]
         self.assertEqual(a[top]['claims'].keys(), b[top]['claims'].keys())  # the variant lost only lower claims
         self.assertIn(('run', 'c', 2, 'text'), a)  # small units stay whole
+
+    def test_bands_cut_a_turned_sheet_across_as_displayed(self):
+        """Bands were cut by unrotated y, which on a sheet turned a quarter is a strip down the
+        page as read (code review 2026-10-01, item 15)."""
+        doc = pymupdf.open()
+        page = doc.new_page(width=1224, height=792)
+        page.set_rotation(90)
+        # Claims along the unrotated x (down the page as displayed), at one unrotated y; ids out of order.
+        ids = [f'x{(n * 7) % 60:02}' for n in range(60)]
+        claims = {i: {'entity': 'e', 'attribute': 'a', 'value': i, 'quote': i, '_box': [20 * n, 300, 20 * n + 10, 310]}
+                  for n, i in enumerate(ids)}
+        key = ('run', 'c', 1, 'visual')
+        units = {key: {'claims': claims, 'tasks': 1}}
+        a, _ = rounds.split_units(units, units, limit=25, rotation=lambda run, content, number: page.rotation_matrix)
+        bands = sorted(k for k in a if k[:4] == key)
+        self.assertEqual(len(bands), 3)
+        spans = sorted((min(claims[i]['_box'][0] for i in a[k]['claims']), max(claims[i]['_box'][2] for i in a[k]['claims']))
+                       for k in bands)
+        self.assertTrue(all(one[1] < two[0] for one, two in zip(spans, spans[1:])))  # each band a stretch of the sheet
+        for k in bands:
+            region = rounds.band_region(page, k[4])
+            for i in a[k]['claims']:
+                self.assertTrue(region.contains(pymupdf.Rect(claims[i]['_box'])))  # the crop shows its claims
+        upright, _ = rounds.split_units(units, units, limit=25)
+        self.assertNotEqual(sorted(sorted(upright[k]['claims']) for k in upright),
+                            sorted(sorted(a[k]['claims']) for k in bands))  # unrotated, the cut fell elsewhere
+        doc.close()
 
     def test_scores_average_each_judges_orders_and_skip_single_orders(self):
         with tempfile.TemporaryDirectory() as d:
@@ -461,6 +489,20 @@ class Report(unittest.TestCase):
             self.assertIn('r02', page)
             self.assertIn('accepted: wins', page)
             self.assertIn('<circle', page)
+
+    def test_variants_by_kind_stay_apart(self):
+        """Two variants of one round were drawn as one unlabelled point per kind (code review 2026-10-01, item 14)."""
+        from semantic_pdf_diff import ledger
+        with tempfile.TemporaryDirectory() as d:
+            history = Path(d) / 'history.jsonl'
+            for variant, win in (('locator', 0.7), ('reconcile', 0.3)):
+                for stratum in ('text', 'table'):
+                    ledger.figure(history, metric='win_rate', value={'mean': win, 'low': win - 0.1, 'high': win + 0.1},
+                                  round='r06', variant=variant, stratum=stratum)
+            page = rounds.report(history, Path(d) / 'report.html').read_text()
+            for variant in ('locator', 'reconcile'):
+                for stratum in ('text', 'table'):
+                    self.assertIn(f'<title>r06 {variant} {stratum}</title>', page)
 
 if __name__ == '__main__':
     unittest.main()

@@ -48,17 +48,15 @@ def analyse(folder, limit=None):
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     items = batch["items"][:limit]
-    verdicts = judgements.by_rater(judgements.read(folder))
+    records = judgements.read(folder)
+    verdicts, scored = judgements.by_rater(records), judgements.UnitVerdicts(records)
     units = []
     for item in items:
+        score = scored.score(item["id"])
+        if score is None:  # no judge saw it in both orders: the decision leaves it out too
+            continue
         by_judge = {j: v[item["id"]] for j, v in verdicts.items() if item["id"] in v}
         scores = {j: {o: x["score"] for o, x in orders.items()} for j, orders in by_judge.items()}
-        flat = [s for orders in scores.values() for s in orders.values()]
-        if not flat:
-            continue
-        leaning = {j: (sum(o.values()) / len(o) > 0.5) - (sum(o.values()) / len(o) < 0.5) for j, o in scores.items()}
-        flipped = sorted(j for j, o in scores.items() if len(o) == 2 and len({s for s in o.values()}) > 1
-                         and 0.5 not in o.values())
         base_keys = {_claim_key(c): c for c in item["baseline"]}
         var_keys = {_claim_key(c): c for c in item["variant"]}
         problems = {"baseline": Counter(), "variant": Counter()}
@@ -74,8 +72,8 @@ def analyse(folder, limit=None):
                   for side in ("baseline", "variant")}
         units.append({
             "id": item["id"], "run": item["run"], "page": item["page"], "family": item["family"],
-            "image": item["image"], "score": round(sum(flat) / len(flat), 3), "scores": scores,
-            "judges_disagree": len({v for v in leaning.values() if v}) > 1, "order_flipped": flipped,
+            "image": item["image"], "score": round(score, 3), "scores": scores,
+            "judges_disagree": scored.disagree(item["id"]), "order_flipped": scored.flipped(item["id"]),
             "counts": item.get("counts", {}),
             "only_baseline": [c for k, c in base_keys.items() if k not in var_keys],
             "only_variant": [c for k, c in var_keys.items() if k not in base_keys],

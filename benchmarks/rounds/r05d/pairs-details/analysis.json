@@ -13,7 +13,7 @@
       },
       "dc-cd-p31-38": {
         "units": 8,
-        "mean": 0.453
+        "mean": 0.516
       },
       "dc-cd-p39-42": {
         "units": 4,
@@ -23,7 +23,7 @@
     "by_family": {
       "visual": {
         "units": 21,
-        "mean": 0.417
+        "mean": 0.44
       }
     },
     "problems": {
@@ -35,7 +35,6 @@
       "u-dc-cd-p31-38-870cc2fd-p7-visual",
       "u-dc-cd-p31-38-870cc2fd-p4-visual",
       "u-dc-cd-p31-38-870cc2fd-p5-visual",
-      "u-dc-cd-p31-38-870cc2fd-p2-visual",
       "u-calg-cd-p62-66-e0051bec-p3-visual",
       "u-dc-cd-p31-38-870cc2fd-p6-visual",
       "u-dc-cd-p31-38-870cc2fd-p1-visual",
@@ -3730,7 +3729,7 @@
       "page": 2,
       "family": "visual",
       "image": "images/dc-cd-p31-38-870cc2fd-p2.jpg",
-      "score": 0.667,
+      "score": 1.0,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "variant-first": 1.0,
@@ -3740,7 +3739,7 @@
           "variant-first": 0.0
         }
       },
-      "judges_disagree": true,
+      "judges_disagree": false,
       "order_flipped": [],
       "counts": {
         "baseline": 190,
@@ -6293,7 +6292,7 @@
       "page": 1,
       "family": "visual",
       "image": "images/dc-cd-p31-38-870cc2fd-p1.jpg",
-      "score": 0.333,
+      "score": 0.5,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "baseline-first": 0.0,

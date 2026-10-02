@@ -29,7 +29,7 @@
       },
       "ken-cd-p95-98": {
         "units": 5,
-        "mean": 0.608
+        "mean": 0.675
       },
       "lcit-report-p12-19": {
         "units": 1,
@@ -47,7 +47,7 @@
     "by_family": {
       "table": {
         "units": 11,
-        "mean": 0.595
+        "mean": 0.625
       },
       "text": {
         "units": 11,
@@ -63,7 +63,6 @@
       "variant": {}
     },
     "split": [
-      "u-ken-cd-p95-98-f7b0008f-p3-table",
       "u-nrel-5mw-p25-36-5eaf02be-p4-text",
       "u-dc-manual-p59-66-a157bdf0-p6-visual",
       "u-dc-cd-p31-38-870cc2fd-p5-table",
@@ -560,7 +559,7 @@
       "page": 3,
       "family": "table",
       "image": "images/ken-cd-p95-98-f7b0008f-p3.jpg",
-      "score": 0.667,
+      "score": 1.0,
       "scores": {
         "Qwen/Qwen3.5-397B-A17B": {
           "baseline-first": 1.0,
@@ -570,7 +569,7 @@
           "baseline-first": 0.0
         }
       },
-      "judges_disagree": true,
+      "judges_disagree": false,
       "order_flipped": [],
       "counts": {
         "baseline": 36,

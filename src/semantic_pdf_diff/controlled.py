@@ -11,8 +11,8 @@ can still leverage caching and fast testing."
   pipeline asks the same queries and recorded answers replay.
 - Every number printed is logged with its role (a fact, a distractor such as a superseded value, or a section,
   table or page number), and every fact is located on its page, so a claim can be classed exactly: right,
-  loose (the fact's value and attribute, a vague entity), misbound, misread (a non-fact number), hallucinated
-  (a value printed nowhere), and facts missed.
+  loose (the fact's value and attribute, a vague entity), misbound, wrong unit (the fact's number in a unit of
+  another kind or size), misread (a non-fact number), hallucinated (a value printed nowhere), and facts missed.
 """
 import io
 import json
@@ -1074,7 +1074,7 @@ def write(project, folder):
 STOP = {"the", "an", "of", "for", "per", "each", "at", "in", "on", "to", "and", "with", "is", "value", "by", "its"}
 # Words a reader may fairly use for one another (domain-neutral; a project's own synonyms are in its facts).
 SAME = {"weight": "mass", "number": "count", "quantity": "count", "qty": "count", "velocity": "speed",
-        "seating": "seat", "rider": "seat", "tonnage": "ton", "max": "maximum", "min": "minimum",
+        "seating": "seat", "rider": "seat", "tonnage": "ton", "max": "maximum", "min": "minimum", "avg": "average",
         "dia": "diameter", "temp": "temperature", "rated": "rating"}
 
 def tokens(text):
@@ -1144,6 +1144,76 @@ def holds(fact, number):
 
 INEXACT_STEPS = 10  # how many tolerances off a reading bound to a bar may be and still count as that bar's, misread
 
+# Typed values (code review 2026-10-01, item 10: "5,151 ft" held a flow in gpm). A unit's kind and its size in the
+# kind's base: values of two kinds never hold each other's facts, and one kind compares by magnitude ("10,000 W" is
+# "10 kW"). A unit not listed, or none, abstains: the number decides, as before. The corpus's units and their
+# common spellings; compare.UNITS is the product's own (its numeric check enters comparison prompts), and the
+# clean-up's values module (milestone 6) is to hold both.
+UNIT_KINDS = {kind: units for kind, units in (
+    ("length", {"in": 1, "inch": 1, "inches": 1, '"': 1, "ft": 12, "feet": 12, "foot": 12, "'": 12, "m": 39.3701,
+                "mm": 0.0393701, "cm": 0.393701}),
+    ("area", {"ft²": 1, "ft2": 1, "sf": 1, "sq ft": 1, "sq. ft": 1, "square feet": 1, "m²": 10.7639, "m2": 10.7639}),
+    ("speed", {"mph": 1, "mi/h": 1, "m/s": 2.23694, "km/h": 0.621371, "kph": 0.621371, "ft/s": 0.681818,
+               "fps": 0.681818}),
+    ("pressure", {"psi": 1, "psig": 1, "psia": 1, "psf": 1 / 144, "ksi": 1000, "kPa": 0.145038, "Pa": 0.000145038,
+                  "bar": 14.5038, "MPa": 145.038}),
+    ("force", {"kips": 1, "kip": 1, "lb": 0.001, "lbs": 0.001, "lbf": 0.001, "kN": 0.224809}),
+    ("tonnage", {"tons": 1, "ton": 1}),
+    ("energy", {"MWh": 1, "kWh": 0.001, "GWh": 1000, "Wh": 0.000001}),
+    ("energy a year", {"MWh/yr": 1, "MWh/year": 1, "kWh/yr": 0.001, "kWh/year": 0.001}),
+    ("power", {"kW": 1, "W": 0.001, "MW": 1000, "hp": 0.7457, "bhp": 0.7457}),
+    ("flow", {"gpm": 1, "gal/min": 1, "MGD": 694.444, "L/s": 15.8503, "cfs": 448.831, "cfm": 7.48052,
+              "scfm": 7.48052, "acfm": 7.48052, "m3/h": 4.40287, "m³/h": 4.40287}),
+    ("loading rate", {"gpm/ft²": 1, "gpm/ft2": 1, "gpm/sf": 1, "gpm/sq ft": 1}),
+    ("rotation", {"rpm": 1, "r/min": 1}),
+    ("time", {"s": 1, "sec": 1, "second": 1, "seconds": 1, "min": 60, "mins": 60, "minute": 60, "minutes": 60,
+              "h": 3600, "hr": 3600, "hrs": 3600, "hour": 3600, "hours": 3600}),
+    ("acceleration", {"g": 1, "G": 1, "m/s²": 0.101972, "m/s2": 0.101972}),
+    ("people", {"persons": 1, "person": 1, "people": 1, "occupants": 1, "riders": 1, "seats": 1}),
+    ("people an hour", {"riders/h": 1, "riders/hr": 1, "riders per hour": 1, "persons/h": 1, "pph": 1}),
+    ("money", {"$M": 1, "M$": 1, "$K": 0.001, "$": 0.000001}),
+    ("degrees F", {"°F": 1, "F": 1, "deg F": 1, "degF": 1}),
+    ("degrees C", {"°C": 1, "C": 1, "deg C": 1, "degC": 1}),
+    ("sound", {"dBA": 1, "dB(A)": 1, "dB": 1}),
+    ("concentration", {"mg/L": 1, "ppm": 1}),
+    ("turbidity", {"NTU": 1}),
+    ("angle", {"°": 1, "deg": 1, "degrees": 1}),
+    ("rate", {"1/s": 1, "s−1": 1, "s-1": 1, "/s": 1}),  # NFKC: s⁻¹ is s−1
+    ("percent", {"%": 1, "percent": 1}),
+)}
+_EXACT = {u: (kind, size) for kind, units in UNIT_KINDS.items() for u, size in units.items()}
+# Case matters only where a letter's case changes the unit (m metre, M mega; g, G; s, S); longer spellings fold.
+_FOLDED = {u.casefold(): ks for u, ks in _EXACT.items() if len(u) > 1 and u.casefold() not in
+           {v.casefold() for v in _EXACT if v != u}}
+
+def unit_kind(text):
+    """(kind, size in the kind's base) of a unit as written, or None when it isn't listed."""
+    text = " ".join(unicodedata.normalize("NFKC", str(text)).split()).rstrip(".")  # NFKC: ft² is ft2
+    text = re.sub(r"^(?:per|in)\s+", "", text)
+    return _EXACT.get(text) or _FOLDED.get(text.casefold())
+
+UNIT_AFTER = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥]=?)?\s*[-+±]?\$?\d[\d,]*(?:\.\d+)?\s*(.*?)\s*$")
+
+def claimed_unit(claim):
+    """A claim's unit: its own field, or what follows the number in its value ("63.3 mph")."""
+    unit = str(claim.get("unit", "") or "").strip()
+    if unit:
+        return unit
+    m = UNIT_AFTER.match(str(claim.get("value", "")))
+    return m.group(1) if m else ""
+
+def holds_as(fact, number, unit):
+    """Whether a value with its unit is the fact's (holds), compared in the fact's unit when both units are known.
+    None when the number is the fact's but the units are of two kinds or sizes: a wrong unit."""
+    mine, theirs = unit_kind(unit), unit_kind(fact.unit)
+    if mine is None or theirs is None or mine == theirs:
+        return holds(fact, number)
+    if mine[0] == theirs[0]:  # converted: within the rounding of a conversion
+        converted = number * mine[1] / theirs[1]
+        if holds(fact, converted) or abs(converted - fact.number) <= 0.005 * max(abs(fact.number), 1e-9):
+            return True
+    return None if holds(fact, number) else False
+
 def classify(claim, facts, printed):
     """(outcome, fact id or None) for one claim.
 
@@ -1151,6 +1221,7 @@ def classify(claim, facts, printed):
     the claim's names describe best. Right: the value's own fact fits best, alone. Loose: it ties for best (a bare
     "pump" among three pumps), or no name fits at all. Misbound: another fact fits better (the value filed under
     another entity or attribute). Distractor: a superseded or otherwise wrong value, bound to its own fact.
+    Wrong unit: right or loose but for its unit, of another kind or size than the fact's (UNIT_KINDS).
     Misread: a printed number that isn't a fact (a page or section number). Hallucinated: printed nowhere.
     Inexact: a bar's value read against the axis, outside its tolerance, the bar named alone. Text: a value
     without a number, not scored yet.
@@ -1166,12 +1237,19 @@ def classify(claim, facts, printed):
     if length is None and unit.strip().startswith("'"):
         length = inches(value + unit)  # "26" with "'-6\"" as its unit
     date = DATE.match(value) and value.strip()
+    said = claimed_unit(claim)
+    typed = {}  # fact id: holds_as (None: the fact's number, in a unit of another kind or size)
     if date:  # a date: the same date
         holders = [f for f in facts if f.value.strip() == date]
     elif length is not None and any(f.unit == "ft-in" for f in facts):  # a length: lengths, in inches
         holders = [f for f in facts if f.unit == "ft-in" and abs(inches(f.value) - length) < 0.01]
     else:
-        holders = [f for f in facts if f.unit != "ft-in" and not DATE.match(f.value) and holds(f, number)]
+        typed = {f.id: holds_as(f, number, said) for f in facts if f.unit != "ft-in" and not DATE.match(f.value)}
+        typed = {i: v for i, v in typed.items() if v is not False}
+        holders = [f for f in facts if f.id in typed]
+    # the right fact's number in another unit ("63.3 m/s" for 63.3 mph): bound well, read wrong
+    unit_checked = lambda outcome, fid: (("wrong unit" if outcome in ("right", "loose") and typed.get(fid, True) is None
+                                          else outcome), fid)
     weights = rarity(facts) if holders or any(f.tolerance for f in facts) else None
     scores = {f.id: fit(claim, f, weights) for f in facts} if weights else {}
     if any(f.tolerance for f in facts):  # read against an axis: the names pick the bar, its height is checked
@@ -1179,8 +1257,11 @@ def classify(claim, facts, printed):
         top = [f for f in facts if scores[f.id] == best]
         if best > 0 and len(top) == 1 and top[0].tolerance:
             bar = top[0]
-            if holds(bar, number):
+            held = holds_as(bar, number, said)
+            if held:
                 return "right", bar.id
+            if held is None:
+                return "wrong unit", bar.id
             if abs(bar.number - number) <= INEXACT_STEPS * bar.tolerance:
                 return "inexact", bar.id  # its height misjudged, or another bar's read: alike to the eye
     if holders:
@@ -1192,14 +1273,14 @@ def classify(claim, facts, printed):
                                     for i in top):
             top = [holder.id]  # facts named alike (a superseded value and its successor): the value decides
         if best == 0 or (holder.id in top and len(top) > 1):
-            return "loose", holder.id
+            return unit_checked("loose", holder.id)
         if top == [holder.id]:
-            return ("right" if holder.role == "fact" else "distractor"), holder.id
+            return unit_checked("right" if holder.role == "fact" else "distractor", holder.id)
         said = tokens(claim.get("entity", ""))
         named = lambda f: any(tokens(n) and tokens(n) <= said for n in (f.entity,) + tuple(f.aliases))
         rivals = [by_id[i] for i in top]
         if named(holder) and all(f.entity != holder.entity and named(f) for f in rivals):
-            return "loose", holder.id  # two things named, the value's own among them ("D104 MEETING 104"): vague
+            return unit_checked("loose", holder.id)  # two things named, the value's own among them ("D104 MEETING 104")
         return "misbound", holder.id
     if date:
         return ("misread", None) if any(printed_value(p["text"]) == ("date", date) for p in printed) else ("hallucinated", None)
@@ -1241,6 +1322,17 @@ def ranges(claims):
             yield {**c, "value": f"{value} {m.group(3).strip()}".strip(),
                    "attribute": f"{bound} {c.get('attribute', '')}".strip()}
 
+def distinctive(fact, facts):
+    """The words of a fact's conditions that tell it from its neighbours: not in the conditions of other facts
+    about the same entity, nor in its own name and attribute; failing that, not in the neighbours' conditions; failing that,
+    all of them. A condition is kept when a claim says one (code review 2026-10-01, item 10: "maximum day" kept
+    "average day" by the word "day", and a claim naming "Filters" kept "with one filter out of service")."""
+    words = tokens(fact.conditions)
+    neighbours = set().union(*(tokens(f.conditions) for f in facts if f.entity == fact.entity and f.id != fact.id))
+    # its own name and attribute, not the entity's aliases: an alias may carry a scope ("four halls")
+    names = set().union(*(tokens(n) for n in (fact.entity, fact.attribute) + tuple(fact.synonyms)))
+    return (words - neighbours - names) or (words - neighbours) or words
+
 NUMERIC_VALUE = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥$])?\s*[-+±]?\$?\d")
 
 def score(key_data, claims):
@@ -1279,17 +1371,18 @@ def score(key_data, claims):
         # the same reading twice (overlapping tiles, other readers) counts once, but either may keep its conditions;
         # a value that repeats ("25 MWh" in June and in July) is two readings, told apart by the fact each names
         outcome, fid = classify(c, numeric, key_data["printed"])
-        if (ident, fid or outcome) not in seen:
-            seen[(ident, fid or outcome)] = True
+        reading = (ident, fid or outcome, outcome == "wrong unit")  # "63.3 mph" and "63.3 m/s" are two readings
+        if reading not in seen:
+            seen[reading] = True
             outcomes[outcome] = outcomes.get(outcome, 0) + 1
         if outcome in ("right", "loose") and fid:
             found.setdefault(fid, outcome)
             if outcome == "right":
                 found[fid] = "right"
-            want = by_id[fid].conditions
+            want = distinctive(by_id[fid], facts)
             if want and fid not in conditions or conditions.get(fid) is False:
                 text = " ".join(str(c.get(k, "")) for k in ("conditions", "entity", "attribute", "value"))
-                conditions[fid] = bool(tokens(want) & (tokens(text) | bounds(text)))
+                conditions[fid] = bool(want & (tokens(text) | bounds(text)))
     real = [f for f in facts if f.role == "fact"]
     by_form = {}
     for f in real:

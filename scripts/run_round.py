@@ -109,8 +109,8 @@ def main(argv=None):
     #    slices marked public only: a sensitive document must never reach the repository.
     manifest = json.loads(record_runs.MANIFEST.read_text())
     wanted_set = spec.get("set", "dev")
-    in_set = {n for r in manifest["runs"] if wanted_set == "all" or r["set"] == wanted_set for n in r["slices"]}
-    private = sorted(s["name"] for s in manifest["slices"] if s["name"] in in_set and not s.get("public"))
+    private = rounds.private_slices([r["name"] for r in manifest["runs"] if wanted_set == "all" or r["set"] == wanted_set],
+                                    manifest)
     if private:
         print(f"Refusing: slices not marked public in {record_runs.MANIFEST.name}: {', '.join(private)}")
         return 2
@@ -160,7 +160,7 @@ def main(argv=None):
         from semantic_pdf_diff import queries
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff.llm import folder_client
-        from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
+        from semantic_pdf_diff.llm import evaluator_settings
         cap = float(checks.get("cap", 2.0))
         for v in spec["variants"]:
             step = f"check:{v}"
@@ -176,8 +176,7 @@ def main(argv=None):
                     save_state()
                     print(f"Paused: {state['paused']}")
                     return 3
-                settings = Settings.from_env(model=model, **EVALUATOR_SETTINGS,
-                                             concurrency=4, timeout=600, retries=1, max_cost=left)
+                settings = evaluator_settings(model, concurrency=4, timeout=600, retries=1, max_cost=left)
                 with folder_client(dump_dir, settings) as client:
                     client.ledger = Ledger(LEDGER, round=name, step="check", variant=v, judge=model)
                     _, _, failures = queries.check(dump_dir, client, model)
@@ -281,11 +280,11 @@ def main(argv=None):
         from semantic_pdf_diff.judgements import ModelJudge
         from semantic_pdf_diff.llm import folder_client
         from semantic_pdf_diff.ledger import Ledger
-        from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
+        from semantic_pdf_diff.llm import evaluator_settings
         batch = folder / f"pairs-{v}"
         if remaining() <= 0:
             raise Paused(f"round cap reached while judging {v} ({model}, units to {upto})")
-        settings = Settings.from_env(model=model, **EVALUATOR_SETTINGS, concurrency=16,
+        settings = evaluator_settings(model, concurrency=16,
                                      timeout=int(spec.get("judge_timeout", 600)),
                                      retries=int(spec.get("judge_retries", 2)), max_cost=remaining())
         with folder_client(batch, settings) as client:
@@ -334,12 +333,11 @@ def main(argv=None):
         from semantic_pdf_diff import postmortem
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff.llm import folder_client
-        from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
+        from semantic_pdf_diff.llm import evaluator_settings
         batch, pm = folder / f"pairs-{v}", spec["postmortem"]
         left = min(remaining(), pm["cap"] - ledger.spent(LEDGER, round=name, step="postmortem"))
         if pm["analyst"] and left > 0:
-            settings = Settings.from_env(model=pm["analyst"], **EVALUATOR_SETTINGS,
-                                         concurrency=1, timeout=600, retries=1, max_cost=left)
+            settings = evaluator_settings(pm["analyst"], concurrency=1, timeout=600, retries=1, max_cost=left)
             with folder_client(batch, settings) as client:
                 client.ledger = Ledger(LEDGER, round=name, step="postmortem", variant=v, judge=pm["analyst"])
                 postmortem.write(batch, DOCUMENTS, client, units=pm["units"])

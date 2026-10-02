@@ -191,3 +191,38 @@ None now. The owner's reading of the full review may add some.
   - **Unreadable PDFs (item 7):** an encrypted, empty or corrupt PDF gets one failed row naming why, and the run goes on. The next run tries it again.
   - **Truncation (item 12):** a truncated answer isn't retried, and its message is unchanged, so recorded failures replay alike.
   - **`reconcile` (item 13):** a claim is compared only with clusters stating its value. 4,000 claims: 25.2 s before, 0.06 s after, with identical output.
+- **Milestone 2b, the evaluation fixes (2026-10-02): done.** Each comes with a test that fails without it.
+  - **Evaluator clients (items 2, 9):**
+    - `llm.evaluator_settings` takes only endpoint settings from the environment, so an exported shaping setting no longer reaches a judge.
+    - `llm.Budget` is one cost cap per command, carried across models; `--max-cost 0` no longer means "no cap".
+    - It's used by `review judge`, `queries check`, `run_round`, the eye and page tests, and spot checks.
+  - **Spot checks** pause at their budget like `run_round` (exit 3). Like rounds, they refuse private slices (`rounds.private_slices`).
+  - **Folder fixtures (item 8)** repack when the zip's bytes would differ, not the row count. A paid answer that replaced a recorded failure is packed after a crash.
+  - **One unit score (item 11):**
+    - `judgements.UnitVerdicts` defines a unit's score, flips, disagreement and "unsettled".
+    - The decision, `unsettled`, the analysis and the post-mortem all use it.
+    - The committed analyses' score fields were recomputed offline. Their issue notes weren't: today's local stores no longer match what those rounds read.
+      - 16 units in 9 batches changed score
+      - 2 units no judge saw in both orders left the analyses
+      - each batch's split list lost at most one unit
+    - The committed post-mortems stand as written.
+  - **The rounds report (item 14):** the by-kind chart names each point by round, variant and stratum, coloured by stratum. Two variants in one round were one unlabelled point.
+  - **Bands on turned sheets (item 15):**
+    - Units are cut by y as displayed, and cropped through `rounds.band_region`.
+    - Batches record `"bands": "as displayed"`. `add_context` refuses an older batch with a band on a rotated page.
+    - Upright pages cut as before.
+  - **The controlled scorer (item 10):**
+    - **Typed values:**
+      - a unit's kind and size (`controlled.UNIT_KINDS`, the corpus's units and their spellings)
+      - two kinds never hold each other's values; one kind compares by magnitude; an unknown unit abstains
+      - the right fact's number in another unit is a new outcome, **wrong unit**; a misbound claim stays misbound
+      - `compare.UNITS` stays the product's, because it enters comparison prompts; milestone 6's `values` module is to hold both
+    - **Conditions** are kept only by their distinctive words: not in the same entity's other conditions, nor in the fact's own name and attribute.
+    - **"located in" and "in"** resolve to within or located at by the object's kind.
+    - **Fractions of an inch** are read: 2'-9 1/2" is 33.5 in.
+    - **Offline re-score:** `results.json` changed only where the corpus holds such claims.
+      - coaster tables, clean, continued and multilevel: 5 entry speeds each, read in m/s for mph, now count as wrong-unit readings beside the right ones
+      - wtp tables, stacked: 3 blower airflows in scfm, read as gpm, move from right to wrong unit
+      - no recall changed
+      - the conditions, "located in" and fraction slips occur in no recorded claim; only their tests show them
+  - 318 tests pass.
