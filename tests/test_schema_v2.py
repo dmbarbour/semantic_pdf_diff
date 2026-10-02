@@ -100,6 +100,22 @@ class InterpreterTests(unittest.TestCase):
         self.assertNotEqual(extract.prompt_hash, comparison_interpreter(s).prompt_hash)
         self.assertNotEqual(extract.settings, extraction_interpreter(Settings(tile_points=500)).settings)
 
+class DocumentTypes(unittest.TestCase):
+    """Coverage rows and the report have one owner each (code review 2026-10-01, A1)."""
+    def test_coverage_rows_and_reports_hold_only_their_fields(self):
+        from pydantic import ValidationError
+        from semantic_pdf_diff.models import REPORT_SCHEMA, EvidenceDocument, coverage_row
+        row = coverage_row(content='sha256:x.pdf', task='open', status='failed', issues=['a.pdf: encrypted'])
+        self.assertEqual(list(row), ['content', 'page', 'bbox', 'task', 'image', 'status', 'issues', 'claims'])
+        self.assertEqual(coverage_row(content='c', task='t', status='complete', duplicate_of='u')['duplicate_of'], 'u')
+        with self.assertRaises(ValidationError):
+            coverage_row(content='c', task='t', status='done')
+        empty = dict(sources=[], files=[], interpreters={}, evidence=[], coverage=[], sections=[], situation={},
+                     scan_issues=[])
+        self.assertEqual(EvidenceDocument(**empty).schema_version, REPORT_SCHEMA)
+        with self.assertRaises(ValidationError):
+            EvidenceDocument(**empty, extra=1)
+
 class CliTests(unittest.TestCase):
     def run_cli(self, root, a, b):
         client = Recorder(vision=False)

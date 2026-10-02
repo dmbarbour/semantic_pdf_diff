@@ -419,6 +419,72 @@ def settings_class(levers=DEFAULT_LEVERS):
 
 Settings = settings_class()
 
+REPORT_SCHEMA = 2  # report.json and evidence.json (and the comparisons a store saves)
+
+class CoverageRow(Strict):
+    """One task's outcome, as a store keeps it and a report shows it: the one owner of its fields (code review
+    2026-10-01: six hand-written rows). Rows travel as dicts (row())."""
+    content: str
+    page: int | None = None
+    bbox: list | None = None
+    task: str
+    image: str | None = None
+    status: Literal["complete", "partial", "failed", "skipped", "not_reached"]
+    issues: list[str] = Field(default_factory=list)
+    claims: int = 0
+    duplicate_of: str | None = None  # a repeated block's first occurrence, whose result it follows
+
+    def row(self):
+        out = self.model_dump()
+        if out["duplicate_of"] is None:
+            del out["duplicate_of"]
+        return out
+
+def coverage_row(**fields):
+    return CoverageRow(**fields).row()
+
+class Situation(Strict):
+    """A content item's situating results, as reports carry them."""
+    figures: list[dict]
+    unresolved: list[dict]
+    issues: list
+    quality: dict | None = None
+
+class EvidenceDocument(Strict):
+    """evidence.json: what was read, written before comparing (so it stands if comparing fails)."""
+    schema_version: int = REPORT_SCHEMA
+    sources: list[dict]
+    files: list[dict]
+    interpreters: dict
+    evidence: list[dict]
+    coverage: list[dict]
+    sections: list[dict]
+    situation: dict
+    scan_issues: list[dict]
+
+class Report(Strict):
+    """report.json: the comparison (compare()'s result first) and everything it rests on; report.html is drawn
+    from it. A key compare() adds must be added here: a report holds nothing unowned."""
+    mode: str
+    findings: list[dict]
+    unmatched: list[dict]
+    shared: list[str]
+    retrieval: dict
+    schema_version: int = REPORT_SCHEMA
+    created_at: str
+    sources: list[dict]
+    files: list[dict]
+    interpreters: dict
+    scan_issues: list[dict]
+    file_difference: dict
+    sections: list[dict]
+    situation: dict
+    evidence: list[dict]
+    coverage: list[dict]
+    settings: dict
+    usage: dict
+    limitations: list[str]
+
 class Gain(Strict):
     """A gain that lets a "no worse" variant through, named before judging: a mechanical figure
     (rounds.gains) and the relative change it must reach (-0.10: at least ten percent less)."""

@@ -305,3 +305,8 @@ None now. The owner's reading of the full review may add some.
       - A fixture description's source type now comes from the recipe, not the prompt's text.
     - **The sheet-details mark** missed a detail noted without a sheet label ("Drawing sheet. Detail B4", as the review found). It's fixed and tested.
     - No store or fixture format changed. Requests are unchanged (golden requests).
+  - **6b, the report: done.**
+    - **`models.CoverageRow`** owns a task row's fields and statuses. The six hand-written rows are built through `coverage_row()` and still travel as the same dicts.
+    - **`EvidenceDocument` and `Report`** own `evidence.json`'s and `report.json`'s fields, with one `REPORT_SCHEMA` (once written twice). `Situation` owns a content item's situating results.
+    - A report holds nothing unowned: a key `compare()` adds must be added to `Report`.
+    - Both documents came out byte for byte as before on a synthetic comparison, apart from its temporary paths.

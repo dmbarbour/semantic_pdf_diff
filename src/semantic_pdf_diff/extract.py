@@ -10,7 +10,8 @@ from pathlib import Path
 import pymupdf
 from .pages import (display_y, lines as _lines, native, native_page, reading_blocks, reading_dict_blocks, shown,
                     shown_by_matrix, shown_point, top_by_matrix)
-from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, Settings, claim_id, merge_occurrences
+from .models import (DerivationStep, Evidence, Extraction, PdfLocator, Section, Settings, claim_id, coverage_row,
+                     merge_occurrences)
 from .levers import LAYER_NOTE, LOCATOR_NOTE, lever_marks
 from .situate import page_figures
 from .dispatch import Dispatcher
@@ -779,8 +780,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         copies = [e.model_copy(update={"locator": PdfLocator(page=page_no, bbox=tuple(bbox), region=region, task=task),
                                        "section": section.id, "derivation": [*e.derivation, step]})
                   for e in entry["found"]]
-        row = {"content": content, "page": page_no, "bbox": list(bbox), "task": task, "image": None,
-               "status": entry["row"]["status"], "issues": [note], "claims": len(copies), "duplicate_of": entry["task"]}
+        row = coverage_row(content=content, page=page_no, bbox=list(bbox), task=task, status=entry["row"]["status"],
+                           issues=[note], claims=len(copies), duplicate_of=entry["task"])
         evidence.extend(copies)
         record(row, copies)
 
@@ -817,8 +818,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             if entry["task"] != task:
                 entry = None  # an early sighting, extracted normally before repetition is proven
         found = []
-        row = {"content": content, "page": page_no, "bbox": list(bbox), "task": task,
-               "image": image, "status": "complete", "issues": [], "claims": 0}
+        row = coverage_row(content=content, page=page_no, bbox=list(bbox), task=task, image=image, status="complete")
         images = ([output / image] if image else []) + [output / x for x in extra_images]
         section = page_section.box(page_no, bbox)  # the heading above the region, not the page's
         # A region spanning sections (a tile, an overview) is told all their headings.
@@ -916,8 +916,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         fits = len(text.encode()) <= s.text_bytes
         splittable = len(columns) > 2
         if not fits and not splittable:
-            record({"content": content, "page": page_no, "bbox": list(bbox), "task": task, "image": None,
-                    "status": "partial", "issues": ["Table row exceeds text budget; inspect visual tiles"], "claims": 0})
+            record(coverage_row(content=content, page=page_no, bbox=list(bbox), task=task, status="partial",
+                                issues=["Table row exceeds text budget; inspect visual tiles"]))
             return
         if fits:
             def then(status):
@@ -979,8 +979,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
     if problem:  # one failed row, and the run goes on with the other documents; the next run tries it again
         if opened is not None:
             opened.close()
-        record({"content": content, "page": None, "bbox": None, "task": "open", "image": None, "status": "failed",
-                "issues": [f"{name}: {problem}"], "claims": 0})
+        record(coverage_row(content=content, task="open", status="failed", issues=[f"{name}: {problem}"]))
         state["result"] = ([], coverage)
         return
     with opened as doc:
@@ -1006,9 +1005,9 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                          if s.keep_table(context_of, page, table, rows)]
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors
                 found = []
-                record({"content": content, "page": number, "bbox": list(native_page(page)),
-                        "task": f"table-detection:p{number}", "image": None, "status": "failed",
-                        "issues": [type(e).__name__ + ": " + str(e)], "claims": 0})
+                record(coverage_row(content=content, page=number, bbox=list(native_page(page)),
+                                    task=f"table-detection:p{number}", status="failed",
+                                    issues=[type(e).__name__ + ": " + str(e)]))
             height = page.rect.height
             continuing, carried = carried, None
             context_of.tables_on[number] = [bbox for bbox, _, _ in found]
@@ -1059,9 +1058,9 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     # A figure's caption, or a sheet detail's titles, as source text.
                     visual_task(number, page, tag, rect, text=note)
             else:
-                record({"content": content, "page": number, "bbox": list(native_page(page)),
-                        "task": f"vision:p{number}", "image": None, "status": "skipped",
-                        "issues": ["Visual extraction disabled; charts, diagrams and scans may be missed"], "claims": 0})
+                record(coverage_row(content=content, page=number, bbox=list(native_page(page)), task=f"vision:p{number}",
+                                    status="skipped",
+                                    issues=["Visual extraction disabled; charts, diagrams and scans may be missed"]))
         if on_sections:
             on_sections([x.model_copy(update={"signals": signals.get(x.id, {})}) for x in sections])
         while state["pending"]:  # refinement may still render crops from this document

@@ -17,7 +17,7 @@ from .dispatch import Dispatcher
 from .readings import reconcile
 from .extract import EXTRACT, Context, Job, pdf_sections, run_jobs, text_groups
 from .llm import SYSTEM, Budget, Client, evaluator_settings, folder_client, redact_url
-from .models import Settings, Source
+from .models import EvidenceDocument, Report, Settings, Situation, Source, coverage_row
 from .progress import Progress, log, setup_logging
 from .throttle import RateLimiter
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
@@ -287,33 +287,32 @@ def run(args, settings, store, names, out, force_rescan=False):
         progress.close()
         situations = situate_sources(store, client, names, files, by_content, sections, coverage) if triage else {}
         evidence = [e for items in by_content.values() for e in items]
-        situation_data = {c: {'figures': [f.model_dump() for f in figures], 'unresolved': [r.model_dump() for r in unresolved],
-                              'issues': issues, 'quality': checks}
+        situation_data = {c: Situation(figures=[f.model_dump() for f in figures], unresolved=[r.model_dump() for r in unresolved],
+                                       issues=issues, quality=checks).model_dump()
                           for c, (figures, unresolved, issues, checks) in sorted(situations.items())}
         source_data = [store.source(n).model_dump() for n in names]
         file_data = [f.model_dump() for n in names for f in files[n]]
         scan_issues = [{'source': n, 'path': p, 'reason': r} for n in names for p, r in store.issues(n)]
         interpreters = {'extract': interpreter.model_dump(), **({'triage': triage.model_dump()} if triage else {})}
         out.mkdir(parents=True, exist_ok=True)
-        (out / 'evidence.json').write_text(json.dumps({'schema_version': 2, 'sources': source_data, 'files': file_data,
-            'interpreters': interpreters, 'evidence': [e.model_dump() for e in evidence], 'coverage': coverage,
-            'sections': [{'content': c, **x.model_dump()} for c, items in sorted(sections.items()) for x in items],
-            'situation': situation_data, 'scan_issues': scan_issues}, indent=2, ensure_ascii=False), encoding='utf-8')
+        document = EvidenceDocument(sources=source_data, files=file_data, interpreters=interpreters,
+            evidence=[e.model_dump() for e in evidence], coverage=coverage,
+            sections=[{'content': c, **x.model_dump()} for c, items in sorted(sections.items()) for x in items],
+            situation=situation_data, scan_issues=scan_issues)
+        (out / 'evidence.json').write_text(json.dumps(document.model_dump(), indent=2, ensure_ascii=False), encoding='utf-8')
         left, right = ([e for c in dict.fromkeys(f.content for f in files[n]) for e in by_content[c]] for n in names)
         log.info(f"Comparing {len(left)} × {len(right)} extracted claims via retrieval")
         progress = Progress('compare', client, heartbeat=settings.heartbeat_seconds)
         data = compare(left, right, store.folder, client, args.mode, progress=progress)
         progress.close()
         interpreters['compare'] = comparison_interpreter(settings).model_dump()
-        data.update(schema_version=2, created_at=provenance.now().isoformat(),
+        data = Report(**data, created_at=provenance.now().isoformat(),
             sources=source_data, files=file_data, interpreters=interpreters, scan_issues=scan_issues,
             file_difference=file_difference(files[names[0]], files[names[1]]),
-            sections=[{'content': c, **x.model_dump()} for c, items in sorted(sections.items()) for x in items],
-            situation=situation_data,
-            evidence=[e.model_dump() for e in evidence], coverage=coverage,
+            sections=document.sections, situation=situation_data, evidence=document.evidence, coverage=coverage,
             settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
             usage={'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage, **fixture_usage(client)},
-            limitations=LIMITATIONS)
+            limitations=LIMITATIONS).model_dump()
         store.save_comparison(data['created_at'], data)
         write_report(data, out, assets=store.folder / 'assets')
         incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
@@ -554,8 +553,7 @@ def extract_sources(store, client, names, files, progress):
                 sections[file.content] = store.sections(file.content)
             elif extension != '.pdf':
                 reason = f'No adapter for {extension} files yet' if extension else 'No file extension; not interpreted'
-                row = {'content': file.content, 'page': None, 'bbox': None, 'task': 'unsupported', 'image': None,
-                       'status': 'skipped', 'issues': [reason], 'claims': 0}
+                row = coverage_row(content=file.content, task='unsupported', status='skipped', issues=[reason])
                 store.record_task(row, [])
                 store.mark_extracted(file.content)
                 by_content[file.content] = []
