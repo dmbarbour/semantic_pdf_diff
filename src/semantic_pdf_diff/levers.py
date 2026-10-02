@@ -17,8 +17,9 @@ type instead of an intermediate type."
 - The tables once kept by hand (setting classes, role tuples, the lever list, setting regions, lever marks)
   are read off the declarations.
 
-Milestone 3 moves the options; their behaviour still lives where it was, reading them, so every configuration
-holds every lever (its order changes nothing yet). Milestone 4 moves behaviour into hooks, one kind at a time.
+Each lever acts only through its hooks (milestone 4), so a configuration may leave any out: a lever left out asks
+exactly what its `off` settings ask (tests/test_golden_requests.py). The geometry the segmentation levers choose
+from is in segmentation.py; a document's caches and access are in the reader the hooks are given (extract.Context).
 """
 import hashlib
 import json
@@ -111,6 +112,7 @@ class Lever(BaseModel):
     lever_name: ClassVar[str] = ""
     stage: ClassVar[str] = ""      # instructions, context, segmentation, inclusion or matching
     parked: ClassVar[bool] = False  # kept as a setting, off by default (the owner, 2026-10-02)
+    off: ClassVar[dict] = {}        # its settings that ask exactly what leaving it out of a configuration asks
     marks: ClassVar[dict] = {}
 
 # Lines levers add to prompts (their text lives with the lever; extract.py writes them).
@@ -124,101 +126,258 @@ def _shaping(regions=ALL_REGIONS, roles=EXTRACT):
 def _selecting(regions=ALL_REGIONS, roles=EXTRACT):
     return Declared("selecting", roles, regions)
 
+def _rules(rules):
+    return "".join(rule.rstrip() + "\n" for rule in rules)
+
 class ExtractPrompt(Lever):
-    lever_name, stage = "extract_prompt", "instructions"
+    lever_name, stage, off = "extract_prompt", "instructions", {"extract_prompt": None}
     extract_prompt: Annotated[str | None, _shaping()] = None  # replaces the extraction instructions
 
+    def base_instructions(self, builtin):
+        return self.extract_prompt or super().base_instructions(builtin)
+
 class ExtractRules(Lever):
-    lever_name, stage = "extract_rules", "instructions"
+    lever_name, stage, off = "extract_rules", "instructions", {"extract_rules": []}
     extract_rules: Annotated[list[str], _shaping()] = Field(default_factory=list)  # appended to the instructions
 
+    def instructions(self, builtin):
+        return super().instructions(builtin) + _rules(self.extract_rules)
+
 class VisualRules(Lever):
-    lever_name, stage = "visual_rules", "instructions"
+    lever_name, stage, off = "visual_rules", "instructions", {"visual_rules": []}
     # appended for image tasks only (tiles, figures, overview)
     visual_rules: Annotated[list[str], _shaping(VISUAL)] = Field(default_factory=list)
 
+    def region_rules(self, region):
+        return super().region_rules(region) + (_rules(self.visual_rules) if region in ("tile", "figure", "overview") else "")
+
 class Neighbours(Lever):
     lever_name, stage = "neighbours", "context"
+    off = {"context_before": 0, "context_after": 0}
     marks = {"context_before": re.compile(r"^Before: \.\.\.(.*)$", re.M),
              "context_after": re.compile(r"^After: (.*)\.\.\.$", re.M)}
     context_before: Annotated[int, _shaping(TEXTUAL)] = Field(default=400, ge=0, le=20000)  # characters before
     context_after: Annotated[int, _shaping(TEXTUAL)] = Field(default=400, ge=0, le=20000)   # characters after
 
+    def text_lines(self, reader, page_no, segments, text):
+        """Text before the task's first block and after its last, crossing to the neighbouring pages when the
+        page runs out."""
+        lines = super().text_lines(reader, page_no, segments, text)
+        before, after = self.context_before, self.context_after
+        if not before and not after:
+            return lines
+        first, last = segments[0][0], segments[-1][0]
+        blocks = reader.page_blocks(page_no)
+        boxes = [b for b, _ in blocks]
+        i0 = boxes.index(first) if first in boxes else 0
+        i1 = len(boxes) - 1 - boxes[::-1].index(last) if last in boxes else len(boxes) - 1
+        head = " ".join(t for _, t in blocks[:i0])
+        tail = " ".join(t for _, t in blocks[i1 + 1:])
+        if before and len(head) < before and page_no > 1:
+            head = " ".join(t for _, t in reader.page_blocks(page_no - 1)) + " " + head
+        if after and len(tail) < after and page_no < reader.pages:
+            tail = tail + " " + " ".join(t for _, t in reader.page_blocks(page_no + 1))
+        if before and head.strip():
+            lines.append("Before: ..." + head.strip()[-before:])
+        if after and tail.strip():
+            lines.append("After: " + tail.strip()[:after] + "...")
+        return lines
+
 class TableContext(Lever):
     lever_name, stage = "table_context", "context"
+    off = {"table_context": 0}
     marks = {"table_context": re.compile(r"^Above the table: \.\.\.(.*)$", re.M)}
     # characters of text above a table (lead-in, caption)
     table_context: Annotated[int, _shaping(frozenset({"table"}))] = Field(default=400, ge=0, le=20000)
 
+    def table_lines(self, reader, page_no, top, flat):
+        """Text just above a table (its lead-in sentence or caption)."""
+        lines = super().table_lines(reader, page_no, top, flat)
+        above = reader.text_above(page_no, top) if self.table_context else ""
+        return lines + (["Above the table: ..." + above.strip()[-self.table_context:]] if above.strip() else [])
+
 class StemContext(Lever):
     lever_name, stage = "stem_context", "context"
+    off = {"stem_context": False}
     marks = {"stem_context": re.compile(r"^Within: (.+)$", re.M)}
     # tell text and table tasks which numbered items and headings they're under
     stem_context: Annotated[bool, _shaping(TEXTUAL)] = True
 
+    def _within(self, reader, page_no, box):
+        path = reader.stem_path(page_no, box) if self.stem_context else []
+        return ["Within: " + " > ".join(path)] if path else []
+
+    def text_lines(self, reader, page_no, segments, text):
+        return super().text_lines(reader, page_no, segments, text) + self._within(reader, page_no, segments[0][0])
+
+    def table_lines(self, reader, page_no, top, flat):
+        return super().table_lines(reader, page_no, top, flat) + self._within(reader, page_no, top)
+
 class References(Lever):
     lever_name, stage, parked = "references", "context", True
+    off = {"references": False}
     marks = {"references": re.compile(r"^((?:Defined elsewhere|Cited): .+)$", re.M)}
     # abbreviations defined elsewhere and cited figures' captions as context
     references: Annotated[bool, _shaping(TEXTUAL)] = False
 
+    def _cited(self, reader, text):
+        line = reader.cited(text) if self.references else ""
+        return [line] if line else []
+
+    def text_lines(self, reader, page_no, segments, text):
+        return super().text_lines(reader, page_no, segments, text) + self._cited(reader, text)
+
+    def table_lines(self, reader, page_no, top, flat):
+        return super().table_lines(reader, page_no, top, flat) + self._cited(reader, flat)
+
 class TileLocator(Lever):
     lever_name, stage, parked = "tile_locator", "context", True
+    off = {"tile_locator": False}
     marks = {"tile_locator": re.compile("^(" + re.escape(LOCATOR_NOTE) + ")$", re.M)}
     # with each tile, a page thumbnail outlining where the tile sits
     tile_locator: Annotated[bool, _shaping(VISUAL)] = False
 
+    def tile_lines(self, reader, page, rect, tag):
+        lines = super().tile_lines(reader, page, rect, tag)
+        return lines + ([LOCATOR_NOTE] if self.tile_locator and tag.startswith("tile") else [])
+
+    def tile_images(self, reader, page, rect, tag):
+        images = super().tile_images(reader, page, rect, tag)
+        return images + ([reader.locator(page, rect, tag)] if self.tile_locator and tag.startswith("tile") else [])
+
 class Tiling(Lever):
-    lever_name, stage = "tiling", "segmentation"
+    lever_name, stage, off = "tiling", "segmentation", {"tiling": "grid"}
     # bands: full-width, cut at whitespace gaps, on report-sized pages
     tiling: Annotated[Literal["grid", "bands"], _selecting(VISUAL)] = "bands"
 
+    def tiles(self, reader, page):
+        """On a report-sized page, full-width bands cut at whitespace gaps, skipping bands with no graphics (text
+        tasks already cover them); otherwise the platform's grid."""
+        side = self.tile_points
+        if self.tiling != "bands" or page.rect.width > 1.6 * side:
+            return super().tiles(reader, page)
+        from .segmentation import _graphics, bands
+        graphics = _graphics(page)
+        return [(f"tile:{i}", r, "") for i, r in enumerate(
+            b for b in bands(page, side) if any(b.intersects(g) for g in graphics))]
+
 class GrowTiles(Lever):
-    lever_name, stage = "grow_tiles", "segmentation"
+    lever_name, stage, off = "grow_tiles", "segmentation", {"grow_tiles": False}
     grow_tiles: Annotated[bool, _shaping(VISUAL)] = True  # extend grid tiles to include every text line they cut
 
+    def grow(self, reader, page, rect, within):
+        rect = super().grow(reader, page, rect, within)
+        if not self.grow_tiles:
+            return rect
+        from .segmentation import grown
+        return grown(page, rect, lines=reader.lines(page)) & within
+
 class SheetDetails(Lever):
-    lever_name, stage, parked = "sheet_details", "segmentation", True
+    lever_name, stage, parked, off = "sheet_details", "segmentation", True, {"sheet_details": False}
     marks = {"sheet_details": re.compile(r"^(Sheet .+ Detail .+)$", re.M)}
     # cut drawing sheets into their details, titled from the sheet
     sheet_details: Annotated[bool, _selecting(VISUAL)] = False
 
+    def viewports(self, reader, page):
+        """A drawing sheet's details (and its title-block and notes columns), each noted with the sheet's and
+        the detail's titles. Side columns get no note: with "Title block" (round 5b), or even the sheet's title
+        (5c), the model skipped a legible revision table as not engineering."""
+        areas = super().viewports(reader, page)
+        if not self.sheet_details:
+            return areas
+        from .segmentation import sheet_details
+        found = sheet_details(page, reader.lines(page))
+        if not found:
+            return areas
+        from .situate import title_block
+        label, heading = title_block(page)
+        sheet = " ".join(x for x in (label.title() if label else "Drawing sheet", heading) if x)
+        return areas + [(rect, f"{sheet}. " + (f"Detail {number}: {title}" if title else f"Detail {number}") if number
+                         else "") for number, title, rect in found]
+
 class SkipEmpty(Lever):
-    lever_name, stage = "skip_empty", "segmentation"
+    lever_name, stage, off = "skip_empty", "segmentation", {"skip_empty": False}
     skip_empty: Annotated[bool, _selecting(VISUAL)] = True  # don't send tiles with no text, drawing or image
 
+    def kept_tiles(self, reader, page, regions):
+        """Blank tiles dropped, the others keeping their numbers (and so their recorded keys)."""
+        regions = super().kept_tiles(reader, page, regions)
+        if not self.skip_empty or not regions:
+            return regions
+        from .segmentation import _empty
+        return [x for x, blank in zip(regions, _empty(page, [r for _, r, _ in regions], reader.lines(page))) if not blank]
+
 class FigureTasks(Lever):
-    lever_name, stage = "figure_tasks", "segmentation"
+    lever_name, stage, off = "figure_tasks", "segmentation", {"figure_tasks": False}
     marks = {"figure_tasks": re.compile(r"^Caption: (.+)$", re.M)}
     # read each detected figure whole, besides the tile grid (which can cut through figures)
     figure_tasks: Annotated[bool, _selecting(frozenset({"figure"}))] = True
 
+    def figure_regions(self, reader, page, number, grid):
+        """Each detected figure (drawing or image, with its caption) read whole, unless it fits inside one tile
+        or is the whole page (a drawing sheet: the overview)."""
+        regions = super().figure_regions(reader, page, number, grid)
+        if not self.figure_tasks:
+            return regions
+        from .pages import shown
+        from .segmentation import FIGURE_PAD
+        for i, figure in enumerate(f for f in reader.figures(page, number) if f.region):
+            box = (shown(page, figure.bbox) + (-FIGURE_PAD, -FIGURE_PAD, FIGURE_PAD, FIGURE_PAD)) & page.rect
+            if box.is_empty or abs(box) >= 0.9 * abs(page.rect) or any(box in r for r in grid):
+                continue
+            regions.append((f"figure:{i}", box, f"Caption: {figure.caption}" if figure.caption else ""))
+        return regions
+
 class VisualTextLayer(Lever):
-    lever_name, stage = "visual_text_layer", "inclusion"
+    lever_name, stage, off = "visual_text_layer", "inclusion", {"visual_text_layer": 0}
     marks = {"visual_text_layer": re.compile("^" + re.escape(LAYER_NOTE) + "\n(.*)$", re.M)}
     # characters of a region's PDF text sent with its image
     visual_text_layer: Annotated[int, _shaping(VISUAL)] = Field(default=1500, ge=0, le=20000)
 
+    def region_text(self, reader, page, rect, layer, text):
+        text = super().region_text(reader, page, rect, layer, text)
+        if not self.visual_text_layer or not layer.strip():
+            return text
+        return (text + "\n" if text else "") + LAYER_NOTE + "\n" + " ".join(layer.split())[:self.visual_text_layer]
+
 class TableFilter(Lever):
-    lever_name, stage, parked = "table_filter", "inclusion", True
+    lever_name, stage, parked, off = "table_filter", "inclusion", True, {"table_filter": False}
     # drop detected "tables" that are charts, frames or paragraphs
     table_filter: Annotated[bool, _selecting(frozenset({"table", "table-detection"}))] = False
 
+    def keep_table(self, reader, page, table, rows):
+        if not super().keep_table(reader, page, table, rows):
+            return False
+        from .extract import real_table
+        return not self.table_filter or real_table(page, table, rows)
+
 class QuoteMatch(Lever):
-    lever_name, stage = "quote_match", "matching"
+    lever_name, stage, off = "quote_match", "matching", {"quote_match": "exact"}
     # fragments: quotes normalized (Unicode, line-end hyphens) and made of "a ... b" or "a | b" parts;
     # excerpts: also words read in order across a pseudo-table. Applied as answers are stored: bound.
     quote_match: Annotated[Literal["exact", "fragments", "excerpts"], Declared("post", EXTRACT, TEXTUAL)] = "fragments"
 
+    def loose_match(self, quote, text):
+        if super().loose_match(quote, text):
+            return True
+        from .extract import excerpted
+        return self.quote_match != "exact" and excerpted(quote, text, in_order=self.quote_match == "excerpts")
+
 class Reconcile(Lever):
-    lever_name, stage = "reconcile", "matching"
+    lever_name, stage, off = "reconcile", "matching", {"reconcile": False}
     # merge readings of one fact by different tasks into one claim; applied when evidence is read, not stored
     reconcile: Annotated[bool, Declared("post")] = True
 
+    def reconciles(self):
+        return self.reconcile
+
 class DedupeRepeated(Lever):
-    lever_name, stage = "dedupe_repeated", "matching"
+    lever_name, stage, off = "dedupe_repeated", "matching", {"dedupe_repeated": False}
     # extract exactly repeated table rows (same cells, same table position, 3+ pages) once
     dedupe_repeated: Annotated[bool, _shaping()] = True
+
+    def dedupes_repeated_rows(self):
+        return self.dedupe_repeated
 
 # The canonical order: the prompt's (instructions, then context lines as the providers write them), then the
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
@@ -303,13 +462,130 @@ class Platform(Composable):
     zip_ratio_min_bytes: Annotated[int, _selecting(roles=())] = Field(default=100 * 1024 ** 2, ge=0)
 
     def assumptions(self):
-        """The platform's own: room in the context for a prompt; every lever whose behaviour the pipeline still
-        reads directly is present (milestone 4 moves behaviour into hooks)."""
+        """The platform's own: room in the context for a prompt."""
         if self.context_tokens <= self.output_tokens + self.safety_tokens + 600:
             yield "Context must leave room for prompts after output and safety reserves"
-        missing = [name for name in DEFAULT_LEVERS if name not in type(self).levers]
-        if missing:
-            yield f"levers the pipeline still reads directly are missing: {', '.join(missing)}"
+
+    # --- hooks: instructions. The extraction prompt is the instructions (with {max_claims} unfilled), then the
+    # region's rules, then the task's source type, section, context and data.
+
+    @chosen
+    def base_instructions(self, builtin):
+        """The instructions rules are added to: the built-in ones (extract.EXTRACT), or a replacement."""
+        return builtin
+
+    @chained
+    def instructions(self, builtin):
+        return self.base_instructions(builtin)
+
+    @chained
+    def region_rules(self, region):
+        """Rules for one kind of region's tasks only (region: text, table, tile, figure or overview)."""
+        return ""
+
+    # --- hooks: context lines. Each gets the document's reader (extract.Context): its caches and the document
+    # access the providers share. A query's context is CONTEXT_NOTE followed by the lines, in the levers' order.
+
+    @chained
+    def text_lines(self, reader, page_no, segments, text):
+        """Context lines for a text task: segments [(bbox, text)] in reading order, text the task's own."""
+        return []
+
+    @chained
+    def table_lines(self, reader, page_no, top, flat):
+        """Context lines for a table task: top, the box its lead-in sits above; flat, the rows as sent."""
+        return []
+
+    @chained
+    def tile_lines(self, reader, page, rect, tag):
+        """Context lines for an image task (tag: tile, figure or overview)."""
+        return []
+
+    @chained
+    def tile_images(self, reader, page, rect, tag):
+        """Images sent after an image task's own (paths under the store)."""
+        return []
+
+    # --- matching: how answers are checked and kept
+
+    @chained
+    def loose_match(self, quote, text):
+        """Whether a quote that isn't in its source exactly (extract.quoted) is accepted all the same."""
+        return False
+
+    @chosen
+    def reconciles(self):
+        """Whether readings of one fact by different tasks are read as one claim (store.evidence)."""
+        return False
+
+    @chosen
+    def dedupes_repeated_rows(self):
+        """Whether exactly repeated table rows are extracted once (extract.consume)."""
+        return False
+
+    # --- inclusion: what a task carries, and which detected tables are read
+
+    @chained
+    def region_text(self, reader, page, rect, layer, text):
+        """An image task's source text, from its note (a caption, a detail's titles) and the region's text layer."""
+        return text
+
+    @chained
+    def keep_table(self, reader, page, table, rows):
+        """Whether a detected table is read as one."""
+        return True
+
+    # --- segmentation: which image tasks a page becomes. visual_regions is the order of steps; the hooks are
+    # the choices within them.
+
+    def visual_regions(self, reader, page, number):
+        """[(tag, Rect, note)] in displayed coordinates: the page's tiles (none on a page no larger than one), the
+        figures read whole, then the overview. A page divided into viewports (a sheet's details) is tiled one
+        viewport at a time; otherwise the tiler chooses."""
+        regions = []
+        if max(page.rect.width, page.rect.height) > self.tile_points:
+            areas = self.viewports(reader, page)
+            regions = self._tile_areas(reader, page, areas) if areas else self.tiles(reader, page)
+        regions = self.kept_tiles(reader, page, regions)
+        grid = [r for _, r, _ in regions] or [page.rect]
+        return regions + self.figure_regions(reader, page, number, grid) + [("overview", page.rect, "")]
+
+    def _tile_areas(self, reader, page, areas):
+        """Viewports tiled one by one, numbered across them: a small one whole; a larger one like a page, since
+        larger crops lose small print (round 5: a 620-point crop missed a revision table 420-point tiles read)."""
+        from .segmentation import tiles
+        side, parts = self.tile_points, []
+        for rect, note in areas:
+            pieces = [rect] if max(rect.width, rect.height) <= 1.25 * side else list(tiles(rect, side))
+            parts += [(self.grow(reader, page, r, rect), note) for r in pieces]
+        return [(f"tile:{i}", r, note) for i, (r, note) in enumerate(parts) if not r.is_empty]
+
+    @chosen
+    def tiles(self, reader, page):
+        """A page's tiles, [(tag, Rect, note)]: the platform's are an overlapping grid, each tile grown."""
+        from .segmentation import tiles
+        return [(f"tile:{i}", self.grow(reader, page, r, page.rect), "")
+                for i, r in enumerate(tiles(page.rect, self.tile_points))]
+
+    @chained
+    def grow(self, reader, page, rect, within):
+        """A tile as sent, from the tile as cut, kept within a bound (the page, or its viewport)."""
+        return rect
+
+    @chained
+    def viewports(self, reader, page):
+        """[(Rect, note)]: areas a page divides into, each tiled on its own; none, the page is tiled whole."""
+        return []
+
+    @chained
+    def kept_tiles(self, reader, page, regions):
+        """The tiles worth sending."""
+        return regions
+
+    @chained
+    def figure_regions(self, reader, page, number, grid):
+        """[(tag, Rect, note)] read besides the tiles (grid: the tiles kept, or the page)."""
+        return []
 
     def configuration(self):
         """The configuration as data: its levers in order and every setting the platform holds (endpoint

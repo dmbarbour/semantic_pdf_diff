@@ -44,8 +44,7 @@ readings approximate; do not guess what an unexplained symbol, colour or line st
 
 def extraction_template(s):
     """The extraction instructions in force: the baseline, or a variant's (with {max_claims} unfilled)."""
-    template = s.extract_prompt or EXTRACT
-    return template + "".join(rule.rstrip() + "\n" for rule in s.extract_rules)
+    return s.instructions(EXTRACT)
 
 # Numbered markers, from outer to inner: "Contest 9.", "9-2." or "3.1", "c.", "(iii)", "4.".
 STEM = re.compile(r"^\s*(Contest \d+\.|\d+-\d+\.|\d+(?:\.\d+)+\.?|[a-z]\.|\((?:[ivx]+|\d+|[a-z])\)\.?|\d+\.)(?=\s|$)")
@@ -288,245 +287,22 @@ def covered(quote, text, fold=False):
     words = terms(quote, fold)
     return bool(words) and words <= terms(text, fold)
 
-def tiles(rect, side, overlap=0.18):
-    """Evenly spaced tiles covering rect; neighbours overlap by at least `overlap`."""
-    def starts(lo, hi):
-        span = hi - lo
-        if span <= side:
-            return [lo]
-        n = math.ceil((span - side) / (side * (1 - overlap))) + 1
-        step = (span - side) / (n - 1)
-        return [lo + k * step for k in range(n)]
-    for y in starts(rect.y0, rect.y1):
-        for x in starts(rect.x0, rect.x1):
-            yield pymupdf.Rect(x, y, min(x + side, rect.x1), min(y + side, rect.y1))
-
-FIGURE_PAD = 8.0  # points around a figure's region
-
-def _graphics(page):
-    """Drawings (smaller than half the page: not frames) and images, as displayed."""
-    boxes = []
-    for d in page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings():
-        r = shown(page, d["rect"])
-        if r.height < 0.5 * page.rect.height:
-            boxes.append(r)
-    for image in page.get_image_info():
-        boxes.append(shown(page, image["bbox"]))
-    return boxes
-
-def bands(page, height, gap_from=0.5, pad=4.0, overlap=0.15):
-    """Full-width bands down a page, each cut at the widest empty horizontal gap in the lower
-    part of its window, so lines, charts and legends aren't split (research round 1: on the
-    report slices this cut 7 lines where a grid cut 2,126). Falls back to an overlapping cut."""
-    boxes = [b for b in [r for r, _ in _lines(page)] + _graphics(page) if not b.is_empty or b.height > 0]
-    if not boxes:
-        return []
-    content = pymupdf.Rect(boxes[0])
-    for b in boxes:
-        content |= b
-    content = (content + (-pad, -pad, pad, pad)) & page.rect
-    spans, gaps = sorted((b.y0, b.y1) for b in boxes), []
-    reach = spans[0][1]
-    for y0, y1 in spans[1:]:
-        if y0 > reach + 1:
-            gaps.append((reach, y0))
-        reach = max(reach, y1)
-    out, top = [], content.y0
-    while content.y1 - top > height:
-        fits = [g for g in gaps if top + gap_from * height <= (g[0] + g[1]) / 2 <= top + height]
-        if fits:
-            gap = max(fits, key=lambda g: (g[1] - g[0], g[0]))
-            cut = following = (gap[0] + gap[1]) / 2
-        else:
-            cut, following = top + height, top + height * (1 - overlap)
-        out.append(pymupdf.Rect(content.x0, top, content.x1, cut))
-        top = following
-    out.append(pymupdf.Rect(content.x0, top, content.x1, content.y1))
-    return out
-
-def grown(page, rect, limit=0.25, lines=None):
-    """A crop grown to include every text line it cuts, by at most `limit` of its size per side."""
-    lines = _lines(page) if lines is None else lines
-    most = rect + (-limit * rect.width, -limit * rect.height, limit * rect.width, limit * rect.height)
-    out = pymupdf.Rect(rect)
-    for _ in range(3):
-        changed = False
-        for box, _ in lines:
-            if out.intersects(box) and box not in out and box in most:
-                out |= box
-                changed = True
-        if not changed:
-            break
-    return out & page.rect
-
-DETAIL_NUMBER = re.compile(r"^[A-H]\d{1,2}$")  # grid-referenced detail numbers (US National CAD Standard)
-BORDER = 0.6  # a vertical line this share of the page height is a frame or title-block border
-
-def _borders(page):
-    """Long vertical lines as displayed: [(x, y0, y1)], merged when closer than 30 points."""
-    found = []
-    for d in page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings():
-        for item in d.get("items") or ():
-            if item[0] == "l":
-                a, b = (shown_point(page, p) for p in item[1:3])
-                if abs(a.x - b.x) < 1:
-                    found.append((a.x, min(a.y, b.y), max(a.y, b.y)))
-            elif item[0] == "re":
-                r = shown(page, item[1])
-                found += [(r.x0, r.y0, r.y1), (r.x1, r.y0, r.y1)]
-    out = []
-    for x, y0, y1 in sorted(v for v in found if v[2] - v[1] >= BORDER * page.rect.height):
-        if out and x - out[-1][0] < 30:
-            out[-1] = (out[-1][0], min(out[-1][1], y0), max(out[-1][2], y1))
-        else:
-            out.append((x, y0, y1))
-    return out
-
-def _widest_gap(boxes, lo, hi, band):
-    """Middle of the widest x range in [lo, hi] that no box crossing the band covers, or None."""
-    reach, gaps = lo, []
-    for a, z in sorted((b.x0, b.x1) for b in boxes if b.intersects(band)):
-        if z <= lo:
-            continue
-        if a > reach:
-            gaps.append((reach, min(a, hi)))
-        reach = max(reach, z)
-        if reach >= hi:
-            break
-    if reach < hi:
-        gaps.append((reach, hi))
-    gaps = [g for g in gaps if g[1] > g[0]]
-    return (lambda g: (g[0] + g[1]) / 2)(max(gaps, key=lambda g: g[1] - g[0])) if gaps else None
-
-def sheet_details(page, lines=None):
-    """A drawing sheet's details as displayed: [(number, title, Rect)], and its side columns
-    (title block, notes) as ("", "", Rect); [] if the page has no detail numbers.
-
-    Detail titles are large grid references such as "B4" at a detail's bottom left. A detail
-    runs up to the next title above it and across to the widest gap before the next detail to
-    its right (research round 1: this isolated all five details on dc S-522)."""
-    lines = _lines(page) if lines is None else lines
-    spans = [(s["size"], s["text"].strip(), shown(page, s["bbox"]))
-             for b in page.get_text("dict")["blocks"] for l in b.get("lines", ()) for s in l["spans"] if s["text"].strip()]
-    if not spans:
-        return []
-    median = sorted(size for size, _, _ in spans)[len(spans) // 2]
-    numbers = [(t, r, size) for size, t, r in spans if DETAIL_NUMBER.match(t) and size >= 2 * median]
-    borders = [b for b in _borders(page) if b[0] > 0.5 * page.rect.width and b[0] > max(r.x1 for _, r, _ in numbers)] \
-        if numbers else []
-    if not numbers or not borders:
-        return []
-    left = [b for b in _borders(page) if b[0] < 0.2 * page.rect.width]
-    x0 = left[-1][0] if left else page.rect.x0
-    right, y0, y1 = borders[0]
-    area = pymupdf.Rect(x0, y0, right, y1)
-    size = max(s for _, _, s in numbers)
-    column = 6 * size  # titles closer than this in x share a column
-    boxes = [box for box, _ in lines] + [g for g in _graphics(page) if g.width < 0.5 * area.width and g.height < 0.5 * area.height]
-    boxes = [b for b in boxes if b.intersects(area)]
-    view = {}
-    for name, t, _ in numbers:
-        top = area.y0
-        for _, u, _ in numbers:
-            if abs(u.x0 - t.x0) < column and u.y1 < t.y1 - 1.6 * size:
-                top = max(top, u.y1 + 1.2 * size)  # below the title above (and its scale line)
-        view[name] = [t.x0 - 1.2 * size, top, area.x1, min(area.y1, t.y1 + 1.2 * size)]  # with the scale bar
-    for name, t, _ in numbers:
-        r = view[name]
-        for other, u, _ in numbers:
-            ru = view[other]
-            if u.x0 > t.x0 + column and ru[1] < r[3] and ru[3] > r[1]:
-                band = pymupdf.Rect(t.x0, max(r[1], ru[1]), u.x0, min(r[3], ru[3]))
-                gap = _widest_gap(boxes, t.x0 + column, u.x0 + 0.4 * size, band)
-                edge = gap if gap is not None else u.x0 - 0.8 * size
-                r[2] = min(r[2], edge)
-                ru[0] = min(ru[0], edge)
-    for name, t, _ in numbers:
-        r = view[name]
-        lefts = [view[o][2] for o, u, _ in numbers if u.x0 < t.x0 - column and view[o][1] < r[3] and view[o][3] > r[1]]
-        r[0] = max(lefts) if lefts else area.x0
-    out = []
-    for name, t, s in sorted(numbers, key=lambda n: (n[1].y0, n[1].x0)):
-        # The title is set about as large as the number, beside it; the scale line is small, below it.
-        near = pymupdf.Rect(t.x1 - 1, t.y0 - s, t.x1 + 25 * s, t.y1 + s)
-        beside = sorted((r for size, text, r in spans if r.intersects(near) and r.x0 >= near.x0 and text != name
-                         and (size >= 0.6 * s or SCALE.search(text))), key=lambda r: (round(r.y0), r.x0))
-        title = " ".join(text for size, text, r in spans for b in beside if r == b)
-        out.append((name, " ".join(dict.fromkeys(title.split()))[:200], pymupdf.Rect(view[name]) & page.rect))
-    edges = [b[0] for b in _borders(page) if b[0] >= right] + [page.rect.x1]
-    for a, z in zip(edges, edges[1:]):
-        column = pymupdf.Rect(a, y0, z, y1) & page.rect
-        if any(box.intersects(column) and box.x0 >= a - 1 for box, _ in lines):
-            out.append(("", "", column))
-    return out
-
-SCALE = re.compile(r"\d[\"']?\s*=\s*\d|\bSCALE\b|\bN\.?T\.?S\b", re.IGNORECASE)
-def _empty(page, rects, lines=None):
-    """Which rects hold no text line, drawing or image (blank paper: the model reports "the image is
-    blank" and returns nothing; 7% of grid tiles on the development drawing sheets, round 5d)."""
-    lines = _lines(page) if lines is None else lines
-    marks = [box for box, _ in lines] + _graphics(page)
-    return [not any(r.intersects(m) for m in marks) for r in rects]
-
-def visual_regions(page, side, figures=(), tiling="grid", grow=False, details=False, skip_empty=False):
-    """Tiles, then whole figures, then the overview: [(tag, Rect, note)] in displayed coordinates.
-
-    Tiles are a fixed grid (tiling="grid"), or on report-sized pages full-width bands cut at
-    whitespace gaps, skipping bands with no graphics that text tasks already cover
-    (tiling="bands"). grow extends grid tiles to whole text lines. details cuts a drawing sheet
-    into its details (and title-block and notes columns), each tiled on its own when larger
-    than a tile, with the sheet's and the detail's titles as the note. A grid can cut a chart
-    from its legend or a diagram in two, so each detected figure (drawing or image, with its
-    caption) is also read whole, unless it already fits inside one tile or is the whole page
-    (a drawing sheet: the overview)."""
-    regions = []
-    if max(page.rect.width, page.rect.height) > side:
-        lines = _lines(page) if grow or details else None
-        viewports = sheet_details(page, lines) if details else []
-        if viewports:
-            from .situate import title_block
-            label, heading = title_block(page)
-            sheet = " ".join(x for x in (label.title() if label else "Drawing sheet", heading) if x)
-            parts = []
-            for number, title, rect in viewports:
-                # Side columns get no note: with "Title block" (round 5b), or even the sheet's title
-                # (5c), the model skipped a legible revision table as not engineering.
-                note = f"{sheet}. " + (f"Detail {number}: {title}" if title else f"Detail {number}") if number else ""
-                # Larger crops lose small print (round 5: a 620-point crop missed a title block's
-                # revision table that 420-point tiles read), so a detail is tiled like a page.
-                pieces = [rect] if max(rect.width, rect.height) <= 1.25 * side else list(tiles(rect, side))
-                parts += [(grown(page, r, lines=lines) & rect if grow else r, note) for r in pieces]
-            regions = [(f"tile:{i}", r, note) for i, (r, note) in enumerate(parts) if not r.is_empty]
-        elif tiling == "bands" and page.rect.width <= 1.6 * side:
-            graphics = _graphics(page)
-            regions = [(f"tile:{i}", r, "") for i, r in enumerate(
-                b for b in bands(page, side) if any(b.intersects(g) for g in graphics))]
-        else:
-            lines = lines if lines is not None else (_lines(page) if grow else None)
-            regions = [(f"tile:{i}", grown(page, r, lines=lines) if grow else r, "")
-                       for i, r in enumerate(tiles(page.rect, side))]
-    if skip_empty and regions:  # drop blank tiles, keeping the others' numbers (and so their recorded keys)
-        regions = [x for x, empty in zip(regions, _empty(page, [r for _, r, _ in regions])) if not empty]
-    grid = [r for _, r, _ in regions] or [page.rect]
-    for i, figure in enumerate(f for f in figures if f.region):
-        box = (shown(page, figure.bbox) + (-FIGURE_PAD, -FIGURE_PAD, FIGURE_PAD, FIGURE_PAD)) & page.rect
-        whole_page = abs(box) >= 0.9 * abs(page.rect)
-        if box.is_empty or whole_page or any(box in r for r in grid):
-            continue
-        regions.append((f"figure:{i}", box, f"Caption: {figure.caption}" if figure.caption else ""))
-    return regions + [("overview", page.rect, "")]
+from .segmentation import (FIGURE_PAD, SCALE, _empty, _graphics, bands, grown, sheet_details,  # noqa: F401
+                           tiles)
 
 LOCATOR_SIDE = 384  # pixels: the page thumbnail that shows where a tile sits
 
 class Context:
-    """The context lines a document's queries get, one provider per lever: each returns its lines
-    for a region, and a query's context is CONTEXT_NOTE followed by them, in the order below. What a
-    lever added is found again by LEVER_MARKS (lever_notes). Providers work on the page as displayed
-    (see pages), so rotated sheets read like upright ones."""
+    """A document's reader for the context levers (levers.py: text_lines, table_lines, tile_lines, tile_images):
+    the caches and document access their hooks share. A query's context is CONTEXT_NOTE followed by the lines
+    the configuration's levers give, in their order. What a lever added is found again by its marks
+    (lever_notes). The reader works on the page as displayed (see pages), so rotated sheets read like upright
+    ones."""
 
-    def __init__(self, doc, s):
+    def __init__(self, doc, s, assets=None, stem=""):
         self.doc, self.s = doc, s
-        self.blocks, self.stems, self.cited = {}, {}, {}
+        self.assets, self.stem = assets, stem  # where the locator's images go, and their names' stem
+        self.blocks, self.stems, self.cited_by, self.page_lines = {}, {}, {}, {}
         self.tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
 
     @staticmethod
@@ -535,15 +311,30 @@ class Context:
         return (CONTEXT_NOTE + "\n" + "\n".join(lines)) if lines else ""
 
     def for_text(self, page_no, segments, text):
-        return self.compose(self.neighbours(page_no, segments[0][0], segments[-1][0])
-                            + self.within(page_no, segments[0][0]) + self.references(text))
+        return self.compose(self.s.text_lines(self, page_no, segments, text))
 
     def for_table(self, page_no, bbox, flat):
-        top = self.table_top(page_no, bbox)
-        return self.compose(self.lead_in(page_no, top) + self.within(page_no, top) + self.references(flat))
+        return self.compose(self.s.table_lines(self, page_no, self.table_top(page_no, bbox), flat))
 
-    def for_tile(self, tag):
-        return self.compose(self.locator(tag))
+    def for_tile(self, page, rect, tag):
+        """(context, extra images) for an image task."""
+        return self.compose(self.s.tile_lines(self, page, rect, tag)), tuple(self.s.tile_images(self, page, rect, tag))
+
+    # --- what the hooks read
+
+    @property
+    def pages(self):
+        return len(self.doc)
+
+    def lines(self, page):
+        """A page's text lines as displayed (pages.lines), once per page: the segmentation hooks share them."""
+        if page.number not in self.page_lines:
+            self.page_lines[page.number] = _lines(page)
+        return self.page_lines[page.number]
+
+    def figures(self, page, number):
+        """The page's detected figures (situate.page_figures)."""
+        return page_figures(page, number)
 
     def page_blocks(self, page_no):
         """The page's text blocks in reading order: [(bbox, text)]."""
@@ -552,47 +343,18 @@ class Context:
                                     if b[6] == 0 and b[4].strip()]
         return self.blocks[page_no]
 
-    # --- providers: context_before and context_after, table_context, stem_context, references, tile_locator
-
-    def neighbours(self, page_no, first, last):
-        """Text before the block at `first` and after the block at `last`, crossing to the
-        neighbouring pages when the page runs out."""
-        before, after = self.s.context_before, self.s.context_after
-        if not before and not after:
-            return []
-        blocks = self.page_blocks(page_no)
-        boxes = [b for b, _ in blocks]
-        i0 = boxes.index(first) if first in boxes else 0
-        i1 = len(boxes) - 1 - boxes[::-1].index(last) if last in boxes else len(boxes) - 1
-        head = " ".join(t for _, t in blocks[:i0])
-        tail = " ".join(t for _, t in blocks[i1 + 1:])
-        if before and len(head) < before and page_no > 1:
-            head = " ".join(t for _, t in self.page_blocks(page_no - 1)) + " " + head
-        if after and len(tail) < after and page_no < len(self.doc):
-            tail = tail + " " + " ".join(t for _, t in self.page_blocks(page_no + 1))
-        parts = []
-        if before and head.strip():
-            parts.append("Before: ..." + head.strip()[-before:])
-        if after and tail.strip():
-            parts.append("After: " + tail.strip()[:after] + "...")
-        return parts
-
     def table_top(self, page_no, row_box):
         for box in self.tables_on.get(page_no, ()):
             if pymupdf.Rect(row_box) in pymupdf.Rect(box) + (-2, -2, 2, 2):
                 return box
         return row_box
 
-    def lead_in(self, page_no, bbox):
-        """Text just above a table (its lead-in sentence or caption)."""
-        limit = self.s.table_context
-        if not limit:
-            return []
+    def text_above(self, page_no, bbox):
+        """The text of the blocks just above a box (a table's lead-in sentence or caption), as displayed."""
         page = self.doc[page_no - 1]
         table = shown(page, bbox)  # as displayed (rotated sheets)
-        above = " ".join(t for b, t in self.page_blocks(page_no)
-                         if shown(page, b).y1 <= table.y0 + 2 and shown(page, b).x1 > table.x0 and shown(page, b).x0 < table.x1)
-        return ["Above the table: ..." + above.strip()[-limit:]] if above.strip() else []
+        return " ".join(t for b, t in self.page_blocks(page_no)
+                        if shown(page, b).y1 <= table.y0 + 2 and shown(page, b).x1 > table.x0 and shown(page, b).x0 < table.x1)
 
     def stem_path(self, page_no, bbox):
         """The numbered items and headings a region sits under, e.g. ['9-2. Cooking', 'c. ...'] (also
@@ -606,24 +368,18 @@ class Context:
                 return above[-1]
         return []
 
-    def within(self, page_no, bbox):
-        if not self.s.stem_context:
-            return []
-        path = self.stem_path(page_no, bbox)
-        return ["Within: " + " > ".join(path)] if path else []
+    def cited(self, text):
+        """Abbreviations defined elsewhere and the captions of figures and tables the text cites, as one line."""
+        if not self.cited_by:
+            self.cited_by.update(terms=glossary(self.doc),
+                                 figures=[f for n, page in enumerate(self.doc, 1) for f in page_figures(page, n)])
+        return references(text, self.cited_by["terms"], self.cited_by["figures"])
 
-    def references(self, text):
-        """Abbreviations defined elsewhere and the captions of figures and tables the text cites."""
-        if not self.s.references:
-            return []
-        if not self.cited:
-            self.cited.update(terms=glossary(self.doc),
-                              figures=[f for n, page in enumerate(self.doc, 1) for f in page_figures(page, n)])
-        lines = references(text, self.cited["terms"], self.cited["figures"])
-        return [lines] if lines else []
-
-    def locator(self, tag):
-        return [LOCATOR_NOTE] if self.s.tile_locator and tag.startswith("tile") else []
+    def locator(self, page, rect, tag):
+        """The whole page, small, with the region outlined: rendered once into the store, its path returned."""
+        where = f"{self.stem}-{tag.replace(':', '-')}-where.png"
+        render_locator(page, rect, self.assets / where)
+        return "assets/" + where
 
 # What each lever added to a query, found by the lines its builder writes (the levers' marks). For
 # diagnostics only (the queries dump, docs/plans/content-addressed-queries-2026-09-28.md): a query is found by
@@ -1014,7 +770,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         """
         region = task.split(":")[0]
         entry = None
-        if repeat_key is not None and s.dedupe_repeated:
+        if repeat_key is not None and s.dedupes_repeated_rows():
             entry = repeats.setdefault(repeat_key, {"task": task, "page": page_no, "seen": 0, "done": False,
                                                     "ok": False, "found": [], "row": None, "followers": []})
             entry["seen"] += 1
@@ -1038,7 +794,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         # A region spanning sections (a tile, an overview) is told all their headings.
         heading = " | ".join(" > ".join(x.heading_path) for x in page_section.spanned_box(page_no, bbox)
                              if x.heading_path)
-        rules = "".join(rule.rstrip() + "\n" for rule in s.visual_rules) if region in ("tile", "figure", "overview") else ""
+        rules = s.region_rules(region)
         prompt = (extraction_template(s).replace("{max_claims}", str(s.claims_per_request)) + rules
                   + "\nSource type: " + region
                   + (f"\nSection: {heading}" if heading else "") + (f"\n{context}" if context else "")
@@ -1101,8 +857,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         context = context_of.for_text(page_no, segments, text)
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
-        loose = s.quote_match != "exact"
-        match = lambda q: quoted(q, text) or (loose and excerpted(q, text, in_order=s.quote_match == "excerpts"))
+        match = lambda q: quoted(q, text) or s.loose_match(q, text)
         consume(page_no, union(b for b, _ in segments), task, text, check=match, locate=locate,
                 context=context,
                 then=lambda status: refine_text(page_no, segments, text, task, depth, status))
@@ -1143,10 +898,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             context = context_of.for_table(page_no, bbox, flat)
             if repeat_key is not None and context:  # the same row under another lead-in or stem isn't a repeat
                 repeat_key += (hashlib.sha256(context.encode()).hexdigest(),)
-            loose = s.quote_match != "exact"
             consume(page_no, bbox, task, text, derivation=derivation,
-                    check=lambda q: quoted(q, text) or covered(q, flat)
-                    or (loose and excerpted(q, text, in_order=s.quote_match == "excerpts")),
+                    check=lambda q: quoted(q, text) or covered(q, flat) or s.loose_match(q, text),
                     then=then, repeat_key=repeat_key, repeat_after=2, context=context)
         else:
             split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
@@ -1167,13 +920,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", clip=native_rect) if b[6] == 0]
         def place(quote):  # the first text block in the region holding the quote
             return next((box for box, text in blocks if covered(quote, text, fold=True)), None)
-        if s.visual_text_layer and layer.strip():
-            text = (text + "\n" if text else "") + LAYER_NOTE + "\n" + " ".join(layer.split())[:s.visual_text_layer]
-        extra, context = (), ""
-        if s.tile_locator and tag.startswith("tile"):  # where on the page this tile sits
-            where = f"{stem}-{tag.replace(':', '-')}-where.png"
-            render_locator(page, rect, assets / where)
-            extra, context = ("assets/" + where,), context_of.for_tile(tag)
+        text = s.region_text(context_of, page, rect, layer, text)
+        context, extra = context_of.for_tile(page, rect, tag)
         consume(page_no, native_rect, tag, text, "assets/" + name, check=check, place=place,
                 crop=(tuple(round(v, 3) for v in rect), s.image_side), context=context, extra_images=extra,
                 then=lambda status: refine_visual(page_no, page, tag, rect, depth, status))
@@ -1208,7 +956,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         state["result"] = ([], coverage)
         return
     with opened as doc:
-        context_of = Context(doc, s)  # the task functions above read it when they run
+        context_of = Context(doc, s, assets, stem)  # the task functions above read it when they run
         sections, owner = pdf_sections(doc, s.section_depth, s.section_pages)
         page_section = owner
         if on_sections:
@@ -1227,7 +975,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 unrotated = lambda b: tuple(native(page, b)) if b else None
                 found = [(unrotated(table.bbox), rows, [unrotated(b) for b in row_boxes(table, rows)])
                          for table in page.find_tables().tables for rows in [table.extract()]
-                         if not s.table_filter or real_table(page, table, rows)]
+                         if s.keep_table(context_of, page, table, rows)]
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors
                 found = []
                 record({"content": content, "page": number, "bbox": list(native_page(page)),
@@ -1276,9 +1024,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 signals.setdefault(section, {}).setdefault(name_, 0)
                 signals[section][name_] += value
             if s.vision:
-                shown_figures = page_figures(page, number) if s.figure_tasks else []
-                for tag, rect, note in visual_regions(page, s.tile_points, shown_figures, s.tiling, s.grow_tiles,
-                                                      s.sheet_details, s.skip_empty):
+                for tag, rect, note in s.visual_regions(context_of, page, number):
                     # Task tags are unique within content: "<region>:p<page>[:<index>]".
                     region, _, index = tag.partition(":")
                     tag = f"{region}:p{number}" + (f":{index}" if index else "")

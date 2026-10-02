@@ -44,6 +44,15 @@ def ev(eid, page, region, bbox):
     return Evidence(id=eid, content='sha256:x.pdf', entity='e', attribute='a', value='v', kind='text', quote='q',
                     confidence=.9, locator=loc, occurrences=[occ])
 
+
+def visual_regions(page, side, number=1, **settings):
+    """A page's image tasks under the given settings (the segmentation levers off unless named)."""
+    from semantic_pdf_diff.extract import Context
+    from semantic_pdf_diff.models import Settings
+    s = Settings(**{"tile_points": side, "tiling": "grid", "grow_tiles": False, "skip_empty": False,
+                    "figure_tasks": False, **settings})
+    return s.visual_regions(Context(page.parent, s), page, number)
+
 class Figures(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.TemporaryDirectory()
@@ -119,17 +128,16 @@ class Figures(unittest.TestCase):
         self.assertGreater(figures[0].bbox[1], 400)
 
     def test_figures_are_read_whole_unless_a_tile_holds_them(self):
-        from semantic_pdf_diff.extract import visual_regions
-        from semantic_pdf_diff.situate import page_figures
         page = self.doc[1]  # figure 1: a 180 x 190 point drawing with its caption
-        tags = lambda side: [t for t, _, _ in visual_regions(page, side, page_figures(page, 2))]
+        tags = lambda side: [t for t, _, _ in visual_regions(page, side, number=2, figure_tasks=True)]
         self.assertIn('figure:0', tags(120))      # small tiles cut it: read it whole too
         self.assertNotIn('figure:0', tags(1000))  # one tile holds the whole page
-        rect = {t: r for t, r, _ in visual_regions(page, 120, page_figures(page, 2))}['figure:0']
+        self.assertNotIn('figure:0', [t for t, _, _ in visual_regions(page, 120, number=2)])  # figure tasks off
+        rect = {t: r for t, r, _ in visual_regions(page, 120, number=2, figure_tasks=True)}['figure:0']
         self.assertGreaterEqual(rect.y1, 290)     # the caption is included
 
     def test_bands_and_grown_tiles_keep_lines_whole(self):
-        from semantic_pdf_diff.extract import _lines, grown, visual_regions
+        from semantic_pdf_diff.extract import _lines, grown
         doc = pymupdf.open()
         page = doc.new_page(width=612, height=792)
         for y in range(60, 760, 14):  # a page of text lines...
@@ -147,7 +155,6 @@ class Figures(unittest.TestCase):
         self.assertLessEqual(cut([grown(page, tile)]), cut([tile]))
 
     def test_blank_tiles_are_skipped_and_the_rest_keep_their_numbers(self):
-        from semantic_pdf_diff.extract import visual_regions
         doc = pymupdf.open()
         page = doc.new_page(width=900, height=900)
         page.insert_text((40, 60), 'Pump rated 12 kW', fontsize=9)  # only the top-left corner has content
@@ -161,7 +168,7 @@ class Figures(unittest.TestCase):
         self.assertEqual(kept[-1], every[-1])
 
     def test_sheet_details_are_read_one_by_one_with_their_titles(self):
-        from semantic_pdf_diff.extract import sheet_details, visual_regions
+        from semantic_pdf_diff.extract import sheet_details
         doc = pymupdf.open()
         page = doc.new_page(width=2448, height=1584)
         page.draw_rect(pymupdf.Rect(108, 72, 2394, 1512))  # frame
@@ -188,7 +195,7 @@ class Figures(unittest.TestCase):
         self.assertGreaterEqual(found[''][1].x0, 2124)  # the title-block column
         self.assertLess(found['C1'][1].y1, found['A1'][1].y0 + 5)   # C1 ends where A1 begins
         self.assertLess(found['C1'][1].x1, 1200)                    # and before C3
-        notes = [n for t, _, n in visual_regions(page, 420, details=True) if t.startswith('tile')]
+        notes = [n for t, _, n in visual_regions(page, 420, sheet_details=True) if t.startswith('tile')]
         self.assertIn('Sheet S-522 DECK DETAILS. Detail C3: FOOTING ELEVATION 1" = 1\'-0"', notes)
         self.assertFalse(any(n for t, _, n in visual_regions(page, 420) if t.startswith('tile')))  # off by default
 

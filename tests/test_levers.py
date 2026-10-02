@@ -92,11 +92,13 @@ class DefaultConfiguration(unittest.TestCase):
         self.assertLessEqual(set(L.lever_settings()), set(Settings.model_fields))
         self.assertIn("neighbours (context): context_before [shaping], context_after [shaping]", Settings.explain())
 
-    def test_any_order_composes_but_every_lever_is_needed_until_behaviour_moves(self):
+    def test_any_levers_in_any_order_compose(self):
         backwards = settings_class(tuple(reversed(L.DEFAULT_LEVERS)))
         self.assertEqual(backwards().context_before, 400)
-        with self.assertRaisesRegex(ValidationError, "levers the pipeline still reads directly are missing: extract_prompt"):
-            settings_class(L.DEFAULT_LEVERS[1:])()
+        bare = settings_class(())()  # the platform alone
+        self.assertEqual((bare.reconciles(), bare.instructions("built-in")), (False, "built-in"))
+        with self.assertRaises(ValidationError):
+            settings_class(())(context_before=10)  # its lever isn't there
         with self.assertRaisesRegex(ValueError, "unknown levers: knobs"):
             settings_class(("knobs",))
         with self.assertRaisesRegex(ValueError, "listed twice"):
@@ -105,6 +107,32 @@ class DefaultConfiguration(unittest.TestCase):
     def test_the_context_must_leave_room(self):
         with self.assertRaisesRegex(ValidationError, "Context must leave room"):
             Settings(context_tokens=4096, output_tokens=4000)
+
+    def test_each_lever_says_what_leaving_it_out_means(self):
+        for lever in L.LEVER_CLASSES:
+            self.assertEqual(set(lever.off), set(lever.model_fields), lever.lever_name)
+            lever.model_validate(lever.off)  # valid values
+
+    def test_order_is_the_order_of_context_lines(self):
+        from semantic_pdf_diff.extract import CONTEXT_NOTE, Context
+        import pymupdf
+        doc = pymupdf.open()
+        page = doc.new_page()
+        page.insert_text((50, 60), "3.1 Pumps", fontsize=11)
+        page.insert_text((50, 90), "The pumps listed below serve the loop.", fontsize=9)
+        page.insert_text((50, 120), "Pump P-1 is rated 10 kW.", fontsize=9)
+        page.insert_text((50, 150), "Pump P-2 is rated 12 kW.", fontsize=9)
+        blocks = Context(doc, Settings()).page_blocks(1)
+        segment = [b for b in blocks if "P-1" in b[1]]
+        lines = lambda order: Context(doc, settings_class(order)()).for_text(1, segment, segment[0][1]).splitlines()
+        canonical = lines(L.DEFAULT_LEVERS)
+        self.assertEqual(canonical[0], CONTEXT_NOTE)
+        self.assertEqual([x.split(":")[0] for x in canonical[1:]], ["Before", "After", "Within"])
+        swapped = list(L.DEFAULT_LEVERS)
+        i, j = swapped.index("neighbours"), swapped.index("stem_context")
+        swapped[i], swapped[j] = swapped[j], swapped[i]
+        self.assertEqual([x.split(":")[0] for x in lines(tuple(swapped))[1:]], ["Within", "Before", "After"])
+        doc.close()
 
 class Configurations(unittest.TestCase):
     def test_a_configuration_is_data_and_hashes_as_data(self):

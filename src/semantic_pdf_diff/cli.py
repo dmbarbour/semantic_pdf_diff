@@ -15,7 +15,7 @@ from . import fixtures, manifest, provenance
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
 from .readings import reconcile
-from .extract import EXTRACT, Job, pdf_sections, run_jobs, text_groups, visual_regions
+from .extract import EXTRACT, Context, Job, pdf_sections, run_jobs, text_groups
 from .llm import SYSTEM, Budget, Client, evaluator_settings, folder_client, redact_url
 from .models import Settings, Source
 from .progress import Progress, log, setup_logging
@@ -225,15 +225,13 @@ def plan(sources, settings):
             pdfs += 1
             with pymupdf.open(stream=read_origin(f.origin), filetype='pdf') as doc:
                 pages += len(doc)
+                reader = Context(doc, settings)
                 for page in doc:
                     groups = text_groups(page, settings.text_bytes)
                     text_calls += len(groups)
                     text_bytes += sum(len(t.encode()) for _, segments in groups for _, t in segments)
                     if settings.vision:
-                        visual += len(visual_regions(page, settings.tile_points,
-                                                     page_figures(page, 0) if settings.figure_tasks else [],
-                                                     settings.tiling, settings.grow_tiles, settings.sheet_details,
-                                                     settings.skip_empty))
+                        visual += len(settings.visual_regions(reader, page, 0))
                 if settings.situate:  # one request per figure and per section (plus re-asks, not counted)
                     situating += (len(find_figures(doc))
                                   + len(pdf_sections(doc, settings.section_depth, settings.section_pages)[0]))
@@ -274,7 +272,7 @@ def run(args, settings, store, names, out, force_rescan=False):
         cleared = store.bind(role, reset=args.reset)
         if cleared:
             log.info(f"Reset cleared ({role.role}): {json.dumps(cleared)}")
-    if store.set_reconcile(settings.reconcile):
+    if store.set_reconcile(settings.reconciles()):
         log.info("Readings merging changed: situating results will be redone")
     if settings.rescan == 'auto' or force_rescan:
         for name in names:

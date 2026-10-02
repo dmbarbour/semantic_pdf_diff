@@ -260,3 +260,24 @@ None now. The owner's reading of the full review may add some.
     - `record_runs` and the controlled corpus write `configuration()`.
   - **Store binding (item 4):** every resolved setting of a role, and extraction's lever order. Existing stores ask for `--reset` once; answers replay.
   - **Named configurations:** `benchmarks/round0.json` and `champion.json` pin their lever order. A test holds the champion equal to the defaults, so a default can't move without a round.
+- **Milestone 4, extraction levers in their mixins (2026-10-02): done.** Requests unchanged: the golden requests pass, and a query snapshot of every slice under three profiles matches HEAD's.
+  - **Every extraction lever acts only through hooks** (`Settings.explain()` lists them):
+
+    | Stage | Hooks (chained or chosen) | Levers |
+    |---|---|---|
+    | Instructions | `base_instructions` (chosen), `instructions`, `region_rules` | extract_prompt, extract_rules, visual_rules |
+    | Context | `text_lines`, `table_lines`, `tile_lines`, `tile_images` | neighbours, table_context, stem_context, references, tile_locator |
+    | Segmentation | `tiles` (chosen), `grow`, `viewports`, `kept_tiles`, `figure_regions` | tiling, grow_tiles, sheet_details, skip_empty, figure_tasks |
+    | Inclusion | `region_text`, `keep_table` | visual_text_layer, table_filter |
+    | Matching | `loose_match`, `reconciles` (chosen), `dedupes_repeated_rows` (chosen) | quote_match, reconcile, dedupe_repeated |
+
+    No lever setting is read anywhere else.
+  - **The platform's `visual_regions`** is the order of segmentation's steps. A sheet's details are *viewports*, tiled one by one, not a second tiler: one lever chooses the tiler, as the design says.
+  - **`extract.Context` is now the document's reader:** caches and document access the hooks share (page blocks and lines, text above a table, stem paths, citations, the locator image).
+  - **The segmentation geometry** (grid, bands, grown crops, sheet details, blank tiles) moved to `segmentation.py`, a piece of milestone 7's split brought forward so levers can use it without an import cycle.
+  - **Absent is off:**
+    - Each lever declares `off`, the settings that ask exactly what leaving it out asks. So a configuration may hold any levers in any order.
+    - Round 0 without its 16 switched-off levers (all but figure tasks and the row dedupe) asks its golden requests.
+    - Every lever off asks what no lever at all asks, on reports and on sheets.
+  - **Order** now orders a stage's lines: a test swaps neighbours and stems and sees their context lines swap.
+  - **Parked levers** stay settings and stay in the default configuration, off. Off, they no longer branch through the main path; their hooks return what's below them.

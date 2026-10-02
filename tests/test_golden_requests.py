@@ -64,5 +64,32 @@ class GoldenRequests(unittest.TestCase):
                     self.skipTest(f"golden {recorded_with[2:]}; images differ under PyMuPDF {pymupdf.VersionBind}")
                 self.assertEqual(text, golden, f"{name}: requests changed, so recorded answers to them would miss")
 
+class AbsentIsOff(unittest.TestCase):
+    """Every lever acts through its hooks, so a configuration may leave it out, and a lever left out asks exactly
+    what its `off` settings ask (levers.py; architecture clean-up, milestone 4)."""
+    def golden(self, name):
+        text = (GOLDEN / f"requests-{name}.txt").read_text(encoding="utf-8")
+        if text.split("\n", 1)[0] != f"# PyMuPDF {pymupdf.VersionBind}":
+            self.skipTest("golden recorded under another PyMuPDF")
+        return text
+
+    def test_round_0_without_its_levers_that_are_off(self):
+        from semantic_pdf_diff.levers import REGISTRY
+        from semantic_pdf_diff.models import Settings
+        settings = Settings(**ROUND0)
+        off = [n for n in ROUND0["levers"] if all(getattr(settings, f) == v for f, v in REGISTRY[n].off.items())]
+        self.assertGreater(len(off), 10)
+        fields = {f for n in off for f in REGISTRY[n].model_fields}
+        lean = {"levers": [n for n in ROUND0["levers"] if n not in off],
+                **{k: v for k, v in ROUND0.items() if k != "levers" and k not in fields}}
+        self.assertEqual(transcript(lean, False), self.golden("round0"), f"without {off}")
+
+    def test_every_lever_off_is_no_lever_at_all(self):
+        from semantic_pdf_diff.levers import LEVER_CLASSES
+        off = {f: v for lever in LEVER_CLASSES for f, v in lever.off.items()}
+        for sheet in (False, True):
+            with self.subTest(sheet=sheet):
+                self.assertEqual(transcript({"levers": []}, sheet), transcript(off, sheet))
+
 if __name__ == "__main__":
     unittest.main()
