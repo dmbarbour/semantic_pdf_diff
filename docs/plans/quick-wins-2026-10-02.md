@@ -1,6 +1,6 @@
 # Quick wins after the clean-up
 
-- **Status:** Active (2026-10-02). The owner: "Please start with the quick wins. Create a small plan to control drift risk. Well, item 1 is fine, too, finishing control documents where natural."
+- **Status:** Completed (2026-10-02). The owner: "Please start with the quick wins. Create a small plan to control drift risk. Well, item 1 is fine, too, finishing control documents where natural."
 - **From:** the [code review](../reviews/code-review-2026-10-01.md)'s leftovers, after the [architecture clean-up](architecture-cleanup-2026-10-02.md).
 - **Then:** [controlled documents](controlled-documents-2026-10-01.md) milestone 4 (revision pairs), and its later milestones where they follow naturally. Tracked in that plan, not here.
 
@@ -57,3 +57,8 @@
   - The insights, post-mortem, query dump, eye test, page test and rounds report pages are built with `html_pages.page()`. Each keeps only its layout rules.
   - Colours come from the shared tokens. The palette gained good, mid and bad (results) and add and del (diff lines), so every page follows the system's dark mode, or `data-theme`, like the report.
   - The committed eye test, page test and r09b post-mortem pages were regenerated offline. Their bodies are byte for byte as before; only the head changed.
+- **Item 4, the plans index (2026-10-02): done.**
+  - Query improvement moved from Planned to Active, as its plan says.
+  - The controlled documents row now says milestones 1 to 3 are done, as its plan does.
+  - Every other row matched its plan's Status line. No plan was rewritten.
+  - The quick wins are done; next is controlled documents milestone 4 (revision pairs), in its own plan.
