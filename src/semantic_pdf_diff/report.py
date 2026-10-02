@@ -1,4 +1,4 @@
-import html
+from .html_pages import esc, page as html_page
 import json
 import os
 from pathlib import Path
@@ -12,7 +12,6 @@ def write_report(data, output, assets=None):
     prefix = os.path.relpath(Path(assets), output).replace(os.sep, "/") + "/" if assets else "assets/"
     link = lambda image: prefix + image.split("/", 1)[1] if image.startswith("assets/") else image
     (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-    esc = lambda x: html.escape(str(x), quote=True)
     evidence = {e["id"]:e for e in data["evidence"]}
     occurrences = {}
     for f in data["files"]:
@@ -49,17 +48,18 @@ def write_report(data, output, assets=None):
     shared = ''.join(card(eid) for eid in data.get('shared', []))
     issues_found = ''.join('<tr><td>'+esc(i['source'])+'</td><td>'+esc(i['path'])+'</td><td>'+esc(i['reason'])+'</td></tr>' for i in data.get('scan_issues', []))
     coverage = ''.join('<tr><td>'+esc(where(r['content']))+'</td><td>'+esc(r['page'] if r['page'] is not None else '')+'</td><td>'+esc(r['task'])+'</td><td>'+esc(r['status'])+'</td><td>'+esc('; '.join(r['issues']))+'</td></tr>' for r in data['coverage'])
-    page = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Semantic PDF comparison</title><style>
-:root{font-family:system-ui,sans-serif;color:#183047;background:#edf2f6}body{max-width:1200px;margin:32px auto;padding:0 24px}
-h1{font-size:36px;letter-spacing:-1px}h2{font-size:20px}h3{font-size:15px;color:#356783}.meta{color:#536879}
-article,header,details.coverage{background:white;border:1px solid #d7e1e8;border-radius:12px;padding:22px;margin:18px 0}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}section{min-width:0;padding:12px;background:#f7f9fb;border-radius:8px}
-img{display:block;max-width:100%;max-height:500px;margin:14px auto}blockquote{border-left:3px solid #83a9bf;margin:14px 0;padding-left:12px}
-small{overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;border-bottom:1px solid #d7e1e8;padding:8px}
-select,input{padding:10px;border:1px solid #aac0cd;border-radius:6px;margin:8px}pre{white-space:pre-wrap}.warning{color:#854400}summary{cursor:pointer}
+    style = '''
+:root{font-family:system-ui,sans-serif}body{max-width:1200px;margin:32px auto;padding:0 24px}
+h1{font-size:36px;letter-spacing:-1px}h2{font-size:20px}h3{font-size:15px;color:var(--accent)}.meta{color:var(--muted)}
+article,header,details.coverage{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin:18px 0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}section{min-width:0;padding:12px;background:var(--panel);border-radius:8px}
+img{display:block;max-width:100%;max-height:500px;margin:14px auto}blockquote{border-left:3px solid var(--rule);margin:14px 0;padding-left:12px}
+small{overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;border-bottom:1px solid var(--line);padding:8px}
+select,input{padding:10px;border:1px solid var(--field);border-radius:6px;margin:8px;background:var(--card);color:var(--fg)}
+pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{color:var(--accent)}
 @media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
-</style><header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1>'''
+'''
+    page = '<header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1>'
     page += f"<p>{' ↔ '.join(esc(x['name']) for x in data['sources'])}</p><p>Mode: {esc(data['mode'])}</p>"
     page += f"<p>{esc(dict(counts))}</p><p class='warning'>{len(issues)} incomplete, failed or skipped source tasks. {len(data['unmatched'])} claims lack a confirmed counterpart.</p>"
     diff = data.get('file_difference')
@@ -77,7 +77,8 @@ select,input{padding:10px;border:1px solid #aac0cd;border-radius:6px;margin:8px}
     page += situating(data.get('situation', {}), data.get('sections', []), where, esc)
     page += '<details class="coverage"><summary>Files not scanned ('+str(len(data.get('scan_issues', [])))+'): hidden, unsafe or over limits</summary><table><thead><tr><th>Source</th><th>Path</th><th>Reason</th></tr></thead><tbody>'+issues_found+'</tbody></table></details>'
     page += '<details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>File</th><th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody>'+coverage+'</tbody></table></details>'
-    page += '''<script>function filter(){const r=document.querySelector('#filter').value,q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;document.querySelector('#query').oninput=filter;</script></html>'''
+    page += '''<script>function filter(){const r=document.querySelector('#filter').value,q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;document.querySelector('#query').oninput=filter;</script>'''
+    page = html_page('Semantic PDF comparison', page, style)
     (output/'report.html').write_text(page,encoding='utf-8')
 
 def situating(situation, sections, where, esc):

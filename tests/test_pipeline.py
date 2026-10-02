@@ -198,5 +198,12 @@ class Tests(unittest.TestCase):
             html=(Path(d)/'report.html').read_text()
             self.assertNotIn('<script>alert(1)</script>',html)
             self.assertIn('&lt;script&gt;',html)
+            self.assertIn('prefers-color-scheme:dark',html)  # the shared palette (html_pages), dark mode included
+
+    def test_pages_share_escaping_and_embedded_data(self):
+        from semantic_pdf_diff.html_pages import embed_json, fill, page
+        self.assertNotIn('</script>', embed_json({'x': '</script>'}))
+        self.assertEqual(fill('<title>__TITLE__</title>__DATA__', 'a<b', [1]), '<title>a&lt;b</title>[1]')
+        self.assertTrue(page('t', '<p>x</p>').startswith('<!doctype html>'))
 
 if __name__=='__main__': unittest.main()

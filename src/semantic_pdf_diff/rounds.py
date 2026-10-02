@@ -17,8 +17,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from . import judgements
 from .pages import native, shown_by_matrix
+from .regions import FAMILY, region_of  # noqa: F401 (FAMILY, for callers)
 
-FAMILY = {"text": "text", "table": "table", "tile": "visual", "figure": "visual", "overview": "visual"}
 MAX_CLAIMS = 25     # claims shown per side (sampled when there are more)
 PAGE_TEXT = 6000    # characters of the page's text layer shown to judges
 
@@ -67,7 +67,7 @@ def collect(runs_dir, unit="family"):
             contents = sorted({f.content for f in store.files() if f.content.endswith(".pdf")})
             for content in contents:
                 for row in store.coverage(content):
-                    family = family_of(row["task"].split(":")[0])
+                    family = family_of(region_of(row["task"]))
                     if family and row.get("page"):
                         units[(folder.name, content, row["page"], family)]["tasks"] += 1
                 from .readings import wording
@@ -184,7 +184,7 @@ def lever_scope(baseline_dir, variant_dir, unit="family"):
     return ({"page"} if families else set()) if unit == "page" else families
 
 def _unit_of(task, unit):
-    region = (task or "").split(":")[0]
+    region = region_of(task)
     return FAMILY.get(region) if unit == "family" else ("page" if region in FAMILY else None)
 
 def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", "visual", "page"), changed_only=True,
@@ -553,7 +553,6 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
 def write_spotcheck(folder, seed=3):
     """spotcheck.html: a batch's units for a person, blind (each unit's sets shown as A and B in
     a random order, recorded in spotcheck-order.json beside it), with the judges' questions."""
-    import html as markup
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     rng = random.Random(seed)
@@ -598,9 +597,8 @@ def write_spotcheck(folder, seed=3):
                                for k, v in CLAIM_PROBLEMS.items()],
             "better": BETTER, "confidence": SURE}
     (folder / "spotcheck-order.json").write_text(json.dumps(order, indent=2) + "\n")
-    page = (Path(__file__).with_name("spotcheck_page.html").read_text(encoding="utf-8")
-            .replace("__TITLE__", markup.escape(folder.name))
-            .replace("__DATA__", json.dumps(data, ensure_ascii=False).replace("</", "<\\/")))
+    from .html_pages import fill
+    page = fill(Path(__file__).with_name("spotcheck_page.html").read_text(encoding="utf-8"), folder.name, data)
     (folder / "spotcheck.html").write_text(page, encoding="utf-8")
     return folder / "spotcheck.html"
 
@@ -891,7 +889,7 @@ def mechanical(runs_dir):
         with Store.open(folder) as store:
             for content in sorted({f.content for f in store.files() if f.content.endswith(".pdf")}):
                 for row in store.coverage(content):
-                    family = FAMILY.get(row["task"].split(":")[0])
+                    family = FAMILY.get(region_of(row["task"]))
                     if not family:
                         continue
                     for key in (family, "all"):
@@ -922,11 +920,10 @@ def mechanical(runs_dir):
 
 def report(history_path, target, title="Query improvement"):
     """A self-contained HTML page of every figure recorded in the history, as simple SVG charts."""
-    import html
+    from .html_pages import esc
     from .ledger import read
     records = read(history_path)
     rounds = sorted({r.get("round", "") for r in records})
-    esc = lambda x: html.escape(str(x))
 
     def chart(series, ylabel, lo=0.0, hi=1.0, height=220, band=None, legend=None):
         """series: {name: [(round, value, low, high)]} drawn over rounds; band draws a line at y.

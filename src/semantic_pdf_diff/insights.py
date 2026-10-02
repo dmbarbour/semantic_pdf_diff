@@ -11,13 +11,13 @@ blind (the owner, 2026-09-27):
     analyse(batch_folder, limit)  -> writes analysis.json beside pairs.json
     page(round_folder)            -> writes insights.html in the round folder
 """
-import html
+from .html_pages import esc
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
 from . import judgements
-from .rounds import FAMILY
+from .regions import family_of
 
 def _issues(runs_dir, run, content, page, family):
     """{issue: tasks} the model reported for one unit's tasks, from a replay store."""
@@ -32,7 +32,7 @@ def _issues(runs_dir, run, content, page, family):
         return {}
     with store:
         for row in store.coverage(content):
-            region = FAMILY.get(row["task"].split(":")[0])
+            region = family_of(row["task"])
             if row.get("page") == page and region and family in (region, "page"):
                 for issue in row.get("issues") or ():
                     found[" ".join(str(issue).split())[:300]] += 1
@@ -121,7 +121,6 @@ def _score_class(s):
     return "win" if s > 0.5 else "loss" if s < 0.5 else "even"
 
 def _claims(claims):
-    esc = html.escape
     return "".join(f"<li>{esc(c['entity'])} | {esc(c['attribute'])} | <b>{esc(str(c['value']))} {esc(c.get('unit', ''))}</b>"
                    + (f" | {esc(c['conditions'])}" if c.get("conditions") else "") + "</li>" for c in claims) or "<li>none</li>"
 
@@ -130,7 +129,6 @@ def page(round_folder):
     notes, the model's issues), what changed, and the judges' remarks."""
     round_folder = Path(round_folder)
     spec = json.loads((round_folder / "round.json").read_text())
-    esc = html.escape
     out = [f"<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
            f"<title>Round {esc(spec['name'])} insights</title><style>{STYLE}</style></head><body>",
            f"<h1>Round {esc(spec['name'])}: why variants won or lost</h1><p class='muted'>{esc(spec.get('note', ''))}</p>"]

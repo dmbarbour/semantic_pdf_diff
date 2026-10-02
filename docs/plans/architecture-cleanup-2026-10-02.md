@@ -335,3 +335,18 @@ None now. The owner's reading of the full review may add some.
       A mid-round rubric change was undetected before. Files from before 2026-10-02 have no rubric and are read as before.
     - **`judgements.rate()`** is the one loop the three model raters share (judges, the review panel, query checkers), once written three times. Each rater turns its answers into its own records.
     - People's spot-check answers are written through `save()` too.
+  - **6e, regions, values and pages: done.** Milestone 6 is done.
+    - **`regions.py`** owns the region names (all, visual, textual), the families judges compare by, `region_of(task)` (once open-coded in six places), and crops' stems, names and glob. Asset names are unchanged.
+    - **`values.py`** owns value parsing:
+      - numbers
+      - dates
+      - lengths in feet and inches, with fractions
+      - the product's unit table (`UNITS`, from `compare`)
+      - the scorer's unit kinds (`UNIT_KINDS`, from `controlled`)
+
+      The old names are re-exported where they lived, and the controlled re-score is unchanged.
+      - **Two unit tables stay apart on purpose.** The product's enters comparison prompts, so merging them is a decision for a round.
+      - **The product's text folding stays with its users** (`extract.FOLD`, `readings.QUOTES`). It decides which quotes verify, which decides which tasks are refined, so harmonising the three fold tables would change requests.
+    - **`html_pages.py`:** `esc`, `embed_json`, `fill` (the `__TITLE__`/`__DATA__` templates, once injected by hand twice), `page()`, and a palette of colour tokens with a dark mode.
+      - The product report uses them and gains dark mode.
+      - The other pages use the shared escaping. Their heads and palettes move over as they're next changed.

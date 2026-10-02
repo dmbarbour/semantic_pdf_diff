@@ -13,7 +13,7 @@ For one decided batch (pairs-<variant>/):
 Written as postmortem.json and postmortem.html beside pairs.json. Claude writes the round's review
 from it (docs/reviews/round-*.md).
 """
-import html
+from .html_pages import esc
 import json
 import random
 from collections import defaultdict
@@ -178,7 +178,6 @@ def write(folder, documents=None, client=None, units=5, seed=1):
     return evidence
 
 def page(folder, evidence):
-    esc = html.escape
     parts = [f"<h1>Post-mortem: {esc(evidence['batch'])}</h1>",
              f"<p>Levers: {esc(', '.join(evidence['levers']) or 'unknown')}. Decision: {esc(str(evidence['decision']))}. "
              f"Overall: {esc(json.dumps(evidence['overall']))}</p>"]

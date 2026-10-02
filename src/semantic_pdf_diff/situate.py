@@ -8,6 +8,7 @@ import math
 import re
 from .models import Figure, Reference
 from .pages import native, native_page, reading_blocks, shown
+from .regions import crop_name, crop_stem
 
 KINDS = {"figure": "figure", "figures": "figure", "fig": "figure", "figs": "figure", "table": "table",
          "tables": "table", "sheet": "sheet", "sheets": "sheet", "drawing": "sheet", "drawings": "sheet",
@@ -454,7 +455,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
     from .models import FigureAbout, SectionAbout
     figures, unresolved = figure_map(doc, evidence)
     by_id = {e.id: e for e in evidence}
-    stem = content.split(":", 1)[1][:12]
+    stem = crop_stem(content)
     assets = output / "assets"
     assets.mkdir(parents=True, exist_ok=True)
     side = image_side or client.s.image_side
@@ -476,7 +477,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
     index = SectionIndex(sections, doc)
 
     def ask_figure(figure):
-        images = [render(figure.page, figure.bbox, f"{stem}-{figure.id.replace(':', '-')}.png")] if figure.region else []
+        images = [render(figure.page, figure.bbox, crop_name(stem, figure.id))] if figure.region else []
         part = figure_material(doc, figure, index, by_id, text_by_page)
         prompt, trimmed = fit(lambda scale: figure_prompt(part, scale), client, images)
         if trimmed:
@@ -520,7 +521,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
                          for f in mine) or "(none)"
         # Sheets are shown by their figure requests; scans only by an image of the page.
         overview = [p for p in pages if p not in sheets and scanned(doc[p - 1], text_by_page[p])][:MAX_OVERVIEWS]
-        images = [render(p, native_rect(doc[p - 1]), f"{stem}-overview-p{p}.png") for p in overview]
+        images = [render(p, native_rect(doc[p - 1]), crop_name(stem, f"overview-p{p}")) for p in overview]
         heading = " > ".join(section.heading_path) or "(no heading)"
         head = (SITUATE_SECTION + f"\nHeading path: {heading}\nPages: {section.first_page}-{section.last_page} of {len(doc)}"
                 f"\nFigures:\n{figs}\nClaims:\n{claims}\nText:\n")

@@ -9,7 +9,7 @@ images, index.html, and checks/<model>.json. (docs/plans/content-addressed-queri
 """
 import difflib
 import hashlib
-import html
+from .html_pages import esc
 import json
 import random
 import shutil
@@ -212,7 +212,6 @@ def page(folder):
         data = json.loads(path.read_text(encoding="utf-8"))
         for item, c in data["checks"].items():
             checks.setdefault(item, {})[data["model"]] = c
-    esc = html.escape
     parts = []
     for item in items(folder):
         notes = "".join(f"<tr><th>{esc(k)}</th><td>{esc(v)}</td></tr>" for k, v in item["notes"].items()) or \

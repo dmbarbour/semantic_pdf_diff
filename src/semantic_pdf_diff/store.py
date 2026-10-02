@@ -12,6 +12,7 @@ import os
 import sqlite3
 from pathlib import Path
 from .levers import ALL_REGIONS, TEXTUAL, VISUAL, setting_regions  # noqa: F401 (the region names, for callers)
+from .regions import crops_of, region_of  # noqa: F401 (region_of, for callers)
 from .models import Evidence, Figure, FileRef, Interpreter, Section, Settings, Source, merge_occurrences
 
 SCHEMA_VERSION = 8  # 8: responses cached by query hash and model; the query log
@@ -83,9 +84,6 @@ class InterpreterMismatch(StoreError):
                          f"derived data ({', '.join(sorted(regions))} extraction and all comparisons), "
                          "--reset --dry-run to preview, or use a new store.")
 
-def region_of(task):
-    """'tile:3-r0' -> 'tile'; 'table-detection' and 'vision' are their own regions."""
-    return task.split(":")[0]
 
 def interpreter_differences(old, new):
     """Flattened {field: (old, new)} for differing parts of two interpreter descriptions."""
@@ -465,7 +463,7 @@ class Store:
             orphans = sorted(set(orphans) | {c for (c,) in self.db.execute(
                 f"SELECT content FROM file WHERE source IN ({marks}) AND content NOT IN "
                 f"(SELECT content FROM file WHERE source NOT IN ({marks}))", gone + gone)})
-        crops = [p for c in orphans for p in self.assets.glob(c.split(":", 1)[1][:12] + "-*.png")]
+        crops = [p for c in orphans for p in self.assets.glob(crops_of(c))]
         summary = {"sources": gone, "content": len(orphans), "crops": len(crops), "dry_run": dry_run}
         if orphans:
             marks = ",".join("?" * len(orphans))

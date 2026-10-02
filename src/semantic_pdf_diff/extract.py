@@ -13,6 +13,7 @@ from .pages import (display_y, lines as _lines, native, native_page, reading_blo
 from .models import (DerivationStep, Evidence, Extraction, PdfLocator, Section, Settings, claim_id, coverage_row,
                      merge_occurrences)
 from .levers import LAYER_NOTE, LOCATOR_NOTE, lever_marks
+from .regions import crop_name, crop_stem, region_of
 from .situate import page_figures
 from .dispatch import Dispatcher
 from .llm import CallLimitReached, NotRecorded
@@ -408,7 +409,7 @@ class Context:
 
     def locator(self, page, rect, tag):
         """The whole page, small, with the region outlined: rendered once into the store, its path returned."""
-        where = f"{self.stem}-{tag.replace(':', '-')}-where.png"
+        where = crop_name(self.stem, tag, "-where")
         render_locator(page, rect, self.assets / where)
         return "assets/" + where
 
@@ -760,7 +761,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
     content, on_task, on_sections, state = job.content, job.on_task, job.on_sections, job.state
     s = client.s
     evidence, coverage = [], []
-    stem = content.split(":", 1)[1][:12]
+    stem = crop_stem(content)
     assets = output / "assets"
     assets.mkdir(exist_ok=True, parents=True)
     page_section = None  # a SectionIndex once the document is open
@@ -799,7 +800,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         Each claim found becomes one occurrence; sightings of the same claim by other
         tasks are merged into one piece of evidence afterwards (union provenance).
         """
-        region = task.split(":")[0]
+        region = region_of(task)
         entry = None
         if repeat_key is not None and s.dedupes_repeated_rows():
             entry = repeats.setdefault(repeat_key, {"task": task, "page": page_no, "seen": 0, "done": False,
@@ -940,7 +941,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             table_task(page_no, bbox, f"{task}:c{i}", header, row, [columns[0], *part], depth, derivation)
 
     def visual_task(page_no, page, tag, rect, depth=0, text=""):
-        name = f"{stem}-{tag.replace(':', '-')}.png"
+        name = crop_name(stem, tag)
         render(page, rect, assets / name, s.image_side)
         native_rect = native(page, rect)
         layer = page.get_text("text", clip=native_rect)
@@ -957,7 +958,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
     def refine_visual(page_no, page, tag, rect, depth, status):
         # Refine only local tiles; an overview or a whole figure may be incomplete because
         # it spans many facts, and all its areas already have tile coverage.
-        if (status not in ("partial", "failed") or tag.split(":")[0] in ("overview", "figure") or depth >= s.refinement_depth
+        if (status not in ("partial", "failed") or region_of(tag) in ("overview", "figure") or depth >= s.refinement_depth
                 or min(rect.width, rect.height) < MIN_REFINE_POINTS):
             return
         if rect.width > rect.height:

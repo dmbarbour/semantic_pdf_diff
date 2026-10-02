@@ -21,6 +21,8 @@ import re
 import unicodedata
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from .values import (_EXACT, _FOLDED, DATE, UNIT_KINDS, parse_number, same_number,  # noqa: F401 (values.py)
+                     unit_kind)
 
 # --- facts ---------------------------------------------------------------------------------------
 
@@ -46,17 +48,6 @@ class Fact:
     @property
     def number(self):
         return None if self.relation else parse_number(self.value)
-
-def parse_number(text):
-    """The first number in a value as printed ("1,250" → 1250.0, "-0.8" → -0.8, "±0.05" → 0.05), or None."""
-    text = unicodedata.normalize("NFKC", str(text)).replace("−", "-").replace("–", "-")
-    m = re.search(r"-?\d[\d,]*(?:\.\d+)?|-?\.\d+", text)
-    if not m:
-        return None
-    try:
-        return float(m.group(0).replace(",", ""))
-    except ValueError:
-        return None
 
 class Draw:
     """Seeded values, each printed string unique within a document (so a value names one fact)."""
@@ -1121,8 +1112,6 @@ def rarity(facts):
     n = len(facts)
     return {**{w: math.log(1 + n / c) for w, c in counts.items()}, None: math.log(1 + n)}
 
-DATE = re.compile(r"^\s*(\d{4})-(\d{2})-(\d{2})\s*$")
-
 def printed_value(text):
     """A printed number, for finding values on the page: lengths in feet and inches as inches (38'-6" is 462, not
     38), dates as dates (2026-01-10, not 2026), anything else as parse_number reads it."""
@@ -1135,62 +1124,11 @@ def printed_value(text):
             return ("in", length)
     return parse_number(text)
 
-def same_number(a, b):
-    return a is not None and b is not None and abs(a - b) <= 1e-9 * max(1.0, abs(a), abs(b))
-
 def holds(fact, number):
     """Whether a value is the fact's: the same number, or within its tolerance (a bar read against an axis)."""
     return same_number(fact.number, number) or bool(fact.tolerance and abs(fact.number - number) <= fact.tolerance)
 
 INEXACT_STEPS = 10  # how many tolerances off a reading bound to a bar may be and still count as that bar's, misread
-
-# Typed values (code review 2026-10-01, item 10: "5,151 ft" held a flow in gpm). A unit's kind and its size in the
-# kind's base: values of two kinds never hold each other's facts, and one kind compares by magnitude ("10,000 W" is
-# "10 kW"). A unit not listed, or none, abstains: the number decides, as before. The corpus's units and their
-# common spellings; compare.UNITS is the product's own (its numeric check enters comparison prompts), and the
-# clean-up's values module (milestone 6) is to hold both.
-UNIT_KINDS = {kind: units for kind, units in (
-    ("length", {"in": 1, "inch": 1, "inches": 1, '"': 1, "ft": 12, "feet": 12, "foot": 12, "'": 12, "m": 39.3701,
-                "mm": 0.0393701, "cm": 0.393701}),
-    ("area", {"ft²": 1, "ft2": 1, "sf": 1, "sq ft": 1, "sq. ft": 1, "square feet": 1, "m²": 10.7639, "m2": 10.7639}),
-    ("speed", {"mph": 1, "mi/h": 1, "m/s": 2.23694, "km/h": 0.621371, "kph": 0.621371, "ft/s": 0.681818,
-               "fps": 0.681818}),
-    ("pressure", {"psi": 1, "psig": 1, "psia": 1, "psf": 1 / 144, "ksi": 1000, "kPa": 0.145038, "Pa": 0.000145038,
-                  "bar": 14.5038, "MPa": 145.038}),
-    ("force", {"kips": 1, "kip": 1, "lb": 0.001, "lbs": 0.001, "lbf": 0.001, "kN": 0.224809}),
-    ("tonnage", {"tons": 1, "ton": 1}),
-    ("energy", {"MWh": 1, "kWh": 0.001, "GWh": 1000, "Wh": 0.000001}),
-    ("energy a year", {"MWh/yr": 1, "MWh/year": 1, "kWh/yr": 0.001, "kWh/year": 0.001}),
-    ("power", {"kW": 1, "W": 0.001, "MW": 1000, "hp": 0.7457, "bhp": 0.7457}),
-    ("flow", {"gpm": 1, "gal/min": 1, "MGD": 694.444, "L/s": 15.8503, "cfs": 448.831, "cfm": 7.48052,
-              "scfm": 7.48052, "acfm": 7.48052, "m3/h": 4.40287, "m³/h": 4.40287}),
-    ("loading rate", {"gpm/ft²": 1, "gpm/ft2": 1, "gpm/sf": 1, "gpm/sq ft": 1}),
-    ("rotation", {"rpm": 1, "r/min": 1}),
-    ("time", {"s": 1, "sec": 1, "second": 1, "seconds": 1, "min": 60, "mins": 60, "minute": 60, "minutes": 60,
-              "h": 3600, "hr": 3600, "hrs": 3600, "hour": 3600, "hours": 3600}),
-    ("acceleration", {"g": 1, "G": 1, "m/s²": 0.101972, "m/s2": 0.101972}),
-    ("people", {"persons": 1, "person": 1, "people": 1, "occupants": 1, "riders": 1, "seats": 1}),
-    ("people an hour", {"riders/h": 1, "riders/hr": 1, "riders per hour": 1, "persons/h": 1, "pph": 1}),
-    ("money", {"$M": 1, "M$": 1, "$K": 0.001, "$": 0.000001}),
-    ("degrees F", {"°F": 1, "F": 1, "deg F": 1, "degF": 1}),
-    ("degrees C", {"°C": 1, "C": 1, "deg C": 1, "degC": 1}),
-    ("sound", {"dBA": 1, "dB(A)": 1, "dB": 1}),
-    ("concentration", {"mg/L": 1, "ppm": 1}),
-    ("turbidity", {"NTU": 1}),
-    ("angle", {"°": 1, "deg": 1, "degrees": 1}),
-    ("rate", {"1/s": 1, "s−1": 1, "s-1": 1, "/s": 1}),  # NFKC: s⁻¹ is s−1
-    ("percent", {"%": 1, "percent": 1}),
-)}
-_EXACT = {u: (kind, size) for kind, units in UNIT_KINDS.items() for u, size in units.items()}
-# Case matters only where a letter's case changes the unit (m metre, M mega; g, G; s, S); longer spellings fold.
-_FOLDED = {u.casefold(): ks for u, ks in _EXACT.items() if len(u) > 1 and u.casefold() not in
-           {v.casefold() for v in _EXACT if v != u}}
-
-def unit_kind(text):
-    """(kind, size in the kind's base) of a unit as written, or None when it isn't listed."""
-    text = " ".join(unicodedata.normalize("NFKC", str(text)).split()).rstrip(".")  # NFKC: ft² is ft2
-    text = re.sub(r"^(?:per|in)\s+", "", text)
-    return _EXACT.get(text) or _FOLDED.get(text.casefold())
 
 UNIT_AFTER = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥]=?)?\s*[-+±]?\$?\d[\d,]*(?:\.\d+)?\s*(.*?)\s*$")
 

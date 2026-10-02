@@ -533,8 +533,7 @@ def _num(value):
 
 def page(folder, data):
     """report.html: for each kind of sheet, every plan's recall by font size and its cost, per model."""
-    import html
-    esc = lambda x: html.escape(str(x))
+    from .html_pages import esc
     from .eyetest import STYLE, _cell
     out = [f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' "
            f"content='width=device-width, initial-scale=1'><title>Page tests</title><style>{STYLE}</style></head><body>",

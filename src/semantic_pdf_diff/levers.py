@@ -30,12 +30,11 @@ from typing import Annotated, ClassVar, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+# Extraction regions (regions.py): a changed setting clears the stored results of the regions it can change.
+from .regions import ALL as ALL_REGIONS, TEXTUAL, VISUAL
+
 # --- declarations ---------------------------------------------------------------------------------------------
 
-# Extraction regions (a task's prefix): a changed setting clears the stored results of the regions it can change.
-ALL_REGIONS = frozenset({"text", "table", "tile", "figure", "overview", "vision", "table-detection"})
-VISUAL = frozenset({"tile", "figure", "overview", "vision"})
-TEXTUAL = frozenset({"text", "table"})
 
 EXTRACT, TRIAGE, COMPARE = ("extract",), ("triage",), ("compare",)
 EVERY_ROLE = EXTRACT + TRIAGE + COMPARE

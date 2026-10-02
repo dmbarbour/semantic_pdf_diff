@@ -14,7 +14,7 @@ over to later runs that produce the same results.
 import base64
 from collections import Counter
 import hashlib
-import html
+from .html_pages import fill
 import json
 import random
 import re
@@ -334,8 +334,7 @@ def write_page(folder, batch):
                  "missing": MISSING, "worth": WORTH}
     for name, template, data in (("review.html", "review_page.html", answers),
                                  ("questions.html", "questions_page.html", questions)):
-        payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
-        page = _template(template).replace("__TITLE__", html.escape(batch["name"])).replace("__DATA__", payload)
+        page = fill(_template(template), batch["name"], data)
         (folder / name).write_text(page, encoding="utf-8")
 
 def _template(name):

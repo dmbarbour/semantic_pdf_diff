@@ -940,8 +940,7 @@ def _cell(value):
 
 def page(folder, data):
     """report.html: the models side by side (acuity, thresholds, binding), then every card."""
-    import html
-    esc = lambda x: html.escape(str(x))
+    from .html_pages import esc
     models = list(data["models"])
     out = [f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' "
            f"content='width=device-width, initial-scale=1'><title>Eye tests</title><style>{STYLE}</style></head><body>",
