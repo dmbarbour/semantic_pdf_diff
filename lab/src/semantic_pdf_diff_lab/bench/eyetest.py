@@ -912,12 +912,7 @@ def responders(folder):
 # --- the page -----------------------------------------------------------------------------------
 
 STYLE = """
-:root { --bg:#fbfaf7; --fg:#1d1d1b; --muted:#6b6a64; --line:#dedbd2; --card:#ffffff; --good:#2f7d4f; --mid:#a07a1a;
-        --bad:#b23b3b; }
-@media (prefers-color-scheme: dark) { :root { --bg:#17181a; --fg:#e9e7e1; --muted:#9d9b94; --line:#34363a;
-        --card:#202226; --good:#63b884; --mid:#d4b04a; --bad:#e07a7a; } }
-body { background:var(--bg); color:var(--fg); font:15px/1.45 system-ui, sans-serif; margin:0 auto; max-width:1200px;
-       padding:16px; }
+body { font:15px/1.45 system-ui, sans-serif; margin:0 auto; max-width:1200px; padding:16px; }
 h1 { font-size:22px; } h2 { font-size:18px; margin-top:28px; } h3 { font-size:15px; }
 p, li { max-width:75ch; } .muted { color:var(--muted); }
 .scroll { overflow-x:auto; }
@@ -942,9 +937,8 @@ def page(folder, data):
     """report.html: the models side by side (acuity, thresholds, binding), then every card."""
     from semantic_pdf_diff.html_pages import esc
     models = list(data["models"])
-    out = [f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' "
-           f"content='width=device-width, initial-scale=1'><title>Eye tests</title><style>{STYLE}</style></head><body>",
-           "<h1>Eye tests for vision models</h1>",
+    from semantic_pdf_diff.html_pages import page as html_page
+    out = ["<h1>Eye tests for vision models</h1>",
            "<p>Random codes and numbers drawn at known sizes, so every answer is scored exactly and nothing can be "
            "guessed from context. Glyph heights are cap heights in the image's own pixels, before the host resizes "
            f"it. A size is read when {PASS:.0%} of its items are. Suite: {esc(data['suite'])}, {len(data['cards'])} "
@@ -1039,7 +1033,6 @@ def page(folder, data):
                        f"<p><b>Answer key</b></p><pre>{esc(json.dumps(card['truth'], ensure_ascii=False))}</pre>"
                        + "".join(answers) + "</details>")
         out.append("</details>")
-    out.append("</body></html>")
     target = Path(folder) / "report.html"
-    target.write_text("\n".join(out) + "\n", encoding="utf-8")
+    target.write_text(html_page("Eye tests", "\n".join(out), STYLE) + "\n", encoding="utf-8")
     return target

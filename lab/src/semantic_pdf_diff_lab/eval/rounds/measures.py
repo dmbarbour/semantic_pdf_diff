@@ -168,18 +168,18 @@ def report(history_path, target, title="Query improvement"):
     decisions = [r for r in records if r["metric"] == "decision"]
     rows = "".join(f"<tr><td>{esc(r.get('round'))}</td><td>{esc(r.get('variant'))}</td><td>{esc(r['value'])}</td></tr>"
                    for r in decisions)
-    page = f"""<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(title)}</title><style>
-:root{{--bg:#f3f5f7;--card:#fff;--ink:#1b2733;--muted:#5b6b7a;--line:#d5dde4}}
-@media (prefers-color-scheme:dark){{:root{{--bg:#12171c;--card:#1b232b;--ink:#e3e9ee;--muted:#9aa9b6;--line:#2f3b46}}}}
-body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,sans-serif}}main{{max-width:980px;margin:auto;padding:16px}}
-section{{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0}}
-h1{{font-size:22px}}h2{{font-size:15px;margin:0 0 8px}}svg{{width:100%;height:auto}}
-.axis,.legend{{font-size:11px;fill:var(--muted)}}.legend{{font-weight:600}}.grid{{stroke:var(--line)}}.band{{stroke:var(--muted);stroke-dasharray:4 4}}
-table{{border-collapse:collapse;width:100%}}td{{border-bottom:1px solid var(--line);padding:6px}}
-</style><main><h1>{esc(title)}</h1><p>{len(records)} figures over {len(rounds)} round(s), from <code>{esc(Path(history_path).name)}</code>.</p>
+    from semantic_pdf_diff.html_pages import page as html_page
+    style = """
+body{margin:0;font:15px/1.45 system-ui,sans-serif}main{max-width:980px;margin:auto;padding:16px}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0}
+h1{font-size:22px}h2{font-size:15px;margin:0 0 8px}svg{width:100%;height:auto}
+.axis,.legend{font-size:11px;fill:var(--muted)}.legend{font-weight:600}.grid{stroke:var(--line)}.band{stroke:var(--muted);stroke-dasharray:4 4}
+table{border-collapse:collapse;width:100%}td{border-bottom:1px solid var(--line);padding:6px}
+"""
+    page = f"""<main><h1>{esc(title)}</h1><p>{len(records)} figures over {len(rounds)} round(s), from <code>{esc(Path(history_path).name)}</code>.</p>
 {"".join(f"<section><h2>{esc(h)}</h2>{svg}</section>" for h, svg in sections)}
-<section><h2>Decisions</h2><table>{rows or "<tr><td>none yet</td></tr>"}</table></section></main></html>"""
+<section><h2>Decisions</h2><table>{rows or "<tr><td>none yet</td></tr>"}</table></section></main>"""
+    page = html_page(title, page, style)
     Path(target).parent.mkdir(parents=True, exist_ok=True)
     Path(target).write_text(page, encoding="utf-8")
     return target

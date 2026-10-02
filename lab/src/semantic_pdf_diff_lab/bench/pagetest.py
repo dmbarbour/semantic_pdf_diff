@@ -535,9 +535,8 @@ def page(folder, data):
     """report.html: for each kind of sheet, every plan's recall by font size and its cost, per model."""
     from semantic_pdf_diff.html_pages import esc
     from .eyetest import STYLE, _cell
-    out = [f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' "
-           f"content='width=device-width, initial-scale=1'><title>Page tests</title><style>{STYLE}</style></head><body>",
-           "<h1>Page tests: slicing, shrinking and close-ups</h1>",
+    from semantic_pdf_diff.html_pages import page as html_page
+    out = ["<h1>Page tests: slicing, shrinking and close-ups</h1>",
            "<p>Synthetic pages at real sizes with random codes and numbers at known font sizes. Static plans read the "
            "whole page shrunk into one image, or tiles of a given side in points rendered at a given size in pixels. "
            "Close-up runs start from an overview and follow the close-ups the model asks for (free: as it sees fit; "
@@ -566,7 +565,6 @@ def page(folder, data):
                                f"<td>{acc.get('prompt_tokens', 0):g}</td>" +
                                "".join(f"<td>{'–' if acc.get(e) is None else f'{acc[e]:g}'}</td>" for e in extra) + "</tr>")
                 out.append("</table></div>")
-    out.append("</body></html>")
     target = Path(folder) / "report.html"
-    target.write_text("\n".join(out) + "\n", encoding="utf-8")
+    target.write_text(html_page("Page tests", "\n".join(out), STYLE) + "\n", encoding="utf-8")
     return target

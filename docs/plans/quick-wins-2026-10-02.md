@@ -39,6 +39,10 @@
 ## Found along the way
 
 - **Three dead imports**, found by the check that confirmed item 2's list was unused, and removed with it: `relations` in `schematics.py`, a second `pymupdf` import in `sections.py` (left by milestone 7's split), and `base64` in `review.py` once `image_data` went.
+- **The page test's answers fixture gained three recipe rows** when its report was regenerated.
+  - These are crops of different regions that render the same image, so they make one query; the replay noted the other ways it was built.
+  - No answer changed. The rows are diagnostic labels.
+  - The old packing counted rows, so it never wrote such additions; since milestone 2b's fix (packing by bytes) the zip catches up. Committed as it came.
 
 ## Progress
 
@@ -49,3 +53,7 @@
   - Removed: `SectionIndex.boundaries`, the `situate.native_rect` alias, `review.image_data`, `fixtures.NotRecorded`, `schematics.build`'s `intro` and `eyetest._axes`'s `card` and `rng`.
   - `judgements.QUESTIONS` and `KINDS` documented each question's answer; that text is now the `Record`'s comments.
   - **The client's folder cache is gone.** `Client` takes a store or nothing, and a folder is refused with a message. Its key (`request_hash`) went with it. Tests moved to no cache, and the caching test to a store. The streaming test now checks the query hash, what answers are cached and recorded by.
+- **Item 3, generated pages on the shared palette (2026-10-02): done.**
+  - The insights, post-mortem, query dump, eye test, page test and rounds report pages are built with `html_pages.page()`. Each keeps only its layout rules.
+  - Colours come from the shared tokens. The palette gained good, mid and bad (results) and add and del (diff lines), so every page follows the system's dark mode, or `data-theme`, like the report.
+  - The committed eye test, page test and r09b post-mortem pages were regenerated offline. Their bodies are byte for byte as before; only the head changed.

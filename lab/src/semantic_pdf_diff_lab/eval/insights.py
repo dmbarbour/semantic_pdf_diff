@@ -11,7 +11,7 @@ blind (the owner, 2026-09-27):
     analyse(batch_folder, limit)  -> writes analysis.json beside pairs.json
     page(round_folder)            -> writes insights.html in the round folder
 """
-from semantic_pdf_diff.html_pages import esc
+from semantic_pdf_diff.html_pages import esc, page as html_page
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -100,17 +100,12 @@ def _means(units, field):
 # --- the page -----------------------------------------------------------------------------------
 
 STYLE = """
-:root { --bg:#fbfaf7; --fg:#1d1d1b; --muted:#6b6a64; --line:#dedbd2; --card:#ffffff; --win:#2f7d4f; --loss:#b23b3b;
-        --even:#8a7a35; --accent:#2c5d8f; }
-@media (prefers-color-scheme: dark) { :root { --bg:#17181a; --fg:#e9e7e1; --muted:#9d9b94; --line:#34363a;
-        --card:#202226; --win:#63b884; --loss:#e07a7a; --even:#cdb85f; --accent:#7fb0e0; } }
-body { background:var(--bg); color:var(--fg); font:15px/1.5 system-ui, sans-serif; margin:0 auto; max-width:1100px;
-       padding:16px; }
+body { font:15px/1.5 system-ui, sans-serif; margin:0 auto; max-width:1100px; padding:16px; }
 h1 { font-size:1.5rem; } h2 { font-size:1.2rem; margin-top:2rem; border-top:1px solid var(--line); padding-top:1rem; }
 h3 { font-size:1rem; } .muted { color:var(--muted); } table { border-collapse:collapse; margin:.5rem 0; }
 td, th { border-bottom:1px solid var(--line); padding:3px 10px 3px 0; text-align:left; vertical-align:top; }
 details { background:var(--card); border:1px solid var(--line); border-radius:6px; margin:6px 0; padding:6px 10px; }
-summary { cursor:pointer; } .win { color:var(--win); } .loss { color:var(--loss); } .even { color:var(--even); }
+summary { cursor:pointer; } .win { color:var(--good); } .loss { color:var(--bad); } .even { color:var(--mid); }
 .tag { display:inline-block; border:1px solid var(--line); border-radius:10px; padding:0 7px; margin:1px; font-size:.85em; }
 .bar { display:inline-block; height:9px; vertical-align:middle; } .claims { font-size:.9em; }
 img { max-width:100%; border:1px solid var(--line); } .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -129,9 +124,7 @@ def page(round_folder):
     notes, the model's issues), what changed, and the judges' remarks."""
     round_folder = Path(round_folder)
     spec = json.loads((round_folder / "round.json").read_text())
-    out = [f"<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
-           f"<title>Round {esc(spec['name'])} insights</title><style>{STYLE}</style></head><body>",
-           f"<h1>Round {esc(spec['name'])}: why variants won or lost</h1><p class='muted'>{esc(spec.get('note', ''))}</p>"]
+    out = [f"<h1>Round {esc(spec['name'])}: why variants won or lost</h1><p class='muted'>{esc(spec.get('note', ''))}</p>"]
     for variant in spec["variants"]:
         batch = round_folder / f"pairs-{variant}"
         if not (batch / "analysis.json").exists():
@@ -155,7 +148,7 @@ def page(round_folder):
             out.append("<div><h3>Problems judges tagged</h3><table><tr><th>tag</th><th>baseline</th><th>variant</th></tr>"
                        + "".join(f"<tr><td>{esc(t)}</td>"
                                  + "".join(f"<td><span class='bar' style='width:{60 * s['problems'][side].get(t, 0) / top:.0f}px;"
-                                           f"background:var(--{'loss' if side == 'variant' else 'accent'})'></span> "
+                                           f"background:var(--{'bad' if side == 'variant' else 'accent'})'></span> "
                                            f"{s['problems'][side].get(t, 0)}</td>" for side in ("baseline", "variant"))
                                  + "</tr>" for t in tags) + "</table></div></div>")
         else:
@@ -192,7 +185,6 @@ def page(round_folder):
                   f"<ul class='claims'>{_claims(u['only_baseline'])}</ul></div><div><b>Only in variant</b>"
                   f"<ul class='claims'>{_claims(u['only_variant'])}</ul></div></div>"
                 + f"<p><a href='pairs-{esc(variant)}/{esc(u['image'])}'>page image</a></p></details>")
-    out.append("</body></html>")
     target = round_folder / "insights.html"
-    target.write_text("\n".join(out), encoding="utf-8")
+    target.write_text(html_page(f"Round {spec['name']} insights", "\n".join(out), STYLE), encoding="utf-8")
     return target

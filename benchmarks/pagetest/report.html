@@ -1,10 +1,9 @@
-<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Page tests</title><style>
-:root { --bg:#fbfaf7; --fg:#1d1d1b; --muted:#6b6a64; --line:#dedbd2; --card:#ffffff; --good:#2f7d4f; --mid:#a07a1a;
-        --bad:#b23b3b; }
-@media (prefers-color-scheme: dark) { :root { --bg:#17181a; --fg:#e9e7e1; --muted:#9d9b94; --line:#34363a;
-        --card:#202226; --good:#63b884; --mid:#d4b04a; --bad:#e07a7a; } }
-body { background:var(--bg); color:var(--fg); font:15px/1.45 system-ui, sans-serif; margin:0 auto; max-width:1200px;
-       padding:16px; }
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page tests</title><style>:root{--bg:#edf2f6;--fg:#183047;--muted:#536879;--accent:#356783;--card:#ffffff;--panel:#f7f9fb;--line:#d7e1e8;--rule:#83a9bf;--field:#aac0cd;--warn:#854400;--good:#2f7d4f;--mid:#8a6a10;--bad:#b23b3b;--add:#e6f4ea;--del:#fce8e6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12171c;--fg:#e3e9ee;--muted:#9aa9b6;--accent:#8cb8d4;--card:#1b232b;--panel:#202a33;--line:#2f3b46;--rule:#4f7690;--field:#4a5d6c;--warn:#e0a35c;--good:#63b884;--mid:#d4b04a;--bad:#e07a7a;--add:#12351f;--del:#3d1a17}}
+:root[data-theme="dark"]{--bg:#12171c;--fg:#e3e9ee;--muted:#9aa9b6;--accent:#8cb8d4;--card:#1b232b;--panel:#202a33;--line:#2f3b46;--rule:#4f7690;--field:#4a5d6c;--warn:#e0a35c;--good:#63b884;--mid:#d4b04a;--bad:#e07a7a;--add:#12351f;--del:#3d1a17}
+body{background:var(--bg);color:var(--fg)}
+
+body { font:15px/1.45 system-ui, sans-serif; margin:0 auto; max-width:1200px; padding:16px; }
 h1 { font-size:22px; } h2 { font-size:18px; margin-top:28px; } h3 { font-size:15px; }
 p, li { max-width:75ch; } .muted { color:var(--muted); }
 .scroll { overflow-x:auto; }
@@ -16,8 +15,7 @@ details { background:var(--card); border:1px solid var(--line); border-radius:6p
 summary { cursor:pointer; }
 pre { white-space:pre-wrap; word-break:break-word; font-size:13px; }
 img { max-width:100%; height:auto; border:1px solid var(--line); }
-</style></head><body>
-<h1>Page tests: slicing, shrinking and close-ups</h1>
+</style></head><body><h1>Page tests: slicing, shrinking and close-ups</h1>
 <p>Synthetic pages at real sizes with random codes and numbers at known font sizes. Static plans read the whole page shrunk into one image, or tiles of a given side in points rendered at a given size in pixels. Close-up runs start from an overview and follow the close-ups the model asks for (free: as it sees fit; informed: told the page has text below its measured threshold). Figures are per sheet, averaged over seeds; recall is the share of items read exactly.</p>
 <h2>letter (612 × 792 pt)</h2>
 <h3>Qwen/Qwen3-VL-235B-A22B-Instruct: static plans</h3><div class='scroll'><table><tr><th>Plan</th><th>4 pt</th><th>5 pt</th><th>6 pt</th><th>7 pt</th><th>8 pt</th><th>10 pt</th><th>12 pt</th><th>14 pt</th><th>All</th><th>Smallest read (pt)</th><th>Spurious</th><th>Queries</th><th>Prompt tokens</th><th>whole_in_tiles</th></tr>
@@ -200,5 +198,4 @@ img { max-width:100%; height:auto; border:1px solid var(--line); }
 <tr><td>informed-boxes</td><td class="bad">0.38</td><td class="mid">0.50</td><td class="mid">0.50</td><td class="mid">0.50</td><td class="good">1.00</td><td class="good">1.00</td><td class="good">1.00</td><td class="mid">0.75</td><td>20.8</td><td>0</td><td>2</td><td>1034</td><td>0.469</td><td>1</td><td>0.5</td><td>0.5</td></tr>
 <tr><td>informed-cells</td><td class="mid">0.62</td><td class="mid">0.75</td><td class="mid">0.88</td><td class="good">1.00</td><td class="good">1.00</td><td class="good">0.92</td><td class="good">1.00</td><td class="mid">0.90</td><td>7.26</td><td>6.5</td><td>6.5</td><td>2999</td><td>0.875</td><td>2.5</td><td>1</td><td>1</td></tr>
 <tr><td>informed-ranges</td><td class="mid">0.62</td><td class="mid">0.75</td><td class="mid">0.88</td><td class="good">1.00</td><td class="good">1.00</td><td class="good">0.92</td><td class="good">1.00</td><td class="mid">0.90</td><td>7.26</td><td>7.5</td><td>6.5</td><td>3076.5</td><td>0.875</td><td>2.5</td><td>1</td><td>1</td></tr>
-</table></div>
-</body></html>
+</table></div></body></html>

@@ -200,9 +200,8 @@ def page(folder, evidence):
                          + f"<p><b>Only the baseline:</b></p><ul>{claims(u['only_baseline'])}</ul>"
                          + f"<p><b>Only the variant:</b></p><ul>{claims(u['only_variant'])}</ul>"
                          + "<p><b>Judges:</b></p><ul>" + "".join(f"<li>{esc(n)}</li>" for n in u["notes"]) + "</ul></details>")
-    (Path(folder) / "postmortem.html").write_text(
-        "<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
-        "<title>Post-mortem</title><style>:root{--bg:#fff;--fg:#1d1d1f;--line:#ddd}@media (prefers-color-scheme: dark){:root{--bg:#141414;--fg:#eee;--line:#333}}"
-        "body{background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,sans-serif;max-width:1100px;margin:0 auto;padding:16px}"
-        "td,th{border-bottom:1px solid var(--line);padding:3px 10px 3px 0;text-align:left}details{border:1px solid var(--line);"
-        "border-radius:6px;margin:6px 0;padding:6px 10px}</style></head><body>" + "".join(parts) + "</body></html>\n", encoding="utf-8")
+    from semantic_pdf_diff.html_pages import page as html_page
+    style = ("body{font:15px/1.45 system-ui,sans-serif;max-width:1100px;margin:0 auto;padding:16px}"
+             "td,th{border-bottom:1px solid var(--line);padding:3px 10px 3px 0;text-align:left}details{border:1px solid "
+             "var(--line);border-radius:6px;margin:6px 0;padding:6px 10px}")
+    (Path(folder) / "postmortem.html").write_text(html_page("Post-mortem", "".join(parts), style) + "\n", encoding="utf-8")

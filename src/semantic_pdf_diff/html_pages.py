@@ -17,16 +17,16 @@ def fill(template, title, data):
     """A page template's __TITLE__ and __DATA__ filled in."""
     return template.replace("__TITLE__", esc(title)).replace("__DATA__", embed_json(data))
 
-# Colour tokens, light and dark (the system's choice, or data-theme on the root element).
-PALETTE = """
-:root{--bg:#edf2f6;--fg:#183047;--muted:#536879;--accent:#356783;--card:#ffffff;--panel:#f7f9fb;--line:#d7e1e8;
---rule:#83a9bf;--field:#aac0cd;--warn:#854400}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12171c;--fg:#e3e9ee;--muted:#9aa9b6;
---accent:#8cb8d4;--card:#1b232b;--panel:#202a33;--line:#2f3b46;--rule:#4f7690;--field:#4a5d6c;--warn:#e0a35c}}
-:root[data-theme="dark"]{--bg:#12171c;--fg:#e3e9ee;--muted:#9aa9b6;--accent:#8cb8d4;--card:#1b232b;--panel:#202a33;
---line:#2f3b46;--rule:#4f7690;--field:#4a5d6c;--warn:#e0a35c}
-body{background:var(--bg);color:var(--fg)}
-"""
+# Colour tokens, light and dark (the system's choice, or data-theme on the root element). good, mid and bad mark
+# results (a win, a tie, a loss); add and del, the lines of a diff.
+_LIGHT = ("--bg:#edf2f6;--fg:#183047;--muted:#536879;--accent:#356783;--card:#ffffff;--panel:#f7f9fb;--line:#d7e1e8;"
+          "--rule:#83a9bf;--field:#aac0cd;--warn:#854400;--good:#2f7d4f;--mid:#8a6a10;--bad:#b23b3b;--add:#e6f4ea;"
+          "--del:#fce8e6")
+_DARK = ("--bg:#12171c;--fg:#e3e9ee;--muted:#9aa9b6;--accent:#8cb8d4;--card:#1b232b;--panel:#202a33;--line:#2f3b46;"
+         "--rule:#4f7690;--field:#4a5d6c;--warn:#e0a35c;--good:#63b884;--mid:#d4b04a;--bad:#e07a7a;--add:#12351f;"
+         "--del:#3d1a17")
+PALETTE = (f":root{{{_LIGHT}}}\n@media (prefers-color-scheme:dark){{:root:not([data-theme=\"light\"]){{{_DARK}}}}}\n"
+           f":root[data-theme=\"dark\"]{{{_DARK}}}\nbody{{background:var(--bg);color:var(--fg)}}\n")
 
 def page(title, body, style="", palette=True):
     """A whole page: its head (charset, viewport, title, the palette and the page's own style) and body."""

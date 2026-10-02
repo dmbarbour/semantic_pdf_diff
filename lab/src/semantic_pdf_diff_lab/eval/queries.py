@@ -235,18 +235,16 @@ def page(folder):
     head = (f"{summary['shown']} of {summary['candidates']} queries" + (f" that differ from the baseline ({summary['unchanged']} unchanged)"
             if summary["against"] else "") + (f", where {summary['lever']} added something" if summary["lever"] else "")
             + (f"; {flags} flagged by a checker" if checks else ""))
-    (folder / "index.html").write_text(f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>Queries</title><style>
-:root{{--bg:#fff;--fg:#1d1d1f;--muted:#666;--line:#ddd;--add:#e6f4ea;--del:#fce8e6;--bad:#b3261e;--ok:#1e7a34}}
-@media (prefers-color-scheme: dark){{:root{{--bg:#141414;--fg:#eee;--muted:#aaa;--line:#333;--add:#12351f;--del:#3d1a17;--bad:#f28b82;--ok:#81c995}}}}
-body{{background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,sans-serif;margin:0 auto;max-width:1100px;padding:16px}}
-h1{{font-size:20px}} h2{{font-size:16px;border-top:1px solid var(--line);padding-top:12px}}
-.status{{color:var(--muted);font-weight:normal}} pre{{white-space:pre-wrap;word-break:break-word;font-size:13px}}
-.diff .add{{background:var(--add)}} .diff .del{{background:var(--del)}} .diff .hunk{{color:var(--muted)}}
-.notes th{{text-align:left;padding-right:12px;color:var(--muted);font-weight:normal;vertical-align:top}}
-.images img{{max-width:320px;max-height:320px;margin:4px;border:1px solid var(--line)}}
-.checks .bad{{color:var(--bad)}} .checks .ok{{color:var(--ok)}} .checks .old{{color:var(--muted)}}
-</style></head><body><h1>Queries: {esc(summary['runs'])}</h1><p>{esc(head)}.</p>
-{''.join(parts)}</body></html>
-""", encoding="utf-8")
+    from semantic_pdf_diff.html_pages import page as html_page
+    style = """
+body{font:15px/1.45 system-ui,sans-serif;margin:0 auto;max-width:1100px;padding:16px}
+h1{font-size:20px} h2{font-size:16px;border-top:1px solid var(--line);padding-top:12px}
+.status{color:var(--muted);font-weight:normal} pre{white-space:pre-wrap;word-break:break-word;font-size:13px}
+.diff .add{background:var(--add)} .diff .del{background:var(--del)} .diff .hunk{color:var(--muted)}
+.notes th{text-align:left;padding-right:12px;color:var(--muted);font-weight:normal;vertical-align:top}
+.images img{max-width:320px;max-height:320px;margin:4px;border:1px solid var(--line)}
+.checks .bad{color:var(--bad)} .checks .ok{color:var(--good)} .checks .old{color:var(--muted)}
+"""
+    body = f"<h1>Queries: {esc(summary['runs'])}</h1><p>{esc(head)}.</p>\n{''.join(parts)}"
+    (folder / "index.html").write_text(html_page("Queries", body, style) + "\n", encoding="utf-8")
     return folder / "index.html"
