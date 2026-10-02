@@ -347,7 +347,7 @@ class TableFilter(Lever):
     def keep_table(self, reader, page, table, rows):
         if not super().keep_table(reader, page, table, rows):
             return False
-        from .extract import real_table
+        from .tables import real_table
         return not self.table_filter or real_table(page, table, rows)
 
 class QuoteMatch(Lever):
@@ -359,7 +359,7 @@ class QuoteMatch(Lever):
     def loose_match(self, quote, text):
         if super().loose_match(quote, text):
             return True
-        from .extract import excerpted
+        from .quotes import excerpted
         return self.quote_match != "exact" and excerpted(quote, text, in_order=self.quote_match == "excerpts")
 
 class Reconcile(Lever):

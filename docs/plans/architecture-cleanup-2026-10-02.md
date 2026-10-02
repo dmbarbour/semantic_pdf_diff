@@ -350,3 +350,13 @@ None now. The owner's reading of the full review may add some.
     - **`html_pages.py`:** `esc`, `embed_json`, `fill` (the `__TITLE__`/`__DATA__` templates, once injected by hand twice), `page()`, and a palette of colour tokens with a dark mode.
       - The product report uses them and gains dark mode.
       - The other pages use the shared escaping. Their heads and palettes move over as they're next changed.
+- **Milestone 7, module splits: in progress.**
+  - **Re-sequenced (the order is Claude's to set):** the `controlled/` package and the split of `rounds` move to milestone 8, so the evaluation and bench code moves once, straight into `eval/` and `bench/`. Milestone 7 takes the product's splits, and the `RoundRunner`.
+  - **7a, `extract` split: done.**
+    - `quotes`: quote checking
+    - `stems`: numbered items, glossary, references
+    - `context`: the document reader, lever marks, the locator
+    - `tables`: real tables, row boxes
+    - `sections`: the section index and section text
+
+    `extract` keeps the prompt, `ExtractQuery`, text grouping and the extraction pipeline (1,070 lines to 554), and re-exports the names callers import from it. A move: requests unchanged (golden requests, a query snapshot of every slice).
