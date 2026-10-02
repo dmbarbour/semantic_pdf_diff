@@ -328,7 +328,9 @@ class RateRule(Strict):
 class Settings(Strict):
     model: str = "gemma-4"
     base_url: str = "http://localhost:8000/v1"
-    context_tokens: int = Field(default=8192, ge=2048)
+    # Model-neutral defaults (the owner, 2026-10-02): a context most current vision models offer, and a
+    # generous per-image bound. config.example.json holds gemma-4's measured profile (262,144 and 300).
+    context_tokens: int = Field(default=32768, ge=2048)
     output_tokens: int = Field(default=4000, ge=256)
     # Claims asked for per extraction request; raise with output_tokens (about 150 tokens per claim).
     # 20 and 4,000 are what every recording and round used (2026-09-26 on).
@@ -385,7 +387,6 @@ class Settings(Strict):
     situate: bool = True
     verify_visuals: bool = True
     response_format: Literal["none", "json_object", "json_schema"] = "none"
-    temperature: float | None = Field(default=0.0, ge=0, le=2)
     seed: int | None = None
     max_token_field: Literal["max_tokens", "max_completion_tokens"] = "max_tokens"
     aliases: dict[str, str] = Field(default_factory=dict)
@@ -546,7 +547,7 @@ SETTING_CLASSES = {
                      "image_side", "section_depth", "section_pages", "dedupe_repeated", "extract_prompt",
                      "extract_rules", "visual_rules", "context_before", "context_after", "table_context",
                      "visual_text_layer", "stem_context", "grow_tiles", "tile_locator", "references",
-                     "response_format", "temperature", "seed", "max_token_field"), "shaping"),
+                     "response_format", "seed", "max_token_field"), "shaping"),
     **dict.fromkeys(("tile_points", "refinement_depth", "vision", "figure_tasks", "tiling", "sheet_details",
                      "skip_empty", "table_filter", "situate", "verify_visuals", "top_k", "min_score", "max_pairs",
                      "aliases", "rescan", "max_zip_depth", "max_source_bytes", "zip_ratio_limit",

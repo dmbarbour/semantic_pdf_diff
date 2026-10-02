@@ -142,8 +142,8 @@ class ResponseShapeTests(unittest.TestCase):
         self.assertEqual(seen[0]['temperature'], 0.0)
         self.assertNotIn('seed', seen[0])
         self.assertNotIn('response_format', seen[0])
-        _, seen = self.ask([reply(EMPTY)], temperature=None, seed=7, response_format='json_schema')
-        self.assertNotIn('temperature', seen[0])
+        _, seen = self.ask([reply(EMPTY)], seed=7, response_format='json_schema')
+        self.assertEqual(seen[0]['temperature'], 0.0)  # always: temperature isn't a setting
         self.assertEqual(seen[0]['seed'], 7)
         self.assertEqual(seen[0]['response_format']['json_schema']['schema'], Extraction.model_json_schema())
 

@@ -18,15 +18,15 @@ from test_situate import diagram
 
 # A value other than the default for each setting, chosen not to stop the run (limits stay loose).
 TOGGLES = {
-    'model': 'another-model', 'image_tokens': 1000, 'max_calls': 1_000_000, 'max_cost': 1000.0, 'retries': 1,
+    'model': 'another-model', 'image_tokens': 28000, 'max_calls': 1_000_000, 'max_cost': 1000.0, 'retries': 1,
     'timeout': 300.0, 'stream': False, 'concurrency': 2, 'heartbeat_seconds': 5.0,
     'rate_limits': [{'tokens_per_minute': 100_000_000}],
-    'context_tokens': 16384, 'safety_tokens': 1000, 'output_tokens': 3000, 'claims_per_request': 10,
+    'context_tokens': 8192, 'safety_tokens': 26000, 'output_tokens': 3000, 'claims_per_request': 10,
     'text_bytes': 400, 'image_side': 800, 'section_depth': 1,
     'extract_prompt': 'List engineering claims as JSON: {"claims": [], "complete": true, "issues": []}',
     'extract_rules': ['Be brief.'], 'visual_rules': ['Read chart axes before values.'], 'context_before': 100,
     'context_after': 100, 'table_context': 60, 'visual_text_layer': 200, 'stem_context': False, 'grow_tiles': False,
-    'tile_locator': True, 'references': True, 'response_format': 'json_object', 'temperature': 0.5, 'seed': 7,
+    'tile_locator': True, 'references': True, 'response_format': 'json_object', 'seed': 7,
     'max_token_field': 'max_completion_tokens',
     'tile_points': 300, 'refinement_depth': 0, 'vision': False, 'figure_tasks': False, 'tiling': 'grid',
     'sheet_details': True, 'skip_empty': False, 'table_filter': True, 'situate': False, 'verify_visuals': False,
@@ -34,8 +34,11 @@ TOGGLES = {
     'reconcile': False, 'quote_match': 'exact',
 }
 # Settings that act only on the drawing sheet: grid tiles (report pages are cut into bands), its details,
-# and its frame (a false table). A slower document: most of a run's time is its tiles.
-ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter'}
+# and its frame (a false table); and refinement, which only grid tiles are large enough for (the stub answers
+# some tiles "incomplete"). A slower document: most of a run's time is its tiles.
+# The budget settings' values bite under the model-neutral defaults (32,768 tokens of context): 8,192, or a
+# per-image or safety reserve that leaves little room, changes what situating sends and what's refused.
+ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refinement_depth'}
 # Settings these documents can't exercise, and why (each still needs its class checked elsewhere).
 NOT_EXERCISED = {
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
@@ -146,3 +149,22 @@ class SettingsKeepToTheirClass(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class DefaultsFitTheirBudget(unittest.TestCase):
+    """The shipped defaults must fit their own context budget: once, 4,000 output tokens left 3,792 of an
+    8,192-token context for input, and a plain comparison was refused 172 of 178 times (code review 2026-10-01).
+    Recordings and the other tests run under other profiles, so only this one runs the defaults as shipped."""
+    def test_a_plain_comparison_is_refused_nothing(self):
+        import os
+        from unittest.mock import patch
+        clean = {k: v for k, v in os.environ.items() if not k.startswith(("PDF_DIFF_", "OPENAI_"))}
+        with tempfile.TemporaryDirectory() as d, jittery_model() as (url, _), patch.dict(os.environ, clean, clear=True):
+            root = Path(d)
+            a, b = document(root / "a.pdf", 10, True), document(root / "b.pdf", 12, True)
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                cli.main([str(a), str(b), "--out", str(root / "out"), "--base-url", url])
+            report = json.loads((root / "out" / "report.json").read_text())
+        refused = [f["rationale"] for f in report["findings"] if "budget" in str(f.get("rationale"))]
+        issues = [i for row in report["coverage"] for i in row.get("issues", []) if "budget" in i]
+        self.assertEqual((refused, issues), ([], []))
+        self.assertTrue(report["findings"])

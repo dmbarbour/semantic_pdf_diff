@@ -98,7 +98,7 @@ class Tests(unittest.TestCase):
                 c.ask('extract',Extraction)
                 self.assertEqual(state['calls'],2)
                 self.assertEqual(c.cache_hits,1)
-                with self.assertRaises(BudgetExceeded): c.ask('x'*10000,Extraction)
+                with self.assertRaises(BudgetExceeded): c.ask('x'*40000,Extraction)  # over the default budget
                 state['truncate']=True
                 with self.assertRaises(ModelFailure): c.ask('another request',Extraction)
                 with self.assertRaises(BudgetExceeded): c.ask('limit',Extraction)

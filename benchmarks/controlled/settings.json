@@ -36,7 +36,6 @@
   "situate": true,
   "verify_visuals": true,
   "response_format": "none",
-  "temperature": 0.0,
   "seed": null,
   "max_token_field": "max_tokens",
   "aliases": {},

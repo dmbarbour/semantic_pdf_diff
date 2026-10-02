@@ -270,8 +270,42 @@ The order is mine to set. The design questions below are the owner's.
 | **3. Splits** | The `controlled/` package (before milestone 4, which adds revision pairs to it); `rounds`, `extract` and `llm.Client` split; `pipeline.py` out of the CLI; a tested `RoundRunner` | None (moves) |
 | **4. Packaging and hygiene** | `eval/` and `bench/` subpackages with an import test; the docs pass; `git gc`, ledger rotation | None |
 
-**For the owner to decide:**
+**For the owner to decide** (answered 2026-10-02, below):
 - **The package split** (A2): subpackages within one distribution, or the evaluation and bench tooling outside the shipped package.
 - **Parked levers:** delete them, or move them to an experimental module.
 - **The default profile** (item 1): the measured gemma-4 profile (context 262,144, images 300) as the shipped default, or a smaller, model-neutral profile that fits.
 - **Committed round images and fixtures:** keep committing, re-render images from the public slices, or use Git LFS.
+
+## Decisions (2026-10-02)
+
+The owner, having read the summary, before the full review:
+
+1. **Temperature.** "we don't really need `PDF_DIFF_TEMPERATURE` - just fixing temp at 0 for all the things is fine."
+   - **Done:** temperature is no longer a setting. Every request is sent at 0.0.
+   - Request bytes are unchanged, so recorded answers still replay.
+   - Stores bound before the change ask for one `--reset`; answers replay free.
+   - The other query-shaping settings judges take from the environment (seed, response format, max-token field) are for the evaluator-client helper (item 2).
+2. **Architecture.** "Seems there's a fair bit of architecture clean-up to do."
+3. **Packaging.** "IIUC, Python supports installing `package[extra-features]` in some way ... this might offer a way to make meta-evaluation and bench tooling available via CLI without making it the default."
+   - **What extras do:** `pip install semantic-pdf-diff[eval]` installs the extra's *dependencies*. Every module in the distribution is installed either way, so an extra alone doesn't hide code or commands.
+   - **How to get the owner's result:**
+     - The evaluation and bench tooling becomes its own distribution, in this repository (say `semantic-pdf-diff-lab`).
+     - The core declares it as an extra: `lab = ["semantic-pdf-diff-lab"]`.
+     - The lab package registers its commands through an entry-point group (`semantic_pdf_diff.commands`), and the core CLI lists whatever is installed.
+     - So `pip install semantic-pdf-diff[lab]` adds `pdf-semantic-diff rounds ...` and the rest; a plain install doesn't have them.
+   - **Proposed staging:**
+     - first the `eval/` and `bench/` subpackages, with a test that the core never imports them, and the evaluation commands registered through the entry-point group
+     - then moving them into the second distribution, which becomes mechanical
+4. **Levers.** "perhaps we should treat them as settings of some form for now; I'd also like to investigate *how* levers are modeled"
+   - Parked levers stay.
+   - The investigation is in [lever architecture](../research/lever-architecture-2026-10-02.md): lever objects with declared hooks, composed by a pipeline; a shallow class hierarchy by kind; configurations as data. It has two questions for the owner.
+5. **Defaults.** "model-neutral, but example settings could essentially be gemma-4."
+   - **Done:**
+     - `context_tokens` defaults to 32,768, a context most current vision models offer, with the 1,200-token image bound kept.
+     - `config.example.json` holds gemma-4's measured profile: 262,144 context tokens, 300 per image, 20 claims with 4,000 output tokens.
+     - A test runs a plain comparison under the shipped defaults and requires no budget refusals. It fails under the old defaults with the refusals of item 1.
+6. **Committed images.** "Ideally, we should not be committing images and images for development rounds. The fixture for CI testing answers is probably the exception."
+   - For phase 4:
+     - development rounds' page images, and the page text in their judge caches, leave version control
+     - batches re-render images from the public slices; byte-identically, since judge requests hash image bytes
+     - the CI fixture (`replay-slices.zip`) stays

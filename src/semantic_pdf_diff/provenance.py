@@ -18,12 +18,12 @@ EXTENSION_ALIASES = {".jpeg": ".jpg", ".tif": ".tiff", ".htm": ".html", ".yml": 
 # Settings that shape what extraction sends to the model or how content is chunked.
 # Timeouts, retries, call limits, credentials and the endpoint URL are excluded.
 EXTRACTION_SETTINGS = ("model", "context_tokens", "output_tokens", "text_bytes", "image_side", "tile_points",
-                       "refinement_depth", "claims_per_request", "figure_tasks", "section_depth", "section_pages", "dedupe_repeated", "vision", "response_format", "temperature",
+                       "refinement_depth", "claims_per_request", "figure_tasks", "section_depth", "section_pages", "dedupe_repeated", "vision", "response_format",
                        "seed", "max_token_field")
-TRIAGE_SETTINGS = ("model", "context_tokens", "output_tokens", "image_side", "response_format", "temperature",
+TRIAGE_SETTINGS = ("model", "context_tokens", "output_tokens", "image_side", "response_format",
                    "seed", "max_token_field")
 COMPARISON_SETTINGS = ("model", "top_k", "min_score", "max_pairs", "verify_visuals", "aliases",
-                       "response_format", "temperature", "seed", "output_tokens", "max_token_field")
+                       "response_format", "seed", "output_tokens", "max_token_field")
 
 def normalized_extension(name):
     """Lowercase extension with known aliases collapsed, or None if there is none."""

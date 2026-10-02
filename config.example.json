@@ -1,7 +1,8 @@
 {
-  "context_tokens": 8192,
-  "output_tokens": 1400,
-  "image_tokens": 1200,
+  "context_tokens": 262144,
+  "output_tokens": 4000,
+  "claims_per_request": 20,
+  "image_tokens": 300,
   "safety_tokens": 400,
   "max_calls": 100000,
   "retries": 2,
@@ -15,7 +16,6 @@
   "situate": true,
   "verify_visuals": true,
   "response_format": "none",
-  "temperature": 0,
   "aliases": {
     "chw": "chilled water",
     "duty pump": "primary pump"
