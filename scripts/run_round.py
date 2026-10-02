@@ -477,8 +477,7 @@ class RoundRunner:
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("round", type=Path)
-    parser.add_argument("--only", choices=["record", "replay", "measure", "check", "pairs", "judge", "decide", "postmortem",
-                                           "report"])
+    parser.add_argument("--only", choices=["record", "replay", "measure", "check", "pairs", "judge", "postmortem", "report"])
     parser.add_argument("--accept-checks", action="store_true",
                         help="the query checks' flags were looked over and accepted: go on to sampling and judging")
     args = parser.parse_args(argv)

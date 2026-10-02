@@ -76,16 +76,17 @@ def unit_scores(folder, limit=None, verdicts_dir="verdicts"):
 # Acceptance (docs/plans/query-improvement): win clearly overall, lose clearly nowhere; the thresholds
 # are a round's criteria (models.Criteria), set in round.json before judging.
 
-def decide(folder, limit=None, verdicts_dir="verdicts", documents=None, criteria=None, gains=None):
+def decide(folder, limit=None, verdicts_dir="verdicts", documents=None, criteria=None, gains=None, exclude=()):
     """Win rates with intervals, overall and per stratum, and the decision under `criteria` (over the
     first `limit` units when judging is still in progress): decide_scores on a batch's files.
 
     Strata are the kinds of region (text, table, visual) and, given `documents` ({slice name:
     family}, from scripts/slices.json), the document families (reports, drawings, ...), as the
-    plan stratifies; either kind of stratum can block. gains: measured changes, for a named gain."""
+    plan stratifies; either kind of stratum can block. gains: measured changes, for a named gain.
+    exclude: units whose verdicts don't count (judged on the wrong input, say)."""
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    scores = unit_scores(folder, limit, verdicts_dir)
+    scores = {u: s for u, s in unit_scores(folder, limit, verdicts_dir).items() if u not in set(exclude)}
     family = {i["id"]: i["family"] for i in batch["items"]}
     document = {i["id"]: (documents or {}).get(i.get("run")) for i in batch["items"]}
     return decide_scores(scores, family, document, batch["units"], criteria, gains)

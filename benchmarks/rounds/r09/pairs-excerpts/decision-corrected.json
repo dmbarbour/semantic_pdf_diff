@@ -1,0 +1,106 @@
+{
+  "note": "The owner, 2026-10-02: \"Go ahead\" (re-decide without the units judged on the wrong crop). Decided offline from the recorded verdicts, under today's rules (rounds.decide, exclude=...).",
+  "excluded": {
+    "u-calg-cd-p62-66-e0051bec-p5-visual-b2of4": "judged on another unit's crop: a text and a visual unit cut into bands of the same number on one page shared one image name, and the first unit's crop was kept for both (found 2026-10-02, architecture clean-up milestone 9)"
+  },
+  "recorded": {
+    "decision": "inconclusive",
+    "overall": {
+      "mean": 0.508,
+      "low": 0.387,
+      "high": 0.629
+    },
+    "units_judged": 31
+  },
+  "today_all_units": {
+    "overall": {
+      "mean": 0.492,
+      "low": 0.366,
+      "high": 0.617
+    },
+    "strata": {
+      "table": {
+        "mean": 0.25,
+        "low": 0.0,
+        "high": 0.671
+      },
+      "text": {
+        "mean": 0.589,
+        "low": 0.374,
+        "high": 0.805
+      },
+      "visual": {
+        "mean": 0.442,
+        "low": 0.268,
+        "high": 0.617
+      },
+      "drawings": {
+        "mean": 0.389,
+        "low": 0.242,
+        "high": 0.536
+      },
+      "manuals": {
+        "mean": 1.0,
+        "low": 0.0,
+        "high": 1.0
+      },
+      "reports": {
+        "mean": 0.625,
+        "low": 0.376,
+        "high": 0.874
+      },
+      "rules": {
+        "mean": 0.5,
+        "low": 0.0,
+        "high": 1.0
+      }
+    },
+    "decision": "inconclusive"
+  },
+  "today_without": {
+    "units_judged": 29,
+    "overall": {
+      "mean": 0.491,
+      "low": 0.362,
+      "high": 0.621
+    },
+    "strata": {
+      "table": {
+        "mean": 0.25,
+        "low": 0.0,
+        "high": 0.671
+      },
+      "text": {
+        "mean": 0.589,
+        "low": 0.374,
+        "high": 0.805
+      },
+      "visual": {
+        "mean": 0.438,
+        "low": 0.246,
+        "high": 0.629
+      },
+      "drawings": {
+        "mean": 0.382,
+        "low": 0.225,
+        "high": 0.54
+      },
+      "manuals": {
+        "mean": 1.0,
+        "low": 0.0,
+        "high": 1.0
+      },
+      "reports": {
+        "mean": 0.625,
+        "low": 0.376,
+        "high": 0.874
+      },
+      "rules": {
+        "mean": 0.5,
+        "low": 0.0,
+        "high": 1.0
+      }
+    },
+    "decision": "inconclusive"
+  }
+}

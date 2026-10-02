@@ -1,0 +1,90 @@
+{
+  "note": "The owner, 2026-10-02: \"Go ahead\" (re-decide without the units judged on the wrong crop). Decided offline from the recorded verdicts, under today's rules (rounds.decide, exclude=...).",
+  "excluded": {
+    "u-habex-interim-p80-89-52da8af4-p7-text-b1of2": "judged on another unit's crop: a text and a visual unit cut into bands of the same number on one page shared one image name, and the first unit's crop was kept for both (found 2026-10-02, architecture clean-up milestone 9)"
+  },
+  "recorded": {
+    "decision": "no worse: accept only with another gain (e.g. cost)",
+    "overall": {
+      "mean": 0.655,
+      "low": 0.5,
+      "high": 0.81
+    },
+    "units_judged": 21
+  },
+  "today_all_units": {
+    "overall": {
+      "mean": 0.655,
+      "low": 0.503,
+      "high": 0.807
+    },
+    "strata": {
+      "text": {
+        "mean": 0.886,
+        "low": 0.737,
+        "high": 1.0
+      },
+      "visual": {
+        "mean": 0.4,
+        "low": 0.244,
+        "high": 0.556
+      },
+      "drawings": {
+        "mean": 0.438,
+        "low": 0.0,
+        "high": 1.0
+      },
+      "manuals": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 1.0
+      },
+      "reports": {
+        "mean": 0.75,
+        "low": 0.628,
+        "high": 0.872
+      }
+    },
+    "decision": "accepted: wins"
+  },
+  "today_without": {
+    "units_judged": 20,
+    "overall": {
+      "mean": 0.637,
+      "low": 0.483,
+      "high": 0.792
+    },
+    "strata": {
+      "text": {
+        "mean": 0.875,
+        "low": 0.711,
+        "high": 1.0
+      },
+      "visual": {
+        "mean": 0.4,
+        "low": 0.244,
+        "high": 0.556
+      },
+      "drawings": {
+        "mean": 0.438,
+        "low": 0.0,
+        "high": 1.0
+      },
+      "manuals": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 1.0
+      },
+      "reports": {
+        "mean": 0.733,
+        "low": 0.608,
+        "high": 0.859
+      }
+    },
+    "decision": "no worse: accept only with a gain named in advance"
+  },
+  "today_held_out_rule": {
+    "all_units": "accepted: holds out",
+    "without": "accepted: holds out"
+  }
+}

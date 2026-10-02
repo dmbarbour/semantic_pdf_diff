@@ -183,6 +183,18 @@ class Rounds(unittest.TestCase):
                 self.assertEqual(rounds.unsettled(folder, ['j1']), {'u1', 'u2'})  # flipped; failed an order
             self.assertEqual(rounds.decide(folder)['coverage'], 0.2)
 
+    def test_units_judged_on_the_wrong_input_can_be_left_out(self):
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            items = [{'id': f'u{i}', 'family': 'text'} for i in range(3)]
+            (folder / 'pairs.json').write_text(json.dumps({'items': items, 'units': {'units': 3, 'unchanged': 0}}))
+            (folder / 'verdicts').mkdir()
+            (folder / 'verdicts' / 'j.json').write_text(json.dumps({'reviewer': 'j', 'verdicts': {
+                u: {'baseline-first': {'score': s}, 'variant-first': {'score': s}} for u, s in (('u0', 1.0), ('u1', 1.0), ('u2', 0.0))}}))
+            self.assertEqual(rounds.decide(folder)['units_judged'], 3)
+            left = rounds.decide(folder, exclude=['u2'])  # u2 judged on another unit's crop, say
+            self.assertEqual((left['units_judged'], left['overall']['mean']), (2, 1.0))
+
     def test_a_small_stratum_cannot_block(self):
         with tempfile.TemporaryDirectory() as d:
             folder = Path(d)

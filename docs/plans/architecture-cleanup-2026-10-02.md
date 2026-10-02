@@ -1,6 +1,6 @@
 # Architecture clean-up, and levers as mixins
 
-- **Status:** Completed (2026-10-02). The owner: "Alright, I've read both the review and plan. It's go." Milestones 1 to 9 are done; two questions are left for the owner (Open questions).
+- **Status:** Completed (2026-10-02). The owner: "Alright, I've read both the review and plan. It's go." Milestones 1 to 9 are done, and the owner answered the two questions left (Open questions).
 - **From:**
   - the [code review of 2026-10-01](../reviews/code-review-2026-10-01.md), with the owner's decisions (2026-10-02)
   - the [lever architecture](../research/lever-architecture-2026-10-02.md) investigation, settled with the owner the same day
@@ -157,8 +157,12 @@ Each ends with the full suite passing and a commit. Where requests mustn't chang
 
 ## Open questions
 
-- **Re-decide rounds 9, 9b and 9h without the 4 mis-cropped units?** Each of those units was judged on another unit's crop (milestone 9). Re-deciding is offline and free; whether to, and whether to record both decisions, is the owner's call.
-- **`run_round --only decide`** is accepted, but no step checks it (the review noted it). Drop it, or make it decide without judging?
+None now. The two left at the end were answered (2026-10-02):
+
+- **Re-decide rounds 9, 9b and 9h without the 4 units judged on another unit's crop?** The owner: "Go ahead."
+  - Done offline, as each batch's `decision-corrected.json`. No conclusion changed.
+  - Fragments still holds out, so it stays in the champion. See the correction in [round 9's review](../reviews/round-09-2026-09-28.md).
+- **`run_round --only decide`**, accepted but checked by no step. The owner: "Go ahead and drop it, especially if it's not hard to rebuild later." Dropped. To decide a judged batch again without judging more, call `rounds.decide`, as the correction above did.
 
 ## Progress
 
@@ -383,7 +387,7 @@ Each ends with the full suite passing and a commit. Where requests mustn't chang
       - recording paused at the round's cap
       - flagged queries holding the round until accepted
       - criteria changed after judging began, refused
-    - `--only decide` is still accepted and checked by no step, as the review noted. It's left for the owner's word on whether to drop it.
+    - `--only decide`, accepted but checked by no step, was dropped on the owner's word.
 - **Milestone 8, packaging (2026-10-02): done.**
   - **The lab is its own distribution,** `semantic-pdf-diff-lab` in `lab/` (package `semantic_pdf_diff_lab`), declared by the core as the extra `lab`. The staged step (subpackages of the core first) was skipped, so each module moved once.
     - `eval/`: rounds, judgements, rubrics, review, insights, post-mortem, query dumps and checks, taxonomy, the evaluation's types (`eval/models.py`: `RoundSpec`, `Criteria`, `PairVerdict`, the panel labels), and the lab's commands
