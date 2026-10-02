@@ -1,6 +1,6 @@
 # Comparing revisions: align items, then explain differences
 
-- **Status:** Planned (2026-10-02). The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
+- **Status:** Active (2026-10-02): milestone 1 (research) done. The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
 - **From:** [controlled documents](controlled-documents-2026-10-01.md) milestone 4, where every change was found but most "different" findings weren't changes.
 - **Depends on:**
   - controlled documents (revision pairs, exact comparison scoring)
@@ -237,6 +237,31 @@ Claude's reading of where proposals mode begins to make sense:
 
 - **Relations:** schematics' links aren't compared yet (controlled documents milestone 4).
 - **Comparing more than two revisions at once.**
+
+## Progress
+
+- **Milestone 1, research (2026-10-02): done.** [Correspondence without a model](../research/correspondence-without-a-model-2026-10-02.md).
+  - **Prior art:**
+    - Fellegi–Sunter record linkage is the owner's "weighted mixture": signals as log-odds weights, two thresholds, a review band for the judge.
+    - Lowe's ratio test is the margin (decision 10).
+    - Patience diff and GumTree align containers by shared unique anchors, as design item 1 does.
+    - Origin analysis, group linkage and iMAP cover splits and merges (decision 11).
+    - BM25F handles fielded names.
+  - **Measured offline** on the six pairs, with no model calls (`scripts/alignment_sketch.py`):
+    - **Claims scored alone lose changes:** 24 of the 59 claim pairs of changed facts scored as non-matches.
+    - **Items first:**
+      - the judge gets 47 pairs instead of 1,798, 15 of them false
+      - all 22 changes and 198 unchanged facts are covered
+      - no pair touches an added or removed fact
+      - 408 pairs have equal values, settled without the judge
+      - the image reader's "blower 4–6" were left ambiguous by the margin
+  - **The design, adjusted by the research:**
+    - value disagreement weighs lightly, since values change between revisions
+    - correlated signals are merged before weighting
+    - the margin is an odds threshold in bits, against the non-match scores' tail
+    - greedy best-first rather than optimal assignment
+    - no new dependency
+  - **Caveat:** the sketches were built while looking at these pairs; development evidence (decision 7).
 
 ## Open questions
 
