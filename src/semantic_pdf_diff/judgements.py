@@ -36,6 +36,50 @@ class Record:
     answer: dict = field(default_factory=dict)
     status: str = "answered"  # or failed
     attempts: int = 1
+    rubric: str = ""          # the rubric the rater answered under, as its file's header says ("" before 2026-10-02)
+
+class JudgementError(ValueError):
+    pass
+
+def load(path, rubric=None):
+    """A verdicts file's verdicts ({} if there's none), refusing one judged under another rubric: a mid-round rubric
+    change would otherwise mix rubrics undetected (code review 2026-10-01, A1)."""
+    path = Path(path)
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if rubric and data.get("rubric") not in (None, "", rubric):
+        raise JudgementError(f"{path} was judged under rubric {data['rubric']}, not {rubric}: judge into another folder")
+    return data["verdicts"]
+
+def save(path, rater, verdicts, rubric=""):
+    """Write a verdicts file: its rater and rubric, then the verdicts (the layout read() reads)."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data = {"reviewer": rater, **({"rubric": rubric} if rubric else {}), "verdicts": verdicts}
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return path
+
+def rate(client, requests, progress=None):
+    """Ask a model each request once, concurrently: requests are (ident, prompt, schema, images, key). Returns
+    ({ident: answer}, {ident: error}), each in the order requests finished. The loop the model raters share
+    (judges, the review panel, query checkers), once written three times."""
+    from .dispatch import Dispatcher
+    from .progress import NoProgress
+    progress = progress or NoProgress()
+    answers, errors = {}, {}
+    with Dispatcher(client) as dispatch:
+        for ident, prompt, schema, images, key in requests:
+            def finish(value, error, ident=ident):
+                progress.finish("failed" if error else "complete")
+                if error is not None:
+                    errors[ident] = str(error)
+                else:
+                    answers[ident] = value
+            progress.add()
+            dispatch.submit(prompt, schema, images, key, finish)
+        dispatch.drain()
+    return answers, errors
 
 def failures_folder(verdicts_dir):
     """Where a verdicts folder's failed verdicts are counted: failures/ for verdicts/, failures-<x>/
@@ -57,15 +101,16 @@ def read(folder, verdicts_dir="verdicts"):
     for path in sorted((folder / verdicts_dir).glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         rater = names[path.name] = data["reviewer"]
+        rubric = data.get("rubric", "")
         for unit, orders in data["verdicts"].items():
             for order, v in orders.items():
                 out.append(Record(rater, kind, "pair", unit, order=order,
-                                  answer={k: x for k, x in v.items() if k != "claims"}))
+                                  answer={k: x for k, x in v.items() if k != "claims"}, rubric=rubric))
                 for side, claims in (v.get("claims") or {}).items():
                     for c in claims:
                         out.append(Record(rater, kind, "claim", unit, order=order, side=side, index=c["index"],
                                           answer={"mark": c["mark"], "problems": c.get("problems", []),
-                                                  "claim": c.get("claim")}))
+                                                  "claim": c.get("claim")}, rubric=rubric))
     for path in sorted((folder / failures_folder(verdicts_dir)).glob("*.json")):
         rater = names.get(path.name, path.stem)  # a judge that never answered has no verdicts file to name it
         for key, attempts in json.loads(path.read_text(encoding="utf-8")).items():
@@ -89,6 +134,9 @@ class UnitVerdicts:
 
     def __init__(self, records, raters=None):
         self.orders = {}  # {unit: {rater: {order: score}}}
+        rubrics = {r.rubric for r in answered(records) if r.rubric}
+        if len(rubrics) > 1:
+            raise JudgementError(f"verdicts under more than one rubric ({', '.join(sorted(rubrics))}) can't be scored together")
         for r in answered(records):
             if raters is None or r.rater in raters:
                 self.orders.setdefault(r.unit, {}).setdefault(r.rater, {})[r.order] = r.answer["score"]

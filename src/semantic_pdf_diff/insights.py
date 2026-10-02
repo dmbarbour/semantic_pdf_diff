@@ -27,7 +27,7 @@ def _issues(runs_dir, run, content, page, family):
         return {}
     found = Counter()
     try:
-        store = Store(folder)
+        store = Store.open(folder)
     except StoreError:  # a store kept at an older schema (rounds before 2026-09-28): no issues to show
         return {}
     with store:

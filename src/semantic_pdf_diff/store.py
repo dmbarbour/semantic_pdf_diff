@@ -139,9 +139,28 @@ class Store:
             raise StoreError(f"{path} has schema version {version and version[0]}, expected {SCHEMA_VERSION}; "
                              "use a new store (no migrations during development)")
 
+    @classmethod
+    def open(cls, folder):
+        """A store opened to read only (code review 2026-10-01, A1): no folder or schema created, no writer's lock
+        (a reader neither waits on a run nor stops one), and any write is an error."""
+        self = cls.__new__(cls)
+        self.folder = Path(folder)
+        self.assets = self.folder / "assets"
+        self._lock = None
+        path = self.folder / "store.sqlite"
+        if not path.exists():
+            raise StoreError(f"{path}: no such store")
+        self.db = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+        version = self.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
+        if not version or int(version[0]) != SCHEMA_VERSION:
+            self.close()
+            raise StoreError(f"{path} has schema version {version and version[0]}, expected {SCHEMA_VERSION}")
+        return self
+
     def close(self):
         self.db.close()
-        self._lock.close()
+        if self._lock is not None:
+            self._lock.close()
 
     def __enter__(self):
         return self

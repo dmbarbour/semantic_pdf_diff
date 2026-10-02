@@ -378,7 +378,7 @@ class Replay(unittest.TestCase):
             self.skipTest("no recorded corpus")
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
-            with fixtures.Fixture(fixtures.unpack(folder / "replay.zip", d)) as f:
+            with fixtures.open(folder / "replay.zip", "read") as f:
                 recorded_with = f.meta().get("pymupdf")
                 responder = f.db.execute("SELECT DISTINCT responder FROM response").fetchone()[0]
             if recorded_with != pymupdf.VersionBind:
@@ -413,7 +413,7 @@ class Corpus(unittest.TestCase):
         folder = Path(__file__).resolve().parent.parent / "benchmarks" / "controlled"
         if not (folder / "replay.zip").exists():
             self.skipTest("no recorded corpus")
-        with tempfile.TemporaryDirectory() as d, fixtures.Fixture(fixtures.unpack(folder / "replay.zip", d)) as f:
+        with fixtures.open(folder / "replay.zip", "read") as f:
             recorded_with = f.meta().get("pymupdf")
         if recorded_with != pymupdf.VersionBind:
             self.skipTest(f"recorded with PyMuPDF {recorded_with}; documents differ under {pymupdf.VersionBind}")

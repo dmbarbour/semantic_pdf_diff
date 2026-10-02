@@ -72,14 +72,15 @@ def recipe_labels(parts):
     return digest, role, region, content, task
 
 class Fixture:
-    """An open fixture database. Used from the main thread only."""
+    """An open fixture database: storage only (the replay policy is Replayer's). Used from the main thread only.
+    readonly: nothing is written, not even which answers were used (fixtures.open's "read")."""
 
-    def __init__(self, path, create=False):
-        self.path = Path(path)
+    def __init__(self, path, create=False, readonly=False):
+        self.path, self.readonly = Path(path), readonly
         if not self.path.exists() and not create:
             raise FixtureError(f"{self.path}: no such fixture")
         new = not self.path.exists()
-        self.db = sqlite3.connect(self.path)
+        self.db = sqlite3.connect(self.path.resolve().as_uri() + "?mode=ro", uri=True) if readonly else sqlite3.connect(self.path)
         if new:
             with self.db:
                 self.db.executescript(SCHEMA)
@@ -88,24 +89,26 @@ class Fixture:
         if not version or int(version[0]) != SCHEMA_VERSION:
             self.db.close()
             raise FixtureError(f"{self.path} has fixture schema {version and version[0]}, expected {SCHEMA_VERSION}")
-        with self.db:
-            self.db.execute(SESSIONS)
-        self.served, self.recorded, self.missing, self.used, self.responders = 0, 0, [], set(), set()
+        if not readonly:
+            with self.db:
+                self.db.execute(SESSIONS)
+        self.used = set()
         self.packed_to = None    # the zip an unpacked fixture came from (see folder_fixture)
 
+    def log_session(self, responders, replayed, recorded, missing):
+        """One run's use of this working file, for prune's guard (Replayer.close)."""
+        if (replayed or recorded or missing) and not self.readonly:
+            with self.db:
+                self.db.execute("INSERT INTO session VALUES (?, ?, ?, ?, ?)",
+                                (_now(), json.dumps(sorted(responders)), replayed, recorded, missing))
+
     def close(self):
-        if self.used:
+        if self.used and not self.readonly:
             with self.db:
                 now = _now()
                 self.db.executemany("UPDATE response SET used=? WHERE query=? AND responder=? AND sample=?",
                                     [(now, *u) for u in sorted(self.used)])
-            self.used = set()
-        if self.served or self.recorded or self.missing:
-            with self.db:
-                self.db.execute("INSERT INTO session VALUES (?, ?, ?, ?, ?)",
-                                (_now(), json.dumps(sorted(self.responders)), self.served, self.recorded,
-                                 len(self.missing)))
-            self.served, self.recorded, self.missing = 0, 0, []
+        self.used = set()
         self.db.close()
         if self.packed_to is not None:  # packed again when its packed bytes would differ (packing is reproducible):
             data = packed(self.path)      # an answer that replaced a recorded failure counts, not only new rows
@@ -132,7 +135,6 @@ class Fixture:
         """(outcome, answer, error) as recorded, or None. Marks the answer as used (see prune)."""
         row = self.db.execute("SELECT outcome, answer, error FROM response WHERE query=? AND responder=? AND sample=?",
                               (query, responder, sample)).fetchone()
-        self.responders.add(responder)
         if row is not None:
             self.used.add((query, responder, sample))  # written once, on close
         return row
@@ -143,7 +145,6 @@ class Fixture:
         the side tables' facts about the query. `recorded` keeps a carried answer's original date."""
         if outcome not in OUTCOMES:
             raise ValueError(f"outcome {outcome!r} is not one of {OUTCOMES}")
-        self.responders.add(responder)
         with self.db:
             self.db.execute("INSERT OR REPLACE INTO response VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             (query, responder, sample, outcome, answer, error, json.dumps(usage or {}, sort_keys=True),
@@ -153,10 +154,11 @@ class Fixture:
                                 (query, json.dumps(description, sort_keys=True)))
         if recipe is not None:
             self.note_recipe(query, recipe)
-        self.recorded += 1
 
     def note_recipe(self, query, recipe):
         """A way the pipeline built a query (for summaries; several recipes may build one query)."""
+        if self.readonly:
+            return
         with self.db:
             self.db.execute("INSERT OR IGNORE INTO recipe VALUES (?, ?, ?, ?, ?, ?, ?)",
                             (query, *recipe_labels(recipe), json.dumps(list(recipe), default=str)))
@@ -212,6 +214,85 @@ class Fixture:
                          "prompt_tokens": p or 0, "completion_tokens": c or 0}
                         for responder, role, outcome, n, p, c in rows],
         }
+
+class Replayer:
+    """The replay policy over a fixture (code review 2026-10-01, A1: it was split between llm.Client and Fixture):
+    which recorded answer a request gets (its sample), what's replayed and what's asked again, how an answer's
+    outcome is recorded, and the counts. The client is transport and its cache; the fixture is storage.
+
+    Modes: `replay` serves recorded answers and recorded failures, and marks anything unrecorded;
+    `replay-or-record` serves recorded answers and asks again for the rest, recorded failures included;
+    `record-new` replays the model's failures as failures too, asking only transient ones again.
+    fresh_regions: the A/A control's extraction regions, answered afresh as another sample of the same query."""
+
+    def __init__(self, fixture, mode="replay", responder="", fresh_regions=()):
+        if mode not in MODES:
+            raise ValueError(f"mode {mode!r} is not one of {MODES}")
+        self.fixture, self.mode, self.responder = fixture, mode, responder
+        self.fresh_regions = frozenset(fresh_regions or ())
+        self.replayed, self.recorded, self.missing = 0, 0, []
+
+    def sample(self, key):
+        """Which answer to a query this run wants: 0, or 1 for the A/A control's fresh regions."""
+        return 1 if key and key[0] == "extract" and key[1] in self.fresh_regions else 0
+
+    def lookup(self, query, key, parse):
+        """("answer", parse(recorded)), ("failure", its error), ("ask", None) to ask the model, or ("unrecorded",
+        None) when replaying a query nothing answers. parse may raise; then nothing was served."""
+        row = self.fixture.answer(query, self.responder, self.sample(key))
+        if row is not None and key is not None:
+            self.fixture.note_recipe(query, key)
+        if row is not None and row[0] != "ok" and (self.mode == "replay" or self.mode == "record-new" and row[0] == "invalid"):
+            self.replayed += 1
+            return "failure", row[2]
+        if row is not None and row[0] == "ok":  # recorded failures in record modes fall through: asked again
+            value = parse(row[1])
+            self.replayed += 1
+            return "answer", value
+        if self.mode == "replay" and row is None:
+            self.missing.append(list(key) if key else [query])
+            return "unrecorded", None
+        return "ask", None
+
+    def record(self, query, key, answer, error, usage=None, description=None):
+        """An answer, or the model's failure (error: its text), unless only replaying."""
+        if self.mode == "replay":
+            return
+        from .llm import transient
+        outcome = "ok" if error is None else "transient" if transient(error) else "invalid"
+        self.fixture.record(query, self.responder, self.sample(key), outcome=outcome, answer=answer, error=error,
+                            usage=usage, description=description, recipe=key)
+        self.recorded += 1
+
+    def usage(self):
+        return {"path": str(self.fixture.path), "responder": self.responder, "mode": self.mode,
+                "replayed": self.replayed, "recorded": self.recorded, "missing": len(self.missing)}
+
+    def close(self):
+        self.fixture.log_session({self.responder}, self.replayed, self.recorded, len(self.missing))
+        self.fixture.close()
+
+def open(path, mode="read"):  # noqa: A001 (fixtures.open, as the module's reader)
+    """A fixture, open for one use (code review 2026-10-01, A1: five ways to open one, three working-file
+    conventions, and read-only uses that could write):
+    - read: to look at; nothing is written. A .zip is read from a temporary copy.
+    - replay: answers served are marked used (prune's guard). A .zip is replayed from a temporary copy.
+    - record: a .sqlite working file, created if missing; a .zip is refused (record, then pack).
+    A folder is its own fixture (folder_fixture), whatever the mode."""
+    import tempfile
+    path = Path(path)
+    if path.is_dir():
+        return folder_fixture(path)
+    if mode not in ("read", "replay", "record"):
+        raise ValueError(f"mode {mode!r} is not read, replay or record")
+    if path.suffix == ".zip":
+        if mode == "record":
+            raise FixtureError(f"{path}: record into a .sqlite fixture, then pack it (pdf-semantic-diff fixtures pack)")
+        temp = tempfile.TemporaryDirectory(prefix="fixture-")
+        fixture = Fixture(unpack(path, temp.name), readonly=mode == "read")
+        fixture.temp = temp  # removed when the fixture closes
+        return fixture
+    return Fixture(path, create=mode == "record", readonly=mode == "read")
 
 def pack(fixture, target):
     """Zip a fixture reproducibly: rows in key order, last-use times and sessions left out, fixed

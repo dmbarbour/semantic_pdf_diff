@@ -326,24 +326,19 @@ def run(args, settings, store, names, out, force_rescan=False):
         # in the report even when all tasks completed successfully.
         return 2 if incomplete else 0
     finally:  # also on failure, so the answers this run used stay marked as used
-        if getattr(client, 'fixture', None) is not None:
-            client.fixture.close()
+        if getattr(client, 'replay', None) is not None:
+            client.close()
 
 def make_client(args, settings, store):
     fixture = None
     if getattr(args, 'fixture', None):
-        path = args.fixture
-        if path.suffix == '.zip':
-            if args.fixture_mode != 'replay':
-                raise ValueError('record into a .sqlite fixture, then pack it: pdf-semantic-diff fixtures pack')
-            temp = tempfile.TemporaryDirectory(prefix='fixture-')
-            path = fixtures.unpack(path, temp.name)
-        fixture = fixtures.Fixture(path, create=args.fixture_mode != 'replay')
+        try:
+            fixture = fixtures.open(args.fixture, 'replay' if args.fixture_mode == 'replay' else 'record')
+        except fixtures.FixtureError as e:
+            raise ValueError(str(e)) from e
         if args.fixture_mode != 'replay':  # text and rendering depend on it: replay tests compare versions
             import pymupdf
             fixture.note('pymupdf', pymupdf.VersionBind)
-        if path is not args.fixture:
-            fixture.temp = temp  # removed when the fixture closes
     if fixture is None:
         return attach_ledger(Client(settings, store), args)
     fresh = [r for r in getattr(args, 'fresh_regions', '').split(',') if r]
@@ -351,14 +346,16 @@ def make_client(args, settings, store):
                                 fresh_regions=fresh), args)
 
 def fixture_usage(client):
-    f = getattr(client, 'fixture', None)  # test doubles have none
-    if f is None:
+    replay = getattr(client, 'replay', None)  # test doubles have none
+    if replay is None:
         return {}
-    if f.missing:
-        log.warning(f"Replay: {len(f.missing)} request(s) have no answer from {client.responder}; first: {f.missing[0]}")
-    log.info(f"Fixture {f.path.name}: {f.served} answers replayed, {f.recorded} recorded, {len(f.missing)} missing")
-    return {'fixture': {'path': str(f.path), 'responder': client.responder, 'mode': client.mode,
-                        'replayed': f.served, 'recorded': f.recorded, 'missing': len(f.missing)}}
+    if replay.missing:
+        log.warning(f"Replay: {len(replay.missing)} request(s) have no answer from {replay.responder}; "
+                    f"first: {replay.missing[0]}")
+    used = replay.usage()
+    log.info(f"Fixture {replay.fixture.path.name}: {used['replayed']} answers replayed, {used['recorded']} recorded, "
+             f"{used['missing']} missing")
+    return {'fixture': used}
 
 def fixtures_command(argv):
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff fixtures', description='Replay fixtures of recorded answers.')
@@ -377,7 +374,10 @@ def fixtures_command(argv):
                        help='prune even if no run since then used the fixture, a run missed requests, or most answers go')
     args = parser.parse_args(argv)
     if args.command == 'prune':
-        with fixtures.Fixture(args.fixture) as fixture:
+        if args.fixture.suffix != '.sqlite' or not args.fixture.exists():  # a .zip once crashed here
+            print(f'{args.fixture}: prune works on a .sqlite working fixture (then pack it again)', file=sys.stderr)
+            return 1
+        with fixtures.open(args.fixture, 'record') as fixture:
             try:
                 print(json.dumps(fixture.prune(args.unused_since, args.responder, args.dry_run, args.force)))
             except fixtures.FixtureError as e:
@@ -385,10 +385,8 @@ def fixtures_command(argv):
                 return 1
         return 0
     if args.command == 'summary':
-        with tempfile.TemporaryDirectory() as d:
-            path = fixtures.unpack(args.fixture, d) if args.fixture.suffix == '.zip' else args.fixture
-            with fixtures.Fixture(path) as fixture:
-                print(json.dumps(fixture.summary(), indent=2))
+        with fixtures.open(args.fixture, 'read') as fixture:
+            print(json.dumps(fixture.summary(), indent=2))
     else:
         fixtures.pack(args.fixture, args.target)
         print(f'Packed {args.target}')

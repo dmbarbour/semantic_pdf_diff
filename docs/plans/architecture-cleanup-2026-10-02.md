@@ -310,3 +310,28 @@ None now. The owner's reading of the full review may add some.
     - **`EvidenceDocument` and `Report`** own `evidence.json`'s and `report.json`'s fields, with one `REPORT_SCHEMA` (once written twice). `Situation` owns a content item's situating results.
     - A report holds nothing unowned: a key `compare()` adds must be added to `Report`.
     - Both documents came out byte for byte as before on a synthetic comparison, apart from its temporary paths.
+  - **6c, fixtures, replay and stores: done.**
+    - **`fixtures.open(path, mode)`** is the one way to open a `.sqlite`, a `.zip` or a folder:
+      - *read* writes nothing, not even last-use marks (a read-only connection)
+      - *replay* marks what it serves, for prune's guard; a zip is replayed from a temporary copy
+      - *record* creates a working `.sqlite` and refuses a zip
+
+      The CLI, the summary command, the controlled corpus and the tests use it. `prune` on a zip gets a message, where it once crashed.
+    - **`fixtures.Replayer`** owns the replay policy that was split between `llm.Client` and `Fixture`:
+      - which sample a request wants (the A/A control's fresh regions)
+      - what's replayed and what's asked again, by mode
+      - how an outcome is recorded
+      - the counts and the session log prune reads
+
+      `Client` keeps transport and its cache; it parses a recorded answer into its schema. `Fixture` is storage.
+    - **`Store.open(folder)`** opens a store to read only, with no folder, schema or writer's lock, and refuses writes. A reader no longer waits on a running extraction or stops one. The rounds, insights, post-mortem, query dumps, review sources and the query snapshot read through it.
+  - **6d, judgement files and one rating loop: done.**
+    - **`judgements` owns the verdict files:**
+      - `save()` writes a header with the rater and the rubric
+      - `load()` refuses to add to a file judged under another rubric
+      - `read()` gives each record its rubric
+      - `UnitVerdicts` refuses verdicts under more than one rubric
+
+      A mid-round rubric change was undetected before. Files from before 2026-10-02 have no rubric and are read as before.
+    - **`judgements.rate()`** is the one loop the three model raters share (judges, the review panel, query checkers), once written three times. Each rater turns its answers into its own records.
+    - People's spot-check answers are written through `save()` too.

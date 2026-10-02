@@ -63,6 +63,22 @@ def evidence(eid, task, region):
     return Evidence(id=eid, content='sha256:' + 'a' * 64 + '.pdf', entity='e', attribute='a', value='1', kind='text',
                     quote='q', confidence=1, locator=PdfLocator(page=1, bbox=(0, 0, 1, 1), region=region, task=task))
 
+
+class ReadOnly(unittest.TestCase):
+    def test_a_reader_neither_writes_nor_waits_on_a_writer(self):
+        import sqlite3
+        from semantic_pdf_diff.store import Store, StoreError
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d) / 'store'
+            with self.assertRaises(StoreError):
+                Store.open(folder)
+            self.assertFalse(folder.exists())  # nothing created
+            with Store(folder) as writer:  # the writer holds its lock...
+                with Store.open(folder) as reader:  # ...and a reader opens anyway
+                    self.assertEqual(reader.files(), [])
+                    with self.assertRaises(sqlite3.OperationalError):
+                        reader.set_reconcile(not reader.reconciles())
+
 class ReadingsInStore(unittest.TestCase):
     def test_the_store_reads_merged_readings_and_forgets_situating_when_that_changes(self):
         from semantic_pdf_diff.models import Claim, claim_id

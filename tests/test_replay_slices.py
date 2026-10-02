@@ -42,7 +42,7 @@ class ReplaySlices(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dir = tempfile.TemporaryDirectory()
-        with fixtures.Fixture(fixtures.unpack(FIXTURE, cls.dir.name)) as f:
+        with fixtures.open(FIXTURE, "read") as f:
             cls.summary = f.summary()
         from semantic_pdf_diff.provenance import content_id
         wanted = {content_id((SLICES / f'{n}.pdf').read_bytes(), f'{n}.pdf') for slices in RUNS.values() for n in slices}

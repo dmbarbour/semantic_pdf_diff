@@ -239,11 +239,11 @@ def folder_client(folder, settings, mode="replay-or-record", responder=None):
     Answers already recorded are served; the rest are asked (in replay mode: fail as unrecorded).
     responder: whose answers they are (default: the model's name), e.g. a model at another host."""
     from .fixtures import folder_fixture
-    fixture = folder_fixture(folder)
+    client = Client(settings, None, fixture=folder_fixture(folder), mode=mode, responder=responder)
     try:
-        yield Client(settings, None, fixture=fixture, mode=mode, responder=responder)
+        yield client
     finally:
-        fixture.close()
+        client.close()
 
 class Client:
     """Chat Completions client with a response cache.
@@ -254,16 +254,14 @@ class Client:
     """
     def __init__(self, settings: Settings, cache, api_key: str | None = None, fixture=None, mode="replay",
                  responder=None, fresh_regions=None):
-        """fixture: an open fixtures.Fixture. In `replay` mode answers come only from it and
-        unrecorded requests fail; in `replay-or-record` mode unrecorded requests (and recorded
-        failures) go to the model and are recorded under `responder` (default: the model name);
-        `record-new` is the same but replays the model's failures as failures (transient ones
-        are asked again)."""
+        """fixture: an open fixtures.Fixture, replayed under its policy (fixtures.Replayer: mode, responder,
+        fresh_regions). In `replay` mode answers come only from it and unrecorded requests fail; in
+        `replay-or-record` mode unrecorded requests (and recorded failures) go to the model and are recorded under
+        `responder` (default: the model name); `record-new` is the same but replays the model's failures as
+        failures (transient ones are asked again)."""
+        from .fixtures import Replayer
         self.s = settings
-        self.fixture, self.mode, self.responder = fixture, mode, responder or settings.model
-        # A/A control: extraction requests for these regions are answered afresh, as another sample
-        # of the same query, so a round can measure how much re-asking alone moves results.
-        self.fresh_regions = frozenset(fresh_regions or ())
+        self.replay = None if fixture is None else Replayer(fixture, mode, responder or settings.model, fresh_regions)
         self.store = None if cache is None or isinstance(cache, (str, Path)) else cache
         self.cache = Path(cache) if isinstance(cache, (str, Path)) else None
         if self.cache is not None:
@@ -341,10 +339,29 @@ class Client:
         return Request(raw, request_hash, key, schema, estimate + self.s.output_tokens, prompt, tuple(hashes),
                        query=query, description=describe(prompt, sizes, params, key))
 
-    def _sample(self, request):
-        """Which answer to a query this run wants: 0, or 1 for the A/A control's fresh regions."""
-        fresh = request.key and request.key[0] == "extract" and request.key[1] in self.fresh_regions
-        return 1 if fresh else 0
+    @property
+    def fixture(self):
+        return self.replay and self.replay.fixture
+
+    @property
+    def mode(self):
+        return self.replay.mode if self.replay else None
+
+    @property
+    def responder(self):
+        return self.replay.responder if self.replay else self.s.model
+
+    def close(self):
+        """Close the fixture, if any, logging this run's use of it."""
+        if self.replay is not None:
+            self.replay.close()
+
+    @staticmethod
+    def _recorded(text, schema):
+        try:
+            return schema.model_validate_json(text)
+        except ValueError as e:
+            raise ModelFailure(f"Recorded answer no longer fits {schema.__name__}: {e}") from e
 
     def cached(self, request):
         """The cached response, or None (main thread: the store is single-threaded).
@@ -354,26 +371,13 @@ class Client:
         what each task was asked (diagnostics; never used for lookup)."""
         if self.store is not None and request.key is not None:
             self.store.note_query(request.query, request.key, request.prompt, request.images)
-        if self.fixture is not None:
-            sample = self._sample(request)
-            row = self.fixture.answer(request.query, self.responder, sample)
-            if row is not None and request.key is not None:
-                self.fixture.note_recipe(request.query, request.key)
-            if row is not None and row[0] != "ok" and (self.mode == "replay"
-                                                        or self.mode == "record-new" and row[0] == "invalid"):
-                self.fixture.served += 1
-                raise ModelFailure(f"Recorded failure: {row[2]}")
-            if row is not None and row[0] == "ok":  # recorded failures in record modes fall through: asked again
-                try:
-                    value = request.schema.model_validate_json(row[1])
-                except ValueError as e:
-                    raise ModelFailure(f"Recorded answer no longer fits {request.schema.__name__}: {e}") from e
-                self.fixture.served += 1
-                return value
-            if self.mode == "replay" and row is None:
-                request.unrecorded = True
-                self.fixture.missing.append(list(request.key) if request.key else [request.query])
-            return None
+        if self.replay is not None:
+            kind, value = self.replay.lookup(request.query, request.key,
+                                             lambda text: self._recorded(text, request.schema))
+            if kind == "failure":
+                raise ModelFailure(f"Recorded failure: {value}")
+            request.unrecorded = kind == "unrecorded"
+            return value
         value = self._lookup(request)
         if value is not None:
             self.cache_hits += 1
@@ -391,10 +395,8 @@ class Client:
             self._record(request, "", f"{type(error).__name__}: {error}")
 
     def _record(self, request, answer, error):
-        if self.fixture is not None and self.mode != "replay":
-            outcome = "ok" if error is None else "transient" if transient(error) else "invalid"
-            self.fixture.record(request.query, self.responder, self._sample(request), outcome=outcome, answer=answer,
-                                error=error, usage=request.usage, description=request.description, recipe=request.key)
+        if self.replay is not None:
+            self.replay.record(request.query, request.key, answer, error, request.usage, request.description)
 
     def send(self, request):
         """Call the model, with retries (thread-safe; touches neither the cache nor the store)."""

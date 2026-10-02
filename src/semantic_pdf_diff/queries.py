@@ -78,7 +78,7 @@ def collect(runs_dir, role="extract"):
         assets = {}
         for path in sorted((folder / "assets").glob("*.png")) if (folder / "assets").exists() else ():
             assets.setdefault(hashlib.sha256(path.read_bytes()).hexdigest(), path)
-        with Store(folder) as store:
+        with Store.open(folder) as store:
             names = {f.content: Path(f.path).name for f in store.files()}
             for q in store.queries(role=None if role == "all" else role):
                 q.update(run=folder.name, document=names.get(q["content"], q["content"]),
@@ -171,33 +171,21 @@ def check_prompt(item):
 def check(folder, client, model, progress=None):
     """Ask one checker model about every query in a dump; merged into checks/<model>.json. Answers are
     cached in the dump folder, so a rerun (after a budget pause) pays only for what's missing."""
-    from .dispatch import Dispatcher
-    from .progress import NoProgress
+    from . import judgements
     from .review import reviewer_file
     folder = Path(folder)
-    progress = progress or NoProgress()
     target = folder / "checks" / f"{reviewer_file(model)}.json"
     checks = json.loads(target.read_text(encoding="utf-8"))["checks"] if target.exists() else {}
-    failures = []
-    with Dispatcher(client) as dispatch:
-        for item in items(folder):
-            if item["id"] in checks:
-                continue
-            def finish(value, error, item=item):
-                progress.finish("failed" if error else "complete")
-                if error is not None:
-                    failures.append(f"{item['id']}: {error}")
-                    return
-                ok = value.ok and not value.problems
-                checks[item["id"]] = {"ok": ok,
-                                      "problems": sorted({p.strip().lower() for p in value.problems} & set(PROBLEMS)),
-                                      "note": value.note.strip(),
-                                      # a changed query's problem is the change's unless the checker says otherwise
-                                      "in_change": None if ok or not item["diff"] else value.in_change is not False}
-            progress.add()
-            dispatch.submit(check_prompt(item), QueryCheck, [folder / i for i in item["images"]], ("check", item["id"]),
-                            finish)
-        dispatch.drain()
+    todo = {item["id"]: item for item in items(folder) if item["id"] not in checks}
+    answers, errors = judgements.rate(client, ((ident, check_prompt(item), QueryCheck, [folder / i for i in item["images"]],
+                                                ("check", ident)) for ident, item in todo.items()), progress)
+    failures = [f"{ident}: {error}" for ident, error in errors.items()]
+    for ident, value in answers.items():
+        ok = value.ok and not value.problems
+        checks[ident] = {"ok": ok, "problems": sorted({p.strip().lower() for p in value.problems} & set(PROBLEMS)),
+                         "note": value.note.strip(),
+                         # a changed query's problem is the change's unless the checker says otherwise
+                         "in_change": None if ok or not todo[ident]["diff"] else value.in_change is not False}
     target.parent.mkdir(exist_ok=True)
     target.write_text(json.dumps({"model": model, "checks": checks}, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     page(folder)

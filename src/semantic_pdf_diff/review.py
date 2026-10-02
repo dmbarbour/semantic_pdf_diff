@@ -76,7 +76,7 @@ class Source:
     def __init__(self, label, folder):
         from .store import Store
         self.label, self.folder = label, Path(folder)
-        self.store = Store(self.folder)
+        self.store = Store.open(self.folder)
         self.docs, self.names = {}, {}
         for f in self.store.files():
             self.names.setdefault(f.content, f"{f.source} / {f.path}")
@@ -646,33 +646,21 @@ def judge(folder, client, reviewer, limit=None, progress=None, stage="answers"):
     """Ask one model to review every item in a batch; writes labels/<reviewer>.json.
 
     Answers are recorded in the batch's replay fixture (fixtures.folder_fixture), so a rerun costs nothing."""
-    from .dispatch import Dispatcher
-    from .models import PanelLabel
-    from .progress import NoProgress
+    from . import judgements
+    from .models import PanelLabel, PanelQuestionLabel
     folder = Path(folder)
-    progress = progress or NoProgress()
-    from .models import PanelQuestionLabel
     batch = json.loads((folder / "batch.json").read_text(encoding="utf-8"))
     questions = stage == "questions"
     items = (question_items(batch) if questions else public_items(batch))[:limit]
-    labels, failures = {}, []
-    with Dispatcher(client) as dispatch:
-        for item in items:
-            def finish(value, error, item=item):
-                progress.finish("failed" if error else "complete")
-                if error is not None:
-                    failures.append(f"{item['id']}: {error}")
-                    return
-                answer = value.model_dump()
-                labels[item["id"]] = clean_question_label(item, answer) if questions else clean_label(item, answer)
-            progress.add()
-            if questions:
-                images = [folder / i["src"] for i in item["request"]["images"]]
-                dispatch.submit(question_prompt(item), PanelQuestionLabel, images, ("review", item["id"], stage), finish)
-            else:
-                dispatch.submit(judge_prompt(item), PanelLabel, [folder / i["src"] for i in item["images"]],
-                                ("review", item["id"], stage), finish)
-        dispatch.drain()
+    by_id = {item["id"]: item for item in items}
+    answers, errors = judgements.rate(client, (
+        (item["id"], question_prompt(item), PanelQuestionLabel, [folder / i["src"] for i in item["request"]["images"]],
+         ("review", item["id"], stage)) if questions else
+        (item["id"], judge_prompt(item), PanelLabel, [folder / i["src"] for i in item["images"]], ("review", item["id"], stage))
+        for item in items), progress)
+    failures = [f"{ident}: {error}" for ident, error in errors.items()]
+    labels = {ident: (clean_question_label if questions else clean_label)(by_id[ident], value.model_dump())
+              for ident, value in answers.items()}
     data = {"format": QUESTIONS_FORMAT if questions else FORMAT, "version": 1, "batch": batch["name"],
             "reviewer": reviewer, "created": now().strftime("%Y-%m-%d"),
             "labels": [labels[i["id"]] for i in items if i["id"] in labels]}

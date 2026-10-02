@@ -50,7 +50,7 @@ def take(target, fixture):
                     "--fixture-mode", "replay", "--base-url", "http://127.0.0.1:9/v1"] + ([] if whole else ["--no-situate"])
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                     cli.main(command)
-                with Store(out) as store:
+                with Store.open(out) as store:
                     for q in store.queries():
                         snapshot[f"{name}|{run}|{q['role']}|{q['content'][7:19]}|{q['task']}"] = q["hash"]
                 print(f"{name} {run}: {sum(1 for k in snapshot if k.startswith(f'{name}|{run}|'))} queries", flush=True)

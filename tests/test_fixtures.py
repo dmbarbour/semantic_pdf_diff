@@ -11,6 +11,65 @@ from test_concurrency import jittery_model, make_pdf
 
 UNREACHABLE = 'http://127.0.0.1:9/v1'  # replay must never call the model
 
+
+class OpenModes(unittest.TestCase):
+    """One way to open a fixture, for one use (code review 2026-10-01, A1)."""
+    def test_reading_writes_nothing_replaying_marks_use_and_recording_refuses_a_zip(self):
+        from semantic_pdf_diff import fixtures
+        with tempfile.TemporaryDirectory() as d:
+            working = Path(d) / 'answers.sqlite'
+            with fixtures.open(working, 'record') as f:
+                f.record('q1', 'm', outcome='ok', answer='{}')
+            before = working.read_bytes()
+            with fixtures.open(working, 'read') as f:
+                self.assertIsNotNone(f.answer('q1', 'm'))
+            self.assertEqual(working.read_bytes(), before)  # not even the last-use mark
+            with fixtures.open(working, 'replay') as f:
+                f.answer('q1', 'm')
+            with fixtures.open(working, 'read') as f:
+                self.assertIsNotNone(f.db.execute("SELECT used FROM response").fetchone()[0])
+            packed = Path(d) / 'answers.zip'
+            fixtures.pack(working, packed)
+            zipped = packed.read_bytes()
+            with fixtures.open(packed, 'replay') as f:  # from a temporary copy
+                self.assertIsNotNone(f.answer('q1', 'm'))
+            self.assertEqual(packed.read_bytes(), zipped)
+            with self.assertRaisesRegex(fixtures.FixtureError, 'record into a .sqlite'):
+                fixtures.open(packed, 'record')
+            with self.assertRaises(fixtures.FixtureError):
+                fixtures.open(Path(d) / 'missing.sqlite', 'replay')
+
+    def test_prune_refuses_a_zip_instead_of_crashing(self):
+        from semantic_pdf_diff import cli, fixtures
+        with tempfile.TemporaryDirectory() as d:
+            working = Path(d) / 'answers.sqlite'
+            with fixtures.open(working, 'record') as f:
+                f.record('q1', 'm', outcome='ok', answer='{}')
+            fixtures.pack(working, Path(d) / 'answers.zip')
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                code = cli.fixtures_command(['prune', str(Path(d) / 'answers.zip'), '--unused-since', '2000-01-01'])
+            self.assertEqual(code, 1)
+            self.assertIn('prune works on a .sqlite', err.getvalue())
+
+    def test_the_replay_policy_counts_what_it_serves(self):
+        from semantic_pdf_diff import fixtures
+        with tempfile.TemporaryDirectory() as d, fixtures.open(Path(d) / 'f.sqlite', 'record') as f:
+            f.record('ok', 'm', outcome='ok', answer='{"a": 1}')
+            f.record('bad', 'm', outcome='invalid', answer='', error='ValueError: bad JSON')
+            f.record('flaky', 'm', outcome='transient', answer='', error='TimeoutError: timed out')
+            replay = fixtures.Replayer(f, 'replay', 'm')
+            self.assertEqual(replay.lookup('ok', None, json.loads), ('answer', {'a': 1}))
+            self.assertEqual(replay.lookup('bad', None, json.loads), ('failure', 'ValueError: bad JSON'))
+            self.assertEqual(replay.lookup('new', ('extract', 'text'), json.loads), ('unrecorded', None))
+            self.assertEqual(replay.usage()['replayed'], 2)
+            self.assertEqual(replay.missing, [['extract', 'text']])
+            again = fixtures.Replayer(f, 'record-new', 'm')
+            self.assertEqual(again.lookup('bad', None, json.loads)[0], 'failure')  # the model's failure: replayed
+            self.assertEqual(again.lookup('flaky', None, json.loads)[0], 'ask')     # a timeout: asked again
+            self.assertEqual(fixtures.Replayer(f, 'replay-or-record', 'm').lookup('bad', None, json.loads)[0], 'ask')
+            fresh = fixtures.Replayer(f, 'replay', 'm', fresh_regions=['tile'])
+            self.assertEqual((fresh.sample(('extract', 'tile')), fresh.sample(('extract', 'text'))), (1, 0))
+
 class RecordAndReplay(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.TemporaryDirectory()

@@ -63,7 +63,7 @@ def collect(runs_dir, unit="family"):
     for folder in sorted(Path(runs_dir).iterdir()):
         if not (folder / "store.sqlite").exists():
             continue
-        with Store(folder) as store:
+        with Store.open(folder) as store:
             contents = sorted({f.content for f in store.files() if f.content.endswith(".pdf")})
             for content in contents:
                 for row in store.coverage(content):
@@ -106,7 +106,7 @@ def rotations(runs_dir):
     cache = {}
     def rotation(run, content, page):
         if (run, content) not in cache:
-            with Store(Path(runs_dir) / run) as store:
+            with Store.open(Path(runs_dir) / run) as store:
                 file = next(f for f in store.files() if f.content == content)
                 data = read_origin(store.origin(file.source, file.path))
             with pymupdf.open(stream=data, filetype="pdf") as doc:
@@ -281,7 +281,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
     hidden_unique = 0  # claims only one side has that a unit's sample leaves out (rubric v4 says there are none)
     for (run, content, page, family, *band), a, b in picked:
         if (run, content) not in docs:
-            with Store(Path(baseline_dir) / run) as store:
+            with Store.open(Path(baseline_dir) / run) as store:
                 file = next(f for f in store.files() if f.content == content)
                 docs[(run, content)] = read_origin(store.origin(file.source, file.path))
                 docs[(run, content, "sections")] = store.sections(content)
@@ -443,41 +443,36 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
     which used to hold every later chunk for another timeout; retry_failed asks such verdicts
     once more (run_round does, when a variant's judging ends): judgements.ask_again. They're
     counted in failures/<reviewer>.json (failures-<x>/ for verdicts-<x>/)."""
-    from .dispatch import Dispatcher
     from .models import PairVerdict
-    from .progress import NoProgress
     from .review import reviewer_file
     folder = Path(folder)
-    progress = progress or NoProgress()
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
     target = folder / verdicts_dir / f"{reviewer_file(reviewer)}.json"
-    verdicts = json.loads(target.read_text(encoding="utf-8"))["verdicts"] if target.exists() else {}
+    verdicts = judgements.load(target, rubric)
     failed_path = folder / judgements.failures_folder(verdicts_dir) / f"{reviewer_file(reviewer)}.json"
     failed = json.loads(failed_path.read_text(encoding="utf-8")) if failed_path.exists() else {}
-    failures = []
     included = {i["id"] for i in batch["items"][:limit]}
-    with Dispatcher(client) as dispatch:
+    shown = {}  # (unit, order): the claim sets as shown, for reading the answer back
+
+    def wanted():
         for item, order, prompt, images, a, b, groups in pair_requests(folder, batch, rubric):
             if item["id"] not in included or only is not None and item["id"] not in only:
                 continue
             attempts = failed.get(f"{item['id']}|{order}", 0)
             if order in verdicts.get(item["id"], {}) or not judgements.ask_again(attempts, retry_failed):
                 continue  # judged already, or failed and not (or no longer) retried
-            def finish(value, error, item=item, order=order, a=a, b=b, groups=groups):
-                progress.finish("failed" if error else "complete")
-                if error is not None:
-                    failures.append(f"{item['id']} {order}: {error}")
-                    failed[f"{item['id']}|{order}"] = failed.get(f"{item['id']}|{order}", 0) + 1
-                    return
-                failed.pop(f"{item['id']}|{order}", None)
-                verdicts.setdefault(item["id"], {})[order] = pair_verdict(rubric, value.model_dump(), order, a, b, groups)
-            progress.add()
-            dispatch.submit(prompt, PairVerdict, images, ("judge", item["id"], rubric, order), finish)
-        dispatch.drain()
+            shown[item["id"], order] = (a, b, groups)
+            yield (item["id"], order), prompt, PairVerdict, images, ("judge", item["id"], rubric, order)
+
+    answers, errors = judgements.rate(client, wanted(), progress)
+    failures = [f"{unit} {order}: {error}" for (unit, order), error in errors.items()]
+    for unit, order in errors:
+        failed[f"{unit}|{order}"] = failed.get(f"{unit}|{order}", 0) + 1
+    for (unit, order), value in answers.items():
+        failed.pop(f"{unit}|{order}", None)
+        verdicts.setdefault(unit, {})[order] = pair_verdict(rubric, value.model_dump(), order, *shown[unit, order])
     if verdicts:
-        target.parent.mkdir(exist_ok=True)
-        target.write_text(json.dumps({"reviewer": reviewer, "verdicts": verdicts}, indent=2, ensure_ascii=False) + "\n",
-                          encoding="utf-8")
+        judgements.save(target, reviewer, verdicts, rubric)
     if failed or failed_path.exists():
         failed_path.parent.mkdir(exist_ok=True)
         failed_path.write_text(json.dumps(failed, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -515,7 +510,7 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
         if not task or not task.startswith(("text", "table")):
             return None
         if (side_dir, run, content) not in sources:
-            with Store(Path(side_dir) / run) as store:
+            with Store.open(Path(side_dir) / run) as store:
                 sources[(side_dir, run, content)] = {q["task"]: q["prompt"] for q in store.queries(content=content,
                                                                                                     role="extract")}
         prompt = sources[(side_dir, run, content)].get(task)
@@ -541,7 +536,7 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
                                   if (text := source(side_dir, run, content, c.get("_task")))}
                            for side, side_dir in (("baseline", baseline_dir), ("variant", variant_dir))}
         if (run, content) not in docs:
-            with Store(Path(baseline_dir) / run) as store:
+            with Store.open(Path(baseline_dir) / run) as store:
                 file = next(f for f in store.files() if f.content == content)
                 docs[(run, content)] = read_origin(store.origin(file.source, file.path))
         with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
@@ -640,10 +635,8 @@ def import_spotcheck(folder, answers_file):
                                      "baseline_problems": a.get(f"{'a' if first == 'baseline' else 'b'}_problems", []),
                                      "variant_problems": a.get(f"{'a' if first == 'variant' else 'b'}_problems", []),
                                      "note": a.get("note", ""), "remarks": a.get("note", ""), "claims": marks}}
-    target = folder / "verdicts-human" / f"{reviewer_file(data['reviewer'])}.json"
-    target.parent.mkdir(exist_ok=True)
-    target.write_text(json.dumps({"reviewer": data["reviewer"], "verdicts": verdicts}, indent=2, ensure_ascii=False) + "\n")
-    return target
+    return judgements.save(folder / judgements.HUMAN / f"{reviewer_file(data['reviewer'])}.json", data["reviewer"],
+                           verdicts)
 
 def _judge_claim_marks(folder, verdicts_dir="verdicts"):
     """{(unit, side, index): mark} from judges who marked claims (rubric v5 on); a claim marked
@@ -865,7 +858,7 @@ def gains(baseline_dir, variant_dir, fixture=None):
             return None
         queries = set()
         for folder in (p for p in Path(runs_dir).iterdir() if (p / "store.sqlite").exists()):
-            with Store(folder) as store:
+            with Store.open(folder) as store:
                 queries |= {q["hash"] for q in store.queries()}
         db = sqlite3.connect(f"file:{fixture}?mode=ro", uri=True)
         total = 0
@@ -895,7 +888,7 @@ def mechanical(runs_dir):
     for folder in sorted(Path(runs_dir).iterdir()):
         if not (folder / "store.sqlite").exists():
             continue
-        with Store(folder) as store:
+        with Store.open(folder) as store:
             for content in sorted({f.content for f in store.files() if f.content.endswith(".pdf")}):
                 for row in store.coverage(content):
                     family = FAMILY.get(row["task"].split(":")[0])

@@ -112,6 +112,29 @@ class OneScore(unittest.TestCase):
         self.assertEqual((v.score("u2"), v.flipped("u2"), v.disagree("u2")), (0.375, [], True))  # 0.75 against 0.0
         self.assertIsNone(v.score("u3"))
 
+class Files(unittest.TestCase):
+    """Judgement files carry their rubric, and one loop rates for every model rater (code review 2026-10-01, A1)."""
+    def test_a_file_judged_under_one_rubric_refuses_another(self):
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            (folder / "pairs.json").write_text(json.dumps({"items": ITEMS}))
+            target, _, _ = rounds.judge_pairs(folder, Judge(), "judge-a", rubric="v5")
+            self.assertEqual(json.loads(target.read_text())["rubric"], "v5")
+            self.assertEqual({r.rubric for r in judgements.read(folder)}, {"v5"})
+            with self.assertRaisesRegex(judgements.JudgementError, "judged under rubric v5, not v6"):
+                rounds.judge_pairs(folder, Judge(), "judge-a", rubric="v6")
+            other = folder / "verdicts" / "judge-b.json"
+            judgements.save(other, "judge-b", {ITEMS[0]["id"]: {"baseline-first": {"score": 1.0}}}, "v4")
+            with self.assertRaisesRegex(judgements.JudgementError, "more than one rubric"):
+                judgements.UnitVerdicts.read(folder)
+
+    def test_one_loop_rates_and_keeps_failures_apart(self):
+        from semantic_pdf_diff.models import PairVerdict
+        answers, errors = judgements.rate(Judge(failing={"u2"}), [
+            ("one", "A1. x\nB1. y", PairVerdict, [], ("judge", "u1")),
+            ("two", "A1. x", PairVerdict, [], ("judge", "u2"))])
+        self.assertEqual((list(answers), errors), (["one"], {"two": "timed out"}))
+
 class Raters(unittest.TestCase):
     def test_a_model_judge_rates_and_keeps_its_errors(self):
         with tempfile.TemporaryDirectory() as d:

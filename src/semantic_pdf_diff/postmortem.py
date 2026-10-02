@@ -87,7 +87,7 @@ def _unit_queries(runs_dir, item, side):
     if not tasks or not (folder / "store.sqlite").exists():
         return {}
     try:
-        with Store(folder) as store:
+        with Store.open(folder) as store:
             return {q["task"]: q["prompt"] for q in store.queries(content=item["content"]) if q["task"] in tasks}
     except Exception:  # a store from before the query log
         return {}

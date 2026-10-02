@@ -57,8 +57,7 @@ def main(argv=None):
         from semantic_pdf_diff import cli, ledger
         out = RUNS / ("replay" if args.replay else "recorded")
         if args.replay and not args.responder:  # the responder the fixture holds, whatever the environment says
-            import tempfile
-            with tempfile.TemporaryDirectory() as d, fixtures.Fixture(fixtures.unpack(PACKED, d)) as f:
+            with fixtures.open(PACKED, "read") as f:
                 held = [r for (r,) in f.db.execute("SELECT DISTINCT responder FROM response")]
             if len(held) != 1:
                 parser.error(f"the fixture holds {held}: name one with --responder")
