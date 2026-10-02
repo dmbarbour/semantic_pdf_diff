@@ -1,6 +1,6 @@
 # Comparing revisions: align items, then explain differences
 
-- **Status:** Planned (2026-10-02). The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9).
+- **Status:** Planned (2026-10-02). The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
 - **From:** [controlled documents](controlled-documents-2026-10-01.md) milestone 4, where every change was found but most "different" findings weren't changes.
 - **Depends on:**
   - controlled documents (revision pairs, exact comparison scoring)
@@ -39,6 +39,8 @@
 7. **No defaults to beat in early development.** On Claude's proposal to keep comparison levers opt-in until a real check, the owner: "For early development, we shouldn't consider any levers defaults like a null hypothesis; just try to get things vaguely somewhat working by eyeball and intuition (or your non-biological equivalent) before we scientifically pursue systematic improvements." (Measures; milestone 7.)
 8. **Held-out sets as a rolling window.** On Claude's proposal to retire a held-out series after three checks, the owner: "I think we could use something closer to a rolling window? No need to be too aggressive with retiring tests, so long as the collection is just barely big and mobile enough that specializing/overfitting to them is infeasible or impractical." (Design item 5.)
 9. **Proposals mode deferred, not for long.** The owner: "Let's defer proposals comparison mode for a little bit longer, but it is an important use case that we shouldn't defer too much longer, so we should seek opportunities where it begins to make sense to pursue it." (Openings for proposals mode.)
+10. **No alignment on a slim margin.** The owner: "if we have a lot of high-confidence counterparts they should also be considered unaligned without model support; this shouldn't be a `0.51 vs. 0.49` decision, for example, or whatever our scoring equivalent turns out to be in context of the noise floor (match `0.81 vs. 0.80`)." (Design items 1 and 2.)
+11. **Splits and merges, with one-to-one favoured, not assumed.** The owner: "we could consider splitting/merging to be another viable relationship (and knob to test), so I wouldn't strongly assume 1:1 correspondences or alignments, just favor it heuristically, e.g. two resistors in series could be combined, or one could be split, as a trivial example. Not sure how to approach that, though." (Design items 1, 3 and 7.)
 
 ## Design
 
@@ -53,7 +55,17 @@ The mechanisms below are Claude's, built on the owner's multi-pass idea and deci
   - A value printed once in each revision (a number with its unit, a date, a length) ties the claims holding it.
   - A value that repeats within a revision is a weak anchor (decision 2).
   - Most facts don't change between revisions (198 of 220 on the controlled pairs), so most items share most of their values. Diff tools anchor on unique unchanged lines the same way.
-- **Each item gets at most one counterpart,** most confident first. Pairs below a confidence floor stay unaligned.
+- **One counterpart is favoured, not assumed** (decision 11): most confident first, an item whose counterpart is settled is less likely to take another. Pairs below a confidence floor stay unaligned.
+- **No alignment on a slim margin** (decision 10): when an item's best counterpart isn't clearly ahead of its next, it's ambiguous, however confident both are.
+  - "Clearly" is set against the scores' noise floor, measured on the controlled pairs, not fixed in advance.
+  - Claude's reading: an ambiguous item isn't aligned mechanically. The judge decides it, as it decides the middle band; without a judge's support it stays unaligned.
+  - Prior art: Lowe's ratio test in image feature matching accepts a match only when the best is clearly better than the second best.
+- **Splits and merges** (decision 11). Claude's proposed approach, cheapest signals first:
+  - **anchors divided:** one item's unchanged values found in two items of the other revision, little overlapping, suggest a split; the reverse, a merge
+  - **names related:** a shared tag stem (`P-101` → `P-101A` and `P-101B`), "A/B", "1 and 2", "divided", "combined"
+  - **values that add up:** a leftover value equal to the sum of two others of one attribute and unit (two resistors in series; a room divided, its areas summing), tried only on leftovers, two or three terms at a time
+  - **structure:** the new items where the old one was (the same table, rows or rooms side by side)
+  - A candidate split or merge goes to the "why different" pass (design item 3) to confirm. The report then needs a finding with several members, a change to its schema decided in that milestone.
 - **Within an aligned item:** claims are paired by attribute. Leftover values of one attribute are a candidate change (room 102's two widths, once its depth anchors the room).
 - **Unaligned items:**
   - one only in the later revision is added; one only in the earlier is removed
@@ -77,14 +89,16 @@ The mechanisms below are Claude's, built on the owner's multi-pass idea and deci
 - **Combining them:**
   - **Prior art to research:**
     - **probabilistic record linkage:** Fellegi and Sunter weigh each field's agreement by how likely it is among true matches against non-matches, with two thresholds: match, possible match, non-match
+    - **the margin between candidates:** Lowe's ratio test (decision 10), and how linkage handles one record matching several
+    - **one-to-many matching:** splits and merges in record linkage and in schema matching (decision 11)
     - **blocking:** cheap keys (a tag, an attribute word, a value bucket) so all pairs are never scored
     - **sequence alignment and diff algorithms:** reading order
     - **schema and ontology matching:** attributes named differently
   - **Weights from the controlled pairs:** their exact labels can set the weights, with other pairs held back to check them.
-  - **Two thresholds:**
-    - above the upper, matched, and equal values settled as equivalent without a model
+  - **Two thresholds and a margin:**
+    - above the upper, and clearly ahead of the next candidate, matched, with equal values settled as equivalent without a model
     - below the lower, not compared
-    - between, the judge decides
+    - between, or above but not clearly ahead (decision 10), the judge decides
 - **The risk:** a condition or scope changed in words the claims don't carry. The knob "conditions changed, value kept" shows it.
 
 **3. Explaining differences ("why different").**
@@ -99,7 +113,7 @@ The mechanisms below are Claude's, built on the owner's multi-pass idea and deci
   - a superseded value printed beside the new one
   - an alternative or option, not the same item
   - a misreading: the value read again from each crop
-- **The output is the difference's kind:** a change, a renaming, a move, a restatement, a misreading, not the same item, or other conditions. The report groups differences by kind.
+- **The output is the difference's kind:** a change, a renaming, a move, a restatement, a split or merge, a misreading, not the same item, or other conditions. The report groups differences by kind.
 - **Scored exactly:** each revision edit records its kind in the key, so "why" is scored as well as "whether".
 
 **4. Identity at extraction (the owner's "near-tacit entities").**
@@ -151,6 +165,9 @@ The mechanisms below are Claude's, built on the owner's multi-pass idea and deci
 - fungible items: many repeated values (door sizes)
 - a table split in two
 - an item replaced wholesale: the same tag, every value changed (decision 1's case)
+- an item split (decision 11): a pump replaced by two smaller ones whose capacities sum to its own; a meeting room divided by a new wall, the two areas summing to about the old one
+- items merged (decision 11): two rooms joined by removing a wall; two valves replaced by one
+- near-ties: several items alike enough that alignment is ambiguous (decision 10)
 
 ## Milestones
 
@@ -178,6 +195,8 @@ The mechanisms below are Claude's, built on the owner's multi-pass idea and deci
   - additions and removals found
   - unchanged facts confirmed
   - false changes
+  - splits and merges recognised
+  - items left ambiguous by the margin, and how the judge decided them
   - the share of "different" findings that are changes
   - with milestone 4, the kinds named right
   - pairs sent to the judge, pairs settled without one, and cost
