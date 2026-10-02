@@ -149,3 +149,20 @@ The meta-audit's lever registry: declarations in one table, code unchanged.
 
 - **Scope beyond extraction.** Situating, comparison and judging have prompt choices too (rubric clauses are string-replace chains; review, A1). Should the same lever model cover them, so a genetic programme can search a whole pipeline's configuration, or only extraction?
 - **Interactions.** For genetic programming, should levers declare conflicts and dependencies from the start, or only when the search needs them?
+
+## The owner's direction (2026-10-02), and a prototype
+
+**The owner:**
+- "I'd be surprised if Python's ample metaprogramming facilities didn't enable tuning an inheritance list from a settings file. Putting every concern into one base class would be troublesome, but having one platform/container class for the instantiated configuration (instead of global state) would be relatively conventional OO. Order of classes would impact order of prompt text, but that's a permutation we can choose to exercise or not. In any case, condition-based composition isn't very robust or extensible, so I'd prefer mixins if the transition is viable. We could always start it as mixins that merely modify a set of configuration options, if that's the best we can easily do."
+- On the two questions: "yes use same lever model for all parts of the pipeline, and levers could have a simple common way to express their assumptions (e.g. as a small test to run after all mixins are applied) enabling detection of conflicts based on the final type instead of an intermediate type."
+
+**A throwaway prototype (Claude's, not project code) confirms the mechanics:**
+- **Composition from data:** a configuration's ordered lever names are composed into a class with `type()`.
+- **One settings model:** each lever is a pydantic model with its own fields and hooks, so the composed class merges every lever's settings into one validated model. A setting whose lever isn't in the configuration is rejected.
+- **Order is prompt order:** hooks chain through `super()`, and reordering the list reorders the prompt's lines.
+- **Assumptions on the final type:** each lever's assumptions, collected from the final type's method resolution order and run once each, caught a conflict (bands with tile growing).
+- **Store binding:** the configuration hashes as data: ordered names plus settings.
+
+**Claude's earlier objections, revised:**
+- **"Configurations become classes, awkward to serialise":** wrong framing. The configuration is the data; the class is derived from it and cached.
+- **Byte order:** stays a real constraint, met by a canonical order for named configurations; permutations are an experiment's explicit choice, as the owner says.
