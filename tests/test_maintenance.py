@@ -103,5 +103,23 @@ class Maintenance(unittest.TestCase):
         self.assertIn('no comparison 99', err)
         self.assertEqual(self.cli('show', 'sources', '--store', self.root / 'nowhere')[0], 1)
 
+class LedgerRotation(unittest.TestCase):
+    """The ledger rotates by month between rounds (architecture clean-up, milestone 9): spend checks read the live file
+    only, and a full accounting reads the archives too."""
+    def test_older_months_move_out_and_the_total_stays(self):
+        from semantic_pdf_diff import ledger
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "ledger.jsonl"
+            for when, cost, round_ in (("2026-08-30T10:00:00+00:00", 1.0, "r00"), ("2026-09-15T10:00:00+00:00", 2.0, "r01"),
+                                       ("2026-10-01T09:00:00+00:00", 4.0, "r10")):
+                path.open("a").write(json.dumps({"time": when, "cost": cost, "round": round_}) + "\n")
+            self.assertEqual(ledger.rotate(path, "2026-10-01"), 2)
+            self.assertEqual(sorted(p.name for p in Path(d).iterdir()),
+                             ["ledger-2026-08.jsonl", "ledger-2026-09.jsonl", "ledger.jsonl"])
+            self.assertEqual(ledger.spent(path), 4.0)                    # what a cap reads
+            self.assertEqual(ledger.spent(path, archives=True), 7.0)     # nothing lost
+            self.assertEqual(ledger.spent(path, archives=True, round="r01"), 2.0)
+            self.assertEqual(ledger.rotate(path, "2026-10-01"), 0)       # again: nothing more to move
+
 if __name__ == '__main__':
     unittest.main()

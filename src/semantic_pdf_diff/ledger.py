@@ -19,11 +19,28 @@ def _append(path, record):
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
 
-def read(path):
+def read(path, archives=False):
+    """A ledger's records; with archives, its rotated months' first (see rotate)."""
     path = Path(path)
-    if not path.exists():
-        return []
-    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    paths = (sorted(path.parent.glob(f"{path.stem}-????-??{path.suffix}")) if archives else []) + [path]
+    return [json.loads(line) for p in paths if p.exists() for line in p.read_text(encoding="utf-8").splitlines()
+            if line.strip()]
+
+def rotate(path, before):
+    """Move records older than `before` (an ISO time) into monthly archives beside the ledger (ledger-2026-09.jsonl):
+    spend checks read only the live file, which once held 32,000 records re-read on every check (code review
+    2026-10-01). Rotate between rounds: a round's cap counts what the live file holds. Returns the records moved."""
+    path = Path(path)
+    keep, moved = [], {}
+    for line in (path.read_text(encoding="utf-8").splitlines() if path.exists() else ()):
+        if line.strip():
+            when = json.loads(line).get("time", "")
+            (moved.setdefault(when[:7], []) if when and when < before else keep).append(line)
+    for month, lines in sorted(moved.items()):
+        with path.with_name(f"{path.stem}-{month}{path.suffix}").open("a", encoding="utf-8") as f:
+            f.write("".join(line + "\n" for line in lines))
+    path.write_text("".join(line + "\n" for line in keep), encoding="utf-8")
+    return sum(len(v) for v in moved.values())
 
 class Ledger:
     """Appends one line per model response: time, model, tokens, reported cost, and tags."""
@@ -44,13 +61,14 @@ class Ledger:
         with self.lock:
             _append(self.path, record)
 
-def unpriced(path, **match):
+def unpriced(path, archives=False, **match):
     """How many ledger records matching the given tags came without a reported cost."""
-    return sum(1 for r in read(path) if r.get("unpriced") and all(r.get(k) == v for k, v in match.items()))
+    return sum(1 for r in read(path, archives) if r.get("unpriced") and all(r.get(k) == v for k, v in match.items()))
 
-def spent(path, **match):
-    """Total reported cost of ledger records matching the given tags (unpriced ones count 0: see unpriced)."""
-    return round(sum(r.get("cost", 0.0) for r in read(path) if all(r.get(k) == v for k, v in match.items())), 6)
+def spent(path, archives=False, **match):
+    """Total reported cost of ledger records matching the given tags (unpriced ones count 0: see unpriced); with
+    archives, the rotated months' too (a full accounting rather than a cap's)."""
+    return round(sum(r.get("cost", 0.0) for r in read(path, archives) if all(r.get(k) == v for k, v in match.items())), 6)
 
 def figure(path, *, metric, value, **fields):
     """Record one measured figure (a metric's value with its context) in a history file."""

@@ -1,6 +1,6 @@
 # Limits and engineering review (v0.2.0)
 
-- This is a runnable baseline, not a validated engineering sign-off system. No real VLM was available during development; evaluate against labeled representative PDFs before relying on findings. Measuring accuracy is planned in [plans/evaluation-benchmarks-2026-09-23.md](plans/evaluation-benchmarks-2026-09-23.md).
+- This is not a validated engineering sign-off system. Extraction has been measured with one real model (gemma-4-31B) on public sample documents and on controlled documents with known facts (the lab, `lab/`), not on labeled representative proposals. Evaluate against yours before relying on findings.
 - Small models may misread dense diagrams, arrow direction, legends, log axes and merged table headers. Overview context can help but does not solve arbitrary cross-page relationships. No local OCR engine, engineering solver, graph-isomorphism engine or full table reconstruction is included.
 - Table extraction treats the first row as a provisional header; repeated/multilevel headers and continued tables need review. Tiling may separate legends or labels; partial findings remain visible.
 - Sparse retrieval can miss semantic equivalents with no shared terms. Domain aliases help; candidate recall is not guaranteed. Increase `top_k` / lower `min_score` for recall, and inspect unmatched evidence. Very generic claims can make retrieval expensive.

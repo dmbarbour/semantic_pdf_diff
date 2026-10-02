@@ -20,3 +20,7 @@ benchmarks/eyetest/images/
 benchmarks/pagetest/images/
 benchmarks/spotchecks/*/spotcheck.html
 benchmarks/spotchecks/*/sources/
+# Development rounds' crops and page text: the documents' content, made again from the public slices when needed
+# (the owner, 2026-10-02; scripts/rerender_rounds.py)
+benchmarks/rounds/*/pairs-*/images/
+benchmarks/rounds/*/pairs-*/pages.json

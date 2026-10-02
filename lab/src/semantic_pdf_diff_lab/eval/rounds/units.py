@@ -252,6 +252,30 @@ def _lead(doc, page, region, cache, key):
     before = " ".join(" ".join(above).split())[-LEAD:]
     return before, " > ".join(context.stem_path(page, tuple(region)))
 
+# A batch's page text (what judges and people read beside each crop) is the document's content, so like its images
+# it isn't committed (the owner, 2026-10-02): pairs.json holds the rest, and PAGES (git-ignored) the text, restored
+# from the public slices by rerender.
+PAGES = "pages.json"
+PAGE_FIELDS = ("page_text", "page_text_full")
+
+def save_batch(folder, batch):
+    """pairs.json without page text, and the text in PAGES beside it."""
+    folder = Path(folder)
+    pages = {i["id"]: {k: i[k] for k in PAGE_FIELDS if k in i} for i in batch["items"]}
+    lean = {**batch, "items": [{k: v for k, v in i.items() if k not in PAGE_FIELDS} for i in batch["items"]]}
+    (folder / "pairs.json").write_text(json.dumps(lean, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (folder / PAGES).write_text(json.dumps(pages, indent=0, ensure_ascii=False) + "\n", encoding="utf-8")
+
+def load_batch(folder):
+    """pairs.json with its page text merged back in, where PAGES holds it."""
+    folder = Path(folder)
+    batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
+    if (folder / PAGES).exists():
+        pages = json.loads((folder / PAGES).read_text(encoding="utf-8"))
+        for item in batch["items"]:
+            item.update(pages.get(item["id"], {}))
+    return batch
+
 def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", limit=MAX_CLAIMS, documents=None):
     """Write a pairwise batch: pairs.json (with which side is the baseline) and page images.
 
@@ -285,7 +309,9 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
         with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
             part, parts, y0, y1 = band[0] if band else (0, 1, None, None)
             region = band_region(doc[page - 1], band[0]) if band else None
-            name = f"{run}-{content.split(':')[1][:8]}-p{page}" + (f"-b{part}of{parts}" if band else "") + ".jpg"
+            # a band's crop is its own: a text and a visual unit cut into bands of the same number once shared one, so
+            # one of them was judged on the other's crop (rounds 9, 9b and 9h; found 2026-10-02)
+            name = f"{run}-{content.split(':')[1][:8]}-p{page}" + (f"-{family}-b{part}of{parts}" if band else "") + ".jpg"
             if not (folder / "images" / name).exists():  # a band is shown as its own crop, at full size
                 (folder / "images" / name).write_bytes(render(doc, page, region, None, 1400))
             text = doc[page - 1].get_text("text", clip=region)[:PAGE_TEXT]
@@ -307,7 +333,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
     batch = {"format": "semantic-pdf-diff-pairwise-batch", "version": 1, "baseline": str(baseline_dir),
              "variant": str(variant_dir), "seed": seed, "unit_claims": UNIT_CLAIMS, "bands": BANDS, "units": counts,
              "items": items}
-    (folder / "pairs.json").write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    save_batch(folder, batch)
     return batch
 
 def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, unit="family"):
@@ -323,7 +349,7 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
     from semantic_pdf_diff.scan import read_origin
     from semantic_pdf_diff.store import Store
     folder = Path(folder)
-    batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
+    batch = load_batch(folder)
     if batch.get("unit_claims") != UNIT_CLAIMS:  # units recomputed another way wouldn't match the batch's
         raise ValueError(f"{folder}'s units were built by an earlier collect ({batch.get('unit_claims', 'merged wording')}); "
                          "rebuild the batch to add context")
@@ -372,5 +398,48 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
             (folder / name).write_bytes(render(doc, page, None, region, 1400))
             item["page_image"] = name
             item["page_text_full"] = doc[page - 1].get_text("text")[:PAGE_TEXT]
-    (folder / "pairs.json").write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    save_batch(folder, batch)
     return batch
+
+def rerender(folder, slices, target=None):
+    """A batch's images and page text made again from the PDFs its runs read (`slices`: a folder of them, the public
+    slices): the images into `target` (default: the batch's own images folder, and then the text into PAGES), what
+    build_batch and add_context wrote, byte for byte under the same PyMuPDF. Development rounds' images aren't committed (the owner, 2026-10-02: "we should not be
+    committing images ... for development rounds"); this brings them back. Returns the image names written."""
+    import pymupdf
+    from semantic_pdf_diff.pages import native_page
+    from semantic_pdf_diff.provenance import content_id
+    from ..review import render
+    folder = Path(folder)
+    target = Path(target) if target else folder / "images"
+    target.mkdir(parents=True, exist_ok=True)
+    batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
+    pdfs = {content_id(p.read_bytes(), p.name): p for p in sorted(Path(slices).glob("*.pdf"))}
+    written, pages = [], {}
+    for item in batch["items"]:
+        source = pdfs.get(item["content"])
+        if source is None:
+            raise FileNotFoundError(f"{item['content']} ({item['run']}): not among {slices}'s PDFs")
+        with pymupdf.open(source) as doc:
+            page = doc[item["page"] - 1]
+            band = item.get("band")
+            if band and batch.get("bands") == BANDS:
+                region = band_region(page, band)
+            elif band:  # cut by unrotated y, before 2026-10-02
+                whole = native_page(page)
+                region = pymupdf.Rect(whole.x0, max(whole.y0, band[2] - 12), whole.x1, min(whole.y1, band[3] + 12))
+            else:
+                region = None
+            pages[item["id"]] = {"page_text": page.get_text("text", clip=region)[:PAGE_TEXT],
+                                 **({"page_text_full": page.get_text("text")[:PAGE_TEXT]} if item.get("page_image") else {})}
+            name = Path(item["image"]).name
+            if name not in written:  # as build_batch did: the first unit to name an image renders it
+                (target / name).write_bytes(render(doc, item["page"], region, None, 1400))
+                written.append(name)
+            page_name = Path(item.get("page_image") or "").name
+            if page_name and page_name not in written:
+                (target / page_name).write_bytes(render(doc, item["page"], None, region, 1400))
+                written.append(page_name)
+    if target == folder / "images":
+        (folder / PAGES).write_text(json.dumps(pages, indent=0, ensure_ascii=False) + "\n", encoding="utf-8")
+    return written

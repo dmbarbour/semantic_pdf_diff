@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .. import judgements
 from ..rubrics import CLAIM_MARKS, CLAIM_PROBLEMS, PAIRWISE, PAIR_PROBLEMS, rubric as rubric_of
-from .units import _ident
+from .units import _ident, load_batch
 from .judging import _set_note
 from .decisions import interval, region, unit_scores
 
@@ -24,7 +24,7 @@ def write_spotcheck(folder, seed=3):
     """spotcheck.html: a batch's units for a person, blind (each unit's sets shown as A and B in
     a random order, recorded in spotcheck-order.json beside it), with the judges' questions."""
     folder = Path(folder)
-    batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
+    batch = load_batch(folder)
     rng = random.Random(seed)
     order, items = {}, []
     def public(item, claims, side, other):

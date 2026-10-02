@@ -1,6 +1,11 @@
 # Validation
 
-One hundred and twenty-three automated tests passed on Python 3.12 with PyMuPDF 1.28.2, Pydantic 2.13.5, tqdm 4.70.1 and openpyxl 3.1.5. The one hundred and nineteen core tests also passed on Python 3.10 with the minimum supported PyMuPDF 1.24.3, Pydantic 2.7.0 and tqdm 4.60.0; the four synthetic-spreadsheet tests need the `dev` extra and are skipped without it.
+**2026-10-02:** 360 automated tests passed on Python 3.10.21 with PyMuPDF 1.28.2, Pydantic 2.13.5 and tqdm 4.70.1, with the lab installed beside the product (`pip install -e '.[dev]' -e lab`).
+
+- Some tests need git-ignored local files and skip without them: the fetched sample slices, the master answers fixture, and rounds' crops and page text (made again from the slices).
+- The minimum-version run hasn't been repeated since v0.2.0.
+
+**v0.2.0:** 123 tests passed on Python 3.12 with PyMuPDF 1.28.2, Pydantic 2.13.5, tqdm 4.70.1 and openpyxl 3.1.5. The 119 core tests also passed on Python 3.10 with the minimum supported PyMuPDF 1.24.3, Pydantic 2.7.0 and tqdm 4.60.0.
 
 The end-to-end test creates temporary PDFs, sends native text and rendered images to a local HTTP stub, generates HTML/JSON, and reruns with zero additional HTTP calls because of caching. Other tests cover retrieval across modalities, many-to-one candidates, unit conversions, uncertainty gates, byte budgets, malformed/truncated responses, call limits, visual refinement, quote rejection and escaped report content.
 

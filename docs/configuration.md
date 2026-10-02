@@ -35,6 +35,71 @@ Settings are in `config.example.json`; all omitted settings have defaults in `mo
 - **Levers** are the settings that shape how documents are read (context lines, tiling, quote matching and so on). Each is a mixin in `levers.py` that declares its settings, the stores' bindings it is part of, and the regions a change clears. A settings file may name its levers in order (`"levers": [...]`); without, the default order. `benchmarks/round0.json` and `benchmarks/champion.json` name theirs. A lever left out asks exactly what it asks switched off; a lever's place orders its lines among others' (context lines, for one).
 - **A store binds every setting that shapes its results,** resolved, and the levers' order. A store made before 2026-10-02 bound only levers changed from the defaults of its day, so it asks for `--reset` once; recorded answers replay.
 
+
+### Every setting
+
+Generated from the settings' declarations (`levers.settings_table`); `tests/test_settings.py` checks it's current. *Class:* endpoint settings never change what's asked; shaping ones change queries' content; selecting ones, which queries are made; post ones, only what's done with answers. *Bound by:* the stores' bindings it is part of (a change asks for `--reset`). *Regions:* the extraction regions a change clears.
+
+<!-- settings table: generated, do not edit -->
+| Setting | Default | Class | Lever | Bound by | Regions |
+|---|---|---|---|---|---|
+| `model` | `"gemma-4"` | endpoint |  | extract, triage, compare | all |
+| `base_url` | `"http://localhost:8000/v1"` | endpoint |  | - | - |
+| `max_calls` | `100000` | endpoint |  | - | - |
+| `max_cost` | `null` | endpoint |  | - | - |
+| `retries` | `2` | endpoint |  | - | - |
+| `timeout` | `120` | endpoint |  | - | - |
+| `stream` | `true` | endpoint |  | - | - |
+| `concurrency` | `4` | endpoint |  | - | - |
+| `heartbeat_seconds` | `30.0` | endpoint |  | - | - |
+| `rate_limits` | `[]` | endpoint |  | - | - |
+| `context_tokens` | `32768` | shaping |  | extract, triage | all |
+| `output_tokens` | `4000` | shaping |  | extract, triage, compare | all |
+| `claims_per_request` | `20` | shaping |  | extract | all |
+| `image_tokens` | `1200` | shaping |  | extract, triage | all |
+| `safety_tokens` | `400` | shaping |  | extract, triage | all |
+| `text_bytes` | `1800` | shaping |  | extract | table, text |
+| `image_side` | `1000` | shaping |  | extract, triage | figure, overview, tile, vision |
+| `tile_points` | `420` | selecting |  | extract | figure, overview, tile, vision |
+| `refinement_depth` | `1` | selecting |  | extract | all |
+| `section_depth` | `2` | shaping |  | extract | all |
+| `section_pages` | `20` | shaping |  | extract | all |
+| `top_k` | `4` | selecting |  | compare | - |
+| `min_score` | `0.1` | selecting |  | compare | - |
+| `max_pairs` | `1000` | selecting |  | compare | - |
+| `vision` | `true` | selecting |  | extract | figure, overview, tile, vision |
+| `situate` | `true` | selecting |  | - | - |
+| `response_format` | `"none"` | shaping |  | extract, triage, compare | all |
+| `seed` | `null` | shaping |  | extract, triage, compare | all |
+| `max_token_field` | `"max_tokens"` | shaping |  | extract, triage, compare | all |
+| `aliases` | `{}` | selecting |  | compare | - |
+| `rescan` | `"auto"` | selecting |  | - | - |
+| `max_zip_depth` | `8` | selecting |  | - | - |
+| `max_source_bytes` | `53687091200` | selecting |  | - | - |
+| `zip_ratio_limit` | `1000.0` | selecting |  | - | - |
+| `zip_ratio_min_bytes` | `104857600` | selecting |  | - | - |
+| `extract_prompt` | `null` | shaping | extract_prompt | extract | all |
+| `extract_rules` | `[]` | shaping | extract_rules | extract | all |
+| `visual_rules` | `[]` | shaping | visual_rules | extract | figure, overview, tile, vision |
+| `context_before` | `400` | shaping | neighbours | extract | table, text |
+| `context_after` | `400` | shaping | neighbours | extract | table, text |
+| `table_context` | `400` | shaping | table_context | extract | table |
+| `stem_context` | `true` | shaping | stem_context | extract | table, text |
+| `references` | `false` | shaping | references | extract | table, text |
+| `tile_locator` | `false` | shaping | tile_locator | extract | figure, overview, tile, vision |
+| `tiling` | `"bands"` | selecting | tiling | extract | figure, overview, tile, vision |
+| `grow_tiles` | `true` | shaping | grow_tiles | extract | figure, overview, tile, vision |
+| `sheet_details` | `false` | selecting | sheet_details | extract | figure, overview, tile, vision |
+| `skip_empty` | `true` | selecting | skip_empty | extract | figure, overview, tile, vision |
+| `figure_tasks` | `true` | selecting | figure_tasks | extract | figure |
+| `visual_text_layer` | `1500` | shaping | visual_text_layer | extract | figure, overview, tile, vision |
+| `table_filter` | `false` | selecting | table_filter | extract | table, table-detection |
+| `quote_match` | `"fragments"` | post | quote_match | extract | table, text |
+| `reconcile` | `true` | post | reconcile | - | - |
+| `dedupe_repeated` | `true` | shaping | dedupe_repeated | extract | all |
+| `verify_visuals` | `true` | selecting | verify_visuals | compare | - |
+<!-- end of settings table -->
+
 - `response_format` is `none` by default because some compatible servers do not support it; `json_object` requests JSON mode and `json_schema` sends the response schema for guided decoding (vLLM, llama.cpp, and similar), which is strongly recommended for small models where supported. The 0.1 `json_mode: true` setting still maps to `json_object`.
 - Every request is sent at temperature 0, for reproducible answers; it isn't a setting. `seed` is sent when set.
 - Set `max_token_field` to `max_completion_tokens` if your server requires it.
@@ -72,4 +137,18 @@ The `--out` folder is an evidence store: `store.sqlite` (sources, files, content
 - **Maintenance:** `show VIEW` prints `sources`, `source_files`, `evidence_occurrences`, `coverage_by_source`, `orphaned_content` or `comparisons` (the same names are SQL views in `store.sqlite`). `report` regenerates a report from a saved comparison (`--comparison ID`, default latest). `gc` deletes orphaned content with its evidence, tasks, sections, cached extraction responses and crops; `--dry-run` previews, and `--orphaned-sources` also removes sources whose linked manifest file is gone.
 - **Schema changes** during development aren't migrated: an older store refuses to open; use a new folder.
 
-Exit codes: `0` processing complete (semantic uncertainty may remain); `2` incomplete source coverage (including tasks `not_reached` because of `max_calls`), a comparison processing failure, no extracted claims on either side, or pair-limit truncation; `1` fatal input/configuration error. Inspect the JSON and coverage ledger regardless of exit code.
+- **Recorded answers:** `--fixture FILE` takes answers from a replay fixture (a `.sqlite` working file, or a `.zip` to replay). `--fixture-mode` sets the policy:
+  - `replay`: fail what isn't recorded
+  - `replay-or-record`: ask the model and record it, recorded failures too
+  - `record-new`: record only what was never asked
+
+  `--responder` names whose answers to use. `--fresh-regions` re-asks extraction for some regions as a second sample (an A/A control).
+- **Cost:** `--max-cost` stops sending once the provider-reported cost reaches that many dollars. `--ledger FILE` appends every response's reported cost, tagged with `--ledger-tag KEY=VALUE`.
+
+Exit codes:
+- `0` processing complete (semantic uncertainty may remain)
+- `2` incomplete source coverage (including tasks `not_reached` because of `max_calls`), a comparison processing failure, no extracted claims on either side, or pair-limit truncation
+- `3` paused for budget (the cost cap, or the provider's balance): rerun the same command to resume, keeping finished work
+- `1` fatal input or configuration error
+
+Inspect the JSON and coverage ledger regardless of exit code.

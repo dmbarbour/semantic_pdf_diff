@@ -4,9 +4,17 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 
 ## Status
 
-**v0.2.0** (tagged) compares two PDFs. It's a runnable baseline, not yet validated against a real model; see [limitations](docs/limitations.md). The main branch is mid-way through the generalization below; evidence already uses the new content-based schema (v2).
+**v0.2.0** (tagged) compares two PDFs. The main branch has since gained:
 
-A generalized design is planned and not yet implemented: sources as folders and zip archives, a persistent resumable store, more formats (`.docx`, `.pptx`, spreadsheets), criteria-first comparison of two or more sources, consistency checks and RAG export. See [docs/plans/](docs/plans/README.md).
+- **Sources** as files, folders and zip archives, declared in a persistent, resumable store
+- **Replay fixtures:** recorded model answers, so runs replay offline
+- **Levers:** how documents are read, composed as mixins (`levers.py`)
+- **The lab** (`lab/`, its own distribution): improvement rounds judged by model panels and people, controlled documents with known facts, eye and page tests
+
+**Status:**
+- Extraction has been measured with one real model (gemma-4-31B, through DeepInfra) on public sample documents and the controlled corpus.
+- It isn't a validated engineering sign-off tool; see [limitations](docs/limitations.md).
+- **Still planned:** more formats (`.docx`, `.pptx`, spreadsheets), criteria-first comparison of two or more sources, consistency checks and RAG export. See [docs/plans/](docs/plans/README.md).
 
 ## Quick start
 

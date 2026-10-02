@@ -184,6 +184,17 @@ class Declarations(unittest.TestCase):
             self.assertTrue(name == "section" or any(name in c.model_fields and name in c.marks
                                                      for c in levers.LEVER_CLASSES), name)
 
+class Documented(unittest.TestCase):
+    """Every setting is documented (code review 2026-10-01: configuration.md missed 26 of 56): docs/configuration.md
+    holds the table levers.settings_table generates. After changing a setting, regenerate it:
+    python -c "from semantic_pdf_diff.levers import settings_table; from semantic_pdf_diff.models import Settings;
+    print(settings_table(Settings))" and paste it between the markers."""
+    def test_the_settings_table_is_current(self):
+        from semantic_pdf_diff.levers import settings_table
+        doc = (Path(__file__).resolve().parent.parent / "docs/configuration.md").read_text(encoding="utf-8")
+        table = doc.split("<!-- settings table: generated, do not edit -->\n", 1)[1].split("<!-- end of settings table -->")[0]
+        self.assertEqual(table, settings_table(Settings))
+
 class DefaultsFitTheirBudget(unittest.TestCase):
     """The shipped defaults must fit their own context budget: once, 4,000 output tokens left 3,792 of an
     8,192-token context for input, and a plain comparison was refused 172 of 178 times (code review 2026-10-01).

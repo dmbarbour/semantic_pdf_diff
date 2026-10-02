@@ -1,6 +1,6 @@
 # Architecture clean-up, and levers as mixins
 
-- **Status:** Active (2026-10-02). The owner: "Alright, I've read both the review and plan. It's go."
+- **Status:** Completed (2026-10-02). The owner: "Alright, I've read both the review and plan. It's go." Milestones 1 to 9 are done; two questions are left for the owner (Open questions).
 - **From:**
   - the [code review of 2026-10-01](../reviews/code-review-2026-10-01.md), with the owner's decisions (2026-10-02)
   - the [lever architecture](../research/lever-architecture-2026-10-02.md) investigation, settled with the owner the same day
@@ -157,7 +157,8 @@ Each ends with the full suite passing and a commit. Where requests mustn't chang
 
 ## Open questions
 
-None now. The owner's reading of the full review may add some.
+- **Re-decide rounds 9, 9b and 9h without the 4 mis-cropped units?** Each of those units was judged on another unit's crop (milestone 9). Re-deciding is offline and free; whether to, and whether to record both decisions, is the owner's call.
+- **`run_round --only decide`** is accepted, but no step checks it (the review noted it). Drop it, or make it decide without judging?
 
 ## Progress
 
@@ -406,3 +407,25 @@ None now. The owner's reading of the full review may add some.
 
     The venv got the lab installed with `uv pip install -e lab`, offline from uv's cache.
   - **The docs** say to install both (`pip install -e '.[dev]' -e lab`).
+- **Milestone 9, hygiene and docs (2026-10-02): done.** The clean-up is done.
+  - **Development rounds' crops and page text left version control,** as the owner decided: "we should not be committing images ... for development rounds."
+    - `rounds.rerender()` (`scripts/rerender_rounds.py`) makes a batch's images and page text again from the public slices.
+    - It came back byte for byte for all 30 committed batches: 832 images and 945 units' page text.
+    - Batches split into a committed `pairs.json` and a git-ignored `pages.json` (`save_batch`, `load_batch`). Each loads back to its committed content.
+    - Judging a batch without its page text stops with how to restore it.
+    - The recorded-judging test re-judges committed batches from their fixtures. With a batch's crops and text made again from the slices, it gives the same verdicts and asks nothing new, so the judges' inputs came back byte for byte. Without the slices (a fresh clone), it skips.
+    - Spot-check images stay committed (sc01 is the owner's survey in progress), and so does the CI answers fixture.
+  - **A finding from the re-render:** in rounds 9, 9b and 9h, 4 units were judged on another unit's crop.
+    - A text unit and a visual unit cut into bands of the same number on one page got one image name, and the first written was kept for both.
+    - New batches name a band's crop by its family.
+    - The 4 units' verdicts are suspect. Whether to re-decide those rounds without them is open (Open questions).
+  - **The ledger rotates by month:** `ledger.rotate`. September's 28,704 records moved to `ledger-2026-09.jsonl`.
+    - Spend checks read the live file; `spent(..., archives=True)` gives the full accounting.
+    - The total, $44.66, is unchanged.
+  - **`git gc`** packed the repository's loose objects.
+  - **The user docs:**
+    - **A settings table** in `configuration.md`, generated from the declarations (`levers.settings_table`). A test keeps it current, so every setting is documented (once 26 of 56 weren't).
+    - **Exit code 3,** and the fixture, cost and ledger flags.
+    - **The status** in README, `how-it-works` and limitations: sources, store and lab are implemented, and the measurements were made with a real model.
+    - **The code map** covers every module.
+    - **The validation numbers.**

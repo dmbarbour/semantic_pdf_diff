@@ -228,6 +228,29 @@ class Rounds(unittest.TestCase):
             self.assertEqual(decision['decision'], 'accepted: wins')
             self.assertEqual(decision['borderline'], ['overall low 0.524 near 0.5'])
 
+    def test_images_and_page_text_come_back_from_the_documents(self):
+        """A batch's crops and page text are the documents' content, so they aren't committed (the owner, 2026-10-02):
+        pairs.json holds the rest, and rerender makes them again, byte for byte."""
+        import shutil
+        folder = self.root / 'batch-rerender'
+        built = rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=8, limit=1)
+        lean = json.loads((folder / 'pairs.json').read_text())
+        self.assertFalse(any('page_text' in i for i in lean['items']))  # kept apart, in pages.json
+        self.assertTrue(all('page_text' in i for i in rounds.load_batch(folder)['items']))
+        banded = [i for i in built['items'] if i['band']]
+        self.assertTrue(banded)
+        for i in banded:  # a band's crop is its own unit's (rounds 9, 9b and 9h once shared one between two units)
+            self.assertIn(f"-{i['family']}-b", i['image'])
+        originals = {p.name: p.read_bytes() for p in (folder / 'images').iterdir()}
+        pages = (folder / rounds.PAGES).read_text()
+        shutil.rmtree(folder / 'images')
+        (folder / rounds.PAGES).unlink()
+        with self.assertRaisesRegex(ValueError, 'no page text: restore it'):
+            rounds.judge_pairs(folder, Judge(), 'judge')
+        rounds.rerender(folder, self.root)  # a.pdf and b.pdf: the documents the runs read
+        self.assertEqual({p.name: p.read_bytes() for p in (folder / 'images').iterdir()}, originals)
+        self.assertEqual((folder / rounds.PAGES).read_text(), pages)
+
     def test_failed_verdicts_are_not_asked_again_until_the_retry(self):
         folder = self.root / 'batch-retry'
         rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=2)

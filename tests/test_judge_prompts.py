@@ -94,6 +94,8 @@ class GoldenPrompts(unittest.TestCase):
 ROUNDS = Path(__file__).resolve().parent.parent / "benchmarks" / "rounds"
 REPLAYED = {"v1": "r05/pairs-details", "v2": "r07/pairs-locator", "v3": "r08/pairs-charts", "v4": "r09h/pairs-fragments"}
 
+SLICES = Path(__file__).resolve().parent.parent / "samples/slices"
+
 class RecordedJudging(unittest.TestCase):
     def test_committed_batches_judge_again_to_the_same_verdicts(self):
         for rubric, name in REPLAYED.items():
@@ -105,7 +107,14 @@ class RecordedJudging(unittest.TestCase):
                     copy = Path(d)
                     for f in ("pairs.json", "replay.zip"):
                         shutil.copy(folder / f, copy / f)
-                    (copy / "images").symlink_to(folder / "images")
+                    # Crops and page text aren't committed (the owner, 2026-10-02): here if made, else made again.
+                    if (folder / rounds.PAGES).exists() and (folder / "images").exists():
+                        shutil.copy(folder / rounds.PAGES, copy / rounds.PAGES)
+                        (copy / "images").symlink_to(folder / "images")
+                    elif list(SLICES.glob("*.pdf")):
+                        rounds.rerender(copy, SLICES)
+                    else:
+                        self.skipTest(f"no crops or page text for {name}, nor slices to make them (scripts/make_slices.py)")
                     settings = Settings(model=committed["reviewer"], **EVALUATOR_SETTINGS)
                     with folder_client(copy, settings, mode="replay") as client:
                         rounds.judge_pairs(copy, client, committed["reviewer"], rubric=rubric)

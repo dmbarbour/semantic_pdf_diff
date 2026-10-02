@@ -1,6 +1,6 @@
 # How it works
 
-This describes the current code: comparing two PDFs, with evidence in the content-based schema v2. The generalized design (sources as folders and archives, a persistent store, criteria-first comparison, more formats) is planned in [plans/](plans/README.md) and not yet implemented.
+This describes the current code: comparing two sources (files, folders, zip archives) through a persistent store, with evidence in the content-based schema v2. Criteria-first comparison and more formats are planned in [plans/](plans/README.md).
 
 ## Claims and provenance
 
@@ -55,6 +55,16 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `dispatch.py` | Worker threads for model requests; everything else stays on the main thread |
 | `progress.py` | Progress bars, heartbeats and logging |
 | `store.py` | SQLite evidence store: binding, per-task records, semantic response cache, comparisons |
-| `cli.py` | Orchestration, planning and exit semantics |
+| `cli.py` | Commands: arguments into settings and run options, planning, exit semantics; the lab's commands by entry point |
+| `pipeline.py` | A run: bind the store, scan, extract, situate, compare, report |
+| `levers.py` | Settings' declarations, levers as mixins on the platform, configurations |
+| `context.py`, `quotes.py`, `stems.py`, `sections.py`, `tables.py`, `segmentation.py` | Extraction's pieces: the document reader, quote checks, numbered items, sections, tables, page segmentation |
+| `readings.py` | Merging readings of one fact by different tasks |
+| `pages.py` | Page coordinates as displayed and as stored |
+| `regions.py`, `values.py` | Region names and crop names; numbers, dates, lengths and units as printed |
+| `fixtures.py` | Replay fixtures: recorded answers, the replay policy |
+| `ledger.py` | Cost ledger and measured figures |
+| `html_pages.py` | What every generated page shares: escaping, embedded data, the palette |
+| `lab/` (`semantic_pdf_diff_lab`) | The lab, its own distribution: `eval/` (rounds, judges, rubrics, review panels, spot checks, query checks, post-mortems) and `bench/` (controlled documents, eye and page tests) |
 
 API contracts were checked against the [OpenAI Chat Completions reference](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create) and [PyMuPDF Page documentation](https://pymupdf.readthedocs.io/en/latest/page.html). Provider compatibility still needs a live smoke test.

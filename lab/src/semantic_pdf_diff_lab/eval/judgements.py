@@ -220,7 +220,8 @@ class QuoteCheck:
 
     def rate(self, folder):
         from semantic_pdf_diff.extract import excerpted
-        batch = json.loads((Path(folder) / "pairs.json").read_text(encoding="utf-8"))
+        from .rounds import load_batch
+        batch = load_batch(folder)
         out = []
         for item in batch["items"]:
             text = item.get("page_text_full") or item["page_text"]

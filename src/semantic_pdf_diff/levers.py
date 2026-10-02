@@ -661,3 +661,22 @@ def lever_marks(cls):
 def lever_settings(levers=DEFAULT_LEVERS):
     """The settings the levers own (the rest are the platform's or endpoint settings)."""
     return tuple(f for name in levers for f in REGISTRY[name].model_fields)
+
+def settings_table(cls):
+    """Every setting as a Markdown table row (docs/configuration.md holds this table; tests/test_settings.py keeps it
+    current): name, default, class, the lever owning it, the roles it binds, the regions it changes."""
+    owner = {f: lever.lever_name for lever in LEVER_CLASSES for f in lever.model_fields}
+    rows = ["| Setting | Default | Class | Lever | Bound by | Regions |", "|---|---|---|---|---|---|"]
+    fields = cls.model_fields
+    endpoint = [n for n in fields if declared(cls, n).kind == "endpoint"]
+    levered = [f for lever in cls.lever_classes for f in lever.model_fields]
+    order = endpoint + [n for n in fields if n not in endpoint and n not in levered] + levered
+    for name in order:
+        field = fields[name]
+        d = declared(cls, name)
+        default = field.get_default(call_default_factory=True)
+        shown = json.dumps(default) if not isinstance(default, str) else f'"{default}"'
+        regions = "all" if d.regions == ALL_REGIONS else ", ".join(sorted(d.regions))
+        rows.append(f"| `{name}` | `{shown}` | {d.kind} | {owner.get(name, '')} | {', '.join(d.roles) or '-'} | "
+                    f"{regions if d.roles and 'extract' in d.roles else '-'} |")
+    return "\n".join(rows) + "\n"

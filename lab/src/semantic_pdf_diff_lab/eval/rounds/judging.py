@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .. import judgements
 from ..rubrics import CLAIM_MARKS, CLAIM_PROBLEMS, PAIR_PROBLEMS, rubric as rubric_of
-from .units import _ident
+from .units import _ident, load_batch
 
 def _set_note(shown, total, hidden):
     return (f"all {total} claims" if shown >= total else
@@ -65,6 +65,9 @@ def pair_requests(folder, batch, rubric="v1"):
     judged_by = rubric_of(rubric)
     template, numbered, whole = judged_by.prompt(), judged_by.numbered(), judged_by.whole()
     for item in batch["items"]:
+        if "page_text" not in item:
+            raise ValueError(f"{folder} has no page text: restore it and the images from the public slices "
+                             "(rounds.rerender(folder, 'samples/slices'))")
         for order in ("baseline-first", "variant-first"):
             a, b = (item["baseline"], item["variant"]) if order == "baseline-first" else (item["variant"], item["baseline"])
             counts = item.get("counts") or {}
@@ -132,7 +135,7 @@ def judge_pairs(folder, client, reviewer, progress=None, limit=None, rubric="v1"
     from ..models import PairVerdict
     from ..review import reviewer_file
     folder = Path(folder)
-    batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
+    batch = load_batch(folder)
     target = folder / verdicts_dir / f"{reviewer_file(reviewer)}.json"
     verdicts = judgements.load(target, rubric)
     failed_path = folder / judgements.failures_folder(verdicts_dir) / f"{reviewer_file(reviewer)}.json"
