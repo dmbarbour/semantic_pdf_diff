@@ -1,6 +1,6 @@
 # Comparing revisions: align items, then explain differences
 
-- **Status:** Planned (2026-10-02), for the owner's review. The owner, on the outline: "Looks good! Please do so."
+- **Status:** Planned (2026-10-02). The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9).
 - **From:** [controlled documents](controlled-documents-2026-10-01.md) milestone 4, where every change was found but most "different" findings weren't changes.
 - **Depends on:**
   - controlled documents (revision pairs, exact comparison scoring)
@@ -12,12 +12,13 @@
     - 59 came from names by position ("blower 5", "dimension 2"), which shift when a row is inserted.
     - 17 took two items of a kind for one item changed (two track elements, two revisions' dates, two design options).
     - 3 of 13 additions were paired with a neighbour and called changes.
+  - **The cost:** 1,798 pairs judged for six small pairs ($0.247), 854 of them unrelated. Judging pairs one by one doesn't scale to long specifications.
 
 ## Goal
 
 - **A revision comparison that reports what changed, and only that:** changes, additions and removals, each explained, with unchanged content confirmed.
-- **Most false differences gone without a model:** decide which items correspond across the whole document, not pair by pair.
-- **Every step measured exactly** on controlled revision pairs, confirmed on pairs held out from development, then on real revision series.
+- **Correspondence decided cheaply and softly, before any value is judged:** cheap signals, each with a confidence, decide which items correspond across the whole document. The judge sees only what they leave uncertain.
+- **Working first, measured systematically later** (decision 7): developed by inspection on controlled revision pairs, then on real revision series; held-out sets and promotion rules come with systematic improvement.
 
 ## Today
 
@@ -31,47 +32,65 @@
 
 1. **Items with nothing to anchor them may be misaligned.** The owner: "I think the 'no anchors' risk is acceptable because even a human would definitely get that wrong or just consider it a wholesale replacement of a component."
 2. **Repeated values make weak identity, and that's fair.** The owner: "Similar with repeated values risks; fungible things naturally have weak identity even to the human eye."
-3. **Overfitting is a risk, met with breadth and held-out sets.** The owner: "I agree this is a risk. It's partially mitigated by trials, but we can increase breadth of samples, too, when we feel there is risk of overfitting, and perhaps support a more robust approach to 'learning' lever promotions with training vs. test sets (though... not sure this applies, but perhaps something analogous applies)." The analogue proposed is design item 5.
+3. **Overfitting is a risk, met with breadth and held-out sets.** The owner: "I agree this is a risk. It's partially mitigated by trials, but we can increase breadth of samples, too, when we feel there is risk of overfitting, and perhaps support a more robust approach to 'learning' lever promotions with training vs. test sets (though... not sure this applies, but perhaps something analogous applies)." The analogue is design item 5.
 4. **Real samples:** the owner: "the samples we have at the moment were from a relatively brief research, IIRC without focus on revisions of the same documents (which should be an easier search), and of course we haven't really touched the docx or pptx samples yet (which will greatly expand our available test samples, IIUC)."
 5. **Controlled documents in place of spot checks.** The owner: "I'm hoping these fictional controlled tests with known difficulty knobs will greatly mitigate need for spot checks, so I can focus on findings from actual trials later; those findings become new difficulty knobs."
+6. **Correspondence scored softly, researched first.** On Claude's proposal to settle exact matches without a model, the owner: "We should do some research on what can help here, making it more soft/probabilistic/heuristic in nature without fully intelligent. Tools like BM25F or similar might apply, or a weighted mixture of techniques that each can output confidence between 0 and 1. Pairwise analyses of all pairs of things is super-expensive, so if we can use other means and filter it down that's good." (Design item 2; milestone 1.)
+7. **No defaults to beat in early development.** On Claude's proposal to keep comparison levers opt-in until a real check, the owner: "For early development, we shouldn't consider any levers defaults like a null hypothesis; just try to get things vaguely somewhat working by eyeball and intuition (or your non-biological equivalent) before we scientifically pursue systematic improvements." (Measures; milestone 7.)
+8. **Held-out sets as a rolling window.** On Claude's proposal to retire a held-out series after three checks, the owner: "I think we could use something closer to a rolling window? No need to be too aggressive with retiring tests, so long as the collection is just barely big and mobile enough that specializing/overfitting to them is infeasible or impractical." (Design item 5.)
+9. **Proposals mode deferred, not for long.** The owner: "Let's defer proposals comparison mode for a little bit longer, but it is an important use case that we shouldn't defer too much longer, so we should seek opportunities where it begins to make sense to pursue it." (Openings for proposals mode.)
 
 ## Design
 
-**1. Items and alignment (a lever, revisions mode).**
+The mechanisms below are Claude's, built on the owner's multi-pass idea and decision 6.
 
-The design below is Claude's, built on the owner's multi-pass idea.
-
+**1. Items and alignment (revisions mode).**
 - **Items:** a revision's claims grouped by the thing they describe.
   - Claims sharing a tag join one item. A tag is an identifier of letters and digits, such as `P-101B`, `V-314`, `D103` or `AHU-3`.
   - Other claims are grouped by their folded entity name.
   - Positional names ("blower 5") are items like any other; alignment sorts them out.
-- **Anchors:** a value printed once in each revision (a number with its unit, a date, a length) ties the claims holding it.
-  - A value that repeats within a revision is a weak anchor, counted only for items already aligned on others (decision 2).
+- **Item correspondence is scored** (design item 2), not decided by one rule. The strongest signal for revisions is anchors:
+  - A value printed once in each revision (a number with its unit, a date, a length) ties the claims holding it.
+  - A value that repeats within a revision is a weak anchor (decision 2).
   - Most facts don't change between revisions (198 of 220 on the controlled pairs), so most items share most of their values. Diff tools anchor on unique unchanged lines the same way.
-- **Item alignment:** item pairs are scored by shared anchors and name evidence (the same tag is strong, a similar name weak). Then each item gets at most one counterpart, strongest pairs first.
+- **Each item gets at most one counterpart,** most confident first. Pairs below a confidence floor stay unaligned.
 - **Within an aligned item:** claims are paired by attribute. Leftover values of one attribute are a candidate change (room 102's two widths, once its depth anchors the room).
 - **Unaligned items:**
   - one only in the later revision is added; one only in the earlier is removed
   - their claims aren't sent for comparison, so the report lists them without a counterpart, as it lists additions and removals today
   - unaligned items with similar names and no anchors go to the judge as possible renamings
-- **Mechanism:** a lever on the `candidates` hook, off by default.
-  - With it on, the judge sees only aligned pairs and possible renamings.
-  - The hook learns the mode; proposals mode keeps TF-IDF.
-- **Expected** (Claude's inference, to be measured):
+- **Mechanism:** a provider of the `candidates` hook. The hook learns the mode; proposals mode keeps retrieval.
+- **Expected** (Claude's inference, to be seen):
   - the 59 positional-name and 17 same-kind differences aren't sent to the judge
   - the 3 additions taken for changes become additions
   - an item whose every value changed under a positional name is misaligned, as decision 1 accepts
 
-**2. Exact matches settled without a model (a lever).**
-- **What's settled:** claims in aligned items with the same attribute, value, unit and conditions are equivalent.
-  - The report shows each such finding as settled mechanically.
-  - Today each costs a model call; unrelated pairs, most of today's calls, vanish with alignment.
-- **The risk:** a condition or scope changed in words the claims don't carry. The knob "conditions changed, value kept" measures it.
+**2. Correspondence without a model: cheap signals, each with a confidence (decision 6).**
+- **Research first** (milestone 1), then a first version by inspection.
+- **Candidate signals,** each a confidence between 0 and 1:
+  - **anchors:** values shared once in each revision (design item 1)
+  - **fielded lexical similarity:** BM25F over entity, attribute, conditions, quote and section, each field weighted
+  - **identifiers:** the same tag; tags renumbered alike (`P-101B` → `P-201B`)
+  - **value agreement:** equal after unit conversion (today's numeric check)
+  - **structure:** the same heading path, the same table, row label and column header, a nearby place in the reading order
+  - **semantic similarity, later:** embeddings ([retrieval recall](retrieval-recall-2026-09-23.md))
+- **Combining them:**
+  - **Prior art to research:**
+    - **probabilistic record linkage:** Fellegi and Sunter weigh each field's agreement by how likely it is among true matches against non-matches, with two thresholds: match, possible match, non-match
+    - **blocking:** cheap keys (a tag, an attribute word, a value bucket) so all pairs are never scored
+    - **sequence alignment and diff algorithms:** reading order
+    - **schema and ontology matching:** attributes named differently
+  - **Weights from the controlled pairs:** their exact labels can set the weights, with other pairs held back to check them.
+  - **Two thresholds:**
+    - above the upper, matched, and equal values settled as equivalent without a model
+    - below the lower, not compared
+    - between, the judge decides
+- **The risk:** a condition or scope changed in words the claims don't carry. The knob "conditions changed, value kept" shows it.
 
-**3. Explaining differences ("why different", a lever).**
+**3. Explaining differences ("why different").**
 - **A second, targeted call** for each "different" or "uncertain" finding and each possible renaming. It's sent:
   - both claims with their quotes, sections and table context, and both crops
-  - the alignment's evidence: shared anchors, the item's other values
+  - the alignment's evidence: shared anchors, the signals' confidences, the item's other values
 - **A checklist of known confounders:**
   - the same item, renamed or renumbered
   - moved: another section, table or row
@@ -89,18 +108,20 @@ The design below is Claude's, built on the owner's multi-pass idea.
   - table claims carry the parse's row label and column header ([one table model](one-table-model-2026-09-30.md) overlaps)
   - tags found by pattern near a value
 - **A per-document entity register later:** tags, row labels, captions, headings and defined abbreviations, with a model pass only for what's left. Claims would point at register entries.
-- **Revisions need this least,** since alignment infers identity from the other revision. It matters most for proposals mode (two designs share no values), which is out of scope here (open question 4).
+- **Revisions need this least,** since alignment infers identity from the other revision. Proposals need it most (two designs share no values).
 - **Measured** by a new extraction count (claims named by position, per document) and by the pairs' precision.
 
-**5. Development and held-out sets (the train/test analogue, decision 3).**
-- **Development is everything looked at while building a lever:** the seed-1 controlled documents and pairs, and the development slices.
-- **Held-out sets are scored only when a lever is up for promotion,** against a rule written before the check, as rounds' criteria are:
-  - **a fresh seed of the same pairs:** new values and layouts, nearly free to generate; catches fitting to particular values
-  - **held-out knobs:** pairs of kinds built but not scored during development; catches fitting to particular traps
+**5. Development and held-out sets (decisions 3 and 8; milestone 7).**
+- **Development is everything looked at while building:** the seed-1 controlled documents and pairs, the development slices, the development real series.
+- **Held-out sets are scored only when a change is up for promotion,** against a rule written before the check, as rounds' criteria are. They're drawn from:
+  - **fresh seeds of the same pairs:** new values and layouts, nearly free to generate; catch fitting to particular values
+  - **held-out knobs:** pairs of kinds built but not scored during development; catch fitting to particular traps
   - **a held-out project, later:** a backup domain (traffic control, district heating, …); catches fitting to the generator's phrasing and layouts
-  - **a held-out real series**, once real pairs can be read (item 6)
-- **A held-out set wears out with use:** each check leaks a little of it into decisions. Controlled sets are refreshed with a new seed for each check; real held-out sets as new samples arrive (open question 3).
-- **The same split could serve the controlled stratum in rounds** (controlled documents milestone 5): seed 1 for development, a fresh seed held out.
+  - **held-out real series**, once real pairs can be read (item 6)
+- **A rolling window (decision 8):** the held-out collection keeps just big and mobile enough that fitting to it is impractical.
+  - New members join as they're made (controlled seeds cost cents; real series as found).
+  - The oldest move into development, gradually rather than by fixed retirement.
+- **The same split could serve the controlled stratum in rounds** (controlled documents milestone 5): seed 1 for development, fresh seeds held out.
 - **More configurations, more lucky winners:** with several cursors (lever search), held-out confirmation is the guard.
 
 **6. Real revision pairs.**
@@ -133,20 +154,24 @@ The design below is Claude's, built on the owner's multi-pass idea.
 
 ## Milestones
 
-1. **Alignment, developed on the seed-1 pairs.**
-   - The lever (design item 1).
+1. **Research: correspondence without a model** (design item 2).
+   - A research note: record linkage, BM25F, blocking, alignment and diff algorithms, schema matching.
+   - For each: what applies to claims and revisions, what it needs, and how its confidence is set.
+   - No model spend.
+2. **Alignment, a first version,** on the seed-1 pairs (design items 1 and 2).
+   - Built from the research, tuned by inspection (decision 7).
    - Edit kinds recorded in the keys.
-   - Per pair, beside today's measures: pairs sent to the judge, and cost.
-2. **The held-out check:** a fresh seed of the six pairs and the new knobs' pairs (design item 7), each scored first here, against a rule written beforehand.
-3. **Exact matches settled without a model** (design item 2), measured the same way.
-4. **Real revision pairs,** once the `.txt`/`.md` and `.docx` adapters are built (in their own plan):
-   - the QUIC drafts for development, TS 38.300 v19.2 → v19.3 held out, and the moderator's summaries
+   - The new knobs (design item 7) added as they're needed.
+3. **Real revision pairs,** once the `.txt`/`.md` and `.docx` adapters are built (in their own plan):
+   - the QUIC drafts, TS 38.300 and the moderator's summaries
    - the raters above
    - a search for more series
-5. **"Why different"** (design item 3), scored against the edit kinds.
-6. **Identity at extraction** (design item 4), with the one table model plan.
+4. **"Why different"** (design item 3).
+5. **Identity at extraction** (design item 4), with the one table model plan.
+6. **Proposals mode,** when an opening below makes it natural (decision 9).
+7. **Systematic improvement:** the rolling held-out window, a promotion rule, and the measures below as gates. When the first versions work by inspection.
 
-## Measures and promotion
+## Measures
 
 - **Per pair, exact:**
   - changes found
@@ -154,45 +179,46 @@ The design below is Claude's, built on the owner's multi-pass idea.
   - unchanged facts confirmed
   - false changes
   - the share of "different" findings that are changes
-  - with milestone 5, the kinds named right
-  - pairs sent to the judge, and cost
-- **A rule proposed for comparison levers,** on the held-out pairs:
-  - no lost change, addition, removal or confirmation (exact counts, against the default)
-  - the share of "different" findings that are changes rises
-  - Real pairs, once readable, must be no worse by their raters.
+  - with milestone 4, the kinds named right
+  - pairs sent to the judge, pairs settled without one, and cost
+- **Until milestone 7 these are diagnostics, read by eye** (decision 7). No current behaviour is a default that a new one must beat.
+
+## Openings for proposals mode (decision 9)
+
+Claude's reading of where proposals mode begins to make sense:
+- **Once alignment's signals work:** counterparts across two designs can be scored with the same signals, structure and kind standing in for anchors.
+- **Once the entity register exists** (design item 4): it's what proposals need most.
+- **Once `.docx` and `.pptx` can be read:** two fetched sets are competing proposals.
+  - `3gpp-ran1-beam-management`: four companies' contributions on one agenda item
+  - `3gpp-rel19-aiml-views`: nine companies' views, in `.pptx`, `.docx` and PDF
+- **Controlled proposals:** two fictional designs of one system from the same fact sheet's kinds, with counterparts known. The controlled generator can make them.
+- **[Criteria-first comparison](n-way-comparison-2026-09-23.md)** holds the plan for proposals and N-way comparison.
 
 ## Costs
 
 | Step | Estimate |
 |---|---|
-| Milestone 1: the six pairs compared again with alignment | under $0.25 (fewer calls than today's $0.25) |
-| Milestone 2: a fresh seed (12 documents read, then compared with and without the lever) and the knob pairs | about $0.5–1 |
-| Milestone 3: exact matches settled | cents, and fewer calls after |
-| Milestone 4: real specifications (hundreds of pages each) | dollars; estimated and mentioned before running |
-| Milestone 5: a call per candidate difference | cents on the controlled pairs |
-| Milestone 6: the controlled corpus read again under the extraction lever | estimated before running |
+| Milestone 1: research | no model spend |
+| Milestone 2: the six pairs compared again, as the first version takes shape | under $0.25 a try, less as fewer pairs reach the judge |
+| Milestone 3: real specifications (hundreds of pages each) | dollars; estimated and mentioned before running |
+| Milestone 4: a call per candidate difference | cents on the controlled pairs |
+| Milestone 5: the controlled corpus read again under the extraction change | estimated before running |
+| Milestone 7: fresh seeds for the held-out window | cents each |
 
 ## Relation to other plans
 
 - **[Controlled documents](controlled-documents-2026-10-01.md):** its revision pairs and scorer measure this plan; its milestone 6 turns this plan's findings into knobs.
-- **[Retrieval recall](retrieval-recall-2026-09-23.md):** BM25 and hybrid retrieval are other providers of the same `candidates` hook. For revisions, alignment comes first; for proposals, retrieval.
-- **[Criteria-first comparison](n-way-comparison-2026-09-23.md):** proposals and N-way comparison, out of scope here.
+- **[Retrieval recall](retrieval-recall-2026-09-23.md):** BM25 and embeddings are signals here and providers of the `candidates` hook there. For revisions, alignment comes first; for proposals, retrieval.
+- **[Criteria-first comparison](n-way-comparison-2026-09-23.md):** proposals and N-way comparison (decision 9).
 - **Recognising versions of one document** (plans index): pairs whose order is known; the version signals help find real series.
 - **[Multi-format adapters](multi-format-adapters-2026-09-23.md):** `.txt`/`.md` and `.docx` first, which unlock the real series.
 - **[Lever index](../reviews/levers.md):** the two rows from controlled documents milestone 4 ("a change needs the same item", "names that carry identity") are built here.
 
 ## Not in scope
 
-- **Proposals mode:** counterparts across two designs (open question 4).
 - **Relations:** schematics' links aren't compared yet (controlled documents milestone 4).
 - **Comparing more than two revisions at once.**
 
 ## Open questions
 
-1. **Settling exact matches without a model** (design item 2) saves most calls, at the risk of a condition changed in words the claims don't carry. Claude recommends building it as a lever, off until the "conditions changed, value kept" knob has measured it.
-2. **Promoting a comparison lever before real pairs can be read:**
-   - Option a: keep it opt-in until milestone 4's real check.
-   - Option b: make it a default on held-out controlled evidence alone.
-   - Claude recommends option a. The controlled documents' rule says a controlled gain alone never promotes a lever; comparisons aren't judged on real documents yet.
-3. **Wearing out held-out sets:** a fresh controlled seed for every promotion check, and a real held-out series retired after three checks? Claude's proposal; the number is a guess.
-4. **Proposals mode later,** under criteria-first comparison, or sooner? Asked 2026-10-02; not yet answered.
+None at present.
