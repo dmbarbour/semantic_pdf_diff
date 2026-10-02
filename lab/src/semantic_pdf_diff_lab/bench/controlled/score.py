@@ -211,11 +211,15 @@ def distinctive(fact, facts):
 
 NUMERIC_VALUE = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥$])?\s*[-+±]?\$?\d")
 
+def key_facts(key_data):
+    """A key's facts, as Facts."""
+    return [Fact(**{k: (tuple(v) if k in ("aliases", "synonyms") else v) for k, v in f.items()})
+            for f in key_data["facts"]]
+
 def score(key_data, claims):
     """Each claim classed, facts found and missed, and conditions kept, from a key and extracted claims (dicts
     with entity, attribute, value, unit, conditions)."""
-    facts = [Fact(**{k: (tuple(v) if k in ("aliases", "synonyms") else v) for k, v in f.items()})
-             for f in key_data["facts"]]
+    facts = key_facts(key_data)
     by_id = {f.id: f for f in facts}
     numeric = [f for f in facts if not f.relation]
     related = [f for f in key_data["facts"] if f.get("relation")]

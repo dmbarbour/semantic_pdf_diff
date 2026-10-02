@@ -732,9 +732,10 @@ def scanned(data, dpi=150):
     return out.tobytes(garbage=3, deflate=True, no_new_id=True)
 RUNNING_HEADER = "Lakeshore Convention Center · Doc LCC-HC-DB-004 · Rev C · 2026-03-14"
 
-def corpus(seeds=(1,), knobs=False):
+def corpus(seeds=(1,), knobs=False, revisions=False):
     """The clean corpus; with knobs, also each table project under every table knob, and each prose project under
-    every prose knob (ids "<project>-<knob>")."""
+    every prose knob (ids "<project>-<knob>"); with revisions, also each revision pair's generated side
+    (revisions.py: the other side is a corpus document)."""
     out = [make(seed) for make in PROJECTS.values() for seed in seeds]
     if knobs:
         from .schematics import SCHEMATIC_KNOBS, SCHEMATIC_PROJECTS
@@ -748,6 +749,9 @@ def corpus(seeds=(1,), knobs=False):
                         p = make(seed)
                         p.id, p.knob = f"{p.id}-{knob}", knob
                         out.append(p)
+    if revisions:
+        from .revisions import revised
+        out += [project for seed in seeds for _, project in revised(seed)]
     return out
 
 # --- rendering ---------------------------------------------------------------------------------

@@ -367,6 +367,117 @@ class Scoring(unittest.TestCase):
         self.assertEqual(s["found"], 0)
 
 
+class Revisions(unittest.TestCase):
+    """Revision pairs (milestone 4): each revision changes what it says, and its key stays honest."""
+    def test_each_revision_changes_what_it_says(self):
+        from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
+        expected = {"wtp-s1": (4, 3, 1), "coaster-s1": (4, 3, 1), "wtp-tables-s1-clean": (3, 4, 3),
+                    "lcc-s1-traps": (3, 2, 2), "lcc-energy-s1-clean": (5, 0, 0), "lcc-plan-s1-clean": (3, 1, 0)}
+        bases = {p.id: p for p in controlled.corpus(knobs=True)}
+        made = revisions.revised()
+        self.assertEqual([pair for pair, _ in made], revisions.pairs())
+        for pair, project in made:
+            with self.subTest(pair=pair.id):
+                keys = {}
+                for p in (bases[pair.id], project):  # the base is a corpus document
+                    _, log = controlled.render(p)
+                    keys[p.id] = controlled.key(p, log)
+                kinds = comparison.changes(keys[pair.earlier], keys[pair.later])
+                self.assertEqual(tuple(len(kinds[k]) for k in ("changed", "added", "removed")), expected[pair.id])
+        # the narrated change: the later coaster prints the old lift height as superseded, the earlier as current
+        coaster = dict((pair.id, project) for pair, project in made)["coaster-s1"]
+        self.assertEqual(coaster.fact("ride.lift").value, bases["coaster-s1"].fact("ride.lift_old").value)
+
+    def test_an_edit_that_leaves_a_number_behind_is_caught(self):
+        from semantic_pdf_diff_lab.bench.controlled import revisions
+        base, p = controlled.water_treatment(1), controlled.water_treatment(1)
+        revisions.add_sentence(p, "chem.alum", "Its day tank holds {v} gal.",
+                               controlled.Fact("chem.tank", "Alum day tank", (), "volume", (), "1,234", "gal"))
+        p.facts.pop()  # the sentence printed, its fact forgotten
+        with self.assertRaisesRegex(ValueError, "neither the base's nor facts"):
+            revisions.check(base, p)
+
+    def test_values_change_as_whole_tokens(self):
+        from semantic_pdf_diff_lab.bench.controlled import revisions
+        self.assertEqual(revisions._pattern("3").sub("X", "3 trains, a 3-second gust, 0.3 g, 13 cars, P-3, 3."),
+                         "X trains, a 3-second gust, 0.3 g, 13 cars, P-3, X.")
+
+class ComparisonScoring(unittest.TestCase):
+    """A report's findings against the key's changes, on the treatment plant's pair."""
+    @classmethod
+    def setUpClass(cls):
+        from semantic_pdf_diff_lab.bench.controlled import revisions
+        (_, revised), = [x for x in revisions.revised() if x[0].id == "wtp-s1"]
+        cls.keys, cls.facts = [], []
+        for p in (controlled.water_treatment(1), revised):
+            _, log = controlled.render(p)
+            cls.keys.append(controlled.key(p, log))
+            cls.facts.append({f.id: f for f in p.facts if f.role == "fact"})
+
+    def claims(self):
+        """One claim of each fact in each revision, read right: {(revision, fact id): claim}."""
+        return {(s, fid): {**claim(f), "id": f"{'ab'[s]}:{fid}", "content": f"{'ab'[s]}.pdf"}
+                for s in (0, 1) for fid, f in self.facts[s].items()}
+
+    def report(self, claims, findings, unmatched):
+        return {"sources": [{"name": "a"}, {"name": "b"}],
+                "files": [{"source": "a", "content": "a.pdf"}, {"source": "b", "content": "b.pdf"}],
+                "evidence": list(claims.values()), "findings": [{"a": a, "b": b, "relation": r} for (a, b), r in findings.items()],
+                "unmatched": [{"id": i} for i in unmatched],
+                "retrieval": {"attempted_pairs": len(findings), "omitted_by_pair_limit": 0}}
+
+    def perfect(self):
+        """Every fact in both revisions paired with itself, different if changed; the added and removed unmatched."""
+        from semantic_pdf_diff_lab.bench.controlled import comparison
+        c, kinds = self.claims(), comparison.changes(*self.keys)
+        findings = {(c[0, f]["id"], c[1, f]["id"]): "different" if f in kinds["changed"] else "equivalent"
+                    for f in kinds["changed"] + kinds["unchanged"]}
+        return c, findings, [c[0, f]["id"] for f in kinds["removed"]] + [c[1, f]["id"] for f in kinds["added"]]
+
+    def test_a_perfect_comparison_finds_every_change(self):
+        from semantic_pdf_diff_lab.bench.controlled import comparison
+        s = comparison.score_comparison(*self.keys, self.report(*self.perfect()))
+        self.assertEqual((s["changes_found"], s["additions_found"], s["removals_found"], s["unchanged_confirmed"]),
+                         ("4/4", "3/3", "1/1", "28/28"))
+        self.assertEqual((s["false_changes"], s["difference_precision"], s["different"]), (0, 1.0, {"change": 4}))
+
+    def test_each_kind_of_error_is_classed(self):
+        from semantic_pdf_diff_lab.bench.controlled import comparison
+        c, findings, unmatched = self.perfect()
+        ident = lambda s, f: c[s, f]["id"]
+        both = lambda f: (ident(0, f), ident(1, f))
+        findings[both("plant.design_flow")] = "equivalent"  # a change missed
+        findings[both("plant.peak_flow")] = "different"     # a change that isn't one
+        del findings[both("mix.g")]                         # never compared: listed unmatched on both sides
+        unmatched += list(both("mix.g"))
+        findings[ident(0, "P-101C.capacity"), ident(1, "P-101D.capacity")] = "different"  # a new pump as a change
+        unmatched.remove(ident(1, "P-101D.capacity"))
+        del findings[both("chem.alum_max")], c[1, "chem.alum_max"]  # the later reading of a change missing
+        c[1, "ghost"] = {"entity": "Alum feed", "attribute": "maximum dose", "value": "61.2", "unit": "mg/L",
+                         "conditions": "", "id": "b:ghost", "content": "b.pdf"}
+        findings[ident(0, "chem.alum_max"), "b:ghost"] = "different"  # against a value printed nowhere
+        s = comparison.score_comparison(*self.keys, self.report(c, findings, unmatched))
+        self.assertEqual([s["detail"][f] for f in ("plant.design_flow", "plant.peak_flow", "mix.g", "P-101D.capacity",
+                                                   "chem.alum_max", "P-101C.capacity")],
+                         ["called equivalent", "false change", "unpaired", "as a change", "unextracted", "confirmed"])
+        self.assertEqual(s["different"], {"across facts": 1, "change": 2, "no change": 1, "unscored": 1})
+        self.assertEqual((s["changes_found"], s["false_changes"], s["difference_precision"]), ("2/4", 1, 0.4))
+
+    def test_a_range_stands_for_both_its_bounds(self):
+        from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
+        (_, revised), = revisions.revised(only=("lcc-s1-traps",))
+        keys = []
+        for p in (controlled.convention_center(1), revised):
+            p.id, p.knob = p.id + "-traps", "traps"
+            _, log = controlled.render(p)
+            keys.append(controlled.key(p, log))
+        low, high = (revised.fact(f) for f in ("hallc.tmin", "hallc.tmax"))
+        c = {s: {"entity": "Hall C", "attribute": "indoor temperature range", "value": f"{low.value} to {high.value}",
+                 "unit": "°F", "conditions": "", "id": f"{'ab'[s]}:range", "content": f"{'ab'[s]}.pdf"} for s in (0, 1)}
+        s = comparison.score_comparison(*keys, self.report(c, {("a:range", "b:range"): "equivalent"}, []))
+        self.assertEqual((s["detail"]["hallc.tmin"], s["detail"]["hallc.tmax"]), ("confirmed", "confirmed"))
+        self.assertEqual(s["equivalent"], {"no change": 1})
+
 class Replay(unittest.TestCase):
     """The committed corpus, read again from its recorded answers, scores as committed."""
     def test_the_corpus_reads_again_to_the_recorded_scores(self):
@@ -403,6 +514,36 @@ class Replay(unittest.TestCase):
                 result = controlled.score(key, found)
                 self.assertEqual((result["recall"], result["outcomes"]), (committed[run]["recall"], committed[run]["outcomes"]))
 
+    def test_a_revision_pair_compares_again_to_the_recorded_scores(self):
+        import contextlib, io, json, tempfile
+        from pathlib import Path
+        import pymupdf
+        from semantic_pdf_diff import cli, fixtures
+        from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
+        folder = Path(__file__).resolve().parent.parent / "benchmarks" / "controlled"
+        if not (folder / "comparisons.json").exists():
+            self.skipTest("no recorded comparisons")
+        with fixtures.open(folder / "replay.zip", "read") as f:
+            recorded_with = f.meta().get("pymupdf")
+            responder = f.db.execute("SELECT DISTINCT responder FROM response").fetchone()[0]
+        if recorded_with != pymupdf.VersionBind:
+            self.skipTest(f"recorded with PyMuPDF {recorded_with}; documents differ under {pymupdf.VersionBind}")
+        committed = json.loads((folder / "comparisons.json").read_text())["recorded"]["wtp-s1"]
+        (pair, revised), = revisions.revised(only=("wtp-s1",))
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            pdfs = [controlled.write(p, d / "docs") for p in (controlled.water_treatment(1), revised)]
+            for pdf in pdfs:
+                self.assertEqual(pdf.read_bytes(), (folder / "docs" / pdf.name).read_bytes())  # generated alike
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                code = cli.main([*map(str, pdfs), "--mode", "revisions", "--config", str(folder / "settings.json"), "-q",
+                                 "--no-situate", "--out", str(d / "run"), "--fixture", str(folder / "replay.zip"),
+                                 "--fixture-mode", "replay", "--base-url", "http://127.0.0.1:9/v1", "--responder", responder])
+            self.assertIn(code, (0, 2))
+            keys = [json.loads((d / "docs" / f"{i}.key.json").read_text()) for i in (pair.earlier, pair.later)]
+            result = comparison.score_comparison(*keys, json.loads((d / "run" / "report.json").read_text()))
+            self.assertEqual(result, committed)
+
 @slow
 class Corpus(unittest.TestCase):
     """Every committed document is generated again byte for byte, so recorded answers keep replaying (a drawing
@@ -420,7 +561,7 @@ class Corpus(unittest.TestCase):
             recorded_with = f.meta().get("pymupdf")
         if recorded_with != pymupdf.VersionBind:
             self.skipTest(f"recorded with PyMuPDF {recorded_with}; documents differ under {pymupdf.VersionBind}")
-        projects = controlled.corpus(knobs=True)
+        projects = controlled.corpus(knobs=True, revisions=True)
         # every committed document is still generated, and every generated one is committed
         self.assertEqual({p.id for p in projects}, {f.stem for f in (folder / "docs").glob("*.pdf")})
         self.assertEqual({p.id for p in projects}, {f.name[:-len(".key.json")] for f in (folder / "docs").glob("*.key.json")})

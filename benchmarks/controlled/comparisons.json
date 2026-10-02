@@ -1,0 +1,1026 @@
+{
+ "recorded": {
+  "wtp-s1": {
+   "facts": {
+    "changed": 4,
+    "added": 3,
+    "removed": 1,
+    "unchanged": 28
+   },
+   "changes_found": "4/4",
+   "additions_found": "3/3",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "28/28",
+   "false_changes": 0,
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 4
+   },
+   "added": {
+    "reported": 3
+   },
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 28
+   },
+   "different": {
+    "change": 5
+   },
+   "equivalent": {
+    "no change": 32,
+    "unscored": 2
+   },
+   "findings": {
+    "complementary": 51,
+    "different": 5,
+    "equivalent": 34,
+    "unrelated": 82
+   },
+   "unmatched": 4,
+   "pairs": 172,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "reported",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "P-101D.capacity": "reported",
+    "P-101D.head": "reported",
+    "P-101D.motor": "reported",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "reported",
+    "chem.chlorine": "reported",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "optA.cost": "reported",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "reported",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "coaster-s1": {
+   "facts": {
+    "changed": 4,
+    "added": 3,
+    "removed": 1,
+    "unchanged": 23
+   },
+   "changes_found": "4/4",
+   "additions_found": "1/3",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "23/23",
+   "false_changes": 0,
+   "difference_precision": 0.6364,
+   "changed": {
+    "reported": 4
+   },
+   "added": {
+    "as a change": 2,
+    "reported": 1
+   },
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 23
+   },
+   "different": {
+    "across facts": 4,
+    "change": 7
+   },
+   "equivalent": {
+    "no change": 29,
+    "unscored": 1
+   },
+   "findings": {
+    "complementary": 21,
+    "different": 11,
+    "equivalent": 30,
+    "uncertain": 4,
+    "unrelated": 99
+   },
+   "unmatched": 2,
+   "pairs": 165,
+   "omitted": 0,
+   "detail": {
+    "el.Camelback.g": "confirmed",
+    "el.Camelback.height": "confirmed",
+    "el.Camelback.speed": "confirmed",
+    "el.First drop.g": "confirmed",
+    "el.First drop.speed": "confirmed",
+    "el.Helix.g": "as a change",
+    "el.Helix.height": "as a change",
+    "el.Helix.speed": "reported",
+    "el.Vertical loop.g": "confirmed",
+    "el.Vertical loop.height": "confirmed",
+    "el.Vertical loop.speed": "reported",
+    "el.Zero-g roll.g": "confirmed",
+    "el.Zero-g roll.height": "confirmed",
+    "el.Zero-g roll.speed": "confirmed",
+    "ride.angle": "confirmed",
+    "ride.capacity": "reported",
+    "ride.drop": "confirmed",
+    "ride.duration": "confirmed",
+    "ride.g_max": "confirmed",
+    "ride.inversions": "confirmed",
+    "ride.length": "confirmed",
+    "ride.lift": "reported",
+    "ride.speed": "confirmed",
+    "station.length": "reported",
+    "struct.columns": "confirmed",
+    "struct.steel": "confirmed",
+    "struct.wind": "confirmed",
+    "trains.cars": "confirmed",
+    "trains.count": "confirmed",
+    "trains.mass": "reported",
+    "trains.riders": "confirmed"
+   }
+  },
+  "wtp-tables-s1-clean": {
+   "facts": {
+    "changed": 3,
+    "added": 4,
+    "removed": 3,
+    "unchanged": 78
+   },
+   "changes_found": "3/3",
+   "additions_found": "4/4",
+   "removals_found": "3/3",
+   "unchanged_confirmed": "78/78",
+   "false_changes": 0,
+   "difference_precision": 0.2667,
+   "changed": {
+    "reported": 3
+   },
+   "added": {
+    "reported": 4
+   },
+   "removed": {
+    "reported": 3
+   },
+   "unchanged": {
+    "confirmed": 78
+   },
+   "different": {
+    "across facts": 6,
+    "change": 4,
+    "unscored": 5
+   },
+   "equivalent": {
+    "no change": 155,
+    "unscored": 8
+   },
+   "findings": {
+    "complementary": 108,
+    "different": 15,
+    "equivalent": 163,
+    "uncertain": 11,
+    "unrelated": 309
+   },
+   "unmatched": 11,
+   "pairs": 606,
+   "omitted": 0,
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "reported",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "reported",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "P-101D.capacity": "reported",
+    "P-101D.motor power": "reported",
+    "P-101D.motor speed": "reported",
+    "P-101D.total dynamic head": "reported",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "confirmed",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "confirmed",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "confirmed",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "confirmed",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "confirmed",
+    "V-306.flow coefficient": "reported",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "confirmed",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "confirmed",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "confirmed",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "confirmed",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "confirmed",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "confirmed",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "confirmed",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "confirmed",
+    "V-314.flow coefficient": "reported",
+    "V-314.pressure rating": "reported",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "confirmed",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "confirmed",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "confirmed",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "confirmed",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "confirmed",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "confirmed"
+   }
+  },
+  "lcc-s1-traps": {
+   "facts": {
+    "changed": 3,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 18
+   },
+   "changes_found": "3/3",
+   "additions_found": "2/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "18/18",
+   "false_changes": 0,
+   "difference_precision": 0.5,
+   "changed": {
+    "reported": 3
+   },
+   "added": {
+    "reported": 2
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 18
+   },
+   "different": {
+    "across facts": 3,
+    "change": 3
+   },
+   "equivalent": {
+    "no change": 24
+   },
+   "findings": {
+    "complementary": 4,
+    "different": 6,
+    "equivalent": 24,
+    "uncertain": 1,
+    "unrelated": 82
+   },
+   "unmatched": 4,
+   "pairs": 117,
+   "omitted": 0,
+   "detail": {
+    "ahu3.airflow": "confirmed",
+    "ahu3.fanmotor": "confirmed",
+    "hallc.area": "confirmed",
+    "hallc.height": "confirmed",
+    "hallc.liveload": "confirmed",
+    "hallc.noise": "reported",
+    "hallc.occupancy": "confirmed",
+    "hallc.tmax": "confirmed",
+    "hallc.tmin": "confirmed",
+    "halls.area": "confirmed",
+    "opt1.cost": "reported",
+    "opt1.load": "confirmed",
+    "opt2.cost": "confirmed",
+    "opt2.load": "confirmed",
+    "roof.snow": "reported",
+    "room101.area": "confirmed",
+    "room101.seats": "confirmed",
+    "room102.area": "confirmed",
+    "room102.seats": "confirmed",
+    "room103.area": "confirmed",
+    "room103.seats": "confirmed",
+    "room104.area": "reported",
+    "room104.seats": "reported",
+    "room105.area": "reported",
+    "room105.seats": "reported"
+   }
+  },
+  "lcc-energy-s1-clean": {
+   "facts": {
+    "changed": 5,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 16
+   },
+   "changes_found": "5/5",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "16/16",
+   "false_changes": 0,
+   "difference_precision": 0.8333,
+   "changed": {
+    "reported": 5
+   },
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 16
+   },
+   "different": {
+    "across facts": 1,
+    "change": 5
+   },
+   "equivalent": {
+    "no change": 16,
+    "unscored": 1
+   },
+   "findings": {
+    "complementary": 15,
+    "different": 6,
+    "equivalent": 17,
+    "uncertain": 23,
+    "unrelated": 137
+   },
+   "unmatched": 23,
+   "pairs": 198,
+   "omitted": 0,
+   "detail": {
+    "opt1.august": "confirmed",
+    "opt1.demand": "confirmed",
+    "opt1.july": "reported",
+    "opt1.june": "confirmed",
+    "opt1.may": "confirmed",
+    "opt1.october": "confirmed",
+    "opt1.season": "reported",
+    "opt1.september": "confirmed",
+    "opt2.august": "reported",
+    "opt2.demand": "confirmed",
+    "opt2.july": "confirmed",
+    "opt2.june": "confirmed",
+    "opt2.may": "confirmed",
+    "opt2.october": "confirmed",
+    "opt2.season": "reported",
+    "opt2.september": "confirmed",
+    "zone.concourse": "confirmed",
+    "zone.exhibit": "reported",
+    "zone.kitchens": "confirmed",
+    "zone.loading": "confirmed",
+    "zone.meeting": "confirmed"
+   }
+  },
+  "lcc-plan-s1-clean": {
+   "facts": {
+    "changed": 3,
+    "added": 1,
+    "removed": 0,
+    "unchanged": 35
+   },
+   "changes_found": "3/3",
+   "additions_found": "0/1",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "35/35",
+   "false_changes": 0,
+   "difference_precision": 0.2208,
+   "changed": {
+    "reported": 3
+   },
+   "added": {
+    "as a change": 1
+   },
+   "removed": {},
+   "unchanged": {
+    "confirmed": 35
+   },
+   "different": {
+    "across facts": 44,
+    "change": 17,
+    "unscored": 16
+   },
+   "equivalent": {
+    "no change": 160,
+    "unscored": 17
+   },
+   "findings": {
+    "complementary": 114,
+    "different": 77,
+    "equivalent": 177,
+    "uncertain": 27,
+    "unrelated": 145
+   },
+   "unmatched": 7,
+   "pairs": 540,
+   "omitted": 0,
+   "detail": {
+    "D101.height": "confirmed",
+    "D101.width": "confirmed",
+    "D102.height": "confirmed",
+    "D102.width": "confirmed",
+    "D103.height": "confirmed",
+    "D103.width": "reported",
+    "D104.height": "confirmed",
+    "D104.width": "confirmed",
+    "D110.height": "confirmed",
+    "D110.width": "confirmed",
+    "D111.height": "confirmed",
+    "D111.width": "confirmed",
+    "D112.height": "confirmed",
+    "D112.width": "confirmed",
+    "revA.date": "confirmed",
+    "revB.date": "confirmed",
+    "revC.date": "confirmed",
+    "revD.date": "as a change",
+    "room101.area": "confirmed",
+    "room101.depth": "confirmed",
+    "room101.width": "confirmed",
+    "room102.area": "reported",
+    "room102.depth": "confirmed",
+    "room102.width": "reported",
+    "room103.area": "confirmed",
+    "room103.depth": "confirmed",
+    "room103.width": "confirmed",
+    "room104.area": "confirmed",
+    "room104.depth": "confirmed",
+    "room104.width": "confirmed",
+    "room110.area": "confirmed",
+    "room110.depth": "confirmed",
+    "room110.width": "confirmed",
+    "room111.area": "confirmed",
+    "room111.depth": "confirmed",
+    "room111.width": "confirmed",
+    "room112.area": "confirmed",
+    "room112.depth": "confirmed",
+    "room112.width": "confirmed"
+   }
+  }
+ },
+ "replay": {
+  "wtp-s1": {
+   "facts": {
+    "changed": 4,
+    "added": 3,
+    "removed": 1,
+    "unchanged": 28
+   },
+   "changes_found": "4/4",
+   "additions_found": "3/3",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "28/28",
+   "false_changes": 0,
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 4
+   },
+   "added": {
+    "reported": 3
+   },
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 28
+   },
+   "different": {
+    "change": 5
+   },
+   "equivalent": {
+    "no change": 32,
+    "unscored": 2
+   },
+   "findings": {
+    "complementary": 51,
+    "different": 5,
+    "equivalent": 34,
+    "unrelated": 82
+   },
+   "unmatched": 4,
+   "pairs": 172,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "reported",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "P-101D.capacity": "reported",
+    "P-101D.head": "reported",
+    "P-101D.motor": "reported",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "reported",
+    "chem.chlorine": "reported",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "optA.cost": "reported",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "reported",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "coaster-s1": {
+   "facts": {
+    "changed": 4,
+    "added": 3,
+    "removed": 1,
+    "unchanged": 23
+   },
+   "changes_found": "4/4",
+   "additions_found": "1/3",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "23/23",
+   "false_changes": 0,
+   "difference_precision": 0.6364,
+   "changed": {
+    "reported": 4
+   },
+   "added": {
+    "as a change": 2,
+    "reported": 1
+   },
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 23
+   },
+   "different": {
+    "across facts": 4,
+    "change": 7
+   },
+   "equivalent": {
+    "no change": 29,
+    "unscored": 1
+   },
+   "findings": {
+    "complementary": 21,
+    "different": 11,
+    "equivalent": 30,
+    "uncertain": 4,
+    "unrelated": 99
+   },
+   "unmatched": 2,
+   "pairs": 165,
+   "omitted": 0,
+   "detail": {
+    "el.Camelback.g": "confirmed",
+    "el.Camelback.height": "confirmed",
+    "el.Camelback.speed": "confirmed",
+    "el.First drop.g": "confirmed",
+    "el.First drop.speed": "confirmed",
+    "el.Helix.g": "as a change",
+    "el.Helix.height": "as a change",
+    "el.Helix.speed": "reported",
+    "el.Vertical loop.g": "confirmed",
+    "el.Vertical loop.height": "confirmed",
+    "el.Vertical loop.speed": "reported",
+    "el.Zero-g roll.g": "confirmed",
+    "el.Zero-g roll.height": "confirmed",
+    "el.Zero-g roll.speed": "confirmed",
+    "ride.angle": "confirmed",
+    "ride.capacity": "reported",
+    "ride.drop": "confirmed",
+    "ride.duration": "confirmed",
+    "ride.g_max": "confirmed",
+    "ride.inversions": "confirmed",
+    "ride.length": "confirmed",
+    "ride.lift": "reported",
+    "ride.speed": "confirmed",
+    "station.length": "reported",
+    "struct.columns": "confirmed",
+    "struct.steel": "confirmed",
+    "struct.wind": "confirmed",
+    "trains.cars": "confirmed",
+    "trains.count": "confirmed",
+    "trains.mass": "reported",
+    "trains.riders": "confirmed"
+   }
+  },
+  "wtp-tables-s1-clean": {
+   "facts": {
+    "changed": 3,
+    "added": 4,
+    "removed": 3,
+    "unchanged": 78
+   },
+   "changes_found": "3/3",
+   "additions_found": "4/4",
+   "removals_found": "3/3",
+   "unchanged_confirmed": "78/78",
+   "false_changes": 0,
+   "difference_precision": 0.2667,
+   "changed": {
+    "reported": 3
+   },
+   "added": {
+    "reported": 4
+   },
+   "removed": {
+    "reported": 3
+   },
+   "unchanged": {
+    "confirmed": 78
+   },
+   "different": {
+    "across facts": 6,
+    "change": 4,
+    "unscored": 5
+   },
+   "equivalent": {
+    "no change": 155,
+    "unscored": 8
+   },
+   "findings": {
+    "complementary": 108,
+    "different": 15,
+    "equivalent": 163,
+    "uncertain": 11,
+    "unrelated": 309
+   },
+   "unmatched": 11,
+   "pairs": 606,
+   "omitted": 0,
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "reported",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "reported",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "P-101D.capacity": "reported",
+    "P-101D.motor power": "reported",
+    "P-101D.motor speed": "reported",
+    "P-101D.total dynamic head": "reported",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "confirmed",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "confirmed",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "confirmed",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "confirmed",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "confirmed",
+    "V-306.flow coefficient": "reported",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "confirmed",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "confirmed",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "confirmed",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "confirmed",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "confirmed",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "confirmed",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "confirmed",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "confirmed",
+    "V-314.flow coefficient": "reported",
+    "V-314.pressure rating": "reported",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "confirmed",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "confirmed",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "confirmed",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "confirmed",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "confirmed",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "confirmed"
+   }
+  },
+  "lcc-s1-traps": {
+   "facts": {
+    "changed": 3,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 18
+   },
+   "changes_found": "3/3",
+   "additions_found": "2/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "18/18",
+   "false_changes": 0,
+   "difference_precision": 0.5,
+   "changed": {
+    "reported": 3
+   },
+   "added": {
+    "reported": 2
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 18
+   },
+   "different": {
+    "across facts": 3,
+    "change": 3
+   },
+   "equivalent": {
+    "no change": 24
+   },
+   "findings": {
+    "complementary": 4,
+    "different": 6,
+    "equivalent": 24,
+    "uncertain": 1,
+    "unrelated": 82
+   },
+   "unmatched": 4,
+   "pairs": 117,
+   "omitted": 0,
+   "detail": {
+    "ahu3.airflow": "confirmed",
+    "ahu3.fanmotor": "confirmed",
+    "hallc.area": "confirmed",
+    "hallc.height": "confirmed",
+    "hallc.liveload": "confirmed",
+    "hallc.noise": "reported",
+    "hallc.occupancy": "confirmed",
+    "hallc.tmax": "confirmed",
+    "hallc.tmin": "confirmed",
+    "halls.area": "confirmed",
+    "opt1.cost": "reported",
+    "opt1.load": "confirmed",
+    "opt2.cost": "confirmed",
+    "opt2.load": "confirmed",
+    "roof.snow": "reported",
+    "room101.area": "confirmed",
+    "room101.seats": "confirmed",
+    "room102.area": "confirmed",
+    "room102.seats": "confirmed",
+    "room103.area": "confirmed",
+    "room103.seats": "confirmed",
+    "room104.area": "reported",
+    "room104.seats": "reported",
+    "room105.area": "reported",
+    "room105.seats": "reported"
+   }
+  },
+  "lcc-energy-s1-clean": {
+   "facts": {
+    "changed": 5,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 16
+   },
+   "changes_found": "5/5",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "16/16",
+   "false_changes": 0,
+   "difference_precision": 0.8333,
+   "changed": {
+    "reported": 5
+   },
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 16
+   },
+   "different": {
+    "across facts": 1,
+    "change": 5
+   },
+   "equivalent": {
+    "no change": 16,
+    "unscored": 1
+   },
+   "findings": {
+    "complementary": 15,
+    "different": 6,
+    "equivalent": 17,
+    "uncertain": 23,
+    "unrelated": 137
+   },
+   "unmatched": 23,
+   "pairs": 198,
+   "omitted": 0,
+   "detail": {
+    "opt1.august": "confirmed",
+    "opt1.demand": "confirmed",
+    "opt1.july": "reported",
+    "opt1.june": "confirmed",
+    "opt1.may": "confirmed",
+    "opt1.october": "confirmed",
+    "opt1.season": "reported",
+    "opt1.september": "confirmed",
+    "opt2.august": "reported",
+    "opt2.demand": "confirmed",
+    "opt2.july": "confirmed",
+    "opt2.june": "confirmed",
+    "opt2.may": "confirmed",
+    "opt2.october": "confirmed",
+    "opt2.season": "reported",
+    "opt2.september": "confirmed",
+    "zone.concourse": "confirmed",
+    "zone.exhibit": "reported",
+    "zone.kitchens": "confirmed",
+    "zone.loading": "confirmed",
+    "zone.meeting": "confirmed"
+   }
+  },
+  "lcc-plan-s1-clean": {
+   "facts": {
+    "changed": 3,
+    "added": 1,
+    "removed": 0,
+    "unchanged": 35
+   },
+   "changes_found": "3/3",
+   "additions_found": "0/1",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "35/35",
+   "false_changes": 0,
+   "difference_precision": 0.2208,
+   "changed": {
+    "reported": 3
+   },
+   "added": {
+    "as a change": 1
+   },
+   "removed": {},
+   "unchanged": {
+    "confirmed": 35
+   },
+   "different": {
+    "across facts": 44,
+    "change": 17,
+    "unscored": 16
+   },
+   "equivalent": {
+    "no change": 160,
+    "unscored": 17
+   },
+   "findings": {
+    "complementary": 114,
+    "different": 77,
+    "equivalent": 177,
+    "uncertain": 27,
+    "unrelated": 145
+   },
+   "unmatched": 7,
+   "pairs": 540,
+   "omitted": 0,
+   "detail": {
+    "D101.height": "confirmed",
+    "D101.width": "confirmed",
+    "D102.height": "confirmed",
+    "D102.width": "confirmed",
+    "D103.height": "confirmed",
+    "D103.width": "reported",
+    "D104.height": "confirmed",
+    "D104.width": "confirmed",
+    "D110.height": "confirmed",
+    "D110.width": "confirmed",
+    "D111.height": "confirmed",
+    "D111.width": "confirmed",
+    "D112.height": "confirmed",
+    "D112.width": "confirmed",
+    "revA.date": "confirmed",
+    "revB.date": "confirmed",
+    "revC.date": "confirmed",
+    "revD.date": "as a change",
+    "room101.area": "confirmed",
+    "room101.depth": "confirmed",
+    "room101.width": "confirmed",
+    "room102.area": "reported",
+    "room102.depth": "confirmed",
+    "room102.width": "reported",
+    "room103.area": "confirmed",
+    "room103.depth": "confirmed",
+    "room103.width": "confirmed",
+    "room104.area": "confirmed",
+    "room104.depth": "confirmed",
+    "room104.width": "confirmed",
+    "room110.area": "confirmed",
+    "room110.depth": "confirmed",
+    "room110.width": "confirmed",
+    "room111.area": "confirmed",
+    "room111.depth": "confirmed",
+    "room111.width": "confirmed",
+    "room112.area": "confirmed",
+    "room112.depth": "confirmed",
+    "room112.width": "confirmed"
+   }
+  }
+ }
+}

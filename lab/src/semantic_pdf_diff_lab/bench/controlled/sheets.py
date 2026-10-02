@@ -32,6 +32,7 @@ class Plan:
     rooms: list
     doors: dict                 # tag: (width in, height in)
     notes: list = field(default_factory=list)
+    revisions: tuple = ()       # the revision table's rows: (revision, date, description)
 
 def floor_plan(d):
     """Hall C's meeting rooms: a row of rooms north of a corridor, a row south, each its own size."""
@@ -67,13 +68,16 @@ def floor_plan(d):
              "SEE MECHANICAL SHEETS FOR DUCT AND DIFFUSER LOCATIONS.",
              "VERIFY ALL CONDITIONS IN THE FIELD BEFORE STARTING WORK.",
              "ROOM AREAS ARE NET, MEASURED TO FACE OF FINISH."]
-    return Plan(grid_x, grid_y, rooms, doors, notes)
+    return Plan(grid_x, grid_y, rooms, doors, notes, REVISIONS)
 
 def plan_sheet(seed=1):
     """A controlled project whose one page is the floor plan sheet."""
-    from .corpus import Draw, Fact, Project
-    d = Draw(f"lcc-plan-{seed}")
-    plan = floor_plan(d)
+    from .corpus import Draw
+    return sheet_project(floor_plan(Draw(f"lcc-plan-{seed}")), f"lcc-plan-s{seed}")
+
+def sheet_project(plan, ident):
+    """The project a plan draws: its facts read from the plan (so a revised plan gives the revision's facts)."""
+    from .corpus import Fact, Project
     facts = []
     for r in plan.rooms:
         room = f"{r.name.title()} {r.number}"
@@ -94,10 +98,10 @@ def plan_sheet(seed=1):
         facts.append(Fact(f"{r.door}.part-of.room{r.number}", door, (r.door,), "part of", (), room, "",
                           relation="part of", object_aliases=aliases, accepts=("within", "linked", "serves", "leads to"),
                           drawn="table"))
-    for rev, date, what in REVISIONS:  # the revision table's dates: fair claims, so facts
+    for rev, date, what in plan.revisions:  # the revision table's dates: fair claims, so facts
         facts.append(Fact(f"rev{rev}.date", f"Revision {rev}", (f"Rev {rev}", f"Rev. {rev}"), "date",
                           ("issue date", "revision date", "issued", "date issued"), date, "", what, drawn="table"))
-    project = Project(f"lcc-plan-s{seed}", "Lakeshore Hall C: Meeting Rooms Floor Plan", facts, [], kinds=SHEET_KNOBS,
+    project = Project(ident, "Lakeshore Hall C: Meeting Rooms Floor Plan", facts, [], kinds=SHEET_KNOBS,
                       things=[(f"{r.name.title()} {r.number}", (f"Room {r.number}", f"{r.name.title()} Room {r.number}",
                                                                  r.number, f"{r.name} {r.number}")) for r in plan.rooms] +
                              [(f"Door {r.door}", (r.door,)) for r in plan.rooms] +
@@ -148,7 +152,7 @@ def render(project):
     lines([(tb.x0, ARCH_D[1] - 540), (tb.x1, ARCH_D[1] - 540)], 1.0)
     rev_y = ARCH_D[1] - 760  # the revision table, above the title
     text(tb.x0 + 20, rev_y, "REVISIONS", 10)
-    for k, (rev, date, what) in enumerate(REVISIONS):
+    for k, (rev, date, what) in enumerate(plan.revisions):
         yy = rev_y + 22 + k * 20
         text(tb.x0 + 20, yy, rev, 9)
         text(tb.x0 + 60, yy, date, 9)

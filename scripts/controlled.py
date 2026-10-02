@@ -7,7 +7,9 @@
     python scripts/controlled.py score                       # results.json from the runs' stores, offline
     python scripts/controlled.py run --replay                # read again from the packed fixture, offline
 
-The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay.
+The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
+is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
+(comparisons.json; revisions.py, comparison.py).
 """
 import argparse
 import contextlib
@@ -23,6 +25,7 @@ DOCS = FOLDER / "docs"
 WORKING = FOLDER / "fixture.sqlite"   # recorded answers (git-ignored); packed into replay.zip
 PACKED = FOLDER / "replay.zip"
 RUNS = ROOT / "benchmarks/runs/controlled"
+PAIR_RUNS = ROOT / "benchmarks/runs/controlled-pairs"
 LEDGER = ROOT / "benchmarks/ledger.jsonl"
 # The settings recordings share (scripts/record_runs.py): they shape the queries, so they decide what replays.
 BASE_SETTINGS = {"claims_per_request": 20, "output_tokens": 4000, "context_tokens": 262144, "image_tokens": 300}
@@ -42,16 +45,17 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate", help="write the corpus's PDFs and answer keys")
     gen.add_argument("--seed", type=int, action="append", help="default: 1")
-    run = sub.add_parser("run", help="extract every document (recorded; answers already recorded are free)")
+    run = sub.add_parser("run", help="extract every document and compare every revision pair (recorded; answers "
+                                     "already recorded are free)")
     run.add_argument("--replay", action="store_true", help="from the packed fixture, without calling a model")
     run.add_argument("--responder", help="default: the configured model")
     run.add_argument("--max-cost", type=float, default=0.2)
-    sub.add_parser("score", help="score each run against its key (offline)")
+    sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.bench import controlled
     from semantic_pdf_diff import fixtures
     if args.command == "generate":
-        for project in controlled.corpus(tuple(args.seed or (1,)), knobs=True):
+        for project in controlled.corpus(tuple(args.seed or (1,)), knobs=True, revisions=True):
             print(f"{controlled.write(project, DOCS)}: {len(project.facts)} facts")
         return 0
     if args.command == "run":
@@ -64,12 +68,17 @@ def main(argv=None):
             if len(held) != 1:
                 parser.error(f"the fixture holds {held}: name one with --responder")
             args.responder = held[0]
+        from semantic_pdf_diff_lab.bench.controlled import revisions
         config = settings_file()
         before = ledger.spent(LEDGER, round="controlled") if LEDGER.exists() else 0.0
         worst = 0
         setup_logging(quiet=True)
-        for pdf in sorted(DOCS.glob("*.pdf")):
-            options = pipeline.RunOptions(fixture=PACKED if args.replay else WORKING,
+        # each document alone (the same PDF on both sides: extraction only), then each pair in revisions mode
+        jobs = [(pdf, pdf, out / pdf.stem, pdf.stem, "proposals") for pdf in sorted(DOCS.glob("*.pdf"))]
+        jobs += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", PAIR_RUNS / out.name / p.id, f"pair {p.id}",
+                  "revisions") for p in revisions.pairs()]
+        for a, b, folder, name, mode in jobs:
+            options = pipeline.RunOptions(mode=mode, fixture=PACKED if args.replay else WORKING,
                                           fixture_mode="replay" if args.replay else "record-new", responder=args.responder)
             if args.replay:
                 settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL)
@@ -79,9 +88,9 @@ def main(argv=None):
                     print(f"cap of ${args.max_cost} reached")
                     return 3
                 settings = pipeline.settings_from(config, situate=False, max_cost=round(left, 4))
-                options.ledger, options.ledger_tags = LEDGER, {"round": "controlled", "run": pdf.stem}
-            code = pipeline.attempt(pipeline.compare_paths, pdf, pdf, out / pdf.stem, settings, options)
-            print(f"{pdf.stem}: exit {code}", flush=True)
+                options.ledger, options.ledger_tags = LEDGER, {"round": "controlled", "run": name.replace(" ", "-")}
+            code = pipeline.attempt(pipeline.compare_paths, a, b, folder, settings, options)
+            print(f"{name}: exit {code}", flush=True)
             worst = max(worst, code)
         if not args.replay:
             fixtures.pack(WORKING, PACKED)
@@ -154,7 +163,33 @@ def main(argv=None):
             print(f"{which} {run}: recall {r['recall']} ({r['found']}/{r['facts']}, {r['found_right']} right) "
                   f"by form {r['recall_by_form']} by reader {r['by_reader']}; claims {r['claims']} {r['outcomes']}; "
                   f"conditions kept {r['conditions_kept']}")
+    compared = compare_pairs()
+    for which, pairs in compared.items():
+        print(f"\n{which} revision pairs: pair                         changes  added  removed  unchanged  false  "
+              "precision  findings")
+        for pair, r in pairs.items():
+            precision = "-" if r["difference_precision"] is None else f"{r['difference_precision']:.2f}"
+            print(f"  {pair:30s} {r['changes_found']:>7s} {r['additions_found']:>6s} {r['removals_found']:>8s} "
+                  f"{r['unchanged_confirmed']:>10s} {r['false_changes']:6d} {precision:>10s}  {r['findings']}")
+            for kind in ("changed", "added", "removed", "unchanged"):
+                print(f"      {kind}: {r[kind]}")
+            print(f"      different: {r['different']}; equivalent: {r['equivalent']}; unmatched {r['unmatched']}; "
+                  f"pairs {r['pairs']} (omitted {r['omitted']})")
     return 0
+
+def compare_pairs():
+    """comparisons.json: each revision pair's comparison scored against the two revisions' keys."""
+    from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
+    compared = {}
+    for which in ("recorded", "replay"):
+        for pair in revisions.pairs():
+            report = PAIR_RUNS / which / pair.id / "report.json"
+            if report.exists():
+                keys = [json.loads((DOCS / f"{d}.key.json").read_text(encoding="utf-8")) for d in (pair.earlier, pair.later)]
+                compared.setdefault(which, {})[pair.id] = comparison.score_comparison(
+                    *keys, json.loads(report.read_text(encoding="utf-8")))
+    (FOLDER / "comparisons.json").write_text(json.dumps(compared, indent=1) + "\n", encoding="utf-8")
+    return compared
 
 if __name__ == "__main__":
     sys.exit(main())

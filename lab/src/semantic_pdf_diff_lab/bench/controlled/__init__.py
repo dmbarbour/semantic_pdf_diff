@@ -6,6 +6,8 @@ form and place known, so extraction is scored exactly (docs/plans/controlled-doc
     relations   relations between named things, and how claims stating them are scored
     schematics  system drawings: parts, links and enclosures, laid out
     sheets      drawing sheets: a floor plan with dimensions, tags and a door schedule
+    revisions   revision pairs: a corpus document and a revision of it with known changes
+    comparison  a comparison in revisions mode scored against the key's changes
 
 This façade keeps `controlled.X` working for corpus and score (architecture clean-up, milestone 8).
 """

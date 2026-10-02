@@ -1,6 +1,6 @@
 # Controlled documents with known facts
 
-- **Status:** Active (2026-10-01): milestones 1, 2 (table, prose and layout knobs) and 3 (charts, scans, schematics, relations and drawing sheets) done.
+- **Status:** Active (2026-10-02): milestones 1, 2 (table, prose and layout knobs), 3 (charts, scans, schematics, relations and drawing sheets) and 4 (revision pairs and comparison scoring) done.
 - **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](one-table-model-2026-09-30.md) (table hazards; its table eye tests become part of this); [content-addressed queries](content-addressed-queries-2026-09-28.md) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
 - **Why:**
   - **The owner (2026-10-01):** "similar to the eye test as a controlled test, we could have controlled PDF tests, i.e. where you generate a few PDFs with known facts to extract for fictional projects. This might provide a more robust control without relying on yours or my ability to extract facts."
@@ -492,6 +492,69 @@ Each row is a situation met in this project's documents, with where it was recor
     - the corridor as a named thing
   - **A correction caught before any reading:** extending the chart drawer changed two committed chart PDFs' bytes. It was restored, and a test now generates every committed document again, byte for byte.
   - **Not covered:** the drawing scale is a fair claim the key lacks (1–4 misread per sheet); details, callouts and sections; noise on scans.
+
+- **Milestone 4, revision pairs and comparison scoring (2026-10-02): done.**
+  - **Code:** `revisions.py` (the pairs and their edits) and `comparison.py` (the scorer). `scripts/controlled.py run` reads every document, then compares each pair in revisions mode; `score` writes `comparisons.json`.
+  - **Six pairs, one per kind of document.** Each pairs a corpus document with a revision made by editing it. The corpus document is unchanged byte for byte, so its recorded answers serve the pair; only the revision is read anew.
+
+    | Pair (forms) | Changed | Added | Removed | Unchanged |
+    |---|---|---|---|---|
+    | `wtp-s1` (prose, tables) | design flow, a pump's capacity, maximum alum dose, UV's capital cost | pump P-101D (3 facts) | chlorine dose (its sentence) | 28 |
+    | `coaster-s1` (prose; the change narrated) | lift hill height, train mass, hourly capacity, the loop's entry speed | the helix (3) | station platform length | 23 |
+    | `wtp-tables-s1-clean` (schedules) | a pump's power, a blower's pressure, a valve's Cv | pump P-101D (4) | valve V-314 (3); the valves below move up across the split tables | 78 |
+    | `lcc-s1-traps` (trap phrasings) | noise limit tightened ("shall not exceed"), roof snow rating ("not rated for … above"), chilled beams' first cost (stated against the baseline's) | room 105 (2) | room 104 (2): a renumbering | 18 |
+    | `lcc-energy-s1-clean` (charts) | two monthly bars, the two season totals that follow them, a zone's peak load | – | – | 16 |
+    | `lcc-plan-s1-clean` (drawing sheet) | room 102's width and area, door D103's width | revision D's date (the revision table) | – | 35 |
+
+    - The coaster's corpus document is revision B, which says the lift hill "was raised from 178 ft to 230 ft". So its earlier revision is the generated one, and the later prints the superseded height beside the new.
+  - **Keys stay honest by construction** (a test checks each rule):
+    - a value is changed wherever it's printed, as a whole token ("3" never inside "3-second")
+    - every fact must be placed on the page
+    - a revision may print no number its base doesn't, besides facts, added items' names and page numbers, so an edit that missed a printed value is caught
+  - **The scorer** binds each revision's claims to its own key's facts (`score.classify`; a range to both bounds). A finding then pairs one fact read in both revisions, or two facts. Each fact is classed by what the report says of it:
+    - **changed:** reported (a "different" finding), called equivalent, uncertain, other, unpaired, unextracted
+    - **unchanged:** confirmed (equivalent), false change (different), uncertain, other, unpaired, unextracted
+    - **added or removed:** reported (a claim left without a counterpart, as the report lists them), as a change, called equivalent, other, unextracted
+    - **every "different" finding** too: a change, no change, a misreading, across facts (two facts' claims), unscored (a claim bound to no fact). Precision is the share that are changes.
+  - **gemma-4 compared the six pairs for $0.305:** $0.058 to read the six revisions, $0.247 for 1,798 comparisons.
+
+    | Pair | Changes found | Additions | Removals | Unchanged confirmed | "Different" findings that are changes | Comparisons |
+    |---|---|---|---|---|---|---|
+    | `wtp-s1` | 4 / 4 | 3 / 3 | 1 / 1 | 28 / 28 | 5 / 5 | 172 |
+    | `coaster-s1` | 4 / 4 | 1 / 3 | 1 / 1 | 23 / 23 | 7 / 11 | 165 |
+    | `wtp-tables-s1-clean` | 3 / 3 | 4 / 4 | 3 / 3 | 78 / 78 | 4 / 15 | 606 |
+    | `lcc-s1-traps` | 3 / 3 | 2 / 2 | 2 / 2 | 18 / 18 | 3 / 6 | 117 |
+    | `lcc-energy-s1-clean` | 5 / 5 | – | – | 16 / 16 | 5 / 6 | 198 |
+    | `lcc-plan-s1-clean` | 3 / 3 | 0 / 1 | – | 35 / 35 | 17 / 77 | 540 |
+
+  - **Every change was found, and every unchanged fact confirmed:**
+    - 22 of 22 changes paired with themselves as different
+    - 198 of 198 unchanged facts paired with themselves as equivalent; none called different
+    - 7 of 7 removals left without a counterpart, as the report lists removals
+    - 10 of 13 additions likewise; the other 3 were taken for changes (below)
+    - the coaster's superseded height, printed beside the new one, didn't hide its change
+    - the renumbered room was reported as a removal and an addition, not as a change
+  - **But most "different" findings weren't changes:** 41 of 120 were. The other 79:
+    - **Names by position (59).** The image reader named rows by position ("blower 5") and dimensions by order ("dimension 2").
+      - Inserting pump P-101D moved every blower down a row, so "blower 5" was B-402 in one revision and B-401 in the other: 11 false differences.
+      - On the floor plan, unlabelled dimensions were compared across rooms' widths and depths: 48.
+    - **Two items of a kind taken for one item changed (17).** In revisions mode the prompt says corresponding claims describe the same object, and the model took "the same kind" for "the same":
+      - different track elements ("First drop | peak g | 2.3" against the Camelback's 2.8), and the new helix against older elements
+      - revision D's date against revisions A, B and C's
+      - the two cooling options' loads and demands: spot check sc01 item 2's alternatives trap, met again in comparison
+    - **A claim bound to no fact (3).**
+  - **The approximate-reading veto** made 23 of the energy study's findings uncertain. Most were the text reader's month-shifted chart values (milestone 3a's known flaw), read alike in both revisions.
+  - **Checked by hand:**
+    - every "different" and "uncertain" finding of the coaster, design basis and energy study pairs
+    - every difference between two facts in the schedules pair, and 15 of the floor plan's 60, with its date findings
+  - **The scorer's own flaw, found that way:** a range ("66 to 75 °F") was bound to its first number only, so the maximum temperature looked unextracted. It's now bound to both bounds, as extraction scoring reads one.
+  - **The local run stores were rebuilt.** Stores bound before the architecture clean-up record the settings differently (temperature became a constant), so they refused to load. They were moved aside, and every document replayed from the fixture: no answer missing, the committed extraction scores unchanged, and the pairs' replayed comparisons scoring as recorded.
+  - **The lever index has two new rows:** a change needs the same item, and names that carry identity.
+  - **Not covered:**
+    - relations (a door's room, schematics' links) aren't compared
+    - conditions changed with the value kept, and items renamed
+    - one seed, one sample per query
+    - these are counts to compare between levers, not rates to quote
 
 ## Decisions (2026-10-01)
 
