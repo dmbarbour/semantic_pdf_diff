@@ -7,6 +7,7 @@ as a diff. After an intended change, regenerate with GOLDEN_UPDATE=1 and review 
 The replays judge committed round batches again from their own fixtures (replay.zip), offline,
 and must reproduce the committed verdicts: the answers are found by the queries rebuilt today.
 """
+import stubs  # noqa: F401 (a clean environment)
 import json
 import os
 import shutil

@@ -6,6 +6,7 @@ The null model is round 9's A/A control: a variant that re-asks the baseline's i
 changes nothing else. Its 32 unit scores, symmetrised: judges mostly pick a side even when there's
 nothing to choose. Units sit in 27 regions, 5 cut into two bands whose scores often agree.
 """
+import stubs  # noqa: F401 (a clean environment)
 import collections
 import random
 import unittest

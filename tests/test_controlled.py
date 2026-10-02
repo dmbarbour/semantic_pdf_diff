@@ -1,4 +1,5 @@
 """Controlled documents: generated the same way every time, every fact placed, claims classed exactly."""
+import stubs  # noqa: F401 (a clean environment)
 import unittest
 from semantic_pdf_diff import controlled
 
@@ -301,8 +302,6 @@ class Scoring(unittest.TestCase):
         self.assertEqual(s["outcomes"], {"distractor": 1})
         self.assertEqual(s["found"], 0)
 
-if __name__ == "__main__":
-    unittest.main()
 
 class Replay(unittest.TestCase):
     """The committed corpus, read again from its recorded answers, scores as committed."""
@@ -343,6 +342,7 @@ class Corpus(unittest.TestCase):
     """Every committed document is generated again byte for byte, so recorded answers keep replaying (a drawing
     change that moved one chart's bytes once went unnoticed until a run had started)."""
     def test_every_committed_document_is_generated_alike(self):
+        import json
         import tempfile
         from pathlib import Path
         import pymupdf
@@ -354,8 +354,16 @@ class Corpus(unittest.TestCase):
             recorded_with = f.meta().get("pymupdf")
         if recorded_with != pymupdf.VersionBind:
             self.skipTest(f"recorded with PyMuPDF {recorded_with}; documents differ under {pymupdf.VersionBind}")
-        for project in controlled.corpus(knobs=True):
-            committed = folder / "docs" / f"{project.id}.pdf"
-            if committed.exists():
-                with self.subTest(document=project.id):
-                    self.assertEqual(controlled.render(project)[0], committed.read_bytes())
+        projects = controlled.corpus(knobs=True)
+        # every committed document is still generated, and every generated one is committed
+        self.assertEqual({p.id for p in projects}, {f.stem for f in (folder / "docs").glob("*.pdf")})
+        self.assertEqual({p.id for p in projects}, {f.name[:-len(".key.json")] for f in (folder / "docs").glob("*.key.json")})
+        for project in projects:
+            with self.subTest(document=project.id):
+                data, log = controlled.render(project)
+                self.assertEqual(data, (folder / "docs" / f"{project.id}.pdf").read_bytes())
+                key = json.loads((folder / "docs" / f"{project.id}.key.json").read_text(encoding="utf-8"))
+                self.assertEqual(json.loads(json.dumps(controlled.key(project, log), ensure_ascii=False)), key)
+
+if __name__ == "__main__":
+    unittest.main()

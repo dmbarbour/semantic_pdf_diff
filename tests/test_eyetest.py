@@ -1,4 +1,5 @@
 """Eye tests: every card draws its answers, scoring tells errors apart, and recorded answers replay."""
+import stubs  # noqa: F401 (a clean environment)
 import json
 import tempfile
 import unittest

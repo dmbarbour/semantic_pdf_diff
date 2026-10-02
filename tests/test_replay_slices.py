@@ -4,6 +4,7 @@ Needs the fetched samples cut into slices (scripts/fetch_samples.py, scripts/mak
 and the same PyMuPDF version the fixture was recorded with; otherwise it skips. Answers
 differ between responders, so outcomes are checked for shape, not exact content.
 """
+import stubs  # noqa: F401 (a clean environment)
 import contextlib
 import io
 import json

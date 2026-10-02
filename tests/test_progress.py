@@ -1,3 +1,4 @@
+import stubs  # noqa: F401 (a clean environment)
 import contextlib
 import io
 import json

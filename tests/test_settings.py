@@ -3,6 +3,7 @@ pipeline, an endpoint setting changes no query that reaches the model, a post-pr
 extraction query, and a shaping or selecting one changes some query (else it's dead or misfiled).
 See docs/plans/content-addressed-queries-2026-09-28.md, milestone 1.
 """
+import stubs  # noqa: F401 (a clean environment)
 import contextlib
 import io
 import json
@@ -76,9 +77,7 @@ def document(path, rating, sheet=False):
     cited.insert_text((60, 115), 'b. The standby pump starts within 5 s of a trip.', fontsize=9)
     if not sheet:
         doc.set_toc([[1, '3 Pumps', 1], [2, '3.1 Pump Station', 1], [2, '3.2 Controls', 2]])
-        doc.save(path)
-        doc.close()
-        return path
+        return saved(doc, path)
     sheet = doc.new_page(width=2448, height=1584)
     sheet.draw_rect(pymupdf.Rect(108, 72, 2394, 1512))
     sheet.draw_line(pymupdf.Point(2124, 72), pymupdf.Point(2124, 1512))
@@ -91,7 +90,13 @@ def document(path, rating, sheet=False):
         sheet.insert_text((x, y), name, fontsize=25, fontname='cour')
         sheet.insert_text((x + 50, y), title, fontsize=25)
     doc.set_toc([[1, '3 Pumps', 1], [2, '3.1 Pump Station', 1], [2, '3.2 Controls', 2], [1, 'Drawings', 3]])
-    doc.save(path)
+    return saved(doc, path)
+
+def saved(doc, path):
+    """Saved byte for byte alike in every process: no creation date, no fresh document id. Claims' ids hash
+    the document's bytes, and requests list claims in id order (tests/test_golden_requests.py)."""
+    doc.set_metadata({})
+    doc.save(path, garbage=3, deflate=True, no_new_id=True)
     doc.close()
     return path
 
@@ -147,8 +152,34 @@ class SettingsKeepToTheirClass(unittest.TestCase):
                 else:
                     self.assertNotEqual(queries, base, f"{name} ({kind}) changed no query: dead, or misfiled")
 
-if __name__ == '__main__':
-    unittest.main()
+
+class SettingsTablesAgree(unittest.TestCase):
+    """The tables that say what each setting does are kept by hand until they're generated from the levers'
+    declarations (architecture clean-up, milestone 3). Until then they must agree."""
+    # Known gaps, each with its fix: remove an entry when it's fixed.
+    UNBOUND = {"image_tokens": "situating sizes its prompt by it (review item 3; clean-up milestone 2)",
+               "safety_tokens": "situating sizes its prompt by it (review item 3; clean-up milestone 2)"}
+
+    def test_shaping_settings_are_bound_by_a_role(self):
+        from semantic_pdf_diff import provenance as P
+        bound = set(P.EXTRACTION_SETTINGS) | set(P.TRIAGE_SETTINGS) | set(P.COMPARISON_SETTINGS) | set(P.LEVERS)
+        shaping = {k for k, v in SETTING_CLASSES.items() if v == "shaping"}
+        self.assertEqual(shaping - bound, set(self.UNBOUND))  # a new unbound one fails; so does a fixed one left listed
+
+    def test_interpreters_hold_no_transport(self):
+        from semantic_pdf_diff import provenance as P
+        bound = set(P.EXTRACTION_SETTINGS) | set(P.TRIAGE_SETTINGS) | set(P.COMPARISON_SETTINGS) | set(P.LEVERS)
+        self.assertEqual({k for k in bound if SETTING_CLASSES[k] == "endpoint"}, {"model"})  # the model answers
+
+    def test_levers_scopes_and_marks_name_real_settings(self):
+        from semantic_pdf_diff import extract, provenance as P, store
+        self.assertLessEqual(set(P.LEVERS), set(Settings.model_fields))
+        self.assertLessEqual(set(store.SETTING_REGIONS), set(Settings.model_fields))
+        self.assertFalse({k for k in store.SETTING_REGIONS if SETTING_CLASSES[k] == "endpoint"})
+        # a lever without a scope clears every region when changed: only the instructions should
+        self.assertEqual(set(P.LEVERS) - set(store.SETTING_REGIONS), {"extract_prompt", "extract_rules"})
+        marks = {name for name, _ in extract.LEVER_MARKS}
+        self.assertLessEqual(marks - set(P.LEVERS), {"figure_tasks", "section"})  # notes that aren't levers
 
 class DefaultsFitTheirBudget(unittest.TestCase):
     """The shipped defaults must fit their own context budget: once, 4,000 output tokens left 3,792 of an
@@ -168,3 +199,6 @@ class DefaultsFitTheirBudget(unittest.TestCase):
         issues = [i for row in report["coverage"] for i in row.get("issues", []) if "budget" in i]
         self.assertEqual((refused, issues), ([], []))
         self.assertTrue(report["findings"])
+
+if __name__ == '__main__':
+    unittest.main()

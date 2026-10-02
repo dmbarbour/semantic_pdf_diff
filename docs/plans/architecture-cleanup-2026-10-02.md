@@ -1,6 +1,6 @@
 # Architecture clean-up, and levers as mixins
 
-- **Status:** Planned (2026-10-02). Waiting for the owner's go, and open to change once the owner has read the full review.
+- **Status:** Active (2026-10-02). The owner: "Alright, I've read both the review and plan. It's go."
 - **From:**
   - the [code review of 2026-10-01](../reviews/code-review-2026-10-01.md), with the owner's decisions (2026-10-02)
   - the [lever architecture](../research/lever-architecture-2026-10-02.md) investigation, settled with the owner the same day
@@ -158,3 +158,22 @@ Each ends with the full suite passing and a commit. Where requests mustn't chang
 ## Open questions
 
 None now. The owner's reading of the full review may add some.
+
+## Progress
+
+- **Milestone 1, guards (2026-10-02): done.**
+  - **Golden requests** for extraction, situating and comparison (`tests/test_golden_requests.py`), from comparisons of synthetic documents under three profiles:
+    - the defaults: 45 requests
+    - round 0: 151
+    - a drawing sheet: 228
+
+    One line per request (its role and a hash of its prompt, images and parameters), plus each role's first prompt in full. Skipped under another PyMuPDF.
+  - **The goldens' first finding:** the synthetic test documents weren't the same bytes in two processes (a creation date and a fresh document id). Claims' ids hash a document's bytes, and situating lists claims in id order, so a figure's prompt changed between runs. The pipeline was deterministic for a given document; the test fixture wasn't. It's now saved byte for byte alike.
+  - **The settings tables must agree** until they're generated (milestone 3):
+    - every shaping setting is bound by a role, except the two known gaps of review item 3, listed until milestone 2 fixes them
+    - no transport setting is in an interpreter, except the model
+    - levers, scopes and prompt marks name real settings
+  - **The controlled corpus test** checks that every committed document is still generated, and every generated one committed, with its key.
+  - **Every test module runs with a clean environment** (`PDF_DIFF_*` and `OPENAI_*` cleared in `tests/stubs.py`, which all of them import).
+  - **`unittest.main()` guards** moved below the test classes in three files.
+  - 301 tests pass.

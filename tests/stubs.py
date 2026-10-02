@@ -1,7 +1,14 @@
 """Answers shared by test stub models, and round 0's settings for tests of pipeline mechanics."""
 import json
+import os
 import re
 from pathlib import Path
+
+# Tests run with a clean environment: PDF_DIFF_* and OPENAI_* exported in a shell (the scripts say to source .env)
+# would otherwise change what the CLI's Settings.from_env reads, and so what tests send and expect. Every test
+# module imports this module.
+for _name in [n for n in os.environ if n.startswith(("PDF_DIFF_", "OPENAI_"))]:
+    del os.environ[_name]
 
 # The query settings before the improvement rounds' champion became the defaults (2026-09-28):
 # tests of mechanics (refinement, tiling, prompt layout) that don't depend on the levers use these.

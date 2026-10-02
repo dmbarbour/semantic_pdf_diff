@@ -1,4 +1,5 @@
 """Page tests: sheets draw their items, static plans and close-up runs work, requests become regions."""
+import stubs  # noqa: F401 (a clean environment)
 import tempfile
 import unittest
 from semantic_pdf_diff import pagetest

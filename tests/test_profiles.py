@@ -1,4 +1,5 @@
 """Vision profiles: predictions scale with what reaches the model, and plans are the cheapest that read."""
+import stubs  # noqa: F401 (a clean environment)
 import unittest
 from semantic_pdf_diff import profiles
 from semantic_pdf_diff.profiles import Profile

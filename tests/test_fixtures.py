@@ -1,3 +1,4 @@
+import stubs  # noqa: F401 (a clean environment)
 import contextlib
 import io
 import json
@@ -223,8 +224,6 @@ class RecordAndReplay(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn('pack it', log)
 
-if __name__ == '__main__':
-    unittest.main()
 
 class FolderFixtures(unittest.TestCase):
     def test_answers_survive_a_crash_and_are_packed_later(self):
@@ -264,3 +263,6 @@ class FolderFixtures(unittest.TestCase):
             h = folder_fixture(here)
             self.assertIsNotNone(h.answer('q2', 'judge'))
             h.close()
+
+if __name__ == '__main__':
+    unittest.main()

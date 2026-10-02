@@ -1,3 +1,4 @@
+import stubs  # noqa: F401 (a clean environment)
 import io
 import tempfile
 import unittest

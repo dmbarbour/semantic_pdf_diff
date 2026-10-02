@@ -1,4 +1,5 @@
 import contextlib
+import base64
 import hashlib
 import io
 import json
@@ -57,9 +58,13 @@ def jittery_model():
             role = 'compare' if 'Compare exactly' in prompt else 'triage' if situating_answer(prompt) else 'extract'
             seen = hashlib.sha256(json.dumps({k: v for k, v in body.items() if k not in ('model', 'stream', 'stream_options')},
                                              sort_keys=True).encode()).hexdigest()
+            images = [hashlib.sha256(base64.b64decode(p['image_url']['url'].split(',', 1)[1])).hexdigest()
+                      for p in parts[1:] if p.get('type') == 'image_url']
+            params = {k: v for k, v in body.items() if k not in ('model', 'messages', 'stream', 'stream_options')}
             with state['lock']:
                 state['active'] -= 1
                 state.setdefault('queries', []).append((role, seen))
+                state.setdefault('transcript', []).append((role, prompt, images, params))
             self.send_response(200); self.end_headers()
             self.wfile.write(json.dumps({'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(answer)}}],
                                          'usage': {'prompt_tokens': 100, 'completion_tokens': 20,

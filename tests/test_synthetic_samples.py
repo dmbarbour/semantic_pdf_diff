@@ -1,3 +1,4 @@
+import stubs  # noqa: F401 (a clean environment)
 import importlib.util
 import json
 import tempfile

@@ -1,4 +1,5 @@
 """Judgement records: verdict files read as records, failures kept per verdicts folder, raters."""
+import stubs  # noqa: F401 (a clean environment)
 import json
 import tempfile
 import unittest

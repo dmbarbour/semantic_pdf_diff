@@ -1,3 +1,4 @@
+import stubs  # noqa: F401 (a clean environment)
 import random
 import unittest
 from semantic_pdf_diff.models import Claim, Evidence, PdfLocator, claim_id

@@ -1,3 +1,4 @@
+import stubs  # noqa: F401 (a clean environment)
 import tempfile
 import unittest
 from pathlib import Path
