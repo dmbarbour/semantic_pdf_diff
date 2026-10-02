@@ -81,3 +81,15 @@ class Readings(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class ReconcileScales(unittest.TestCase):
+    """reconcile runs on every load of a store: 4,000 claims took 27 s when every claim was compared with every
+    cluster (code review 2026-10-01, item 13)."""
+    def test_thousands_of_claims_reconcile_quickly(self):
+        import time
+        from semantic_pdf_diff.readings import reconcile
+        claims = [sighting(f'Pump P-{i % 900}', 'rated power', str(i % 1500), 'kW', page=1 + i % 20,
+                           task=f'text:p{1 + i % 20}:{i % 7}', region='text') for i in range(4000)]
+        started = time.monotonic()
+        reconcile(claims)
+        self.assertLess(time.monotonic() - started, 5)

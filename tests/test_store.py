@@ -290,3 +290,31 @@ class ResumeAndReuse(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class ResumedRuns(unittest.TestCase):
+    """A run stopped by the call limit, then resumed, leaves the store as one uninterrupted run would: no task
+    rows from the stopped run's refinements (code review 2026-10-01, item 5)."""
+    def test_a_resumed_run_keeps_only_its_own_tasks(self):
+        import contextlib, io, json, tempfile
+        from pathlib import Path
+        from semantic_pdf_diff import cli
+        from semantic_pdf_diff.store import Store
+        from test_concurrency import jittery_model
+        from test_settings import document
+        with tempfile.TemporaryDirectory() as d, jittery_model() as (url, _):
+            root = Path(d)
+            a, b = document(root / 'a.pdf', 10, True), document(root / 'b.pdf', 12, True)
+            run = lambda limit: cli.main([str(a), str(b), '--out', str(root / 'out'), '--base-url', url,
+                                          '--no-situate'] + (['--config', str(limit)] if limit else []))
+            limit = root / 'limit.json'
+            limit.write_text(json.dumps({'max_calls': 12}))
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                run(limit)  # stopped part way: tasks not reached
+                run(None)   # resumed
+            report = json.loads((root / 'out' / 'report.json').read_text())
+            with Store(root / 'out') as store:
+                stored = {(r['content'], r['task']) for c in {r['content'] for r in report['coverage']}
+                          for r in store.coverage(c)}
+        ran = {(r['content'], r['task']) for r in report['coverage']}
+        self.assertFalse([r for r in report['coverage'] if r['status'] == 'not_reached'])
+        self.assertEqual(stored, ran)

@@ -13,7 +13,7 @@ from .pages import (display_y, lines as _lines, native, native_page, reading_blo
 from .models import DerivationStep, Evidence, Extraction, PdfLocator, Section, claim_id, merge_occurrences
 from .situate import page_figures
 from .dispatch import Dispatcher
-from .llm import CallLimitReached
+from .llm import CallLimitReached, NotRecorded
 from .progress import NoProgress, log
 
 # Bump when prompt assembly or task construction changes, not only the template text;
@@ -888,7 +888,8 @@ def section_text(doc, section):
         bottom = section.last_y if number == section.last_page and section.last_y is not None else area.y1
         if bottom <= top:
             continue
-        parts.append(page.get_text("text", clip=pymupdf.Rect(area.x0, top - 1, area.x1, bottom - 1)))
+        # a clip is in the page's unrotated coordinates: on a sheet stored sideways, the displayed band differs
+        parts.append(page.get_text("text", clip=native(page, pymupdf.Rect(area.x0, top - 1, area.x1, bottom - 1))))
     return "\n".join(parts)
 
 # How each extraction pass gets from PDF bytes to a claim.
@@ -1064,7 +1065,10 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         def finish(result, error):
             state["pending"] -= 1
             if error is not None:
-                row.update(status="not_reached" if isinstance(error, CallLimitReached) else "failed", issues=[str(error)])
+                # not reached: the call limit, the cost cap, or an answer a replay doesn't hold. Nothing was learnt,
+                # so it isn't refined; the next run asks it again.
+                unreached = isinstance(error, (CallLimitReached, NotRecorded))
+                row.update(status="not_reached" if unreached else "failed", issues=[str(error)])
             else:
                 handle(result)
             evidence.extend(found)
@@ -1117,7 +1121,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 then=lambda status: refine_text(page_no, segments, text, task, depth, status))
 
     def refine_text(page_no, segments, text, task, depth, status):
-        if status == "complete" or depth >= s.refinement_depth:
+        if status not in ("partial", "failed") or depth >= s.refinement_depth:
             return
         if len(segments) > 1:
             middle = len(segments) // 2
@@ -1190,7 +1194,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
     def refine_visual(page_no, page, tag, rect, depth, status):
         # Refine only local tiles; an overview or a whole figure may be incomplete because
         # it spans many facts, and all its areas already have tile coverage.
-        if (status == "complete" or tag.split(":")[0] in ("overview", "figure") or depth >= s.refinement_depth
+        if (status not in ("partial", "failed") or tag.split(":")[0] in ("overview", "figure") or depth >= s.refinement_depth
                 or min(rect.width, rect.height) < MIN_REFINE_POINTS):
             return
         if rect.width > rect.height:
@@ -1203,12 +1207,20 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             visual_task(page_no, page, f"{tag}-r{i}", child, depth + 1)
 
     name = content if isinstance(path, (bytes, bytearray)) else Path(path).name
-    opened = pymupdf.open(stream=path, filetype="pdf") if isinstance(path, (bytes, bytearray)) else pymupdf.open(path)
+    try:
+        opened = pymupdf.open(stream=path, filetype="pdf") if isinstance(path, (bytes, bytearray)) else pymupdf.open(path)
+        problem = ("encrypted; it needs to be decrypted before comparison" if opened.needs_pass
+                   else "not a nonempty PDF" if not opened.is_pdf or not len(opened) else None)
+    except (RuntimeError, ValueError) as error:  # corrupt, or not a PDF at all
+        opened, problem = None, f"unreadable ({error})"
+    if problem:  # one failed row, and the run goes on with the other documents; the next run tries it again
+        if opened is not None:
+            opened.close()
+        record({"content": content, "page": None, "bbox": None, "task": "open", "image": None, "status": "failed",
+                "issues": [f"{name}: {problem}"], "claims": 0})
+        state["result"] = ([], coverage)
+        return
     with opened as doc:
-        if doc.needs_pass:
-            raise ValueError(f"{name}: encrypted PDF needs to be decrypted before comparison")
-        if not doc.is_pdf or not len(doc):
-            raise ValueError(f"{name}: expected a nonempty PDF")
         context_of = Context(doc, s)  # the task functions above read it when they run
         sections, owner = pdf_sections(doc, s.section_depth, s.section_pages)
         page_section = owner

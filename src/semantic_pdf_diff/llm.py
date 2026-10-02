@@ -54,6 +54,10 @@ TRANSIENT = re.compile(r"TimeoutError|timed out|HTTP (?:408|429|5\d\d)|Connectio
 def transient(error):
     return bool(TRANSIENT.search(error or ""))
 
+class Truncated(ModelFailure):
+    """The answer hit the output limit. Not retried: at temperature 0 it would stop at the same place, and every
+    attempt is billed. Refinement asks again in smaller pieces."""
+
 class NotRecorded(ModelFailure):
     """Replay found no recorded answer for a request."""
 
@@ -402,8 +406,8 @@ class Client:
                 choice = (result.get("choices") or [None])[0]
                 if not isinstance(choice, dict):
                     raise ValueError("Response has no choices")
-                if choice.get("finish_reason") == "length":
-                    raise ValueError("Truncated model output; reduce crop/text size or increase output budget")
+                if choice.get("finish_reason") == "length":  # the same words as when it was retried, so recorded
+                    raise Truncated("ValueError: Truncated model output; reduce crop/text size or increase output budget")
                 answer = (choice.get("message") or {}).get("content")
                 if not isinstance(answer, str) or not answer.strip():
                     raise ValueError("Response has no text content")

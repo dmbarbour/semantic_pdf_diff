@@ -384,3 +384,28 @@ class CliTests(unittest.TestCase):
         self.assertEqual(redact_url('http://localhost:8000/v1'), 'http://localhost:8000/v1')
 
 if __name__ == '__main__': unittest.main()
+
+class UnreadableDocuments(unittest.TestCase):
+    """One unreadable PDF doesn't stop the run: it gets a failed row naming why, and the others are read
+    (code review 2026-10-01, item 7)."""
+    def test_a_corrupt_pdf_beside_a_good_one(self):
+        import tempfile
+        from pathlib import Path
+        from semantic_pdf_diff.extract import Job, run_jobs
+        from semantic_pdf_diff.models import Extraction, Settings
+        import pymupdf
+        good = pymupdf.open()
+        good.new_page().insert_text((72, 72), "Pump P-1 is rated 10 kW.")
+        good_bytes = good.tobytes()
+        class Quiet:
+            s = Settings(vision=False)
+            def prepare(self, *a, **k): return ("q", None)
+            def ask(self, *a, **k): return Extraction(claims=[], complete=True, issues=[])
+        jobs = [Job("sha256:" + "0" * 64 + ".pdf", lambda: b"%PDF-1.7 garbage, not a document"),
+                Job("sha256:" + "1" * 64 + ".pdf", lambda: good_bytes)]
+        with tempfile.TemporaryDirectory() as d:
+            run_jobs([jobs], Path(d), Quiet())
+        bad, ok = jobs[0].state["result"][1], jobs[1].state["result"][1]
+        self.assertEqual([(r["task"], r["status"]) for r in bad], [("open", "failed")])
+        self.assertIn("unreadable", bad[0]["issues"][0])
+        self.assertTrue(ok and all(r["status"] != "failed" for r in ok))

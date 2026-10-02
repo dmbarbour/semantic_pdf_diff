@@ -177,3 +177,17 @@ None now. The owner's reading of the full review may add some.
   - **Every test module runs with a clean environment** (`PDF_DIFF_*` and `OPENAI_*` cleared in `tests/stubs.py`, which all of them import).
   - **`unittest.main()` guards** moved below the test classes in three files.
   - 301 tests pass.
+- **Milestone 2a, the pipeline's fixes (2026-10-02): done.** Each comes with a test that fails without it.
+  - **Rotated pages (item 6):**
+    - Figure detection now works as the page is displayed (captions, drawings, pairing, reading order), recording boxes in unrotated coordinates.
+    - `section_text` clips in unrotated coordinates.
+    - A new upright-or-rotated test covers a captioned figure and section text.
+    - Writing it showed the test page itself had drawn its sideways figure as boxes of no width (two turned corners). That was fixed first, and the bug still showed: a rotated page's figure was its caption alone.
+    - Nine of the drawing slices' situating requests changed. They were recorded for $0.0028 into the replay fixture and the master.
+  - **Situating and extraction bound to `image_tokens` and `safety_tokens` (item 3).** The tables-agree test's list of known gaps is now empty.
+  - **Unreached tasks (item 5):**
+    - An answer a replay doesn't hold counts as "not reached", like the call limit. Only answered (partial) or failed tasks are refined.
+    - A finished document keeps only this run's task rows, so a run resumed after the call limit leaves the store as one uninterrupted run would.
+  - **Unreadable PDFs (item 7):** an encrypted, empty or corrupt PDF gets one failed row naming why, and the run goes on. The next run tries it again.
+  - **Truncation (item 12):** a truncated answer isn't retried, and its message is unchanged, so recorded failures replay alike.
+  - **`reconcile` (item 13):** a claim is compared only with clusters stating its value. 4,000 claims: 25.2 s before, 0.06 s after, with identical output.

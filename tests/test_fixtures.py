@@ -71,13 +71,15 @@ class RecordAndReplay(unittest.TestCase):
                        "ON q.query = r.query WHERE q.role = 'extract' LIMIT 2)")
         code, report, log = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture))
         self.assertEqual(code, 2)
-        # The two failed tasks are refined into smaller requests, which weren't recorded either.
+        # The two tasks weren't reached (nothing was learnt), so they aren't refined into smaller requests
+        # that weren't recorded either; the next run asks them again (code review 2026-10-01, item 5).
         missing = report['usage']['fixture']['missing']
-        self.assertGreaterEqual(missing, 2)
         self.assertIn(f'{missing} request(s) have no answer', log)
-        failed = [r for r in report['coverage'] if r['status'] == 'failed']
-        self.assertGreaterEqual(len(failed), 2)  # situating requests can miss too; they aren't coverage tasks
-        self.assertTrue(all('No recorded answer' in r['issues'][0] for r in failed))
+        unreached = [r for r in report['coverage'] if r['status'] == 'not_reached']
+        self.assertGreaterEqual(len(unreached), 2)
+        self.assertEqual(missing, len(unreached))  # one request each: none refined
+        self.assertTrue(all('No recorded answer' in r['issues'][0] for r in unreached))
+        self.assertFalse([r for r in report['coverage'] if r['status'] == 'failed'])
 
     def test_recorded_failures_replay_as_failures_and_are_retried_when_recording(self):
         self.record()

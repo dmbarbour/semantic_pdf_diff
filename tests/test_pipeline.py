@@ -101,6 +101,8 @@ class Tests(unittest.TestCase):
                 with self.assertRaises(BudgetExceeded): c.ask('x'*40000,Extraction)  # over the default budget
                 state['truncate']=True
                 with self.assertRaises(ModelFailure): c.ask('another request',Extraction)
+                self.assertEqual(state['calls'],3)  # a truncated answer isn't retried: it would truncate again
+                with self.assertRaises(ModelFailure): c.ask('one more',Extraction)  # the fourth and last call
                 with self.assertRaises(BudgetExceeded): c.ask('limit',Extraction)
         finally:
             server.shutdown();server.server_close();thread.join()

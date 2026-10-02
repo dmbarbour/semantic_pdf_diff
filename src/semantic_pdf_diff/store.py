@@ -376,6 +376,19 @@ class Store:
             self.db.execute("INSERT OR REPLACE INTO meta VALUES ('reconcile', ?)", ("1" if on else "0",))
         return cleared
 
+    def keep_tasks(self, content, tasks):
+        """Drop a content item's task rows and evidence from tasks not in `tasks` (this run's): an earlier,
+        interrupted run's refinement children, say, that this run didn't need."""
+        tasks = sorted(set(tasks))
+        marks = ",".join("?" * len(tasks)) or "''"
+        with self.db:
+            dropped = self.db.execute(f"DELETE FROM task WHERE content=? AND task NOT IN ({marks})",
+                                      (content, *tasks)).rowcount
+            self.db.execute(f"DELETE FROM evidence WHERE content=? AND task NOT IN ({marks})", (content, *tasks))
+            if dropped:
+                self.db.execute("DELETE FROM situation WHERE content=?", (content,))  # it read the old evidence
+        return dropped
+
     def coverage(self, content):
         return [json.loads(r) for (r,) in self.db.execute("SELECT row FROM task WHERE content=? ORDER BY rowid", (content,))]
 

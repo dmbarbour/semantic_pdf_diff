@@ -620,6 +620,12 @@ def pdf_job(store, source, file, by_content, coverage, sections):
         sections[file.content] = found
         store.record_sections(file.content, found)
     def done(evidence, ledger):
+        # Rows from an earlier run's tasks that this run didn't have (an interrupted run's refinements) go:
+        # the store holds what this run found, so a later run that loads it reads the same.
+        store.keep_tasks(file.content, [r['task'] for r in ledger])
+        for row in ledger:
+            if row['task'] == 'open':
+                log.warning(f"Couldn't read {file.path}: {'; '.join(row['issues'])}")
         # Failed or unreached tasks (e.g. the call limit) are retried on the next run; the rest replays from cache.
         if not any(r['status'] in ('failed', 'not_reached') for r in ledger):
             store.mark_extracted(file.content)

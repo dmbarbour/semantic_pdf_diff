@@ -20,6 +20,7 @@ Clustering is greedy against each cluster's representative (the most local readi
 chains of near-matches don't merge distinct facts.
 """
 import re
+from functools import lru_cache
 from .models import Occurrence, representative_rank
 
 # Not "a": single letters name modules, details and grid lines ("Module A" and "Module B" are two
@@ -32,13 +33,15 @@ QUOTES = str.maketrans({"’": "'", "‘": "'", "′": "'", "″": '"', "“": '
 def _stated(e):
     return re.sub(r"[\s,]", "", f"{e.value}{e.unit}".translate(QUOTES)).casefold()
 
+@lru_cache(maxsize=1 << 16)
 def _words(text):
+    """A text's words, lightly normalized (cached: reconcile compares each claim's names many times)."""
     words = set()
     for w in re.findall(r"[a-z0-9]+", text.translate(QUOTES).casefold()):
         if w in STOPWORDS:
             continue
         words.add(w[:-1] if len(w) > 3 and w.endswith("s") and not w.endswith("ss") else w)
-    return words
+    return frozenset(words)
 
 def _conditions_agree(a, b):
     x, y = _words(a.conditions), _words(b.conditions)
@@ -84,9 +87,13 @@ def reconcile(evidence):
     # sheet without it), and judges tagged three times as many claims invented. Round 6's one
     # case the other way (a local reading lacking "isolated tower") is the cheaper error.
     claims = sorted(evidence, key=lambda e: (representative_rank(e), e.id))
-    clusters = []  # [representative, [members]]
+    clusters = []  # [representative, [members]], in the order they were started
+    # A fact has one stated value, so a claim is compared only with clusters stating its value: the same
+    # clusters, in the same order, as comparing with all of them, without the quadratic cost.
+    by_value = {}
     for e in claims:
-        for cluster in clusters:
+        group = by_value.setdefault((e.approximate, _stated(e)), [])
+        for cluster in group:
             # Every reading must agree with every other, not only with the representative: a generic
             # one ("beam", no conditions) would otherwise gather "Floor Beam @ Grid 4" and "@ Grid 5",
             # or "at rated speed" and "at cut-in".
@@ -95,6 +102,7 @@ def reconcile(evidence):
                 break
         else:
             clusters.append([e, []])
+            group.append(clusters[-1])
     out = []
     for head, members in clusters:
         if not members:

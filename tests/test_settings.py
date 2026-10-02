@@ -157,8 +157,7 @@ class SettingsTablesAgree(unittest.TestCase):
     """The tables that say what each setting does are kept by hand until they're generated from the levers'
     declarations (architecture clean-up, milestone 3). Until then they must agree."""
     # Known gaps, each with its fix: remove an entry when it's fixed.
-    UNBOUND = {"image_tokens": "situating sizes its prompt by it (review item 3; clean-up milestone 2)",
-               "safety_tokens": "situating sizes its prompt by it (review item 3; clean-up milestone 2)"}
+    UNBOUND = {}  # image_tokens and safety_tokens were, until clean-up milestone 2 (review item 3)
 
     def test_shaping_settings_are_bound_by_a_role(self):
         from semantic_pdf_diff import provenance as P

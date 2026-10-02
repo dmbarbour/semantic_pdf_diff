@@ -355,7 +355,7 @@ class SectionContext(unittest.TestCase):
         self.assertFalse(excerpted('gelcoat E1 [Pa] 3.440E+09', text, in_order=False))  # fragments only
         self.assertTrue(excerpted('22.0 | 12.1 | 19.94 | -105.90E+6', text, in_order=False))
 
-    def displayed_page(self, path, rotated):
+    def displayed_page(self, path, rotated, caption=False):
         """One page as displayed (600 x 400): a heading, a paragraph, a lead-in over a ruled table, a note
         beside it, a figure with text around it. Stored upright, or sideways with /Rotate 90."""
         doc = pymupdf.open()
@@ -376,10 +376,13 @@ class SectionContext(unittest.TestCase):
             text(195, 100 + 30 * r, b)
         text(420, 120, 'SHEET NOTES BESIDE THE TABLE')
         text(40, 250, 'Text above the figure describes the pump curve.')
-        for i in range(12):  # a figure: a cluster of drawings
-            x, y = 60 + (i % 4) * 40, 270 + (i // 4) * 30
-            page.draw_rect(pymupdf.Rect(at(x, y), at(x + 25, y + 18)))
+        for i in range(12):  # a figure: a cluster of drawings (a displayed box turned whole: two turned corners
+            x, y = 60 + (i % 4) * 40, 270 + (i // 4) * 30  # make a box of no width)
+            box = pymupdf.Rect(x, y, x + 25, y + 18)
+            page.draw_rect(box * page.derotation_matrix if rotated else box)
         text(40, 380, 'Text below the figure gives the duty point.')
+        if caption:
+            text(60, 365, 'Figure 2: Pump curve')
         doc.set_toc([[1, '3.1 Pumps', 1]])
         doc.save(path)
         doc.close()
@@ -406,6 +409,27 @@ class SectionContext(unittest.TestCase):
             self.assertEqual(prompts[False], prompts[True])
             self.assertIn('Text above the figure', around[False][0])
             self.assertEqual(around[False], around[True])  # a figure's surroundings too (situating)
+
+    def test_figures_and_section_text_are_the_same_upright_or_rotated(self):
+        """Metamorphic, for situating: the same page as displayed, stored upright or sideways, has the same
+        captioned figure (its box as displayed) and the same section text (code review 2026-10-01, item 6)."""
+        from semantic_pdf_diff.extract import section_text
+        from semantic_pdf_diff.pages import shown
+        from semantic_pdf_diff.situate import page_figures
+        with tempfile.TemporaryDirectory() as d:
+            figures, texts = {}, {}
+            for rotated in (False, True):
+                path = self.displayed_page(Path(d) / f'page-{rotated}.pdf', rotated, caption=True)
+                with pymupdf.open(path) as doc:
+                    page = doc[0]
+                    figures[rotated] = [(f.caption, tuple(round(v) for v in shown(page, f.bbox)), f.kind)
+                                        for f in page_figures(page, 1)]
+                    texts[rotated] = sorted(line.strip() for section in pdf_sections(doc, 2, 20)[0]
+                                            for line in section_text(doc, section).splitlines() if line.strip())
+            self.assertTrue(any(caption == 'Figure 2: Pump curve' for caption, _, _ in figures[False]), figures[False])
+            self.assertEqual(figures[False], figures[True])
+            self.assertIn('Text below the figure gives the duty point.', texts[False])
+            self.assertEqual(texts[False], texts[True])
 
     def rotated_sheet(self, path):
         """A page rotated 90° (like the drawing sets): a sentence displayed above a table, a note beside it."""

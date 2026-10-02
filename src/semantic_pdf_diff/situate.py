@@ -7,7 +7,7 @@ requests that write "about" statements build on it.
 import math
 import re
 from .models import Figure, Reference
-from .pages import native_page, shown
+from .pages import native, native_page, reading_blocks, shown
 
 KINDS = {"figure": "figure", "figures": "figure", "fig": "figure", "figs": "figure", "table": "table",
          "tables": "table", "sheet": "sheet", "sheets": "sheet", "drawing": "sheet", "drawings": "sheet",
@@ -149,8 +149,9 @@ def drawing_regions(page, drawings=None):
     return sorted(regions, key=lambda b: (b[1], b[0]))
 
 def image_regions(page):
+    """Image blocks' boxes, as the page is displayed."""
     page_area = page.rect.width * page.rect.height
-    return [tuple(b["bbox"]) for b in page.get_text("dict")["blocks"]
+    return [tuple(shown(page, b["bbox"])) for b in page.get_text("dict")["blocks"]
             if b.get("type") == 1 and _area(b["bbox"]) >= 0.01 * page_area]
 
 def find_figures(doc):
@@ -161,20 +162,23 @@ def find_figures(doc):
     return [f for number, page in enumerate(doc, 1) for f in page_figures(page, number)]
 
 def page_figures(page, number):
-    """One page's figures (see find_figures)."""
+    """One page's figures (see find_figures). Captions, drawings and their pairing are worked out as the
+    page is displayed ("below", "beside" and the page's width are about what a reader sees; a drawing sheet
+    is often stored sideways), and each figure's box is recorded in the page's unrotated coordinates."""
     figures = []
     captions = []
-    for block in page.get_text("blocks", sort=True):
+    for block in reading_blocks(page):
         match = CAPTION.match(block[4]) if block[6] == 0 else None
         if match:
-            captions.append((tuple(block[:4]), " ".join(block[4].split()), label_of(*match.groups()),
+            captions.append((tuple(shown(page, block[:4])), " ".join(block[4].split()), label_of(*match.groups()),
                              KINDS[match.group(1).lower().rstrip(".")]))
     # Entries in a list of figures or tables look like captions but aren't figures.
     captions = [c for c in captions if not LIST_ENTRY.search(c[1])]
     drawings = page_drawings(page)
     label, title = title_block(page) if not captions else (None, "")
     sheet = not captions and (label is not None or is_sheet(len(drawings), len(page.get_text("text").strip())))
-    regions = [] if sheet else drawing_regions(page, drawings) + image_regions(page)
+    displayed = [dict(d, rect=tuple(shown(page, d["rect"]))) for d in drawings] if page.rotation else drawings
+    regions = [] if sheet else drawing_regions(page, displayed) + image_regions(page)
     pairs = []
     for ci, (cbox, *_ ) in enumerate(captions):
         for ri, rbox in enumerate(regions):
@@ -201,9 +205,11 @@ def page_figures(page, number):
         if item.get("label"):
             item["label_source"] = "caption"
     if sheet:
-        items.append(dict(bbox=tuple(native_rect(page)), kind="sheet", label=label, title=title,
+        items.append(dict(bbox=tuple(page.rect), kind="sheet", label=label, title=title,
                           label_source="title block" if label else ""))
-    for i, item in enumerate(sorted(items, key=lambda x: (x["bbox"][1], x["bbox"][0]))):
+    for i, item in enumerate(sorted(items, key=lambda x: (x["bbox"][1], x["bbox"][0]))):  # in reading order
+        if page.rotation:
+            item = dict(item, bbox=tuple(native(page, item["bbox"])))
         figures.append(Figure(id=f"fig:p{number}:{i}", page=number, **item))
     return figures
 
