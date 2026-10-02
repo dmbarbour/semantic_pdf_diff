@@ -185,7 +185,6 @@ def describe(prompt, image_sizes, params, key=None):
 @dataclass
 class Request:
     raw: bytes
-    request_hash: str          # the byte cache's key (library use without a store): the whole request, model included
     key: tuple | None          # the caller's recipe: how the query was built (role, region, content, task, ...); labels only
     schema: type
     estimate: int  # tokens, input plus output reserve, for rate limiting
@@ -272,16 +271,12 @@ def build_request(s, prompt, schema, images=(), key=None):
     elif s.response_format == "json_schema":
         body["response_format"] = {"type": "json_schema", "json_schema": {
             "name": schema.__name__, "schema": schema.model_json_schema()}}
-    # The hash names what is asked; how the answer travels (streamed or not) isn't part of it,
-    # so cached answers still match.
-    request_hash = hashlib.sha256(s.base_url.encode() + json.dumps(body).encode()
-                                  + json.dumps(schema.model_json_schema(), sort_keys=True).encode()).hexdigest()
     params = {k: v for k, v in body.items() if k not in ("model", "messages")}
     query = query_hash(prompt, hashes, params)
     if s.stream:
         body.update(stream=True, stream_options={"include_usage": True})
     raw = json.dumps(body).encode()
-    return Request(raw, request_hash, key, schema, estimate + s.output_tokens, prompt, tuple(hashes),
+    return Request(raw, key, schema, estimate + s.output_tokens, prompt, tuple(hashes),
                    query=query, description=describe(prompt, sizes, params, key))
 
 class Transport:
@@ -402,11 +397,11 @@ class Transport:
 class Client:
     """Chat Completions client with a response cache.
 
-    `cache` is either a Store, whose response cache is keyed by the query that reached the
-    model and the model, or a folder for a byte-keyed file cache (for library use without a store),
-    or None when a fixture holds every answer (see folder_client).
+    `store`: a Store, whose response cache is keyed by the query that reached the model and the model; or None, no
+    cache (a fixture holding every answer, see folder_client, or a caller that asks once). A folder of files keyed
+    by the request's bytes was once the cache without a store; only tests used it (removed 2026-10-02).
     """
-    def __init__(self, settings: Settings, cache, api_key: str | None = None, fixture=None, mode="replay",
+    def __init__(self, settings: Settings, store, api_key: str | None = None, fixture=None, mode="replay",
                  responder=None, fresh_regions=None):
         """fixture: an open fixtures.Fixture, replayed under its policy (fixtures.Replayer: mode, responder,
         fresh_regions). In `replay` mode answers come only from it and unrecorded requests fail; in
@@ -416,10 +411,9 @@ class Client:
         from .fixtures import Replayer
         self.s = settings
         self.replay = None if fixture is None else Replayer(fixture, mode, responder or settings.model, fresh_regions)
-        self.store = None if cache is None or isinstance(cache, (str, Path)) else cache
-        self.cache = Path(cache) if isinstance(cache, (str, Path)) else None
-        if self.cache is not None:
-            self.cache.mkdir(parents=True, exist_ok=True)
+        if isinstance(store, (str, Path)):
+            raise TypeError("a client caches in a store (store.Store) or not at all: the folder cache is gone")
+        self.store = store
         self.cache_hits = 0
         self.transport = Transport(settings, api_key)
 
@@ -528,17 +522,8 @@ class Client:
         return hashlib.sha256((self.s.model + "\x00" + request.query).encode()).hexdigest()
 
     def _lookup(self, request):
-        if self.store is None and self.cache is None:
-            return None
         if self.store is None:
-            target = self.cache / (request.request_hash + ".json")
-            if not target.exists():
-                return None
-            try:
-                return request.schema.model_validate_json(target.read_text())
-            except ValueError:
-                target.unlink()
-                return None
+            return None
         row = self.store.cached(self._cache_key(request))
         if row is None:
             return None
@@ -549,14 +534,8 @@ class Client:
             return None
 
     def _save(self, request, value):
-        if self.store is None and self.cache is None:
-            return
         if self.store is None:
-            target = self.cache / (request.request_hash + ".json")
-            temp = target.with_suffix(".tmp")
-            temp.write_text(value.model_dump_json())
-            temp.replace(target)
-        else:
-            key = request.key or ("raw", "")
-            content = key[2] if key[0] in ("extract", "triage") else ""
-            self.store.cache(self._cache_key(request), key[0], key[1], request.query, value.model_dump_json(), content)
+            return
+        key = request.key or ("raw", "")
+        content = key[2] if key[0] in ("extract", "triage") else ""
+        self.store.cache(self._cache_key(request), key[0], key[1], request.query, value.model_dump_json(), content)

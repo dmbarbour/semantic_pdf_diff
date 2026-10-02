@@ -13,7 +13,6 @@ link a relational fact (relations.RELATIONS) drawn in its kind of line, or as a 
 import math
 from dataclasses import dataclass, field
 
-from . import relations
 
 # --- the model ---------------------------------------------------------------------------------------
 
@@ -597,7 +596,7 @@ NOTE_ATTRIBUTES = {"hp": ("motor power", ("power", "rating", "horsepower", "rate
                    "°F": ("supply air temperature setpoint", ("setpoint", "temperature setpoint", "supply air temperature",
                                                              "set point"))}
 
-def build(make, pid, title, intro, seed):
+def build(make, pid, title, seed):
     """A controlled project from a system: a fact per link and per number, prose and a figure, chosen by knob."""
     from .corpus import Draw, Fact, Project
     d = Draw(f"{pid}-{seed}")
@@ -628,10 +627,10 @@ def build(make, pid, title, intro, seed):
     return project
 
 def ahu_drawing(seed=1):
-    return build(air_handler, "ahu-schematic", "Lakeshore Hall C: AHU-3 Air System", None, seed)
+    return build(air_handler, "ahu-schematic", "Lakeshore Hall C: AHU-3 Air System", seed)
 
 def uv_layout(seed=1):
-    return build(uv_channel, "uv-layout", "Kestrel Spectrograph: UV Channel Layout", None, seed)
+    return build(uv_channel, "uv-layout", "Kestrel Spectrograph: UV Channel Layout", seed)
 
 def intro_html(system, esc):
     """The description, its facts (if any) in spans so layout places them."""

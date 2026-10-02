@@ -60,10 +60,6 @@ def model_label(text, kind):
         return label_of("sheet", text)
     return None
 
-def native_rect(page):
-    """The page in unrotated coordinates, like text, drawings and figure boxes."""
-    return native_page(page)
-
 def is_sheet(drawings, characters):
     return drawings >= SHEET_PATHS and drawings >= characters / 2
 
@@ -521,7 +517,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
                          for f in mine) or "(none)"
         # Sheets are shown by their figure requests; scans only by an image of the page.
         overview = [p for p in pages if p not in sheets and scanned(doc[p - 1], text_by_page[p])][:MAX_OVERVIEWS]
-        images = [render(p, native_rect(doc[p - 1]), crop_name(stem, f"overview-p{p}")) for p in overview]
+        images = [render(p, native_page(doc[p - 1]), crop_name(stem, f"overview-p{p}")) for p in overview]
         heading = " > ".join(section.heading_path) or "(no heading)"
         head = (SITUATE_SECTION + f"\nHeading path: {heading}\nPages: {section.first_page}-{section.last_page} of {len(doc)}"
                 f"\nFigures:\n{figs}\nClaims:\n{claims}\nText:\n")

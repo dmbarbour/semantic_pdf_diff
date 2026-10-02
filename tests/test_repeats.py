@@ -120,7 +120,7 @@ class ConcurrentFollowers(unittest.TestCase):
         with jittery_model() as (url, state), tempfile.TemporaryDirectory() as d:
             path = build(Path(d) / 'r.pdf')
             for workers in (1, 6):
-                client = Client(Settings(base_url=url, vision=False, concurrency=workers, retries=0), Path(d) / f'cache{workers}')
+                client = Client(Settings(base_url=url, vision=False, concurrency=workers, retries=0), None)
                 with patch.object(pymupdf.Page, 'find_tables', title_blocks):
                     evidence, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
                 results.append(([e.model_dump() for e in evidence], coverage))

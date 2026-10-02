@@ -67,7 +67,7 @@ def pdf(path, build, width=500, height=500):
 class ResponseShapeTests(unittest.TestCase):
     def ask(self, replies, **settings):
         with stub(replies) as (url, seen), tempfile.TemporaryDirectory() as d:
-            client = Client(Settings(**{'base_url': url, 'retries': 0, **settings}), Path(d))
+            client = Client(Settings(**{'base_url': url, 'retries': 0, **settings}), None)
             return client.ask('x', Extraction), seen
 
     def test_null_usage_is_tolerated(self):
@@ -96,7 +96,7 @@ class ResponseShapeTests(unittest.TestCase):
         from semantic_pdf_diff.ledger import Ledger, read
         paid = {'prompt_tokens': 10, 'completion_tokens': 5, 'estimated_cost': 0.001}
         with tempfile.TemporaryDirectory() as d, stub([reply('not json', usage=paid), reply(EMPTY, usage=paid)]) as (url, _):
-            client = Client(Settings(base_url=url, retries=1), Path(d) / 'cache')
+            client = Client(Settings(base_url=url, retries=1), None)
             client.ledger = Ledger(Path(d) / 'ledger.jsonl', round='t')
             with patch('semantic_pdf_diff.llm.time.sleep'):
                 client.ask('x', Extraction)
@@ -109,7 +109,7 @@ class ResponseShapeTests(unittest.TestCase):
         paid = {'prompt_tokens': 10, 'completion_tokens': 5, 'estimated_cost': 0.001}
         with tempfile.TemporaryDirectory() as d, \
                 stub([(200, {'Content-Type': 'text/event-stream'}, cut.encode()), reply(EMPTY, usage=paid)]) as (url, _):
-            client = Client(Settings(base_url=url, retries=1, max_cost=1.0), Path(d) / 'cache')
+            client = Client(Settings(base_url=url, retries=1, max_cost=1.0), None)
             client.ledger = Ledger(Path(d) / 'ledger.jsonl', round='t')
             with patch('semantic_pdf_diff.llm.time.sleep'), self.assertLogs('semantic_pdf_diff', 'WARNING'):
                 self.assertTrue(client.ask('x', Extraction).complete)
@@ -154,7 +154,7 @@ class ResponseShapeTests(unittest.TestCase):
         body = ''.join(f'data: {json.dumps(c)}\n\n' for c in chunks) + 'data: [DONE]\n\n'
         with stub([(200, {'Content-Type': 'text/event-stream'}, body.encode())]) as (url, seen), \
                 tempfile.TemporaryDirectory() as d:
-            client = Client(Settings(base_url=url, retries=0), Path(d))
+            client = Client(Settings(base_url=url, retries=0), None)
             self.assertTrue(client.ask('x', Extraction).complete)
             self.assertTrue(seen[0]['stream'])
             self.assertEqual(seen[0]['stream_options'], {'include_usage': True})
@@ -163,9 +163,9 @@ class ResponseShapeTests(unittest.TestCase):
 
     def test_streaming_does_not_change_what_a_cached_answer_is_found_by(self):
         with tempfile.TemporaryDirectory() as d:
-            streamed = Client(Settings(stream=True), Path(d)).prepare('x', Extraction)
-            plain = Client(Settings(stream=False), Path(d)).prepare('x', Extraction)
-            self.assertEqual(streamed.request_hash, plain.request_hash)
+            streamed = Client(Settings(stream=True), None).prepare('x', Extraction)
+            plain = Client(Settings(stream=False), None).prepare('x', Extraction)
+            self.assertEqual(streamed.query, plain.query)  # answers are cached and recorded by the query
             self.assertNotEqual(streamed.raw, plain.raw)
 
     def test_http_key_warning(self):
@@ -174,7 +174,7 @@ class ResponseShapeTests(unittest.TestCase):
                                 ('https://remote.example/v1', False)]:
                 stream = io.StringIO()
                 with self.subTest(url=url), contextlib.redirect_stderr(stream):
-                    Client(Settings(base_url=url), Path(d), api_key='k')
+                    Client(Settings(base_url=url), None, api_key='k')
                 self.assertEqual('unencrypted' in stream.getvalue(), warned)
 
 class ValidationTests(unittest.TestCase):

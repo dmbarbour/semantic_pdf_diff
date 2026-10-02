@@ -11,7 +11,6 @@ Items are blind: the page never shows which responder (model) produced them. Lab
 attach to stable targets (claim IDs, figure and section IDs, claim pairs), so they carry
 over to later runs that produce the same results.
 """
-import base64
 from collections import Counter
 import hashlib
 from semantic_pdf_diff.html_pages import fill
@@ -549,9 +548,6 @@ def pairwise_agreement(units):
 
 def _round(x):
     return None if x is None else round(x, 3)
-
-def image_data(folder, src):
-    return "data:image/jpeg;base64," + base64.b64encode((Path(folder) / src).read_bytes()).decode()
 
 # --- a panel of model reviewers ------------------------------------------------------------
 

@@ -58,9 +58,6 @@ SESSIONS = """CREATE TABLE IF NOT EXISTS session (time TEXT NOT NULL, responders
 class FixtureError(RuntimeError):
     pass
 
-class NotRecorded(FixtureError):
-    pass
-
 def recipe_labels(parts):
     """(recipe hash, role, region, content, task) from a recipe (the caller's key tuple)."""
     parts = list(parts)

@@ -122,7 +122,7 @@ class ConcurrentClient(unittest.TestCase):
         state = {'lock': threading.Lock(), 'active': 0, 'peak': 0, 'count': 0}
         url = self.serve(state)
         with tempfile.TemporaryDirectory() as d:
-            client = Client(Settings(base_url=url, concurrency=4, retries=0), Path(d))
+            client = Client(Settings(base_url=url, concurrency=4, retries=0), None)
             requests = [client.prepare(f'prompt {i}', Extraction) for i in range(12)]
             started = time.monotonic()
             with ThreadPoolExecutor(12) as pool:
@@ -139,7 +139,7 @@ class ConcurrentClient(unittest.TestCase):
                  'answer': lambda n: (0.4, 400) if n % 4 == 0 else (0.04, 40)}
         url = self.serve(state)
         with tempfile.TemporaryDirectory() as d:
-            client = Client(Settings(base_url=url, concurrency=4, retries=0), Path(d))
+            client = Client(Settings(base_url=url, concurrency=4, retries=0), None)
             requests = [client.prepare(f'prompt {i}', Extraction) for i in range(16)]
             with ThreadPoolExecutor(4) as pool:
                 list(pool.map(client.send, requests))
@@ -149,7 +149,7 @@ class ConcurrentClient(unittest.TestCase):
         state = {'lock': threading.Lock(), 'active': 0, 'peak': 0, 'count': 0, 'throttle_first': 4, 'delay': 0.05}
         url = self.serve(state)
         with tempfile.TemporaryDirectory() as d:
-            client = Client(Settings(base_url=url, concurrency=8, retries=2), Path(d))
+            client = Client(Settings(base_url=url, concurrency=8, retries=2), None)
             requests = [client.prepare(f'prompt {i}', Extraction) for i in range(4)]
             with ThreadPoolExecutor(4) as pool:
                 list(pool.map(client.send, requests))

@@ -26,7 +26,7 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual(s.timeout,3.5)
             self.assertFalse(s.vision)
             self.assertEqual(s.aliases,{'chw':'chilled water'})
-            self.assertEqual(Client(s,Path(directory)).api_key,'test-only-key')
+            self.assertEqual(Client(s,None).api_key,'test-only-key')
             self.assertNotIn('test-only-key',s.model_dump_json())
 
     def test_empty_fallback_and_invalid_values(self):

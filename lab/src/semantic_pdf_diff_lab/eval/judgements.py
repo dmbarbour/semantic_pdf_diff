@@ -14,13 +14,6 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
-QUESTIONS = {
-    "pair": "which of two claim sets is better (answer: score 1 when the variant's, 0 the baseline's, 0.5 the same; "
-            "None when a person can't tell), with confidence, wrong counts, problems, note and remarks",
-    "claim": "is this claim a faithful reading, bound to the right thing (answer: mark ok, wrong or unsure; problems)",
-    "quote": "is this claim's quote on its page, as excerpts of the text layer (answer: found)",
-}
-KINDS = ("model", "person", "check")
 MAX_ATTEMPTS = 2  # a failed verdict is asked once more at most, when a variant's judging ends
 HUMAN = "verdicts-human"  # people's verdicts (spot checks); every other verdicts folder holds judges'
 
@@ -28,7 +21,11 @@ HUMAN = "verdicts-human"  # people's verdicts (spot checks); every other verdict
 class Record:
     rater: str
     kind: str                # model, person or check
-    question: str            # pair, claim or quote (QUESTIONS)
+    # pair: which of two claim sets is better (answer: score 1 when the variant's, 0 the baseline's, 0.5 the same;
+    #   None when a person can't tell), with confidence, wrong counts, problems, note and remarks
+    # claim: is this claim a faithful reading, bound to the right thing (answer: mark ok, wrong or unsure; problems)
+    # quote: is this claim's quote on its page, as excerpts of the text layer (answer: found)
+    question: str            # pair, claim or quote
     unit: str
     order: str = ""          # baseline-first or variant-first: how the sets were shown (people see one order)
     side: str = ""           # claim, quote: baseline or variant

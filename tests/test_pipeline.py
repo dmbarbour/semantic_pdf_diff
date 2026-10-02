@@ -92,8 +92,11 @@ class Tests(unittest.TestCase):
         thread = threading.Thread(target=server.serve_forever,daemon=True);thread.start()
         try:
             with tempfile.TemporaryDirectory() as d:
+                from semantic_pdf_diff.store import Store
                 s = Settings(base_url=f'http://127.0.0.1:{server.server_port}/v1',retries=1,max_calls=4)
-                c = Client(s,Path(d))
+                store = Store(Path(d) / 'store')
+                self.addCleanup(store.close)
+                c = Client(s,store)
                 self.assertTrue(c.ask('extract',Extraction).complete)
                 c.ask('extract',Extraction)
                 self.assertEqual(state['calls'],2)

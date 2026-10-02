@@ -489,7 +489,7 @@ def _graph(card, rng, c):
     truth = {"edges": [{k: e[k] for k in ("start", "end", "label")} for e in edges]}
     return truth, prompt, names + [e["label"] for e in edges]
 
-def _axes(c, card, rng, top, step, left_labels):
+def _axes(c, top, step, left_labels):
     """A chart's frame: the plot area, and a vertical axis from 0 to `top` labelled every `step`."""
     left = c.margin + max(c.width(l) for l in left_labels) + c.size
     plot = (left, c.margin + 3 * c.size, c.w - c.margin, c.h - c.margin - 2.2 * c.size)
@@ -515,7 +515,7 @@ def _chart_values(card, rng, c):
     if cats < 2:
         raise ValueError(f"{card.id}: glyphs too large for the chart")
     categories = unique(rng, code, cats, taken=map(compact, series))
-    plot, scale = _axes(c, card, rng, top, 200, ticks)
+    plot, scale = _axes(c, top, 200, ticks)
     group = (plot[2] - plot[0]) / cats
     bar = group * 0.8 / series_n
     for i, cat in enumerate(categories):
@@ -550,7 +550,7 @@ def _chart_axis(card, rng, c):
     categories = unique(rng, code, bars)
     if max(c.width(x) for x in categories) * 1.15 * bars > plot_w:
         raise ValueError(f"{card.id}: glyphs too large for the chart")
-    plot, scale = _axes(c, card, rng, top, step, ticks)
+    plot, scale = _axes(c, top, step, ticks)
     width = (plot[2] - plot[0]) / bars
     values = {}
     for i, cat in enumerate(categories):

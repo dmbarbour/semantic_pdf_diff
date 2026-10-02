@@ -77,10 +77,6 @@ class SectionIndex:
         found += [s for s in self.sections if s.first_page == page and y0 < s.first_y < y1 and s not in found]
         return [s for s in found if s is not None]
 
-    def boundaries(self, page):
-        """y positions on a page where a new section starts."""
-        return [s.first_y for s in self.sections if s.first_page == page and s.first_y > 0]
-
 def pdf_sections(doc, depth, pages_per_section):
     """Sections from the outline down to `depth`, else fixed page ranges.
 
@@ -138,7 +134,6 @@ def _content_above(doc, page, y):
 
 def section_text(doc, section):
     """A section's text, clipped to where it starts and ends on its first and last pages."""
-    import pymupdf
     parts = []
     for number in range(section.first_page, section.last_page + 1):
         page = doc[number - 1]
