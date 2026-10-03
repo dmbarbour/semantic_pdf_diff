@@ -108,6 +108,54 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 5. `.csv` / `.xlsx`: table region detection and sheet maps, then model-guided table interpretation.
 6. Images.
 
+## Milestone 1 in detail (2026-10-03), for the owner's review
+
+Written when the work began. The owner (2026-10-02), on the readers' value beyond formats: "When we do add the alternative readers, we'll implicitly get a new form of control tests: same facts across two or more representations" (the [controlled documents](controlled-documents-2026-10-01.md) plan's decision 4).
+
+**Today:**
+- Extraction is one PDF job (`extract._pdf_job`): a generator fed a page at a time for fair share, whose closures build text, table and image tasks, check quotes, write coverage rows and evidence.
+- Context reaches prompts only through levers' hooks given a reader (`extract.Context`), whose methods answer in pages and boxes (blocks on a page, the text above a table, a numbered item's stems, citations).
+- Locators are PDF's (`models.PdfLocator`), and `models.Locator` is already meant to become a union discriminated by `format`.
+- Any other extension is recorded as unsupported.
+
+**Proposed:**
+1. **A shared task core.**
+   - What every reader does with a task moves out of the PDF job into one small class: queue the request, check quotes, make evidence and coverage rows, follow repeated blocks, refine on a partial answer.
+   - The PDF job keeps only what is PDF's: pages, text blocks, table detection, crops.
+   - PDF requests stay byte for byte, checked as in the clean-up by the golden requests and a query snapshot of every slice.
+2. **Readers chosen by extension** (the extension policy above): PDF as today, and `.txt` and `.md` by one text reader.
+   - Each yields parts as the PDF job yields pages, so fair share across sources holds.
+3. **The text reader:**
+   - **Sections:**
+     - Markdown headings
+     - in plain text, numbered headings in the RFC style ("7.2.  Stream Concurrency")
+     - else fixed line ranges
+   - **Text tasks:** paragraphs (blank-line separated) grouped up to `text_bytes`, as PDF blocks are.
+   - **Table tasks:** Markdown pipe tables, as PDF table rows are (header and row).
+   - **Quotes:** checked against the source text exactly.
+   - **No image tasks.** An image a Markdown file links is recorded as not read; plain-text drawings (ASCII art) aren't read as figures (the owner, 2026-10-02).
+   - **Context levers through a text reader** with the same methods as `extract.Context`, answering in lines rather than boxes:
+     - neighbouring text
+     - the text above a table
+     - a numbered item's stems ("7.2." > "a.")
+     - citations
+     - The levers apply unchanged.
+4. **Locators:**
+   - A `TextLocator` (format `text`): first and last line, region, task. `Locator` becomes the union the model anticipates.
+   - Reports show a text excerpt under its heading path where a PDF claim shows a crop.
+   - An addition to `evidence.json` and `report.json`, not a change to PDF claims.
+5. **Prompts name the region as today** ("Source type: text", "table"): a Markdown paragraph is text to the model. The locator's format says where it came from.
+6. **Situating** (figures, "about" statements) stays PDF's in this milestone. Text documents get sections, not "about" statements.
+7. **Measured on the controlled corpus written as Markdown** (decision 4 there):
+   - prose and tables as Markdown, charts, schematics and sheets left out and their facts marked absent
+   - scored by the same keys, so the reader is exact-scored before any real document is read
+   - then the revision pairs in Markdown, and the QUIC drafts as a first real revision series
+
+**Questions for the owner:**
+1. **Locators:** a `TextLocator` beside `PdfLocator`, and text excerpts in reports. (Proposed: yes.)
+2. **Regions and prompts:** text formats' tasks named "text" and "table" as PDF's are, so a paragraph asks what a PDF paragraph asks. The alternative is new region names per format, which would make every format's prompts different. (Proposed: the same names.)
+3. **The shared task core:** a refactor of the PDF job, kept byte-identical, rather than a text reader that copies its task handling. (Proposed: the shared core.)
+
 ## Decisions (2026-09-23)
 
 - **Spreadsheet claims are marked by provenance, not trust.** A claim read directly from cells is *more direct* than one a model extracted from prose or a chart, and its derivation says so (see *Derivation* in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md)). Directness is not reliability. A spreadsheet still raises questions: is our interpretation of the columns right (and if a model interpreted the headers, that is itself a model step in the derivation)? Is a value a measurement, a projection, a requirement or wishful thinking? Are uncertainties given? Those are judged like any other claim (see *Epistemic status* in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md)), not assumed away.
