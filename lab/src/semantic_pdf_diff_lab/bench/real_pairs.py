@@ -11,6 +11,9 @@ aligned by difflib; a block found in both is unchanged text.
   are left out of the comparison of a block's numbers.
 - Explained findings (compare.explain) are counted by kind and by where their claims sit: a value change named in
   unchanged text is suspect, as a "different" finding there is.
+- **Pictures** (a Word document's): a picture whose bytes differ from its counterpart's (the picture with the same
+  caption, else in the same place among the pictures), or that has none, is changed text at its paragraph; one alike
+  in both is unchanged.
 """
 import difflib
 import re
@@ -61,7 +64,23 @@ def diff(earlier, later):
         for first, last, _ in b[j0:j1]:
             changed_b.update(range(first, last + 1))
         replaced.append((a[i0:i1], b[j0:j1]))
-    return changed_a, changed_b, replaced
+    pictures_a, pictures_b = changed_pictures(earlier, later)
+    return changed_a | pictures_a, changed_b | pictures_b, replaced
+
+def changed_pictures(earlier, later):
+    """(lines of the earlier's pictures that changed, the later's): a picture with no counterpart (by caption, else by
+    place among the pictures), or whose bytes differ from it."""
+    import hashlib
+    one, two = getattr(earlier, "pictures", []), getattr(later, "pictures", [])
+    digest = lambda p: hashlib.sha256(p.data).hexdigest()
+    def counterparts(mine, theirs):
+        by_caption = {p.caption: p for p in theirs if p.caption}
+        return [by_caption.get(p.caption) if p.caption else (theirs[k] if k < len(theirs) else None)
+                for k, p in enumerate(mine)]
+    changed = []
+    for mine, theirs in ((one, two), (two, one)):
+        changed.append({p.line for p, q in zip(mine, counterparts(mine, theirs)) if q is None or digest(p) != digest(q)})
+    return tuple(changed)
 
 def rate(report, earlier, later):
     """A revisions report rated by the text diff (see the module's note): earlier and later, the two documents
@@ -106,7 +125,10 @@ def rate(report, earlier, later):
                            "numbers_new": sorted((after - before).elements())[:10]})
     show = lambda cid: {k: evidence[cid][k] for k in ("entity", "attribute", "value", "unit", "conditions")} | \
         {"lines": evidence[cid]["locator"].get("lines") or evidence[cid]["locator"].get("paragraphs")}
+    regions = Counter(e["locator"].get("region") for e in report["evidence"])
     return {"claims": [sum(1 for s in side.values() if s == 0), sum(1 for s in side.values() if s == 1)],
+            "claims_from_pictures": sum(regions[r] for r in ("overview", "tile", "figure")),
+            "pictures_changed": [len(x) for x in changed_pictures(earlier, later)],
             "changed_blocks": len(changed[2]), "changed_lines": [len(changed[0]), len(changed[1])],
             "findings": dict(sorted(findings.items())), "unmatched": dict(sorted(unmatched.items())),
             **({"explained": dict(sorted(explained.items()))} if explained else {}),

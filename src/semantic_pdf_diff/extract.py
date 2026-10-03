@@ -243,6 +243,56 @@ def extract_pdf(path, content, output, client, on_task=None, on_sections=None, d
     run_jobs([[job]], output, client, dispatcher, progress)
     return job.state["result"]
 
+class Visuals:
+    """Image tasks over a page's regions, for the PDF job and a Word document's pictures (pictures.py): the region
+    rendered to a crop, its text layer a check on quotes and, by region_text, context; its context lines (for_tile);
+    a partial tile refined in halves.
+
+    A PDF's claims are located in the region and placed in their section by the text block quoting them. A Word
+    picture's are at its paragraph: `box`, the locator's box and the section's place both; its caption (`text`)
+    stays with the halves a tile is refined into (`derivation`: its steps, the region's otherwise)."""
+    def __init__(self, core, context_of, assets, stem, settings):
+        self.core, self.context_of, self.assets, self.stem, self.s = core, context_of, assets, stem, settings
+
+    def task(self, page_no, page, tag, rect, depth=0, text="", box=None, derivation=None):
+        s = self.s
+        name = crop_name(self.stem, tag)
+        render(page, rect, self.assets / name, s.image_side)
+        native_rect = native(page, rect)
+        layer = page.get_text("text", clip=native_rect)
+        check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
+        if box is None:
+            blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", clip=native_rect) if b[6] == 0]
+
+            def place(quote):  # the first text block in the region holding the quote
+                return next((found for found, text in blocks if covered(quote, text, fold=True)), None)
+        else:
+            def place(quote):
+                return box
+        source = s.region_text(self.context_of, page, rect, layer, text)
+        context, extra = self.context_of.for_tile(page, rect, tag)
+        kept = text if box is not None else ""
+        self.core.consume(page_no, native_rect if box is None else box, tag, source, "assets/" + name, check=check,
+                          place=place, crop=(tuple(round(v, 3) for v in rect), s.image_side), context=context,
+                          extra_images=extra, derivation=derivation,
+                          then=lambda status: self.refine(page_no, page, tag, rect, depth, status, kept, box, derivation))
+
+    def refine(self, page_no, page, tag, rect, depth, status, text, box, derivation):
+        # Refine only local tiles; an overview or a whole figure may be incomplete because
+        # it spans many facts, and all its areas already have tile coverage.
+        s = self.s
+        if (status not in ("partial", "failed") or region_of(tag) in ("overview", "figure") or depth >= s.refinement_depth
+                or min(rect.width, rect.height) < MIN_REFINE_POINTS):
+            return
+        if rect.width > rect.height:
+            mid = (rect.x0 + rect.x1) / 2
+            children = [pymupdf.Rect(rect.x0, rect.y0, mid + 12, rect.y1), pymupdf.Rect(mid - 12, rect.y0, rect.x1, rect.y1)]
+        else:
+            mid = (rect.y0 + rect.y1) / 2
+            children = [pymupdf.Rect(rect.x0, rect.y0, rect.x1, mid + 12), pymupdf.Rect(rect.x0, mid - 12, rect.x1, rect.y1)]
+        for i, child in enumerate(children):
+            self.task(page_no, page, f"{tag}-r{i}", child, depth + 1, text, box, derivation)
+
 def _pdf_job(path, job, output, client, dispatch, progress):
     """Generator doing one PDF's extraction: yields "page" before feeding each page, then
     "waiting" while its requests are pending; job.state["result"] is set at the end."""
@@ -255,36 +305,6 @@ def _pdf_job(path, job, output, client, dispatch, progress):
     core = TaskCore(job, output, client, dispatch, progress, name, pdf_locator, DERIVATION,
                     oversized="Table row exceeds text budget; inspect visual tiles")
     record = core.record
-
-    def visual_task(page_no, page, tag, rect, depth=0, text=""):
-        name = crop_name(stem, tag)
-        render(page, rect, assets / name, s.image_side)
-        native_rect = native(page, rect)
-        layer = page.get_text("text", clip=native_rect)
-        check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
-        blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", clip=native_rect) if b[6] == 0]
-        def place(quote):  # the first text block in the region holding the quote
-            return next((box for box, text in blocks if covered(quote, text, fold=True)), None)
-        text = s.region_text(context_of, page, rect, layer, text)
-        context, extra = context_of.for_tile(page, rect, tag)
-        core.consume(page_no, native_rect, tag, text, "assets/" + name, check=check, place=place,
-                crop=(tuple(round(v, 3) for v in rect), s.image_side), context=context, extra_images=extra,
-                then=lambda status: refine_visual(page_no, page, tag, rect, depth, status))
-
-    def refine_visual(page_no, page, tag, rect, depth, status):
-        # Refine only local tiles; an overview or a whole figure may be incomplete because
-        # it spans many facts, and all its areas already have tile coverage.
-        if (status not in ("partial", "failed") or region_of(tag) in ("overview", "figure") or depth >= s.refinement_depth
-                or min(rect.width, rect.height) < MIN_REFINE_POINTS):
-            return
-        if rect.width > rect.height:
-            mid = (rect.x0 + rect.x1) / 2
-            children = [pymupdf.Rect(rect.x0, rect.y0, mid + 12, rect.y1), pymupdf.Rect(mid - 12, rect.y0, rect.x1, rect.y1)]
-        else:
-            mid = (rect.y0 + rect.y1) / 2
-            children = [pymupdf.Rect(rect.x0, rect.y0, rect.x1, mid + 12), pymupdf.Rect(rect.x0, mid - 12, rect.x1, rect.y1)]
-        for i, child in enumerate(children):
-            visual_task(page_no, page, f"{tag}-r{i}", child, depth + 1)
 
     try:
         opened = pymupdf.open(stream=path, filetype="pdf") if isinstance(path, (bytes, bytearray)) else pymupdf.open(path)
@@ -300,6 +320,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         return
     with opened as doc:
         context_of = Context(doc, s, assets, stem)  # the task functions read it when they run
+        visuals = Visuals(core, context_of, assets, stem, s)
         sections, owner = pdf_sections(doc, s.section_depth, s.section_pages)
         core.reader, core.sections = context_of, owner
         if on_sections:
@@ -372,7 +393,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     region, _, index = tag.partition(":")
                     tag = f"{region}:p{number}" + (f":{index}" if index else "")
                     # A figure's caption, or a sheet detail's titles, as source text.
-                    visual_task(number, page, tag, rect, text=note)
+                    visuals.task(number, page, tag, rect, text=note)
             else:
                 record(coverage_row(content=content, page=number, bbox=list(native_page(page)), task=f"vision:p{number}",
                                     status="skipped",

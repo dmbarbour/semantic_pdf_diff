@@ -9,6 +9,9 @@ media."
   tables as pipe tables (a schedule's sections as tables of their own, a split schedule whole).
 - **What it doesn't:** charts, schematics and drawing sheets. A chart's caption stays, marked as not shown; the
   facts only it held are listed in the key as absent, so they're neither found nor missed.
+- **Word carries charts as pictures** (the adapters plan, "Pictures in Word documents"): each chart cropped from the
+  PDF's page as a PNG, at its drawn size, its caption after it in the Caption style; its facts are placed at the
+  picture's paragraph ("docx-figure") and scored.
 - **The key:** the facts printed, each placed by line; every printed number logged with its role, as a PDF's are.
 """
 import re
@@ -65,15 +68,21 @@ def _numbers(line):
         if re.search(r"[0-9]", text) and printed_value(text) is not None:
             yield text
 
-def key(project, lines, tables=None, representation="markdown"):
+def key(project, lines, tables=None, representation="markdown", pictures=None):
     """A representation's key: the PDF key's facts that the lines print, each placed by line ("md-prose", "md-table";
     for Word, "docx-prose", "docx-table"), the others listed as absent; every printed number logged with its role.
-    tables: the line numbers that are table rows (default: Markdown's, lines starting "|")."""
+    tables: the line numbers that are table rows (default: Markdown's, lines starting "|"). pictures: {chart number:
+    the line of the picture showing it}, its facts placed there ("docx-figure")."""
+    from .corpus import charts
     by_value = {}
     for f in project.facts:
         if not f.relation and f.drawn != "chart":  # a chart's facts: absent, though a total may print the same number
             by_value.setdefault(printed_value(f.value), []).append(f)
         f.forms = []
+    for number, line in (pictures or {}).items():
+        for _, facts in charts(project)[number - 1].series:
+            for f in facts:
+                f.forms.append({"form": "docx-figure", "page": 1, "line": line})
     log = []
     prefix = "docx" if representation == "docx" else "md"
     for n, line in enumerate(lines, 1):
@@ -122,9 +131,25 @@ def write(project, lines, folder):
 
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)  # zip members' and core properties' time, so the same project gives the same bytes
 
-def docx(lines):
+def chart_pictures(project, dpi=200):
+    """{chart caption: (PNG bytes, (width, height) in points)}: each chart as the PDF draws it, cropped from its page."""
+    import pymupdf
+    from .corpus import charts, render
+    if not charts(project):
+        return {}
+    data, _ = render(project)
+    doc = pymupdf.open("pdf", data)
+    out = {}
+    for number, chart in enumerate(charts(project), 1):
+        page_no, box = project.chart_boxes[number]
+        rect = pymupdf.Rect(box)
+        out[chart.caption] = (doc[page_no - 1].get_pixmap(dpi=dpi, clip=rect).tobytes("png"), (rect.width, rect.height))
+    return out
+
+def docx(lines, pictures=None):
     """The Markdown lines as a Word document's bytes: headings as headings, paragraphs, pipe tables as tables, a bold
-    caption line as a bold paragraph. Byte for byte the same each time."""
+    caption line as a bold paragraph; a chart not shown, as its picture with its caption after it when `pictures`
+    ({caption: (PNG, size in points)}) holds it. Byte for byte the same each time."""
     import datetime
     import io
     import zipfile
@@ -156,7 +181,14 @@ def docx(lines):
         elif line.startswith("**") and line.endswith("**"):
             document.add_paragraph().add_run(line.strip("*")).bold = True
         elif line.startswith("*") and line.endswith("*"):
-            document.add_paragraph().add_run(line.strip("*")).italic = True
+            caption = line.strip("*").removesuffix(" (a chart, not shown in this representation)")
+            if pictures and caption in pictures:
+                from docx.shared import Pt
+                png, (width, _) = pictures[caption]
+                document.add_paragraph().add_run().add_picture(io.BytesIO(png), width=Pt(width))
+                document.add_paragraph(caption, style="Caption")
+            else:
+                document.add_paragraph().add_run(line.strip("*")).italic = True
         elif line.strip():
             document.add_paragraph(line)
         k += 1
@@ -170,11 +202,13 @@ def docx(lines):
     return fixed.getvalue()
 
 def docx_key(project, data):
-    """A Word document's key, placed by the reader's own lines (paragraphs and table rows, docxdocs.read_docx)."""
+    """A Word document's key, placed by the reader's own lines (paragraphs and table rows, docxdocs.read_docx), its
+    charts' facts at their pictures' paragraphs (in order: chart n, picture n)."""
     from semantic_pdf_diff.docxdocs import read_docx
     doc = read_docx(data)
     rows = {n for b in doc.blocks if b.kind == "table" for n in b.row_lines}
-    return key(project, [t for _, t in doc.lines], rows, "docx")
+    pictures = {number: p.line for number, p in enumerate(doc.pictures, 1)}
+    return key(project, [t for _, t in doc.lines], rows, "docx", pictures)
 
 def write_docx(project, lines, folder):
     """Write <id>.docx and <id>.key.json into folder; returns the document's path."""
@@ -182,7 +216,7 @@ def write_docx(project, lines, folder):
     from pathlib import Path
     folder = Path(folder)
     folder.mkdir(parents=True, exist_ok=True)
-    data = docx(lines)
+    data = docx(lines, chart_pictures(project))
     path = folder / f"{project.id}.docx"
     path.write_bytes(data)
     (folder / f"{project.id}.key.json").write_text(json.dumps(docx_key(project, data), indent=1, ensure_ascii=False) + "\n",

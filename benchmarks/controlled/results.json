@@ -1030,29 +1030,35 @@
    }
   },
   "lcc-enduse-s1-clean.docx": {
-   "facts": 3,
-   "found": 3,
+   "facts": 33,
+   "found": 33,
    "recall": 1.0,
-   "found_right": 3,
+   "found_right": 33,
    "missed": [],
-   "claims": 3,
+   "claims": 51,
    "outcomes": {
-    "right": 3
+    "right": 51
    },
-   "conditions_kept": "3/3",
+   "conditions_kept": "33/33",
    "recall_by_form": {
+    "docx-figure": 1.0,
     "docx-prose": 1.0
    },
    "by_reader": {
-    "text": 1.0
+    "text": 0.0909,
+    "visual": 0.9091
    },
    "outcomes_by_reader": {
     "text": {
      "right": 3
+    },
+    "visual": {
+     "right": 48
     }
    },
    "conditions_by_reader": {
-    "text": "3/3"
+    "text": "3/3",
+    "visual": "30/30"
    }
   },
   "lcc-enduse-s1-clean.md": {
@@ -1336,31 +1342,39 @@
    }
   },
   "lcc-energy-s1-clean-revised.docx": {
-   "facts": 4,
-   "found": 4,
+   "facts": 21,
+   "found": 21,
    "recall": 1.0,
-   "found_right": 4,
+   "found_right": 19,
    "missed": [],
-   "claims": 6,
+   "claims": 23,
    "outcomes": {
-    "right": 4,
+    "loose": 2,
+    "right": 19,
     "text": 2
    },
-   "conditions_kept": "2/2",
+   "conditions_kept": "19/19",
    "recall_by_form": {
+    "docx-figure": 1.0,
     "docx-prose": 1.0
    },
    "by_reader": {
-    "text": 1.0
+    "text": 0.1905,
+    "visual": 0.8095
    },
    "outcomes_by_reader": {
     "text": {
-     "right": 4,
+     "loose": 2,
+     "right": 2,
      "text": 2
+    },
+    "visual": {
+     "right": 17
     }
    },
    "conditions_by_reader": {
-    "text": "2/2"
+    "text": "2/2",
+    "visual": "17/17"
    }
   },
   "lcc-energy-s1-clean-revised.md": {
@@ -1392,31 +1406,39 @@
    }
   },
   "lcc-energy-s1-clean.docx": {
-   "facts": 4,
-   "found": 4,
+   "facts": 21,
+   "found": 21,
    "recall": 1.0,
-   "found_right": 4,
+   "found_right": 19,
    "missed": [],
-   "claims": 6,
+   "claims": 23,
    "outcomes": {
-    "right": 4,
+    "loose": 2,
+    "right": 19,
     "text": 2
    },
-   "conditions_kept": "2/2",
+   "conditions_kept": "19/19",
    "recall_by_form": {
+    "docx-figure": 1.0,
     "docx-prose": 1.0
    },
    "by_reader": {
-    "text": 1.0
+    "text": 0.1905,
+    "visual": 0.8095
    },
    "outcomes_by_reader": {
     "text": {
-     "right": 4,
+     "loose": 2,
+     "right": 2,
      "text": 2
+    },
+    "visual": {
+     "right": 17
     }
    },
    "conditions_by_reader": {
-    "text": "2/2"
+    "text": "2/2",
+    "visual": "17/17"
    }
   },
   "lcc-energy-s1-clean.md": {
@@ -5438,29 +5460,35 @@
    }
   },
   "lcc-enduse-s1-clean.docx": {
-   "facts": 3,
-   "found": 3,
+   "facts": 33,
+   "found": 33,
    "recall": 1.0,
-   "found_right": 3,
+   "found_right": 33,
    "missed": [],
-   "claims": 3,
+   "claims": 51,
    "outcomes": {
-    "right": 3
+    "right": 51
    },
-   "conditions_kept": "3/3",
+   "conditions_kept": "33/33",
    "recall_by_form": {
+    "docx-figure": 1.0,
     "docx-prose": 1.0
    },
    "by_reader": {
-    "text": 1.0
+    "text": 0.0909,
+    "visual": 0.9091
    },
    "outcomes_by_reader": {
     "text": {
      "right": 3
+    },
+    "visual": {
+     "right": 48
     }
    },
    "conditions_by_reader": {
-    "text": "3/3"
+    "text": "3/3",
+    "visual": "30/30"
    }
   },
   "lcc-enduse-s1-clean.md": {
@@ -5744,31 +5772,39 @@
    }
   },
   "lcc-energy-s1-clean-revised.docx": {
-   "facts": 4,
-   "found": 4,
+   "facts": 21,
+   "found": 21,
    "recall": 1.0,
-   "found_right": 4,
+   "found_right": 19,
    "missed": [],
-   "claims": 6,
+   "claims": 23,
    "outcomes": {
-    "right": 4,
+    "loose": 2,
+    "right": 19,
     "text": 2
    },
-   "conditions_kept": "2/2",
+   "conditions_kept": "19/19",
    "recall_by_form": {
+    "docx-figure": 1.0,
     "docx-prose": 1.0
    },
    "by_reader": {
-    "text": 1.0
+    "text": 0.1905,
+    "visual": 0.8095
    },
    "outcomes_by_reader": {
     "text": {
-     "right": 4,
+     "loose": 2,
+     "right": 2,
      "text": 2
+    },
+    "visual": {
+     "right": 17
     }
    },
    "conditions_by_reader": {
-    "text": "2/2"
+    "text": "2/2",
+    "visual": "17/17"
    }
   },
   "lcc-energy-s1-clean-revised.md": {
@@ -5800,31 +5836,39 @@
    }
   },
   "lcc-energy-s1-clean.docx": {
-   "facts": 4,
-   "found": 4,
+   "facts": 21,
+   "found": 21,
    "recall": 1.0,
-   "found_right": 4,
+   "found_right": 19,
    "missed": [],
-   "claims": 6,
+   "claims": 23,
    "outcomes": {
-    "right": 4,
+    "loose": 2,
+    "right": 19,
     "text": 2
    },
-   "conditions_kept": "2/2",
+   "conditions_kept": "19/19",
    "recall_by_form": {
+    "docx-figure": 1.0,
     "docx-prose": 1.0
    },
    "by_reader": {
-    "text": 1.0
+    "text": 0.1905,
+    "visual": 0.8095
    },
    "outcomes_by_reader": {
     "text": {
-     "right": 4,
+     "loose": 2,
+     "right": 2,
      "text": 2
+    },
+    "visual": {
+     "right": 17
     }
    },
    "conditions_by_reader": {
-    "text": "2/2"
+    "text": "2/2",
+    "visual": "17/17"
    }
   },
   "lcc-energy-s1-clean.md": {

@@ -355,6 +355,33 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
     - Each fix's test fails with that fix reverted.
   - **`scripts/metafiles.py render`** draws every distinct metafile in the samples' Word documents into `benchmarks/metafiles` (git-ignored), optionally beside reference renders.
   - **Next:** step 4, pictures read in their Word document with a PDF figure's context.
+- **Pictures in Word documents, steps 4–5 (2026-10-03): read and measured.**
+  - **The reader** (`docxdocs.py`) keeps each picture with:
+    - its paragraph
+    - its bytes and format: a drawing's image, or an embedded object's preview
+    - its displayed size: a drawing's extent, an object's VML style
+    - its caption: the next paragraph in a caption style (Word's Caption, 3GPP's TF) or starting "Figure …", else the one before
+  - **Pictures** (`pictures.py`) become pages at their displayed size:
+    - metafiles drawn by `metafiles.py`; images placed as they are
+    - every picture drawn before any task is fed, since adding a page invalidates earlier ones and a refined tile renders from its page
+    - Each page gets a PDF page's image tasks (`extract.Visuals`, shared with the PDF job, its PDF requests byte for byte as before): the caption as source text, the text layer as context and check, the section's headings.
+    - Claims are located at the picture's paragraph (`DocxLocator`, now with the image regions) with their crops.
+    - A picture that can't be drawn is recorded, with its reason.
+  - **The controlled corpus's Word documents carry their charts as pictures,** cropped from the PDF's drawing with their captions. The charts' facts are placed at the pictures ("docx-figure") and scored.
+
+    | | PDF | Word, charts as pictures |
+    |---|---|---|
+    | Energy study: recall; claims misbound | 21 of 21; 7 | 21 of 21; 0 |
+    | End-use study: recall; claims misbound | 33 of 33; 5 | 33 of 33; 0 |
+    | Energy revision pair | every change, no false change | every change (the charts' bars too), no false change, each named "changed" |
+
+  - **TS 38.300 v19.2 → v19.3, pictures read** (the revision comparison plan's real pair), $0.142 for both versions' pictures and the comparisons they added:
+    - claims from pictures: 2,706 of 13,355
+    - quotes found in the picture's own text layer: 2,428 (90%)
+    - picture tasks: 354 of 358 complete (4 long procedure diagrams hit the claim limit)
+    - The rater (`bench/real_pairs.py`) now counts a picture changed when its bytes differ from its counterpart's (by caption): four procedure diagrams changed and one was renamed.
+    - Differences on pictures fell mostly on those diagrams. Inserted messages shifted their steps, and the pairings across steps were named "not the same item".
+  - **Stores made before this read no pictures** until `--reset` (no users yet; noted, not migrated).
 
 ## Open questions
 

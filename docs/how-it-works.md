@@ -32,7 +32,13 @@ Extraction of all compared sources shares one queue: pages are fed round-robin a
 
 ## Text files and Word documents
 
-`.txt` and `.md` files are read by a text reader (`textdocs.py`) through the same task core as PDFs (`tasks.py`): the same prompts, quote checks, context levers and refinement. Word documents (`.docx`, with the `office` extra) are read into the same form by `docxdocs.py`: each paragraph and table row a line, headings by style (`Heading N`), tracked changes applied, the table of contents left out; embedded pictures and objects are recorded as not read yet. Their claims are located by paragraphs (`DocxLocator`).
+`.txt` and `.md` files are read by a text reader (`textdocs.py`) through the same task core as PDFs (`tasks.py`): the same prompts, quote checks, context levers and refinement. Word documents (`.docx`, with the `office` extra) are read into the same form by `docxdocs.py`: each paragraph and table row a line, headings by style (`Heading N`), tracked changes applied, the table of contents left out. Their claims are located by paragraphs (`DocxLocator`).
+
+A Word document's pictures are read as a PDF's figures are (`pictures.py`). Each picture becomes a page at its displayed size:
+- **EMF or WMF** (most technical figures: Visio and chart-tool previews) is drawn by `metafiles.py` from the vendored metafile renderer's playback. Paths are vector, clips are computed, and text is set in PDF's built-in fonts, so the page draws alike on every machine and its labels are a text layer.
+- **A raster image** is placed as it is.
+
+The page gets a PDF page's image tasks (the whole picture, and tiles when it's large). Each task has the picture's caption as source text, its text layer as context and as a check on quotes, and its section's headings. Its claims are located at the picture's paragraph, with their crops. Charts and other drawings without a picture are recorded as not read. A store made before pictures were read needs `--reset` to read them.
 
 - **Pages:** a form feed starts one (as in RFCs); otherwise the file is one page.
 - **Sections:** from Markdown headings, or numbered headings in the RFC style ("7.2.  Stream Concurrency"); failing those, fixed page ranges.
@@ -62,7 +68,9 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `situate.py` | Figures, captions and citing prose; figure and section "about" requests |
 | `tasks.py` | The task core every reader shares: requests, quote checks, evidence, coverage, refinement |
 | `textdocs.py` | Plain text and Markdown: pages, sections, paragraphs and pipe tables, line locators |
-| `docxdocs.py` | Word documents read into the text reader's form: paragraphs, headings by style, tables, tracked changes |
+| `docxdocs.py` | Word documents read into the text reader's form: paragraphs, headings by style, tables, tracked changes, pictures |
+| `pictures.py` | A Word document's pictures as pages, read with a PDF figure's image tasks and context |
+| `metafiles.py` | EMF, EMF+ and WMF pictures drawn into PDF pages (vector, text as text), from the vendored `vendor/metafile_render` |
 | `compare.py` | Retrieval, local reasoning, numeric checks, and (revisions) explaining differences |
 | `align.py` | Revisions mode: items matched across revisions before judging; equal values settled |
 | `report.py` | Escaped HTML and JSON reports |

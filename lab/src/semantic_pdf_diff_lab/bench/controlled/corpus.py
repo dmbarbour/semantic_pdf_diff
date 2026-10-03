@@ -1045,6 +1045,8 @@ def render(project, page_size="letter"):
         if project.has("furniture"):  # a running header of numbers that aren't facts
             page.insert_text((54, 36), RUNNING_HEADER, fontname="helv", fontsize=8)
     drawn = draw_charts(project, doc, figures)
+    project.chart_boxes = {n: (page_no, tuple(box)) for n, (page_no, box) in figures.items()  # for representations
+                           if n <= len(charts(project))}
     if getattr(project, "schematic", None):
         drawn = draw_schematics(project, doc, figures, spans)
     doc.set_metadata({})

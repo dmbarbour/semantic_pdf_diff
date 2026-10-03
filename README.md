@@ -68,7 +68,7 @@ pdf-semantic-diff report --store work --out reports/latest
 pdf-semantic-diff gc --store work --dry-run
 ```
 
-A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. PDF, `.txt`, `.md` and `.docx` files are extracted so far; other files are listed as skipped.
+A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. PDF, `.txt`, `.md` and `.docx` files are extracted so far, a Word document's pictures (EMF, WMF and images) included; other files are listed as skipped.
 
 Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error.
 

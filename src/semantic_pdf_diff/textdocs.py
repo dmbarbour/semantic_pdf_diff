@@ -55,7 +55,19 @@ class TextDocument:
     lines: list         # [(page, text)] by line number - 1
     blocks: list
     headings: list      # [(page, line, level, title)]
-    images: list        # [(page, line, alt, target)]
+    images: list        # [(page, line, alt, target)]: images not read (a Markdown file's links, a Word chart)
+    pictures: list = field(default_factory=list)  # [Picture]: a Word document's pictures, read
+
+@dataclass
+class Picture:
+    """A picture in a Word document: at its paragraph (line), its bytes and format, its displayed size in points
+    (None: unknown), and its caption."""
+    line: int
+    data: bytes
+    extension: str      # ".emf", ".png"
+    size: tuple | None
+    caption: str
+    name: str           # the part's name ("image12.emf")
 
 def _cells(line):
     line = line.strip()
@@ -294,7 +306,7 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     core.sections, core.reader = index, TextReader(doc, s)
     if job.on_sections:
         job.on_sections(sections)
-    signals = {}
+    signals, kept = {}, []  # kept: the pictures document, open until its tasks are done
     for page in range(1, doc.pages + 1):
         yield "page"
         blocks = [b for b in doc.blocks if b.page == page]
@@ -317,8 +329,11 @@ def text_job(data, job, output, client, dispatch, progress, extension):
             if pg == page:
                 core.record(coverage_row(content=job.content, page=page, bbox=[0.0, float(line), 1.0, float(line + 1)],
                                          task=f"image:p{page}:{line}", status="skipped",
-                                         issues=[f"A picture or object in the document isn't read yet ({alt})" if word
-                                                 else f"An image in a Markdown file isn't read: {alt or target}"]))
+                                         issues=[f"A picture or object in the document isn't read yet ({alt}: {target})"
+                                                 if word else f"An image in a Markdown file isn't read: {alt or target}"]))
+        if word and page == 1 and doc.pictures:  # a Word document is one page: its pictures follow its text
+            from .pictures import tasks as picture_tasks
+            yield from picture_tasks(core, s, doc.pictures, job.content, output, kept)
         section = index[page].id
         counts = Counter(numbers=sum(len(re.findall(r"\d", b.text)) > 0 for b in blocks), tables=len(tables),
                          characters=sum(len(b.text) for b in blocks))
@@ -329,4 +344,6 @@ def text_job(data, job, output, client, dispatch, progress, extension):
         job.on_sections([x.model_copy(update={"signals": signals.get(x.id, {})}) for x in sections])
     while job.state["pending"]:
         yield "waiting"
+    for picture_document in kept:
+        picture_document.close()
     job.state["result"] = core.result(lambda r: (r["page"] or 0, r["task"]))

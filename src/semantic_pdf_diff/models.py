@@ -117,11 +117,12 @@ class TextLocator(Strict):
 
 class DocxLocator(Strict):
     """Where a claim sits within a Word document: its paragraphs (a table row counts as one), counted from 1 through
-    the body; never a path."""
+    the body; never a path. A claim read from a picture is at the picture's paragraph, in the region of the picture
+    it was read from (overview: the whole picture; tile; figure), with its crop (pictures.py)."""
     format: Literal["docx"] = "docx"
     page: int = Field(default=1, ge=1)  # a .docx has no pages until it's laid out
     paragraphs: tuple[int, int]
-    region: Literal["text", "table"]
+    region: Literal["text", "table", "tile", "figure", "overview"]
     task: str
 
     @property

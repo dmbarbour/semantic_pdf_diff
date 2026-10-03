@@ -95,10 +95,12 @@ def pack():
         copy = d / "fixture.sqlite"
         shutil.copy(WORKING, copy)
         start = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        with contextlib.redirect_stdout(io.StringIO()):
+        said = io.StringIO()
+        with contextlib.redirect_stdout(said):
             code = run(True, None, 0, False, fixture=copy, runs=d / "runs", pair_runs=d / "pairs")
         if code not in (0, 2):
-            print(f"the replay failed (exit {code}): nothing packed")
+            failed = [line for line in said.getvalue().splitlines() if "exit 1" in line or "fixture holds" in line]
+            print(f"the replay failed (exit {code}): nothing packed\n  " + "\n  ".join(failed[:20]))
             return code
         with fixtures.open(copy, "record") as f:
             dropped = f.prune(start, force=True)["answers_removed"]

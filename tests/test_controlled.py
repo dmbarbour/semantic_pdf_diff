@@ -633,7 +633,7 @@ class Corpus(unittest.TestCase):
                 self.assertEqual("\n".join(lines) + "\n", (folder / "docs-md" / f"{project.id}.md").read_text(encoding="utf-8"))
                 key = json.loads((folder / "docs-md" / f"{project.id}.key.json").read_text(encoding="utf-8"))
                 self.assertEqual(json.loads(json.dumps(representations.key(project, lines), ensure_ascii=False)), key)
-                data = representations.docx(lines)  # and as a Word document
+                data = representations.docx(lines, representations.chart_pictures(project))  # and as Word, charts as pictures
                 self.assertEqual(data, (folder / "docs-docx" / f"{project.id}.docx").read_bytes())
                 key = json.loads((folder / "docs-docx" / f"{project.id}.key.json").read_text(encoding="utf-8"))
                 self.assertEqual(json.loads(json.dumps(representations.docx_key(project, data), ensure_ascii=False)), key)
