@@ -19,7 +19,8 @@
     "reconcile",
     "dedupe_repeated",
     "align",
-    "verify_visuals"
+    "verify_visuals",
+    "explain_differences"
   ],
   "context_before": 400,
   "context_after": 400,

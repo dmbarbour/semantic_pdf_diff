@@ -5,7 +5,7 @@ import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 import pymupdf
-from semantic_pdf_diff.models import Evidence, FileRef, PdfLocator, Settings, Source, Extraction, Judgment
+from semantic_pdf_diff.models import Evidence, FileRef, PdfLocator, Settings, Source, Extraction, Judgment, Explanation
 from semantic_pdf_diff.llm import Client, BudgetExceeded, ModelFailure
 from semantic_pdf_diff.compare import candidates, numeric_check, compare
 from semantic_pdf_diff.extract import extract_pdf, split_utf8, tiles
@@ -21,12 +21,14 @@ def ev(id='A-1', **kw):
     return Evidence(**data)
 
 class Fake:
-    def __init__(self,s=None,relation='different',same=True):
+    def __init__(self,s=None,relation='different',same=True,kind='changed'):
         self.s = s or Settings()
-        self.relation,self.same = relation,same
+        self.relation,self.same,self.kind = relation,same,kind
     def ask(self,prompt,schema,images=(),key=None):
         if schema is Judgment:
             return Judgment(relation=self.relation,rationale='Fixture judgment',confidence=.95,same_conditions=self.same)
+        if schema is Explanation:
+            return Explanation(kind=self.kind,rationale='Fixture explanation',confidence=.9)
         raise AssertionError('Unexpected extraction')
 
 class Tests(unittest.TestCase):

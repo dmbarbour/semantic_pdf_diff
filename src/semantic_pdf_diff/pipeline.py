@@ -153,7 +153,8 @@ def run(options, settings, store, names, out, force_rescan=False):
         left, right = ([e for c in dict.fromkeys(f.content for f in files[n]) for e in by_content[c]] for n in names)
         log.info(f"Comparing {len(left)} × {len(right)} extracted claims via retrieval")
         progress = Progress('compare', client, heartbeat=settings.heartbeat_seconds)
-        data = compare(left, right, store.folder, client, options.mode, progress=progress)
+        headings = {(c, x.id): " > ".join(x.heading_path) for c, items in sections.items() for x in items}
+        data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings)
         progress.close()
         interpreters['compare'] = comparison_interpreter(settings).model_dump()
         data = Report(**data, created_at=provenance.now().isoformat(),
@@ -166,7 +167,8 @@ def run(options, settings, store, names, out, force_rescan=False):
         store.save_comparison(data['created_at'], data)
         write_report(data, out, assets=store.folder / 'assets')
         incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
-                      or data['retrieval']['omitted_by_pair_limit'] > 0 or any(f.get('processing_error') for f in data['findings']))
+                      or data['retrieval']['omitted_by_pair_limit'] > 0
+                      or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error') for f in data['findings']))
         print(f"Report: {out / 'report.html'}" + (' (incomplete source coverage)' if incomplete else ''))
         note = budget_note(client)
         if note:

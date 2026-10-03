@@ -9,6 +9,8 @@ aligned by difflib; a block found in both is unchanged text.
   uncertain) and no claim without a counterpart touches is a possible miss.
 - References aren't numbers that matter here: bracketed citations ("[RFC9001]") and section numbers ("Section 7.2")
   are left out of the comparison of a block's numbers.
+- Explained findings (compare.explain) are counted by kind and by where their claims sit: a value change named in
+  unchanged text is suspect, as a "different" finding there is.
 """
 import difflib
 import re
@@ -71,12 +73,14 @@ def rate(report, earlier, later):
     span = lambda loc: loc.get("lines") or loc.get("paragraphs")  # a text file's lines, a Word document's paragraphs
     lines = lambda e: set(range(span(e["locator"])[0], span(e["locator"])[1] + 1)) if span(e["locator"]) else set()
     in_changed = lambda cid: bool(lines(evidence[cid]) & changed[side[cid]])
-    findings = Counter()
+    findings, explained = Counter(), Counter()
     suspect = []
     for f in report["findings"]:
         where = "changed text" if in_changed(f["a"]) or in_changed(f["b"]) else "unchanged text"
         kind = "settled" if f.get("settled") else f["relation"]
         findings[f"{kind} in {where}"] += 1
+        if "explanation" in f:
+            explained[f"{f['explanation']['kind']} in {where}"] += 1
         if f["relation"] == "different" and where == "unchanged text":
             suspect.append(f)
     unmatched = Counter(f"{u['status']} in {'changed' if in_changed(u['id']) else 'unchanged'} text"
@@ -105,11 +109,14 @@ def rate(report, earlier, later):
     return {"claims": [sum(1 for s in side.values() if s == 0), sum(1 for s in side.values() if s == 1)],
             "changed_blocks": len(changed[2]), "changed_lines": [len(changed[0]), len(changed[1])],
             "findings": dict(sorted(findings.items())), "unmatched": dict(sorted(unmatched.items())),
+            **({"explained": dict(sorted(explained.items()))} if explained else {}),
             "suspect_differences": len(suspect), "numeric_changes": numeric,
             "numeric_changes_unseen": len(unseen),
             "pairs_judged": report["retrieval"]["attempted_pairs"],
             "settled": sum(1 for f in report["findings"] if f.get("settled")),
             "groupings": dict(sorted(Counter(g["kind"] for g in report.get("groupings", [])).items())),
-            "examples": {"suspect": [{"a": show(f["a"]), "b": show(f["b"]), "rationale": f["rationale"][:200]}
+            "examples": {"suspect": [{"a": show(f["a"]), "b": show(f["b"]), "rationale": f["rationale"][:200],
+                                      **({"kind": f["explanation"]["kind"], "why": f["explanation"]["rationale"][:200]}
+                                         if "explanation" in f else {})}
                                      for f in suspect[:15]],
                          "unseen": unseen[:15]}}

@@ -6,11 +6,16 @@
     python scripts/controlled.py run --max-cost 0.2          # extraction, recorded into a fixture (resumable)
     python scripts/controlled.py score                       # results.json from the runs' stores, offline
     python scripts/controlled.py run --replay                # read again from the packed fixture, offline
+    python scripts/controlled.py run --unaligned             # the PDF pairs only, alignment off (see below)
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
 is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
 (comparisons.json; revisions.py, comparison.py). The corpus is also written as Markdown (docs-md; representations.py),
 read and compared the same way, its runs and pairs named "<id>.md"; and as Word documents (docs-docx), "<id>.docx".
+
+With --unaligned the PDF pairs are compared again with alignment off (into "<recorded or replay>-unaligned"): every
+retrieval candidate is judged, as before alignment, so most "different" findings aren't changes, and the
+explanations (compare.explain) are measured where non-changes abound.
 """
 import argparse
 import contextlib
@@ -53,6 +58,7 @@ def main(argv=None):
     run.add_argument("--replay", action="store_true", help="from the packed fixture, without calling a model")
     run.add_argument("--responder", help="default: the configured model")
     run.add_argument("--max-cost", type=float, default=0.2)
+    run.add_argument("--unaligned", action="store_true", help="only the PDF pairs, compared with alignment off")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.bench import controlled
@@ -90,17 +96,22 @@ def main(argv=None):
             jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}", PAIR_RUNS / out.name / f"{p.id}{suffix}",
                       f"pair {p.id}{suffix}", "revisions") for p in revisions.pairs()
                      if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
+        overrides = {}
+        if args.unaligned:
+            jobs = [(a, b, PAIR_RUNS / f"{out.name}-unaligned" / folder.name, name + " unaligned", mode)
+                    for a, b, folder, name, mode in jobs if mode == "revisions" and a.suffix == ".pdf"]
+            overrides = {"align": False}
         for a, b, folder, name, mode in jobs:
             options = pipeline.RunOptions(mode=mode, fixture=PACKED if args.replay else WORKING,
                                           fixture_mode="replay" if args.replay else "record-new", responder=args.responder)
             if args.replay:
-                settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL)
+                settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL, **overrides)
             else:
                 left = args.max_cost - (ledger.spent(LEDGER, round="controlled") - before)
                 if left <= 0:
                     print(f"cap of ${args.max_cost} reached")
                     return 3
-                settings = pipeline.settings_from(config, situate=False, max_cost=round(left, 4))
+                settings = pipeline.settings_from(config, situate=False, max_cost=round(left, 4), **overrides)
                 options.ledger, options.ledger_tags = LEDGER, {"round": "controlled", "run": name.replace(" ", "-")}
             code = pipeline.attempt(pipeline.compare_paths, a, b, folder, settings, options)
             print(f"{name}: exit {code}", flush=True)
@@ -201,6 +212,10 @@ def main(argv=None):
                 print(f"      {kind}: {r[kind]}")
             print(f"      different: {r['different']}; equivalent: {r['equivalent']}; unmatched {r['unmatched']}; "
                   f"pairs {r['pairs']} (omitted {r['omitted']})")
+            if "kinds" in r:
+                k = r["kinds"]
+                print(f"      kinds named right {k['right']}/{k['scored']}, value changes named precisely "
+                      f"{k['value_change_precision']}: {k['by_claims']}")
     return 0
 
 def key_path(run):
@@ -217,7 +232,7 @@ def compare_pairs():
     "<id>.md")."""
     from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
     compared = {}
-    for which in ("recorded", "replay"):
+    for which in ("recorded", "replay", "recorded-unaligned", "replay-unaligned"):
         for pair in revisions.pairs():
             for suffix in ("", ".md", ".docx"):
                 report = PAIR_RUNS / which / f"{pair.id}{suffix}" / "report.json"

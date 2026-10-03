@@ -13,6 +13,12 @@ fact is then classed by what the report says of it:
 Every "different" and "equivalent" finding is classed too: a change, no change, a misreading (a claim bound to its
 fact but read wrong), across facts (two facts' claims paired), or unscored (a claim bound to no fact).
 
+**Kinds** (compare.explain, revisions mode): an explained finding's kind is scored against what its claims are, per
+the keys (EXPECTED): a changed value "changed", a conditions change "conditions", the same fact unchanged an
+editorial kind (renamed, moved, restated), two facts' claims "not_same_item" (or "split_or_merge", the old item's and
+a new one's of a split), a misreading "misread". The kinds named as value changes are also checked: of the
+explanations saying "changed" or "conditions", the share whose claims are a change.
+
 Relations (a door's room) aren't compared yet: they're left out of the changes.
 
 A revision's key logs its edits from its base (revisions.py), read in the direction of the comparison:
@@ -28,6 +34,10 @@ from .score import classify, key_facts, ranges
 
 BOUND = ("right", "loose")              # a claim of its fact, read right
 READ_WRONG = ("wrong unit", "inexact")  # a claim of its fact, read wrong
+# The kinds an explanation may rightly name, by what the keys say its finding's claims are.
+EXPECTED = {"change": {"changed"}, "conditions": {"conditions"}, "no change": {"renamed", "moved", "restated"},
+            "across facts": {"not_same_item"}, "split": {"split_or_merge"}, "misreading": {"misread"}}
+VALUE_CHANGES = ("changed", "conditions")
 
 def edits(earlier, later):
     """The edits between two revisions, from whichever key logs them, read from the earlier to the later:
@@ -90,6 +100,8 @@ def score_comparison(earlier, later, report):
     between = defaultdict(set)   # fact id: relations found between its claims in the two revisions
     of_claim = defaultdict(set)  # claim id: relations found with any claim of the other revision
     classes = {"different": Counter(), "equivalent": Counter()}
+    split_pairs = {(x, y) for old, new in splits for x in old for y in new}
+    kinds_found = defaultdict(Counter)  # what the claims are: the kinds explanations named
     for finding in report["findings"]:
         a, b = (finding["a"], finding["b"]) if side[finding["a"]] == 0 else (finding["b"], finding["a"])
         relation = finding["relation"]
@@ -99,11 +111,18 @@ def score_comparison(earlier, later, report):
         common = fa.keys() & fb.keys()
         for fid in common:
             between[fid].add(relation)
+        what = ("unscored" if not fa or not fb else "across facts" if not common
+                else "misreading" if any(fa[f] in READ_WRONG or fb[f] in READ_WRONG for f in common)
+                else "change" if any(kind_of.get(f) in ("changed", "conditions") for f in common)
+                else "no change")
         if relation in classes:
-            classes[relation]["unscored" if not fa or not fb else "across facts" if not common
-                              else "misreading" if any(fa[f] in READ_WRONG or fb[f] in READ_WRONG for f in common)
-                              else "change" if any(kind_of.get(f) in ("changed", "conditions") for f in common)
-                              else "no change"] += 1
+            classes[relation][what] += 1
+        if "explanation" in finding:
+            if what == "change" and not any(kind_of.get(f) == "changed" for f in common):
+                what = "conditions"
+            elif what == "across facts" and any((x, y) in split_pairs for x in fa for y in fb):
+                what = "split"
+            kinds_found[what][finding["explanation"]["kind"]] += 1
     unmatched = {u["id"] for u in report["unmatched"]}
     settled = {(f["a"], f["b"]) for f in report["findings"] if f.get("settled")}
     detail = {}
@@ -139,6 +158,15 @@ def score_comparison(earlier, later, report):
                   if olds & set(g["earlier_claims"]) and news & set(g["later_claims"])]
         split_detail.append({"from": old, "to": new, "viewed_as": sorted(set(viewed)), "compared": found,
                              "old_claims": len(olds), "new_claims": len(news), "old_claims_relations": relations})
+    scored = {w: k for w, k in kinds_found.items() if w != "unscored"}
+    named_changes = sum(n for k in scored.values() for kind, n in k.items() if kind in VALUE_CHANGES)
+    explained = {"right": sum(n for w, k in scored.items() for kind, n in k.items() if kind in EXPECTED[w]),
+                 "scored": sum(sum(k.values()) for k in scored.values()),
+                 "value_change_precision": round(sum(n for w in ("change", "conditions") for kind, n in
+                                                     kinds_found.get(w, {}).items() if kind in VALUE_CHANGES)
+                                                 / named_changes, 4)
+                 if named_changes else None,
+                 "by_claims": {w: dict(sorted(k.items())) for w, k in sorted(kinds_found.items())}}
     return {"facts": {k: len(v) for k, v in kinds.items()},
             "changes_found": f"{count('changed', 'reported')}/{len(kinds['changed'])}",
             "additions_found": f"{count('added', 'reported')}/{len(kinds['added'])}",
@@ -153,4 +181,5 @@ def score_comparison(earlier, later, report):
             "unmatched": len(report["unmatched"]),
             "pairs": report["retrieval"]["attempted_pairs"], "omitted": report["retrieval"]["omitted_by_pair_limit"],
             **({"splits": split_detail} if splits else {}),
+            **({"kinds": explained} if kinds_found else {}),
             "detail": dict(sorted(detail.items()))}

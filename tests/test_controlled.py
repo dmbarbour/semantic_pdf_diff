@@ -493,6 +493,26 @@ class ComparisonScoring(unittest.TestCase):
         self.assertEqual(s["different"], {"across facts": 1, "change": 2, "no change": 1, "unscored": 1})
         self.assertEqual((s["changes_found"], s["false_changes"], s["difference_precision"]), ("2/4", 1, 0.4))
 
+    def test_explanations_are_scored_by_what_their_claims_are(self):
+        from semantic_pdf_diff_lab.bench.controlled import comparison
+        c, findings, unmatched = self.perfect()
+        ident = lambda s, f: c[s, f]["id"]
+        both = lambda f: (ident(0, f), ident(1, f))
+        findings[both("plant.peak_flow")] = "different"  # no change: restated is right
+        findings[ident(0, "P-101C.capacity"), ident(1, "P-101D.capacity")] = "different"  # two pumps
+        unmatched.remove(ident(1, "P-101D.capacity"))
+        report = self.report(c, findings, unmatched)
+        changed = comparison.changes(*self.keys)["changed"]
+        named = {both(f): "changed" for f in changed[:3]} | {both(changed[3]): "not_same_item"} | \
+            {both("plant.peak_flow"): "restated", (ident(0, "P-101C.capacity"), ident(1, "P-101D.capacity")): "not_same_item"}
+        for f in report["findings"]:
+            if (f["a"], f["b"]) in named:
+                f["explanation"] = {"kind": named[f["a"], f["b"]]}
+        s = comparison.score_comparison(*self.keys, report)["kinds"]
+        self.assertEqual((s["right"], s["scored"], s["value_change_precision"]), (5, 6, 1.0))
+        self.assertEqual(s["by_claims"], {"across facts": {"not_same_item": 1}, "change": {"changed": 3, "not_same_item": 1},
+                                          "no change": {"restated": 1}})
+
     def test_a_range_stands_for_both_its_bounds(self):
         from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
         (_, revised), = revisions.revised(only=("lcc-s1-traps",))

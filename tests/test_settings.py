@@ -46,6 +46,7 @@ NOT_EXERCISED = {
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
     'dedupe_repeated': 'needs a table row repeated on three or more pages (tests/test_repeats.py)',
     'align': 'revisions mode only; these runs compare proposals (tests/test_align.py)',
+    'explain_differences': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
     'base_url': 'the stub model is the endpoint',
     'rescan': 'reads sources, not the documents given on the command line',
     'max_zip_depth': 'archives only', 'max_source_bytes': 'sources only', 'zip_ratio_limit': 'archives only',

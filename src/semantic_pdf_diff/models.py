@@ -312,6 +312,23 @@ class Judgment(Strict):
             return {k: v for k, v in data.items() if k in cls.model_fields}
         return data
 
+# Why two claims of a revisions finding differ (compare.explain): value changes, editorial changes, not changes.
+DIFFERENCE_KINDS = ("changed", "conditions", "renamed", "moved", "restated", "split_or_merge", "misread",
+                    "not_same_item", "unclear")
+
+class Explanation(Strict):
+    kind: Literal["changed", "conditions", "renamed", "moved", "restated", "split_or_merge", "misread",
+                  "not_same_item", "unclear"]
+    rationale: str = Field(min_length=1, max_length=800)
+    confidence: float = Field(ge=0, le=1)
+
+    @model_validator(mode="before")
+    @classmethod
+    def drop_unknown(cls, data):
+        if isinstance(data, dict):
+            return {k: v for k, v in data.items() if k in cls.model_fields}
+        return data
+
 class RateRule(Strict):
     """A throughput ceiling, applying on the given days and hours (local time).
 

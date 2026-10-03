@@ -42,6 +42,8 @@ def jittery_model():
             if 'Compare exactly' in prompt:
                 relation = ['equivalent', 'different', 'complementary', 'unrelated'][int(digest, 16) % 4]
                 answer = {'relation': relation, 'rationale': 'stub', 'confidence': .9, 'same_conditions': True}
+            elif 'Explain a difference' in prompt:
+                answer = {'kind': ['changed', 'not_same_item'][int(digest, 16) % 2], 'rationale': 'stub', 'confidence': .8}
             elif situating_answer(prompt):
                 answer = situating_answer(prompt)
             elif len(parts) > 1:  # an image: a claim derived from its pixels
@@ -55,7 +57,7 @@ def jittery_model():
                 answer = {'claims': claims, 'complete': True, 'issues': []}
             # What reached the model, for tests of what settings change: the body without the model's
             # name or how the answer travels (docs/plans/content-addressed-queries).
-            role = 'compare' if 'Compare exactly' in prompt else 'triage' if situating_answer(prompt) else 'extract'
+            role = 'compare' if 'Compare exactly' in prompt or 'Explain a difference' in prompt else 'triage' if situating_answer(prompt) else 'extract'
             seen = hashlib.sha256(json.dumps({k: v for k, v in body.items() if k not in ('model', 'stream', 'stream_options')},
                                              sort_keys=True).encode()).hexdigest()
             images = [hashlib.sha256(base64.b64decode(p['image_url']['url'].split(',', 1)[1])).hexdigest()

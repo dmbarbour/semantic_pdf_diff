@@ -394,7 +394,80 @@ Claude's reading of where proposals mode begins to make sense:
     - list members and positional attributes (the "why different" pass, milestone 4, is where they'd be told apart)
     - claims left unpaired (710 and 244)
     - the rater counting references as numeric changes
+- **Milestone 4, "why different" (2026-10-03): a first version.** The owner: "Excellent work! Please proceed with 1. Then we'll work on reading pictures."
+  - **The design (Claude's, within design item 3):**
+    - **A lever, `explain_differences`** (comparison stage, revisions only, on by default per decision 7): after judging, one more call for each "different" or "uncertain" finding. Settled, complementary and unrelated findings aren't explained.
+    - **What the call is sent:**
+      - both claims as the judge saw them (empty fields dropped), with their sections and crops
+      - the judgment and its rationale
+      - whether the two quotes are the same text
+      - each claim's item: its other claims in its own revision, up to 8, those naming its attribute first
+      - the other revision's claims stating each claim's value, in either claim's item, up to 4, the counterpart itself left out
+    - **A checklist** in the prompt (`compare.EXPLAIN`):
+      - values the other revision still or already states (members of one list, numbered conditions)
+      - nothing stated elsewhere (B replaced A)
+      - identical quotes
+      - readers' own conditions and numbering
+      - names the source gives (95th and 99th percentile)
+      - quotes and images supporting their values
+      - superseded values
+    - **The output** is a kind: changed, conditions, renamed, moved, restated, split_or_merge, misread, not_same_item or unclear, with a rationale. It's recorded on the finding as `explanation`; the judge's relation stays as it was.
+    - **The report** counts explained differences by kind in three groups:
+      - value changes: changed, conditions
+      - editorial changes: renamed, moved, restated, split or merge
+      - not changes: misread, not the same item
+      - It lists value changes first and filters by kind.
+    - **The scorer** (`bench/controlled/comparison.py`) checks each kind against what its claims are per the keys:
+      - a changed value: changed
+      - a conditions change: conditions
+      - the same fact unchanged: an editorial kind
+      - two facts' claims: not the same item, or split or merge across a split
+      - a misreading: misread
+      - Also reported: the share of named value changes that are changes.
+    - **`scripts/controlled.py run --unaligned`** compares the PDF pairs again with alignment off, so the explanations meet many non-changes, as before alignment.
+  - **Prompt version 2** fixed what version 1 got wrong:
+    - The counterpart was among its own value's echoes, so a conditions change looked like two statements side by side. The controlled conditions pair was named "not the same item" 5 times of 6.
+    - "Conditions" was named where both revisions quote the same sentence (QUIC 6 times, TS 38.300 3 times): readers attach context of their own.
+
+    | Version 2 | Kinds right | Changes named as value changes | Non-changes named as value changes |
+    |---|---|---|---|
+    | Controlled pairs, aligned (28 pair runs) | 73 of 76 | 74 of 74 (conditions changes: 5 of 6 named exactly) | 0 of 2 |
+    | Controlled PDF pairs, unaligned (10) | 147 of 171 | 46 of 46 | 8 of 125 |
+
+    - **Unaligned:** of the judge's 117 scored "different" findings, 42 were changes (0.36). Of the 54 findings explained as value changes, 46 were (0.85).
+    - **The misses:**
+      - two facts' claims named "changed": 7 of 89
+      - readers' positional numbering with equal values ("dimension 1" against "dimension 2") named "not the same item" rather than restated: 2 aligned, 15 unaligned. It's still not a change.
+      - the PDF conditions pair's turbidity (95th then 99th percentile) named "changed"
+  - **Real pairs, rated by the text diff:**
+
+    | | QUIC draft-34 → RFC 9000 | TS 38.300 v19.2 → v19.3 |
+    |---|---|---|
+    | Explained ("different" and "uncertain") | 65 | 64 |
+    | Value changes named, in changed text / unchanged text (version 1) | 8 / 2 (5 / 4) | 20 / 3 (17 / 3) |
+    | Suspect differences (unchanged text) | 13: 10 not the same item, 1 restated, 1 split, 1 misread | 12: 8 not the same item, 2 changed, 2 split |
+    | Not the same item, in changed text / unchanged text | 25 / 14 | 5 / 30 |
+    | "Conditions" where the quotes are the same text (version 1) | 3 (6) | 2 (3) |
+
+    - The pairing faults milestone 3 read by hand are named "not the same item":
+      - QUIC's Connection ID field against its length field
+      - TS 38.300's RA Report list members, detection conditions 1 and 2, the BSR's short and extended short formats
+  - **Cost:**
+    - version 1: $0.016 (controlled), $0.032 (real pairs)
+    - version 2: $0.017 (controlled), $0.034 (real pairs)
+    - the unaligned pairs: $0.18, mostly fresh judgments, since the pre-alignment answers no longer matched today's claims
+  - **The committed controlled fixture** holds only what its standard runs replay. The unaligned runs' answers stay local, like the real pairs'.
+  - **Not done:**
+    - confirming split or merge candidates by a model (see the open question)
+    - explaining possible renamings: alignment finds renamed items by their values, settles them, and lists them in the groupings
+    - reading a misread value again from its crop: the crops are sent and the checklist asks, but there's no separate reading
+  - **Left open:**
+    - "conditions" named on identical quotes
+    - readers' numbering named "not the same item"
+    - the rater could count value-change kinds in unchanged text as its suspect measure
 
 ## Open questions
 
-None at present.
+- **Split and merge confirmation (design item 1's note: "a change to its schema decided in that milestone").** Claude's recommendation:
+  - defer it until a pair produces candidates that need a model: the controlled split pair's candidate is right without one, and neither real pair produced a candidate
+  - when built, record the confirmation on the grouping, which is already alignment's view (decision 12), rather than add a finding with several members

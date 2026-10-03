@@ -19,7 +19,8 @@
     "reconcile",
     "dedupe_repeated",
     "align",
-    "verify_visuals"
+    "verify_visuals",
+    "explain_differences"
   ],
   "claims_per_request": 6,
   "output_tokens": 1400,

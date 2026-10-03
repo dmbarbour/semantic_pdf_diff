@@ -8,9 +8,9 @@ Nobody is ground truth here. Each rater (people, model judges, exact keys, mecha
 
 | Path | In git | Contents |
 |---|---|---|
-| `controlled/` | yes (not `fixture.sqlite`) | Controlled documents: PDFs, Markdown and Word versions with their answer keys, the recorded answers (`replay.zip`), and the scores (`results.json` for extraction, `comparisons.json` for revision pairs). Plan: [controlled documents](../docs/plans/controlled-documents-2026-10-01.md) |
+| `controlled/` | yes (not `fixture.sqlite`) | Controlled documents: PDFs, Markdown and Word versions with their answer keys, the recorded answers the standard runs replay (`replay.zip`; the `--unaligned` runs' answers stay in the local `fixture.sqlite`), and the scores (`results.json` for extraction, `comparisons.json` for revision pairs, with explanations' kinds). Plan: [controlled documents](../docs/plans/controlled-documents-2026-10-01.md) |
 | `eyetest/` | yes (not `images/`, not `report.html`) | Eye tests for vision models (`scripts/eye_test.py`): `results.json` compares the models; `replay.zip` holds their answers, which a test replays; the images and the report are drawn again on demand |
-| `real-pairs/` | yes (not `fixture.sqlite`) | Real revision pairs (`scripts/real_pairs.py`): the settings, the recorded answers and the raters' results. Plan: [comparing revisions](../docs/plans/revision-comparison-2026-10-02.md) |
+| `real-pairs/` | yes (not `fixture.sqlite` or `replay.zip`) | Real revision pairs (`scripts/real_pairs.py`): the settings and the raters' results; the recorded answers stay local, as the samples do. Plan: [comparing revisions](../docs/plans/revision-comparison-2026-10-02.md) |
 | `champion.json`, `round0.json` | yes | The defaults since the improvement rounds, and the settings before them (tests pin both) |
 | `rounds/<name>/` | no | Improvement rounds (`scripts/run_round.py`): their specs, pairs, verdicts and decisions. Five batches that tests judge again offline are in `tests/fixtures/rounds/` |
 | `batches/<name>/` | no | Review batches (`pdf-semantic-diff review sample`) and their labels |

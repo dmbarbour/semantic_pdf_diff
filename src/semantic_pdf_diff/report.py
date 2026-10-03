@@ -43,11 +43,19 @@ def write_report(data, output, assets=None):
                          else f"PDF bbox {list(loc['bbox'])}")
     issues = [r for r in data['coverage'] if r['status'] != 'complete']
     rows = []
-    for f in data['findings']:
+    # explained differences first, value changes leading (KINDS' order); the rest as found
+    order = {k: i for i, k in enumerate(KINDS)}
+    shown = sorted(data['findings'], key=lambda f: order.get(f.get('explanation', {}).get('kind'), len(KINDS)))
+    for f in shown:
         numeric = '<pre>'+esc(json.dumps(f['numeric'],indent=2))+'</pre>' if f.get('numeric') else ''
         title = f['relation'].title() + (' (settled without a model)' if f.get('settled') else '')
-        rows.append(f'''<article data-relation="{esc(f['relation'])}"><h2>{esc(title)}</h2>
-        <p>{esc(f['rationale'])}</p><div class="pair">{card(f['a'])}{card(f['b'])}</div>
+        why = f.get('explanation')
+        if why:
+            title += ': ' + KINDS[why['kind']][0].lower()
+            why = (f"<p><b>{esc(KINDS[why['kind']][1])}.</b> {esc(why['rationale'])}"
+                   f" <small>(explanation confidence {why['confidence']})</small></p>")
+        rows.append(f'''<article data-relation="{esc(f['relation'])}" data-kind="{esc(f.get('explanation', {}).get('kind', ''))}"><h2>{esc(title)}</h2>
+        {why or ''}<p>{esc(f['rationale'])}</p><div class="pair">{card(f['a'])}{card(f['b'])}</div>
         <details><summary>Calculation and matching details</summary>{numeric}<p>Retrieval score {f['retrieval_score']}; {'alignment' if f.get('settled') else 'model'} confidence {f['confidence']}</p></details></article>''')
     unmatched = ''.join('<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched'])
     shared = ''.join(card(eid) for eid in data.get('shared', []))
@@ -66,7 +74,7 @@ pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{col
 '''
     page = '<header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1>'
     page += f"<p>{' ↔ '.join(esc(x['name']) for x in data['sources'])}</p><p>Mode: {esc(data['mode'])}</p>"
-    page += f"<p>{esc(dict(counts))}</p><p class='warning'>{len(issues)} incomplete, failed or skipped source tasks. {len(data['unmatched'])} claims lack a confirmed counterpart.</p>"
+    page += f"<p>{esc(dict(counts))}</p>" + kinds_html(data['findings'], esc) + f"<p class='warning'>{len(issues)} incomplete, failed or skipped source tasks. {len(data['unmatched'])} claims lack a confirmed counterpart.</p>"
     diff = data.get('file_difference')
     if diff:
         render = lambda item: esc(' → '.join(item) if isinstance(item, list) else item)
@@ -76,16 +84,46 @@ pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{col
     page += '<p>Model conclusions require review. “Complete” means the extractor reported no local issue, not proof of exhaustive coverage. Unmatched claims do not establish additions or deletions.</p>'
     page += '<p>Revision mode treats the first source as the earlier version and the second as the later one. Proposal mode treats both symmetrically; neither is ranked.</p>'
     page += '<details><summary>Run metadata and limitations</summary><pre>'+esc(json.dumps({k:v for k,v in data.items() if k not in ('evidence','coverage','findings','unmatched')},indent=2))+'</pre></details></header>'
-    page += '<label>Show <select id="filter"><option value="all">All relations</option>'+''.join('<option>'+r+'</option>' for r in ['different','equivalent','complementary','uncertain','unrelated'])+'</select></label><input id="query" placeholder="Search findings" aria-label="Search findings">'
+    page += '<label>Show <select id="filter"><option value="all">All relations</option>'+''.join('<option>'+r+'</option>' for r in ['different','equivalent','complementary','uncertain','unrelated'])+'</select></label>'
+    if any('explanation' in f for f in data['findings']):
+        page += '<label>Kind <select id="kind"><option value="all">All kinds</option>'+''.join(f'<option value="{k}">{esc(v[0])}</option>' for k, v in KINDS.items())+'</select></label>'
+    page += '<input id="query" placeholder="Search findings" aria-label="Search findings">'
     page += '<main>'+''.join(rows)+'</main><details><summary>Unmatched evidence ('+str(len(data['unmatched']))+')</summary>'+unmatched+'</details>'
     page += groupings_html(data.get('groupings', []), esc)
     page += '<details><summary>Shared evidence ('+str(len(data.get('shared', [])))+'): identical content in both sources, not compared</summary>'+shared+'</details>'
     page += situating(data.get('situation', {}), data.get('sections', []), where, esc)
     page += '<details class="coverage"><summary>Files not scanned ('+str(len(data.get('scan_issues', [])))+'): hidden, unsafe or over limits</summary><table><thead><tr><th>Source</th><th>Path</th><th>Reason</th></tr></thead><tbody>'+issues_found+'</tbody></table></details>'
     page += '<details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>File</th><th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody>'+coverage+'</tbody></table></details>'
-    page += '''<script>function filter(){const r=document.querySelector('#filter').value,q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;document.querySelector('#query').oninput=filter;</script>'''
+    page += '''<script>function filter(){const r=document.querySelector('#filter').value,k=document.querySelector('#kind')?.value||'all',q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||(k!=='all'&&a.dataset.kind!==k)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;const kind=document.querySelector('#kind');if(kind)kind.onchange=filter;document.querySelector('#query').oninput=filter;</script>'''
     page = html_page('Semantic PDF comparison', page, style)
     (output/'report.html').write_text(page,encoding='utf-8')
+
+# A difference's kind (compare.explain): its name, and what it means, in the order the report lists them.
+KINDS = {"changed": ("Changed", "The same item and property under the same conditions; its value was revised"),
+         "conditions": ("Conditions changed", "The same item and property; the conditions or scope it's stated for changed"),
+         "renamed": ("Renamed", "The same item and value under a new name, tag or number"),
+         "moved": ("Moved", "The same statement in another section, table or row"),
+         "restated": ("Restated", "The same meaning in other words, units, precision or format"),
+         "split_or_merge": ("Split or merge", "One item became several, or several became one"),
+         "misread": ("Misread", "A claim doesn't say what its source says"),
+         "not_same_item": ("Not the same item", "Different items or properties, paired by the comparison"),
+         "unclear": ("Unclear", "The evidence doesn't decide")}
+# The kinds as a reader weighs them: value changes, editorial changes, and differences that aren't changes.
+KIND_GROUPS = (("Value changes", ("changed", "conditions")),
+               ("Editorial changes", ("renamed", "moved", "restated", "split_or_merge")),
+               ("Not changes", ("misread", "not_same_item")), ("Unclear", ("unclear",)))
+
+def kinds_html(findings, esc):
+    """The explained differences counted by kind, in their groups (empty when none was explained)."""
+    found = Counter(f['explanation']['kind'] for f in findings if 'explanation' in f)
+    if not found:
+        return ''
+    parts = []
+    for group, kinds in KIND_GROUPS:
+        mine = [f"{KINDS[k][0].lower()} {found[k]}" for k in kinds if found[k]]
+        if mine:
+            parts.append(f"<b>{esc(group)}</b> ({sum(found[k] for k in kinds)}): {esc(', '.join(mine))}")
+    return "<p>Differences explained: " + "; ".join(parts) + "</p>"
 
 GROUPING_ORDER = ("split candidate", "merge candidate", "ambiguous", "renamed", "attached", "unaligned", "matched")
 

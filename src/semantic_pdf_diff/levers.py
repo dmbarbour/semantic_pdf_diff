@@ -391,6 +391,15 @@ class VerifyVisuals(Lever):
         images = super().comparison_images(evidence, output)
         return images + ([output / evidence.image] if self.verify_visuals and evidence.image else [])
 
+class ExplainDifferences(Lever):
+    lever_name, stage, off = "explain_differences", "comparison", {"explain_differences": False}
+    # revisions: ask why each "different" or "uncertain" finding differs (a change, a renaming, not the same item...),
+    # with the claims' items around them (compare.explain; docs/plans/revision-comparison-2026-10-02.md, milestone 4)
+    explain_differences: Annotated[bool, _selecting(roles=COMPARE)] = True
+
+    def explains(self, mode):
+        return self.explain_differences and mode == "revisions"
+
 class DedupeRepeated(Lever):
     lever_name, stage, off = "dedupe_repeated", "matching", {"dedupe_repeated": False}
     # extract exactly repeated table rows (same cells, same table position, 3+ pages) once
@@ -404,7 +413,7 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, VisualTextLayer, TableFilter,
-                 QuoteMatch, Reconcile, DedupeRepeated, Align, VerifyVisuals)
+                 QuoteMatch, Reconcile, DedupeRepeated, Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -545,6 +554,12 @@ class Platform(Composable):
     def comparison_images(self, evidence, output):
         """Images sent with a claim being compared (paths)."""
         return []
+
+    @chosen
+    def explains(self, mode):
+        """Whether each "different" or "uncertain" finding is explained by a second call, which names the kind of
+        difference (compare.explain): the platform's, never; the explain_differences lever's, in revisions mode."""
+        return False
 
     # --- matching: how answers are checked and kept
 
