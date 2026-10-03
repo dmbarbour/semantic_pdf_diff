@@ -122,6 +122,31 @@ class Alignment(unittest.TestCase):
         self.assertEqual(pairs(found, left, right, "settled"), {(("MEETING 102", "dimension 1", "24'-0\""),
                                                                  ("MEETING 102", "depth", "24'-0\""))})
 
+    def test_a_split_and_a_merge_are_candidates_with_their_evidence(self):
+        left = [claim("P-101A", "capacity", "5,151", "gpm"), claim("P-101A", "head", "96.8", "ft"),
+                claim("P-101C", "capacity", "7,650", "gpm"), claim("P-101C", "head", "62.1", "ft"),
+                claim("V-310", "Cv", "450"), claim("V-311", "Cv", "300")]
+        right = [claim("P-101A", "capacity", "5,151", "gpm"), claim("P-101A", "head", "96.8", "ft"),
+                 claim("P-101E", "capacity", "4,102", "gpm"), claim("P-101E", "head", "63.4", "ft"),
+                 claim("P-101F", "capacity", "3,548", "gpm"), claim("P-101F", "head", "60.9", "ft"),
+                 claim("V-31", "Cv", "750")]
+        found = align.align(left, right)
+        kinds = {g["kind"]: g for g in found.groups}
+        split = kinds["split candidate"]
+        self.assertEqual((split["earlier"], split["later"]), (["P-101C"], ["P-101E", "P-101F"]))
+        self.assertEqual(split["evidence"]["sums"], [{"attribute": "capacity", "whole": "7,650", "parts": ["4,102", "3,548"]}])
+        self.assertEqual(kinds["matched"]["earlier"], ["P-101A"])
+        self.assertEqual(found.judge, [])  # candidates are shown, not compared claim by claim
+        self.assertEqual((found.regrouped[0], found.regrouped[1]), ([2, 3], [2, 3, 4, 5]))
+        # two valves become one: V-310 and V-311 share a stem with V-31 only if their tags say so; here they don't,
+        # so they're unaligned, each on its side
+        self.assertEqual(sorted(g["kind"] for g in found.groups if g["kind"] == "unaligned"), ["unaligned"] * 3)
+        merged = align.align([claim("Room 104A", "area", "1,200", "ft²"), claim("Room 104B", "area", "800", "ft²")],
+                             [claim("Room 104", "area", "2,000", "ft²")])
+        merge = next(g for g in merged.groups if g["kind"] == "merge candidate")
+        self.assertEqual((merge["earlier"], merge["later"], len(merge["evidence"]["sums"])),
+                         (["Room 104A", "Room 104B"], ["Room 104"], 1))
+
     def test_values_compare_in_their_units_and_only_numbers_tags_lengths_and_dates_count(self):
         key = lambda value, unit="": align.value_key(claim("x", "y", value, unit))
         self.assertEqual(key("1.2", "MW"), key("1,200", "kW"))
@@ -130,6 +155,29 @@ class Alignment(unittest.TestCase):
         self.assertEqual(key("D103"), ("id", "D103"))
         self.assertIsNone(key("ROOM 102 ENLARGED, DOOR D103 WIDENED"))
         self.assertIsNone(key("steel"))
+
+class Report(unittest.TestCase):
+    def test_the_report_shows_the_groupings_and_marks_regrouped_claims(self):
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent))
+        from test_pipeline import Fake, ev
+        from semantic_pdf_diff.compare import compare
+        from semantic_pdf_diff.report import groupings_html
+        left = [ev("A-1", entity="P-101A", attribute="capacity", value="5151", unit="gpm"),
+                ev("A-2", entity="P-101C", attribute="capacity", value="7650", unit="gpm")]
+        right = [ev("B-1", entity="P-101A", attribute="capacity", value="5151", unit="gpm"),
+                 ev("B-2", entity="P-101E", attribute="capacity", value="4102", unit="gpm"),
+                 ev("B-3", entity="P-101F", attribute="capacity", value="3548", unit="gpm")]
+        result = compare(left, right, Path("."), Fake(relation="different"), "revisions")
+        kinds = sorted(g["kind"] for g in result["groupings"])
+        self.assertEqual(kinds, ["matched", "split candidate"])
+        self.assertEqual({u["id"]: u["status"] for u in result["unmatched"]},
+                         {"A-2": "regrouped", "B-2": "regrouped", "B-3": "regrouped"})
+        matched = next(g for g in result["groupings"] if g["kind"] == "matched")
+        self.assertEqual(matched["outcome"]["settled"], 1)
+        self.assertIn("split candidate", groupings_html(result["groupings"], str))
+        self.assertEqual(compare(left, right, Path("."), Fake(relation="different"), "proposals")["groupings"], [])
 
 class Lever(unittest.TestCase):
     def test_revisions_align_and_proposals_keep_retrieval(self):

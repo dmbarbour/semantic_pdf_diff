@@ -438,6 +438,8 @@ class Report(Strict):
     unmatched: list[dict]
     shared: list[str]
     retrieval: dict
+    # revisions: how alignment grouped the two revisions' items, as it saw them (align.py; empty in proposals)
+    groupings: list[dict] = Field(default_factory=list)
     schema_version: int = REPORT_SCHEMA
     created_at: str
     sources: list[dict]

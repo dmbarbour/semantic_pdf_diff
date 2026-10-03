@@ -14,9 +14,15 @@ over the whole of both before any value is judged, from cheap signals, so the ju
 - **Claims within an aligned item:** equal values under agreeing conditions are settled as equivalent, without a
   model; the rest are paired by attribute and conditions, best first, for the judge (a changed value among them).
 
+- **Groupings, as alignment sees them** (decision 12): every group it formed, matched, renamed, attached, ambiguous,
+  unaligned, and split or merge candidates (leftover items whose names share a stem, one on one side and two or
+  more on the other, with whether their values add up), each with its evidence. The report shows them as they are:
+  regroupings can be messy, and candidates are only candidates.
+
 The weights and thresholds were set by inspection on the controlled revision pairs (decision 7: early development
-by eye); calibrated confidences, splits and merges come later.
+by eye); calibrated confidences come later.
 """
+from collections import Counter
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -37,12 +43,15 @@ JOINING = 0.6     # a positional claim joins a tagged item holding this share of
 @dataclass
 class Correspondence:
     """Which claims are compared: pairs for the judge [(i, j, score)], pairs settled as equivalent without one
-    [(i, j, score)], the claims whose items have no counterpart (indices in each side), and a summary for the
-    report."""
+    [(i, j, score)], the claims whose items have no counterpart (indices in each side), a summary for the report,
+    and the groupings alignment formed ({kind, earlier, later (names), earlier_claims, later_claims (indices),
+    score, evidence}). Claims in a split or merge candidate are in `regrouped` (indices in each side)."""
     judge: list
     settled: list = field(default_factory=list)
     unaligned: tuple = ((), ())
     summary: dict = field(default_factory=dict)
+    groups: list = field(default_factory=list)
+    regrouped: tuple = ((), ())
 
 def words(text):
     """A name's words: case-folded, stop words dropped, plurals folded."""
@@ -119,6 +128,19 @@ class Side:
         for vals in self.item_values.values():
             for v in vals:
                 self.holders[v] += 1
+
+    def display(self, key):
+        """An item's name as its claims most often give it."""
+        return Counter(self.claims[i].entity for i in self.items[key]).most_common(1)[0][0]
+
+    def numbers(self, key):
+        """An item's numeric values by claim: [(claim index, unit kind, number)]."""
+        out = []
+        for i in self.items[key]:
+            v = self.values[i]
+            if v is not None and v[0] not in ("date", "id") and isinstance(v[1], (int, float)):
+                out.append((i, v[0], v[1]))
+        return out
 
     def _join_positional(self):
         """An untagged item whose values are mostly one tagged item's, and clearly that one's, joins it: the image
@@ -254,6 +276,51 @@ def _homes(src, dst, key):
         return [key]
     return []
 
+def stem(key):
+    """What related names share: a tag less its final letter (P-101C, P-101E: P-101); a name's words less its
+    identifiers, with the identifiers' leading digits (Room 104, Room 104A: room 104)."""
+    if TAG.fullmatch(key):
+        return key.rstrip("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    w = words(key)
+    digits = sorted(m.group() for x in identifiers(w) for m in [re.match(r"\d+", x)] if m)
+    return " ".join(sorted(w - identifiers(w)) + digits) if digits else None
+
+def _sums(one, many, keys):
+    """The attributes whose value in one item is the sum of the others' (within rounding): [(attribute, whole,
+    parts)]. one, many: (side, key); keys: the others' keys."""
+    side, key = one
+    out = []
+    for i, kind, x in side.numbers(key):
+        parts = []
+        for k in keys:
+            match = [(j, n) for j, kd, n in many.numbers(k) if kd == kind and fits(side.claims[i], many.claims[j])]
+            if not match:
+                break
+            parts.append(match[0])
+        if len(parts) == len(keys) and abs(sum(n for _, n in parts) - x) <= 0.005 * max(abs(x), 1e-9):
+            out.append((side.claims[i].attribute, side.claims[i].value, [many.claims[j].value for j, _ in parts]))
+    return out
+
+def _regroup(a, b, lone_a, lone_b):
+    """Split and merge candidates among leftover items: one item on one side, two or more on the other, their names
+    sharing a stem. [(kind, earlier keys, later keys, evidence)]; candidates only, by names and values."""
+    out, used_a, used_b = [], set(), set()
+    for kind, src, dst, lone_src, lone_dst in (("split", a, b, lone_a, lone_b), ("merge", b, a, lone_b, lone_a)):
+        for key in sorted(lone_src):
+            if key in (used_a if src is a else used_b) or stem(key) is None:
+                continue
+            parts = [k for k in sorted(lone_dst) if k not in (used_b if src is a else used_a) and stem(k) == stem(key)]
+            if len(parts) < 2:
+                continue
+            sums = _sums((src, key), dst, parts)
+            evidence = {"stem": stem(key), "sums": [{"attribute": at, "whole": w, "parts": ps} for at, w, ps in sums],
+                        "shared_attributes": sorted(src.item_attributes[key] & frozenset().union(
+                            *(dst.item_attributes[k] for k in parts)))}
+            (used_a if src is a else used_b).add(key)
+            (used_b if src is a else used_a).update(parts)
+            out.append((kind, [key], parts, evidence) if kind == "split" else (kind, parts, [key], evidence))
+    return out
+
 def align(left, right):
     """The Correspondence of two revisions' claims (left the earlier, right the later)."""
     a, b = Side(left), Side(right)
@@ -289,9 +356,16 @@ def align(left, right):
     homed_a, homed_b = {ka for ka, _ in attached}, {kb for _, kb in attached}
     lone_a = [k for k in a.items if k not in aligned and k not in open_a and k not in homed_a]
     lone_b = [k for k in b.items if k not in taken_b and k not in open_b and k not in homed_b]
+    regroupings = _regroup(a, b, lone_a, lone_b)
+    regrouped_a = {k for _, ka, _, _ in regroupings for k in ka}
+    regrouped_b = {k for _, _, kb, _ in regroupings for k in kb}
+    lone_a = [k for k in lone_a if k not in regrouped_a]
+    lone_b = [k for k in lone_b if k not in regrouped_b]
     unaligned_a = sorted(i for k in lone_a for i in a.items[k])
     unaligned_b = sorted(i for k in lone_b for i in b.items[k])
     judge = sorted(set(judge), key=lambda x: (-x[2], x[0], x[1]))
+    groups = _groups(a, b, candidates, aligned, attached, ambiguous, open_a, open_b, of_a, of_b, lone_a, lone_b,
+                     regroupings)
     summary = {"strategy": "items aligned across revisions by shared values, names and attributes, best first with "
                            "a margin; equal values in aligned items settled without a model",
                "items": [len(a.items), len(b.items)], "aligned_items": len(aligned),
@@ -300,5 +374,37 @@ def align(left, right):
                # items matched under another tag: P-101B now P-201B (by its values)
                "renamed_items": sorted([ka, kb] for ka, kb in list(aligned.items()) + sorted(attached)
                                        if ka != kb and TAG.fullmatch(ka) and TAG.fullmatch(kb)),
+               "regrouped_items": [len(regrouped_a), len(regrouped_b)],
                "settled_pairs": len(settled)}
-    return Correspondence(judge, sorted(settled), (unaligned_a, unaligned_b), summary)
+    regrouped = (sorted(i for k in regrouped_a for i in a.items[k]), sorted(i for k in regrouped_b for i in b.items[k]))
+    return Correspondence(judge, sorted(settled), (unaligned_a, unaligned_b), summary, groups, regrouped)
+
+def _groups(a, b, candidates, aligned, attached, ambiguous, open_a, open_b, of_a, of_b, lone_a, lone_b, regroupings):
+    """The groupings as alignment formed them, for the report: each with its items' names, claims and evidence."""
+    def group(kind, ka, kb, score=None, evidence=None):
+        return {"kind": kind, "earlier": [a.display(k) for k in ka], "later": [b.display(k) for k in kb],
+                "earlier_claims": sorted(i for k in ka for i in a.items[k]),
+                "later_claims": sorted(j for k in kb for j in b.items[k]),
+                "score": None if score is None else round(score, 3), "evidence": evidence or {}}
+    def shared(ka, kb):
+        return {"shared_values": len(a.item_values[ka] & b.item_values[kb]),
+                "names": "same" if ka == kb else "related" if _name(a, b, ka, kb) > 0 else "different"}
+    out = []
+    for ka, kb in sorted(aligned.items()):
+        renamed = ka != kb and TAG.fullmatch(ka) and TAG.fullmatch(kb)
+        out.append(group("renamed" if renamed else "matched", [ka], [kb], candidates[ka, kb], shared(ka, kb)))
+    for ka, kb in sorted(attached):
+        out.append(group("attached", [ka], [kb], None, {**shared(ka, kb), "note": "a second counterpart: one thing "
+                                                         "read as two items in one revision"}))
+    for ka in sorted(open_a):
+        later = sorted(k for k in of_a[ka] if k not in aligned.values())
+        out.append(group("ambiguous", [ka], later, None, {"candidates": {b.display(k): round(of_a[ka][k], 3)
+                                                                          for k in later}}))
+    for kb in sorted(open_b - {k for ka in open_a for k in of_a[ka]}):
+        earlier = sorted(k for k in of_b[kb] if k not in aligned)
+        out.append(group("ambiguous", earlier, [kb], None, {"candidates": {a.display(k): round(of_b[kb][k], 3)
+                                                                            for k in earlier}}))
+    for kind, ka, kb, evidence in regroupings:
+        out.append(group(kind + " candidate", ka, kb, None, evidence))
+    out += [group("unaligned", [k], []) for k in sorted(lone_a)] + [group("unaligned", [], [k]) for k in sorted(lone_b)]
+    return out

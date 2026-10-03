@@ -41,6 +41,8 @@
 9. **Proposals mode deferred, not for long.** The owner: "Let's defer proposals comparison mode for a little bit longer, but it is an important use case that we shouldn't defer too much longer, so we should seek opportunities where it begins to make sense to pursue it." (Openings for proposals mode.)
 10. **No alignment on a slim margin.** The owner: "if we have a lot of high-confidence counterparts they should also be considered unaligned without model support; this shouldn't be a `0.51 vs. 0.49` decision, for example, or whatever our scoring equivalent turns out to be in context of the noise floor (match `0.81 vs. 0.80`)." (Design items 1 and 2.)
 11. **Splits and merges, with one-to-one favoured, not assumed.** The owner: "we could consider splitting/merging to be another viable relationship (and knob to test), so I wouldn't strongly assume 1:1 correspondences or alignments, just favor it heuristically, e.g. two resistors in series could be combined, or one could be split, as a trivial example. Not sure how to approach that, though." (Design items 1, 3 and 7.)
+12. **Regroupings shown as the tool sees them (2026-10-03).** On Claude's two options for showing a split or merge (a finding with several members, or a separate section beside the pairwise findings), the owner: "I think b is better. The issue is that regroupings can get messy in general, so there is no clear way to present them always. It's best that the report is honest about how the pdf_semantic_diff is viewing the groupings in these cases."
+    - **Claude's reading:** the report gains a section of groupings: how alignment grouped the two revisions' items (matched, renamed, attached, ambiguous, unaligned, and split or merge candidates), each with its evidence and what was then done with its claims (settled, judged, not compared). Candidates are labelled as candidates, found by names and values, not confirmed. Pairwise findings stay as they are.
 
 ## Design
 
@@ -331,6 +333,21 @@ Claude's reading of where proposals mode begins to make sense:
     - for each split, whether the old item was compared with its parts
   - **Cost:** $0.054 to read the four revisions and judge their pairs. The six earlier pairs scored as before.
   - **Left:** the other four knobs (a section moved, units restated, fungible items, a table split in two), merges, near-ties, and split detection.
+- **Groupings, as alignment sees them (2026-10-03; decision 12).**
+  - **The report gains a groupings section:** every group alignment formed (matched, renamed, attached, ambiguous, unaligned, and split or merge candidates), each with:
+    - its items' names and claims
+    - its evidence (shared values, how the names relate, the candidates' scores, a stem and sums)
+    - its outcome: settled, judged by relation, left without a counterpart
+  - **It says in so many words that it's alignment's view, not a verdict.** Pairwise findings are unchanged; `report.json` gains `groupings` (empty in proposals mode).
+  - **Split and merge candidates** are leftover items whose names share a stem, one on one side and two or more on the other: a tag less its final letter (`P-101C`, then `P-101E` and `P-101F`), or a name's words with its identifiers' leading digits (Room 104, then Room 104A and Room 104B).
+    - The evidence lists any attribute whose value is the parts' sum within rounding.
+    - Their claims are listed as "regrouped", not compared claim by claim.
+    - A model's confirmation of a candidate is left for later.
+  - **On the ten pairs,** offline:
+    - the split pair's P-101C showed as a split candidate into P-101E and P-101F, its capacity 7,650 = 4,102 + 3,548
+    - the renamed pair's P-101B → P-201B showed as renamed
+    - no other pair gained a candidate
+  - **The scorer** reports for each split how the groupings viewed it.
 
 ## Open questions
 

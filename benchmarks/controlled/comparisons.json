@@ -868,6 +868,9 @@
       "P-101F.motor power",
       "P-101F.motor speed"
      ],
+     "viewed_as": [
+      "split candidate"
+     ],
      "compared": [],
      "old_claims": 6,
      "new_claims": 12,
@@ -1838,6 +1841,9 @@
       "P-101F.total dynamic head",
       "P-101F.motor power",
       "P-101F.motor speed"
+     ],
+     "viewed_as": [
+      "split candidate"
      ],
      "compared": [],
      "old_claims": 6,

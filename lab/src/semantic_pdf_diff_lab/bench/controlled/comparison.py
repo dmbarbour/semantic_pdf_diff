@@ -19,8 +19,8 @@ A revision's key logs its edits from its base (revisions.py), read in the direct
 - **renamed facts** (P-101B now P-201B, values kept) are the same facts, scored as unchanged or changed
 - **a conditions change with the value kept** is classed apart: settled (the comparison saw no change: missed),
   else the relations the judge gave
-- **a split** (one item become two) is reported as its removed and added facts, and whether the comparison
-  compared the old item's claims with the new items' at all
+- **a split** (one item become two) is reported as its removed and added facts, how the report's groupings viewed
+  it (a split candidate, or apart), and whether the old item's claims were compared with the new items' at all
 """
 from collections import Counter, defaultdict
 
@@ -135,8 +135,10 @@ def score_comparison(earlier, later, report):
         relations = sorted({r for c in olds for r in of_claim[c]} if olds else set())
         found = sorted({f["relation"] for f in report["findings"]
                         if (f["a"] in olds and f["b"] in news) or (f["b"] in olds and f["a"] in news)})
-        split_detail.append({"from": old, "to": new, "compared": found, "old_claims": len(olds), "new_claims": len(news),
-                             "old_claims_relations": relations})
+        viewed = [g["kind"] for g in report.get("groupings", [])
+                  if olds & set(g["earlier_claims"]) and news & set(g["later_claims"])]
+        split_detail.append({"from": old, "to": new, "viewed_as": sorted(set(viewed)), "compared": found,
+                             "old_claims": len(olds), "new_claims": len(news), "old_claims_relations": relations})
     return {"facts": {k: len(v) for k, v in kinds.items()},
             "changes_found": f"{count('changed', 'reported')}/{len(kinds['changed'])}",
             "additions_found": f"{count('added', 'reported')}/{len(kinds['added'])}",

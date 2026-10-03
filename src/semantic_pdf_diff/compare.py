@@ -137,6 +137,7 @@ def file_difference(files_a, files_b):
 SETTLED = ("Settled without a model: the same value in corresponding items of the two revisions, with conditions "
            "that agree.")
 UNALIGNED = "No corresponding item in the other revision (by shared values, names and attributes): possibly added or removed."
+REGROUPED = "Viewed as part of a split or merge candidate (see the groupings); not compared claim by claim."
 
 # Provenance stays out of the model's view; it sees the claims and any source crops.
 PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences"}
@@ -160,7 +161,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None):
     findings, matched, attempted = [], set(), set()
     left = [e for e in left if e.id not in shared_ids]
     right = [e for e in right if e.id not in shared_ids]
-    scored, settled, unaligned, alignment = {}, {}, set(), []
+    scored, settled, unaligned, regrouped, alignment, groupings = {}, {}, set(), set(), [], []
     for a_side, b_side in ((left, right + shared), (shared, right)):
         if not a_side or not b_side:
             continue
@@ -171,8 +172,11 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None):
         for i, j, score in found.settled:
             settled.setdefault((a_side[i].id, b_side[j].id), (score, a_side[i], b_side[j]))
         unaligned |= {a_side[i].id for i in found.unaligned[0]} | {b_side[j].id for j in found.unaligned[1]}
+        regrouped |= {a_side[i].id for i in found.regrouped[0]} | {b_side[j].id for j in found.regrouped[1]}
         if found.summary:
             alignment.append(found.summary)
+        groupings += [{**g, "earlier_claims": [a_side[i].id for i in g["earlier_claims"]],
+                       "later_claims": [b_side[j].id for j in g["later_claims"]]} for g in found.groups]
     pairs = sorted(scored.values(), key=lambda x: (-x[0], x[1].id, x[2].id))
     results = {}
     progress = progress or NoProgress()
@@ -239,11 +243,17 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None):
     def status(e):
         if e.id in attempted:
             return "no_confirmed_counterpart"
-        return "unaligned" if e.id in unaligned else "not_compared"
+        return "regrouped" if e.id in regrouped else "unaligned" if e.id in unaligned else "not_compared"
+    notes = {"unaligned": UNALIGNED, "regrouped": REGROUPED}
     unmatched = [{"id": e.id, "status": status(e),
-                  "note": UNALIGNED if status(e) == "unaligned" else
-                          "No confirmed counterpart in retrieved evidence; this does not establish absence."}
+                  "note": notes.get(status(e), "No confirmed counterpart in retrieved evidence; this does not establish absence.")}
                  for e in left + right if e.id not in matched]
+    for g in groupings:  # what was done with each group's claims, as the findings say
+        mine = set(g["earlier_claims"]), set(g["later_claims"])
+        found = [f for f in findings if f["a"] in mine[0] and f["b"] in mine[1]]
+        g["outcome"] = {"settled": sum(1 for f in found if f.get("settled")),
+                        **dict(sorted(Counter(f["relation"] for f in found if not f.get("settled")).items())),
+                        **dict(sorted(Counter(u["status"] for u in unmatched if u["id"] in mine[0] | mine[1]).items()))}
     retrieval = {"shared_evidence": len(shared_ids), "candidate_pairs": len(pairs),
                  "attempted_pairs": min(len(pairs), client.s.max_pairs),
                  "omitted_by_pair_limit": max(0, len(pairs) - client.s.max_pairs),
@@ -252,4 +262,4 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None):
         retrieval.update(strategy=alignment[0]["strategy"], settled_pairs=sum(1 for f in findings if f.get("settled")),
                          alignment=[{k: v for k, v in x.items() if k != "strategy"} for x in alignment])
     return {"mode": mode, "findings": findings, "unmatched": unmatched, "shared": sorted(shared_ids),
-            "retrieval": retrieval}
+            "retrieval": retrieval, "groupings": groupings}

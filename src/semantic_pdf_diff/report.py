@@ -74,6 +74,7 @@ pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{col
     page += '<details><summary>Run metadata and limitations</summary><pre>'+esc(json.dumps({k:v for k,v in data.items() if k not in ('evidence','coverage','findings','unmatched')},indent=2))+'</pre></details></header>'
     page += '<label>Show <select id="filter"><option value="all">All relations</option>'+''.join('<option>'+r+'</option>' for r in ['different','equivalent','complementary','uncertain','unrelated'])+'</select></label><input id="query" placeholder="Search findings" aria-label="Search findings">'
     page += '<main>'+''.join(rows)+'</main><details><summary>Unmatched evidence ('+str(len(data['unmatched']))+')</summary>'+unmatched+'</details>'
+    page += groupings_html(data.get('groupings', []), esc)
     page += '<details><summary>Shared evidence ('+str(len(data.get('shared', [])))+'): identical content in both sources, not compared</summary>'+shared+'</details>'
     page += situating(data.get('situation', {}), data.get('sections', []), where, esc)
     page += '<details class="coverage"><summary>Files not scanned ('+str(len(data.get('scan_issues', [])))+'): hidden, unsafe or over limits</summary><table><thead><tr><th>Source</th><th>Path</th><th>Reason</th></tr></thead><tbody>'+issues_found+'</tbody></table></details>'
@@ -81,6 +82,41 @@ pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{col
     page += '''<script>function filter(){const r=document.querySelector('#filter').value,q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;document.querySelector('#query').oninput=filter;</script>'''
     page = html_page('Semantic PDF comparison', page, style)
     (output/'report.html').write_text(page,encoding='utf-8')
+
+GROUPING_ORDER = ("split candidate", "merge candidate", "ambiguous", "renamed", "attached", "unaligned", "matched")
+
+def _evidence(value):
+    """A grouping's evidence as words: sums as sums ("capacity: 7,650 = 4,102 + 3,548"), candidates with their
+    scores, lists as lists."""
+    if isinstance(value, list) and value and isinstance(value[0], dict) and 'parts' in value[0]:
+        return '; '.join(f"{x['attribute']}: {x['whole']} = {' + '.join(x['parts'])}" for x in value)
+    if isinstance(value, dict):
+        return ', '.join(f"{k} {v}" for k, v in value.items())
+    if isinstance(value, list):
+        return ', '.join(map(str, value))
+    return str(value)
+
+def groupings_html(groupings, esc):
+    """How alignment grouped the revisions' items, as it saw them (revisions mode): the unusual first, matched last."""
+    if not groupings:
+        return ''
+    counts = Counter(g['kind'] for g in groupings)
+    rows = []
+    for g in sorted(groupings, key=lambda g: (GROUPING_ORDER.index(g['kind']) if g['kind'] in GROUPING_ORDER else 99,
+                                                g['earlier'], g['later'])):
+        evidence = '; '.join(f"{k.replace('_', ' ')}: {_evidence(v)}" for k, v in g.get('evidence', {}).items()
+                             if v not in ([], {}, None))
+        outcome = ', '.join(f"{v} {k.replace('_', ' ')}" for k, v in g.get('outcome', {}).items() if v)
+        rows.append(f"<tr><td>{esc(g['kind'])}</td><td>{esc(', '.join(g['earlier']) or '—')}</td>"
+                    f"<td>{esc(', '.join(g['later']) or '—')}</td><td>{esc(evidence)}</td><td>{esc(outcome)}</td></tr>")
+    return ('<details class="coverage"><summary>How the revisions were grouped: '
+            + esc(', '.join(f"{n} {k}" for k, n in sorted(counts.items(), key=lambda x: GROUPING_ORDER.index(x[0])
+                                                                           if x[0] in GROUPING_ORDER else 99)))
+            + '</summary><p>Alignment groups each revision\'s claims into items and decides which items correspond '
+              'before any value is judged. This is how it saw them, not a verdict: split and merge candidates come '
+              'from related names and values that add up, and aren\'t confirmed.</p>'
+              '<table><thead><tr><th>Grouping</th><th>Earlier</th><th>Later</th><th>Evidence</th><th>Outcome</th></tr>'
+              '</thead><tbody>' + ''.join(rows) + '</tbody></table></details>')
 
 def situating(situation, sections, where, esc):
     """Figures, section "abouts" and their quality checks, per content."""
