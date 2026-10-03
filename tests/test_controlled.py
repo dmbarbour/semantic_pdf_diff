@@ -371,19 +371,25 @@ class Revisions(unittest.TestCase):
     """Revision pairs (milestone 4): each revision changes what it says, and its key stays honest."""
     def test_each_revision_changes_what_it_says(self):
         from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
-        expected = {"wtp-s1": (4, 3, 1), "coaster-s1": (4, 3, 1), "wtp-tables-s1-clean": (3, 4, 3),
-                    "lcc-s1-traps": (3, 2, 2), "lcc-energy-s1-clean": (5, 0, 0), "lcc-plan-s1-clean": (3, 1, 0)}
+        # (changed, added, removed, conditions changed with the value kept)
+        expected = {"wtp-s1": (4, 3, 1, 0), "coaster-s1": (4, 3, 1, 0), "wtp-tables-s1-clean": (3, 4, 3, 0),
+                    "lcc-s1-traps": (3, 2, 2, 0), "lcc-energy-s1-clean": (5, 0, 0, 0), "lcc-plan-s1-clean": (3, 1, 0, 0),
+                    # the knobs for alignment: a rename and a reorder change no fact; a split is four facts gone,
+                    # eight new
+                    "wtp-tables-s1-clean-renamed": (0, 0, 0, 0), "wtp-tables-s1-clean-reordered": (0, 0, 0, 0),
+                    "wtp-s1-conditions": (0, 0, 0, 2), "wtp-tables-s1-clean-split": (0, 8, 4, 0)}
         bases = {p.id: p for p in controlled.corpus(knobs=True)}
         made = revisions.revised()
         self.assertEqual([pair for pair, _ in made], revisions.pairs())
         for pair, project in made:
             with self.subTest(pair=pair.id):
                 keys = {}
-                for p in (bases[pair.id], project):  # the base is a corpus document
+                for p in (bases[project.revision_of], project):  # the base is a corpus document
                     _, log = controlled.render(p)
                     keys[p.id] = controlled.key(p, log)
                 kinds = comparison.changes(keys[pair.earlier], keys[pair.later])
-                self.assertEqual(tuple(len(kinds[k]) for k in ("changed", "added", "removed")), expected[pair.id])
+                self.assertEqual(tuple(len(kinds[k]) for k in ("changed", "added", "removed", "conditions")),
+                                 expected[pair.id])
         # the narrated change: the later coaster prints the old lift height as superseded, the earlier as current
         coaster = dict((pair.id, project) for pair, project in made)["coaster-s1"]
         self.assertEqual(coaster.fact("ride.lift").value, bases["coaster-s1"].fact("ride.lift_old").value)

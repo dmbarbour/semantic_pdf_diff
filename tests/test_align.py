@@ -82,6 +82,24 @@ class Alignment(unittest.TestCase):
                                                        ("Filters", "filtration rate", "4.1"))})
         self.assertEqual(len(found.settled), 1)
 
+    def test_a_condition_named_in_the_attribute_is_judged_not_settled(self):
+        left = [claim("raw water", "95th percentile turbidity", "37.6", "NTU", "measured over five years"),
+                claim("raw water", "peak flow", "42.2", "MGD")]
+        right = [claim("raw water", "99th percentile turbidity", "37.6", "NTU", "measured over five years"),
+                 claim("raw water", "peak flow", "42.2", "MGD")]
+        found = align.align(left, right)
+        self.assertEqual(pairs(found, left, right), {(("raw water", "95th percentile turbidity", "37.6"),
+                                                       ("raw water", "99th percentile turbidity", "37.6"))})
+
+    def test_a_renamed_item_is_matched_by_its_values_and_listed(self):
+        left = [claim("P-101B", "capacity", "5,590", "gpm"), claim("P-101B", "head", "64.9", "ft"),
+                claim("P-101A", "capacity", "5,151", "gpm")]
+        right = [claim("P-201B", "capacity", "5,590", "gpm"), claim("P-201B", "head", "64.9", "ft"),
+                 claim("P-101A", "capacity", "5,151", "gpm")]
+        found = align.align(left, right)
+        self.assertEqual((len(found.settled), found.judge), (3, []))
+        self.assertEqual(found.summary["renamed_items"], [["P-101B", "P-201B"]])
+
     def test_readers_phrasing_conditions_differently_doesnt_stop_a_settlement(self):
         left = [claim("D112", "width", "6'-0\"", conditions="Door Schedule"),
                 claim("D112", "width", "6'-0\"", conditions="face of finish")]

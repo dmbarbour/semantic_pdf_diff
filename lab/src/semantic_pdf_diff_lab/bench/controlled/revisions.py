@@ -73,6 +73,7 @@ def change(project, fact_id, value):
     _rewrite(project, edit)
     if not count and fact.drawn != "chart":
         raise ValueError(f"{project.id}: {fact_id}'s value {fact.value} isn't printed in its blocks")
+    project.edits.append({"kind": "changed", "fact": fact_id, "from": fact.value, "to": value})
     fact.value = value
 
 def _rows(project):
@@ -93,6 +94,7 @@ def drop_row(project, tag):
         rows[:] = [row for row in rows if not pattern.search(name(row))]
     if not dropped:
         raise ValueError(f"{project.id}: no row named {tag}")
+    project.edits.append({"kind": "removed", "facts": [f.id for f in project.facts if f.value in dropped]})
     project.facts[:] = [f for f in project.facts if f.value not in dropped]
 
 def add_row(project, like, tag, d, after=None):
@@ -113,9 +115,11 @@ def add_row(project, like, tag, d, after=None):
     for rows, name, cells in _rows(project):
         for row in rows:
             if pattern.search(name(row)):
+                before = len(project.facts)
                 new = [rename(name(row))] + [copy(c) for c in cells(row)]
                 where = next(k for k, r in enumerate(rows) if at.search(name(r)))
                 rows.insert(where + 1, (new[0], new[1:]) if isinstance(row, tuple) else new)
+                project.edits.append({"kind": "added", "facts": [f.id for f in project.facts[before:]]})
                 return
     raise ValueError(f"{project.id}: no row named {like}")
 
@@ -134,7 +138,9 @@ def drop_sentence(project, fact_id):
     blocks, i, sentences, k = _paragraph(project, fact_id)
     gone = sentences.pop(k)
     blocks[i] = ("p", " ".join(sentences))
-    project.facts[:] = [f for f in project.facts if f.relation or not _pattern(f.value).search(gone)]
+    dropped = [f for f in project.facts if not f.relation and _pattern(f.value).search(gone)]
+    project.edits.append({"kind": "removed", "facts": [f.id for f in dropped]})
+    project.facts[:] = [f for f in project.facts if f not in dropped]
 
 def add_sentence(project, after_fact, template, fact):
     """A sentence stating a new fact ({v} its value), after the sentence printing another's."""
@@ -142,6 +148,7 @@ def add_sentence(project, after_fact, template, fact):
     sentences.insert(k + 1, template.format(v=fact.value))
     blocks[i] = ("p", " ".join(sentences))
     project.facts.append(fact)
+    project.edits.append({"kind": "added", "facts": [fact.id]})
 
 def rewrite(project, old, new):
     """A passage of a paragraph rewritten (printed exactly once)."""
@@ -153,6 +160,80 @@ def rewrite(project, old, new):
                 blocks[i] = ("p", block[1].replace(old, new))
     if found != 1:
         raise ValueError(f"{project.id}: {old!r} is printed {found} times")
+
+def rename_row(project, old, new):
+    """A row's thing renamed (P-101B becomes P-201B), its values kept."""
+    pattern, renamed = _pattern(old), {}
+    for rows, name, cells in _rows(project):
+        for k, row in enumerate(rows):
+            if pattern.search(name(row)):
+                rows[k] = (pattern.sub(new, name(row)), cells(row)) if isinstance(row, tuple) else \
+                          [pattern.sub(new, name(row))] + list(cells(row))
+                for f in project.facts:
+                    if f.value in cells(row):
+                        renamed[f.id] = f.id.replace(old, new)
+                        f.id, f.entity = renamed[f.id], pattern.sub(new, f.entity)
+                        f.aliases = tuple(pattern.sub(new, a) for a in f.aliases)
+    if not renamed:
+        raise ValueError(f"{project.id}: no row named {old}")
+    project.edits.append({"kind": "renamed", "facts": renamed})
+
+def move_row(project, tag, after):
+    """A row moved within its table, to after the row named `after` (rows reordered; nothing else changes)."""
+    pattern, at = _pattern(tag), _pattern(after)
+    for rows, name, cells in _rows(project):
+        k = next((k for k, r in enumerate(rows) if pattern.search(name(r))), None)
+        if k is not None and any(at.search(name(r)) for r in rows):
+            row = rows.pop(k)
+            rows.insert(next(j for j, r in enumerate(rows) if at.search(name(r))) + 1, row)
+            project.edits.append({"kind": "moved", "facts": [f.id for f in project.facts if f.value in cells(row)]})
+            return
+    raise ValueError(f"{project.id}: no table with rows {tag} and {after}")
+
+def restate(project, fact_id, old, new, conditions):
+    """A fact's conditions changed, its value kept: a passage rewritten (printed once) and the key's conditions."""
+    rewrite(project, old, new)
+    fact = project.fact(fact_id)
+    project.edits.append({"kind": "conditions", "fact": fact_id, "from": fact.conditions, "to": conditions})
+    fact.conditions = conditions
+
+def split_row(project, tag, tags, d, column):
+    """A row's thing split in two (one pump replaced by two smaller ones): the column `column`'s value divided
+    between them so the parts sum to the whole, the other values drawn near the old ones."""
+    pattern = _pattern(tag)
+    for rows, name, cells in _rows(project):
+        k = next((k for k, r in enumerate(rows) if pattern.search(name(r))), None)
+        if k is None:
+            continue
+        row = rows.pop(k)
+        old = [f for f in project.facts if f.value in cells(row)]
+        whole = next(f for f in old if f.attribute == column)
+        decimals = len(whole.value.split(".")[1]) if "." in whole.value else 0
+        for _ in range(100):
+            part = d.number(whole.number * 0.35, whole.number * 0.65, decimals)
+            rest = f"{whole.number - parse_number(part):,.{decimals}f}"
+            if rest not in d.used and parse_number(rest) > 0:
+                d.used.add(rest)
+                break
+        else:
+            raise ValueError(f"{project.id}: no split of {whole.value}")
+        new_facts = []
+        for n, new_tag in enumerate(tags):
+            rename = lambda text: pattern.sub(new_tag, text)
+            values = {}
+            for f in old:
+                value = (part if n == 0 else rest) if f is whole else near(d, f.value, -0.05, 0.05)
+                g = replace(f, id=f.id.replace(tag, new_tag), entity=rename(f.entity),
+                            aliases=tuple(map(rename, f.aliases)), value=value, forms=[])
+                new_facts.append(g)
+                values[f.value] = value
+            new_row = [rename(name(row))] + [values.get(c, c) for c in cells(row)]
+            rows.insert(k + n, (new_row[0], new_row[1:]) if isinstance(row, tuple) else new_row)
+        project.facts[:] = [f for f in project.facts if f not in old] + new_facts
+        project.edits.append({"kind": "split", "from": [f.id for f in old], "to": [g.id for g in new_facts],
+                              "sum": {"column": column, "whole": whole.value, "parts": [part, rest]}})
+        return
+    raise ValueError(f"{project.id}: no row named {tag}")
 
 # --- the revisions -----------------------------------------------------------------------------
 
@@ -172,6 +253,8 @@ def coaster_earlier(p, d):
     rewrite(p, f"In revision B the lift hill was raised from {old.value} ft to {lift.value} ft.",
             f"The lift hill rises {old.value} ft.")
     p.facts.remove(old)
+    p.edits += [{"kind": "removed", "facts": [old.id]},
+                {"kind": "changed", "fact": lift.id, "from": lift.value, "to": old.value}]
     lift.value, lift.conditions = old.value, ""
     for fid in ("trains.mass", "ride.capacity", "el.Vertical loop.speed"):
         change(p, fid, near(d, p.fact(fid).value, -0.1, 0.1))
@@ -221,15 +304,50 @@ def plan_later(p, d):
     width, height = plan.doors["D103"]
     plan.doors["D103"] = (next((w for w in (36, 42, 48, 72) if w > width), 48), height)
     plan.revisions = plan.revisions + (("D", "2026-04-02", "ROOM 102 ENLARGED, DOOR D103 WIDENED"),)
+    before = {f.id: f.value for f in p.facts}
     p.facts[:] = sheet_project(plan, p.id).facts
+    p.edits += [{"kind": "changed", "fact": f.id, "from": before[f.id], "to": f.value}
+                for f in p.facts if f.id in before and before[f.id] != f.value]
+    p.edits.append({"kind": "added", "facts": [f.id for f in p.facts if f.id not in before]})
 
-# base maker, its knob (None: the clean corpus), the edit, whether the generated document is the earlier one
-PAIRS = ((PROJECTS["wtp"], None, wtp_later, False),
-         (PROJECTS["coaster"], None, coaster_earlier, True),
-         (TABLE_PROJECTS["wtp-tables"], "clean", wtp_tables_later, False),
-         (PROSE_PROJECTS["lcc"], "traps", lcc_later, False),
-         (CHART_PROJECTS["lcc-energy"], "clean", energy_later, False),
-         (SHEET_PROJECTS["lcc-plan"], "clean", plan_later, False))
+def renamed_later(p, d):
+    """Pump P-101B renamed P-201B, its values kept: the same pump under a new tag (alignment by its values)."""
+    rename_row(p, "P-101B", "P-201B")
+
+def reordered_later(p, d):
+    """Rows reordered, nothing else: a valve moved down its schedule, across the split tables, and a blower up."""
+    move_row(p, "V-303", "V-317")
+    move_row(p, "B-403", "B-401")
+
+def conditions_later(p, d):
+    """Two values kept under new conditions: the filtration rate now with all filters in service, the raw water
+    turbidity now a 99th percentile (a change a value comparison alone can't see)."""
+    restate(p, "filters.rate", "With one filter out of service, the filtration rate is",
+            "With all filters in service, the filtration rate is", "with all filters in service")
+    raw = p.fact("plant.raw_turbidity")
+    for old in ("(95th percentile)", "the 95th percentile raw water turbidity"):
+        if any(old in block[1] for _, blocks in p.sections for block in blocks if block[0] == "p"):
+            rewrite(p, old, old.replace("95th", "99th"))
+    p.edits.append({"kind": "conditions", "fact": raw.id, "from": raw.conditions, "to": "99th percentile"})
+    raw.conditions = "99th percentile"
+
+def split_later(p, d):
+    """Pump P-101C replaced by two, P-101E and P-101F, whose capacities sum to its own."""
+    split_row(p, "P-101C", ("P-101E", "P-101F"), d, "capacity")
+
+# base maker, its knob (None: the clean corpus), the edit, whether the generated document is the earlier one, and
+# the revision's name (the first revision of a base is "revised"; its pair is named after the base)
+PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
+         (PROJECTS["coaster"], None, coaster_earlier, True, "earlier"),
+         (TABLE_PROJECTS["wtp-tables"], "clean", wtp_tables_later, False, "revised"),
+         (PROSE_PROJECTS["lcc"], "traps", lcc_later, False, "revised"),
+         (CHART_PROJECTS["lcc-energy"], "clean", energy_later, False, "revised"),
+         (SHEET_PROJECTS["lcc-plan"], "clean", plan_later, False, "revised"),
+         # knobs for alignment (the revision comparison plan, design item 7)
+         (TABLE_PROJECTS["wtp-tables"], "clean", renamed_later, False, "renamed"),
+         (TABLE_PROJECTS["wtp-tables"], "clean", reordered_later, False, "reordered"),
+         (PROJECTS["wtp"], None, conditions_later, False, "conditions"),
+         (TABLE_PROJECTS["wtp-tables"], "clean", split_later, False, "split"))
 
 def _base(make, knob, seed):
     p = make(seed)
@@ -240,10 +358,10 @@ def _base(make, knob, seed):
 def pairs(seed=1):
     """Each pair's documents, by id (nothing generated)."""
     out = []
-    for make, knob, edit, earlier in PAIRS:
+    for make, knob, edit, earlier, name in PAIRS:
         base = _base(make, knob, seed).id
-        mine = f"{base}-{'earlier' if earlier else 'revised'}"
-        out.append(Pair(base, *((mine, base) if earlier else (base, mine))))
+        mine = f"{base}-{name}"
+        out.append(Pair(base if name in ("revised", "earlier") else mine, *((mine, base) if earlier else (base, mine))))
     return out
 
 def check(base, project):
@@ -259,6 +377,7 @@ def check(base, project):
     structure = lambda log: {p["text"] for p in log if p["role"] == "structure"}
     old = {f.id for f in base.facts}
     names = {w for f in project.facts if f.id not in old for name in (f.entity, *f.aliases) for w in name.split()}
+    names |= {w for e in project.edits if e["kind"] == "conditions" for w in e["to"].split()}  # "99th percentile"
     stray = structure(after) - structure(before) - names - {str(p["page"]) for p in after}
     if stray:
         raise ValueError(f"{project.id}: numbers printed that are neither the base's nor facts: {sorted(stray)}")
@@ -267,11 +386,12 @@ def revised(seed=1, only=None):
     """[(Pair, the generated project)]: each pair's generated document (or only those of the pairs named), checked
     against its base."""
     out = []
-    for (make, knob, edit, _), pair in zip(PAIRS, pairs(seed)):
+    for (make, knob, edit, _, _), pair in zip(PAIRS, pairs(seed)):
         if only is not None and pair.id not in only:
             continue
         project = _base(make, knob, seed)
         edit(project, drawer(project))
+        project.revision_of = project.id
         project.id = pair.earlier if pair.later == project.id else pair.later
         check(_base(make, knob, seed), project)
         out.append((pair, project))

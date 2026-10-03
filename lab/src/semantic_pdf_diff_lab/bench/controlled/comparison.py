@@ -14,6 +14,13 @@ Every "different" and "equivalent" finding is classed too: a change, no change, 
 fact but read wrong), across facts (two facts' claims paired), or unscored (a claim bound to no fact).
 
 Relations (a door's room) aren't compared yet: they're left out of the changes.
+
+A revision's key logs its edits from its base (revisions.py), read in the direction of the comparison:
+- **renamed facts** (P-101B now P-201B, values kept) are the same facts, scored as unchanged or changed
+- **a conditions change with the value kept** is classed apart: settled (the comparison saw no change: missed),
+  else the relations the judge gave
+- **a split** (one item become two) is reported as its removed and added facts, and whether the comparison
+  compared the old item's claims with the new items' at all
 """
 from collections import Counter, defaultdict
 
@@ -22,14 +29,36 @@ from .score import classify, key_facts, ranges
 BOUND = ("right", "loose")              # a claim of its fact, read right
 READ_WRONG = ("wrong unit", "inexact")  # a claim of its fact, read wrong
 
+def edits(earlier, later):
+    """The edits between two revisions, from whichever key logs them, read from the earlier to the later:
+    (renames {later id: earlier id}, splits [(earlier ids, later ids)])."""
+    renames, splits = {}, []
+    for key, other, forward in ((later, earlier, True), (earlier, later, False)):
+        if key.get("revision_of") != other["project"]:
+            continue
+        for e in key.get("edits", []):
+            if e["kind"] == "renamed":
+                renames.update({new: old for old, new in e["facts"].items()} if forward else e["facts"])
+            elif e["kind"] == "split":
+                splits.append((e["from"], e["to"]) if forward else (e["to"], e["from"]))
+    return renames, splits
+
 def changes(earlier, later):
-    """The facts' changes between two revisions' keys, by fact id (distractors and relations aside)."""
-    facts = lambda key: {f["id"]: f for f in key["facts"] if f["role"] == "fact" and not f.get("relation")}
-    a, b = facts(earlier), facts(later)
+    """The facts' changes between two revisions' keys, by fact id (distractors and relations aside; renamed facts
+    under their earlier ids): changed (the value), conditions (the value kept, its conditions changed), added,
+    removed, unchanged."""
+    renames, _ = edits(earlier, later)
+    facts = lambda key, rename: {rename.get(f["id"], f["id"]): f for f in key["facts"]
+                                 if f["role"] == "fact" and not f.get("relation")}
+    a, b = facts(earlier, {}), facts(later, renames)
     both = a.keys() & b.keys()
+    same = lambda x, y: " ".join(x.casefold().split()) == " ".join(y.casefold().split())
     return {"changed": sorted(i for i in both if a[i]["value"] != b[i]["value"]),
+            "conditions": sorted(i for i in both if a[i]["value"] == b[i]["value"]
+                                 and not same(a[i].get("conditions", ""), b[i].get("conditions", ""))),
             "added": sorted(b.keys() - a.keys()), "removed": sorted(a.keys() - b.keys()),
-            "unchanged": sorted(i for i in both if a[i]["value"] == b[i]["value"])}
+            "unchanged": sorted(i for i in both if a[i]["value"] == b[i]["value"]
+                                and same(a[i].get("conditions", ""), b[i].get("conditions", "")))}
 
 def sides(report):
     """{claim id: 0 (the earlier revision's) or 1 (the later's)}, by the source its file is in."""
@@ -44,12 +73,14 @@ def sides(report):
 def score_comparison(earlier, later, report):
     """A comparison report (report.json's data) scored against the two revisions' keys (see the module's note)."""
     side, keys = sides(report), (earlier, later)
+    renames, splits = edits(earlier, later)
     facts = [[f for f in key_facts(k) if not f.relation] for k in keys]
-    bound = {}  # claim id: {fact id: outcome}, the facts it's bound to
+    bound = {}  # claim id: {fact id: outcome}, the facts it's bound to (the later's renamed to the earlier's ids)
     for e in report["evidence"]:
         s = side[e["id"]]
         read = [classify(part, facts[s], keys[s]["printed"]) for part in ranges([e])]
-        bound[e["id"]] = {fid: outcome for outcome, fid in read if outcome in BOUND + READ_WRONG}
+        bound[e["id"]] = {(renames.get(fid, fid) if s else fid): outcome for outcome, fid in read
+                          if outcome in BOUND + READ_WRONG}
     kinds = changes(earlier, later)
     kind_of = {fid: kind for kind, ids in kinds.items() for fid in ids}
     claims_of = defaultdict(lambda: ([], []))  # fact id: its claims in each revision
@@ -71,9 +102,16 @@ def score_comparison(earlier, later, report):
         if relation in classes:
             classes[relation]["unscored" if not fa or not fb else "across facts" if not common
                               else "misreading" if any(fa[f] in READ_WRONG or fb[f] in READ_WRONG for f in common)
-                              else "change" if any(kind_of.get(f) == "changed" for f in common) else "no change"] += 1
+                              else "change" if any(kind_of.get(f) in ("changed", "conditions") for f in common)
+                              else "no change"] += 1
     unmatched = {u["id"] for u in report["unmatched"]}
+    settled = {(f["a"], f["b"]) for f in report["findings"] if f.get("settled")}
     detail = {}
+    for fid in kinds["conditions"]:  # the value kept: settled means the comparison saw no change
+        a, b = claims_of[fid]
+        pairs = {(x, y) for x in a for y in b}
+        detail[fid] = ("unextracted" if not a or not b else "settled" if pairs & settled and not between[fid] - {"equivalent"}
+                       else "judged " + "/".join(sorted(between[fid])) if between[fid] else "unpaired")
     for kind, (different, equivalent) in (("changed", ("reported", "called equivalent")),
                                           ("unchanged", ("false change", "confirmed"))):
         for fid in kinds[kind]:
@@ -90,6 +128,15 @@ def score_comparison(earlier, later, report):
                            else "reported" if any(c in unmatched for c in mine) else "other")
     count = lambda kind, status: sum(1 for f in kinds[kind] if detail[f] == status)
     differences = sum(classes["different"].values())
+    split_detail = []
+    for old, new in splits:  # was the old item compared with its parts at all?
+        olds = {c for f in old for c in claims_of[f][0]}
+        news = {c for f in new for c in claims_of[f][1]}
+        relations = sorted({r for c in olds for r in of_claim[c]} if olds else set())
+        found = sorted({f["relation"] for f in report["findings"]
+                        if (f["a"] in olds and f["b"] in news) or (f["b"] in olds and f["a"] in news)})
+        split_detail.append({"from": old, "to": new, "compared": found, "old_claims": len(olds), "new_claims": len(news),
+                             "old_claims_relations": relations})
     return {"facts": {k: len(v) for k, v in kinds.items()},
             "changes_found": f"{count('changed', 'reported')}/{len(kinds['changed'])}",
             "additions_found": f"{count('added', 'reported')}/{len(kinds['added'])}",
@@ -103,4 +150,5 @@ def score_comparison(earlier, later, report):
             "findings": dict(sorted(Counter(f["relation"] for f in report["findings"]).items())),
             "unmatched": len(report["unmatched"]),
             "pairs": report["retrieval"]["attempted_pairs"], "omitted": report["retrieval"]["omitted_by_pair_limit"],
+            **({"splits": split_detail} if splits else {}),
             "detail": dict(sorted(detail.items()))}

@@ -71,9 +71,15 @@ def attribute(claim):
 
 def fits(x, y):
     """Two claims of one value name the same property: most words shared, one's words within the other's ("date" and
-    "revision A date"), or either unnamed (the value decides)."""
+    "revision A date"), or either unnamed (the value decides). Not when both name identifiers and they differ:
+    "95th percentile turbidity" isn't "99th percentile turbidity", though its value may be."""
     a, b = attribute(x), attribute(y)
-    return not a or not b or jaccard(a, b) >= 0.5 or a <= b or b <= a
+    if not a or not b:
+        return True
+    ia, ib = identifiers(words(x.attribute)), identifiers(words(y.attribute))
+    if ia and ib and ia != ib:
+        return False
+    return jaccard(a, b) >= 0.5 or a <= b or b <= a
 
 NUMERIC = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥]=?)?\s*[-+±]?\$?\d")
 
@@ -291,5 +297,8 @@ def align(left, right):
                "items": [len(a.items), len(b.items)], "aligned_items": len(aligned),
                "ambiguous_items": [len(open_a), len(open_b)],
                "attached_items": len(attached), "unaligned_items": [len(lone_a), len(lone_b)],
+               # items matched under another tag: P-101B now P-201B (by its values)
+               "renamed_items": sorted([ka, kb] for ka, kb in list(aligned.items()) + sorted(attached)
+                                       if ka != kb and TAG.fullmatch(ka) and TAG.fullmatch(kb)),
                "settled_pairs": len(settled)}
     return Correspondence(judge, sorted(settled), (unaligned_a, unaligned_b), summary)

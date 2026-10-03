@@ -90,6 +90,8 @@ class Project:
     values: dict = None
     kinds: tuple = ()    # the knobs a prose, chart or schematic project is drawn under
     things: list = None  # the named parts a schematic shows: [(name, aliases)]
+    edits: list = field(default_factory=list)  # a revision's edits from its base (revisions.py), in the key
+    revision_of: str = ""                      # the base document's id, for a revision
 
     def has(self, knob):
         """Whether a prose, layout or chart knob applies: "all" applies every knob of the project's kind."""
@@ -1048,6 +1050,8 @@ def key(project, log):
     out = {"project": project.id, "title": project.title, "facts": [fields(f) for f in project.facts], "printed": log}
     if project.things:
         out["parts"] = [{"name": n, "aliases": list(a)} for n, a in project.things]
+    if project.revision_of:
+        out["revision_of"], out["edits"] = project.revision_of, project.edits
     return out
 
 def write(project, folder):

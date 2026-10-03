@@ -308,8 +308,29 @@ Claude's reading of where proposals mode begins to make sense:
   - **Not yet:**
     - split and merge findings with several members (a report schema change, for the owner)
     - calibrated confidences
-    - the new knobs (design item 7)
     - BM25F; it wasn't needed on these pairs
+- **Milestone 2, the first knobs (2026-10-02): four of design item 7's eight.** The owner: "Looks good."
+  - **Each revision's key now logs its edits from its base:**
+    - kinds: changed, added, removed, renamed, moved, conditions, split
+    - read in the comparison's direction, so the scorer can tell a rename from a removal and an addition
+  - **Four new pairs, each one knob:**
+
+    | Pair | Edit | What the comparison did |
+    |---|---|---|
+    | `wtp-tables-s1-clean-renamed` | P-101B renamed P-201B, values kept | Aligned by its values; all 84 facts confirmed, 150 pairs settled, none judged; the summary lists `P-101B → P-201B` |
+    | `wtp-tables-s1-clean-reordered` | a valve moved down its schedule across the split tables, a blower up | All 84 confirmed; 5 pairs judged, 145 settled |
+    | `wtp-s1-conditions` | the filtration rate now "with all filters in service", the raw turbidity a 99th percentile, values kept | The turbidity judged different; the filtration rate judged uncertain (the product's rule for other conditions) |
+    | `wtp-tables-s1-clean-split` | pump P-101C replaced by P-101E and P-101F, their capacities summing to its own | Reported as 4 facts removed and 8 added, the old pump never compared with its parts: split detection isn't built |
+
+  - **A miss, found and fixed:**
+    - At first the turbidity's change was settled as unchanged: the readers put the percentile in the attribute ("95th percentile turbidity"), and alignment dropped identifiers from attributes.
+    - Attributes whose identifiers conflict no longer fit, unless both are positions ("dimension 1", "dimension 2").
+  - **The scorer:**
+    - renamed facts scored under one id
+    - a conditions change with the value kept classed apart ("settled" is a miss)
+    - for each split, whether the old item was compared with its parts
+  - **Cost:** $0.054 to read the four revisions and judge their pairs. The six earlier pairs scored as before.
+  - **Left:** the other four knobs (a section moved, units restated, fungible items, a table split in two), merges, near-ties, and split detection.
 
 ## Open questions
 

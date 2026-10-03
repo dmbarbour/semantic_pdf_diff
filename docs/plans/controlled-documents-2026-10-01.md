@@ -568,6 +568,11 @@ Each row is a situation met in this project's documents, with where it was recor
      - **A gain there alone never promotes a lever** that the judged real documents don't support.
 
    - **The owner (2026-10-01):** "We can try this rule, though it may be a bit rigid. We should probably contemplate tracking multiple 'cursors' for leading configurations of levers to mitigate the local minima/maxima traps that we might run into with rigid rules." The cursors idea is recorded with the lever search (plans index).
+4. **Representations as controls (2026-10-02).** The owner: "When we do add the alternative readers, we'll implicitly get a new form of control tests: same facts across two or more representations, within constraints of being unable to effectively represent all media (I'm not inclined to even try to interpret ASCII art as figures, for example.)"
+   - **Claude's reading:** as each reader is added ([multi-format adapters](multi-format-adapters-2026-09-23.md)), the corpus is also written in that reader's format (`.txt`/`.md`, `.docx`, later `.pptx`, `.csv`/`.xlsx`), each fact with a known place in it. The same key then scores each representation, and the medium becomes a knob beside the others, extending the table plan's medium test (Uses).
+   - **Only what a format carries:**
+     - a chart or schematic stays out of plain text rather than being drawn as text
+     - the facts it holds are marked absent from that representation, not missed
 
 ## Open questions
 
