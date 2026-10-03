@@ -29,9 +29,9 @@ Extraction of all compared sources shares one queue: pages are fed round-robin a
 5. **Local comparison:** One claim pair per request, with source images where available. The model distinguishes equivalent, different, complementary, unrelated and uncertain. A deterministic decimal calculator checks supported unit conversions. Unestablished conditions, approximate readings, low confidence or inconsistent arithmetic veto confident difference/equivalence judgments.
 6. **Review report:** Filter/search findings, inspect both sources, review numeric checks, unmatched evidence, provenance and task-level coverage. No model-generated global summary is needed.
 
-## Text files
+## Text files and Word documents
 
-`.txt` and `.md` files are read by a text reader (`textdocs.py`) through the same task core as PDFs (`tasks.py`): the same prompts, quote checks, context levers and refinement.
+`.txt` and `.md` files are read by a text reader (`textdocs.py`) through the same task core as PDFs (`tasks.py`): the same prompts, quote checks, context levers and refinement. Word documents (`.docx`, with the `office` extra) are read into the same form by `docxdocs.py`: each paragraph and table row a line, headings by style (`Heading N`), tracked changes applied, the table of contents left out; embedded pictures and objects are recorded as not read yet. Their claims are located by paragraphs (`DocxLocator`).
 
 - **Pages:** a form feed starts one (as in RFCs); otherwise the file is one page.
 - **Sections:** from Markdown headings, or numbered headings in the RFC style ("7.2.  Stream Concurrency"); failing those, fixed page ranges.
@@ -61,6 +61,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `situate.py` | Figures, captions and citing prose; figure and section "about" requests |
 | `tasks.py` | The task core every reader shares: requests, quote checks, evidence, coverage, refinement |
 | `textdocs.py` | Plain text and Markdown: pages, sections, paragraphs and pipe tables, line locators |
+| `docxdocs.py` | Word documents read into the text reader's form: paragraphs, headings by style, tables, tracked changes |
 | `compare.py` | Retrieval, local reasoning and numeric checks |
 | `align.py` | Revisions mode: items matched across revisions before judging; equal values settled |
 | `report.py` | Escaped HTML and JSON reports |

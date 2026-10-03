@@ -39,6 +39,7 @@ FLOOR = 0.3       # below it, an item has no counterpart
 MARGIN = 0.15     # a counterpart must lead the next candidate by this much
 PAIRING = 0.5     # claims within an item: the attribute and conditions similarity to pair them
 JOINING = 0.6     # a positional claim joins a tagged item holding this share of its item's values
+WORDING = 0.5     # claims left without a partner: the share of their words in common to pair them
 
 @dataclass
 class Correspondence:
@@ -93,12 +94,15 @@ def fits(x, y):
         return False
     return jaccard(a, b) >= 0.5 or a <= b or b <= a
 
-NUMERIC = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥]=?)?\s*[-+±]?\$?\d")
+# One number, perhaps signed or approximate, perhaps followed by a unit's word ("63.3 mph"): a range ("0..160",
+# "66 to 75") or a list is a value in words.
+NUMERIC = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥]=?)?\s*[-+±]?\$?\d[\d,]*(?:\.\d+)?\s*[^\d\s.,]*\s*$")
 
 def value_key(claim):
     """A value comparable across revisions: in its unit's base where the unit is known (1.2 MW is 1,200 kW), else
-    with its unit as written; lengths in inches, dates as dates, a tag as itself ("D103"). None for anything else:
-    a number inside words ("ROOM 102 ENLARGED") isn't the value."""
+    with its unit as written; lengths in inches, dates as dates, a tag as itself ("D103"); a value in words as its
+    words, case, spacing and punctuation folded (a specification's claims are mostly words: "MUST close the
+    connection"). A number inside words ("ROOM 102 ENLARGED") is part of the words, not the value."""
     text = str(claim.value).strip()
     if TAG.fullmatch(text):
         return ("id", text)
@@ -106,11 +110,14 @@ def value_key(claim):
     if isinstance(v, tuple):  # ("in", 33.5), ("date", "2026-01-10")
         return v
     if v is None or not NUMERIC.match(text):
-        return None
-    known = unit(claim.unit or "")
+        folded = " ".join(re.findall(r"[^\W_]+", text.casefold()))
+        unit_words = " ".join(re.findall(r"[^\W_]+", str(claim.unit or "").casefold()))
+        return ("text", f"{folded} {unit_words}".strip()) if folded else None
+    said = (claim.unit or "").strip() or re.sub(r"^[^\d]*[\d,.]+\s*", "", text)  # "63.3 mph": the unit in the value
+    known = unit(said)
     if known:
         return (known[0], round(v * float(known[1]), 9))
-    return (re.sub(r"\s", "", claim.unit or "").casefold(), round(v, 9))
+    return (re.sub(r"\s", "", said).casefold(), round(v, 9))
 
 class Side:
     """One revision's items: {key: [claim indices]}, each item's values, attributes and name words."""
@@ -281,6 +288,19 @@ def _within(a, b, ia, ib, settle):
             judge.append((i, j, round(s / 1.5, 4)))
             best_a.setdefault(i, s)
             best_b.setdefault(j, s)
+    # still without a partner: by all their words, best first, one each (a statement reworded, its attribute named
+    # otherwise by another reading)
+    left_a = [i for i in ia if i not in done_a and i not in best_a]
+    left_b = [j for j in ib if j not in done_b and j not in best_b]
+    whole = lambda c: words(f"{c.entity} {c.attribute} {c.value} {c.unit} {c.conditions}")
+    for s, i, j in sorted(((jaccard(whole(a.claims[i]), whole(b.claims[j])), i, j) for i in left_a for j in left_b),
+                          key=lambda x: (-x[0], x[1], x[2])):
+        if s < WORDING:
+            break
+        if i in left_a and j in left_b:
+            judge.append((i, j, round(s, 4)))
+            left_a.remove(i)
+            left_b.remove(j)
     return judge, settled
 
 def _homes(src, dst, key):
@@ -385,6 +405,7 @@ def align(left, right):
     homed_a, homed_b = {ka for ka, _ in attached}, {kb for _, kb in attached}
     lone_a = [k for k in a.items if k not in aligned and k not in open_a and k not in homed_a]
     lone_b = [k for k in b.items if k not in taken_b and k not in open_b and k not in homed_b]
+    judge += _strays(a, b, judge + settled, lone_a, lone_b)
     regroupings = _regroup(a, b, lone_a, lone_b)
     regrouped_a = {k for _, ka, _, _ in regroupings for k in ka}
     regrouped_b = {k for _, _, kb, _ in regroupings for k in kb}
@@ -407,6 +428,27 @@ def align(left, right):
                "settled_pairs": len(settled)}
     regrouped = (sorted(i for k in regrouped_a for i in a.items[k]), sorted(i for k in regrouped_b for i in b.items[k]))
     return Correspondence(judge, sorted(settled), (unaligned_a, unaligned_b), summary, groups, regrouped)
+
+def _strays(a, b, pairs, lone_a, lone_b):
+    """Claims left without a partner in items that have counterparts, paired with the one such claim on the other side
+    holding the same value under a fitting attribute: a reader may file a fact under another entity in one revision
+    ("first drop" for the ride's maximum acceleration). For the judge, not settled: the entities differ."""
+    done = ({i for i, _, _ in pairs}, {j for _, j, _ in pairs})
+    lone = (set(), set())
+    for side, keys, out in ((a, lone_a, lone[0]), (b, lone_b, lone[1])):
+        for k in keys:
+            out.update(side.items[k])
+    stray_a = [i for i in range(len(a.claims)) if i not in done[0] and i not in lone[0] and a.values[i] is not None]
+    stray_b = defaultdict(list)
+    for j in range(len(b.claims)):
+        if j not in done[1] and j not in lone[1] and b.values[j] is not None:
+            stray_b[b.values[j]].append(j)
+    out = []
+    for i in stray_a:
+        matches = [j for j in stray_b.get(a.values[i], []) if fits(a.claims[i], b.claims[j])]
+        if len(matches) == 1 and sum(a.values[k] == a.values[i] for k in stray_a) == 1:
+            out.append((i, matches[0], 0.5))
+    return out
 
 def _groups(a, b, candidates, aligned, attached, ambiguous, open_a, open_b, of_a, of_b, lone_a, lone_b, regroupings):
     """The groupings as alignment formed them, for the report: each with its items' names, claims and evidence."""

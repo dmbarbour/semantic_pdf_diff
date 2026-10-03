@@ -1,6 +1,6 @@
 # Comparing revisions: align items, then explain differences
 
-- **Status:** Active (2026-10-02): milestones 1 (research) and 2 (alignment, a first version) done. The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
+- **Status:** Active (2026-10-03): milestones 1 (research) and 2 (alignment, a first version) done; milestone 3 (real revision pairs) begun with two pairs. The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
 - **From:** [controlled documents](controlled-documents-2026-10-01.md) milestone 4, where every change was found but most "different" findings weren't changes.
 - **Depends on:**
   - controlled documents (revision pairs, exact comparison scoring)
@@ -355,6 +355,45 @@ Claude's reading of where proposals mode begins to make sense:
     - **A condition moved:** one revision's reader put "95th percentile" in the conditions, the other's "99th percentile" in the attribute. Conflicting identifiers anywhere in attribute and conditions now block a settlement.
     - **Synonyms:** "number of inversions" against "inversion count". "Number" and "quantity" fold to "count", and a value each item holds under one property only pairs whatever the attributes are called.
     - **A superseded value beside the new one:** the later revision's "raised from 178 ft" took the old reading, leaving 230 ft unpaired. A leftover reading may now pair with one whose value group went to the judge, under the same attribute.
+- **Milestone 3, real revision pairs (2026-10-03): the first two.** The owner: "I agree with the recommended order. No issues with spending a few dollars to get both of these done."
+  - **The pairs** (`scripts/real_pairs.py`; measurements in `benchmarks/real-pairs/results.json`):
+    - QUIC transport draft-34 against RFC 9000: plain text, the RFC editor's revision of the last draft, mostly editorial
+    - 3GPP TS 38.300 v19.2.0 against v19.3.0: Word, a quarter's technical changes
+  - **The rater:** a mechanical text diff (`bench/real_pairs.py`), one rater among others.
+    - Both files' paragraphs, page furniture dropped, are aligned by difflib.
+    - A "different" finding whose claims both sit in unchanged text is suspect.
+    - A changed paragraph whose numbers changed, touched by no finding of note and no unmatched claim, is a possible miss.
+
+    | | QUIC draft-34 → RFC 9000 | TS 38.300 v19.2 → v19.3 |
+    |---|---|---|
+    | Claims, earlier / later | 2,489 / 2,069 | 5,288 / 5,361 |
+    | Paragraph groups changed in the text | 308 | 47 |
+    | Settled without a model | 1,042 | 4,845 |
+    | Judged | 998 | 501 |
+    | "Different": in changed text / in unchanged text | 9 / 13 | 9 / 12 |
+    | Numeric changes in the text, of them unseen | 32, 15 | 12, 3 |
+    | Claims unaligned (possibly added or removed) | 332 | 102 |
+    | Claims in matched items left unpaired | 710 | 244 |
+    | Cost (extraction, comparison) | $0.52 | $0.59 |
+
+  - **Read by hand:**
+    - **TS 38.300's differences in changed text are changes,** one substantive: the UE's LP-WUS monitoring went from "does not monitor" to "monitors LP-WUS regardless of which DRX cycle". The rest are lists of message contents reworded.
+    - **The suspect differences are pairing faults:**
+      - list members paired with each other (an RA Report's contents)
+      - positional attributes ("detection condition 1" against "2")
+      - two of a kind (a BSR's "extended short" and "short" formats)
+      - one figure read two ways in the two revisions (QUIC's "Connection ID Length" field, 8 bits, against the Connection ID, 0..160)
+    - **The unseen numeric changes are references,** not values: a contents page's numbers, "Figures 7 and 8", a new citation's number.
+  - **Alignment fixes the real documents called for** (the controlled pairs scored as before, in every format):
+    - **Values in words settle like numbers:** case, spacing and punctuation folded. A specification's claims are mostly words, and QUIC's first run sent 1,812 pairs to the judge, 822 of them judged equivalent; then 952.
+    - **Claims left over pair by all their words,** best first: statements reworded.
+    - **A range or a list is a value in words:** "0..160" had been keyed as the number 0.
+    - **A unit written in the value counts:** "63.3 mph" is 63.3 with the unit mph.
+    - **A fact filed under another entity in one revision** pairs by its value with the one leftover holding it ("first drop" against "Ridgeback" for the ride's maximum acceleration, met in the Word corpus).
+  - **Left open:**
+    - list members and positional attributes (the "why different" pass, milestone 4, is where they'd be told apart)
+    - claims left unpaired (710 and 244)
+    - the rater counting references as numeric changes
 
 ## Open questions
 

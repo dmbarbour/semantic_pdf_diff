@@ -115,8 +115,22 @@ class TextLocator(Strict):
         """Its lines as a box, (0, first, 1, last + 1): sections and the task core place text in lines as PDF in points."""
         return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
 
+class DocxLocator(Strict):
+    """Where a claim sits within a Word document: its paragraphs (a table row counts as one), counted from 1 through
+    the body; never a path."""
+    format: Literal["docx"] = "docx"
+    page: int = Field(default=1, ge=1)  # a .docx has no pages until it's laid out
+    paragraphs: tuple[int, int]
+    region: Literal["text", "table"]
+    task: str
+
+    @property
+    def bbox(self):
+        """Its paragraphs as a box, (0, first, 1, last + 1), as TextLocator's lines."""
+        return (0.0, float(self.paragraphs[0]), 1.0, float(self.paragraphs[1] + 1))
+
 # Each format has its locator shape, told apart by `format`.
-Locator = Annotated[PdfLocator | TextLocator, Field(discriminator="format")]
+Locator = Annotated[PdfLocator | TextLocator | DocxLocator, Field(discriminator="format")]
 
 class Section(Strict):
     """A logical part of one piece of content: the unit of context, and later of scheduling."""

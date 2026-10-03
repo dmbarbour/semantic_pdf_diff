@@ -112,6 +112,15 @@ class Alignment(unittest.TestCase):
         found = align.align(left, right)
         self.assertEqual((len(found.settled), found.judge), (2, []))
 
+    def test_a_fact_filed_under_another_entity_still_pairs_by_its_value(self):
+        left = [claim("first drop", "peak g", "2.3", "g"), claim("first drop", "maximum vertical acceleration", "3.8", "g"),
+                claim("Ridgeback", "track length", "6,694", "ft")]
+        right = [claim("First drop", "peak g", "2.3", "g"), claim("Ridgeback", "track length", "6,694", "ft"),
+                 claim("Ridgeback", "maximum vertical acceleration", "3.8", "g")]
+        found = align.align(left, right)
+        self.assertIn((("first drop", "maximum vertical acceleration", "3.8"),
+                       ("Ridgeback", "maximum vertical acceleration", "3.8")), pairs(found, left, right))
+
     def test_a_renamed_item_is_matched_by_its_values_and_listed(self):
         left = [claim("P-101B", "capacity", "5,590", "gpm"), claim("P-101B", "head", "64.9", "ft"),
                 claim("P-101A", "capacity", "5,151", "gpm")]
@@ -168,14 +177,17 @@ class Alignment(unittest.TestCase):
         self.assertEqual((merge["earlier"], merge["later"], len(merge["evidence"]["sums"])),
                          (["Room 104A", "Room 104B"], ["Room 104"], 1))
 
-    def test_values_compare_in_their_units_and_only_numbers_tags_lengths_and_dates_count(self):
+    def test_values_compare_in_their_units_and_words_as_words(self):
         key = lambda value, unit="": align.value_key(claim("x", "y", value, unit))
         self.assertEqual(key("1.2", "MW"), key("1,200", "kW"))
         self.assertEqual(key("2'-9 1/2\""), ("in", 33.5))
         self.assertEqual(key("2026-04-02"), ("date", "2026-04-02"))
         self.assertEqual(key("D103"), ("id", "D103"))
-        self.assertIsNone(key("ROOM 102 ENLARGED, DOOR D103 WIDENED"))
-        self.assertIsNone(key("steel"))
+        # words are a value too, their case, spacing and punctuation folded; a number inside them is part of them
+        self.assertEqual(key("ROOM 102 ENLARGED, DOOR D103 WIDENED"), ("text", "room 102 enlarged door d103 widened"))
+        self.assertEqual(key("MUST  close the connection."), key("must close the connection"))
+        self.assertNotEqual(key("0..160"), key("0..2040"))  # ranges are words, not their first number
+        self.assertEqual(key("63.3 mph"), key("63.3", "mph"))  # the unit written in the value
 
 class Report(unittest.TestCase):
     def test_the_report_shows_the_groupings_and_marks_regrouped_claims(self):

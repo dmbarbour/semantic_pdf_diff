@@ -212,13 +212,21 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
                 dispatch.wait_one()
 
 # Readers by normalized extension (the adapters plan: chosen by extension only, no sniffing).
-TEXT_EXTENSIONS = (".txt", ".md")
+TEXT_EXTENSIONS = (".txt", ".md", ".docx")
+
+def office_installed():
+    try:
+        import docx  # noqa: F401
+    except ImportError:
+        return False
+    return True
 
 def reader_for(extension):
-    """The job generator reading content of this extension, or None if none reads it."""
+    """The job generator reading content of this extension, or None if none reads it (a .docx needs the office
+    extra)."""
     if extension == ".pdf":
         return _pdf_job
-    if extension in TEXT_EXTENSIONS:
+    if extension in TEXT_EXTENSIONS and (extension != ".docx" or office_installed()):
         from .textdocs import text_job
         return lambda data, job, output, client, dispatch, progress: text_job(data, job, output, client, dispatch,
                                                                               progress, extension)

@@ -1,4 +1,5 @@
-"""Plain text and Markdown documents (docs/plans/multi-format-adapters-2026-09-23.md, milestone 1).
+"""Plain text and Markdown documents (docs/plans/multi-format-adapters-2026-09-23.md, milestone 1), and Word
+documents read into the same form (docxdocs.py, milestone 2).
 
 A text file is read as pages of lines: a form feed starts a page (as in RFCs), else the file is one page. Where a
 PDF task sits on a page in a box of points, a text task sits in lines: its box is (0, first line, 1, last line + 1),
@@ -17,7 +18,7 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
-from .models import DerivationStep, Section, TextLocator, coverage_row
+from .models import DerivationStep, DocxLocator, Section, TextLocator, coverage_row
 from .sections import SectionIndex
 from .tasks import TaskCore, split_utf8
 
@@ -228,8 +229,20 @@ class TextReader:
     def cited(self, text):
         return ""  # no glossary or figure captions read from text files yet
 
+DOCX_DERIVATION = {
+    "text": [DerivationStep(step="docx-paragraphs", detail="grouped paragraphs"), DerivationStep(step="model-extraction")],
+    "table": [DerivationStep(step="docx-table", detail="row with its header"), DerivationStep(step="model-extraction")],
+}
+
 def text_locator(page, bbox, region, task):
     return TextLocator(page=page, lines=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region, task=task)
+
+def docx_locator(page, bbox, region, task):
+    return DocxLocator(page=page, paragraphs=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region,
+                       task=task)
+
+# Tasks fed between turns of fair share, on a page as long as a whole Word document or unpaginated text.
+TASKS_PER_TURN = 20
 
 def groups(blocks, text_bytes, section_of):
     """A page's text and code blocks grouped up to the byte budget (oversized blocks split), never across a section
@@ -258,10 +271,21 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     then "waiting" while its requests are pending; job.state["result"] is set at the end."""
     s = client.s
     name = job.content
-    core = TaskCore(job, output, client, dispatch, progress, name, text_locator, DERIVATION)
+    word = extension == ".docx"
+    core = TaskCore(job, output, client, dispatch, progress, name, docx_locator if word else text_locator,
+                    DOCX_DERIVATION if word else DERIVATION)
     raw = data if isinstance(data, (bytes, bytearray)) else open(data, "rb").read()
-    text = raw.decode("utf-8", errors="replace")
-    doc = parse(text, markdown=extension in (".md", ".markdown"))
+    if word:
+        from .docxdocs import read_docx
+        try:
+            doc = read_docx(raw)
+        except Exception as error:  # not a Word document after all, or a damaged one
+            core.record(coverage_row(content=job.content, task="open", status="failed",
+                                     issues=[f"{name}: unreadable ({type(error).__name__}: {error})"]))
+            job.state["result"] = ([], core.coverage)
+            return
+    else:
+        doc = parse(raw.decode("utf-8", errors="replace"), markdown=extension in (".md", ".markdown"))
     if not doc.blocks:
         core.record(coverage_row(content=job.content, task="open", status="failed", issues=[f"{name}: no text"]))
         job.state["result"] = ([], core.coverage)
@@ -274,7 +298,9 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     for page in range(1, doc.pages + 1):
         yield "page"
         blocks = [b for b in doc.blocks if b.page == page]
-        for ids, segments in groups(blocks, s.text_bytes, lambda box, p=page: index.box(p, box).id):
+        for k, (ids, segments) in enumerate(groups(blocks, s.text_bytes, lambda box, p=page: index.box(p, box).id)):
+            if k and k % TASKS_PER_TURN == 0:
+                yield "page"  # a long page: other sources take their turn
             core.text_task(page, segments, f"text:p{page}:{ids}")
         tables = [b for b in blocks if b.kind == "table"]
         core.reader.tables_on[page] = [b.box for b in tables]
@@ -291,7 +317,8 @@ def text_job(data, job, output, client, dispatch, progress, extension):
             if pg == page:
                 core.record(coverage_row(content=job.content, page=page, bbox=[0.0, float(line), 1.0, float(line + 1)],
                                          task=f"image:p{page}:{line}", status="skipped",
-                                         issues=[f"An image in a Markdown file isn't read: {alt or target}"]))
+                                         issues=[f"A picture or object in the document isn't read yet ({alt})" if word
+                                                 else f"An image in a Markdown file isn't read: {alt or target}"]))
         section = index[page].id
         counts = Counter(numbers=sum(len(re.findall(r"\d", b.text)) > 0 for b in blocks), tables=len(tables),
                          characters=sum(len(b.text) for b in blocks))

@@ -21,7 +21,7 @@ def write_report(data, output, assets=None):
     def card(eid):
         e = evidence[eid]
         image = ('<a href="'+esc(link(e['image']))+'"><img loading="lazy" src="'+esc(link(e['image']))+'" alt="Source crop"></a>') if e.get('image') else ''
-        verified = {True: '<p>Quote found in the file\'s text.</p>' if e['locator'].get('format') == 'text'
+        verified = {True: '<p>Quote found in the file\'s text.</p>' if e['locator'].get('format') in ('text', 'docx')
                     else '<p>Quote found in PDF text layer.</p>',
                     False: '<p class="warning">Quote not found in the PDF text layer for this region; possible misread or raster-only label.</p>'
                     }.get(e.get('quote_verified'), '')
@@ -39,6 +39,7 @@ def write_report(data, output, assets=None):
         <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>{image}</section>'''
     counts = Counter(f['relation'] for f in data['findings'])
     place = lambda loc: (f"lines {loc['lines'][0]}–{loc['lines'][1]}" if loc.get('format') == 'text'
+                         else f"paragraphs {loc['paragraphs'][0]}–{loc['paragraphs'][1]}" if loc.get('format') == 'docx'
                          else f"PDF bbox {list(loc['bbox'])}")
     issues = [r for r in data['coverage'] if r['status'] != 'complete']
     rows = []

@@ -1,0 +1,1820 @@
+{
+ "recorded": {
+  "quic-34-rfc9000": {
+   "claims": [
+    2489,
+    2069
+   ],
+   "changed_blocks": 308,
+   "changed_lines": [
+    3448,
+    2824
+   ],
+   "findings": {
+    "complementary in changed text": 83,
+    "complementary in unchanged text": 49,
+    "different in changed text": 9,
+    "different in unchanged text": 13,
+    "equivalent in changed text": 311,
+    "equivalent in unchanged text": 348,
+    "settled in changed text": 410,
+    "settled in unchanged text": 632,
+    "uncertain in changed text": 32,
+    "uncertain in unchanged text": 11,
+    "unrelated in changed text": 104,
+    "unrelated in unchanged text": 38
+   },
+   "unmatched": {
+    "no_confirmed_counterpart in changed text": 77,
+    "no_confirmed_counterpart in unchanged text": 61,
+    "not_compared in changed text": 417,
+    "not_compared in unchanged text": 293,
+    "unaligned in changed text": 233,
+    "unaligned in unchanged text": 99
+   },
+   "suspect_differences": 13,
+   "numeric_changes": 32,
+   "numeric_changes_unseen": 15,
+   "pairs_judged": 998,
+   "settled": 1042,
+   "groupings": {
+    "ambiguous": 31,
+    "attached": 51,
+    "matched": 418,
+    "unaligned": 270
+   },
+   "examples": {
+    "suspect": [
+     {
+      "a": {
+       "entity": "1-RTT Packet",
+       "attribute": "Packet Payload length",
+       "value": "8..",
+       "unit": "bytes",
+       "conditions": "",
+       "lines": [
+        6725,
+        6735
+       ]
+      },
+      "b": {
+       "entity": "1-RTT Packet",
+       "attribute": "Packet Payload length",
+       "value": "8..",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5478,
+        5488
+       ]
+      },
+      "rationale": "The entity and attribute are the same, but the units are incompatible (bytes vs bits) for the same value (8..)."
+     },
+     {
+      "a": {
+       "entity": "Retry Packet",
+       "attribute": "Source Connection ID Length length",
+       "value": "8",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        6563,
+        6575
+       ]
+      },
+      "b": {
+       "entity": "Retry Packet",
+       "attribute": "Source Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5352,
+        5364
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Source Connection ID Length' field, whereas Claim B specifies a variable length of 0..160 bits for the 'Source Connection ID' itself. While the attr"
+     },
+     {
+      "a": {
+       "entity": "Handshake Packet",
+       "attribute": "Destination Connection ID Length field size",
+       "value": "8",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        6509,
+        6523
+       ]
+      },
+      "b": {
+       "entity": "Handshake Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        5304,
+        5318
+       ]
+      },
+      "rationale": "Claim A specifies the size of the 'Length field' (the field that stores the length value) as 8 bits, whereas Claim B specifies the actual 'length' of the Connection ID itself as 0..160 bits. These are"
+     },
+     {
+      "a": {
+       "entity": "Version Negotiation Packet",
+       "attribute": "Source Connection ID Length",
+       "value": "8",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        6237,
+        6246
+       ]
+      },
+      "b": {
+       "entity": "Version Negotiation Packet",
+       "attribute": "Source Connection ID length",
+       "value": "0..2040",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        5093,
+        5102
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable length range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet."
+     },
+     {
+      "a": {
+       "entity": "endpoint",
+       "attribute": "error handling requirement",
+       "value": "generate a connection error or fully revert changes",
+       "unit": "",
+       "conditions": "processing contents of invalid packets prior to discovering an error",
+       "lines": [
+        1878,
+        1882
+       ]
+      },
+      "b": {
+       "entity": "endpoint",
+       "attribute": "error generation requirement",
+       "value": "MUST generate a connection error",
+       "unit": "",
+       "conditions": "processing contents of invalid packets prior to discovering an error",
+       "lines": [
+        1483,
+        1487
+       ]
+      },
+      "rationale": "Claim A allows for two options (generate a connection error OR fully revert changes), whereas Claim B mandates only one specific action (MUST generate a connection error), removing the alternative of "
+     },
+     {
+      "a": {
+       "entity": "Retry Packet",
+       "attribute": "Destination Connection ID Length length",
+       "value": "8",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        6563,
+        6575
+       ]
+      },
+      "b": {
+       "entity": "Retry Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5352,
+        5364
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a variable length of 0..160 bits for the 'Destination Connection ID' itself. Whil"
+     },
+     {
+      "a": {
+       "entity": "Handshake Packet",
+       "attribute": "Source Connection ID Length field size",
+       "value": "8",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        6509,
+        6523
+       ]
+      },
+      "b": {
+       "entity": "Handshake Packet",
+       "attribute": "Source Connection ID length",
+       "value": "0..160",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        5304,
+        5318
+       ]
+      },
+      "rationale": "Claim A specifies the size of the 'Length field' as 8 bits, whereas Claim B specifies the length of the 'Source Connection ID' itself as 0..160 bits. While they refer to the same entity, the attribute"
+     },
+     {
+      "a": {
+       "entity": "0-RTT Packet",
+       "attribute": "Source Connection ID Length length",
+       "value": "8",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        6445,
+        6459
+       ]
+      },
+      "b": {
+       "entity": "0-RTT packet",
+       "attribute": "Source Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5254,
+        5268
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Source Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Source Connection ID' itself. While they refer to the "
+     },
+     {
+      "a": {
+       "entity": "ECN validation",
+       "attribute": "failure condition",
+       "value": "non-zero ECN count for ECT codepoint never applied",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        5617,
+        5622
+       ]
+      },
+      "b": {
+       "entity": "ECN validation",
+       "attribute": "failure condition",
+       "value": "sum of increase in ECT(1) and ECN-CE counts < number of newly acknowledged packets sent with ECT(1)",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        4546,
+        4552
+       ]
+      },
+      "rationale": "Claim A defines failure as receiving a non-zero ECN count for an ECT codepoint that was never applied. Claim B defines failure based on a mathematical inequality between the sum of ECT(1) and ECN-CE c"
+     },
+     {
+      "a": {
+       "entity": "0-RTT Packet",
+       "attribute": "Destination Connection ID Length length",
+       "value": "8",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        6445,
+        6459
+       ]
+      },
+      "b": {
+       "entity": "0-RTT packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5254,
+        5268
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Destination Connection ID' itself. While they ref"
+     },
+     {
+      "a": {
+       "entity": "Version Negotiation Packet",
+       "attribute": "Destination Connection ID Length",
+       "value": "8",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        6237,
+        6246
+       ]
+      },
+      "b": {
+       "entity": "Version Negotiation Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..2040",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        5093,
+        5102
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet."
+     },
+     {
+      "a": {
+       "entity": "1-RTT Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bytes",
+       "conditions": "",
+       "lines": [
+        6725,
+        6735
+       ]
+      },
+      "b": {
+       "entity": "1-RTT Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5478,
+        5488
+       ]
+      },
+      "rationale": "Claims A and B specify the same value (0..160) for the same attribute, but use incompatible units: bytes versus bits."
+     },
+     {
+      "a": {
+       "entity": "stream",
+       "attribute": "final size definition",
+       "value": "amount of flow control credit consumed by a stream",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        1479,
+        1483
+       ]
+      },
+      "b": {
+       "entity": "stream",
+       "attribute": "final size",
+       "value": "offset of the byte with the largest offset sent + 1",
+       "unit": "bytes",
+       "conditions": "general case",
+       "lines": [
+        1167,
+        1171
+       ]
+      },
+      "rationale": "Claim A defines 'final size' as the amount of flow control credit consumed, whereas Claim B defines it as the offset of the largest byte sent plus one. These are distinct engineering definitions for t"
+     }
+    ],
+    "unseen": [
+     {
+      "earlier": "QUIC J. Iyengar, Ed. Internet-Draft Fastly Intended status: Standards Track M. Thomson, Ed. Expires: 19 July 2021 Mozilla 15 January 2021 QUIC: A UDP-Based Multiplexed and Secure Transport draft-ietf-quic-transport-34",
+      "later": "\ufeff Internet Engineering Task Force (IETF) J. Iyengar, Ed. Request for Comments: 9000 Fastly Category: Standards Track M. Thomson, Ed. ISSN: 2070-1721 Mozilla May 2021 QUIC: A UDP-Based Multiplexed and Secure Transport",
+      "numbers_gone": [
+       "15",
+       "19",
+       "2021"
+      ],
+      "numbers_new": [
+       "1721",
+       "2070",
+       "9000"
+      ]
+     },
+     {
+      "earlier": "1. Overview . . . . . . . . . . . . . . . . . . . . . . . . . . 7 1.1. Document Structure . . . . . . . . . . . . . . . . . . . 8 1.2. Terms and Definitions . . . . . . . . . . . . . . . . . . 10 1.3. Notational Conventions . . . . . . . . . . . . . . . . . 11 2. Streams . . . . . . . . . . . . . . ",
+      "later": "1. Overview 1.1. Document Structure 1.2. Terms and Definitions 1.3. Notational Conventions 2. Streams 2.1. Stream Types and Identifiers 2.2. Sending and Receiving Data 2.3. Stream Prioritization 2.4. Operations on Streams 3. Stream States 3.1. Sending Stream States 3.2. Receiving Stream States 3.3. ",
+      "numbers_gone": [
+       "10",
+       "101",
+       "102",
+       "103",
+       "104",
+       "105",
+       "105",
+       "105",
+       "105",
+       "105"
+      ],
+      "numbers_new": []
+     },
+     {
+      "earlier": "Receivers need to limit the amount of data that they are required to buffer, in order to prevent a fast sender from overwhelming them or a malicious sender from consuming a large amount of memory. To enable a receiver to limit memory commitments for a connection, streams are flow controlled both ind",
+      "later": "Receivers need to limit the amount of data that they are required to buffer, in order to prevent a fast sender from overwhelming them or a malicious sender from consuming a large amount of memory. To enable a receiver to limit memory commitments for a connection, streams are flow controlled both ind",
+      "numbers_gone": [],
+      "numbers_new": [
+       "4.1",
+       "4.2"
+      ]
+     },
+     {
+      "earlier": "Figure 5 provides an overview of the 1-RTT handshake. Each line shows a QUIC packet with the packet type and packet number shown first, followed by the frames that are typically contained in those packets. So, for instance the first packet is of type Initial, with packet number 0, and contains a CRY",
+      "later": "Figure 5 provides an overview of the 1-RTT handshake. Each line shows a QUIC packet with the packet type and packet number shown first, followed by the frames that are typically contained in those packets. For instance, the first packet is of type Initial, with packet number 0, and contains a CRYPTO",
+      "numbers_gone": [
+       "4"
+      ],
+      "numbers_new": []
+     },
+     {
+      "earlier": "In both cases (Figure 7 and Figure 8), the client sets the value of the initial_source_connection_id transport parameter to \"C1\". When the handshake does not include a Retry (Figure 7), the server sets original_destination_connection_id to \"S1\" and initial_source_connection_id to \"S3\". In this case,",
+      "later": "In both cases (Figures 7 and 8), the client sets the value of the initial_source_connection_id transport parameter to \"C1\". When the handshake does not include a Retry (Figure 7), the server sets original_destination_connection_id to \"S1\" (note that this value is chosen by the client) and initial_so",
+      "numbers_gone": [],
+      "numbers_new": [
+       "7",
+       "8"
+      ]
+     },
+     {
+      "earlier": "An endpoint MAY send data to an unvalidated peer address, but it MUST protect against potential attacks as described in Section 9.3.1 and Section 9.3.2. An endpoint MAY skip validation of a peer address if that address has been seen recently. In particular, if an endpoint returns to a previously-val",
+      "later": "An endpoint MAY send data to an unvalidated peer address, but it MUST protect against potential attacks as described in Sections 9.3.1 and 9.3.2. An endpoint MAY skip validation of a peer address if that address has been seen recently. In particular, if an endpoint returns to a previously validated ",
+      "numbers_gone": [],
+      "numbers_new": [
+       "9.3",
+       "9.3"
+      ]
+     },
+     {
+      "earlier": "If packets received at the server's preferred address have a different source address than observed from the client during the handshake, the server MUST protect against potential attacks as described in Section 9.3.1 and Section 9.3.2. In addition to intentional simultaneous migration, this might a",
+      "later": "If packets received at the server's preferred address have a different source address than observed from the client during the handshake, the server MUST protect against potential attacks as described in Sections 9.3.1 and 9.3.2. In addition to intentional simultaneous migration, this might also occ",
+      "numbers_gone": [],
+      "numbers_new": [
+       "9.3",
+       "9.3"
+      ]
+     },
+     {
+      "earlier": "Packet numbers are divided into 3 spaces in QUIC: * Initial space: All Initial packets (Section 17.2.2) are in this space. * Handshake space: All Handshake packets (Section 17.2.4) are in this space. * Application data space: All 0-RTT (Section 17.2.3) and 1-RTT (Section 17.3.1) packets are in this ",
+      "later": "Packet numbers are divided into three spaces in QUIC: Initial space: All Initial packets (Section 17.2.2) are in this space. Handshake space: All Handshake packets (Section 17.2.4) are in this space. Application data space: All 0-RTT (Section 17.2.3) and 1-RTT (Section 17.3.1) packets are in this sp",
+      "numbers_gone": [
+       "3"
+      ],
+      "numbers_new": []
+     },
+     {
+      "earlier": "Use of ECN requires the receiving endpoint to read the ECN field from an IP packet, which is not possible on all platforms. If an endpoint does not implement ECN support or does not have access to received ECN fields, it does not report ECN counts for packets it receives. Even if an endpoint does no",
+      "later": "The use of ECN requires the receiving endpoint to read the ECN field from an IP packet, which is not possible on all platforms. If an endpoint does not implement ECN support or does not have access to received ECN fields, it does not report ECN counts for packets it receives. Even if an endpoint doe",
+      "numbers_gone": [],
+      "numbers_new": [
+       "13.2",
+       "19.3"
+      ]
+     },
+     {
+      "earlier": "A blind attacker, one who injects packets without being able to observe valid packets for a connection, is unlikely to be successful, since packet protection ensures that valid packets are only generated by endpoints that possess the key material established during the handshake; see Section 7 and S",
+      "later": "An attacker that injects packets without being able to observe valid packets for a connection is unlikely to be successful, since packet protection ensures that valid packets are only generated by endpoints that possess the key material established during the handshake; see Sections 7 and 21.1.1. Si",
+      "numbers_gone": [],
+      "numbers_new": [
+       "21.1",
+       "7"
+      ]
+     },
+     {
+      "earlier": "[BCP38] Ferguson, P. and D. Senie, \"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing\", BCP 38, RFC 2827, DOI 10.17487/RFC2827, May 2000, <https://www.rfc-editor.org/info/rfc2827>.",
+      "later": "[BCP38] Ferguson, P. and D. Senie, \"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing\", BCP 38, RFC 2827, May 2000. <https://www.rfc-editor.org/info/bcp38>",
+      "numbers_gone": [
+       "10.17487",
+       "2000,"
+      ],
+      "numbers_new": [
+       "2000"
+      ]
+     },
+     {
+      "earlier": "[QUIC-INVARIANTS] Thomson, M., \"Version-Independent Properties of QUIC\", Work in Progress, Internet-Draft, draft-ietf-quic- invariants-13, 15 January 2021, <https://tools.ietf.org/html/draft-ietf-quic-invariants- 13>. [QUIC-RECOVERY] Iyengar, J., Ed. and I. Swett, Ed., \"QUIC Loss Detection and Conge",
+      "later": "[QUIC-INVARIANTS] Thomson, M., \"Version-Independent Properties of QUIC\", RFC 8999, DOI 10.17487/RFC8999, May 2021, <https://www.rfc-editor.org/info/rfc8999>. [QUIC-RECOVERY] Iyengar, J., Ed. and I. Swett, Ed., \"QUIC Loss Detection and Congestion Control\", RFC 9002, DOI 10.17487/RFC9002, May 2021, <h",
+      "numbers_gone": [
+       "13",
+       "13,",
+       "15"
+      ],
+      "numbers_new": [
+       "10.17487",
+       "10.17487",
+       "10.17487"
+      ]
+     },
+     {
+      "earlier": "[QUIC-MANAGEABILITY] Kuehlewind, M. and B. Trammell, \"Manageability of the QUIC Transport Protocol\", Work in Progress, Internet-Draft, draft-ietf-quic-manageability-08, 2 November 2020, <http://www.ietf.org/internet-drafts/draft-ietf-quic- manageability-08.txt>.",
+      "later": "[QUIC-MANAGEABILITY] Kuehlewind, M. and B. Trammell, \"Manageability of the QUIC Transport Protocol\", Work in Progress, Internet-Draft, draft-ietf-quic-manageability-11, 21 April 2021, <https://tools.ietf.org/html/draft-ietf-quic- manageability-11>.",
+      "numbers_gone": [
+       "08",
+       "2020,"
+      ],
+      "numbers_new": [
+       "11",
+       "2021,"
+      ]
+     },
+     {
+      "earlier": "[RFC4941] Narten, T., Draves, R., and S. Krishnan, \"Privacy Extensions for Stateless Address Autoconfiguration in IPv6\", RFC 4941, DOI 10.17487/RFC4941, September 2007, <https://www.rfc-editor.org/info/rfc4941>.",
+      "later": "",
+      "numbers_gone": [
+       "10.17487",
+       "2007,"
+      ],
+      "numbers_new": []
+     },
+     {
+      "earlier": "",
+      "later": "[RFC8981] Gont, F., Krishnan, S., Narten, T., and R. Draves, \"Temporary Address Extensions for Stateless Address Autoconfiguration in IPv6\", RFC 8981, DOI 10.17487/RFC8981, February 2021, <https://www.rfc-editor.org/info/rfc8981>.",
+      "numbers_gone": [],
+      "numbers_new": [
+       "10.17487",
+       "2021,"
+      ]
+     }
+    ]
+   }
+  },
+  "ts38300-j20-j30": {
+   "claims": [
+    5288,
+    5361
+   ],
+   "changed_blocks": 47,
+   "changed_lines": [
+    640,
+    678
+   ],
+   "findings": {
+    "complementary in changed text": 32,
+    "complementary in unchanged text": 44,
+    "different in changed text": 9,
+    "different in unchanged text": 12,
+    "equivalent in changed text": 41,
+    "equivalent in unchanged text": 246,
+    "settled in changed text": 83,
+    "settled in unchanged text": 4762,
+    "uncertain in changed text": 17,
+    "uncertain in unchanged text": 26,
+    "unrelated in changed text": 36,
+    "unrelated in unchanged text": 38
+   },
+   "unmatched": {
+    "no_confirmed_counterpart in changed text": 20,
+    "no_confirmed_counterpart in unchanged text": 29,
+    "not_compared in changed text": 57,
+    "not_compared in unchanged text": 187,
+    "unaligned in changed text": 18,
+    "unaligned in unchanged text": 84
+   },
+   "suspect_differences": 12,
+   "numeric_changes": 12,
+   "numeric_changes_unseen": 3,
+   "pairs_judged": 501,
+   "settled": 4845,
+   "groupings": {
+    "ambiguous": 26,
+    "attached": 14,
+    "matched": 1713,
+    "unaligned": 71
+   },
+   "examples": {
+    "suspect": [
+     {
+      "a": {
+       "entity": "L2 U2N Remote and first L2 U2N Relay UE",
+       "attribute": "connection type",
+       "value": "PC5-RRC connection",
+       "unit": "",
+       "conditions": "established using NR sidelink PC5 unicast link establishment procedure",
+       "lines": [
+        4349,
+        4353
+       ]
+      },
+      "b": {
+       "entity": "L2 U2N Relay UEs",
+       "attribute": "connection type",
+       "value": "PC5-RRC connection",
+       "unit": "",
+       "conditions": "established using NR sidelink PC5 unicast link establishment procedure",
+       "lines": [
+        4360,
+        4360
+       ]
+      },
+      "rationale": "Claim A describes a connection between a Remote UE and a Relay UE, whereas Claim B describes a connection between two Relay UEs. While the connection type and procedure are identical, the entities inv"
+     },
+     {
+      "a": {
+       "entity": "LP-SS",
+       "attribute": "number of OOK symbols within an OFDM symbol",
+       "value": "1, 2 or 4",
+       "unit": "",
+       "conditions": "configurable",
+       "lines": [
+        3148,
+        3148
+       ]
+      },
+      "b": {
+       "entity": "LP-SS",
+       "attribute": "number of OOK symbols within an OFDM symbol",
+       "value": ">= number of LP-WUS symbols",
+       "unit": "symbols",
+       "conditions": "configurable",
+       "lines": [
+        3155,
+        3155
+       ]
+      },
+      "rationale": "Claim A specifies a discrete set of possible values (1, 2, or 4), whereas Claim B defines the value as a relative constraint (greater than or equal to the number of LP-WUS symbols)."
+     },
+     {
+      "a": {
+       "entity": "Intra-system Too Late Handover",
+       "attribute": "detection condition 2",
+       "value": "CHO/LTM or CHO with candidate SCG(s) configured but execution not initiated prior to connection failure",
+       "unit": "",
+       "conditions": "UE reported timer is absent or > Tstore_UE_cntxt",
+       "lines": [
+        3477,
+        3477
+       ]
+      },
+      "b": {
+       "entity": "Intra-system Too Late Handover",
+       "attribute": "detection condition 1",
+       "value": "no recent handover for the UE prior to the connection failure",
+       "unit": "",
+       "conditions": "UE reported timer is absent or > Tstore_UE_cntxt",
+       "lines": [
+        3484,
+        3484
+       ]
+      },
+      "rationale": "Both claims describe detection conditions for 'Intra-system Too Late Handover' under the same timer conditions, but they specify different triggers: Claim A requires a configured but uninitiated hando"
+     },
+     {
+      "a": {
+       "entity": "BSR extended short format",
+       "attribute": "reporting capacity",
+       "value": "one BSR (of one LCG)",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3054,
+        3054
+       ]
+      },
+      "b": {
+       "entity": "BSR short format",
+       "attribute": "reporting capacity",
+       "value": "one BSR (of one LCG)",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3060,
+        3060
+       ]
+      },
+      "rationale": "Claim A refers to an 'extended short format' while Claim B refers to a 'short format'. Although the reporting capacity value is the same, the entities (the formats themselves) are distinct designation"
+     },
+     {
+      "a": {
+       "entity": "L2 U2N Remote UE",
+       "attribute": "reporting content",
+       "value": "one or multiple candidate L2 U2N Relay UE(s) and Uu measurements",
+       "unit": "",
+       "conditions": "reported to source gNB after measurement/discovery",
+       "lines": [
+        4448,
+        4448
+       ]
+      },
+      "b": {
+       "entity": "L2 U2N Remote UE",
+       "attribute": "reporting content",
+       "value": "one or multiple candidate L2 U2N Relay UE(s) and sidelink measurement",
+       "unit": "",
+       "conditions": "between L2 U2N Remote UE and source L2 U2N Relay UE; reported to source gNB after measurement/discovery",
+       "lines": [
+        4493,
+        4493
+       ]
+      },
+      "rationale": "Claim A specifies 'Uu measurements' as part of the reporting content, whereas Claim B specifies 'sidelink measurement between the L2 U2N Remote UE and the source L2 U2N Relay UE'."
+     },
+     {
+      "a": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indexes of the SSBs and number of RACH preambles sent on each tried SSB in chronological order",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3547,
+        3547
+       ]
+      },
+      "b": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "2-step RACH information as specified in clause 5.7.10.4 of TS 38.331 [12]",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3556,
+        3556
+       ]
+      },
+      "rationale": "Claim A specifies the content of the RA Report as SSB indexes and the number of preambles sent in chronological order, whereas Claim B specifies the content as 2-step RACH information per a specific T"
+     },
+     {
+      "a": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indication whether selected SSB is above or below configured RSRP threshold per RACH attempt",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3548,
+        3548
+       ]
+      },
+      "b": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indexes of the SSBs and number of RACH preambles sent on each tried SSB listed in chronological order of attempts",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3554,
+        3554
+       ]
+      },
+      "rationale": "Both claims describe the content of the RA Report for the same design. Claim A specifies an indication of RSRP threshold status per attempt, while Claim B specifies SSB indexes and the number of pream"
+     },
+     {
+      "a": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indication whether selected SSB is above or below configured RSRP threshold per RACH attempt",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3548,
+        3548
+       ]
+      },
+      "b": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indication of LBT failures detected during the random access",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3557,
+        3557
+       ]
+      },
+      "rationale": "Both claims describe the content of the 'RA Report', but they specify entirely different information: Claim A refers to SSB RSRP threshold indications, while Claim B refers to LBT failure indications."
+     },
+     {
+      "a": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indication whether selected SSB is above or below configured RSRP threshold per RACH attempt",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3548,
+        3548
+       ]
+      },
+      "b": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "2-step RACH information as specified in clause 5.7.10.4 of TS 38.331 [12]",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3556,
+        3556
+       ]
+      },
+      "rationale": "Claim A specifies a particular content item (SSB RSRP threshold indication), whereas Claim B replaces this with a reference to 2-step RACH information in TS 38.331. The content of the RA Report has ch"
+     },
+     {
+      "a": {
+       "entity": "Layer 3 filtering for cell quality",
+       "attribute": "input",
+       "value": "measurements provided at point B",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        2678,
+        2678
+       ]
+      },
+      "b": {
+       "entity": "L3 Beam filtering",
+       "attribute": "input",
+       "value": "measurements provided at point A1",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        2689,
+        2689
+       ]
+      },
+      "rationale": "Claim A specifies the input for Layer 3 filtering as measurements from point B, while Claim B specifies the input for L3 Beam filtering as measurements from point A1."
+     },
+     {
+      "a": {
+       "entity": "Command Request message",
+       "attribute": "content",
+       "value": "Correlation ID and AIOTF Identifier",
+       "unit": "",
+       "conditions": "must be same as those used in corresponding inventory procedure",
+       "lines": [
+        5145,
+        5145
+       ]
+      },
+      "b": {
+       "entity": "Command Request message",
+       "attribute": "included content",
+       "value": "AIOTF Identifier",
+       "unit": "",
+       "conditions": "same as used in corresponding inventory procedure",
+       "lines": [
+        5144,
+        5156
+       ]
+      },
+      "rationale": "Claim A requires both Correlation ID and AIOTF Identifier, whereas Claim B only specifies the AIOTF Identifier for the same entity and conditions."
+     },
+     {
+      "a": {
+       "entity": "Command Request message",
+       "attribute": "content",
+       "value": "Correlation ID and AIOTF Identifier",
+       "unit": "",
+       "conditions": "must be same as those used in corresponding inventory procedure",
+       "lines": [
+        5145,
+        5145
+       ]
+      },
+      "b": {
+       "entity": "Command Request message",
+       "attribute": "included content",
+       "value": "Correlation ID",
+       "unit": "",
+       "conditions": "same as used in corresponding inventory procedure",
+       "lines": [
+        5144,
+        5156
+       ]
+      },
+      "rationale": "Claim A specifies that both the Correlation ID and AIOTF Identifier must be included, whereas Claim B only specifies the Correlation ID."
+     }
+    ],
+    "unseen": [
+     {
+      "earlier": "3GPP TS 38.300 V19.2.0 (2026-03)",
+      "later": "3GPP TS 38.300 V19.3.0 (2026-06)",
+      "numbers_gone": [
+       "03"
+      ],
+      "numbers_new": [
+       "06"
+      ]
+     },
+     {
+      "earlier": "",
+      "later": "[72] 3GPP TS 33.369: \"Security aspects of Ambient Internet of Things (AIoT) services for isolated private networks\".",
+      "numbers_gone": [],
+      "numbers_new": [
+       "33.369"
+      ]
+     },
+     {
+      "earlier": "",
+      "later": "- It receives an A-IoT Paging message for A-IoT CBRA, when it has no stored transaction ID, as specified in TS 38.391 [66];",
+      "numbers_gone": [],
+      "numbers_new": [
+       "38.391"
+      ]
+     }
+    ]
+   }
+  }
+ },
+ "replay": {
+  "quic-34-rfc9000": {
+   "claims": [
+    2489,
+    2069
+   ],
+   "changed_blocks": 308,
+   "changed_lines": [
+    3448,
+    2824
+   ],
+   "findings": {
+    "complementary in changed text": 83,
+    "complementary in unchanged text": 49,
+    "different in changed text": 9,
+    "different in unchanged text": 13,
+    "equivalent in changed text": 311,
+    "equivalent in unchanged text": 348,
+    "settled in changed text": 410,
+    "settled in unchanged text": 632,
+    "uncertain in changed text": 32,
+    "uncertain in unchanged text": 11,
+    "unrelated in changed text": 104,
+    "unrelated in unchanged text": 38
+   },
+   "unmatched": {
+    "no_confirmed_counterpart in changed text": 77,
+    "no_confirmed_counterpart in unchanged text": 61,
+    "not_compared in changed text": 417,
+    "not_compared in unchanged text": 293,
+    "unaligned in changed text": 233,
+    "unaligned in unchanged text": 99
+   },
+   "suspect_differences": 13,
+   "numeric_changes": 32,
+   "numeric_changes_unseen": 15,
+   "pairs_judged": 998,
+   "settled": 1042,
+   "groupings": {
+    "ambiguous": 31,
+    "attached": 51,
+    "matched": 418,
+    "unaligned": 270
+   },
+   "examples": {
+    "suspect": [
+     {
+      "a": {
+       "entity": "1-RTT Packet",
+       "attribute": "Packet Payload length",
+       "value": "8..",
+       "unit": "bytes",
+       "conditions": "",
+       "lines": [
+        6725,
+        6735
+       ]
+      },
+      "b": {
+       "entity": "1-RTT Packet",
+       "attribute": "Packet Payload length",
+       "value": "8..",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5478,
+        5488
+       ]
+      },
+      "rationale": "The entity and attribute are the same, but the units are incompatible (bytes vs bits) for the same value (8..)."
+     },
+     {
+      "a": {
+       "entity": "Retry Packet",
+       "attribute": "Source Connection ID Length length",
+       "value": "8",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        6563,
+        6575
+       ]
+      },
+      "b": {
+       "entity": "Retry Packet",
+       "attribute": "Source Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5352,
+        5364
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Source Connection ID Length' field, whereas Claim B specifies a variable length of 0..160 bits for the 'Source Connection ID' itself. While the attr"
+     },
+     {
+      "a": {
+       "entity": "Handshake Packet",
+       "attribute": "Destination Connection ID Length field size",
+       "value": "8",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        6509,
+        6523
+       ]
+      },
+      "b": {
+       "entity": "Handshake Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        5304,
+        5318
+       ]
+      },
+      "rationale": "Claim A specifies the size of the 'Length field' (the field that stores the length value) as 8 bits, whereas Claim B specifies the actual 'length' of the Connection ID itself as 0..160 bits. These are"
+     },
+     {
+      "a": {
+       "entity": "Version Negotiation Packet",
+       "attribute": "Source Connection ID Length",
+       "value": "8",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        6237,
+        6246
+       ]
+      },
+      "b": {
+       "entity": "Version Negotiation Packet",
+       "attribute": "Source Connection ID length",
+       "value": "0..2040",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        5093,
+        5102
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable length range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet."
+     },
+     {
+      "a": {
+       "entity": "endpoint",
+       "attribute": "error handling requirement",
+       "value": "generate a connection error or fully revert changes",
+       "unit": "",
+       "conditions": "processing contents of invalid packets prior to discovering an error",
+       "lines": [
+        1878,
+        1882
+       ]
+      },
+      "b": {
+       "entity": "endpoint",
+       "attribute": "error generation requirement",
+       "value": "MUST generate a connection error",
+       "unit": "",
+       "conditions": "processing contents of invalid packets prior to discovering an error",
+       "lines": [
+        1483,
+        1487
+       ]
+      },
+      "rationale": "Claim A allows for two options (generate a connection error OR fully revert changes), whereas Claim B mandates only one specific action (MUST generate a connection error), removing the alternative of "
+     },
+     {
+      "a": {
+       "entity": "Retry Packet",
+       "attribute": "Destination Connection ID Length length",
+       "value": "8",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        6563,
+        6575
+       ]
+      },
+      "b": {
+       "entity": "Retry Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5352,
+        5364
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a variable length of 0..160 bits for the 'Destination Connection ID' itself. Whil"
+     },
+     {
+      "a": {
+       "entity": "Handshake Packet",
+       "attribute": "Source Connection ID Length field size",
+       "value": "8",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        6509,
+        6523
+       ]
+      },
+      "b": {
+       "entity": "Handshake Packet",
+       "attribute": "Source Connection ID length",
+       "value": "0..160",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        5304,
+        5318
+       ]
+      },
+      "rationale": "Claim A specifies the size of the 'Length field' as 8 bits, whereas Claim B specifies the length of the 'Source Connection ID' itself as 0..160 bits. While they refer to the same entity, the attribute"
+     },
+     {
+      "a": {
+       "entity": "0-RTT Packet",
+       "attribute": "Source Connection ID Length length",
+       "value": "8",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        6445,
+        6459
+       ]
+      },
+      "b": {
+       "entity": "0-RTT packet",
+       "attribute": "Source Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5254,
+        5268
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Source Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Source Connection ID' itself. While they refer to the "
+     },
+     {
+      "a": {
+       "entity": "ECN validation",
+       "attribute": "failure condition",
+       "value": "non-zero ECN count for ECT codepoint never applied",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        5617,
+        5622
+       ]
+      },
+      "b": {
+       "entity": "ECN validation",
+       "attribute": "failure condition",
+       "value": "sum of increase in ECT(1) and ECN-CE counts < number of newly acknowledged packets sent with ECT(1)",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        4546,
+        4552
+       ]
+      },
+      "rationale": "Claim A defines failure as receiving a non-zero ECN count for an ECT codepoint that was never applied. Claim B defines failure based on a mathematical inequality between the sum of ECT(1) and ECN-CE c"
+     },
+     {
+      "a": {
+       "entity": "0-RTT Packet",
+       "attribute": "Destination Connection ID Length length",
+       "value": "8",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        6445,
+        6459
+       ]
+      },
+      "b": {
+       "entity": "0-RTT packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5254,
+        5268
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Destination Connection ID' itself. While they ref"
+     },
+     {
+      "a": {
+       "entity": "Version Negotiation Packet",
+       "attribute": "Destination Connection ID Length",
+       "value": "8",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        6237,
+        6246
+       ]
+      },
+      "b": {
+       "entity": "Version Negotiation Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..2040",
+       "unit": "bit",
+       "conditions": "",
+       "lines": [
+        5093,
+        5102
+       ]
+      },
+      "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet."
+     },
+     {
+      "a": {
+       "entity": "1-RTT Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bytes",
+       "conditions": "",
+       "lines": [
+        6725,
+        6735
+       ]
+      },
+      "b": {
+       "entity": "1-RTT Packet",
+       "attribute": "Destination Connection ID length",
+       "value": "0..160",
+       "unit": "bits",
+       "conditions": "",
+       "lines": [
+        5478,
+        5488
+       ]
+      },
+      "rationale": "Claims A and B specify the same value (0..160) for the same attribute, but use incompatible units: bytes versus bits."
+     },
+     {
+      "a": {
+       "entity": "stream",
+       "attribute": "final size definition",
+       "value": "amount of flow control credit consumed by a stream",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        1479,
+        1483
+       ]
+      },
+      "b": {
+       "entity": "stream",
+       "attribute": "final size",
+       "value": "offset of the byte with the largest offset sent + 1",
+       "unit": "bytes",
+       "conditions": "general case",
+       "lines": [
+        1167,
+        1171
+       ]
+      },
+      "rationale": "Claim A defines 'final size' as the amount of flow control credit consumed, whereas Claim B defines it as the offset of the largest byte sent plus one. These are distinct engineering definitions for t"
+     }
+    ],
+    "unseen": [
+     {
+      "earlier": "QUIC J. Iyengar, Ed. Internet-Draft Fastly Intended status: Standards Track M. Thomson, Ed. Expires: 19 July 2021 Mozilla 15 January 2021 QUIC: A UDP-Based Multiplexed and Secure Transport draft-ietf-quic-transport-34",
+      "later": "\ufeff Internet Engineering Task Force (IETF) J. Iyengar, Ed. Request for Comments: 9000 Fastly Category: Standards Track M. Thomson, Ed. ISSN: 2070-1721 Mozilla May 2021 QUIC: A UDP-Based Multiplexed and Secure Transport",
+      "numbers_gone": [
+       "15",
+       "19",
+       "2021"
+      ],
+      "numbers_new": [
+       "1721",
+       "2070",
+       "9000"
+      ]
+     },
+     {
+      "earlier": "1. Overview . . . . . . . . . . . . . . . . . . . . . . . . . . 7 1.1. Document Structure . . . . . . . . . . . . . . . . . . . 8 1.2. Terms and Definitions . . . . . . . . . . . . . . . . . . 10 1.3. Notational Conventions . . . . . . . . . . . . . . . . . 11 2. Streams . . . . . . . . . . . . . . ",
+      "later": "1. Overview 1.1. Document Structure 1.2. Terms and Definitions 1.3. Notational Conventions 2. Streams 2.1. Stream Types and Identifiers 2.2. Sending and Receiving Data 2.3. Stream Prioritization 2.4. Operations on Streams 3. Stream States 3.1. Sending Stream States 3.2. Receiving Stream States 3.3. ",
+      "numbers_gone": [
+       "10",
+       "101",
+       "102",
+       "103",
+       "104",
+       "105",
+       "105",
+       "105",
+       "105",
+       "105"
+      ],
+      "numbers_new": []
+     },
+     {
+      "earlier": "Receivers need to limit the amount of data that they are required to buffer, in order to prevent a fast sender from overwhelming them or a malicious sender from consuming a large amount of memory. To enable a receiver to limit memory commitments for a connection, streams are flow controlled both ind",
+      "later": "Receivers need to limit the amount of data that they are required to buffer, in order to prevent a fast sender from overwhelming them or a malicious sender from consuming a large amount of memory. To enable a receiver to limit memory commitments for a connection, streams are flow controlled both ind",
+      "numbers_gone": [],
+      "numbers_new": [
+       "4.1",
+       "4.2"
+      ]
+     },
+     {
+      "earlier": "Figure 5 provides an overview of the 1-RTT handshake. Each line shows a QUIC packet with the packet type and packet number shown first, followed by the frames that are typically contained in those packets. So, for instance the first packet is of type Initial, with packet number 0, and contains a CRY",
+      "later": "Figure 5 provides an overview of the 1-RTT handshake. Each line shows a QUIC packet with the packet type and packet number shown first, followed by the frames that are typically contained in those packets. For instance, the first packet is of type Initial, with packet number 0, and contains a CRYPTO",
+      "numbers_gone": [
+       "4"
+      ],
+      "numbers_new": []
+     },
+     {
+      "earlier": "In both cases (Figure 7 and Figure 8), the client sets the value of the initial_source_connection_id transport parameter to \"C1\". When the handshake does not include a Retry (Figure 7), the server sets original_destination_connection_id to \"S1\" and initial_source_connection_id to \"S3\". In this case,",
+      "later": "In both cases (Figures 7 and 8), the client sets the value of the initial_source_connection_id transport parameter to \"C1\". When the handshake does not include a Retry (Figure 7), the server sets original_destination_connection_id to \"S1\" (note that this value is chosen by the client) and initial_so",
+      "numbers_gone": [],
+      "numbers_new": [
+       "7",
+       "8"
+      ]
+     },
+     {
+      "earlier": "An endpoint MAY send data to an unvalidated peer address, but it MUST protect against potential attacks as described in Section 9.3.1 and Section 9.3.2. An endpoint MAY skip validation of a peer address if that address has been seen recently. In particular, if an endpoint returns to a previously-val",
+      "later": "An endpoint MAY send data to an unvalidated peer address, but it MUST protect against potential attacks as described in Sections 9.3.1 and 9.3.2. An endpoint MAY skip validation of a peer address if that address has been seen recently. In particular, if an endpoint returns to a previously validated ",
+      "numbers_gone": [],
+      "numbers_new": [
+       "9.3",
+       "9.3"
+      ]
+     },
+     {
+      "earlier": "If packets received at the server's preferred address have a different source address than observed from the client during the handshake, the server MUST protect against potential attacks as described in Section 9.3.1 and Section 9.3.2. In addition to intentional simultaneous migration, this might a",
+      "later": "If packets received at the server's preferred address have a different source address than observed from the client during the handshake, the server MUST protect against potential attacks as described in Sections 9.3.1 and 9.3.2. In addition to intentional simultaneous migration, this might also occ",
+      "numbers_gone": [],
+      "numbers_new": [
+       "9.3",
+       "9.3"
+      ]
+     },
+     {
+      "earlier": "Packet numbers are divided into 3 spaces in QUIC: * Initial space: All Initial packets (Section 17.2.2) are in this space. * Handshake space: All Handshake packets (Section 17.2.4) are in this space. * Application data space: All 0-RTT (Section 17.2.3) and 1-RTT (Section 17.3.1) packets are in this ",
+      "later": "Packet numbers are divided into three spaces in QUIC: Initial space: All Initial packets (Section 17.2.2) are in this space. Handshake space: All Handshake packets (Section 17.2.4) are in this space. Application data space: All 0-RTT (Section 17.2.3) and 1-RTT (Section 17.3.1) packets are in this sp",
+      "numbers_gone": [
+       "3"
+      ],
+      "numbers_new": []
+     },
+     {
+      "earlier": "Use of ECN requires the receiving endpoint to read the ECN field from an IP packet, which is not possible on all platforms. If an endpoint does not implement ECN support or does not have access to received ECN fields, it does not report ECN counts for packets it receives. Even if an endpoint does no",
+      "later": "The use of ECN requires the receiving endpoint to read the ECN field from an IP packet, which is not possible on all platforms. If an endpoint does not implement ECN support or does not have access to received ECN fields, it does not report ECN counts for packets it receives. Even if an endpoint doe",
+      "numbers_gone": [],
+      "numbers_new": [
+       "13.2",
+       "19.3"
+      ]
+     },
+     {
+      "earlier": "A blind attacker, one who injects packets without being able to observe valid packets for a connection, is unlikely to be successful, since packet protection ensures that valid packets are only generated by endpoints that possess the key material established during the handshake; see Section 7 and S",
+      "later": "An attacker that injects packets without being able to observe valid packets for a connection is unlikely to be successful, since packet protection ensures that valid packets are only generated by endpoints that possess the key material established during the handshake; see Sections 7 and 21.1.1. Si",
+      "numbers_gone": [],
+      "numbers_new": [
+       "21.1",
+       "7"
+      ]
+     },
+     {
+      "earlier": "[BCP38] Ferguson, P. and D. Senie, \"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing\", BCP 38, RFC 2827, DOI 10.17487/RFC2827, May 2000, <https://www.rfc-editor.org/info/rfc2827>.",
+      "later": "[BCP38] Ferguson, P. and D. Senie, \"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing\", BCP 38, RFC 2827, May 2000. <https://www.rfc-editor.org/info/bcp38>",
+      "numbers_gone": [
+       "10.17487",
+       "2000,"
+      ],
+      "numbers_new": [
+       "2000"
+      ]
+     },
+     {
+      "earlier": "[QUIC-INVARIANTS] Thomson, M., \"Version-Independent Properties of QUIC\", Work in Progress, Internet-Draft, draft-ietf-quic- invariants-13, 15 January 2021, <https://tools.ietf.org/html/draft-ietf-quic-invariants- 13>. [QUIC-RECOVERY] Iyengar, J., Ed. and I. Swett, Ed., \"QUIC Loss Detection and Conge",
+      "later": "[QUIC-INVARIANTS] Thomson, M., \"Version-Independent Properties of QUIC\", RFC 8999, DOI 10.17487/RFC8999, May 2021, <https://www.rfc-editor.org/info/rfc8999>. [QUIC-RECOVERY] Iyengar, J., Ed. and I. Swett, Ed., \"QUIC Loss Detection and Congestion Control\", RFC 9002, DOI 10.17487/RFC9002, May 2021, <h",
+      "numbers_gone": [
+       "13",
+       "13,",
+       "15"
+      ],
+      "numbers_new": [
+       "10.17487",
+       "10.17487",
+       "10.17487"
+      ]
+     },
+     {
+      "earlier": "[QUIC-MANAGEABILITY] Kuehlewind, M. and B. Trammell, \"Manageability of the QUIC Transport Protocol\", Work in Progress, Internet-Draft, draft-ietf-quic-manageability-08, 2 November 2020, <http://www.ietf.org/internet-drafts/draft-ietf-quic- manageability-08.txt>.",
+      "later": "[QUIC-MANAGEABILITY] Kuehlewind, M. and B. Trammell, \"Manageability of the QUIC Transport Protocol\", Work in Progress, Internet-Draft, draft-ietf-quic-manageability-11, 21 April 2021, <https://tools.ietf.org/html/draft-ietf-quic- manageability-11>.",
+      "numbers_gone": [
+       "08",
+       "2020,"
+      ],
+      "numbers_new": [
+       "11",
+       "2021,"
+      ]
+     },
+     {
+      "earlier": "[RFC4941] Narten, T., Draves, R., and S. Krishnan, \"Privacy Extensions for Stateless Address Autoconfiguration in IPv6\", RFC 4941, DOI 10.17487/RFC4941, September 2007, <https://www.rfc-editor.org/info/rfc4941>.",
+      "later": "",
+      "numbers_gone": [
+       "10.17487",
+       "2007,"
+      ],
+      "numbers_new": []
+     },
+     {
+      "earlier": "",
+      "later": "[RFC8981] Gont, F., Krishnan, S., Narten, T., and R. Draves, \"Temporary Address Extensions for Stateless Address Autoconfiguration in IPv6\", RFC 8981, DOI 10.17487/RFC8981, February 2021, <https://www.rfc-editor.org/info/rfc8981>.",
+      "numbers_gone": [],
+      "numbers_new": [
+       "10.17487",
+       "2021,"
+      ]
+     }
+    ]
+   }
+  },
+  "ts38300-j20-j30": {
+   "claims": [
+    5288,
+    5361
+   ],
+   "changed_blocks": 47,
+   "changed_lines": [
+    640,
+    678
+   ],
+   "findings": {
+    "complementary in changed text": 32,
+    "complementary in unchanged text": 44,
+    "different in changed text": 9,
+    "different in unchanged text": 12,
+    "equivalent in changed text": 41,
+    "equivalent in unchanged text": 246,
+    "settled in changed text": 83,
+    "settled in unchanged text": 4762,
+    "uncertain in changed text": 17,
+    "uncertain in unchanged text": 26,
+    "unrelated in changed text": 36,
+    "unrelated in unchanged text": 38
+   },
+   "unmatched": {
+    "no_confirmed_counterpart in changed text": 20,
+    "no_confirmed_counterpart in unchanged text": 29,
+    "not_compared in changed text": 57,
+    "not_compared in unchanged text": 187,
+    "unaligned in changed text": 18,
+    "unaligned in unchanged text": 84
+   },
+   "suspect_differences": 12,
+   "numeric_changes": 12,
+   "numeric_changes_unseen": 3,
+   "pairs_judged": 501,
+   "settled": 4845,
+   "groupings": {
+    "ambiguous": 26,
+    "attached": 14,
+    "matched": 1713,
+    "unaligned": 71
+   },
+   "examples": {
+    "suspect": [
+     {
+      "a": {
+       "entity": "L2 U2N Remote and first L2 U2N Relay UE",
+       "attribute": "connection type",
+       "value": "PC5-RRC connection",
+       "unit": "",
+       "conditions": "established using NR sidelink PC5 unicast link establishment procedure",
+       "lines": [
+        4349,
+        4353
+       ]
+      },
+      "b": {
+       "entity": "L2 U2N Relay UEs",
+       "attribute": "connection type",
+       "value": "PC5-RRC connection",
+       "unit": "",
+       "conditions": "established using NR sidelink PC5 unicast link establishment procedure",
+       "lines": [
+        4360,
+        4360
+       ]
+      },
+      "rationale": "Claim A describes a connection between a Remote UE and a Relay UE, whereas Claim B describes a connection between two Relay UEs. While the connection type and procedure are identical, the entities inv"
+     },
+     {
+      "a": {
+       "entity": "LP-SS",
+       "attribute": "number of OOK symbols within an OFDM symbol",
+       "value": "1, 2 or 4",
+       "unit": "",
+       "conditions": "configurable",
+       "lines": [
+        3148,
+        3148
+       ]
+      },
+      "b": {
+       "entity": "LP-SS",
+       "attribute": "number of OOK symbols within an OFDM symbol",
+       "value": ">= number of LP-WUS symbols",
+       "unit": "symbols",
+       "conditions": "configurable",
+       "lines": [
+        3155,
+        3155
+       ]
+      },
+      "rationale": "Claim A specifies a discrete set of possible values (1, 2, or 4), whereas Claim B defines the value as a relative constraint (greater than or equal to the number of LP-WUS symbols)."
+     },
+     {
+      "a": {
+       "entity": "Intra-system Too Late Handover",
+       "attribute": "detection condition 2",
+       "value": "CHO/LTM or CHO with candidate SCG(s) configured but execution not initiated prior to connection failure",
+       "unit": "",
+       "conditions": "UE reported timer is absent or > Tstore_UE_cntxt",
+       "lines": [
+        3477,
+        3477
+       ]
+      },
+      "b": {
+       "entity": "Intra-system Too Late Handover",
+       "attribute": "detection condition 1",
+       "value": "no recent handover for the UE prior to the connection failure",
+       "unit": "",
+       "conditions": "UE reported timer is absent or > Tstore_UE_cntxt",
+       "lines": [
+        3484,
+        3484
+       ]
+      },
+      "rationale": "Both claims describe detection conditions for 'Intra-system Too Late Handover' under the same timer conditions, but they specify different triggers: Claim A requires a configured but uninitiated hando"
+     },
+     {
+      "a": {
+       "entity": "BSR extended short format",
+       "attribute": "reporting capacity",
+       "value": "one BSR (of one LCG)",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3054,
+        3054
+       ]
+      },
+      "b": {
+       "entity": "BSR short format",
+       "attribute": "reporting capacity",
+       "value": "one BSR (of one LCG)",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3060,
+        3060
+       ]
+      },
+      "rationale": "Claim A refers to an 'extended short format' while Claim B refers to a 'short format'. Although the reporting capacity value is the same, the entities (the formats themselves) are distinct designation"
+     },
+     {
+      "a": {
+       "entity": "L2 U2N Remote UE",
+       "attribute": "reporting content",
+       "value": "one or multiple candidate L2 U2N Relay UE(s) and Uu measurements",
+       "unit": "",
+       "conditions": "reported to source gNB after measurement/discovery",
+       "lines": [
+        4448,
+        4448
+       ]
+      },
+      "b": {
+       "entity": "L2 U2N Remote UE",
+       "attribute": "reporting content",
+       "value": "one or multiple candidate L2 U2N Relay UE(s) and sidelink measurement",
+       "unit": "",
+       "conditions": "between L2 U2N Remote UE and source L2 U2N Relay UE; reported to source gNB after measurement/discovery",
+       "lines": [
+        4493,
+        4493
+       ]
+      },
+      "rationale": "Claim A specifies 'Uu measurements' as part of the reporting content, whereas Claim B specifies 'sidelink measurement between the L2 U2N Remote UE and the source L2 U2N Relay UE'."
+     },
+     {
+      "a": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indexes of the SSBs and number of RACH preambles sent on each tried SSB in chronological order",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3547,
+        3547
+       ]
+      },
+      "b": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "2-step RACH information as specified in clause 5.7.10.4 of TS 38.331 [12]",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3556,
+        3556
+       ]
+      },
+      "rationale": "Claim A specifies the content of the RA Report as SSB indexes and the number of preambles sent in chronological order, whereas Claim B specifies the content as 2-step RACH information per a specific T"
+     },
+     {
+      "a": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indication whether selected SSB is above or below configured RSRP threshold per RACH attempt",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3548,
+        3548
+       ]
+      },
+      "b": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indexes of the SSBs and number of RACH preambles sent on each tried SSB listed in chronological order of attempts",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3554,
+        3554
+       ]
+      },
+      "rationale": "Both claims describe the content of the RA Report for the same design. Claim A specifies an indication of RSRP threshold status per attempt, while Claim B specifies SSB indexes and the number of pream"
+     },
+     {
+      "a": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indication whether selected SSB is above or below configured RSRP threshold per RACH attempt",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3548,
+        3548
+       ]
+      },
+      "b": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indication of LBT failures detected during the random access",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3557,
+        3557
+       ]
+      },
+      "rationale": "Both claims describe the content of the 'RA Report', but they specify entirely different information: Claim A refers to SSB RSRP threshold indications, while Claim B refers to LBT failure indications."
+     },
+     {
+      "a": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "Indication whether selected SSB is above or below configured RSRP threshold per RACH attempt",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3548,
+        3548
+       ]
+      },
+      "b": {
+       "entity": "RA Report",
+       "attribute": "content",
+       "value": "2-step RACH information as specified in clause 5.7.10.4 of TS 38.331 [12]",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        3556,
+        3556
+       ]
+      },
+      "rationale": "Claim A specifies a particular content item (SSB RSRP threshold indication), whereas Claim B replaces this with a reference to 2-step RACH information in TS 38.331. The content of the RA Report has ch"
+     },
+     {
+      "a": {
+       "entity": "Layer 3 filtering for cell quality",
+       "attribute": "input",
+       "value": "measurements provided at point B",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        2678,
+        2678
+       ]
+      },
+      "b": {
+       "entity": "L3 Beam filtering",
+       "attribute": "input",
+       "value": "measurements provided at point A1",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        2689,
+        2689
+       ]
+      },
+      "rationale": "Claim A specifies the input for Layer 3 filtering as measurements from point B, while Claim B specifies the input for L3 Beam filtering as measurements from point A1."
+     },
+     {
+      "a": {
+       "entity": "Command Request message",
+       "attribute": "content",
+       "value": "Correlation ID and AIOTF Identifier",
+       "unit": "",
+       "conditions": "must be same as those used in corresponding inventory procedure",
+       "lines": [
+        5145,
+        5145
+       ]
+      },
+      "b": {
+       "entity": "Command Request message",
+       "attribute": "included content",
+       "value": "AIOTF Identifier",
+       "unit": "",
+       "conditions": "same as used in corresponding inventory procedure",
+       "lines": [
+        5144,
+        5156
+       ]
+      },
+      "rationale": "Claim A requires both Correlation ID and AIOTF Identifier, whereas Claim B only specifies the AIOTF Identifier for the same entity and conditions."
+     },
+     {
+      "a": {
+       "entity": "Command Request message",
+       "attribute": "content",
+       "value": "Correlation ID and AIOTF Identifier",
+       "unit": "",
+       "conditions": "must be same as those used in corresponding inventory procedure",
+       "lines": [
+        5145,
+        5145
+       ]
+      },
+      "b": {
+       "entity": "Command Request message",
+       "attribute": "included content",
+       "value": "Correlation ID",
+       "unit": "",
+       "conditions": "same as used in corresponding inventory procedure",
+       "lines": [
+        5144,
+        5156
+       ]
+      },
+      "rationale": "Claim A specifies that both the Correlation ID and AIOTF Identifier must be included, whereas Claim B only specifies the Correlation ID."
+     }
+    ],
+    "unseen": [
+     {
+      "earlier": "3GPP TS 38.300 V19.2.0 (2026-03)",
+      "later": "3GPP TS 38.300 V19.3.0 (2026-06)",
+      "numbers_gone": [
+       "03"
+      ],
+      "numbers_new": [
+       "06"
+      ]
+     },
+     {
+      "earlier": "",
+      "later": "[72] 3GPP TS 33.369: \"Security aspects of Ambient Internet of Things (AIoT) services for isolated private networks\".",
+      "numbers_gone": [],
+      "numbers_new": [
+       "33.369"
+      ]
+     },
+     {
+      "earlier": "",
+      "later": "- It receives an A-IoT Paging message for A-IoT CBRA, when it has no stored transaction ID, as specified in TS 38.391 [66];",
+      "numbers_gone": [],
+      "numbers_new": [
+       "38.391"
+      ]
+     }
+    ]
+   }
+  }
+ }
+}

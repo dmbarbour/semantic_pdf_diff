@@ -1,6 +1,6 @@
 # Multi-format source adapters
 
-- **Status:** Active (2026-10-03): milestone 1 (`.txt`/`.md` and a shared task core) done; next, `.docx`. Format priority (2026-09-23): PDF, then `.docx` and `.pptx`; Cameo models via a separate project.
+- **Status:** Active (2026-10-03): milestones 1 (`.txt`/`.md` and a shared task core) and 2 (`.docx`) done; next, `.pptx`. Format priority (2026-09-23): PDF, then `.docx` and `.pptx`; Cameo models via a separate project.
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (locators, sections, store)
 
 ## Goal
@@ -201,6 +201,25 @@ Written when the work began. The owner (2026-10-02), on the readers' value beyon
     - a new value beside a superseded one ("raised from 178 ft to 230 ft")
   - **Cost:** $0.066 to read the Markdown corpus and compare its pairs.
   - **Not yet:** situating (figures and "about" statements) for text files; RFC furniture other than repeated lines; the QUIC drafts (the revision comparison plan's milestone 3).
+
+- **Milestone 2, `.docx` (2026-10-03): done.** The owner: "I agree with the recommended order. No issues with spending a few dollars to get both of these done."
+  - **The reader** (`docxdocs.py`, with python-docx, MIT, in the `office` extra) reads a Word document into the text reader's form, so the task core, sections and context levers work unchanged:
+    - each paragraph and table row a line
+    - headings by style ("Heading N"); a title is text
+    - tracked insertions in, deletions out
+    - the table of contents left out
+    - tables row by row
+    - Claims are located by paragraphs (`DocxLocator`); reports show "paragraphs 12–14".
+    - Without python-docx, a `.docx` is skipped with the install command in its coverage note.
+  - **Not read yet:** embedded pictures and objects (each recorded as not read: 294 in the two TS 38.300 versions, mostly 3GPP's figures), and comments.
+  - **Long documents keep fair share:** a page as long as a whole Word document yields to other sources every 20 tasks.
+  - **The controlled corpus written as Word documents** (17, from the Markdown, byte for byte the same each time):
+    - full recall
+    - no misbinding where the PDF schedules had 6–18
+    - its nine revision pairs found every change, addition and removal with no false change
+    - $0.058
+  - **A real document:** 3GPP TS 38.300 v19.2.0 and v19.3.0, about 800 KB of text each, read for $0.52: 10,649 claims, 1,283 table rows (the revision comparison plan's milestone 3).
+  - **A fault found and fixed:** cells were skipped when Python reused an lxml element's id; each `w:tc` is one cell.
 
 ## Open questions
 

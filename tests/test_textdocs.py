@@ -67,7 +67,8 @@ def extract(name, text, **settings):
     model = Model(**settings)
     found = {}
     with tempfile.TemporaryDirectory() as d:
-        job = Job("sha256:" + "a" * 64 + Path(name).suffix, lambda: text.encode(),
+        data = text if isinstance(text, bytes) else text.encode()
+        job = Job("sha256:" + "a" * 64 + Path(name).suffix, lambda: data,
                   on_sections=lambda s: found.update(sections=s), reader=reader_for(Path(name).suffix))
         run_jobs([[job]], Path(d), model)
     evidence, coverage = job.state["result"]

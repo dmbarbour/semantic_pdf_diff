@@ -65,17 +65,20 @@ def _numbers(line):
         if re.search(r"[0-9]", text) and printed_value(text) is not None:
             yield text
 
-def key(project, lines):
-    """The Markdown's key: the PDF key's facts that the lines print, each placed by line ("md-prose", "md-table"), the
-    others listed as absent; every printed number logged with its role."""
+def key(project, lines, tables=None, representation="markdown"):
+    """A representation's key: the PDF key's facts that the lines print, each placed by line ("md-prose", "md-table";
+    for Word, "docx-prose", "docx-table"), the others listed as absent; every printed number logged with its role.
+    tables: the line numbers that are table rows (default: Markdown's, lines starting "|")."""
     by_value = {}
     for f in project.facts:
         if not f.relation and f.drawn != "chart":  # a chart's facts: absent, though a total may print the same number
             by_value.setdefault(printed_value(f.value), []).append(f)
         f.forms = []
     log = []
+    prefix = "docx" if representation == "docx" else "md"
     for n, line in enumerate(lines, 1):
-        form = "md-table" if line.startswith("|") else "md-prose"
+        table = n in tables if tables is not None else line.startswith("|")
+        form = f"{prefix}-table" if table else f"{prefix}-prose"
         for text in _numbers(line):
             facts = by_value.get(printed_value(text), []) if re.match(r"[-+±$]?\d", text) else []
             for f in facts:
@@ -86,7 +89,7 @@ def key(project, lines):
     out = pdf_key(project, log)
     out["facts"] = [f for f in out["facts"] if f["id"] not in absent and not f.get("relation")]
     out["absent"] = absent
-    out["representation"] = "markdown"
+    out["representation"] = representation
     return out
 
 # Layout knobs (page furniture, columns, page breaks, rasters) mean nothing in Markdown: only the clean documents
@@ -112,5 +115,76 @@ def write(project, lines, folder):
     path = folder / f"{project.id}.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     (folder / f"{project.id}.key.json").write_text(json.dumps(key(project, lines), indent=1, ensure_ascii=False) + "\n",
+                                                   encoding="utf-8")
+    return path
+
+# --- Word (.docx) ------------------------------------------------------------------------------
+
+FIXED_TIME = (2026, 1, 1, 0, 0, 0)  # zip members' and core properties' time, so the same project gives the same bytes
+
+def docx(lines):
+    """The Markdown lines as a Word document's bytes: headings as headings, paragraphs, pipe tables as tables, a bold
+    caption line as a bold paragraph. Byte for byte the same each time."""
+    import datetime
+    import io
+    import zipfile
+    import docx as python_docx
+    document = python_docx.Document()
+    props = document.core_properties
+    stamp = datetime.datetime(*FIXED_TIME)
+    props.created = props.modified = props.last_printed = stamp
+    props.author = props.last_modified_by = "controlled corpus"
+    k = 0
+    while k < len(lines):
+        line = lines[k]
+        heading = re.match(r"^(#{1,6})\s+(.*)$", line)
+        if heading:
+            document.add_heading(heading.group(2), level=len(heading.group(1)) - 1)
+        elif line.startswith("|"):
+            rows = []
+            while k < len(lines) and lines[k].startswith("|"):
+                cells = [c.strip().replace("\\|", "|") for c in lines[k].strip().strip("|").split(" | ")]
+                if not all(set(c) <= {"-"} for c in cells):  # the rule under the header
+                    rows.append(cells)
+                k += 1
+            table = document.add_table(rows=len(rows), cols=max(len(r) for r in rows))
+            table.style = "Table Grid"
+            for r, cells in enumerate(rows):
+                for c, text in enumerate(cells):
+                    table.cell(r, c).text = text
+            continue
+        elif line.startswith("**") and line.endswith("**"):
+            document.add_paragraph().add_run(line.strip("*")).bold = True
+        elif line.startswith("*") and line.endswith("*"):
+            document.add_paragraph().add_run(line.strip("*")).italic = True
+        elif line.strip():
+            document.add_paragraph(line)
+        k += 1
+    raw = io.BytesIO()
+    document.save(raw)
+    fixed = io.BytesIO()  # the same members, each dated FIXED_TIME
+    with zipfile.ZipFile(io.BytesIO(raw.getvalue())) as source, zipfile.ZipFile(fixed, "w", zipfile.ZIP_DEFLATED) as out:
+        for info in source.infolist():
+            out.writestr(zipfile.ZipInfo(info.filename, FIXED_TIME), source.read(info.filename),
+                         compress_type=zipfile.ZIP_DEFLATED)
+    return fixed.getvalue()
+
+def docx_key(project, data):
+    """A Word document's key, placed by the reader's own lines (paragraphs and table rows, docxdocs.read_docx)."""
+    from semantic_pdf_diff.docxdocs import read_docx
+    doc = read_docx(data)
+    rows = {n for b in doc.blocks if b.kind == "table" for n in b.row_lines}
+    return key(project, [t for _, t in doc.lines], rows, "docx")
+
+def write_docx(project, lines, folder):
+    """Write <id>.docx and <id>.key.json into folder; returns the document's path."""
+    import json
+    from pathlib import Path
+    folder = Path(folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    data = docx(lines)
+    path = folder / f"{project.id}.docx"
+    path.write_bytes(data)
+    (folder / f"{project.id}.key.json").write_text(json.dumps(docx_key(project, data), indent=1, ensure_ascii=False) + "\n",
                                                    encoding="utf-8")
     return path

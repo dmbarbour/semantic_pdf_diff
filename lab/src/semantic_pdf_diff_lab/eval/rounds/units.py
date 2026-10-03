@@ -59,7 +59,7 @@ def collect(runs_dir, unit="family"):
         if not (folder / "store.sqlite").exists():
             continue
         with Store.open(folder) as store:
-            contents = sorted({f.content for f in store.files() if f.content.endswith((".pdf", ".txt", ".md"))})
+            contents = sorted({f.content for f in store.files() if f.content.endswith((".pdf", ".txt", ".md", ".docx"))})
             for content in contents:
                 for row in store.coverage(content):
                     family = family_of(region_of(row["task"]))
