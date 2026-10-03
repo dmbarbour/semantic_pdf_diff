@@ -10,6 +10,8 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 - **Replay fixtures:** recorded model answers, so runs replay offline
 - **Levers:** how documents are read, composed as mixins (`levers.py`)
 - **The lab** (`lab/`, its own distribution): improvement rounds judged by model panels and people, controlled documents with known facts, eye and page tests
+- **Plain text and Markdown** read as well as PDF: sections from headings, paragraphs and pipe tables, claims located by line
+- **Revisions aligned before they're judged:** items matched across revisions by their values, equal values settled without a model, and the report showing how it grouped them
 
 **Status:**
 - Extraction has been measured with one real model (gemma-4-31B, through DeepInfra) on public sample documents and the controlled corpus.
@@ -65,7 +67,7 @@ pdf-semantic-diff report --store work --out reports/latest
 pdf-semantic-diff gc --store work --dry-run
 ```
 
-A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. Only PDFs are extracted so far; other files are listed as skipped.
+A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. PDF, `.txt` and `.md` files are extracted so far; other files are listed as skipped.
 
 Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error.
 

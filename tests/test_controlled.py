@@ -408,6 +408,30 @@ class Revisions(unittest.TestCase):
         self.assertEqual(revisions._pattern("3").sub("X", "3 trains, a 3-second gust, 0.3 g, 13 cars, P-3, 3."),
                          "X trains, a 3-second gust, 0.3 g, 13 cars, P-3, X.")
 
+class Representations(unittest.TestCase):
+    """The corpus written as Markdown (representations.py; the plan's decision 4): the same facts, placed by line, and
+    the ones only a chart held listed as absent."""
+    def test_markdown_keeps_every_fact_it_can_and_lists_the_rest(self):
+        from semantic_pdf_diff import textdocs
+        from semantic_pdf_diff_lab.bench.controlled import representations as R
+        written = {p.id: (p, lines) for p, lines in R.corpus()}
+        self.assertNotIn("lcc-plan-s1-clean", written)            # a drawing sheet: not carried
+        self.assertNotIn("ahu-schematic-s1-clean", written)       # a schematic: not carried
+        self.assertNotIn("wtp-tables-s1-dense", written)          # a layout knob: meaningless in Markdown
+        for doc in ("wtp-tables-s1-clean", "lcc-energy-s1-clean", "wtp-s1-revised"):
+            with self.subTest(document=doc):
+                project, lines = written[doc]
+                key = R.key(project, lines)
+                self.assertTrue(all(f["forms"] for f in key["facts"]))
+                self.assertEqual({f["id"] for f in key["facts"]} | set(key["absent"]),
+                                 {f.id for f in project.facts if not f.relation})
+        energy = R.key(*written["lcc-energy-s1-clean"])
+        self.assertIn("opt1.july", energy["absent"])               # a bar: only the chart held it
+        self.assertIn("opt1.season", {f["id"] for f in energy["facts"]})
+        parsed = textdocs.parse("\n".join(written["wtp-tables-s1-clean"][1]), markdown=True)
+        self.assertEqual(sum(b.kind == "table" for b in parsed.blocks), 3)  # pumps, blowers, valves (whole)
+        self.assertEqual(parsed.headings[0][3], "Harrow Creek WTP: Equipment Schedules")
+
 class ComparisonScoring(unittest.TestCase):
     """A report's findings against the key's changes, on the treatment plant's pair."""
     @classmethod
@@ -577,6 +601,14 @@ class Corpus(unittest.TestCase):
                 self.assertEqual(data, (folder / "docs" / f"{project.id}.pdf").read_bytes())
                 key = json.loads((folder / "docs" / f"{project.id}.key.json").read_text(encoding="utf-8"))
                 self.assertEqual(json.loads(json.dumps(controlled.key(project, log), ensure_ascii=False)), key)
+        from semantic_pdf_diff_lab.bench.controlled import representations
+        written = representations.corpus()
+        self.assertEqual({p.id for p, _ in written}, {f.stem for f in (folder / "docs-md").glob("*.md")})
+        for project, lines in written:
+            with self.subTest(markdown=project.id):
+                self.assertEqual("\n".join(lines) + "\n", (folder / "docs-md" / f"{project.id}.md").read_text(encoding="utf-8"))
+                key = json.loads((folder / "docs-md" / f"{project.id}.key.json").read_text(encoding="utf-8"))
+                self.assertEqual(json.loads(json.dumps(representations.key(project, lines), ensure_ascii=False)), key)
 
 if __name__ == "__main__":
     unittest.main()

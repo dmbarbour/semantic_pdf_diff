@@ -348,6 +348,13 @@ Claude's reading of where proposals mode begins to make sense:
     - the renamed pair's P-101B → P-201B showed as renamed
     - no other pair gained a candidate
   - **The scorer** reports for each split how the groupings viewed it.
+- **The revision pairs in Markdown (2026-10-03; the adapters plan's milestone 1).**
+  - The nine pairs Markdown can carry, compared with alignment.
+  - **Every change, addition and removal found; no false change; 0–6 pairs judged per pair.**
+  - **Three misses, fixed** (the PDF pairs scored as before):
+    - **A condition moved:** one revision's reader put "95th percentile" in the conditions, the other's "99th percentile" in the attribute. Conflicting identifiers anywhere in attribute and conditions now block a settlement.
+    - **Synonyms:** "number of inversions" against "inversion count". "Number" and "quantity" fold to "count", and a value each item holds under one property only pairs whatever the attributes are called.
+    - **A superseded value beside the new one:** the later revision's "raised from 178 ft" took the old reading, leaving 230 ft unpaired. A leftover reading may now pair with one whose value group went to the judge, under the same attribute.
 
 ## Open questions
 

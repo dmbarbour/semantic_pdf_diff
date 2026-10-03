@@ -29,6 +29,18 @@ Extraction of all compared sources shares one queue: pages are fed round-robin a
 5. **Local comparison:** One claim pair per request, with source images where available. The model distinguishes equivalent, different, complementary, unrelated and uncertain. A deterministic decimal calculator checks supported unit conversions. Unestablished conditions, approximate readings, low confidence or inconsistent arithmetic veto confident difference/equivalence judgments.
 6. **Review report:** Filter/search findings, inspect both sources, review numeric checks, unmatched evidence, provenance and task-level coverage. No model-generated global summary is needed.
 
+## Text files
+
+`.txt` and `.md` files are read by a text reader (`textdocs.py`) through the same task core as PDFs (`tasks.py`): the same prompts, quote checks, context levers and refinement.
+
+- **Pages:** a form feed starts one (as in RFCs); otherwise the file is one page.
+- **Sections:** from Markdown headings, or numbered headings in the RFC style ("7.2.  Stream Concurrency"); failing those, fixed page ranges.
+- **Text tasks:** paragraphs, grouped up to the byte budget, kept as laid out: text written for a monospace font, its arrows and simple structures, reaches the model as written.
+- **Table tasks:** Markdown pipe tables, row by row with their header, as PDF tables are.
+- **Page furniture:** a line repeated near the top or bottom of three or more pages is left out.
+- **Not read:** linked images (recorded as skipped).
+- **Locators:** a claim's locator is its page and line range (`TextLocator`); reports show the lines where a PDF claim shows its box.
+
 ## Modes
 
 Evidence from content present in both sources is **shared**: listed once, never compared with itself, but used as a retrieval target, so a claim in changed content whose counterpart sits in shared content isn't reported as unmatched. Reports also summarize the **file-level difference**: files unchanged, modified (same relative path, different content), moved or renamed (same content, different path), added and removed, with paths compared relative to each source's roots (so `rev1/x.pdf` lines up with `rev2/x.pdf`).
@@ -47,6 +59,8 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `llm.py` | Compatible API transport, request budgeting, retries and cache |
 | `extract.py` | PDF text/tables, page/tile rendering, refinement and provenance |
 | `situate.py` | Figures, captions and citing prose; figure and section "about" requests |
+| `tasks.py` | The task core every reader shares: requests, quote checks, evidence, coverage, refinement |
+| `textdocs.py` | Plain text and Markdown: pages, sections, paragraphs and pipe tables, line locators |
 | `compare.py` | Retrieval, local reasoning and numeric checks |
 | `align.py` | Revisions mode: items matched across revisions before judging; equal values settled |
 | `report.py` | Escaped HTML and JSON reports |

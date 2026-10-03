@@ -10,7 +10,7 @@ from pathlib import Path
 from . import fixtures, provenance
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
-from .extract import Job, run_jobs
+from .extract import Job, reader_for, run_jobs
 from .llm import Client, redact_url
 from .models import EvidenceDocument, Report, Situation, Source, coverage_row
 from .progress import Progress, log
@@ -228,7 +228,7 @@ def extract_sources(store, client, names, files, progress):
                 by_content[file.content] = store.evidence(file.content)
                 coverage.extend(store.coverage(file.content))
                 sections[file.content] = store.sections(file.content)
-            elif extension != '.pdf':
+            elif reader_for(extension) is None:
                 reason = f'No adapter for {extension} files yet' if extension else 'No file extension; not interpreted'
                 row = coverage_row(content=file.content, task='unsupported', status='skipped', issues=[reason])
                 store.record_task(row, [])
@@ -237,10 +237,10 @@ def extract_sources(store, client, names, files, progress):
                 coverage.append(row)
             else:
                 by_content[file.content] = None  # claimed by this source's queue
-                queue.append(pdf_job(store, name, file, by_content, coverage, sections))
+                queue.append(pdf_job(store, name, file, by_content, coverage, sections, reader_for(extension)))
         queues.append(queue)
     if any(queues):
-        log.info(f"Extracting {sum(map(len, queues))} PDF(s): " + ', '.join(
+        log.info(f"Extracting {sum(map(len, queues))} document(s): " + ', '.join(
             f'{name} {len(q)}' for name, q in zip(names, queues)))
         run_jobs(queues, store.folder, client, progress=progress)
     coverage.sort(key=lambda r: (r['content'], r['page'] or 0, r['task']))  # independent of completion order
@@ -294,7 +294,7 @@ def situate_sources(store, client, names, files, by_content, sections, coverage)
     progress.close()
     return situations
 
-def pdf_job(store, source, file, by_content, coverage, sections):
+def pdf_job(store, source, file, by_content, coverage, sections, reader=None):
     def keep_sections(found):
         sections[file.content] = found
         store.record_sections(file.content, found)
@@ -313,7 +313,8 @@ def pdf_job(store, source, file, by_content, coverage, sections):
         by_content[file.content] = reconcile(evidence) if store.reconciles() and evidence else evidence
         coverage.extend(ledger)
         log.debug(f'Extracted {file.path}: {len(evidence)} claim(s)')
-    return Job(file.content, lambda: read_origin(store.origin(source, file.path)), store.record_task, keep_sections, done)
+    return Job(file.content, lambda: read_origin(store.origin(source, file.path)), store.record_task, keep_sections, done,
+               reader=reader)
 
 def shortcut_names(paths):
     """Source names from the paths' final components, made unique."""

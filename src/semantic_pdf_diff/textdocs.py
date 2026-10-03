@@ -1,0 +1,305 @@
+"""Plain text and Markdown documents (docs/plans/multi-format-adapters-2026-09-23.md, milestone 1).
+
+A text file is read as pages of lines: a form feed starts a page (as in RFCs), else the file is one page. Where a
+PDF task sits on a page in a box of points, a text task sits in lines: its box is (0, first line, 1, last line + 1),
+so sections, the context levers and the task core work unchanged, and its claims get a TextLocator.
+
+- **Blocks:** paragraphs between blank lines, kept as laid out (spacing intact: text written for a monospace font,
+  arrows and simple structures, reaches the model as written; the owner, 2026-10-03), Markdown pipe tables (read
+  row by row, as PDF tables are), and Markdown code blocks (kept whole).
+- **Sections:** Markdown headings; in plain text, numbered headings in the RFC style ("7.2.  Stream Concurrency");
+  failing those, fixed page ranges.
+- **Page furniture:** a line repeated near the top or bottom of three or more pages (an RFC's running header and
+  footer) is left out, as page furniture isn't content.
+- **Not read:** images a Markdown file links (recorded as skipped), and drawings made of characters as figures.
+"""
+import re
+from collections import Counter, defaultdict
+from dataclasses import dataclass, field
+
+from .models import DerivationStep, Section, TextLocator, coverage_row
+from .sections import SectionIndex
+from .tasks import TaskCore, split_utf8
+
+MD_HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
+SETEXT = re.compile(r"^(=+|-+)\s*$")
+# "7.2.  Stream Concurrency", "Appendix A.  Pseudocode" at the left margin (an RFC's body is indented)
+RFC_HEADING = re.compile(r"^((?:\d+|Appendix [A-Z]|[A-Z])(?:\.\d+)*)\.?\s{1,4}(\S.{0,90})$")
+FENCE = re.compile(r"^\s*(```|~~~)")
+TABLE_RULE = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)*\|?\s*$")
+IMAGE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
+
+DERIVATION = {
+    "text": [DerivationStep(step="text-file", detail="grouped paragraphs"), DerivationStep(step="model-extraction")],
+    "table": [DerivationStep(step="markdown-table", detail="row with its header"), DerivationStep(step="model-extraction")],
+}
+
+@dataclass
+class Block:
+    page: int
+    first: int          # lines, counted from 1 through the whole file
+    last: int
+    text: str
+    kind: str = "text"  # text, code or table
+    rows: list = field(default_factory=list)  # a table's rows of cells, its header first
+    row_lines: list = field(default_factory=list)
+
+    @property
+    def box(self):
+        return (0.0, float(self.first), 1.0, float(self.last + 1))
+
+@dataclass
+class TextDocument:
+    pages: int
+    lines: list         # [(page, text)] by line number - 1
+    blocks: list
+    headings: list      # [(page, line, level, title)]
+    images: list        # [(page, line, alt, target)]
+
+def _cells(line):
+    line = line.strip()
+    if line.startswith("|"):
+        line = line[1:]
+    if line.endswith("|"):
+        line = line[:-1]
+    return [c.strip() for c in line.split("|")]
+
+def furniture(lines):
+    """Line numbers of page furniture: a line, its digits aside, near the top or bottom of three or more pages."""
+    by_page = defaultdict(list)
+    for n, (page, text) in enumerate(lines, 1):
+        if text.strip():
+            by_page[page].append((n, text))
+    edges = defaultdict(set)
+    for page, rows in by_page.items():
+        for n, text in rows[:2] + rows[-2:]:
+            edges[re.sub(r"\d+", "#", " ".join(text.split()))].add((page, n))
+    return {n for spots in edges.values() if len({p for p, _ in spots}) >= 3 for _, n in spots}
+
+def parse(text, markdown):
+    """A text file as pages, lines, blocks, headings and linked images."""
+    lines, page = [], 1
+    for raw in text.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        while "\f" in raw:
+            before, _, raw = raw.partition("\f")
+            if before.strip():
+                lines.append((page, before.rstrip()))
+            page += 1
+        lines.append((page, raw.rstrip()))
+    skip = furniture(lines) if page >= 3 else set()
+    blocks, headings, images = [], [], []
+    current, fence = [], None
+
+    def close():
+        nonlocal current
+        if current:
+            n0, n1 = current[0][0], current[-1][0]
+            blocks.append(Block(lines[n0 - 1][0], n0, n1, "\n".join(t for _, t in current)))
+        current = []
+    n = 0
+    while n < len(lines):
+        n += 1
+        pg, line = lines[n - 1]
+        if n in skip:
+            close()
+            continue
+        if markdown and fence is not None:  # inside a code block: kept whole, as written
+            if FENCE.match(line):
+                blocks.append(Block(pg, fence[0], n, "\n".join(fence[1]), "code"))
+                fence = None
+            else:
+                fence[1].append(line)
+            continue
+        if markdown and FENCE.match(line):
+            close()
+            fence = (n, [])
+            continue
+        if not line.strip() or (current and lines[current[-1][0] - 1][0] != pg):
+            close()
+            if not line.strip():
+                continue
+        if markdown:
+            for alt, target in IMAGE.findall(line):
+                images.append((pg, n, alt, target))
+            heading = MD_HEADING.match(line)
+            nxt = lines[n][1] if n < len(lines) else ""
+            if heading or (line.strip() and not current and SETEXT.match(nxt) and "|" not in line):
+                close()
+                level, title = (len(heading.group(1)), heading.group(2)) if heading else (1 if nxt.startswith("=") else 2, line.strip())
+                headings.append((pg, n, level, title))
+                blocks.append(Block(pg, n, n, line.strip()))
+                if not heading:
+                    n += 1  # the underline
+                continue
+            if "|" in line and n < len(lines) and TABLE_RULE.match(lines[n][1]):
+                close()
+                rows, row_lines, first = [_cells(line)], [n], n
+                n += 1  # the rule
+                while n < len(lines) and "|" in lines[n][1] and lines[n][1].strip():
+                    n += 1
+                    rows.append(_cells(lines[n - 1][1]))
+                    row_lines.append(n)
+                blocks.append(Block(pg, first, n, "\n".join(lines[k - 1][1] for k in range(first, n + 1)), "table",
+                                    rows, row_lines))
+                continue
+        else:
+            heading = RFC_HEADING.match(line)
+            if heading and not current and not line[0].isspace():
+                close()
+                headings.append((pg, n, heading.group(1).count(".") + 1, " ".join(line.split())))
+                blocks.append(Block(pg, n, n, " ".join(line.split())))
+                continue
+        current.append((n, line))
+    close()
+    if fence is not None:  # an unclosed code block runs to the end
+        blocks.append(Block(lines[fence[0] - 1][0], fence[0], len(lines), "\n".join(fence[1]), "code"))
+    return TextDocument(page, lines, blocks, headings, images)
+
+def text_sections(doc, depth, pages_per_section):
+    """Sections from the headings down to `depth` levels (each with its heading path), else fixed page ranges.
+    Returns (sections, SectionIndex)."""
+    sections, path = [], []
+    for page, line, level, title in doc.headings:
+        path = path[:level - 1] + [title]
+        if level <= depth:
+            sections.append(Section(id=f"sec{len(sections) + 1}", first_page=page, last_page=page, first_y=float(line),
+                                    heading_path=list(path[:depth]), origin="headings"))
+    if not sections or sections[0].first_y > 1 or sections[0].first_page > 1:  # text before the first heading
+        sections.insert(0, Section(id="sec0", first_page=1, last_page=1, first_y=0.0, origin="headings" if sections
+                                   else "pages"))
+    if len(sections) == 1 and not doc.headings:  # no headings: page ranges
+        sections = [Section(id=f"sec{k + 1}", first_page=p, last_page=min(p + pages_per_section - 1, doc.pages),
+                            origin="pages") for k, p in enumerate(range(1, doc.pages + 1, pages_per_section))]
+    for k, sec in enumerate(sections):  # each ends where the next begins
+        nxt = sections[k + 1] if k + 1 < len(sections) else None
+        sections[k] = sec.model_copy(update={"last_page": nxt.first_page if nxt else doc.pages,
+                                             "last_y": nxt.first_y if nxt else None})
+    return sections, SectionIndex(sections)
+
+class TextReader:
+    """The context levers' reader for a text file (extract.Context's methods, in lines rather than points)."""
+
+    def __init__(self, doc, s):
+        self.doc, self.s = doc, s
+        self.by_page = defaultdict(list)
+        for b in doc.blocks:
+            self.by_page[b.page].append(b)
+        self.tables_on = {}
+
+    @staticmethod
+    def compose(lines):
+        from .context import CONTEXT_NOTE
+        lines = [line for line in lines if line]
+        return (CONTEXT_NOTE + "\n" + "\n".join(lines)) if lines else ""
+
+    def for_text(self, page_no, segments, text):
+        return self.compose(self.s.text_lines(self, page_no, segments, text))
+
+    def for_table(self, page_no, bbox, flat):
+        return self.compose(self.s.table_lines(self, page_no, self.table_top(page_no, bbox), flat))
+
+    @property
+    def pages(self):
+        return self.doc.pages
+
+    def page_blocks(self, page_no):
+        """The page's blocks in order: [(box, text)], the text's whitespace folded, as a PDF page's blocks are."""
+        return [(b.box, " ".join(b.text.split())) for b in self.by_page.get(page_no, [])]
+
+    def table_top(self, page_no, row_box):
+        for box in self.tables_on.get(page_no, ()):
+            if box[1] <= row_box[1] and row_box[3] <= box[3]:
+                return box
+        return row_box
+
+    def text_above(self, page_no, bbox):
+        """The text of the blocks above a box on its page."""
+        return " ".join(t for b, t in self.page_blocks(page_no) if b[3] <= bbox[1])
+
+    def stem_path(self, page_no, bbox):
+        """The headings a box sits under, every level ("7. Flow Control > 7.2. Stream Concurrency")."""
+        path = []
+        for page, line, level, title in self.doc.headings:
+            if (page, line) > (page_no, bbox[1]):
+                break
+            path = path[:level - 1] + [title]
+        return path
+
+    def cited(self, text):
+        return ""  # no glossary or figure captions read from text files yet
+
+def text_locator(page, bbox, region, task):
+    return TextLocator(page=page, lines=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region, task=task)
+
+def groups(blocks, text_bytes, section_of):
+    """A page's text and code blocks grouped up to the byte budget (oversized blocks split), never across a section
+    boundary: [(ids, [(box, text)])], ids like '3.0-5.0' naming the blocks, as text_groups names a PDF page's."""
+    pieces = []
+    for bi, block in enumerate(blocks):
+        if block.kind == "table":
+            continue
+        for ci, chunk in enumerate(split_utf8(block.text.strip("\n"), text_bytes)):
+            if chunk.strip():
+                pieces.append((f"{bi}.{ci}", block.box, chunk))
+    out, group, size = [], [], 0
+    for piece in pieces + [None]:
+        extra = len(piece[2].encode()) + 2 if piece else 0
+        if group and (piece is None or size + extra > text_bytes or section_of(piece[1]) != section_of(group[-1][1])):
+            ids = group[0][0] + (f"-{group[-1][0]}" if len(group) > 1 else "")
+            out.append((ids, [(b, t) for _, b, t in group]))
+            group, size = [], 0
+        if piece:
+            group.append(piece)
+            size += extra
+    return out
+
+def text_job(data, job, output, client, dispatch, progress, extension):
+    """Generator doing one text file's extraction, as extract's PDF job does a PDF's: yields "page" before each page,
+    then "waiting" while its requests are pending; job.state["result"] is set at the end."""
+    s = client.s
+    name = job.content
+    core = TaskCore(job, output, client, dispatch, progress, name, text_locator, DERIVATION)
+    raw = data if isinstance(data, (bytes, bytearray)) else open(data, "rb").read()
+    text = raw.decode("utf-8", errors="replace")
+    doc = parse(text, markdown=extension in (".md", ".markdown"))
+    if not doc.blocks:
+        core.record(coverage_row(content=job.content, task="open", status="failed", issues=[f"{name}: no text"]))
+        job.state["result"] = ([], core.coverage)
+        return
+    sections, index = text_sections(doc, s.section_depth, s.section_pages)
+    core.sections, core.reader = index, TextReader(doc, s)
+    if job.on_sections:
+        job.on_sections(sections)
+    signals = {}
+    for page in range(1, doc.pages + 1):
+        yield "page"
+        blocks = [b for b in doc.blocks if b.page == page]
+        for ids, segments in groups(blocks, s.text_bytes, lambda box, p=page: index.box(p, box).id):
+            core.text_task(page, segments, f"text:p{page}:{ids}")
+        tables = [b for b in blocks if b.kind == "table"]
+        core.reader.tables_on[page] = [b.box for b in tables]
+        for ti, table in enumerate(tables):
+            header, body = table.rows[0], table.rows[1:]
+            width = max(len(r) for r in table.rows)
+            for ri, row in enumerate(body):
+                if not any(c.strip() for c in row):
+                    continue
+                line = table.row_lines[ri + 1]
+                core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", header,
+                                row, list(range(width)))
+        for pg, line, alt, target in doc.images:
+            if pg == page:
+                core.record(coverage_row(content=job.content, page=page, bbox=[0.0, float(line), 1.0, float(line + 1)],
+                                         task=f"image:p{page}:{line}", status="skipped",
+                                         issues=[f"An image in a Markdown file isn't read: {alt or target}"]))
+        section = index[page].id
+        counts = Counter(numbers=sum(len(re.findall(r"\d", b.text)) > 0 for b in blocks), tables=len(tables),
+                         characters=sum(len(b.text) for b in blocks))
+        for key, value in counts.items():
+            signals.setdefault(section, {}).setdefault(key, 0)
+            signals[section][key] += value
+    if job.on_sections:
+        job.on_sections([x.model_copy(update={"signals": signals.get(x.id, {})}) for x in sections])
+    while job.state["pending"]:
+        yield "waiting"
+    job.state["result"] = core.result(lambda r: (r["page"] or 0, r["task"]))

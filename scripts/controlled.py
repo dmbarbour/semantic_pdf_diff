@@ -9,7 +9,8 @@
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
 is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
-(comparisons.json; revisions.py, comparison.py).
+(comparisons.json; revisions.py, comparison.py). The corpus is also written as Markdown (docs-md; representations.py),
+read and compared the same way, its runs and pairs named "<id>.md".
 """
 import argparse
 import contextlib
@@ -22,6 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 FOLDER = ROOT / "benchmarks/controlled"
 DOCS = FOLDER / "docs"
+DOCS_MD = FOLDER / "docs-md"  # the same projects as Markdown (representations.py)
 WORKING = FOLDER / "fixture.sqlite"   # recorded answers (git-ignored); packed into replay.zip
 PACKED = FOLDER / "replay.zip"
 RUNS = ROOT / "benchmarks/runs/controlled"
@@ -57,6 +59,9 @@ def main(argv=None):
     if args.command == "generate":
         for project in controlled.corpus(tuple(args.seed or (1,)), knobs=True, revisions=True):
             print(f"{controlled.write(project, DOCS)}: {len(project.facts)} facts")
+        from semantic_pdf_diff_lab.bench.controlled import representations
+        for project, lines in representations.corpus(tuple(args.seed or (1,))):
+            print(f"{representations.write(project, lines, DOCS_MD)}")
         return 0
     if args.command == "run":
         from semantic_pdf_diff import ledger, pipeline
@@ -75,8 +80,12 @@ def main(argv=None):
         setup_logging(quiet=True)
         # each document alone (the same PDF on both sides: extraction only), then each pair in revisions mode
         jobs = [(pdf, pdf, out / pdf.stem, pdf.stem, "proposals") for pdf in sorted(DOCS.glob("*.pdf"))]
+        jobs += [(md, md, out / md.name, md.name, "proposals") for md in sorted(DOCS_MD.glob("*.md"))]
         jobs += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", PAIR_RUNS / out.name / p.id, f"pair {p.id}",
                   "revisions") for p in revisions.pairs()]
+        jobs += [(DOCS_MD / f"{p.earlier}.md", DOCS_MD / f"{p.later}.md", PAIR_RUNS / out.name / f"{p.id}.md",
+                  f"pair {p.id}.md", "revisions") for p in revisions.pairs()
+                 if (DOCS_MD / f"{p.earlier}.md").exists() and (DOCS_MD / f"{p.later}.md").exists()]
         for a, b, folder, name, mode in jobs:
             options = pipeline.RunOptions(mode=mode, fixture=PACKED if args.replay else WORKING,
                                           fixture_mode="replay" if args.replay else "record-new", responder=args.responder)
@@ -107,7 +116,7 @@ def main(argv=None):
             for c in unit["claims"].values():
                 claims.setdefault(run, []).append({**c, "_family": family})
         for run, found in sorted(claims.items()):
-            key = json.loads((DOCS / f"{run}.key.json").read_text(encoding="utf-8"))
+            key = json.loads(key_path(run).read_text(encoding="utf-8"))
             result = controlled.score(key, found)
             readers = {f: controlled.score(key, [c for c in found if c["_family"] == f])
                        for f in sorted({c["_family"] for c in found})}
@@ -163,6 +172,17 @@ def main(argv=None):
             print(f"{which} {run}: recall {r['recall']} ({r['found']}/{r['facts']}, {r['found_right']} right) "
                   f"by form {r['recall_by_form']} by reader {r['by_reader']}; claims {r['claims']} {r['outcomes']}; "
                   f"conditions kept {r['conditions_kept']}")
+    for which, runs in results.items():  # each Markdown document beside its PDF
+        md = {run[:-3]: r for run, r in runs.items() if run.endswith(".md")}
+        if md:
+            print(f"\n{which} Markdown beside PDF: document                 facts  recall md / pdf   right md / pdf  "
+                  "misbound md / pdf  hallucinated md / pdf")
+            for doc, r in sorted(md.items()):
+                pdf = runs.get(doc, {})
+                o, po = r["outcomes"], pdf.get("outcomes", {})
+                print(f"  {doc:38s} {r['facts']:5d}  {r['recall']:6.3f} / {pdf.get('recall', float('nan')):5.3f}  "
+                      f"{r['found_right']:6d} / {pdf.get('found_right', 0):5d}  {o.get('misbound', 0):8d} / "
+                      f"{po.get('misbound', 0):6d}  {o.get('hallucinated', 0):12d} / {po.get('hallucinated', 0):6d}")
     compared = compare_pairs()
     for which, pairs in compared.items():
         print(f"\n{which} revision pairs: pair                         changes  added  removed  unchanged  false  "
@@ -177,17 +197,23 @@ def main(argv=None):
                   f"pairs {r['pairs']} (omitted {r['omitted']})")
     return 0
 
+def key_path(run):
+    """A run's key: a PDF's in docs, a Markdown's ("<id>.md") in docs-md."""
+    return DOCS_MD / f"{run[:-3]}.key.json" if run.endswith(".md") else DOCS / f"{run}.key.json"
+
 def compare_pairs():
-    """comparisons.json: each revision pair's comparison scored against the two revisions' keys."""
+    """comparisons.json: each revision pair's comparison scored against the two revisions' keys (PDF, and Markdown as
+    "<id>.md")."""
     from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
     compared = {}
     for which in ("recorded", "replay"):
         for pair in revisions.pairs():
-            report = PAIR_RUNS / which / pair.id / "report.json"
-            if report.exists():
-                keys = [json.loads((DOCS / f"{d}.key.json").read_text(encoding="utf-8")) for d in (pair.earlier, pair.later)]
-                compared.setdefault(which, {})[pair.id] = comparison.score_comparison(
-                    *keys, json.loads(report.read_text(encoding="utf-8")))
+            for suffix in ("", ".md"):
+                report = PAIR_RUNS / which / f"{pair.id}{suffix}" / "report.json"
+                if report.exists():
+                    keys = [json.loads(key_path(d + suffix).read_text(encoding="utf-8")) for d in (pair.earlier, pair.later)]
+                    compared.setdefault(which, {})[pair.id + suffix] = comparison.score_comparison(
+                        *keys, json.loads(report.read_text(encoding="utf-8")))
     (FOLDER / "comparisons.json").write_text(json.dumps(compared, indent=1) + "\n", encoding="utf-8")
     return compared
 

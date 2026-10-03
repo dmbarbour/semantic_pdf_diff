@@ -96,7 +96,7 @@ class CommandLine(unittest.TestCase):
             folder.mkdir()
             (folder / 'pump.pdf').write_bytes(pdf_bytes(f'Pump rated power {power} kW'))
             (folder / 'shared-rules.pdf').write_bytes(rules)
-            (folder / 'readme.md').write_text('# not yet supported')
+            (folder / 'readme.rtf').write_text('# not yet supported')
 
     def cli(self, *argv):
         out, err = io.StringIO(), io.StringIO()
@@ -125,7 +125,7 @@ class CommandLine(unittest.TestCase):
             self.source('add', 'team-b', '--path', self.root / 'team-b')
             code, _, err = self.cli('compare', '--store', self.store, 'team-a', 'team-b', '--base-url', url, '--no-vision')
             report = json.loads((self.store / 'report.json').read_text())
-            self.assertEqual(code, 2)  # --no-vision and the unsupported .md are incomplete
+            self.assertEqual(code, 2)  # --no-vision and the unsupported .rtf are incomplete
             self.assertEqual(len(report['shared']), 1)  # the identical rules PDF
             # The stub calls every pair equivalent; the numeric check vetoes each to uncertain.
             self.assertEqual({f['relation'] for f in report['findings']}, {'uncertain'})
@@ -134,8 +134,8 @@ class CommandLine(unittest.TestCase):
             self.assertTrue(any(report['shared'][0] in (f['a'], f['b']) for f in report['findings']))
             self.assertNotIn(report['shared'][0], [u['id'] for u in report['unmatched']])
             unsupported = [r for r in report['coverage'] if r['task'] == 'unsupported']
-            self.assertEqual(len(unsupported), 1)  # both readme.md files are the same content
-            self.assertEqual(unsupported[0]['issues'], ['No adapter for .md files yet'])
+            self.assertEqual(len(unsupported), 1)  # both readme.rtf files are the same content
+            self.assertEqual(unsupported[0]['issues'], ['No adapter for .rtf files yet'])
 
     def test_rescan_is_automatic_unless_configured(self):
         with model_server() as (url, state):
@@ -165,7 +165,7 @@ class CommandLine(unittest.TestCase):
         self.assertEqual(self.source('import', target, '--name', 'team-a-copy')[0], 0)
         self.assertEqual({f['content'] for f in json.loads(self.source('show', 'team-a-copy')[1])['files']},
                          {f['content'] for f in exported['files']})
-        (self.root / 'team-a' / 'readme.md').write_text('# changed')
+        (self.root / 'team-a' / 'readme.rtf').write_text('# changed')
         _, _, err = self.source('import', target, '--name', 'team-a-changed')
         self.assertIn("1 file(s) differ from the manifest's hashes", err)
 

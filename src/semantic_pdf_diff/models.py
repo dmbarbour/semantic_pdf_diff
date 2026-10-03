@@ -101,8 +101,22 @@ class PdfLocator(Strict):
     region: Literal["text", "table", "tile", "figure", "overview"]
     task: str
 
-# Other formats add their own locator shapes, discriminated by `format`.
-Locator = PdfLocator
+class TextLocator(Strict):
+    """Where a claim sits within a text file (.txt, .md): its page (a form feed starts one) and its lines, counted
+    from 1 through the file; never a path."""
+    format: Literal["text"] = "text"
+    page: int = Field(ge=1)
+    lines: tuple[int, int]
+    region: Literal["text", "table"]
+    task: str
+
+    @property
+    def bbox(self):
+        """Its lines as a box, (0, first, 1, last + 1): sections and the task core place text in lines as PDF in points."""
+        return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
+
+# Each format has its locator shape, told apart by `format`.
+Locator = Annotated[PdfLocator | TextLocator, Field(discriminator="format")]
 
 class Section(Strict):
     """A logical part of one piece of content: the unit of context, and later of scheduling."""
@@ -114,7 +128,7 @@ class Section(Strict):
     first_y: float = 0.0
     last_y: float | None = None        # None: to the bottom of last_page
     heading_path: list[str] = Field(default_factory=list)
-    origin: Literal["outline", "pages"]
+    origin: Literal["outline", "pages", "headings"]  # headings: a text file's (textdocs.py)
     # Cheap triage signals summed over the section's pages (numbers, units, requirement
     # words, tables, images, vector drawings, text characters); filled as pages are read.
     signals: dict[str, int] = Field(default_factory=dict)

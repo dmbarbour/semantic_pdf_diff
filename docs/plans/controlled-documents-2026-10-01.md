@@ -573,6 +573,7 @@ Each row is a situation met in this project's documents, with where it was recor
    - **Only what a format carries:**
      - a chart or schematic stays out of plain text rather than being drawn as text
      - the facts it holds are marked absent from that representation, not missed
+   - **Markdown, the first (2026-10-03):** `representations.py` writes the clean and trap documents and their revisions as Markdown (`docs-md`), 17 documents, scored by the same facts. Results are in the [adapters plan](multi-format-adapters-2026-09-23.md) (Progress): full recall, and no misbinding where the PDF schedules had 6–18.
 
 ## Open questions
 

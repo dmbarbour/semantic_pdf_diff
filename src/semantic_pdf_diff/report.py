@@ -21,7 +21,8 @@ def write_report(data, output, assets=None):
     def card(eid):
         e = evidence[eid]
         image = ('<a href="'+esc(link(e['image']))+'"><img loading="lazy" src="'+esc(link(e['image']))+'" alt="Source crop"></a>') if e.get('image') else ''
-        verified = {True: '<p>Quote found in PDF text layer.</p>',
+        verified = {True: '<p>Quote found in the file\'s text.</p>' if e['locator'].get('format') == 'text'
+                    else '<p>Quote found in PDF text layer.</p>',
                     False: '<p class="warning">Quote not found in the PDF text layer for this region; possible misread or raster-only label.</p>'
                     }.get(e.get('quote_verified'), '')
         loc = e['locator']
@@ -35,8 +36,10 @@ def write_report(data, output, assets=None):
         return f'''<section><h3>{esc(where(e['content']))}{heading} · page {loc['page']} · {esc(e['kind'])}</h3>
         <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
         <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}<blockquote>{esc(e['quote'])}</blockquote>{verified}{also}
-        <small>{esc(eid)} · {esc(loc['region'])} region, PDF bbox {esc(list(loc['bbox']))} · confidence {e['confidence']:.2f}</small>{image}</section>'''
+        <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>{image}</section>'''
     counts = Counter(f['relation'] for f in data['findings'])
+    place = lambda loc: (f"lines {loc['lines'][0]}–{loc['lines'][1]}" if loc.get('format') == 'text'
+                         else f"PDF bbox {list(loc['bbox'])}")
     issues = [r for r in data['coverage'] if r['status'] != 'complete']
     rows = []
     for f in data['findings']:

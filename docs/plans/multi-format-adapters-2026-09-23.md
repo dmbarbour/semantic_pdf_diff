@@ -1,6 +1,6 @@
 # Multi-format source adapters
 
-- **Status:** Planned. Format priority (2026-09-23): PDF, then `.docx` and `.pptx`; Cameo models via a separate project.
+- **Status:** Active (2026-10-03): milestone 1 (`.txt`/`.md` and a shared task core) done; next, `.docx`. Format priority (2026-09-23): PDF, then `.docx` and `.pptx`; Cameo models via a separate project.
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (locators, sections, store)
 
 ## Goal
@@ -133,7 +133,10 @@ Written when the work began. The owner (2026-10-02), on the readers' value beyon
    - **Text tasks:** paragraphs (blank-line separated) grouped up to `text_bytes`, as PDF blocks are.
    - **Table tasks:** Markdown pipe tables, as PDF table rows are (header and row).
    - **Quotes:** checked against the source text exactly.
-   - **No image tasks.** An image a Markdown file links is recorded as not read; plain-text drawings (ASCII art) aren't read as figures (the owner, 2026-10-02).
+   - **No image tasks.** An image a Markdown file links is recorded as not read.
+   - **Text laid out for a monospace font:**
+     - **Kept as text, its spacing intact:** code blocks, and blocks indented as RFC figures are. Arrows ("A -> B") and simple structures reach the model as written.
+     - **No reader for drawings made of characters.** The owner may lift that restriction later (Decisions).
    - **Context levers through a text reader** with the same methods as `extract.Context`, answering in lines rather than boxes:
      - neighbouring text
      - the text above a table
@@ -151,14 +154,53 @@ Written when the work began. The owner (2026-10-02), on the readers' value beyon
    - scored by the same keys, so the reader is exact-scored before any real document is read
    - then the revision pairs in Markdown, and the QUIC drafts as a first real revision series
 
-**Questions for the owner:**
+**Questions for the owner** (answered 2026-10-03; see Decisions):
 1. **Locators:** a `TextLocator` beside `PdfLocator`, and text excerpts in reports. (Proposed: yes.)
 2. **Regions and prompts:** text formats' tasks named "text" and "table" as PDF's are, so a paragraph asks what a PDF paragraph asks. The alternative is new region names per format, which would make every format's prompts different. (Proposed: the same names.)
 3. **The shared task core:** a refactor of the PDF job, kept byte-identical, rather than a text reader that copies its task handling. (Proposed: the shared core.)
 
 ## Decisions (2026-09-23)
 
+- **Milestone 1's design (2026-10-03).** The owner: "I agree with all three recommendations": a `TextLocator` beside `PdfLocator` with text excerpts in reports; text formats' tasks named "text" and "table" as PDF's are; a shared task core, the PDF job refactored byte-identically.
+- **Text laid out for a monospace font (2026-10-03).** The owner: "I would add caution on recognizing ASCII art. We should still recognize simple arrows and such. And it may be we want to recognize some graph-like structures written with the expectation of monospace. I might end up rolling back the restriction on recognizing ASCII art, but I won't prioritize it." Claude's reading:
+  - such text is sent as text with its spacing kept, so arrows and simple structures are read
+  - no dedicated reader for drawings made of characters for now
 - **Spreadsheet claims are marked by provenance, not trust.** A claim read directly from cells is *more direct* than one a model extracted from prose or a chart, and its derivation says so (see *Derivation* in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md)). Directness is not reliability. A spreadsheet still raises questions: is our interpretation of the columns right (and if a model interpreted the headers, that is itself a model step in the derivation)? Is a value a measurement, a projection, a requirement or wishful thinking? Are uncertainties given? Those are judged like any other claim (see *Epistemic status* in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md)), not assumed away.
+
+## Progress
+
+- **Milestone 1, a shared task core and `.txt`/`.md` (2026-10-03): done.**
+  - **The task core** (`tasks.py`) does what every reader does with a task:
+    - the request, quote checks, evidence and coverage rows
+    - repeated blocks
+    - text and table tasks with their refinement
+  - **The PDF job** (`extract.py`) keeps pages, blocks, table detection and image tasks.
+  - **Byte for byte:** a query snapshot of every slice under three profiles matched before and after, 10,208 queries, none changed.
+  - **The text reader** (`textdocs.py`), chosen by extension:
+    - pages by form feed
+    - sections from Markdown or RFC-style numbered headings
+    - paragraphs kept as laid out, pipe tables row by row
+    - page furniture (a line repeated near the edges of three or more pages) left out
+    - linked images recorded as not read
+    - context levers through a line-based reader, claims located by `TextLocator` (page and lines)
+    - The report shows "lines 5–5" where a PDF claim shows its box.
+  - **Measured on the controlled corpus written as Markdown** (17 documents: the clean and trap documents and their revisions; charts, schematics and sheets left out, their facts marked absent):
+
+    | | Markdown | PDF |
+    |---|---|---|
+    | Recall, every document | 1.000 | 1.000 |
+    | Misbound claims, `wtp-tables-s1-clean` | 0 | 6 |
+    | Misbound claims, `coaster-tables-s1-clean` | 0 | 18 |
+    | Misbound claims, the energy studies | 0 | 5–9 |
+
+    - The schedules' misbinding in PDF came from layout (the text layer's column shifts, the image reader's row names), not from the tables' content.
+  - **The Markdown revision pairs** (9) found every change, addition and removal with no false change, and judged 0–6 pairs each. The PDF pairs judged 4–24.
+  - **Alignment fixes Markdown found** (the revision comparison plan):
+    - a condition moved between attribute and conditions ("95th percentile")
+    - "number of inversions" against "inversion count"
+    - a new value beside a superseded one ("raised from 178 ft to 230 ft")
+  - **Cost:** $0.066 to read the Markdown corpus and compare its pairs.
+  - **Not yet:** situating (figures and "about" statements) for text files; RFC furniture other than repeated lines; the QUIC drafts (the revision comparison plan's milestone 3).
 
 ## Open questions
 

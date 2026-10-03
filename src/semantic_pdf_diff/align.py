@@ -53,12 +53,15 @@ class Correspondence:
     groups: list = field(default_factory=list)
     regrouped: tuple = ((), ())
 
+SAME = {"number": "count", "quantity": "count", "qty": "count", "no": "count"}  # "number of inversions", "inversion count"
+
 def words(text):
-    """A name's words: case-folded, stop words dropped, plurals folded."""
+    """A name's words: case-folded, stop words dropped, plurals and a few synonyms folded."""
     out = set()
     for w in re.findall(r"[a-z0-9]+", str(text).casefold()):
         if w not in STOP:
-            out.add(w[:-1] if len(w) > 3 and w.endswith("s") and not w.endswith("ss") else w)
+            w = w[:-1] if len(w) > 3 and w.endswith("s") and not w.endswith("ss") else w
+            out.add(SAME.get(w, w))
     return frozenset(out)
 
 def identifiers(name):
@@ -209,13 +212,24 @@ def _conditions(x, y):
     a, b = words(x.conditions), words(y.conditions)
     return 1.0 if not a and not b else jaccard(a, b)
 
+def _conflict(x, y):
+    """Two readings name different identifiers, wherever they put them: "turbidity, 95th percentile" against
+    "99th percentile turbidity" (a reader may move a condition into the attribute)."""
+    ia = identifiers(words(x.attribute) | words(x.conditions))
+    ib = identifiers(words(y.attribute) | words(y.conditions))
+    return bool(ia and ib and ia != ib)
+
+def _one_property(side, claims):
+    """Whether a value's readings in an item all name one property (each pair fits): then the value identifies it."""
+    return all(fits(side.claims[i], side.claims[j]) for i in claims for j in claims if i < j)
+
 def _within(a, b, ia, ib, settle):
     """Claim pairs within two corresponding items. Claims of one value (the same value under a fitting attribute)
     are a group: readers phrase conditions differently ("Door Schedule", "face of finish"), so a group is unchanged
     when any of its readings agree on conditions across the revisions, and is settled (if settle) with one pair per
     claim; a group with none agreeing goes to the judge (its conditions may have changed). The rest pair by
     attribute and conditions, best first, for the judge. Returns (to judge, settled)."""
-    judge, settled, done_a, done_b = [], [], set(), set()
+    judge, settled, done_a, done_b, unsure_a, unsure_b = [], [], set(), set(), set(), set()
     groups = defaultdict(lambda: ([], []))
     for i in ia:
         if a.values[i] is not None:
@@ -224,12 +238,16 @@ def _within(a, b, ia, ib, settle):
         if b.values[j] is not None and b.values[j] in groups:
             groups[b.values[j]][1].append(j)
     for value, (ga, gb) in sorted(groups.items(), key=lambda x: str(x[0])):
-        # a tag as the value ("D103") points at one thing, whatever the attribute calls the pointing
+        # a tag as the value ("D103") points at one thing, whatever the attribute calls the pointing; so does a value
+        # each item holds under one property only ("number of inversions", "inversion count")
         pairs = [(i, j) for i in ga for j in gb if value[0] == "id" or fits(a.claims[i], b.claims[j])]
+        if not pairs and _one_property(a, ga) and _one_property(b, gb):
+            pairs = [(i, j) for i in ga for j in gb]
         if not pairs:
             continue
         ranked = sorted(pairs, key=lambda p: (-_conditions(a.claims[p[0]], b.claims[p[1]]), p))
-        agreed = settle and _conditions(a.claims[ranked[0][0]], b.claims[ranked[0][1]]) >= 0.5
+        best = (a.claims[ranked[0][0]], b.claims[ranked[0][1]])
+        agreed = settle and _conditions(*best) >= 0.5 and not any(_conflict(a.claims[i], b.claims[j]) for i, j in pairs)
         covered_a, covered_b = set(), set()
         for i, j in ranked:  # one pair per claim, best conditions first
             if i in covered_a and j in covered_b:
@@ -239,12 +257,23 @@ def _within(a, b, ia, ib, settle):
             covered_b.add(j)
         done_a |= covered_a
         done_b |= covered_b
+        if not agreed:  # judged, not settled: still open to a leftover reading
+            unsure_a |= covered_a
+            unsure_b |= covered_b
     similarity = lambda i, j: (jaccard(attribute(a.claims[i]), attribute(b.claims[j]))
                                + 0.5 * jaccard(words(a.claims[i].conditions), words(b.claims[j].conditions)))
     named = lambda i, j: jaccard(attribute(a.claims[i]), attribute(b.claims[j])) > 0  # unnamed: only by value
     best_a, best_b = {}, {}
-    for s, i, j in sorted(((similarity(i, j), i, j) for i in ia if i not in done_a for j in ib if j not in done_b
-                           if named(i, j)), key=lambda x: (-x[0], x[1], x[2])):
+    # each reading left over pairs with its best partner, left over too or in a value group sent to the judge: a later
+    # revision may print the superseded value beside the new one ("raised from 178 ft to 230 ft"), and the old
+    # reading paired with the old value under other conditions
+    free_a = lambda i: i not in done_a or i in unsure_a
+    free_b = lambda j: j not in done_b or j in unsure_b
+    same = lambda i, j: words(a.claims[i].attribute) == words(b.claims[j].attribute)  # with a judged reading: only
+    candidates = [(similarity(i, j), i, j) for i in ia for j in ib if (i not in done_a or j not in done_b)
+                  and free_a(i) and free_b(j) and named(i, j) and (a.values[i] is None or a.values[i] != b.values[j])
+                  and ((i not in done_a and j not in done_b) or same(i, j))]
+    for s, i, j in sorted(candidates, key=lambda x: (-x[0], x[1], x[2])):
         if s < PAIRING:
             break
         # each claim with its best partners (ties kept: two readings of a changed value both pair)

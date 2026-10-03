@@ -91,6 +91,27 @@ class Alignment(unittest.TestCase):
         self.assertEqual(pairs(found, left, right), {(("raw water", "95th percentile turbidity", "37.6"),
                                                        ("raw water", "99th percentile turbidity", "37.6"))})
 
+    def test_a_condition_moved_between_attribute_and_conditions_is_still_seen(self):
+        left = [claim("raw water", "turbidity", "37.6", "NTU", "95th percentile, measured over five years")]
+        right = [claim("raw water", "99th percentile turbidity", "37.6", "NTU", "measured over five years")]
+        found = align.align(left, right)
+        self.assertEqual((found.settled, len(found.judge)), ([], 1))
+
+    def test_the_new_value_is_judged_beside_a_superseded_one(self):
+        # the later revision says "raised from 178 ft to 230 ft": the old height read twice, the new once
+        left = [claim("lift hill", "height", "178", "ft"), claim("lift hill", "drop", "237", "ft")]
+        right = [claim("lift hill", "height", "230", "ft", "revision B"), claim("lift hill", "drop", "237", "ft"),
+                 claim("lift hill", "height", "178", "ft", "revision A (implied by 'raised from')")]
+        found = align.align(left, right)
+        self.assertIn((("lift hill", "height", "178"), ("lift hill", "height", "230")), pairs(found, left, right))
+
+    def test_a_count_by_any_name_pairs_by_its_value(self):
+        left = [claim("Ridgeback roller coaster", "number of inversions", "5"), claim("Ridgeback roller coaster",
+                                                                                     "track length", "6,694", "ft")]
+        right = [claim("Ridgeback", "inversion count", "5"), claim("Ridgeback", "track length", "6,694", "ft")]
+        found = align.align(left, right)
+        self.assertEqual((len(found.settled), found.judge), (2, []))
+
     def test_a_renamed_item_is_matched_by_its_values_and_listed(self):
         left = [claim("P-101B", "capacity", "5,590", "gpm"), claim("P-101B", "head", "64.9", "ft"),
                 claim("P-101A", "capacity", "5,151", "gpm")]
