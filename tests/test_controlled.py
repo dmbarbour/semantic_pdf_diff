@@ -377,7 +377,11 @@ class Revisions(unittest.TestCase):
                     # the knobs for alignment: a rename and a reorder change no fact; a split is four facts gone,
                     # eight new
                     "wtp-tables-s1-clean-renamed": (0, 0, 0, 0), "wtp-tables-s1-clean-reordered": (0, 0, 0, 0),
-                    "wtp-s1-conditions": (0, 0, 0, 2), "wtp-tables-s1-clean-split": (0, 8, 4, 0)}
+                    "wtp-s1-conditions": (0, 0, 0, 2), "wtp-tables-s1-clean-split": (0, 8, 4, 0),
+                    # the knobs from the "why different" pass's misses: rewording and renumbering change no fact; a
+                    # list member replaced is one gone and one new; a lead-in renamed changes two values' conditions
+                    "wtp-s1-reworded": (0, 0, 0, 0), "spec-s1": (3, 0, 0, 0), "spec-s1-members": (0, 2, 1, 0),
+                    "spec-s1-renumbered": (0, 1, 0, 0), "spec-s1-context": (0, 0, 0, 2)}
         bases = {p.id: p for p in controlled.corpus(knobs=True)}
         made = revisions.revised()
         self.assertEqual([pair for pair, _ in made], revisions.pairs())

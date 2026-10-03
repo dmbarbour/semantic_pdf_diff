@@ -7,6 +7,7 @@
     python scripts/controlled.py score                       # results.json from the runs' stores, offline
     python scripts/controlled.py run --replay                # read again from the packed fixture, offline
     python scripts/controlled.py run --unaligned             # the PDF pairs only, alignment off (see below)
+    python scripts/controlled.py pack                        # replay.zip: the answers the standard runs replay
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
 is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
@@ -16,6 +17,10 @@ read and compared the same way, its runs and pairs named "<id>.md"; and as Word 
 With --unaligned the PDF pairs are compared again with alignment off (into "<recorded or replay>-unaligned"): every
 retrieval candidate is judged, as before alignment, so most "different" findings aren't changes, and the
 explanations (compare.explain) are measured where non-changes abound.
+
+Recording adds to the working fixture (fixture.sqlite, git-ignored), which keeps every answer ever recorded. `pack`
+writes the committed replay.zip: the standard runs are replayed from fresh stores against a copy of the fixture, and
+only the answers they use are packed (the --unaligned runs' answers and superseded ones stay local).
 """
 import argparse
 import contextlib
@@ -53,13 +58,14 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate", help="write the corpus's PDFs and answer keys")
     gen.add_argument("--seed", type=int, action="append", help="default: 1")
-    run = sub.add_parser("run", help="extract every document and compare every revision pair (recorded; answers "
-                                     "already recorded are free)")
-    run.add_argument("--replay", action="store_true", help="from the packed fixture, without calling a model")
-    run.add_argument("--responder", help="default: the configured model")
-    run.add_argument("--max-cost", type=float, default=0.2)
-    run.add_argument("--unaligned", action="store_true", help="only the PDF pairs, compared with alignment off")
+    running = sub.add_parser("run", help="extract every document and compare every revision pair (recorded; "
+                                         "answers already recorded are free)")
+    running.add_argument("--replay", action="store_true", help="from the packed fixture, without calling a model")
+    running.add_argument("--responder", help="default: the configured model")
+    running.add_argument("--max-cost", type=float, default=0.2)
+    running.add_argument("--unaligned", action="store_true", help="only the PDF pairs, compared with alignment off")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
+    sub.add_parser("pack", help="pack the answers the standard runs replay into replay.zip (offline)")
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.bench import controlled
     from semantic_pdf_diff import fixtures
@@ -72,54 +78,90 @@ def main(argv=None):
             print(f"{representations.write_docx(project, lines, DOCS_DOCX)}")
         return 0
     if args.command == "run":
-        from semantic_pdf_diff import ledger, pipeline
-        from semantic_pdf_diff.progress import setup_logging
-        out = RUNS / ("replay" if args.replay else "recorded")
-        if args.replay and not args.responder:  # the responder the fixture holds, whatever the environment says
-            with fixtures.open(PACKED, "read") as f:
-                held = [r for (r,) in f.db.execute("SELECT DISTINCT responder FROM response")]
-            if len(held) != 1:
-                parser.error(f"the fixture holds {held}: name one with --responder")
-            args.responder = held[0]
-        from semantic_pdf_diff_lab.bench.controlled import revisions
-        config = settings_file()
-        before = ledger.spent(LEDGER, round="controlled") if LEDGER.exists() else 0.0
-        worst = 0
-        setup_logging(quiet=True)
-        # each document alone (the same PDF on both sides: extraction only), then each pair in revisions mode
-        jobs = [(pdf, pdf, out / pdf.stem, pdf.stem, "proposals") for pdf in sorted(DOCS.glob("*.pdf"))]
-        jobs += [(md, md, out / md.name, md.name, "proposals") for md in sorted(DOCS_MD.glob("*.md"))]
-        jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(DOCS_DOCX.glob("*.docx"))]
-        jobs += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", PAIR_RUNS / out.name / p.id, f"pair {p.id}",
-                  "revisions") for p in revisions.pairs()]
-        for folder, suffix in ((DOCS_MD, ".md"), (DOCS_DOCX, ".docx")):
-            jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}", PAIR_RUNS / out.name / f"{p.id}{suffix}",
-                      f"pair {p.id}{suffix}", "revisions") for p in revisions.pairs()
-                     if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
-        overrides = {}
-        if args.unaligned:
-            jobs = [(a, b, PAIR_RUNS / f"{out.name}-unaligned" / folder.name, name + " unaligned", mode)
-                    for a, b, folder, name, mode in jobs if mode == "revisions" and a.suffix == ".pdf"]
-            overrides = {"align": False}
-        for a, b, folder, name, mode in jobs:
-            options = pipeline.RunOptions(mode=mode, fixture=PACKED if args.replay else WORKING,
-                                          fixture_mode="replay" if args.replay else "record-new", responder=args.responder)
-            if args.replay:
-                settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL, **overrides)
-            else:
-                left = args.max_cost - (ledger.spent(LEDGER, round="controlled") - before)
-                if left <= 0:
-                    print(f"cap of ${args.max_cost} reached")
-                    return 3
-                settings = pipeline.settings_from(config, situate=False, max_cost=round(left, 4), **overrides)
-                options.ledger, options.ledger_tags = LEDGER, {"round": "controlled", "run": name.replace(" ", "-")}
-            code = pipeline.attempt(pipeline.compare_paths, a, b, folder, settings, options)
-            print(f"{name}: exit {code}", flush=True)
-            worst = max(worst, code)
-        if not args.replay:
-            fixtures.pack(WORKING, PACKED)
-            print(f"packed {PACKED}; spent ${ledger.spent(LEDGER, round='controlled') - before:.3f}")
-        return worst
+        return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error)
+    if args.command == "pack":
+        return pack()
+    return score()
+
+def pack():
+    """replay.zip from the working fixture: the standard runs replayed from fresh stores against a copy, which marks
+    the answers they use, and only those packed."""
+    import shutil
+    import tempfile
+    from datetime import datetime, timezone
+    from semantic_pdf_diff import fixtures
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        copy = d / "fixture.sqlite"
+        shutil.copy(WORKING, copy)
+        start = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        with contextlib.redirect_stdout(io.StringIO()):
+            code = run(True, None, 0, False, fixture=copy, runs=d / "runs", pair_runs=d / "pairs")
+        if code not in (0, 2):
+            print(f"the replay failed (exit {code}): nothing packed")
+            return code
+        with fixtures.open(copy, "record") as f:
+            dropped = f.prune(start, force=True)["answers_removed"]
+        fixtures.pack(copy, PACKED)
+    print(f"packed {PACKED}: {dropped} answers the standard runs don't use left out")
+    return 0
+
+def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=RUNS, pair_runs=PAIR_RUNS):
+    """Every document read alone, then every revision pair compared: recorded into the working fixture, or replayed
+    (from replay.zip, or `fixture`) into fresh or existing stores under runs and pair_runs."""
+    from semantic_pdf_diff import fixtures, ledger, pipeline
+    from semantic_pdf_diff.progress import setup_logging
+    fixture = fixture or (PACKED if replay else WORKING)
+    out = runs / ("replay" if replay else "recorded")
+    if replay and not responder:  # the responder the fixture holds, whatever the environment says
+        with fixtures.open(fixture, "read") as f:
+            held = [r for (r,) in f.db.execute("SELECT DISTINCT responder FROM response")]
+        if len(held) != 1:
+            (error or print)(f"the fixture holds {held}: name one with --responder")
+            return 1
+        responder = held[0]
+    from semantic_pdf_diff_lab.bench.controlled import revisions
+    config = settings_file()
+    before = ledger.spent(LEDGER, round="controlled") if LEDGER.exists() else 0.0
+    worst = 0
+    setup_logging(quiet=True)
+    # each document alone (the same PDF on both sides: extraction only), then each pair in revisions mode
+    jobs = [(pdf, pdf, out / pdf.stem, pdf.stem, "proposals") for pdf in sorted(DOCS.glob("*.pdf"))]
+    jobs += [(md, md, out / md.name, md.name, "proposals") for md in sorted(DOCS_MD.glob("*.md"))]
+    jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(DOCS_DOCX.glob("*.docx"))]
+    jobs += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", pair_runs / out.name / p.id, f"pair {p.id}",
+              "revisions") for p in revisions.pairs()]
+    for folder, suffix in ((DOCS_MD, ".md"), (DOCS_DOCX, ".docx")):
+        jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}", pair_runs / out.name / f"{p.id}{suffix}",
+                  f"pair {p.id}{suffix}", "revisions") for p in revisions.pairs()
+                 if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
+    overrides = {}
+    if unaligned:
+        jobs = [(a, b, pair_runs / f"{out.name}-unaligned" / folder.name, name + " unaligned", mode)
+                for a, b, folder, name, mode in jobs if mode == "revisions" and a.suffix == ".pdf"]
+        overrides = {"align": False}
+    for a, b, folder, name, mode in jobs:
+        options = pipeline.RunOptions(mode=mode, fixture=fixture,
+                                      fixture_mode="replay" if replay else "record-new", responder=responder)
+        if replay:
+            settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL, **overrides)
+        else:
+            left = max_cost - (ledger.spent(LEDGER, round="controlled") - before)
+            if left <= 0:
+                print(f"cap of ${max_cost} reached")
+                return 3
+            settings = pipeline.settings_from(config, situate=False, max_cost=round(left, 4), **overrides)
+            options.ledger, options.ledger_tags = LEDGER, {"round": "controlled", "run": name.replace(" ", "-")}
+        code = pipeline.attempt(pipeline.compare_paths, a, b, folder, settings, options)
+        print(f"{name}: exit {code}", flush=True)
+        worst = max(worst, code)
+    if not replay:
+        print(f"spent ${ledger.spent(LEDGER, round='controlled') - before:.3f}; run `pack` before committing")
+    return worst
+
+def score():
+    """results.json and comparisons.json from the runs' stores, with tables printed."""
+    from semantic_pdf_diff_lab.bench import controlled
     from semantic_pdf_diff_lab.eval import rounds
     results = {}
     for which in ("recorded", "replay"):

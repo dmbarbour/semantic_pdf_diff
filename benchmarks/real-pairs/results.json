@@ -33,14 +33,14 @@
     "unaligned in unchanged text": 99
    },
    "explained": {
-    "changed in changed text": 5,
-    "conditions in changed text": 3,
-    "conditions in unchanged text": 2,
-    "misread in unchanged text": 1,
-    "not_same_item in changed text": 25,
+    "changed in changed text": 4,
+    "conditions in changed text": 2,
+    "conditions in unchanged text": 3,
+    "misread in unchanged text": 2,
+    "not_same_item in changed text": 26,
     "not_same_item in unchanged text": 14,
-    "restated in changed text": 5,
-    "restated in unchanged text": 6,
+    "restated in changed text": 6,
+    "restated in unchanged text": 4,
     "split_or_merge in changed text": 3,
     "split_or_merge in unchanged text": 1
    },
@@ -81,8 +81,8 @@
        ]
       },
       "rationale": "The entity and attribute are the same, but the units are incompatible (bytes vs bits) for the same value (8..).",
-      "kind": "restated",
-      "why": "The quotes for A and B are identical ('Packet Payload (8..)'), meaning the source text did not change. The difference is solely in the units assigned by the reader (bytes vs bits), which constitutes a"
+      "kind": "misread",
+      "why": "The quotes for A and B are identical ('Packet Payload (8..)'), but the claims assign different units (bytes vs bits). Since the source text is the same, one of the claims must have misread the unit as"
      },
      {
       "a": {
@@ -136,7 +136,7 @@
       },
       "rationale": "Claim A specifies the size of the 'Length field' (the field that stores the length value) as 8 bits, whereas Claim B specifies the actual 'length' of the Connection ID itself as 0..160 bits. These are",
       "kind": "not_same_item",
-      "why": "Claim A refers to the size of the field that stores the length value ('Destination Connection ID Length field size'), while Claim B refers to the actual length of the Connection ID data itself ('Desti"
+      "why": "Claim A refers to the size of the field that stores the length value (8 bits), while Claim B refers to the actual length of the Connection ID data (0..160 bits). The provided context shows that both t"
      },
      {
       "a": {
@@ -163,7 +163,7 @@
       },
       "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable length range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet.",
       "kind": "not_same_item",
-      "why": "Claim A refers to the length of the 'Source Connection ID Length' field (a fixed 8-bit field used to specify the length of the ID), whereas Claim B refers to the length of the 'Source Connection ID' i"
+      "why": "Claim A refers to the length of the 'Source Connection ID Length' field (fixed at 8 bits), whereas Claim B refers to the length of the 'Source Connection ID' itself (variable 0..2040 bits). Both the f"
      },
      {
       "a": {
@@ -190,7 +190,7 @@
       },
       "rationale": "Claim A allows for two options (generate a connection error OR fully revert changes), whereas Claim B mandates only one specific action (MUST generate a connection error), removing the alternative of ",
       "kind": "split_or_merge",
-      "why": "Claim A in the earlier revision combined two requirements (generate a connection error OR fully revert changes) into one statement. In the later revision, these were split into two separate claims: Cl"
+      "why": "Claim A combined two requirements (generate error OR revert changes) into one statement. In the later revision, these were split into two separate claims: Claim B (generate error) and a separate state"
      },
      {
       "a": {
@@ -217,7 +217,7 @@
       },
       "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a variable length of 0..160 bits for the 'Destination Connection ID' itself. Whil",
       "kind": "not_same_item",
-      "why": "Claim A refers to the 'Destination Connection ID Length' field (a length indicator), while Claim B refers to the 'Destination Connection ID' field itself. The context lists show that both the length f"
+      "why": "Claim A refers to the 'Destination Connection ID Length' field (a length indicator), while Claim B refers to the 'Destination Connection ID' field itself. Both fields are present in both revisions, as"
      },
      {
       "a": {
@@ -244,7 +244,7 @@
       },
       "rationale": "Claim A specifies the size of the 'Length field' as 8 bits, whereas Claim B specifies the length of the 'Source Connection ID' itself as 0..160 bits. While they refer to the same entity, the attribute",
       "kind": "not_same_item",
-      "why": "Claim A refers to the size of the 'Length field' (the metadata field that stores the length), while Claim B refers to the length of the 'Source Connection ID' itself (the actual data). These are two d"
+      "why": "Claim A refers to the size of the 'Length field' (the metadata field that stores the length), while Claim B refers to the length of the 'Source Connection ID' itself (the actual data). The context lis"
      },
      {
       "a": {
@@ -271,7 +271,7 @@
       },
       "rationale": "Claim A specifies a fixed length of 8 bits for the 'Source Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Source Connection ID' itself. While they refer to the ",
       "kind": "not_same_item",
-      "why": "Claim A refers to the length of the 'Source Connection ID Length' field (a metadata field), while Claim B refers to the length of the 'Source Connection ID' itself (the actual identifier). The context"
+      "why": "Claim A refers to the length of the 'Source Connection ID Length' field (a metadata field), while Claim B refers to the length of the 'Source Connection ID' itself (the actual identifier). Both proper"
      },
      {
       "a": {
@@ -298,7 +298,7 @@
       },
       "rationale": "Claim A defines failure as receiving a non-zero ECN count for an ECT codepoint that was never applied. Claim B defines failure based on a mathematical inequality between the sum of ECT(1) and ECN-CE c",
       "kind": "not_same_item",
-      "why": "Both A and B are members of a list of failure conditions for ECN validation. The context lists show that the condition described in B was already present in the earlier revision, and the condition des"
+      "why": "Claim A and Claim B describe two different failure conditions for ECN validation. The provided context shows that in the earlier revision, the value for Claim B was already present alongside other con"
      },
      {
       "a": {
@@ -325,7 +325,7 @@
       },
       "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Destination Connection ID' itself. While they ref",
       "kind": "not_same_item",
-      "why": "Claim A refers to the length of the 'Destination Connection ID Length' field (a metadata field), while Claim B refers to the length of the 'Destination Connection ID' itself. The context lists show th"
+      "why": "Claim A refers to the length of the 'Destination Connection ID Length' field (a metadata field of 8 bits), while Claim B refers to the length of the 'Destination Connection ID' itself (the actual ID, "
      },
      {
       "a": {
@@ -352,7 +352,7 @@
       },
       "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet.",
       "kind": "not_same_item",
-      "why": "Claim A refers to the length of the 'Destination Connection ID Length' field (a metadata field specifying the length), while Claim B refers to the length of the 'Destination Connection ID' itself (the"
+      "why": "Claim A refers to the length of the 'Destination Connection ID Length' field (the field that specifies the length), while Claim B refers to the length of the 'Destination Connection ID' itself (the ac"
      },
      {
       "a": {
@@ -379,7 +379,7 @@
       },
       "rationale": "Claims A and B specify the same value (0..160) for the same attribute, but use incompatible units: bytes versus bits.",
       "kind": "misread",
-      "why": "The quotes for A and B are identical ('Destination Connection ID (0..160)'), but the claims assign different units (bytes vs bits). Since the source text is the same, the difference is a result of how"
+      "why": "The quotes for A and B are identical ('Destination Connection ID (0..160)'), but the claims assign different units (bytes vs bits). Since the source text is the same, one of the claims must have misre"
      },
      {
       "a": {
@@ -406,7 +406,7 @@
       },
       "rationale": "Claim A defines 'final size' as the amount of flow control credit consumed, whereas Claim B defines it as the offset of the largest byte sent plus one. These are distinct engineering definitions for t",
       "kind": "not_same_item",
-      "why": "Claim A is a high-level definition of 'final size' as flow control credit consumption, while Claim B is a specific calculation for the 'final size' value in the general case. The context lists show th"
+      "why": "Claim A is a high-level definition of 'final size' as flow control credit consumption. Claim B is a specific calculation for the 'general case' of final size. The earlier revision contains both the ge"
      }
     ],
     "unseen": [
@@ -602,14 +602,13 @@
     "unaligned in unchanged text": 84
    },
    "explained": {
-    "changed in changed text": 9,
-    "changed in unchanged text": 2,
-    "conditions in changed text": 11,
-    "conditions in unchanged text": 1,
-    "not_same_item in changed text": 5,
-    "not_same_item in unchanged text": 30,
+    "changed in changed text": 10,
+    "changed in unchanged text": 1,
+    "conditions in changed text": 7,
+    "not_same_item in changed text": 6,
+    "not_same_item in unchanged text": 32,
     "restated in unchanged text": 3,
-    "split_or_merge in changed text": 1,
+    "split_or_merge in changed text": 3,
     "split_or_merge in unchanged text": 2
    },
    "suspect_differences": 12,
@@ -650,7 +649,7 @@
       },
       "rationale": "Claim A describes a connection between a Remote UE and a Relay UE, whereas Claim B describes a connection between two Relay UEs. While the connection type and procedure are identical, the entities inv",
       "kind": "not_same_item",
-      "why": "Claim A describes a connection between a Remote UE and a Relay UE, while Claim B describes a connection between two Relay UEs. Both items are present in both revisions, as evidenced by the provided co"
+      "why": "Claim A refers to a connection between a Remote UE and a Relay UE, while Claim B refers to a connection between two Relay UEs. Both items are present in both revisions (as shown in the 'A's item, earl"
      },
      {
       "a": {
@@ -676,8 +675,8 @@
        ]
       },
       "rationale": "Claim A specifies a discrete set of possible values (1, 2, or 4), whereas Claim B defines the value as a relative constraint (greater than or equal to the number of LP-WUS symbols).",
-      "kind": "changed",
-      "why": "The value for the number of OOK symbols within an OFDM symbol for LP-SS was revised from a discrete set (1, 2, or 4) to a relative constraint (>= number of LP-WUS symbols)."
+      "kind": "not_same_item",
+      "why": "Both revisions state two different constraints for the 'number of OOK symbols within an OFDM symbol': one as a discrete set (1, 2, or 4) and one as a relative constraint (>= number of LP-WUS symbols)."
      },
      {
       "a": {
@@ -704,7 +703,7 @@
       },
       "rationale": "Both claims describe detection conditions for 'Intra-system Too Late Handover' under the same timer conditions, but they specify different triggers: Claim A requires a configured but uninitiated hando",
       "kind": "not_same_item",
-      "why": "Claim A refers to 'detection condition 2' and Claim B refers to 'detection condition 1'. The context lists show that both 'detection condition 1' and 'detection condition 2' exist in both revisions, m"
+      "why": "Claim A refers to 'detection condition 2' and Claim B refers to 'detection condition 1'. The context lists show that both 'detection condition 1' and 'detection condition 2' exist in both revisions as"
      },
      {
       "a": {
@@ -731,7 +730,7 @@
       },
       "rationale": "Claim A refers to an 'extended short format' while Claim B refers to a 'short format'. Although the reporting capacity value is the same, the entities (the formats themselves) are distinct designation",
       "kind": "not_same_item",
-      "why": "The source defines two distinct entities: 'BSR extended short format' and 'BSR short format'. Both entities are present in both revisions with the same reporting capacity, meaning A and B are differen"
+      "why": "Both the 'BSR extended short format' and the 'BSR short format' are stated in both revisions with the same reporting capacity. They are distinct entities (different formats), not a revision of the sam"
      },
      {
       "a": {
@@ -758,7 +757,7 @@
       },
       "rationale": "Claim A specifies 'Uu measurements' as part of the reporting content, whereas Claim B specifies 'sidelink measurement between the L2 U2N Remote UE and the source L2 U2N Relay UE'.",
       "kind": "changed",
-      "why": "The reporting content for the L2 U2N Remote UE was revised from 'Uu measurements' in Claim A to 'sidelink measurement between the L2 U2N Remote UE and the source L2 U2N Relay UE' in Claim B."
+      "why": "The reporting content for the L2 U2N Remote UE was revised from 'Uu measurements' in the earlier revision to 'sidelink measurement between the L2 U2N Remote UE and the source L2 U2N Relay UE' in the l"
      },
      {
       "a": {
@@ -785,7 +784,7 @@
       },
       "rationale": "Claim A specifies the content of the RA Report as SSB indexes and the number of preambles sent in chronological order, whereas Claim B specifies the content as 2-step RACH information per a specific T",
       "kind": "not_same_item",
-      "why": "Both A and B are members of a list describing the content of the 'RA Report'. In the earlier revision, the content includes both the SSB indexes (A) and the 2-step RACH information (B). In the later r"
+      "why": "Both A and B are members of a list describing the content of the 'RA Report'. In the earlier revision, both the value of A and the value of B (2-step RACH information) are listed as separate content i"
      },
      {
       "a": {
@@ -812,7 +811,7 @@
       },
       "rationale": "Both claims describe the content of the RA Report for the same design. Claim A specifies an indication of RSRP threshold status per attempt, while Claim B specifies SSB indexes and the number of pream",
       "kind": "not_same_item",
-      "why": "Both A and B are members of a list describing the 'content' of the RA Report. The context lists show that the value in A is present in the later revision, and the value in B is present in the earlier "
+      "why": "Both A and B are members of a list describing the content of the RA Report. The context shows that in the earlier revision, the value in B was already present as a separate item, and in the later revi"
      },
      {
       "a": {
@@ -839,7 +838,7 @@
       },
       "rationale": "Both claims describe the content of the 'RA Report', but they specify entirely different information: Claim A refers to SSB RSRP threshold indications, while Claim B refers to LBT failure indications.",
       "kind": "not_same_item",
-      "why": "The 'RA Report' content is a list of multiple items. Claim A (SSB RSRP threshold) is present in both revisions (it appears in the 'B's item, later revision' list), and Claim B (LBT failures) is a diff"
+      "why": "Both claims describe the 'content' attribute of the 'RA Report', which is a list of multiple items. Claim A (SSB RSRP threshold) is present in both revisions (it appears in the 'later revision' list p"
      },
      {
       "a": {
@@ -866,7 +865,7 @@
       },
       "rationale": "Claim A specifies a particular content item (SSB RSRP threshold indication), whereas Claim B replaces this with a reference to 2-step RACH information in TS 38.331. The content of the RA Report has ch",
       "kind": "not_same_item",
-      "why": "Both A and B are members of a list describing the 'content' of the 'RA Report'. In the earlier revision, the RA Report contains both the SSB RSRP threshold indication (A) and the 2-step RACH informati"
+      "why": "Claim A and Claim B are different members of a list describing the content of the RA Report. In the earlier revision, both the SSB RSRP threshold indication (A) and the 2-step RACH information (B) are"
      },
      {
       "a": {
@@ -893,7 +892,7 @@
       },
       "rationale": "Claim A specifies the input for Layer 3 filtering as measurements from point B, while Claim B specifies the input for L3 Beam filtering as measurements from point A1.",
       "kind": "not_same_item",
-      "why": "Claim A refers to 'Layer 3 filtering for cell quality' (input point B), while Claim B refers to 'L3 Beam filtering' (input point A1). The earlier revision contains both 'L3 Beam filtering' (point A1) "
+      "why": "Claim A refers to 'Layer 3 filtering for cell quality' (input point B), while Claim B refers to 'L3 Beam filtering' (input point A1). The earlier revision contains both items separately, confirming th"
      },
      {
       "a": {
@@ -920,7 +919,7 @@
       },
       "rationale": "Claim A requires both Correlation ID and AIOTF Identifier, whereas Claim B only specifies the AIOTF Identifier for the same entity and conditions.",
       "kind": "split_or_merge",
-      "why": "Claim A combined 'Correlation ID' and 'AIOTF Identifier' into one statement. In the later revision, these are split into two separate claims (Claim B and the provided context claim for 'Correlation ID"
+      "why": "Claim A specifies that the Command Request message includes both the Correlation ID and AIOTF Identifier. In the later revision, these are split into two separate claims: Claim B specifies the AIOTF I"
      },
      {
       "a": {
@@ -947,7 +946,7 @@
       },
       "rationale": "Claim A specifies that both the Correlation ID and AIOTF Identifier must be included, whereas Claim B only specifies the Correlation ID.",
       "kind": "split_or_merge",
-      "why": "Claim A combines 'Correlation ID and AIOTF Identifier' into one statement. In the later revision, these are split into two separate claims (Claim B for Correlation ID and another claim for AIOTF Ident"
+      "why": "Claim A specifies two items (Correlation ID and AIOTF Identifier) as a single requirement. In the later revision, these are split into two separate claims (Claim B for Correlation ID and another claim"
      }
     ],
     "unseen": [

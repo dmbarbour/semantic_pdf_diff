@@ -175,7 +175,7 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
 - LibreOffice (installed here: `soffice --headless --convert-to`) renders EMF and WMF faithfully, about 1.5 s for five pictures in one call.
 - Converted to PDF, a drawing stays vector, and its labels stay text. A sequence diagram's "UE", "gNB", "1. UECapabilityEnquiry" and the stack's "PHY", "MAC", "RLC" are in its text layer.
 - Each picture lands on a page with a white background, so it's cropped to what's drawn.
-- Python has no maintained EMF renderer. Pillow reads WMF only on Windows; PyMuPDF opens PNG, JPEG and TIFF but not EMF.
+- Pillow reads WMF only on Windows; PyMuPDF opens PNG, JPEG and TIFF but not EMF. (The research below found one pure-Python renderer, first released in September 2026.)
 
 **Proposed (Claude's):**
 1. **Pictures become pages:**
@@ -205,6 +205,53 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
 - **C. Every picture read** (a size floor aside), rather than only captioned ones.
 
 **Cost:** about 150 pictures in each TS 38.300 version, about one request each, with tiles for large ones: roughly $0.10–0.25 a version. The controlled Word figures cost cents.
+
+**The owner's answers (2026-10-03):**
+- **A:** "I wouldn't count on LibreOffice being available in most environments, among them my intended usage environment. It's also outside our control and difficult to make reproducible. My intuition is that it isn't the right move. Perhaps do a bit more research. If there is an un-maintained python lib with a suitable license, consider grabbing a copy and extracting what is needed? Do a bit more research on this and our options, in any case."
+- **B:** "Yes, we'll want similar context as what PDF pics get."
+- **C:** "Every pic."
+
+**The research (2026-10-03).** A survey of renderers was run, and the candidates were tried on TS 38.300 v19.3's 143 metafiles. Renders were made in the scratchpad only.
+
+- **What the figures are:**
+  - 103 EMF, every one EMF+ "dual" (an EMF+ stream with a plain GDI fallback). 101 preview Visio objects: 65 binary `.vsd`, 36 `.vsdx`.
+  - 40 WMF, 37 of them previews of Msc-generator charts, whose OLE object holds the chart's source as text.
+  - Labels are text records: EMF+ DrawDriverString in 53 EMFs, GDI ExtTextOutW in 49, WMF ExtTextOut. A few store glyph indices instead of characters (4 seen).
+  - Visio's gradient boxes are drawn in the GDI fallback by an XOR trick: pattern blits (PATINVERT) over DIB pattern brushes.
+
+| Route | License | On our figures |
+|---|---|---|
+| **metafile-render** 0.3.0 (Python; Pillow, pyclipper; ~7,100 lines; first released 2026-09, one author) | MIT | Every EMF renders. Sequence diagrams and stacks are good, and its SVG, drawn by PyMuPDF, keeps labels as text. Visio's gradient boxes become black stripes over their labels. 36 of 103 SVGs are a raster wrapped in SVG. 38 of 40 WMFs fail or render blank (Msc-generator's clipping). |
+| Apache POI HEMF/HWMF (Java, ~16,000 lines of logic) | Apache-2.0 | All 143 render, the best seen: gradients, boxes and labels right. A port needs Java2D's clipping areas, transforms and raster operations rebuilt. |
+| wmf2svg (Java, ~28,000 lines) | Apache-2.0 | All convert. Draws both streams of dual files (labels doubled); misplaced labels. |
+| metafile-rs, emf-rs, emfsdk (Rust) | Apache-2.0 / MIT | A native build to maintain. metafile-rs drops all EMF+ text. |
+| pyemf, pyemf3; libwmf | LGPL | Write or parse only; none renders what we need |
+| libUEMF, libemf2svg, pymfvu, UniConvertor, libvisio-ng | GPL or AGPL | Ruled out for an MIT project |
+| Pillow's WMF plugin | MIT-CMU | Renders only on Windows |
+
+- **The specifications** ([MS-EMF], [MS-EMFPLUS], [MS-WMF]) allow copying them "in order to develop implementations". Microsoft's patent map lists no patents for any of them. An implementation of our own, or our own fixes, may follow them.
+- **Text without rendering:**
+  - the metafiles' own text records (a record walker of about 300 lines)
+  - `.vsdx` shape text (the `vsdx` package, BSD-3; text found in 35 of 36)
+  - Msc-generator chart sources (`olefile`, BSD; 35 of 37 read)
+  - Binary `.vsd` would need a port of POI's HDGF (text only, ~1,700 lines).
+- **Checked here:** metafile-render's vector SVG, opened by PyMuPDF, gives a crisp page whose text layer reads "UE gNB AMF NAS RRC PDCP…". MuPDF's own fonts draw it, so the same picture gives the same pixels on every machine.
+
+**Revised proposal (Claude's), for the owner:**
+1. **Render with a vendored copy of metafile-render** (MIT, kept with its license notice), its SVG output drawn by PyMuPDF. Our fixes:
+   - Visio's gradient fills: the XOR pattern blits and pattern brushes, or the EMF+ stream with its text placed right
+   - WMF clipping as real regions (pyclipper), for Msc-generator's charts
+   - no whole-picture raster fallback
+   - one text element per run
+   - its safety limits made settings
+2. **The picture's text from its own records,** as a PDF figure's text layer is given (`visual_text_layer`). Its labels reach the model as text even where the drawing is imperfect. An Msc-generator chart's source is given too.
+3. **Raster pictures** (PNG, JPEG) as they are; Pillow and pyclipper join the `office` extra.
+4. **Later:** Visio sources (`.vsdx` with the BSD `vsdx` package; `.vsd` through an HDGF port).
+
+**The alternatives:**
+- port Apache POI (the best quality, a much larger job)
+- write our own renderer from the specifications for the record types our figures use, borrowing from metafile-render and POI with attribution
+- text first only, deferring pixels (days, not weeks, but arrows and layout are lost)
 
 ## Decisions (2026-09-23)
 

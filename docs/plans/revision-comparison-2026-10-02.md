@@ -170,6 +170,12 @@ The mechanisms below are Claude's, built on the owner's multi-pass idea and deci
 - an item split (decision 11): a pump replaced by two smaller ones whose capacities sum to its own; a meeting room divided by a new wall, the two areas summing to about the old one
 - items merged (decision 11): two rooms joined by removing a wall; two valves replaced by one
 - near-ties: several items alike enough that alignment is ambiguous (decision 10)
+- **From milestone 4's misses** (2026-10-03; the owner: "Regarding the conditions changes and explanations, see if we can extract some difficulty knobs from those for control docs."). Most are on a new base, a link protocol's specification modelled on QUIC's and TS 38.300's confounders:
+  - **look-alikes:** a value changed beside its look-alikes (the extended short report's field beside the short report's; the Session ID's maximum beside the Session ID Length field)
+  - **list members:** a list's member replaced by another of the same shape, and one added
+  - **a numbered condition inserted,** the rest renumbered: a number names a place, not an item
+  - **a lead-in's conditions changed:** the sentences under it kept word for word, so the quotes match and the conditions don't
+  - **conditions reworded,** meaning the same (on the treatment plant)
 
 ## Milestones
 
@@ -465,6 +471,49 @@ Claude's reading of where proposals mode begins to make sense:
     - "conditions" named on identical quotes
     - readers' numbering named "not the same item"
     - the rater could count value-change kinds in unchanged text as its suspect measure
+
+- **Knobs from milestone 4's misses, and prompt versions 3 and 4 (2026-10-03).** The owner: "Regarding the conditions changes and explanations, see if we can extract some difficulty knobs from those for control docs."
+  - **A new base, the link protocol's specification** (`corpus.link_protocol`, 21 facts), written to the real specifications' confounders:
+    - two report formats with nested names
+    - a header table with each field beside its length field
+    - a report's contents as a list
+    - numbered conditions
+    - timers whose state is named only by a lead-in sentence
+  - **Five pairs** (design item 7), each in PDF, Markdown and Word: look-alikes changed, a list member replaced and one added, a numbered condition inserted, a lead-in's conditions changed, and conditions reworded (on the treatment plant). Recording them cost $0.063.
+
+    | Knob (version 4) | PDF | Markdown | Word |
+    |---|---|---|---|
+    | Look-alikes: the extended short format's field, the Session ID's maximum | 3 of 3 changes, no false change, each named changed | the same; a short/extended pairing named not the same item | the same; two such pairings named not the same item |
+    | A list member replaced, one added | every addition and removal found; 2 unchanged timers named conditions (their readers attached the wrong lead-in) | every addition and removal found, nothing judged | the same |
+    | A numbered condition inserted | the new condition found | the new condition paired with an old one, named not the same item (not counted as found) | the same, 4 pairings named not the same item |
+    | A lead-in's conditions changed, the sentences kept | missed: settled as no change (the readings' conditions were already wrong), one claim unread | 1 judged, named conditions; one claim unread | 2 of 2 named conditions |
+    | Conditions reworded | all settled | all settled | all settled |
+
+  - **Version 3:**
+    - a value in words echoes by its numbers ("no acknowledgement received within 856" against "... is received within 856")
+    - conditions echo too: whether each claim's conditions are still, or already, stated in the other revision
+    - The lead-in knob's Word pair went from not the same item to conditions.
+  - **Version 4:**
+    - numbers the source gives (conditions, steps) are positions, renumbered when one is inserted
+    - identical quotes name conditions only when the conditions were replaced
+    - The numbered-condition knob went from changed to not the same item.
+
+    | | Version 2 | Version 4 |
+    |---|---|---|
+    | Controlled pairs, aligned: kinds right | 73 of 76 (28 pair runs) | 100 of 108 (43, with the knobs) |
+    | Controlled PDF pairs, unaligned: kinds right | 147 of 171 (10 pairs) | 189 of 216 (15) |
+    | QUIC: value changes named in changed / unchanged text | 8 / 2 | 6 / 3 |
+    | TS 38.300: the same | 20 / 3 | 17 / 1 |
+    | Suspect differences named changed (QUIC; TS 38.300) | 0; 2 | 0; 1 |
+
+  - **Cost:**
+    - version 3: $0.027 (controlled), $0.116 (unaligned), $0.037 (real pairs)
+    - version 4: $0.029, $0.076, $0.039
+  - **Left open:**
+    - **"Conditions" on identical quotes** (QUIC 4). Two readers give the same sentence different context, and a changed lead-in looks the same to the echoes. Telling them apart needs the source text around each claim (its lead-in, its heading) in the explanation's prompt; that's the next step here.
+    - **A lead-in's state misattributed** by the PDF readers when two lead-ins share a page: an extraction difficulty the knob now measures.
+    - **The scorer counts an inserted condition as found** only when it's left unmatched; paired with an old one and explained "not the same item", it isn't.
+  - **The committed controlled fixture** is now written by `scripts/controlled.py pack`: the standard runs replayed against a copy of the working fixture, and only the answers they use packed. Recording no longer packs.
 
 ## Open questions
 

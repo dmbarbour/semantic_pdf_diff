@@ -556,6 +556,16 @@ Each row is a situation met in this project's documents, with where it was recor
     - one seed, one sample per query
     - these are counts to compare between levers, not rates to quote
 
+- **Milestone 6, begun (2026-10-03): the "why different" pass's misses as knobs.** The owner: "Regarding the conditions changes and explanations, see if we can extract some difficulty knobs from those for control docs."
+  - **A new base,** a link protocol's specification (`link_protocol`, 21 facts), with the confounders QUIC and TS 38.300 showed:
+    - formats with nested names
+    - fields beside their length fields
+    - a list of contents
+    - numbered conditions
+    - values whose state only a lead-in names
+  - **Five revision pairs on it and on the treatment plant**, in PDF, Markdown and Word. Results are in the [revision comparison plan](revision-comparison-2026-10-02.md)'s milestone 4.
+  - **The base's extraction joins `results.json`.**
+
 ## Decisions (2026-10-01)
 
 1. **Domains:** new ones for inspiration, with backups logged (design item 1); the owner left the choice open.

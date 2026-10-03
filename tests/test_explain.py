@@ -94,6 +94,26 @@ class Explain(unittest.TestCase):
         self.assertEqual((lines["A's value in the later revision"], lines["B's value in the earlier revision"]), ("[]", "[]"))
         self.assertEqual((lines["Quotes"], json.loads(lines["A"])), ("different text", {"value": "4.1"}))
 
+    def test_values_in_words_echo_by_their_numbers_and_conditions_echo_too(self):
+        # a condition inserted, the rest renumbered: "Condition 1" now names another; the old one is still stated
+        cond = lambda id, attribute, value, conditions="": ev(id, entity="link failure", attribute=attribute, value=value,
+                                                              unit="ms", conditions=conditions, quote=value)
+        a = cond("A-1", "declaration condition 1", "no acknowledgement received within 856")
+        b = cond("B-1", "declaration condition 1", "peer reports a fatal error within 2,052")
+        kept = cond("B-2", "declaration condition 2", "no acknowledgement is received within 856")
+        revisions = Revisions([a], [b, kept])
+        self.assertEqual([x["value"] for x in revisions.echoes(a, 0, b)], [kept.value])
+        # a lead-in's state renamed, the values under it kept: the old state is stated nowhere later
+        timer = lambda id, conditions: ev(id, entity="retransmission timer", attribute="value", value="709", unit="ms",
+                                          conditions=conditions, quote="The retransmission timer is 709 ms.")
+        idle = lambda id: ev(id, entity="retransmission timer", attribute="value", value="1,245", unit="ms",
+                             conditions="link is idle", quote="The retransmission timer is 1,245 ms.")
+        a, b = timer("A-1", "link is congested"), timer("B-1", "link is lightly loaded")
+        revisions = Revisions([a, idle("A-2")], [b, idle("B-2")])
+        self.assertEqual((revisions.condition_echoes(a, 0, b), revisions.condition_echoes(b, 1, a)), ([], []))
+        self.assertEqual([x["value"] for x in revisions.condition_echoes(idle("A-2"), 0, b)], ["1,245"])
+        self.assertEqual(revisions.condition_echoes(timer("A-3", ""), 0, b), "none stated")
+
     def test_the_report_counts_differences_by_kind(self):
         from semantic_pdf_diff.report import kinds_html
         findings = [{"explanation": {"kind": "changed"}}, {"explanation": {"kind": "not_same_item"}},

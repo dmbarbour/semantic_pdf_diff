@@ -13,6 +13,12 @@ The changes are those revisions make, met in documents and reviews:
 - a drawing's revision table gaining a row
 - a change the later revision narrates, printing the superseded value beside the new one (the roller coaster's
   lift hill: the corpus's document is that later revision, so its earlier one is generated)
+
+And the confounders the "why different" pass met in real specifications (the revision comparison plan, milestone 4),
+on the link protocol's specification: a value changed beside its look-alikes (an extended short format beside the
+short; a field beside its length field), a list's member replaced and another added, a numbered condition inserted
+(the rest renumbered), a lead-in's conditions changed with the sentences under it kept word for word, and a value's
+conditions reworded without changing their meaning.
 """
 import re
 from dataclasses import dataclass, replace
@@ -235,6 +241,43 @@ def split_row(project, tag, tags, d, column):
         return
     raise ValueError(f"{project.id}: no row named {tag}")
 
+def replace_paragraph(project, fact_id, text, fact):
+    """A paragraph (a list's member) replaced by another stating a new fact ({v} its value): one gone, one new."""
+    blocks, i, _, _ = _paragraph(project, fact_id)
+    old = project.fact(fact_id)
+    blocks[i] = ("p", text.format(v=fact.value))
+    project.facts[:] = [f for f in project.facts if f is not old] + [fact]
+    project.edits += [{"kind": "removed", "facts": [old.id]}, {"kind": "added", "facts": [fact.id]}]
+
+def add_paragraph(project, after_fact, text, fact):
+    """A paragraph stating a new fact ({v} its value), after the paragraph printing another's."""
+    blocks, i, _, _ = _paragraph(project, after_fact)
+    blocks.insert(i + 1, ("p", text.format(v=fact.value)))
+    project.facts.append(fact)
+    project.edits.append({"kind": "added", "facts": [fact.id]})
+
+def insert_numbered(project, label, first_fact, text, fact):
+    """A numbered paragraph ("Condition 1: ...") inserted first among its numbered siblings, which are renumbered
+    after it: the new one stating a new fact ({v} its value). Renumbering changes no fact."""
+    blocks, i, _, _ = _paragraph(project, first_fact)
+    numbered = re.compile(rf"^{re.escape(label)} (\d+):")
+    labels = {}
+    for k, block in enumerate(blocks):
+        m = block[0] == "p" and numbered.match(block[1])
+        if m:
+            n = int(m.group(1))
+            labels[f"{label} {n}"] = f"{label} {n + 1}"
+            blocks[k] = ("p", numbered.sub(f"{label} {n + 1}:", block[1]))
+    blocks.insert(i, ("p", text.format(v=fact.value)))
+    project.facts.append(fact)
+    project.edits += [{"kind": "added", "facts": [fact.id]}, {"kind": "renumbered", "labels": labels}]
+
+def reword(project, passages, facts):
+    """Passages rewritten without changing what they state (conditions in other words): the facts unchanged."""
+    for old, new in passages:
+        rewrite(project, old, new)
+    project.edits.append({"kind": "reworded", "facts": list(facts)})
+
 # --- the revisions -----------------------------------------------------------------------------
 
 def wtp_later(p, d):
@@ -335,6 +378,52 @@ def split_later(p, d):
     """Pump P-101C replaced by two, P-101E and P-101F, whose capacities sum to its own."""
     split_row(p, "P-101C", ("P-101E", "P-101F"), d, "capacity")
 
+def reworded_later(p, d):
+    """Two values' conditions said in other words, meaning the same: the filtration rate with "a single" filter out
+    of service, and alum dosed "for an average day" and "for a maximum day" (no change)."""
+    reword(p, [("With one filter out of service, the filtration rate is",
+                "With a single filter out of service, the filtration rate is"),
+               ("mg/L on the average day and up to", "mg/L for an average day and up to"),
+               ("mg/L on the maximum day.", "mg/L for a maximum day.")],
+           ["filters.rate", "chem.alum", "chem.alum_max"])
+
+def spec_later(p, d):
+    """Revision B of the link protocol: values changed beside their look-alikes (the extended short report's field
+    beside the short report's, the Session ID's maximum beside the Session ID Length field) and a numbered condition's
+    count; the report's members, the conditions and the link states' lead-ins kept word for word."""
+    change(p, "ext.field", d.number(14, 40))  # the small field lengths near it are all taken
+    for fid in ("hdr.sid", "fail.retx"):
+        change(p, fid, near(d, p.fact(fid).value, -0.25, 0.25))
+
+def members_later(p, d):
+    """The measurement report's beam index replaced by the battery level, in its place, and the transmit power added
+    last: members of one list, each a length in bits, none of them another changed."""
+    report = ("Measurement report", ("measurement report", "the report", "report contents"))
+    member = lambda fid, what, value: Fact(fid, *report, f"{what} length", (what, f"{what} size", f"{what} field"),
+                                           value, "bits")
+    ta = p.fact("meas.ta")
+    replace_paragraph(p, "meas.beam", "– the battery level, {v} bits;", member("meas.battery", "battery level", d.number(6, 30)))
+    rewrite(p, f"the timing advance, {ta.value} bits.", f"the timing advance, {ta.value} bits;")
+    add_paragraph(p, "meas.ta", "– the transmit power, {v} bits.", member("meas.power", "transmit power", d.number(6, 30)))
+
+def renumbered_later(p, d):
+    """A new first condition for declaring a link failure, the others renumbered after it (2, 3, 4), their values
+    kept: a numbered condition's number is its place, not its identity."""
+    insert_numbered(p, "Condition", "fail.ack", "Condition 1: the peer reports a fatal error within {v} ms of setup.",
+                    Fact("fail.fatal", "Link failure detection",
+                         ("link failure", "failure detection", "link failure declaration"), "fatal error window",
+                         ("fatal error timeout", "error window"), d.number(1000, 5000), "ms", basis="required"))
+
+def context_later(p, d):
+    """The congested state's lead-in now names a lightly loaded link: the two values under it keep their sentence
+    word for word, but their conditions changed (a quote alike in both revisions, its meaning not)."""
+    rewrite(p, "When the link is congested, the following values apply.",
+            "When the link is lightly loaded, the following values apply.")
+    for fid in ("timer.congested", "window.congested"):
+        fact = p.fact(fid)
+        p.edits.append({"kind": "conditions", "fact": fid, "from": fact.conditions, "to": "link lightly loaded"})
+        fact.conditions = "link lightly loaded"
+
 # base maker, its knob (None: the clean corpus), the edit, whether the generated document is the earlier one, and
 # the revision's name (the first revision of a base is "revised"; its pair is named after the base)
 PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
@@ -347,7 +436,13 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          (TABLE_PROJECTS["wtp-tables"], "clean", renamed_later, False, "renamed"),
          (TABLE_PROJECTS["wtp-tables"], "clean", reordered_later, False, "reordered"),
          (PROJECTS["wtp"], None, conditions_later, False, "conditions"),
-         (TABLE_PROJECTS["wtp-tables"], "clean", split_later, False, "split"))
+         (TABLE_PROJECTS["wtp-tables"], "clean", split_later, False, "split"),
+         # knobs from the "why different" pass's misses (the revision comparison plan, milestone 4)
+         (PROJECTS["wtp"], None, reworded_later, False, "reworded"),
+         (PROJECTS["spec"], None, spec_later, False, "revised"),
+         (PROJECTS["spec"], None, members_later, False, "members"),
+         (PROJECTS["spec"], None, renumbered_later, False, "renumbered"),
+         (PROJECTS["spec"], None, context_later, False, "context"))
 
 def _base(make, knob, seed):
     p = make(seed)
@@ -378,6 +473,8 @@ def check(base, project):
     old = {f.id for f in base.facts}
     names = {w for f in project.facts if f.id not in old for name in (f.entity, *f.aliases) for w in name.split()}
     names |= {w for e in project.edits if e["kind"] == "conditions" for w in e["to"].split()}  # "99th percentile"
+    names |= {w for e in project.edits if e["kind"] == "renumbered" for label in e["labels"].values()
+              for w in label.split()}  # "Condition 4"
     stray = structure(after) - structure(before) - names - {str(p["page"]) for p in after}
     if stray:
         raise ValueError(f"{project.id}: numbers printed that are neither the base's nor facts: {sorted(stray)}")

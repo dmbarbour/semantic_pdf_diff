@@ -265,7 +265,98 @@ def roller_coaster(seed=1):
     ]
     return Project(f"coaster-s{seed}", "Ridgeback roller coaster", F, sections)
 
-PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster}
+def link_protocol(seed=1):
+    """A link protocol's specification, written to the confounders the "why different" pass met in real
+    specifications (docs/plans/revision-comparison-2026-10-02.md, milestone 4): two of a kind with nested names (a
+    short and an extended short report format), a field beside its length field (Session ID, Session ID Length), a
+    list whose members share one attribute's shape (a report's contents), numbered conditions, and values whose
+    conditions are given only by a lead-in (the same sentence under two link states)."""
+    d = Draw(f"spec-{seed}")
+    F = []
+    add = lambda *a, **k: F.append(Fact(*a, **k)) or F[-1]
+    bits = lambda lo, hi: d.number(lo, hi)  # small whole numbers from 6 up: headings and conditions print 1 to 5
+    short = add("short.field", "Short status report", ("short report", "short format", "short status report format"),
+                "buffer size field length", ("buffer size field", "field length", "field size"), bits(6, 9), "bits")
+    ext = add("ext.field", "Extended short status report",
+              ("extended short report", "extended short format", "extended short status report format"),
+              "buffer size field length", ("buffer size field", "field length", "field size"), bits(10, 14), "bits")
+    groups = add("long.groups", "Long status report", ("long report", "long format", "long status report format"),
+                 "maximum channel groups", ("channel groups", "number of channel groups", "groups"), bits(15, 24), "")
+    long_field = add("long.field", "Long status report", ("long report", "long format", "long status report format"),
+                     "buffer size field length", ("buffer size field", "field length", "field size"), bits(25, 32), "bits")
+    field = lambda fid, name, aliases, attribute, value: add(
+        fid, name, aliases, attribute, ("length", "size", "field length", "length in bits"), value, "bits")
+    version = field("hdr.version", "Version field", ("Version", "version field"), "length", bits(6, 16))
+    sid_len = field("hdr.sid_len", "Session ID Length field", ("Session ID Length", "session ID length field"), "length",
+                    bits(6, 16))
+    sid = field("hdr.sid", "Session ID field", ("Session ID", "session ID"), "maximum length", bits(120, 240))
+    pn_len = field("hdr.pn_len", "Packet Number Length field", ("Packet Number Length", "packet number length field"),
+                   "length", bits(6, 16))
+    pn = field("hdr.pn", "Packet Number field", ("Packet Number", "packet number"), "maximum length", bits(33, 64))
+    report = ("Measurement report", ("measurement report", "the report", "report contents"))
+    member = lambda fid, what, value: add(fid, *report, f"{what} length", (what, f"{what} size", f"{what} field"),
+                                          value, "bits")
+    cell = member("meas.cell", "serving cell index", bits(6, 20))
+    beam = member("meas.beam", "beam index", bits(6, 20))
+    rssi = member("meas.rssi", "received signal strength", bits(6, 20))
+    ta = member("meas.ta", "timing advance", bits(6, 20))
+    failure = ("Link failure detection", ("link failure", "failure detection", "link failure declaration"))
+    ack = add("fail.ack", *failure, "acknowledgement timeout", ("ack timeout", "timeout", "acknowledgement window"),
+              d.number(200, 900), "ms", basis="required")
+    retx = add("fail.retx", *failure, "consecutive failed retransmissions", ("failed retransmissions", "retransmissions"),
+               bits(6, 30), "", basis="required")
+    snr = add("fail.snr", *failure, "signal-to-noise threshold", ("SNR threshold", "signal-to-noise ratio"),
+              d.number(1.5, 4.5, 1), "dB", basis="required")
+    low = add("fail.duration", *failure, "low signal duration", ("duration", "time below threshold"), bits(33, 90), "s",
+              basis="required")
+    timer = ("Retransmission timer", ("retransmission timer", "RTO", "retransmit timer"))
+    window = ("Send window", ("send window", "window", "transmit window"))
+    timer_busy = add("timer.congested", *timer, "duration", ("value", "timeout", "timer value"), d.number(300, 900), "ms",
+                     "link congested", basis="required")
+    window_busy = add("window.congested", *window, "size", ("window size", "packets"), d.number(91, 150), "packets",
+                      "link congested", basis="required")
+    timer_idle = add("timer.idle", *timer, "duration", ("value", "timeout", "timer value"), d.number(1000, 3000), "ms",
+                     "link idle", basis="required")
+    window_idle = add("window.idle", *window, "size", ("window size", "packets"), d.number(151, 256), "packets",
+                      "link idle", basis="required")
+    sections = [
+        ("1 Status Report Formats", [
+            ("p", f"Three formats carry buffer status to the gateway. The short status report carries the status of one "
+                  f"channel group in a buffer size field of {short.value} bits. The extended short status report also "
+                  f"carries the status of one channel group, in a buffer size field of {ext.value} bits. The long status "
+                  f"report carries up to {groups.value} channel groups, each in a buffer size field of "
+                  f"{long_field.value} bits."),
+        ]),
+        ("2 Header Fields", [
+            ("p", "Every packet starts with the header fields of Table 1, in order. Each length field gives the length of "
+                  "the field that follows it."),
+            ("table", "Table 1. Header fields", ["Field", "Length (bits)"],
+             [["Version", version.value], ["Session ID Length", sid_len.value], ["Session ID", f"up to {sid.value}"],
+              ["Packet Number Length", pn_len.value], ["Packet Number", f"up to {pn.value}"]]),
+        ]),
+        ("3 Measurement Report", [
+            ("p", "The measurement report contains, in this order:"),
+            ("p", f"– the serving cell index, {cell.value} bits;"),
+            ("p", f"– the beam index, {beam.value} bits;"),
+            ("p", f"– the received signal strength, {rssi.value} bits;"),
+            ("p", f"– the timing advance, {ta.value} bits."),
+        ]),
+        ("4 Link Failure Detection", [
+            ("p", "A link failure is declared when any of the following conditions holds."),
+            ("p", f"Condition 1: no acknowledgement is received within {ack.value} ms."),
+            ("p", f"Condition 2: {retx.value} consecutive retransmissions fail."),
+            ("p", f"Condition 3: the signal-to-noise ratio stays below {snr.value} dB for {low.value} s."),
+        ]),
+        ("5 Timers by Link State", [
+            ("p", "When the link is congested, the following values apply."),
+            ("p", f"The retransmission timer is {timer_busy.value} ms. The send window is {window_busy.value} packets."),
+            ("p", "When the link is idle, the following values apply."),
+            ("p", f"The retransmission timer is {timer_idle.value} ms. The send window is {window_idle.value} packets."),
+        ]),
+    ]
+    return Project(f"spec-s{seed}", "Lakeshore Telemetry Link: Protocol Specification", F, sections)
+
+PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster, "spec": link_protocol}
 
 # --- table knobs (milestone 2) -------------------------------------------------------------------
 # Schedules rendered clean or with one knob, the same facts either way, so a knob's effect is the difference.

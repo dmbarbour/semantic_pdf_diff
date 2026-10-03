@@ -147,7 +147,10 @@ def instructions(mode):
     return COMPARE + MODE_CONTEXT[mode]
 
 # Bump when the way explanation prompts are assembled changes, not only the template.
-EXPLAIN_VERSION = 2  # 2: a claim's counterpart isn't among its value's echoes; quotes compared; replaced statements
+# 2: a claim's counterpart isn't among its value's echoes; quotes compared; replaced statements
+# 3: values in words echo by their numbers; conditions echo too (the controlled knobs from milestone 4's misses)
+# 4: the source's numbering is position; identical quotes name conditions only when the conditions were replaced
+EXPLAIN_VERSION = 4
 
 # Why a revisions finding differs (docs/plans/revision-comparison-2026-10-02.md, design item 3): the kinds, and a
 # checklist of the confounders seen in the controlled and real pairs (list members, numbered conditions, two of a
@@ -171,12 +174,18 @@ Check before answering:
 - Is A's value still stated for its item in the later revision, or was B's already stated in the earlier one?
   Such claims (other than A and B) are listed below. If so, A and B are likely different members or properties
   that both revisions state, not a change.
+- Are A's conditions still stated for its item in the later revision, or were B's already stated in the earlier
+  one? If A's are gone and B's are new, the conditions were replaced (conditions), not two cases side by side.
 - If neither list holds anything, A's statement is gone from the later revision and B's is new: B likely replaced
   A, a change (changed, conditions) or a restatement, not two items side by side.
-- If the quotes are the same text, the quoted source did not change: the difference is in the readings (restated,
-  misread) or they are different statements (not_same_item), unless the text around them changed.
+- If the quotes are the same text, the quoted source did not change. Name conditions only when the lists of
+  conditions below show A's gone and B's new (a lead-in or heading around the sentence changed); otherwise the
+  readings differ (restated, misread) or they are different statements (not_same_item).
 - Readers word conditions, and number positions ("dimension 1", "item 2"), on their own: conditions changed only
   when the source's own words for the scope changed; a reader's numbering alone does not make two items.
+- Numbers the source gives to conditions, steps or list items ("Condition 1", "step 3") are positions: inserting
+  one renumbers the rest. If A's value is stated under another number in the later revision, A was renumbered,
+  and B, under A's old number, is another item (not_same_item), not A changed.
 - Do names or numbers the source gives tell two things apart ("condition 1" and "condition 2", "short format" and
   "extended short format", "95th" and "99th percentile")? Then ask whether both are stated in both revisions.
 - Does each quote, and each image, support its claim's value and unit?
@@ -209,19 +218,40 @@ class Revisions:
         others.sort(key=lambda j: (-jaccard(mine, words(f"{side.claims[j].attribute} {side.claims[j].conditions}")), j))
         return [_brief(side.claims[j]) for j in others[:SIBLINGS]]
 
-    def echoes(self, e, s, other):
-        """Claims of the other revision (side 1 - s) stating e's value, in e's item or its counterpart `other`'s;
-        not `other` itself, which may hold the value too (a conditions change)."""
-        side, mine = self.sides[1 - s], self.sides[s]
-        value = mine.values[self.where[s][e.id][0]]
-        if value is None:
-            return []
+    def _others(self, e, s, other):
+        """The other revision's claims (indices in side 1 - s) in e's item or its counterpart `other`'s, `other` left
+        out: it may share what's looked for (a conditions change keeps the value)."""
+        side = self.sides[1 - s]
         items = {self.where[1 - s][other.id][1]}
         key = self.where[s][e.id][1]
         if key in side.items:
             items.add(key)
-        found = sorted(j for k in items for j in side.items[k] if side.values[j] == value and side.claims[j].id != other.id)
-        return [_brief(side.claims[j]) for j in found[:ECHOES]]
+        return sorted(j for k in items for j in side.items[k] if side.claims[j].id != other.id)
+
+    def echoes(self, e, s, other):
+        """Claims of the other revision stating e's value, in e's item or its counterpart's: the same value key, or
+        for a value in words, the same numbers ("no acknowledgement within 856 ms", read with another word)."""
+        side, mine = self.sides[1 - s], self.sides[s]
+        value = mine.values[self.where[s][e.id][0]]
+        numbers = sorted(NUMBERS.findall(e.value))
+        if value is None and not numbers:
+            return []
+        same = lambda j: (value is not None and side.values[j] == value) or \
+            (bool(numbers) and value is not None and value[0] == "text" and sorted(NUMBERS.findall(side.claims[j].value)) == numbers)
+        return [_brief(side.claims[j]) for j in self._others(e, s, other) if same(j)][:ECHOES]
+
+    def condition_echoes(self, e, s, other):
+        """Claims of the other revision stated under e's conditions (the same words), in e's item or its
+        counterpart's; "none stated" when e states none."""
+        from .align import words
+        mine = words(e.conditions)
+        if not mine:
+            return "none stated"
+        side = self.sides[1 - s]
+        return [_brief(side.claims[j]) for j in self._others(e, s, other)
+                if words(side.claims[j].conditions) == mine][:ECHOES]
+
+NUMBERS = re.compile(r"\d[\d,]*(?:\.\d+)?")
 
 def explanation_prompt(a, b, finding, payload, revisions):
     """The prompt asking why a revisions finding differs: A (earlier) and B (later) as the judge saw them, the
@@ -236,7 +266,9 @@ def explanation_prompt(a, b, finding, payload, revisions):
              "A's item, earlier revision=" + dump(revisions.siblings(a, 0)),
              "B's item, later revision=" + dump(revisions.siblings(b, 1)),
              "A's value in the later revision=" + dump(revisions.echoes(a, 0, b)),
-             "B's value in the earlier revision=" + dump(revisions.echoes(b, 1, a))]
+             "B's value in the earlier revision=" + dump(revisions.echoes(b, 1, a)),
+             "A's conditions in the later revision=" + dump(revisions.condition_echoes(a, 0, b)),
+             "B's conditions in the earlier revision=" + dump(revisions.condition_echoes(b, 1, a))]
     return "\n".join(lines)
 
 def compare(left, right, output, client, mode, dispatcher=None, progress=None, headings=None):
