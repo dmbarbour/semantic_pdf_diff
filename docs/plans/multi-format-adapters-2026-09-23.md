@@ -248,6 +248,8 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
 3. **Raster pictures** (PNG, JPEG) as they are; Pillow and pyclipper join the `office` extra.
 4. **Later:** Visio sources (`.vsdx` with the BSD `vsdx` package; `.vsd` through an HDGF port).
 
+**The owner's decision (2026-10-03):** "Let's go with 1 for now, but hold 2/3 as fallback options if we struggle with fixes or quality." Route 1 is the vendored copy of metafile-render; the POI port and a renderer of our own stay fallbacks.
+
 **The alternatives:**
 - port Apache POI (the best quality, a much larger job)
 - write our own renderer from the specifications for the record types our figures use, borrowing from metafile-render and POI with attribution
@@ -314,6 +316,45 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
     - $0.058
   - **A real document:** 3GPP TS 38.300 v19.2.0 and v19.3.0, about 800 KB of text each, read for $0.52: 10,649 claims, 1,283 table rows (the revision comparison plan's milestone 3).
   - **A fault found and fixed:** cells were skipped when Python reused an lxml element's id; each `w:tc` is one cell.
+
+- **Pictures in Word documents, steps 1–3 (2026-10-03): metafiles drawn.** The owner: "Let's go with 1 for now, but hold 2/3 as fallback options if we struggle with fixes or quality."
+  - **The vendored copy:** metafile-render 0.3.0 from PyPI, every file checked against the wheel's record, in `src/semantic_pdf_diff/vendor/metafile_render` with its MIT license. Our changes are listed in `vendor/README.md`.
+  - **Our PDF backend** (`metafiles.py`) draws the vendored playback's commands into a one-page PDF:
+    - vector paths
+    - clips computed with pyclipper (GDI's replace, intersect, union, exclude and xor), once per distinct clip stack
+    - text as text in PDF's built-in fonts, measured with their metrics; a run tighter than the font is narrowed to its advances
+    - bitmaps in drawing order, mask operations drawn with the masked colour transparent
+    - The vendored SVG and Pillow backends aren't used. The page draws alike on every machine, and its labels are the text layer the visual tasks read.
+  - **Fixed in the vendored copy** (found on TS 38.300's figures):
+    - dual files play their EMF+ stream, falling back to the EMF records
+    - GetDC windows draw in GDI's own coordinates
+    - placeable WMFs map onto their bounding box
+    - EMF+ regions are read
+    - a text record fills its rectangle only with ETO_OPAQUE
+    - the clip-operation limit is raised from 64 to 100,000
+
+    | TS 38.300, three versions | Before the fixes (v19.3) | After (all three) |
+    |---|---|---|
+    | Distinct metafiles drawn | 106 of 143 (37 WMF over the clip limit) | 163 of 163 |
+    | With text, words in all | 104, 3,939 | 155, 6,256 |
+    | Compared by eye with Apache POI's renders (v19.3's 143) | Visio's gradient boxes black over their labels; GetDC labels scattered; Msc-generator charts blank | close throughout |
+
+  - **Known differences:**
+    - EMF+ gradients drawn as one representative colour (the vendored brush approximation)
+    - translucent fills drawn opaque in a few figures
+    - the 3GPP cover logo's EMF+ image not decoded: its fallback bitmap is drawn, cropped
+    - 2 characters the built-in fonts can't show (counted)
+    - one path drawn with an AND operation skipped
+  - **Tests** (`tests/test_metafiles.py`) build small WMF and EMF+ files record by record:
+    - a window mapped onto its box
+    - text placed as text
+    - an excluded rectangle
+    - GetDC text in GDI's coordinates
+    - an EMF+ stream without drawing
+    - a region's hole
+    - Each fix's test fails with that fix reverted.
+  - **`scripts/metafiles.py render`** draws every distinct metafile in the samples' Word documents into `benchmarks/metafiles` (git-ignored), optionally beside reference renders.
+  - **Next:** step 4, pictures read in their Word document with a PDF figure's context.
 
 ## Open questions
 
