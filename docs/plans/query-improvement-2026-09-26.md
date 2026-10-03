@@ -1,6 +1,9 @@
 # Query improvement in rounds
 
 - **Status:** Active (2026-09-26).
+  - **2026-10-03:**
+    - Nothing waits on the sc01 survey any more. The owner: "I won't get back to that spotcheck." That covers re-judging sc01 with v6, agreement with the owner's sc01 verdicts, the measurements owed after the surveys, and the next round.
+    - The rounds' working data left the repository (the owner); their record is [docs/research/rounds.md](../research/rounds.md).
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md) (fixtures, recording by responder); [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md) (review pages, panel, consensus).
 - **Feeds:** every prompt and context change in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) (e.g. epistemic status) and later plans.
 

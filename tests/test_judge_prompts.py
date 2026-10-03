@@ -4,7 +4,7 @@ A byte change in a judge prompt changes its query hash, so every recorded verdic
 judging is paid again (88% of spend). The goldens make such a change deliberate: it shows here
 as a diff. After an intended change, regenerate with GOLDEN_UPDATE=1 and review the diff.
 
-The replays judge committed round batches again from their own fixtures (replay.zip), offline,
+The replays judge five rounds' batches again from their own fixtures (tests/fixtures/rounds), offline,
 and must reproduce the committed verdicts: the answers are found by the queries rebuilt today.
 """
 import stubs  # noqa: F401 (a clean environment)
@@ -91,7 +91,7 @@ class GoldenPrompts(unittest.TestCase):
         asked.append((review.question_prompt(question), []))
         self.check("review-panel", transcript(asked))
 
-ROUNDS = Path(__file__).resolve().parent.parent / "benchmarks" / "rounds"
+ROUNDS = Path(__file__).resolve().parent / "fixtures" / "rounds"  # the batches replayed (docs/research/rounds.md)
 REPLAYED = {"v1": "r05/pairs-details", "v2": "r07/pairs-locator", "v3": "r08/pairs-charts", "v4": "r09h/pairs-fragments"}
 
 SLICES = Path(__file__).resolve().parent.parent / "samples/slices"

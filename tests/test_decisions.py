@@ -84,7 +84,7 @@ class RoundSpecs(unittest.TestCase):
         from pathlib import Path
         from pydantic import ValidationError
         from semantic_pdf_diff_lab.eval.models import RoundSpec
-        specs = sorted(Path(__file__).resolve().parent.parent.glob('benchmarks/rounds/*/round.json'))
+        specs = sorted(Path(__file__).resolve().parent.parent.glob('tests/fixtures/rounds/*/round.json'))
         self.assertGreater(len(specs), 10)
         for path in specs:
             with self.subTest(round=path.parent.name):

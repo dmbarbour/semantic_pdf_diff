@@ -8,19 +8,22 @@ samples/
 .env
 tests/fixtures/*.sqlite
 benchmarks/runs/
-benchmarks/batches/*/images/
-benchmarks/batches/*/review.html
-benchmarks/batches/*/replay.zip
 benchmarks/**/replay.sqlite
 benchmarks/controlled/fixture.sqlite
-benchmarks/batches/*/questions.html
 benchmarks/report.html
-benchmarks/rounds/*/insights.html
 benchmarks/eyetest/images/
-benchmarks/pagetest/images/
-benchmarks/spotchecks/*/spotcheck.html
-benchmarks/spotchecks/*/sources/
-# Development rounds' crops and page text: the documents' content, made again from the public slices when needed
-# (the owner, 2026-10-02; scripts/rerender_rounds.py)
-benchmarks/rounds/*/pairs-*/images/
-benchmarks/rounds/*/pairs-*/pages.json
+# Working data stays local (the owner, 2026-10-03): rounds, spot checks, review batches and the page tests are
+# recorded in docs (docs/research/rounds.md); the spend ledgers and the rounds' history feed the budget caps
+benchmarks/rounds/
+benchmarks/spotchecks/
+benchmarks/batches/
+benchmarks/pagetest/
+benchmarks/eyetest/report.html
+benchmarks/ledger*.jsonl
+benchmarks/history.jsonl
+# The test fixtures' round batches: crops and page text are made again from the public slices
+tests/fixtures/rounds/*/pairs-*/images/
+tests/fixtures/rounds/*/pairs-*/pages.json
+# Real revision pairs' answers: their samples aren't committed, so CI can't replay them
+benchmarks/real-pairs/fixture.sqlite
+benchmarks/real-pairs/replay.zip
