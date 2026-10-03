@@ -159,6 +159,53 @@ Written when the work began. The owner (2026-10-02), on the readers' value beyon
 2. **Regions and prompts:** text formats' tasks named "text" and "table" as PDF's are, so a paragraph asks what a PDF paragraph asks. The alternative is new region names per format, which would make every format's prompts different. (Proposed: the same names.)
 3. **The shared task core:** a refactor of the PDF job, kept byte-identical, rather than a text reader that copies its task handling. (Proposed: the shared core.)
 
+## Pictures in Word documents, in detail (2026-10-03), for the owner's review
+
+The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll work on reading pictures." The per-format table already says a `.docx`'s embedded images go to the visual pipeline; this is how, ahead of milestone 6 (images on their own).
+
+**What the samples hold** (Word and PowerPoint files in `samples/`):
+
+| Where | Pictures | Notes |
+|---|---|---|
+| TS 38.300 (three versions) | 270 EMF, 115 WMF, 19 PNG | Almost all are previews of embedded Visio drawings (176 `.vsd`, 92 `.vsdx`, 109 OLE `.bin` beside them): sequence diagrams, protocol stacks, architectures |
+| RAN1 contributions and summaries (5) | 13 PNG, 2 JPEG | Plots and tables as pictures |
+| Rel-19 views (`.pptx`, 3) | PNG, JPEG, TIFF, one embedded workbook | For milestone 3 |
+
+**Found by trying:**
+- LibreOffice (installed here: `soffice --headless --convert-to`) renders EMF and WMF faithfully, about 1.5 s for five pictures in one call.
+- Converted to PDF, a drawing stays vector, and its labels stay text. A sequence diagram's "UE", "gNB", "1. UECapabilityEnquiry" and the stack's "PHY", "MAC", "RLC" are in its text layer.
+- Each picture lands on a page with a white background, so it's cropped to what's drawn.
+- Python has no maintained EMF renderer. Pillow reads WMF only on Windows; PyMuPDF opens PNG, JPEG and TIFF but not EMF.
+
+**Proposed (Claude's):**
+1. **Pictures become pages:**
+   - A raster picture (PNG, JPEG, GIF, BMP, TIFF) is wrapped in a page by PyMuPDF.
+   - An EMF or WMF picture is converted to PDF by LibreOffice, keeping its vector drawing and text, then cropped to its drawing.
+   - The PDF job's visual tasks then read these pages unchanged: a figure read whole, tiles for a large one, the text layer as context (`visual_text_layer`), and crops for comparisons (`verify_visuals`).
+2. **Read in their document, not apart:** each picture's tasks are part of its Word document's job.
+   - Its context is its caption (the paragraph naming "Figure …", or one in a caption style), its section heading, and the paragraphs around it, as a PDF figure's are.
+   - Its claims are located at the picture's paragraph (`DocxLocator`, region figure or tile) with their crop.
+   - A picture's tasks are keyed by its bytes. An unchanged picture in two revisions asks the same queries and gets the same claims, which alignment then settles.
+3. **LibreOffice as an optional converter:**
+   - It's found on the path, or named by a setting: the first piece of milestone 4's converter interface, pulled forward.
+   - Without it, EMF and WMF pictures stay recorded as not read, with the install hint; raster pictures are read regardless.
+   - Its version is recorded with the run, as PyMuPDF's is, since it shapes the crops.
+4. **Every picture is read,** a tiny one (under about half an inch drawn) excepted. A cover logo costs one request; captions don't decide, since many real figures have none.
+5. **Measured:**
+   - **The controlled Word documents gain their figures** as pictures (the PDF's chart and drawing regions, rendered). The Word representation then carries chart and schematic facts too, scored exactly beside the PDF's readings.
+   - **TS 38.300's figures** are read by eye, and the v19.2 → v19.3 pair compared again with pictures.
+6. **Later, as tentative index rows:**
+   - the Visio sources' shape text (`.vsdx` XML), as `.pptx` chart XML is read
+   - a Markdown file's linked local images
+   - `.pptx` pictures, by the same path
+
+**For the owner:**
+- **A. LibreOffice as an optional external converter for EMF and WMF now.** Recommended: it's the only renderer here that draws 3GPP's figures, and it's already the plan's first converter. The alternative is leaving TS 38.300's figures unread until milestone 4.
+- **B. Pictures read within their document,** with captions and neighbouring text as context and claims located at their paragraph. Recommended over reading each picture as a separate file, which loses the caption and section.
+- **C. Every picture read** (a size floor aside), rather than only captioned ones.
+
+**Cost:** about 150 pictures in each TS 38.300 version, about one request each, with tiles for large ones: roughly $0.10–0.25 a version. The controlled Word figures cost cents.
+
 ## Decisions (2026-09-23)
 
 - **Milestone 1's design (2026-10-03).** The owner: "I agree with all three recommendations": a `TextLocator` beside `PdfLocator` with text excerpts in reports; text formats' tasks named "text" and "table" as PDF's are; a shared task core, the PDF job refactored byte-identically.
