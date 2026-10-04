@@ -510,6 +510,27 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
     - **A gap met on the way:** a store re-run after a reader change keeps the tasks the old reader made. The first re-run asked nothing new ($0.002). The pair was re-read into a fresh store, the old one set aside. A reader version in the store's binding would close this gap; until then, a reader change means fresh stores.
   - **The real-pair replay names the model as recorded,** as the controlled corpus's does: it works without `.env`.
   - Cost: $0.015 for the knobs.
+- **Text boxes (2026-10-04): built.** The owner, on text boxes as the next Word knob: "Please proceed."
+  - **What the reader did before:**
+    - **a modern text box was read twice,** once from its shape and once from the VML copy Word keeps for older readers, both glued into the middle of the sentence anchoring it
+    - **a table in a text box** was never read as a table: its cells were glued, twice, into the paragraph before it
+    - **every text box was reported as an unread object**
+  - **The design** (`docxdocs.py`):
+    - **out of the anchor:** a paragraph's own text leaves its text boxes out
+    - **after the anchor:** each box's paragraphs and tables follow the paragraph anchoring it, read as the document's own (headings, numbering, footnotes, nested boxes alike), as footnotes follow theirs
+    - **in a table cell,** a box's text joins the cell's
+    - **no copies:** Word's copy for older readers (`mc:Fallback`) is never read, so text, pictures and footnote marks aren't repeated
+    - **not a picture:** a plain text box is no longer reported unread. A drawing of grouped shapes or a drawing canvas is recorded as "a drawing of shapes (its text read, not its arrangement)".
+  - **Measured on the real Word samples first,** the old reader against the new:
+    - **TS 38.300** reads exactly as before.
+    - **A Qualcomm RAN1 contribution** draws its figures with Word shapes. Before, all their labels were glued twice into one paragraph ("AI/ML Model(ID#X)AI/ML Model(ID#X)Output features…"); now each label is read once, on its own line. Unread objects fell from 166 to 64, the rest shapes without text.
+    - **An Ericsson contribution's** body sentences no longer carry its diagrams' labels glued in. Its two grouped drawings are recorded as drawings of shapes.
+  - **The knob** (`word.py`, `wtp-s1-textbox`), the treatment plant's document with:
+    - a sentence in a modern text box (a shape with Word's VML copy)
+    - the pump table and its caption in another
+    - a sentence in a VML text box alone, as older Word wrote them
+    - **Result:** 33 of 33 facts read right, conditions kept 11 of 11, the same claims as the plain document, for $0.001. Most of its queries were the plain document's.
+  - **Not yet:** a drawing of shapes is read as its text only. The [lever index](../reviews/levers.md) has a row for reading their arrangement.
 
 ## Open questions
 

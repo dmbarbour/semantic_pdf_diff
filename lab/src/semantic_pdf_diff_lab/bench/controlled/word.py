@@ -18,6 +18,9 @@ reader's own lines).
   tables nested in an area table, one per area.
 - **layout:** the schedules inside a borderless table of one row and two columns, used to lay out the page: read
   as content, it reads as the plain document does.
+- **textbox:** the treatment plant's document with a sentence and a captioned table in text boxes as Word writes
+  them (a DrawingML shape, and a VML copy of it for older readers), and a sentence in a VML text box alone (as
+  older Word wrote them); each anchored in a paragraph.
 
 Byte for byte the same each time (representations.FIXED_TIME).
 """
@@ -30,6 +33,11 @@ import zipfile
 from .representations import FIXED_TIME
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+NAMESPACES = (f'xmlns:w="{W}" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" '
+              'xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" '
+              'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+              'xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" '
+              'xmlns:v="urn:schemas-microsoft-com:vml"')
 AUTHOR, DATE = "controlled corpus", "2026-01-01T00:00:00Z"
 SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[A-Z])")
 CONDITION = re.compile(r"^Condition (\d+): (.*)$")
@@ -83,6 +91,7 @@ class Writer:
         self.revision = 0
         self.footnotes = []  # their texts, numbered from 1
         self.lists = {}      # label: numId
+        self.boxes = 0
 
     def mark(self, tag):
         self.revision += 1
@@ -159,6 +168,40 @@ class Writer:
                     self.tracked(p, before, new)
                 elif new:
                     p.append(self.run(new))
+        return table._tbl
+
+    def text_box(self, anchor, elements, legacy=False):
+        """A text box anchored in paragraph `anchor` (an element), holding `elements` (paragraphs and tables, moved
+        out of the body): as Word writes one, a DrawingML shape with a VML copy for older readers; or (legacy) the
+        VML shape alone."""
+        import copy
+        from docx.oxml import parse_xml
+        self.boxes += 1
+        n = self.boxes
+        vml = (f'<w:pict><v:shape id="Text Box {n}" type="#_x0000_t202" style="position:absolute;margin-left:300pt;'
+               f'width:160pt;height:80pt"><v:textbox><w:txbxContent/></v:textbox></v:shape></w:pict>')
+        if legacy:
+            run = parse_xml(f"<w:r {NAMESPACES}>{vml}</w:r>")
+        else:
+            run = parse_xml(
+                f'<w:r {NAMESPACES}><mc:AlternateContent><mc:Choice Requires="wps"><w:drawing><wp:anchor distT="0" '
+                f'distB="0" distL="114300" distR="114300" simplePos="0" relativeHeight="{n}" behindDoc="0" locked="0" '
+                f'layoutInCell="1" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="column">'
+                f'<wp:posOffset>3810000</wp:posOffset></wp:positionH><wp:positionV relativeFrom="paragraph">'
+                f'<wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="2032000" cy="1016000"/>'
+                f'<wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapSquare wrapText="bothSides"/>'
+                f'<wp:docPr id="{n}" name="Text Box {n}"/><wp:cNvGraphicFramePr/><a:graphic><a:graphicData '
+                f'uri="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"><wps:wsp>'
+                f'<wps:cNvSpPr txBox="1"/><wps:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="2032000" cy="1016000"/>'
+                f'</a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></wps:spPr><wps:txbx><w:txbxContent/>'
+                f'</wps:txbx><wps:bodyPr/></wps:wsp></a:graphicData></a:graphic></wp:anchor></w:drawing>'
+                f'</mc:Choice><mc:Fallback>{vml}</mc:Fallback></mc:AlternateContent></w:r>')
+        boxes = list(run.iter(_qn("w:txbxContent")))
+        copies = [[copy.deepcopy(e) for e in elements] for _ in boxes[1:]]
+        boxes[0].extend(elements)
+        for box, held in zip(boxes[1:], copies):
+            box.extend(held)
+        anchor.append(run)
 
     def footnote(self, paragraph, text):
         """A footnote reference at the end of `paragraph` (an element), its note `text`."""
@@ -455,6 +498,33 @@ def laid_out(project):
         cell._tc.remove(cell.paragraphs[0]._p)
     return writer.save()
 
+def boxed(lines, sentences, tables):
+    """The document with each sentence printing a value of `sentences` ({value: "modern" | "legacy"}) moved into a
+    text box anchored in its paragraph, and each table captioned as in `tables` (with its caption) into a text box
+    anchored in the paragraph before it: a Word document's bytes."""
+    writer = Writer()
+    parts, last, k = blocks(lines), None, 0
+    pattern = lambda v: re.compile(rf"(?<![\w.,]){re.escape(v)}(?![\w]|[.,]\d)")
+    while k < len(parts):
+        block = parts[k]
+        if block[0] == "bold" and block[1] in tables and k + 1 < len(parts) and parts[k + 1][0] == "table":
+            held = [writer.paragraph(block[1], bold=True), writer.table(parts[k + 1][1]), writer.paragraph()]
+            writer.text_box(last, held)  # a box ends with a paragraph, as a cell does
+            k += 2
+            continue
+        if block[0] == "p":
+            kept, moved = [], []
+            for sentence in SENTENCE.split(block[1]):
+                kind = next((sentences[v] for v in sentences if pattern(v).search(sentence)), None)
+                (moved if kind else kept).append((sentence, kind))
+            last = writer.paragraph(" ".join(sentence for sentence, _ in kept))
+            for sentence, kind in moved:
+                writer.text_box(last, [writer.paragraph(sentence)], legacy=kind == "legacy")
+        else:
+            write_block(writer, block)
+        k += 1
+    return writer.save()
+
 # --- the knobs' documents and pairs ----------------------------------------------------------------------------
 
 # Facts whose sentences move into footnotes: each sentence stands beside another in its paragraph
@@ -471,6 +541,11 @@ def documents(seed=1):
     notes = water_treatment(seed)
     notes.id = f"{base.id}-footnotes"
     out.append((notes, footnoted(markdown(base), [base.fact(f).value for f in FOOTNOTED])))
+    boxes = water_treatment(seed)
+    boxes.id = f"{base.id}-textbox"
+    out.append((boxes, boxed(markdown(base), {base.fact("plant.finished_turbidity").value: "modern",
+                                              base.fact("chem.chlorine").value: "legacy"},
+                             {"Table 1. Raw water pumps"})))
     (_, later), = revised(seed, only=(base.id,))
     later.id, later.revision_of = f"{base.id}-tracked", base.id
     out.append((later, tracked(markdown(base), markdown(later))))

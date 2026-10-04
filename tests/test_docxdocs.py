@@ -207,5 +207,59 @@ class WordTables(unittest.TestCase):
         self.assertIn('Header: ["Pump", "Rated point"]\nRow: ["P-101A", "Flow: 450 gpm; Head: 85 ft"]', rows)
         self.assertFalse(any('"Flow"' in r for r in rows))  # the nested rows aren't asked under the outer header
 
+GROUP = """<w:r {ns} xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"><w:drawing>
+<wp:inline><wp:extent cx="2000000" cy="1000000"/><wp:docPr id="9" name="Group 9"/><a:graphic>
+<a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"><wpg:wgp>{shapes}</wpg:wgp>
+</a:graphicData></a:graphic></wp:inline></w:drawing></w:r>"""
+SHAPE = ('<wps:wsp><wps:spPr/><wps:txbx><w:txbxContent><w:p><w:r><w:t>{}</w:t></w:r></w:p></w:txbxContent></wps:txbx>'
+         '<wps:bodyPr/></wps:wsp>')
+
+@unittest.skipIf(docx is None, "python-docx isn't installed (the office extra)")
+class WordTextBoxes(unittest.TestCase):
+    """Text boxes (the adapters plan, "Text boxes"): read once, after the paragraph anchoring them."""
+    def test_a_text_box_follows_its_paragraph_once_and_isnt_an_unread_object(self):
+        from semantic_pdf_diff.docxdocs import read_docx
+        from semantic_pdf_diff_lab.bench.controlled.word import Writer
+        writer = Writer()
+        p = writer.paragraph("The plant serves 89,000 persons.")
+        writer.text_box(p, [writer.paragraph("Chlorine is fed at 3.3 mg/L.")])          # with Word's VML copy
+        q = writer.paragraph("Alum is dosed at 38.8 mg/L.")
+        writer.text_box(q, [writer.paragraph("The basins are 14.5 ft deep.")], legacy=True)
+        held = [writer.paragraph("Table 1. Pumps", bold=True), writer.table([["Tag", "Capacity (gpm)"],
+                                                                             ["P-101A", "5,151"]]), writer.paragraph()]
+        writer.text_box(q, held)
+        doc = read_docx(writer.save())
+        self.assertEqual([t for _, t in doc.lines if t],
+                         ["The plant serves 89,000 persons.", "Chlorine is fed at 3.3 mg/L.",
+                          "Alum is dosed at 38.8 mg/L.", "The basins are 14.5 ft deep.", "Table 1. Pumps",
+                          "Tag | Capacity (gpm)", "P-101A | 5,151"])
+        self.assertEqual([b.rows for b in doc.blocks if b.kind == "table"], [[["Tag", "Capacity (gpm)"],
+                                                                              ["P-101A", "5,151"]]])
+        self.assertEqual(doc.images, [])
+
+    def test_grouped_shapes_are_read_as_text_and_recorded_as_a_drawing(self):
+        from docx.oxml import parse_xml
+        from semantic_pdf_diff.docxdocs import read_docx
+        from semantic_pdf_diff_lab.bench.controlled.word import NAMESPACES
+        d = docx.Document()
+        p = d.add_paragraph("Figure 3 shows the monitoring loop.")
+        p._p.append(parse_xml(GROUP.format(ns=NAMESPACES, shapes=SHAPE.format("Model inference") +
+                                           SHAPE.format("Monitoring every 40 ms"))))
+        table = d.add_table(rows=2, cols=2)
+        table.cell(0, 0).text, table.cell(0, 1).text, table.cell(1, 0).text = "Item", "Note", "Blower B-401"
+        cell = table.cell(1, 1)
+        cell.paragraphs[0].add_run("Note")
+        from semantic_pdf_diff_lab.bench.controlled.word import Writer
+        boxed = Writer()
+        boxed.text_box(cell.paragraphs[0]._p, [boxed.paragraph("rated at 75 kW")])
+        raw = io.BytesIO()
+        d.save(raw)
+        doc = read_docx(raw.getvalue())
+        texts = [t for _, t in doc.lines if t]
+        self.assertEqual(texts[:3], ["Figure 3 shows the monitoring loop.", "Model inference", "Monitoring every 40 ms"])
+        self.assertEqual([detail for *_, detail in doc.images],
+                         ["a drawing of shapes (its text read, not its arrangement)"])
+        self.assertEqual(next(b for b in doc.blocks if b.kind == "table").rows[1], ["Blower B-401", "Note rated at 75 kW"])
+
 if __name__ == "__main__":
     unittest.main()

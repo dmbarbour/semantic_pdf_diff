@@ -31,8 +31,12 @@ grouping, the context levers and the task core work unchanged, and a claim's loc
   marked "[1]" where it stands.
 - **Numbered lists:** Word writes their numbers ("Condition 3:", "a)", "iv."), not the text: they're written from the
   numbering definitions (levels, formats, label text, a style's own numbering) before each item's text.
-- **Not read yet:** charts and other drawings without a picture, each recorded as not read; comments; text boxes
-  (their text is read where they're anchored).
+- **Text boxes** (DrawingML shapes, and VML in older documents): a paragraph's own text leaves its text boxes out;
+  each box's paragraphs and tables follow the paragraph anchoring it, read as the document's own. In a table cell a
+  box's text joins the cell's. A copy Word keeps for older readers (mc:Fallback) is never read: its text, pictures
+  and footnote marks would repeat the shape's. A plain text box isn't a picture; a drawing of grouped shapes is
+  recorded as one whose text is read but not its arrangement.
+- **Not read yet:** charts and other drawings without a picture, each recorded as not read; comments.
 
 Needs python-docx (the `office` extra).
 """
@@ -50,6 +54,10 @@ A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
 R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 WP = "{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}"
 V = "{urn:schemas-microsoft-com:vml}"
+MC = "{http://schemas.openxmlformats.org/markup-compatibility/2006}"
+SHAPES = ("{http://schemas.microsoft.com/office/word/2010/wordprocessingGroup}wgp",   # grouped shapes
+          "{http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas}wpc",  # a drawing canvas
+          V + "group")
 NESTED_INLINE_ROWS = 6  # a nested table this small is written into its cell; a larger one is read on its own
 LAYOUT_CHARS = 200      # cells averaging this much text make a table without a header row a layout table
 HEADER_CHARS = 40       # a header row's cells are filled and at most this long
@@ -63,11 +71,28 @@ def _qn(tag):
     from docx.oxml.ns import qn
     return qn(tag)
 
-def paragraph_text(p, notes=None):
+def _walk(element, boxes=False):
+    """An element's descendants in order, without the copies Word keeps for older readers (mc:Fallback) and, unless
+    boxes, without its text boxes' content."""
+    skip = {MC + "Fallback"} | (set() if boxes else {_qn("w:txbxContent")})
+    for child in element:
+        if child.tag in skip:
+            continue
+        yield child
+        yield from _walk(child, boxes)
+
+def _boxes(element):
+    """The text boxes an element anchors (not those inside them), in order."""
+    for node in _walk(element):
+        for child in node:
+            if child.tag == _qn("w:txbxContent"):
+                yield child
+
+def paragraph_text(p, notes=None, boxes=False):
     """A paragraph's text with tracked insertions applied and deletions left out; with notes ({footnote id: its
-    number}), each footnote reference marked "[n]"."""
+    number}), each footnote reference marked "[n]". Its text boxes' text is left out, or with boxes, put after it."""
     out = []
-    for node in p.iter():
+    for node in _walk(p):
         tag = node.tag
         if tag == _qn("w:t"):
             out.append(node.text or "")
@@ -77,7 +102,15 @@ def paragraph_text(p, notes=None):
             out.append("\n")
         elif notes is not None and tag == _qn("w:footnoteReference") and node.get(_qn("w:id")) in notes:
             out.append(f"[{notes[node.get(_qn('w:id'))]}]")
+    if boxes:
+        out += [" " + _box_text(box, notes) for box in _boxes(p)]
     return "".join(out)
+
+def _box_text(box, notes=None):
+    """A text box's text on one line: its paragraphs and its tables' paragraphs, boxes within it included."""
+    paragraphs = [q for child in _children(box, "w:p", "w:tbl")
+                  for q in ([child] if child.tag == _qn("w:p") else [n for n in _walk(child) if n.tag == _qn("w:p")])]
+    return " ".join(t for t in (paragraph_text(q, notes, True).strip() for q in paragraphs) if t)
 
 def _footnotes(document):
     """{footnote id: its text} from the document's footnotes part (none: {}); separators left out."""
@@ -92,7 +125,8 @@ def _footnotes(document):
     for note in root.iter(_qn("w:footnote")):
         if note.get(_qn("w:type")) in ("separator", "continuationSeparator", "continuationNotice"):
             continue
-        out[note.get(_qn("w:id"))] = " ".join(paragraph_text(p).strip() for p in note.iter(_qn("w:p"))).strip()
+        out[note.get(_qn("w:id"))] = " ".join(paragraph_text(p, boxes=True).strip() for p in _walk(note)
+                                              if p.tag == _qn("w:p")).strip()
     return out
 
 class Numbering:
@@ -241,7 +275,7 @@ def _cell_text(tc, numbers):
     parts, nested = [], []
     for child in _children(tc, "w:p", "w:tbl"):
         if child.tag == _qn("w:p"):
-            parts.append(paragraph_text(child, numbers).strip())
+            parts.append(paragraph_text(child, numbers, boxes=True).strip())
             continue
         grid = _grid(child, numbers)
         if len(grid) > NESTED_INLINE_ROWS:
@@ -326,27 +360,36 @@ def _style(paragraph_element, styles):
             sid = ps.get(_qn("w:val"))
     return styles.get(sid, sid or "Normal")
 
-def _pictures(element, part):
+def _pictures(element, part, boxes=False):
     """[(the picture's part, its displayed size in points or None) or (None, what it is)] for each drawing,
-    embedded object and VML picture in an element."""
+    embedded object and VML picture in an element (with boxes, those in its text boxes too); a plain text box is
+    none."""
     out = []
-    for node in element.iter(_qn("w:drawing"), _qn("w:object"), _qn("w:pict")):
+    kinds = {_qn("w:drawing"), _qn("w:object"), _qn("w:pict")}
+    for node in (n for n in _walk(element, boxes) if n.tag in kinds):
+        own = list(_walk(node))  # the drawing itself, not what its text boxes hold
+        has_text = any(True for _ in _boxes(node))
+        shapes = any(n.tag in SHAPES for n in own)
         if node.tag == _qn("w:drawing"):
-            blip = next(node.iter(A + "blip"), None)
+            blip = next((n for n in own if n.tag == A + "blip"), None)
             rid = blip.get(R + "embed") if blip is not None else None
-            extent = next(node.iter(WP + "extent"), None)
+            extent = next((n for n in own if n.tag == WP + "extent"), None)
             size = (int(extent.get("cx")) / EMU_PER_POINT, int(extent.get("cy")) / EMU_PER_POINT) \
                 if extent is not None and extent.get("cx") and extent.get("cy") else None
             what = "a chart or drawing without a picture"
         else:
-            data = next(node.iter(V + "imagedata"), None)
+            data = next((n for n in own if n.tag == V + "imagedata"), None)
             rid = data.get(R + "id") if data is not None else None
-            shape = next(node.iter(V + "shape"), None)
+            shape = next((n for n in own if n.tag == V + "shape"), None)
             found = dict((k.lower(), float(v) * POINTS_PER[(u or "").lower() or None])
                          for k, v, u in LENGTH.findall(shape.get("style", "") if shape is not None else ""))
             size = (found["width"], found["height"]) if "width" in found and "height" in found else None
             what = "an embedded object without a preview"
         target = part.related_parts.get(rid) if rid else None
+        if target is None and has_text:
+            if not shapes:
+                continue  # a text box: its text is read
+            what = "a drawing of shapes (its text read, not its arrangement)"
         out.append((target, size) if target is not None else (None, what))
     return out
 
@@ -362,8 +405,8 @@ def read_docx(data):
         lines.append((1, text))
         return len(lines)
 
-    def note(element, n, where):
-        for target, detail in _pictures(element, document.part):
+    def note(element, n, where, boxes=False):
+        for target, detail in _pictures(element, document.part, boxes):
             if target is None:
                 images.append((1, n, where, detail))
             else:
@@ -374,7 +417,8 @@ def read_docx(data):
 
     def cited(element):
         """The footnote ids an element cites, numbered as they're met."""
-        ids = [r.get(_qn("w:id")) for r in element.iter(_qn("w:footnoteReference")) if r.get(_qn("w:id")) in notes]
+        ids = [r.get(_qn("w:id")) for r in _walk(element, boxes=element.tag == _qn("w:tbl"))
+               if r.tag == _qn("w:footnoteReference") and r.get(_qn("w:id")) in notes]
         for i in ids:
             numbers.setdefault(i, len(numbers) + 1)
         return ids
@@ -395,20 +439,17 @@ def read_docx(data):
         n = line(text)
         styles_of[n] = style
         note(child, n, style)
-        if ids and not text:
-            footnote_lines(ids)
-            return
-        if not text or style.lower().startswith("toc"):
-            return
         match = HEADING.match(style)
-        if match:
+        if text and match:
             level = int(match.group(1))
             title = " ".join(text.split())
             headings.append((1, n, level, title))
             blocks.append(Block(1, n, n, title))
-        else:
+        elif text and not style.lower().startswith("toc"):
             blocks.append(Block(1, n, n, text))
         footnote_lines(ids)
+        for box in _boxes(child):  # after the paragraph anchoring it, as the document's own paragraphs
+            content(_children(box, "w:p", "w:tbl"))
 
     def table(child, place=None):
         """A data table's rows as lines, its larger nested tables after it; a layout table's cells as content. A
@@ -438,7 +479,7 @@ def read_docx(data):
         blocks.append(Block(1, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
                             row_lines, row_headers))
         if place is None:
-            note(child, first, "table")
+            note(child, first, "table", boxes=True)
         for cells, cell in inner:
             where = ", ".join(t for t in (cells[0].text if cells[0] is not cell else "",
                                           _joined(labels[cell.first:cell.last + 1])) if t)
