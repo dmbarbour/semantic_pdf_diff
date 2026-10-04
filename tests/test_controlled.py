@@ -51,9 +51,12 @@ class Knobs(unittest.TestCase):
 
     def test_charts_under_every_knob(self):
         import pymupdf
-        # grouped bars (energy), stacked bars and lines (end use): a fact of each, and its chart's step
+        # grouped bars (energy), stacked bars and lines (end use), and the dense charts' bars and lines (metered): a
+        # fact of each, and its chart's step
         for make, fid, step in ((controlled.energy_study, "opt1.july", 50), (controlled.end_use_study, "fans.july", 50),
-                                (controlled.end_use_study, "opt2.july", 100)):
+                                (controlled.end_use_study, "opt2.july", 100),
+                                (controlled.metered_study, "north.use.july", 50),
+                                (controlled.metered_study, "south.peak.july", 100)):
             for knob in controlled.CHART_KNOBS:
                 project = make(1)
                 project.knob = knob
@@ -70,6 +73,26 @@ class Knobs(unittest.TestCase):
                     self.assertEqual(fact.tolerance, step / 4 if knob in ("axis", "all") else 0.0)
                     text = "".join(page.get_text() for page in pymupdf.open("pdf", data))
                     self.assertEqual(text == "", knob in ("scan", "all"))  # a scan has no text layer
+
+    def test_procedure_diagrams_place_every_message_where_it_is_drawn(self):
+        import pymupdf
+        from semantic_pdf_diff_lab.bench.controlled import procedures
+        for knob in procedures.PROCEDURE_KNOBS:
+            project = procedures.attach_procedure(1)
+            project.knob = knob
+            data, log = controlled.render(project)
+            with self.subTest(knob=knob):
+                again = procedures.attach_procedure(1)
+                again.knob = knob
+                self.assertEqual(controlled.render(again)[0], data)  # byte for byte
+                messages = [f for f in project.facts if f.drawn == "figure"]
+                self.assertEqual(len(messages), 24)  # more than one request returns (claims_per_request 20)
+                self.assertTrue(all({x["form"] for x in f.forms} == {"figure"} for f in messages))
+                steps = {p["text"] for p in log if p["role"] == "structure"}
+                self.assertTrue({str(k) for k in range(1, 25)} <= steps)  # the step numbers: structure, not facts
+                self.assertEqual(len({f.value for f in project.facts}), len(project.facts))  # a value names one fact
+                words = pymupdf.open("pdf", data)[0].get_text()
+                self.assertEqual("Admission Grant" in words, knob == "clean")  # raster: the diagram is an image
 
     def test_schematics_place_every_relation_where_each_knob_says(self):
         from semantic_pdf_diff_lab.bench.controlled import schematics
@@ -381,7 +404,9 @@ class Revisions(unittest.TestCase):
                     # the knobs from the "why different" pass's misses: rewording and renumbering change no fact; a
                     # list member replaced is one gone and one new; a lead-in renamed changes two values' conditions
                     "wtp-s1-reworded": (0, 0, 0, 0), "spec-s1": (3, 0, 0, 0), "spec-s1-members": (0, 2, 1, 0),
-                    "spec-s1-renumbered": (0, 1, 0, 0), "spec-s1-context": (0, 0, 0, 2)}
+                    "spec-s1-renumbered": (0, 1, 0, 0), "spec-s1-context": (0, 0, 0, 2),
+                    # a diagram: a message inserted (the steps after it renumbered) and two parameters revised
+                    "attach-s1-clean": (2, 1, 0, 0)}
         bases = {p.id: p for p in controlled.corpus(knobs=True)}
         made = revisions.revised()
         self.assertEqual([pair for pair, _ in made], revisions.pairs())
@@ -432,9 +457,37 @@ class Representations(unittest.TestCase):
         energy = R.key(*written["lcc-energy-s1-clean"])
         self.assertIn("opt1.july", energy["absent"])               # a bar: only the chart held it
         self.assertIn("opt1.season", {f["id"] for f in energy["facts"]})
+        attach = R.key(*written["attach-s1-clean"])
+        self.assertIn("msg7.rate", attach["absent"])                # a message: only the diagram held it
+        self.assertIn("attach.deadline", {f["id"] for f in attach["facts"]})
         parsed = textdocs.parse("\n".join(written["wtp-tables-s1-clean"][1]), markdown=True)
         self.assertEqual(sum(b.kind == "table" for b in parsed.blocks), 3)  # pumps, blowers, valves (whole)
         self.assertEqual(parsed.headings[0][3], "Harrow Creek WTP: Equipment Schedules")
+
+    def test_word_carries_a_procedure_diagram_as_a_metafile_that_draws_its_labels_as_text(self):
+        try:
+            import docx  # noqa: F401
+            import pyclipper  # noqa: F401
+        except ImportError:
+            self.skipTest("needs the office extra (python-docx, Pillow, pyclipper)")
+        import pymupdf
+        from semantic_pdf_diff import metafiles
+        from semantic_pdf_diff.docxdocs import read_docx
+        from semantic_pdf_diff_lab.bench.controlled import representations as R
+        project, lines = {p.id: (p, lines) for p, lines in R.corpus()}["attach-s1-clean"]
+        data = R.docx(lines, R.chart_pictures(project))
+        picture, = read_docx(data).pictures
+        self.assertEqual((picture.extension, picture.caption), (".wmf", "Figure 1. Attach procedure"))
+        drawn = metafiles.draw(picture.data)
+        self.assertFalse(drawn.skipped)
+        text = pymupdf.open("pdf", drawn.pdf)[0].get_text()
+        for f in project.facts:
+            if f.drawn == "figure":
+                self.assertIn(f"{f.attribute} {f.value}", text)
+        key = R.docx_key(project, data)
+        self.assertEqual(key["absent"], [])
+        self.assertEqual({x["form"] for f in key["facts"] if f["id"].startswith("msg") for x in f["forms"]},
+                         {"docx-figure"})
 
 class ComparisonScoring(unittest.TestCase):
     """A report's findings against the key's changes, on the treatment plant's pair."""

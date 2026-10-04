@@ -13,6 +13,8 @@ The changes are those revisions make, met in documents and reviews:
 - a drawing's revision table gaining a row
 - a change the later revision narrates, printing the superseded value beside the new one (the roller coaster's
   lift hill: the corpus's document is that later revision, so its earlier one is generated)
+- a message inserted into a procedure diagram, the steps after it renumbered (TS 38.300's procedure diagrams, read
+  as pictures: the revision comparison plan)
 
 And the confounders the "why different" pass met in real specifications (the revision comparison plan, milestone 4),
 on the link protocol's specification: a value changed beside its look-alikes (an extended short format beside the
@@ -24,6 +26,7 @@ import re
 from dataclasses import dataclass, replace
 
 from .corpus import (CHART_PROJECTS, Draw, Fact, PROJECTS, PROSE_PROJECTS, TABLE_PROJECTS, parse_number, render)
+from .procedures import PROCEDURE_PROJECTS
 from .sheets import SHEET_PROJECTS, sheet_project
 
 @dataclass
@@ -77,7 +80,7 @@ def change(project, fact_id, value):
         count += n
         return text
     _rewrite(project, edit)
-    if not count and fact.drawn != "chart":
+    if not count and fact.drawn not in ("chart", "figure"):
         raise ValueError(f"{project.id}: {fact_id}'s value {fact.value} isn't printed in its blocks")
     project.edits.append({"kind": "changed", "fact": fact_id, "from": fact.value, "to": value})
     fact.value = value
@@ -272,6 +275,16 @@ def insert_numbered(project, label, first_fact, text, fact):
     project.facts.append(fact)
     project.edits += [{"kind": "added", "facts": [fact.id]}, {"kind": "renumbered", "labels": labels}]
 
+def insert_message(project, after_fact, sender, receiver, message, fact):
+    """A message inserted into a procedure diagram after the one carrying `after_fact`, the steps after it renumbered
+    (their messages and values kept): its parameter a new fact."""
+    procedure = next(b[1] for _, blocks in project.sections for b in blocks if b[0] == "procedure")
+    k = next(i for i, step in enumerate(procedure.steps) if step[3].id == after_fact)
+    procedure.steps.insert(k + 1, (sender, receiver, message, fact))
+    project.facts.append(fact)
+    project.edits += [{"kind": "added", "facts": [fact.id]},
+                      {"kind": "renumbered", "labels": {str(n): str(n + 1) for n in range(k + 2, len(procedure.steps))}}]
+
 def reword(project, passages, facts):
     """Passages rewritten without changing what they state (conditions in other words): the facts unchanged."""
     for old, new in passages:
@@ -424,6 +437,17 @@ def context_later(p, d):
         p.edits.append({"kind": "conditions", "fact": fid, "from": fact.conditions, "to": "link lightly loaded"})
         fact.conditions = "link lightly loaded"
 
+def attach_later(p, d):
+    """Revision B of the attach procedure: a Key Challenge inserted after the Key Request, the 15 steps after it
+    renumbered; the lookup timeout (before the insertion) and the setup timer (after it, so renumbered too)
+    revised."""
+    for fid in ("msg5.timeout", "msg16.timer"):
+        change(p, fid, near(d, p.fact(fid).value))
+    insert_message(p, "msg9.length", 1, 0, "Key Challenge",
+                   Fact("challenge.timeout", "Key Challenge", ("key challenge", "Key Challenge message"),
+                        "response timeout", ("timeout", "challenge timeout"), d.number(100, 900), "ms",
+                        basis="required", drawn="figure"))
+
 # base maker, its knob (None: the clean corpus), the edit, whether the generated document is the earlier one, and
 # the revision's name (the first revision of a base is "revised"; its pair is named after the base)
 PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
@@ -442,7 +466,9 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          (PROJECTS["spec"], None, spec_later, False, "revised"),
          (PROJECTS["spec"], None, members_later, False, "members"),
          (PROJECTS["spec"], None, renumbered_later, False, "renumbered"),
-         (PROJECTS["spec"], None, context_later, False, "context"))
+         (PROJECTS["spec"], None, context_later, False, "context"),
+         # a claim-heavy diagram (the adapters plan, "Pictures in Word documents")
+         (PROCEDURE_PROJECTS["attach"], "clean", attach_later, False, "revised"))
 
 def _base(make, knob, seed):
     p = make(seed)

@@ -332,6 +332,251 @@
     "visual": "0/0"
    }
   },
+  "attach-s1-clean": {
+   "facts": 26,
+   "found": 26,
+   "recall": 1.0,
+   "found_right": 26,
+   "missed": [],
+   "claims": 34,
+   "outcomes": {
+    "hallucinated": 2,
+    "loose": 1,
+    "misread": 2,
+    "right": 27,
+    "text": 2
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "figure": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.5,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "hallucinated": 2,
+     "loose": 1,
+     "misread": 2,
+     "right": 13,
+     "text": 1
+    },
+    "text": {
+     "right": 26
+    },
+    "visual": {
+     "right": 26,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "attach-s1-clean-revised": {
+   "facts": 27,
+   "found": 27,
+   "recall": 1.0,
+   "found_right": 27,
+   "missed": [],
+   "claims": 41,
+   "outcomes": {
+    "hallucinated": 2,
+    "misread": 1,
+    "right": 31,
+    "text": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "figure": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.4815,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "hallucinated": 2,
+     "misread": 1,
+     "right": 13
+    },
+    "text": {
+     "right": 27
+    },
+    "visual": {
+     "right": 28,
+     "text": 7
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "attach-s1-clean-revised.docx": {
+   "facts": 27,
+   "found": 27,
+   "recall": 1.0,
+   "found_right": 27,
+   "missed": [],
+   "claims": 27,
+   "outcomes": {
+    "right": 27
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-figure": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0741,
+    "visual": 0.9259
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "right": 25
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "attach-s1-clean-revised.md": {
+   "facts": 2,
+   "found": 2,
+   "recall": 1.0,
+   "found_right": 2,
+   "missed": [],
+   "claims": 3,
+   "outcomes": {
+    "right": 2,
+    "text": 1
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-prose": 1.0
+   },
+   "by_reader": {
+    "text": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0"
+   }
+  },
+  "attach-s1-clean.docx": {
+   "facts": 26,
+   "found": 26,
+   "recall": 1.0,
+   "found_right": 26,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "right": 26
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-figure": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0769,
+    "visual": 0.9231
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "right": 24
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "attach-s1-clean.md": {
+   "facts": 2,
+   "found": 2,
+   "recall": 1.0,
+   "found_right": 2,
+   "missed": [],
+   "claims": 3,
+   "outcomes": {
+    "right": 2,
+    "text": 1
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-prose": 1.0
+   },
+   "by_reader": {
+    "text": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0"
+   }
+  },
+  "attach-s1-raster": {
+   "facts": 26,
+   "found": 26,
+   "recall": 1.0,
+   "found_right": 26,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "hallucinated": 5,
+    "right": 27,
+    "text": 1
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "figure": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0769,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "hallucinated": 5,
+     "right": 27,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
   "coaster-s1": {
    "facts": 30,
    "found": 30,
@@ -1559,6 +1804,288 @@
    },
    "conditions_by_reader": {
     "visual": "19/19"
+   }
+  },
+  "lcc-metered-s1-all": {
+   "facts": 51,
+   "found": 35,
+   "recall": 0.6863,
+   "found_right": 35,
+   "missed": [
+    "north.peak.april",
+    "north.peak.february",
+    "north.peak.january",
+    "north.peak.may",
+    "north.use.december",
+    "north.use.january",
+    "north.use.november",
+    "north.use.october",
+    "south.peak.april",
+    "south.peak.november",
+    "south.use.december",
+    "south.use.january",
+    "south.use.may",
+    "south.use.november",
+    "south.use.october",
+    "south.use.september"
+   ],
+   "claims": 72,
+   "outcomes": {
+    "inexact": 36,
+    "right": 36
+   },
+   "conditions_kept": "34/34",
+   "recall_by_form": {
+    "chart": 0.6667,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "visual": 0.6863
+   },
+   "outcomes_by_reader": {
+    "visual": {
+     "inexact": 36,
+     "right": 36
+    }
+   },
+   "conditions_by_reader": {
+    "visual": "34/34"
+   }
+  },
+  "lcc-metered-s1-axis": {
+   "facts": 51,
+   "found": 43,
+   "recall": 0.8431,
+   "found_right": 28,
+   "missed": [
+    "north.peak.october",
+    "north.use.december",
+    "north.use.november",
+    "south.peak.december",
+    "south.peak.november",
+    "south.peak.september",
+    "south.use.december",
+    "south.use.november"
+   ],
+   "claims": 91,
+   "outcomes": {
+    "hallucinated": 1,
+    "inexact": 31,
+    "loose": 19,
+    "misread": 1,
+    "right": 39
+   },
+   "conditions_kept": "42/42",
+   "recall_by_form": {
+    "chart": 0.8333,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 0.8431
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    },
+    "visual": {
+     "hallucinated": 1,
+     "inexact": 31,
+     "loose": 19,
+     "misread": 1,
+     "right": 36
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "42/42"
+   }
+  },
+  "lcc-metered-s1-clean": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 91,
+   "outcomes": {
+    "loose": 24,
+    "misbound": 14,
+    "right": 53
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "misbound": 14,
+     "right": 3
+    },
+    "visual": {
+     "loose": 24,
+     "right": 51
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "50/50"
+   }
+  },
+  "lcc-metered-s1-clean.docx": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 51,
+   "outcomes": {
+    "right": 51
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "docx-figure": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 0.9412
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    },
+    "visual": {
+     "right": 48
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "48/48"
+   }
+  },
+  "lcc-metered-s1-clean.md": {
+   "facts": 3,
+   "found": 3,
+   "recall": 1.0,
+   "found_right": 3,
+   "missed": [],
+   "claims": 3,
+   "outcomes": {
+    "right": 3
+   },
+   "conditions_kept": "2/2",
+   "recall_by_form": {
+    "md-prose": 1.0
+   },
+   "by_reader": {
+    "text": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2"
+   }
+  },
+  "lcc-metered-s1-legend-caption": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 77,
+   "outcomes": {
+    "loose": 24,
+    "right": 53
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    },
+    "visual": {
+     "loose": 24,
+     "right": 51
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "50/50"
+   }
+  },
+  "lcc-metered-s1-raster": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 53,
+   "outcomes": {
+    "right": 53
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    },
+    "visual": {
+     "right": 51
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "50/50"
+   }
+  },
+  "lcc-metered-s1-scan": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 51,
+   "outcomes": {
+    "right": 51
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "visual": {
+     "right": 51
+    }
+   },
+   "conditions_by_reader": {
+    "visual": "50/50"
    }
   },
   "lcc-plan-s1-all": {
@@ -4870,6 +5397,251 @@
     "visual": "0/0"
    }
   },
+  "attach-s1-clean": {
+   "facts": 26,
+   "found": 26,
+   "recall": 1.0,
+   "found_right": 26,
+   "missed": [],
+   "claims": 34,
+   "outcomes": {
+    "hallucinated": 2,
+    "loose": 1,
+    "misread": 2,
+    "right": 27,
+    "text": 2
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "figure": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.5,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "hallucinated": 2,
+     "loose": 1,
+     "misread": 2,
+     "right": 13,
+     "text": 1
+    },
+    "text": {
+     "right": 26
+    },
+    "visual": {
+     "right": 26,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "attach-s1-clean-revised": {
+   "facts": 27,
+   "found": 27,
+   "recall": 1.0,
+   "found_right": 27,
+   "missed": [],
+   "claims": 41,
+   "outcomes": {
+    "hallucinated": 2,
+    "misread": 1,
+    "right": 31,
+    "text": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "figure": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.4815,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "hallucinated": 2,
+     "misread": 1,
+     "right": 13
+    },
+    "text": {
+     "right": 27
+    },
+    "visual": {
+     "right": 28,
+     "text": 7
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "attach-s1-clean-revised.docx": {
+   "facts": 27,
+   "found": 27,
+   "recall": 1.0,
+   "found_right": 27,
+   "missed": [],
+   "claims": 27,
+   "outcomes": {
+    "right": 27
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-figure": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0741,
+    "visual": 0.9259
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "right": 25
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "attach-s1-clean-revised.md": {
+   "facts": 2,
+   "found": 2,
+   "recall": 1.0,
+   "found_right": 2,
+   "missed": [],
+   "claims": 3,
+   "outcomes": {
+    "right": 2,
+    "text": 1
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-prose": 1.0
+   },
+   "by_reader": {
+    "text": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0"
+   }
+  },
+  "attach-s1-clean.docx": {
+   "facts": 26,
+   "found": 26,
+   "recall": 1.0,
+   "found_right": 26,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "right": 26
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-figure": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0769,
+    "visual": 0.9231
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "right": 24
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "attach-s1-clean.md": {
+   "facts": 2,
+   "found": 2,
+   "recall": 1.0,
+   "found_right": 2,
+   "missed": [],
+   "claims": 3,
+   "outcomes": {
+    "right": 2,
+    "text": 1
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-prose": 1.0
+   },
+   "by_reader": {
+    "text": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0"
+   }
+  },
+  "attach-s1-raster": {
+   "facts": 26,
+   "found": 26,
+   "recall": 1.0,
+   "found_right": 26,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "hallucinated": 5,
+    "right": 27,
+    "text": 1
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "figure": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0769,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "hallucinated": 5,
+     "right": 27,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
   "coaster-s1": {
    "facts": 30,
    "found": 30,
@@ -6097,6 +6869,288 @@
    },
    "conditions_by_reader": {
     "visual": "19/19"
+   }
+  },
+  "lcc-metered-s1-all": {
+   "facts": 51,
+   "found": 35,
+   "recall": 0.6863,
+   "found_right": 35,
+   "missed": [
+    "north.peak.april",
+    "north.peak.february",
+    "north.peak.january",
+    "north.peak.may",
+    "north.use.december",
+    "north.use.january",
+    "north.use.november",
+    "north.use.october",
+    "south.peak.april",
+    "south.peak.november",
+    "south.use.december",
+    "south.use.january",
+    "south.use.may",
+    "south.use.november",
+    "south.use.october",
+    "south.use.september"
+   ],
+   "claims": 72,
+   "outcomes": {
+    "inexact": 36,
+    "right": 36
+   },
+   "conditions_kept": "34/34",
+   "recall_by_form": {
+    "chart": 0.6667,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "visual": 0.6863
+   },
+   "outcomes_by_reader": {
+    "visual": {
+     "inexact": 36,
+     "right": 36
+    }
+   },
+   "conditions_by_reader": {
+    "visual": "34/34"
+   }
+  },
+  "lcc-metered-s1-axis": {
+   "facts": 51,
+   "found": 43,
+   "recall": 0.8431,
+   "found_right": 28,
+   "missed": [
+    "north.peak.october",
+    "north.use.december",
+    "north.use.november",
+    "south.peak.december",
+    "south.peak.november",
+    "south.peak.september",
+    "south.use.december",
+    "south.use.november"
+   ],
+   "claims": 91,
+   "outcomes": {
+    "hallucinated": 1,
+    "inexact": 31,
+    "loose": 19,
+    "misread": 1,
+    "right": 39
+   },
+   "conditions_kept": "42/42",
+   "recall_by_form": {
+    "chart": 0.8333,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 0.8431
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    },
+    "visual": {
+     "hallucinated": 1,
+     "inexact": 31,
+     "loose": 19,
+     "misread": 1,
+     "right": 36
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "42/42"
+   }
+  },
+  "lcc-metered-s1-clean": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 91,
+   "outcomes": {
+    "loose": 24,
+    "misbound": 14,
+    "right": 53
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "misbound": 14,
+     "right": 3
+    },
+    "visual": {
+     "loose": 24,
+     "right": 51
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "50/50"
+   }
+  },
+  "lcc-metered-s1-clean.docx": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 51,
+   "outcomes": {
+    "right": 51
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "docx-figure": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 0.9412
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    },
+    "visual": {
+     "right": 48
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "48/48"
+   }
+  },
+  "lcc-metered-s1-clean.md": {
+   "facts": 3,
+   "found": 3,
+   "recall": 1.0,
+   "found_right": 3,
+   "missed": [],
+   "claims": 3,
+   "outcomes": {
+    "right": 3
+   },
+   "conditions_kept": "2/2",
+   "recall_by_form": {
+    "md-prose": 1.0
+   },
+   "by_reader": {
+    "text": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2"
+   }
+  },
+  "lcc-metered-s1-legend-caption": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 77,
+   "outcomes": {
+    "loose": 24,
+    "right": 53
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    },
+    "visual": {
+     "loose": 24,
+     "right": 51
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "50/50"
+   }
+  },
+  "lcc-metered-s1-raster": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 53,
+   "outcomes": {
+    "right": 53
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "text": 0.0588,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "text": {
+     "right": 3
+    },
+    "visual": {
+     "right": 51
+    }
+   },
+   "conditions_by_reader": {
+    "text": "2/2",
+    "visual": "50/50"
+   }
+  },
+  "lcc-metered-s1-scan": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 51,
+   "outcomes": {
+    "right": 51
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "chart": 1.0,
+    "prose": 1.0
+   },
+   "by_reader": {
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "visual": {
+     "right": 51
+    }
+   },
+   "conditions_by_reader": {
+    "visual": "50/50"
    }
   },
   "lcc-plan-s1-all": {

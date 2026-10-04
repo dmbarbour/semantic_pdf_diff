@@ -705,11 +705,69 @@ def end_use_study(seed=1):
     return Project(f"lcc-enduse-s{seed}", "Lakeshore Hall C: Energy by End Use", F, sections,
                    texts={k: (v, v) for k, v in plain.items()}, values=values, kinds=CHART_KNOBS)
 
-CHART_PROJECTS = {"lcc-energy": energy_study, "lcc-enduse": end_use_study}
+def metered_study(seed=1):
+    """The convention center's metered electricity over a year, in two dense charts (batch C of the adapters plan's
+    diagrams decisions: "We'll need to ensure some claim-heavy diagrams and charts are in our control docs"): each
+    substation's monthly use as grouped bars, 24 values, and its monthly peak demand as lines, 24 more; each chart
+    holds more claims than one request returns (claims_per_request 20). The year's totals are in the text."""
+    d = Draw(f"lcc-metered-{seed}")
+    F = []
+    add = lambda *a, **k: F.append(Fact(*a, **k)) or F[-1]
+    months = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+              "November", "December")
+    season = (0.62, 0.58, 0.64, 0.72, 0.84, 0.95, 1.0, 0.98, 0.88, 0.74, 0.64, 0.66)
+    flatter = (0.78, 0.76, 0.8, 0.85, 0.92, 0.97, 1.0, 0.99, 0.93, 0.86, 0.8, 0.8)  # demand: the halls' base load
+    stations = (("North substation", ("North", "north substation", "the north substation", "substation N")),
+                ("South substation", ("South", "south substation", "the south substation", "substation S")))
+    def grid(near, step):  # a bar or point read to half the axis's step; values may repeat, entity and month apart
+        text = f"{max(step, round(near / step) * step):,g}"
+        d.used.add(text)
+        return text
+    use, peak = [], []
+    # The substations' ranges don't meet (North's least above South's most), so a value repeats only within one.
+    for (name, aliases), short, top, demand in zip(stations, ("north", "south"), (d.rng.uniform(760, 820),
+                                                                                d.rng.uniform(340, 380)),
+                                                   (d.rng.uniform(2100, 2250), d.rng.uniform(1100, 1200))):
+        use.append((name, [add(f"{short}.use.{m.lower()}", name, aliases, "electricity use",
+                               ("energy use", "monthly electricity use", "electricity", "consumption", "energy"),
+                               grid(top * k * d.rng.uniform(0.95, 1.05), 25), "MWh", m, drawn="chart")
+                           for m, k in zip(months, season)]))
+        peak.append((name, [add(f"{short}.peak.{m.lower()}", name, aliases, "peak demand",
+                                ("monthly peak demand", "demand", "peak load", "maximum demand"),
+                                grid(demand * k * d.rng.uniform(0.96, 1.04), 50), "kW", m, drawn="chart")
+                            for m, k in zip(months, flatter)]))
+    totals = []
+    for (name, aliases), (_, facts), short in zip(stations, use, ("north", "south")):
+        text = f"{sum(f.number for f in facts):,.0f}"
+        d.used.add(text)
+        totals.append(add(f"{short}.use.year", name, aliases, "electricity use",
+                          ("annual electricity use", "energy use", "yearly use", "total use", "consumption"), text,
+                          "MWh", "year"))
+    contract = add("site.contract", "Lakeshore Convention Center", ("the center", "the site", "convention center"),
+                   "contract demand", ("contracted demand", "demand limit"), d.number(3500, 3900), "kW",
+                   basis="required")
+    use_chart = Chart("Figure 1. Monthly electricity use by substation", list(months), use, "MWh", 50, 900,
+                      "dark bars: North substation; light bars: South substation", height=240)
+    peak_chart = Chart("Figure 2. Monthly peak demand by substation", list(months), peak, "kW", 100, 2400,
+                       "circles: North substation; squares: South substation", height=260, kind="line")
+    plain = {"use": "Over the year the North substation delivered {n} MWh and the South substation {s} MWh. Figure 1 "
+                    "gives each substation's use month by month.",
+             "peak": "The utility contract caps the center's demand at {c} kW. Figure 2 gives each substation's peak "
+                     "demand in each month; the two peaks seldom fall in the same hour, so their sum overstates the "
+                     "center's."}
+    values = dict(n=totals[0].value, s=totals[1].value, c=contract.value)
+    sections = [("1 Electricity Use", [("text", "use"), ("chart", use_chart)]),
+                ("2 Peak Demand", [("text", "peak"), ("chart", peak_chart)])]
+    return Project(f"lcc-metered-s{seed}", "Lakeshore Convention Center: Metered Electricity", F, sections,
+                   texts={k: (v, v) for k, v in plain.items()}, values=values, kinds=CHART_KNOBS)
+
+CHART_PROJECTS = {"lcc-energy": energy_study, "lcc-enduse": end_use_study, "lcc-metered": metered_study}
+
+FIGURES = ("chart", "procedure")  # blocks drawn into a room left for them, numbered as figures
 
 def charts(project):
-    """The project's charts, in order (figure-1, figure-2, ...)."""
-    return [block[1] for _, blocks in project.sections for block in blocks if block[0] == "chart"]
+    """The project's charts and procedure diagrams (procedures.py), in order (figure-1, figure-2, ...)."""
+    return [block[1] for _, blocks in project.sections for block in blocks if block[0] in FIGURES]
 
 def draw_chart(page, rect, chart, values=True, legend=True, size=7.5):
     """Draw a bar chart into rect on a PyMuPDF page: an axis from 0 to its top, grouped bars, the categories under
@@ -831,11 +889,12 @@ def corpus(seeds=(1,), knobs=False, revisions=False):
     (revisions.py: the other side is a corpus document)."""
     out = [make(seed) for make in PROJECTS.values() for seed in seeds]
     if knobs:
+        from .procedures import PROCEDURE_KNOBS, PROCEDURE_PROJECTS
         from .schematics import SCHEMATIC_KNOBS, SCHEMATIC_PROJECTS
         from .sheets import SHEET_KNOBS, SHEET_PROJECTS
         for makers, all_knobs in ((TABLE_PROJECTS, TABLE_KNOBS), (PROSE_PROJECTS, PROSE_KNOBS),
                                   (CHART_PROJECTS, CHART_KNOBS), (SCHEMATIC_PROJECTS, SCHEMATIC_KNOBS),
-                                  (SHEET_PROJECTS, SHEET_KNOBS)):
+                                  (SHEET_PROJECTS, SHEET_KNOBS), (PROCEDURE_PROJECTS, PROCEDURE_KNOBS)):
             for make in makers.values():
                 for seed in seeds:
                     for knob in all_knobs:
@@ -955,7 +1014,7 @@ def html(project, breaks=()):
                     out.append((PAGE_BREAK if f"figure-{number}" in breaks else "") +
                                f"<div id='figure-{number}' style='height:{height:g}pt'></div>"
                                f"<p class='caption'>{esc(block[1].caption)}</p>")
-            elif block[0] == "chart":  # room for the chart, drawn after layout; its caption below
+            elif block[0] in FIGURES:  # room for the chart or diagram, drawn after layout; its caption below
                 chart = block[1]
                 caption = chart.caption + (f" ({chart.legend_words})" if chart.legend_words and project.has("legend-caption")
                                            else "")
@@ -1031,8 +1090,9 @@ def render(project, page_size="letter"):
         writer.close()
         split = {int(i.split("-")[1]) for i, p in pages.items() if len(p) > 1} - breaks
         # Story doesn't move a box of fixed height (a chart's room) to the next page: it overflows, and what
-        # follows is lost. Such a box starts a page instead.
-        split |= {f"figure-{n}" for n, (_, box) in figures.items() if box.y1 > body.y1 + 1} - breaks
+        # follows is lost, even by a fraction of a point (a diagram 0.7 pt over lost its next section). Such a box
+        # starts a page instead.
+        split |= {f"figure-{n}" for n, (_, box) in figures.items() if box.y1 > body.y1 + 0.01} - breaks
         if not split:
             break
         breaks |= split
@@ -1056,25 +1116,31 @@ def render(project, page_size="letter"):
 
 def draw_charts(project, doc, figures):
     """Draw each chart into the room left for it, as a drawing or a picture (raster), with or without its values
-    (axis) and legend (legend-caption). Returns {page: [(chart box, [(fact, box)], [(number, facts, box)])]}: what
-    was drawn where, since the drawer knows which number is a tick and which a value."""
+    (axis) and legend (legend-caption); and each procedure diagram (procedures.py), as a drawing or a picture.
+    Returns {page: [(chart box, [(fact, box)], [(number, facts, box)], form)]}: what was drawn where, since the
+    drawer knows which number is a tick and which a value."""
     import pymupdf
+    from .procedures import Procedure, draw_procedure
     out = {}
     for number, chart in enumerate(charts(project), 1):
         page_no, box = figures[number]
         page = doc[page_no - 1]
-        for _, facts in chart.series:
-            for f in facts:
-                f.tolerance = chart.step / 4 if project.has("axis") else 0.0
-        draw = lambda pg, r, chart=chart: draw_chart(pg, r, chart, values=not project.has("axis"),
-                                                      legend=not project.has("legend-caption"))
+        if isinstance(chart, Procedure):
+            draw, form = (lambda pg, r, chart=chart: draw_procedure(pg, r, chart)), "figure"
+        else:
+            for _, facts in chart.series:
+                for f in facts:
+                    f.tolerance = chart.step / 4 if project.has("axis") else 0.0
+            draw = lambda pg, r, chart=chart: draw_chart(pg, r, chart, values=not project.has("axis"),
+                                                          legend=not project.has("legend-caption"))
+            form = "chart"
         if project.has("raster"):
             bars, numbers = raster(page, box, draw)
             shift = lambda r: pymupdf.Rect(r) + (box.x0, box.y0, box.x0, box.y0)
             bars, numbers = [(f, shift(b)) for f, b in bars], [(t, fs, shift(b)) for t, fs, b in numbers]
         else:
             bars, numbers = draw(page, box)
-        out.setdefault(page_no, []).append((box, bars, numbers, "chart"))
+        out.setdefault(page_no, []).append((box, bars, numbers, form))
     return out
 
 def draw_schematics(project, doc, figures, spans):

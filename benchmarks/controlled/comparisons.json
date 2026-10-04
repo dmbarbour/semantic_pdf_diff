@@ -4022,6 +4022,173 @@
     "window.idle": "confirmed"
    }
   },
+  "attach-s1-clean": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 1,
+    "removed": 0,
+    "unchanged": 24
+   },
+   "changes_found": "2/2",
+   "additions_found": "1/1",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "22/24",
+   "false_changes": 0,
+   "difference_precision": 0.4,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {
+    "reported": 1
+   },
+   "removed": {},
+   "unchanged": {
+    "confirmed": 22,
+    "uncertain": 2
+   },
+   "different": {
+    "change": 2,
+    "unscored": 3
+   },
+   "equivalent": {
+    "no change": 28,
+    "unscored": 2
+   },
+   "findings": {
+    "different": 5,
+    "equivalent": 30,
+    "uncertain": 2
+   },
+   "unmatched": 26,
+   "pairs": 15,
+   "omitted": 0,
+   "kinds": {
+    "right": 3,
+    "scored": 4,
+    "value_change_precision": 0.6667,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "no change": {
+      "conditions": 1,
+      "restated": 1
+     },
+     "unscored": {
+      "changed": 3
+     }
+    }
+   },
+   "detail": {
+    "attach.attempts": "confirmed",
+    "attach.deadline": "confirmed",
+    "challenge.timeout": "reported",
+    "msg1.interval": "uncertain",
+    "msg10.budget": "confirmed",
+    "msg11.timeout": "confirmed",
+    "msg12.lifetime": "confirmed",
+    "msg13.lifetime": "uncertain",
+    "msg14.deadline": "confirmed",
+    "msg15.window": "confirmed",
+    "msg16.timer": "reported",
+    "msg17.window": "confirmed",
+    "msg18.interval": "confirmed",
+    "msg19.lifetime": "confirmed",
+    "msg2.period": "confirmed",
+    "msg20.interval": "confirmed",
+    "msg21.lifetime": "confirmed",
+    "msg22.interval": "confirmed",
+    "msg23.period": "confirmed",
+    "msg24.hysteresis": "confirmed",
+    "msg3.interval": "confirmed",
+    "msg4.depth": "confirmed",
+    "msg5.timeout": "reported",
+    "msg6.size": "confirmed",
+    "msg7.rate": "confirmed",
+    "msg8.period": "confirmed",
+    "msg9.length": "confirmed"
+   }
+  },
+  "attach-s1-clean.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 1,
+    "removed": 0,
+    "unchanged": 24
+   },
+   "changes_found": "2/2",
+   "additions_found": "1/1",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "24/24",
+   "false_changes": 0,
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {
+    "reported": 1
+   },
+   "removed": {},
+   "unchanged": {
+    "confirmed": 24
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 24
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 24
+   },
+   "unmatched": 1,
+   "pairs": 2,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "attach.attempts": "confirmed",
+    "attach.deadline": "confirmed",
+    "challenge.timeout": "reported",
+    "msg1.interval": "confirmed",
+    "msg10.budget": "confirmed",
+    "msg11.timeout": "confirmed",
+    "msg12.lifetime": "confirmed",
+    "msg13.lifetime": "confirmed",
+    "msg14.deadline": "confirmed",
+    "msg15.window": "confirmed",
+    "msg16.timer": "reported",
+    "msg17.window": "confirmed",
+    "msg18.interval": "confirmed",
+    "msg19.lifetime": "confirmed",
+    "msg2.period": "confirmed",
+    "msg20.interval": "confirmed",
+    "msg21.lifetime": "confirmed",
+    "msg22.interval": "confirmed",
+    "msg23.period": "confirmed",
+    "msg24.hysteresis": "confirmed",
+    "msg3.interval": "confirmed",
+    "msg4.depth": "confirmed",
+    "msg5.timeout": "reported",
+    "msg6.size": "confirmed",
+    "msg7.rate": "confirmed",
+    "msg8.period": "confirmed",
+    "msg9.length": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -8212,6 +8379,173 @@
     "timer.idle": "confirmed",
     "window.congested": "judged uncertain",
     "window.idle": "confirmed"
+   }
+  },
+  "attach-s1-clean": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 1,
+    "removed": 0,
+    "unchanged": 24
+   },
+   "changes_found": "2/2",
+   "additions_found": "1/1",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "22/24",
+   "false_changes": 0,
+   "difference_precision": 0.4,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {
+    "reported": 1
+   },
+   "removed": {},
+   "unchanged": {
+    "confirmed": 22,
+    "uncertain": 2
+   },
+   "different": {
+    "change": 2,
+    "unscored": 3
+   },
+   "equivalent": {
+    "no change": 28,
+    "unscored": 2
+   },
+   "findings": {
+    "different": 5,
+    "equivalent": 30,
+    "uncertain": 2
+   },
+   "unmatched": 26,
+   "pairs": 15,
+   "omitted": 0,
+   "kinds": {
+    "right": 3,
+    "scored": 4,
+    "value_change_precision": 0.6667,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "no change": {
+      "conditions": 1,
+      "restated": 1
+     },
+     "unscored": {
+      "changed": 3
+     }
+    }
+   },
+   "detail": {
+    "attach.attempts": "confirmed",
+    "attach.deadline": "confirmed",
+    "challenge.timeout": "reported",
+    "msg1.interval": "uncertain",
+    "msg10.budget": "confirmed",
+    "msg11.timeout": "confirmed",
+    "msg12.lifetime": "confirmed",
+    "msg13.lifetime": "uncertain",
+    "msg14.deadline": "confirmed",
+    "msg15.window": "confirmed",
+    "msg16.timer": "reported",
+    "msg17.window": "confirmed",
+    "msg18.interval": "confirmed",
+    "msg19.lifetime": "confirmed",
+    "msg2.period": "confirmed",
+    "msg20.interval": "confirmed",
+    "msg21.lifetime": "confirmed",
+    "msg22.interval": "confirmed",
+    "msg23.period": "confirmed",
+    "msg24.hysteresis": "confirmed",
+    "msg3.interval": "confirmed",
+    "msg4.depth": "confirmed",
+    "msg5.timeout": "reported",
+    "msg6.size": "confirmed",
+    "msg7.rate": "confirmed",
+    "msg8.period": "confirmed",
+    "msg9.length": "confirmed"
+   }
+  },
+  "attach-s1-clean.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 1,
+    "removed": 0,
+    "unchanged": 24
+   },
+   "changes_found": "2/2",
+   "additions_found": "1/1",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "24/24",
+   "false_changes": 0,
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {
+    "reported": 1
+   },
+   "removed": {},
+   "unchanged": {
+    "confirmed": 24
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 24
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 24
+   },
+   "unmatched": 1,
+   "pairs": 2,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "attach.attempts": "confirmed",
+    "attach.deadline": "confirmed",
+    "challenge.timeout": "reported",
+    "msg1.interval": "confirmed",
+    "msg10.budget": "confirmed",
+    "msg11.timeout": "confirmed",
+    "msg12.lifetime": "confirmed",
+    "msg13.lifetime": "confirmed",
+    "msg14.deadline": "confirmed",
+    "msg15.window": "confirmed",
+    "msg16.timer": "reported",
+    "msg17.window": "confirmed",
+    "msg18.interval": "confirmed",
+    "msg19.lifetime": "confirmed",
+    "msg2.period": "confirmed",
+    "msg20.interval": "confirmed",
+    "msg21.lifetime": "confirmed",
+    "msg22.interval": "confirmed",
+    "msg23.period": "confirmed",
+    "msg24.hysteresis": "confirmed",
+    "msg3.interval": "confirmed",
+    "msg4.depth": "confirmed",
+    "msg5.timeout": "reported",
+    "msg6.size": "confirmed",
+    "msg7.rate": "confirmed",
+    "msg8.period": "confirmed",
+    "msg9.length": "confirmed"
    }
   },
   "wtp-s1-tracked.docx": {

@@ -143,6 +143,7 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
         jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}", pair_runs / out.name / f"{p.id}{suffix}",
                   f"pair {p.id}{suffix}", "revisions") for p in listed
                  if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
+    jobs = [job for job in jobs if job[4] != "revisions" or not same_document(job[0], job[1])]
     overrides = {}
     if unaligned:
         jobs = [(a, b, pair_runs / f"{out.name}-unaligned" / folder.name, name + " unaligned", mode)
@@ -151,8 +152,9 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
     for a, b, folder, name, mode in jobs:
         options = pipeline.RunOptions(mode=mode, fixture=fixture,
                                       fixture_mode="replay" if replay else "record-new", responder=responder)
-        if replay:
-            settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL, **overrides)
+        if replay:  # the model named as recorded, whatever the environment says (its name is in the stores' binding)
+            settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL, model=responder,
+                                              **overrides)
         else:
             left = max_cost - (ledger.spent(LEDGER, round="controlled") - before)
             if left <= 0:
@@ -190,11 +192,12 @@ def score():
             result["conditions_by_reader"] = {f: r["conditions_kept"] for f, r in readers.items()}
             results.setdefault(which, {})[run] = result
     (FOLDER / "results.json").write_text(json.dumps(results, indent=1) + "\n", encoding="utf-8")
-    from semantic_pdf_diff_lab.bench.controlled import sheets
+    from semantic_pdf_diff_lab.bench.controlled import procedures, sheets
     knobbed = [(p, controlled.TABLE_KNOBS) for p in controlled.TABLE_PROJECTS] + \
               [(p, controlled.PROSE_KNOBS) for p in controlled.PROSE_PROJECTS] + \
               [(p, controlled.CHART_KNOBS) for p in controlled.CHART_PROJECTS] + \
-              [(p, sheets.SHEET_KNOBS) for p in sheets.SHEET_PROJECTS]
+              [(p, sheets.SHEET_KNOBS) for p in sheets.SHEET_PROJECTS] + \
+              [(p, procedures.PROCEDURE_KNOBS) for p in procedures.PROCEDURE_PROJECTS]
     for which, runs in results.items():  # each knobbed project's knobs beside its clean version
         for project, knobs in knobbed:
             mine = {run[len(project) + 2:].partition("-")[2]: r for run, r in runs.items()
@@ -277,6 +280,11 @@ def key_path(run):
         return DOCS_DOCX / f"{run[:-5]}.key.json"
     return DOCS / f"{run}.key.json"
 
+def same_document(earlier, later):
+    """Whether a pair's two documents are byte for byte the same: a revision whose changes the representation can't
+    carry (the procedure diagram's, in Markdown), so there's nothing to compare."""
+    return Path(earlier).read_bytes() == Path(later).read_bytes()
+
 def compare_pairs():
     """comparisons.json: each revision pair's comparison scored against the two revisions' keys (PDF, and Markdown as
     "<id>.md")."""
@@ -286,7 +294,8 @@ def compare_pairs():
         for pair in revisions.pairs() + word.pairs():
             for suffix in (("", ".md", ".docx") if pair in revisions.pairs() else (".docx",)):
                 report = PAIR_RUNS / which / f"{pair.id}{suffix}" / "report.json"
-                if report.exists():
+                documents = [key_path(d + suffix).with_name(f"{d}{suffix or '.pdf'}") for d in (pair.earlier, pair.later)]
+                if report.exists() and not same_document(*documents):
                     keys = [json.loads(key_path(d + suffix).read_text(encoding="utf-8")) for d in (pair.earlier, pair.later)]
                     compared.setdefault(which, {})[pair.id + suffix] = comparison.score_comparison(
                         *keys, json.loads(report.read_text(encoding="utf-8")))

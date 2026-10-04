@@ -5,6 +5,7 @@ form and place known, so extraction is scored exactly (docs/plans/controlled-doc
     score       claims scored against a key
     relations   relations between named things, and how claims stating them are scored
     schematics  system drawings: parts, links and enclosures, laid out
+    procedures  procedures drawn as message sequence charts, in PDF and as WMF for Word
     sheets      drawing sheets: a floor plan with dimensions, tags and a door schedule
     revisions   revision pairs: a corpus document and a revision of it with known changes
     comparison  a comparison in revisions mode scored against the key's changes
@@ -17,7 +18,7 @@ from .corpus import (  # noqa: F401
     Project, RUNNING_HEADER, SERIES_FILL, Schedule, TABLE_KNOBS, TABLE_PROJECTS,
     _esc, _last, _phrase, _schedule_facts, charts, convention_center,
     corpus, draw_chart, draw_charts, draw_schematics, end_use_study, energy_study,
-    equipment_schedules, html, key, locate, parse_number, printed_value,
+    equipment_schedules, html, key, locate, metered_study, parse_number, printed_value,
     raster, render, roller_coaster, scanned, schedule_html, track_schedules,
     water_treatment, write)
 from .score import (  # noqa: F401

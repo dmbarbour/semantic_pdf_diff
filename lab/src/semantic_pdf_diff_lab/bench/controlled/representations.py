@@ -7,11 +7,13 @@ media."
 
 - **What Markdown carries:** headings, paragraphs (the plain or trap phrasing, as the project's knob says), and
   tables as pipe tables (a schedule's sections as tables of their own, a split schedule whole).
-- **What it doesn't:** charts, schematics and drawing sheets. A chart's caption stays, marked as not shown; the
-  facts only it held are listed in the key as absent, so they're neither found nor missed.
-- **Word carries charts as pictures** (the adapters plan, "Pictures in Word documents"): each chart cropped from the
-  PDF's page as a PNG, at its drawn size, its caption after it in the Caption style; its facts are placed at the
-  picture's paragraph ("docx-figure") and scored.
+- **What it doesn't:** charts, procedure diagrams, schematics and drawing sheets. A chart's or diagram's caption
+  stays, marked as not shown; the facts only it held are listed in the key as absent, so they're neither found nor
+  missed.
+- **Word carries charts and diagrams as pictures** (the adapters plan, "Pictures in Word documents"): each chart
+  cropped from the PDF's page as a PNG, each procedure diagram as a WMF of the same drawing (procedures.py), at its
+  drawn size, its caption after it in the Caption style; its facts are placed at the picture's paragraph
+  ("docx-figure") and scored.
 - **The key:** the facts printed, each placed by line; every printed number logged with its role, as a PDF's are.
 """
 import re
@@ -57,6 +59,8 @@ def markdown(project):
                     out += _table(caption, [title] + [c.label for c in columns], [[tag, *cells] for tag, cells in rows])
             elif kind == "chart":
                 out += [f"*{block[1].caption} (a chart, not shown in this representation)*", ""]
+            elif kind == "procedure":
+                out += [f"*{block[1].caption} (a diagram, not shown in this representation)*", ""]
             else:
                 return None  # a schematic's parts: not carried
     return out
@@ -76,7 +80,8 @@ def key(project, lines, tables=None, representation="markdown", pictures=None):
     from .corpus import charts
     by_value = {}
     for f in project.facts:
-        if not f.relation and f.drawn != "chart":  # a chart's facts: absent, though a total may print the same number
+        if not f.relation and f.drawn not in ("chart", "figure"):  # a chart's or diagram's facts: absent, though a
+                                                                     # total may print the same number
             by_value.setdefault(printed_value(f.value), []).append(f)
         f.forms = []
     for number, line in (pictures or {}).items():
@@ -131,10 +136,14 @@ def write(project, lines, folder):
 
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)  # zip members' and core properties' time, so the same project gives the same bytes
 
+NOT_SHOWN = re.compile(r" \(a (?:chart|diagram), not shown in this representation\)$")
+
 def chart_pictures(project, dpi=200):
-    """{chart caption: (PNG bytes, (width, height) in points)}: each chart as the PDF draws it, cropped from its page."""
+    """{caption: (PNG bytes, (width, height) in points, WMF bytes or None)}: each chart as the PDF draws it, cropped
+    from its page; each procedure diagram the same, with the WMF of its drawing that Word carries."""
     import pymupdf
     from .corpus import charts, render
+    from .procedures import Procedure, wmf
     if not charts(project):
         return {}
     data, _ = render(project)
@@ -143,13 +152,15 @@ def chart_pictures(project, dpi=200):
     for number, chart in enumerate(charts(project), 1):
         page_no, box = project.chart_boxes[number]
         rect = pymupdf.Rect(box)
-        out[chart.caption] = (doc[page_no - 1].get_pixmap(dpi=dpi, clip=rect).tobytes("png"), (rect.width, rect.height))
+        out[chart.caption] = (doc[page_no - 1].get_pixmap(dpi=dpi, clip=rect).tobytes("png"), (rect.width, rect.height),
+                              wmf(chart, rect.width) if isinstance(chart, Procedure) else None)
     return out
 
 def docx(lines, pictures=None):
     """The Markdown lines as a Word document's bytes: headings as headings, paragraphs, pipe tables as tables, a bold
-    caption line as a bold paragraph; a chart not shown, as its picture with its caption after it when `pictures`
-    ({caption: (PNG, size in points)}) holds it. Byte for byte the same each time."""
+    caption line as a bold paragraph; a chart or diagram not shown, as its picture with its caption after it when
+    `pictures` ({caption: (PNG, size in points, metafile or None)}) holds it: a metafile takes the PNG's place (the PNG
+    sizes the picture). Byte for byte the same each time."""
     import datetime
     import io
     import zipfile
@@ -181,11 +192,13 @@ def docx(lines, pictures=None):
         elif line.startswith("**") and line.endswith("**"):
             document.add_paragraph().add_run(line.strip("*")).bold = True
         elif line.startswith("*") and line.endswith("*"):
-            caption = line.strip("*").removesuffix(" (a chart, not shown in this representation)")
+            caption = NOT_SHOWN.sub("", line.strip("*"))
             if pictures and caption in pictures:
                 from docx.shared import Pt
-                png, (width, _) = pictures[caption]
-                document.add_paragraph().add_run().add_picture(io.BytesIO(png), width=Pt(width))
+                png, (width, _), metafile = pictures[caption]
+                shape = document.add_paragraph().add_run().add_picture(io.BytesIO(png), width=Pt(width))
+                if metafile:
+                    _metafile(document, shape, metafile)
                 document.add_paragraph(caption, style="Caption")
             else:
                 document.add_paragraph().add_run(line.strip("*")).italic = True
@@ -200,6 +213,18 @@ def docx(lines, pictures=None):
             out.writestr(zipfile.ZipInfo(info.filename, FIXED_TIME), source.read(info.filename),
                          compress_type=zipfile.ZIP_DEFLATED)
     return fixed.getvalue()
+
+def _metafile(document, shape, data):
+    """Point an inline picture at a WMF in place of its image, dropping the image (no other picture uses it)."""
+    from docx.opc.constants import RELATIONSHIP_TYPE as RT
+    from docx.opc.part import Part
+    from docx.oxml.ns import qn
+    part = Part(document.part.package.next_partname("/word/media/image%d.wmf"), "image/x-wmf", data,
+                document.part.package)
+    blip = next(shape._inline.iter(qn("a:blip")))
+    old = blip.get(qn("r:embed"))
+    blip.set(qn("r:embed"), document.part.relate_to(part, RT.IMAGE))
+    document.part.drop_rel(old)
 
 def docx_key(project, data):
     """A Word document's key, placed by the reader's own lines (paragraphs and table rows, docxdocs.read_docx), its

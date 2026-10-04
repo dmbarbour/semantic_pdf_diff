@@ -426,6 +426,55 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
 
   - **Not yet:** merged and nested table cells, text boxes, Word charts (chart XML), equations, comments.
   - Cost: $0.004.
+- **Claim-heavy diagrams and charts in the controlled corpus (2026-10-04): built.** The owner: "We'll need to ensure some claim-heavy diagrams and charts are in our control docs."
+  - **Dense charts** (`lcc-metered`, under the six chart knobs): a year of a convention center's metered electricity.
+    - two substations' monthly use as grouped bars: 24 values
+    - their monthly peak demand as lines: 24 more
+    - the year's totals and the contract demand in the text: 51 facts in all
+    - Values repeat within a substation (the month tells them apart); the two substations' ranges never meet.
+  - **A procedure diagram** (`procedures.py`, `attach`, under the clean and raster knobs): a message sequence chart with four lifelines and 24 numbered messages.
+    - Each message carries one parameter and its value ("7. Admission Grant (granted rate 13,097 kbit/s)").
+    - Attributes of one shape recur: four lifetimes, three intervals, two timeouts.
+    - **One layout, two drawers:** the PDF draws it as vector shapes or, under the raster knob, as an image. The Word document carries the same shapes as a WMF. Our metafile renderer draws that WMF back with nothing skipped and every label as text.
+    - Markdown marks it as not shown, and lists its facts as absent.
+  - **A revision pair on the diagram,** after TS 38.300's procedure diagrams (above):
+    - a Key Challenge message inserted at step 10, so steps 10–24 become 11–25
+    - one parameter revised before the insertion, one after it (renumbered as well)
+    - The Markdown pair is skipped: its two files are byte for byte the same, since Markdown can't carry the diagram. The run and the scorer now skip any pair whose two documents are identical.
+  - **gemma-4 read them for $0.076.** No existing run or pair scored differently.
+
+    | Dense charts (51 facts) | Recall | Facts read right | Loose | Misbound | Inexact | Claims |
+    |---|---|---|---|---|---|---|
+    | clean | 1.00 | 51 | 24 | 14 | 0 | 91 |
+    | axis | 0.84 | 28 | 19 | 0 | 31 | 91 |
+    | raster | 1.00 | 51 | 0 | 0 | 0 | 53 |
+    | legend-caption | 1.00 | 51 | 24 | 0 | 0 | 77 |
+    | scan | 1.00 | 51 | 0 | 0 | 0 | 51 |
+    | all | 0.69 | 35 | 0 | 0 | 36 | 72 |
+    | Word, charts as pictures | 1.00 | 51 | 0 | 0 | 0 | 51 |
+
+    | Procedure diagram (26 facts) | Recall | Facts read right | Loose | Misread | Hallucinated | Claims |
+    |---|---|---|---|---|---|---|
+    | clean | 1.00 | 26 | 1 | 2 | 2 | 34 |
+    | raster | 1.00 | 26 | 0 | 0 | 5 | 33 |
+    | Word, a WMF picture | 1.00 | 26 | 0 | 0 | 0 | 26 |
+
+    | Diagram pair | Changes | Additions | Unchanged confirmed | "Different" findings that are changes |
+    |---|---|---|---|---|
+    | PDF | 2 / 2 | 1 / 1 | 22 / 24 (2 uncertain) | 2 of 5 |
+    | Word | 2 / 2 | 1 / 1 | 24 / 24 | 2 of 2 |
+
+  - **Continuation fired as built:** 40 capped reads, from PDF figure, overview and tile tasks and from Word pictures' overview and tile tasks. Each was continued once, and every one was complete after it.
+  - **The renumbering didn't confuse the comparison.** Messages kept their names across revisions, so no step was paired with another by its number.
+  - **Faults these documents expose** (two new rows in the [lever index](../reviews/levers.md)):
+    - **The PDF table reader took the diagram for a table:** the lifelines read as column rules, and labels were cut into cells.
+      - Of its 7 claims, 2 were hallucinated ("5|72 s" read as 72 s) and 2 misread (step numbers as values).
+      - All 3 of the PDF pair's "different" findings that aren't changes, and both of its uncertain ones, involve these claims.
+    - **Thousands separators read as decimal points:** on the raster diagram, all 5 values with a comma were read with a point ("13,097 kbit/s" as 13.097). The image reader made none on the vector page or in Word, where a text layer holds the labels.
+    - **The text reader misbinds a chart's printed values:** 14 on the clean dense charts, as on the other charts (milestone 3a's known flaw).
+    - **The PDF's image reader named the peak demand line chart's values "power"** (the axis is in kW): 24 loose. In Word, with the caption beside the picture, all were named "peak demand".
+    - **Against the axis,** 31–36 readings were off by more than a quarter step: 24 bars and 24 points at 50 and 100 steps.
+  - **A layout fault fixed on the way:** a figure 0.7 pt past the page body silently lost the section after it, since the overflow check allowed 1 pt. It now allows 0.01 pt. No committed document fell in that slack, so none changed.
 
 ## Open questions
 
