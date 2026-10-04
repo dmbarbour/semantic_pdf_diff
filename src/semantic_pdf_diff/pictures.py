@@ -7,6 +7,8 @@ the whole picture, and tiles when it's large; extract.Visuals), each with the pi
 the page's text layer as a check on quotes and as context, and its section's headings. Its claims are located at the
 picture's paragraph (DocxLocator), each with the crop it was read from.
 """
+import re
+
 import pymupdf
 
 from .models import DerivationStep, coverage_row
@@ -46,48 +48,92 @@ def page_of(picture):
     out.new_page(width=width, height=height).show_pdf_page(pymupdf.Rect(0, 0, width, height), source, 0)
     return out
 
-def tasks(core, settings, pictures, content, output, keep):
-    """Generator feeding each picture's image tasks (yielding "page" between pictures, for fair share). keep: a
-    list the pictures document is appended to, for the caller to close once its tasks are done (refinement renders
-    crops from it later). Every picture is drawn into the document before any task is fed: adding a page invalidates
-    the pages loaded before it, and a tile refined later renders from its page."""
-    from .extract import Context, Visuals
-    from .regions import crop_stem
-    s = settings
-    assets = output / "assets"
-    assets.mkdir(exist_ok=True, parents=True)
-    stem = crop_stem(content)
-    doc = pymupdf.open()
-    keep.append(doc)
-    context_of = Context(doc, s, assets, stem)
-    visuals = Visuals(core, context_of, assets, stem, s)
-    drawn_pages = []  # (picture, its page's number)
-    for picture in pictures:
-        yield "page"
-        box = (0.0, float(picture.line), 1.0, float(picture.line + 1))
-        task = f"picture:p1:{picture.line}"
-        if not s.vision:
-            core.record(coverage_row(content=content, page=1, bbox=list(box), task=task, status="skipped",
-                                     issues=["Visual extraction disabled; pictures aren't read"]))
-            continue
-        try:
-            single = page_of(picture)
-        except PictureError as error:
-            core.record(coverage_row(content=content, page=1, bbox=list(box), task=task, status="skipped",
-                                     issues=[str(error)]))
-            continue
-        doc.insert_pdf(single)
-        drawn_pages.append((picture, len(doc)))
-    for picture, number in drawn_pages:
-        yield "page"
-        box = (0.0, float(picture.line), 1.0, float(picture.line + 1))
-        page = doc[number - 1]
-        drawn = "a metafile drawn as vector" if picture.extension in METAFILES else "an image"
-        note = f"Caption: {picture.caption}" if picture.caption else ""
-        for tag, rect, _ in s.visual_regions(context_of, page, number):
-            region, _, index = tag.partition(":")
-            tag = f"{region}:p1:pic{picture.line}" + (f":{index}" if index else "")
-            derivation = [DerivationStep(step="docx-picture", detail=f"{picture.name}, {drawn}"),
-                          DerivationStep(step="picture-region", detail=region),
-                          DerivationStep(step="model-extraction")]
-            visuals.task(1, page, tag, rect, text=note, box=box, derivation=derivation)
+class Reading:
+    """A Word document's pictures being read: the pictures document (each picture a page, open until their tasks are
+    done; refinement renders from it later) and each picture's own words, for the label check (labels())."""
+    def __init__(self):
+        self.doc = pymupdf.open()
+        self.words = {}  # a picture's line: the words of its text layer
+
+    def tasks(self, core, settings, pictures, content, output):
+        """Generator feeding each picture's image tasks, yielding "page" between pictures (fair share). Every picture
+        is drawn into the document before any task is fed: adding a page invalidates the pages loaded before it, and
+        a tile refined later renders from its page."""
+        from .extract import Context, Visuals
+        from .regions import crop_stem
+        s, doc = settings, self.doc
+        assets = output / "assets"
+        assets.mkdir(exist_ok=True, parents=True)
+        stem = crop_stem(content)
+        context_of = Context(doc, s, assets, stem)
+        visuals = Visuals(core, context_of, assets, stem, s)
+        drawn_pages = []  # (picture, its page's number)
+        for picture in pictures:
+            yield "page"
+            box = (0.0, float(picture.line), 1.0, float(picture.line + 1))
+            task = f"picture:p1:{picture.line}"
+            if not s.vision:
+                core.record(coverage_row(content=content, page=1, bbox=list(box), task=task, status="skipped",
+                                         issues=["Visual extraction disabled; pictures aren't read"]))
+                continue
+            try:
+                single = page_of(picture)
+            except PictureError as error:
+                core.record(coverage_row(content=content, page=1, bbox=list(box), task=task, status="skipped",
+                                         issues=[str(error)]))
+                continue
+            doc.insert_pdf(single)
+            drawn_pages.append((picture, len(doc)))
+        for picture, number in drawn_pages:
+            yield "page"
+            box = (0.0, float(picture.line), 1.0, float(picture.line + 1))
+            page = doc[number - 1]
+            self.words[picture.line] = words(page.get_text())
+            drawn = "a metafile drawn as vector" if picture.extension in METAFILES else "an image"
+            note = f"Caption: {picture.caption}" if picture.caption else ""
+            for tag, rect, _ in s.visual_regions(context_of, page, number):
+                region, _, index = tag.partition(":")
+                tag = f"{region}:p1:pic{picture.line}" + (f":{index}" if index else "")
+                derivation = [DerivationStep(step="docx-picture", detail=f"{picture.name}, {drawn}"),
+                              DerivationStep(step="picture-region", detail=region),
+                              DerivationStep(step="model-extraction")]
+                visuals.task(1, page, tag, rect, text=note, box=box, derivation=derivation)
+
+    def labels(self, core, content):
+        """The label check, a coverage row per picture with a text layer ("labels:p1:pic<line>"): the share of the
+        picture's own words that some claim read from it mentions, and those none does. A quality measure,
+        never applied: a low share says the picture may be read incompletely (the owner: "better applied as a
+        quality and confidence check")."""
+        said = {}
+        for e in core.evidence:
+            mentions = words(" ".join((e.entity, e.attribute, e.value, e.unit, e.conditions, e.quote)))
+            for o in e.occurrences or [e]:
+                match = PICTURE_TASK.search(o.locator.task)
+                if match:
+                    said.setdefault(int(match.group(1)), set()).update(mentions)
+        for line, own in sorted(self.words.items()):
+            if len(own) < MIN_LABEL_WORDS:
+                continue
+            missing = sorted(own - said.get(line, set()))
+            share = 1 - len(missing) / len(own)
+            note = f"Label coverage {share:.0%}: {len(missing)} of the picture's {len(own)} words in no claim"
+            core.record(coverage_row(content=content, page=1, bbox=[0.0, float(line), 1.0, float(line + 1)],
+                                     task=f"labels:p1:pic{line}", status="complete",
+                                     issues=[note + (f" ({', '.join(missing[:LISTED])})" if missing else "")]))
+
+    def close(self):
+        self.doc.close()
+
+PICTURE_TASK = re.compile(r":pic(\d+)")
+WORD = re.compile(r"[A-Za-z][A-Za-z0-9\-]{2,}")
+MIN_LABEL_WORDS = 3   # a picture with fewer words of its own isn't checked
+LISTED = 15           # the uncovered words a row lists
+
+# Words that label nothing: a figure's sentences ("the following steps are the same") aren't labels to be covered
+FUNCTION_WORDS = frozenset(
+    "the and are for from with that this these those not but all any can may its into than then them they was were "
+    "has have had will shall should would could been being each per via also only same following other such".split())
+
+def words(text):
+    """A text's words for the label check: three letters or more, case folded, function words left out."""
+    return {w.casefold() for w in WORD.findall(text)} - FUNCTION_WORDS

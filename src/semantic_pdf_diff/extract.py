@@ -56,10 +56,12 @@ class ExtractQuery:
     heading: str = ""  # the headings the region falls under
     context: str = ""  # CONTEXT_NOTE and the levers' lines
     data: str = ""     # the source data: text, a table row, or an image task's note and text layer
+    continuation: str = ""  # CONTINUATION_NOTE and the claims earlier requests for this task returned
 
     def prompt(self):
         return (self.instructions + "\nSource type: " + self.region + (f"\nSection: {self.heading}" if self.heading else "")
-                + (f"\n{self.context}" if self.context else "") + "\nSOURCE DATA:\n" + self.data)
+                + (f"\n{self.context}" if self.context else "")
+                + (f"\n{self.continuation}" if self.continuation else "") + "\nSOURCE DATA:\n" + self.data)
 
     @property
     def request(self):
@@ -74,7 +76,20 @@ class ExtractQuery:
         heading = ""
         if tail.startswith("Section: "):
             heading, _, tail = tail[len("Section: "):].partition("\n")
-        return cls(instructions, region, heading, tail, data)
+        context, mark, continued = tail.partition(CONTINUATION_NOTE)
+        return cls(instructions, region, heading, context.rstrip("\n") if mark else tail, data,
+                   mark + continued if mark else "")
+
+# What a continued request is told (tasks.TaskCore.consume): the claims returned so far, not to be repeated.
+CONTINUATION_NOTE = ("ALREADY EXTRACTED from this same source by an earlier request (do not repeat these; extract the "
+                     "claims that remain):")
+
+def continuation(claims):
+    """A continued request's note: the claims earlier requests returned, one a line, by entity, attribute and value
+    only: enough not to repeat them, and conditions listed were copied onto the claims that followed (a valve's
+    stroke time given the "rated point" of the flow coefficients listed before it)."""
+    rows = [" | ".join(x for x in (c.entity, c.attribute, f"{c.value} {c.unit}".strip()) if x) for c in claims]
+    return CONTINUATION_NOTE + "".join("\n- " + r for r in rows)
 
 def extraction_template(s):
     """The extraction instructions in force: the baseline, or a variant's (with {max_claims} unfilled)."""

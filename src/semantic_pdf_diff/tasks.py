@@ -6,6 +6,7 @@ and a box: PDF points, or lines of a text file), its sections, its context reade
 Split from extract.py; PDF requests are byte for byte what they were (tests/test_golden_requests.py).
 """
 import hashlib
+import re
 import json
 from pathlib import Path
 
@@ -34,6 +35,11 @@ def split_utf8(text, limit):
 def union(boxes):
     boxes = list(boxes)
     return (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
+
+# An incomplete answer's issue saying the claim limit stopped it ("more steps (17-22) than the 20 claim limit
+# allowed"), as a request to continue; not clipping or illegibility, which another request wouldn't mend
+LIMIT_SAID = re.compile(r"claim limit|limit of \d+ claims|maximum (?:of )?\d+ claims|\d+[- ]claim (?:limit|maximum|cap)"
+                        r"|more (?:claims|facts|steps|items|rows|entries) (?:than|remain)|(?:claims|facts) remain", re.I)
 
 class TaskCore:
     """One content item's extraction tasks: the evidence and coverage they make, as tasks finish.
@@ -76,8 +82,13 @@ class TaskCore:
         self.record(row, copies)
 
     def consume(self, page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None,
-                then=None, repeat_key=None, repeat_after=1, place=None, context="", extra_images=()):
+                then=None, repeat_key=None, repeat_after=1, place=None, context="", extra_images=(), continued=(),
+                origin=None):
         """Queue one extraction task; when it finishes, record it and call then(status).
+
+        An answer incomplete with its claims at the limit is the model asking for more: the task is asked again
+        ("<task>-c<n>", up to the continuation limit), told the claims returned so far (continued), and then(status)
+        waits for the last of them.
 
         repeat_key identifies exactly repeated boilerplate: once `repeat_after` earlier
         sightings prove the repetition, the task follows the first occurrence's result
@@ -116,13 +127,21 @@ class TaskCore:
         heading = " | ".join(" > ".join(x.heading_path) for x in self.sections.spanned_box(page_no, bbox)
                              if x.heading_path)
         rules = s.region_rules(region)
+        from .extract import continuation
         prompt = self.query(self.template(s).replace("{max_claims}", str(s.claims_per_request)) + rules,
-                            region, heading, context, text).prompt()
+                            region, heading, context, text, continuation(continued) if continued else "").prompt()
         key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
         if context:  # only then, so requests without context keep their recorded keys
             key += (hashlib.sha256(context.encode()).hexdigest(),)
         if rules:  # image-task rules aren't in the interpreter's prompt hash (text tasks keep replaying),
             key += ("visual rules", hashlib.sha256(rules.encode()).hexdigest())  # so they're in the key
+        if continued:
+            key += ("continued", len(continued))
+
+        origin = origin or task
+        turn = int(task.rsplit("-c", 1)[1]) if task != origin else 0
+        more = []  # the answer's claims, when it asks to be continued
+        asked = []  # [True] when it does (it may ask with no claim of its own)
 
         def finish(result, error):
             state["pending"] -= 1
@@ -143,12 +162,21 @@ class TaskCore:
                 entry["followers"] = []
             log.debug("%s %s: %s, %d claim(s)%s", Path(self.name).name, task, row["status"], row["claims"],
                       f" ({'; '.join(row['issues'])[:200]})" if row["issues"] else "")
-            if then:
+            if asked:
+                self.consume(page_no, bbox, f"{origin}-c{turn + 1}", text, image, check, locate, crop, derivation, then,
+                             place=place, context=context, extra_images=extra_images,
+                             continued=tuple(continued) + tuple(more), origin=origin)
+            elif then:
                 then(row["status"])
 
         def handle(result):
             row["status"] = "complete" if result.complete else "partial"
             row["issues"] = list(result.issues)
+            if (not result.complete and turn < s.continuation_limit(region)
+                    and (len(result.claims) >= s.claims_per_request or any(LIMIT_SAID.search(i) for i in result.issues))):
+                more.extend(result.claims)
+                asked.append(True)
+                row["issues"].append(f"Continued: the claim limit reached, the rest asked for ({origin}-c{turn + 1})")
             for claim in result.claims:
                 verified = check(claim.quote) if check else None
                 if not image and not verified:

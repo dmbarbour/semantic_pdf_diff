@@ -18,6 +18,7 @@
     "quote_match",
     "reconcile",
     "dedupe_repeated",
+    "continue_reading",
     "align",
     "verify_visuals",
     "explain_differences"

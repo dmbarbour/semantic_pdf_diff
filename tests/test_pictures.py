@@ -16,8 +16,8 @@ except ImportError:  # the office extra
     docx = None
 
 def build():
-    """A Word document: a paragraph of text, then three pictures, each captioned: a WMF schematic labelled "Flow 75
-    gpm", a PNG, and a WMF that's no metafile at all."""
+    """A Word document: a paragraph of text, then three pictures, each captioned: a WMF schematic labelled "Flow rate
+    75 gpm", a PNG, and a WMF that's no metafile at all."""
     from docx.opc.constants import RELATIONSHIP_TYPE as RT
     from docx.opc.packuri import PackURI
     from docx.opc.part import Part
@@ -36,7 +36,7 @@ def build():
             part = Part(PackURI(f"/word/media/{name}"), "image/x-wmf", data, document.part.package)
             next(shape._inline.iter(qn("a:blip"))).set(qn("r:embed"), document.part.relate_to(part, RT.IMAGE))
         document.add_paragraph(caption, style="Caption")
-    picture(wmf(WINDOW + [wmf_text(100, 100, "Flow 75 gpm")]), "schematic.wmf", "Figure 1: Flow schematic")
+    picture(wmf(WINDOW + [wmf_text(100, 100, "Flow rate 75 gpm")]), "schematic.wmf", "Figure 1: Flow schematic")
     picture(None, "logo.png", "Figure 2: Logo")
     picture(b"not a metafile", "broken.wmf", "Figure 3: Broken")
     raw = io.BytesIO()
@@ -83,13 +83,18 @@ class Pictures(unittest.TestCase):
         self.assertEqual(flow.section, sections[-1].id)
         asked = next(q for q in model.queries if q.region == "overview" and "Flow schematic" in q.data)
         self.assertIn("Caption: Figure 1: Flow schematic", asked.data)
-        self.assertIn("Flow 75 gpm", asked.data)  # the picture's own text, as a PDF figure's text layer
+        self.assertIn("Flow rate 75 gpm", asked.data)  # the picture's own text, as a PDF figure's text layer
         statuses = {r["task"]: (r["status"], r["issues"]) for r in coverage if "pic" in r["task"]}
         self.assertEqual(statuses[f"overview:p1:pic{schematic.line}"][0], "complete")
         self.assertEqual(statuses[f"overview:p1:pic{doc.pictures[1].line}"][0], "complete")
         broken, issues = statuses[f"picture:p1:{doc.pictures[2].line}"]
         self.assertEqual(broken, "skipped")
         self.assertIn("broken.wmf: not drawn", issues[0])
+        # the label check: the model claimed the number, but none of the picture's words ("flow", "rate", "gpm")
+        status, issues = statuses[f"labels:p1:pic{schematic.line}"]
+        self.assertEqual(status, "complete")  # a quality measure, not a failure
+        self.assertEqual(issues, ["Label coverage 0%: 3 of the picture's 3 words in no claim (flow, gpm, rate)"])
+        self.assertNotIn(f"labels:p1:pic{doc.pictures[1].line}", statuses)  # the PNG has no text layer
 
     def test_large_pictures_are_tiled_and_their_tiles_refined_after_every_picture_is_drawn(self):
         # through the CLI and a model answering out of order, some tiles partial: they're refined later, from pages

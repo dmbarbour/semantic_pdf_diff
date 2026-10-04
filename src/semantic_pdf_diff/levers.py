@@ -370,6 +370,18 @@ class Reconcile(Lever):
     def reconciles(self):
         return self.reconcile
 
+class ContinueReading(Lever):
+    lever_name, stage, off = "continue_reading", "inclusion", {"continuations": 0}
+    # an image task's answer incomplete with its claims at the limit is the model asking for more: the same task asked
+    # again, told what it returned, for the rest (the owner, 2026-10-03: "enabling 'continue' based on a request from
+    # the model"; splitting a picture loses its visual context). Text and table tasks are refined by splitting their
+    # text instead: continued, a page's text task read the tables in it too, conditions from their headers copied onto
+    # every row (the controlled schedules)
+    continuations: Annotated[int, _selecting(VISUAL)] = Field(default=3, ge=0, le=20)
+
+    def continuation_limit(self, region):
+        return self.continuations if region in VISUAL else 0
+
 class Align(Lever):
     lever_name, stage, off = "align", "comparison", {"align": False}
     # revisions: decide which items correspond across the two revisions before any value is judged, and settle equal
@@ -413,7 +425,7 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, VisualTextLayer, TableFilter,
-                 QuoteMatch, Reconcile, DedupeRepeated, Align, VerifyVisuals, ExplainDifferences)
+                 QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -572,6 +584,12 @@ class Platform(Composable):
     def reconciles(self):
         """Whether readings of one fact by different tasks are read as one claim (store.evidence)."""
         return False
+
+    @chosen
+    def continuation_limit(self, region):
+        """How many times a task's answer that's incomplete with its claims at the limit is continued (tasks.TaskCore),
+        by the task's region: the platform's, never."""
+        return 0
 
     @chosen
     def dedupes_repeated_rows(self):

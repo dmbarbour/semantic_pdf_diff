@@ -31,12 +31,12 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 31,
+    "no change": 32,
     "unscored": 2
    },
    "findings": {
     "different": 4,
-    "equivalent": 33
+    "equivalent": 34
    },
    "unmatched": 6,
    "pairs": 4,
@@ -283,7 +283,7 @@
    "removals_found": "1/1",
    "unchanged_confirmed": "23/23",
    "false_changes": 0,
-   "difference_precision": 1.0,
+   "difference_precision": 0.8333,
    "changed": {
     "reported": 4
    },
@@ -298,18 +298,19 @@
     "confirmed": 23
    },
    "different": {
-    "change": 5
+    "change": 5,
+    "unscored": 1
    },
    "equivalent": {
-    "no change": 24,
+    "no change": 26,
     "unscored": 1
    },
    "findings": {
-    "different": 5,
-    "equivalent": 25
+    "different": 6,
+    "equivalent": 27
    },
-   "unmatched": 7,
-   "pairs": 5,
+   "unmatched": 5,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -318,6 +319,9 @@
     "by_claims": {
      "change": {
       "changed": 5
+     },
+     "unscored": {
+      "changed": 1
      }
     }
    },
@@ -538,7 +542,7 @@
    "removals_found": "3/3",
    "unchanged_confirmed": "78/78",
    "false_changes": 0,
-   "difference_precision": 0.8,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -553,30 +557,24 @@
     "confirmed": 78
    },
    "different": {
-    "change": 8,
-    "unscored": 2
+    "change": 3
    },
    "equivalent": {
-    "no change": 128,
-    "unscored": 10
+    "no change": 78
    },
    "findings": {
-    "different": 10,
-    "equivalent": 138,
-    "uncertain": 4
+    "different": 3,
+    "equivalent": 78
    },
-   "unmatched": 13,
-   "pairs": 21,
+   "unmatched": 7,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
-    "right": 11,
-    "scored": 11,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 11
-     },
-     "unscored": {
       "changed": 3
      }
     }
@@ -1416,28 +1414,30 @@
     "change": 8
    },
    "equivalent": {
-    "no change": 88,
+    "no change": 93,
     "unscored": 19
    },
    "findings": {
+    "complementary": 1,
     "different": 8,
-    "equivalent": 107,
-    "uncertain": 2,
+    "equivalent": 112,
+    "uncertain": 5,
     "unrelated": 1
    },
-   "unmatched": 23,
-   "pairs": 25,
+   "unmatched": 26,
+   "pairs": 30,
    "omitted": 0,
    "kinds": {
-    "right": 8,
-    "scored": 10,
+    "right": 11,
+    "scored": 13,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 8
+      "changed": 9
      },
      "no change": {
-      "not_same_item": 2
+      "not_same_item": 2,
+      "restated": 2
      }
     }
    },
@@ -1506,14 +1506,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 138,
-    "unscored": 12
+    "no change": 84
    },
    "findings": {
-    "equivalent": 150
+    "equivalent": 84
    },
    "unmatched": 0,
-   "pairs": 4,
+   "pairs": 0,
    "omitted": 0,
    "detail": {
     "B-401.airflow": "confirmed",
@@ -1861,14 +1860,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 138,
-    "unscored": 12
+    "no change": 84
    },
    "findings": {
-    "equivalent": 150
+    "equivalent": 84
    },
-   "unmatched": 4,
-   "pairs": 8,
+   "unmatched": 0,
+   "pairs": 7,
    "omitted": 0,
    "detail": {
     "B-401.airflow": "confirmed",
@@ -2468,14 +2466,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 130,
-    "unscored": 8
+    "no change": 80
    },
    "findings": {
-    "equivalent": 138
+    "equivalent": 80
    },
-   "unmatched": 24,
-   "pairs": 4,
+   "unmatched": 12,
+   "pairs": 0,
    "omitted": 0,
    "splits": [
     {
@@ -2499,8 +2496,8 @@
       "split candidate"
      ],
      "compared": [],
-     "old_claims": 6,
-     "new_claims": 12,
+     "old_claims": 4,
+     "new_claims": 8,
      "old_claims_relations": []
     }
    ],
@@ -4058,12 +4055,12 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 31,
+    "no change": 32,
     "unscored": 2
    },
    "findings": {
     "different": 4,
-    "equivalent": 33
+    "equivalent": 34
    },
    "unmatched": 6,
    "pairs": 4,
@@ -4310,7 +4307,7 @@
    "removals_found": "1/1",
    "unchanged_confirmed": "23/23",
    "false_changes": 0,
-   "difference_precision": 1.0,
+   "difference_precision": 0.8333,
    "changed": {
     "reported": 4
    },
@@ -4325,18 +4322,19 @@
     "confirmed": 23
    },
    "different": {
-    "change": 5
+    "change": 5,
+    "unscored": 1
    },
    "equivalent": {
-    "no change": 24,
+    "no change": 26,
     "unscored": 1
    },
    "findings": {
-    "different": 5,
-    "equivalent": 25
+    "different": 6,
+    "equivalent": 27
    },
-   "unmatched": 7,
-   "pairs": 5,
+   "unmatched": 5,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -4345,6 +4343,9 @@
     "by_claims": {
      "change": {
       "changed": 5
+     },
+     "unscored": {
+      "changed": 1
      }
     }
    },
@@ -4565,7 +4566,7 @@
    "removals_found": "3/3",
    "unchanged_confirmed": "78/78",
    "false_changes": 0,
-   "difference_precision": 0.8,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -4580,30 +4581,24 @@
     "confirmed": 78
    },
    "different": {
-    "change": 8,
-    "unscored": 2
+    "change": 3
    },
    "equivalent": {
-    "no change": 128,
-    "unscored": 10
+    "no change": 78
    },
    "findings": {
-    "different": 10,
-    "equivalent": 138,
-    "uncertain": 4
+    "different": 3,
+    "equivalent": 78
    },
-   "unmatched": 13,
-   "pairs": 21,
+   "unmatched": 7,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
-    "right": 11,
-    "scored": 11,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 11
-     },
-     "unscored": {
       "changed": 3
      }
     }
@@ -5443,28 +5438,30 @@
     "change": 8
    },
    "equivalent": {
-    "no change": 88,
+    "no change": 93,
     "unscored": 19
    },
    "findings": {
+    "complementary": 1,
     "different": 8,
-    "equivalent": 107,
-    "uncertain": 2,
+    "equivalent": 112,
+    "uncertain": 5,
     "unrelated": 1
    },
-   "unmatched": 23,
-   "pairs": 25,
+   "unmatched": 26,
+   "pairs": 30,
    "omitted": 0,
    "kinds": {
-    "right": 8,
-    "scored": 10,
+    "right": 11,
+    "scored": 13,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 8
+      "changed": 9
      },
      "no change": {
-      "not_same_item": 2
+      "not_same_item": 2,
+      "restated": 2
      }
     }
    },
@@ -5533,14 +5530,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 138,
-    "unscored": 12
+    "no change": 84
    },
    "findings": {
-    "equivalent": 150
+    "equivalent": 84
    },
    "unmatched": 0,
-   "pairs": 4,
+   "pairs": 0,
    "omitted": 0,
    "detail": {
     "B-401.airflow": "confirmed",
@@ -5888,14 +5884,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 138,
-    "unscored": 12
+    "no change": 84
    },
    "findings": {
-    "equivalent": 150
+    "equivalent": 84
    },
-   "unmatched": 4,
-   "pairs": 8,
+   "unmatched": 0,
+   "pairs": 7,
    "omitted": 0,
    "detail": {
     "B-401.airflow": "confirmed",
@@ -6495,14 +6490,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 130,
-    "unscored": 8
+    "no change": 80
    },
    "findings": {
-    "equivalent": 138
+    "equivalent": 80
    },
-   "unmatched": 24,
-   "pairs": 4,
+   "unmatched": 12,
+   "pairs": 0,
    "omitted": 0,
    "splits": [
     {
@@ -6526,8 +6520,8 @@
       "split candidate"
      ],
      "compared": [],
-     "old_claims": 6,
-     "new_claims": 12,
+     "old_claims": 4,
+     "new_claims": 8,
      "old_claims_relations": []
     }
    ],

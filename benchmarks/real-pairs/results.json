@@ -576,10 +576,10 @@
   },
   "ts38300-j20-j30": {
    "claims": [
-    6653,
-    6702
+    6642,
+    6703
    ],
-   "claims_from_pictures": 2706,
+   "claims_from_pictures": 2696,
    "pictures_changed": [
     8,
     8
@@ -590,35 +590,34 @@
     686
    ],
    "findings": {
-    "complementary in changed text": 37,
+    "complementary in changed text": 38,
     "complementary in unchanged text": 54,
-    "different in changed text": 19,
+    "different in changed text": 25,
     "different in unchanged text": 17,
-    "equivalent in changed text": 84,
+    "equivalent in changed text": 83,
     "equivalent in unchanged text": 440,
     "settled in changed text": 98,
     "settled in unchanged text": 5855,
     "uncertain in changed text": 37,
     "uncertain in unchanged text": 27,
-    "unrelated in changed text": 89,
+    "unrelated in changed text": 93,
     "unrelated in unchanged text": 54
    },
    "unmatched": {
-    "no_confirmed_counterpart in changed text": 44,
+    "no_confirmed_counterpart in changed text": 45,
     "no_confirmed_counterpart in unchanged text": 32,
-    "not_compared in changed text": 79,
+    "not_compared in changed text": 78,
     "not_compared in unchanged text": 237,
-    "unaligned in changed text": 40,
+    "unaligned in changed text": 31,
     "unaligned in unchanged text": 89
    },
    "explained": {
-    "changed in changed text": 11,
+    "changed in changed text": 12,
     "changed in unchanged text": 2,
-    "conditions in changed text": 9,
+    "conditions in changed text": 10,
     "conditions in unchanged text": 1,
-    "misread in changed text": 1,
     "misread in unchanged text": 2,
-    "not_same_item in changed text": 33,
+    "not_same_item in changed text": 38,
     "not_same_item in unchanged text": 34,
     "restated in unchanged text": 3,
     "split_or_merge in changed text": 2,
@@ -627,13 +626,13 @@
    "suspect_differences": 17,
    "numeric_changes": 12,
    "numeric_changes_unseen": 3,
-   "pairs_judged": 858,
+   "pairs_judged": 868,
    "settled": 5953,
    "groupings": {
     "ambiguous": 35,
     "attached": 17,
     "matched": 1904,
-    "unaligned": 82
+    "unaligned": 81
    },
    "examples": {
     "suspect": [

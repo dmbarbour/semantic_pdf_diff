@@ -383,6 +383,36 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
     - Differences on pictures fell mostly on those diagrams. Inserted messages shifted their steps, and the pairings across steps were named "not the same item".
   - **Stores made before this read no pictures** until `--reset` (no users yet; noted, not migrated).
 
+- **Diagrams with many claims: the owner's decisions (2026-10-03).** Measured on TS 38.300's pictures: 8 of 338 picture reads hit the 20-claim limit; a median picture has 95% of its label words in some claim, the largest procedure diagrams 76–100%. Claude's five ideas, and the owner's answers:
+  - **1. Continue when the model asks for more:** "I think enabling 'continue' based on a request from the model is straightforward." Now.
+  - **2. Labels no claim covers:** "Analysis of labels unused is probably better applied as a quality and confidence check." Now, as a check, not a trigger.
+  - **3. Split a picture in halves:** "I think splitting halves will be very confusing in some cases; the purpose of the vision model is to see and report things as a human might, and visual context is a big part of that." Not done.
+  - **4. The model proposes the partition:** "Support for interactive analysis of images (4) would be somewhat analogous to progressive disclosure, but I agree it should be secondary." Later.
+  - **5. Read a picture's source** (Msc-generator's chart text, Visio's shape text): "Reading source for pictures is very nice to have as a fallback for attempting to understand claims." Later, "when we'd get to it normally."
+  - The owner: "We'll need to ensure some claim-heavy diagrams and charts are in our control docs."
+- **Continued reading and the label check (2026-10-04): built.**
+  - **Continuation** (the `continue_reading` lever, `continuations`, default 3):
+    - The trigger is an image task's answer that's incomplete with its claims at the limit, or that says the claim limit stopped it ("more steps (17–22) than the 20 claim limit allowed"). That's the model asking for more; clipping or illegibility isn't.
+    - The same task is asked again ("<task>-c<n>") with the claims it returned listed by entity, attribute and value, not to be repeated.
+    - A first request's bytes are as before, so recorded answers replay.
+  - **Image tasks only.** Continued, a page's text task read the tables on the page too, copying a header's condition ("rated point") onto every row. The other revision's reading lacked it, so alignment couldn't settle them. Listing the claims without conditions didn't stop it. Text and table tasks keep refinement by splitting their text.
+
+    | Controlled corpus (116 runs) | Before | Continued, all tasks | Conditions not listed | Image tasks only |
+    |---|---|---|---|---|
+    | Facts read right | 4,607 | 4,611 | 4,606 | 4,606 |
+    | Misbound claims | 281 | 243 | 242 | 226 |
+    | Claims | 6,106 | 5,707 | 5,712 | 5,681 |
+    | Revision pairs with fewer unchanged facts confirmed | – | 3 | 3 | 0 |
+
+    - The gain is in tiles: a capped tile is continued, not halved. The equipment schedules' halves had read rows twice; they went from 6–8 misbound to 0.
+    - Slightly worse: the floor plan's clean run reads 5 facts loosely rather than right; the scanned end-use study has 2 misbound where it had none.
+    - On TS 38.300: 3 capped picture reads continued, all complete, 17 more claims.
+    - Cost: $0.34 on the controlled corpus (three versions), $0.012 on TS 38.300.
+  - **The label check** (`pictures.Reading.labels`): a coverage row for each picture with a text layer (`labels:p1:pic<line>`, status complete). It gives the share of the picture's own words (three letters or more, function words left out) that some claim from it mentions, and lists the words none does. It's a quality measure, never applied.
+    - On TS 38.300's 267 pictures (two versions): median 100%, 16 under 80%, none under half.
+    - The uncovered words are mostly axis titles and sentences in figures.
+- **Word's own difficulties as knobs (2026-10-03).** The owner: "I do want Word-specific knobs; we should definitely include some footnotes etc, speaker notes in pptx later, etc.. For tracked changes, we'll generally process the changes-applied version, but that must be tested if not already." (The reader applies tracked changes; a unit test covers it, no controlled document does yet.)
+
 ## Open questions
 
 None currently.

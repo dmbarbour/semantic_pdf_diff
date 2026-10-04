@@ -97,6 +97,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `quote_match` | `"fragments"` | post | quote_match | extract | table, text |
 | `reconcile` | `true` | post | reconcile | - | - |
 | `dedupe_repeated` | `true` | shaping | dedupe_repeated | extract | all |
+| `continuations` | `3` | selecting | continue_reading | extract | figure, overview, tile, vision |
 | `align` | `true` | selecting | align | compare | - |
 | `verify_visuals` | `true` | selecting | verify_visuals | compare | - |
 | `explain_differences` | `true` | selecting | explain_differences | compare | - |
