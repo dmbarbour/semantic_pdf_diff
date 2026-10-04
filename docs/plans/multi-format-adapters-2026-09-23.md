@@ -412,6 +412,20 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
     - On TS 38.300's 267 pictures (two versions): median 100%, 16 under 80%, none under half.
     - The uncovered words are mostly axis titles and sentences in figures.
 - **Word's own difficulties as knobs (2026-10-03).** The owner: "I do want Word-specific knobs; we should definitely include some footnotes etc, speaker notes in pptx later, etc.. For tracked changes, we'll generally process the changes-applied version, but that must be tested if not already." (The reader applies tracked changes; a unit test covers it, no controlled document does yet.)
+- **Word knobs, a first set (2026-10-04): built.**
+  - **The reader** (`docxdocs.py`) now reads:
+    - **footnotes:** each placed as a line ("Footnote 1: …") after the paragraph or table citing it, marked "[1]" where cited
+    - **numbered lists:** written from Word's numbering definitions (levels, formats, label text, a style's own numbering): "Condition 3:", "a)", "iv.", "•"
+  - **The knobs** (`bench/controlled/word.py`): Word-only documents beside the corpus, scored by the same facts.
+
+    | Knob | Document | Result |
+    |---|---|---|
+    | Tracked changes | the treatment plant's revision as unaccepted insertions and deletions to the earlier document (values, a row added, a sentence dropped) | scored exactly as the clean revision: 4 of 4 changes, 3 of 3 additions, 1 of 1 removal, 28 of 28 unchanged, no false change |
+    | Footnotes | three sentences, four facts, moved into footnotes | 33 of 33 facts found, all read right |
+    | Numbered lists | the specification's conditions as a Word list labelled "Condition %1:", and its renumbered revision | the reader writes the same text as the plain document, so the queries are byte for byte the plain document's: the same answers and scores |
+
+  - **Not yet:** merged and nested table cells, text boxes, Word charts (chart XML), equations, comments.
+  - Cost: $0.004.
 
 ## Open questions
 

@@ -76,6 +76,10 @@ def main(argv=None):
         for project, lines in representations.corpus(tuple(args.seed or (1,))):
             print(f"{representations.write(project, lines, DOCS_MD)}")
             print(f"{representations.write_docx(project, lines, DOCS_DOCX)}")
+        from semantic_pdf_diff_lab.bench.controlled import word
+        for seed in args.seed or (1,):
+            for path in word.write(DOCS_DOCX, seed):  # Word's own difficulties (word.py)
+                print(path)
         return 0
     if args.command == "run":
         return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error)
@@ -133,9 +137,11 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
     jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(DOCS_DOCX.glob("*.docx"))]
     jobs += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", pair_runs / out.name / p.id, f"pair {p.id}",
               "revisions") for p in revisions.pairs()]
+    from semantic_pdf_diff_lab.bench.controlled import word
     for folder, suffix in ((DOCS_MD, ".md"), (DOCS_DOCX, ".docx")):
+        listed = revisions.pairs() + (word.pairs() if suffix == ".docx" else [])  # Word's own: word.py
         jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}", pair_runs / out.name / f"{p.id}{suffix}",
-                  f"pair {p.id}{suffix}", "revisions") for p in revisions.pairs()
+                  f"pair {p.id}{suffix}", "revisions") for p in listed
                  if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
     overrides = {}
     if unaligned:
@@ -274,11 +280,11 @@ def key_path(run):
 def compare_pairs():
     """comparisons.json: each revision pair's comparison scored against the two revisions' keys (PDF, and Markdown as
     "<id>.md")."""
-    from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
+    from semantic_pdf_diff_lab.bench.controlled import comparison, revisions, word
     compared = {}
     for which in ("recorded", "replay", "recorded-unaligned", "replay-unaligned"):
-        for pair in revisions.pairs():
-            for suffix in ("", ".md", ".docx"):
+        for pair in revisions.pairs() + word.pairs():
+            for suffix in (("", ".md", ".docx") if pair in revisions.pairs() else (".docx",)):
                 report = PAIR_RUNS / which / f"{pair.id}{suffix}" / "report.json"
                 if report.exists():
                     keys = [json.loads(key_path(d + suffix).read_text(encoding="utf-8")) for d in (pair.earlier, pair.later)]

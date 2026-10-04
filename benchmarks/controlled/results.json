@@ -2629,6 +2629,48 @@
     "text": "4/4"
    }
   },
+  "spec-s1-numbered.docx": {
+   "facts": 21,
+   "found": 19,
+   "recall": 0.9048,
+   "found_right": 12,
+   "missed": [
+    "fail.duration",
+    "fail.snr"
+   ],
+   "claims": 21,
+   "outcomes": {
+    "loose": 7,
+    "misbound": 1,
+    "misread": 1,
+    "right": 12
+   },
+   "conditions_kept": "4/4",
+   "recall_by_form": {
+    "docx-prose": 0.875,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.2381,
+    "text": 0.6667
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 4,
+     "right": 1
+    },
+    "text": {
+     "loose": 3,
+     "misbound": 1,
+     "misread": 1,
+     "right": 11
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "4/4"
+   }
+  },
   "spec-s1-renumbered": {
    "facts": 22,
    "found": 21,
@@ -2674,6 +2716,47 @@
     "table": "0/0",
     "text": "4/4",
     "visual": "4/4"
+   }
+  },
+  "spec-s1-renumbered-numbered.docx": {
+   "facts": 22,
+   "found": 19,
+   "recall": 0.8636,
+   "found_right": 10,
+   "missed": [
+    "fail.duration",
+    "window.congested",
+    "window.idle"
+   ],
+   "claims": 20,
+   "outcomes": {
+    "loose": 9,
+    "misread": 1,
+    "right": 10
+   },
+   "conditions_kept": "2/2",
+   "recall_by_form": {
+    "docx-prose": 0.8235,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.2273,
+    "text": 0.6364
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 4,
+     "right": 1
+    },
+    "text": {
+     "loose": 5,
+     "misread": 1,
+     "right": 9
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "2/2"
    }
   },
   "spec-s1-renumbered.docx": {
@@ -3432,6 +3515,40 @@
     "text": "10/10"
    }
   },
+  "wtp-s1-footnotes.docx": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 35,
+   "outcomes": {
+    "right": 33,
+    "text": 2
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3939,
+    "text": 0.6061
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13,
+     "text": 2
+    },
+    "text": {
+     "right": 20
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
   "wtp-s1-revised": {
    "facts": 35,
    "found": 35,
@@ -3641,6 +3758,40 @@
     },
     "text": {
      "right": 20
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-tracked.docx": {
+   "facts": 35,
+   "found": 35,
+   "recall": 1.0,
+   "found_right": 35,
+   "missed": [],
+   "claims": 37,
+   "outcomes": {
+    "right": 35,
+    "text": 2
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.4571,
+    "text": 0.5429
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 16,
+     "text": 2
+    },
+    "text": {
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -7016,6 +7167,48 @@
     "text": "4/4"
    }
   },
+  "spec-s1-numbered.docx": {
+   "facts": 21,
+   "found": 19,
+   "recall": 0.9048,
+   "found_right": 12,
+   "missed": [
+    "fail.duration",
+    "fail.snr"
+   ],
+   "claims": 21,
+   "outcomes": {
+    "loose": 7,
+    "misbound": 1,
+    "misread": 1,
+    "right": 12
+   },
+   "conditions_kept": "4/4",
+   "recall_by_form": {
+    "docx-prose": 0.875,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.2381,
+    "text": 0.6667
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 4,
+     "right": 1
+    },
+    "text": {
+     "loose": 3,
+     "misbound": 1,
+     "misread": 1,
+     "right": 11
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "4/4"
+   }
+  },
   "spec-s1-renumbered": {
    "facts": 22,
    "found": 21,
@@ -7061,6 +7254,47 @@
     "table": "0/0",
     "text": "4/4",
     "visual": "4/4"
+   }
+  },
+  "spec-s1-renumbered-numbered.docx": {
+   "facts": 22,
+   "found": 19,
+   "recall": 0.8636,
+   "found_right": 10,
+   "missed": [
+    "fail.duration",
+    "window.congested",
+    "window.idle"
+   ],
+   "claims": 20,
+   "outcomes": {
+    "loose": 9,
+    "misread": 1,
+    "right": 10
+   },
+   "conditions_kept": "2/2",
+   "recall_by_form": {
+    "docx-prose": 0.8235,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.2273,
+    "text": 0.6364
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 4,
+     "right": 1
+    },
+    "text": {
+     "loose": 5,
+     "misread": 1,
+     "right": 9
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "2/2"
    }
   },
   "spec-s1-renumbered.docx": {
@@ -7819,6 +8053,40 @@
     "text": "10/10"
    }
   },
+  "wtp-s1-footnotes.docx": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 35,
+   "outcomes": {
+    "right": 33,
+    "text": 2
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3939,
+    "text": 0.6061
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13,
+     "text": 2
+    },
+    "text": {
+     "right": 20
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
   "wtp-s1-revised": {
    "facts": 35,
    "found": 35,
@@ -8028,6 +8296,40 @@
     },
     "text": {
      "right": 20
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-tracked.docx": {
+   "facts": 35,
+   "found": 35,
+   "recall": 1.0,
+   "found_right": 35,
+   "missed": [],
+   "claims": 37,
+   "outcomes": {
+    "right": 35,
+    "text": 2
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.4571,
+    "text": 0.5429
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 16,
+     "text": 2
+    },
+    "text": {
+     "right": 19
     }
    },
    "conditions_by_reader": {

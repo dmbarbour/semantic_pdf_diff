@@ -565,6 +565,7 @@ Each row is a situation met in this project's documents, with where it was recor
     - values whose state only a lead-in names
   - **Five revision pairs on it and on the treatment plant**, in PDF, Markdown and Word. Results are in the [revision comparison plan](revision-comparison-2026-10-02.md)'s milestone 4.
   - **The base's extraction joins `results.json`.**
+- **Word knobs (2026-10-04; the adapters plan):** tracked changes, footnotes and numbered lists as Word-only documents (`word.py`), in `docs-docx` beside the representations. Two are revision pairs: the treatment plant's revision as tracked changes, and the specification's renumbered conditions as Word lists.
 
 ## Decisions (2026-10-01)
 

@@ -637,6 +637,15 @@ class Corpus(unittest.TestCase):
                 self.assertEqual(data, (folder / "docs-docx" / f"{project.id}.docx").read_bytes())
                 key = json.loads((folder / "docs-docx" / f"{project.id}.key.json").read_text(encoding="utf-8"))
                 self.assertEqual(json.loads(json.dumps(representations.docx_key(project, data), ensure_ascii=False)), key)
+        from semantic_pdf_diff_lab.bench.controlled import word
+        only_word = word.documents()  # Word's own difficulties (word.py)
+        self.assertEqual({p.id for p, _ in written} | {p.id for p, _ in only_word},
+                         {f.stem for f in (folder / "docs-docx").glob("*.docx")})
+        for project, data in only_word:
+            with self.subTest(word=project.id):
+                self.assertEqual(data, (folder / "docs-docx" / f"{project.id}.docx").read_bytes())
+                key = json.loads((folder / "docs-docx" / f"{project.id}.key.json").read_text(encoding="utf-8"))
+                self.assertEqual(json.loads(json.dumps(representations.docx_key(project, data), ensure_ascii=False)), key)
 
 if __name__ == "__main__":
     unittest.main()

@@ -77,5 +77,44 @@ class Reading(unittest.TestCase):
         self.assertEqual([s.heading_path for s in sections][-1], ["1 Design Basis", "1.1 Pumps"])
         self.assertEqual([r["status"] for r in coverage if r["task"].startswith("image")], ["skipped"])
 
+@unittest.skipIf(docx is None, "python-docx isn't installed (the office extra)")
+class WordFeatures(unittest.TestCase):
+    """Footnotes and numbered lists: what Word holds outside a paragraph's own text (the Word knobs, word.py)."""
+    def test_a_footnote_follows_the_paragraph_citing_it(self):
+        from semantic_pdf_diff.docxdocs import read_docx
+        from semantic_pdf_diff_lab.bench.controlled.word import Writer
+        writer = Writer()
+        writer.heading("1 Design Basis", 1)
+        p = writer.paragraph("The plant serves 89,000 persons.")
+        writer.footnote(p, "Chlorine is fed at 3.3 mg/L.")
+        writer.paragraph("Alum is dosed at 38.8 mg/L.")
+        doc = read_docx(writer.save())
+        texts = [t for _, t in doc.lines if t]
+        self.assertEqual(texts[1:], ["The plant serves 89,000 persons.[1]", "Footnote 1: Chlorine is fed at 3.3 mg/L.",
+                                     "Alum is dosed at 38.8 mg/L."])
+        self.assertIn("Footnote 1: Chlorine is fed at 3.3 mg/L.", [b.text for b in doc.blocks])
+
+    def test_numbered_lists_are_written_as_word_numbers_them(self):
+        from semantic_pdf_diff.docxdocs import Numbering, _format, read_docx
+        from semantic_pdf_diff_lab.bench.controlled.word import Writer
+        writer = Writer()
+        for text in ("no acknowledgement within 856 ms", "21 retransmissions fail", "SNR below 4.3 dB"):
+            writer.numbered(text, "Condition %1:")
+        doc = read_docx(writer.save())
+        self.assertEqual([t for _, t in doc.lines if t],
+                         ["Condition 1: no acknowledgement within 856 ms", "Condition 2: 21 retransmissions fail",
+                          "Condition 3: SNR below 4.3 dB"])
+        self.assertEqual([_format(n, f) for n, f in ((3, "lowerLetter"), (28, "upperLetter"), (14, "lowerRoman"),
+                                                      (9, "upperRoman"), (7, "decimalZero"))],
+                         ["c", "AB", "xiv", "IX", "07"])
+        # Word's own List Number and List Bullet styles: numbered by their style; a deeper level restarts
+        d = docx.Document()
+        for text, style in (("first", "List Number"), ("second", "List Number"), ("a point", "List Bullet")):
+            d.add_paragraph(text, style=style)
+        raw = io.BytesIO()
+        d.save(raw)
+        texts = [t for _, t in read_docx(raw.getvalue()).lines if t]
+        self.assertEqual(texts, ["1. first", "2. second", "• a point"])
+
 if __name__ == "__main__":
     unittest.main()
