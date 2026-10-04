@@ -10,6 +10,14 @@ reader's own lines).
 - **footnotes:** sentences stating facts moved into footnotes, each leaving its reference mark.
 - **numbered:** numbered conditions as an auto-numbered list, Word writing "Condition 1:" from the list's label; in
   the renumbered revision, a condition inserted renumbers the rest with no change to their text.
+- **merged** (the equipment schedules; the adapters plan, "Merged and nested cells"): headers of two rows made of
+  merged cells (a group over its columns, a label merged down over both rows; the pumps' found by the reader, the
+  blowers' marked to repeat); each pump's tag merged down over its rated and runout rows, its motor's values too;
+  the valves' stroke times as Open and Close, one cell merged across both where they're equal.
+- **nested:** each pump's rated point and motor as small tables nested in its row's cells; the valves as two large
+  tables nested in an area table, one per area.
+- **layout:** the schedules inside a borderless table of one row and two columns, used to lay out the page: read
+  as content, it reads as the plain document does.
 
 Byte for byte the same each time (representations.FIXED_TIME).
 """
@@ -316,6 +324,137 @@ def numbered(lines, label="Condition %1:"):
             write_block(writer, block)
     return writer.save()
 
+def _table(container, rows, merges=(), header_rows=0, style="Table Grid"):
+    """A table in a document or a cell: rows of cell texts; merges [(row, column, last row, last column)], the first
+    cell's text kept; the first header_rows rows marked to repeat as a header. style None: no borders."""
+    table = container.add_table(rows=len(rows), cols=max(len(r) for r in rows))
+    if style:
+        table.style = style
+    for r, row in enumerate(rows):
+        for c, text in enumerate(row):
+            if text:
+                table.cell(r, c).text = text
+    for r0, c0, r1, c1 in merges:
+        table.cell(r0, c0).merge(table.cell(r1, c1)).text = rows[r0][c0]  # merging joins the cells' paragraphs
+    for r in range(header_rows):
+        table.rows[r]._tr.get_or_add_trPr().append(_element("w:tblHeader"))
+    return table
+
+def _schedules(project):
+    """The equipment schedules' parts: {"pumps" | "blowers" | "valves": (title, columns, rows)}."""
+    parts = [part for _, blocks in project.sections for block in blocks if block[0] == "schedule"
+             for part in block[1].sections]
+    return {name: (title, columns, rows) for name, (title, _, columns, rows) in zip(("pumps", "blowers", "valves"), parts)}
+
+def _opening(writer, project):
+    """The schedules' title, heading and lead-in, as the plain document has them."""
+    lines = _plain(project)
+    for block in blocks(lines)[:3]:
+        write_block(writer, block)
+
+def _plain(project):
+    from .representations import markdown
+    return markdown(project)
+
+def merged(project, seed=1):
+    """(the project with the knob's new facts, the document's bytes): see the module's notes."""
+    from dataclasses import replace
+    from .corpus import Draw
+    d = Draw(f"wtp-tables-{seed}-merged")
+    d.used |= {f.value for f in project.facts}
+    parts = _schedules(project)
+    writer = Writer()
+    _opening(writer, project)
+    (title, columns, rows) = parts["pumps"]
+    writer.paragraph("Table 1a. Raw water pumps", bold=True)
+    head = [[title, "Point", "Hydraulics", "", "Motor", ""], ["", ""] + [c.label for c in columns]]
+    body, merges = [], [(0, 0, 1, 0), (0, 1, 1, 1), (0, 2, 0, 3), (0, 4, 0, 5)]
+    for tag, cells in rows:
+        capacity, head_ft = (project.fact(f"{tag}.{c.attribute}") for c in columns[:2])
+        runout = [replace(capacity, id=f"{tag}.runout capacity", value=d.number(capacity.number * 1.15,
+                                                                               capacity.number * 1.3),
+                          conditions="runout point", forms=[]),
+                  replace(head_ft, id=f"{tag}.runout total dynamic head",
+                          value=d.number(head_ft.number * 0.65, head_ft.number * 0.8, 1), conditions="runout point",
+                          forms=[])]
+        project.facts += runout
+        r = len(head) + len(body)
+        body += [[tag, "Rated"] + list(cells), [tag, "Runout", runout[0].value, runout[1].value, cells[2], cells[3]]]
+        merges += [(r, 0, r + 1, 0), (r, 4, r + 1, 4), (r, 5, r + 1, 5)]  # the tag and its motor, over both rows
+    _table(writer.document, head + body, merges)
+    (title, columns, rows) = parts["blowers"]
+    writer.paragraph("Table 1b. Process air blowers", bold=True)
+    head = [[title, "Rated point", "", "Motor", ""], [""] + [c.label for c in columns]]
+    _table(writer.document, head + [[tag] + list(cells) for tag, cells in rows],
+           [(0, 0, 1, 0), (0, 1, 0, 2), (0, 3, 0, 4)], header_rows=2)
+    (title, columns, rows) = parts["valves"]
+    writer.paragraph("Table 2. Valve schedule", bold=True)
+    head = [[title] + [c.label for c in columns[:2]] + ["Stroke time (s)", ""], ["", "", "", "Open", "Close"]]
+    body, merges = [], [(0, 0, 1, 0), (0, 1, 1, 1), (0, 2, 1, 2), (0, 3, 0, 4)]
+    for k, (tag, cells) in enumerate(rows):
+        r = len(head) + len(body)
+        if k % 4 == 0:  # opened and closed alike: one time, merged across both
+            body.append([tag] + list(cells) + [""])
+            merges.append((r, 3, r, 4))
+            continue
+        opening = project.fact(f"{tag}.stroke time")
+        opening.synonyms += ("open time", "opening stroke time")  # its column's own word: "Open"
+        closing = replace(opening, id=f"{tag}.closing stroke time", attribute="closing stroke time",
+                          synonyms=("closing time", "close time", "stroke time"),
+                          value=d.number(opening.number * 0.8, opening.number * 1.25, 1), forms=[])
+        project.facts.append(closing)
+        body.append([tag] + list(cells) + [closing.value])
+    _table(writer.document, head + body, merges)
+    return project, writer.save()
+
+def nested(project):
+    """The document's bytes (the project's own facts): see the module's notes."""
+    parts = _schedules(project)
+    writer = Writer()
+    _opening(writer, project)
+    (title, columns, rows) = parts["pumps"]
+    writer.paragraph("Table 1a. Raw water pumps", bold=True)
+    outer = _table(writer.document, [[title, "Rated point", "Motor"]] + [[tag, "", ""] for tag, _ in rows])
+    for r, (tag, cells) in enumerate(rows, 1):
+        for c, pick in ((1, slice(0, 2)), (2, slice(2, 4))):
+            cell = outer.cell(r, c)
+            _table(cell, [[column.label, value] for column, value in zip(columns[pick], cells[pick])])
+            cell._tc.remove(cell.paragraphs[0]._p)  # the cell's first, empty paragraph
+    (title, columns, rows) = parts["blowers"]
+    writer.paragraph("Table 1b. Process air blowers", bold=True)
+    _table(writer.document, [[title] + [c.label for c in columns]] + [[tag] + list(cells) for tag, cells in rows])
+    (title, columns, rows) = parts["valves"]
+    writer.paragraph("Table 2. Valve schedule", bold=True)
+    areas = ("Raw water intake", "Filter gallery")
+    outer = _table(writer.document, [["Area", "Valves"]] + [[area, ""] for area in areas])
+    half = len(rows) // 2
+    for r, chunk in enumerate((rows[:half], rows[half:]), 1):
+        cell = outer.cell(r, 1)
+        _table(cell, [[title] + [c.label for c in columns]] + [[tag] + list(cells) for tag, cells in chunk])
+        cell._tc.remove(cell.paragraphs[0]._p)
+    return writer.save()
+
+def laid_out(project):
+    """The document's bytes: the plain document's blocks in a borderless one-row table of two columns, the pumps and
+    blowers on the left, the valves on the right."""
+    parts = blocks(_plain(project))
+    writer = Writer()
+    write_block(writer, parts[0])  # the title, above the layout
+    split = next(k for k, b in enumerate(parts) if b[0] == "bold" and b[1].startswith("Table 2"))
+    grid = writer.document.add_table(rows=1, cols=2)  # no style: no borders
+    for cell, chunk in zip(grid.rows[0].cells, (parts[1:split], parts[split:])):
+        for block in chunk:
+            if block[0] == "heading":
+                cell.add_paragraph(block[2], style=f"Heading {block[1]}")
+            elif block[0] == "table":
+                _table(cell, block[1])
+            elif block[0] == "bold":
+                cell.add_paragraph().add_run(block[1]).bold = True
+            else:
+                cell.add_paragraph(block[1])
+        cell._tc.remove(cell.paragraphs[0]._p)
+    return writer.save()
+
 # --- the knobs' documents and pairs ----------------------------------------------------------------------------
 
 # Facts whose sentences move into footnotes: each sentence stands beside another in its paragraph
@@ -343,6 +482,14 @@ def documents(seed=1):
     lines = markdown(renumbered)
     renumbered.id, renumbered.revision_of = f"{renumbered.id}-numbered", spec.id
     out.append((renumbered, numbered(lines)))
+    from .corpus import equipment_schedules
+    for knob in ("merged", "nested", "layout"):  # merged and nested cells, a layout table
+        schedules = equipment_schedules(seed)
+        schedules.id, schedules.knob = f"{schedules.id}-{knob}", "clean"
+        if knob == "merged":
+            out.append(merged(schedules, seed))
+        else:
+            out.append((schedules, nested(schedules) if knob == "nested" else laid_out(schedules)))
     return out
 
 def pairs(seed=1):

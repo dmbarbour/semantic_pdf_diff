@@ -44,6 +44,8 @@ class Block:
     kind: str = "text"  # text, code or table
     rows: list = field(default_factory=list)  # a table's rows of cells, its header first
     row_lines: list = field(default_factory=list)
+    row_headers: list = field(default_factory=list)  # each body row's own header labels (a Word table's merged
+                                                     # cells); empty: every row is read under rows[0]
 
     @property
     def box(self):
@@ -323,8 +325,9 @@ def text_job(data, job, output, client, dispatch, progress, extension):
                 if not any(c.strip() for c in row):
                     continue
                 line = table.row_lines[ri + 1]
-                core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", header,
-                                row, list(range(width)))
+                labels = table.row_headers[ri] if table.row_headers else header
+                core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", labels,
+                                row, list(range(len(labels) if table.row_headers else width)))
         for pg, line, alt, target in doc.images:
             if pg == page:
                 core.record(coverage_row(content=job.content, page=page, bbox=[0.0, float(line), 1.0, float(line + 1)],

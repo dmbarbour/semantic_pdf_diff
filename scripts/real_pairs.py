@@ -65,8 +65,8 @@ def main(argv=None):
                 continue
             options = pipeline.RunOptions(mode="revisions", fixture=PACKED if args.replay else WORKING,
                                           fixture_mode="replay" if args.replay else "record-new", responder=responder)
-            if args.replay:
-                settings = pipeline.settings_from(config, base_url=pipeline.NO_MODEL)
+            if args.replay:  # the model named as recorded, whatever the environment says
+                settings = pipeline.settings_from(config, base_url=pipeline.NO_MODEL, model=responder)
             else:
                 left = args.max_cost - (ledger.spent(LEDGER, round="real-pairs") - before)
                 if left <= 0:

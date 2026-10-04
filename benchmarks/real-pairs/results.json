@@ -576,8 +576,8 @@
   },
   "ts38300-j20-j30": {
    "claims": [
-    6642,
-    6703
+    6629,
+    6683
    ],
    "claims_from_pictures": 2696,
    "pictures_changed": [
@@ -596,8 +596,8 @@
     "different in unchanged text": 17,
     "equivalent in changed text": 83,
     "equivalent in unchanged text": 440,
-    "settled in changed text": 98,
-    "settled in unchanged text": 5855,
+    "settled in changed text": 87,
+    "settled in unchanged text": 5853,
     "uncertain in changed text": 37,
     "uncertain in unchanged text": 27,
     "unrelated in changed text": 93,
@@ -606,7 +606,7 @@
    "unmatched": {
     "no_confirmed_counterpart in changed text": 45,
     "no_confirmed_counterpart in unchanged text": 32,
-    "not_compared in changed text": 78,
+    "not_compared in changed text": 71,
     "not_compared in unchanged text": 237,
     "unaligned in changed text": 31,
     "unaligned in unchanged text": 89
@@ -625,13 +625,13 @@
    },
    "suspect_differences": 17,
    "numeric_changes": 12,
-   "numeric_changes_unseen": 3,
+   "numeric_changes_unseen": 4,
    "pairs_judged": 868,
-   "settled": 5953,
+   "settled": 5940,
    "groupings": {
     "ambiguous": 35,
     "attached": 17,
-    "matched": 1904,
+    "matched": 1903,
     "unaligned": 81
    },
    "examples": {
@@ -1067,6 +1067,23 @@
       "numbers_gone": [],
       "numbers_new": [
        "38.391"
+      ]
+     },
+     {
+      "earlier": "Change history Date | Meeting | TDoc | CR | Rev | Cat | Subject/Comment | New Version 2017.03 | RAN2 97bis | R2-1702627 | - | - | - | First version. | 0.1.0 2017.04 | RAN2 97bis | R2-1703825 | - | - | - | Editorial Updates: - Stage 2 Details of ARQ operation marked as FFS - Placeholder for CU/DU Spl",
+      "later": "Change history Date | Meeting | TDoc | CR | Rev | Cat | Subject/Comment | New Version 2017.03 | RAN2 97bis | R2-1702627 | - | - | - | First version. | 0.1.0 2017.04 | RAN2 97bis | R2-1703825 | - | - | - | Editorial Updates: - Stage 2 Details of ARQ operation marked as FFS - Placeholder for CU/DU Spl",
+      "numbers_gone": [],
+      "numbers_new": [
+       "06",
+       "1",
+       "1",
+       "1",
+       "1",
+       "1",
+       "1",
+       "112",
+       "112",
+       "112"
       ]
      }
     ]
@@ -1612,10 +1629,10 @@
   },
   "ts38300-j20-j30": {
    "claims": [
-    5288,
-    5361
+    6629,
+    6683
    ],
-   "claims_from_pictures": 0,
+   "claims_from_pictures": 2696,
    "pictures_changed": [
     8,
     8
@@ -1626,40 +1643,106 @@
     686
    ],
    "findings": {
-    "complementary in changed text": 32,
-    "complementary in unchanged text": 44,
-    "different in changed text": 9,
-    "different in unchanged text": 12,
-    "equivalent in changed text": 41,
-    "equivalent in unchanged text": 246,
-    "settled in changed text": 85,
-    "settled in unchanged text": 4760,
-    "uncertain in changed text": 17,
-    "uncertain in unchanged text": 26,
-    "unrelated in changed text": 36,
-    "unrelated in unchanged text": 38
+    "complementary in changed text": 38,
+    "complementary in unchanged text": 54,
+    "different in changed text": 25,
+    "different in unchanged text": 17,
+    "equivalent in changed text": 83,
+    "equivalent in unchanged text": 440,
+    "settled in changed text": 87,
+    "settled in unchanged text": 5853,
+    "uncertain in changed text": 37,
+    "uncertain in unchanged text": 27,
+    "unrelated in changed text": 93,
+    "unrelated in unchanged text": 54
    },
    "unmatched": {
-    "no_confirmed_counterpart in changed text": 20,
-    "no_confirmed_counterpart in unchanged text": 29,
-    "not_compared in changed text": 57,
-    "not_compared in unchanged text": 187,
-    "unaligned in changed text": 18,
-    "unaligned in unchanged text": 84
+    "no_confirmed_counterpart in changed text": 45,
+    "no_confirmed_counterpart in unchanged text": 32,
+    "not_compared in changed text": 71,
+    "not_compared in unchanged text": 237,
+    "unaligned in changed text": 31,
+    "unaligned in unchanged text": 89
    },
-   "suspect_differences": 12,
+   "explained": {
+    "changed in changed text": 12,
+    "changed in unchanged text": 2,
+    "conditions in changed text": 10,
+    "conditions in unchanged text": 1,
+    "misread in unchanged text": 2,
+    "not_same_item in changed text": 38,
+    "not_same_item in unchanged text": 34,
+    "restated in unchanged text": 3,
+    "split_or_merge in changed text": 2,
+    "split_or_merge in unchanged text": 2
+   },
+   "suspect_differences": 17,
    "numeric_changes": 12,
-   "numeric_changes_unseen": 3,
-   "pairs_judged": 501,
-   "settled": 4845,
+   "numeric_changes_unseen": 4,
+   "pairs_judged": 868,
+   "settled": 5940,
    "groupings": {
-    "ambiguous": 26,
-    "attached": 14,
-    "matched": 1713,
-    "unaligned": 71
+    "ambiguous": 35,
+    "attached": 17,
+    "matched": 1903,
+    "unaligned": 81
    },
    "examples": {
     "suspect": [
+     {
+      "a": {
+       "entity": "Remote UE Uu-PHY",
+       "attribute": "connection",
+       "value": "gNB Uu-PHY",
+       "unit": "",
+       "conditions": "L2 Multi-path Relay using SL indirect path",
+       "lines": [
+        4928,
+        4928
+       ]
+      },
+      "b": {
+       "entity": "Relay UE Uu-PHY",
+       "attribute": "connection",
+       "value": "gNB Uu-PHY",
+       "unit": "",
+       "conditions": "L2 Multi-path Relay using SL indirect path",
+       "lines": [
+        4937,
+        4937
+       ]
+      },
+      "rationale": "Claim A describes a connection between the Remote UE Uu-PHY and the gNB Uu-PHY, whereas Claim B describes a connection between the Relay UE Uu-PHY and the gNB Uu-PHY. Since these are different entitie",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the 'Remote UE Uu-PHY' and Claim B refers to the 'Relay UE Uu-PHY'. The provided context shows that both entities and their respective connections to the gNB Uu-PHY exist in both the"
+     },
+     {
+      "a": {
+       "entity": "Relay UE Uu-PHY",
+       "attribute": "connection",
+       "value": "gNB Uu-PHY",
+       "unit": "",
+       "conditions": "L2 Multi-path Relay using SL indirect path",
+       "lines": [
+        4928,
+        4928
+       ]
+      },
+      "b": {
+       "entity": "Remote UE Uu-PHY",
+       "attribute": "connection",
+       "value": "gNB Uu-PHY",
+       "unit": "",
+       "conditions": "L2 Multi-path Relay using SL indirect path",
+       "lines": [
+        4937,
+        4937
+       ]
+      },
+      "rationale": "Claim A describes a connection between the Relay UE Uu-PHY and the gNB Uu-PHY, whereas Claim B describes a connection between the Remote UE Uu-PHY and the gNB Uu-PHY. These are distinct entities withi",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the 'Relay UE Uu-PHY' and Claim B refers to the 'Remote UE Uu-PHY'. Both entities are present in both revisions, as evidenced by the provided context lists, indicating they are disti"
+     },
      {
       "a": {
        "entity": "L2 U2N Remote and first L2 U2N Relay UE",
@@ -1683,7 +1766,9 @@
         4360
        ]
       },
-      "rationale": "Claim A describes a connection between a Remote UE and a Relay UE, whereas Claim B describes a connection between two Relay UEs. While the connection type and procedure are identical, the entities inv"
+      "rationale": "Claim A describes a connection between a Remote UE and a Relay UE, whereas Claim B describes a connection between two Relay UEs. While the connection type and procedure are identical, the entities inv",
+      "kind": "not_same_item",
+      "why": "Claim A refers to a connection between a Remote UE and a Relay UE, while Claim B refers to a connection between two Relay UEs. Both items are present in both revisions (as shown in the context lists),"
      },
      {
       "a": {
@@ -1708,7 +1793,9 @@
         3155
        ]
       },
-      "rationale": "Claim A specifies a discrete set of possible values (1, 2, or 4), whereas Claim B defines the value as a relative constraint (greater than or equal to the number of LP-WUS symbols)."
+      "rationale": "Claim A specifies a discrete set of possible values (1, 2, or 4), whereas Claim B defines the value as a relative constraint (greater than or equal to the number of LP-WUS symbols).",
+      "kind": "not_same_item",
+      "why": "Both revisions state two different constraints for the 'number of OOK symbols within an OFDM symbol': one as a discrete set (1, 2, or 4) and one as a relative constraint (>= number of LP-WUS symbols)."
      },
      {
       "a": {
@@ -1733,7 +1820,9 @@
         3484
        ]
       },
-      "rationale": "Both claims describe detection conditions for 'Intra-system Too Late Handover' under the same timer conditions, but they specify different triggers: Claim A requires a configured but uninitiated hando"
+      "rationale": "Both claims describe detection conditions for 'Intra-system Too Late Handover' under the same timer conditions, but they specify different triggers: Claim A requires a configured but uninitiated hando",
+      "kind": "not_same_item",
+      "why": "Claim A refers to 'detection condition 2' and Claim B refers to 'detection condition 1'. The context lists show that both 'detection condition 1' and 'detection condition 2' exist in both revisions as"
      },
      {
       "a": {
@@ -1758,7 +1847,9 @@
         3060
        ]
       },
-      "rationale": "Claim A refers to an 'extended short format' while Claim B refers to a 'short format'. Although the reporting capacity value is the same, the entities (the formats themselves) are distinct designation"
+      "rationale": "Claim A refers to an 'extended short format' while Claim B refers to a 'short format'. Although the reporting capacity value is the same, the entities (the formats themselves) are distinct designation",
+      "kind": "not_same_item",
+      "why": "Both the 'BSR extended short format' and the 'BSR short format' are stated in both revisions with the same reporting capacity. They are distinct entities (different formats), not a revision of the sam"
      },
      {
       "a": {
@@ -1783,7 +1874,9 @@
         4493
        ]
       },
-      "rationale": "Claim A specifies 'Uu measurements' as part of the reporting content, whereas Claim B specifies 'sidelink measurement between the L2 U2N Remote UE and the source L2 U2N Relay UE'."
+      "rationale": "Claim A specifies 'Uu measurements' as part of the reporting content, whereas Claim B specifies 'sidelink measurement between the L2 U2N Remote UE and the source L2 U2N Relay UE'.",
+      "kind": "changed",
+      "why": "The reporting content for the L2 U2N Remote UE was revised from 'Uu measurements' in Claim A to 'sidelink measurement between the L2 U2N Remote UE and the source L2 U2N Relay UE' in Claim B."
      },
      {
       "a": {
@@ -1808,7 +1901,9 @@
         3556
        ]
       },
-      "rationale": "Claim A specifies the content of the RA Report as SSB indexes and the number of preambles sent in chronological order, whereas Claim B specifies the content as 2-step RACH information per a specific T"
+      "rationale": "Claim A specifies the content of the RA Report as SSB indexes and the number of preambles sent in chronological order, whereas Claim B specifies the content as 2-step RACH information per a specific T",
+      "kind": "not_same_item",
+      "why": "Both A and B are members of a list describing the content of the 'RA Report'. In the earlier revision, both the value of A and the value of B (2-step RACH information) are listed as separate content i"
      },
      {
       "a": {
@@ -1833,7 +1928,9 @@
         3554
        ]
       },
-      "rationale": "Both claims describe the content of the RA Report for the same design. Claim A specifies an indication of RSRP threshold status per attempt, while Claim B specifies SSB indexes and the number of pream"
+      "rationale": "Both claims describe the content of the RA Report for the same design. Claim A specifies an indication of RSRP threshold status per attempt, while Claim B specifies SSB indexes and the number of pream",
+      "kind": "not_same_item",
+      "why": "Both A and B are members of a list describing the content of the RA Report. The context shows that in the earlier revision, the value in B was already present as a separate item, and in the later revi"
      },
      {
       "a": {
@@ -1858,7 +1955,9 @@
         3557
        ]
       },
-      "rationale": "Both claims describe the content of the 'RA Report', but they specify entirely different information: Claim A refers to SSB RSRP threshold indications, while Claim B refers to LBT failure indications."
+      "rationale": "Both claims describe the content of the 'RA Report', but they specify entirely different information: Claim A refers to SSB RSRP threshold indications, while Claim B refers to LBT failure indications.",
+      "kind": "not_same_item",
+      "why": "Both claims describe the 'content' attribute of the 'RA Report', which is a list of multiple items. Claim A (SSB RSRP threshold) is present in both revisions (it appears in the 'later revision' list p"
      },
      {
       "a": {
@@ -1883,7 +1982,9 @@
         3556
        ]
       },
-      "rationale": "Claim A specifies a particular content item (SSB RSRP threshold indication), whereas Claim B replaces this with a reference to 2-step RACH information in TS 38.331. The content of the RA Report has ch"
+      "rationale": "Claim A specifies a particular content item (SSB RSRP threshold indication), whereas Claim B replaces this with a reference to 2-step RACH information in TS 38.331. The content of the RA Report has ch",
+      "kind": "not_same_item",
+      "why": "Claim A and Claim B are different members of a list describing the content of the RA Report. In the earlier revision, both the SSB RSRP threshold indication (A) and the 2-step RACH information (B) are"
      },
      {
       "a": {
@@ -1908,7 +2009,36 @@
         2689
        ]
       },
-      "rationale": "Claim A specifies the input for Layer 3 filtering as measurements from point B, while Claim B specifies the input for L3 Beam filtering as measurements from point A1."
+      "rationale": "Claim A specifies the input for Layer 3 filtering as measurements from point B, while Claim B specifies the input for L3 Beam filtering as measurements from point A1.",
+      "kind": "not_same_item",
+      "why": "Claim A refers to 'Layer 3 filtering for cell quality' and Claim B refers to 'L3 Beam filtering'. Both items are present in the earlier revision as distinct entities with different inputs (point B vs "
+     },
+     {
+      "a": {
+       "entity": "Evaluation of reporting criteria",
+       "attribute": "output",
+       "value": "D",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        2670,
+        2670
+       ]
+      },
+      "b": {
+       "entity": "Evaluation of reporting criteria",
+       "attribute": "output",
+       "value": "MAC CE reporting",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        2695,
+        2695
+       ]
+      },
+      "rationale": "Claim A identifies the output of the 'Evaluation of reporting criteria' block as 'D', whereas Claim B identifies the output of the same block as 'MAC CE reporting'.",
+      "kind": "changed",
+      "why": "The output value of the 'Evaluation of reporting criteria' block was revised from 'D' in the earlier revision to 'MAC CE reporting' in the later revision."
      },
      {
       "a": {
@@ -1933,7 +2063,9 @@
         5156
        ]
       },
-      "rationale": "Claim A requires both Correlation ID and AIOTF Identifier, whereas Claim B only specifies the AIOTF Identifier for the same entity and conditions."
+      "rationale": "Claim A requires both Correlation ID and AIOTF Identifier, whereas Claim B only specifies the AIOTF Identifier for the same entity and conditions.",
+      "kind": "split_or_merge",
+      "why": "Claim A specifies that the Command Request message includes both the Correlation ID and AIOTF Identifier. In the later revision, these are split into two separate claims: Claim B specifies the AIOTF I"
      },
      {
       "a": {
@@ -1958,7 +2090,9 @@
         5156
        ]
       },
-      "rationale": "Claim A specifies that both the Correlation ID and AIOTF Identifier must be included, whereas Claim B only specifies the Correlation ID."
+      "rationale": "Claim A specifies that both the Correlation ID and AIOTF Identifier must be included, whereas Claim B only specifies the Correlation ID.",
+      "kind": "split_or_merge",
+      "why": "Claim A specifies two items (Correlation ID and AIOTF Identifier) as a single requirement. In the later revision, these are split into two separate claims (Claim B for Correlation ID and another claim"
      }
     ],
     "unseen": [
@@ -1986,6 +2120,23 @@
       "numbers_gone": [],
       "numbers_new": [
        "38.391"
+      ]
+     },
+     {
+      "earlier": "Change history Date | Meeting | TDoc | CR | Rev | Cat | Subject/Comment | New Version 2017.03 | RAN2 97bis | R2-1702627 | - | - | - | First version. | 0.1.0 2017.04 | RAN2 97bis | R2-1703825 | - | - | - | Editorial Updates: - Stage 2 Details of ARQ operation marked as FFS - Placeholder for CU/DU Spl",
+      "later": "Change history Date | Meeting | TDoc | CR | Rev | Cat | Subject/Comment | New Version 2017.03 | RAN2 97bis | R2-1702627 | - | - | - | First version. | 0.1.0 2017.04 | RAN2 97bis | R2-1703825 | - | - | - | Editorial Updates: - Stage 2 Details of ARQ operation marked as FFS - Placeholder for CU/DU Spl",
+      "numbers_gone": [],
+      "numbers_new": [
+       "06",
+       "1",
+       "1",
+       "1",
+       "1",
+       "1",
+       "1",
+       "112",
+       "112",
+       "112"
       ]
      }
     ]

@@ -489,6 +489,24 @@ class Representations(unittest.TestCase):
         self.assertEqual({x["form"] for f in key["facts"] if f["id"].startswith("msg") for x in f["forms"]},
                          {"docx-figure"})
 
+    def test_word_table_knobs_place_every_fact_in_a_table_row(self):
+        try:
+            import docx  # noqa: F401
+        except ImportError:
+            self.skipTest("needs the office extra (python-docx)")
+        from semantic_pdf_diff.docxdocs import read_docx
+        from semantic_pdf_diff_lab.bench.controlled import representations as R, word
+        made = {p.id: (p, data) for p, data in word.documents()}
+        clean = [t for _, t in read_docx(R.docx(R.markdown(controlled.equipment_schedules(1)))).lines if t]
+        for knob, facts in (("merged", 105), ("nested", 84), ("layout", 84)):
+            with self.subTest(knob=knob):
+                project, data = made[f"wtp-tables-s1-{knob}"]
+                key = R.docx_key(project, data)
+                self.assertEqual((len(key["facts"]), key["absent"]), (facts, []))
+                self.assertEqual({x["form"] for f in key["facts"] for x in f["forms"]}, {"docx-table"})
+        # laid out, the schedules read as the plain document does (but for the layout cells' empty paragraphs)
+        self.assertEqual([t for _, t in read_docx(made["wtp-tables-s1-layout"][1]).lines if t], clean)
+
 class ComparisonScoring(unittest.TestCase):
     """A report's findings against the key's changes, on the treatment plant's pair."""
     @classmethod

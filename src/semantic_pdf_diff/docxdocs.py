@@ -6,7 +6,24 @@ grouping, the context levers and the task core work unchanged, and a claim's loc
   text), tabs and breaks as spaces and new lines.
 - **Headings:** paragraphs whose style is "Heading N", at level N; a "Title" is text. A table of contents (styles
   "toc N") is left out, as it repeats the headings.
-- **Tables:** row by row with the first row as header; a cell merged across columns (one w:tc) is read once.
+- **Tables** (the adapters plan, "Merged and nested cells"; the owner, 2026-10-04: "Go ahead with the initial
+  design based on your recommendations, heuristic for layout tables. This will provide a foundation for improving
+  things later."):
+  - **The grid:** each row's cells placed on the table's columns. A cell merged down repeats its text in every row
+    it covers, so a row keeps its subject; a cell merged across is one cell, read under its columns' labels joined
+    ("Stroke time (s) > Open / Close").
+  - **Headers:** the rows marked to repeat as a header, else the first row, and the next too when the first has a
+    cell merged across (or down into it) and it holds no number. Under several header rows a column is labelled
+    by its path ("Rated point > Capacity (gpm)").
+  - **Nested tables:** one of up to NESTED_INLINE_ROWS rows is written into its cell ("Flow: 450 gpm; Head: 85 ft"),
+    so its values stay in their row; a larger one is read as a table of its own after the outer table, under a
+    line naming its place ("Table in P-101A, Rating:").
+  - **Layout tables:** a table not marked with a header row holds content rather than data when it has one row or
+    one column (a boxed note or proposal), or when its first row doesn't look like a header (each cell filled, at
+    most HEADER_CHARS characters) and a cell holds a heading or the cells average LAYOUT_CHARS characters. Its
+    cells are read in order as the document's own paragraphs and tables. (A table of companies' comments has a
+    header row, long cells and the odd pasted heading: data.)
+  - Content controls and custom markup around rows, cells and paragraphs are read through.
 - **Pictures:** each picture (a drawing's image, or an embedded object's preview, often an EMF or WMF) is kept with
   its paragraph, displayed size and caption (the next paragraph in a caption style or starting "Figure ...", else
   the one before), for pictures.py to read.
@@ -21,6 +38,7 @@ Needs python-docx (the `office` extra).
 """
 import io
 import re
+from dataclasses import dataclass, field
 
 from .textdocs import Block, Picture, TextDocument
 
@@ -32,6 +50,11 @@ A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
 R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 WP = "{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}"
 V = "{urn:schemas-microsoft-com:vml}"
+NESTED_INLINE_ROWS = 6  # a nested table this small is written into its cell; a larger one is read on its own
+LAYOUT_CHARS = 200      # cells averaging this much text make a table without a header row a layout table
+HEADER_CHARS = 40       # a header row's cells are filled and at most this long
+WRAPPERS = ("w:sdt", "w:sdtContent", "w:customXml")  # content controls and custom markup: read through
+DIGIT = re.compile(r"\d")
 EMU_PER_POINT = 12700
 LENGTH = re.compile(r"(width|height)\s*:\s*([\d.]+)\s*(pt|in|cm|mm|px)?", re.I)
 POINTS_PER = {"pt": 1.0, "in": 72.0, "cm": 72 / 2.54, "mm": 72 / 25.4, "px": 0.75, None: 0.75}
@@ -160,6 +183,140 @@ def _format(n, form):
         return out.upper() if form == "upperRoman" else out
     return "" if form == "none" else str(n)
 
+def _children(element, *tags):
+    """An element's children with these tags, read through content controls and custom markup."""
+    wanted, wrappers = {_qn(t) for t in tags}, {_qn(t) for t in WRAPPERS}
+    for child in element:
+        if child.tag in wanted:
+            yield child
+        elif child.tag in wrappers:
+            yield from _children(child, *tags)
+
+def _property(element, props, name):
+    """A row's or cell's property element (w:trPr, w:tcPr), or None."""
+    holder = element.find(_qn(props))
+    return holder.find(_qn(name)) if holder is not None else None
+
+def _number(element, props, name, default):
+    found = _property(element, props, name)
+    return int(found.get(_qn("w:val"), default)) if found is not None else default
+
+@dataclass
+class Cell:
+    """A table cell placed on the grid: its text (small nested tables written in), the columns it covers, whether
+    it continues a cell merged down from the row above, and its larger nested tables (read after the table)."""
+    text: str
+    first: int
+    last: int
+    continued: bool = False
+    nested: list = field(default_factory=list)
+
+def _grid(table, numbers):
+    """[(w:tr, [Cell])]: each row's cells on the table's columns. A cell merged down repeats its text in the rows it
+    covers; a deleted row (a tracked deletion) reads as empty."""
+    rows, above = [], {}  # above: column -> the cell merged down into it
+    for tr in _children(table, "w:tr"):
+        deleted = _property(tr, "w:trPr", "w:del") is not None
+        column, cells = _number(tr, "w:trPr", "w:gridBefore", 0), []
+        for tc in _children(tr, "w:tc"):
+            span = max(1, _number(tc, "w:tcPr", "w:gridSpan", 1))
+            merge = _property(tc, "w:tcPr", "w:vMerge")
+            restart = merge is not None and merge.get(_qn("w:val")) == "restart"
+            if merge is not None and not restart and column in above and not deleted:
+                cell = Cell(above[column].text, column, column + span - 1, continued=True)
+            else:
+                text, nested = ("", []) if deleted else _cell_text(tc, numbers)
+                cell = Cell(text, column, column + span - 1, nested=nested)
+                if restart:
+                    above[column] = cell
+                else:
+                    above.pop(column, None)
+            cells.append(cell)
+            column += span
+        rows.append((tr, cells))
+    return rows
+
+def _cell_text(tc, numbers):
+    """(a cell's text, its larger nested tables): its paragraphs joined, each small nested table written in."""
+    parts, nested = [], []
+    for child in _children(tc, "w:p", "w:tbl"):
+        if child.tag == _qn("w:p"):
+            parts.append(paragraph_text(child, numbers).strip())
+            continue
+        grid = _grid(child, numbers)
+        if len(grid) > NESTED_INLINE_ROWS:
+            parts.append("(table below)")
+            nested.append(child)
+        else:
+            parts.append("; ".join(_inline(cells) for _, cells in grid if any(c.text for c in cells)))
+    return " ".join(parts).strip(), nested
+
+def _inline(cells):
+    """A small nested table's row as text: "Flow: 450 gpm" for a label and a value, else its cells by commas."""
+    texts = [c.text for c in cells if c.text]
+    return f"{texts[0]}: {texts[1]}" if len(texts) == 2 else ", ".join(texts)
+
+def _header_rows(grid):
+    """How many rows head a table: those marked to repeat as a header; else the first, and the next while the row
+    above has a cell merged across (or one merged down into it) and the row holds no number (three at most)."""
+    marked = 0
+    for tr, _ in grid:
+        if _property(tr, "w:trPr", "w:tblHeader") is None:
+            break
+        marked += 1
+    if marked:
+        return min(marked, len(grid))
+    n = 1
+    while n < min(len(grid) - 1, 3):
+        before, row = grid[n - 1][1], grid[n][1]
+        merged = any(c.last > c.first for c in before) or any(c.continued for c in row)
+        if not merged or any(DIGIT.search(c.text) for c in row) or not any(c.text for c in row):
+            break
+        n += 1
+    return n
+
+def _labels(grid, heads):
+    """Each column's label: its header cells' texts top to bottom, a merged cell's once ("Rated point > TDH (ft)")."""
+    width = max((c.last + 1 for _, cells in grid for c in cells), default=0)
+    out = []
+    for column in range(width):
+        path = []
+        for _, cells in grid[:heads]:
+            cell = next((c for c in cells if c.first <= column <= c.last), None)
+            if cell is not None and cell.text and (not path or path[-1] != cell.text):
+                path.append(cell.text)
+        out.append(" > ".join(path))
+    return out
+
+def _joined(labels):
+    """One label for a cell merged across columns: their shared path once, then each leaf ("A > B / C")."""
+    labels = list(dict.fromkeys(label for label in labels if label))
+    if len(labels) < 2:
+        return labels[0] if labels else ""
+    paths = [label.split(" > ") for label in labels]
+    shared = 0
+    while all(len(p) > shared + 1 and p[shared] == paths[0][shared] for p in paths):
+        shared += 1
+    leaves = " / ".join(" > ".join(p[shared:]) for p in paths)
+    return " > ".join(paths[0][:shared] + [leaves])
+
+def _layout(table, styles):
+    """Whether a table lays out content rather than holding data (see the module's notes)."""
+    rows = list(_children(table, "w:tr"))
+    if not rows or any(_property(tr, "w:trPr", "w:tblHeader") is not None for tr in rows):
+        return False
+    cells = [list(_children(tr, "w:tc")) for tr in rows]
+    if len(rows) == 1 or max(len(r) for r in cells) == 1:
+        return True
+    text = lambda tc: " ".join(paragraph_text(p) for p in _children(tc, "w:p")).strip()
+    if all(0 < len(text(tc)) <= HEADER_CHARS for tc in cells[0]):
+        return False  # a header row: data, however long or headed its cells
+    flat = [tc for r in cells for tc in r]
+    if any(HEADING.match(_style(p, styles)) for tc in flat for p in _children(tc, "w:p")):
+        return True
+    filled = [len(t) for t in map(text, flat) if t]
+    return bool(filled) and sum(filled) / len(filled) >= LAYOUT_CHARS
+
 def _style(paragraph_element, styles):
     ppr = paragraph_element.find(_qn("w:pPr"))
     sid = None
@@ -227,45 +384,75 @@ def read_docx(data):
             m = line(f"Footnote {numbers[i]}: {notes[i]}")
             blocks.append(Block(1, m, m, f"Footnote {numbers[i]}: {notes[i]}"))
     listing = Numbering(document)
-    for child in document.element.body.iterchildren():
-        if child.tag == _qn("w:p"):
-            style = _style(child, styles)
-            ids = cited(child)
-            text = paragraph_text(child, numbers).strip()
-            label = listing.label(child)
-            if label and text:
-                text = f"{label} {text}"
-            n = line(text)
-            styles_of[n] = style
-            note(child, n, style)
-            if ids and not text:
-                footnote_lines(ids)
-                continue
-            if not text or style.lower().startswith("toc"):
-                continue
-            match = HEADING.match(style)
-            if match:
-                level = int(match.group(1))
-                title = " ".join(text.split())
-                headings.append((1, n, level, title))
-                blocks.append(Block(1, n, n, title))
-            else:
-                blocks.append(Block(1, n, n, text))
+
+    def paragraph(child):
+        style = _style(child, styles)
+        ids = cited(child)
+        text = paragraph_text(child, numbers).strip()
+        label = listing.label(child)
+        if label and text:
+            text = f"{label} {text}"
+        n = line(text)
+        styles_of[n] = style
+        note(child, n, style)
+        if ids and not text:
             footnote_lines(ids)
-        elif child.tag == _qn("w:tbl"):
-            rows, row_lines = [], []
-            ids = cited(child)
-            for tr in child.iter(_qn("w:tr")):
-                cells = []
-                for tc in tr.iter(_qn("w:tc")):  # a cell merged across columns is one w:tc (w:gridSpan)
-                    cells.append(" ".join(paragraph_text(p, numbers).strip() for p in tc.iter(_qn("w:p"))).strip())
-                rows.append(cells)
-                row_lines.append(line(" | ".join(cells)))
-            if rows:
-                blocks.append(Block(1, row_lines[0], row_lines[-1], "\n".join(t for _, t in lines[row_lines[0] - 1:]),
-                                    "table", rows, row_lines))
-                note(child, row_lines[0], "table")
-            footnote_lines(ids)
+            return
+        if not text or style.lower().startswith("toc"):
+            return
+        match = HEADING.match(style)
+        if match:
+            level = int(match.group(1))
+            title = " ".join(text.split())
+            headings.append((1, n, level, title))
+            blocks.append(Block(1, n, n, title))
+        else:
+            blocks.append(Block(1, n, n, text))
+        footnote_lines(ids)
+
+    def table(child, place=None):
+        """A data table's rows as lines, its larger nested tables after it; a layout table's cells as content. A
+        nested table (`place`: the line naming where it sits) leaves pictures and footnotes to its outer table."""
+        if place is None and _layout(child, styles):
+            for tr in _children(child, "w:tr"):
+                for tc in _children(tr, "w:tc"):
+                    content(_children(tc, "w:p", "w:tbl"))
+            return
+        ids = cited(child) if place is None else []
+        grid = _grid(child, numbers)
+        if not grid:
+            return
+        if place:
+            n = line(place)
+            blocks.append(Block(1, n, n, place))
+        heads = _header_rows(grid)
+        labels = _labels(grid, heads)
+        header_lines = [line(" | ".join(c.text for c in cells)) for _, cells in grid[:heads]]
+        rows, row_lines, row_headers, inner = [labels], [header_lines[0]], [], []
+        for _, cells in grid[heads:]:
+            rows.append([c.text for c in cells])
+            row_headers.append([_joined(labels[c.first:c.last + 1]) for c in cells])
+            row_lines.append(line(" | ".join(c.text for c in cells)))
+            inner += [(cells, c) for c in cells if c.nested]
+        first = header_lines[0]
+        blocks.append(Block(1, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
+                            row_lines, row_headers))
+        if place is None:
+            note(child, first, "table")
+        for cells, cell in inner:
+            where = ", ".join(t for t in (cells[0].text if cells[0] is not cell else "",
+                                          _joined(labels[cell.first:cell.last + 1])) if t)
+            for nested in cell.nested:
+                table(nested, f"Table in {where}:" if where else "Table:")
+        footnote_lines(ids)
+
+    def content(elements):
+        for child in elements:
+            if child.tag == _qn("w:p"):
+                paragraph(child)
+            elif child.tag == _qn("w:tbl"):
+                table(child)
+    content(child for child in document.element.body.iterchildren() if child.tag in (_qn("w:p"), _qn("w:tbl")))
     pictures = [Picture(n, data, extension, size, _caption(n, lines, styles_of), name)
                 for n, data, extension, size, name in found]
     return TextDocument(1, lines, blocks, headings, images, pictures)

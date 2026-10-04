@@ -566,6 +566,7 @@ Each row is a situation met in this project's documents, with where it was recor
   - **Five revision pairs on it and on the treatment plant**, in PDF, Markdown and Word. Results are in the [revision comparison plan](revision-comparison-2026-10-02.md)'s milestone 4.
   - **The base's extraction joins `results.json`.**
 - **Word knobs (2026-10-04; the adapters plan):** tracked changes, footnotes and numbered lists as Word-only documents (`word.py`), in `docs-docx` beside the representations. Two are revision pairs: the treatment plant's revision as tracked changes, and the specification's renumbered conditions as Word lists.
+- **Word table knobs (2026-10-04; the adapters plan, "Merged and nested cells"):** the equipment schedules with merged cells (105 facts, runout points and closing times added), with nested tables, and inside a layout table. All three are read in full and right.
 - **Claim-heavy diagrams and charts (2026-10-04; results in the adapters plan).** The owner: "We'll need to ensure some claim-heavy diagrams and charts are in our control docs."
   - **Dense charts** (`lcc-metered`, the chart knobs): 24 bars and 24 line points in two charts, 51 facts.
   - **A procedure diagram** (`procedures.py`): a message sequence chart of 24 messages with their parameters (26 facts), under the clean and raster knobs. It's a WMF picture in Word, and absent in Markdown.

@@ -475,6 +475,41 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
     - **The PDF's image reader named the peak demand line chart's values "power"** (the axis is in kW): 24 loose. In Word, with the caption beside the picture, all were named "peak demand".
     - **Against the axis,** 31–36 readings were off by more than a quarter step: 24 bars and 24 points at 50 and 100 steps.
   - **A layout fault fixed on the way:** a figure 0.7 pt past the page body silently lost the section after it, since the overflow check allowed 1 pt. It now allows 0.01 pt. No committed document fell in that slack, so none changed.
+- **Merged and nested cells, and layout tables (2026-10-04): built.** The owner, on Claude's proposal: "Okay, seems we'll get plenty of levers to explore here, and difficulty knobs to test them. Go ahead with the initial design based on your recommendations, heuristic for layout tables. This will provide a foundation for improving things later."
+  - **What the Word reader did before** (checked on a small document):
+    - **a nested table was read three times:** squashed into its cell, added as extra columns, and read as rows of the outer table under its header ("Flow | 450 gpm" asked as Pump = Flow, Duty = 450 gpm)
+    - **a cell merged down** left the rows below it without their subject
+    - **a cell merged across** shifted the cells after it under the wrong headers
+    - **a table of one row** (a boxed note or proposal) was taken for a header with no rows: never read
+  - **The design** (`docxdocs.py`):
+    - **the grid:** each row's cells placed on the table's columns. A cell merged down repeats its text in each row it covers; a cell merged across is one value, asked under its columns' labels joined ("Stroke time (s) > Open / Close"). Each row is asked under its own labels.
+    - **headers:** the rows Word marks to repeat as a header; else the first row, and the next too when the first has a merged cell and the next holds no number. Under two header rows a column's label is its path ("Hydraulics > Capacity (gpm)").
+    - **nested tables:** up to 6 rows, written into the cell ("Capacity (gpm): 7,824; TDH (ft): 134.8"); larger, read on their own after the outer table, under a line naming where they sit ("Table in Raw water intake, Valves:")
+    - **layout tables,** read as the document's own paragraphs and tables:
+      - not marked with a header row, and
+      - of one row or one column, or with no header-like first row and either a heading in a cell or long cells (200 characters on average)
+    - Content controls around rows, cells and paragraphs are read through.
+    - **One departure from the recommendation:** the 6-row limit is a named constant, not a setting. A setting joins every store's binding, so every store would need rebuilding for no change in behaviour. It becomes a setting when it's tried as a lever (the [lever index](../reviews/levers.md) has a row for these heuristics).
+  - **Measured on the real Word samples before recording,** the old reader against the new, offline:
+    - **The first layout rule misfired:** long cells or a pasted heading made 3GPP's tables of companies' comments (a "Company | Comments" header, then long views) into layout, half the tables of two RAN1 feature-lead summaries. A short, filled first row now keeps a table data. The summaries then changed in 1–2 of 590–733 rows.
+    - **Boxes are now read:** one-row and one-column tables, never read before, are read as text. One Ericsson contribution had 13, its work item's objectives among them.
+    - **TS 38.300 changed in one table, the change history.** A title row merged across all its columns ("Change history") had been read as the header and the real header row as data; the columns are now labelled ("Change history > Date", "> Meeting", …). About 600 row queries changed in each version.
+  - **Three Word knobs** (`word.py`), on the equipment schedules:
+
+    | Knob | What it holds | Facts | Read right | Claims |
+    |---|---|---|---|---|
+    | merged | two-row headers made of merged cells (one table's found, one's marked to repeat); each pump's tag and motor merged down over its rated and runout rows; valves' stroke times as Open and Close, merged across where equal | 105 (84, 6 runout points, 15 closing times) | 105 | 105 |
+    | nested | each pump's rated point and motor as small nested tables; the valves as two large tables nested in an area table | 84 | 84 | 84 |
+    | layout | the plain document inside a borderless one-row, two-column table | 84 | 84 | 84 |
+
+    - The layout document asks byte for byte the plain document's queries: it was read from recorded answers, at no cost.
+    - **A key fix, from reading the claims:** the merged knob's opening stroke times were first scored loose (15). The claims were right ("Stroke time Open: 45.4 s"), but the key lacked the column's own word, so the opening and closing times tied. "Open time" is now among those facts' names.
+  - **TS 38.300 re-read,** its revision pair compared again, $0.083:
+    - The model mostly declines the change history either way ("a change history log rather than engineering specifications"): 39 claims from its 1,187 rows before, 10 now.
+    - The pair's rating barely moved: 13–20 fewer claims per version, 11 fewer settled in changed text. One more numeric change went unseen: the history's rows added in v19.3.0, document administration.
+    - **A gap met on the way:** a store re-run after a reader change keeps the tasks the old reader made. The first re-run asked nothing new ($0.002). The pair was re-read into a fresh store, the old one set aside. A reader version in the store's binding would close this gap; until then, a reader change means fresh stores.
+  - **The real-pair replay names the model as recorded,** as the controlled corpus's does: it works without `.env`.
+  - Cost: $0.015 for the knobs.
 
 ## Open questions
 
