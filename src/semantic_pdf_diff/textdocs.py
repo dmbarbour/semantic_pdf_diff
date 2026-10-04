@@ -46,6 +46,7 @@ class Block:
     row_lines: list = field(default_factory=list)
     row_headers: list = field(default_factory=list)  # each body row's own header labels (a Word table's merged
                                                      # cells); empty: every row is read under rows[0]
+    source: str = ""    # where a table came from, if not a table: "chart" (a Word chart's data)
 
     @property
     def box(self):
@@ -248,6 +249,9 @@ DOCX_DERIVATION = {
     "table": [DerivationStep(step="docx-table", detail="row with its header"), DerivationStep(step="model-extraction")],
 }
 
+CHART_DERIVATION = [DerivationStep(step="docx-chart", detail="a chart's cached values, a row per category"),
+                    DerivationStep(step="model-extraction")]
+
 def text_locator(page, bbox, region, task):
     return TextLocator(page=page, lines=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region, task=task)
 
@@ -327,7 +331,8 @@ def text_job(data, job, output, client, dispatch, progress, extension):
                 line = table.row_lines[ri + 1]
                 labels = table.row_headers[ri] if table.row_headers else header
                 core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", labels,
-                                row, list(range(len(labels) if table.row_headers else width)))
+                                row, list(range(len(labels) if table.row_headers else width)),
+                                derivation=CHART_DERIVATION if table.source == "chart" else None)
         for pg, line, alt, target in doc.images:
             if pg == page:
                 core.record(coverage_row(content=job.content, page=page, bbox=[0.0, float(line), 1.0, float(line + 1)],

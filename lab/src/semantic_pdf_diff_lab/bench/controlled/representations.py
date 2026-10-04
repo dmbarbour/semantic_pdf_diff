@@ -72,16 +72,17 @@ def _numbers(line):
         if re.search(r"[0-9]", text) and printed_value(text) is not None:
             yield text
 
-def key(project, lines, tables=None, representation="markdown", pictures=None):
+def key(project, lines, tables=None, representation="markdown", pictures=None, chart_rows=()):
     """A representation's key: the PDF key's facts that the lines print, each placed by line ("md-prose", "md-table";
     for Word, "docx-prose", "docx-table"), the others listed as absent; every printed number logged with its role.
     tables: the line numbers that are table rows (default: Markdown's, lines starting "|"). pictures: {chart number:
-    the line of the picture showing it}, its facts placed there ("docx-figure")."""
+    the line of the picture showing it}, its facts placed there ("docx-figure"). chart_rows: the line numbers that are
+    a Word chart's data rows ("docx-chart"), where its facts are printed."""
     from .corpus import charts
     by_value = {}
     for f in project.facts:
-        if not f.relation and f.drawn not in ("chart", "figure"):  # a chart's or diagram's facts: absent, though a
-                                                                     # total may print the same number
+        if not f.relation and (f.drawn not in ("chart", "figure") or (chart_rows and f.drawn == "chart")):
+            # a chart's or diagram's facts: absent (though a total may print the same number), unless its data is
             by_value.setdefault(printed_value(f.value), []).append(f)
         f.forms = []
     for number, line in (pictures or {}).items():
@@ -92,7 +93,7 @@ def key(project, lines, tables=None, representation="markdown", pictures=None):
     prefix = "docx" if representation == "docx" else "md"
     for n, line in enumerate(lines, 1):
         table = n in tables if tables is not None else line.startswith("|")
-        form = f"{prefix}-table" if table else f"{prefix}-prose"
+        form = f"{prefix}-chart" if n in chart_rows else f"{prefix}-table" if table else f"{prefix}-prose"
         for text in _numbers(line):
             facts = by_value.get(printed_value(text), []) if re.match(r"[-+±$]?\d", text) else []
             for f in facts:
@@ -232,8 +233,9 @@ def docx_key(project, data):
     from semantic_pdf_diff.docxdocs import read_docx
     doc = read_docx(data)
     rows = {n for b in doc.blocks if b.kind == "table" for n in b.row_lines}
+    charted = {n for b in doc.blocks if b.kind == "table" and b.source == "chart" for n in b.row_lines[1:]}
     pictures = {number: p.line for number, p in enumerate(doc.pictures, 1)}
-    return key(project, [t for _, t in doc.lines], rows, "docx", pictures)
+    return key(project, [t for _, t in doc.lines], rows, "docx", pictures, charted)
 
 def write_docx(project, lines, folder):
     """Write <id>.docx and <id>.key.json into folder; returns the document's path."""

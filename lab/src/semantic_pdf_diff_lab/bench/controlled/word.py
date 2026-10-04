@@ -21,6 +21,9 @@ reader's own lines).
 - **textbox:** the treatment plant's document with a sentence and a captioned table in text boxes as Word writes
   them (a DrawingML shape, and a VML copy of it for older readers), and a sentence in a VML text box alone (as
   older Word wrote them); each anchored in a paragraph.
+- **charts:** the chart studies with each chart a Word chart (chart XML caching its series, as Word keeps them; no
+  workbook), not a picture, its caption after it: grouped bars a clustered column chart, stacked bars a stacked
+  one, lines a line chart; values cached as numbers shown "#,##0", the value axis titled with the unit.
 
 Byte for byte the same each time (representations.FIXED_TIME).
 """
@@ -202,6 +205,25 @@ class Writer:
         for box, held in zip(boxes[1:], copies):
             box.extend(held)
         anchor.append(run)
+
+    def chart(self, chart):
+        """A Word chart of a corpus Chart in a paragraph of its own: its part (chart XML), related and drawn inline."""
+        from docx.opc.constants import CONTENT_TYPE as CT, RELATIONSHIP_TYPE as RT
+        from docx.opc.part import Part
+        from docx.oxml import parse_xml
+        self.boxes += 1  # drawings share one numbering
+        n = self.boxes
+        part = Part(self.document.part.package.next_partname("/word/charts/chart%d.xml"), CT.DML_CHART,
+                    chart_xml(chart), self.document.part.package)
+        rid = self.document.part.relate_to(part, RT.CHART)
+        p = self.paragraph()
+        p.append(parse_xml(
+            f'<w:r {NAMESPACES} xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:drawing>'
+            f'<wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="5486400" cy="3200400"/>'
+            f'<wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{n}" name="Chart {n}"/><wp:cNvGraphicFramePr/>'
+            f'<a:graphic><a:graphicData uri="{CHART_URI}"><c:chart xmlns:c="{CHART_URI}" r:id="{rid}"/>'
+            f'</a:graphicData></a:graphic></wp:inline></w:drawing></w:r>'))
+        return p
 
     def footnote(self, paragraph, text):
         """A footnote reference at the end of `paragraph` (an element), its note `text`."""
@@ -498,6 +520,66 @@ def laid_out(project):
         cell._tc.remove(cell.paragraphs[0]._p)
     return writer.save()
 
+CHART_URI = "http://schemas.openxmlformats.org/drawingml/2006/chart"
+
+def chart_xml(chart):
+    """A corpus Chart as a chart part's XML: its series cached as Word caches them (strings for names and categories,
+    numbers for values, shown "#,##0"), the value axis titled with the unit, the caption left to the paragraph
+    after it (so no title)."""
+    from xml.sax.saxutils import escape
+    count = len(chart.categories)
+    column = lambda k: chr(ord("B") + k)
+    cache = lambda kind, items, code="": (f'<c:{kind}>' + (f"<c:formatCode>{code}</c:formatCode>" if code else "") +
+                                          f'<c:ptCount val="{len(items)}"/>' +
+                                          "".join(f'<c:pt idx="{i}"><c:v>{escape(str(v))}</c:v></c:pt>'
+                                                  for i, v in enumerate(items)) + f"</c:{kind}>")
+    series = []
+    for k, (name, facts) in enumerate(chart.series):
+        raw = [f"{f.number:g}" for f in facts]
+        series.append(f'<c:ser><c:idx val="{k}"/><c:order val="{k}"/><c:tx><c:strRef><c:f>Sheet1!${column(k)}$1</c:f>'
+                      f'{cache("strCache", [name])}</c:strRef></c:tx>'
+                      + ('<c:marker><c:symbol val="circle"/></c:marker>' if chart.kind == "line" else "")
+                      + f'<c:cat><c:strRef><c:f>Sheet1!$A$2:$A${count + 1}</c:f>{cache("strCache", chart.categories)}'
+                      f'</c:strRef></c:cat><c:val><c:numRef><c:f>Sheet1!${column(k)}$2:${column(k)}${count + 1}</c:f>'
+                      f'{cache("numCache", raw, "#,##0")}</c:numRef></c:val></c:ser>')
+    if chart.kind == "line":
+        group = ('<c:lineChart><c:grouping val="standard"/><c:varyColors val="0"/>' + "".join(series) +
+                 '<c:marker val="1"/><c:axId val="1"/><c:axId val="2"/></c:lineChart>')
+    else:
+        stacked = chart.kind == "stacked"
+        group = (f'<c:barChart><c:barDir val="col"/><c:grouping val="{"stacked" if stacked else "clustered"}"/>'
+                 '<c:varyColors val="0"/>' + "".join(series) + ('<c:overlap val="100"/>' if stacked else "") +
+                 '<c:axId val="1"/><c:axId val="2"/></c:barChart>')
+    axis_title = (f'<c:title><c:tx><c:rich><a:bodyPr/><a:p><a:r><a:t>{escape(chart.axis)}</a:t></a:r></a:p></c:rich>'
+                  f'</c:tx><c:overlay val="0"/></c:title>')
+    xml = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<c:chartSpace xmlns:c="{CHART_URI}" '
+           'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+           'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><c:date1904 val="0"/>'
+           '<c:chart><c:autoTitleDeleted val="1"/><c:plotArea><c:layout/>' + group +
+           '<c:catAx><c:axId val="1"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/>'
+           '<c:axPos val="b"/><c:numFmt formatCode="General" sourceLinked="1"/><c:crossAx val="2"/></c:catAx>'
+           '<c:valAx><c:axId val="2"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/>'
+           '<c:axPos val="l"/><c:majorGridlines/>' + axis_title + '<c:numFmt formatCode="#,##0" sourceLinked="1"/>'
+           '<c:crossAx val="1"/><c:crossBetween val="between"/></c:valAx></c:plotArea>'
+           + ('<c:legend><c:legendPos val="b"/><c:overlay val="0"/></c:legend>' if len(chart.series) > 1 else "") +
+           '<c:plotVisOnly val="1"/></c:chart></c:chartSpace>')
+    return xml.encode("utf-8")
+
+def charted(project):
+    """The project's document with each chart a Word chart, its caption after it in the Caption style: bytes."""
+    from .corpus import charts
+    from .representations import NOT_SHOWN, markdown
+    by_caption = {c.caption: c for c in charts(project)}
+    writer = Writer()
+    for block in blocks(markdown(project)):
+        caption = NOT_SHOWN.sub("", block[1]) if block[0] == "italic" else None
+        if caption in by_caption:
+            writer.chart(by_caption[caption])
+            writer.document.add_paragraph(caption, style="Caption")
+        else:
+            write_block(writer, block)
+    return writer.save()
+
 def boxed(lines, sentences, tables):
     """The document with each sentence printing a value of `sentences` ({value: "modern" | "legacy"}) moved into a
     text box anchored in its paragraph, and each table captioned as in `tables` (with its caption) into a text box
@@ -557,6 +639,11 @@ def documents(seed=1):
     lines = markdown(renumbered)
     renumbered.id, renumbered.revision_of = f"{renumbered.id}-numbered", spec.id
     out.append((renumbered, numbered(lines)))
+    from .corpus import CHART_PROJECTS
+    for make in CHART_PROJECTS.values():  # charts as Word charts
+        study = make(seed)
+        study.id = f"{study.id}-charts"
+        out.append((study, charted(study)))
     from .corpus import equipment_schedules
     for knob in ("merged", "nested", "layout"):  # merged and nested cells, a layout table
         schedules = equipment_schedules(seed)

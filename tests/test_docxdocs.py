@@ -261,5 +261,53 @@ class WordTextBoxes(unittest.TestCase):
                          ["a drawing of shapes (its text read, not its arrangement)"])
         self.assertEqual(next(b for b in doc.blocks if b.kind == "table").rows[1], ["Blower B-401", "Note rated at 75 kW"])
 
+@unittest.skipIf(docx is None, "python-docx isn't installed (the office extra)")
+class WordCharts(unittest.TestCase):
+    """Word charts (the adapters plan, "Word charts"): read from the values they cache, after their paragraph."""
+    def chart_document(self, broken=False, newer=False):
+        from docx.oxml import parse_xml
+        from semantic_pdf_diff_lab.bench.controlled.corpus import Chart, Fact
+        from semantic_pdf_diff_lab.bench.controlled.word import NAMESPACES, Writer
+        fact = lambda v: Fact("x", "x", (), "x", (), v)
+        writer = Writer()
+        writer.paragraph("Figure 1 compares the two options.")
+        anchor = writer.chart(Chart("Figure 1. Monthly energy", ["May", "June"],
+                                    [("Option 1", [fact("1,750"), fact("300")]), ("Option 2", [fact("225"), fact("325")])],
+                                    "MWh", 50, 2000))
+        writer.document.add_paragraph("Figure 1. Monthly energy", style="Caption")
+        if broken:  # the chart's part damaged
+            reference = anchor.find(".//{http://schemas.openxmlformats.org/drawingml/2006/chart}chart")
+            rid = reference.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id")
+            writer.document.part.related_parts[rid]._blob = b"<not a chart"
+        if newer:
+            anchor.append(parse_xml(f'<w:r {NAMESPACES}><w:drawing><wp:inline><wp:extent cx="1" cy="1"/>'
+                                    '<wp:docPr id="7" name="Chart 7"/><a:graphic><a:graphicData '
+                                    'uri="http://schemas.microsoft.com/office/drawing/2014/chartex"/></a:graphic>'
+                                    '</wp:inline></w:drawing></w:r>'))
+        return writer.save()
+
+    def test_a_chart_is_read_from_its_data_after_its_paragraph(self):
+        import sys
+        from pathlib import Path
+        from semantic_pdf_diff.docxdocs import read_docx
+        doc = read_docx(self.chart_document())
+        self.assertEqual([t for _, t in doc.lines if t][1:5],
+                         ["Chart (clustered column chart); values: MWh; caption: Figure 1. Monthly energy",
+                          "Category | Option 1 | Option 2", "May | 1,750 | 225", "June | 300 | 325"])
+        self.assertEqual(doc.images, [])
+        sys.path.insert(0, str(Path(__file__).parent))
+        from test_textdocs import extract
+        evidence, _, _, _ = extract("charted.docx", self.chart_document())
+        steps = {e.value: [d.step for d in e.derivation] for e in evidence}
+        self.assertEqual(steps["1,750"][:2], ["docx-chart", "model-extraction"])
+
+    def test_a_chart_not_read_is_recorded(self):
+        from semantic_pdf_diff.docxdocs import read_docx
+        broken = read_docx(self.chart_document(broken=True))
+        self.assertTrue(broken.images[0][3].startswith("a chart whose data couldn't be read"))
+        self.assertNotIn("May | 1,750 | 225", [t for _, t in broken.lines])
+        newer = read_docx(self.chart_document(newer=True))
+        self.assertEqual([detail for *_, detail in newer.images], ["a chart of a newer kind (chartex), not read yet"])
+
 if __name__ == "__main__":
     unittest.main()

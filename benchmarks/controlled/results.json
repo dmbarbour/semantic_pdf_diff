@@ -1230,6 +1230,38 @@
     "visual": "33/33"
    }
   },
+  "lcc-enduse-s1-charts.docx": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "right": 33
+   },
+   "conditions_kept": "33/33",
+   "recall_by_form": {
+    "docx-chart": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.9091,
+    "text": 0.0909
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 30
+    },
+    "text": {
+     "right": 3
+    }
+   },
+   "conditions_by_reader": {
+    "table": "30/30",
+    "text": "3/3"
+   }
+  },
   "lcc-enduse-s1-clean": {
    "facts": 33,
    "found": 33,
@@ -1499,6 +1531,42 @@
    "conditions_by_reader": {
     "text": "2/2",
     "visual": "19/19"
+   }
+  },
+  "lcc-energy-s1-charts.docx": {
+   "facts": 21,
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 19,
+   "missed": [],
+   "claims": 23,
+   "outcomes": {
+    "loose": 2,
+    "right": 19,
+    "text": 2
+   },
+   "conditions_kept": "19/19",
+   "recall_by_form": {
+    "docx-chart": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.8095,
+    "text": 0.1905
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 17
+    },
+    "text": {
+     "loose": 2,
+     "right": 2,
+     "text": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "17/17",
+    "text": "2/2"
    }
   },
   "lcc-energy-s1-clean": {
@@ -1899,6 +1967,38 @@
    "conditions_by_reader": {
     "text": "2/2",
     "visual": "42/42"
+   }
+  },
+  "lcc-metered-s1-charts.docx": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 51,
+   "outcomes": {
+    "right": 51
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "docx-chart": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.9412,
+    "text": 0.0588
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 48
+    },
+    "text": {
+     "right": 3
+    }
+   },
+   "conditions_by_reader": {
+    "table": "48/48",
+    "text": "2/2"
    }
   },
   "lcc-metered-s1-clean": {
@@ -6408,6 +6508,38 @@
     "visual": "33/33"
    }
   },
+  "lcc-enduse-s1-charts.docx": {
+   "facts": 33,
+   "found": 33,
+   "recall": 1.0,
+   "found_right": 33,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "right": 33
+   },
+   "conditions_kept": "33/33",
+   "recall_by_form": {
+    "docx-chart": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.9091,
+    "text": 0.0909
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 30
+    },
+    "text": {
+     "right": 3
+    }
+   },
+   "conditions_by_reader": {
+    "table": "30/30",
+    "text": "3/3"
+   }
+  },
   "lcc-enduse-s1-clean": {
    "facts": 33,
    "found": 33,
@@ -6677,6 +6809,42 @@
    "conditions_by_reader": {
     "text": "2/2",
     "visual": "19/19"
+   }
+  },
+  "lcc-energy-s1-charts.docx": {
+   "facts": 21,
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 19,
+   "missed": [],
+   "claims": 23,
+   "outcomes": {
+    "loose": 2,
+    "right": 19,
+    "text": 2
+   },
+   "conditions_kept": "19/19",
+   "recall_by_form": {
+    "docx-chart": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.8095,
+    "text": 0.1905
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 17
+    },
+    "text": {
+     "loose": 2,
+     "right": 2,
+     "text": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "17/17",
+    "text": "2/2"
    }
   },
   "lcc-energy-s1-clean": {
@@ -7077,6 +7245,38 @@
    "conditions_by_reader": {
     "text": "2/2",
     "visual": "42/42"
+   }
+  },
+  "lcc-metered-s1-charts.docx": {
+   "facts": 51,
+   "found": 51,
+   "recall": 1.0,
+   "found_right": 51,
+   "missed": [],
+   "claims": 51,
+   "outcomes": {
+    "right": 51
+   },
+   "conditions_kept": "50/50",
+   "recall_by_form": {
+    "docx-chart": 1.0,
+    "docx-prose": 1.0
+   },
+   "by_reader": {
+    "table": 0.9412,
+    "text": 0.0588
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 48
+    },
+    "text": {
+     "right": 3
+    }
+   },
+   "conditions_by_reader": {
+    "table": "48/48",
+    "text": "2/2"
    }
   },
   "lcc-metered-s1-clean": {

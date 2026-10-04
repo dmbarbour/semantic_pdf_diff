@@ -32,7 +32,7 @@ Extraction of all compared sources shares one queue: pages are fed round-robin a
 
 ## Text files and Word documents
 
-`.txt` and `.md` files are read by a text reader (`textdocs.py`) through the same task core as PDFs (`tasks.py`): the same prompts, quote checks, context levers and refinement. Word documents (`.docx`, with the `office` extra) are read into the same form by `docxdocs.py`: each paragraph and table row a line, headings by style (`Heading N`), tracked changes applied, the table of contents left out. Tables are read on their grid: a cell merged down repeats in each row it covers, a cell merged across is asked under its columns' labels, a small nested table is written into its cell and a large one read on its own, and a table used for layout is read as paragraphs. A text box's paragraphs follow the paragraph anchoring it. Their claims are located by paragraphs (`DocxLocator`).
+`.txt` and `.md` files are read by a text reader (`textdocs.py`) through the same task core as PDFs (`tasks.py`): the same prompts, quote checks, context levers and refinement. Word documents (`.docx`, with the `office` extra) are read into the same form by `docxdocs.py`: each paragraph and table row a line, headings by style (`Heading N`), tracked changes applied, the table of contents left out. Tables are read on their grid: a cell merged down repeats in each row it covers, a cell merged across is asked under its columns' labels, a small nested table is written into its cell and a large one read on its own, and a table used for layout is read as paragraphs. A text box's paragraphs follow the paragraph anchoring it. A chart is read from the values it caches (`chartxml.py`), as a table of categories by series after a line naming it. Their claims are located by paragraphs (`DocxLocator`).
 
 A Word document's pictures are read as a PDF's figures are (`pictures.py`). Each picture becomes a page at its displayed size:
 - **EMF or WMF** (most technical figures: Visio and chart-tool previews) is drawn by `metafiles.py` from the vendored metafile renderer's playback. Paths are vector, clips are computed, and text is set in PDF's built-in fonts, so the page draws alike on every machine and its labels are a text layer.
@@ -69,6 +69,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `tasks.py` | The task core every reader shares: requests, quote checks, evidence, coverage, refinement |
 | `textdocs.py` | Plain text and Markdown: pages, sections, paragraphs and pipe tables, line locators |
 | `docxdocs.py` | Word documents read into the text reader's form: paragraphs, headings by style, tables, tracked changes, pictures |
+| `chartxml.py` | Charts stored as chart XML (Word's, later PowerPoint's): their cached series as tables, values in their number formats |
 | `pictures.py` | A Word document's pictures as pages, read with a PDF figure's image tasks and context |
 | `metafiles.py` | EMF, EMF+ and WMF pictures drawn into PDF pages (vector, text as text), from the vendored `vendor/metafile_render` |
 | `compare.py` | Retrieval, local reasoning, numeric checks, and (revisions) explaining differences |

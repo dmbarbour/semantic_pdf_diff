@@ -531,6 +531,27 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
     - a sentence in a VML text box alone, as older Word wrote them
     - **Result:** 33 of 33 facts read right, conditions kept 11 of 11, the same claims as the plain document, for $0.001. Most of its queries were the plain document's.
   - **Not yet:** a drawing of shapes is read as its text only. The [lever index](../reviews/levers.md) has a row for reading their arrangement.
+- **Word charts (2026-10-04): built.** The owner: "Please proceed with Word charts next." The plan's approach (Per-format approach, `.pptx`): "chart XML, which holds the actual series data ... Chart XML beats estimating values from pixels."
+  - **Before:** a Word chart was recorded as "a chart or drawing without a picture" and not read.
+  - **The design** (`chartxml.py`, shared with PowerPoint later; `docxdocs.py`):
+    - **from its cache:** each chart is read from the values it caches beside its drawing, not from its workbook
+    - **as tables:** a row per category and a column per series (column, bar, line, area, pie, doughnut, radar, stock, surface; a combination's groups side by side); for scatter and bubble charts, a row per point ("Series | X | Y")
+    - **values as shown:** each in its series' number format ("#,##0" 1,750; "0.0%" 12.5%; dates as ISO dates; rounded half away from zero, as Office rounds), "General" as the shortest exact form
+    - **a label first:** the table follows a line naming the chart: "Chart: Readiness for a WI (%) (clustered column chart); values: MWh; caption: Figure 1 …". It gives the title (a lone series' name when untitled, as Word shows it), the kind, the axes' titles and the nearest caption paragraph.
+    - **placement:** after the paragraph anchoring the chart, or after its table when the chart sits in a cell
+    - **provenance:** the rows are read as table rows, their claims' derivation "docx-chart"
+    - **not read:** the newer chart kinds (chartex: waterfall, histogram, treemap) are recorded as not read, as is a chart whose part can't be parsed
+  - **On the real samples:** only the Ericsson Rel-19 views paper has a Word chart (TS 38.300 has none). It's now read: three categories by four series, with its caption.
+  - **The knob** (`word.py`, `-charts`): the three chart studies with each chart a Word chart rather than a picture. Values are cached as numbers shown "#,##0", the value axis titled with the unit, the caption after the chart.
+
+    | Study | Facts read right | Claims, charts as data | Claims, charts as pictures |
+    |---|---|---|---|
+    | cooling energy | 21 of 21 | 23 (the 2 loose are prose, as with pictures) | 23 |
+    | energy by end use | 33 of 33 | 33 | 51 |
+    | metered electricity (dense) | 51 of 51 | 51 | 51 |
+
+    - Read as data, the charts' values are read right, kept to their month (conditions 19 of 19, 33 of 33, 50 of 50), and read once: a picture's overview and tiles had read the end-use chart's values twice.
+    - Cost: $0.014.
 
 ## Open questions
 

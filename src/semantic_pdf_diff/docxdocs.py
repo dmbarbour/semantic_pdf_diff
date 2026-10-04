@@ -36,7 +36,11 @@ grouping, the context levers and the task core work unchanged, and a claim's loc
   box's text joins the cell's. A copy Word keeps for older readers (mc:Fallback) is never read: its text, pictures
   and footnote marks would repeat the shape's. A plain text box isn't a picture; a drawing of grouped shapes is
   recorded as one whose text is read but not its arrangement.
-- **Not read yet:** charts and other drawings without a picture, each recorded as not read; comments.
+- **Charts** (chart XML; chartxml.py): each read from the values it caches, as a line naming it ("Chart: Monthly use
+  (clustered column chart); values: MWh; caption: Figure 2: ...", its caption the nearest caption paragraph) and
+  tables of categories by series, after the paragraph anchoring it (after its table, in a cell). Charts of the
+  newer kinds (chartex) are recorded as not read.
+- **Not read yet:** other drawings without a picture, each recorded as not read; comments.
 
 Needs python-docx (the `office` extra).
 """
@@ -44,6 +48,7 @@ import io
 import re
 from dataclasses import dataclass, field
 
+from . import chartxml
 from .textdocs import Block, Picture, TextDocument
 
 HEADING = re.compile(r"^(?:Heading|heading)\s*(\d)$")
@@ -55,6 +60,8 @@ R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 WP = "{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}"
 V = "{urn:schemas-microsoft-com:vml}"
 MC = "{http://schemas.openxmlformats.org/markup-compatibility/2006}"
+CHART = "http://schemas.openxmlformats.org/drawingml/2006/chart"
+CHARTEX = "http://schemas.microsoft.com/office/drawing/2014/chartex"
 SHAPES = ("{http://schemas.microsoft.com/office/word/2010/wordprocessingGroup}wgp",   # grouped shapes
           "{http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas}wpc",  # a drawing canvas
           V + "group")
@@ -360,6 +367,27 @@ def _style(paragraph_element, styles):
             sid = ps.get(_qn("w:val"))
     return styles.get(sid, sid or "Normal")
 
+def _charts(element, boxes=False):
+    """The charts (c:chart, naming their part) an element's drawings hold, in order."""
+    for node in _walk(element, boxes):
+        if node.tag == A + "graphicData" and node.get("uri") == CHART:
+            yield from (c for c in node if c.tag == "{%s}chart" % CHART)
+
+def _is_caption(text, style):
+    style = style.casefold()
+    return bool(text) and (style in CAPTION_STYLES or "caption" in style or bool(FIGURE_TITLE.match(text)))
+
+def _caption_near(element, styles):
+    """The caption of a chart in this paragraph: the next paragraph within two, or the one before, in a caption style
+    or naming a figure; "" when none is."""
+    after = [e for e in element.itersiblings() if e.tag == _qn("w:p")][:2]
+    before = [e for e in element.itersiblings(preceding=True) if e.tag == _qn("w:p")][:1]
+    for p in after + before:
+        text = paragraph_text(p).strip()
+        if _is_caption(text, _style(p, styles)):
+            return " ".join(text.split())
+    return ""
+
 def _pictures(element, part, boxes=False):
     """[(the picture's part, its displayed size in points or None) or (None, what it is)] for each drawing,
     embedded object and VML picture in an element (with boxes, those in its text boxes too); a plain text box is
@@ -370,13 +398,17 @@ def _pictures(element, part, boxes=False):
         own = list(_walk(node))  # the drawing itself, not what its text boxes hold
         has_text = any(True for _ in _boxes(node))
         shapes = any(n.tag in SHAPES for n in own)
+        uris = {n.get("uri") for n in own if n.tag == A + "graphicData"}
+        if CHART in uris:
+            continue  # a chart: read from its data (_charts)
         if node.tag == _qn("w:drawing"):
             blip = next((n for n in own if n.tag == A + "blip"), None)
             rid = blip.get(R + "embed") if blip is not None else None
             extent = next((n for n in own if n.tag == WP + "extent"), None)
             size = (int(extent.get("cx")) / EMU_PER_POINT, int(extent.get("cy")) / EMU_PER_POINT) \
                 if extent is not None and extent.get("cx") and extent.get("cy") else None
-            what = "a chart or drawing without a picture"
+            what = ("a chart of a newer kind (chartex), not read yet" if CHARTEX in uris
+                    else "a chart or drawing without a picture")
         else:
             data = next((n for n in own if n.tag == V + "imagedata"), None)
             rid = data.get(R + "id") if data is not None else None
@@ -429,6 +461,25 @@ def read_docx(data):
             blocks.append(Block(1, m, m, f"Footnote {numbers[i]}: {notes[i]}"))
     listing = Numbering(document)
 
+    def chart(element, n, where, caption=""):
+        """A chart's label and tables as lines, after line n; one whose data can't be read, recorded as not read."""
+        part = document.part.related_parts.get(element.get(R + "id"))
+        try:
+            data = chartxml.read(part.blob)
+            if not data.tables:
+                raise ValueError("no series")
+        except Exception as error:  # a damaged or unexpected part: noted, the rest of the document read
+            images.append((1, n, where, f"a chart whose data couldn't be read ({type(error).__name__}: {error})"))
+            return
+        label = data.label(caption)
+        m = line(label)
+        blocks.append(Block(1, m, m, label))
+        for header, rows in data.tables:
+            first = line(" | ".join(header))
+            row_lines = [first] + [line(" | ".join(row)) for row in rows]
+            blocks.append(Block(1, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table",
+                                [header] + rows, row_lines, source="chart"))
+
     def paragraph(child):
         style = _style(child, styles)
         ids = cited(child)
@@ -448,6 +499,8 @@ def read_docx(data):
         elif text and not style.lower().startswith("toc"):
             blocks.append(Block(1, n, n, text))
         footnote_lines(ids)
+        for found in _charts(child):
+            chart(found, n, style, _caption_near(child, styles))
         for box in _boxes(child):  # after the paragraph anchoring it, as the document's own paragraphs
             content(_children(box, "w:p", "w:tbl"))
 
@@ -480,6 +533,9 @@ def read_docx(data):
                             row_lines, row_headers))
         if place is None:
             note(child, first, "table", boxes=True)
+        if place is None:
+            for found in _charts(child, boxes=True):  # a chart in a cell: after its table
+                chart(found, first, "table")
         for cells, cell in inner:
             where = ", ".join(t for t in (cells[0].text if cells[0] is not cell else "",
                                           _joined(labels[cell.first:cell.last + 1])) if t)
