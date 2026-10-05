@@ -281,12 +281,24 @@ The owner (2026-10-04): "Let's do Excel next. 99% of my spreadsheets are Excel."
    - the controlled corpus written as workbooks, scored by the same keys (the medium test: the same facts from PDF, Word, slides and Excel)
    - the IEA 15 MW workbook against the tables in its own PDF report (a real medium test)
 
-**Questions for the owner:**
-1. **Long series tables.** The IEA workbook's eight airfoil sheets are 300–400 rows of angle-of-attack against lift, drag and moment. The synthetic workbook has a 2,000-row flow log. Read row by row, each becomes thousands of exact claims: free under the rules, but they flood the comparison with point-by-point pairings nobody wants. The one table model deferred *summarise* (decision 3: "we can defer summary strategies if that's the plan"); real data now has such tables. Options:
-   - (a) iterate anyway: every point a claim
-   - (b) **summarise** (Claude's recommendation): the rules mark the table a series. It gives a few claims (what it tabulates, its range and row count, extremes and the values the model picks as characteristic), and the full table is kept as structured evidence for later use, not as thousands of claims.
-   - (c) record such tables as "not read: a series of N rows" for now
-2. **openpyxl** as a dependency of the `office` extra (MIT; already in the `dev` extra)? It reads number formats, merged cells, defined tables and cached values. The alternative is reading the workbook's XML directly, as for decks: more code to keep. Claude's recommendation: openpyxl.
+**Decision 1, how a table is handled (the owner, 2026-10-04):** "I believe our decision previously was: ask a model how to handle the table. We should give the model the headers and samples of the rows, report number of claims and our own heuristic opinion (summary vs. point per claim) based on size and a short analysis of rows (whether they're mostly text, numbers, etc..), then ask the model how to handle it, i.e. whether how to produce claims from rows or how to summarize things within a few known templates."
+
+So the rules query (step 5) is one "how should this table be read?" query per table:
+- **What it's shown:**
+  - the table's place (sheet, range, caption or title), its full header block, and sample rows (the first, some from the middle and end, any unusual ones)
+  - its size: rows, and the claims a point per cell would give
+  - **a short analysis of its rows,** mechanical: each column's kind (numbers, text, dates, empty, and in what shares), its distinct values, whether it steps evenly (a hint of an input, as the one table model's decision 2 says), long text
+  - **our heuristic opinion,** from size and that analysis, labelled as such: "a series: 330 rows of numbers, column A stepping evenly: summarise?" or "150 rows of mostly text, each a distinct item: claims per row?"
+- **What it answers,** one of:
+  - **claims from rows:** the row-to-claims mapping (roles, composites), applied to every row mechanically; or rows read one by one where cells need reading
+  - **a summary, within a few known templates,** naming the template and its columns. The statistics are computed mechanically and marked derived. Proposed templates (Claude's):
+    - **series:** a curve of one or more quantities against an input (the airfoil polars): the input's range and step; each quantity's extremes and where they fall; the values at points the model names
+    - **log:** samples of quantities over time (the flow log): the span and count; each quantity's minimum, maximum, mean and last value
+    - **list:** many records of one kind (the RAN1 document list): the count, and counts by the categories the model names
+- **Checked, recorded, replayable** as the one table model says: a mapping's claims for the sample rows must match the model's examples; values must parse; rows the mapping doesn't fit are read one by one.
+
+**Question for the owner:**
+- **openpyxl** as a dependency of the `office` extra (MIT; already in the `dev` extra)? It reads number formats, merged cells, defined tables and cached values. The alternative is reading the workbook's XML directly, as for decks: more code to keep. Claude's recommendation: openpyxl.
 
 ## Decisions (2026-09-23)
 

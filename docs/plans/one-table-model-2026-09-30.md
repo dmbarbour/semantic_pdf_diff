@@ -128,6 +128,7 @@
    - **The default** is guidance in that query: for a case table, one claim per output cell with that row's inputs as conditions. It isn't something found before asking.
    - **Heuristics as hints only:** evenly stepped values in the first columns (wind speed 14, 15, 16…) look like inputs. They're shown to the model as hints and never decide alone.
 3. **Summarise is deferred.** The owner: "we can defer summary strategies if that's the plan." The plan builds iterate and per-row first. Summarise comes after milestone 4, if long logs turn up.
+   - **Revisited (2026-10-04),** when Excel's real tables brought long series (the adapters plan, "Excel, in detail", decision 1). The owner: "ask a model how to handle the table ... report number of claims and our own heuristic opinion (summary vs. point per claim) based on size and a short analysis of rows ... then ask the model how to handle it, i.e. whether how to produce claims from rows or how to summarize things within a few known templates." Summaries come with the rules, chosen by the model among known templates.
 
 ## Open questions
 
