@@ -120,7 +120,10 @@ def run(options, settings, store, names, out, force_rescan=False):
             store.bind(role, dry_run=True)
     for role in filter(None, (interpreter, triage)):
         cleared = store.bind(role, reset=options.reset)
-        if cleared:
+        if cleared.get("automatic"):
+            log.info(f"Changed settings that only post-process answers ({'; '.join(cleared['automatic'])}): what they "
+                     f"affect is recomputed from cached answers")
+        elif cleared:
             log.info(f"Reset cleared ({role.role}): {json.dumps(cleared)}")
     if store.set_reconcile(settings.reconciles()):
         log.info("Readings merging changed: situating results will be redone")

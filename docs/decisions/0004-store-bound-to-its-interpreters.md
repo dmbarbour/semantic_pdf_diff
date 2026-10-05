@@ -1,6 +1,6 @@
 # 0004. A store is bound to its interpreters, with a selective reset
 
-- **Status:** Accepted (2026-09-23)
+- **Status:** Accepted (2026-09-23); amended 2026-10-04 (changes that can't cost a model call, and the refusal's content)
 - **Source:** [evidence store plan](../plans/sources-and-evidence-store-2026-09-23.md): [concepts](../plans/sources-and-evidence-store-2026-09-23.md#concepts) (interpreter, binding, `--reset`), [decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23); [content-addressed queries: progress](../plans/content-addressed-queries-2026-09-28.md#progress), milestones 2 and 5 (cached answers kept through resets); [architecture clean-up: progress](../plans/architecture-cleanup-2026-10-02.md#progress), milestone 3 (every resolved setting bound); [code review 2026-10-01](../reviews/code-review-2026-10-01.md), item 4
 
 ## Context
@@ -17,7 +17,12 @@ Mixing models, prompts or reading settings in one store gives evidence of mixed 
   - for extraction, the order of the levers acting on it ([0013](0013-levers-as-mixins.md))
   - library versions: this tool, PyMuPDF, pydantic
 - **Left out:** endpoint settings other than the model (timeouts, retries, call limits, concurrency, rate limits, cost caps, credentials, the URL).
-- **A run with a different interpreter is refused** (`store.InterpreterMismatch`), naming each difference. The user passes `--reset` or uses a new store. `--reset --dry-run` shows what would be cleared.
+- **A run with a different interpreter is refused** (`store.InterpreterMismatch`). The user passes `--reset` or uses a new store; `--reset --dry-run` shows what would be cleared.
+- **The refusal is friendly** (2026-10-04). The owner, choosing between keeping the guard, recording instead of guarding, and a middle way: "I lean towards 3 with a friendly refusal." It says:
+  - each difference and its effect ("claims_per_request: 20 -> 25 (shapes what's asked)")
+  - what going ahead clears (regions, tasks, claim sightings, saved comparisons)
+  - at most how many requests would be asked again, with their text and images (`Store.rerun_estimate`, from the store's query log); unchanged queries replay free
+- **A change that can't cost a model call isn't refused** (the middle way): when every difference is a setting that only post-processes answers (`quote_match`), it's applied and what it affects is recomputed from cached answers, with a note in the log. Reader changes aren't refused either ([0016](0016-content-reread-when-its-reader-changes.md)).
 - **`--reset` is selective:**
   - A setting's change clears the extraction regions it declares (a tile size: the visual regions only), plus situating results and all comparisons.
   - A change not tied to one setting (model, prompts, library versions) clears all extraction.

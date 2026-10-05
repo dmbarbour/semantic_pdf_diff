@@ -72,7 +72,7 @@ A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifes
 
 Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error.
 
-The `--out` folder is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence and cached model responses, and an interrupted run resumes where it stopped. A store is bound to the model and extraction settings it was built with; a run with different ones is refused unless you pass `--reset` (preview with `--reset --dry-run`) or use a new folder.
+The `--out` folder is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence and cached model responses, and an interrupted run resumes where it stopped. A store is bound to the model and extraction settings it was built with. A run with different ones is refused, saying what differs and at most how much would be asked again, unless you pass `--reset` (preview with `--reset --dry-run`) or use a new folder. Settings that only post-process answers are applied without asking, recomputed from cached answers.
 
 ## Documentation
 

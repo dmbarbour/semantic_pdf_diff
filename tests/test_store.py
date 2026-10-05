@@ -321,6 +321,31 @@ class ResumeAndReuse(unittest.TestCase):
             code, _ = self.run_cli(a, b, root / 'out', url, '--model', 'another-model', '--reset')
             self.assertEqual(code, 2)  # --no-vision is deliberately incomplete
 
+    def test_a_refusal_says_what_differs_what_going_ahead_clears_and_asks(self):
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
+            root = Path(d); a, b = self.pdfs(root)
+            self.run_cli(a, b, root / 'out', url)
+            config = root / 'more-claims.json'
+            config.write_text(json.dumps({'claims_per_request': 25}))
+            code, log = self.run_cli(a, b, root / 'out', url, '--config', str(config))
+            self.assertEqual(code, 1)
+            self.assertIn("claims_per_request: 20 -> 25 (shapes what's asked)", log)
+            self.assertIn('Going ahead clears what they affect', log)
+            self.assertRegex(log, r'at most [\d,]+ would be asked again \(about [\d,]+ tokens')
+            self.assertIn('rerun with --reset', log)
+
+    def test_a_post_processing_change_is_applied_without_asking_and_costs_nothing(self):
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
+            root = Path(d); a, b = self.pdfs(root)
+            self.run_cli(a, b, root / 'out', url)
+            first = state['requests']
+            config = root / 'exact-quotes.json'
+            config.write_text(json.dumps({'quote_match': 'exact'}))
+            code, log = self.run_cli(a, b, root / 'out', url, '--config', str(config))
+            self.assertNotEqual(code, 1)  # not refused
+            self.assertIn('only post-process answers (quote_match', log)
+            self.assertEqual(state['requests'], first)  # recomputed from cached answers
+
 if __name__ == '__main__':
     unittest.main()
 

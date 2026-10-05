@@ -232,7 +232,7 @@ Milestones 1–3 come before the next round, which waits on the owner's surveys 
     - With five null variants per round, it promotes one in 4.5% of rounds; the mean alone does in 12.5%, and winning again in 1.0–1.4%.
     - At true rates of 0.65 and 0.70, it promotes 47% and 73% of the time.
   - **Removed:** the fixture fingerprint and semantic keys, the `#fresh` responder (now sample 1), and the `cache_check` setting.
-  - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it.
+  - **Kept for now:** the store's interpreter binding and `SETTING_REGIONS`, which decide which derived evidence a settings change clears. Cached answers are no longer cleared with it. *Settled 2026-10-04 ([decision 0004](../decisions/0004-store-bound-to-its-interpreters.md)): the guard stays for changes that can cost a model call, with a refusal saying what going ahead clears and asks; changes that can't (post-processing settings) are applied without asking.*
 
 - **Milestone 6 (2026-09-30): done.**
   - **Golden judge prompts:** every rubric's pairwise prompt (v1–v6) and the review panel's prompts, byte for byte, on fixed items (`tests/golden/`).
