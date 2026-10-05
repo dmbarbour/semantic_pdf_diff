@@ -47,6 +47,7 @@ class Block:
     row_headers: list = field(default_factory=list)  # each body row's own header labels (a Word table's merged
                                                      # cells); empty: every row is read under rows[0]
     source: str = ""    # where a table came from, if not a table: "chart" (a Word chart's data)
+    grid: object = None  # a table's cells as its rules see them (tablerules.Grid): a workbook's tables, for now
 
     @property
     def box(self):
@@ -360,17 +361,27 @@ def text_job(data, job, output, client, dispatch, progress, extension):
             core.text_task(page, segments, f"text:p{page}:{ids}")
         tables = [b for b in blocks if b.kind == "table"]
         core.reader.tables_on[page] = [b.box for b in tables]
+        limit = s.rules_from()
         for ti, table in enumerate(tables):
             header, body = table.rows[0], table.rows[1:]
             width = max(len(r) for r in table.rows)
-            for ri, row in enumerate(body):
+
+            def by_itself(ri, table=table, ti=ti, header=header, body=body, width=width):
+                row = body[ri]
                 if not any(c.strip() for c in row):
-                    continue
+                    return
                 line = table.row_lines[ri + 1]
                 labels = table.row_headers[ri] if table.row_headers else header
                 core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", labels,
                                 row, list(range(len(labels) if table.row_headers else width)),
                                 derivation=chart_derivation(extension) if table.source == "chart" else None)
+            if table.grid is not None and table.grid.rows and limit is not None and len(body) > limit:
+                from . import tablerules
+                tablerules.read(core, page, table.grid, f"rules:p{page}:{ti}", by_itself,
+                                DerivationStep(step=core.derivation["table"][0].step, detail="the table's cells"))
+                continue
+            for ri in range(len(body)):
+                by_itself(ri)
         seen = Counter()
         for pg, line, alt, target in doc.images:
             if pg == page:

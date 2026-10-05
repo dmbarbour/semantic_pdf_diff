@@ -75,12 +75,15 @@ class Reading(unittest.TestCase):
         polar = [b for b in doc.blocks if b.kind == "table"][1]
         self.assertEqual(polar.rows[0], ["alpha [deg]", "c_l", "c_d"])
 
-    def test_what_isnt_read_yet_is_recorded(self):
+    def test_an_ambiguous_region_is_recorded_and_a_long_table_kept_whole(self):
         from semantic_pdf_diff.xlsxdocs import read_xlsx
         doc = read_xlsx(workbook())
         unread = [what for *_, what in doc.images]
         self.assertTrue(any(w.startswith("skipped: ambiguous sheet layout (Polar!A8:E11)") for w in unread))
-        self.assertIn("a table of 60 rows (Polar!A14:C74), not read yet: it awaits the rules query", unread)
+        long = next(b for b in doc.blocks if b.kind == "table" and b.grid.place == "Polar!A14:C74")
+        self.assertEqual((len(long.rows), long.grid.place, long.grid.columns), (61, "Polar!A14:C74", ["A", "B", "C"]))
+        self.assertEqual((long.grid.names[0], long.grid.rows[0], long.grid.labels), ("15", ["R-001", "Requirement 1", "3"],
+                                                                                      ["ID", "Requirement", "Value"]))
 
     def test_a_workbook_is_extracted_with_cell_locators(self):
         import sys
@@ -95,6 +98,76 @@ class Reading(unittest.TestCase):
         self.assertEqual((located.page, located.sheet, located.cells, located.region), (1, "Summary", "A6:D6", "table"))
         self.assertEqual(values["110"].locator.sheet, "Rev B (superseded)")
         self.assertEqual([s.heading_path for s in sections], [["Summary"], ["Polar"], ["Rev B (superseded)"]])
+
+class RulesModel:
+    """The text tests' model, answering a table's rules query with the given rules (keyed by the table's place)."""
+    def __init__(self, answers, **settings):
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent))
+        from test_textdocs import Model
+        self.base, self.answers, self.asked = Model(**settings), answers, []
+        self.s = self.base.s
+
+    def __getattr__(self, name):
+        return getattr(self.base, name)
+
+    def ask(self, prompt, schema, images=(), key=None):
+        from semantic_pdf_diff.tablerules import Rules
+        if schema is not Rules:
+            return self.base.ask(prompt, schema, images, key)
+        self.asked.append(prompt)
+        place = prompt.split("TABLE: ", 1)[1].split(";", 1)[0].split("\n", 1)[0]
+        return Rules.model_validate(self.answers[place])
+
+REQUIREMENTS = {"reading": "rules", "subject": "requirements",
+                "claims": [{"entity": "{A}", "attribute": "{C.header}", "value": "{C}", "number": True}],
+                "examples": [{"row": "15", "claims": [{"entity": "R-001", "attribute": "Value", "value": "3"}]}]}
+
+@unittest.skipIf(openpyxl is None, "python-docx and openpyxl aren't installed (the office extra)")
+class Rules(unittest.TestCase):
+    def extract(self, answers, **settings):
+        import tempfile
+        from pathlib import Path
+        from semantic_pdf_diff.extract import Job, reader_for, run_jobs
+        model = RulesModel(answers, **settings)
+        data = workbook()
+        with tempfile.TemporaryDirectory() as d:
+            job = Job("sha256:" + "a" * 64 + ".xlsx", lambda: data, reader=reader_for(".xlsx"))
+            run_jobs([[job]], Path(d), model)
+        evidence, coverage = job.state["result"]
+        return evidence, coverage, model
+
+    def test_a_long_table_is_read_by_rules_in_one_query(self):
+        evidence, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS})
+        self.assertEqual(len(model.asked), 1)
+        self.assertIn("SIZE: 60 rows, 3 columns", model.asked[0])
+        ruled = [e for e in evidence if e.derivation[-1].step == "table-rules"]
+        self.assertEqual(len(ruled), 60)
+        first = next(e for e in ruled if e.entity == "R-001")
+        self.assertEqual((first.attribute, first.value, first.quote, first.quote_verified), ("Value", "3", "R-001 | 3", True))
+        self.assertEqual((first.locator.sheet, first.locator.cells), ("Polar", "A15:C15"))
+        row, = [r for r in coverage if r["task"].startswith("rules:")]
+        self.assertEqual((row["status"], row["claims"]), ("complete", 60))
+        self.assertFalse([r for r in coverage if r["task"].startswith("table:p2:1:")])  # no row asked by itself
+
+    def test_rules_that_miss_their_examples_are_asked_again_then_rows_read(self):
+        wrong = {**REQUIREMENTS, "examples": [{"row": "15", "claims": [{"value": "4"}]}]}
+        evidence, coverage, model = self.extract({"Polar!A14:C74": wrong})
+        self.assertEqual(len(model.asked), 2)
+        self.assertIn("ITS PROBLEMS:\n- row 15: the templates give 3, not 4", model.asked[1])
+        tasks = [r["task"] for r in coverage]
+        self.assertIn("rules:p2:1:again", tasks)
+        self.assertEqual(sum(t.startswith("table:p2:1:") for t in tasks), 60)  # every row read by itself
+
+    def test_every_table_by_rules_or_none(self):
+        summary = {"reading": "rows"}
+        _, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS, "Summary!A4:D8": summary,
+                                           "Polar!A3:C5": summary, "Rev B (superseded)!A1:B2": summary}, table_rules=0)
+        self.assertEqual(len(model.asked), 4)
+        _, coverage, model = self.extract({}, table_rules=None)
+        self.assertEqual(model.asked, [])
+        self.assertEqual(sum(r["task"].startswith("table:p2:1:") for r in coverage), 60)
 
 if __name__ == "__main__":
     unittest.main()

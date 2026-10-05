@@ -19,8 +19,9 @@ The owner (2026-10-04): "Let's do Excel next. 99% of my spreadsheets are Excel."
 - **An ambiguous region is skipped, never silently** (the plan's contract): a table with a column, past its first,
   that holds values under no header, as two tables pressed together do. It's recorded as "skipped: ambiguous sheet
   layout", with its range.
-- **Tables are read row by row up to READ_ROWS rows,** for now: a larger one is recorded as not read yet (awaiting
-  the rules query, the plan's step 5), never silently; its header row is kept as a line.
+- **Every table is read whole,** each row a line, with its grid as rules see it (tablerules.Grid: its columns by
+  letter, header labels, rows by sheet row number, the title above it). Whether its rows are read one by one or by
+  rules a model writes is the text job's choice (the table_rules setting).
 - **Comments** on cells are content, as Word's: after the region holding them ('Comment by Ana on B5: ...').
 - **Charts** are read from their data (chartxml.py), and pictures as a Word document's are, after the sheet's
   regions.
@@ -30,14 +31,14 @@ Needs openpyxl (the `office` extra).
 """
 import datetime
 import io
+import re
 import posixpath
 from dataclasses import dataclass, field
 
-from . import chartxml
+from . import chartxml, tablerules
 from .docxdocs import Cell, _header_rows, _joined, _labels
 from .textdocs import Block, Picture, TextDocument
 
-READ_ROWS = 50  # a table this long is read row by row for now; a longer one awaits the rules query
 XDR = "{http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing}"
 A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
 R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
@@ -84,8 +85,9 @@ def shown(cell, formula=None):
         return f"[formula {formula}, not calculated]" if isinstance(formula, str) and formula.startswith("=") else ""
     if isinstance(value, bool):
         return "TRUE" if value else "FALSE"
-    if isinstance(value, datetime.datetime):
-        return value.date().isoformat() if value.time() == datetime.time() else value.isoformat(" ")
+    if isinstance(value, datetime.datetime):  # its time shown if its format shows one, midnight too (a log's first)
+        timed = re.search(r"[hs]", re.sub(r'"[^"]*"|\[[^\]]*\]', "", cell.number_format.split(";")[0].lower()))
+        return value.isoformat(" ") if timed or value.time() != datetime.time() else value.date().isoformat()
     if isinstance(value, (datetime.date, datetime.time)):
         return value.isoformat()
     if isinstance(value, (int, float)):
@@ -221,7 +223,7 @@ def read_xlsx(data):
         places[len(lines)] = place
         return len(lines)
 
-    def table(page, sheet, region, cells, merges):
+    def table(page, sheet, region, cells, merges, title):
         grid = _grid(region, cells, merges)
         heads = min(region.header_rows or _header_rows(grid, marked=0), len(grid))
         row_ref = lambda r: f"{_letter(region.left)}{r}:{_letter(region.right)}{r}"
@@ -230,23 +232,21 @@ def read_xlsx(data):
             images.append((page, len(lines), "sheet", f"skipped: ambiguous sheet layout ({sheet}!{region.ref}): a column "
                                                      "holds values under no header, as tables pressed together do"))
             return
-        if region.rows - heads > READ_ROWS:
-            r, header = grid[0]
-            n = line(page, " | ".join(c.text for c in header), (sheet, row_ref(r)))
-            region.lines.append(n)
-            images.append((page, n, "sheet", f"a table of {region.rows - heads} rows ({sheet}!{region.ref}), not read "
-                                             "yet: it awaits the rules query"))
-            return
         labels = _labels(grid, heads)
         header_lines = [line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))) for r, row in grid[:heads]]
-        rows, row_lines, row_headers = [labels], [header_lines[0]], []
+        rows, row_lines, row_headers, aligned = [labels], [header_lines[0]], [], []
         for r, row in grid[heads:]:
             rows.append([c.text for c in row])
             row_headers.append([_joined(labels[c.first:c.last + 1]) for c in row])
             row_lines.append(line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))))
+            aligned.append([""] * (region.right - region.left + 1))
+            for c in row:
+                aligned[-1][c.first] = c.text
         first = header_lines[0]
+        ruled = tablerules.grid([_letter(c) for c in range(region.left, region.right + 1)], labels, aligned,
+                                [r for r, _ in grid[heads:]], row_lines[1:], title, f"{sheet}!{region.ref}")
         blocks.append(Block(page, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
-                            row_lines, row_headers))
+                            row_lines, row_headers, grid=ruled))
         region.lines += list(range(first, len(lines) + 1))
 
     def drawings(page, sheet):
@@ -300,6 +300,7 @@ def read_xlsx(data):
             n = line(page, "(Hidden sheet)", (ws.title, "A1"))
             blocks.append(Block(page, n, n, "(Hidden sheet)"))
         comments = {(cell.row, cell.column): cell.comment for cell in ws._cells.values() if cell.comment}
+        above = None  # the last text cell read, a table's title when just above it
         for region in regions(ws, cells, merges):
             mapped.append(region)
             if region.kind == "pairs":  # a label and its value: one line each
@@ -317,8 +318,11 @@ def read_xlsx(data):
                             m = line(page, cells[(r, c)], (ws.title, f"{_letter(c)}{r}"))
                             blocks.append(Block(page, m, m, cells[(r, c)]))
                             region.lines.append(m)
+                            above = (r, c, cells[(r, c)])
             else:
-                table(page, ws.title, region, cells, merges)
+                title = above[2] if above and region.top - 2 <= above[0] < region.top and \
+                    region.left <= above[1] <= region.right else ""
+                table(page, ws.title, region, cells, merges, title)
             for (r, c), note in sorted(comments.items()):
                 if region.top <= r <= region.bottom and region.left <= c <= region.right:
                     text = (f"Comment by {note.author or 'an unnamed author'} on {_letter(c)}{r}: "

@@ -26,8 +26,17 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Excerpt quotes (with an in-order window) | `quote_match: excerpts` | Not accepted | r09 0.51 (0.39–0.63); the window let chart-axis labels through as values |
 | Chart-reading rule | `visual_rules` | Not accepted | r08 0.59 (0.47–0.71); vaguer readings, out-of-range ones remain |
 | Tile locator | `tile_locator` | Parked | r06 0.49 (flawed sampling), r07 0.58 (0.47–0.68): no worse; wins on IEA and LCIT in both rounds |
+| Table rules | `table_rules: 50` | Default for Excel's tables (2026-10-05; the owner's design, not a round) | the controlled workbooks with every table by rules (`table_rules: 0`): scores as row by row, all 44 tables by rules; the samples: a 1,930-row list in one query, long series and logs summarised |
 
 ## Levers
+
+### Table rules (`table_rules`)
+- **Mechanism:** a table of more body rows than the setting is read by rules a model writes for it (`tablerules.py`; the owner's decision, the adapters plan's "Excel, in detail"): one query shows the columns analysed, sample rows and our opinion; the answer is templates applied to every row, rows read by themselves, or a summary (series, log, list). Excel's tables only, for now.
+- **Expected:** one query a table, not one a row, with claims as good. **Got** (not a round): on the controlled workbooks with every table by rules, scores as row by row; on the samples, sensible readings by eye.
+- **Next:**
+  - show the rules query the text before the table, as `table_context` does for rows (the traps study's conditions)
+  - judge rules against rows in a round on real tables; Word, PowerPoint and PDF tables onto the same grid (the one table model)
+  - whether bookkeeping columns (a document list's contact IDs) should be left out
 
 ### Neighbouring text (`context_before`, `context_after`)
 - **Mechanism:** 400 characters before and after each text chunk, marked as context not to extract from.

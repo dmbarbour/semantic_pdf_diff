@@ -1,0 +1,163 @@
+"""Tables read by rules a model writes (tablerules.py; the adapters plan, "Excel, in detail", step 5): the analysis and
+our opinion the model is shown, its rules applied to every row, checked against its own examples, and the summary
+templates computed."""
+import stubs  # noqa: F401 (a clean environment)
+import datetime
+import unittest
+
+from semantic_pdf_diff import tablerules as tr
+
+def pumps():
+    """A schedule: tags, two quantities with units in their headers, a section row, a provisional value."""
+    rows = [["Duty pumps", "", ""], ["P-1", "118", "24.1"], ["P-2", "120", "25.5"],
+            ["Standby", "", ""], ["P-3", "TBC", "25.5"]]
+    return tr.grid(["B", "C", "D"], ["Tag", "Flow (L/s)", "Head [m]"], rows, range(5, 10), range(11, 16),
+                   "Pump schedule", "Summary!B4:D9")
+
+def polar(n=331):
+    rows = [[str(a), f"{0.11 * a:.3f}", f"{0.006 + 0.0001 * a * a:.4f}"] for a in range(-165, -165 + n)]
+    return tr.grid(["A", "B", "C"], ["alpha [deg]", "c_l", "c_d"], rows, range(4, 4 + n), range(10, 10 + n),
+                   "FFA-W3-211", "Polar!A3:C334")
+
+class Analysis(unittest.TestCase):
+    def test_columns_counted_and_section_rows_kept_apart(self):
+        g = pumps()
+        self.assertEqual(g.names, ["6", "7", "9"])
+        self.assertEqual(g.sections, ["Duty pumps", "Duty pumps", "Standby"])
+        self.assertEqual(g.keys, [1, 2, 4])
+        tag, flow, head = tr.analyse(g)
+        self.assertEqual((flow.numbers, flow.texts, flow.low, flow.high), (2, 1, "", ""))  # TBC: not all numbers
+        self.assertEqual((head.numbers, head.low, head.high, head.distinct), (3, "24.1", "25.5", 2))
+        self.assertIn("text 3; all distinct", tr.describe(tag))
+
+    def test_a_series_is_seen_and_summarising_suggested(self):
+        g = polar()
+        alpha = tr.analyse(g)[0]
+        self.assertEqual((alpha.order, alpha.step, alpha.low, alpha.high), ("rising", "1", "-165", "165"))
+        self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("a series: 331 rows, mostly numbers, column A rising"
+                                                                 " in steps of 1; a summary (series)"))
+
+    def test_a_shape_of_points_suggests_a_summary_too(self):
+        import math
+        rows = [[f"{math.cos(k / 20):.4f}", f"{0.1 * math.sin(k / 20):.4f}"] for k in range(126)]
+        g = tr.grid(["A", "B"], ["x/c", "y/c"], rows, range(5, 131), range(5, 131))
+        self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("points: 126 rows, mostly numbers, no column in order"))
+
+    def test_sentences_are_prose_read_row_by_row(self):
+        rows = [[f"REQ-{k:03d}", f"The pumping station shall deliver {k} L/s at the design head.",
+                 ["Performance", "Controls"][k % 2]] for k in range(150)]
+        g = tr.grid(["A", "B", "C"], ["ID", "Requirement", "Type"], rows, range(5, 155), range(5, 155))
+        cols = tr.analyse(g)
+        self.assertEqual([c.prose for c in cols], [False, True, False])  # 11 words, under 60 characters
+        said = tr.opinion(g, cols)
+        self.assertTrue(said.startswith("rows of prose (column B: 11 words on average): each row read by itself; "))
+        self.assertTrue(said.endswith("a summary (list) counting them by column C"))
+        self.assertIn("B: Requirement: text 150; all distinct; prose: 11 words", tr.question(g, cols))
+
+    def test_a_log_steps_in_minutes(self):
+        start = datetime.datetime(2026, 7, 1)
+        rows = [[(start + datetime.timedelta(minutes=5 * i)).isoformat(" "), f"{95 + i % 7}.5"] for i in range(200)]
+        g = tr.grid(["A", "B"], ["Timestamp", "Flow (L/s)"], rows, range(2, 202), range(2, 202))
+        time = tr.analyse(g)[0]
+        self.assertEqual((time.dates, time.order, time.step), (200, "rising", "5 min"))
+        self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("a log: 200 rows"))
+
+    def test_the_question_shows_samples_size_and_our_opinion(self):
+        asked = tr.question(polar())
+        self.assertIn("TABLE: Polar!A3:C334; title: FFA-W3-211", asked)
+        self.assertIn("SIZE: 331 rows, 3 columns; a claim per value cell would give about 662 claims", asked)
+        self.assertIn("A: alpha [deg]: numbers 331; -165 to 165; rising; in steps of 1; all distinct", asked)
+        self.assertIn("4 | -165 | -18.150 | 2.7285", asked)
+        self.assertIn("... (rows 9 to 85 not shown)", asked)
+        self.assertIn("OUR HEURISTIC OPINION (a guess", asked)
+        self.assertIn("SECTIONS (section rows label the rows below them): Duty pumps (rows 6 to 7); Standby (rows 9 "
+                      "to 9)", tr.question(pumps()))
+
+class Applying(unittest.TestCase):
+    RULES = {"reading": "rules", "subject": "PS-3 pumps",
+             "claims": [{"columns": "C:D", "entity": "{B}", "attribute": "{*.name}", "value": "{*}", "unit": "{*.unit}",
+                         "conditions": "{section}", "number": True}],
+             "examples": [{"row": 6, "claims": [{"entity": "P-1", "attribute": "Flow", "value": "118", "unit": "L/s"},
+                                                {"entity": "P-1", "attribute": "Head", "value": 24.1, "unit": "m"}]}]}
+
+    def test_rules_give_every_rows_claims_and_a_misfit_is_named(self):
+        g, rules = pumps(), tr.Rules.model_validate(self.RULES)
+        made = tr.row_claims(rules, g, 0)
+        self.assertEqual([(f["entity"], f["attribute"], f["value"], f["unit"], f["conditions"]) for f, _, _ in made],
+                         [("P-1", "Flow", "118", "L/s", "Duty pumps"), ("P-1", "Head", "24.1", "m", "Duty pumps")])
+        self.assertEqual(made[0][1], [0, 1])  # the cells it came from: B and C
+        with self.assertRaisesRegex(tr.Misfit, "C9 isn't a number: 'TBC'"):
+            tr.row_claims(rules, g, 2)
+        self.assertEqual(tr.problems(rules, g), [])  # one row in three: read by itself, not a problem
+
+    def test_rules_must_give_their_own_examples(self):
+        g = pumps()
+        wrong = tr.Rules.model_validate({**self.RULES, "examples": [{"row": "7", "claims": [{"value": "121",
+                                                                                            "unit": "L/s"}]}]})
+        self.assertEqual(tr.problems(wrong, g), ["row 7: the templates give 120 L/s; 25.5 m, not 121 L/s"])
+        by_place = tr.Rules.model_validate({**self.RULES, "examples": [{"row": "2", "claims": [{"value": "120",
+                                                                                                  "unit": "L/s"}]}]})
+        self.assertEqual(tr.problems(by_place, g), [])  # row 7, the second shown, named by its place: still checked
+        unknown = tr.Rules.model_validate({**self.RULES, "claims": [{"entity": "{B}", "attribute": "x",
+                                                                     "value": "{Q}"}]})
+        self.assertEqual(tr.problems(unknown, g), ["no column Q in the table"])
+        self.assertTrue(tr.problems(tr.Rules(reading="sideways"), g)[0].startswith("unknown reading 'sideways'"))
+        self.assertEqual(tr.problems(tr.Rules(reading="rows"), g), [])
+
+    def test_a_sideways_table_and_units_outside_brackets(self):
+        rows = [["Capital cost ($M)", "6.35", "2.82"], ["Annual energy use (MWh/yr)", "771", "n/a"]]
+        g = tr.grid(["A", "B", "C"], ["", "Option A: UV", "Option B: chlorine"], rows, [5, 6], [11, 12])
+        sideways = tr.Rules.model_validate({"reading": "rules", "claims": [{
+            "columns": "B:C", "entity": "{*.header}", "attribute": "{A.cell_name}", "value": "{*.value}",
+            "unit": "{A.cell_unit}", "number": True}], "examples": [{"row": "6", "claims": [
+                {"value": "771", "unit": "MWh/yr"}, {"value": "n/a"}]}]})
+        made = [(f["entity"], f["attribute"], f["value"], f["unit"]) for f, _, _ in tr.row_claims(sideways, g, 1)]
+        self.assertEqual(made, [("Option A: UV", "Annual energy use", "771", "MWh/yr")])  # n/a: no claim
+        self.assertEqual(tr.problems(sideways, g), [])  # an example's n/a: no claim by the templates' own rule
+        g = tr.grid(["A", "B", "C"], ["Element", "Height (ft)", "Vertical g"], [["E1", "129", "2.58"]], [5], [11])
+        unitless = tr.Rules.model_validate({"reading": "rules", "claims": [{
+            "columns": "B:C", "entity": "{A}", "attribute": "{*.name}", "value": "{*}", "unit": "{*.unit}"}],
+            "examples": [{"row": "5", "claims": [{"value": "129", "unit": "ft"}, {"value": "2.58", "unit": "g"}]}]})
+        self.assertEqual(tr.problems(unitless, g), ['row 5: the templates give 129 ft; 2.58, not 2.58 g (column C\'s '
+                                                    'header "Vertical g" has no unit in brackets for .unit to take: give '
+                                                    'such columns a template of their own, the unit written out)'])
+
+    def test_an_example_of_a_row_read_by_itself_is_no_problem(self):
+        g, rules = pumps(), tr.Rules.model_validate({**Applying.RULES, "examples": [{"row": "9", "claims": [
+            {"value": "TBC"}]}]})
+        self.assertEqual(tr.problems(rules, g), [])  # row 9's flow isn't a number: it's read by itself anyway
+
+class Summaries(unittest.TestCase):
+    def test_a_series_gives_its_range_extremes_and_points(self):
+        rules = tr.Rules(reading="summary", template="series", subject="FFA-W3-211", input="A", quantities=["B"],
+                         points=["0", "12"])
+        g = polar()
+        self.assertEqual(tr.problems(rules, g), [])
+        found = [(s.fields["attribute"], s.fields["value"], s.fields["unit"], s.fields["conditions"], s.computed)
+                 for s in tr.summarise(rules, g)]
+        self.assertEqual(found, [("alpha range", "-165 to 165", "deg", "331 points, in steps of 1", False),
+                                 ("maximum c_l", "18.150", "", "at alpha = 165 deg", False),
+                                 ("minimum c_l", "-18.150", "", "at alpha = -165 deg", False),
+                                 ("c_l", "0.000", "", "at alpha = 0 deg", False),
+                                 ("c_l", "1.320", "", "at alpha = 12 deg", False)])
+
+    def test_a_log_gives_span_extremes_mean_and_last(self):
+        rows = [["2026-07-01 00:00:00", "95.0"], ["2026-07-01 00:05:00", "101.5"], ["2026-07-01 00:10:00", "98.0"]]
+        g = tr.grid(["A", "B"], ["Timestamp", "Flow (L/s)"], rows, range(2, 5), range(2, 5))
+        rules = tr.Rules(reading="summary", template="log", subject="PS-3", input="A", quantities=["B"])
+        found = {s.fields["attribute"]: (s.fields["value"], s.fields["conditions"], s.computed)
+                 for s in tr.summarise(rules, g)}
+        self.assertEqual(found["Timestamp span"], ("2026-07-01 00:00:00 to 2026-07-01 00:10:00", "3 samples", False))
+        self.assertEqual(found["maximum Flow"], ("101.5", "at Timestamp = 2026-07-01 00:05:00", False))
+        self.assertEqual(found["mean Flow"], ("98.17", "over 3 samples", True))
+        self.assertEqual(found["last Flow"][0], "98.0")
+
+    def test_a_list_counts_its_rows_by_category(self):
+        rows = [[f"R1-{k}", ["Agreed", "Agreed", "Noted"][k % 3]] for k in range(30)]
+        g = tr.grid(["A", "B"], ["TDoc", "Status"], rows, range(2, 32), range(2, 32))
+        rules = tr.Rules(reading="summary", template="list", subject="RAN1 contributions", categories=["B"])
+        found = [(s.fields["value"], s.fields["conditions"]) for s in tr.summarise(rules, g)]
+        self.assertEqual(found, [("30", ""), ("20", "Status = Agreed"), ("10", "Status = Noted")])
+
+if __name__ == "__main__":
+    unittest.main()

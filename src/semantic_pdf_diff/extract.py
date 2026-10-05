@@ -242,7 +242,7 @@ def office_installed(workbook=False):
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
 READERS = {".pdf": "pdf/1", ".txt": "text/1", ".md": "text/1", ".docx": "docx/2",  # docx/2: equations, comments
-           ".pptx": "pptx/1", ".xlsx": "xlsx/1", ".xlsm": "xlsx/1"}
+           ".pptx": "pptx/1", ".xlsx": "xlsx/2", ".xlsm": "xlsx/2"}  # xlsx/2: tables read by rules
 
 def reader_version(extension):
     """The version of what reads content of this extension ("docx/1"); "unsupported" where nothing reads it yet."""

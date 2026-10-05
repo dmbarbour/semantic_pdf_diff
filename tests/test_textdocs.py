@@ -55,6 +55,9 @@ class Model:
         self.calls, self.cache_hits, self.usage, self.queries = 0, 0, {}, []
 
     def ask(self, prompt, schema, images=(), key=None):
+        from semantic_pdf_diff.tablerules import Rules
+        if schema is Rules:  # a long table's rules query: each row read by itself, as without rules
+            return Rules(reading="rows")
         query = ExtractQuery.read(prompt)
         self.queries.append(query)
         claims = [{"entity": "plant", "attribute": "value", "value": number, "unit": unit, "kind": "text",

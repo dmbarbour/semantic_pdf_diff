@@ -327,6 +327,16 @@ class FigureTasks(Lever):
             regions.append((f"figure:{i}", box, f"Caption: {figure.caption}" if figure.caption else ""))
         return regions
 
+class TableRules(Lever):
+    lever_name, stage, off = "table_rules", "segmentation", {"table_rules": None}
+    # a table of more body rows than this is read by rules a model writes for it (tablerules.py): one query per table
+    # rather than one a row; 0: every table so; none: every table row by row. Excel's tables only, for now (the
+    # adapters plan, "Excel, in detail", step 5): other formats' tables have no grid for the rules yet
+    table_rules: Annotated[int | None, _selecting(frozenset({"table"}))] = Field(default=50, ge=0)
+
+    def rules_from(self):
+        return self.table_rules
+
 class VisualTextLayer(Lever):
     lever_name, stage, off = "visual_text_layer", "inclusion", {"visual_text_layer": 0}
     marks = {"visual_text_layer": re.compile("^" + re.escape(LAYER_NOTE) + "\n(.*)$", re.M)}
@@ -424,8 +434,9 @@ class DedupeRepeated(Lever):
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
-                 TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, VisualTextLayer, TableFilter,
-                 QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
+                 TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, TableRules, VisualTextLayer,
+                 TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals,
+                 ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -590,6 +601,11 @@ class Platform(Composable):
         """How many times a task's answer that's incomplete with its claims at the limit is continued (tasks.TaskCore),
         by the task's region: the platform's, never."""
         return 0
+
+    @chosen
+    def rules_from(self):
+        """The body rows a table may have before it's read by rules a model writes (tablerules.py); None: never."""
+        return None
 
     @chosen
     def dedupes_repeated_rows(self):
