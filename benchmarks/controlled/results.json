@@ -1711,12 +1711,11 @@
    "facts": 33,
    "found": 33,
    "recall": 1.0,
-   "found_right": 27,
+   "found_right": 33,
    "missed": [],
    "claims": 33,
    "outcomes": {
-    "loose": 6,
-    "right": 27
+    "right": 33
    },
    "conditions_kept": "33/33",
    "recall_by_form": {
@@ -1729,8 +1728,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 6,
-     "right": 24
+     "right": 30
     },
     "text": {
      "right": 3
@@ -2133,36 +2131,28 @@
   },
   "lcc-energy-s1-clean-revised.xlsx": {
    "facts": 21,
-   "found": 16,
-   "recall": 0.7619,
-   "found_right": 14,
-   "missed": [
-    "zone.concourse",
-    "zone.exhibit",
-    "zone.kitchens",
-    "zone.loading",
-    "zone.meeting"
-   ],
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 19,
+   "missed": [],
    "claims": 23,
    "outcomes": {
     "loose": 2,
-    "misbound": 5,
-    "right": 14,
+    "right": 19,
     "text": 2
    },
-   "conditions_kept": "14/14",
+   "conditions_kept": "19/19",
    "recall_by_form": {
-    "xlsx-chart": 0.7059,
+    "xlsx-chart": 1.0,
     "xlsx-prose": 1.0
    },
    "by_reader": {
-    "table": 0.5714,
+    "table": 0.8095,
     "text": 0.1905
    },
    "outcomes_by_reader": {
     "table": {
-     "misbound": 5,
-     "right": 12
+     "right": 17
     },
     "text": {
      "loose": 2,
@@ -2171,7 +2161,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "12/12",
+    "table": "17/17",
     "text": "2/2"
    }
   },
@@ -2277,36 +2267,28 @@
   },
   "lcc-energy-s1-clean.xlsx": {
    "facts": 21,
-   "found": 16,
-   "recall": 0.7619,
-   "found_right": 14,
-   "missed": [
-    "zone.concourse",
-    "zone.exhibit",
-    "zone.kitchens",
-    "zone.loading",
-    "zone.meeting"
-   ],
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 19,
+   "missed": [],
    "claims": 23,
    "outcomes": {
     "loose": 2,
-    "misbound": 5,
-    "right": 14,
+    "right": 19,
     "text": 2
    },
-   "conditions_kept": "14/14",
+   "conditions_kept": "19/19",
    "recall_by_form": {
-    "xlsx-chart": 0.7059,
+    "xlsx-chart": 1.0,
     "xlsx-prose": 1.0
    },
    "by_reader": {
-    "table": 0.5714,
+    "table": 0.8095,
     "text": 0.1905
    },
    "outcomes_by_reader": {
     "table": {
-     "misbound": 5,
-     "right": 12
+     "right": 17
     },
     "text": {
      "loose": 2,
@@ -2315,7 +2297,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "12/12",
+    "table": "17/17",
     "text": "2/2"
    }
   },
@@ -8802,12 +8784,11 @@
    "facts": 33,
    "found": 33,
    "recall": 1.0,
-   "found_right": 27,
+   "found_right": 33,
    "missed": [],
    "claims": 33,
    "outcomes": {
-    "loose": 6,
-    "right": 27
+    "right": 33
    },
    "conditions_kept": "33/33",
    "recall_by_form": {
@@ -8820,8 +8801,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 6,
-     "right": 24
+     "right": 30
     },
     "text": {
      "right": 3
@@ -9224,36 +9204,28 @@
   },
   "lcc-energy-s1-clean-revised.xlsx": {
    "facts": 21,
-   "found": 16,
-   "recall": 0.7619,
-   "found_right": 14,
-   "missed": [
-    "zone.concourse",
-    "zone.exhibit",
-    "zone.kitchens",
-    "zone.loading",
-    "zone.meeting"
-   ],
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 19,
+   "missed": [],
    "claims": 23,
    "outcomes": {
     "loose": 2,
-    "misbound": 5,
-    "right": 14,
+    "right": 19,
     "text": 2
    },
-   "conditions_kept": "14/14",
+   "conditions_kept": "19/19",
    "recall_by_form": {
-    "xlsx-chart": 0.7059,
+    "xlsx-chart": 1.0,
     "xlsx-prose": 1.0
    },
    "by_reader": {
-    "table": 0.5714,
+    "table": 0.8095,
     "text": 0.1905
    },
    "outcomes_by_reader": {
     "table": {
-     "misbound": 5,
-     "right": 12
+     "right": 17
     },
     "text": {
      "loose": 2,
@@ -9262,7 +9234,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "12/12",
+    "table": "17/17",
     "text": "2/2"
    }
   },
@@ -9368,36 +9340,28 @@
   },
   "lcc-energy-s1-clean.xlsx": {
    "facts": 21,
-   "found": 16,
-   "recall": 0.7619,
-   "found_right": 14,
-   "missed": [
-    "zone.concourse",
-    "zone.exhibit",
-    "zone.kitchens",
-    "zone.loading",
-    "zone.meeting"
-   ],
+   "found": 21,
+   "recall": 1.0,
+   "found_right": 19,
+   "missed": [],
    "claims": 23,
    "outcomes": {
     "loose": 2,
-    "misbound": 5,
-    "right": 14,
+    "right": 19,
     "text": 2
    },
-   "conditions_kept": "14/14",
+   "conditions_kept": "19/19",
    "recall_by_form": {
-    "xlsx-chart": 0.7059,
+    "xlsx-chart": 1.0,
     "xlsx-prose": 1.0
    },
    "by_reader": {
-    "table": 0.5714,
+    "table": 0.8095,
     "text": 0.1905
    },
    "outcomes_by_reader": {
     "table": {
-     "misbound": 5,
-     "right": 12
+     "right": 17
     },
     "text": {
      "loose": 2,
@@ -9406,7 +9370,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "12/12",
+    "table": "17/17",
     "text": "2/2"
    }
   },

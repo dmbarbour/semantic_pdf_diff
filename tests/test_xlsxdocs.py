@@ -121,7 +121,7 @@ class RulesModel:
         place = prompt.split("TABLE: ", 1)[1].split(";", 1)[0].split("\n", 1)[0]
         return Rules.model_validate(self.answers.get(place, {"reading": "rows"}))
 
-REQUIREMENTS = {"reading": "rules", "subject": "requirements",
+REQUIREMENTS = {"binding": "values of requirements, by ID", "reading": "rules", "subject": "requirements",
                 "claims": [{"entity": "{A}", "attribute": "{C.header}", "value": "{C}", "number": True}],
                 "examples": [{"row": "15", "claims": [{"entity": "R-001", "attribute": "Value", "value": "3"}]}]}
 
@@ -154,6 +154,8 @@ class Rules(unittest.TestCase):
         self.assertEqual((first.locator.sheet, first.locator.cells), ("Polar", "A15:C15"))
         row = next(r for r in coverage if r["task"] == "rules:p2:1")
         self.assertEqual((row["status"], row["claims"]), ("complete", 60))
+        self.assertIn("[binding: values of requirements, by ID]", row["issues"][0])
+        self.assertIn("How a claim is bound", long)
         self.assertEqual(sum(r["task"].startswith("table:p1:0:") for r in coverage), 3)  # "rows": each by itself
         self.assertFalse([r for r in coverage if r["task"].startswith("table:p2:1:")])  # no row asked by itself
 

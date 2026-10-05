@@ -748,6 +748,30 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
     - an uncertainty template for value and ± columns
     - our opinion's grading, its wording, or none
     - bookkeeping columns, the examples check, uncalculated formulas
+- **Binding in the rules query (2026-10-05).** The owner: "Yes, please work on improving binding a bit. You can run several experiments at that cost if needed."
+  - **Four prompt variants** on the 26 controlled workbooks: binding conventions, a worked example, a sentence the model writes first, and all three. The [lever index](../reviews/levers.md) has the table; all three together read best.
+  - **Adopted** (`tablerules.py`, reader version `xlsx/4`):
+    - **how a claim is bound,** as in any extraction:
+      - the attribute is the property measured, never an option's or a series' name
+      - the entity is the thing with the value: an item, or an alternative being compared
+      - conditions are the circumstances, never the document's own details
+      - columns that are alternatives of one quantity name the entity, the quantity is the attribute, and the row's label is a condition
+    - **a worked example:** "Monthly cooling energy", columns Option 1 and Option 2: entity the option, attribute "cooling energy" written out, the month a condition
+    - **"binding":** the model first writes what the values measure, what has them and under what; kept in the coverage record
+  - **The controlled workbooks,** every table asked against row by row:
+
+    | | Every table asked | Row by row |
+    |---|---|---|
+    | Facts read right, of 1,015 scored | 959 | 959 |
+    | Misbound | 10 | 10 |
+    | Traps study, conditions kept (2 runs) | 12 of 12 | 4 of 12 |
+    | Claims outside the key (treatment plant, n/a cells) | none | 8 |
+    | Revision pairs (14) | the same in every pair: every change found, no false change | |
+    | Queries for tables | 44, and 10 rows read by themselves | 288 |
+
+  - **Still fragile:** a one-series table ("Option 1, chilled beams (tons)") flipped between its series name and "peak cooling load" as the attribute under small changes to the prompt.
+  - **By eye on the samples:** the IEA overview's entity became the turbine; the synthetic workbook's commissioning table reads "Pump system | Flow at duty point | 118 L/s | Measured"; its superseded sheet's swap is fixed but its "superseded" mark is lost.
+  - Cost: $0.12 for the experiments, $0.003 for the pairs.
 
 ## Open questions
 

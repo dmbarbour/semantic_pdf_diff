@@ -16,6 +16,11 @@ to produce claims from rows or how to summarize things within a few known templa
   - rules: the claims a row gives, as templates of its cells, applied to every row mechanically (row_claims)
   - rows: each row read by itself, as a table's rows are without rules
   - summary: a known template (series, log, list) over named columns, its statistics computed (summarise)
+- **Binding** (2026-10-05, measured on the controlled workbooks): the prompt says how a claim is bound, as in any
+  extraction (the attribute the property measured, never an option's or a series' name; the entity the thing with
+  the value, an item or an alternative compared; conditions the circumstances, never the document's own details;
+  columns that are alternatives of one quantity name the entity), with a worked example, and the model first writes
+  what the values measure, what has them and under what ("binding", kept in the coverage record).
 - **Checked** (problems): the templates must give the model's own example claims for the rows it chose (values and
   units); a value marked a number must be one; a summary's columns must exist and hold what its template needs. A row
   the templates don't fit is read by itself. An answer with problems, or rules failing a fifth of the rows, is asked
@@ -77,8 +82,20 @@ reading:
     the count, and the counts by each category's values.
   Don't summarise rows that are each a fact someone would check on its own (requirements, design values, schedules).
 "subject" names what the table describes: a summary's entity.
+How a claim is bound, as in any extraction:
+- the attribute names the property a value measures (cooling energy, peak load, flow), never an option's or a
+  series' name
+- the entity is the thing that has the value: an item (a pump, a zone) or an alternative being compared (a design
+  option, a unit size); never a parameter's name
+- conditions are the circumstances the value holds under (a month, an operating point, a load case, a location),
+  never the document's own details (its revision, its date of issue)
+- when the columns are alternatives or series of one quantity (Option 1, Option 2), each column names the entity
+  or a condition, the quantity is the attribute (from the title, the caption or the text above), and the row's
+  label (a month, a case) is a condition
+For example, a table "Monthly cooling energy" with columns Month | Option 1 (MWh) | Option 2 (MWh): one template
+over columns B:C, entity {*.name}, attribute "cooling energy", value {*}, unit {*.unit}, conditions {A}.
 Return JSON:
-{"reading":"rules|rows|summary", "why":"one sentence", "subject":"...",
+{"binding":"what the values measure (the attribute), what has them (the entity), under what (the conditions)", "reading":"rules|rows|summary", "why":"one sentence", "subject":"...",
 "claims":[{"columns":"", "entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"...", "number":true}],
 "examples":[{"row":"5", "claims":[{"entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"..."}]}],
 "template":"series|log|list", "input":"A", "quantities":["B"], "categories":["C"], "points":["0"]}
@@ -365,6 +382,7 @@ class Example(Lenient):
 
 class Rules(Lenient):
     """A model's answer to the rules query (RULES)."""
+    binding: str = Field(default="", max_length=400)  # what the values measure, what has them, under what
     reading: str = Field(default="", max_length=20)
     why: str = Field(default="", max_length=400)
     subject: str = Field(default="", max_length=160)
@@ -704,6 +722,8 @@ def read(core, page, g, task, by_itself, source):
     def use(name, answer, issues):
         reading = answer.reading.strip().lower()
         why = f" ({answer.why})" if answer.why else ""
+        if answer.binding:
+            why += f" [binding: {answer.binding}]"
         if reading == "rows":
             return record(name, "complete", [everyone(name, f"the model's reading{why}")[:500]])
         found, misfits = [], []

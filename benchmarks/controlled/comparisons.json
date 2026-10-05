@@ -2255,30 +2255,27 @@
     "removed": 0,
     "unchanged": 16
    },
-   "changes_found": "4/5",
+   "changes_found": "5/5",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "12/16",
+   "unchanged_confirmed": "16/16",
    "false_changes": 0,
-   "difference_precision": 0.8,
+   "difference_precision": 1.0,
    "changed": {
-    "reported": 4,
-    "unextracted": 1
+    "reported": 5
    },
    "conditions": {},
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 12,
-    "unextracted": 4
+    "confirmed": 16
    },
    "different": {
-    "change": 4,
-    "unscored": 1
+    "change": 5
    },
    "equivalent": {
-    "no change": 12,
-    "unscored": 6
+    "no change": 16,
+    "unscored": 2
    },
    "findings": {
     "different": 5,
@@ -2288,15 +2285,12 @@
    "pairs": 5,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 4
-     },
-     "unscored": {
-      "changed": 1
+      "changed": 5
      }
     }
    },
@@ -2317,11 +2311,11 @@
     "opt2.october": "confirmed",
     "opt2.season": "reported",
     "opt2.september": "confirmed",
-    "zone.concourse": "unextracted",
-    "zone.exhibit": "unextracted",
-    "zone.kitchens": "unextracted",
-    "zone.loading": "unextracted",
-    "zone.meeting": "unextracted"
+    "zone.concourse": "confirmed",
+    "zone.exhibit": "reported",
+    "zone.kitchens": "confirmed",
+    "zone.loading": "confirmed",
+    "zone.meeting": "confirmed"
    }
   },
   "lcc-plan-s1-clean": {
@@ -9317,30 +9311,27 @@
     "removed": 0,
     "unchanged": 16
    },
-   "changes_found": "4/5",
+   "changes_found": "5/5",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "12/16",
+   "unchanged_confirmed": "16/16",
    "false_changes": 0,
-   "difference_precision": 0.8,
+   "difference_precision": 1.0,
    "changed": {
-    "reported": 4,
-    "unextracted": 1
+    "reported": 5
    },
    "conditions": {},
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 12,
-    "unextracted": 4
+    "confirmed": 16
    },
    "different": {
-    "change": 4,
-    "unscored": 1
+    "change": 5
    },
    "equivalent": {
-    "no change": 12,
-    "unscored": 6
+    "no change": 16,
+    "unscored": 2
    },
    "findings": {
     "different": 5,
@@ -9350,15 +9341,12 @@
    "pairs": 5,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 4
-     },
-     "unscored": {
-      "changed": 1
+      "changed": 5
      }
     }
    },
@@ -9379,11 +9367,11 @@
     "opt2.october": "confirmed",
     "opt2.season": "reported",
     "opt2.september": "confirmed",
-    "zone.concourse": "unextracted",
-    "zone.exhibit": "unextracted",
-    "zone.kitchens": "unextracted",
-    "zone.loading": "unextracted",
-    "zone.meeting": "unextracted"
+    "zone.concourse": "confirmed",
+    "zone.exhibit": "reported",
+    "zone.kitchens": "confirmed",
+    "zone.loading": "confirmed",
+    "zone.meeting": "confirmed"
    }
   },
   "lcc-plan-s1-clean": {
