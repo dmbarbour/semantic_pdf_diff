@@ -99,6 +99,53 @@ class Reading(unittest.TestCase):
         self.assertEqual(values["110"].locator.sheet, "Rev B (superseded)")
         self.assertEqual([s.heading_path for s in sections], [["Summary"], ["Polar"], ["Rev B (superseded)"]])
 
+CSV = ("# Exported by SCADA historian\n"
+       "Site: PS-3,Interval: daily\n"
+       "\n"
+       "Date,Volume pumped (m3),Energy (kWh)\n"
+       "2026-07-01,8420,1712\n"
+       "2026-07-02,8390,\"1,705\"\n"
+       "\n"
+       "Alarm,Count,Note\n"
+       "Pump trip,1,\"tripped twice,\nreset by hand\"\n"
+       "Comms loss,5,\n")
+
+class Csv(unittest.TestCase):
+    """CSV files (xlsxdocs.read_csv): a one-sheet workbook of text cells, placed by the file's lines and fields; no
+    extra needed."""
+    def test_preamble_and_tables_placed_by_lines_and_fields(self):
+        from semantic_pdf_diff.xlsxdocs import read_csv
+        doc = read_csv(CSV.encode())
+        self.assertEqual([(g.ref, g.kind) for g in doc.regions], [("A1", "text"), ("A2:B2", "text"), ("A4:C6", "table"),
+                                                                  ("A8:C10", "table")])
+        texts = [t for _, t in doc.lines]
+        self.assertEqual(texts[:3], ["# Exported by SCADA historian", "Site: PS-3", "Interval: daily"])
+        alarms = [b for b in doc.blocks if b.kind == "table"][1]
+        self.assertEqual(alarms.rows[1], ["Pump trip", "1", "tripped twice, reset by hand"])
+        self.assertEqual(doc.places[alarms.row_lines[1]], ((9, 10), (1, 3)))  # the quoted field spans two lines
+        self.assertEqual(doc.places[alarms.row_lines[2]], ((11, 11), (1, 3)))
+        daily = [b for b in doc.blocks if b.kind == "table"][0]
+        self.assertEqual((daily.grid.place, daily.grid.rows[1]), ("A4:C6", ["2026-07-02", "8390", "1,705"]))
+
+    def test_semicolons_and_windows_1252(self):
+        from semantic_pdf_diff.xlsxdocs import read_csv
+        doc = read_csv("Pumpe;Förderhöhe (m);Leistung (kW)\nP-1;24,1;22\nP-2;25,5;22\n".encode("cp1252"))
+        table, = [b for b in doc.blocks if b.kind == "table"]
+        self.assertEqual(table.rows, [["Pumpe", "Förderhöhe (m)", "Leistung (kW)"], ["P-1", "24,1", "22"],
+                                      ["P-2", "25,5", "22"]])
+
+    def test_a_csv_file_is_extracted_with_line_and_field_locators(self):
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent))
+        from test_textdocs import extract
+        from semantic_pdf_diff.models import CsvLocator
+        evidence, coverage, sections, _ = extract("export.csv", CSV.encode())
+        located = {e.value: e.locator for e in evidence}["8420"]
+        self.assertIsInstance(located, CsvLocator)
+        self.assertEqual((located.file_lines, located.fields, located.region), ((5, 5), (1, 3), "table"))
+        self.assertEqual(evidence[0].derivation[0].step[:4], "csv-")
+
 class RulesModel:
     """The text tests' model, answering a table's rules query with the given rules (keyed by the table's place), or
     with each row read by itself."""

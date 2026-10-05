@@ -789,6 +789,16 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
   - **Adopted:** three fresh examples (`tablerules.py`, reader `xlsx/5`). The [lever index](../reviews/levers.md) has the details.
   - **On the committed corpus with pairs:** facts as row by row, every condition kept. One pair is worse: the specification's Session ID change is judged uncertain, because its two revisions' rules bound the length differently. That adds a lever idea: the same rules for a table in both revisions.
   - Cost: $0.35.
+- **CSV (2026-10-05): built.** (The owner, on what's next: "Looks good. Please proceed.")
+  - **Read as a one-sheet workbook of text cells** (`xlsxdocs.read_csv`; no extra needed), through the workbook reader's own parts. The reader was split for it: a `Sheet` (cells, merges, comments, defined tables, hidden) and a writer shared by both. The workbooks read byte for byte as before (32 compared).
+  - **Parsing:** delimiter sniffed (comma, semicolon, tab, bar); UTF-8, else Windows-1252; fields as written (no number formats to apply); a backstop of 1,000,000 records, recorded if reached.
+  - **Regions:** preamble lines are text; blocks parted by blank lines are tables (or label-and-value pairs), each asked how it's read as a workbook's are.
+  - **Located** by the file's lines and fields (`CsvLocator`: "lines 5–5, fields 1–3"; a quoted field may span lines). Reader version `csv/1`; `.csv` and `.tsv`.
+  - **On the synthetic CSV:** the regions its key gives (two preamble lines; daily totals, lines 4–9; alarms, lines 11–14). The rules read "PS-3 | Volume pumped | 8277 m3 | on date 2026-07-05", the site from the preamble.
+  - **The RAN1 document list, exported to CSV:** the same opinion and the same reading as its workbook.
+    - **A regression found on the way:** under the binding prompt, both are read by rules over every column (30,177 claims, bookkeeping included), where the earlier prompt gave the list summary (69 claims). The lever index's bookkeeping-columns idea is for this.
+  - **Fixed on the way:** the lab's run collector and real-pairs reader listed formats by hand; they now follow the product's list (`extract.TEXT_EXTENSIONS`).
+  - Cost: $0.005.
 
 ## Open questions
 

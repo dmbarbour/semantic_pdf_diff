@@ -227,7 +227,7 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
                 dispatch.wait_one()
 
 # Readers by normalized extension (the adapters plan: chosen by extension only, no sniffing).
-TEXT_EXTENSIONS = (".txt", ".md", ".docx", ".pptx", ".xlsx", ".xlsm")
+TEXT_EXTENSIONS = (".txt", ".md", ".docx", ".pptx", ".xlsx", ".xlsm", ".csv", ".tsv")
 
 def office_installed(workbook=False):
     """Whether the office extra's libraries are installed: python-docx (and with workbook, openpyxl)."""
@@ -242,7 +242,8 @@ def office_installed(workbook=False):
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
 READERS = {".pdf": "pdf/1", ".txt": "text/1", ".md": "text/1", ".docx": "docx/2",  # docx/2: equations, comments
-           ".pptx": "pptx/1", ".xlsx": "xlsx/5", ".xlsm": "xlsx/5"}  # xlsx/5: three worked examples in the rules query
+           ".pptx": "pptx/1", ".xlsx": "xlsx/5", ".xlsm": "xlsx/5",  # xlsx/5: three worked examples in the rules query
+           ".csv": "csv/1", ".tsv": "csv/1"}
 
 def reader_version(extension):
     """The version of what reads content of this extension ("docx/1"); "unsupported" where nothing reads it yet."""

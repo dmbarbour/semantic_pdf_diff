@@ -163,7 +163,24 @@ class XlsxLocator(Strict):
         """Its lines as a box, (0, first, 1, last + 1), as TextLocator's."""
         return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
 
-Locator = Annotated[PdfLocator | TextLocator | DocxLocator | PptxLocator | XlsxLocator, Field(discriminator="format")]
+class CsvLocator(Strict):
+    """Where a claim sits within a CSV file: the file's lines (a quoted field may span several) and fields (counted
+    from 1) its cells came from, and its lines in the reader's own count; never a path."""
+    format: Literal["csv"] = "csv"
+    page: int = Field(default=1, ge=1)
+    file_lines: tuple[int, int]
+    fields: tuple[int, int]
+    lines: tuple[int, int]
+    region: Literal["text", "table", "tile", "figure", "overview"]
+    task: str
+
+    @property
+    def bbox(self):
+        """Its lines as a box, (0, first, 1, last + 1), as TextLocator's."""
+        return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
+
+Locator = Annotated[PdfLocator | TextLocator | DocxLocator | PptxLocator | XlsxLocator | CsvLocator,
+                    Field(discriminator="format")]
 
 class Section(Strict):
     """A logical part of one piece of content: the unit of context, and later of scheduling."""

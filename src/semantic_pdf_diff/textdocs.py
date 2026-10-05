@@ -284,6 +284,20 @@ def xlsx_locator(places, page, bbox, region, task):
         cells = refs[0]
     return XlsxLocator(page=page, sheet=sheet, cells=cells, lines=(first, last), region=region, task=task)
 
+CSV_DERIVATION = {
+    "text": [DerivationStep(step="csv-fields", detail="grouped fields"), DerivationStep(step="model-extraction")],
+    "table": [DerivationStep(step="csv-table", detail="row with its header"), DerivationStep(step="model-extraction")],
+}
+
+def csv_locator(places, page, bbox, region, task):
+    """A CSV claim's locator: its lines, and the file's lines and fields they were read from (their union)."""
+    from .models import CsvLocator
+    first, last = int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)
+    found = [places[n] for n in range(first, last + 1) if n in places] or [((0, 0), (0, 0))]
+    return CsvLocator(file_lines=(min(f[0][0] for f in found), max(f[0][1] for f in found)),
+                      fields=(min(f[1][0] for f in found), max(f[1][1] for f in found)), lines=(first, last),
+                      region=region, task=task)
+
 def pptx_locator(page, bbox, region, task):
     return PptxLocator(page=page, lines=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region, task=task)
 
@@ -322,10 +336,12 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     s = client.s
     name = job.content
     word, deck, book = extension == ".docx", extension == ".pptx", extension in (".xlsx", ".xlsm")
+    sheet = extension in (".csv", ".tsv")
     office = word or deck or book
     core = TaskCore(job, output, client, dispatch, progress, name,
                     docx_locator if word else pptx_locator if deck else text_locator,
-                    DOCX_DERIVATION if word else PPTX_DERIVATION if deck else XLSX_DERIVATION if book else DERIVATION)
+                    DOCX_DERIVATION if word else PPTX_DERIVATION if deck else XLSX_DERIVATION if book else
+                    CSV_DERIVATION if sheet else DERIVATION)
     raw = data if isinstance(data, (bytes, bytearray)) else open(data, "rb").read()
     if office:
         from .docxdocs import read_docx
@@ -339,6 +355,10 @@ def text_job(data, job, output, client, dispatch, progress, extension):
                                      issues=[f"{name}: unreadable ({type(error).__name__}: {error})"]))
             job.state["result"] = ([], core.coverage)
             return
+    elif sheet:  # a CSV file, read as a one-sheet workbook of text cells
+        from .xlsxdocs import read_csv
+        doc = read_csv(raw)
+        core.locator = lambda page, bbox, region, task: csv_locator(doc.places, page, bbox, region, task)
     else:
         doc = parse(raw.decode("utf-8", errors="replace"), markdown=extension in (".md", ".markdown"))
     if book:  # a workbook's claims are placed by sheet and cells, known once it's read

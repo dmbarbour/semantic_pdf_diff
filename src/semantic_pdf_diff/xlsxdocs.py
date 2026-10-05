@@ -27,7 +27,10 @@ The owner (2026-10-04): "Let's do Excel next. 99% of my spreadsheets are Excel."
   regions.
 - **Not followed or read:** external links, pivot caches, macros; a chart sheet is recorded as not read.
 
-Needs openpyxl (the `office` extra).
+- **CSV files** (read_csv) are read as one-sheet workbooks of text cells, through the same regions, grids and tables,
+  each line placed by the file's lines and fields.
+
+Workbooks need openpyxl (the `office` extra); CSV files need nothing.
 """
 import datetime
 import io
@@ -114,16 +117,26 @@ def _merges(ws):
                 out[(r, c)] = bounds
     return out
 
-def regions(ws, cells, merges):
+@dataclass
+class Sheet:
+    """A sheet as the reader takes it, whatever it came from (a workbook's sheet, a CSV file): its cells' text by
+    (row, column) from 1, its merged cells, its comments ({(row, column): (author, text)}), Excel's defined tables
+    ([(top, left, bottom, right, header rows, name)]) and whether it's hidden."""
+    title: str
+    cells: dict
+    merges: dict = field(default_factory=dict)
+    comments: dict = field(default_factory=dict)
+    tables: list = field(default_factory=list)
+    hidden: bool = False
+
+def regions(sheet):
     """A sheet's regions: its defined tables; then blocks of filled (or merged-over) cells joined through shared edges
     (two tables touching only at a corner stay two), blocks whose bounds overlap merged into one (a list's sparse
     columns); a lone cell heading a wider block split off as its title."""
-    from openpyxl.utils.cell import range_boundaries
+    cells, merges = sheet.cells, sheet.merges
     found, taken = [], set()
-    for table in ws.tables.values():  # (openpyxl's items() gives each table's range, not the table)
-        left, top, right, bottom = range_boundaries(table.ref)
-        found.append(Region(ws.title, top, left, bottom, right, "table", max(1, table.headerRowCount or 0),
-                            table.displayName or table.name))
+    for top, left, bottom, right, heads, name in sheet.tables:
+        found.append(Region(sheet.title, top, left, bottom, right, "table", max(1, heads or 0), name))
         taken |= {(r, c) for r in range(top, bottom + 1) for c in range(left, right + 1)}
     occupied, boxes = (set(cells) | set(merges)) - taken, []
     while occupied:
@@ -156,7 +169,7 @@ def regions(ws, cells, merges):
             first = [c for c in range(left, right + 1) if (top, c) in cells]
             if len(first) != 1:
                 break
-            found.append(Region(ws.title, top, first[0], top, first[0], "text"))
+            found.append(Region(sheet.title, top, first[0], top, first[0], "text"))
             top += 1
             while top < bottom and not any((top, c) in cells for c in range(left, right + 1)):
                 top += 1  # rows under the title merged over, empty: skipped
@@ -165,12 +178,12 @@ def regions(ws, cells, merges):
                                                             if (pairs, c) in cells):
             pairs += 1  # narrow leading rows (a label and its value) over a wider table: pairs
         if pairs > top and any((r, c) in cells for r in range(pairs, bottom + 1) for c in range(left + 2, right + 1)):
-            found.append(Region(ws.title, top, left, pairs - 1, left + 1, "pairs"))
+            found.append(Region(sheet.title, top, left, pairs - 1, left + 1, "pairs"))
             top = pairs
         held = [c for (r, c) in set(cells) | set(merges) if top <= r <= bottom and left <= c <= right]
         left, right = min(held, default=left), max(held, default=right)  # what's left, without the split rows' width
         kind = "text" if top == bottom or left == right else "table"
-        found.append(Region(ws.title, top, left, bottom, right, kind))
+        found.append(Region(sheet.title, top, left, bottom, right, kind))
     return sorted(found, key=lambda g: (g.top, g.left))
 
 def _grid(region, cells, merges):
@@ -206,51 +219,107 @@ def _sheet_parts(package):
     return {s.get("name"): rels[s.get(R + "id")][1] for s in package.xml(book).iter(S + "sheet")
             if s.get(R + "id") in rels}
 
+class _Writer:
+    """A TextDocument written sheet by sheet: lines, each placed ({line: (sheet, cell range)}), blocks, headings,
+    notes of what isn't read (images), pictures and the sheet map."""
+
+    def __init__(self):
+        self.lines, self.blocks, self.headings, self.images, self.pictures = [], [], [], [], []
+        self.places, self.mapped = {}, []
+
+    def line(self, page, text, place):
+        self.lines.append((page, text))
+        self.places[len(self.lines)] = place
+        return len(self.lines)
+
+    def block(self, page, text, place):
+        n = self.line(page, text, place)
+        self.blocks.append(Block(page, n, n, text))
+        return n
+
+    def table(self, page, sheet, region, cells, merges, title):
+        lines, images, blocks = self.lines, self.images, self.blocks
+        grid = _grid(region, cells, merges)
+        heads = min(region.header_rows or _header_rows(grid, marked=0), len(grid))
+        row_ref = lambda r: f"{_letter(region.left)}{r}:{_letter(region.right)}{r}"
+        if not region.name and _unheaded(grid, heads):
+            region.kind = "ambiguous"
+            where = f"{sheet}!{region.ref}" if sheet else region.ref
+            images.append((page, len(lines), "sheet", f"skipped: ambiguous sheet layout ({where}): a column holds "
+                                                     "values under no header, as tables pressed together do"))
+            return
+        labels = _labels(grid, heads)
+        header_lines = [self.line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))) for r, row in grid[:heads]]
+        rows, row_lines, row_headers, aligned = [labels], [header_lines[0]], [], []
+        for r, row in grid[heads:]:
+            rows.append([c.text for c in row])
+            row_headers.append([_joined(labels[c.first:c.last + 1]) for c in row])
+            row_lines.append(self.line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))))
+            aligned.append([""] * (region.right - region.left + 1))
+            for c in row:
+                aligned[-1][c.first] = c.text
+        first = header_lines[0]
+        ruled = tablerules.grid([_letter(c) for c in range(region.left, region.right + 1)], labels, aligned,
+                                [r for r, _ in grid[heads:]], row_lines[1:], title,
+                                f"{sheet}!{region.ref}" if sheet else region.ref)
+        blocks.append(Block(page, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
+                            row_lines, row_headers, grid=ruled))
+        region.lines += list(range(first, len(lines) + 1))
+
+    def sheet(self, page, sheet, heading=True):
+        """A sheet's regions read onto a page: its name a heading (unless not), "(Hidden sheet)" if hidden; pairs as
+        "label: value" lines, text cell by cell, tables on their grid, comments after their region."""
+        cells, merges = sheet.cells, sheet.merges
+        if heading:
+            n = self.block(page, sheet.title, (sheet.title, "A1"))
+            self.headings.append((page, n, 1, sheet.title))
+        if sheet.hidden:
+            self.block(page, "(Hidden sheet)", (sheet.title, "A1"))
+        above = None  # the last text cell read, a table's title when just above it
+        for region in regions(sheet):
+            self.mapped.append(region)
+            if region.kind == "pairs":  # a label and its value: one line each
+                for r in range(region.top, region.bottom + 1):
+                    shown_ = [cells[(r, c)] for c in (region.left, region.left + 1) if (r, c) in cells]
+                    if shown_:
+                        region.lines.append(self.block(page, ": ".join(shown_), (sheet.title, f"{_letter(region.left)}"
+                                                                                 f"{r}:{_letter(region.left + 1)}{r}")))
+            elif region.kind == "text":
+                for r in range(region.top, region.bottom + 1):
+                    for c in range(region.left, region.right + 1):
+                        if (r, c) in cells:
+                            region.lines.append(self.block(page, cells[(r, c)], (sheet.title, f"{_letter(c)}{r}")))
+                            above = (r, c, cells[(r, c)])
+            else:
+                title = above[2] if above and region.top - 2 <= above[0] < region.top and \
+                    region.left <= above[1] <= region.right else ""
+                self.table(page, sheet.title, region, cells, merges, title)
+            for (r, c), (author, note) in sorted(sheet.comments.items()):
+                if region.top <= r <= region.bottom and region.left <= c <= region.right:
+                    self.block(page, f"Comment by {author or 'an unnamed author'} on {_letter(c)}{r}: "
+                                     f"{' '.join(note.split())}", (sheet.title, f"{_letter(c)}{r}"))
+
+    def document(self, pages):
+        return TextDocument(max(1, pages), self.lines, self.blocks, self.headings, self.images, self.pictures,
+                            self.places, self.mapped)
+
 def read_xlsx(data):
     """A workbook's TextDocument: sheets as pages, regions' rows and cells as lines (each placed by its sheet and
     range), each sheet's name its heading; the sheet map in .regions."""
     import openpyxl
+    from openpyxl.utils.cell import range_boundaries
     from .pptxdocs import Package
     raw = bytes(data)
     book = openpyxl.load_workbook(io.BytesIO(raw), data_only=True)
     written = openpyxl.load_workbook(io.BytesIO(raw), data_only=False)  # the formulas, for cells left uncalculated
     package = Package(raw)
     parts = _sheet_parts(package)
-    lines, blocks, headings, images, pictures, places, mapped = [], [], [], [], [], {}, []
-
-    def line(page, text, place):
-        lines.append((page, text))
-        places[len(lines)] = place
-        return len(lines)
-
-    def table(page, sheet, region, cells, merges, title):
-        grid = _grid(region, cells, merges)
-        heads = min(region.header_rows or _header_rows(grid, marked=0), len(grid))
-        row_ref = lambda r: f"{_letter(region.left)}{r}:{_letter(region.right)}{r}"
-        if not region.name and _unheaded(grid, heads):
-            region.kind = "ambiguous"
-            images.append((page, len(lines), "sheet", f"skipped: ambiguous sheet layout ({sheet}!{region.ref}): a column "
-                                                     "holds values under no header, as tables pressed together do"))
-            return
-        labels = _labels(grid, heads)
-        header_lines = [line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))) for r, row in grid[:heads]]
-        rows, row_lines, row_headers, aligned = [labels], [header_lines[0]], [], []
-        for r, row in grid[heads:]:
-            rows.append([c.text for c in row])
-            row_headers.append([_joined(labels[c.first:c.last + 1]) for c in row])
-            row_lines.append(line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))))
-            aligned.append([""] * (region.right - region.left + 1))
-            for c in row:
-                aligned[-1][c.first] = c.text
-        first = header_lines[0]
-        ruled = tablerules.grid([_letter(c) for c in range(region.left, region.right + 1)], labels, aligned,
-                                [r for r, _ in grid[heads:]], row_lines[1:], title, f"{sheet}!{region.ref}")
-        blocks.append(Block(page, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
-                            row_lines, row_headers, grid=ruled))
-        region.lines += list(range(first, len(lines) + 1))
+    out = _Writer()
+    line, blocks, images, pictures = out.line, out.blocks, out.images, out.pictures
 
     def drawings(page, sheet):
         """A sheet's charts (read from their data) and pictures (read as a Word document's), after its regions."""
+        lines = out.lines
         part = parts.get(sheet)
         drawing = package.related(part, "drawing") if part else None
         if not drawing:
@@ -292,44 +361,64 @@ def read_xlsx(data):
     for page, ws in enumerate(book.worksheets, 1):
         formulas = {key: cell.value for key, cell in written[ws.title]._cells.items()
                     if isinstance(cell.value, str) and cell.value.startswith("=")}
-        cells, merges = _filled(ws, formulas), _merges(ws)
-        n = line(page, ws.title, (ws.title, "A1"))
-        headings.append((page, n, 1, ws.title))
-        blocks.append(Block(page, n, n, ws.title))
-        if ws.sheet_state != "visible":
-            n = line(page, "(Hidden sheet)", (ws.title, "A1"))
-            blocks.append(Block(page, n, n, "(Hidden sheet)"))
-        comments = {(cell.row, cell.column): cell.comment for cell in ws._cells.values() if cell.comment}
-        above = None  # the last text cell read, a table's title when just above it
-        for region in regions(ws, cells, merges):
-            mapped.append(region)
-            if region.kind == "pairs":  # a label and its value: one line each
-                for r in range(region.top, region.bottom + 1):
-                    shown_ = [cells[(r, c)] for c in (region.left, region.left + 1) if (r, c) in cells]
-                    if shown_:
-                        text = ": ".join(shown_)
-                        m = line(page, text, (ws.title, f"{_letter(region.left)}{r}:{_letter(region.left + 1)}{r}"))
-                        blocks.append(Block(page, m, m, text))
-                        region.lines.append(m)
-            elif region.kind == "text":
-                for r in range(region.top, region.bottom + 1):
-                    for c in range(region.left, region.right + 1):
-                        if (r, c) in cells:
-                            m = line(page, cells[(r, c)], (ws.title, f"{_letter(c)}{r}"))
-                            blocks.append(Block(page, m, m, cells[(r, c)]))
-                            region.lines.append(m)
-                            above = (r, c, cells[(r, c)])
-            else:
-                title = above[2] if above and region.top - 2 <= above[0] < region.top and \
-                    region.left <= above[1] <= region.right else ""
-                table(page, ws.title, region, cells, merges, title)
-            for (r, c), note in sorted(comments.items()):
-                if region.top <= r <= region.bottom and region.left <= c <= region.right:
-                    text = (f"Comment by {note.author or 'an unnamed author'} on {_letter(c)}{r}: "
-                            f"{' '.join(note.text.split())}")
-                    m = line(page, text, (ws.title, f"{_letter(c)}{r}"))
-                    blocks.append(Block(page, m, m, text))
+        tables = []
+        for table in ws.tables.values():  # (openpyxl's items() gives each table's range, not the table)
+            left, top, right, bottom = range_boundaries(table.ref)
+            tables.append((top, left, bottom, right, table.headerRowCount, table.displayName or table.name))
+        comments = {(cell.row, cell.column): (cell.comment.author, cell.comment.text)
+                    for cell in ws._cells.values() if cell.comment}
+        out.sheet(page, Sheet(ws.title, _filled(ws, formulas), _merges(ws), comments, tables,
+                              ws.sheet_state != "visible"))
         drawings(page, ws.title)
     for sheet in book.chartsheets:
-        images.append((1, len(lines), "workbook", f"a chart sheet ({sheet.title}), not read yet"))
-    return TextDocument(max(1, len(book.worksheets)), lines, blocks, headings, images, pictures, places, mapped)
+        images.append((1, len(out.lines), "workbook", f"a chart sheet ({sheet.title}), not read yet"))
+    return out.document(len(book.worksheets))
+
+# --- CSV: a one-sheet workbook of text cells
+
+CSV_RECORDS = 1_000_000  # a backstop: records read from one file; past it, recorded as not read
+A1 = re.compile(r"^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$")
+
+def _column(letters):
+    n = 0
+    for ch in letters:
+        n = n * 26 + ord(ch) - 64
+    return n
+
+def _decode(raw):
+    """A CSV file's text: UTF-8 (a byte-order mark dropped), else Windows-1252, as spreadsheet exports are."""
+    try:
+        return raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return raw.decode("cp1252", errors="replace")
+
+def read_csv(data):
+    """A CSV (or tab-separated) file's TextDocument, read as a one-sheet workbook whose cells are its fields as
+    written: preamble lines are text, blocks parted by blank lines are tables (or label-and-value pairs), each read as
+    a workbook's are. Each line's place is the file's lines and fields it came from ({line: ((first line, last line),
+    (first field, last field))}; a quoted field may span lines). The delimiter is sniffed (comma, semicolon, tab or
+    bar)."""
+    import csv
+    text = _decode(bytes(data))
+    try:
+        dialect = csv.Sniffer().sniff(text[:65536], delimiters=",;\t|")
+    except csv.Error:
+        dialect = csv.excel
+    reader = csv.reader(io.StringIO(text, newline=""), dialect)
+    cells, spans, before, out = {}, {}, 0, _Writer()
+    for r, record in enumerate(reader, 1):
+        if r > CSV_RECORDS:
+            out.images.append((1, 0, "sheet", f"records past {CSV_RECORDS:,} not read (a backstop)"))
+            break
+        spans[r] = (before + 1, reader.line_num)
+        before = reader.line_num
+        for c, field_ in enumerate(record, 1):
+            shown_ = " ".join(field_.split())
+            if shown_:
+                cells[(r, c)] = shown_
+    out.sheet(1, Sheet("", cells), heading=False)
+    for n, (_, ref) in out.places.items():
+        m = A1.match(ref)
+        first, last = (m.group(1), int(m.group(2))), (m.group(3) or m.group(1), int(m.group(4) or m.group(2)))
+        out.places[n] = ((spans[first[1]][0], spans[last[1]][1]), (_column(first[0]), _column(last[0])))
+    return out.document(1)
