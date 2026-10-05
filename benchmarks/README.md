@@ -19,6 +19,24 @@ Nobody is ground truth here. Each rater (people, model judges, exact keys, mecha
 | `runs/` | no | Stores replayed or recorded by the scripts above |
 | `ledger.jsonl`, `history.jsonl` | no | Every model call's reported cost (the budget caps read it), and the rounds' figures; spend by month is in the rounds record |
 
+## What's measured
+
+From the closed [evaluation benchmarks plan](../docs/plans/evaluation-benchmarks-2026-09-23.md): what extraction, retrieval and comparison quality mean here, and which rater gives each ([decision 0018](../docs/decisions/0018-several-raters-none-ground-truth.md): none is ground truth).
+
+| Measure | Question | Rated by |
+|---|---|---|
+| Claim recall | Of the claims a careful reader would extract, how many did we get? | controlled keys (exactly, on their documents); judges and people (relative, on real pages) |
+| Claim precision | Of the claims extracted, how many are real and correctly stated? | controlled keys (right, loose, misbound, misread, wrong unit); review flags |
+| Hallucination rate | How many claims have no support in the source? | controlled keys (a value printed nowhere); quote checks |
+| Value accuracy | Is the value right, or within tolerance for approximate readings (a bar read against its axis)? Is the unit right? | controlled keys (inexact, wrong unit); review flags |
+| Qualifier accuracy | Are conditions, basis and stated uncertainty kept, or silently dropped? | controlled keys (conditions kept); review flags |
+| Provenance accuracy | Does the claim point to the right file, page, cell or region, and is its quote verified? | controlled keys (each fact's place); quote checks; review flags |
+| Coverage honesty | When claims were missed, did the task say it was partial? | coverage rows against the keys; the label check on pictures |
+| Retrieval recall@k | When each claim keeps its top k candidates, are the pairs worth comparing among them? | pair labels (the [retrieval recall](../docs/plans/retrieval-recall-2026-09-23.md) plan's benchmark, not yet built) |
+| Comparison accuracy | Is each reported relation (equivalent, different, ...) right, and each difference named by the right kind? | controlled revision pairs (exactly); real pairs' raters (a text diff, change logs) |
+
+Figures are reported per rater, per responder, per claim kind (text, table, chart, diagram) and per format, since the failure modes differ.
+
 ## Reviewing a batch (for people)
 
 Each batch has two pages. Do them in this order:

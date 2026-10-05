@@ -98,6 +98,10 @@ Revisions of one design are commensurable by default. They use claim-level compa
 5. **Matrix report** with source picking and pinning; two-way proposals switch over from claim-level comparison here.
 6. **Ordered revision series** (claim-level, content-difference first).
 
+*From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):*
+- **Claim-to-criterion labels:** "does this claim address this criterion?", measuring the second retrieval task, on the retrieval benchmark's review page.
+- **Reviewer-decision variants:** deliberately good and bad sets of reviewer decisions (aliases, criteria, forced table strategies) as export files, to measure how much they move results and to check that a bad set degrades them visibly rather than silently.
+
 ## Decisions (2026-09-24)
 
 - **Context:** the gemma-4 deployment serves 262,144 tokens. Criterion-level requests hold all positions with generous context; splitting into groups is a rare fallback.

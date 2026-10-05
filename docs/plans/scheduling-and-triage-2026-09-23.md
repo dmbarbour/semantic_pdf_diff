@@ -132,6 +132,11 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 7. **Claim quality signals** with sorting and filtering in reports.
 8. **Reviewer feedback:** review controls in reports and `import-reviews` (the first capture path for annotations), feeding calibration.
 
+*From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):* situating's quality, measured.
+- **Figure–reference links:** which prose cites which figure, labelled on curated pages; link precision and recall, and figure detection recall (reports' unresolved-reference counts are a label-free proxy).
+- **"About" statements:** rated for usefulness and correctness (what the section or figure is about, without values); and whether "about" embeddings align sections across sources better than headings alone.
+- Synthetic diagrams with known structure are built: the controlled corpus's schematics.
+
 ## Open questions
 
 None currently.

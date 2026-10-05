@@ -1,6 +1,6 @@
 # Evaluation benchmarks: extraction and retrieval
 
-- **Status:** Active (2026-09-25): review tooling and the first batch done. Claude will build most of this with you. Your main job is checking labels. Embedding models run locally (see [retrieval-recall](retrieval-recall-2026-09-23.md)), so this no longer waits on in-house access.
+- **Status:** Completed (2026-10-04), overtaken by later plans. The owner: "Close evaluation benchmarks too, same treatment." Decisions in force: [0018](../decisions/0018-several-raters-none-ground-truth.md) and [0019](../decisions/0019-offline-review-pages.md) ([0017](../decisions/0017-public-corpus-labels-in-the-repo.md), superseded); the measures: [benchmarks README](../../benchmarks/README.md#whats-measured). Unfinished items moved: see the [plans index](README.md) (Completed).
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md) for responder tables (Claude, weak local VLM, in-house gemma-4); easier once [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) produces evidence stores to sample from.
 - **Informs:** [retrieval-recall](retrieval-recall-2026-09-23.md), prompt and extraction work in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) and [multi-format-adapters](multi-format-adapters-2026-09-23.md), and [n-way-comparison](n-way-comparison-2026-09-23.md)
 

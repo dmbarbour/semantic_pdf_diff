@@ -64,7 +64,7 @@ Every numeric comparison records the parsed quantities, the conversions applied,
 
 - **Table-driven unit tests** for every rule above, including the case pitfalls fixed in 0.2.0.
 - **A corpus of real unit strings** collected from sample extractions (once replay tables exist), to measure how many parse, convert or abstain, and why.
-- **Synthetic documents** from [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md) with known quantities in mixed units.
+- **Synthetic documents** with known quantities in mixed units: a knob of the [controlled documents](controlled-documents-2026-10-01.md), which took over the closed evaluation benchmarks plan's synthetic documents.
 
 ## Milestones
 

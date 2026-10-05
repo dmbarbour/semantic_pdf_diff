@@ -103,9 +103,9 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 
 1. Adapter interface and intermediate units; refactor the PDF path to use it. Include `.txt` / `.md` here as the simplest adapters: they are nearly free and exercise the interface (and the `ietf-quic-transport` samples).
 2. `.docx`.
-3. `.pptx`, including chart XML.
+3. `.pptx`, including chart XML. *From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):* the controlled corpus written as slides too, scored by the same keys (its representations, as Markdown and Word are).
 4. External converter interface. *Tentative, very low priority (the owner, 2026-10-04, above):* LibreOffice an optional extra dependency at most, never assumed; legacy `.doc`/`.ppt`/`.xls` are recorded as unsupported meanwhile.
-5. `.csv` / `.xlsx`: table region detection and sheet maps, then model-guided table interpretation.
+5. `.csv` / `.xlsx`: table region detection and sheet maps, then model-guided table interpretation. *From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):* extraction scored against the synthetic spreadsheets' answer keys (`scripts/make_synthetic_samples.py`), with claim matching and adjudication of the leftovers.
 6. Images.
 
 ## Milestone 1 in detail (2026-10-03), for the owner's review

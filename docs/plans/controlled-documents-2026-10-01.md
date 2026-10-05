@@ -246,6 +246,7 @@ Each row is a situation met in this project's documents, with where it was recor
 4. **Revision pairs and comparison scoring.**
 5. **Into rounds:** the controlled stratum reported beside judged win rates, exactly scored.
 6. **New failures become knobs:** each round's review and post-mortem adds the situations it finds.
+7. **Measured accuracy in the docs.** *From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):* measured accuracy figures in the user docs ([limitations](../limitations.md) now says only that extraction "has been measured with one real model ... not on labeled representative proposals"), the controlled scores beside judged ones, each with what it rests on.
 
 ## Progress
 
