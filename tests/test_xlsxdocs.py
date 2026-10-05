@@ -100,7 +100,8 @@ class Reading(unittest.TestCase):
         self.assertEqual([s.heading_path for s in sections], [["Summary"], ["Polar"], ["Rev B (superseded)"]])
 
 class RulesModel:
-    """The text tests' model, answering a table's rules query with the given rules (keyed by the table's place)."""
+    """The text tests' model, answering a table's rules query with the given rules (keyed by the table's place), or
+    with each row read by itself."""
     def __init__(self, answers, **settings):
         import sys
         from pathlib import Path
@@ -118,7 +119,7 @@ class RulesModel:
             return self.base.ask(prompt, schema, images, key)
         self.asked.append(prompt)
         place = prompt.split("TABLE: ", 1)[1].split(";", 1)[0].split("\n", 1)[0]
-        return Rules.model_validate(self.answers[place])
+        return Rules.model_validate(self.answers.get(place, {"reading": "rows"}))
 
 REQUIREMENTS = {"reading": "rules", "subject": "requirements",
                 "claims": [{"entity": "{A}", "attribute": "{C.header}", "value": "{C}", "number": True}],
@@ -138,33 +139,36 @@ class Rules(unittest.TestCase):
         evidence, coverage = job.state["result"]
         return evidence, coverage, model
 
-    def test_a_long_table_is_read_by_rules_in_one_query(self):
+    def test_every_table_is_asked_how_its_read(self):
         evidence, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS})
-        self.assertEqual(len(model.asked), 1)
-        self.assertIn("SIZE: 60 rows, 3 columns", model.asked[0])
+        self.assertEqual([q.split("TABLE: ", 1)[1].split(";")[0].split("\n")[0] for q in model.asked],
+                         ["Summary!A4:D8", "Polar!A3:C5", "Polar!A14:C74", "Rev B (superseded)!A1:B2"])
+        long = model.asked[2]
+        self.assertIn("SIZE: 60 rows, 3 columns", long)
+        self.assertIn("CONTEXT (for reference only: do not extract claims from it):\nAbove the table: ...", long)
+        self.assertIn("Within: Polar", long)  # the context a row of it would be given
         ruled = [e for e in evidence if e.derivation[-1].step == "table-rules"]
         self.assertEqual(len(ruled), 60)
         first = next(e for e in ruled if e.entity == "R-001")
         self.assertEqual((first.attribute, first.value, first.quote, first.quote_verified), ("Value", "3", "R-001 | 3", True))
         self.assertEqual((first.locator.sheet, first.locator.cells), ("Polar", "A15:C15"))
-        row, = [r for r in coverage if r["task"].startswith("rules:")]
+        row = next(r for r in coverage if r["task"] == "rules:p2:1")
         self.assertEqual((row["status"], row["claims"]), ("complete", 60))
+        self.assertEqual(sum(r["task"].startswith("table:p1:0:") for r in coverage), 3)  # "rows": each by itself
         self.assertFalse([r for r in coverage if r["task"].startswith("table:p2:1:")])  # no row asked by itself
 
     def test_rules_that_miss_their_examples_are_asked_again_then_rows_read(self):
         wrong = {**REQUIREMENTS, "examples": [{"row": "15", "claims": [{"value": "4"}]}]}
         evidence, coverage, model = self.extract({"Polar!A14:C74": wrong})
-        self.assertEqual(len(model.asked), 2)
-        self.assertIn("ITS PROBLEMS:\n- row 15: the templates give 3, not 4", model.asked[1])
+        self.assertEqual(len(model.asked), 5)
+        self.assertIn("ITS PROBLEMS:\n- row 15: the templates give 3, not 4", model.asked[3])
         tasks = [r["task"] for r in coverage]
         self.assertIn("rules:p2:1:again", tasks)
         self.assertEqual(sum(t.startswith("table:p2:1:") for t in tasks), 60)  # every row read by itself
 
-    def test_every_table_by_rules_or_none(self):
-        summary = {"reading": "rows"}
-        _, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS, "Summary!A4:D8": summary,
-                                           "Polar!A3:C5": summary, "Rev B (superseded)!A1:B2": summary}, table_rules=0)
-        self.assertEqual(len(model.asked), 4)
+    def test_tables_asked_from_a_size_or_none(self):
+        _, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS}, table_rules=50)
+        self.assertEqual(len(model.asked), 1)  # only the table of more than 50 rows
         _, coverage, model = self.extract({}, table_rules=None)
         self.assertEqual(model.asked, [])
         self.assertEqual(sum(r["task"].startswith("table:p2:1:") for r in coverage), 60)

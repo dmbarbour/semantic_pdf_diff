@@ -713,6 +713,41 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
     - **The RAN1 list's 30,177 claims** include bookkeeping (contact IDs, reservation times). The model chose them over the list summary we suggested as an alternative. Whether such columns should be left out is a question for a round.
     - **The IEA polars' header says "alpha [rad]"** over values from −180 to 180: degrees. Claims carry the header's unit, as written.
     - **Full-precision values:** the IEA cells hold 15 significant digits in General format ("3.78071922309736 m"), read as stored. Excel would show fewer in a narrow column.
+- **Every Excel table asked how it's read (2026-10-05).** The owner, on step 5's 50-row cut-off: "I was under the impression we'd also ask how to translate rows to claims even for short tables; is this just adding the statistics option for longer ones, because stats might be the more useful view even for tables of 30 items, it's difficult to set a hard boundary." And, going ahead: "I'm sure that we can also extract some levers to improve table handling experimentally. But let's see where we're at with our original vision of this."
+  - **The cut-off was Claude's,** from step 4's plan (a row-by-row baseline the rules must beat), not the owner's decision 1, which had size as an input to our opinion.
+  - **Changed:**
+    - `table_rules` 0 by default: every Excel table is asked; none reads every table row by row, the baseline (`scripts/controlled.py run --rows`, replacing `--rules`)
+    - **our opinion without a cut-off:** it names the table's shape (a series, a log, a set of points, a list) and weighs a summary by size, graded: an aside under 20 rows ("with 10 rows a summary would save little"), one of two readings from 20, the likelier from 100
+      - prose decides the reading where it's a third of the table's text, else it's an aside; a list needs records mostly of text
+    - **the context a row would be given** (the text above the table, its headings) is shown with the table, and the prompt says a condition it names for every row belongs in the templates
+    - reader version `xlsx/3`
+  - **The controlled workbooks,** every table asked against every row by itself:
+
+    | | Every table asked | Row by row |
+    |---|---|---|
+    | Queries for tables | 44 (all read by rules on the first answer) and 10 rows read by themselves | 288 |
+    | Facts read right, of 1,034 | 943 | 959 |
+    | Traps study, conditions kept (2 runs) | 12 of 12 | 4 of 12 |
+    | Treatment plant (4 runs) | the same facts, without 2 claims outside the key (n/a cells) | |
+    | Cooling energy study (2 runs) | 14 of 21 right, 5 misbound | 19 of 21 |
+    | End use study | 27 of 33 right, 6 loose | 33 of 33 |
+    | Revision pairs (14) | as row by row but the energy study's: 4 of 5 changes, 12 of 16 unchanged confirmed | every change found |
+
+    - **The misbinding:** in the charts' data tables, the rules made each month the entity and each series ("Option 1, chilled beams") the attribute. Row by row, the quantity comes from the caption ("cooling energy"), the option is the entity and the month a condition. The rules query has none of the extraction instructions' guidance on alternatives, entities and conditions.
+  - **The samples** ($0.04):
+    - **IEA 15 MW:** 43 tables, 24 by rules and 19 summarised, none failing twice; 68 queries ($0.04) against 510 ($0.29) when the short tables were read row by row. With size graded, the model now summarises mid-sized distributions it read by rules before: blade geometry (60 rows), structural properties (25), tower (40), rotor performance (50).
+    - **The synthetic workbook's short tables, by eye against its key:**
+      - design basis: a claim a row; its uncalculated formula a claim valued "[formula =C6+C7, not calculated]"
+      - pump schedule: right, units from the headers, with a Duty or Standby claim a row beside the key's 3
+      - commissioning results: the value and ± columns made two claims ("measured value", "measured tolerance"), where the key has one composite
+      - the superseded sheet: entity and attribute swapped ("Design flow | Parameter | 110 L/s"), marked "Rev B (superseded)"
+      - every design basis row conditioned on the document's revision line
+    - **RAN1 document list:** a list summary (69 claims) rather than 30,177 claims by rules over every column: prose is now an aside where it's a small part of the text
+  - **Candidate levers** (the owner: "extract some levers to improve table handling experimentally"), in the [lever index](../reviews/levers.md)'s ideas:
+    - the extraction instructions' guidance on entities, conditions and alternatives in the rules query
+    - an uncertainty template for value and ± columns
+    - our opinion's grading, its wording, or none
+    - bookkeeping columns, the examples check, uncalculated formulas
 
 ## Open questions
 

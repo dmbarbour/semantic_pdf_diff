@@ -1711,11 +1711,12 @@
    "facts": 33,
    "found": 33,
    "recall": 1.0,
-   "found_right": 33,
+   "found_right": 27,
    "missed": [],
    "claims": 33,
    "outcomes": {
-    "right": 33
+    "loose": 6,
+    "right": 27
    },
    "conditions_kept": "33/33",
    "recall_by_form": {
@@ -1728,7 +1729,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 30
+     "loose": 6,
+     "right": 24
     },
     "text": {
      "right": 3
@@ -2131,28 +2133,36 @@
   },
   "lcc-energy-s1-clean-revised.xlsx": {
    "facts": 21,
-   "found": 21,
-   "recall": 1.0,
-   "found_right": 19,
-   "missed": [],
+   "found": 16,
+   "recall": 0.7619,
+   "found_right": 14,
+   "missed": [
+    "zone.concourse",
+    "zone.exhibit",
+    "zone.kitchens",
+    "zone.loading",
+    "zone.meeting"
+   ],
    "claims": 23,
    "outcomes": {
     "loose": 2,
-    "right": 19,
+    "misbound": 5,
+    "right": 14,
     "text": 2
    },
-   "conditions_kept": "19/19",
+   "conditions_kept": "14/14",
    "recall_by_form": {
-    "xlsx-chart": 1.0,
+    "xlsx-chart": 0.7059,
     "xlsx-prose": 1.0
    },
    "by_reader": {
-    "table": 0.8095,
+    "table": 0.5714,
     "text": 0.1905
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 17
+     "misbound": 5,
+     "right": 12
     },
     "text": {
      "loose": 2,
@@ -2161,7 +2171,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "17/17",
+    "table": "12/12",
     "text": "2/2"
    }
   },
@@ -2267,28 +2277,36 @@
   },
   "lcc-energy-s1-clean.xlsx": {
    "facts": 21,
-   "found": 21,
-   "recall": 1.0,
-   "found_right": 19,
-   "missed": [],
+   "found": 16,
+   "recall": 0.7619,
+   "found_right": 14,
+   "missed": [
+    "zone.concourse",
+    "zone.exhibit",
+    "zone.kitchens",
+    "zone.loading",
+    "zone.meeting"
+   ],
    "claims": 23,
    "outcomes": {
     "loose": 2,
-    "right": 19,
+    "misbound": 5,
+    "right": 14,
     "text": 2
    },
-   "conditions_kept": "19/19",
+   "conditions_kept": "14/14",
    "recall_by_form": {
-    "xlsx-chart": 1.0,
+    "xlsx-chart": 0.7059,
     "xlsx-prose": 1.0
    },
    "by_reader": {
-    "table": 0.8095,
+    "table": 0.5714,
     "text": 0.1905
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 17
+     "misbound": 5,
+     "right": 12
     },
     "text": {
      "loose": 2,
@@ -2297,7 +2315,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "17/17",
+    "table": "12/12",
     "text": "2/2"
    }
   },
@@ -3536,7 +3554,7 @@
    "outcomes": {
     "right": 23
    },
-   "conditions_kept": "4/12",
+   "conditions_kept": "12/12",
    "recall_by_form": {
     "xlsx-prose": 1.0,
     "xlsx-table": 1.0
@@ -3554,7 +3572,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "0/8",
+    "table": "8/8",
     "text": "4/4"
    }
   },
@@ -3666,7 +3684,7 @@
    "outcomes": {
     "right": 23
    },
-   "conditions_kept": "4/12",
+   "conditions_kept": "12/12",
    "recall_by_form": {
     "xlsx-prose": 1.0,
     "xlsx-table": 1.0
@@ -3684,7 +3702,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "0/8",
+    "table": "8/8",
     "text": "4/4"
    }
   },
@@ -5419,10 +5437,9 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 35,
+   "claims": 33,
    "outcomes": {
-    "right": 33,
-    "text": 2
+    "right": 33
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -5435,8 +5452,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13,
-     "text": 2
+     "right": 13
     },
     "text": {
      "right": 20
@@ -5663,10 +5679,9 @@
    "recall": 1.0,
    "found_right": 35,
    "missed": [],
-   "claims": 37,
+   "claims": 35,
    "outcomes": {
-    "right": 35,
-    "text": 2
+    "right": 35
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -5679,8 +5694,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 16,
-     "text": 2
+     "right": 16
     },
     "text": {
      "right": 19
@@ -5839,10 +5853,9 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 35,
+   "claims": 33,
    "outcomes": {
-    "right": 33,
-    "text": 2
+    "right": 33
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -5855,8 +5868,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13,
-     "text": 2
+     "right": 13
     },
     "text": {
      "right": 20
@@ -6045,10 +6057,9 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 35,
+   "claims": 33,
    "outcomes": {
-    "right": 33,
-    "text": 2
+    "right": 33
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -6061,8 +6072,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13,
-     "text": 2
+     "right": 13
     },
     "text": {
      "right": 20
@@ -8792,11 +8802,12 @@
    "facts": 33,
    "found": 33,
    "recall": 1.0,
-   "found_right": 33,
+   "found_right": 27,
    "missed": [],
    "claims": 33,
    "outcomes": {
-    "right": 33
+    "loose": 6,
+    "right": 27
    },
    "conditions_kept": "33/33",
    "recall_by_form": {
@@ -8809,7 +8820,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 30
+     "loose": 6,
+     "right": 24
     },
     "text": {
      "right": 3
@@ -9212,28 +9224,36 @@
   },
   "lcc-energy-s1-clean-revised.xlsx": {
    "facts": 21,
-   "found": 21,
-   "recall": 1.0,
-   "found_right": 19,
-   "missed": [],
+   "found": 16,
+   "recall": 0.7619,
+   "found_right": 14,
+   "missed": [
+    "zone.concourse",
+    "zone.exhibit",
+    "zone.kitchens",
+    "zone.loading",
+    "zone.meeting"
+   ],
    "claims": 23,
    "outcomes": {
     "loose": 2,
-    "right": 19,
+    "misbound": 5,
+    "right": 14,
     "text": 2
    },
-   "conditions_kept": "19/19",
+   "conditions_kept": "14/14",
    "recall_by_form": {
-    "xlsx-chart": 1.0,
+    "xlsx-chart": 0.7059,
     "xlsx-prose": 1.0
    },
    "by_reader": {
-    "table": 0.8095,
+    "table": 0.5714,
     "text": 0.1905
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 17
+     "misbound": 5,
+     "right": 12
     },
     "text": {
      "loose": 2,
@@ -9242,7 +9262,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "17/17",
+    "table": "12/12",
     "text": "2/2"
    }
   },
@@ -9348,28 +9368,36 @@
   },
   "lcc-energy-s1-clean.xlsx": {
    "facts": 21,
-   "found": 21,
-   "recall": 1.0,
-   "found_right": 19,
-   "missed": [],
+   "found": 16,
+   "recall": 0.7619,
+   "found_right": 14,
+   "missed": [
+    "zone.concourse",
+    "zone.exhibit",
+    "zone.kitchens",
+    "zone.loading",
+    "zone.meeting"
+   ],
    "claims": 23,
    "outcomes": {
     "loose": 2,
-    "right": 19,
+    "misbound": 5,
+    "right": 14,
     "text": 2
    },
-   "conditions_kept": "19/19",
+   "conditions_kept": "14/14",
    "recall_by_form": {
-    "xlsx-chart": 1.0,
+    "xlsx-chart": 0.7059,
     "xlsx-prose": 1.0
    },
    "by_reader": {
-    "table": 0.8095,
+    "table": 0.5714,
     "text": 0.1905
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 17
+     "misbound": 5,
+     "right": 12
     },
     "text": {
      "loose": 2,
@@ -9378,7 +9406,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "17/17",
+    "table": "12/12",
     "text": "2/2"
    }
   },
@@ -10617,7 +10645,7 @@
    "outcomes": {
     "right": 23
    },
-   "conditions_kept": "4/12",
+   "conditions_kept": "12/12",
    "recall_by_form": {
     "xlsx-prose": 1.0,
     "xlsx-table": 1.0
@@ -10635,7 +10663,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "0/8",
+    "table": "8/8",
     "text": "4/4"
    }
   },
@@ -10747,7 +10775,7 @@
    "outcomes": {
     "right": 23
    },
-   "conditions_kept": "4/12",
+   "conditions_kept": "12/12",
    "recall_by_form": {
     "xlsx-prose": 1.0,
     "xlsx-table": 1.0
@@ -10765,7 +10793,7 @@
     }
    },
    "conditions_by_reader": {
-    "table": "0/8",
+    "table": "8/8",
     "text": "4/4"
    }
   },
@@ -12500,10 +12528,9 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 35,
+   "claims": 33,
    "outcomes": {
-    "right": 33,
-    "text": 2
+    "right": 33
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -12516,8 +12543,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13,
-     "text": 2
+     "right": 13
     },
     "text": {
      "right": 20
@@ -12744,10 +12770,9 @@
    "recall": 1.0,
    "found_right": 35,
    "missed": [],
-   "claims": 37,
+   "claims": 35,
    "outcomes": {
-    "right": 35,
-    "text": 2
+    "right": 35
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -12760,8 +12785,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 16,
-     "text": 2
+     "right": 16
     },
     "text": {
      "right": 19
@@ -12920,10 +12944,9 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 35,
+   "claims": 33,
    "outcomes": {
-    "right": 33,
-    "text": 2
+    "right": 33
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -12936,8 +12959,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13,
-     "text": 2
+     "right": 13
     },
     "text": {
      "right": 20
@@ -13126,10 +13148,9 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 35,
+   "claims": 33,
    "outcomes": {
-    "right": 33,
-    "text": 2
+    "right": 33
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -13142,8 +13163,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13,
-     "text": 2
+     "right": 13
     },
     "text": {
      "right": 20
@@ -14161,7 +14181,7 @@
    }
   }
  },
- "recorded-rules": {
+ "recorded-rows": {
   "attach-s1-clean-revised.xlsx": {
    "facts": 2,
    "found": 2,
@@ -14770,9 +14790,10 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 33,
+   "claims": 35,
    "outcomes": {
-    "right": 33
+    "right": 33,
+    "text": 2
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -14785,7 +14806,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13
+     "right": 13,
+     "text": 2
     },
     "text": {
      "right": 20
@@ -14802,9 +14824,10 @@
    "recall": 1.0,
    "found_right": 35,
    "missed": [],
-   "claims": 35,
+   "claims": 37,
    "outcomes": {
-    "right": 35
+    "right": 35,
+    "text": 2
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -14817,7 +14840,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 16
+     "right": 16,
+     "text": 2
     },
     "text": {
      "right": 19
@@ -14834,9 +14858,10 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 33,
+   "claims": 35,
    "outcomes": {
-    "right": 33
+    "right": 33,
+    "text": 2
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -14849,7 +14874,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13
+     "right": 13,
+     "text": 2
     },
     "text": {
      "right": 20
@@ -14866,9 +14892,10 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 33,
+   "claims": 35,
    "outcomes": {
-    "right": 33
+    "right": 33,
+    "text": 2
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -14881,7 +14908,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13
+     "right": 13,
+     "text": 2
     },
     "text": {
      "right": 20
@@ -15023,7 +15051,7 @@
    }
   }
  },
- "replay-rules": {
+ "replay-rows": {
   "attach-s1-clean-revised.xlsx": {
    "facts": 2,
    "found": 2,
@@ -15632,9 +15660,10 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 33,
+   "claims": 35,
    "outcomes": {
-    "right": 33
+    "right": 33,
+    "text": 2
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -15647,7 +15676,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13
+     "right": 13,
+     "text": 2
     },
     "text": {
      "right": 20
@@ -15664,9 +15694,10 @@
    "recall": 1.0,
    "found_right": 35,
    "missed": [],
-   "claims": 35,
+   "claims": 37,
    "outcomes": {
-    "right": 35
+    "right": 35,
+    "text": 2
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -15679,7 +15710,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 16
+     "right": 16,
+     "text": 2
     },
     "text": {
      "right": 19
@@ -15696,9 +15728,10 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 33,
+   "claims": 35,
    "outcomes": {
-    "right": 33
+    "right": 33,
+    "text": 2
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -15711,7 +15744,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13
+     "right": 13,
+     "text": 2
     },
     "text": {
      "right": 20
@@ -15728,9 +15762,10 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 33,
+   "claims": 35,
    "outcomes": {
-    "right": 33
+    "right": 33,
+    "text": 2
    },
    "conditions_kept": "11/11",
    "recall_by_form": {
@@ -15743,7 +15778,8 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 13
+     "right": 13,
+     "text": 2
     },
     "text": {
      "right": 20

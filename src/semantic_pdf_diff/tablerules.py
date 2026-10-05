@@ -6,11 +6,12 @@ rows, report number of claims and our own heuristic opinion (summary vs. point p
 analysis of rows (whether they're mostly text, numbers, etc..), then ask the model how to handle it, i.e. whether how
 to produce claims from rows or how to summarize things within a few known templates."
 
-- **What the model is shown** (question): the table's place and title; each column's header and a mechanical
-  analysis of its cells (analyse: numbers, dates, text and empty cells counted, distinct values, the range, an order
-  and an even step, long text); sample rows (the first, some from the middle and the end, and rows unlike the rest);
-  the table's size and the claims a point per value cell would give; and our heuristic opinion (opinion), labelled a
-  guess.
+- **What the model is shown** (question): the table's place and title, and the context a row would be given (the
+  text above the table, its headings); each column's header and a mechanical analysis of its cells (analyse:
+  numbers, dates, text and empty cells counted, distinct values, the range, an order and an even step, prose);
+  sample rows (the first, some from the middle and the end, and rows unlike the rest); the table's size and the
+  claims a point per value cell would give; and our heuristic opinion (opinion), labelled a guess, a summary weighed
+  by size without a cut-off.
 - **What it answers** (Rules), one reading:
   - rules: the claims a row gives, as templates of its cells, applied to every row mechanically (row_claims)
   - rows: each row read by itself, as a table's rows are without rules
@@ -37,7 +38,7 @@ SAMPLE_FIRST, SAMPLE_MIDDLE, SAMPLE_LAST, SAMPLE_ODD = 5, 3, 2, 3  # the sample 
 SHOWN_CELL = 120    # characters of a sample cell shown
 LONG_TEXT = 60      # a column of text averaging this many characters is prose
 SENTENCE = 6        # or this many words: sentences (requirements, titles), whose claims are in their words
-SUMMARY_ROWS = 100  # our opinion weighs a summary from this many rows
+FEW_ROWS, MANY_ROWS = 20, 100  # our opinion of a summary: graded, weak under FEW_ROWS, strong from MANY_ROWS
 CATEGORIES = 12     # a category's values counted one by one; the rest counted together
 RETRY_SHARE = 0.2   # rules failing more of the rows than this are asked for again
 CONFIDENCE = 0.9    # a claim made by rules: as sure as the rules
@@ -55,15 +56,17 @@ reading:
   every row mechanically. Placeholders: {B} the row's cell in column B; {B.header} column B's header; {B.name} the
   header without its unit; {B.unit} the unit in the header's brackets ("Flow (L/s)" gives L/s); {B.cell_name} and
   {B.cell_unit} split the row's own cell the same way (a row label "Capital cost ($M)" gives Capital cost and $M);
-  {section} the section row above the row; {title} the table's title; {subject} your subject. A template with "columns": "C:F" is applied to
-  each of those columns in turn, {*} standing for the column's cell ({*.header}, {*.name} and {*.unit} likewise). Set
-  "number": true when the value must be a number: a row whose cell isn't one is read by itself instead. An empty
-  value, or n/a, gives no claim. A value is a cell's own value (a number, a name, a short code), never a sentence. Write out
-  the claims two or three of the rows shown give (no placeholders) as examples: they check the templates.
+  {section} the section row above the row; {title} the table's title; {subject} your subject. A template with
+  "columns": "C:F" is applied to each of those columns in turn, {*} standing for the column's cell ({*.header},
+  {*.name} and {*.unit} likewise). Set "number": true when the value must be a number: a row whose cell isn't one is
+  read by itself instead. An empty value, or n/a, gives no claim. A value is a cell's own value (a number, a name, a
+  short code), never a sentence. A condition the text around the table names for every row (a load case, a date,
+  a state) belongs in the templates' conditions. Write out the claims two or three of the rows shown give (no
+  placeholders) as examples: they check the templates.
 - "rows": the cells need reading: sentences (a requirement, a note, a description: their claims are in their words),
   several values in one cell, rows unlike each other. Each row is read by itself.
-- "summary": the rows are many samples of the same few quantities, and what matters is their overall shape, not
-  each row. Name a template and its columns; its statistics are computed from every row:
+- "summary": the rows are samples of the same few quantities, and what matters is their overall shape, not each
+  row. Name a template and its columns; its statistics are computed from every row:
   - "series": quantities against an input (a polar, a curve, a sweep): "input" the input's column, "quantities"
     theirs, "points" a few input values (as shown) that matter on their own, such as zero or a design point, at
     which each quantity is reported too (none if none does). Gives the input's range and step, and each quantity's
@@ -247,7 +250,9 @@ def point_claims(g, cols):
     return sum(c.filled for c in cols[1:]) if len(cols) > 1 else sum(c.filled for c in cols)
 
 def opinion(g, cols):
-    """Our heuristic opinion of how the table should be read, from its size and the analysis."""
+    """Our heuristic opinion of how the table should be read, from its size and the analysis. A summary is weighed
+    by size, graded rather than cut off (the owner, 2026-10-05: "stats might be the more useful view even for tables
+    of 30 items, it's difficult to set a hard boundary")."""
     n, claims = len(g.rows), point_claims(g, cols)
     filled = sum(c.filled for c in cols) or 1
     measured = sum(c.numbers + c.dates for c in cols)
@@ -255,25 +260,35 @@ def opinion(g, cols):
     inputs = [c for c in cols if c.order]
     categories = [c for c in cols if c.texts and 1 < c.distinct <= CATEGORIES and c.distinct < c.filled]
     per = f"{claims / n:.1f}".rstrip("0").rstrip(".") if n else "0"
-    if n >= SUMMARY_ROWS and inputs and measured >= 0.8 * filled:
-        x = inputs[0]
-        name = "log" if x.dates else "series"
-        return (f"a {name}: {n} rows, mostly numbers, column {x.letter} {x.order}"
-                + (f" {'mostly ' if x.mostly else ''}in steps of {x.step}" if x.step else "")
-                + f"; a summary ({name}) may serve better than {claims} claims")
-    if n >= SUMMARY_ROWS and measured >= 0.8 * filled:
-        return (f"points: {n} rows, mostly numbers, no column in order (a shape's coordinates, a cloud of samples?); "
-                f"a summary (series, over the column that best serves as the input) may serve better than {claims} "
-                "claims, unless each row is a fact of its own")
     by = ", ".join(c.letter for c in categories)
-    if prose:
+    text = sum(c.length * c.filled for c in cols) or 1  # prose decides the reading where it's much of the table's text
+    worded = sum(c.length * c.filled for c in prose) / text
+    if prose and worded >= 0.3:
         return (f"rows of prose (column {prose[0].letter}: {round(prose[0].words)} words on average): each row read by "
                 "itself" + (f"; or, if the records matter only together, a summary (list) counting them by column {by}"
-                            if n >= SUMMARY_ROWS and categories else ""))
-    if n >= SUMMARY_ROWS and categories:
-        return (f"a list: {n} records; a summary (list) counting them by column {by} may serve, unless each record "
-                "is a fact of its own")
-    return f"claims from rows: about {claims} claims, {per} a row, by rules"
+                            if n >= FEW_ROWS and categories else ""))
+    aside = (f"; column {prose[0].letter} holds prose ({round(prose[0].words)} words on average): rows read by "
+             "themselves if its words hold claims") if prose else ""
+    shape = None
+    if inputs and measured >= 0.8 * filled:
+        x = inputs[0]
+        shape = ("log" if x.dates else "series", "log" if x.dates else "series",
+                 f"mostly numbers, column {x.letter} {x.order}"
+                 + (f" {'mostly ' if x.mostly else ''}in steps of {x.step}" if x.step else ""))
+    elif measured >= 0.8 * filled and n > 2 and len(cols) > 1:
+        shape = ("set of points", "series", "mostly numbers, no column in order: a shape's coordinates, samples?")
+    elif categories and measured < 0.5 * filled:  # records of text, sorted into a few kinds
+        shape = ("list", "list", f"records that column {by} sorts into a few kinds")
+    if shape is None:
+        return f"claims from rows by rules: about {claims} claims, {per} a row" + aside
+    name, template, why = shape
+    if n >= MANY_ROWS:
+        return f"a {name} ({why}): a summary ({template}) may serve better than {claims} claims" + aside
+    if n >= FEW_ROWS:
+        return (f"a {name} ({why}): a summary ({template}) or claims from rows by rules (about {claims}): a summary if "
+                "the rows are samples rather than facts each worth checking" + aside)
+    return (f"claims from rows by rules: about {claims} claims, {per} a row (a {name}, {why}; with {n} rows a summary "
+            "would save little)" + aside)
 
 def samples(g):
     """The rows shown: the first, some from the middle and the end, and rows unlike the rest (a pattern of cell
@@ -286,12 +301,12 @@ def samples(g):
     odd = [i for i, row in enumerate(g.rows) if i not in picked and seen[pattern(row)] <= max(1, n // 50)]
     return sorted(i for i in picked | set(odd[:SAMPLE_ODD]) if 0 <= i < n)
 
-def question(g, cols=None):
-    """The rules query's text."""
+def question(g, cols=None, context=""):
+    """The rules query's text; context: the context lines a row of the table is given (its lead-in, its headings)."""
     cols = cols or analyse(g)
     n, claims = len(g.rows), point_claims(g, cols)
     cut = lambda text: (text[:SHOWN_CELL] + "…" if len(text) > SHOWN_CELL else text).replace("|", "/")
-    lines = [f"TABLE: {g.place}" + (f"; title: {g.title}" if g.title else ""),
+    lines = [f"TABLE: {g.place}" + (f"; title: {g.title}" if g.title else "")] + ([context] if context else []) + [
              f"SIZE: {n} rows, {len(cols)} columns; a claim per value cell would give about {claims} claims",
              "COLUMNS (letter: header: what its cells hold):"] + [describe(c) for c in cols]
     if any(g.sections):
@@ -633,9 +648,9 @@ def read(core, page, g, task, by_itself, source):
     one of the table's body rows as a table row without rules. source: the reader's first derivation step."""
     from .llm import CallLimitReached, NotRecorded
     cols = analyse(g)
-    asked = question(g, cols)
     first, last = g.lines[0], g.lines[-1]
     span = (0.0, float(first), 1.0, float(last + 1))
+    asked = question(g, cols, core.reader.for_table(page, span, " ".join(g.labels)))
     row_box = lambda i: (0.0, float(g.lines[i]), 1.0, float(g.lines[i] + 1))
 
     def ask(prompt, attempt, then):

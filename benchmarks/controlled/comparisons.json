@@ -391,12 +391,11 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 28,
-    "unscored": 2
+    "no change": 28
    },
    "findings": {
     "different": 4,
-    "equivalent": 30
+    "equivalent": 28
    },
    "unmatched": 4,
    "pairs": 4,
@@ -2256,27 +2255,30 @@
     "removed": 0,
     "unchanged": 16
    },
-   "changes_found": "5/5",
+   "changes_found": "4/5",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "16/16",
+   "unchanged_confirmed": "12/16",
    "false_changes": 0,
-   "difference_precision": 1.0,
+   "difference_precision": 0.8,
    "changed": {
-    "reported": 5
+    "reported": 4,
+    "unextracted": 1
    },
    "conditions": {},
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 16
+    "confirmed": 12,
+    "unextracted": 4
    },
    "different": {
-    "change": 5
+    "change": 4,
+    "unscored": 1
    },
    "equivalent": {
-    "no change": 16,
-    "unscored": 2
+    "no change": 12,
+    "unscored": 6
    },
    "findings": {
     "different": 5,
@@ -2286,12 +2288,15 @@
    "pairs": 5,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 4,
+    "scored": 4,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 5
+      "changed": 4
+     },
+     "unscored": {
+      "changed": 1
      }
     }
    },
@@ -2312,11 +2317,11 @@
     "opt2.october": "confirmed",
     "opt2.season": "reported",
     "opt2.september": "confirmed",
-    "zone.concourse": "confirmed",
-    "zone.exhibit": "reported",
-    "zone.kitchens": "confirmed",
-    "zone.loading": "confirmed",
-    "zone.meeting": "confirmed"
+    "zone.concourse": "unextracted",
+    "zone.exhibit": "unextracted",
+    "zone.kitchens": "unextracted",
+    "zone.loading": "unextracted",
+    "zone.meeting": "unextracted"
    }
   },
   "lcc-plan-s1-clean": {
@@ -3951,11 +3956,10 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 31,
-    "unscored": 2
+    "no change": 31
    },
    "findings": {
-    "equivalent": 33,
+    "equivalent": 31,
     "uncertain": 2
    },
    "unmatched": 4,
@@ -5087,11 +5091,10 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 33,
-    "unscored": 2
+    "no change": 33
    },
    "findings": {
-    "equivalent": 35
+    "equivalent": 33
    },
    "unmatched": 0,
    "pairs": 0,
@@ -7450,12 +7453,11 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 28,
-    "unscored": 2
+    "no change": 28
    },
    "findings": {
     "different": 4,
-    "equivalent": 30
+    "equivalent": 28
    },
    "unmatched": 4,
    "pairs": 4,
@@ -9315,27 +9317,30 @@
     "removed": 0,
     "unchanged": 16
    },
-   "changes_found": "5/5",
+   "changes_found": "4/5",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "16/16",
+   "unchanged_confirmed": "12/16",
    "false_changes": 0,
-   "difference_precision": 1.0,
+   "difference_precision": 0.8,
    "changed": {
-    "reported": 5
+    "reported": 4,
+    "unextracted": 1
    },
    "conditions": {},
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 16
+    "confirmed": 12,
+    "unextracted": 4
    },
    "different": {
-    "change": 5
+    "change": 4,
+    "unscored": 1
    },
    "equivalent": {
-    "no change": 16,
-    "unscored": 2
+    "no change": 12,
+    "unscored": 6
    },
    "findings": {
     "different": 5,
@@ -9345,12 +9350,15 @@
    "pairs": 5,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 4,
+    "scored": 4,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 5
+      "changed": 4
+     },
+     "unscored": {
+      "changed": 1
      }
     }
    },
@@ -9371,11 +9379,11 @@
     "opt2.october": "confirmed",
     "opt2.season": "reported",
     "opt2.september": "confirmed",
-    "zone.concourse": "confirmed",
-    "zone.exhibit": "reported",
-    "zone.kitchens": "confirmed",
-    "zone.loading": "confirmed",
-    "zone.meeting": "confirmed"
+    "zone.concourse": "unextracted",
+    "zone.exhibit": "unextracted",
+    "zone.kitchens": "unextracted",
+    "zone.loading": "unextracted",
+    "zone.meeting": "unextracted"
    }
   },
   "lcc-plan-s1-clean": {
@@ -11010,11 +11018,10 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 31,
-    "unscored": 2
+    "no change": 31
    },
    "findings": {
-    "equivalent": 33,
+    "equivalent": 31,
     "uncertain": 2
    },
    "unmatched": 4,
@@ -12146,11 +12153,10 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 33,
-    "unscored": 2
+    "no change": 33
    },
    "findings": {
-    "equivalent": 35
+    "equivalent": 33
    },
    "unmatched": 0,
    "pairs": 0,
@@ -15731,7 +15737,7 @@
    }
   }
  },
- "recorded-rules": {
+ "recorded-rows": {
   "wtp-s1.xlsx": {
    "facts": {
     "changed": 4,
@@ -15763,14 +15769,15 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 28
+    "no change": 28,
+    "unscored": 2
    },
    "findings": {
     "different": 4,
-    "equivalent": 28
+    "equivalent": 30
    },
    "unmatched": 4,
-   "pairs": 15,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -16164,7 +16171,7 @@
     "equivalent": 18
    },
    "unmatched": 0,
-   "pairs": 15,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -16461,10 +16468,11 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 31
+    "no change": 31,
+    "unscored": 2
    },
    "findings": {
-    "equivalent": 31,
+    "equivalent": 33,
     "uncertain": 2
    },
    "unmatched": 4,
@@ -16696,10 +16704,11 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 33
+    "no change": 33,
+    "unscored": 2
    },
    "findings": {
-    "equivalent": 33
+    "equivalent": 35
    },
    "unmatched": 0,
    "pairs": 0,
@@ -16780,7 +16789,7 @@
     "unrelated": 1
    },
    "unmatched": 2,
-   "pairs": 13,
+   "pairs": 10,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -17060,7 +17069,7 @@
    }
   }
  },
- "replay-rules": {
+ "replay-rows": {
   "wtp-s1.xlsx": {
    "facts": {
     "changed": 4,
@@ -17092,14 +17101,15 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 28
+    "no change": 28,
+    "unscored": 2
    },
    "findings": {
     "different": 4,
-    "equivalent": 28
+    "equivalent": 30
    },
    "unmatched": 4,
-   "pairs": 15,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -17493,7 +17503,7 @@
     "equivalent": 18
    },
    "unmatched": 0,
-   "pairs": 15,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -17790,10 +17800,11 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 31
+    "no change": 31,
+    "unscored": 2
    },
    "findings": {
-    "equivalent": 31,
+    "equivalent": 33,
     "uncertain": 2
    },
    "unmatched": 4,
@@ -18025,10 +18036,11 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 33
+    "no change": 33,
+    "unscored": 2
    },
    "findings": {
-    "equivalent": 33
+    "equivalent": 35
    },
    "unmatched": 0,
    "pairs": 0,
@@ -18109,7 +18121,7 @@
     "unrelated": 1
    },
    "unmatched": 2,
-   "pairs": 13,
+   "pairs": 10,
    "omitted": 0,
    "kinds": {
     "right": 5,

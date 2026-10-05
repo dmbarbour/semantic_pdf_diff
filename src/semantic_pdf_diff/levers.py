@@ -329,10 +329,11 @@ class FigureTasks(Lever):
 
 class TableRules(Lever):
     lever_name, stage, off = "table_rules", "segmentation", {"table_rules": None}
-    # a table of more body rows than this is read by rules a model writes for it (tablerules.py): one query per table
-    # rather than one a row; 0: every table so; none: every table row by row. Excel's tables only, for now (the
-    # adapters plan, "Excel, in detail", step 5): other formats' tables have no grid for the rules yet
-    table_rules: Annotated[int | None, _selecting(frozenset({"table"}))] = Field(default=50, ge=0)
+    # a table of more body rows than this is read as a model says it should be (tablerules.py: rules applied to every
+    # row, each row read by itself, or a summary), one query per table; 0, the default: every table (the owner,
+    # 2026-10-05: "I was under the impression we'd also ask how to translate rows to claims even for short tables");
+    # none: every table row by row, as before. Excel's tables only, for now: other formats' tables have no grid yet
+    table_rules: Annotated[int | None, _selecting(frozenset({"table"}))] = Field(default=0, ge=0)
 
     def rules_from(self):
         return self.table_rules

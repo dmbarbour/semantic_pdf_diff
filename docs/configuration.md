@@ -92,7 +92,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `sheet_details` | `false` | selecting | sheet_details | extract | figure, overview, tile, vision |
 | `skip_empty` | `true` | selecting | skip_empty | extract | figure, overview, tile, vision |
 | `figure_tasks` | `true` | selecting | figure_tasks | extract | figure |
-| `table_rules` | `50` | selecting | table_rules | extract | table |
+| `table_rules` | `0` | selecting | table_rules | extract | table |
 | `visual_text_layer` | `1500` | shaping | visual_text_layer | extract | figure, overview, tile, vision |
 | `table_filter` | `false` | selecting | table_filter | extract | table, table-detection |
 | `quote_match` | `"fragments"` | post | quote_match | extract | table, text |

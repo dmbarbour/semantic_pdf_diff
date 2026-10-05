@@ -34,14 +34,14 @@ class Analysis(unittest.TestCase):
         g = polar()
         alpha = tr.analyse(g)[0]
         self.assertEqual((alpha.order, alpha.step, alpha.low, alpha.high), ("rising", "1", "-165", "165"))
-        self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("a series: 331 rows, mostly numbers, column A rising"
-                                                                 " in steps of 1; a summary (series)"))
+        self.assertEqual(tr.opinion(g, tr.analyse(g)), "a series (mostly numbers, column A rising in steps of 1): a "
+                                                        "summary (series) may serve better than 662 claims")
 
     def test_a_shape_of_points_suggests_a_summary_too(self):
         import math
         rows = [[f"{math.cos(k / 20):.4f}", f"{0.1 * math.sin(k / 20):.4f}"] for k in range(126)]
         g = tr.grid(["A", "B"], ["x/c", "y/c"], rows, range(5, 131), range(5, 131))
-        self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("points: 126 rows, mostly numbers, no column in order"))
+        self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("a set of points (mostly numbers, no column in order"))
 
     def test_sentences_are_prose_read_row_by_row(self):
         rows = [[f"REQ-{k:03d}", f"The pumping station shall deliver {k} L/s at the design head.",
@@ -54,13 +54,32 @@ class Analysis(unittest.TestCase):
         self.assertTrue(said.endswith("a summary (list) counting them by column C"))
         self.assertIn("B: Requirement: text 150; all distinct; prose: 11 words", tr.question(g, cols))
 
+    def test_a_short_notes_column_is_an_aside(self):
+        rows = [[f"M{k}"] + [f"{k + c}.25" for c in range(12)] + ["see note 4 of annex B"] for k in range(8)]
+        g = tr.grid([chr(65 + c) for c in range(14)], ["Material"] + [f"P{c}" for c in range(12)] + ["Notes"], rows,
+                    range(2, 10), range(2, 10))
+        said = tr.opinion(g, tr.analyse(g))
+        self.assertTrue(said.startswith("claims from rows by rules: about 104 claims"))
+        self.assertTrue(said.endswith("; column N holds prose (6 words on average): rows read by themselves if its "
+                                      "words hold claims"))
+
     def test_a_log_steps_in_minutes(self):
         start = datetime.datetime(2026, 7, 1)
         rows = [[(start + datetime.timedelta(minutes=5 * i)).isoformat(" "), f"{95 + i % 7}.5"] for i in range(200)]
         g = tr.grid(["A", "B"], ["Timestamp", "Flow (L/s)"], rows, range(2, 202), range(2, 202))
         time = tr.analyse(g)[0]
         self.assertEqual((time.dates, time.order, time.step), (200, "rising", "5 min"))
-        self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("a log: 200 rows"))
+        self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("a log (mostly numbers, column A rising in steps of "
+                                                                 "5 min): a summary (log) may serve better"))
+
+    def test_a_summary_is_weighed_by_size_without_a_cut_off(self):
+        said = {n: tr.opinion(polar(n), tr.analyse(polar(n))) for n in (10, 30, 331)}
+        self.assertEqual(said[10], "claims from rows by rules: about 20 claims, 2 a row (a series, mostly numbers, column"
+                                   " A rising in steps of 1; with 10 rows a summary would save little)")
+        self.assertEqual(said[30], "a series (mostly numbers, column A rising in steps of 1): a summary (series) or "
+                                   "claims from rows by rules (about 60): a summary if the rows are samples rather than "
+                                   "facts each worth checking")
+        self.assertIn("may serve better than 662 claims", said[331])
 
     def test_the_question_shows_samples_size_and_our_opinion(self):
         asked = tr.question(polar())

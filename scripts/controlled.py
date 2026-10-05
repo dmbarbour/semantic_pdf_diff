@@ -7,7 +7,7 @@
     python scripts/controlled.py score                       # results.json from the runs' stores, offline
     python scripts/controlled.py run --replay                # read again from the packed fixture, offline
     python scripts/controlled.py run --unaligned             # the PDF pairs only, alignment off (see below)
-    python scripts/controlled.py run --rules                 # the workbooks, every table read by rules (below)
+    python scripts/controlled.py run --rows                  # the workbooks, every table read row by row (below)
     python scripts/controlled.py pack                        # replay.zip: the answers the standard runs replay
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
@@ -20,9 +20,9 @@ With --unaligned the PDF pairs are compared again with alignment off (into "<rec
 retrieval candidate is judged, as before alignment, so most "different" findings aren't changes, and the
 explanations (compare.explain) are measured where non-changes abound.
 
-With --rules the workbooks and their pairs are read again with every table read by rules a model writes for it
-(table_rules 0; tablerules.py), into "<recorded or replay>-rules": the same keys score the rules against reading each
-row by itself. Packed with the standard runs.
+With --rows the workbooks and their pairs are read again with every table read row by row (table_rules none), into
+"<recorded or replay>-rows": the baseline the standard runs' tables, each read as a model says (tablerules.py), are
+scored against by the same keys. Packed with the standard runs.
 
 Recording adds to the working fixture (fixture.sqlite, git-ignored), which keeps every answer ever recorded. `pack`
 writes the committed replay.zip: the standard runs are replayed from fresh stores against a copy of the fixture, and
@@ -72,7 +72,7 @@ def main(argv=None):
     running.add_argument("--responder", help="default: the configured model")
     running.add_argument("--max-cost", type=float, default=0.2)
     running.add_argument("--unaligned", action="store_true", help="only the PDF pairs, compared with alignment off")
-    running.add_argument("--rules", action="store_true", help="only the workbooks, every table read by rules")
+    running.add_argument("--rows", action="store_true", help="only the workbooks, every table read row by row")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     sub.add_parser("pack", help="pack the answers the standard runs replay into replay.zip (offline)")
     args = parser.parse_args(argv)
@@ -96,9 +96,9 @@ def main(argv=None):
                 print(path)
         return 0
     if args.command == "run":
-        if args.unaligned and args.rules:
-            parser.error("--unaligned and --rules are separate runs")
-        return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rules=args.rules)
+        if args.unaligned and args.rows:
+            parser.error("--unaligned and --rows are separate runs")
+        return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rows=args.rows)
     if args.command == "pack":
         return pack()
     return score()
@@ -120,7 +120,7 @@ def pack():
             code = run(True, None, 0, False, fixture=copy, runs=d / "runs", pair_runs=d / "pairs")
             if code in (0, 2):
                 code = max(code, run(True, None, 0, False, fixture=copy, runs=d / "runs", pair_runs=d / "pairs",
-                                     rules=True))
+                                     rows=True))
         if code not in (0, 2):
             failed = [line for line in said.getvalue().splitlines() if "exit 1" in line or "fixture holds" in line]
             print(f"the replay failed (exit {code}): nothing packed\n  " + "\n  ".join(failed[:20]))
@@ -131,7 +131,7 @@ def pack():
     print(f"packed {PACKED}: {dropped} answers the standard runs don't use left out")
     return 0
 
-def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=RUNS, pair_runs=PAIR_RUNS, rules=False):
+def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=RUNS, pair_runs=PAIR_RUNS, rows=False):
     """Every document read alone, then every revision pair compared: recorded into the working fixture, or replayed
     (from replay.zip, or `fixture`) into fresh or existing stores under runs and pair_runs."""
     from semantic_pdf_diff import fixtures, ledger, pipeline
@@ -170,10 +170,10 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
         jobs = [(a, b, pair_runs / f"{out.name}-unaligned" / folder.name, name + " unaligned", mode)
                 for a, b, folder, name, mode in jobs if mode == "revisions" and a.suffix == ".pdf"]
         overrides = {"align": False}
-    if rules:
-        jobs = [(a, b, folder.parent.parent / f"{folder.parent.name}-rules" / folder.name, name + " rules", mode)
+    if rows:
+        jobs = [(a, b, folder.parent.parent / f"{folder.parent.name}-rows" / folder.name, name + " rows", mode)
                 for a, b, folder, name, mode in jobs if a.suffix == ".xlsx"]
-        overrides = {"table_rules": 0}
+        overrides = {"table_rules": None}
     for a, b, folder, name, mode in jobs:
         options = pipeline.RunOptions(mode=mode, fixture=fixture,
                                       fixture_mode="replay" if replay else "record-new", responder=responder)
@@ -199,7 +199,7 @@ def score():
     from semantic_pdf_diff_lab.bench import controlled
     from semantic_pdf_diff_lab.eval import rounds
     results = {}
-    for which in ("recorded", "replay", "recorded-rules", "replay-rules"):
+    for which in ("recorded", "replay", "recorded-rows", "replay-rows"):
         runs = RUNS / which
         if not runs.exists():
             continue
@@ -319,7 +319,7 @@ def compare_pairs():
     "<id>.md")."""
     from semantic_pdf_diff_lab.bench.controlled import comparison, revisions, word
     compared = {}
-    for which in ("recorded", "replay", "recorded-unaligned", "replay-unaligned", "recorded-rules", "replay-rules"):
+    for which in ("recorded", "replay", "recorded-unaligned", "replay-unaligned", "recorded-rows", "replay-rows"):
         for pair in revisions.pairs() + word.pairs():
             for suffix in (("", ".md", ".docx", ".pptx", ".xlsx") if pair in revisions.pairs() else (".docx",)):
                 report = PAIR_RUNS / which / f"{pair.id}{suffix}" / "report.json"
