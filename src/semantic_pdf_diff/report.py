@@ -21,7 +21,7 @@ def write_report(data, output, assets=None):
     def card(eid):
         e = evidence[eid]
         image = ('<a href="'+esc(link(e['image']))+'"><img loading="lazy" src="'+esc(link(e['image']))+'" alt="Source crop"></a>') if e.get('image') else ''
-        verified = {True: '<p>Quote found in the file\'s text.</p>' if e['locator'].get('format') in ('text', 'docx')
+        verified = {True: '<p>Quote found in the file\'s text.</p>' if e['locator'].get('format') in ('text', 'docx', 'pptx')
                     else '<p>Quote found in PDF text layer.</p>',
                     False: '<p class="warning">Quote not found in the PDF text layer for this region; possible misread or raster-only label.</p>'
                     }.get(e.get('quote_verified'), '')
@@ -33,13 +33,14 @@ def write_report(data, output, assets=None):
                 + esc('; '.join(f"p.{o['locator']['page']} {o['locator']['region']}" for o in e['occurrences'])) + "</p>") if others else ''
         heading = headings.get((e['content'], e.get('section', '')), '')
         heading = f" · § {esc(heading)}" if heading else ''
-        return f'''<section><h3>{esc(where(e['content']))}{heading} · page {loc['page']} · {esc(e['kind'])}</h3>
+        return f'''<section><h3>{esc(where(e['content']))}{heading} · {'slide' if loc.get('format') == 'pptx' else 'page'} {loc['page']} · {esc(e['kind'])}</h3>
         <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
         <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}<blockquote>{esc(e['quote'])}</blockquote>{verified}{also}
         <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>{image}</section>'''
     counts = Counter(f['relation'] for f in data['findings'])
     place = lambda loc: (f"lines {loc['lines'][0]}–{loc['lines'][1]}" if loc.get('format') == 'text'
                          else f"paragraphs {loc['paragraphs'][0]}–{loc['paragraphs'][1]}" if loc.get('format') == 'docx'
+                         else f"slide {loc['page']}, lines {loc['lines'][0]}–{loc['lines'][1]}" if loc.get('format') == 'pptx'
                          else f"PDF bbox {list(loc['bbox'])}")
     issues = [r for r in data['coverage'] if r['status'] != 'complete']
     rows = []

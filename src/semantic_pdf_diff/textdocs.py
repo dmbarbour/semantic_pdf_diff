@@ -18,7 +18,7 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
-from .models import DerivationStep, DocxLocator, Section, TextLocator, coverage_row
+from .models import DerivationStep, DocxLocator, PptxLocator, Section, TextLocator, coverage_row
 from .sections import SectionIndex
 from .tasks import TaskCore, split_utf8
 
@@ -71,6 +71,7 @@ class Picture:
     size: tuple | None
     caption: str
     name: str           # the part's name ("image12.emf")
+    page: int = 1       # its page: a slide's number in a deck (a Word document is one page)
 
 def _cells(line):
     line = line.strip()
@@ -249,11 +250,20 @@ DOCX_DERIVATION = {
     "table": [DerivationStep(step="docx-table", detail="row with its header"), DerivationStep(step="model-extraction")],
 }
 
-CHART_DERIVATION = [DerivationStep(step="docx-chart", detail="a chart's cached values, a row per category"),
-                    DerivationStep(step="model-extraction")]
+PPTX_DERIVATION = {
+    "text": [DerivationStep(step="pptx-shapes", detail="grouped paragraphs"), DerivationStep(step="model-extraction")],
+    "table": [DerivationStep(step="pptx-table", detail="row with its header"), DerivationStep(step="model-extraction")],
+}
+
+def chart_derivation(extension):
+    return [DerivationStep(step=f"{extension.lstrip('.')}-chart", detail="a chart's cached values, a row per category"),
+            DerivationStep(step="model-extraction")]
 
 def text_locator(page, bbox, region, task):
     return TextLocator(page=page, lines=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region, task=task)
+
+def pptx_locator(page, bbox, region, task):
+    return PptxLocator(page=page, lines=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region, task=task)
 
 def docx_locator(page, bbox, region, task):
     return DocxLocator(page=page, paragraphs=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region,
@@ -289,15 +299,18 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     then "waiting" while its requests are pending; job.state["result"] is set at the end."""
     s = client.s
     name = job.content
-    word = extension == ".docx"
-    core = TaskCore(job, output, client, dispatch, progress, name, docx_locator if word else text_locator,
-                    DOCX_DERIVATION if word else DERIVATION)
+    word, deck = extension == ".docx", extension == ".pptx"
+    office = word or deck
+    core = TaskCore(job, output, client, dispatch, progress, name,
+                    docx_locator if word else pptx_locator if deck else text_locator,
+                    DOCX_DERIVATION if word else PPTX_DERIVATION if deck else DERIVATION)
     raw = data if isinstance(data, (bytes, bytearray)) else open(data, "rb").read()
-    if word:
+    if office:
         from .docxdocs import read_docx
+        from .pptxdocs import read_pptx
         try:
-            doc = read_docx(raw)
-        except Exception as error:  # not a Word document after all, or a damaged one
+            doc = read_docx(raw) if word else read_pptx(raw)
+        except Exception as error:  # not a Word document or deck after all, or a damaged one
             core.record(coverage_row(content=job.content, task="open", status="failed",
                                      issues=[f"{name}: unreadable ({type(error).__name__}: {error})"]))
             job.state["result"] = ([], core.coverage)
@@ -332,17 +345,18 @@ def text_job(data, job, output, client, dispatch, progress, extension):
                 labels = table.row_headers[ri] if table.row_headers else header
                 core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", labels,
                                 row, list(range(len(labels) if table.row_headers else width)),
-                                derivation=CHART_DERIVATION if table.source == "chart" else None)
+                                derivation=chart_derivation(extension) if table.source == "chart" else None)
         for pg, line, alt, target in doc.images:
             if pg == page:
                 core.record(coverage_row(content=job.content, page=page, bbox=[0.0, float(line), 1.0, float(line + 1)],
                                          task=f"image:p{page}:{line}", status="skipped",
                                          issues=[f"A picture or object in the document isn't read yet ({alt}: {target})"
-                                                 if word else f"An image in a Markdown file isn't read: {alt or target}"]))
-        if word and page == 1 and doc.pictures:  # a Word document is one page: its pictures follow its text
+                                                 if office else f"An image in a Markdown file isn't read: {alt or target}"]))
+        shown = [p for p in doc.pictures if p.page == page]  # a Word document is one page; a deck's, its slides
+        if office and shown:  # a page's pictures follow its text
             from .pictures import Reading
-            kept.append(Reading())
-            yield from kept[-1].tasks(core, s, doc.pictures, job.content, output)
+            kept.append(Reading("docx" if word else "pptx"))
+            yield from kept[-1].tasks(core, s, shown, job.content, output)
         section = index[page].id
         counts = Counter(numbers=sum(len(re.findall(r"\d", b.text)) > 0 for b in blocks), tables=len(tables),
                          characters=sum(len(b.text) for b in blocks))

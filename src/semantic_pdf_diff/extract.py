@@ -227,7 +227,7 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
                 dispatch.wait_one()
 
 # Readers by normalized extension (the adapters plan: chosen by extension only, no sniffing).
-TEXT_EXTENSIONS = (".txt", ".md", ".docx")
+TEXT_EXTENSIONS = (".txt", ".md", ".docx", ".pptx")
 
 def office_installed():
     try:
@@ -238,7 +238,8 @@ def office_installed():
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/1", ".txt": "text/1", ".md": "text/1", ".docx": "docx/2"}  # docx/2: equations, comments
+READERS = {".pdf": "pdf/1", ".txt": "text/1", ".md": "text/1", ".docx": "docx/2",  # docx/2: equations, comments
+           ".pptx": "pptx/1"}
 
 def reader_version(extension):
     """The version of what reads content of this extension ("docx/1"); "unsupported" where nothing reads it yet."""
@@ -249,7 +250,7 @@ def reader_for(extension):
     extra)."""
     if extension == ".pdf":
         return _pdf_job
-    if extension in TEXT_EXTENSIONS and (extension != ".docx" or office_installed()):
+    if extension in TEXT_EXTENSIONS and (extension not in (".docx", ".pptx") or office_installed()):
         from .textdocs import text_job
         return lambda data, job, output, client, dispatch, progress: text_job(data, job, output, client, dispatch,
                                                                               progress, extension)

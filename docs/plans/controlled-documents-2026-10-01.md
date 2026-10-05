@@ -567,6 +567,7 @@ Each row is a situation met in this project's documents, with where it was recor
   - **Five revision pairs on it and on the treatment plant**, in PDF, Markdown and Word. Results are in the [revision comparison plan](revision-comparison-2026-10-02.md)'s milestone 4.
   - **The base's extraction joins `results.json`.**
 - **Word knobs (2026-10-04; the adapters plan):** tracked changes, footnotes and numbered lists as Word-only documents (`word.py`), in `docs-docx` beside the representations. Two are revision pairs: the treatment plant's revision as tracked changes, and the specification's renumbered conditions as Word lists.
+- **The corpus as slide decks (2026-10-04; the adapters plan, milestone 3):** 26 decks of the representations and a speaker-notes knob (`slides.py`), every fact read as in Word, the 15 revision pairs scored as Word's.
 - **Word charts as a knob (2026-10-04; the adapters plan, "Word charts"):** the three chart studies with each chart a Word chart (chart XML caching its series) rather than a picture: every value read right, once.
 - **A Word text box knob (2026-10-04; the adapters plan, "Text boxes"):** the treatment plant's document with two sentences and a captioned table in text boxes (modern, with Word's VML copy, and VML alone), read in full and right.
 - **Word table knobs (2026-10-04; the adapters plan, "Merged and nested cells"):** the equipment schedules with merged cells (105 facts, runout points and closing times added), with nested tables, and inside a layout table. All three are read in full and right.

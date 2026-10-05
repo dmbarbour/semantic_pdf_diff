@@ -10,14 +10,14 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 - **Replay fixtures:** recorded model answers, so runs replay offline
 - **Levers:** how documents are read, composed as mixins (`levers.py`)
 - **The lab** (`lab/`, its own distribution): improvement rounds judged by model panels and people, controlled documents with known facts, eye and page tests
-- **Plain text, Markdown and Word** read as well as PDF: sections from headings, paragraphs and tables, claims located by line or paragraph (Word needs `pip install 'semantic-pdf-diff[office]'`)
+- **Plain text, Markdown, Word and PowerPoint** read as well as PDF: sections from headings (a slide's title), paragraphs, tables, charts from their data, pictures and speaker notes, claims located by line, paragraph or slide (Word and PowerPoint need `pip install 'semantic-pdf-diff[office]'`)
 - **Revisions aligned before they're judged:** items matched across revisions by their values, equal values settled without a model, and the report showing how it grouped them
 - **Differences explained:** in revisions, each difference named by kind (a value or its conditions changed, renamed, restated, misread, not the same item), value changes listed first
 
 **Status:**
 - Extraction has been measured with one real model (gemma-4-31B, through DeepInfra) on public sample documents and the controlled corpus.
 - It isn't a validated engineering sign-off tool; see [limitations](docs/limitations.md).
-- **Still planned:** more formats (`.pptx`, spreadsheets, images), criteria-first comparison of two or more sources, consistency checks and RAG export. See [docs/plans/](docs/plans/README.md).
+- **Still planned:** more formats (spreadsheets, images), criteria-first comparison of two or more sources, consistency checks and RAG export. See [docs/plans/](docs/plans/README.md).
 
 ## Quick start
 

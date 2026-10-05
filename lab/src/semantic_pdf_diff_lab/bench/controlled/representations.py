@@ -74,11 +74,13 @@ def _numbers(line):
 
 def key(project, lines, tables=None, representation="markdown", pictures=None, chart_rows=()):
     """A representation's key: the PDF key's facts that the lines print, each placed by line ("md-prose", "md-table";
-    for Word, "docx-prose", "docx-table"), the others listed as absent; every printed number logged with its role.
+    for Word, "docx-prose", "docx-table"; for slides, "pptx-..."), the others listed as absent; every printed number
+    logged with its role.
     tables: the line numbers that are table rows (default: Markdown's, lines starting "|"). pictures: {chart number:
     the line of the picture showing it}, its facts placed there ("docx-figure"). chart_rows: the line numbers that are
     a Word chart's data rows ("docx-chart"), where its facts are printed."""
     from .corpus import charts
+    prefix = representation if representation in ("docx", "pptx") else "md"
     by_value = {}
     for f in project.facts:
         if not f.relation and (f.drawn not in ("chart", "figure") or (chart_rows and f.drawn == "chart")):
@@ -88,9 +90,8 @@ def key(project, lines, tables=None, representation="markdown", pictures=None, c
     for number, line in (pictures or {}).items():
         for _, facts in charts(project)[number - 1].series:
             for f in facts:
-                f.forms.append({"form": "docx-figure", "page": 1, "line": line})
+                f.forms.append({"form": f"{prefix}-figure", "page": 1, "line": line})
     log = []
-    prefix = "docx" if representation == "docx" else "md"
     for n, line in enumerate(lines, 1):
         table = n in tables if tables is not None else line.startswith("|")
         form = f"{prefix}-chart" if n in chart_rows else f"{prefix}-table" if table else f"{prefix}-prose"

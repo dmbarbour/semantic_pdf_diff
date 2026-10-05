@@ -12,7 +12,8 @@
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
 is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
 (comparisons.json; revisions.py, comparison.py). The corpus is also written as Markdown (docs-md; representations.py),
-read and compared the same way, its runs and pairs named "<id>.md"; and as Word documents (docs-docx), "<id>.docx".
+read and compared the same way, its runs and pairs named "<id>.md"; as Word documents (docs-docx), "<id>.docx"; and as
+slide decks (docs-pptx), "<id>.pptx".
 
 With --unaligned the PDF pairs are compared again with alignment off (into "<recorded or replay>-unaligned"): every
 retrieval candidate is judged, as before alignment, so most "different" findings aren't changes, and the
@@ -35,6 +36,7 @@ FOLDER = ROOT / "benchmarks/controlled"
 DOCS = FOLDER / "docs"
 DOCS_MD = FOLDER / "docs-md"  # the same projects as Markdown (representations.py)
 DOCS_DOCX = FOLDER / "docs-docx"  # and as Word documents
+DOCS_PPTX = FOLDER / "docs-pptx"  # and as slide decks
 WORKING = FOLDER / "fixture.sqlite"   # recorded answers (git-ignored); packed into replay.zip
 PACKED = FOLDER / "replay.zip"
 RUNS = ROOT / "benchmarks/runs/controlled"
@@ -72,10 +74,14 @@ def main(argv=None):
     if args.command == "generate":
         for project in controlled.corpus(tuple(args.seed or (1,)), knobs=True, revisions=True):
             print(f"{controlled.write(project, DOCS)}: {len(project.facts)} facts")
-        from semantic_pdf_diff_lab.bench.controlled import representations
+        from semantic_pdf_diff_lab.bench.controlled import representations, slides
         for project, lines in representations.corpus(tuple(args.seed or (1,))):
             print(f"{representations.write(project, lines, DOCS_MD)}")
             print(f"{representations.write_docx(project, lines, DOCS_DOCX)}")
+            print(f"{slides.write(DOCS_PPTX, project, slides.deck(project))}")
+        for seed in args.seed or (1,):
+            for project, data in slides.documents(seed):  # the decks' own difficulties (slides.py)
+                print(slides.write(DOCS_PPTX, project, data))
         from semantic_pdf_diff_lab.bench.controlled import word
         for seed in args.seed or (1,):
             for path in word.write(DOCS_DOCX, seed):  # Word's own difficulties (word.py)
@@ -135,10 +141,11 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
     jobs = [(pdf, pdf, out / pdf.stem, pdf.stem, "proposals") for pdf in sorted(DOCS.glob("*.pdf"))]
     jobs += [(md, md, out / md.name, md.name, "proposals") for md in sorted(DOCS_MD.glob("*.md"))]
     jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(DOCS_DOCX.glob("*.docx"))]
+    jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(DOCS_PPTX.glob("*.pptx"))]
     jobs += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", pair_runs / out.name / p.id, f"pair {p.id}",
               "revisions") for p in revisions.pairs()]
     from semantic_pdf_diff_lab.bench.controlled import word
-    for folder, suffix in ((DOCS_MD, ".md"), (DOCS_DOCX, ".docx")):
+    for folder, suffix in ((DOCS_MD, ".md"), (DOCS_DOCX, ".docx"), (DOCS_PPTX, ".pptx")):
         listed = revisions.pairs() + (word.pairs() if suffix == ".docx" else [])  # Word's own: word.py
         jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}", pair_runs / out.name / f"{p.id}{suffix}",
                   f"pair {p.id}{suffix}", "revisions") for p in listed
@@ -241,7 +248,7 @@ def score():
                   f"by form {r['recall_by_form']} by reader {r['by_reader']}; claims {r['claims']} {r['outcomes']}; "
                   f"conditions kept {r['conditions_kept']}")
     for which, runs in results.items():  # each Markdown and Word document beside its PDF
-        for suffix, name in ((".md", "Markdown"), (".docx", "Word")):
+        for suffix, name in ((".md", "Markdown"), (".docx", "Word"), (".pptx", "Slides")):
             other = {run[:-len(suffix)]: r for run, r in runs.items() if run.endswith(suffix)}
             if not other:
                 continue
@@ -273,11 +280,13 @@ def score():
 
 def key_path(run):
     """A run's key: a PDF's in docs, a Markdown's ("<id>.md") in docs-md, a Word document's ("<id>.docx") in
-    docs-docx."""
+    docs-docx, a deck's ("<id>.pptx") in docs-pptx."""
     if run.endswith(".md"):
         return DOCS_MD / f"{run[:-3]}.key.json"
     if run.endswith(".docx"):
         return DOCS_DOCX / f"{run[:-5]}.key.json"
+    if run.endswith(".pptx"):
+        return DOCS_PPTX / f"{run[:-5]}.key.json"
     return DOCS / f"{run}.key.json"
 
 def same_document(earlier, later):
@@ -292,7 +301,7 @@ def compare_pairs():
     compared = {}
     for which in ("recorded", "replay", "recorded-unaligned", "replay-unaligned"):
         for pair in revisions.pairs() + word.pairs():
-            for suffix in (("", ".md", ".docx") if pair in revisions.pairs() else (".docx",)):
+            for suffix in (("", ".md", ".docx", ".pptx") if pair in revisions.pairs() else (".docx",)):
                 report = PAIR_RUNS / which / f"{pair.id}{suffix}" / "report.json"
                 documents = [key_path(d + suffix).with_name(f"{d}{suffix or '.pdf'}") for d in (pair.earlier, pair.later)]
                 if report.exists() and not same_document(*documents):

@@ -26,13 +26,15 @@ REFERENCE = re.compile(r"\[[^\]]*\]|\b(?:Section|Sections|Appendix|Figure|Table|
                        re.I)
 
 def document(path):
-    """A file's TextDocument as its reader sees it: plain text, Markdown, a Word document, or a zip holding one."""
+    """A file's TextDocument as its reader sees it: plain text, Markdown, a Word document, a deck, or a zip holding
+    one."""
     import zipfile
     from pathlib import Path
     path = Path(path)
     if path.suffix == ".zip":
         with zipfile.ZipFile(path) as z:
-            name = next(n for n in z.namelist() if n.endswith((".docx", ".txt", ".md")) and not n.startswith("__MACOSX"))
+            name = next(n for n in z.namelist()
+                        if n.endswith((".docx", ".pptx", ".txt", ".md")) and not n.startswith("__MACOSX"))
             return read(name, z.read(name))
     return read(path.name, path.read_bytes())
 
@@ -40,6 +42,9 @@ def read(name, data):
     if name.endswith(".docx"):
         from semantic_pdf_diff.docxdocs import read_docx
         return read_docx(data)
+    if name.endswith(".pptx"):
+        from semantic_pdf_diff.pptxdocs import read_pptx
+        return read_pptx(data)
     return parse(data.decode("utf-8", errors="replace"), markdown=name.endswith(".md"))
 
 def blocks(doc):

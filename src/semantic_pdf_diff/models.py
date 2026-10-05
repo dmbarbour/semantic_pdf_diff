@@ -131,7 +131,22 @@ class DocxLocator(Strict):
         return (0.0, float(self.paragraphs[0]), 1.0, float(self.paragraphs[1] + 1))
 
 # Each format has its locator shape, told apart by `format`.
-Locator = Annotated[PdfLocator | TextLocator | DocxLocator, Field(discriminator="format")]
+class PptxLocator(Strict):
+    """Where a claim sits within a slide deck: its slide (page) and its lines (each shape's paragraph, table row and
+    speaker notes paragraph, counted from 1 through the deck); never a path. A claim read from a picture is at the
+    picture's line, in the region of the picture it was read from, with its crop (pictures.py)."""
+    format: Literal["pptx"] = "pptx"
+    page: int = Field(ge=1)
+    lines: tuple[int, int]
+    region: Literal["text", "table", "tile", "figure", "overview"]
+    task: str
+
+    @property
+    def bbox(self):
+        """Its lines as a box, (0, first, 1, last + 1), as TextLocator's."""
+        return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
+
+Locator = Annotated[PdfLocator | TextLocator | DocxLocator | PptxLocator, Field(discriminator="format")]
 
 class Section(Strict):
     """A logical part of one piece of content: the unit of context, and later of scheduling."""

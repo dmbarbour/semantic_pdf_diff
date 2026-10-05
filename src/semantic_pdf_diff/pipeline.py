@@ -234,8 +234,8 @@ def extract_sources(store, client, names, files, progress):
                 coverage.extend(store.coverage(file.content))
                 sections[file.content] = store.sections(file.content)
             elif reader_for(extension) is None:
-                reason = ("Reading .docx files needs python-docx: pip install 'semantic-pdf-diff[office]'"
-                          if extension == '.docx' else f'No adapter for {extension} files yet' if extension
+                reason = (f"Reading {extension} files needs the office extra: pip install 'semantic-pdf-diff[office]'"
+                          if extension in ('.docx', '.pptx') else f'No adapter for {extension} files yet' if extension
                           else 'No file extension; not interpreted')
                 row = coverage_row(content=file.content, task='unsupported', status='skipped', issues=[reason])
                 store.record_task(row, [])

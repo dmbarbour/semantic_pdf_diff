@@ -526,7 +526,10 @@ Claude's reading of where proposals mode begins to make sense:
     | "Different" findings | 3: two named "not the same item" (two members of one proposal's list of specification support), one "changed" |
     | Numeric changes unseen | 2, both the document's own number and title |
 
-  - **The one named "changed":** for BM-Case2, summary #0 says reporting several past time instances in one report is "not needed"; summary #3's Proposal 8 lists it as a reporting capability. It may be a real reversal of the moderator's proposals; not yet checked against the documents.
+  - **The one named "changed" is a false change (checked against both summaries, 2026-10-04).** For BM-Case2, "reporting multiple past time instances in one reporting instance ... is not needed" is Spreadtrum's Proposal 7; "support ... measurements of multiple past time instances in one reporting instance" is ZTE's Proposal 8. Both are in both summaries, unchanged.
+    - The comparison paired one company's view in the earlier summary with another company's in the later, as one item changed.
+    - **The cause:** the claims carried no company. In a "Company | Proposals" table the company is the row's label, the one saying it, but the claims named only "BM-Case2".
+    - **Who asserts a claim** is the tentative *Subject, parties and provenance* plan's question (plans index). Telling companies' views apart would also let alignment refuse to pair them.
   - **Most of the later summary's new claims have no counterpart,** as additions should: 104 not compared, 59 unaligned, 8 without a confirmed counterpart, in changed text.
   - Cost: $0.273 with TS 38.300's re-reading (its equations, the adapters plan).
 

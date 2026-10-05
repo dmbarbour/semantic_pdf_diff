@@ -51,9 +51,9 @@ def page_of(picture):
 class Reading:
     """A Word document's pictures being read: the pictures document (each picture a page, open until their tasks are
     done; refinement renders from it later) and each picture's own words, for the label check (labels())."""
-    def __init__(self):
-        self.doc = pymupdf.open()
-        self.words = {}  # a picture's line: the words of its text layer
+    def __init__(self, kind="docx"):
+        self.doc, self.kind = pymupdf.open(), kind  # kind: the document's format ("docx", "pptx")
+        self.words = {}  # a picture's line: (its page, the words of its text layer)
 
     def tasks(self, core, settings, pictures, content, output):
         """Generator feeding each picture's image tasks, yielding "page" between pictures (fair share). Every picture
@@ -71,15 +71,15 @@ class Reading:
         for picture in pictures:
             yield "page"
             box = (0.0, float(picture.line), 1.0, float(picture.line + 1))
-            task = f"picture:p1:{picture.line}"
+            task = f"picture:p{picture.page}:{picture.line}"
             if not s.vision:
-                core.record(coverage_row(content=content, page=1, bbox=list(box), task=task, status="skipped",
+                core.record(coverage_row(content=content, page=picture.page, bbox=list(box), task=task, status="skipped",
                                          issues=["Visual extraction disabled; pictures aren't read"]))
                 continue
             try:
                 single = page_of(picture)
             except PictureError as error:
-                core.record(coverage_row(content=content, page=1, bbox=list(box), task=task, status="skipped",
+                core.record(coverage_row(content=content, page=picture.page, bbox=list(box), task=task, status="skipped",
                                          issues=[str(error)]))
                 continue
             doc.insert_pdf(single)
@@ -88,16 +88,16 @@ class Reading:
             yield "page"
             box = (0.0, float(picture.line), 1.0, float(picture.line + 1))
             page = doc[number - 1]
-            self.words[picture.line] = words(page.get_text())
+            self.words[picture.line] = (picture.page, words(page.get_text()))
             drawn = "a metafile drawn as vector" if picture.extension in METAFILES else "an image"
             note = f"Caption: {picture.caption}" if picture.caption else ""
             for tag, rect, _ in s.visual_regions(context_of, page, number):
                 region, _, index = tag.partition(":")
-                tag = f"{region}:p1:pic{picture.line}" + (f":{index}" if index else "")
-                derivation = [DerivationStep(step="docx-picture", detail=f"{picture.name}, {drawn}"),
+                tag = f"{region}:p{picture.page}:pic{picture.line}" + (f":{index}" if index else "")
+                derivation = [DerivationStep(step=f"{self.kind}-picture", detail=f"{picture.name}, {drawn}"),
                               DerivationStep(step="picture-region", detail=region),
                               DerivationStep(step="model-extraction")]
-                visuals.task(1, page, tag, rect, text=note, box=box, derivation=derivation)
+                visuals.task(picture.page, page, tag, rect, text=note, box=box, derivation=derivation)
 
     def labels(self, core, content):
         """The label check, a coverage row per picture with a text layer ("labels:p1:pic<line>"): the share of the
@@ -111,14 +111,14 @@ class Reading:
                 match = PICTURE_TASK.search(o.locator.task)
                 if match:
                     said.setdefault(int(match.group(1)), set()).update(mentions)
-        for line, own in sorted(self.words.items()):
+        for line, (page, own) in sorted(self.words.items()):
             if len(own) < MIN_LABEL_WORDS:
                 continue
             missing = sorted(own - said.get(line, set()))
             share = 1 - len(missing) / len(own)
             note = f"Label coverage {share:.0%}: {len(missing)} of the picture's {len(own)} words in no claim"
-            core.record(coverage_row(content=content, page=1, bbox=[0.0, float(line), 1.0, float(line + 1)],
-                                     task=f"labels:p1:pic{line}", status="complete",
+            core.record(coverage_row(content=content, page=page, bbox=[0.0, float(line), 1.0, float(line + 1)],
+                                     task=f"labels:p{page}:pic{line}", status="complete",
                                      issues=[note + (f" ({', '.join(missing[:LISTED])})" if missing else "")]))
 
     def close(self):

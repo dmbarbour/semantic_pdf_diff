@@ -1,6 +1,6 @@
 # Multi-format source adapters
 
-- **Status:** Active (2026-10-03): milestones 1 (`.txt`/`.md` and a shared task core) and 2 (`.docx`) done; next, `.pptx`. Format priority (2026-09-23): PDF, then `.docx` and `.pptx`; Cameo models via a separate project.
+- **Status:** Active (2026-10-04): milestones 1 (`.txt`/`.md` and a shared task core), 2 (`.docx`) and 3 (`.pptx`) done; next, `.csv`/`.xlsx`. Format priority (2026-09-23): PDF, then `.docx` and `.pptx`; Cameo models via a separate project.
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (locators, sections, store)
 
 ## Goal
@@ -564,6 +564,31 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
     - The gap met with merged cells is closed. Each content item records the version of the reader that extracted it (`extract.READERS`: `pdf/1`, `text/1`, `docx/2`), and a run reads again any item whose reader has changed since, or that has gained a reader.
     - Unchanged queries replay from the cache.
     - Every controlled store was read again this way. No score changed, and nothing new was asked but the new knob's queries.
+- **Milestone 3, slide decks (2026-10-04): done.** The owner, choosing between reading slides as Word documents and drawing each slide from its shapes: "This looks good to me, including the recommendation to read slides like Word docs."
+  - **No slide is drawn,** since no renderer is assumed. Drawing a slide from its shapes stays a possible later lever, as for Word's shape drawings ([lever index](../reviews/levers.md)).
+  - **The reader** (`pptxdocs.py`, with the `office` extra; no new dependency: a deck's parts are read with lxml):
+    - each slide a page and a section, titled by its title, or failing one its subtitle or a short text box at its top
+      - The Huawei deck titles every slide with a subtitle; others with text boxes. "Slide 3" when none.
+    - shapes' paragraphs in reading order (top to bottom in bands, left to right), a group's together, a placeholder placed by its layout or master, automatic numbers written ("2.", "b)")
+    - tables on the Word reader's grid (merges: gridSpan, rowSpan, hMerge, vMerge)
+    - charts from their data (`chartxml.py`)
+    - pictures with the slide's title as caption (pictures are now page-aware; a Word document's tasks are unchanged)
+    - speaker notes after the slide's content ("Speaker notes: ...")
+    - a hidden slide read, marked "(Hidden slide)"
+    - recorded as not read: a slide drawn with shapes joined by connectors (its text read, not its arrangement), SmartArt, media, objects without a preview
+    - claims located by slide and line (`PptxLocator`)
+  - **On the four sample decks** (Rel-19 AI/ML views): every slide headed by its title but three (a cover and two closing slides, "Slide N"); 7 tables, 1 chart and 7 pictures read; two Huawei slides recorded as shape diagrams (21 and 123 connectors). None has speaker notes.
+  - **The controlled corpus as decks** (`slides.py`; from the closed evaluation benchmarks plan): 26 decks of the corpus's representations (a slide per section, tables, charts as charts, the procedure diagram as its WMF), and a **notes knob** (two sentences moved into speaker notes). The decks are minimal (no masters, layouts or theme), enough for any reader of the format.
+
+    | | Decks | Their Word versions |
+    |---|---|---|
+    | Facts read right | as Word, fact for fact; the specification slightly better (13 against 10 on the renumbered revision) | |
+    | Revision pairs (15) | every change, addition and removal found, no false change | the same |
+    | End-use study's claims | 33 (its chart read as data) | 51 (as a picture) |
+    | Notes knob | 33 of 33 right | |
+
+    - Cost: $0.059.
+  - **Fixed on the way:** the lab's run collector listed the formats it reads, without `.pptx`.
 
 ## Open questions
 
