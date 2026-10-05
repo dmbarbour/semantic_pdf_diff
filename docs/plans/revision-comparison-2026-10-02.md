@@ -1,6 +1,6 @@
 # Comparing revisions: align items, then explain differences
 
-- **Status:** Active (2026-10-03): milestones 1 (research) and 2 (alignment, a first version) done; milestone 3 (real revision pairs) begun with two pairs. The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
+- **Status:** Active (2026-10-03): milestones 1 (research) and 2 (alignment, a first version) done; milestone 3 (real revision pairs) begun with three pairs (RAN1's feature-lead summaries added 2026-10-04). The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
 - **From:** [controlled documents](controlled-documents-2026-10-01.md) milestone 4, where every change was found but most "different" findings weren't changes.
 - **Depends on:**
   - controlled documents (revision pairs, exact comparison scoring)
@@ -514,6 +514,21 @@ Claude's reading of where proposals mode begins to make sense:
     - **A lead-in's state misattributed** by the PDF readers when two lead-ins share a page: an extraction difficulty the knob now measures.
     - **The scorer counts an inserted condition as found** only when it's left unmatched; paired with an old one and explained "not the same item", it isn't.
   - **The committed controlled fixture** is now written by `scripts/controlled.py pack`: the standard runs replayed against a copy of the working fixture, and only the answers they use packed. Recording no longer packs.
+- **A third real pair: RAN1's feature-lead summaries (2026-10-04).** The owner, on the plans review's cheap wins: "Go for the cheap wins!" Milestone 3 named "the moderator's summaries".
+  - **The pair:** summary #0 and #3 of RAN1 #116's AI/ML beam management discussion (R1-2401596 and R1-2401599, Word). Each is mostly tables of companies' views, with proposals revised round by round. Read with the Word reader's tables on a grid (the adapters plan, "Merged and nested cells").
+  - **What changed between them:** mostly additions, not changes. The rater's text diff finds 13 changed blocks, 66 lines in the earlier summary and 535 in the later: new companies' views and new proposals.
+
+    | | RAN1 #0 → #3 |
+    |---|---|
+    | Claims | 994 → 1,188 (56 from pictures) |
+    | Settled without a model | 803 |
+    | Pairs judged | 169 |
+    | "Different" findings | 3: two named "not the same item" (two members of one proposal's list of specification support), one "changed" |
+    | Numeric changes unseen | 2, both the document's own number and title |
+
+  - **The one named "changed":** for BM-Case2, summary #0 says reporting several past time instances in one report is "not needed"; summary #3's Proposal 8 lists it as a reporting capability. It may be a real reversal of the moderator's proposals; not yet checked against the documents.
+  - **Most of the later summary's new claims have no counterpart,** as additions should: 104 not compared, 59 unaligned, 8 without a confirmed counterpart, in changed text.
+  - Cost: $0.273 with TS 38.300's re-reading (its equations, the adapters plan).
 
 ## Open questions
 

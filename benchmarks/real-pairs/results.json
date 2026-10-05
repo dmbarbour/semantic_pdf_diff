@@ -576,7 +576,7 @@
   },
   "ts38300-j20-j30": {
    "claims": [
-    6629,
+    6626,
     6683
    ],
    "claims_from_pictures": 2696,
@@ -595,21 +595,21 @@
     "different in changed text": 25,
     "different in unchanged text": 17,
     "equivalent in changed text": 83,
-    "equivalent in unchanged text": 440,
+    "equivalent in unchanged text": 441,
     "settled in changed text": 87,
-    "settled in unchanged text": 5853,
+    "settled in unchanged text": 5851,
     "uncertain in changed text": 37,
-    "uncertain in unchanged text": 27,
+    "uncertain in unchanged text": 28,
     "unrelated in changed text": 93,
     "unrelated in unchanged text": 54
    },
    "unmatched": {
     "no_confirmed_counterpart in changed text": 45,
-    "no_confirmed_counterpart in unchanged text": 32,
+    "no_confirmed_counterpart in unchanged text": 34,
     "not_compared in changed text": 71,
-    "not_compared in unchanged text": 237,
+    "not_compared in unchanged text": 231,
     "unaligned in changed text": 31,
-    "unaligned in unchanged text": 89
+    "unaligned in unchanged text": 92
    },
    "explained": {
     "changed in changed text": 12,
@@ -618,7 +618,7 @@
     "conditions in unchanged text": 1,
     "misread in unchanged text": 2,
     "not_same_item in changed text": 38,
-    "not_same_item in unchanged text": 34,
+    "not_same_item in unchanged text": 35,
     "restated in unchanged text": 3,
     "split_or_merge in changed text": 2,
     "split_or_merge in unchanged text": 2
@@ -626,13 +626,13 @@
    "suspect_differences": 17,
    "numeric_changes": 12,
    "numeric_changes_unseen": 4,
-   "pairs_judged": 868,
-   "settled": 5940,
+   "pairs_judged": 870,
+   "settled": 5938,
    "groupings": {
     "ambiguous": 35,
     "attached": 17,
     "matched": 1903,
-    "unaligned": 81
+    "unaligned": 83
    },
    "examples": {
     "suspect": [
@@ -1088,6 +1088,167 @@
      }
     ]
    }
+  },
+  "ran1-fl0-fl3": {
+   "claims": [
+    994,
+    1188
+   ],
+   "claims_from_pictures": 56,
+   "pictures_changed": [
+    0,
+    0
+   ],
+   "changed_blocks": 13,
+   "changed_lines": [
+    66,
+    535
+   ],
+   "findings": {
+    "complementary in unchanged text": 13,
+    "different in unchanged text": 3,
+    "equivalent in changed text": 18,
+    "equivalent in unchanged text": 114,
+    "settled in changed text": 27,
+    "settled in unchanged text": 776,
+    "uncertain in changed text": 5,
+    "uncertain in unchanged text": 11,
+    "unrelated in changed text": 2,
+    "unrelated in unchanged text": 3
+   },
+   "unmatched": {
+    "no_confirmed_counterpart in changed text": 8,
+    "no_confirmed_counterpart in unchanged text": 12,
+    "not_compared in changed text": 104,
+    "not_compared in unchanged text": 73,
+    "unaligned in changed text": 59,
+    "unaligned in unchanged text": 76
+   },
+   "explained": {
+    "changed in unchanged text": 1,
+    "conditions in unchanged text": 2,
+    "not_same_item in changed text": 4,
+    "not_same_item in unchanged text": 11,
+    "unclear in changed text": 1
+   },
+   "suspect_differences": 3,
+   "numeric_changes": 7,
+   "numeric_changes_unseen": 2,
+   "pairs_judged": 169,
+   "settled": 803,
+   "groupings": {
+    "ambiguous": 4,
+    "attached": 19,
+    "matched": 392,
+    "unaligned": 89
+   },
+   "examples": {
+    "suspect": [
+     {
+      "a": {
+       "entity": "AI/ML based beam prediction",
+       "attribute": "proposed specification support",
+       "value": "UE capability signaling including model training, model inference and model monitoring",
+       "unit": "",
+       "conditions": "spatial/time domain",
+       "lines": [
+        800,
+        800
+       ]
+      },
+      "b": {
+       "entity": "AI/ML based beam prediction in spatial/time domain",
+       "attribute": "proposed specification support",
+       "value": "assistance signalling and procedure for model performance monitoring and model update/tuning",
+       "unit": "",
+       "conditions": "Proposal 4",
+       "lines": [
+        1233,
+        1233
+       ]
+      },
+      "rationale": "Both claims propose specification support for AI/ML based beam prediction in the spatial/time domain, but they propose different types of signaling: Claim A focuses on 'UE capability signaling' (train",
+      "kind": "not_same_item",
+      "why": "Claim B's value ('assistance signalling and procedure for model performance monitoring and model update/tuning') is explicitly listed as a separate item in the earlier revision's context. Claim A is a"
+     },
+     {
+      "a": {
+       "entity": "AI/ML based beam prediction",
+       "attribute": "proposed specification support",
+       "value": "UE capability signaling including model training, model inference and model monitoring",
+       "unit": "",
+       "conditions": "spatial/time domain",
+       "lines": [
+        800,
+        800
+       ]
+      },
+      "b": {
+       "entity": "AI/ML based beam prediction in spatial/time domain",
+       "attribute": "proposed specification support",
+       "value": "assistance signalling and procedure for model configuration, model activation/deactivation, model recovery/termination, and model selection",
+       "unit": "",
+       "conditions": "Proposal 3",
+       "lines": [
+        1233,
+        1233
+       ]
+      },
+      "rationale": "Both claims propose specification support for AI/ML based beam prediction in the spatial/time domain, but they propose different types of signaling: Claim A focuses on UE capability signaling (trainin",
+      "kind": "not_same_item",
+      "why": "Claim A and Claim B refer to different types of proposed specification support (UE capability signaling vs. assistance signaling). The evidence shows that the value in Claim B was already present in t"
+     },
+     {
+      "a": {
+       "entity": "BM-Case2",
+       "attribute": "reporting multiple past time instances in one reporting instance",
+       "value": "not needed",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        368,
+        368
+       ]
+      },
+      "b": {
+       "entity": "BM-Case2",
+       "attribute": "reporting capability",
+       "value": "measurements of multiple past time instances in one reporting instance",
+       "unit": "",
+       "conditions": "Proposal 8",
+       "lines": [
+        579,
+        579
+       ]
+      },
+      "rationale": "Claim A states that reporting multiple past time instances for BM-Case2 is 'not needed', while Claim B (from a later revision) specifies support for the capability to report measurements of multiple p",
+      "kind": "changed",
+      "why": "Claim A (Proposal 7) states that reporting multiple past time instances for BM-Case2 is 'not needed', whereas Claim B (Proposal 8) in the later revision changes this to support for that same capabilit"
+     }
+    ],
+    "unseen": [
+     {
+      "earlier": "3GPP TSG RAN WG1 #116 R1-2401596",
+      "later": "3GPP TSG RAN WG1 #116 R1-2401599",
+      "numbers_gone": [
+       "2401596"
+      ],
+      "numbers_new": [
+       "2401599"
+      ]
+     },
+     {
+      "earlier": "Title: FL summary #0 for AI/ML in management",
+      "later": "Title: FL summary #3 for AI/ML in management",
+      "numbers_gone": [
+       "0"
+      ],
+      "numbers_new": [
+       "3"
+      ]
+     }
+    ]
+   }
   }
  },
  "replay": {
@@ -1128,6 +1289,18 @@
     "unaligned in changed text": 233,
     "unaligned in unchanged text": 99
    },
+   "explained": {
+    "changed in changed text": 4,
+    "conditions in changed text": 2,
+    "conditions in unchanged text": 3,
+    "misread in unchanged text": 2,
+    "not_same_item in changed text": 26,
+    "not_same_item in unchanged text": 14,
+    "restated in changed text": 6,
+    "restated in unchanged text": 4,
+    "split_or_merge in changed text": 3,
+    "split_or_merge in unchanged text": 1
+   },
    "suspect_differences": 13,
    "numeric_changes": 32,
    "numeric_changes_unseen": 15,
@@ -1164,7 +1337,9 @@
         5488
        ]
       },
-      "rationale": "The entity and attribute are the same, but the units are incompatible (bytes vs bits) for the same value (8..)."
+      "rationale": "The entity and attribute are the same, but the units are incompatible (bytes vs bits) for the same value (8..).",
+      "kind": "misread",
+      "why": "The quotes for A and B are identical ('Packet Payload (8..)'), but the claims assign different units (bytes vs bits). Since the source text is the same, one of the claims must have misread the unit as"
      },
      {
       "a": {
@@ -1189,7 +1364,9 @@
         5364
        ]
       },
-      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Source Connection ID Length' field, whereas Claim B specifies a variable length of 0..160 bits for the 'Source Connection ID' itself. While the attr"
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Source Connection ID Length' field, whereas Claim B specifies a variable length of 0..160 bits for the 'Source Connection ID' itself. While the attr",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the 'Source Connection ID Length' field (the field that specifies the length), while Claim B refers to the 'Source Connection ID' itself (the actual identifier). Both the length fiel"
      },
      {
       "a": {
@@ -1214,7 +1391,9 @@
         5318
        ]
       },
-      "rationale": "Claim A specifies the size of the 'Length field' (the field that stores the length value) as 8 bits, whereas Claim B specifies the actual 'length' of the Connection ID itself as 0..160 bits. These are"
+      "rationale": "Claim A specifies the size of the 'Length field' (the field that stores the length value) as 8 bits, whereas Claim B specifies the actual 'length' of the Connection ID itself as 0..160 bits. These are",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the size of the field that stores the length value (8 bits), while Claim B refers to the actual length of the Connection ID data (0..160 bits). The provided context shows that both t"
      },
      {
       "a": {
@@ -1239,7 +1418,9 @@
         5102
        ]
       },
-      "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable length range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet."
+      "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable length range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet.",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the length of the 'Source Connection ID Length' field (fixed at 8 bits), whereas Claim B refers to the length of the 'Source Connection ID' itself (variable 0..2040 bits). Both the f"
      },
      {
       "a": {
@@ -1264,7 +1445,9 @@
         1487
        ]
       },
-      "rationale": "Claim A allows for two options (generate a connection error OR fully revert changes), whereas Claim B mandates only one specific action (MUST generate a connection error), removing the alternative of "
+      "rationale": "Claim A allows for two options (generate a connection error OR fully revert changes), whereas Claim B mandates only one specific action (MUST generate a connection error), removing the alternative of ",
+      "kind": "split_or_merge",
+      "why": "Claim A combined two requirements (generate error OR revert changes) into one statement. In the later revision, these were split into two separate claims: Claim B (generate error) and a separate state"
      },
      {
       "a": {
@@ -1289,7 +1472,9 @@
         5364
        ]
       },
-      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a variable length of 0..160 bits for the 'Destination Connection ID' itself. Whil"
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a variable length of 0..160 bits for the 'Destination Connection ID' itself. Whil",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the 'Destination Connection ID Length' field (a length indicator), while Claim B refers to the 'Destination Connection ID' field itself. Both fields are present in both revisions, as"
      },
      {
       "a": {
@@ -1314,7 +1499,9 @@
         5318
        ]
       },
-      "rationale": "Claim A specifies the size of the 'Length field' as 8 bits, whereas Claim B specifies the length of the 'Source Connection ID' itself as 0..160 bits. While they refer to the same entity, the attribute"
+      "rationale": "Claim A specifies the size of the 'Length field' as 8 bits, whereas Claim B specifies the length of the 'Source Connection ID' itself as 0..160 bits. While they refer to the same entity, the attribute",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the size of the 'Length field' (the metadata field that stores the length), while Claim B refers to the length of the 'Source Connection ID' itself (the actual data). The context lis"
      },
      {
       "a": {
@@ -1339,7 +1526,9 @@
         5268
        ]
       },
-      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Source Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Source Connection ID' itself. While they refer to the "
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Source Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Source Connection ID' itself. While they refer to the ",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the length of the 'Source Connection ID Length' field (a metadata field), while Claim B refers to the length of the 'Source Connection ID' itself (the actual identifier). Both proper"
      },
      {
       "a": {
@@ -1364,7 +1553,9 @@
         4552
        ]
       },
-      "rationale": "Claim A defines failure as receiving a non-zero ECN count for an ECT codepoint that was never applied. Claim B defines failure based on a mathematical inequality between the sum of ECT(1) and ECN-CE c"
+      "rationale": "Claim A defines failure as receiving a non-zero ECN count for an ECT codepoint that was never applied. Claim B defines failure based on a mathematical inequality between the sum of ECT(1) and ECN-CE c",
+      "kind": "not_same_item",
+      "why": "Claim A and Claim B describe two different failure conditions for ECN validation. The provided context shows that in the earlier revision, the value for Claim B was already present alongside other con"
      },
      {
       "a": {
@@ -1389,7 +1580,9 @@
         5268
        ]
       },
-      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Destination Connection ID' itself. While they ref"
+      "rationale": "Claim A specifies a fixed length of 8 bits for the 'Destination Connection ID Length' field, whereas Claim B specifies a range of 0..160 bits for the 'Destination Connection ID' itself. While they ref",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the length of the 'Destination Connection ID Length' field (a metadata field of 8 bits), while Claim B refers to the length of the 'Destination Connection ID' itself (the actual ID, "
      },
      {
       "a": {
@@ -1414,7 +1607,9 @@
         5102
        ]
       },
-      "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet."
+      "rationale": "Claim A specifies a fixed length of 8 bits, while Claim B specifies a variable range of 0 to 2040 bits for the same attribute of the Version Negotiation Packet.",
+      "kind": "not_same_item",
+      "why": "Claim A refers to the length of the 'Destination Connection ID Length' field (the field that specifies the length), while Claim B refers to the length of the 'Destination Connection ID' itself (the ac"
      },
      {
       "a": {
@@ -1439,7 +1634,9 @@
         5488
        ]
       },
-      "rationale": "Claims A and B specify the same value (0..160) for the same attribute, but use incompatible units: bytes versus bits."
+      "rationale": "Claims A and B specify the same value (0..160) for the same attribute, but use incompatible units: bytes versus bits.",
+      "kind": "misread",
+      "why": "The quotes for A and B are identical ('Destination Connection ID (0..160)'), but the claims assign different units (bytes vs bits). Since the source text is the same, one of the claims must have misre"
      },
      {
       "a": {
@@ -1464,7 +1661,9 @@
         1171
        ]
       },
-      "rationale": "Claim A defines 'final size' as the amount of flow control credit consumed, whereas Claim B defines it as the offset of the largest byte sent plus one. These are distinct engineering definitions for t"
+      "rationale": "Claim A defines 'final size' as the amount of flow control credit consumed, whereas Claim B defines it as the offset of the largest byte sent plus one. These are distinct engineering definitions for t",
+      "kind": "not_same_item",
+      "why": "Claim A is a high-level definition of 'final size' as flow control credit consumption. Claim B is a specific calculation for the 'general case' of final size. The earlier revision contains both the ge"
      }
     ],
     "unseen": [
@@ -1629,7 +1828,7 @@
   },
   "ts38300-j20-j30": {
    "claims": [
-    6629,
+    6626,
     6683
    ],
    "claims_from_pictures": 2696,
@@ -1648,21 +1847,21 @@
     "different in changed text": 25,
     "different in unchanged text": 17,
     "equivalent in changed text": 83,
-    "equivalent in unchanged text": 440,
+    "equivalent in unchanged text": 441,
     "settled in changed text": 87,
-    "settled in unchanged text": 5853,
+    "settled in unchanged text": 5851,
     "uncertain in changed text": 37,
-    "uncertain in unchanged text": 27,
+    "uncertain in unchanged text": 28,
     "unrelated in changed text": 93,
     "unrelated in unchanged text": 54
    },
    "unmatched": {
     "no_confirmed_counterpart in changed text": 45,
-    "no_confirmed_counterpart in unchanged text": 32,
+    "no_confirmed_counterpart in unchanged text": 34,
     "not_compared in changed text": 71,
-    "not_compared in unchanged text": 237,
+    "not_compared in unchanged text": 231,
     "unaligned in changed text": 31,
-    "unaligned in unchanged text": 89
+    "unaligned in unchanged text": 92
    },
    "explained": {
     "changed in changed text": 12,
@@ -1671,7 +1870,7 @@
     "conditions in unchanged text": 1,
     "misread in unchanged text": 2,
     "not_same_item in changed text": 38,
-    "not_same_item in unchanged text": 34,
+    "not_same_item in unchanged text": 35,
     "restated in unchanged text": 3,
     "split_or_merge in changed text": 2,
     "split_or_merge in unchanged text": 2
@@ -1679,13 +1878,13 @@
    "suspect_differences": 17,
    "numeric_changes": 12,
    "numeric_changes_unseen": 4,
-   "pairs_judged": 868,
-   "settled": 5940,
+   "pairs_judged": 870,
+   "settled": 5938,
    "groupings": {
     "ambiguous": 35,
     "attached": 17,
     "matched": 1903,
-    "unaligned": 81
+    "unaligned": 83
    },
    "examples": {
     "suspect": [
@@ -2137,6 +2336,167 @@
        "112",
        "112",
        "112"
+      ]
+     }
+    ]
+   }
+  },
+  "ran1-fl0-fl3": {
+   "claims": [
+    994,
+    1188
+   ],
+   "claims_from_pictures": 56,
+   "pictures_changed": [
+    0,
+    0
+   ],
+   "changed_blocks": 13,
+   "changed_lines": [
+    66,
+    535
+   ],
+   "findings": {
+    "complementary in unchanged text": 13,
+    "different in unchanged text": 3,
+    "equivalent in changed text": 18,
+    "equivalent in unchanged text": 114,
+    "settled in changed text": 27,
+    "settled in unchanged text": 776,
+    "uncertain in changed text": 5,
+    "uncertain in unchanged text": 11,
+    "unrelated in changed text": 2,
+    "unrelated in unchanged text": 3
+   },
+   "unmatched": {
+    "no_confirmed_counterpart in changed text": 8,
+    "no_confirmed_counterpart in unchanged text": 12,
+    "not_compared in changed text": 104,
+    "not_compared in unchanged text": 73,
+    "unaligned in changed text": 59,
+    "unaligned in unchanged text": 76
+   },
+   "explained": {
+    "changed in unchanged text": 1,
+    "conditions in unchanged text": 2,
+    "not_same_item in changed text": 4,
+    "not_same_item in unchanged text": 11,
+    "unclear in changed text": 1
+   },
+   "suspect_differences": 3,
+   "numeric_changes": 7,
+   "numeric_changes_unseen": 2,
+   "pairs_judged": 169,
+   "settled": 803,
+   "groupings": {
+    "ambiguous": 4,
+    "attached": 19,
+    "matched": 392,
+    "unaligned": 89
+   },
+   "examples": {
+    "suspect": [
+     {
+      "a": {
+       "entity": "AI/ML based beam prediction",
+       "attribute": "proposed specification support",
+       "value": "UE capability signaling including model training, model inference and model monitoring",
+       "unit": "",
+       "conditions": "spatial/time domain",
+       "lines": [
+        800,
+        800
+       ]
+      },
+      "b": {
+       "entity": "AI/ML based beam prediction in spatial/time domain",
+       "attribute": "proposed specification support",
+       "value": "assistance signalling and procedure for model performance monitoring and model update/tuning",
+       "unit": "",
+       "conditions": "Proposal 4",
+       "lines": [
+        1233,
+        1233
+       ]
+      },
+      "rationale": "Both claims propose specification support for AI/ML based beam prediction in the spatial/time domain, but they propose different types of signaling: Claim A focuses on 'UE capability signaling' (train",
+      "kind": "not_same_item",
+      "why": "Claim B's value ('assistance signalling and procedure for model performance monitoring and model update/tuning') is explicitly listed as a separate item in the earlier revision's context. Claim A is a"
+     },
+     {
+      "a": {
+       "entity": "AI/ML based beam prediction",
+       "attribute": "proposed specification support",
+       "value": "UE capability signaling including model training, model inference and model monitoring",
+       "unit": "",
+       "conditions": "spatial/time domain",
+       "lines": [
+        800,
+        800
+       ]
+      },
+      "b": {
+       "entity": "AI/ML based beam prediction in spatial/time domain",
+       "attribute": "proposed specification support",
+       "value": "assistance signalling and procedure for model configuration, model activation/deactivation, model recovery/termination, and model selection",
+       "unit": "",
+       "conditions": "Proposal 3",
+       "lines": [
+        1233,
+        1233
+       ]
+      },
+      "rationale": "Both claims propose specification support for AI/ML based beam prediction in the spatial/time domain, but they propose different types of signaling: Claim A focuses on UE capability signaling (trainin",
+      "kind": "not_same_item",
+      "why": "Claim A and Claim B refer to different types of proposed specification support (UE capability signaling vs. assistance signaling). The evidence shows that the value in Claim B was already present in t"
+     },
+     {
+      "a": {
+       "entity": "BM-Case2",
+       "attribute": "reporting multiple past time instances in one reporting instance",
+       "value": "not needed",
+       "unit": "",
+       "conditions": "",
+       "lines": [
+        368,
+        368
+       ]
+      },
+      "b": {
+       "entity": "BM-Case2",
+       "attribute": "reporting capability",
+       "value": "measurements of multiple past time instances in one reporting instance",
+       "unit": "",
+       "conditions": "Proposal 8",
+       "lines": [
+        579,
+        579
+       ]
+      },
+      "rationale": "Claim A states that reporting multiple past time instances for BM-Case2 is 'not needed', while Claim B (from a later revision) specifies support for the capability to report measurements of multiple p",
+      "kind": "changed",
+      "why": "Claim A (Proposal 7) states that reporting multiple past time instances for BM-Case2 is 'not needed', whereas Claim B (Proposal 8) in the later revision changes this to support for that same capabilit"
+     }
+    ],
+    "unseen": [
+     {
+      "earlier": "3GPP TSG RAN WG1 #116 R1-2401596",
+      "later": "3GPP TSG RAN WG1 #116 R1-2401599",
+      "numbers_gone": [
+       "2401596"
+      ],
+      "numbers_new": [
+       "2401599"
+      ]
+     },
+     {
+      "earlier": "Title: FL summary #0 for AI/ML in management",
+      "later": "Title: FL summary #3 for AI/ML in management",
+      "numbers_gone": [
+       "0"
+      ],
+      "numbers_new": [
+       "3"
       ]
      }
     ]

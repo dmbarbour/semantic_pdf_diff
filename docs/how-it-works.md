@@ -32,13 +32,13 @@ Extraction of all compared sources shares one queue: pages are fed round-robin a
 
 ## Text files and Word documents
 
-`.txt` and `.md` files are read by a text reader (`textdocs.py`) through the same task core as PDFs (`tasks.py`): the same prompts, quote checks, context levers and refinement. Word documents (`.docx`, with the `office` extra) are read into the same form by `docxdocs.py`: each paragraph and table row a line, headings by style (`Heading N`), tracked changes applied, the table of contents left out. Tables are read on their grid: a cell merged down repeats in each row it covers, a cell merged across is asked under its columns' labels, a small nested table is written into its cell and a large one read on its own, and a table used for layout is read as paragraphs. A text box's paragraphs follow the paragraph anchoring it. A chart is read from the values it caches (`chartxml.py`), as a table of categories by series after a line naming it. Their claims are located by paragraphs (`DocxLocator`).
+`.txt` and `.md` files are read by a text reader (`textdocs.py`) through the same task core as PDFs (`tasks.py`): the same prompts, quote checks, context levers and refinement. Word documents (`.docx`, with the `office` extra) are read into the same form by `docxdocs.py`: each paragraph and table row a line, headings by style (`Heading N`), tracked changes applied, the table of contents left out. Tables are read on their grid: a cell merged down repeats in each row it covers, a cell merged across is asked under its columns' labels, a small nested table is written into its cell and a large one read on its own, and a table used for layout is read as paragraphs. A text box's paragraphs follow the paragraph anchoring it. A chart is read from the values it caches (`chartxml.py`), as a table of categories by series after a line naming it. Equations are written as linear text where they stand (K_offset, (a+b)/c), and each comment follows the paragraph it comments on, naming its author and the text it's about. Their claims are located by paragraphs (`DocxLocator`).
 
 A Word document's pictures are read as a PDF's figures are (`pictures.py`). Each picture becomes a page at its displayed size:
 - **EMF or WMF** (most technical figures: Visio and chart-tool previews) is drawn by `metafiles.py` from the vendored metafile renderer's playback. Paths are vector, clips are computed, and text is set in PDF's built-in fonts, so the page draws alike on every machine and its labels are a text layer.
 - **A raster image** is placed as it is.
 
-The page gets a PDF page's image tasks (the whole picture, and tiles when it's large). Each task has the picture's caption as source text, its text layer as context and as a check on quotes, and its section's headings. Its claims are located at the picture's paragraph, with their crops. Charts and other drawings without a picture are recorded as not read. A store made before pictures were read needs `--reset` to read them.
+The page gets a PDF page's image tasks (the whole picture, and tiles when it's large). Each task has the picture's caption as source text, its text layer as context and as a check on quotes, and its section's headings. Its claims are located at the picture's paragraph, with their crops. Drawings without a picture, and charts of the newer kinds, are recorded as not read. Content read by an earlier version of its reader is read again on the next run, unchanged queries replaying from the cache ([decision 0016](decisions/0016-content-reread-when-its-reader-changes.md)).
 
 - **Pages:** a form feed starts one (as in RFCs); otherwise the file is one page.
 - **Sections:** from Markdown headings, or numbered headings in the RFC style ("7.2.  Stream Concurrency"); failing those, fixed page ranges.
@@ -81,7 +81,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `throttle.py` | Rate limits with time-of-day rules; adaptive concurrency |
 | `dispatch.py` | Worker threads for model requests; everything else stays on the main thread |
 | `progress.py` | Progress bars, heartbeats and logging |
-| `store.py` | SQLite evidence store: binding, per-task records, semantic response cache, comparisons |
+| `store.py` | SQLite evidence store: binding, per-task records, the response cache keyed by query and model, the reader version each content item was read with, comparisons |
 | `cli.py` | Commands: arguments into settings and run options, planning, exit semantics; the lab's commands by entry point |
 | `pipeline.py` | A run: bind the store, scan, extract, situate, compare, report |
 | `levers.py` | Settings' declarations, levers as mixins on the platform, configurations |

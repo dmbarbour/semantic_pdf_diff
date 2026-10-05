@@ -40,7 +40,11 @@ grouping, the context levers and the task core work unchanged, and a claim's loc
   (clustered column chart); values: MWh; caption: Figure 2: ...", its caption the nearest caption paragraph) and
   tables of categories by series, after the paragraph anchoring it (after its table, in a cell). Charts of the
   newer kinds (chartex) are recorded as not read.
-- **Not read yet:** other drawings without a picture, each recorded as not read; comments.
+- **Equations** (Office Math): written as plain text where they stand, in a linear form: K_offset, (a+b)/(c),
+  x^(2), √(x), ∑_(i=1)^(N) x_i, sin(θ), [a b; c d].
+- **Comments:** each placed as a line after the paragraph (or table) holding its reference, naming its author and
+  the text it comments on: 'Comment by Ana on "the design flow": Check against the 2025 census.'
+- **Not read yet:** other drawings without a picture, each recorded as not read.
 
 Needs python-docx (the `office` extra).
 """
@@ -60,6 +64,8 @@ R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 WP = "{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}"
 V = "{urn:schemas-microsoft-com:vml}"
 MC = "{http://schemas.openxmlformats.org/markup-compatibility/2006}"
+M = "{http://schemas.openxmlformats.org/officeDocument/2006/math}"
+ANCHOR_CHARS = 100  # a comment's anchored text, at most this long (then "…")
 CHART = "http://schemas.openxmlformats.org/drawingml/2006/chart"
 CHARTEX = "http://schemas.microsoft.com/office/drawing/2014/chartex"
 SHAPES = ("{http://schemas.microsoft.com/office/word/2010/wordprocessingGroup}wgp",   # grouped shapes
@@ -86,7 +92,8 @@ def _walk(element, boxes=False):
         if child.tag in skip:
             continue
         yield child
-        yield from _walk(child, boxes)
+        if child.tag != M + "oMath":  # an equation is read whole (_math)
+            yield from _walk(child, boxes)
 
 def _boxes(element):
     """The text boxes an element anchors (not those inside them), in order."""
@@ -109,9 +116,54 @@ def paragraph_text(p, notes=None, boxes=False):
             out.append("\n")
         elif notes is not None and tag == _qn("w:footnoteReference") and node.get(_qn("w:id")) in notes:
             out.append(f"[{notes[node.get(_qn('w:id'))]}]")
+        elif tag == M + "oMath":
+            out.append(_math(node))
     if boxes:
         out += [" " + _box_text(box, notes) for box in _boxes(p)]
     return "".join(out)
+
+def _math(e):
+    """An equation (Office Math) as linear text: fractions (a)/(b), scripts x_(i) and x^(2), roots √(x), sums and
+    integrals ∑_(i=1)^(N) x, delimiters, functions, matrices [a b; c d]; an argument of one symbol unbracketed."""
+    tag = e.tag[len(M):] if isinstance(e.tag, str) and e.tag.startswith(M) else ""
+    part = lambda name: next((c for c in e if c.tag == M + name), None)
+    text = lambda x: _math(x) if x is not None else ""
+    arg = lambda x: (lambda t: t if len(t) <= 1 or t.replace(".", "").isalnum() else f"({t})")(text(x))
+    prop = lambda holder, name, default: next((c.get(M + "val", default) for c in (part(holder) if part(holder) is not
+                                                                                   None else ()) if c.tag == M + name),
+                                               default)
+    if tag == "t":
+        return e.text or ""
+    if tag.endswith("Pr") or tag == "ctrlPr":
+        return ""
+    if tag == "f":
+        return f"{arg(part('num'))}/{arg(part('den'))}"
+    if tag in ("sSup", "sSub", "sSubSup", "sPre"):
+        sub = f"_{arg(part('sub'))}" if part("sub") is not None else ""
+        sup = f"^{arg(part('sup'))}" if part("sup") is not None else ""
+        return f"{sub}{sup}{text(part('e'))}" if tag == "sPre" else f"{text(part('e'))}{sub}{sup}"
+    if tag == "rad":
+        degree = text(part("deg"))
+        return f"√{arg(part('e'))}" if not degree else f"root({degree})({text(part('e'))})"
+    if tag == "d":
+        begin, end, between = prop("dPr", "begChr", "("), prop("dPr", "endChr", ")"), prop("dPr", "sepChr", "|")
+        return begin + between.join(text(c) for c in e if c.tag == M + "e") + end
+    if tag == "nary":
+        sign = prop("naryPr", "chr", "∫")
+        sub = f"_{arg(part('sub'))}" if text(part("sub")) else ""
+        sup = f"^{arg(part('sup'))}" if text(part("sup")) else ""
+        return f"{sign}{sub}{sup} {text(part('e'))}"
+    if tag == "func":
+        body = text(part("e"))
+        return text(part("fName")) + (body if body.startswith("(") else f"({body})")
+    if tag in ("limLow", "limUpp"):
+        return f"{text(part('e'))}{'_' if tag == 'limLow' else '^'}{arg(part('lim'))}"
+    if tag == "eqArr":
+        return "; ".join(text(c) for c in e if c.tag == M + "e")
+    if tag == "m":
+        rows = [" ".join(text(c) for c in row if c.tag == M + "e") for row in e if row.tag == M + "mr"]
+        return "[" + "; ".join(rows) + "]"
+    return "".join(_math(c) for c in e)
 
 def _box_text(box, notes=None):
     """A text box's text on one line: its paragraphs and its tables' paragraphs, boxes within it included."""
@@ -223,6 +275,35 @@ def _format(n, form):
                 out, n = out + numeral, n - value
         return out.upper() if form == "upperRoman" else out
     return "" if form == "none" else str(n)
+
+def _comments(document):
+    """{comment id: (author, its text)} from the document's comments part (none: {})."""
+    from docx.opc.constants import RELATIONSHIP_TYPE as RT
+    from docx.oxml import parse_xml
+    part = next((r.target_part for r in document.part.rels.values() if r.reltype == RT.COMMENTS and not r.is_external),
+                None)
+    if part is None:
+        return {}
+    root = parse_xml(part.blob)
+    return {c.get(_qn("w:id")): (c.get(_qn("w:author")) or "an unnamed author",
+                                 " ".join(t for t in (paragraph_text(p, boxes=True).strip() for p in _walk(c)
+                                                      if p.tag == _qn("w:p")) if t))
+            for c in root.iter(_qn("w:comment"))}
+
+def _anchors(body):
+    """{comment id: the text it comments on}, gathered in document order between its range marks."""
+    open_, out = [], {}
+    for node in _walk(body, boxes=True):
+        if node.tag == _qn("w:commentRangeStart"):
+            open_.append(node.get(_qn("w:id")))
+            out.setdefault(open_[-1], [])
+        elif node.tag == _qn("w:commentRangeEnd") and node.get(_qn("w:id")) in open_:
+            open_.remove(node.get(_qn("w:id")))
+        elif node.tag in (_qn("w:t"), M + "oMath") and open_:
+            piece = node.text or "" if node.tag == _qn("w:t") else _math(node)
+            for i in open_:
+                out[i].append(piece)
+    return {i: " ".join("".join(parts).split()) for i, parts in out.items()}
 
 def _children(element, *tags):
     """An element's children with these tags, read through content controls and custom markup."""
@@ -446,6 +527,22 @@ def read_docx(data):
                 found.append((n, target.blob, "." + name.rsplit(".", 1)[-1].lower(), detail, name))
     notes = _footnotes(document)
     numbers = {}  # footnote id: its number, in the order the body cites them
+    remarks, anchors, placed = _comments(document), _anchors(document.element.body), set()
+
+    def comment_lines(element):
+        """A line for each comment whose reference the element holds (once each), after it."""
+        for node in _walk(element, boxes=element.tag == _qn("w:tbl")):
+            i = node.get(_qn("w:id")) if node.tag == _qn("w:commentReference") else None
+            if i is None or i not in remarks or i in placed:
+                continue
+            placed.add(i)
+            author, said = remarks[i]
+            anchor = anchors.get(i, "")
+            if len(anchor) > ANCHOR_CHARS:
+                anchor = anchor[:ANCHOR_CHARS].rstrip() + "…"
+            text = f'Comment by {author} on "{anchor}": {said}' if anchor else f"Comment by {author}: {said}"
+            m = line(text)
+            blocks.append(Block(1, m, m, text))
 
     def cited(element):
         """The footnote ids an element cites, numbered as they're met."""
@@ -499,6 +596,7 @@ def read_docx(data):
         elif text and not style.lower().startswith("toc"):
             blocks.append(Block(1, n, n, text))
         footnote_lines(ids)
+        comment_lines(child)
         for found in _charts(child):
             chart(found, n, style, _caption_near(child, styles))
         for box in _boxes(child):  # after the paragraph anchoring it, as the document's own paragraphs
@@ -534,6 +632,7 @@ def read_docx(data):
         if place is None:
             note(child, first, "table", boxes=True)
         if place is None:
+            comment_lines(child)
             for found in _charts(child, boxes=True):  # a chart in a cell: after its table
                 chart(found, first, "table")
         for cells, cell in inner:

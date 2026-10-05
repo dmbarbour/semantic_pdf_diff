@@ -23,7 +23,8 @@ SLICES = ROOT / 'samples/slices'
 MANIFEST = json.loads((ROOT / 'scripts/slices.json').read_text())
 sys.path.insert(0, str(ROOT / 'scripts'))
 import record_runs  # noqa: E402  (the settings every recording shares)
-# The runs recorded in the fixture; by default only the first few development runs replay (REPLAY_ALL=1 for all).
+# The runs to replay: by default the first few development runs; with REPLAY_ALL=1, every run the fixture holds (the
+# committed fixture holds the development runs; held-out runs are recorded into local fixtures only).
 RUNS = {r['name']: tuple(r['slices']) for r in MANIFEST.get('runs', [])
         if r['set'] == 'dev' or os.environ.get('REPLAY_ALL')}
 if not os.environ.get('REPLAY_ALL'):
@@ -47,8 +48,10 @@ class ReplaySlices(unittest.TestCase):
         with fixtures.open(FIXTURE, "read") as f:
             cls.summary = f.summary()
         from semantic_pdf_diff.provenance import content_id
-        wanted = {content_id((SLICES / f'{n}.pdf').read_bytes(), f'{n}.pdf') for slices in RUNS.values() for n in slices}
-        if not wanted <= set(cls.summary['contents']):
+        held = set(cls.summary['contents'])
+        recorded = lambda run: {content_id((SLICES / f'{n}.pdf').read_bytes(), f'{n}.pdf') for n in RUNS[run]} <= held
+        cls.runs = [run for run in RUNS if recorded(run)]
+        if not cls.runs or (not os.environ.get('REPLAY_ALL') and len(cls.runs) < len(RUNS)):
             raise unittest.SkipTest('the fixture was recorded from other slices; re-record (scripts/record_runs.py)')
         if cls.summary['meta'].get('pymupdf') != pymupdf.VersionBind:
             raise unittest.SkipTest(f"fixture recorded with PyMuPDF {cls.summary['meta'].get('pymupdf')}, "
@@ -73,7 +76,7 @@ class ReplaySlices(unittest.TestCase):
         responders = sorted({a['responder'] for a in self.summary['answers']})
         self.assertTrue(responders)
         for responder in responders:
-            for run in RUNS:
+            for run in self.runs:
                 with self.subTest(responder=responder, run=run):
                     code, report = self.replay(run, responder)
                     self.assertIn(code, (0, 2))  # 2: some task partial or failed, as recorded

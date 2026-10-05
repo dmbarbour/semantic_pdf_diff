@@ -309,5 +309,45 @@ class WordCharts(unittest.TestCase):
         newer = read_docx(self.chart_document(newer=True))
         self.assertEqual([detail for *_, detail in newer.images], ["a chart of a newer kind (chartex), not read yet"])
 
+MATH = ('<m:oMath xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">{}</m:oMath>')
+r = lambda t: f"<m:r><m:t>{t}</m:t></m:r>"
+
+@unittest.skipIf(docx is None, "python-docx isn't installed (the office extra)")
+class WordEquationsAndComments(unittest.TestCase):
+    """Equations and comments (the adapters plan, "Equations and comments")."""
+    def test_an_equation_is_written_as_linear_text_where_it_stands(self):
+        from docx.oxml import parse_xml
+        from semantic_pdf_diff.docxdocs import paragraph_text
+        cases = [  # (Office Math, as written)
+            (f"<m:sSub><m:e>{r('K')}</m:e><m:sub>{r('offset')}</m:sub></m:sSub>", "K_offset"),
+            (f"<m:f><m:num>{r('a+b')}</m:num><m:den>{r('c')}</m:den></m:f>", "(a+b)/c"),
+            (f"<m:sSup><m:e>{r('x')}</m:e><m:sup>{r('2')}</m:sup></m:sSup>", "x^2"),
+            (f"{r('Δf=15∙')}<m:sSup><m:e>{r('10')}</m:e><m:sup>{r('3')}</m:sup></m:sSup>", "Δf=15∙10^3"),
+            (f'<m:nary><m:naryPr><m:chr m:val="∑"/></m:naryPr><m:sub>{r("i=1")}</m:sub><m:sup>{r("N")}</m:sup>'
+             f"<m:e>{r('x')}</m:e></m:nary>", "∑_(i=1)^N x"),
+            (f"<m:rad><m:radPr><m:degHide m:val=\"1\"/></m:radPr><m:deg/><m:e>{r('x+1')}</m:e></m:rad>", "√(x+1)"),
+            (f'<m:d><m:dPr><m:begChr m:val="["/><m:endChr m:val="]"/></m:dPr><m:e>{r("0,1")}</m:e></m:d>', "[0,1]"),
+            (f"<m:func><m:fName>{r('sin')}</m:fName><m:e>{r('θ')}</m:e></m:func>", "sin(θ)"),
+        ]
+        for math, want in cases:
+            with self.subTest(want=want):
+                p = parse_xml(f'<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:r>'
+                              f'<w:t xml:space="preserve">Spacing </w:t></w:r>{MATH.format(math)}<w:r><w:t xml:space='
+                              f'"preserve"> applies.</w:t></w:r></w:p>')
+                self.assertEqual(paragraph_text(p), f"Spacing {want} applies.")
+
+    def test_a_comment_follows_the_paragraph_it_comments_on(self):
+        from semantic_pdf_diff.docxdocs import read_docx
+        from semantic_pdf_diff_lab.bench.controlled.word import Writer
+        writer = Writer()
+        p = writer.paragraph("The design flow is 25.9 MGD.")
+        writer.comment(p, "Check against the 2025 census: 44,100 persons.", author="Ana")
+        writer.paragraph("Alum is dosed at 38.8 mg/L.")
+        doc = read_docx(writer.save())
+        self.assertEqual([t for _, t in doc.lines if t],
+                         ["The design flow is 25.9 MGD.",
+                          'Comment by Ana on "The design flow is 25.9 MGD.": Check against the 2025 census: 44,100 '
+                          "persons.", "Alum is dosed at 38.8 mg/L."])
+
 if __name__ == "__main__":
     unittest.main()

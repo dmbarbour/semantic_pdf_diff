@@ -277,6 +277,23 @@ class ResumeAndReuse(unittest.TestCase):
             self.run_cli(renamed, b, root / 'out', url)
             self.assertEqual(state['requests'], first)
 
+    def test_a_changed_reader_reads_its_content_again_replaying_unchanged_queries(self):
+        from unittest import mock
+        from semantic_pdf_diff import extract
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
+            root = Path(d); a, b = self.pdfs(root)
+            self.run_cli(a, b, root / 'out', url)
+            first, findings = state['requests'], self.findings(root / 'out')
+            with mock.patch.dict(extract.READERS, {'.pdf': 'pdf/2'}):  # a reader changed since
+                code, log = self.run_cli(a, b, root / 'out', url)
+            self.assertNotIn('Loaded from store', log)          # read again,
+            self.assertEqual(state['requests'], first)          # its unchanged queries answered from cache
+            self.assertEqual(self.findings(root / 'out'), findings)
+            with Store(root / 'out') as store:
+                self.assertTrue(store.is_extracted(content_id(a.read_bytes(), a.name), 'pdf/2'))
+            code, log = self.run_cli(a, b, root / 'out', url)  # the old version, a downgrade: read again too
+            self.assertNotIn('Loaded from store', log)
+
     def test_failed_tasks_are_retried_on_the_next_run(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
             root = Path(d); a, b = self.pdfs(root)
@@ -286,7 +303,7 @@ class ResumeAndReuse(unittest.TestCase):
             self.assertIn('not_reached', statuses)  # cut off by the call limit, not failed
             self.assertNotIn('failed', statuses)
             with Store(root / 'out') as store:
-                self.assertFalse(store.is_extracted(content_id(a.read_bytes(), a.name)))
+                self.assertFalse(store.is_extracted(content_id(a.read_bytes(), a.name), "pdf/1"))
             code, _ = self.run_cli(a, b, root / 'out', url)
             report = json.loads((root / 'out/report.json').read_text())
             self.assertFalse(any(r['status'] == 'failed' for r in report['coverage']))

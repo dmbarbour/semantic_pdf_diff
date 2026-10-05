@@ -1,6 +1,6 @@
 # Test models and record/replay
 
-- **Status:** Active (2026-09-25)
+- **Status:** Completed (2026-10-04). The owner: "Yes, close test models and move leftovers so we don't lose them." Decisions in force: [0006](../decisions/0006-replay-fixtures.md) to [0010](../decisions/0010-fixtures-hold-answers-only.md); how to record, top up, prune and pack: [samples and testing](../samples-and-testing.md#recorded-answers-replay-fixtures). Unfinished items moved to the [plans index](README.md): other hosted models and a lenient comparison replay under *Model discovery*; collection rounds (milestone 5), the recording kit (milestone 6) and CI (milestone 4) under *Testing and recording infrastructure*.
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (response cache, interpreter records)
 - **Enables:** fast realistic integration tests for every later plan; the [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md)
 

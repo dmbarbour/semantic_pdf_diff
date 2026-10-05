@@ -30,6 +30,10 @@ PAIRS = {
     "quic-34-rfc9000": ("ietf-quic-transport/draft-ietf-quic-transport-34.txt", "ietf-quic-transport/rfc9000.txt"),
     # 3GPP TS 38.300 v19.2.0 and v19.3.0, each a zipped .docx: a small-difference pair
     "ts38300-j20-j30": ("3gpp-ts38300-revisions/38300-j20.zip", "3gpp-ts38300-revisions/38300-j30.zip"),
+    # RAN1's feature lead summaries on AI/ML beam management, version 0 and 3 of one meeting: tables of companies'
+    # views that grow round by round, proposals revised (the revision comparison plan, milestone 3)
+    "ran1-fl0-fl3": ("3gpp-ran1-beam-management/moderator/R1-2401596-FL-summary-0.zip",
+                     "3gpp-ran1-beam-management/moderator/R1-2401599-FL-summary-3.zip"),
 }
 
 def settings_file():

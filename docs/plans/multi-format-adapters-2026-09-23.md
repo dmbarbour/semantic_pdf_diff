@@ -26,7 +26,7 @@ Only content that is truly unstructured goes to the model claim by claim. For st
 | `.docx` | Real paragraphs, heading styles and real tables via `python-docx`. Embedded images go to the visual pipeline. Read as currently written, with tracked changes applied. Comments are content, with a provenance annotation saying what they comment on. | No table detection needed; quote checks become exact. |
 | `.pptx` | Text per shape, tables, speaker notes (content, with "slide N speaker notes" as provenance), and **chart XML, which holds the actual series data**. Embedded images go to vision. | Chart XML beats estimating values from pixels. SmartArt and grouped shapes are the awkward cases. |
 | Images (`.png`, `.jpg`, scans) | Straight into the existing visual pipeline. | Nearly free. |
-| Legacy `.doc`/`.ppt`/`.xls`, or visual fidelity for Office files | Optional headless LibreOffice conversion to PDF. | Provenance maps only to the converted PDF's pages, so this is a fallback, not the main path. |
+| Legacy `.doc`/`.ppt`/`.xls`, or visual fidelity for Office files | Recorded as unsupported. Optional headless LibreOffice conversion to PDF is a tentative, very low priority extra dependency, never assumed (milestone 4). | Provenance would map only to the converted PDF's pages, so it could only ever be a fallback. |
 
 Candidates for later: HTML, and email exports.
 
@@ -78,7 +78,7 @@ Some formats need proprietary or heavyweight tools, e.g. Cameo/MagicDraw `.mdzip
 - A converter "opens" content into formats we already handle (XMI/XML, CSV, HTML, PDF, PNG diagrams…). Its outputs become **derived content** in the store, with provenance back to the original file.
 - The converter's identity (executable path and hash, declared version, arguments) is part of the extraction interpreter, so changing it falls under the store's interpreter-binding rule (reject, or `--reset`). This is best effort only: a converter's own configuration files and dependencies can't be tracked, and the documentation must say clearly that **users are responsible** for resetting a store when they change them.
 - Converters run inside the sandbox with no network, a timeout and output size limits (generous backstops), and write only to a scratch directory the tool provides.
-- The LibreOffice fallback for legacy Office formats becomes just one configured converter.
+- The LibreOffice fallback for legacy Office formats would be just one configured converter, never assumed. The owner (2026-10-04): "We won't have LibreOffice, and let's not assume it, but it could be a tentative extra-dependency eventually (very low priority)."
 
 ## Locators
 
@@ -104,7 +104,7 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 1. Adapter interface and intermediate units; refactor the PDF path to use it. Include `.txt` / `.md` here as the simplest adapters: they are nearly free and exercise the interface (and the `ietf-quic-transport` samples).
 2. `.docx`.
 3. `.pptx`, including chart XML.
-4. External converter interface, with LibreOffice as the first configured converter.
+4. External converter interface. *Tentative, very low priority (the owner, 2026-10-04, above):* LibreOffice an optional extra dependency at most, never assumed; legacy `.doc`/`.ppt`/`.xls` are recorded as unsupported meanwhile.
 5. `.csv` / `.xlsx`: table region detection and sheet maps, then model-guided table interpretation.
 6. Images.
 
@@ -552,6 +552,18 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
 
     - Read as data, the charts' values are read right, kept to their month (conditions 19 of 19, 33 of 33, 50 of 50), and read once: a picture's overview and tiles had read the end-use chart's values twice.
     - Cost: $0.014.
+- **Equations and comments, and readers versioned (2026-10-04): built.** The owner, on the plans review's cheap wins: "Go for the cheap wins!"
+  - **Equations (Office Math) were dropped:** only Word's text runs were read, so TS 38.300's inline symbols vanished from their sentences ("K_offset and K_mac:" read " and :"; "Common TA is a configured timing offset…" read " is a configured…"), along with values (the R2D transmission's subcarrier spacing, Δf=15∙10^3 Hz).
+  - **Now written as linear text where they stand:** K_offset, (a+b)/c, x^2, √(x+1), ∑_(i=1)^N x, sin(θ), [a b; c d]. Nine lines of each TS 38.300 version change.
+  - **Comments,** as the per-format table always said ("Comments are content, with a provenance annotation saying what they comment on"):
+    - each a line after the paragraph (or table) holding its reference: 'Comment by Ana on "the design flow": Check against the 2025 census.'
+    - its anchored text cut at 100 characters
+    - The RAN1 feature-lead summaries hold two each ('Comment by 作者 on "[Note:": To align with proposal 3.1.1').
+  - **A knob,** `wtp-s1-comments`: two sentences moved into reviewers' comments on the sentences before them. 33 of 33 facts read right, conditions kept 11 of 11, $0.002.
+  - **Readers versioned** ([decision 0016](../decisions/0016-content-reread-when-its-reader-changes.md)):
+    - The gap met with merged cells is closed. Each content item records the version of the reader that extracted it (`extract.READERS`: `pdf/1`, `text/1`, `docx/2`), and a run reads again any item whose reader has changed since, or that has gained a reader.
+    - Unchanged queries replay from the cache.
+    - Every controlled store was read again this way. No score changed, and nothing new was asked but the new knob's queries.
 
 ## Open questions
 

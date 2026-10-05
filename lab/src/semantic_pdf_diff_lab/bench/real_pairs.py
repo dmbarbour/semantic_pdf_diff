@@ -32,7 +32,7 @@ def document(path):
     path = Path(path)
     if path.suffix == ".zip":
         with zipfile.ZipFile(path) as z:
-            name = next(n for n in z.namelist() if n.endswith((".docx", ".txt", ".md")))
+            name = next(n for n in z.namelist() if n.endswith((".docx", ".txt", ".md")) and not n.startswith("__MACOSX"))
             return read(name, z.read(name))
     return read(path.name, path.read_bytes())
 

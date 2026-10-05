@@ -1,6 +1,6 @@
 # Query improvement in rounds
 
-- **Status:** Active (2026-09-26).
+- **Status:** Active (2026-09-26); rounds paused since r09b (2026-09-28). The owner (2026-10-04): "We'll defer query rounds for just a bit longer." Open question 1 waits with them.
   - **2026-10-03:**
     - Nothing waits on the sc01 survey any more. The owner: "I won't get back to that spotcheck." That covers re-judging sc01 with v6, agreement with the owner's sc01 verdicts, the measurements owed after the surveys, and the next round.
     - The rounds' working data left the repository (the owner); their record is [docs/research/rounds.md](../research/rounds.md).
@@ -37,7 +37,7 @@ What we've learned so far shapes this:
    - smaller tiles on drawing sheets
 
    Claude and the owner design the first rounds. Later, a model can propose variants from the failure clusters (automatic prompt optimisation), but the owner approves what runs.
-3. **Record.** Run each variant on the evaluation inputs through the live pipeline with the fixture attached (a new interpreter fingerprint, the same responder). Unchanged requests replay for free.
+3. **Record.** Run each variant on the evaluation inputs through the live pipeline with the fixture attached (its changed queries are new; the same responder). Unchanged requests replay for free.
 4. **Judge.** The panel judges, per sampled input:
    - **Pairwise:** the baseline's answer against the variant's, in both orders (to cancel position bias): which is better, or equal, and why.
    - **Per-output checks:** the per-field right/wrong/unsure on each output's claims, weighed across raters (no rater is ground truth).

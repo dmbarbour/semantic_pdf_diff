@@ -17,7 +17,7 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 **Status:**
 - Extraction has been measured with one real model (gemma-4-31B, through DeepInfra) on public sample documents and the controlled corpus.
 - It isn't a validated engineering sign-off tool; see [limitations](docs/limitations.md).
-- **Still planned:** more formats (`.pptx`, spreadsheets, pictures in Word documents), criteria-first comparison of two or more sources, consistency checks and RAG export. See [docs/plans/](docs/plans/README.md).
+- **Still planned:** more formats (`.pptx`, spreadsheets, images), criteria-first comparison of two or more sources, consistency checks and RAG export. See [docs/plans/](docs/plans/README.md).
 
 ## Quick start
 
@@ -80,10 +80,11 @@ The `--out` folder is an evidence **store** (`store.sqlite` plus rendered crops)
 | --- | --- |
 | [How it works](docs/how-it-works.md) | Claims, the extraction and comparison pipeline, modes, code map |
 | [Configuration](docs/configuration.md) | Endpoint, environment variables, settings, context budget, caching, exit codes |
-| [Samples and testing](docs/samples-and-testing.md) | Running tests, the public sample corpus, synthetic samples, local embedding server |
+| [Samples and testing](docs/samples-and-testing.md) | Running tests, the public sample corpus, recorded answers (replay fixtures), synthetic samples, local embedding server |
 | [Limitations](docs/limitations.md) | What the current release can't do, and what to review before relying on it |
 | [Validation](docs/VALIDATION.md) | What has and hasn't been verified |
 | [Plans](docs/plans/README.md) | Design plans for the generalized tool, with status |
+| [Decisions](docs/decisions/README.md) | Architecture decisions in force, each with its reasons and consequences |
 
 ## Tests
 

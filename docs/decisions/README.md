@@ -1,0 +1,22 @@
+# Decisions
+
+An architecture decision record (ADR) here records one decision that is still in force: the problem it answered, what was decided, and what follows from it, with links to the plans and reviews where it was decided. Records are numbered in rough order of decision. A decision that a later one replaced is kept and marked superseded, with a link to its successor.
+
+| No. | Title | Status | Date | Summary |
+|---|---|---|---|---|
+| 0001 | [The v0.2.0 robustness baseline is the stable tag](0001-v0-2-0-stable-baseline.md) | Accepted | 2026-09-23 | `v0.2.0` is the stable baseline; until there are users, plans reorder and formats change without migrations |
+| 0002 | [Evidence attaches to content, and sources are declared in the store](0002-evidence-attaches-to-content.md) | Accepted | 2026-09-23 | Content is SHA-256 plus extension, extracted once and shared across sources; revisions are content differences |
+| 0003 | [A resumable SQLite evidence store in a local folder](0003-sqlite-evidence-store.md) | Accepted | 2026-09-23 | One folder per store: per-task transactions, one writer, owner-only permissions, refusal on another schema version |
+| 0004 | [A store is bound to its interpreters, with a selective reset](0004-store-bound-to-its-interpreters.md) | Accepted | 2026-09-23 | A store refuses another model, prompt or bound setting; `--reset` clears only affected derived data, and cached answers survive |
+| 0005 | [Union provenance: one claim per fact in a piece of content, every sighting kept](0005-union-provenance.md) | Accepted | 2026-09-24 | A claim is a fact within one piece of content; every sighting is an occurrence, with one representative chosen by a fixed rule |
+| 0006 | [Recorded model answers replay as test fixtures](0006-replay-fixtures.md) | Accepted | 2026-09-25 | Zipped SQLite fixtures, packed reproducibly; `replay`, `replay-or-record`, `record-new`; public slices; PyMuPDF pinned |
+| 0007 | [Recorded answers keyed by request meaning and an interpreter fingerprint](0007-semantic-request-keys.md) | Superseded by [0009](0009-content-addressed-queries.md) | 2026-09-25 | Semantic keys kept in step with prompts by hand; stale answers slipped through |
+| 0008 | [Fixtures are recorded by running the pipeline live against hosted gemma-4](0008-record-live-against-hosted-gemma-4.md) | Accepted | 2026-09-25 | One live run records every adaptive round; no collection rounds for models that can be called; the in-house kit deferred |
+| 0009 | [Queries are content-addressed: keyed by what reaches the model](0009-content-addressed-queries.md) | Accepted | 2026-09-28 | A query is named by the hash of what reaches the model; recordings are (query, responder, sample) with an outcome |
+| 0010 | [A fixture holds answers only; evaluation answers have fixtures of their own](0010-fixtures-hold-answers-only.md) | Accepted | 2026-09-28 | No query text or images in fixtures; recipes live in run stores for diagnostics; judge answers in per-folder fixtures |
+| 0011 | [Every setting is declared once, classified by what it can affect](0011-settings-classified-by-effect.md) | Accepted | 2026-09-28 | Endpoint, shaping, selecting or post, checked by a test; bindings, resets and docs read off the declarations |
+| 0012 | [Every request at temperature 0, with model-neutral defaults](0012-temperature-zero-and-model-neutral-defaults.md) | Accepted | 2026-10-02 | Temperature isn't a setting; defaults fit a 32k context; gemma-4's measured profile is the example config |
+| 0013 | [Levers are mixins on a platform class, composed from data](0013-levers-as-mixins.md) | Accepted | 2026-10-02 | Ordered lever lists composed with `type()`; chained and chosen hooks; assumptions checked on the final type |
+| 0014 | [The lab is its own distribution, installed as `semantic-pdf-diff[lab]`](0014-lab-as-its-own-distribution.md) | Accepted | 2026-10-02 | `semantic-pdf-diff[lab]` adds evaluation and bench tooling through entry points; the product never imports it |
+| 0015 | [The repository holds code, docs and the answers tests replay](0015-repository-contents.md) | Accepted | 2026-10-03 | Run data stays local and findings go into docs; git history isn't rewritten |
+| 0016 | [Content is read again when its reader changes](0016-content-reread-when-its-reader-changes.md) | Accepted | 2026-10-04 | Each content item records its reader's version; a changed reader re-reads it, unchanged queries replaying from cache |

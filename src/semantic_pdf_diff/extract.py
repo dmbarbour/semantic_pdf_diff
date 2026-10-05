@@ -236,6 +236,14 @@ def office_installed():
         return False
     return True
 
+# Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
+# parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
+READERS = {".pdf": "pdf/1", ".txt": "text/1", ".md": "text/1", ".docx": "docx/2"}  # docx/2: equations, comments
+
+def reader_version(extension):
+    """The version of what reads content of this extension ("docx/1"); "unsupported" where nothing reads it yet."""
+    return READERS.get(extension, "unsupported") if reader_for(extension) is not None else "unsupported"
+
 def reader_for(extension):
     """The job generator reading content of this extension, or None if none reads it (a .docx needs the office
     extra)."""

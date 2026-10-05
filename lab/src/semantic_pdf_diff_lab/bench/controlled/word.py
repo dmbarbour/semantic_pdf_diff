@@ -21,6 +21,8 @@ reader's own lines).
 - **textbox:** the treatment plant's document with a sentence and a captioned table in text boxes as Word writes
   them (a DrawingML shape, and a VML copy of it for older readers), and a sentence in a VML text box alone (as
   older Word wrote them); each anchored in a paragraph.
+- **comments:** the treatment plant's document with two sentences moved into reviewers' comments on the sentences
+  before them: facts stated only in comments, read as the document's comments.
 - **charts:** the chart studies with each chart a Word chart (chart XML caching its series, as Word keeps them; no
   workbook), not a picture, its caption after it: grouped bars a clustered column chart, stacked bars a stacked
   one, lines a line chart; values cached as numbers shown "#,##0", the value axis titled with the unit.
@@ -93,6 +95,7 @@ class Writer:
         props.author = props.last_modified_by = AUTHOR
         self.revision = 0
         self.footnotes = []  # their texts, numbered from 1
+        self.comments = []   # (author, text), ids from 0
         self.lists = {}      # label: numId
         self.boxes = 0
 
@@ -225,6 +228,19 @@ class Writer:
             f'</a:graphicData></a:graphic></wp:inline></w:drawing></w:r>'))
         return p
 
+    def comment(self, paragraph, text, author="Reviewer"):
+        """A comment on the whole of `paragraph` (an element): its range around the paragraph's runs, its reference
+        at the end, its text in the comments part."""
+        n = str(len(self.comments))
+        self.comments.append((author, text))
+        runs = [c for c in paragraph if c.tag != _qn("w:pPr")]
+        start, end = _element("w:commentRangeStart", **{"w:id": n}), _element("w:commentRangeEnd", **{"w:id": n})
+        (runs[0].addprevious if runs else paragraph.append)(start)
+        paragraph.append(end)
+        reference = _element("w:r")
+        reference.append(_element("w:commentReference", **{"w:id": n}))
+        paragraph.append(reference)
+
     def footnote(self, paragraph, text):
         """A footnote reference at the end of `paragraph` (an element), its note `text`."""
         self.footnotes.append(text)
@@ -270,6 +286,8 @@ class Writer:
     def save(self):
         if self.footnotes:
             self._footnotes_part()
+        if self.comments:
+            self._comments_part()
         raw = io.BytesIO()
         self.document.save(raw)
         fixed = io.BytesIO()  # the same members, each dated FIXED_TIME
@@ -295,6 +313,19 @@ class Writer:
                + "".join(notes) + "</w:footnotes>")
         part = Part(PackURI("/word/footnotes.xml"), CT.WML_FOOTNOTES, xml.encode(), self.document.part.package)
         self.document.part.relate_to(part, RT.FOOTNOTES)
+
+    def _comments_part(self):
+        from xml.sax.saxutils import escape, quoteattr
+        from docx.opc.constants import CONTENT_TYPE as CT, RELATIONSHIP_TYPE as RT
+        from docx.opc.packuri import PackURI
+        from docx.opc.part import Part
+        notes = "".join(f'<w:comment w:id="{n}" w:author={quoteattr(author)} w:date="{DATE}" w:initials="R"><w:p>'
+                        f'<w:r><w:t xml:space="preserve">{escape(text)}</w:t></w:r></w:p></w:comment>'
+                        for n, (author, text) in enumerate(self.comments))
+        xml = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:comments xmlns:w="{W}">{notes}'
+               "</w:comments>")
+        part = Part(PackURI("/word/comments.xml"), CT.WML_COMMENTS, xml.encode(), self.document.part.package)
+        self.document.part.relate_to(part, RT.COMMENTS)
 
 def _row_changes(earlier, later):
     """[(later row, earlier row, kind)]: rows matched in order; kind None (alike or changed), "ins" or "del"."""
@@ -580,6 +611,23 @@ def charted(project):
             write_block(writer, block)
     return writer.save()
 
+def commented(lines, values):
+    """The document with each sentence printing one of `values` moved into a reviewer's comment on the sentence before
+    it (the rest of its paragraph): a Word document's bytes."""
+    writer = Writer()
+    pattern = lambda v: re.compile(rf"(?<![\w.,]){re.escape(v)}(?![\w]|[.,]\d)")
+    for block in blocks(lines):
+        if block[0] != "p" or not any(pattern(v).search(block[1]) for v in values):
+            write_block(writer, block)
+            continue
+        kept, moved = [], []
+        for sentence in SENTENCE.split(block[1]):
+            (moved if any(pattern(v).search(sentence) for v in values) else kept).append(sentence)
+        p = writer.paragraph(" ".join(kept))
+        for sentence in moved:
+            writer.comment(p, sentence)
+    return writer.save()
+
 def boxed(lines, sentences, tables):
     """The document with each sentence printing a value of `sentences` ({value: "modern" | "legacy"}) moved into a
     text box anchored in its paragraph, and each table captioned as in `tables` (with its caption) into a text box
@@ -623,6 +671,10 @@ def documents(seed=1):
     notes = water_treatment(seed)
     notes.id = f"{base.id}-footnotes"
     out.append((notes, footnoted(markdown(base), [base.fact(f).value for f in FOOTNOTED])))
+    remarks = water_treatment(seed)
+    remarks.id = f"{base.id}-comments"
+    out.append((remarks, commented(markdown(base), [base.fact(f).value for f in ("plant.finished_turbidity",
+                                                                                  "chem.chlorine")])))
     boxes = water_treatment(seed)
     boxes.id = f"{base.id}-textbox"
     out.append((boxes, boxed(markdown(base), {base.fact("plant.finished_turbidity").value: "modern",

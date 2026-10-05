@@ -6,6 +6,10 @@ responses. The store is bound to its extraction interpreter: a run with a
 different one is rejected unless the affected derived data is reset. Cached responses are
 kept through a reset: they're keyed by the query that reached the model (and the model), so
 unchanged queries replay and changed ones are asked afresh.
+
+Each content item records the version of the reader that extracted it ("docx/1"; extract.READERS),
+or "unsupported" where none could. A run re-reads an item whose reader has changed since (or one
+that has gained a reader): its tasks are made again, and those whose queries didn't change replay.
 """
 import json
 import os
@@ -20,6 +24,7 @@ SCHEMA_VERSION = 8  # 8: responses cached by query hash and model; the query log
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE source (name TEXT PRIMARY KEY, data TEXT NOT NULL, manifest_hash TEXT, issues TEXT NOT NULL DEFAULT '{}');
+-- extracted: 0, or the version of the reader that extracted it ("docx/1"), or "unsupported"
 CREATE TABLE content (id TEXT PRIMARY KEY, size INTEGER NOT NULL, extracted INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE file (source TEXT NOT NULL REFERENCES source(name) ON DELETE CASCADE, path TEXT NOT NULL,
                    content TEXT NOT NULL REFERENCES content(id), size INTEGER NOT NULL, origin TEXT NOT NULL,
@@ -303,13 +308,15 @@ class Store:
     def orphaned_content(self):
         return [c for (c,) in self.db.execute("SELECT id FROM content WHERE id NOT IN (SELECT content FROM file)")]
 
-    def is_extracted(self, content):
+    def is_extracted(self, content, reader):
+        """Whether a content item was extracted by this version of its reader (an earlier version's reading, or a
+        store from before versions were recorded, doesn't count)."""
         row = self.db.execute("SELECT extracted FROM content WHERE id=?", (content,)).fetchone()
-        return bool(row and row[0])
+        return bool(row) and row[0] == reader
 
-    def mark_extracted(self, content):
+    def mark_extracted(self, content, reader):
         with self.db:
-            self.db.execute("UPDATE content SET extracted=1 WHERE id=?", (content,))
+            self.db.execute("UPDATE content SET extracted=? WHERE id=?", (reader, content))
 
     def record_sections(self, content, sections):
         with self.db:

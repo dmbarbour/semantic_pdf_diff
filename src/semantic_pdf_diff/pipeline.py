@@ -10,7 +10,7 @@ from pathlib import Path
 from . import fixtures, provenance
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
-from .extract import Job, reader_for, run_jobs
+from .extract import Job, reader_for, reader_version, run_jobs
 from .llm import Client, redact_url
 from .models import EvidenceDocument, Report, Situation, Source, coverage_row
 from .progress import Progress, log
@@ -225,7 +225,7 @@ def extract_sources(store, client, names, files, progress):
             extension = '.' + file.content.rsplit('.', 1)[1] if '.' in file.content else None
             if extension in ARCHIVES:
                 by_content[file.content] = []  # a container; its members are files in their own right
-            elif store.is_extracted(file.content):
+            elif store.is_extracted(file.content, reader_version(extension)):
                 log.info(f'Loaded from store: {file.path}')
                 by_content[file.content] = store.evidence(file.content)
                 coverage.extend(store.coverage(file.content))
@@ -236,12 +236,13 @@ def extract_sources(store, client, names, files, progress):
                           else 'No file extension; not interpreted')
                 row = coverage_row(content=file.content, task='unsupported', status='skipped', issues=[reason])
                 store.record_task(row, [])
-                store.mark_extracted(file.content)
+                store.mark_extracted(file.content, "unsupported")
                 by_content[file.content] = []
                 coverage.append(row)
             else:
                 by_content[file.content] = None  # claimed by this source's queue
-                queue.append(pdf_job(store, name, file, by_content, coverage, sections, reader_for(extension)))
+                queue.append(pdf_job(store, name, file, by_content, coverage, sections, reader_for(extension),
+                                     reader_version(extension)))
         queues.append(queue)
     if any(queues):
         log.info(f"Extracting {sum(map(len, queues))} document(s): " + ', '.join(
@@ -298,7 +299,7 @@ def situate_sources(store, client, names, files, by_content, sections, coverage)
     progress.close()
     return situations
 
-def pdf_job(store, source, file, by_content, coverage, sections, reader=None):
+def pdf_job(store, source, file, by_content, coverage, sections, reader=None, version="pdf/1"):
     def keep_sections(found):
         sections[file.content] = found
         store.record_sections(file.content, found)
@@ -311,7 +312,7 @@ def pdf_job(store, source, file, by_content, coverage, sections, reader=None):
                 log.warning(f"Couldn't read {file.path}: {'; '.join(row['issues'])}")
         # Failed or unreached tasks (e.g. the call limit) are retried on the next run; the rest replays from cache.
         if not any(r['status'] in ('failed', 'not_reached') for r in ledger):
-            store.mark_extracted(file.content)
+            store.mark_extracted(file.content, version)
         # Readings of one fact by different tasks become one claim when the store's runs merge them
         # (loaded evidence gets the same from store.evidence).
         by_content[file.content] = reconcile(evidence) if store.reconciles() and evidence else evidence
