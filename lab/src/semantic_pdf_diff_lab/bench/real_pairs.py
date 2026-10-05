@@ -34,7 +34,7 @@ def document(path):
     if path.suffix == ".zip":
         with zipfile.ZipFile(path) as z:
             name = next(n for n in z.namelist()
-                        if n.endswith((".docx", ".pptx", ".txt", ".md")) and not n.startswith("__MACOSX"))
+                        if n.endswith((".docx", ".pptx", ".xlsx", ".txt", ".md")) and not n.startswith("__MACOSX"))
             return read(name, z.read(name))
     return read(path.name, path.read_bytes())
 
@@ -45,6 +45,9 @@ def read(name, data):
     if name.endswith(".pptx"):
         from semantic_pdf_diff.pptxdocs import read_pptx
         return read_pptx(data)
+    if name.endswith((".xlsx", ".xlsm")):
+        from semantic_pdf_diff.xlsxdocs import read_xlsx
+        return read_xlsx(data)
     return parse(data.decode("utf-8", errors="replace"), markdown=name.endswith(".md"))
 
 def blocks(doc):

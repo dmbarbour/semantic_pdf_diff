@@ -146,7 +146,24 @@ class PptxLocator(Strict):
         """Its lines as a box, (0, first, 1, last + 1), as TextLocator's."""
         return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
 
-Locator = Annotated[PdfLocator | TextLocator | DocxLocator | PptxLocator, Field(discriminator="format")]
+class XlsxLocator(Strict):
+    """Where a claim sits within a workbook: its sheet (by number, page, and by name) and its cells ("B5:D5"; "chart"
+    or "picture" for what a sheet's drawing holds), and its lines (each region's row or cell, counted from 1 through
+    the workbook); never a path."""
+    format: Literal["xlsx"] = "xlsx"
+    page: int = Field(ge=1)
+    sheet: str
+    cells: str
+    lines: tuple[int, int]
+    region: Literal["text", "table", "tile", "figure", "overview"]
+    task: str
+
+    @property
+    def bbox(self):
+        """Its lines as a box, (0, first, 1, last + 1), as TextLocator's."""
+        return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
+
+Locator = Annotated[PdfLocator | TextLocator | DocxLocator | PptxLocator | XlsxLocator, Field(discriminator="format")]
 
 class Section(Strict):
     """A logical part of one piece of content: the unit of context, and later of scheduling."""

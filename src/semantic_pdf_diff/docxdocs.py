@@ -378,14 +378,16 @@ def _inline(cells):
     texts = [c.text for c in cells if c.text]
     return f"{texts[0]}: {texts[1]}" if len(texts) == 2 else ", ".join(texts)
 
-def _header_rows(grid):
-    """How many rows head a table: those marked to repeat as a header; else the first, and the next while the row
-    above has a cell merged across (or one merged down into it) and the row holds no number (three at most)."""
-    marked = 0
-    for tr, _ in grid:
-        if _property(tr, "w:trPr", "w:tblHeader") is None:
-            break
-        marked += 1
+def _header_rows(grid, marked=None):
+    """How many rows head a table: those marked to repeat as a header (marked: their count, when the rows aren't Word's
+    elements); else the first, and the next while the row above has a cell merged across (or one merged down into
+    it) and the row holds no number (three at most)."""
+    if marked is None:
+        marked = 0
+        for tr, _ in grid:
+            if _property(tr, "w:trPr", "w:tblHeader") is None:
+                break
+            marked += 1
     if marked:
         return min(marked, len(grid))
     n = 1

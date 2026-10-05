@@ -708,6 +708,14 @@ class Corpus(unittest.TestCase):
                 self.assertEqual(data, (folder / "docs-docx" / f"{project.id}.docx").read_bytes())
                 key = json.loads((folder / "docs-docx" / f"{project.id}.key.json").read_text(encoding="utf-8"))
                 self.assertEqual(json.loads(json.dumps(representations.docx_key(project, data), ensure_ascii=False)), key)
+        from semantic_pdf_diff_lab.bench.controlled import workbooks
+        self.assertEqual({p.id for p, _ in written}, {f.stem for f in (folder / "docs-xlsx").glob("*.xlsx")})
+        for project, _ in written:
+            with self.subTest(workbook=project.id):
+                data = workbooks.workbook(project)
+                self.assertEqual(data, (folder / "docs-xlsx" / f"{project.id}.xlsx").read_bytes())
+                key = json.loads((folder / "docs-xlsx" / f"{project.id}.key.json").read_text(encoding="utf-8"))
+                self.assertEqual(json.loads(json.dumps(workbooks.xlsx_key(project, data), ensure_ascii=False)), key)
         from semantic_pdf_diff_lab.bench.controlled import slides
         only_slides = slides.documents()  # the decks' own difficulties (slides.py)
         self.assertEqual({p.id for p, _ in written} | {p.id for p, _ in only_slides},

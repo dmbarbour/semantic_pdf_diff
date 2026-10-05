@@ -18,7 +18,7 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
-from .models import DerivationStep, DocxLocator, PptxLocator, Section, TextLocator, coverage_row
+from .models import DerivationStep, DocxLocator, PptxLocator, Section, TextLocator, XlsxLocator, coverage_row
 from .sections import SectionIndex
 from .tasks import TaskCore, split_utf8
 
@@ -60,6 +60,8 @@ class TextDocument:
     headings: list      # [(page, line, level, title)]
     images: list        # [(page, line, alt, target)]: images not read (a Markdown file's links, a Word chart)
     pictures: list = field(default_factory=list)  # [Picture]: a Word document's pictures, read
+    places: dict = field(default_factory=dict)    # a workbook's lines' places: {line: (sheet, cell range)}
+    regions: list = field(default_factory=list)   # a workbook's sheet map: [xlsxdocs.Region]
 
 @dataclass
 class Picture:
@@ -262,6 +264,25 @@ def chart_derivation(extension):
 def text_locator(page, bbox, region, task):
     return TextLocator(page=page, lines=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region, task=task)
 
+XLSX_DERIVATION = {
+    "text": [DerivationStep(step="xlsx-cells", detail="grouped cells"), DerivationStep(step="model-extraction")],
+    "table": [DerivationStep(step="xlsx-table", detail="row with its header"), DerivationStep(step="model-extraction")],
+}
+
+def xlsx_locator(places, page, bbox, region, task):
+    """A workbook claim's locator: its lines, and the sheet and cells they were read from (their union)."""
+    from openpyxl.utils.cell import get_column_letter, range_boundaries
+    first, last = int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)
+    found = [places[n] for n in range(first, last + 1) if n in places] or [("", "")]
+    sheet, refs = found[0][0], [ref for s, ref in found if s == found[0][0]]
+    try:
+        bounds = [range_boundaries(ref) for ref in refs]
+        cells = (f"{get_column_letter(min(b[0] for b in bounds))}{min(b[1] for b in bounds)}:"
+                 f"{get_column_letter(max(b[2] for b in bounds))}{max(b[3] for b in bounds)}")
+    except (ValueError, TypeError):  # a drawing's chart or picture, not cells
+        cells = refs[0]
+    return XlsxLocator(page=page, sheet=sheet, cells=cells, lines=(first, last), region=region, task=task)
+
 def pptx_locator(page, bbox, region, task):
     return PptxLocator(page=page, lines=(int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)), region=region, task=task)
 
@@ -299,24 +320,28 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     then "waiting" while its requests are pending; job.state["result"] is set at the end."""
     s = client.s
     name = job.content
-    word, deck = extension == ".docx", extension == ".pptx"
-    office = word or deck
+    word, deck, book = extension == ".docx", extension == ".pptx", extension in (".xlsx", ".xlsm")
+    office = word or deck or book
     core = TaskCore(job, output, client, dispatch, progress, name,
                     docx_locator if word else pptx_locator if deck else text_locator,
-                    DOCX_DERIVATION if word else PPTX_DERIVATION if deck else DERIVATION)
+                    DOCX_DERIVATION if word else PPTX_DERIVATION if deck else XLSX_DERIVATION if book else DERIVATION)
     raw = data if isinstance(data, (bytes, bytearray)) else open(data, "rb").read()
     if office:
         from .docxdocs import read_docx
         from .pptxdocs import read_pptx
         try:
-            doc = read_docx(raw) if word else read_pptx(raw)
-        except Exception as error:  # not a Word document or deck after all, or a damaged one
+            if book:
+                from .xlsxdocs import read_xlsx
+            doc = read_docx(raw) if word else read_pptx(raw) if deck else read_xlsx(raw)
+        except Exception as error:  # not a Word document, deck or workbook after all, or a damaged one
             core.record(coverage_row(content=job.content, task="open", status="failed",
                                      issues=[f"{name}: unreadable ({type(error).__name__}: {error})"]))
             job.state["result"] = ([], core.coverage)
             return
     else:
         doc = parse(raw.decode("utf-8", errors="replace"), markdown=extension in (".md", ".markdown"))
+    if book:  # a workbook's claims are placed by sheet and cells, known once it's read
+        core.locator = lambda page, bbox, region, task: xlsx_locator(doc.places, page, bbox, region, task)
     if not doc.blocks:
         core.record(coverage_row(content=job.content, task="open", status="failed", issues=[f"{name}: no text"]))
         job.state["result"] = ([], core.coverage)
@@ -346,16 +371,23 @@ def text_job(data, job, output, client, dispatch, progress, extension):
                 core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", labels,
                                 row, list(range(len(labels) if table.row_headers else width)),
                                 derivation=chart_derivation(extension) if table.source == "chart" else None)
+        seen = Counter()
         for pg, line, alt, target in doc.images:
             if pg == page:
+                seen[line] += 1  # two notes at one line (a sheet's) stay two rows
+                if alt in ("slide", "sheet", "workbook"):  # a deck's or workbook's note says what it is
+                    issue = target[:1].upper() + target[1:]
+                elif office:
+                    issue = f"A picture or object in the document isn't read yet ({alt}: {target})"
+                else:
+                    issue = f"An image in a Markdown file isn't read: {alt or target}"
                 core.record(coverage_row(content=job.content, page=page, bbox=[0.0, float(line), 1.0, float(line + 1)],
-                                         task=f"image:p{page}:{line}", status="skipped",
-                                         issues=[f"A picture or object in the document isn't read yet ({alt}: {target})"
-                                                 if office else f"An image in a Markdown file isn't read: {alt or target}"]))
+                                         task=f"image:p{page}:{line}" + (f":{seen[line]}" if seen[line] > 1 else ""),
+                                         status="skipped", issues=[issue]))
         shown = [p for p in doc.pictures if p.page == page]  # a Word document is one page; a deck's, its slides
         if office and shown:  # a page's pictures follow its text
             from .pictures import Reading
-            kept.append(Reading("docx" if word else "pptx"))
+            kept.append(Reading("docx" if word else "pptx" if deck else "xlsx"))
             yield from kept[-1].tasks(core, s, shown, job.content, output)
         section = index[page].id
         counts = Counter(numbers=sum(len(re.findall(r"\d", b.text)) > 0 for b in blocks), tables=len(tables),

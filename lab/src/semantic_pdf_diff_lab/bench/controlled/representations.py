@@ -80,7 +80,7 @@ def key(project, lines, tables=None, representation="markdown", pictures=None, c
     the line of the picture showing it}, its facts placed there ("docx-figure"). chart_rows: the line numbers that are
     a Word chart's data rows ("docx-chart"), where its facts are printed."""
     from .corpus import charts
-    prefix = representation if representation in ("docx", "pptx") else "md"
+    prefix = representation if representation in ("docx", "pptx", "xlsx") else "md"
     by_value = {}
     for f in project.facts:
         if not f.relation and (f.drawn not in ("chart", "figure") or (chart_rows and f.drawn == "chart")):
