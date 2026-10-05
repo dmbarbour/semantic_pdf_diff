@@ -255,6 +255,39 @@ The owner (2026-10-03), after the revision comparison's milestone 4: "Then we'll
 - write our own renderer from the specifications for the record types our figures use, borrowing from metafile-render and POI with attribution
 - text first only, deferring pixels (days, not weeks, but arrows and layout are lost)
 
+## Excel, in detail (2026-10-04), for the owner's review
+
+The owner (2026-10-04): "Let's do Excel next. 99% of my spreadsheets are Excel." So milestone 5 is Excel first (`.xlsx`, and `.xlsm` read the same, macros ignored); CSV can follow cheaply; legacy `.xls` stays unsupported (recorded as such).
+
+**The design is already set** by the [one table model](one-table-model-2026-09-30.md) and *Tables and spreadsheets* above: a model writes each table's rules once (which cells give each claim's entity, attribute, value, unit and conditions), and they're applied to every row mechanically, checked, with the rows they don't fit read one by one. A 10,000-row sheet costs one model query, not 10,000.
+
+**Proposed order** (Claude's): Excel goes through the rules path first, before the one table model's PDF repair milestones. A spreadsheet's cells are native (no parser, no repair), so it's the cleanest place to build and measure the rules; PDF and Word tables move onto them afterwards.
+
+**Steps:**
+1. **The reader** (`xlsxdocs.py`, with openpyxl added to the `office` extra):
+   - each sheet a page and a section, titled by its name, in the workbook's order
+   - cells as Excel shows them: the cached value in its number format; a formula without a cached value is recorded as unknown, its formula text as an issue, never evaluated
+   - hidden sheets, rows and columns read, but marked hidden
+   - merged cells, Excel's defined tables and named ranges used as structure
+   - cell comments as content, as in Word
+   - charts read from their data (`chartxml.py`); pictures as in Word
+   - external links never followed
+2. **Regions and the sheet map:** defined tables first; then blocks of filled cells parted by blank rows and columns, with header-like rows; titles and notes as text. A sheet with several regions gets a map (each region's range, first rows and apparent header).
+3. **The table representation** (the one table model's item 1, filled from native cells): a grid with spans, header levels (labels by path), section rows, the row-label column, and hazards named.
+4. **First reading, before the rules exist:** a small region is read row by row, as Word's tables are now. A large one (over a row limit) is recorded "not read yet: N rows, awaiting rules", never silently. This gives a working reader early and a baseline the rules must beat.
+5. **The rules query and their mechanical application** (the one table model's item 4), with its checks and row-by-row fallback.
+6. **Measured:**
+   - the synthetic workbook's answer key: regions, header rows, composite columns, strategies
+   - the controlled corpus written as workbooks, scored by the same keys (the medium test: the same facts from PDF, Word, slides and Excel)
+   - the IEA 15 MW workbook against the tables in its own PDF report (a real medium test)
+
+**Questions for the owner:**
+1. **Long series tables.** The IEA workbook's eight airfoil sheets are 300–400 rows of angle-of-attack against lift, drag and moment. The synthetic workbook has a 2,000-row flow log. Read row by row, each becomes thousands of exact claims: free under the rules, but they flood the comparison with point-by-point pairings nobody wants. The one table model deferred *summarise* (decision 3: "we can defer summary strategies if that's the plan"); real data now has such tables. Options:
+   - (a) iterate anyway: every point a claim
+   - (b) **summarise** (Claude's recommendation): the rules mark the table a series. It gives a few claims (what it tabulates, its range and row count, extremes and the values the model picks as characteristic), and the full table is kept as structured evidence for later use, not as thousands of claims.
+   - (c) record such tables as "not read: a series of N rows" for now
+2. **openpyxl** as a dependency of the `office` extra (MIT; already in the `dev` extra)? It reads number formats, merged cells, defined tables and cached values. The alternative is reading the workbook's XML directly, as for decks: more code to keep. Claude's recommendation: openpyxl.
+
 ## Decisions (2026-09-23)
 
 - **Milestone 1's design (2026-10-03).** The owner: "I agree with all three recommendations": a `TextLocator` beside `PdfLocator` with text excerpts in reports; text formats' tasks named "text" and "table" as PDF's are; a shared task core, the PDF job refactored byte-identically.
