@@ -19,8 +19,10 @@ to produce claims from rows or how to summarize things within a few known templa
 - **Binding** (2026-10-05, measured on the controlled workbooks): the prompt says how a claim is bound, as in any
   extraction (the attribute the property measured, never an option's or a series' name; the entity the thing with
   the value, an item or an alternative compared; conditions the circumstances, never the document's own details;
-  columns that are alternatives of one quantity name the entity), with a worked example, and the model first writes
-  what the values measure, what has them and under what ("binding", kept in the coverage record).
+  columns that are alternatives of one quantity name the entity), with three worked examples from outside the
+  controlled corpus (alternatives as columns, operating points, a table turned sideways: one to four were measured
+  on two seeds of the corpus, three read best), and the model first writes what the values measure, what has them
+  and under what ("binding", kept in the coverage record).
 - **Checked** (problems): the templates must give the model's own example claims for the rows it chose (values and
   units); a value marked a number must be one; a summary's columns must exist and hold what its template needs. A row
   the templates don't fit is read by itself. An answer with problems, or rules failing a fifth of the rows, is asked
@@ -92,8 +94,13 @@ How a claim is bound, as in any extraction:
 - when the columns are alternatives or series of one quantity (Option 1, Option 2), each column names the entity
   or a condition, the quantity is the attribute (from the title, the caption or the text above), and the row's
   label (a month, a case) is a condition
-For example, a table "Monthly cooling energy" with columns Month | Option 1 (MWh) | Option 2 (MWh): one template
-over columns B:C, entity {*.name}, attribute "cooling energy", value {*}, unit {*.unit}, conditions {A}.
+For example:
+- a table "Annual heating demand" with columns Year | Design A (MWh) | Design B (MWh): one template over columns
+  B:C, entity {*.name}, attribute "heating demand", value {*}, unit {*.unit}, conditions {A}
+- a table "Rotor performance" with columns Wind speed (m/s) | Power (kW) | Thrust (kN): one template over columns
+  B:C, entity {subject} (the rotor), attribute {*.name}, value {*}, unit {*.unit}, conditions "at wind speed {A} m/s"
+- a table "Motor options" with row labels such as "Rated power (kW)" and columns Motor A | Motor B: one template
+  over columns B:C, entity {*.header}, attribute {A.cell_name}, value {*}, unit {A.cell_unit}
 Return JSON:
 {"binding":"what the values measure (the attribute), what has them (the entity), under what (the conditions)", "reading":"rules|rows|summary", "why":"one sentence", "subject":"...",
 "claims":[{"columns":"", "entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"...", "number":true}],

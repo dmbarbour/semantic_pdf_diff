@@ -47,6 +47,35 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
   - The gains are in the chart studies' data tables; the other workbooks read alike under every variant. A one-series table ("Option 1, chilled beams (tons)") flips between its series name and "peak cooling load" as the attribute with small changes to the prompt: the binding is still fragile there.
   - By eye on the samples: the IEA overview's entity became the turbine, the tower's properties "tower | fore-aft inertia | at height 28 m", the synthetic commissioning table "Pump system | Flow at duty point | 118 L/s | Measured", the superseded sheet's swap fixed (its "superseded" mark lost).
   - Cost: $0.12.
+- **Worked examples (2026-10-05; the owner: "If one worked example helped, would two or three diverse examples help more? Seems a lever worthy of a check."):**
+  - **Leakage first:** the first example ("Monthly cooling energy", Option 1 and Option 2) mirrors a table of the controlled corpus, so its gain could be the example matching the test. The fresh examples come from outside it:
+    - yearly heating demand by design (alternatives as columns)
+    - rotor performance by wind speed (operating points)
+    - motor options with units in the row labels (a table turned sideways)
+    - a fourth: settlement by pier, a single series
+  - **Measured** on the 26 workbooks and on 26 more from the corpus's second seed (other values, so independent draws). Facts read right of 1,015 · misbound · conditions kept:
+
+    | Examples | Seed 1 | Seed 2 | Both, right |
+    |---|---|---|---|
+    | none | 933 · 36 · 198/198 | 930 · 35 · 196/196 | 1,863 |
+    | one, corpus-like (shipped before) | 959 · 10 · 224/224 | 951 · 14 · 217/217 | 1,910 |
+    | one, fresh | 954 · 15 · 219/219 | 951 · 14 · 217/217 | 1,905 |
+    | two, fresh | 959 · 10 · 224/224 | 956 · 9 · 214/222 | 1,915 |
+    | **three, fresh (adopted)** | **959 · 10 · 224/224** | **956 · 9 · 222/222** | **1,915** |
+    | four, fresh | 959 · 10 · 224/224 | 956 · 9 · 222/222 | 1,915 |
+    | row by row | 959 · 10 · 208/224 | 956 · 9 · 206/222 | 1,915 |
+
+  - **Read:**
+    - most of one example's gain isn't leakage: a fresh one does nearly as well (1,905 against 1,910)
+    - more examples help up to two or three: with three, facts read right equal row by row's on both seeds, with every condition kept
+    - a fourth adds nothing here
+  - **Noisy:** the differences sit in two or three borderline tables (the one-series zone table, the traps study's lead-in), and each variant flips a different one. A round on real tables should judge it.
+  - By eye on the samples: the IEA rotor's performance reads "Rotor | Thrust | 0.20 MN | at Wind = 3 m/s".
+  - **The committed corpus, with pairs:**
+    - facts read right as row by row (959)
+    - every condition kept
+    - one revision pair worse: the specification's Session ID change ("up to 173" to "up to 181" bits) is judged uncertain, where row by row and one example found it. Its two revisions' rules differ: the earlier marked the length a number (its row read by itself), the later didn't (a condition from the text above added), so the claims' conditions differ.
+  - Cost: $0.35.
 - **Next:** the remaining candidate levers in *Ideas not built yet* (table handling); judge rules against rows in a round on real tables; Word, PowerPoint and PDF tables onto the same grid (the one table model).
 
 ### Neighbouring text (`context_before`, `context_after`)
@@ -203,6 +232,7 @@ Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so no
 | Table handling (the owner, 2026-10-05: "we can also extract some levers to improve table handling experimentally"): our opinion's size grading (`FEW_ROWS` 20, `MANY_ROWS` 100) and its wording, or no opinion at all | Excel, every table asked, 2026-10-05 | The model summarised the IEA blade geometry (60 rows) it had read by rules when only long tables were asked |
 | Table handling: an uncertainty template, so a value and its ± column ("118 ± 3") make one claim with its uncertainty, not two | The synthetic workbook's commissioning table, 2026-10-05 | Its key names the two columns composite; the rules made "measured value" and "measured tolerance" |
 | Table handling: guidance on the entity (the table's subject or an item, not a parameter's name) and on document details (a revision line isn't a condition) | The synthetic workbook, 2026-10-05 | "Design flow \| Parameter \| 110 L/s"; every design basis row conditioned "Design Summary Rev C, 2026-08-14" |
+| Table handling: the same rules for a table in both revisions: reuse the earlier revision's rules (or ask once for both) where the table's shape and headers match, so its claims are bound alike | Excel, worked examples, 2026-10-05 | The specification's Session ID change judged uncertain: one revision's rules read its length mechanically with a condition, the other's read the row by itself |
 | Table handling: leave bookkeeping columns (contact IDs, reservation times) out of rules, or prefer the list summary for registers | The RAN1 document list, 2026-10-05 | 30,177 claims by rules over every column, before the list summary was suggested |
 | Table handling: the examples check (strict values and units, any row shown) and the second asking's wording | The controlled workbooks, 2026-10-05 | A unit outside brackets ("Vertical g") failed twice before the problem said how to mend it |
 | Table handling: an uncalculated formula as a claim's value ("[formula =C6+C7, not calculated]") or only as a coverage note | The synthetic workbook, 2026-10-05 | The rules made it a claim with unit m |

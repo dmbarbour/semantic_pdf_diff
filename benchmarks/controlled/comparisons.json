@@ -398,7 +398,7 @@
     "equivalent": 28
    },
    "unmatched": 4,
-   "pairs": 4,
+   "pairs": 12,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -3957,7 +3957,7 @@
     "uncertain": 2
    },
    "unmatched": 4,
-   "pairs": 2,
+   "pairs": 11,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -5091,7 +5091,7 @@
     "equivalent": 33
    },
    "unmatched": 0,
-   "pairs": 0,
+   "pairs": 9,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -5447,14 +5447,15 @@
     "removed": 0,
     "unchanged": 18
    },
-   "changes_found": "3/3",
+   "changes_found": "2/3",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "15/18",
    "false_changes": 0,
-   "difference_precision": 0.6,
+   "difference_precision": 0.5,
    "changed": {
-    "reported": 3
+    "reported": 2,
+    "uncertain": 1
    },
    "conditions": {},
    "added": {},
@@ -5465,7 +5466,7 @@
    },
    "different": {
     "across facts": 2,
-    "change": 3
+    "change": 2
    },
    "equivalent": {
     "no change": 15,
@@ -5473,13 +5474,13 @@
    },
    "findings": {
     "complementary": 1,
-    "different": 5,
+    "different": 4,
     "equivalent": 17,
-    "uncertain": 1,
+    "uncertain": 2,
     "unrelated": 1
    },
-   "unmatched": 2,
-   "pairs": 10,
+   "unmatched": 4,
+   "pairs": 11,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -5505,7 +5506,7 @@
     "fail.snr": "unextracted",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
-    "hdr.sid": "reported",
+    "hdr.sid": "uncertain",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "unextracted",
@@ -7454,7 +7455,7 @@
     "equivalent": 28
    },
    "unmatched": 4,
-   "pairs": 4,
+   "pairs": 12,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -11013,7 +11014,7 @@
     "uncertain": 2
    },
    "unmatched": 4,
-   "pairs": 2,
+   "pairs": 11,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -12147,7 +12148,7 @@
     "equivalent": 33
    },
    "unmatched": 0,
-   "pairs": 0,
+   "pairs": 9,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -12503,14 +12504,15 @@
     "removed": 0,
     "unchanged": 18
    },
-   "changes_found": "3/3",
+   "changes_found": "2/3",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "15/18",
    "false_changes": 0,
-   "difference_precision": 0.6,
+   "difference_precision": 0.5,
    "changed": {
-    "reported": 3
+    "reported": 2,
+    "uncertain": 1
    },
    "conditions": {},
    "added": {},
@@ -12521,7 +12523,7 @@
    },
    "different": {
     "across facts": 2,
-    "change": 3
+    "change": 2
    },
    "equivalent": {
     "no change": 15,
@@ -12529,13 +12531,13 @@
    },
    "findings": {
     "complementary": 1,
-    "different": 5,
+    "different": 4,
     "equivalent": 17,
-    "uncertain": 1,
+    "uncertain": 2,
     "unrelated": 1
    },
-   "unmatched": 2,
-   "pairs": 10,
+   "unmatched": 4,
+   "pairs": 11,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -12561,7 +12563,7 @@
     "fail.snr": "unextracted",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
-    "hdr.sid": "reported",
+    "hdr.sid": "uncertain",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "unextracted",

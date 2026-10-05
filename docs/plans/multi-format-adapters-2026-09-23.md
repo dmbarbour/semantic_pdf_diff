@@ -772,6 +772,23 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
   - **Still fragile:** a one-series table ("Option 1, chilled beams (tons)") flipped between its series name and "peak cooling load" as the attribute under small changes to the prompt.
   - **By eye on the samples:** the IEA overview's entity became the turbine; the synthetic workbook's commissioning table reads "Pump system | Flow at duty point | 118 L/s | Measured"; its superseded sheet's swap is fixed but its "superseded" mark is lost.
   - Cost: $0.12 for the experiments, $0.003 for the pairs.
+- **Worked examples in the rules query (2026-10-05).** The owner: "If one worked example helped, would two or three diverse examples help more? Seems a lever worthy of a check."
+  - **Leakage:** the first example mirrored a corpus table. The fresh ones (heating demand by design, rotor performance by wind speed, motor options with units in the row labels, settlement by pier) come from outside the corpus.
+  - **Measured** on the 26 workbooks and on 26 from the corpus's second seed:
+
+    | Examples | Facts right, both seeds | Misbound | Conditions kept |
+    |---|---|---|---|
+    | none | 1,863 of 2,030 | 71 | all |
+    | one, corpus-like (shipped before) | 1,910 | 24 | all |
+    | one, fresh | 1,905 | 29 | all |
+    | two, fresh | 1,915 | 19 | 438 of 446 |
+    | **three, fresh (adopted)** | **1,915** | **19** | **all** |
+    | four, fresh | 1,915 | 19 | all |
+    | row by row | 1,915 | 19 | 414 of 446 |
+
+  - **Adopted:** three fresh examples (`tablerules.py`, reader `xlsx/5`). The [lever index](../reviews/levers.md) has the details.
+  - **On the committed corpus with pairs:** facts as row by row, every condition kept. One pair is worse: the specification's Session ID change is judged uncertain, because its two revisions' rules bound the length differently. That adds a lever idea: the same rules for a table in both revisions.
+  - Cost: $0.35.
 
 ## Open questions
 
