@@ -832,11 +832,31 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
     - one more pair worse: the treatment plant's pump capacity change (5,590 to 5,473 gpm) judged uncertain, one revision's rules adding "in the treatment process" as a condition and the other's not. It's the open question's case again.
   - Cost: $1.52.
   - **Not built: the same rules for a table in both revisions.** It would make a revision's claims depend on its partner, or on the order contents were read, against [decision 0002](../decisions/0002-evidence-attaches-to-content.md) (content read once per store, its evidence the same in every comparison). It's an open question for the owner (below).
+- **Vague conditions, and how a table was read traced (2026-10-05).** The owner: "I think we cannot effectively identify the 'same table' between revisions in the general case. Each document's claims are processed in any order, and there may be more than two revisions. Trying to avoid vague conditions, and tracing/reporting how a table was read, might be useful."
+  - **Vague conditions, two wordings measured on two seeds** (facts right of 1,015 · conditions kept):
+
+    | Wording | Seed 1 | Seed 2 |
+    |---|---|---|
+    | as before | 959 · 224/224 | 956 · 222/222 |
+    | "never a setting every value in the table shares" | 959 · 208/224 | 956 · 206/222 |
+    | **"a circumstance every row shares (a load case, a state named before the table) is a condition, but a vague setting ("in the plant", "in the process") isn't" (adopted)** | **959 · 224/224** | **956 · 222/222** |
+
+    - The first wording lost real conditions: a lead-in's state is shared by every row of its table.
+    - The adopted one keeps them, and the two tables behind the uncertain changes now read alike in both revisions:
+      - the treatment plant's pumps: no "in the treatment process" in either
+      - the specification's header fields: every row by rules in both, "in the packet header"
+    - Reader version `xlsx/7`, `csv/3`. Cost: $0.09.
+  - **Traced and reported** (`report.py`):
+    - each claim from a table says how it was read: by rules (the template that made it), by a summary, or its row read by itself
+    - a finding between claims whose tables were read differently (one by rules and one by its row, or by different templates) carries `tables_read` in `report.json` and a warning in the report: "the difference may come from the reading"
+    - the report's head counts them
+    - before the wording change, it flagged both uncertain changes: the treatment plant's pump, and the specification's Session ID (one length read by its row, the other by rules)
 
 ## Open questions
 
-1. **Rules alike across revisions?** (2026-10-05) A table's rules are asked per document, so two revisions of one table can be bound differently (the specification's Session ID length: one revision's length read by its row, the other's by rules with a condition; the treatment plant's pump capacity: one revision's rules adding a vague condition from the text above, "in the treatment process"), and the comparison then calls a real change uncertain. Sharing rules between revisions would bind them alike, but a document's claims would then depend on what it's compared with, against decision 0002. Alternatives that keep 0002:
+1. **Rules alike across revisions?** (2026-10-05; decided below) A table's rules are asked per document, so two revisions of one table can be bound differently (the specification's Session ID length: one revision's length read by its row, the other's by rules with a condition; the treatment plant's pump capacity: one revision's rules adding a vague condition from the text above, "in the treatment process"), and the comparison then calls a real change uncertain. Sharing rules between revisions would bind them alike, but a document's claims would then depend on what it's compared with, against decision 0002. Alternatives that keep 0002:
    - make the rules query less sensitive to a table's values (show its shape and fewer values)
    - let the comparison see that two claims differ only by how their tables were read (it has both tables' rules)
    - ask the rules query not to add vague conditions from the text around a table (a setting, "in the treatment process"), only circumstances that set a value apart
    - accept it, and leave it to a later round
+   - **Decided (the owner, 2026-10-05):** "I think we cannot effectively identify the 'same table' between revisions in the general case. Each document's claims are processed in any order, and there may be more than two revisions. Trying to avoid vague conditions, and tracing/reporting how a table was read, might be useful." Rules aren't shared between revisions; vague conditions are tried in the rules query, and how a table was read is traced and reported.

@@ -22,7 +22,9 @@ to produce claims from rows or how to summarize things within a few known templa
   columns that are alternatives of one quantity name the entity), with three worked examples from outside the
   controlled corpus (alternatives as columns, operating points, a table turned sideways: one to four were measured
   on two seeds of the corpus, three read best), and the model first writes what the values measure, what has them
-  and under what ("binding", kept in the coverage record).
+  and under what ("binding", kept in the coverage record). A circumstance every row shares stays a condition, a vague
+  setting doesn't (the owner, 2026-10-05: "Trying to avoid vague conditions"; "never a setting every value shares"
+  was tried first, and lost real conditions that a table's lead-in names).
 - **Checked** (problems): the templates must give the model's own example claims for the rows it chose (values and
   units); a value marked a number must be one; a summary's columns must exist and hold what its template needs. A row
   the templates don't fit is read by itself. An answer with problems, or rules failing a fifth of the rows, is asked
@@ -90,7 +92,8 @@ How a claim is bound, as in any extraction:
 - the entity is the thing that has the value: an item (a pump, a zone) or an alternative being compared (a design
   option, a unit size); never a parameter's name
 - conditions are the circumstances the value holds under (a month, an operating point, a load case, a location),
-  never the document's own details (its revision, its date of issue)
+  never the document's own details (its revision, its date of issue); a circumstance every row shares (a load case,
+  a state named before the table) is a condition, but a vague setting ("in the plant", "in the process") isn't
 - when the columns are alternatives or series of one quantity (Option 1, Option 2), each column names the entity
   or a condition, the quantity is the attribute (from the title, the caption or the text above), and the row's
   label (a month, a case) is a condition

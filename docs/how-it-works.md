@@ -40,6 +40,8 @@ Excel workbooks (`.xlsx`, `.xlsm`, with the `office` extra) are read by `xlsxdoc
 
 CSV files (`.csv`, `.tsv`; no extra needed) are read as one-sheet workbooks of text cells (`xlsxdocs.read_csv`): the delimiter sniffed (comma, semicolon, tab or bar), UTF-8 or else Windows-1252, fields as written; preamble lines read as text and blocks parted by blank lines as tables, each table asked how it's read as a workbook's are. Claims are located by the file's lines and fields (`CsvLocator`; a quoted field may span lines).
 
+How a table was read is traced: each claim from a table says whether its table was read by rules (and the template that made it), by a summary, or row by row, and a comparison between claims whose tables were read differently is flagged (`tables_read` in `report.json`; a warning in the report): a difference there may come from the reading, not the source. A table's rules are asked per document, never shared between revisions.
+
 A Word document's pictures are read as a PDF's figures are (`pictures.py`). Each picture becomes a page at its displayed size:
 - **EMF or WMF** (most technical figures: Visio and chart-tool previews) is drawn by `metafiles.py` from the vendored metafile renderer's playback. Paths are vector, clips are computed, and text is set in PDF's built-in fonts, so the page draws alike on every machine and its labels are a text layer.
 - **A raster image** is placed as it is.

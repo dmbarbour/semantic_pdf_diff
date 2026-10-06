@@ -4,6 +4,33 @@ import os
 from pathlib import Path
 from collections import Counter
 
+def how_read(e):
+    """How a claim's table was read, from its derivation: ("rules", the template that made it), ("summary", the
+    statistic), ("row", "") for a table row read by itself, or None for a claim from text or a picture."""
+    steps = {d["step"]: d.get("detail", "") for d in e.get("derivation", [])}
+    if "table-rules" in steps:
+        return ("rules", steps["table-rules"])
+    if "table-summary" in steps:
+        return ("summary", steps["table-summary"])
+    if any(step.endswith("-table") for step in steps):
+        return ("row", "")
+    return None
+
+def read_as(how):
+    """A table reading in words."""
+    kind, detail = how
+    return {"rules": f"by rules a model wrote for its table ({detail})", "summary": f"by a summary ({detail})",
+            "row": "its row read by itself"}[kind]
+
+def tables_read(a, b):
+    """{"a": how, "b": how} when two compared claims' tables were read differently (one by rules, the other row by
+    row; or by different templates), else None: a difference between them may come from the reading, not the source
+    (the owner, 2026-10-05: "tracing/reporting how a table was read")."""
+    ha, hb = how_read(a), how_read(b)
+    if ha is None or hb is None or ha == hb or (ha[0] == hb[0] and ha[0] != "rules"):
+        return None
+    return {"a": read_as(ha), "b": read_as(hb)}
+
 def write_report(data, output, assets=None):
     """Write report.json and report.html; assets is the folder holding rendered crops
     (default: output/assets), linked relative to the report."""
@@ -11,8 +38,14 @@ def write_report(data, output, assets=None):
     output.mkdir(exist_ok=True, parents=True)
     prefix = os.path.relpath(Path(assets), output).replace(os.sep, "/") + "/" if assets else "assets/"
     link = lambda image: prefix + image.split("/", 1)[1] if image.startswith("assets/") else image
-    (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     evidence = {e["id"]:e for e in data["evidence"]}
+    for f in data["findings"]:  # traced: findings between claims whose tables were read differently
+        differ = tables_read(evidence[f["a"]], evidence[f["b"]]) if f["a"] in evidence and f["b"] in evidence else None
+        if differ:
+            f["tables_read"] = differ
+        else:
+            f.pop("tables_read", None)
+    (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     occurrences = {}
     for f in data["files"]:
         occurrences.setdefault(f["content"], []).append(f"{f['source']} / {f['path']}")
@@ -31,11 +64,13 @@ def write_report(data, output, assets=None):
         seen_by = sorted({o['locator']['region'] for o in e.get('occurrences', [])})
         also = (f"<p>Found {len(e['occurrences'])} times ({esc(', '.join(seen_by))}): "
                 + esc('; '.join(f"p.{o['locator']['page']} {o['locator']['region']}" for o in e['occurrences'])) + "</p>") if others else ''
+        how = how_read(e)
+        read = f"<p>Read {esc(read_as(how))}.</p>" if how else ''
         heading = headings.get((e['content'], e.get('section', '')), '')
         heading = f" · § {esc(heading)}" if heading else ''
         return f'''<section><h3>{esc(where(e['content']))}{heading} · {'slide' if loc.get('format') == 'pptx' else 'sheet' if loc.get('format') == 'xlsx' else 'file' if loc.get('format') == 'csv' else 'page'} {loc['page']} · {esc(e['kind'])}</h3>
         <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
-        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}<blockquote>{esc(e['quote'])}</blockquote>{verified}{also}
+        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}<blockquote>{esc(e['quote'])}</blockquote>{verified}{read}{also}
         <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>{image}</section>'''
     counts = Counter(f['relation'] for f in data['findings'])
     place = lambda loc: (f"lines {loc['lines'][0]}–{loc['lines'][1]}" if loc.get('format') == 'text'
@@ -58,8 +93,10 @@ def write_report(data, output, assets=None):
             title += ': ' + KINDS[why['kind']][0].lower()
             why = (f"<p><b>{esc(KINDS[why['kind']][1])}.</b> {esc(why['rationale'])}"
                    f" <small>(explanation confidence {why['confidence']})</small></p>")
+        differ = (f"<p class='warning'>Their tables were read differently: A {esc(f['tables_read']['a'])}; B "
+                  f"{esc(f['tables_read']['b'])}. The difference may come from the reading.</p>") if f.get('tables_read') else ''
         rows.append(f'''<article data-relation="{esc(f['relation'])}" data-kind="{esc(f.get('explanation', {}).get('kind', ''))}"><h2>{esc(title)}</h2>
-        {why or ''}<p>{esc(f['rationale'])}</p><div class="pair">{card(f['a'])}{card(f['b'])}</div>
+        {why or ''}<p>{esc(f['rationale'])}</p>{differ}<div class="pair">{card(f['a'])}{card(f['b'])}</div>
         <details><summary>Calculation and matching details</summary>{numeric}<p>Retrieval score {f['retrieval_score']}; {'alignment' if f.get('settled') else 'model'} confidence {f['confidence']}</p></details></article>''')
     unmatched = ''.join('<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched'])
     shared = ''.join(card(eid) for eid in data.get('shared', []))
@@ -78,7 +115,10 @@ pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{col
 '''
     page = '<header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1>'
     page += f"<p>{' ↔ '.join(esc(x['name']) for x in data['sources'])}</p><p>Mode: {esc(data['mode'])}</p>"
-    page += f"<p>{esc(dict(counts))}</p>" + kinds_html(data['findings'], esc) + f"<p class='warning'>{len(issues)} incomplete, failed or skipped source tasks. {len(data['unmatched'])} claims lack a confirmed counterpart.</p>"
+    differently = sum(1 for f in data['findings'] if f.get('tables_read'))
+    page += f"<p>{esc(dict(counts))}</p>" + kinds_html(data['findings'], esc) + (
+        f"<p class='warning'>{differently} findings compare claims whose tables were read differently (by rules, a "
+        "summary or row by row): a difference there may come from the reading.</p>" if differently else '') + f"<p class='warning'>{len(issues)} incomplete, failed or skipped source tasks. {len(data['unmatched'])} claims lack a confirmed counterpart.</p>"
     diff = data.get('file_difference')
     if diff:
         render = lambda item: esc(' → '.join(item) if isinstance(item, list) else item)

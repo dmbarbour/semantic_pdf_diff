@@ -189,5 +189,24 @@ class Summaries(unittest.TestCase):
         found = [(s.fields["value"], s.fields["conditions"]) for s in tr.summarise(rules, g)]
         self.assertEqual(found, [("30", ""), ("20", "Status = Agreed"), ("10", "Status = Noted")])
 
+
+
+class Traced(unittest.TestCase):
+    """How a table was read, in reports (the owner, 2026-10-05: "tracing/reporting how a table was read")."""
+    def test_findings_between_tables_read_differently_are_flagged(self):
+        from semantic_pdf_diff.report import how_read, tables_read
+        rules = lambda conditions: {"derivation": [{"step": "xlsx-table"}, {"step": "table-rules",
+                                                                           "detail": f"value {{B}}; conditions {conditions}"}]}
+        row = {"derivation": [{"step": "xlsx-table"}, {"step": "model-extraction"}]}
+        text = {"derivation": [{"step": "xlsx-cells"}, {"step": "model-extraction"}]}
+        self.assertEqual(how_read(row), ("row", ""))
+        self.assertIsNone(how_read(text))
+        self.assertEqual(tables_read(row, rules("{A}")), {"a": "its row read by itself",
+                                                          "b": "by rules a model wrote for its table (value {B}; conditions {A})"})
+        self.assertIsNotNone(tables_read(rules("in the plant"), rules("{A}")))  # bound by different templates
+        self.assertIsNone(tables_read(rules("{A}"), rules("{A}")))
+        self.assertIsNone(tables_read(row, row))
+        self.assertIsNone(tables_read(row, text))
+
 if __name__ == "__main__":
     unittest.main()
