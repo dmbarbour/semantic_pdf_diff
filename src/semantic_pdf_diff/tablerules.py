@@ -475,10 +475,21 @@ def row_claims(rules, g, i):
             for name in ("entity", "attribute", "unit", "conditions"):
                 fields[name], more = _fill(getattr(rule, name), g, i, star, rules.subject)
                 used += more
+                if name in ("unit", "conditions") and PLACEHOLDER.search(getattr(rule, name)) and \
+                        all(not _fill("{" + ref + "}", g, i, star, rules.subject)[0]
+                            for ref in PLACEHOLDER.findall(getattr(rule, name))):
+                    fields[name] = ""  # its placeholders all empty: no stray words ("in" from "in {title}")
             if not fields["entity"] or not fields["attribute"]:
                 raise Misfit(f"row {g.names[i]} gives a claim with no {'entity' if not fields['entity'] else 'attribute'}")
             out.append((fields, sorted(set(used)), rule))
-    return out
+    # two templates giving one claim, one of them without its unit (as an overview's rules wrote): the one with it
+    same = lambda f: (f["entity"], f["attribute"], f["value"], f["conditions"])
+    united, kept, seen = {same(f) for f, _, _ in out if f["unit"]}, [], set()
+    for c in out:
+        if (c[0]["unit"] or same(c[0]) not in united) and (same(c[0]), c[0]["unit"]) not in seen:
+            seen.add((same(c[0]), c[0]["unit"]))
+            kept.append(c)
+    return kept
 
 def _fold(text):
     return " ".join(str(text).replace(",", "").split()).casefold()

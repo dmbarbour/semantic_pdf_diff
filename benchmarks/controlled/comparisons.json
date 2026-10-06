@@ -368,14 +368,15 @@
     "removed": 1,
     "unchanged": 28
    },
-   "changes_found": "4/4",
+   "changes_found": "3/4",
    "additions_found": "3/3",
    "removals_found": "1/1",
    "unchanged_confirmed": "28/28",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
-    "reported": 4
+    "reported": 3,
+    "uncertain": 1
    },
    "conditions": {},
    "added": {
@@ -388,16 +389,17 @@
     "confirmed": 28
    },
    "different": {
-    "change": 4
+    "change": 3
    },
    "equivalent": {
     "no change": 28
    },
    "findings": {
-    "different": 4,
-    "equivalent": 28
+    "different": 3,
+    "equivalent": 28,
+    "uncertain": 1
    },
-   "unmatched": 4,
+   "unmatched": 6,
    "pairs": 12,
    "omitted": 0,
    "kinds": {
@@ -414,7 +416,7 @@
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
     "P-101A.motor": "confirmed",
-    "P-101B.capacity": "reported",
+    "P-101B.capacity": "uncertain",
     "P-101B.head": "confirmed",
     "P-101B.motor": "confirmed",
     "P-101C.capacity": "confirmed",
@@ -7425,14 +7427,15 @@
     "removed": 1,
     "unchanged": 28
    },
-   "changes_found": "4/4",
+   "changes_found": "3/4",
    "additions_found": "3/3",
    "removals_found": "1/1",
    "unchanged_confirmed": "28/28",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
-    "reported": 4
+    "reported": 3,
+    "uncertain": 1
    },
    "conditions": {},
    "added": {
@@ -7445,16 +7448,17 @@
     "confirmed": 28
    },
    "different": {
-    "change": 4
+    "change": 3
    },
    "equivalent": {
     "no change": 28
    },
    "findings": {
-    "different": 4,
-    "equivalent": 28
+    "different": 3,
+    "equivalent": 28,
+    "uncertain": 1
    },
-   "unmatched": 4,
+   "unmatched": 6,
    "pairs": 12,
    "omitted": 0,
    "kinds": {
@@ -7471,7 +7475,7 @@
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
     "P-101A.motor": "confirmed",
-    "P-101B.capacity": "reported",
+    "P-101B.capacity": "uncertain",
     "P-101B.head": "confirmed",
     "P-101B.motor": "confirmed",
     "P-101C.capacity": "confirmed",

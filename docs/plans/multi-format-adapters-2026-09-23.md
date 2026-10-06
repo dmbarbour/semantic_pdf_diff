@@ -799,7 +799,44 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
     - **A regression found on the way:** under the binding prompt, both are read by rules over every column (30,177 claims, bookkeeping included), where the earlier prompt gave the list summary (69 claims). The lever index's bookkeeping-columns idea is for this.
   - **Fixed on the way:** the lab's run collector and real-pairs reader listed formats by hand; they now follow the product's list (`extract.TEXT_EXTENSIONS`).
   - Cost: $0.005.
+- **Step 6, real workbooks (2026-10-05).** Two tests on the IEA 15 MW reference turbine:
+  - **its workbook's two published versions** (v1.0 and the current) as a revision pair
+  - **its PDF report** (54 pages) against each version, the same facts in two formats
+  - **The revision pair, first run:**
+    - 676 "different" findings, 649 of them pairing different items
+    - **the cause:** the blade shell layup sheet stacks 12 tables of one shape, each headed by label-and-value pairs ("Airfoil: circular", "Pct Span: 0.0"); the rules' claims carried no station, only "in the blade shell layup", or a stray "in" where `{title}` was empty
+    - one real change seen even so: the polars' angle in radians in v1.0, degrees now
+  - **Fixed** (reader `xlsx/6`, `csv/2`):
+    - pairs just above a table are its title ("Airfoil: circular; Pct Span: 0.0")
+    - a condition or unit whose placeholders all came out empty is dropped
+    - within a row, a claim alike but for a missing unit, or alike entirely, is dropped: the overview's rules gave each value twice, with and without its unit
+  - **The revision pair, again:**
+    - "different" 676 → 148
+    - pairings of different items 649 → 52
+    - changes found 26 → 93
+    - layup claims carry their station
+  - **The report against the workbook:**
+
+    | | Against the current workbook | Against v1.0 |
+    |---|---|---|
+    | Equivalent | 149 | 132 |
+    | Different | 43 | 11 |
+    | Overview: equivalent, different | 112, 31 | 86, 6 |
+
+    - **Against the current workbook,** the differences are the turbine's later revision: rotor diameter 240 m against 241.35 m, rated wind speed 10.59 against 10.66 m/s, blade mass 65 against 67.92 t.
+    - **Against v1.0, the version the report was written from,** few remain. Most look like true discrepancies between the report and its own workbook (rated wind speed 10.59 against 10.88 m/s, the report also saying 10.8 elsewhere; hub overhang 11.35 against −11.014 m, a sign convention). One is a wrong pairing (rotor-nacelle assembly mass against nacelle mass).
+  - **Comparisons hit `max_pairs`** (1,000) in each run; the rest are recorded as omitted.
+  - **The controlled workbooks with the fixes:**
+    - facts read right as row by row (959)
+    - replays alike
+    - one more pair worse: the treatment plant's pump capacity change (5,590 to 5,473 gpm) judged uncertain, one revision's rules adding "in the treatment process" as a condition and the other's not. It's the open question's case again.
+  - Cost: $1.52.
+  - **Not built: the same rules for a table in both revisions.** It would make a revision's claims depend on its partner, or on the order contents were read, against [decision 0002](../decisions/0002-evidence-attaches-to-content.md) (content read once per store, its evidence the same in every comparison). It's an open question for the owner (below).
 
 ## Open questions
 
-None currently.
+1. **Rules alike across revisions?** (2026-10-05) A table's rules are asked per document, so two revisions of one table can be bound differently (the specification's Session ID length: one revision's length read by its row, the other's by rules with a condition; the treatment plant's pump capacity: one revision's rules adding a vague condition from the text above, "in the treatment process"), and the comparison then calls a real change uncertain. Sharing rules between revisions would bind them alike, but a document's claims would then depend on what it's compared with, against decision 0002. Alternatives that keep 0002:
+   - make the rules query less sensitive to a table's values (show its shape and fewer values)
+   - let the comparison see that two claims differ only by how their tables were read (it has both tables' rules)
+   - ask the rules query not to add vague conditions from the text around a table (a setting, "in the treatment process"), only circumstances that set a value apart
+   - accept it, and leave it to a later round

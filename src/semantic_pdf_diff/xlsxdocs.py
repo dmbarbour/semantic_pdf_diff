@@ -275,15 +275,19 @@ class _Writer:
             self.headings.append((page, n, 1, sheet.title))
         if sheet.hidden:
             self.block(page, "(Hidden sheet)", (sheet.title, "A1"))
-        above = None  # the last text cell read, a table's title when just above it
+        above = None  # the last text cell or pairs read: a table's title when just above it
         for region in regions(sheet):
             self.mapped.append(region)
             if region.kind == "pairs":  # a label and its value: one line each
+                read = []
                 for r in range(region.top, region.bottom + 1):
                     shown_ = [cells[(r, c)] for c in (region.left, region.left + 1) if (r, c) in cells]
                     if shown_:
-                        region.lines.append(self.block(page, ": ".join(shown_), (sheet.title, f"{_letter(region.left)}"
-                                                                                 f"{r}:{_letter(region.left + 1)}{r}")))
+                        read.append(": ".join(shown_))
+                        region.lines.append(self.block(page, read[-1], (sheet.title, f"{_letter(region.left)}"
+                                                                        f"{r}:{_letter(region.left + 1)}{r}")))
+                if read:  # a table's station or case, when it heads one ("Airfoil: circular; Pct Span: 0.0")
+                    above = (region.bottom, region.left, "; ".join(read))
             elif region.kind == "text":
                 for r in range(region.top, region.bottom + 1):
                     for c in range(region.left, region.right + 1):

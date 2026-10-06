@@ -141,6 +141,17 @@ class Applying(unittest.TestCase):
                                                     'header "Vertical g" has no unit in brackets for .unit to take: give '
                                                     'such columns a template of their own, the unit written out)'])
 
+    def test_no_stray_words_and_no_unitless_twin(self):
+        g = tr.grid(["A", "B"], ["Parameter", "Turbine"], [["Hub diameter [m]", "7.94"], ["Turbine class", "IB"]],
+                    [2, 3], [5, 6])
+        rules = tr.Rules.model_validate({"reading": "rules", "claims": [
+            {"columns": "B", "entity": "{B.header}", "attribute": "{A.cell_name}", "value": "{*}", "unit": "{A.cell_unit}",
+             "conditions": "in {title}"},
+            {"columns": "B", "entity": "{B.header}", "attribute": "{A.cell_name}", "value": "{*}", "conditions": "in {title}"}]})
+        made = [(f["attribute"], f["value"], f["unit"], f["conditions"]) for f, _, _ in tr.row_claims(rules, g, 0)]
+        self.assertEqual(made, [("Hub diameter", "7.94", "m", "")])  # no "in", and the unitless twin left out
+        self.assertEqual(len(tr.row_claims(rules, g, 1)), 1)  # a row with no unit: the two alike, kept once
+
     def test_an_example_of_a_row_read_by_itself_is_no_problem(self):
         g, rules = pumps(), tr.Rules.model_validate({**Applying.RULES, "examples": [{"row": "9", "claims": [
             {"value": "TBC"}]}]})

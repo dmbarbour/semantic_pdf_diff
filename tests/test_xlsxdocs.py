@@ -74,6 +74,7 @@ class Reading(unittest.TestCase):
         self.assertIn("(Hidden sheet)", texts)
         polar = [b for b in doc.blocks if b.kind == "table"][1]
         self.assertEqual(polar.rows[0], ["alpha [deg]", "c_l", "c_d"])
+        self.assertEqual(polar.grid.title, "Configuration: default; Reynolds: 8100000")  # the pairs heading it
 
     def test_an_ambiguous_region_is_recorded_and_a_long_table_kept_whole(self):
         from semantic_pdf_diff.xlsxdocs import read_xlsx

@@ -1,6 +1,6 @@
 # Validation
 
-**2026-10-05:** 468 automated tests passed on Python 3.10.21 with PyMuPDF 1.28.2, Pydantic 2.13.5 and tqdm 4.70.1, with the lab installed beside the product (`pip install -e '.[dev]' -e lab`).
+**2026-10-05:** 469 automated tests passed on Python 3.10.21 with PyMuPDF 1.28.2, Pydantic 2.13.5 and tqdm 4.70.1, with the lab installed beside the product (`pip install -e '.[dev]' -e lab`).
 
 - Some tests need git-ignored local files and skip without them: the fetched sample slices, the master answers fixture, and rounds' crops and page text (made again from the slices).
 - The minimum-version run hasn't been repeated since v0.2.0.
