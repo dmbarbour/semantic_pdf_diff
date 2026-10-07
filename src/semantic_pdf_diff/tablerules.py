@@ -63,7 +63,9 @@ might rely on (entity, attribute, value, unit, conditions), as an extraction of 
 reading:
 - "rules": every row gives its claims the same way. Write the claims a row gives as templates; they're applied to
   every row mechanically. Placeholders: {B} the row's cell in column B; {B.header} column B's header; {B.name} the
-  header without its unit; {B.unit} the unit in the header's brackets ("Flow (L/s)" gives L/s); {B.cell_name} and
+  header's own name without its unit; {B.group} the group a header sits under ("Pressure" for
+  "Pressure (bar) > Inlet": the group may be the attribute and the header's own name a condition, or the
+  group a category and the name the attribute); {B.unit} the unit in the header's brackets ("Flow (L/s)" gives L/s); {B.cell_name} and
   {B.cell_unit} split the row's own cell the same way (a row label "Capital cost ($M)" gives Capital cost and $M);
   {section} the section row above the row; {title} the table's title; {subject} your subject. A template with
   "columns": "C:F" is applied to each of those columns in turn, {*} standing for the column's cell ({*.header},
@@ -147,6 +149,27 @@ def grid(columns, labels, rows, names, lines, title="", place=""):
             g.keys.append(key)
     return g
 
+def letter(column):
+    """A column's letter as a spreadsheet names it, from 1 ("A", ..., "Z", "AA")."""
+    out = ""
+    while column:
+        column, rest = divmod(column - 1, 26)
+        out = chr(65 + rest) + out
+    return out
+
+def from_cells(rows, heads, labels, lines, title="", place=""):
+    """A Grid from a reader's table grid (Word's, a deck's: [(row, [Cell])], each cell with its first and last
+    column and its text), its header rows' count, its column labels and its body rows' lines; columns named A, B, ...
+    and rows by their number within the table."""
+    width = max([len(labels)] + [c.last + 1 for _, cells in rows for c in cells])
+    aligned = []
+    for _, cells in rows[heads:]:
+        aligned.append([""] * width)
+        for c in cells:
+            aligned[-1][c.first] = c.text
+    return grid([letter(k) for k in range(1, width + 1)], list(labels) + [""] * (width - len(labels)), aligned,
+                [str(k) for k in range(heads + 1, len(rows) + 1)], lines, title, place)
+
 def number(text):
     """A cell's number as shown ("1,750", "12.5%", "$1,200", "−3"), or None."""
     if not NUMBER.match(text):
@@ -169,7 +192,9 @@ def header_unit(label):
     return found[-1].strip() if found else ""
 
 def header_name(label):
-    """A header without its unit's brackets ("Flow (L/s)" → "Flow")."""
+    """A header's own name: the last part of its path, without its unit's brackets ("Hydraulics > Capacity (gpm)" →
+    "Capacity"; the group stays in {B.header})."""
+    label = label.rsplit(" > ", 1)[-1]
     found = list(BRACKETED.finditer(label))
     if found:
         label = label[:found[-1].start()] + label[found[-1].end():]
@@ -456,8 +481,10 @@ def _fill(template, g, i, star=None, subject=""):
             used.append(k)
             return header_name(g.rows[i][k]) if part == "cell_name" else header_unit(g.rows[i][k])
         label = g.labels[k] if k < len(g.labels) else ""
-        if part not in ("header", "name", "unit"):
+        if part not in ("header", "name", "unit", "group"):
             raise Broken(f"unknown placeholder {{{ref}}}")
+        if part == "group":  # the header's group above its own name ("Stroke time" for "Stroke time (s) > Open")
+            return header_name(label.rsplit(" > ", 1)[0]) if " > " in label else ""
         return label if part == "header" else header_name(label) if part == "name" else header_unit(label)
 
     return " ".join(PLACEHOLDER.sub(one, template).split()), used

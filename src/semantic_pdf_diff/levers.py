@@ -332,7 +332,8 @@ class TableRules(Lever):
     # a table of more body rows than this is read as a model says it should be (tablerules.py: rules applied to every
     # row, each row read by itself, or a summary), one query per table; 0, the default: every table (the owner,
     # 2026-10-05: "I was under the impression we'd also ask how to translate rows to claims even for short tables");
-    # none: every table row by row, as before. Excel's tables only, for now: other formats' tables have no grid yet
+    # none: every table row by row, as before. Tables read on a grid: Excel's, CSV's, Word's and decks' (not yet PDF's,
+    # nor charts' data)
     table_rules: Annotated[int | None, _selecting(frozenset({"table"}))] = Field(default=0, ge=0)
 
     def rules_from(self):

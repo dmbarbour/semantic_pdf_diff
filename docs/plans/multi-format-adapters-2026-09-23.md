@@ -851,6 +851,23 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
     - a finding between claims whose tables were read differently (one by rules and one by its row, or by different templates) carries `tables_read` in `report.json` and a warning in the report: "the difference may come from the reading"
     - the report's head counts them
     - before the wording change, it flagged both uncertain changes: the treatment plant's pump, and the specification's Session ID (one length read by its row, the other by rules)
+- **Word and PowerPoint tables asked how they're read (2026-10-06).** The owner, on step 2 of what's next: "Please proceed."
+  - **Their grids join the rules path** (`tablerules.from_cells`): Word's and decks' tables already sat on a grid (merged cells spanning, header rows labelled by path). Each now carries the rules' grid, named for the query ("table 3"; "slide 2, table 1", the slide's title its title). `table_rules` applies to them as to Excel's. A chart's data is still read row by row. Readers `docx/5`, `pptx/4`.
+  - **Found on the corpus, and fixed:**
+    - **a header's own name:** `{B.name}` kept a multi-level header's group ("Hydraulics > Capacity"). It's now the header's own name, the group left in `{B.header}`.
+    - **`{B.group}`:** neither part of a two-level header is always the attribute. In "Hydraulics > Capacity" the name is; in "Stroke time > Open" the group is, and "Open" is a condition. The group is now reachable, and the prompt says so, with an example from outside the corpus ("Pressure (bar) > Inlet").
+      - Measured as before. On the two seeds' workbooks: no change. On the Word table knobs: 687 → 692 right of 698, misbound 11 → 6.
+  - **The controlled corpus, every table asked against row by row:**
+
+    | | Facts right, asked | Row by row | Misbound, asked | Row by row | Conditions kept, asked | Row by row |
+    |---|---|---|---|---|---|---|
+    | Word (38) | 1,535 of 1,619 | 1,541 | 12 | 6 | 380/380 | 364/380 |
+    | Decks (27) | 1,046 of 1,097 | 1,046 | 4 | 4 | 235/235 | 219/235 |
+    | Workbooks (26) | 959 of 1,015 | 959 | 10 | 10 | 224/224 | 208/224 |
+
+    - **The six left in Word** are the merged-cells knob's rated values ("capacity 7,824 gpm at Rated point"). The key gives the rated point no condition and the runout point one: right claims, scored misbound. A question for the key, not the reader.
+    - **Revision pairs:** as row by row but two decks' (the treatment plant's conditions and rewording knobs). There, one revision's rules took the slide's title ("Treatment Process") as a condition and the other's didn't, so an unchanged value is judged uncertain. The new trace flags both ("tables read differently"). A lever is recorded: a heading's or slide's title isn't a condition.
+  - Cost: $0.10 (the readings $0.05, the experiment $0.06).
 
 ## Open questions
 

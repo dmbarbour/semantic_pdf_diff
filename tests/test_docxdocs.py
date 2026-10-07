@@ -171,6 +171,9 @@ class WordTables(unittest.TestCase):
         self.assertEqual(chillers.rows, [["Unit", "Capacity (tons) > Summer", "Capacity (tons) > Winter"],
                                          ["Chiller CH-1", "450", "300"], ["Chiller CH-1", "425"]])  # the unit repeated
         self.assertEqual(chillers.row_headers[1], ["Unit", "Capacity (tons) > Summer / Winter"])    # one value, both
+        g = chillers.grid  # as the rules query sees it: columns by letter, a spanning value at its first column
+        self.assertEqual((g.place, g.columns, g.labels), ("table 1", ["A", "B", "C"], chillers.rows[0]))
+        self.assertEqual(g.rows, [["Chiller CH-1", "450", "300"], ["Chiller CH-1", "425", ""]])
 
     def test_a_small_nested_table_is_written_into_its_cell_and_a_large_one_read_on_its_own(self):
         from semantic_pdf_diff.docxdocs import read_docx
@@ -181,6 +184,7 @@ class WordTables(unittest.TestCase):
         self.assertEqual(found[3].rows[0], ["Tag", "Cv"])
         self.assertEqual(found[3].rows[-1], ["V-307", "607"])
         self.assertEqual(doc.lines[found[3].first - 2][1], "Table in Intake, Valves:")  # where it sits, just above
+        self.assertEqual((found[3].grid.place, found[3].grid.title), ("table 4", "Table in Intake, Valves"))
         self.assertEqual(sum("Flow" in t for _, t in doc.lines), 1)  # read once, not as rows of the outer table
 
     def test_a_layout_table_is_read_as_content(self):

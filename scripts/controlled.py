@@ -7,7 +7,7 @@
     python scripts/controlled.py score                       # results.json from the runs' stores, offline
     python scripts/controlled.py run --replay                # read again from the packed fixture, offline
     python scripts/controlled.py run --unaligned             # the PDF pairs only, alignment off (see below)
-    python scripts/controlled.py run --rows                  # the workbooks, every table read row by row (below)
+    python scripts/controlled.py run --rows                  # workbooks, Word, decks: tables row by row (below)
     python scripts/controlled.py pack                        # replay.zip: the answers the standard runs replay
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
@@ -20,9 +20,9 @@ With --unaligned the PDF pairs are compared again with alignment off (into "<rec
 retrieval candidate is judged, as before alignment, so most "different" findings aren't changes, and the
 explanations (compare.explain) are measured where non-changes abound.
 
-With --rows the workbooks and their pairs are read again with every table read row by row (table_rules none), into
-"<recorded or replay>-rows": the baseline the standard runs' tables, each read as a model says (tablerules.py), are
-scored against by the same keys. Packed with the standard runs.
+With --rows the workbooks, Word documents and decks, and their pairs, are read again with every table read row by
+row (table_rules none), into "<recorded or replay>-rows": the baseline the standard runs' tables, each read as a model
+says (tablerules.py), are scored against by the same keys. Packed with the standard runs.
 
 Recording adds to the working fixture (fixture.sqlite, git-ignored), which keeps every answer ever recorded. `pack`
 writes the committed replay.zip: the standard runs are replayed from fresh stores against a copy of the fixture, and
@@ -72,7 +72,7 @@ def main(argv=None):
     running.add_argument("--responder", help="default: the configured model")
     running.add_argument("--max-cost", type=float, default=0.2)
     running.add_argument("--unaligned", action="store_true", help="only the PDF pairs, compared with alignment off")
-    running.add_argument("--rows", action="store_true", help="only the workbooks, every table read row by row")
+    running.add_argument("--rows", action="store_true", help="workbooks, Word documents and decks, tables row by row")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     sub.add_parser("pack", help="pack the answers the standard runs replay into replay.zip (offline)")
     args = parser.parse_args(argv)
@@ -172,7 +172,7 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
         overrides = {"align": False}
     if rows:
         jobs = [(a, b, folder.parent.parent / f"{folder.parent.name}-rows" / folder.name, name + " rows", mode)
-                for a, b, folder, name, mode in jobs if a.suffix == ".xlsx"]
+                for a, b, folder, name, mode in jobs if a.suffix in (".xlsx", ".docx", ".pptx")]
         overrides = {"table_rules": None}
     for a, b, folder, name, mode in jobs:
         options = pipeline.RunOptions(mode=mode, fixture=fixture,

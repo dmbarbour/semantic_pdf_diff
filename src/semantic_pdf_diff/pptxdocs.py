@@ -29,7 +29,7 @@ import re
 import zipfile
 from dataclasses import dataclass
 
-from . import chartxml
+from . import chartxml, tablerules
 from .docxdocs import Cell, _format, _header_rows, _joined, _labels
 from .textdocs import Block, Picture, TextDocument
 
@@ -254,6 +254,7 @@ def read_pptx(data):
     rels = package.rels(presentation)
     slides = [rels[s.get(R + "id")][1] for s in root.iter(P + "sldId") if s.get(R + "id") in rels]
     lines, blocks, headings, images, pictures = [], [], [], [], []
+    counted = {}  # each slide's tables, in order, named "slide N, table M" for the rules query
 
     def line(page, text):
         lines.append((page, text))
@@ -314,8 +315,11 @@ def read_pptx(data):
                 row_headers.append([_joined(labels[c.first:c.last + 1]) for c in cells])
                 row_lines.append(line(page, " | ".join(c.text for c in cells)))
             first = header_lines[0]
+            counted[page] = counted.get(page, 0) + 1
+            ruled = tablerules.from_cells(grid, heads, labels, row_lines[1:], title,
+                                          f"slide {page}, table {counted[page]}")
             blocks.append(Block(page, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
-                                row_lines, row_headers))
+                                row_lines, row_headers, grid=ruled))
 
         def chart(page, part):
             try:

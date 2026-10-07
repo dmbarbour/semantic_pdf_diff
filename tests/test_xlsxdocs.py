@@ -147,6 +147,11 @@ class Csv(unittest.TestCase):
         self.assertEqual((located.file_lines, located.fields, located.region), ((5, 5), (1, 3), "table"))
         self.assertEqual(evidence[0].derivation[0].step[:4], "csv-")
 
+class Readers(unittest.TestCase):
+    def test_every_format_read_has_a_reader_version(self):
+        from semantic_pdf_diff.extract import READERS, TEXT_EXTENSIONS
+        self.assertEqual(set(TEXT_EXTENSIONS) | {".pdf"}, set(READERS))
+
 class RulesModel:
     """The text tests' model, answering a table's rules query with the given rules (keyed by the table's place), or
     with each row read by itself."""

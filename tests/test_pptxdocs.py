@@ -90,6 +90,8 @@ class Reading(unittest.TestCase):
         self.assertEqual(chillers.rows, [["Unit", "Capacity (tons) > Summer", "Capacity (tons) > Winter"],
                                          ["Chiller CH-1", "450", "300"], ["Chiller CH-1", "425"]])
         self.assertEqual(chillers.row_headers[1], ["Unit", "Capacity (tons) > Summer / Winter"])
+        self.assertEqual((chillers.grid.place, chillers.grid.title), ("slide 2, table 1", "2 Chillers"))
+        self.assertIsNone(chart.grid)  # a chart's data is read row by row
         self.assertIn("Speaker notes: Chiller CH-1 was retested in June.", [t for page, t in doc.lines if page == 2])
         self.assertEqual((chart.page, chart.source, chart.rows), (3, "chart", [["Category", "Option 1"],
                                                                               ["May", "1,750"], ["June", "300"]]))

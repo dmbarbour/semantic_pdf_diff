@@ -52,7 +52,7 @@ import io
 import re
 from dataclasses import dataclass, field
 
-from . import chartxml
+from . import chartxml, tablerules
 from .textdocs import Block, Picture, TextDocument
 
 HEADING = re.compile(r"^(?:Heading|heading)\s*(\d)$")
@@ -604,6 +604,8 @@ def read_docx(data):
         for box in _boxes(child):  # after the paragraph anchoring it, as the document's own paragraphs
             content(_children(box, "w:p", "w:tbl"))
 
+    counted = [0]  # the document's tables, in order, each named "table N" for the rules query
+
     def table(child, place=None):
         """A data table's rows as lines, its larger nested tables after it; a layout table's cells as content. A
         nested table (`place`: the line naming where it sits) leaves pictures and footnotes to its outer table."""
@@ -629,8 +631,11 @@ def read_docx(data):
             row_lines.append(line(" | ".join(c.text for c in cells)))
             inner += [(cells, c) for c in cells if c.nested]
         first = header_lines[0]
+        counted[0] += 1
+        ruled = tablerules.from_cells(grid, heads, labels, row_lines[1:], place.rstrip(":") if place else "",
+                                      f"table {counted[0]}")
         blocks.append(Block(1, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
-                            row_lines, row_headers))
+                            row_lines, row_headers, grid=ruled))
         if place is None:
             note(child, first, "table", boxes=True)
         if place is None:

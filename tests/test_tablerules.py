@@ -30,6 +30,13 @@ class Analysis(unittest.TestCase):
         self.assertEqual((head.numbers, head.low, head.high, head.distinct), (3, "24.1", "25.5", 2))
         self.assertIn("text 3; all distinct", tr.describe(tag))
 
+    def test_a_headers_own_name_and_unit(self):
+        self.assertEqual((tr.header_name("Hydraulics > Capacity (gpm)"), tr.header_unit("Hydraulics > Capacity (gpm)")),
+                         ("Capacity", "gpm"))
+        self.assertEqual(tr.header_name("alpha [deg]"), "alpha")
+        g = tr.grid(["A", "B"], ["Valve", "Pressure (bar) > Inlet"], [["V-1", "6.2"]], [3], [5])
+        self.assertEqual(tr._fill("{B.group} | {B.name} | {B.unit}", g, 0)[0], "Pressure | Inlet | bar")
+
     def test_a_series_is_seen_and_summarising_suggested(self):
         g = polar()
         alpha = tr.analyse(g)[0]

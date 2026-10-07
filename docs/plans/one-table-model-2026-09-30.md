@@ -1,6 +1,6 @@
 # One table model for every source
 
-- **Status:** Planned (2026-09-30), for the owner's review.
+- **Status:** Milestones 3 and 4 built for native cells (Excel, CSV, Word, decks; 2026-10-04 to 06). PDF tables: a design for the owner's review (2026-10-06).
 - **Depends on:** [multi-format adapters](multi-format-adapters-2026-09-23.md), whose *Tables and spreadsheets* design this generalises; [query improvement](query-improvement-2026-09-26.md), whose rounds measure it; [content-addressed queries](content-addressed-queries-2026-09-28.md) (recorded, replayable queries).
 - **Feeds:** the multi-format plan's `.csv`/`.xlsx` milestone (and later `.docx`/`.pptx` tables); the [lever index](../reviews/levers.md) (its table rows fold into this plan).
 - **Why:**
@@ -106,6 +106,45 @@
    - **Is cell text adequate?** The owner: "we should generally investigate whether cell text is adequate." Every development-slice table gets its sampled rows transcribed by vision, and the disagreements are counted per document and per kind of hazard. That rate decides whether one checked row per table is enough.
 3. **The rules and their mechanical application,** with checks and row-by-row fallback. Behind the `table_model` setting, judged in a round against today's row queries.
 4. **Spreadsheets and CSV through the same path** (the multi-format plan's `.csv`/`.xlsx` milestone), with the medium test. `.docx` and `.pptx` tables follow those adapters.
+
+## PDF tables onto the rules path, in detail (2026-10-06), for the owner's review
+
+**Where things stand:**
+- Milestones 3 and 4 are built for every format with native cells: Excel, CSV, Word and slide decks (the [adapters plan](multi-format-adapters-2026-09-23.md), milestone 5 and after).
+- Each table is asked how it's read (rules, rows, or a summary), and the rules are applied mechanically and checked.
+- On the controlled corpus: one query per table instead of one per row, the same facts, conditions kept better.
+- PDF tables are still read one row per query.
+
+**What's different for PDF:** its cells come from a parser, and structure is where PDF tables fail:
+- stacked tables merged
+- wrapped cells split into rows
+- header text cut
+- misbinding in dense tables (sc01, the eye tests, the controlled tables' knobs)
+
+**Proposed steps** (Claude's):
+1. **PDF tables on the grid, no model:**
+   - PyMuPDF's cells (each with its box, spans from merged cells) placed on the same grid Word and decks use
+   - its header rows: PyMuPDF's detected header and today's same-form test
+   - a table continued over pages joined into one grid (today's continuation logic), each row keeping its page and box
+   - heuristic repairs:
+     - a row with an empty first cell and text continuing the row above is a wrapped cell, merged up
+     - a row with only its first cell is a section row
+     - header cells keep their whole text
+   - Claims made by rules are located by their page and row's box, as row claims are now.
+2. **The rules query for PDF tables, with the table's image** (the owner's "clear visualization of tables when building rules"), and the vision check folded in (decision 1):
+   - the query also transcribes one sample row from the image
+   - a mismatch with the text layer is a hazard: that table's rows are read one by one, with the image
+3. **Measured before going further:**
+   - **The controlled PDF tables** (the treatment plant's and the coaster's schedules, with their knobs: stacked, multilevel, multi-value, dense, continued): rules against `--rows`, by the same keys. Their misbinding today is the target (the coaster's knobs: 9–20 misbound).
+   - **A round on the development slices' real tables** (rubric v6), rules against row queries, with cost per table. The regressions to watch: sc01 items 1 and 4.
+4. **Model repair of structure** (the plan's milestone 2) only where step 3 shows the heuristics and the image leave hazards: a query proposing restructuring edits (merge rows, mark headers and sections, split tables), checked so no text is added or lost.
+
+**This reorders the plan:** repair was to come before the rules. Proposed: rules first, on heuristic grids with the image, because the rules query may absorb much of what repair was for, and the measurement says what's left.
+
+**For the owner's review:**
+1. **Repair after rules, and only where measured** (above), rather than a repair query for every table first. Proposed: yes.
+2. **The table's image in every PDF rules query** (one image, about 260 tokens), rather than only for tables with hazards found. Proposed: always.
+3. **The vision check folded into the rules query** (one transcribed row), rather than in a separate repair query. Proposed: folded in.
 
 ## Relation to other plans and levers
 
