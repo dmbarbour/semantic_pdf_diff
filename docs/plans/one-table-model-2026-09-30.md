@@ -148,6 +148,33 @@
 
 **Decided (the owner, 2026-10-07):** "The recommendations look good." Repair after rules, only where measured; the image in every PDF rules query; the vision check folded into the rules query. And a new lever, asked in the same breath: "is there a good way to show the model a few sample outcomes? Sort of an 'is this your final answer' opportunity? For tables, which are super-efficient due to rules-driven processing, this seems a cheap lever to add." (The adapters plan has its design and measurement.)
 
+## Progress
+
+- **PDF tables asked how they're read (2026-10-07): steps 1 and 2 built.** The owner approved the design above: "The recommendations look good."
+  - **The build** (`tables.pdf_grid`; `extract.py`):
+    - a detected table's cells placed on the grid, merged header cells spanning
+    - **repairs:** a wrapped cell (a row with an empty first cell and no number) joins the row above; a section row labels the rows below
+    - rows keep their boxes, and claims are located by them
+    - **the rules query gets the table's crop** and copies one row from it; a disagreement with the text layer sends the table's rows to be read one by one, as before
+    - a table continued over pages is read part by part, each part with the carried header, as before
+    - reader version `pdf/2`; round 0's named configuration pinned to row by row (`table_rules: null`)
+  - **The controlled PDFs (79 runs), asked against row by row:** facts read right the same (3,207 of 3,355), conditions the same (746 of 756), misbound 229 against 226.
+    - **Better:** the multilevel tables (3 misbound to none), fewer stray claims in the attachment study
+    - **Worse:** the energy study's revision (16 misbound against 9) and one plan pair (2 of 3 changes)
+    - The coaster knobs' misbinding is unchanged, because most of their tables never reached the rules (next point).
+  - **The vision check's finding.** Of the corpus's 394 PDF tables, 254 failed it and were read row by row:
+
+    | | Same text, other cell boundaries | Text differs |
+    |---|---|---|
+    | Controlled PDFs | 204 | 40 |
+    | Development slices (real) | 19 | 43 |
+
+    - **Same text, other boundaries:** a word or header split across cells ("Entry | speed", "p | owers"), a two-line header parsed as a header and a first body row. Structure, not cell text: what step 4's repair is for. The heuristics merge wrapped body rows, not a wrapped header.
+    - **Text differs:** mostly drawings and charts the parser took for tables (the real drawing sheets: dimension strings), and a few cells really misread.
+  - **The development slices,** recorded for their replay fixture (repacked): 118 tables; 15 read by rules, 28 row by row by the model's choice, 67 failing the vision check, 2 answers malformed JSON (inch marks; read row by row).
+  - Cost: $0.39 (the corpus $0.21 and its unaligned pairs $0.18), the slices $0.19.
+  - **Next (step 4, "only where measured"; measured):** repair of cell boundaries. A table whose copied row has the same text in other cells gets its structure mended (cells joined, a wrapped header merged) from the image before the rules apply. A table whose text differs stays row by row.
+
 ## Relation to other plans and levers
 
 - **The multi-format plan's *Tables and spreadsheets* section** is kept for what is specific to spreadsheets: formulas, hidden sheets, external links, sheet maps. Its model-guided interpretation becomes this plan's rules.

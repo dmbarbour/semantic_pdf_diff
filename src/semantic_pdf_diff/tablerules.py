@@ -131,12 +131,14 @@ class Grid:
     keys: list = field(default_factory=list)
     title: str = ""
     place: str = ""
+    boxes: list = field(default_factory=list)  # each row's box on its page (a PDF's), where rows aren't lines
 
-def grid(columns, labels, rows, names, lines, title="", place=""):
+def grid(columns, labels, rows, names, lines, title="", place="", boxes=None):
     """A Grid from a table's body rows (aligned to its columns). A row holding only its first cell, in a table of
     three columns or more, is a section row, labelling the rows below it; an empty row is left out."""
     g, section = Grid(list(columns), list(labels), title=title, place=place), ""
-    for key, (row, name, line) in enumerate(zip(rows, names, lines)):
+    boxes = boxes or [None] * len(rows)
+    for key, (row, name, line, box) in enumerate(zip(rows, names, lines, boxes)):
         row = [row[k] if k < len(row) else "" for k in range(len(columns))]
         filled = [k for k, text in enumerate(row) if text]
         if len(columns) > 2 and filled == [0]:
@@ -147,6 +149,8 @@ def grid(columns, labels, rows, names, lines, title="", place=""):
             g.lines.append(line)
             g.sections.append(section)
             g.keys.append(key)
+            if box is not None:
+                g.boxes.append(box)
     return g
 
 def letter(column):
@@ -415,8 +419,24 @@ class Example(Lenient):
     def _text(cls, value):
         return value if isinstance(value, str) else str(value)
 
+class Transcribed(Lenient):
+    """A row copied from the table's image (a PDF's), to check its text layer."""
+    row: str = Field(default="", max_length=20)
+    cells: list[str] = Field(default_factory=list, max_length=60)
+
+    @field_validator("row", mode="before")
+    @classmethod
+    def _text(cls, value):
+        return value if isinstance(value, str) else str(value)
+
+    @field_validator("cells", mode="before")
+    @classmethod
+    def _texts(cls, value):
+        return [v if isinstance(v, str) else str(v) for v in value] if isinstance(value, list) else value
+
 class Rules(Lenient):
     """A model's answer to the rules query (RULES)."""
+    transcribed: Transcribed | None = None  # with a table's image: one row copied from it
     binding: str = Field(default="", max_length=400)  # what the values measure, what has them, under what
     reading: str = Field(default="", max_length=20)
     why: str = Field(default="", max_length=400)
@@ -468,6 +488,33 @@ def review_question(asked, answer, g):
             except (Misfit, Broken) as error:
                 lines.append(f"  (read by itself: {error})")
     return "\n".join(lines)
+
+IMAGED = """THE TABLE'S IMAGE is attached. The cells above are its text layer, which can be wrong (a symbol lost, a
+cell split or joined). Also copy the cells of one sample row from the image as you read them there, empty cells left
+out: "transcribed": {"row": "<its number>", "cells": ["...", "..."]}.
+"""
+
+def _plain(text):
+    import unicodedata
+    text = unicodedata.normalize("NFKC", str(text)).casefold()
+    return "".join(ch for ch in text if ch.isalnum() or ch in ".-+%/")
+
+def transcription_mismatch(answer, g):
+    """What a row copied from the image says against the text layer's cells: "" when they agree (folded for case,
+    spaces, commas and dash and quote forms), or no row was copied."""
+    t = answer.transcribed
+    if t is None or not t.cells:
+        return ""
+    name = t.row.strip()
+    name = name[4:].strip() if name.lower().startswith("row ") else name
+    if name not in g.names:
+        return f"the copied row {t.row!r} isn't a row of the table"
+    layer = [c for c in g.rows[g.names.index(name)] if c]
+    seen = [c for c in t.cells if str(c).strip()]
+    if [_plain(c) for c in layer] != [_plain(c) for c in seen]:
+        return (f"row {name}: the text layer reads {' | '.join(layer)[:150]}, the image "
+                f"{' | '.join(seen)[:150]}")
+    return ""
 
 # --- applying rules
 
@@ -744,15 +791,22 @@ def describe_rule(rule):
              if getattr(rule, name)]
     return "; ".join(parts)[:300]
 
-def read(core, page, g, task, by_itself, source):
+def read(core, page, g, task, by_itself, source, image=None):
     """Read a table by rules: ask for them, check them (once more if they fail), and apply them; by_itself(key) reads
-    one of the table's body rows as a table row without rules. source: the reader's first derivation step."""
+    one of the table's body rows as a table row without rules. source: the reader's first derivation step. image: the
+    table's crop (a PDF's), sent with the query, which then copies a row from it to check the text layer."""
     from .llm import CallLimitReached, NotRecorded
     cols = analyse(g)
-    first, last = g.lines[0], g.lines[-1]
-    span = (0.0, float(first), 1.0, float(last + 1))
-    asked = question(g, cols, core.reader.for_table(page, span, " ".join(g.labels)))
-    row_box = lambda i: (0.0, float(g.lines[i]), 1.0, float(g.lines[i] + 1))
+    if g.boxes:  # a PDF's rows: their own boxes
+        span = (min(b[0] for b in g.boxes), min(b[1] for b in g.boxes), max(b[2] for b in g.boxes),
+                max(b[3] for b in g.boxes))
+        row_box = lambda i: tuple(g.boxes[i])
+    else:
+        first, last = g.lines[0], g.lines[-1]
+        span = (0.0, float(first), 1.0, float(last + 1))
+        row_box = lambda i: (0.0, float(g.lines[i]), 1.0, float(g.lines[i] + 1))
+    images = [image] if image else []
+    asked = question(g, cols, core.reader.for_table(page, span, " ".join(g.labels))) + ("\n" + IMAGED if image else "")
 
     def ask(prompt, attempt, then):
         name = task + (":again" if attempt else "")
@@ -764,7 +818,7 @@ def read(core, page, g, task, by_itself, source):
 
         core.progress.add()
         core.state["pending"] += 1
-        core.dispatch.submit(prompt, Rules, [], key, finish)
+        core.dispatch.submit(prompt, Rules, [core.output / x for x in images], key, finish)
 
     def record(name, status, issues, found=()):
         row = coverage_row(content=core.content, page=page, bbox=list(span), task=name, status=status,
@@ -781,6 +835,10 @@ def read(core, page, g, task, by_itself, source):
     def first_answer(name, answer, error):
         if error is not None:
             return failed(name, error)
+        if image:  # the vision check (the one table model's decision 1): a row copied from the image
+            mismatch = transcription_mismatch(answer, g)
+            if mismatch:
+                return record(name, "partial", [everyone(name, f"the image and the text layer disagree ({mismatch})")[:500]])
         wrong = problems(answer, g, cols)
         if not wrong:
             return reviewed(name, answer)
@@ -817,7 +875,7 @@ def read(core, page, g, task, by_itself, source):
                            "not reviewed")
             if result.verdict.strip().lower() != "revise" or result.rules is None:
                 return use(name, answer, list(notes) + ["Reviewed: kept"], done())
-            same = lambda r: r.model_dump(exclude={"why", "binding", "examples"})
+            same = lambda r: r.model_dump(exclude={"why", "binding", "examples", "transcribed"})
             if same(result.rules) == same(answer):  # a revision changing nothing: shown again, it'd repeat itself
                 return use(name, answer, list(notes) + [f"Reviewed: a revision changing nothing ({'; '.join(result.problems)}), "
                                                         "kept"[:400]], done())
@@ -834,7 +892,7 @@ def read(core, page, g, task, by_itself, source):
 
         core.progress.add()
         core.state["pending"] += 1
-        core.dispatch.submit(prompt, Review, [], key, finish)
+        core.dispatch.submit(prompt, Review, [core.output / x for x in images], key, finish)
 
     def failed(name, error):
         if isinstance(error, (CallLimitReached, NotRecorded)):  # nothing learnt: the next run asks again

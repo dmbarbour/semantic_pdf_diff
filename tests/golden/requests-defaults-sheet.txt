@@ -1,5 +1,5 @@
 # PyMuPDF 1.28.2
-# 228 requests
+# 231 requests
 
 compare 0086dd9a4a9aa179287825d9d50e611feab5b04ff183ac90dc96e0b68d83f904 images=2
 compare 031d87106ea812c521c323072fd12c9f2ffd3ea9be71dddfe46a74ea92bdcbe0 images=2
@@ -217,6 +217,9 @@ extract f49c89bf20743be73505e58671394a7303b165ecd762ce87f3de69d786608263 images=
 extract f5757ab5cdcb9261a989f0e655b8cb9789296c4f42e04de58086e41d10ad28e1 images=1
 extract f9717bbc0197ca132a1bb734ae2507629685d1fabf86a6accc50701d2ac4e666 images=0
 extract ff2d347bfda5ce1c0b6df70e5e417f87a70a138841528c48c61c1b68821744ce images=1
+table-rules 647335da63be5ad1d7feb581f5a2058a49755979a11cfb9108b5d76358cbac92 images=1
+table-rules 82c8cdda4e7c3655fc6f4e10e40cbf2b5bc678be227610fcb80e11648d654373 images=1
+table-rules 88aac27f82aa594987ee9ed114f0d48006b55eea67a9903b2b11dbd3357ba78b images=1
 triage 091a80fb21037f332fd66e6d9a7c409bc3bbf02f8066e45491475b35682fec64 images=1
 triage 156887f9e00e143e872db899f495b2350e4e0766c91e4f3a2b2f0007247587a8 images=0
 triage 165ab89ff7363e2830b4c4772ef7cd3cda8db51bc84b94cbe1e1f21d2563bbe6 images=0
@@ -272,6 +275,81 @@ SOURCE DATA:
 Caption: Figure 1: Pump curve
 TEXT LAYER OF THIS REGION (from the PDF, may be partial; use it to read small labels):
 Figure 1: Pump curve
+
+=== the first table-rules prompt
+This is one table from an engineering document. Decide how its rows become claims: atomic facts a reader
+might rely on (entity, attribute, value, unit, conditions), as an extraction of the table would give them. Choose one
+reading:
+- "rules": every row gives its claims the same way. Write the claims a row gives as templates; they're applied to
+  every row mechanically. Placeholders: {B} the row's cell in column B; {B.header} column B's header; {B.name} the
+  header's own name without its unit; {B.group} the group a header sits under ("Pressure" for
+  "Pressure (bar) > Inlet": the group may be the attribute and the header's own name a condition, or the
+  group a category and the name the attribute); {B.unit} the unit in the header's brackets ("Flow (L/s)" gives L/s); {B.cell_name} and
+  {B.cell_unit} split the row's own cell the same way (a row label "Capital cost ($M)" gives Capital cost and $M);
+  {section} the section row above the row; {title} the table's title; {subject} your subject. A template with
+  "columns": "C:F" is applied to each of those columns in turn, {*} standing for the column's cell ({*.header},
+  {*.name} and {*.unit} likewise). Set "number": true when the value must be a number: a row whose cell isn't one is
+  read by itself instead. An empty value, or n/a, gives no claim. A value is a cell's own value (a number, a name, a
+  short code), never a sentence. A condition the text around the table names for every row (a load case, a date,
+  a state) belongs in the templates' conditions. Write out the claims two or three of the rows shown give (no
+  placeholders) as examples: they check the templates.
+- "rows": the cells need reading: sentences (a requirement, a note, a description: their claims are in their words),
+  several values in one cell, rows unlike each other. Each row is read by itself.
+- "summary": the rows are samples of the same few quantities, and what matters is their overall shape, not each
+  row. Name a template and its columns; its statistics are computed from every row:
+  - "series": quantities against an input (a polar, a curve, a sweep): "input" the input's column, "quantities"
+    theirs, "points" a few input values (as shown) that matter on their own, such as zero or a design point, at
+    which each quantity is reported too (none if none does). Gives the input's range and step, and each quantity's
+    minimum and maximum and where they fall.
+  - "log": quantities sampled over time: "input" the time's column, "quantities" theirs. Gives the span and count,
+    and each quantity's minimum, maximum, mean and last value.
+  - "list": many records of one kind (a register, a document list): "categories" the columns to count rows by. Gives
+    the count, and the counts by each category's values.
+  Don't summarise rows that are each a fact someone would check on its own (requirements, design values, schedules).
+"subject" names what the table describes: a summary's entity.
+How a claim is bound, as in any extraction:
+- the attribute names the property a value measures (cooling energy, peak load, flow), never an option's or a
+  series' name
+- the entity is the thing that has the value: an item (a pump, a zone) or an alternative being compared (a design
+  option, a unit size); never a parameter's name
+- conditions are the circumstances the value holds under (a month, an operating point, a load case, a location),
+  never the document's own details (its revision, its date of issue); a circumstance every row shares (a load case,
+  a state named before the table) is a condition, but a vague setting ("in the plant", "in the process") isn't
+- when the columns are alternatives or series of one quantity (Option 1, Option 2), each column names the entity
+  or a condition, the quantity is the attribute (from the title, the caption or the text above), and the row's
+  label (a month, a case) is a condition
+For example:
+- a table "Annual heating demand" with columns Year | Design A (MWh) | Design B (MWh): one template over columns
+  B:C, entity {*.name}, attribute "heating demand", value {*}, unit {*.unit}, conditions {A}
+- a table "Rotor performance" with columns Wind speed (m/s) | Power (kW) | Thrust (kN): one template over columns
+  B:C, entity {subject} (the rotor), attribute {*.name}, value {*}, unit {*.unit}, conditions "at wind speed {A} m/s"
+- a table "Motor options" with row labels such as "Rated power (kW)" and columns Motor A | Motor B: one template
+  over columns B:C, entity {*.header}, attribute {A.cell_name}, value {*}, unit {A.cell_unit}
+Return JSON:
+{"binding":"what the values measure (the attribute), what has them (the entity), under what (the conditions)", "reading":"rules|rows|summary", "why":"one sentence", "subject":"...",
+"claims":[{"columns":"", "entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"...", "number":true}],
+"examples":[{"row":"5", "claims":[{"entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"..."}]}],
+"template":"series|log|list", "input":"A", "quantities":["B"], "categories":["C"], "points":["0"]}
+Leave out what your reading doesn't use.
+
+TABLE: page 1, table 1
+CONTEXT (for reference only: do not extract claims from it):
+Above the table: ... is rated 10 kW at 1450 rpm and runs on duty while P-2 stands by. The pump station uses a proportional-integral (PI) controller to hold pressure. Pump P-1 is rated 10 kW at 1450 rpm and runs on duty while P-2 stands by. The pump station uses a proportional-integral (PI) controller to hold pressure. Pump P-1 is rated 10 kW at 1450 rpm and runs on duty while P-2 stands by. Table 1: Equipment ratings
+Within: 3.1 Pump Station
+SIZE: 2 rows, 3 columns; a claim per value cell would give about 4 claims
+COLUMNS (letter: header: what its cells hold):
+A: Item: text 2; all distinct
+B: Power: text 2; all distinct
+C: Speed: text 2; all distinct
+SAMPLE ROWS (the row's number, then its cells by column):
+row | A | B | C
+2 | Pump P-1 | 10 kW | 1450 rpm
+3 | Fan F-2 | 3 kW | 900 rpm
+OUR HEURISTIC OPINION (a guess from the size and the analysis above; decide yourself): claims from rows by rules: about 4 claims, 2 a row
+THE TABLE'S IMAGE is attached. The cells above are its text layer, which can be wrong (a symbol lost, a
+cell split or joined). Also copy the cells of one sample row from the image as you read them there, empty cells left
+out: "transcribed": {"row": "<its number>", "cells": ["...", "..."]}.
+
 
 === the first triage prompt
 Describe one section of an engineering document, using only the material below: its heading

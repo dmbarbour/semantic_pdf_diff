@@ -38,6 +38,8 @@ class Recorder:
             return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)
         if situating_answer(prompt):
             return schema.model_validate(situating_answer(prompt))
+        if schema.__name__ == 'Rules':  # a table's rules query: each row read by itself, as these tests read tables
+            return schema(reading='rows')
         data = prompt.split('SOURCE DATA:\n')[1]
         if ' kW' in data:
             value = data.split(' kW')[0].split()[-1]

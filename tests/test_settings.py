@@ -30,7 +30,7 @@ TOGGLES = {
     'context_after': 100, 'table_context': 60, 'visual_text_layer': 200, 'stem_context': False, 'grow_tiles': False,
     'tile_locator': True, 'references': True, 'response_format': 'json_object', 'seed': 7,
     'max_token_field': 'max_completion_tokens',
-    'tile_points': 300, 'refinement_depth': 0, 'vision': False, 'figure_tasks': False, 'tiling': 'grid',
+    'tile_points': 300, 'refinement_depth': 0, 'vision': False, 'figure_tasks': False, 'tiling': 'grid', 'table_rules': None,
     'sheet_details': True, 'skip_empty': False, 'table_filter': True, 'situate': False, 'verify_visuals': False,
     'top_k': 1, 'min_score': 0.9, 'max_pairs': 1, 'aliases': {'drawing': 'equipment', 'label': 'power'},
     'reconcile': False, 'quote_match': 'exact',
@@ -45,8 +45,7 @@ ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refin
 NOT_EXERCISED = {
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
     'dedupe_repeated': 'needs a table row repeated on three or more pages (tests/test_repeats.py)',
-    'table_rules': "Excel's tables only; these runs read PDFs (tests/test_xlsxdocs.py)",
-    'table_review': "tables read by rules only; these runs read PDFs (tests/test_xlsxdocs.py)",
+    'table_review': "the stub reads every table's rows by themselves, so no rules are reviewed (tests/test_xlsxdocs.py)",
     'align': 'revisions mode only; these runs compare proposals (tests/test_align.py)',
     'explain_differences': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
     'continuations': "only an answer incomplete at the claim limit is continued; the stub's never are "
@@ -144,8 +143,8 @@ class SettingsKeepToTheirClass(unittest.TestCase):
             self.assertNotEqual(getattr(defaults, name), Settings(**{name: value}).__getattribute__(name), name)
 
     def test_each_setting_keeps_to_its_class(self):
-        self.assertEqual({role for role, _ in self.base[False]}, {'extract', 'triage', 'compare'})  # every stage
-        extraction = lambda queries: {q for q in queries if q[0] == 'extract'}
+        self.assertEqual({role for role, _ in self.base[False]}, {'extract', 'table-rules', 'triage', 'compare'})
+        extraction = lambda queries: {q for q in queries if q[0] in ('extract', 'table-rules', 'table-review')}
         for name, value in TOGGLES.items():
             kind, sheet = SETTING_CLASSES[name], name in ON_SHEETS
             with self.subTest(setting=name, kind=kind):

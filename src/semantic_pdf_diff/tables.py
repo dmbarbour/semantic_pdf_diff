@@ -1,5 +1,5 @@
-"""Detected tables: whether one is really a table (the table_filter lever), its rows' boxes, and repeated
-headers. Split from extract.py (milestone 7).
+"""Detected tables: whether one is really a table (the table_filter lever), its rows' boxes, repeated headers, and
+its grid for the rules query (pdf_grid). Split from extract.py (milestone 7).
 """
 import pymupdf
 
@@ -40,3 +40,38 @@ def row_boxes(table, extracted):
     rows = getattr(table, "rows", None) or []
     boxes = [tuple(r.bbox) if getattr(r, "bbox", None) else None for r in rows]
     return boxes if len(boxes) == len(extracted) else []
+
+def pdf_grid(header, body, boxes, title="", place=""):
+    """A detected table's grid as the rules query sees it (tablerules.Grid; the one table model's step 1): its cells'
+    text folded to one line, a header cell PyMuPDF merged (None) labelled as its left neighbour, and heuristic
+    repairs: a row with an empty first cell and no number in it continues the row above (a wrapped cell) and joins
+    it; a row of only its first cell is a section row (tablerules.grid). Rows keep their boxes and, as keys, the
+    index of their first body row."""
+    from . import tablerules
+    width = max([len(header)] + [len(r) for r in body])
+    clean = lambda row: [" ".join(str(c).split()) if c is not None else "" for c in row] + [""] * (width - len(row))
+    labels, last = [], ""
+    for c in list(header) + [None] * (width - len(header)):
+        last = last if c is None else " ".join(str(c).split())
+        labels.append(last)
+    rows, kept_boxes, keys = [], [], []
+    boxes = list(boxes) + [None] * (len(body) - len(boxes))
+    for ri, (row, box) in enumerate(zip(body, boxes)):
+        cells = clean(row)
+        if not any(cells):
+            continue
+        if rows and not cells[0] and not any(tablerules.number(c) is not None for c in cells if c):
+            rows[-1] = [" ".join(t for t in (a, b) if t) for a, b in zip(rows[-1], cells)]  # a wrapped cell
+            if box and kept_boxes[-1]:
+                a = kept_boxes[-1]
+                kept_boxes[-1] = (min(a[0], box[0]), min(a[1], box[1]), max(a[2], box[2]), max(a[3], box[3]))
+            continue
+        rows.append(cells)
+        kept_boxes.append(tuple(box) if box else None)
+        keys.append(ri)
+    if any(b is None for b in kept_boxes):
+        return None  # rows without boxes can't be placed: read row by row
+    g = tablerules.grid([tablerules.letter(k) for k in range(1, width + 1)], labels, rows,
+                        [str(k + 2) for k in range(len(rows))], [0] * len(rows), title, place, kept_boxes)
+    g.keys = [keys[k] for k in g.keys]
+    return g

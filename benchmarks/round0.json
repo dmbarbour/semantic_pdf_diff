@@ -25,6 +25,7 @@
     "verify_visuals",
     "explain_differences"
   ],
+  "table_rules": null,
   "claims_per_request": 6,
   "output_tokens": 1400,
   "context_before": 0,

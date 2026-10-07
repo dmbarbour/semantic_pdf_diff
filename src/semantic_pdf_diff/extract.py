@@ -18,7 +18,7 @@ from .quotes import FOLD, covered, excerpted, quoted  # noqa: F401
 from .sections import SectionIndex, heading_y, pdf_sections, section_text  # noqa: F401
 from .segmentation import grown, sheet_details, tiles  # noqa: F401
 from .stems import _long_form, glossary, stem_index  # noqa: F401
-from .tables import real_table, row_boxes, same_form  # noqa: F401
+from .tables import pdf_grid, real_table, row_boxes, same_form  # noqa: F401
 from .tasks import MIN_REFINE_BYTES, TaskCore, split_utf8, union  # noqa: F401 (callers import them from here)
 
 # Bump when prompt assembly or task construction changes, not only the template text;
@@ -241,7 +241,8 @@ def office_installed(workbook=False):
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/1", ".txt": "text/1", ".md": "text/1",
+READERS = {".pdf": "pdf/2",  # pdf/2: tables asked how they're read
+           ".txt": "text/1", ".md": "text/1",
            ".docx": "docx/5",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers
            ".pptx": "pptx/4",  # pptx/2: tables asked how they're read; 3-4: a header's name and group
            ".xlsx": "xlsx/9", ".xlsm": "xlsx/9",  # xlsx/7: vague conditions guarded against; 8-9: header name, group
@@ -398,11 +399,13 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     derivation = [DerivationStep(step="pdf-table-detection",
                                                  detail=f"row with header continued from page {number - 1}"),
                                   DerivationStep(step="model-extraction")]
-                for ri, row in enumerate(body):
+                def by_itself(ri, number=number, ti=ti, header=header, body=body, body_boxes=body_boxes, bbox=bbox,
+                              width=width, derivation=derivation):
+                    row = body[ri]
                     # Rows with no content (common where drawing geometry is detected as a
                     # table) cost a model call and can't yield a claim.
                     if all(c is None or not str(c).strip() for c in row):
-                        continue
+                        return
                     # Exactly repeated rows (same header and cells, same table position) follow their
                     # first occurrence from the third sighting on; text is never de-duplicated.
                     key = ("table", json.dumps([header, row], ensure_ascii=False, default=str),
@@ -410,6 +413,20 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     row_box = body_boxes[ri] if ri < len(body_boxes) and body_boxes[ri] else tuple(bbox)
                     core.table_task(number, tuple(row_box), f"table:p{number}:{ti}:{ri}", header, row,
                                     list(range(width)), derivation=derivation, repeat_key=key)
+
+                limit = s.rules_from()
+                ruled = pdf_grid(header, body, body_boxes, "", f"page {number}, table {ti + 1}") \
+                    if limit is not None and len(body) > limit else None
+                if ruled is not None and ruled.rows:  # asked how it's read, with its image (the one table model)
+                    from . import tablerules
+                    crop = crop_name(stem, f"rules:p{number}:{ti}")
+                    render(page, displayed, assets / crop, s.image_side)
+                    tablerules.read(core, number, ruled, f"rules:p{number}:{ti}", by_itself,
+                                    DerivationStep(step="pdf-table-detection", detail="the table's cells, on its grid"),
+                                    image=f"assets/{crop}")
+                else:
+                    for ri in range(len(body)):
+                        by_itself(ri)
                 if displayed.y1 - page.rect.y0 > 0.8 * height:
                     carried = (header, width)
                 else:

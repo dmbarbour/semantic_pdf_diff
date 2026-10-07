@@ -215,5 +215,28 @@ class Traced(unittest.TestCase):
         self.assertIsNone(tables_read(row, row))
         self.assertIsNone(tables_read(row, text))
 
+
+
+class PdfTables(unittest.TestCase):
+    """PDF tables on the grid (tables.pdf_grid) and the vision check (transcription_mismatch)."""
+    def test_a_parsed_table_on_the_grid_with_simple_repairs(self):
+        from semantic_pdf_diff.tables import pdf_grid
+        g = pdf_grid(["Tag", "Service", None, "Flow (gpm)"],
+                     [["P-1", "Raw water", "", "450"], ["", "transfer", "", None], ["Standby", "", "", ""],
+                      ["P-2", "Backwash", "", "300"]], [(0, 10, 1, 20), (0, 20, 1, 30), (0, 30, 1, 40), (0, 40, 1, 50)])
+        self.assertEqual(g.labels, ["Tag", "Service", "Service", "Flow (gpm)"])  # a merged header cell spans
+        self.assertEqual(g.rows, [["P-1", "Raw water transfer", "", "450"], ["P-2", "Backwash", "", "300"]])
+        self.assertEqual((g.sections, g.keys, g.boxes), (["", "Standby"], [0, 3], [(0, 10, 1, 30), (0, 40, 1, 50)]))
+        self.assertIsNone(pdf_grid(["A", "B"], [["1", "2"]], [None]))  # rows without boxes: read row by row
+
+    def test_a_row_copied_from_the_image_checks_the_text_layer(self):
+        g = tr.grid(["A", "B"], ["Tag", "Flow"], [["P-1", "1,450"], ["P-2", "Δp 3"]], [2, 3], [0, 0])
+        same = tr.Rules.model_validate({"transcribed": {"row": 2, "cells": ["P-1", "1450"]}})
+        self.assertEqual(tr.transcription_mismatch(same, g), "")  # commas and case folded
+        lost = tr.Rules.model_validate({"transcribed": {"row": "row 3", "cells": ["P-2", "Δp 3"]}})
+        g.rows[1] = ["P-2", "p 3"]  # a symbol the text layer lost
+        self.assertTrue(tr.transcription_mismatch(lost, g).startswith("row 3: the text layer reads P-2 | p 3"))
+        self.assertEqual(tr.transcription_mismatch(tr.Rules(), g), "")  # nothing copied: nothing to check
+
 if __name__ == "__main__":
     unittest.main()

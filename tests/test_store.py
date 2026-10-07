@@ -284,13 +284,13 @@ class ResumeAndReuse(unittest.TestCase):
             root = Path(d); a, b = self.pdfs(root)
             self.run_cli(a, b, root / 'out', url)
             first, findings = state['requests'], self.findings(root / 'out')
-            with mock.patch.dict(extract.READERS, {'.pdf': 'pdf/2'}):  # a reader changed since
+            with mock.patch.dict(extract.READERS, {'.pdf': 'pdf/999'}):  # a reader changed since
                 code, log = self.run_cli(a, b, root / 'out', url)
             self.assertNotIn('Loaded from store', log)          # read again,
             self.assertEqual(state['requests'], first)          # its unchanged queries answered from cache
             self.assertEqual(self.findings(root / 'out'), findings)
             with Store(root / 'out') as store:
-                self.assertTrue(store.is_extracted(content_id(a.read_bytes(), a.name), 'pdf/2'))
+                self.assertTrue(store.is_extracted(content_id(a.read_bytes(), a.name), 'pdf/999'))
             code, log = self.run_cli(a, b, root / 'out', url)  # the old version, a downgrade: read again too
             self.assertNotIn('Loaded from store', log)
 
