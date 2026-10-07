@@ -27,6 +27,7 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Chart-reading rule | `visual_rules` | Not accepted | r08 0.59 (0.47–0.71); vaguer readings, out-of-range ones remain |
 | Tile locator | `tile_locator` | Parked | r06 0.49 (flawed sampling), r07 0.58 (0.47–0.68): no worse; wins on IEA and LCIT in both rounds |
 | Table rules | `table_rules: 0` | Default for Excel's tables: every table asked how it's read (2026-10-05; the owner's design, not a round) | see the lever's section |
+| Table review | `table_review: true` | Default (2026-10-07; the owner's idea, not a round) | the controlled corpus: 30 of 137 tables' rules revised on review; facts as before; one revision pair more read alike |
 
 ## Levers
 

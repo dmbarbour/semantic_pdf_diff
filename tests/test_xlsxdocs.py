@@ -155,19 +155,23 @@ class Readers(unittest.TestCase):
 class RulesModel:
     """The text tests' model, answering a table's rules query with the given rules (keyed by the table's place), or
     with each row read by itself."""
-    def __init__(self, answers, **settings):
+    def __init__(self, answers, reviews=None, **settings):
         import sys
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent))
         from test_textdocs import Model
-        self.base, self.answers, self.asked = Model(**settings), answers, []
+        self.base, self.answers, self.asked, self.reviews, self.reviewed = Model(**settings), answers, [], reviews or {}, []
         self.s = self.base.s
 
     def __getattr__(self, name):
         return getattr(self.base, name)
 
     def ask(self, prompt, schema, images=(), key=None):
-        from semantic_pdf_diff.tablerules import Rules
+        from semantic_pdf_diff.tablerules import Review, Rules
+        if schema is Review:
+            self.reviewed.append(prompt)
+            place = prompt.split("TABLE: ", 1)[1].split(";", 1)[0].split("\n", 1)[0]
+            return Review.model_validate(self.reviews.get(place, {"verdict": "keep"}))
         if schema is not Rules:
             return self.base.ask(prompt, schema, images, key)
         self.asked.append(prompt)
@@ -180,11 +184,11 @@ REQUIREMENTS = {"binding": "values of requirements, by ID", "reading": "rules", 
 
 @unittest.skipIf(openpyxl is None, "python-docx and openpyxl aren't installed (the office extra)")
 class Rules(unittest.TestCase):
-    def extract(self, answers, **settings):
+    def extract(self, answers, reviews=None, **settings):
         import tempfile
         from pathlib import Path
         from semantic_pdf_diff.extract import Job, reader_for, run_jobs
-        model = RulesModel(answers, **settings)
+        model = RulesModel(answers, reviews, **settings)
         data = workbook()
         with tempfile.TemporaryDirectory() as d:
             job = Job("sha256:" + "a" * 64 + ".xlsx", lambda: data, reader=reader_for(".xlsx"))
@@ -220,6 +224,29 @@ class Rules(unittest.TestCase):
         tasks = [r["task"] for r in coverage]
         self.assertIn("rules:p2:1:again", tasks)
         self.assertEqual(sum(t.startswith("table:p2:1:") for t in tasks), 60)  # every row read by itself
+
+    def test_a_review_shows_the_outcome_and_may_revise_the_rules(self):
+        from semantic_pdf_diff import tablerules
+        revised = {**REQUIREMENTS, "claims": [{"entity": "{A}", "attribute": "required value", "value": "{C}",
+                                               "number": True}]}
+        tablerules.REVIEW = True
+        try:
+            evidence, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS}, {"Polar!A14:C74": {
+                "verdict": "revise", "problems": ["the attribute is the column's name"], "rules": revised}})
+            broken = {**revised, "claims": [{"entity": "{A}", "attribute": "x", "value": "{Q}"}]}
+            _, kept, _ = self.extract({"Polar!A14:C74": REQUIREMENTS}, {"Polar!A14:C74": {"verdict": "revise",
+                                                                                         "rules": broken}})
+        finally:
+            tablerules.REVIEW = None
+        review = next(q for q in model.reviewed if "TABLE: Polar!A14:C74" in q)
+        self.assertIn("WHAT THEY GAVE:\nrow 15: R-001 | Requirement 1 | 3\n  R-001 | Value | 3", review)
+        ruled = [e for e in evidence if e.derivation[-1].step == "table-rules"]
+        self.assertEqual({e.attribute for e in ruled}, {"required value"})
+        self.assertEqual(ruled[0].derivation[-2].detail, "revised")
+        row = next(r for r in coverage if r["task"] == "rules:p2:1")
+        self.assertIn("Reviewed: revised (the attribute is the column's name)", row["issues"])
+        row = next(r for r in kept if r["task"] == "rules:p2:1")
+        self.assertTrue(any(i.startswith("Reviewed: a revision with problems (no column Q") for i in row["issues"]))
 
     def test_tables_asked_from_a_size_or_none(self):
         _, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS}, table_rules=50)

@@ -3891,14 +3891,14 @@
    },
    "detail": {
     "P-101A.capacity": "confirmed",
-    "P-101A.head": "uncertain",
+    "P-101A.head": "confirmed",
     "P-101A.motor": "confirmed",
     "P-101B.capacity": "confirmed",
     "P-101B.head": "confirmed",
     "P-101B.motor": "confirmed",
     "P-101C.capacity": "confirmed",
     "P-101C.head": "confirmed",
-    "P-101C.motor": "confirmed",
+    "P-101C.motor": "uncertain",
     "chem.alum": "confirmed",
     "chem.alum_max": "confirmed",
     "chem.chlorine": "confirmed",
@@ -3957,7 +3957,7 @@
     "uncertain": 2
    },
    "unmatched": 4,
-   "pairs": 2,
+   "pairs": 11,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -5004,7 +5004,7 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "32/33",
+   "unchanged_confirmed": "33/33",
    "false_changes": 0,
    "difference_precision": null,
    "changed": {},
@@ -5012,33 +5012,21 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 32,
-    "uncertain": 1
+    "confirmed": 33
    },
    "different": {},
    "equivalent": {
-    "no change": 32
+    "no change": 33
    },
    "findings": {
-    "equivalent": 32,
-    "uncertain": 1
+    "equivalent": 33
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 9,
    "omitted": 0,
-   "kinds": {
-    "right": 1,
-    "scored": 1,
-    "value_change_precision": null,
-    "by_claims": {
-     "no change": {
-      "restated": 1
-     }
-    }
-   },
    "detail": {
     "P-101A.capacity": "confirmed",
-    "P-101A.head": "uncertain",
+    "P-101A.head": "confirmed",
     "P-101A.motor": "confirmed",
     "P-101B.capacity": "confirmed",
     "P-101B.head": "confirmed",
@@ -5101,7 +5089,7 @@
     "equivalent": 33
    },
    "unmatched": 0,
-   "pairs": 0,
+   "pairs": 9,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -5336,7 +5324,7 @@
     "unrelated": 2
    },
    "unmatched": 2,
-   "pairs": 12,
+   "pairs": 11,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -10956,14 +10944,14 @@
    },
    "detail": {
     "P-101A.capacity": "confirmed",
-    "P-101A.head": "uncertain",
+    "P-101A.head": "confirmed",
     "P-101A.motor": "confirmed",
     "P-101B.capacity": "confirmed",
     "P-101B.head": "confirmed",
     "P-101B.motor": "confirmed",
     "P-101C.capacity": "confirmed",
     "P-101C.head": "confirmed",
-    "P-101C.motor": "confirmed",
+    "P-101C.motor": "uncertain",
     "chem.alum": "confirmed",
     "chem.alum_max": "confirmed",
     "chem.chlorine": "confirmed",
@@ -11022,7 +11010,7 @@
     "uncertain": 2
    },
    "unmatched": 4,
-   "pairs": 2,
+   "pairs": 11,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -12069,7 +12057,7 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "32/33",
+   "unchanged_confirmed": "33/33",
    "false_changes": 0,
    "difference_precision": null,
    "changed": {},
@@ -12077,33 +12065,21 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 32,
-    "uncertain": 1
+    "confirmed": 33
    },
    "different": {},
    "equivalent": {
-    "no change": 32
+    "no change": 33
    },
    "findings": {
-    "equivalent": 32,
-    "uncertain": 1
+    "equivalent": 33
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 9,
    "omitted": 0,
-   "kinds": {
-    "right": 1,
-    "scored": 1,
-    "value_change_precision": null,
-    "by_claims": {
-     "no change": {
-      "restated": 1
-     }
-    }
-   },
    "detail": {
     "P-101A.capacity": "confirmed",
-    "P-101A.head": "uncertain",
+    "P-101A.head": "confirmed",
     "P-101A.motor": "confirmed",
     "P-101B.capacity": "confirmed",
     "P-101B.head": "confirmed",
@@ -12166,7 +12142,7 @@
     "equivalent": 33
    },
    "unmatched": 0,
-   "pairs": 0,
+   "pairs": 9,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -12401,7 +12377,7 @@
     "unrelated": 2
    },
    "unmatched": 2,
-   "pairs": 12,
+   "pairs": 11,
    "omitted": 0,
    "kinds": {
     "right": 5,

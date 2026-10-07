@@ -434,6 +434,41 @@ class Rules(Lenient):
     def _texts(cls, value):
         return [v if isinstance(v, str) else str(v) for v in value] if isinstance(value, list) else value
 
+REVIEWING = '''You wrote the rules below for a table. Here is what they give for some of its rows, applied mechanically.
+Check each claim against its row as a careful reader would: is the value the row's own; does the attribute name what
+the value measures; is the entity what has it; are the conditions the circumstances it holds under (nothing vague,
+nothing missing that the row or the text around the table states)? If every claim is right, answer
+{"verdict":"keep"}. If not, say what's wrong and give corrected rules, the same JSON as before:
+{"verdict":"revise", "problems":["..."], "rules":{...}}.
+'''
+
+class Review(Lenient):
+    """A model's review of what its rules gave (REVIEWING)."""
+    verdict: str = Field(default="", max_length=20)
+    problems: list[str] = Field(default_factory=list, max_length=10)
+    rules: Rules | None = None
+
+REVIEW = None  # None: the table_review setting decides; True or False: an experiment's override
+
+def review_question(asked, answer, g):
+    """The review query: the table as shown, the rules, and what they gave for three rows (or a summary's claims)."""
+    table = asked[asked.index("TABLE: "):asked.index("OUR HEURISTIC OPINION")] if "TABLE: " in asked else ""
+    lines = [REVIEWING, "THE TABLE (as you were shown it):", table.rstrip(), "YOUR RULES:",
+             answer.model_dump_json(exclude_defaults=True), "WHAT THEY GAVE:"]
+    show = lambda f: f"  {f['entity']} | {f['attribute']} | {f['value']} {f['unit']}".rstrip() + \
+        (f" | {f['conditions']}" if f["conditions"] else "")
+    if answer.reading.strip().lower() == "summary":
+        lines += [show(stat.fields) for stat in summarise(answer, g)[:30]]
+    else:
+        n = len(g.rows)
+        for i in sorted({0, n // 2, n - 1}):
+            lines.append(f"row {g.names[i]}: " + " | ".join(g.rows[i]))
+            try:
+                lines += [show(f) for f, _, _ in row_claims(answer, g, i)] or ["  (no claims)"]
+            except (Misfit, Broken) as error:
+                lines.append(f"  (read by itself: {error})")
+    return "\n".join(lines)
+
 # --- applying rules
 
 class Misfit(ValueError):
@@ -748,7 +783,7 @@ def read(core, page, g, task, by_itself, source):
             return failed(name, error)
         wrong = problems(answer, g, cols)
         if not wrong:
-            return use(name, answer, [])
+            return reviewed(name, answer)
         record(name, "partial", [f"The rules asked again: {'; '.join(wrong)}"[:500]])
         again = (asked + "\nYOUR EARLIER ANSWER:\n" + answer.model_dump_json(exclude_defaults=True)
                  + "\nITS PROBLEMS:\n" + "\n".join(f"- {w}" for w in wrong) + "\nAnswer again, mending them.")
@@ -760,15 +795,43 @@ def read(core, page, g, task, by_itself, source):
         wrong = problems(answer, g, cols)
         if wrong:
             return record(name, "partial", [everyone(name, "the rules failed twice (" + "; ".join(wrong) + ")")[:500]])
-        use(name, answer, [])
+        reviewed(name, answer)
+
+    def reviewed(name, answer):
+        """The rules' outcome shown to the model once: kept, or revised rules used if they pass the checks."""
+        on = REVIEW if REVIEW is not None else core.s.reviews_tables()
+        if not on or answer.reading.strip().lower() not in ("rules", "summary"):
+            return use(name, answer, [])
+        prompt = review_question(asked, answer, g)
+        key = ("table-review", "table", core.content, name + ":review", hashlib.sha256(prompt.encode()).hexdigest())
+
+        def finish(result, error):
+            core.state["pending"] -= 1
+            if error is not None or result is None:
+                return use(name, answer, [f"Not reviewed: {error}"[:300]], "not reviewed")
+            if result.verdict.strip().lower() != "revise" or result.rules is None:
+                return use(name, answer, ["Reviewed: kept"], "kept")
+            wrong = problems(result.rules, g, cols)
+            if wrong:
+                return use(name, answer, [f"Reviewed: a revision with problems ({'; '.join(wrong)}), the first rules "
+                                          "kept"[:400]], "kept, its revision failing the checks")
+            return use(name, result.rules, [f"Reviewed: revised ({'; '.join(result.problems)})"[:400]], "revised")
+
+        core.progress.add()
+        core.state["pending"] += 1
+        core.dispatch.submit(prompt, Review, [], key, finish)
 
     def failed(name, error):
         if isinstance(error, (CallLimitReached, NotRecorded)):  # nothing learnt: the next run asks again
             return record(name, "not_reached", [str(error)])
         record(name, "failed", [everyone(name, f"the rules query failed ({error})")[:500]])
 
-    def use(name, answer, issues):
+    def use(name, answer, issues, review=""):
         reading = answer.reading.strip().lower()
+        if review:  # the review's outcome, in each claim's derivation
+            source_ = [source, DerivationStep(step="table-review", detail=review)]
+        else:
+            source_ = [source]
         why = f" ({answer.why})" if answer.why else ""
         if answer.binding:
             why += f" [binding: {answer.binding}]"
@@ -784,7 +847,7 @@ def read(core, page, g, task, by_itself, source):
                     quote, verified = " | ".join(g.rows[i][k] for i in stat.rows for k in stat.columns), True
                 box = row_box(stat.rows[0]) if len(stat.rows) == 1 else span
                 found.append(_evidence(core, page, box, name, stat.fields, quote, verified, [
-                    source, DerivationStep(step="table-summary", detail=f"{template} template: {stat.detail}"
+                    *source_, DerivationStep(step="table-summary", detail=f"{template} template: {stat.detail}"
                                                                          + (", computed" if stat.computed else ""))],
                     approximate=stat.computed and stat.fields["attribute"].startswith("mean ")))
             return record(name, "complete", issues + [f"Summarised by the {template} template: {len(g.rows)} rows, "
@@ -799,7 +862,7 @@ def read(core, page, g, task, by_itself, source):
             for fields, used, rule in made:
                 quote = " | ".join(g.rows[i][k] for k in used if g.rows[i][k]) or " | ".join(t for t in g.rows[i] if t)
                 found.append(_evidence(core, page, row_box(i), name, fields, quote, True, [
-                    source, DerivationStep(step="table-rules", detail=describe_rule(rule))]))
+                    *source_, DerivationStep(step="table-rules", detail=describe_rule(rule))]))
         for i in misfits:
             by_itself(g.keys[i])
         summary = (f"Read by rules: {len(g.rows) - len(misfits)} of {len(g.rows)} rows, {len(found)} claims"

@@ -868,6 +868,24 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
     - **The six left in Word** are the merged-cells knob's rated values ("capacity 7,824 gpm at Rated point"). The key gives the rated point no condition and the runout point one: right claims, scored misbound. A question for the key, not the reader.
     - **Revision pairs:** as row by row but two decks' (the treatment plant's conditions and rewording knobs). There, one revision's rules took the slide's title ("Treatment Process") as a condition and the other's didn't, so an unchanged value is judged uncertain. The new trace flags both ("tables read differently"). A lever is recorded: a heading's or slide's title isn't a condition.
   - Cost: $0.10 (the readings $0.05, the experiment $0.06).
+- **A review of the rules' outcome (2026-10-07).** The owner: "Speaking of repair, is there a good way to show the model a few sample outcomes? Sort of an 'is this your final answer' opportunity? For tables, which are super-efficient due to rules-driven processing, this seems a cheap lever to add."
+  - **Built** (`tablerules.py`, the `table_review` lever, on by default):
+    - **what the model is shown,** once its rules pass the checks: the table as it saw it, its rules, and what they gave for three rows (first, middle, last) beside each row's cells; for a summary, its claims
+    - **what it answers:** "keep", or what's wrong and corrected rules
+    - **checks:** corrected rules are checked as any are; failing, the first rules stand
+    - **recorded:** the outcome is in the coverage record and in each claim's derivation (`table-review`: kept, revised, or kept with its revision failing the checks)
+    - one query more per table read by rules
+  - **What the reviews did** on the two seeds' workbooks (measured first, as an experiment):
+    - 13 of 88 tables revised
+    - **the revisions:** "in the treatment process" dropped as too vague; "number" dropped where "up to 173" made rows be read by themselves, so both revisions read those rows by rules alike
+    - 3 revisions used placeholders that don't exist and failed the checks
+    - **facts and conditions unchanged:** those rows gave the same facts read either way
+  - **On the controlled corpus with pairs:**
+    - 137 tables reviewed: 106 kept, 30 revised, 1 revision failing the checks
+    - facts and conditions unchanged in every format
+    - of the two deck pairs left uncertain before, the rewording knob's is now found unchanged; the conditions knob's still leaves one value uncertain
+  - **Read:** a cheap check that mends what it sees (vague conditions, numbers too strict), with no loss measured. Its gains show in consistency between revisions, not in facts read. It stays on, and a round on real tables should judge it.
+  - Cost: $0.04 (the experiment $0.025, the corpus $0.019).
 
 ## Open questions
 

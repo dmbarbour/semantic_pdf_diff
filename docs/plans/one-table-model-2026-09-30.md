@@ -146,6 +146,8 @@
 2. **The table's image in every PDF rules query** (one image, about 260 tokens), rather than only for tables with hazards found. Proposed: always.
 3. **The vision check folded into the rules query** (one transcribed row), rather than in a separate repair query. Proposed: folded in.
 
+**Decided (the owner, 2026-10-07):** "The recommendations look good." Repair after rules, only where measured; the image in every PDF rules query; the vision check folded into the rules query. And a new lever, asked in the same breath: "is there a good way to show the model a few sample outcomes? Sort of an 'is this your final answer' opportunity? For tables, which are super-efficient due to rules-driven processing, this seems a cheap lever to add." (The adapters plan has its design and measurement.)
+
 ## Relation to other plans and levers
 
 - **The multi-format plan's *Tables and spreadsheets* section** is kept for what is specific to spreadsheets: formulas, hidden sheets, external links, sheet maps. Its model-guided interpretation becomes this plan's rules.

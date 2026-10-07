@@ -14,6 +14,7 @@
     "skip_empty",
     "figure_tasks",
     "table_rules",
+    "table_review",
     "visual_text_layer",
     "table_filter",
     "quote_match",

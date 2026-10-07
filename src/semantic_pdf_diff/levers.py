@@ -339,6 +339,17 @@ class TableRules(Lever):
     def rules_from(self):
         return self.table_rules
 
+class TableReview(Lever):
+    lever_name, stage, off = "table_review", "segmentation", {"table_review": False}
+    # a table's rules, applied, shown to the model once with what they gave for three rows (or a summary's claims):
+    # kept, or revised rules used if they pass the checks (the owner, 2026-10-07: "Sort of an 'is this your final
+    # answer' opportunity? For tables, which are super-efficient due to rules-driven processing, this seems a cheap
+    # lever to add"). One query more per table read by rules
+    table_review: Annotated[bool, _shaping(frozenset({"table"}))] = True
+
+    def reviews_tables(self):
+        return self.table_review
+
 class VisualTextLayer(Lever):
     lever_name, stage, off = "visual_text_layer", "inclusion", {"visual_text_layer": 0}
     marks = {"visual_text_layer": re.compile("^" + re.escape(LAYER_NOTE) + "\n(.*)$", re.M)}
@@ -436,9 +447,9 @@ class DedupeRepeated(Lever):
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
-                 TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, TableRules, VisualTextLayer,
-                 TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals,
-                 ExplainDifferences)
+                 TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, TableRules, TableReview,
+                 VisualTextLayer, TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align,
+                 VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -608,6 +619,11 @@ class Platform(Composable):
     def rules_from(self):
         """The body rows a table may have before it's read by rules a model writes (tablerules.py); None: never."""
         return None
+
+    @chosen
+    def reviews_tables(self):
+        """Whether a table's rules, applied, are shown to the model once for review (tablerules.py)."""
+        return False
 
     @chosen
     def dedupes_repeated_rows(self):
