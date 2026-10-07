@@ -42,7 +42,7 @@ CSV files (`.csv`, `.tsv`; no extra needed) are read as one-sheet workbooks of t
 
 Word and PowerPoint tables take the same path: their grids (merged cells spanning, header rows labelled by path) are asked how they're read as a workbook's tables are, each named for the query ("table 3", "slide 2, table 1"; a slide's title is its table's title). A chart's data is still read row by row, and PDF tables are read row by row until they join (the one table model plan).
 
-Once a table's rules pass their checks, the model is shown what they gave for three rows (or a summary's claims) and asked whether that's its final answer (`table_review`): it keeps them, or gives corrected rules, used if they pass the same checks. The outcome is recorded with each claim.
+Once a table's rules pass their checks, the model is shown what they gave for three rows (or a summary's claims) and asked whether that's its final answer: it keeps them, or gives corrected rules, which pass the same checks and are shown again, up to `table_review` times (10); a revision changing nothing ends it, and the last rules passing the checks are used. The outcome is recorded with each claim.
 
 How a table was read is traced: each claim from a table says whether its table was read by rules (and the template that made it), by a summary, or row by row, and a comparison between claims whose tables were read differently is flagged (`tables_read` in `report.json`; a warning in the report): a difference there may come from the reading, not the source. A table's rules are asked per document, never shared between revisions.
 

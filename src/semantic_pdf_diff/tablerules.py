@@ -448,7 +448,7 @@ class Review(Lenient):
     problems: list[str] = Field(default_factory=list, max_length=10)
     rules: Rules | None = None
 
-REVIEW = None  # None: the table_review setting decides; True or False: an experiment's override
+REVIEW = None  # None: the table_review setting decides; an int (or True, one review): an experiment's override
 
 def review_question(asked, answer, g):
     """The review query: the table as shown, the rules, and what they gave for three rows (or a summary's claims)."""
@@ -797,25 +797,40 @@ def read(core, page, g, task, by_itself, source):
             return record(name, "partial", [everyone(name, "the rules failed twice (" + "; ".join(wrong) + ")")[:500]])
         reviewed(name, answer)
 
-    def reviewed(name, answer):
-        """The rules' outcome shown to the model once: kept, or revised rules used if they pass the checks."""
-        on = REVIEW if REVIEW is not None else core.s.reviews_tables()
-        if not on or answer.reading.strip().lower() not in ("rules", "summary"):
-            return use(name, answer, [])
+    def reviewed(name, answer, round_=1, notes=()):
+        """The rules' outcome shown to the model, again after each revision that passes the checks, until it keeps
+        its rules or the cap (table_review) is reached; the last rules passing the checks are used (the owner,
+        2026-10-07: "a cap of e.g. 10 will surely be safe ... just keeping the last revision")."""
+        cap = int(REVIEW) if REVIEW is not None else core.s.reviews_tables()
+        if round_ > cap or answer.reading.strip().lower() not in ("rules", "summary"):
+            return use(name, answer, list(notes))
         prompt = review_question(asked, answer, g)
-        key = ("table-review", "table", core.content, name + ":review", hashlib.sha256(prompt.encode()).hexdigest())
+        suffix = ":review" + (str(round_) if round_ > 1 else "")
+        key = ("table-review", "table", core.content, name + suffix, hashlib.sha256(prompt.encode()).hexdigest())
+        revised = round_ - 1
+        done = lambda: f"revised {revised} time{'s' if revised != 1 else ''}" if revised else "kept"
 
         def finish(result, error):
             core.state["pending"] -= 1
             if error is not None or result is None:
-                return use(name, answer, [f"Not reviewed: {error}"[:300]], "not reviewed")
+                return use(name, answer, list(notes) + [f"Not reviewed: {error}"[:300]], done() if revised else
+                           "not reviewed")
             if result.verdict.strip().lower() != "revise" or result.rules is None:
-                return use(name, answer, ["Reviewed: kept"], "kept")
+                return use(name, answer, list(notes) + ["Reviewed: kept"], done())
+            same = lambda r: r.model_dump(exclude={"why", "binding", "examples"})
+            if same(result.rules) == same(answer):  # a revision changing nothing: shown again, it'd repeat itself
+                return use(name, answer, list(notes) + [f"Reviewed: a revision changing nothing ({'; '.join(result.problems)}), "
+                                                        "kept"[:400]], done())
             wrong = problems(result.rules, g, cols)
             if wrong:
-                return use(name, answer, [f"Reviewed: a revision with problems ({'; '.join(wrong)}), the first rules "
-                                          "kept"[:400]], "kept, its revision failing the checks")
-            return use(name, result.rules, [f"Reviewed: revised ({'; '.join(result.problems)})"[:400]], "revised")
+                return use(name, answer, list(notes) + [f"Reviewed: a revision with problems ({'; '.join(wrong)}), "
+                                                        "the last rules passing the checks kept"[:400]],
+                           done() + ", its next revision failing the checks")
+            note = f"Reviewed: revised ({'; '.join(result.problems)})"[:400]
+            if round_ >= cap:
+                return use(name, result.rules, list(notes) + [note, f"Review cap ({cap}) reached: the last revision used"],
+                           f"revised {round_} time{'s' if round_ != 1 else ''}, the cap reached")
+            reviewed(name, result.rules, round_ + 1, list(notes) + [note])
 
         core.progress.add()
         core.state["pending"] += 1

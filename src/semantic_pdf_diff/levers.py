@@ -340,12 +340,13 @@ class TableRules(Lever):
         return self.table_rules
 
 class TableReview(Lever):
-    lever_name, stage, off = "table_review", "segmentation", {"table_review": False}
-    # a table's rules, applied, shown to the model once with what they gave for three rows (or a summary's claims):
-    # kept, or revised rules used if they pass the checks (the owner, 2026-10-07: "Sort of an 'is this your final
-    # answer' opportunity? For tables, which are super-efficient due to rules-driven processing, this seems a cheap
-    # lever to add"). One query more per table read by rules
-    table_review: Annotated[bool, _shaping(frozenset({"table"}))] = True
+    lever_name, stage, off = "table_review", "segmentation", {"table_review": 0}
+    # the most times a table's rules, applied, are shown to the model with what they gave for three rows (or a
+    # summary's claims): kept, or revised rules used if they pass the checks, and shown again; 0: never (the owner,
+    # 2026-10-07: "Sort of an 'is this your final answer' opportunity? For tables, which are super-efficient due to
+    # rules-driven processing, this seems a cheap lever to add"; "a cap of e.g. 10 will surely be safe yet more than
+    # cover the use cases ... just keeping the last revision")
+    table_review: Annotated[int, _shaping(frozenset({"table"}))] = Field(default=10, ge=0, le=100)
 
     def reviews_tables(self):
         return self.table_review
@@ -622,8 +623,8 @@ class Platform(Composable):
 
     @chosen
     def reviews_tables(self):
-        """Whether a table's rules, applied, are shown to the model once for review (tablerules.py)."""
-        return False
+        """The most times a table's rules, applied, are shown to the model for review (tablerules.py); 0: never."""
+        return 0
 
     @chosen
     def dedupes_repeated_rows(self):

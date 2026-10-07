@@ -886,6 +886,14 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
     - of the two deck pairs left uncertain before, the rewording knob's is now found unchanged; the conditions knob's still leaves one value uncertain
   - **Read:** a cheap check that mends what it sees (vague conditions, numbers too strict), with no loss measured. Its gains show in consistency between revisions, not in facts read. It stays on, and a round on real tables should judge it.
   - Cost: $0.04 (the experiment $0.025, the corpus $0.019).
+  - **Reviews repeated, capped (2026-10-07).** The owner: "Do we cap number of revisions? Probably doesn't take many in practice, so a cap of e.g. 10 will surely be safe yet more than cover the use cases or our example sets, just keeping the last revision."
+    - **The flow:** after each revision that passes the checks, the outcome is shown again, until the model keeps its rules or `table_review` (now the most reviews, default 10; 0 for none) is reached. The last rules passing the checks are used.
+    - **A revision that changes nothing ends it,** kept. One table showed why: the model asked eight times for what its templates can't say ("Option 1" out of an entity), giving back the same rules each time.
+    - **On the controlled corpus:**
+      - 107 tables kept at once, 29 revised once
+      - the one long chain now stops after one review, with the same claims (checked by replay)
+      - no table reached the cap
+      - facts, conditions and pairs as before
 
 ## Open questions
 

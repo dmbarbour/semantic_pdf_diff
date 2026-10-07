@@ -171,7 +171,10 @@ class RulesModel:
         if schema is Review:
             self.reviewed.append(prompt)
             place = prompt.split("TABLE: ", 1)[1].split(";", 1)[0].split("\n", 1)[0]
-            return Review.model_validate(self.reviews.get(place, {"verdict": "keep"}))
+            said = self.reviews.get(place, {"verdict": "keep"})  # a list: one answer a review, then keep
+            if isinstance(said, list):
+                said = said.pop(0) if said else {"verdict": "keep"}
+            return Review.model_validate(said)
         if schema is not Rules:
             return self.base.ask(prompt, schema, images, key)
         self.asked.append(prompt)
@@ -229,22 +232,41 @@ class Rules(unittest.TestCase):
         from semantic_pdf_diff import tablerules
         revised = {**REQUIREMENTS, "claims": [{"entity": "{A}", "attribute": "required value", "value": "{C}",
                                                "number": True}]}
-        tablerules.REVIEW = True
+        tablerules.REVIEW = 10
         try:
-            evidence, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS}, {"Polar!A14:C74": {
-                "verdict": "revise", "problems": ["the attribute is the column's name"], "rules": revised}})
+            evidence, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS}, {"Polar!A14:C74": [{
+                "verdict": "revise", "problems": ["the attribute is the column's name"], "rules": revised}]})
             broken = {**revised, "claims": [{"entity": "{A}", "attribute": "x", "value": "{Q}"}]}
             _, kept, _ = self.extract({"Polar!A14:C74": REQUIREMENTS}, {"Polar!A14:C74": {"verdict": "revise",
                                                                                          "rules": broken}})
+            tablerules.REVIEW = 3  # a reviewer that never keeps: stopped at the cap, its last revision used
+            capped, endless, _ = self.extract({"Polar!A14:C74": REQUIREMENTS}, {"Polar!A14:C74": [
+                {"verdict": "revise", "problems": ["again"], "rules": {**revised, "claims": [
+                    {**revised["claims"][0], "attribute": f"value {k}"}]}} for k in range(5)]})
         finally:
             tablerules.REVIEW = None
         review = next(q for q in model.reviewed if "TABLE: Polar!A14:C74" in q)
         self.assertIn("WHAT THEY GAVE:\nrow 15: R-001 | Requirement 1 | 3\n  R-001 | Value | 3", review)
         ruled = [e for e in evidence if e.derivation[-1].step == "table-rules"]
         self.assertEqual({e.attribute for e in ruled}, {"required value"})
-        self.assertEqual(ruled[0].derivation[-2].detail, "revised")
+        self.assertEqual(ruled[0].derivation[-2].detail, "revised 1 time")
         row = next(r for r in coverage if r["task"] == "rules:p2:1")
         self.assertIn("Reviewed: revised (the attribute is the column's name)", row["issues"])
+        self.assertIn("Reviewed: kept", row["issues"])  # shown again after the revision, and kept
+        self.assertEqual(sum("TABLE: Polar!A14:C74" in q for q in model.reviewed), 2)
+        tablerules.REVIEW = 10
+        try:  # a revision giving back the same rules stops the review at once
+            _, still, model = self.extract({"Polar!A14:C74": REQUIREMENTS}, {"Polar!A14:C74": {
+                "verdict": "revise", "problems": ["wants what the templates can't say"], "rules": REQUIREMENTS}})
+        finally:
+            tablerules.REVIEW = None
+        self.assertEqual(sum("TABLE: Polar!A14:C74" in q for q in model.reviewed), 1)
+        self.assertTrue(any(i.startswith("Reviewed: a revision changing nothing") for i in
+                            next(r for r in still if r["task"] == "rules:p2:1")["issues"]))
+        last = next(e for e in capped if e.derivation[-1].step == "table-rules")
+        self.assertEqual(last.derivation[-2].detail, "revised 3 times, the cap reached")
+        self.assertIn("Review cap (3) reached: the last revision used",
+                      next(r for r in endless if r["task"] == "rules:p2:1")["issues"])
         row = next(r for r in kept if r["task"] == "rules:p2:1")
         self.assertTrue(any(i.startswith("Reviewed: a revision with problems (no column Q") for i in row["issues"]))
 
