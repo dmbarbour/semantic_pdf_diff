@@ -8,6 +8,7 @@ The product is `src/semantic_pdf_diff`. The lab, how it's measured and improved 
 pip install -e '.[dev]' -e lab
 python -m unittest discover -s tests -v
 QUICK=1 python -m unittest discover -s tests    # skips the slowest tests (marked @slow): for iterating, not for commits
+python scripts/run_tests.py                     # the same suite, one module per process on every CPU: about 2.5 minutes
 python examples/demo.py
 ```
 
