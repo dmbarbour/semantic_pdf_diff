@@ -112,6 +112,59 @@ class Mended(unittest.TestCase):
         self.assertEqual(ts.cells_parted_otherwise(a, got, body),
                          ["line 1's cells parted otherwise in the image: TEAM NAME: | TEAM K"])
 
+class CutWords(unittest.TestCase):
+    """Columns the parser draws through words ("7. | 4"): the signal, and the join that mends them."""
+    HEADER = ["Column", "Footing", "", "Load (k", "ips)"]
+    BODY = [["C-18", "10.3", "", "255", ""], ["C-19", "7.", "4", "249", ""], ["C-20", "6.8", "", "224", ""]]
+    CUTS = {0: {3}, 2: {1}}  # the header's "(kips)" cut between D and E; line 2's "7.4" between B and C
+
+    def test_a_cut_word_is_a_signal_shown_with_where_it_is_cut(self):
+        tags = ts.signals(self.HEADER, self.BODY, BOXES[:3], cuts=self.CUTS)
+        self.assertEqual(tags, [[], [ts.CUT], []])
+        shown = ts.show_lines(self.HEADER, self.BODY, tags, self.CUTS)
+        self.assertIn("H:  Column | Footing |  | Load (k | ips)   [a word cut by a column line] (cut at D|E)", shown)
+        self.assertIn("2:  C-19 | 7. | 4 | 249 |    [a word cut by a column line] (cut at B|C)", shown)
+
+    def test_columns_joined_without_a_space_where_a_word_was_cut(self):
+        a = answer(rules=[{"action": "join columns", "column": "B"}, {"action": "join columns", "column": "D:E"}])
+        (head, rows, _), = ts.apply(a, self.HEADER, self.BODY, BOXES[:3], [[]] * 3, self.CUTS).parts
+        self.assertEqual(head, ["Column", "Footing", "Load (kips)"])
+        self.assertEqual(rows, [["C-18", "10.3", "255"], ["C-19", "7.4", "249"], ["C-20", "6.8", "224"]])
+        # where no word was cut, cells are joined with a space; a split names columns as they were shown
+        b = answer(rules=[{"action": "join columns", "column": "A"}, {"action": "split column", "column": "D",
+                                                                      "into": ["x", "y"]}])
+        got = ts.apply(b, ["A", "B", "C", "D"], [["Raw", "water", "1", "2 3"]], BOXES[:1], [[]])
+        self.assertEqual(got.parts[0][1], [["Raw water", "1", "2", "3"]])
+        # with cuts known, a body row's separate values joined where no word was cut is unsupported
+        wrong = answer(rules=[{"action": "join columns", "column": "D"}])
+        got = ts.apply(wrong, self.HEADER, self.BODY, BOXES[:3], [[]] * 3, self.CUTS)
+        self.assertEqual(got.unsupported, [])  # D:E: "255" and "" (only one value in each row), the header free
+        wrong = answer(rules=[{"action": "join columns", "column": "C:D"}])
+        got = ts.apply(wrong, self.HEADER, self.BODY, BOXES[:3], [[]] * 3, self.CUTS)
+        self.assertEqual(got.unsupported[0], "columns C:D hold separate values in the row of line 2 ('4', '249'; no "
+                                             "word cut between them): join only columns a word is cut across")
+        self.assertEqual(ts.problems(answer(rules=[{"action": "join columns", "column": "E"}]), 3, 5, [[]] * 3),
+                         ['rule 1: a join names a column with one after it ("C"), or a range ("C:E"), within A to E'])
+
+    def test_a_cut_header_is_asked_with_the_header_as_the_worst_suspect(self):
+        asked = []
+
+        def submit(prompt, model, images, key, finish):
+            asked.append(prompt)
+            finish(model.model_validate({"rules": [{"action": "join columns", "column": "D"}],
+                                         "examples": [{"line": "H", "cells": ["Column", "Footing", "Load (kips)"]}]})
+                   if model is ts.Structure else model.model_validate({"verdict": "keep"}), None)
+
+        core = SimpleNamespace(content="c", output=__import__("pathlib").Path("/tmp"), state={"pending": 0},
+                               progress=SimpleNamespace(add=lambda: None, finish=lambda status: None),
+                               dispatch=SimpleNamespace(submit=submit), s=SimpleNamespace(reviews_tables=lambda: 0),
+                               record=lambda row, claims: None)
+        out = {}
+        ts.read(core, 1, "structure:p1:0", self.HEADER, [self.BODY[0]], BOXES[:1], None, None, lambda: [],
+                lambda parts, step, apart, table: out.update(parts=parts), {0: {3}, 1: set()})
+        self.assertIn("row holding line H:", asked[0])
+        self.assertEqual(out["parts"][0][0], ["Column", "Footing", "", "Load (kips)"])
+
 class Asked(unittest.TestCase):
     """The query, asked again on problems, reviewed, and the heuristics kept when it fails."""
     def run_with(self, answers, review=2):
@@ -126,7 +179,7 @@ class Asked(unittest.TestCase):
                                dispatch=SimpleNamespace(submit=submit), s=SimpleNamespace(reviews_tables=lambda: review),
                                record=lambda row, claims: recorded.append(row))
         ts.read(core, 4, "structure:p4:0", HEADER, BODY, BOXES, None, [10, 20, 40, 60, 80], lambda: ["assets/t.png"],
-                lambda parts, step, apart: out.update(parts=parts, step=step, apart=apart))
+                lambda parts, step, apart, table: out.update(parts=parts, step=step, apart=apart, table=table))
         return asked, recorded, out
 
     def test_rules_reviewed_and_used(self):
@@ -148,20 +201,20 @@ class Asked(unittest.TestCase):
         asked, recorded, out = self.run_with([bad, bad])
         self.assertEqual([a[1] for a in asked], ["structure:p4:0", "structure:p4:0:again"])
         self.assertIn("ITS PROBLEMS:\n- line 7: your rules give µm | µm; your example Bands | x", asked[1][2])
-        self.assertEqual(out, {"parts": [(HEADER, BODY, BOXES)], "step": None, "apart": []})
+        self.assertEqual(out, {"parts": [(HEADER, BODY, BOXES)], "step": None, "apart": [], "table": True})
         self.assertTrue(recorded[-1]["issues"][0].startswith("Structure as the heuristics left it: the rules failed twice"))
 
     def test_rules_leaving_no_rows_keep_the_heuristics_without_asking_again(self):
         none = {"rules": [{"action": "not table", "lines": [str(k) for k in range(1, 8)]}], "why": "a title block"}
         asked, recorded, out = self.run_with([none])
         self.assertEqual(len(asked), 1)
-        self.assertEqual(out["parts"], [(HEADER, BODY, BOXES)])
+        self.assertEqual((out["parts"], out["table"]), ([(HEADER, BODY, BOXES)], False))  # read as no table
         self.assertEqual(recorded[-1]["issues"], ["Structure as the heuristics left it: the rules leave no rows (a title block)"])
 
     def test_a_table_without_suspects_isnt_asked(self):
         out = {}
         ts.read(None, 1, "t", HEADER, BODY[:2], BOXES[:2], None, None, lambda: [],
-                lambda parts, step, apart: out.update(parts=parts, step=step))
+                lambda parts, step, apart, table: out.update(parts=parts, step=step))
         self.assertEqual(out, {"parts": [(HEADER, BODY[:2], BOXES[:2])], "step": None})
 
 class Extracted(unittest.TestCase):
@@ -243,6 +296,50 @@ class Extracted(unittest.TestCase):
         self.assertTrue(all('"Tag"' in text for text in page1.values()))
         self.assertTrue(any("X1 CCD201" in text for text in page1.values()))
         self.assertFalse(any('"Tag"' in text for task, text in rows.items() if task.startswith("table:p2:")))
+
+    def test_a_part_read_as_no_table_goes_to_a_figure_task(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        import pymupdf
+        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.provenance import content_id
+        from stubs import situating_answer
+
+        rows = [["Room", "Size"], ["", "25'-0\""], ["MEETING 102", "732 SF"]]  # a floor plan's labels, parsed
+
+        class Table:
+            bbox = (20, 20, 280, 120)
+            def extract(self): return rows
+
+        find_tables = lambda page, *a, **k: type("T", (), {"tables": [Table()]})()
+
+        class Client:
+            s = Settings(vision=True)
+            calls, cache_hits, usage = 0, 0, {}
+            asked = []
+
+            def ask(self, prompt, schema, images=(), key=None):
+                self.asked.append(key[3])
+                if schema is ts.Structure:
+                    return ts.Structure.model_validate({"rules": [{"action": "not table", "lines": ["1", "2"]}],
+                                                        "why": "a floor plan"})
+                if situating_answer(prompt):
+                    return schema.model_validate(situating_answer(prompt))
+                return Extraction(claims=[], complete=True)
+
+        with tempfile.TemporaryDirectory() as d, patch.object(pymupdf.Page, "find_tables", find_tables):
+            doc = pymupdf.open()
+            doc.new_page(width=300, height=300)
+            path = Path(d) / "t.pdf"
+            doc.save(path)
+            client = Client()
+            _, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+        self.assertIn("figure:p1:t0", client.asked)
+        self.assertFalse([task for task in client.asked if task.startswith(("table:", "rules:"))])
+        note = next(row for row in coverage if row["task"] == "structure:p1:0:figure")
+        self.assertEqual(note["issues"], ["Not read as a table (the model reads none there): read by a figure task"])
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,6 +4,7 @@ templates computed."""
 import stubs  # noqa: F401 (a clean environment)
 import datetime
 import unittest
+from types import SimpleNamespace
 
 from semantic_pdf_diff import tablerules as tr
 
@@ -135,6 +136,18 @@ class Applying(unittest.TestCase):
                                                                           "value": "{B.cell_value}"}],
                                           "examples": [{"row": 2, "claims": [{"value": "10.2", "unit": '"'}]}]})
         self.assertEqual(tr.problems(quoted, g), [])
+
+    def test_a_tolerance_column_is_its_values_uncertainty(self):
+        g = tr.grid(["A", "B", "C"], ["Parameter", "Measured (L/s)", "±"], [["Flow", "118", "3"], ["Head", "24.1", ""]],
+                    [5, 6], [5, 6])
+        rules = tr.Rules.model_validate({"reading": "rules", "claims": [
+            {"entity": "pump", "attribute": "{A}", "value": "{B}", "unit": "{B.unit}", "uncertainty": "± {C} {B.unit}"}]})
+        flow, = tr.row_claims(rules, g, 0)
+        self.assertEqual((flow[0]["value"], flow[0]["uncertainty"]), ("118", "± 3 L/s"))
+        self.assertEqual(flow[1], [0, 1, 2])  # the cells it came from, the tolerance's too
+        head, = tr.row_claims(rules, g, 1)
+        self.assertEqual(head[0]["uncertainty"], "")  # no tolerance given: none stated
+        self.assertIn("uncertainty ± {C} {B.unit}", tr.describe_rule(rules.claims[0]))
 
     def test_a_sideways_table_and_units_outside_brackets(self):
         rows = [["Capital cost ($M)", "6.35", "2.82"], ["Annual energy use (MWh/yr)", "771", "n/a"]]
@@ -290,6 +303,44 @@ class PdfTables(unittest.TestCase):
         self.assertEqual(head, ((0.1, 0.2, 0.4), True))
         self.assertEqual(row, (None, False))
 
+    def test_words_cut_by_a_column_line(self):
+        import pymupdf
+        from semantic_pdf_diff.tables import Marks, column_edges
+        page = pymupdf.open().new_page(width=300, height=200)
+        page.insert_text((20, 40), "C-19")
+        page.insert_text((100, 40), "7.4 m")  # "7.4" crosses the boundary at x 108
+        page.insert_text((150, 40), "249")
+        cells = lambda: [(10, 30, 60, 45), (60, 30, 108, 45), (108, 30, 140, 45), (140, 30, 200, 45)]
+        table = SimpleNamespace(rows=[SimpleNamespace(cells=cells()), SimpleNamespace(cells=cells())])
+        edges = column_edges(table)
+        self.assertEqual(edges, [60, 108, 140])
+        self.assertEqual(Marks(page).cuts((10, 30, 200, 45), edges), {1})
+        self.assertEqual(Marks(page).cuts((10, 30, 200, 45), [60, None, 140]), set())
+        self.assertIsNone(column_edges(SimpleNamespace(rows=[])))
+
+    def test_columns_joined_where_every_split_word_is_cut(self):
+        from semantic_pdf_diff.tables import cut_columns, split_cuts
+
+        class Marks:  # the boundaries a row's words are cut by, by the row's top
+            def __init__(self, cuts): self.by_top = cuts
+            def cuts(self, box, edges): return self.by_top.get(box[1], set())
+
+        rows = [["Column", "Footing", None, "Base elev. (", "ft)"], ["C-18", "10.3", None, "716.7", None],
+                ["C-19", "7.", "4", "719.3", None], ["C-20", "6.8", None, "756.", "7"]]
+        boxes = [(0, k, 1, k + 1) for k in range(4)]
+        marks = Marks({0: {3}, 2: {1}, 3: {3}})
+        joined, edges, n = cut_columns(rows, boxes, [10, 20, 30, 40], marks)
+        self.assertEqual(n, 2)
+        self.assertEqual(joined, [["Column", "Footing", "Base elev. (ft)"], ["C-18", "10.3", "716.7"],
+                                  ["C-19", "7.4", "719.3"], ["C-20", "6.8", "756.7"]])
+        self.assertEqual(edges, [10, 30])
+        # a boundary with two separate values in a row, uncut, stays
+        rows[1][2] = "2"
+        self.assertEqual(cut_columns(rows, boxes, [10, 20, 30, 40], marks)[2], 1)
+        # a cut counts only where it parts text across two filled cells
+        self.assertEqual(split_cuts(["C-11", "738.9", None], (0, 0, 1, 1), [10, 20], Marks({0: {1}})), set())
+        self.assertEqual(split_cuts(["C-19", "7.", "4"], (0, 0, 1, 1), [10, 20], Marks({0: {1}})), {1})
+
     def test_a_stacked_header_needs_a_header_style_when_styles_are_known(self):
         from semantic_pdf_diff.tables import pdf_parts
         body = [["FOV", "10.2", "3.8"], ["Spectrometer type", "Slit", "IFS"], ["Width", "1024", "256"],
@@ -308,6 +359,9 @@ class PdfTables(unittest.TestCase):
         g.rows[1] = ["P-2", "p 3"]  # a symbol the text layer lost
         self.assertTrue(tr.transcription_mismatch(lost, g).startswith("row 3: the text layer reads P-2 | p 3"))
         self.assertEqual(tr.transcription_mismatch(tr.Rules(), g), "")  # nothing copied: nothing to check
+        words = tr.grid(["A", "B", "C"], ["", "", ""], [["Raw", "water", "pumps"]], [2], [0])
+        header = tr.Rules.model_validate({"transcribed": {"row": 2, "cells": ["Raw water pumps"]}})
+        self.assertEqual(tr.transcription_mismatch(header, words), "")  # no value in the row: nothing claims rest on
 
 if __name__ == "__main__":
     unittest.main()

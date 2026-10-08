@@ -217,9 +217,9 @@ extract f49c89bf20743be73505e58671394a7303b165ecd762ce87f3de69d786608263 images=
 extract f5757ab5cdcb9261a989f0e655b8cb9789296c4f42e04de58086e41d10ad28e1 images=1
 extract f9717bbc0197ca132a1bb734ae2507629685d1fabf86a6accc50701d2ac4e666 images=0
 extract ff2d347bfda5ce1c0b6df70e5e417f87a70a138841528c48c61c1b68821744ce images=1
-table-rules 917132736bca66dff0da8be6973f9808a630355241e34968cc5c1161f1c5cfb7 images=1
-table-rules bb2297ca97d5cdf6c7322063c783c1b320666b0c1c4ae274ea41a143b22efe05 images=1
-table-rules e3b2a81920615b035229bb8ed046968e0a8fe5f5d5ec42b739b9ef751438abe9 images=1
+table-rules 49fc6e2a556dedbdb93bde1d7777594612c34b9c173581d06f15efcc595d7cc1 images=1
+table-rules 4f9834a55c685744e0f22e4d1b4f4e6e588eafdebe8c54b55f27de8527a6bd76 images=1
+table-rules 696568a937c298d6ee6e41fd50a542a684834c0fdd6dd8a5a08fdb279f5e6e41 images=1
 triage 091a80fb21037f332fd66e6d9a7c409bc3bbf02f8066e45491475b35682fec64 images=1
 triage 156887f9e00e143e872db899f495b2350e4e0766c91e4f3a2b2f0007247587a8 images=0
 triage 165ab89ff7363e2830b4c4772ef7cd3cda8db51bc84b94cbe1e1f21d2563bbe6 images=0
@@ -290,7 +290,10 @@ reading:
   "columns": "C:F" is applied to each of those columns in turn, {*} standing for the column's cell ({*.header},
   {*.name} and {*.unit} likewise). Set "number": true when the value must be a number: a row whose cell isn't one is
   read by itself instead. An empty value, or n/a, gives no claim. A value is a cell's own value (a number, a name, a
-  short code), never a sentence. A condition the text around the table names for every row (a load case, a date,
+  short code), never a sentence. A column of tolerances or uncertainties beside a value's ("±", "tol.") gives no
+  claims of its own: write it into that value's template as "uncertainty" ("± {D} {C.unit}"). Columns that only keep
+  the document's own records (who submitted a row and their ID, when it was entered or reserved, a sort order) give
+  no claims: leave them out. A condition the text around the table names for every row (a load case, a date,
   a state) belongs in the templates' conditions. Write out the claims two or three of the rows shown give (no
   placeholders) as examples: they check the templates.
 - "rows": the cells need reading: sentences (a requirement, a note, a description: their claims are in their words),
@@ -314,7 +317,8 @@ How a claim is bound, as in any extraction:
   option, a unit size); never a parameter's name
 - conditions are the circumstances the value holds under (a month, an operating point, a load case, a location),
   never the document's own details (its revision, its date of issue); a circumstance every row shares (a load case,
-  a state named before the table) is a condition, but a vague setting ("in the plant", "in the process") isn't
+  a state named before the table) is a condition, but a vague setting ("in the plant", "in the process") isn't, nor
+  is the heading or slide title the table sits under (what it's about, not a circumstance)
 - when the columns are alternatives or series of one quantity (Option 1, Option 2), each column names the entity
   or a condition, the quantity is the attribute (from the title, the caption or the text above), and the row's
   label (a month, a case) is a condition
@@ -327,7 +331,7 @@ For example:
   over columns B:C, entity {*.header}, attribute {A.cell_name}, value {*}, unit {A.cell_unit}
 Return JSON:
 {"binding":"what the values measure (the attribute), what has them (the entity), under what (the conditions)", "reading":"rules|rows|summary", "why":"one sentence", "subject":"...",
-"claims":[{"columns":"", "entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"...", "number":true}],
+"claims":[{"columns":"", "entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"...", "uncertainty":"", "number":true}],
 "examples":[{"row":"5", "claims":[{"entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"..."}]}],
 "template":"series|log|list", "input":"A", "quantities":["B"], "categories":["C"], "points":["0"]}
 Leave out what your reading doesn't use.

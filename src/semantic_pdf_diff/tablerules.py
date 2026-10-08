@@ -71,7 +71,10 @@ reading:
   "columns": "C:F" is applied to each of those columns in turn, {*} standing for the column's cell ({*.header},
   {*.name} and {*.unit} likewise). Set "number": true when the value must be a number: a row whose cell isn't one is
   read by itself instead. An empty value, or n/a, gives no claim. A value is a cell's own value (a number, a name, a
-  short code), never a sentence. A condition the text around the table names for every row (a load case, a date,
+  short code), never a sentence. A column of tolerances or uncertainties beside a value's ("±", "tol.") gives no
+  claims of its own: write it into that value's template as "uncertainty" ("± {D} {C.unit}"). Columns that only keep
+  the document's own records (who submitted a row and their ID, when it was entered or reserved, a sort order) give
+  no claims: leave them out. A condition the text around the table names for every row (a load case, a date,
   a state) belongs in the templates' conditions. Write out the claims two or three of the rows shown give (no
   placeholders) as examples: they check the templates.
 - "rows": the cells need reading: sentences (a requirement, a note, a description: their claims are in their words),
@@ -95,7 +98,8 @@ How a claim is bound, as in any extraction:
   option, a unit size); never a parameter's name
 - conditions are the circumstances the value holds under (a month, an operating point, a load case, a location),
   never the document's own details (its revision, its date of issue); a circumstance every row shares (a load case,
-  a state named before the table) is a condition, but a vague setting ("in the plant", "in the process") isn't
+  a state named before the table) is a condition, but a vague setting ("in the plant", "in the process") isn't, nor
+  is the heading or slide title the table sits under (what it's about, not a circumstance)
 - when the columns are alternatives or series of one quantity (Option 1, Option 2), each column names the entity
   or a condition, the quantity is the attribute (from the title, the caption or the text above), and the row's
   label (a month, a case) is a condition
@@ -108,7 +112,7 @@ For example:
   over columns B:C, entity {*.header}, attribute {A.cell_name}, value {*}, unit {A.cell_unit}
 Return JSON:
 {"binding":"what the values measure (the attribute), what has them (the entity), under what (the conditions)", "reading":"rules|rows|summary", "why":"one sentence", "subject":"...",
-"claims":[{"columns":"", "entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"...", "number":true}],
+"claims":[{"columns":"", "entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"...", "uncertainty":"", "number":true}],
 "examples":[{"row":"5", "claims":[{"entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"..."}]}],
 "template":"series|log|list", "input":"A", "quantities":["B"], "categories":["C"], "points":["0"]}
 Leave out what your reading doesn't use.
@@ -396,6 +400,7 @@ class RuleClaim(Lenient):
     value: str = Field(default="", max_length=200)
     unit: str = Field(default="", max_length=80)
     conditions: str = Field(default="", max_length=300)
+    uncertainty: str = Field(default="", max_length=120)  # "± {D} {C.unit}": a tolerance column, the value's
     number: bool = False
 
 class Written(Lenient):
@@ -502,7 +507,7 @@ def _plain(text):
 
 def transcription_mismatch(answer, g):
     """What a row copied from the image says against the text layer's cells: "" when they agree (folded for case,
-    spaces, commas and dash and quote forms), or no row was copied."""
+    spaces, commas and dash and quote forms), when no row was copied, or when the row holds no value (no digit)."""
     t = answer.transcribed
     if t is None or not t.cells:
         return ""
@@ -511,6 +516,8 @@ def transcription_mismatch(answer, g):
     if name not in g.names:
         return f"the copied row {t.row!r} isn't a row of the table"
     layer = [c for c in g.rows[g.names.index(name)] if c]
+    if not any(ch.isdigit() for c in layer for ch in str(c)):  # not a row of values (a lone header cell parsed as a
+        return ""  # table of its own: "Raw | water | pumps"): nothing the claims rest on to check
     seen = [c for c in t.cells if str(c).strip()]
     if [_plain(c) for c in layer] != [_plain(c) for c in seen]:
         return (f"row {name}: the text layer reads {' | '.join(layer)[:150]}, the image "
@@ -585,13 +592,16 @@ def row_claims(rules, g, i):
             if rule.number and number(value) is None:
                 raise Misfit(f"{column}{g.names[i]} isn't a number: {value[:40]!r}")
             fields = {"value": value}
-            for name in ("entity", "attribute", "unit", "conditions"):
+            for name in ("entity", "attribute", "unit", "conditions", "uncertainty"):
                 fields[name], more = _fill(getattr(rule, name), g, i, star, rules.subject)
                 used += more
-                if name in ("unit", "conditions") and PLACEHOLDER.search(getattr(rule, name)) and \
+                if name in ("unit", "conditions", "uncertainty") and PLACEHOLDER.search(getattr(rule, name)) and \
                         all(not _fill("{" + ref + "}", g, i, star, rules.subject)[0]
                             for ref in PLACEHOLDER.findall(getattr(rule, name))):
                     fields[name] = ""  # its placeholders all empty: no stray words ("in" from "in {title}")
+            if any(ch.isdigit() for ch in fields["uncertainty"]) is False or \
+                    fields["uncertainty"].strip(" ±+-").casefold() in NOT_APPLICABLE:
+                fields["uncertainty"] = ""  # "±" alone, or "± n/a": no uncertainty stated
             if not fields["entity"] or not fields["attribute"]:
                 raise Misfit(f"row {g.names[i]} gives a claim with no {'entity' if not fields['entity'] else 'attribute'}")
             out.append((fields, sorted(set(used)), rule))
@@ -791,8 +801,8 @@ def summarise(rules, g):
 
 def describe_rule(rule):
     """A rule's derivation detail: "value {C}; attribute {C.name}; entity {A}; unit {C.unit}"."""
-    parts = [f"{name} {getattr(rule, name)}" for name in ("columns", "entity", "attribute", "value", "unit", "conditions")
-             if getattr(rule, name)]
+    parts = [f"{name} {getattr(rule, name)}" for name in ("columns", "entity", "attribute", "value", "unit", "conditions",
+                                                          "uncertainty") if getattr(rule, name)]
     return "; ".join(parts)[:300]
 
 def read(core, page, g, task, by_itself, source, image=None):
@@ -952,7 +962,7 @@ def _evidence(core, page, box, task, fields, quote, verified, derivation, approx
     from .models import Claim
     claim = Claim(entity=fields["entity"][:160], attribute=fields["attribute"][:160], value=fields["value"][:300],
                   unit=fields["unit"][:40], conditions=fields["conditions"][:300], kind="table", quote=quote[:400],
-                  confidence=CONFIDENCE, approximate=approximate)
+                  confidence=CONFIDENCE, approximate=approximate, uncertainty=fields.get("uncertainty", "")[:200])
     home = core.sections.box(page, box).id
     return Evidence(**claim.model_dump(), id=claim_id(core.content, claim), content=core.content, section=home,
                     locator=core.locator(page, box, "table", task), derivation=derivation, quote_verified=verified)

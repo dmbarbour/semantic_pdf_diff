@@ -660,7 +660,7 @@
     "equivalent": 26
    },
    "unmatched": 4,
-   "pairs": 10,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -745,7 +745,7 @@
     "equivalent": 27
    },
    "unmatched": 4,
-   "pairs": 5,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -831,7 +831,7 @@
     "uncertain": 1
    },
    "unmatched": 5,
-   "pairs": 9,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -2003,18 +2003,17 @@
     "change": 5
    },
    "equivalent": {
-    "no change": 19,
+    "no change": 17,
     "unscored": 13
    },
    "findings": {
     "complementary": 2,
     "different": 5,
-    "equivalent": 32,
-    "uncertain": 4,
-    "unrelated": 2
+    "equivalent": 30,
+    "unrelated": 1
    },
-   "unmatched": 7,
-   "pairs": 13,
+   "unmatched": 8,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -2023,9 +2022,6 @@
     "by_claims": {
      "change": {
       "changed": 5
-     },
-     "unscored": {
-      "not_same_item": 4
      }
     }
    },
@@ -2331,7 +2327,7 @@
    "changes_found": "2/3",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "35/35",
+   "unchanged_confirmed": "31/35",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -2344,37 +2340,34 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 35
+    "confirmed": 31,
+    "uncertain": 4
    },
    "different": {
-    "change": 7
+    "change": 6
    },
    "equivalent": {
-    "no change": 87,
-    "unscored": 19
+    "no change": 92,
+    "unscored": 16
    },
    "findings": {
-    "complementary": 1,
-    "different": 7,
-    "equivalent": 106,
-    "uncertain": 3,
-    "unrelated": 1
+    "different": 6,
+    "equivalent": 108,
+    "uncertain": 5
    },
-   "unmatched": 22,
-   "pairs": 23,
+   "unmatched": 27,
+   "pairs": 17,
    "omitted": 0,
    "kinds": {
-    "right": 8,
-    "scored": 10,
+    "right": 11,
+    "scored": 11,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 7,
-      "conditions": 1
+      "changed": 7
      },
      "no change": {
-      "not_same_item": 1,
-      "restated": 1
+      "restated": 4
      }
     }
    },
@@ -2403,19 +2396,19 @@
     "room102.area": "uncertain",
     "room102.depth": "confirmed",
     "room102.width": "reported",
-    "room103.area": "confirmed",
+    "room103.area": "uncertain",
     "room103.depth": "confirmed",
     "room103.width": "confirmed",
-    "room104.area": "confirmed",
+    "room104.area": "uncertain",
     "room104.depth": "confirmed",
     "room104.width": "confirmed",
-    "room110.area": "confirmed",
+    "room110.area": "uncertain",
     "room110.depth": "confirmed",
     "room110.width": "confirmed",
     "room111.area": "confirmed",
     "room111.depth": "confirmed",
     "room111.width": "confirmed",
-    "room112.area": "confirmed",
+    "room112.area": "uncertain",
     "room112.depth": "confirmed",
     "room112.width": "confirmed"
    }
@@ -3858,7 +3851,7 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "30/31",
+   "unchanged_confirmed": "31/31",
    "false_changes": 0,
    "difference_precision": null,
    "changed": {},
@@ -3868,30 +3861,26 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 30,
-    "uncertain": 1
+    "confirmed": 31
    },
    "different": {},
    "equivalent": {
-    "no change": 30
+    "no change": 31
    },
    "findings": {
-    "equivalent": 30,
-    "uncertain": 3
+    "equivalent": 31,
+    "uncertain": 2
    },
-   "unmatched": 6,
-   "pairs": 11,
+   "unmatched": 4,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
-    "right": 3,
-    "scored": 3,
+    "right": 2,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "conditions": {
       "conditions": 2
-     },
-     "no change": {
-      "restated": 1
      }
     }
    },
@@ -3904,7 +3893,7 @@
     "P-101B.motor": "confirmed",
     "P-101C.capacity": "confirmed",
     "P-101C.head": "confirmed",
-    "P-101C.motor": "uncertain",
+    "P-101C.motor": "confirmed",
     "chem.alum": "confirmed",
     "chem.alum_max": "confirmed",
     "chem.chlorine": "confirmed",
@@ -3963,7 +3952,7 @@
     "uncertain": 2
    },
    "unmatched": 4,
-   "pairs": 11,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -5028,7 +5017,7 @@
     "equivalent": 33
    },
    "unmatched": 0,
-   "pairs": 9,
+   "pairs": 0,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -5095,7 +5084,7 @@
     "equivalent": 33
    },
    "unmatched": 0,
-   "pairs": 9,
+   "pairs": 0,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -5146,7 +5135,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 1.0,
+   "difference_precision": 0.7143,
    "changed": {
     "reported": 3
    },
@@ -5158,31 +5147,32 @@
     "unextracted": 2
    },
    "different": {
-    "change": 3
+    "across facts": 2,
+    "change": 5
    },
    "equivalent": {
-    "no change": 23,
+    "no change": 27,
     "unscored": 3
    },
    "findings": {
-    "different": 3,
-    "equivalent": 26,
-    "uncertain": 3,
-    "unrelated": 2
+    "different": 7,
+    "equivalent": 30,
+    "uncertain": 1,
+    "unrelated": 3
    },
-   "unmatched": 4,
-   "pairs": 15,
+   "unmatched": 3,
+   "pairs": 20,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 7,
+    "scored": 7,
     "value_change_precision": 1.0,
     "by_claims": {
      "across facts": {
-      "not_same_item": 1
+      "not_same_item": 2
      },
      "change": {
-      "changed": 4
+      "changed": 5
      },
      "unscored": {
       "restated": 1
@@ -5333,7 +5323,7 @@
     "unrelated": 2
    },
    "unmatched": 2,
-   "pairs": 11,
+   "pairs": 15,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -6659,7 +6649,7 @@
    "changes_found": "2/2",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "23/24",
+   "unchanged_confirmed": "24/24",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -6671,33 +6661,28 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 23,
-    "uncertain": 1
+    "confirmed": 24
    },
    "different": {
     "change": 2
    },
    "equivalent": {
-    "no change": 25
+    "no change": 26
    },
    "findings": {
     "different": 2,
-    "equivalent": 25,
-    "uncertain": 1
+    "equivalent": 26
    },
-   "unmatched": 21,
-   "pairs": 6,
+   "unmatched": 19,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
-    "value_change_precision": 0.6667,
+    "scored": 2,
+    "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "no change": {
-      "conditions": 1
      }
     }
    },
@@ -6709,7 +6694,7 @@
     "msg10.budget": "confirmed",
     "msg11.timeout": "confirmed",
     "msg12.lifetime": "confirmed",
-    "msg13.lifetime": "uncertain",
+    "msg13.lifetime": "confirmed",
     "msg14.deadline": "confirmed",
     "msg15.window": "confirmed",
     "msg16.timer": "reported",
@@ -7716,7 +7701,7 @@
     "equivalent": 26
    },
    "unmatched": 4,
-   "pairs": 10,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -7801,7 +7786,7 @@
     "equivalent": 27
    },
    "unmatched": 4,
-   "pairs": 5,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -7887,7 +7872,7 @@
     "uncertain": 1
    },
    "unmatched": 5,
-   "pairs": 9,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -9059,18 +9044,17 @@
     "change": 5
    },
    "equivalent": {
-    "no change": 19,
+    "no change": 17,
     "unscored": 13
    },
    "findings": {
     "complementary": 2,
     "different": 5,
-    "equivalent": 32,
-    "uncertain": 4,
-    "unrelated": 2
+    "equivalent": 30,
+    "unrelated": 1
    },
-   "unmatched": 7,
-   "pairs": 13,
+   "unmatched": 8,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -9079,9 +9063,6 @@
     "by_claims": {
      "change": {
       "changed": 5
-     },
-     "unscored": {
-      "not_same_item": 4
      }
     }
    },
@@ -9387,7 +9368,7 @@
    "changes_found": "2/3",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "35/35",
+   "unchanged_confirmed": "31/35",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -9400,37 +9381,34 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 35
+    "confirmed": 31,
+    "uncertain": 4
    },
    "different": {
-    "change": 7
+    "change": 6
    },
    "equivalent": {
-    "no change": 87,
-    "unscored": 19
+    "no change": 92,
+    "unscored": 16
    },
    "findings": {
-    "complementary": 1,
-    "different": 7,
-    "equivalent": 106,
-    "uncertain": 3,
-    "unrelated": 1
+    "different": 6,
+    "equivalent": 108,
+    "uncertain": 5
    },
-   "unmatched": 22,
-   "pairs": 23,
+   "unmatched": 27,
+   "pairs": 17,
    "omitted": 0,
    "kinds": {
-    "right": 8,
-    "scored": 10,
+    "right": 11,
+    "scored": 11,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 7,
-      "conditions": 1
+      "changed": 7
      },
      "no change": {
-      "not_same_item": 1,
-      "restated": 1
+      "restated": 4
      }
     }
    },
@@ -9459,19 +9437,19 @@
     "room102.area": "uncertain",
     "room102.depth": "confirmed",
     "room102.width": "reported",
-    "room103.area": "confirmed",
+    "room103.area": "uncertain",
     "room103.depth": "confirmed",
     "room103.width": "confirmed",
-    "room104.area": "confirmed",
+    "room104.area": "uncertain",
     "room104.depth": "confirmed",
     "room104.width": "confirmed",
-    "room110.area": "confirmed",
+    "room110.area": "uncertain",
     "room110.depth": "confirmed",
     "room110.width": "confirmed",
     "room111.area": "confirmed",
     "room111.depth": "confirmed",
     "room111.width": "confirmed",
-    "room112.area": "confirmed",
+    "room112.area": "uncertain",
     "room112.depth": "confirmed",
     "room112.width": "confirmed"
    }
@@ -10914,7 +10892,7 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "30/31",
+   "unchanged_confirmed": "31/31",
    "false_changes": 0,
    "difference_precision": null,
    "changed": {},
@@ -10924,30 +10902,26 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 30,
-    "uncertain": 1
+    "confirmed": 31
    },
    "different": {},
    "equivalent": {
-    "no change": 30
+    "no change": 31
    },
    "findings": {
-    "equivalent": 30,
-    "uncertain": 3
+    "equivalent": 31,
+    "uncertain": 2
    },
-   "unmatched": 6,
-   "pairs": 11,
+   "unmatched": 4,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
-    "right": 3,
-    "scored": 3,
+    "right": 2,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "conditions": {
       "conditions": 2
-     },
-     "no change": {
-      "restated": 1
      }
     }
    },
@@ -10960,7 +10934,7 @@
     "P-101B.motor": "confirmed",
     "P-101C.capacity": "confirmed",
     "P-101C.head": "confirmed",
-    "P-101C.motor": "uncertain",
+    "P-101C.motor": "confirmed",
     "chem.alum": "confirmed",
     "chem.alum_max": "confirmed",
     "chem.chlorine": "confirmed",
@@ -11019,7 +10993,7 @@
     "uncertain": 2
    },
    "unmatched": 4,
-   "pairs": 11,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -12084,7 +12058,7 @@
     "equivalent": 33
    },
    "unmatched": 0,
-   "pairs": 9,
+   "pairs": 0,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -12151,7 +12125,7 @@
     "equivalent": 33
    },
    "unmatched": 0,
-   "pairs": 9,
+   "pairs": 0,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -12202,7 +12176,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 1.0,
+   "difference_precision": 0.7143,
    "changed": {
     "reported": 3
    },
@@ -12214,31 +12188,32 @@
     "unextracted": 2
    },
    "different": {
-    "change": 3
+    "across facts": 2,
+    "change": 5
    },
    "equivalent": {
-    "no change": 23,
+    "no change": 27,
     "unscored": 3
    },
    "findings": {
-    "different": 3,
-    "equivalent": 26,
-    "uncertain": 3,
-    "unrelated": 2
+    "different": 7,
+    "equivalent": 30,
+    "uncertain": 1,
+    "unrelated": 3
    },
-   "unmatched": 4,
-   "pairs": 15,
+   "unmatched": 3,
+   "pairs": 20,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 7,
+    "scored": 7,
     "value_change_precision": 1.0,
     "by_claims": {
      "across facts": {
-      "not_same_item": 1
+      "not_same_item": 2
      },
      "change": {
-      "changed": 4
+      "changed": 5
      },
      "unscored": {
       "restated": 1
@@ -12389,7 +12364,7 @@
     "unrelated": 2
    },
    "unmatched": 2,
-   "pairs": 11,
+   "pairs": 15,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -13715,7 +13690,7 @@
    "changes_found": "2/2",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "23/24",
+   "unchanged_confirmed": "24/24",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -13727,33 +13702,28 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 23,
-    "uncertain": 1
+    "confirmed": 24
    },
    "different": {
     "change": 2
    },
    "equivalent": {
-    "no change": 25
+    "no change": 26
    },
    "findings": {
     "different": 2,
-    "equivalent": 25,
-    "uncertain": 1
+    "equivalent": 26
    },
-   "unmatched": 21,
-   "pairs": 6,
+   "unmatched": 19,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
-    "value_change_precision": 0.6667,
+    "scored": 2,
+    "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "no change": {
-      "conditions": 1
      }
     }
    },
@@ -13765,7 +13735,7 @@
     "msg10.budget": "confirmed",
     "msg11.timeout": "confirmed",
     "msg12.lifetime": "confirmed",
-    "msg13.lifetime": "uncertain",
+    "msg13.lifetime": "confirmed",
     "msg14.deadline": "confirmed",
     "msg15.window": "confirmed",
     "msg16.timer": "reported",
@@ -17607,7 +17577,7 @@
    "changes_found": "3/3",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "35/35",
+   "unchanged_confirmed": "33/35",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -17619,36 +17589,34 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 35
+    "confirmed": 33,
+    "uncertain": 2
    },
    "different": {
-    "change": 9
+    "change": 7
    },
    "equivalent": {
-    "no change": 96,
-    "unscored": 19
+    "no change": 101,
+    "unscored": 16
    },
    "findings": {
-    "complementary": 1,
-    "different": 9,
-    "equivalent": 115,
-    "uncertain": 2,
-    "unrelated": 1
+    "different": 7,
+    "equivalent": 117,
+    "uncertain": 2
    },
-   "unmatched": 24,
-   "pairs": 24,
+   "unmatched": 23,
+   "pairs": 15,
    "omitted": 0,
    "kinds": {
-    "right": 10,
-    "scored": 11,
+    "right": 9,
+    "scored": 9,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 9
+      "changed": 7
      },
      "no change": {
-      "not_same_item": 1,
-      "restated": 1
+      "restated": 2
      }
     }
    },
@@ -17683,13 +17651,13 @@
     "room104.area": "confirmed",
     "room104.depth": "confirmed",
     "room104.width": "confirmed",
-    "room110.area": "confirmed",
+    "room110.area": "uncertain",
     "room110.depth": "confirmed",
     "room110.width": "confirmed",
     "room111.area": "confirmed",
     "room111.depth": "confirmed",
     "room111.width": "confirmed",
-    "room112.area": "confirmed",
+    "room112.area": "uncertain",
     "room112.depth": "confirmed",
     "room112.width": "confirmed"
    }
@@ -21088,14 +21056,15 @@
     "removed": 0,
     "unchanged": 24
    },
-   "changes_found": "2/2",
+   "changes_found": "1/2",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "22/24",
+   "unchanged_confirmed": "23/24",
    "false_changes": 0,
-   "difference_precision": 0.4,
+   "difference_precision": 1.0,
    "changed": {
-    "reported": 2
+    "reported": 1,
+    "uncertain": 1
    },
    "conditions": {},
    "added": {
@@ -21103,39 +21072,39 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 22,
-    "uncertain": 2
+    "confirmed": 23,
+    "uncertain": 1
    },
    "different": {
-    "change": 2,
-    "unscored": 3
+    "change": 1
    },
    "equivalent": {
-    "no change": 28,
-    "unscored": 2
+    "no change": 29,
+    "unscored": 1
    },
    "findings": {
-    "different": 5,
+    "different": 1,
     "equivalent": 30,
-    "uncertain": 2
+    "uncertain": 4
    },
-   "unmatched": 26,
+   "unmatched": 30,
    "pairs": 15,
    "omitted": 0,
    "kinds": {
-    "right": 3,
+    "right": 2,
     "scored": 4,
-    "value_change_precision": 0.6667,
+    "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 2
+      "changed": 1,
+      "conditions": 1
      },
      "no change": {
-      "conditions": 1,
+      "not_same_item": 1,
       "restated": 1
      },
      "unscored": {
-      "changed": 3
+      "conditions": 1
      }
     }
    },
@@ -21147,7 +21116,7 @@
     "msg10.budget": "confirmed",
     "msg11.timeout": "confirmed",
     "msg12.lifetime": "confirmed",
-    "msg13.lifetime": "uncertain",
+    "msg13.lifetime": "confirmed",
     "msg14.deadline": "confirmed",
     "msg15.window": "confirmed",
     "msg16.timer": "reported",
@@ -21162,7 +21131,7 @@
     "msg24.hysteresis": "confirmed",
     "msg3.interval": "confirmed",
     "msg4.depth": "confirmed",
-    "msg5.timeout": "reported",
+    "msg5.timeout": "uncertain",
     "msg6.size": "confirmed",
     "msg7.rate": "confirmed",
     "msg8.period": "confirmed",
@@ -23376,7 +23345,7 @@
    "changes_found": "3/3",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "35/35",
+   "unchanged_confirmed": "33/35",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -23388,36 +23357,34 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 35
+    "confirmed": 33,
+    "uncertain": 2
    },
    "different": {
-    "change": 9
+    "change": 7
    },
    "equivalent": {
-    "no change": 96,
-    "unscored": 19
+    "no change": 101,
+    "unscored": 16
    },
    "findings": {
-    "complementary": 1,
-    "different": 9,
-    "equivalent": 115,
-    "uncertain": 2,
-    "unrelated": 1
+    "different": 7,
+    "equivalent": 117,
+    "uncertain": 2
    },
-   "unmatched": 24,
-   "pairs": 24,
+   "unmatched": 23,
+   "pairs": 15,
    "omitted": 0,
    "kinds": {
-    "right": 10,
-    "scored": 11,
+    "right": 9,
+    "scored": 9,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 9
+      "changed": 7
      },
      "no change": {
-      "not_same_item": 1,
-      "restated": 1
+      "restated": 2
      }
     }
    },
@@ -23452,13 +23419,13 @@
     "room104.area": "confirmed",
     "room104.depth": "confirmed",
     "room104.width": "confirmed",
-    "room110.area": "confirmed",
+    "room110.area": "uncertain",
     "room110.depth": "confirmed",
     "room110.width": "confirmed",
     "room111.area": "confirmed",
     "room111.depth": "confirmed",
     "room111.width": "confirmed",
-    "room112.area": "confirmed",
+    "room112.area": "uncertain",
     "room112.depth": "confirmed",
     "room112.width": "confirmed"
    }
@@ -26857,14 +26824,15 @@
     "removed": 0,
     "unchanged": 24
    },
-   "changes_found": "2/2",
+   "changes_found": "1/2",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "22/24",
+   "unchanged_confirmed": "23/24",
    "false_changes": 0,
-   "difference_precision": 0.4,
+   "difference_precision": 1.0,
    "changed": {
-    "reported": 2
+    "reported": 1,
+    "uncertain": 1
    },
    "conditions": {},
    "added": {
@@ -26872,39 +26840,39 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 22,
-    "uncertain": 2
+    "confirmed": 23,
+    "uncertain": 1
    },
    "different": {
-    "change": 2,
-    "unscored": 3
+    "change": 1
    },
    "equivalent": {
-    "no change": 28,
-    "unscored": 2
+    "no change": 29,
+    "unscored": 1
    },
    "findings": {
-    "different": 5,
+    "different": 1,
     "equivalent": 30,
-    "uncertain": 2
+    "uncertain": 4
    },
-   "unmatched": 26,
+   "unmatched": 30,
    "pairs": 15,
    "omitted": 0,
    "kinds": {
-    "right": 3,
+    "right": 2,
     "scored": 4,
-    "value_change_precision": 0.6667,
+    "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 2
+      "changed": 1,
+      "conditions": 1
      },
      "no change": {
-      "conditions": 1,
+      "not_same_item": 1,
       "restated": 1
      },
      "unscored": {
-      "changed": 3
+      "conditions": 1
      }
     }
    },
@@ -26916,7 +26884,7 @@
     "msg10.budget": "confirmed",
     "msg11.timeout": "confirmed",
     "msg12.lifetime": "confirmed",
-    "msg13.lifetime": "uncertain",
+    "msg13.lifetime": "confirmed",
     "msg14.deadline": "confirmed",
     "msg15.window": "confirmed",
     "msg16.timer": "reported",
@@ -26931,7 +26899,7 @@
     "msg24.hysteresis": "confirmed",
     "msg3.interval": "confirmed",
     "msg4.depth": "confirmed",
-    "msg5.timeout": "reported",
+    "msg5.timeout": "uncertain",
     "msg6.size": "confirmed",
     "msg7.rate": "confirmed",
     "msg8.period": "confirmed",

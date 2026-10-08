@@ -24,8 +24,10 @@ UNIT = re.compile(r"^[(\[]?\s*(µm|μm|nm|mm|cm|m|km|in|ft|mas|%|°|°c|°f|k|w|
 # The signals, each a condition a rule may name. "first cell empty" alone, in a line without a digit, is settled by
 # the heuristics (pdf_grid joins it to the line above) and isn't a suspect by itself.
 SIGNALS = ("no rule above", "first cell empty", "only its first cell", "units only", "words under numbers",
-           "half height")
-ACTIONS = ("join above", "join header", "section", "new table", "not table", "keep", "split column")
+           "half height", "a word cut by a column line")
+CUT = "a word cut by a column line"
+COLUMN_ACTIONS = ("split column", "join columns")  # acting on columns, in every row
+ACTIONS = ("join above", "join header", "section", "new table", "not table", "keep") + COLUMN_ACTIONS
 
 def _filled(row):
     return [c for c in row if c is not None and str(c).strip()]
@@ -33,10 +35,12 @@ def _filled(row):
 def _digit(row):
     return any(ch.isdigit() for c in _filled(row) for ch in str(c))
 
-def signals(header, body, boxes, styles=None, rules=None):
+def signals(header, body, boxes, styles=None, rules=None, cuts=None):
     """For each body line, the signals that it continues the line above (the header, for the first) rather than
-    being a row. styles: each line's look (tables.Marks.styles), a line styled unlike most being a section row, not
-    a stray label; rules: the y of the drawn rules, used when the part's boundaries are mostly ruled."""
+    being a row, or that its cells aren't the image's. styles: each line's look (tables.Marks.styles), a line styled
+    unlike most being a section row, not a stray label; rules: the y of the drawn rules, used when the part's
+    boundaries are mostly ruled; cuts: {line: the column boundaries a word in it is cut by} (tables.Marks.cuts; 0
+    the header)."""
     lines = [header] + list(body)
     tops = [b[1] if b else None for b in boxes]
     ruled = None
@@ -64,6 +68,8 @@ def signals(header, body, boxes, styles=None, rules=None):
             tags.append("words under numbers")
         if usual and i < len(boxes) and boxes[i] and boxes[i][3] - boxes[i][1] < 0.6 * usual:
             tags.append("half height")
+        if cuts and cuts.get(i + 1):
+            tags.append(CUT)
         out.append(tags)
     return out
 
@@ -123,6 +129,8 @@ fits stays a row. Actions:
 - "not table": the line isn't part of the table (a note, a caption)
 - "keep": the line is a row of its own (said of a suspect line to settle it)
 - "split column": "column" (a letter, A first) holds two or more values in each cell; "into" names the new columns
+- "join columns": "column" and the one after it ("C"), or a range ("C:E"), are one column in the image: their cells
+  joined in every row, without a space where a column line cut a word (lines tagged with where they're cut)
 Cells are never retyped: rules only regroup them.
 
 Also copy two or three rows from the image as they read after your rules, empty cells left out, one of them the
@@ -145,12 +153,24 @@ def _letter(k):
 def _line(row):
     return " | ".join("" if c is None else " ".join(str(c).split()) for c in row)
 
-def show_lines(header, body, tags):
+def show_lines(header, body, tags, cuts=None):
     width = max(len(r) for r in [header] + list(body))
-    out = ["    " + " | ".join(_letter(k) for k in range(width)), f"H:  {_line(header)}"]
+    cut = lambda i: (f" (cut at {', '.join(f'{_letter(k)}|{_letter(k + 1)}' for k in sorted(cuts[i]))})"
+                     if cuts and cuts.get(i) else "")
+    out = ["    " + " | ".join(_letter(k) for k in range(width)),
+           f"H:  {_line(header)}" + (f"   [{CUT}]{cut(0)}" if cuts and cuts.get(0) else "")]
     for i, (row, t) in enumerate(zip(body, tags), 1):
-        out.append(f"{i}:  {_line(row)}" + (f"   [{'; '.join(t)}]" if t else ""))
+        out.append(f"{i}:  {_line(row)}" + (f"   [{'; '.join(t)}]" if t else "") + cut(i))
     return "\n".join(out)
+
+def _span(column, width):
+    """A "join columns" rule's columns: "C" (C and D) or "C:E", as (first, last) indices, or None."""
+    letters = [_letter(c) for c in range(width)]
+    a, _, b = column.strip().upper().partition(":")
+    if a not in letters or (b and b not in letters):
+        return None
+    first, last = letters.index(a), letters.index(b) if b else letters.index(a) + 1
+    return (first, last) if first < last < width else None
 
 def _joined(upper, lower):
     out = []
@@ -182,6 +202,7 @@ class Applied:
     header), lines read apart ("not table"), and what each rule did."""
     def __init__(self):
         self.parts, self.origins, self.heads, self.apart, self.did, self.misfits = [], [], [], [], {}, []
+        self.unsupported = []  # joins of a body row's separate values, no word cut between them
 
     def holding(self, number, body):
         """The row (or header) a line ended up in; 0 is the header."""
@@ -220,17 +241,21 @@ def problems(answer, n, width, tags):
             col = rule.column.strip().upper()
             if col not in [_letter(c) for c in range(width)] or len(rule.into) < 2:
                 wrong.append(f"rule {k}: a split names a column (A to {_letter(width - 1)}) and two or more new columns")
+        elif action == "join columns":
+            if _span(rule.column, width) is None:
+                wrong.append(f"rule {k}: a join names a column with one after it (\"C\"), or a range (\"C:E\"), within A to "
+                             f"{_letter(width - 1)}")
         elif not rule.when and not rule.lines:
             wrong.append(f"rule {k}: it says neither \"when\" nor \"lines\"")
     return wrong
 
-def apply(answer, header, body, boxes, tags):
-    """Structure rules applied to a part's lines."""
+def apply(answer, header, body, boxes, tags, cuts=None):
+    """Structure rules applied to a part's lines. cuts: as signals takes them, to join cut words without a space."""
     out = Applied()
     act, named = {}, {}
     for rule in answer.rules:
         action = rule.action.strip().lower()
-        if action == "split column":
+        if action in COLUMN_ACTIONS:
             continue
         for x in rule.lines:
             if _number(x) is not None and _number(x) not in named:
@@ -241,7 +266,7 @@ def apply(answer, header, body, boxes, tags):
             continue
         for rule in answer.rules:
             when = [w.strip().lower() for w in rule.when]
-            if rule.action.strip().lower() != "split column" and when and all(w in tags[i - 1] for w in when):
+            if rule.action.strip().lower() not in COLUMN_ACTIONS and when and all(w in tags[i - 1] for w in when):
                 act[i] = (rule.action.strip().lower(), rule)
                 break
     head, rows, bxs, origins, heads = list(header), [], [], [], []
@@ -288,13 +313,48 @@ def apply(answer, header, body, boxes, tags):
             origins.append([i])
             header_open = False
     close()
+    width = max(len(r) for r in [header] + list(body))
+    index = list(range(width))  # each column's place after joins (splits name columns as they were shown)
+    joins = [(rule, _span(rule.column, width)) for rule in answer.rules
+             if rule.action.strip().lower() == "join columns" and _span(rule.column, width)]
+    for rule, (first, last) in sorted(joins, key=lambda j: -j[1][0]):  # columns joined, in every part
+        joined_rows = []
+
+        def join(row, lines, body_row=True):
+            cut = set().union(*((cuts or {}).get(line, set()) for line in lines))
+            text, pieces, before = "", 0, None
+            for k in range(first, last + 1):
+                piece = " ".join(str(row[k]).split()) if k < len(row) and row[k] is not None else ""
+                if piece:  # no space where a boundary between this piece and the one before cut a word
+                    glued = before is not None and any(j in cut for j in range(before, k))
+                    if before is not None and not glued and body_row and cuts is not None:
+                        out.unsupported.append(f"columns {rule.column.upper()} hold separate values in the row of "
+                                               f"line {lines[0]} ({row[before]!r}, {piece!r}; no word cut between "
+                                               "them): join only columns a word is cut across")
+                    text += ("" if not text or glued else " ") + piece
+                    pieces, before = pieces + 1, k
+            return list(row[:first]) + [text] + list(row[last + 1:]), pieces > 1
+
+        parts = []
+        for p, ((head_, rows_, bxs_), origins, heads) in enumerate(zip(out.parts, out.origins, out.heads)):
+            head_, _ = join(head_, ([0] if p == 0 else []) + heads, body_row=False)
+            new = []
+            for row, lines in zip(rows_, origins):
+                row, both = join(row, lines)
+                new.append(row)
+                if both:
+                    joined_rows.append(row[0])
+            parts.append((head_, new, bxs_))
+        out.parts = parts
+        out.did[id(rule)] = (rule, joined_rows)
+        index = [i if i <= first else first if i <= last else i - (last - first) for i in index]
     for rule in answer.rules:  # columns split, in every part
         if rule.action.strip().lower() != "split column":
             continue
-        letters = [_letter(c) for c in range(max(len(r) for r in [header] + list(body)))]
+        letters = [_letter(c) for c in range(width)]
         if rule.column.strip().upper() not in letters:
             continue
-        k, into, split_rows = letters.index(rule.column.strip().upper()), [t.strip() for t in rule.into], []
+        k, into, split_rows = index[letters.index(rule.column.strip().upper())], [t.strip() for t in rule.into], []
         parts = []
         for head_, rows_, bxs_ in out.parts:
             head_ = list(head_[:k]) + into + list(head_[k + 1:])
@@ -319,8 +379,9 @@ def example_mismatches(answer, applied, body, worst=None):
     worst suspect among them."""
     wrong = []
     rows = [applied.holding(_example_line(e), body) for e in answer.examples if _example_line(e) is not None]
-    if worst and not any(r is not None and r is applied.holding(worst, body) for r in rows):
-        wrong.append(f"the row holding line {worst} isn't among the examples: copy it from the image")
+    if worst is not None and not any(r is not None and r is applied.holding(worst, body) for r in rows):
+        wrong.append(f"the row holding line {'H' if worst == 0 else worst} isn't among the examples: copy it from "
+                     "the image")
     for example in answer.examples:
         number = _example_line(example)
         if number is None or not 0 <= number <= len(body):
@@ -356,6 +417,8 @@ def describe(applied):
         action = rule.action.strip().lower()
         if action == "split column":
             what = f"column {rule.column.upper()} split into {', '.join(rule.into)}"
+        elif action == "join columns":
+            what = f"columns {rule.column.upper()} joined"
         else:
             cond = " and ".join(f'"{w}"' for w in rule.when)
             what = f"{cond + ': ' if cond else ''}{action}"
@@ -380,21 +443,24 @@ def review_question(asked, answer, applied, header, body, tags):
         lines.append("not applied: " + "; ".join(applied.misfits[:6]))
     return "\n".join(lines)
 
-def read(core, page, task, header, body, boxes, styles, rules, images, then):
-    """Ask a part's structure when a line is suspect, then call then(parts, step, apart): parts as tables.pdf_parts
-    gives them, step a DerivationStep saying how the structure was settled (None: as the heuristics left it), apart
-    the body lines read by themselves ("not table"). images: a callable giving the table's crop(s), relative to the
+def read(core, page, task, header, body, boxes, styles, rules, images, then, cuts=None):
+    """Ask a part's structure when a line is suspect, then call then(parts, step, apart, table): parts as
+    tables.pdf_parts gives them, step a DerivationStep saying how the structure was settled (None: as the heuristics
+    left it), apart the body lines read by themselves ("not table"), table False where the model reads no table
+    (rules leaving no rows: a chart, a floor plan). images: a callable giving the table's crop(s), relative to the
     output folder, rendered only for a part that's asked."""
     from .llm import CallLimitReached, NotRecorded
-    tags = signals(header, body, boxes, styles, rules)
+    tags = signals(header, body, boxes, styles, rules, cuts)
     flagged = [i + 1 for i, (t, row) in enumerate(zip(tags, body)) if suspect(t, row)]
+    if cuts and cuts.get(0):  # the header's words cut by a column line
+        flagged.append(0)
     if not flagged:
-        return then([(header, body, boxes)], None, [])
-    worst = max(flagged, key=lambda i: (len(tags[i - 1]), -i))
+        return then([(header, body, boxes)], None, [], True)
+    worst = max(flagged, key=lambda i: (len(tags[i - 1]) if i else 1, -i))
     images = images()
     width = max(len(r) for r in [header] + list(body))
-    asked = STRUCTURE.format(lines=show_lines(header, body, tags), signals=", ".join(f'"{s}"' for s in SIGNALS),
-                             worst=worst)
+    asked = STRUCTURE.format(lines=show_lines(header, body, tags, cuts),
+                             signals=", ".join(f'"{s}"' for s in SIGNALS), worst="H" if worst == 0 else worst)
     span = boxes and all(boxes) and (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes),
                                      max(b[3] for b in boxes))
 
@@ -414,17 +480,19 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then):
                                  status=status, issues=issues, claims=0), [])
         core.progress.finish(status)
 
-    def heuristic(name, status, why):
+    def heuristic(name, status, why, table=True):
         record(name, status, [f"Structure as the heuristics left it: {why}"[:500]])
-        then([(header, body, boxes)], None, [])
+        then([(header, body, boxes)], None, [], table)
 
     def check(answer):
         wrong = problems(answer, len(body), width, tags)
         if wrong:
             return wrong, None
-        applied = apply(answer, header, body, boxes, tags)
+        applied = apply(answer, header, body, boxes, tags, cuts)
         if not applied.parts:
             return [NO_ROWS], None
+        if applied.unsupported:  # a column join the page's words don't bear out
+            return applied.unsupported[:3], None
         return example_mismatches(answer, applied, body, worst), applied
 
     def first(answer, error):
@@ -434,7 +502,7 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then):
         if not wrong:
             return review(answer, applied)
         if wrong == [NO_ROWS]:  # the model reads no table here: asking again won't change that
-            return heuristic(task, "complete", f"{NO_ROWS} ({answer.why or 'no reason given'})")
+            return heuristic(task, "complete", f"{NO_ROWS} ({answer.why or 'no reason given'})", table=False)
         again = (asked + "\nYOUR EARLIER ANSWER:\n" + answer.model_dump_json(exclude_defaults=True)
                  + "\nITS PROBLEMS:\n" + "\n".join(f"- {w}" for w in wrong) + "\nAnswer again, mending them.")
         record(task, "partial", [f"The structure asked again: {'; '.join(wrong)}"[:500]])
@@ -477,7 +545,7 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then):
     def failed(name, error):
         if isinstance(error, (CallLimitReached, NotRecorded)):
             record(name, "not_reached", [str(error)])
-            return then([(header, body, boxes)], None, [])
+            return then([(header, body, boxes)], None, [], True)
         heuristic(name, "failed", f"the structure query failed ({error})")
 
     def use(answer, applied, notes):
@@ -485,6 +553,6 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then):
         parted = cells_parted_otherwise(answer, applied, body)
         record(task, "complete", [f"Structure by rules: {said}"[:500]] + notes[:6] + applied.misfits[:4] + parted[:2])
         step = DerivationStep(step="table-structure", detail=f"by rules a model wrote: {said}"[:400])
-        then(applied.parts, step, applied.apart)
+        then(applied.parts, step, applied.apart, True)
 
     ask(asked, task, Structure, "table-structure", first)

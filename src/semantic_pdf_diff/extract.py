@@ -18,7 +18,8 @@ from .quotes import FOLD, covered, excerpted, quoted  # noqa: F401
 from .sections import SectionIndex, heading_y, pdf_sections, section_text  # noqa: F401
 from .segmentation import grown, sheet_details, tiles  # noqa: F401
 from .stems import _long_form, glossary, stem_index  # noqa: F401
-from .tables import Marks, pdf_grid, pdf_parts, real_table, ruled_rows, row_boxes, same_form  # noqa: F401
+from .tables import (Marks, column_edges, cut_columns, pdf_grid, pdf_parts, real_table,  # noqa: F401
+                     row_boxes, ruled_rows, same_form, split_cuts)
 from .tasks import MIN_REFINE_BYTES, TaskCore, split_utf8, union  # noqa: F401 (callers import them from here)
 
 # Bump when prompt assembly or task construction changes, not only the template text;
@@ -244,7 +245,8 @@ def office_installed(workbook=False):
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/3",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split
+READERS = {".pdf": "pdf/5",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
+           # 4: a part the model reads as no table read as a figure; 5: columns joined where words are cut
            ".txt": "text/1", ".md": "text/1",
            ".docx": "docx/5",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers
            ".pptx": "pptx/4",  # pptx/2: tables asked how they're read; 3-4: a header's name and group
@@ -385,6 +387,30 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         if on_sections:
             on_sections(sections)
         signals = {}
+        regions = {}  # page -> its image tasks' regions, worked out once (the vision loop; tables read as figures)
+
+        def regions_of(number, page):
+            if number not in regions:
+                regions[number] = list(s.visual_regions(context_of, page, number))
+            return regions[number]
+
+        def as_figure(number, page, rect, tag):
+            """A region parsed as a table that the model reads as no table (a chart, a floor plan): read by a figure
+            task, unless the overview, a figure task or one tile already sees it whole. What happened, in words."""
+            if abs(rect & page.rect) >= 0.9 * abs(page.rect):
+                return "seen whole by the page's overview"
+            for region_tag, region, _ in regions_of(number, page):
+                kind = region_tag.partition(":")[0]
+                if kind == "figure" and abs(region & rect) >= 0.8 * abs(rect):
+                    return "seen whole by a figure task"
+                if kind == "tile" and region.contains(rect):
+                    return "seen whole by a tile"
+            visuals.task(number, page, f"figure:p{number}:{tag}", rect, derivation=[
+                DerivationStep(step="pdf-render", detail="a region parsed as a table, read as a figure (the model "
+                                                         "reads no table there)"),
+                DerivationStep(step="model-extraction", detail="vision")])
+            return "read by a figure task"
+
         # (header, width) of a table that ended near the bottom of the previous page
         carried = None
         for number, page in enumerate(doc, 1):
@@ -402,12 +428,13 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     rows = table.extract()
                     if not s.keep_table(context_of, page, table, rows):
                         continue
-                    boxes, styles, rules = row_boxes(table, rows), None, None
+                    boxes, styles, rules, edges = row_boxes(table, rows), None, None, None
                     if marks is not None and boxes:  # lines of one row parted by shading, joined (ruled_rows)
                         rules = marks.rules(table.bbox)
                         rows, boxes, _ = ruled_rows(rows, boxes, rules)
+                        rows, edges, _ = cut_columns(rows, boxes, column_edges(table), marks)  # words a column cut
                         styles = marks.styles(table.bbox, boxes)
-                    found.append((unrotated(table.bbox), rows, [unrotated(b) for b in boxes], styles, rules))
+                    found.append((unrotated(table.bbox), rows, [unrotated(b) for b in boxes], styles, rules, edges))
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors
                 found = []
                 record(coverage_row(content=content, page=number, bbox=list(native_page(page)),
@@ -416,7 +443,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             height = page.rect.height
             continuing, carried = carried, None
             context_of.tables_on[number] = [found_[0] for found_ in found]
-            for ti, (bbox, rows, boxes, styles, rules) in enumerate(found):
+            for ti, (bbox, rows, boxes, styles, rules, edges) in enumerate(found):
                 if not rows:
                     continue
                 displayed = shown(page, bbox)  # continuation is judged as displayed
@@ -447,9 +474,16 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                         render(page, displayed, assets / crop[0], s.image_side)
                     return f"assets/{crop[0]}"
 
-                def proceed(parts, step, apart, base, original, label, ti=ti, bbox=bbox, width=width,
-                            derivation=derivation, image=image, number=number):
-                    """Each part read: by rules where tables are, else row by row; lines apart read by themselves."""
+                def proceed(parts, step, apart, base, original, label, table=True, ti=ti, bbox=bbox, width=width,
+                            derivation=derivation, image=image, number=number, page=page, displayed=displayed):
+                    """Each part read: by rules where tables are, else row by row; lines apart read by themselves; a
+                    part the model reads as no table, as a figure (with vision)."""
+                    if not table and s.vision:
+                        said = as_figure(number, page, displayed, f"t{base}")
+                        record(coverage_row(content=content, page=number, bbox=list(native(page, displayed)),
+                                            task=f"structure:p{number}:{base}:figure", status="complete",
+                                            issues=[f"Not read as a table (the model reads none there): {said}"]))
+                        return
                     limit = s.rules_from()
                     steps = derivation
                     if step is not None:  # the structure the rows come from, in each claim's derivation
@@ -498,14 +532,20 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     label = f", part {pi + 1}" if len(parts) > 1 else ""
                     if s.asks_structure():  # a part with suspect lines asked how they group into rows
                         from . import tablestructure
+                        cuts = None
+                        if marks is not None and edges:  # words a column line splits, by line (0: the header)
+                            cuts = {i + 1: split_cuts(r, b, edges, marks) for i, (r, b) in
+                                    enumerate(zip(part_body, part_boxes))}
+                            if pi == 0 and header is rows[0] and boxes:
+                                cuts[0] = split_cuts(header, boxes[0], edges, marks)
                         tablestructure.read(
                             core, number, f"structure:p{number}:{base}", part_header, part_body, part_boxes,
                             [look.get(tuple(b)) if b else None for b in part_boxes] if look else None,
                             rules, lambda image=image: [image()],
                             # bound now: the answer may come when the loop is pages further on
-                            lambda parts_, step, apart, base=base, label=label, proceed=proceed,
+                            lambda parts_, step, apart, table, base=base, label=label, proceed=proceed,
                             original=(part_header, part_body, part_boxes): proceed(parts_, step, apart, base, original,
-                                                                                   label))
+                                                                                   label, table), cuts)
                     else:
                         proceed([(part_header, part_body, part_boxes)], None, [], base, None, label)
                 if displayed.y1 - page.rect.y0 > 0.8 * height:
@@ -517,7 +557,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 signals.setdefault(section, {}).setdefault(name_, 0)
                 signals[section][name_] += value
             if s.vision:
-                for tag, rect, note in s.visual_regions(context_of, page, number):
+                for tag, rect, note in regions_of(number, page):
                     # Task tags are unique within content: "<region>:p<page>[:<index>]".
                     region, _, index = tag.partition(":")
                     tag = f"{region}:p{number}" + (f":{index}" if index else "")

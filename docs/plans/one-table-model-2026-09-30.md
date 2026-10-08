@@ -1,6 +1,6 @@
 # One table model for every source
 
-- **Status:** Milestones 3 and 4 built for native cells (Excel, CSV, Word, decks; 2026-10-04 to 06). PDF tables: a design for the owner's review (2026-10-06).
+- **Status:** Completed (2026-10-08): one way into claims for every format's tables (rules a model writes, applied mechanically, checked and reviewed), and PDF tables' structure from heuristics and structure rules. Decisions in force: [0023](../decisions/0023-tables-read-by-rules-a-model-writes.md), [0024](../decisions/0024-pdf-table-structure.md). Milestone 3's round against row queries waits with the [query rounds](query-improvement-2026-09-26.md); the remaining table levers are in the [lever index](../reviews/levers.md).
 - **Depends on:** [multi-format adapters](multi-format-adapters-2026-09-23.md), whose *Tables and spreadsheets* design this generalises; [query improvement](query-improvement-2026-09-26.md), whose rounds measure it; [content-addressed queries](content-addressed-queries-2026-09-28.md) (recorded, replayable queries).
 - **Feeds:** the multi-format plan's `.csv`/`.xlsx` milestone (and later `.docx`/`.pptx` tables); the [lever index](../reviews/levers.md) (its table rows fold into this plan).
 - **Why:**
@@ -274,6 +274,21 @@
     - a part the model calls "not a table" read as a figure instead (the turbine plots)
     - a "join columns" action (the model asked for one) and columns cutting through words, the corpus's remaining image-check failures
     - title blocks on drawing sheets kept out of the table path
+
+- **Table levers from the plans review (2026-10-07 and 08).** The owner, on the next steps: "Okay, please proceed with the recommended direction. 2 is OK, IMO. So just pursue 1-5 in whatever order makes the best sense." Each measured on the controlled corpus against the run before it (facts read right 3,207 throughout):
+  - **A part the model reads as no table, read as a figure** (reader `pdf/4`): its lines aren't read as a table; a figure task reads it, unless the overview, a figure task or one tile already sees it whole. Of 20 such parts, 8 went to a figure task, 10 were seen whole by a tile, 2 by a figure task. Misbound 209 to 207, loose claims 434 to 421 (rules); a floor-plan pair's changes 2 of 3 to 3 of 3.
+  - **Columns cutting through words** (reader `pdf/5`):
+    - **First version, the model's:** a signal for a word a column line cuts and a "join columns" action. The model often joined the wrong columns ("360" and "738.9" for a cut between their neighbours), and the signal sent floor plans to the query; whole-text examples couldn't see a join in the wrong place. A guard (two of a row's values joined only across a cut) didn't rescue it.
+    - **Adopted, mechanical first:** columns are joined at detection where every row with text on both sides has a word cut at that boundary (`tables.cut_columns`: "7. | 4" is "7.4", "Base elev. (" and "ft)" one header); a cut counts as a suspect only where it parts text across two filled cells (`split_cuts`); the model's "join columns", with the guard, sees only what's left.
+    - Measured: image-check failures 114 to 96 (same text in other cells 68 to 64), hallucinated claims 7 to 6 (rules) and 11 to 6 (row by row); misbound and misread unchanged; true cells found offline 0.966 to 0.967. One floor-plan pair back to 2 of 3 changes; one attachment pair better and worse by one.
+    - **A misreading of mine, corrected:** fewer "right" claims on some documents (coaster 125 to 111) are fewer duplicate claims; facts found right were unchanged on every one.
+  - **Three binding levers in the rules query** (the lever index's table-handling rows):
+    - a heading's or slide's title the table sits under isn't a condition: the treatment plant's deck pair now confirms every unchanged fact (30 of 31 to 31 of 31)
+    - a tolerance or uncertainty column becomes its value's `uncertainty` (a template field): the synthetic commissioning table's "118 L/s" carries "± 3 L/s", where the column was left out before
+    - columns keeping the document's own records (who submitted a row, their ID, when it was entered, a sort order) give no claims: the RAN1 document list reads as a list summary, 113 claims where there were 30,121
+    - The other formats' scores unchanged; PDF misbound 207 to 205, loose 418 to 426.
+    - **The image check's failures rose with it, 96 to 121,** every new one on a lone header cell the parser took for a table of its own ("Raw | water | pumps"), whose header text the model now copied. **The check now compares a row of values only** (a digit in it; what it asks for): failures 24 of 399, two of them the same text in other cells. Scores unchanged. So most "same text in other cells" failures all along were such header cells, not real tables.
+  - **Cost:** the corpus $0.01, $0.05, $0.03 and $0.30 (the prompt change re-asks every rules query); the workbooks' checks a few cents.
 
 ## Relation to other plans and levers
 

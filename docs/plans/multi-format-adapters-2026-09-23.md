@@ -1,6 +1,6 @@
 # Multi-format source adapters
 
-- **Status:** Active (2026-10-04): milestones 1 (`.txt`/`.md` and a shared task core), 2 (`.docx`) and 3 (`.pptx`) done; next, `.csv`/`.xlsx`. Format priority (2026-09-23): PDF, then `.docx` and `.pptx`; Cameo models via a separate project.
+- **Status:** Completed (2026-10-07): milestones 1 (`.txt`/`.md`, the shared task core), 2 (`.docx`), 3 (`.pptx`), 5 (`.xlsx`/`.csv`, tables read by rules) and 6 (images) done. Decisions in force: [0016](../decisions/0016-content-reread-when-its-reader-changes.md), [0020](../decisions/0020-formats-share-one-task-core.md) to [0023](../decisions/0023-tables-read-by-rules-a-model-writes.md). Milestone 4 (external converters) and the later formats moved to the tentative row "More formats" in the [plans index](README.md); table levers to the [lever index](../reviews/levers.md).
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (locators, sections, store)
 
 ## Goal

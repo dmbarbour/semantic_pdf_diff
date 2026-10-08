@@ -92,7 +92,7 @@ class Marks:
     """A page's drawn marks, read once: horizontal rules (lines, thin boxes, stroked boxes' edges), filled boxes, and
     text spans with their styles. In the page's coordinates, as its tables' boxes are (pages without rotation)."""
     def __init__(self, page):
-        self.page, self._drawn, self._spans = page, None, None
+        self.page, self._drawn, self._spans, self._words = page, None, None, None
 
     def _draw(self):
         if self._drawn is None:
@@ -161,6 +161,73 @@ class Marks:
                     fill = colour
             out.append((fill, total > 0 and bold * 2 > total))
         return out
+
+    def cuts(self, box, edges):
+        """The column boundaries (k: between columns k and k + 1) a word in a row's box is cut by: its box crossing
+        the boundary's x with 15% to 85% of it on each side ("7.4" parted into "7." and "4")."""
+        if box is None or not edges:
+            return set()
+        if self._words is None:
+            self._words = [w[:4] for w in self.page.get_text("words")]
+        x0, y0, x1, y1 = box
+        out = set()
+        for a, b, c, d in self._words:
+            if not (y0 < (b + d) / 2 < y1 and x0 - 1 <= a and c <= x1 + 1) or c - a <= 0:
+                continue
+            for k, x in enumerate(edges):
+                if x is not None and 0.15 < (x - a) / (c - a) < 0.85:
+                    out.add(k)
+        return out
+
+def split_cuts(row, box, edges, marks):
+    """The boundaries a word in a row is cut by, where the cut parts text across two filled cells (a word the
+    parser kept whole in one cell isn't split, wherever a column line runs)."""
+    filled = lambda k: k < len(row) and row[k] is not None and str(row[k]).strip()
+    return {j for j in marks.cuts(box, edges) if filled(j) and filled(j + 1)}
+
+def column_edges(table):
+    """The x of each boundary between a detected table's columns (the median over its rows' cells; None where no
+    row has both cells), or None for a table without cell boxes."""
+    import statistics
+    rows = [getattr(r, "cells", None) for r in getattr(table, "rows", None) or []]
+    rows = [r for r in rows if r]
+    if not rows:
+        return None
+    width = max(len(r) for r in rows)
+    edges = []
+    for k in range(width - 1):
+        xs = [r[k][2] for r in rows if len(r) > k + 1 and r[k] is not None and r[k + 1] is not None]
+        edges.append(statistics.median(xs) if xs else None)
+    return edges
+
+def cut_columns(rows, boxes, edges, marks):
+    """(rows, edges, how many boundaries joined): columns joined across a boundary where every row with text on both
+    sides of it has a word cut there ("7. | 4" is "7.4"; a phantom column holding only the overflow of cut words),
+    without a space where the word was cut. A boundary with two separate values in any row stays."""
+    if not edges or not rows or len(boxes) != len(rows):
+        return rows, edges, 0
+    cut = [marks.cuts(b, edges) if b else set() for b in boxes]
+    filled = lambda r, k: k < len(r) and r[k] is not None and str(r[k]).strip()
+    join = []
+    for j in range(len(edges)):
+        both = [i for i, r in enumerate(rows) if filled(r, j) and filled(r, j + 1)]
+        if both and all(j in cut[i] for i in both):
+            join.append(j)
+    if not join:
+        return rows, edges, 0
+    width = max(len(r) for r in rows)
+    out = []
+    for i, row in enumerate(rows):
+        row = list(row) + [None] * (width - len(row))
+        for j in sorted(join, reverse=True):
+            a, b = row[j], row[j + 1]
+            if filled(row, j) and filled(row, j + 1):
+                merged = str(a).rstrip() + ("" if j in cut[i] else " ") + str(b).lstrip()
+            else:
+                merged = a if filled(row, j) else b if filled(row, j + 1) else a if a is not None else b
+            row = row[:j] + [merged] + row[j + 2:]
+        out.append(row)
+    return out, [x for k, x in enumerate(edges) if k not in join], len(join)
 
 def _joined(upper, lower):
     out = []
