@@ -106,7 +106,7 @@ Ordered by what users submit: PDF first (already supported), then `.docx` and `.
 3. `.pptx`, including chart XML. *From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):* the controlled corpus written as slides too, scored by the same keys (its representations, as Markdown and Word are).
 4. External converter interface. *Tentative, very low priority (the owner, 2026-10-04, above):* LibreOffice an optional extra dependency at most, never assumed; legacy `.doc`/`.ppt`/`.xls` are recorded as unsupported meanwhile.
 5. `.csv` / `.xlsx`: table region detection and sheet maps, then model-guided table interpretation. *From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):* extraction scored against the synthetic spreadsheets' answer keys (`scripts/make_synthetic_samples.py`), with claim matching and adjudication of the leftovers.
-6. Images.
+6. Images. ✅ *Done 2026-10-07: read as one-page documents by the PDF reader's vision tasks (Progress).*
 
 ## Milestone 1 in detail (2026-10-03), for the owner's review
 
@@ -894,6 +894,13 @@ So the rules query (step 5) is one "how should this table be read?" query per ta
       - the one long chain now stops after one review, with the same claims (checked by replay)
       - no table reached the cap
       - facts, conditions and pairs as before
+
+- **Milestone 6, images (2026-10-07): built.** The owner, on the next steps: "Okay, please proceed with the recommended direction. ... So just pursue 1-5 in whatever order makes the best sense."
+  - **The reader** (`extract.image_pdf`, reader `image/1`): `.png`, `.jpg`, `.jpeg`, `.tif`, `.tiff`, `.bmp`, `.gif`, each frame a page of a PDF made in memory, read by the PDF reader. No text layer, so its overview and tiles read it, as a scanned page is.
+  - **Page size** (Claude's): a scan recording 150 dpi or more keeps its paper size (a 300 dpi letter scan is a letter page, tiled as a scanned PDF is). Any other image (a screenshot, a photo; no resolution reads as 96 dpi) is laid out so a tile shows its pixels one to one at `image_side`: a 2,400-pixel-wide image is 1,008 points wide. A large photo gets more tiles rather than less detail.
+  - **A trial:** HabEx p4 rendered to a PNG (150 dpi, no text layer): an overview and 5 tiles, 77 claims ("UV channel camera | FOV | 10.2"), a few cents.
+  - Unreadable images: one failed "open" row, as an unreadable PDF.
+  - **Not done:** whether a phone photo's EXIF orientation is honoured is unchecked; images inside archives and folders are read like any other file, so a folder of logos costs vision tasks.
 
 ## Open questions
 

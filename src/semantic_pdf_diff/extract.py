@@ -228,6 +228,9 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
 
 # Readers by normalized extension (the adapters plan: chosen by extension only, no sniffing).
 TEXT_EXTENSIONS = (".txt", ".md", ".docx", ".pptx", ".xlsx", ".xlsm", ".csv", ".tsv")
+# Images read as one-page documents (a TIFF's frames as pages) by the PDF reader's vision tasks (image_pdf)
+IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".gif")
+SCAN_DPI = 150  # an image recording this resolution or more is a scan: it keeps its paper size
 
 def office_installed(workbook=False):
     """Whether the office extra's libraries are installed: python-docx (and with workbook, openpyxl)."""
@@ -246,7 +249,8 @@ READERS = {".pdf": "pdf/3",  # pdf/2: tables asked how they're read; 3: two-line
            ".docx": "docx/5",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers
            ".pptx": "pptx/4",  # pptx/2: tables asked how they're read; 3-4: a header's name and group
            ".xlsx": "xlsx/9", ".xlsm": "xlsx/9",  # xlsx/7: vague conditions guarded against; 8-9: header name, group
-           ".csv": "csv/5", ".tsv": "csv/5"}
+           ".csv": "csv/5", ".tsv": "csv/5",
+           **{extension: "image/1" for extension in IMAGE_EXTENSIONS}}
 
 def reader_version(extension):
     """The version of what reads content of this extension ("docx/1"); "unsupported" where nothing reads it yet."""
@@ -257,12 +261,35 @@ def reader_for(extension):
     extra)."""
     if extension == ".pdf":
         return _pdf_job
+    if extension in IMAGE_EXTENSIONS:
+        return lambda data, job, output, client, dispatch, progress: _pdf_job(
+            image_pdf(data, extension, client.s), job, output, client, dispatch, progress)
     if extension in TEXT_EXTENSIONS and (extension not in (".docx", ".pptx", ".xlsx", ".xlsm") or
                                          office_installed(workbook=extension in (".xlsx", ".xlsm"))):
         from .textdocs import text_job
         return lambda data, job, output, client, dispatch, progress: text_job(data, job, output, client, dispatch,
                                                                               progress, extension)
     return None
+
+def image_pdf(data, extension, settings):
+    """An image (a path or its bytes) as a PDF's bytes, a page per frame, for the PDF reader: no text layer, so its
+    vision tasks read it. A scan recording SCAN_DPI or more keeps its paper size; any other image (a screenshot, a
+    photo, one without a resolution, which reads as 96 dpi) is laid out so a tile (tile_points) shows its pixels one
+    to one at image_side. b"" if it can't be read (recorded as unreadable)."""
+    try:
+        data = data if isinstance(data, (bytes, bytearray)) else Path(data).read_bytes()
+        frames = pymupdf.open(stream=data, filetype=extension.lstrip("."))
+        dpi = pymupdf.Pixmap(data).xres or 96
+        per_point = 1.0 if dpi >= SCAN_DPI else dpi / 72 * settings.tile_points / settings.image_side
+        pages = pymupdf.open("pdf", frames.convert_to_pdf())
+        out = pymupdf.open()
+        for number, page in enumerate(pages):
+            rect = page.rect * per_point  # the frame's own size, in points of the page it becomes
+            out.new_page(width=rect.width, height=rect.height).show_pdf_page(pymupdf.Rect(0, 0, rect.width, rect.height),
+                                                                              pages, number)
+        return out.tobytes()
+    except Exception:  # PyMuPDF raises assorted errors on images it can't decode
+        return b""
 
 def extract_pdf(path, content, output, client, on_task=None, on_sections=None, dispatcher=None, progress=None):
     """Extract evidence from one PDF (a path or its bytes), identified by its content ID.

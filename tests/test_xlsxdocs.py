@@ -149,8 +149,8 @@ class Csv(unittest.TestCase):
 
 class Readers(unittest.TestCase):
     def test_every_format_read_has_a_reader_version(self):
-        from semantic_pdf_diff.extract import READERS, TEXT_EXTENSIONS
-        self.assertEqual(set(TEXT_EXTENSIONS) | {".pdf"}, set(READERS))
+        from semantic_pdf_diff.extract import IMAGE_EXTENSIONS, READERS, TEXT_EXTENSIONS
+        self.assertEqual(set(TEXT_EXTENSIONS) | set(IMAGE_EXTENSIONS) | {".pdf"}, set(READERS))
 
 class RulesModel:
     """The text tests' model, answering a table's rules query with the given rules (keyed by the table's place), or
