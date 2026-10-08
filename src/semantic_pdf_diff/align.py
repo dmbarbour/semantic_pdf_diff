@@ -115,9 +115,20 @@ def value_key(claim):
         return ("text", f"{folded} {unit_words}".strip()) if folded else None
     said = (claim.unit or "").strip() or re.sub(r"^[^\d]*[\d,.]+\s*", "", text)  # "63.3 mph": the unit in the value
     known = unit(said)
-    if known:
-        return (known[0], round(v * float(known[1]), 9))
-    return (re.sub(r"\s", "", said).casefold(), round(v, 9))
+    key = (known[0], round(v * float(known[1]), 9)) if known else (re.sub(r"\s", "", said).casefold(), round(v, 9))
+    marks = qualifier(text)
+    return key + (marks,) if marks else key
+
+# What a number's prefix says beyond the number: a bound, a tolerance, a currency. "≤ 5" isn't "≥ 5", "±0.5" isn't
+# 0.5, "$5" isn't 5 (code review 2026-10-08, D1: they settled as equivalent without a model). "About" and "~" stay
+# folded: an approximation restated exactly is the same value.
+PREFIX = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈)?\s*([<>≤≥]=?)?\s*(±)?\s*[-+]?\s*(\$)?")
+BOUNDS = {"<=": "≤", ">=": "≥"}
+
+def qualifier(text):
+    """The marks of a number's prefix that change its meaning, normalised ("<=" is "≤"); "" for none."""
+    bound, tolerance, money = PREFIX.match(text).groups()
+    return BOUNDS.get(bound, bound or "") + ("±" if tolerance else "") + ("$" if money else "")
 
 class Side:
     """One revision's items: {key: [claim indices]}, each item's values, attributes and name words."""

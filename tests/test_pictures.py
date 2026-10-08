@@ -96,6 +96,30 @@ class Pictures(unittest.TestCase):
         self.assertEqual(issues, ["Label coverage 0%: 3 of the picture's 3 words in no claim (flow, gpm, rate)"])
         self.assertNotIn(f"labels:p1:pic{doc.pictures[1].line}", statuses)  # the PNG has no text layer
 
+    def test_two_pictures_in_one_paragraph_keep_their_own_tags_and_claims(self):
+        # code review 2026-10-08, A1: they shared a tag, so the second's crop and claims replaced the first's
+        from docx.shared import Inches
+        from test_metafiles import WINDOW, wmf, wmf_text
+        from test_textdocs import extract
+        document = docx.Document()
+        document.add_paragraph("Pump P-1 draws 120 kW.")
+        paragraph = document.add_paragraph()
+        for name, label in [("a.wmf", "Flow rate 75 gpm"), ("b.wmf", "Head pressure 30 psi")]:
+            paragraph.add_run().add_picture(_png(), width=Inches(2))
+            paragraph.runs[-1]._r.find(".//" + _qn("a:blip")).set(_qn("r:embed"), document.part.relate_to(
+                _part(document, name, wmf(WINDOW + [wmf_text(100, 100, label)])), _image_relationship()))
+        raw = io.BytesIO()
+        document.save(raw)
+        evidence, coverage, _, _ = extract("two.docx", raw.getvalue())
+        line = {e.value: e.locator.task for e in evidence if e.value in ("75", "30")}
+        self.assertEqual(len(set(line.values())), 2, line)
+        first = line["75"].split(":")[2]
+        self.assertEqual(line["30"].split(":")[2], first + ".1")
+        crops = {e.image for e in evidence if e.value in ("75", "30")}
+        self.assertEqual(len(crops), 2)
+        labels = [r["task"] for r in coverage if r["task"].startswith("labels:")]
+        self.assertEqual(labels, [f"labels:p1:{first}", f"labels:p1:{first}.1"])
+
     def test_large_pictures_are_tiled_and_their_tiles_refined_after_every_picture_is_drawn(self):
         # through the CLI and a model answering out of order, some tiles partial: they're refined later, from pages
         # that later pictures were added after (once, adding a page invalidated them)

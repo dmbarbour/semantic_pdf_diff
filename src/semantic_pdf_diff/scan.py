@@ -95,7 +95,11 @@ def scan(roots, limits=Limits(), reuse=None, describe=None):
     return result
 
 def _disk_file(result, display, path, disk, limits, reuse, describe):
-    stat = stat_key(path)
+    try:
+        stat = stat_key(path)
+    except OSError as e:  # a broken link, or gone since listed: an issue, not the end of the scan (review C1)
+        result.issue(display, f"unreadable: {type(e).__name__}: {e.strerror or e}", disk)
+        return
     earlier = reuse.get(disk)
     if earlier and tuple(earlier[0]) == stat:
         for f in earlier[1]:
@@ -113,7 +117,8 @@ def _add(result, display, read, origin, limits, depth, disk, stat, describe, siz
         return
     try:
         data = read()
-    except (zipfile.BadZipFile, zlib.error, NotImplementedError, EOFError) as e:  # a corrupt or unsupported member
+    except (zipfile.BadZipFile, zlib.error, NotImplementedError, EOFError, OSError) as e:  # a corrupt or unsupported
+        # member, or a file that can't be read (permissions)
         result.issue(display, f"unreadable: {type(e).__name__}: {e}", disk)
         return
     if result.bytes_read + len(data) > limits.max_source_bytes:

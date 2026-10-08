@@ -8,6 +8,7 @@ the page's text layer as a check on quotes and as context, and its section's hea
 picture's paragraph (DocxLocator), each with the crop it was read from.
 """
 import re
+from collections import Counter
 
 import pymupdf
 
@@ -67,11 +68,11 @@ class Reading:
         stem = crop_stem(content)
         context_of = Context(doc, s, assets, stem)
         visuals = Visuals(core, context_of, assets, stem, s)
-        drawn_pages = []  # (picture, its page's number)
-        for picture in pictures:
+        drawn_pages = []  # (picture, its name in tags, its page's number)
+        for picture, ident in zip(pictures, picture_idents(pictures)):
             yield "page"
             box = (0.0, float(picture.line), 1.0, float(picture.line + 1))
-            task = f"picture:p{picture.page}:{picture.line}"
+            task = f"picture:p{picture.page}:{ident}"
             if not s.vision:
                 core.record(coverage_row(content=content, page=picture.page, bbox=list(box), task=task, status="skipped",
                                          issues=["Visual extraction disabled; pictures aren't read"]))
@@ -83,17 +84,17 @@ class Reading:
                                          issues=[str(error)]))
                 continue
             doc.insert_pdf(single)
-            drawn_pages.append((picture, len(doc)))
-        for picture, number in drawn_pages:
+            drawn_pages.append((picture, ident, len(doc)))
+        for picture, ident, number in drawn_pages:
             yield "page"
             box = (0.0, float(picture.line), 1.0, float(picture.line + 1))
             page = doc[number - 1]
-            self.words[picture.line] = (picture.page, words(page.get_text()))
+            self.words[(picture.page, ident)] = (picture.line, words(page.get_text()))
             drawn = "a metafile drawn as vector" if picture.extension in METAFILES else "an image"
             note = f"Caption: {picture.caption}" if picture.caption else ""
             for tag, rect, _ in s.visual_regions(context_of, page, number):
                 region, _, index = tag.partition(":")
-                tag = f"{region}:p{picture.page}:pic{picture.line}" + (f":{index}" if index else "")
+                tag = f"{region}:p{picture.page}:pic{ident}" + (f":{index}" if index else "")
                 derivation = [DerivationStep(step=f"{self.kind}-picture", detail=f"{picture.name}, {drawn}"),
                               DerivationStep(step="picture-region", detail=region),
                               DerivationStep(step="model-extraction")]
@@ -110,21 +111,32 @@ class Reading:
             for o in e.occurrences or [e]:
                 match = PICTURE_TASK.search(o.locator.task)
                 if match:
-                    said.setdefault(int(match.group(1)), set()).update(mentions)
-        for line, (page, own) in sorted(self.words.items()):
+                    said.setdefault((int(match.group(1)), match.group(2)), set()).update(mentions)
+        for (page, ident), (line, own) in sorted(self.words.items(), key=lambda x: (x[0][0], x[1][0], x[0][1])):
             if len(own) < MIN_LABEL_WORDS:
                 continue
-            missing = sorted(own - said.get(line, set()))
+            missing = sorted(own - said.get((page, ident), set()))
             share = 1 - len(missing) / len(own)
             note = f"Label coverage {share:.0%}: {len(missing)} of the picture's {len(own)} words in no claim"
             core.record(coverage_row(content=content, page=page, bbox=[0.0, float(line), 1.0, float(line + 1)],
-                                     task=f"labels:p{page}:pic{line}", status="complete",
+                                     task=f"labels:p{page}:pic{ident}", status="complete",
                                      issues=[note + (f" ({', '.join(missing[:LISTED])})" if missing else "")]))
 
     def close(self):
         self.doc.close()
 
-PICTURE_TASK = re.compile(r":pic(\d+)")
+PICTURE_TASK = re.compile(r":p(\d+):pic(\d+(?:\.\d+)?)")  # a picture's page and name in a task's tag
+
+def picture_idents(pictures):
+    """Each picture's name in its tasks' tags: its line ("pic12"), and after the first picture at a line (two in one
+    paragraph, or in one table row) an ordinal too ("pic12.1"), so tags stay distinct and the first keeps its old
+    tag (code review 2026-10-08, A1: the second picture's crops and claims replaced the first's)."""
+    seen, out = Counter(), []
+    for picture in pictures:
+        n = seen[(picture.page, picture.line)]
+        seen[(picture.page, picture.line)] += 1
+        out.append(f"{picture.line}" + (f".{n}" if n else ""))
+    return out
 WORD = re.compile(r"[A-Za-z][A-Za-z0-9\-]{2,}")
 MIN_LABEL_WORDS = 3   # a picture with fewer words of its own isn't checked
 LISTED = 15           # the uncovered words a row lists

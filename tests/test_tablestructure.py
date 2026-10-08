@@ -341,5 +341,142 @@ class Extracted(unittest.TestCase):
         note = next(row for row in coverage if row["task"] == "structure:p1:0:figure")
         self.assertEqual(note["issues"], ["Not read as a table (the model reads none there): read by a figure task"])
 
+class NewTables(unittest.TestCase):
+    def test_a_new_tables_rows_are_tagged_apart_from_pdf_parts(self):
+        # code review 2026-10-08, A2: a structure answer's new table was tagged "0.1", pdf_parts' part 1's tag
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        import pymupdf
+        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.provenance import content_id
+        from stubs import situating_answer
+
+        # pdf_parts parts it at "Blowers" (a line of labels: part 1, "0.1"); the model starts a new table at "Fan set 2"
+        rows = [["Tag", "Model"], ["", "X0"], ["P-1", "X1"], ["Fan set 2", "Flow"], ["F-1", "10"], ["Blowers", "Power"],
+                ["B-1", "5"]]
+
+        class Table:
+            bbox = (20, 20, 280, 120)
+            def extract(self): return rows
+
+        find_tables = lambda page, *a, **k: type("T", (), {"tables": [Table()]})()
+
+        class Client:
+            s = Settings(vision=False)
+            calls, cache_hits, usage = 0, 0, {}
+            asked = []
+
+            def ask(self, prompt, schema, images=(), key=None):
+                self.asked.append(key[3])
+                if schema is ts.Structure:
+                    return ts.Structure.model_validate({"rules": [{"action": "new table", "lines": ["3"]}],
+                                                        "examples": [{"line": "1", "cells": ["", "X0"]}]})
+                if schema is ts.StructureReview:
+                    return ts.StructureReview(verdict="keep")
+                if situating_answer(prompt):
+                    return schema.model_validate(situating_answer(prompt))
+                if schema.__name__ == "Rules":
+                    return schema(reading="rows")
+                return Extraction(claims=[], complete=True)
+
+        with tempfile.TemporaryDirectory() as d, patch.object(pymupdf.Page, "find_tables", find_tables):
+            doc = pymupdf.open()
+            doc.new_page(width=300, height=300)
+            path = Path(d) / "t.pdf"
+            doc.save(path)
+            client = Client()
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+        self.assertIn("structure:p1:0", client.asked)
+        tables = sorted(t for t in client.asked if t.startswith("table:"))
+        self.assertIn("table:p1:0+1:0", tables)  # F-1, under the new table's header
+        self.assertIn("table:p1:0.1:0", tables)  # B-1, in pdf_parts' part 1
+        self.assertEqual(len(tables), len(set(tables)))
+
+class Detection(unittest.TestCase):
+    """Table detection's failures in a PDF's extraction (code review 2026-10-08, A3 and A4)."""
+    def extract(self, tables, ask=None, patches=()):
+        import contextlib
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        import pymupdf
+        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.provenance import content_id
+        from stubs import situating_answer
+
+        class Table:
+            def __init__(self, bbox, rows): self.bbox, self.rows_, self.cells = bbox, rows, []
+            def extract(self): return self.rows_
+
+        def find_tables(page, *a, **k):
+            if tables is None:
+                raise RuntimeError("PyMuPDF's own")
+            return type("T", (), {"tables": [Table(b, r) for b, r in tables]})()
+
+        class Client:
+            s = Settings(vision=False, table_structure=False, table_rules=None, refinement_depth=1)
+            calls, cache_hits, usage = 0, 0, {}
+            asked = []
+
+            def ask(self, prompt, schema, images=(), key=None):
+                self.asked.append(key[3])
+                if situating_answer(prompt):
+                    return schema.model_validate(situating_answer(prompt))
+                said = ask(key[3]) if ask else None
+                return said or Extraction(claims=[], complete=True)
+
+        with contextlib.ExitStack() as stack, tempfile.TemporaryDirectory() as d:
+            stack.enter_context(patch.object(pymupdf.Page, "find_tables", find_tables))
+            for target, value in patches:
+                stack.enter_context(patch(target, value))
+            doc = pymupdf.open()
+            doc.new_page(width=300, height=300)
+            path = Path(d) / "t.pdf"
+            doc.save(path)
+            client = Client()
+            _, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+        return client.asked, coverage
+
+    def test_an_unreached_row_isnt_split_by_column(self):
+        from semantic_pdf_diff.llm import CallLimitReached
+        rows = [["Tag", "Flow", "Head", "Power"], ["P-1", "120", "25", "40"]]
+
+        def ask(task):
+            if task.startswith("table:"):
+                raise CallLimitReached("the call limit")
+        asked, coverage = self.extract([((20, 20, 280, 120), rows)], ask)
+        self.assertEqual([t for t in asked if t.startswith("table:")], ["table:p1:0:0"])
+        self.assertEqual(next(r for r in coverage if r["task"] == "table:p1:0:0")["status"], "not_reached")
+
+    def test_a_partial_row_is_still_split_by_column(self):
+        from semantic_pdf_diff.models import Extraction
+        rows = [["Tag", "Flow", "Head", "Power"], ["P-1", "120", "25", "40"]]
+        partial = lambda task: Extraction(claims=[], complete=False) if task == "table:p1:0:0" else None
+        asked, _ = self.extract([((20, 20, 280, 120), rows)], partial)
+        self.assertEqual([t for t in asked if t.startswith("table:")], ["table:p1:0:0", "table:p1:0:0:c0", "table:p1:0:0:c1"])
+
+    def test_a_mending_bug_is_named_ours_and_the_table_read_as_detected(self):
+        rows = [["Tag", "Flow"], ["P-1", "120"]]
+        def broken(*a, **k):
+            raise TypeError("ours")
+        asked, coverage = self.extract([((20, 20, 280, 120), rows), ((20, 150, 280, 250), rows)],
+                                       patches=[("semantic_pdf_diff.extract.cut_columns", broken),
+                                                ("semantic_pdf_diff.extract.row_boxes",
+                                                 lambda table, rows: [(20, 20 + 20 * i, 280, 40 + 20 * i)
+                                                                      for i in range(len(rows))])])
+        self.assertEqual(sorted(t for t in asked if t.startswith("table:")), ["table:p1:0:0", "table:p1:1:0"])
+        mending = [r for r in coverage if r["task"].endswith(":mending")]
+        self.assertEqual(len(mending), 2)
+        self.assertIn("a bug: TypeError: ours", mending[0]["issues"][0])
+        self.assertFalse([r for r in coverage if r["task"] == "table-detection:p1"])
+
+    def test_pymupdfs_own_failure_is_a_detection_failure(self):
+        asked, coverage = self.extract(None)
+        row = next(r for r in coverage if r["task"] == "table-detection:p1")
+        self.assertEqual((row["status"], row["issues"]), ("failed", ["RuntimeError: PyMuPDF's own"]))
+
 if __name__ == "__main__":
     unittest.main()

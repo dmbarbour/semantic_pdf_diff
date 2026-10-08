@@ -386,7 +386,9 @@ def text_job(data, job, output, client, dispatch, progress, extension):
             header, body = table.rows[0], table.rows[1:]
             width = max(len(r) for r in table.rows)
 
-            def by_itself(ri, table=table, ti=ti, header=header, body=body, width=width):
+            # every loop name it uses bound now: rules answer late, after the loop has moved to another page
+            # (code review 2026-10-08, B1: rows were filed under the next sheet)
+            def by_itself(ri, page=page, table=table, ti=ti, header=header, body=body, width=width):
                 row = body[ri]
                 if not any(c.strip() for c in row):
                     return

@@ -245,7 +245,9 @@ class TaskCore:
             return
         if fits:
             def then(status):
-                if status != "complete" and depth < s.refinement_depth and splittable:
+                # as text and pictures: only a partial or failed answer is refined; "not reached" (the call limit, an
+                # answer a replay lacks) learnt nothing (code review 2026-10-08, A3: it tripled the unreached rows)
+                if status in ("partial", "failed") and depth < s.refinement_depth and splittable:
                     self.split_columns(page_no, bbox, task, header, row, columns, depth + 1, derivation)
             context = self.reader.for_table(page_no, bbox, flat)
             if repeat_key is not None and context:  # the same row under another lead-in or stem isn't a repeat

@@ -199,8 +199,13 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
                 while True:
                     if active[i] is None and queue:
                         job = queue.popleft()
-                        job.steps = (job.reader or _pdf_job)(job.load(), job, output, client, dispatch,
-                                                             progress or NoProgress())
+                        try:
+                            loaded = job.load()
+                        except OSError as error:  # moved or unreadable since the scan: one failed row, retried
+                            job.steps = _unloadable(job, error)
+                        else:
+                            job.steps = (job.reader or _pdf_job)(loaded, job, output, client, dispatch,
+                                                                 progress or NoProgress())
                         active[i] = job
                     job = active[i]
                     if job is None:
@@ -226,6 +231,17 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
                 if not dispatch.pending():
                     raise RuntimeError("extraction scheduler stalled: jobs wait on requests that aren't pending")
                 dispatch.wait_one()
+
+def _unloadable(job, error):
+    """The steps of a job whose content can't be loaded: an "open" row, failed (code review 2026-10-08, C1: a file
+    moved since the scan aborted the run)."""
+    row = coverage_row(content=job.content, task="open", status="failed",
+                       issues=[f"unreadable ({type(error).__name__}: {error})"])
+    if job.on_task:
+        job.on_task(row, [])
+    job.state["result"] = ([], [row])
+    return
+    yield  # a generator, as a reader's steps are
 
 # Readers by normalized extension (the adapters plan: chosen by extension only, no sniffing).
 TEXT_EXTENSIONS = (".txt", ".md", ".docx", ".pptx", ".xlsx", ".xlsm", ".csv", ".tsv")
@@ -419,27 +435,37 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             # blocks are grouped up to the byte budget; oversized blocks are split.
             for ids, segments in text_groups(page, s.text_bytes, lambda b, n=number: owner.box(n, b).id):
                 core.text_task(number, segments, f"text:p{number}:{ids}")
+            # Table detection works in displayed coordinates; locators are unrotated. Only PyMuPDF's calls are
+            # detection failures (it raises assorted internal errors); our mending's errors are named as ours, and the
+            # table read as detected (code review 2026-10-08, A4: both dropped the page's tables as "detection").
+            unrotated = lambda b: tuple(native(page, b)) if b else None
+            found = []
             try:
-                # Table detection works in displayed coordinates; locators are unrotated.
-                unrotated = lambda b: tuple(native(page, b)) if b else None
-                marks = Marks(page) if page.rotation == 0 else None  # drawn rules and styles (unrotated pages)
-                found = []
-                for table in page.find_tables().tables:
-                    rows = table.extract()
-                    if not s.keep_table(context_of, page, table, rows):
-                        continue
-                    boxes, styles, rules, edges = row_boxes(table, rows), None, None, None
-                    if marks is not None and boxes:  # lines of one row parted by shading, joined (ruled_rows)
-                        rules = marks.rules(table.bbox)
-                        rows, boxes, _ = ruled_rows(rows, boxes, rules)
-                        rows, edges, _ = cut_columns(rows, boxes, column_edges(table), marks)  # words a column cut
-                        styles = marks.styles(table.bbox, boxes)
-                    found.append((unrotated(table.bbox), rows, [unrotated(b) for b in boxes], styles, rules, edges))
-            except Exception as e:  # PyMuPDF table detection raises assorted internal errors
-                found = []
+                detected = [(table, table.extract()) for table in page.find_tables().tables]
+            except Exception as e:  # noqa: BLE001 (PyMuPDF's)
+                detected = []
                 record(coverage_row(content=content, page=number, bbox=list(native_page(page)),
                                     task=f"table-detection:p{number}", status="failed",
                                     issues=[type(e).__name__ + ": " + str(e)]))
+            marks = Marks(page) if page.rotation == 0 and detected else None  # drawn rules and styles (unrotated)
+            for ti_found, (table, rows) in enumerate(detected):
+                if not s.keep_table(context_of, page, table, rows):
+                    continue
+                boxes, styles, rules, edges = row_boxes(table, rows), None, None, None
+                if marks is not None and boxes:  # lines of one row parted by shading, joined (ruled_rows)
+                    try:
+                        rules = marks.rules(table.bbox)
+                        mended, mended_boxes, _ = ruled_rows(rows, boxes, rules)
+                        mended, edges, _ = cut_columns(mended, mended_boxes, column_edges(table), marks)
+                        styles = marks.styles(table.bbox, mended_boxes)
+                        rows, boxes = mended, mended_boxes
+                    except Exception as e:  # noqa: BLE001 (a bug of ours: the table is still read, as detected)
+                        rules = styles = edges = None
+                        record(coverage_row(content=content, page=number, bbox=list(native(page, table.bbox)),
+                                            task=f"table-detection:p{number}:{ti_found}:mending", status="partial",
+                                            issues=[f"Table mending failed (a bug: {type(e).__name__}: {e}); "
+                                                    "the table read as detected"]))
+                found.append((unrotated(table.bbox), rows, [unrotated(b) for b in boxes], styles, rules, edges))
             height = page.rect.height
             continuing, carried = carried, None
             context_of.tables_on[number] = [found_[0] for found_ in found]
@@ -492,7 +518,9 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                                                   DerivationStep(step="model-extraction")])]
                         steps.insert(len(steps) - 1, step)
                     for pi, (part_header, part_body, part_boxes) in enumerate(parts):
-                        tag = base if pi == 0 else f"{base}.{pi}"
+                        # a structure answer's new tables: "+" apart from pdf_parts' ".", or its part 1 ("0.1") would be
+                        # the tag of pdf_parts' part 1 (code review 2026-10-08, A2)
+                        tag = base if pi == 0 else f"{base}+{pi}"
 
                         def by_itself(ri, tag=tag, header=part_header, body=part_body, body_boxes=part_boxes):
                             row = body[ri]

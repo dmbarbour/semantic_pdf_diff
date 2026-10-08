@@ -188,6 +188,14 @@ class Alignment(unittest.TestCase):
         self.assertEqual(key("MUST  close the connection."), key("must close the connection"))
         self.assertNotEqual(key("0..160"), key("0..2040"))  # ranges are words, not their first number
         self.assertEqual(key("63.3 mph"), key("63.3", "mph"))  # the unit written in the value
+        # a bound, a tolerance and a currency are part of the value (code review 2026-10-08, D1); "about" isn't
+        self.assertNotEqual(key("≤ 5", "NTU"), key("≥ 5", "NTU"))
+        self.assertNotEqual(key("<5"), key(">5"))
+        self.assertEqual(key("<=5"), key("≤ 5"))
+        self.assertNotEqual(key("±0.5", "mm"), key("0.5", "mm"))
+        self.assertNotEqual(key("$5"), key("5"))
+        self.assertEqual(key("about 5", "m"), key("5", "m"))
+        self.assertEqual(key("5", "m"), ("length", 5.0))  # unqualified keys are as before
 
 class Report(unittest.TestCase):
     def test_the_report_shows_the_groupings_and_marks_regrouped_claims(self):

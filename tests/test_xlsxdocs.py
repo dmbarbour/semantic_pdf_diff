@@ -270,6 +270,69 @@ class Rules(unittest.TestCase):
         row = next(r for r in kept if r["task"] == "rules:p2:1")
         self.assertTrue(any(i.startswith("Reviewed: a revision with problems (no column Q") for i in row["issues"]))
 
+    def test_a_late_answer_reads_its_own_sheets_rows(self):
+        # Sheet 1's rules answer ("rows") comes only after sheet 2's rows have been asked; its rows must still be read
+        # as sheet 1's (code review 2026-10-08, B1: they were filed under the sheet the loop had reached).
+        import tempfile
+        import threading
+        from pathlib import Path
+        from types import SimpleNamespace
+        from semantic_pdf_diff.extract import Job, reader_for, run_jobs
+        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.tablerules import Rules
+        wb = openpyxl.Workbook()
+        for title, header, rows in [("Pumps", ["Tag", "Flow (L/s)"], [["P-1", 120], ["P-2", 95]]),
+                                    ("Fans", ["Fan", "Speed (rpm)"], [["F-1", 900], ["F-2", 1200], ["F-3", 1500]])]:
+            ws = wb.active if title == "Pumps" else wb.create_sheet(title)
+            ws.title = title
+            for r, row in enumerate([header] + rows, 1):
+                for c, value in enumerate(row, 1):
+                    ws.cell(r, c, value)
+        out = io.BytesIO()
+        wb.save(out)
+        sheet2_read = threading.Event()
+
+        class Client:  # answers on worker threads (the dispatcher's prepare/send split), so they can come late
+            s = Settings(vision=False, concurrency=4)
+            calls, cache_hits, usage = 0, 0, {}
+            asked, late = [], None
+
+            def prepare(self, prompt, schema, images, key):
+                return SimpleNamespace(prompt=prompt, schema=schema, key=key, query=None)
+
+            def cached(self, request):
+                return None
+
+            def save(self, request, value):
+                pass
+
+            def send(self, request):
+                return self.ask(request.prompt, request.schema, key=request.key)
+
+            def ask(self, prompt, schema, images=(), key=None):
+                self.asked.append((key[3], prompt))
+                if schema is Rules:
+                    if "TABLE: Pumps!" in prompt:
+                        self.late = sheet2_read.wait(5)
+                    return Rules(reading="rows")
+                if schema is Extraction and key[3].startswith("table:p2:"):
+                    sheet2_read.set()
+                if schema is Extraction:
+                    return Extraction(claims=[], complete=True)
+                return schema.model_validate({})
+
+        client = Client()
+        with tempfile.TemporaryDirectory() as d:
+            job = Job("sha256:" + "b" * 64 + ".xlsx", lambda: out.getvalue(), reader=reader_for(".xlsx"))
+            run_jobs([[job]], Path(d), client)
+        _, coverage = job.state["result"]
+        self.assertTrue(client.late)  # the answer did come after sheet 2's rows were asked
+        rows = {task: prompt for task, prompt in client.asked if task.startswith("table:")}
+        self.assertEqual(sorted(t for t in rows if t.startswith("table:p1:")), ["table:p1:0:0", "table:p1:0:1"])
+        self.assertTrue(all("P-" in rows[t] for t in rows if t.startswith("table:p1:")))
+        self.assertFalse(any("P-" in rows[t] for t in rows if t.startswith("table:p2:")))
+        self.assertEqual(len([r for r in coverage if r["task"].startswith("table:")]), 5)  # no tag shared
+
     def test_tables_asked_from_a_size_or_none(self):
         _, coverage, model = self.extract({"Polar!A14:C74": REQUIREMENTS}, table_rules=50)
         self.assertEqual(len(model.asked), 1)  # only the table of more than 50 rows

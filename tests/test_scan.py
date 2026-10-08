@@ -25,6 +25,37 @@ def encrypted_zip():
     return bytes(data)
 
 class FolderScanning(unittest.TestCase):
+    def test_a_broken_link_or_unreadable_file_is_an_issue_not_the_end(self):
+        # code review 2026-10-08, C1: one of them aborted the whole scan
+        import os
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d) / 'team-a'
+            root.mkdir()
+            (root / 'a.pdf').write_bytes(b'pdf a')
+            (root / 'gone.pdf').symlink_to(root / 'nowhere.pdf')
+            locked = root / 'locked.pdf'
+            locked.write_bytes(b'pdf locked')
+            locked.chmod(0)
+            try:
+                result = scan([root])
+            finally:
+                locked.chmod(0o600)
+        self.assertEqual([f.path for f in result.files], ['team-a/a.pdf'] + (['team-a/locked.pdf'] if os.geteuid() == 0 else []))
+        reasons = dict(result.issues)
+        self.assertTrue(reasons['team-a/gone.pdf'].startswith('unreadable: FileNotFoundError'))
+        if os.geteuid() != 0:  # root reads it anyway
+            self.assertTrue(reasons['team-a/locked.pdf'].startswith('unreadable: PermissionError'))
+
+    def test_a_file_gone_since_the_scan_is_a_failed_open_row(self):
+        from semantic_pdf_diff.extract import Job, run_jobs
+        rows = []
+        job = Job('sha256:' + 'c' * 64 + '.pdf', lambda: Path('/nonexistent/x.pdf').read_bytes(),
+                  on_task=lambda row, found: rows.append(row))
+        with tempfile.TemporaryDirectory() as d:
+            run_jobs([[job]], Path(d), object())
+        self.assertEqual([(r['task'], r['status']) for r in rows], [('open', 'failed')])
+        self.assertEqual(job.state['result'][1], rows)
+
     def test_folder_files_hidden_and_clutter(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d) / 'team-a'
