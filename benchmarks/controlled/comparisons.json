@@ -2003,31 +2003,29 @@
     "change": 5
    },
    "equivalent": {
-    "no change": 23,
+    "no change": 19,
     "unscored": 13
    },
    "findings": {
     "complementary": 2,
     "different": 5,
-    "equivalent": 36,
-    "uncertain": 6,
-    "unrelated": 3
+    "equivalent": 32,
+    "uncertain": 4,
+    "unrelated": 2
    },
-   "unmatched": 10,
-   "pairs": 16,
+   "unmatched": 7,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
     "right": 5,
-    "scored": 6,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 5,
-      "misread": 1
+      "changed": 5
      },
      "unscored": {
-      "misread": 2,
-      "not_same_item": 3
+      "not_same_item": 4
      }
     }
    },
@@ -2352,18 +2350,18 @@
     "change": 7
    },
    "equivalent": {
-    "no change": 92,
+    "no change": 87,
     "unscored": 19
    },
    "findings": {
     "complementary": 1,
     "different": 7,
-    "equivalent": 111,
+    "equivalent": 106,
     "uncertain": 3,
     "unrelated": 1
    },
-   "unmatched": 24,
-   "pairs": 27,
+   "unmatched": 22,
+   "pairs": 23,
    "omitted": 0,
    "kinds": {
     "right": 8,
@@ -9061,31 +9059,29 @@
     "change": 5
    },
    "equivalent": {
-    "no change": 23,
+    "no change": 19,
     "unscored": 13
    },
    "findings": {
     "complementary": 2,
     "different": 5,
-    "equivalent": 36,
-    "uncertain": 6,
-    "unrelated": 3
+    "equivalent": 32,
+    "uncertain": 4,
+    "unrelated": 2
    },
-   "unmatched": 10,
-   "pairs": 16,
+   "unmatched": 7,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
     "right": 5,
-    "scored": 6,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 5,
-      "misread": 1
+      "changed": 5
      },
      "unscored": {
-      "misread": 2,
-      "not_same_item": 3
+      "not_same_item": 4
      }
     }
    },
@@ -9410,18 +9406,18 @@
     "change": 7
    },
    "equivalent": {
-    "no change": 92,
+    "no change": 87,
     "unscored": 19
    },
    "findings": {
     "complementary": 1,
     "different": 7,
-    "equivalent": 111,
+    "equivalent": 106,
     "uncertain": 3,
     "unrelated": 1
    },
-   "unmatched": 24,
-   "pairs": 27,
+   "unmatched": 22,
+   "pairs": 23,
    "omitted": 0,
    "kinds": {
     "right": 8,
@@ -17626,33 +17622,33 @@
     "confirmed": 35
    },
    "different": {
-    "change": 8
+    "change": 9
    },
    "equivalent": {
-    "no change": 93,
+    "no change": 96,
     "unscored": 19
    },
    "findings": {
     "complementary": 1,
-    "different": 8,
-    "equivalent": 112,
-    "uncertain": 5,
+    "different": 9,
+    "equivalent": 115,
+    "uncertain": 2,
     "unrelated": 1
    },
-   "unmatched": 26,
-   "pairs": 30,
+   "unmatched": 24,
+   "pairs": 24,
    "omitted": 0,
    "kinds": {
-    "right": 11,
-    "scored": 13,
+    "right": 10,
+    "scored": 11,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 9
      },
      "no change": {
-      "not_same_item": 2,
-      "restated": 2
+      "not_same_item": 1,
+      "restated": 1
      }
     }
    },
@@ -23395,33 +23391,33 @@
     "confirmed": 35
    },
    "different": {
-    "change": 8
+    "change": 9
    },
    "equivalent": {
-    "no change": 93,
+    "no change": 96,
     "unscored": 19
    },
    "findings": {
     "complementary": 1,
-    "different": 8,
-    "equivalent": 112,
-    "uncertain": 5,
+    "different": 9,
+    "equivalent": 115,
+    "uncertain": 2,
     "unrelated": 1
    },
-   "unmatched": 26,
-   "pairs": 30,
+   "unmatched": 24,
+   "pairs": 24,
    "omitted": 0,
    "kinds": {
-    "right": 11,
-    "scored": 13,
+    "right": 10,
+    "scored": 11,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 9
      },
      "no change": {
-      "not_same_item": 2,
-      "restated": 2
+      "not_same_item": 1,
+      "restated": 1
      }
     }
    },

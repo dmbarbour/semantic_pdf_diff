@@ -332,8 +332,8 @@ class TableRules(Lever):
     # a table of more body rows than this is read as a model says it should be (tablerules.py: rules applied to every
     # row, each row read by itself, or a summary), one query per table; 0, the default: every table (the owner,
     # 2026-10-05: "I was under the impression we'd also ask how to translate rows to claims even for short tables");
-    # none: every table row by row, as before. Tables read on a grid: Excel's, CSV's, Word's and decks' (not yet PDF's,
-    # nor charts' data)
+    # none: every table row by row, as before. Tables read on a grid: Excel's, CSV's, Word's, decks' and PDF's (not
+    # charts' data)
     table_rules: Annotated[int | None, _selecting(frozenset({"table"}))] = Field(default=0, ge=0)
 
     def rules_from(self):
@@ -350,6 +350,19 @@ class TableReview(Lever):
 
     def reviews_tables(self):
         return self.table_review
+
+class TableStructure(Lever):
+    lever_name, stage, off = "table_structure", "segmentation", {"table_structure": False}
+    # a PDF table whose lines, after the heuristics (rows joined across unruled boundaries, two-line headers merged,
+    # stacked tables split), still hold a suspect (a line with no rule above it, an empty first cell with values, a
+    # lone label, units alone...) is asked how its lines group into rows, with its image: rules from a closed
+    # vocabulary, applied mechanically, checked against lines the model copies from the image and reviewed as
+    # table_review says (tablestructure.py; the owner, 2026-10-07: "comprehensible suggestions/rules about how to
+    # work around confusing formatting, with feedback similar to how we approach claims rules")
+    table_structure: Annotated[bool, _selecting(frozenset({"table"}))] = True
+
+    def asks_structure(self):
+        return self.table_structure
 
 class VisualTextLayer(Lever):
     lever_name, stage, off = "visual_text_layer", "inclusion", {"visual_text_layer": 0}
@@ -449,8 +462,8 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, TableRules, TableReview,
-                 VisualTextLayer, TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align,
-                 VerifyVisuals, ExplainDifferences)
+                 TableStructure, VisualTextLayer, TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading,
+                 Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -620,6 +633,11 @@ class Platform(Composable):
     def rules_from(self):
         """The body rows a table may have before it's read by rules a model writes (tablerules.py); None: never."""
         return None
+
+    @chosen
+    def asks_structure(self):
+        """Whether a PDF table with suspect lines is asked how its lines group into rows (tablestructure.py)."""
+        return False
 
     @chosen
     def reviews_tables(self):

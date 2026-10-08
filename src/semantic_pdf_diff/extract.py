@@ -18,7 +18,7 @@ from .quotes import FOLD, covered, excerpted, quoted  # noqa: F401
 from .sections import SectionIndex, heading_y, pdf_sections, section_text  # noqa: F401
 from .segmentation import grown, sheet_details, tiles  # noqa: F401
 from .stems import _long_form, glossary, stem_index  # noqa: F401
-from .tables import pdf_grid, real_table, row_boxes, same_form  # noqa: F401
+from .tables import Marks, pdf_grid, pdf_parts, real_table, ruled_rows, row_boxes, same_form  # noqa: F401
 from .tasks import MIN_REFINE_BYTES, TaskCore, split_utf8, union  # noqa: F401 (callers import them from here)
 
 # Bump when prompt assembly or task construction changes, not only the template text;
@@ -241,7 +241,7 @@ def office_installed(workbook=False):
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/2",  # pdf/2: tables asked how they're read
+READERS = {".pdf": "pdf/3",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split
            ".txt": "text/1", ".md": "text/1",
            ".docx": "docx/5",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers
            ".pptx": "pptx/4",  # pptx/2: tables asked how they're read; 3-4: a header's name and group
@@ -369,9 +369,18 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             try:
                 # Table detection works in displayed coordinates; locators are unrotated.
                 unrotated = lambda b: tuple(native(page, b)) if b else None
-                found = [(unrotated(table.bbox), rows, [unrotated(b) for b in row_boxes(table, rows)])
-                         for table in page.find_tables().tables for rows in [table.extract()]
-                         if s.keep_table(context_of, page, table, rows)]
+                marks = Marks(page) if page.rotation == 0 else None  # drawn rules and styles (unrotated pages)
+                found = []
+                for table in page.find_tables().tables:
+                    rows = table.extract()
+                    if not s.keep_table(context_of, page, table, rows):
+                        continue
+                    boxes, styles, rules = row_boxes(table, rows), None, None
+                    if marks is not None and boxes:  # lines of one row parted by shading, joined (ruled_rows)
+                        rules = marks.rules(table.bbox)
+                        rows, boxes, _ = ruled_rows(rows, boxes, rules)
+                        styles = marks.styles(table.bbox, boxes)
+                    found.append((unrotated(table.bbox), rows, [unrotated(b) for b in boxes], styles, rules))
             except Exception as e:  # PyMuPDF table detection raises assorted internal errors
                 found = []
                 record(coverage_row(content=content, page=number, bbox=list(native_page(page)),
@@ -379,13 +388,14 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                                     issues=[type(e).__name__ + ": " + str(e)]))
             height = page.rect.height
             continuing, carried = carried, None
-            context_of.tables_on[number] = [bbox for bbox, _, _ in found]
-            for ti, (bbox, rows, boxes) in enumerate(found):
+            context_of.tables_on[number] = [found_[0] for found_ in found]
+            for ti, (bbox, rows, boxes, styles, rules) in enumerate(found):
                 if not rows:
                     continue
                 displayed = shown(page, bbox)  # continuation is judged as displayed
                 header, body, derivation = rows[0], rows[1:] or rows, None
                 body_boxes = boxes[1:] if len(rows) > 1 else boxes
+                body_styles = None if styles is None else styles[1:] if len(rows) > 1 else styles
                 width = max(len(r) for r in rows)
                 # A table at the top of a page, as wide as one that ended at the bottom of the
                 # previous page, continues it, unless its first row is a header of the same
@@ -394,39 +404,83 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 if (ti == 0 and continuing and continuing[1] == width and displayed.y0 - page.rect.y0 < 0.2 * height
                         and (rows[0] == continuing[0] or not same_form(rows[0], continuing[0]))):
                     if rows[0] != continuing[0]:
-                        body, body_boxes = rows, boxes
+                        body, body_boxes, body_styles = rows, boxes, styles
                     header = continuing[0]
                     derivation = [DerivationStep(step="pdf-table-detection",
                                                  detail=f"row with header continued from page {number - 1}"),
                                   DerivationStep(step="model-extraction")]
-                def by_itself(ri, number=number, ti=ti, header=header, body=body, body_boxes=body_boxes, bbox=bbox,
-                              width=width, derivation=derivation):
-                    row = body[ri]
-                    # Rows with no content (common where drawing geometry is detected as a
-                    # table) cost a model call and can't yield a claim.
-                    if all(c is None or not str(c).strip() for c in row):
-                        return
-                    # Exactly repeated rows (same header and cells, same table position) follow their
-                    # first occurrence from the third sighting on; text is never de-duplicated.
-                    key = ("table", json.dumps([header, row], ensure_ascii=False, default=str),
-                           tuple(round(v / 2) * 2 for v in bbox))
-                    row_box = body_boxes[ri] if ri < len(body_boxes) and body_boxes[ri] else tuple(bbox)
-                    core.table_task(number, tuple(row_box), f"table:p{number}:{ti}:{ri}", header, row,
-                                    list(range(width)), derivation=derivation, repeat_key=key)
+                # Repaired into parts: a header over two lines merged, stacked tables split (tables.pdf_parts).
+                parts = pdf_parts(header, body, body_boxes, body_styles)
+                look = {tuple(b): st for b, st in zip(body_boxes, body_styles or []) if b and st is not None}
+                crop = []
 
-                limit = s.rules_from()
-                ruled = pdf_grid(header, body, body_boxes, "", f"page {number}, table {ti + 1}") \
-                    if limit is not None and len(body) > limit else None
-                if ruled is not None and ruled.rows:  # asked how it's read, with its image (the one table model)
-                    from . import tablerules
-                    crop = crop_name(stem, f"rules:p{number}:{ti}")
-                    render(page, displayed, assets / crop, s.image_side)
-                    tablerules.read(core, number, ruled, f"rules:p{number}:{ti}", by_itself,
-                                    DerivationStep(step="pdf-table-detection", detail="the table's cells, on its grid"),
-                                    image=f"assets/{crop}")
-                else:
-                    for ri in range(len(body)):
-                        by_itself(ri)
+                def image(ti=ti, displayed=displayed, page=page, crop=crop, number=number):
+                    if not crop:
+                        crop.append(crop_name(stem, f"rules:p{number}:{ti}"))
+                        render(page, displayed, assets / crop[0], s.image_side)
+                    return f"assets/{crop[0]}"
+
+                def proceed(parts, step, apart, base, original, label, ti=ti, bbox=bbox, width=width,
+                            derivation=derivation, image=image, number=number):
+                    """Each part read: by rules where tables are, else row by row; lines apart read by themselves."""
+                    limit = s.rules_from()
+                    steps = derivation
+                    if step is not None:  # the structure the rows come from, in each claim's derivation
+                        steps = [*(derivation or [DerivationStep(step="pdf-table-detection",
+                                                                 detail="row with provisional header"),
+                                                  DerivationStep(step="model-extraction")])]
+                        steps.insert(len(steps) - 1, step)
+                    for pi, (part_header, part_body, part_boxes) in enumerate(parts):
+                        tag = base if pi == 0 else f"{base}.{pi}"
+
+                        def by_itself(ri, tag=tag, header=part_header, body=part_body, body_boxes=part_boxes):
+                            row = body[ri]
+                            # Rows with no content (common where drawing geometry is detected as a
+                            # table) cost a model call and can't yield a claim.
+                            if all(c is None or not str(c).strip() for c in row):
+                                return
+                            # Exactly repeated rows (same header and cells, same table position) follow their
+                            # first occurrence from the third sighting on; text is never de-duplicated.
+                            key = ("table", json.dumps([header, row], ensure_ascii=False, default=str),
+                                   tuple(round(v / 2) * 2 for v in bbox))
+                            row_box = body_boxes[ri] if ri < len(body_boxes) and body_boxes[ri] else tuple(bbox)
+                            core.table_task(number, tuple(row_box), f"table:p{number}:{tag}:{ri}", header, row,
+                                            list(range(max(width, len(header), len(row)))), derivation=steps,
+                                            repeat_key=key)
+
+                        place = f"page {number}, table {ti + 1}{label}" + (f", part {pi + 1}" if len(parts) > 1 else "")
+                        ruled = pdf_grid(part_header, part_body, part_boxes, "", place) \
+                            if limit is not None and len(part_body) > limit else None
+                        if ruled is not None and ruled.rows:  # asked how it's read, with its image (the one table model)
+                            from . import tablerules
+                            detail = "the table's cells, on its grid" + (f"; its structure {step.detail}" if step else "")
+                            tablerules.read(core, number, ruled, f"rules:p{number}:{tag}", by_itself,
+                                            DerivationStep(step="pdf-table-detection", detail=detail[:400]),
+                                            image=image())
+                        else:
+                            for ri in range(len(part_body)):
+                                by_itself(ri)
+                    for i in apart:  # lines the structure rules say aren't the table's: each read by itself
+                        header_, body_, boxes_ = original
+                        row_box = boxes_[i] if i < len(boxes_) and boxes_[i] else tuple(bbox)
+                        core.table_task(number, tuple(row_box), f"table:p{number}:{base}:x{i}", header_, body_[i],
+                                        list(range(width)), derivation=steps)
+
+                for pi, (part_header, part_body, part_boxes) in enumerate(parts):
+                    base = f"{ti}" if pi == 0 else f"{ti}.{pi}"
+                    label = f", part {pi + 1}" if len(parts) > 1 else ""
+                    if s.asks_structure():  # a part with suspect lines asked how they group into rows
+                        from . import tablestructure
+                        tablestructure.read(
+                            core, number, f"structure:p{number}:{base}", part_header, part_body, part_boxes,
+                            [look.get(tuple(b)) if b else None for b in part_boxes] if look else None,
+                            rules, lambda image=image: [image()],
+                            # bound now: the answer may come when the loop is pages further on
+                            lambda parts_, step, apart, base=base, label=label, proceed=proceed,
+                            original=(part_header, part_body, part_boxes): proceed(parts_, step, apart, base, original,
+                                                                                   label))
+                    else:
+                        proceed([(part_header, part_body, part_boxes)], None, [], base, None, label)
                 if displayed.y1 - page.rect.y0 > 0.8 * height:
                     carried = (header, width)
                 else:

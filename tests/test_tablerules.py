@@ -129,6 +129,12 @@ class Applying(unittest.TestCase):
         self.assertEqual(tr.problems(unknown, g), ["no column Q in the table"])
         self.assertTrue(tr.problems(tr.Rules(reading="sideways"), g)[0].startswith("unknown reading 'sideways'"))
         self.assertEqual(tr.problems(tr.Rules(reading="rows"), g), [])
+        # the cell named {B.cell_value}; an example parting value and unit otherwise than the cell (10.2 and ")
+        g = tr.grid(["A", "B"], ["", "UV"], [["FOV", '10.2"'], ["Pixel", '14.2"']], [2, 3], [0, 0])
+        quoted = tr.Rules.model_validate({"reading": "rules", "claims": [{"entity": "{B.header}", "attribute": "{A}",
+                                                                          "value": "{B.cell_value}"}],
+                                          "examples": [{"row": 2, "claims": [{"value": "10.2", "unit": '"'}]}]})
+        self.assertEqual(tr.problems(quoted, g), [])
 
     def test_a_sideways_table_and_units_outside_brackets(self):
         rows = [["Capital cost ($M)", "6.35", "2.82"], ["Annual energy use (MWh/yr)", "771", "n/a"]]
@@ -228,6 +234,71 @@ class PdfTables(unittest.TestCase):
         self.assertEqual(g.rows, [["P-1", "Raw water transfer", "", "450"], ["P-2", "Backwash", "", "300"]])
         self.assertEqual((g.sections, g.keys, g.boxes), (["", "Standby"], [0, 3], [(0, 10, 1, 30), (0, 40, 1, 50)]))
         self.assertIsNone(pdf_grid(["A", "B"], [["1", "2"]], [None]))  # rows without boxes: read row by row
+
+    def test_a_parsed_table_repaired_into_parts(self):
+        from semantic_pdf_diff.tables import pdf_parts
+        box = lambda k: (0, k, 1, k + 1)
+        # a header over two lines (a second level under merged cells), an empty row, then a stacked table
+        parts = pdf_parts(["Tag", "Rated point", None],
+                          [["", "", ""], ["", "Capacity (gpm)", "Head (ft)"], ["P-1", "450", "120"], ["P-2", "up to 173", "95"],
+                           ["Blower", "Airflow (scfm)", "Power (hp)"], ["B-1", "900", "40"]], [box(k) for k in range(6)])
+        self.assertEqual([p[0] for p in parts], [["Tag", "Rated point > Capacity (gpm)", "Rated point > Head (ft)"],
+                                                 ["Blower", "Airflow (scfm)", "Power (hp)"]])
+        self.assertEqual([p[1] for p in parts], [[["P-1", "450", "120"], ["P-2", "up to 173", "95"]], [["B-1", "900", "40"]]])
+        self.assertEqual([p[2] for p in parts], [[box(2), box(3)], [box(5)]])
+        # a wrapped header line, without merged cells, joins as the next line
+        (head, body, _), = pdf_parts(["Ride", "Entry"], [["", "speed (mph)"], ["Coaster", "55"]], [box(0), box(1)])
+        self.assertEqual((head, body), (["Ride", "Entry speed (mph)"], [["Coaster", "55"]]))
+        # a table of words alone is left as it was
+        self.assertEqual(pdf_parts(["Tag", "Service"], [["P-1", "Raw water"], ["P-2", "Backwash"]], [box(0), box(1)]),
+                         [(["Tag", "Service"], [["P-1", "Raw water"], ["P-2", "Backwash"]], [box(0), box(1)])])
+
+    def test_rows_joined_across_boundaries_without_a_rule(self):
+        from semantic_pdf_diff.tables import ruled_rows
+        box = lambda y0, y1: (0, y0, 100, y1)
+        rows = [["", "UV", "IR"], ["Cameras", None, None], ["FOV", "10.2", "3.8"], ["Detector", "1×1", "1×1"],
+                ["", "CCD201", "LMAPD"], ["Spectrometer", "7", "40"], ["resolution", "", ""], ["Width", "1024", "256"],
+                ["Height", "512", "128"]]
+        boxes = [box(0, 6), box(6, 12), box(12, 24), box(24, 30), box(30, 36), box(36, 42), box(42, 48), box(48, 60),
+                 box(60, 72)]
+        # rules under the header, FOV, Detector's two lines, Spectrometer's; none between Width and Height (both
+        # labelled with numbers in the same column: they stay apart)
+        joined, kept, n = ruled_rows(rows, boxes, [0, 12, 24, 36, 48, 72])
+        self.assertEqual(n, 3)
+        self.assertEqual(joined, [["Cameras", "UV", "IR"], ["FOV", "10.2", "3.8"], ["Detector", "1×1 CCD201", "1×1 LMAPD"],
+                                  ["Spectrometer resolution", "7", "40"], ["Width", "1024", "256"], ["Height", "512", "128"]])
+        self.assertEqual(kept[2], box(24, 36))
+        self.assertEqual(ruled_rows(rows, boxes, [0, 72])[2], 0)  # too few rules to tell: unchanged
+        self.assertEqual(ruled_rows(rows, boxes, [b[1] for b in boxes])[2], 0)  # every boundary ruled
+
+    def test_drawn_rules_and_row_styles_read_from_the_page(self):
+        import pymupdf
+        from semantic_pdf_diff.tables import Marks
+        doc = pymupdf.open()
+        page = doc.new_page(width=300, height=200)
+        page.draw_rect(pymupdf.Rect(10, 10, 210, 30), color=None, fill=(0.1, 0.2, 0.4))  # a header's fill
+        page.insert_text((20, 24), "Pump", fontname="hebo")
+        page.insert_text((120, 24), "Flow", fontname="hebo")
+        page.insert_text((20, 44), "P-1", fontname="helv")
+        page.insert_text((120, 44), "450", fontname="helv")
+        for x0, x1 in ((10, 110), (110, 210)):  # a rule drawn in two segments
+            page.draw_line((x0, 30), (x1, 30))
+        page.draw_line((10, 50), (60, 50))  # too short to be a rule
+        marks = Marks(page)
+        self.assertEqual([round(y) for y in marks.rules((10, 10, 210, 50))], [30])
+        head, row = marks.styles((10, 10, 210, 50), [(10, 10, 210, 30), (10, 30, 210, 50)])
+        self.assertEqual(head, ((0.1, 0.2, 0.4), True))
+        self.assertEqual(row, (None, False))
+
+    def test_a_stacked_header_needs_a_header_style_when_styles_are_known(self):
+        from semantic_pdf_diff.tables import pdf_parts
+        body = [["FOV", "10.2", "3.8"], ["Spectrometer type", "Slit", "IFS"], ["Width", "1024", "256"],
+                ["Blower", "Airflow (scfm)", "Power (hp)"], ["B-1", "900", "40"]]
+        plain, header = (None, False), ((0.1, 0.2, 0.4), True)
+        parts = pdf_parts(["Camera", "UV", "IR"], body, [(0, k, 1, k + 1) for k in range(5)],
+                          [plain, plain, plain, header, plain])
+        self.assertEqual([p[0][0] for p in parts], ["Camera", "Blower"])  # "Spectrometer type" stays a row
+        self.assertEqual(len(parts[0][1]), 3)
 
     def test_a_row_copied_from_the_image_checks_the_text_layer(self):
         g = tr.grid(["A", "B"], ["Tag", "Flow"], [["P-1", "1,450"], ["P-2", "Δp 3"]], [2, 3], [0, 0])

@@ -46,6 +46,7 @@ NOT_EXERCISED = {
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
     'dedupe_repeated': 'needs a table row repeated on three or more pages (tests/test_repeats.py)',
     'table_review': "the stub reads every table's rows by themselves, so no rules are reviewed (tests/test_xlsxdocs.py)",
+    'table_structure': "no table in these documents has a suspect line (tests/test_tablestructure.py)",
     'align': 'revisions mode only; these runs compare proposals (tests/test_align.py)',
     'explain_differences': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
     'continuations': "only an answer incomplete at the claim limit is continued; the stub's never are "

@@ -15,6 +15,7 @@
     "figure_tasks",
     "table_rules",
     "table_review",
+    "table_structure",
     "visual_text_layer",
     "table_filter",
     "quote_match",
@@ -26,6 +27,7 @@
     "explain_differences"
   ],
   "table_rules": null,
+  "table_structure": false,
   "claims_per_request": 6,
   "output_tokens": 1400,
   "context_before": 0,

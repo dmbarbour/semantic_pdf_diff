@@ -41,8 +41,12 @@ def jittery_model():
             digest = hashlib.sha256(json.dumps(parts).encode()).hexdigest()
             if prompt.startswith('This is one table'):  # a table's rules query: each row read by itself
                 answer = {'reading': 'rows', 'why': 'stub'}
-            elif prompt.startswith('You wrote the rules below'):
+            elif prompt.startswith('You wrote the rules below') or prompt.startswith('You wrote structure rules'):
                 answer = {'verdict': 'keep'}
+            elif prompt.startswith('These are the lines of one table'):  # its structure: every line a row, the
+                worst = re.search(r'row holding line\s+(\d+)', prompt).group(1)  # worst suspect copied as it is
+                line = re.search(rf'^{worst}:  (.*?)(   \[.*\])?$', prompt, re.M).group(1)
+                answer = {'rules': [], 'examples': [{'line': worst, 'cells': [c.strip() for c in line.split('|')]}]}
             elif 'Compare exactly' in prompt:
                 relation = ['equivalent', 'different', 'complementary', 'unrelated'][int(digest, 16) % 4]
                 answer = {'relation': relation, 'rationale': 'stub', 'confidence': .9, 'same_conditions': True}
@@ -62,7 +66,8 @@ def jittery_model():
             # What reached the model, for tests of what settings change: the body without the model's
             # name or how the answer travels (docs/plans/content-addressed-queries).
             role = ('table-rules' if prompt.startswith('This is one table') else 'table-review'
-                    if prompt.startswith('You wrote the rules below') else 'compare' if 'Compare exactly' in prompt
+                    if prompt.startswith('You wrote the rules below') else 'table-structure'
+                    if prompt.startswith('These are the lines of one table') else 'compare' if 'Compare exactly' in prompt
                     or 'Explain a difference' in prompt else 'triage' if situating_answer(prompt) else 'extract')
             seen = hashlib.sha256(json.dumps({k: v for k, v in body.items() if k not in ('model', 'stream', 'stream_options')},
                                              sort_keys=True).encode()).hexdigest()

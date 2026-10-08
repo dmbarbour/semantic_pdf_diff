@@ -40,7 +40,16 @@ Excel workbooks (`.xlsx`, `.xlsm`, with the `office` extra) are read by `xlsxdoc
 
 CSV files (`.csv`, `.tsv`; no extra needed) are read as one-sheet workbooks of text cells (`xlsxdocs.read_csv`): the delimiter sniffed (comma, semicolon, tab or bar), UTF-8 or else Windows-1252, fields as written; preamble lines read as text and blocks parted by blank lines as tables, each table asked how it's read as a workbook's are. Claims are located by the file's lines and fields (`CsvLocator`; a quoted field may span lines).
 
-Word and PowerPoint tables take the same path: their grids (merged cells spanning, header rows labelled by path) are asked how they're read as a workbook's tables are, each named for the query ("table 3", "slide 2, table 1"; a slide's title is its table's title). A chart's data is still read row by row, and PDF tables are read row by row until they join (the one table model plan).
+Word and PowerPoint tables take the same path: their grids (merged cells spanning, header rows labelled by path) are asked how they're read as a workbook's tables are, each named for the query ("table 3", "slide 2, table 1"; a slide's title is its table's title). A chart's data is still read row by row.
+
+PDF tables take the same path, from the parser's cells (`tables.py`, `tablestructure.py`; reader `pdf/3`):
+- **Heuristics, no model:**
+  - where most of a table's row boundaries have a rule drawn under them, rows are joined across the ones that don't (lines of one row the parser split, e.g. where each text line has its own shading box); two rows both labelled and both with a digit in one column stay apart
+  - a header over two lines merged (a second level, "Rated point > Capacity (gpm)", under merged cells)
+  - a stacked table split off: a row of labels over rows of numbers, styled as the header is (its fill or bold)
+  - a wrapped cell (an empty first cell, no number) joined to the row above; a lone first cell a section row
+- **The structure query** (`table_structure`), only for a part with a suspect line: each line tagged with its signals (no rule above it in a mostly ruled table, an empty first cell with values, a lone label, units alone, fewer words under numbers, half height), the table's image attached. The model answers with rules from a closed vocabulary (a condition from the signals, or lines named, and an action: join above, join the header, a section, a new table, not the table, keep, split a column of two values) and two or three rows copied from the image, one the worst suspect's. The rules are applied mechanically (cells are regrouped, never retyped), the examples checked against what they give (a mismatch shown back once, then the heuristics kept), and the outcome reviewed as claims rules are. The rules, in words, go into each claim's derivation.
+- **The rules query** then gets each part with the table's crop, and copies a row of values from the image: a disagreement with the text layer sends the part's rows to be read one by one.
 
 Once a table's rules pass their checks, the model is shown what they gave for three rows (or a summary's claims) and asked whether that's its final answer: it keeps them, or gives corrected rules, which pass the same checks and are shown again, up to `table_review` times (10); a revision changing nothing ends it, and the last rules passing the checks are used. The outcome is recorded with each claim.
 
@@ -55,7 +64,7 @@ The page gets a PDF page's image tasks (the whole picture, and tiles when it's l
 - **Pages:** a form feed starts one (as in RFCs); otherwise the file is one page.
 - **Sections:** from Markdown headings, or numbered headings in the RFC style ("7.2.  Stream Concurrency"); failing those, fixed page ranges.
 - **Text tasks:** paragraphs, grouped up to the byte budget, kept as laid out: text written for a monospace font, its arrows and simple structures, reaches the model as written.
-- **Table tasks:** Markdown pipe tables, row by row with their header, as PDF tables are.
+- **Table tasks:** Markdown pipe tables, row by row with their header.
 - **Page furniture:** a line repeated near the top or bottom of three or more pages is left out.
 - **Not read:** linked images (recorded as skipped).
 - **Locators:** a claim's locator is its page and line range (`TextLocator`); reports show the lines where a PDF claim shows its box.
@@ -84,6 +93,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `pptxdocs.py` | Slide decks read into the text reader's form: slides as pages, shapes in reading order, tables, charts, pictures, speaker notes |
 | `xlsxdocs.py` | Excel workbooks and CSV files read into the text reader's form: sheets as pages, regions and the sheet map, cells as Excel shows them (a CSV's as written), tables on the grid |
 | `tablerules.py` | A table read by rules a model writes for it: the column analysis and our opinion it's shown, the rules applied to every row and checked, the summary templates |
+| `tablestructure.py` | A PDF table's lines grouped into rows by rules a model writes where the heuristics leave suspects: the signals, the rules applied and checked against rows copied from the image |
 | `chartxml.py` | Charts stored as chart XML (Word's and PowerPoint's): their cached series as tables, values in their number formats |
 | `pictures.py` | A Word document's pictures as pages, read with a PDF figure's image tasks and context |
 | `metafiles.py` | EMF, EMF+ and WMF pictures drawn into PDF pages (vector, text as text), from the vendored `vendor/metafile_render` |

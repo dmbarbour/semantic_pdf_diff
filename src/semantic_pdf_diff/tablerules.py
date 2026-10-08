@@ -436,7 +436,7 @@ class Transcribed(Lenient):
 
 class Rules(Lenient):
     """A model's answer to the rules query (RULES)."""
-    transcribed: Transcribed | None = None  # with a table's image: one row copied from it
+    transcribed: Transcribed | None = None  # with a table's image: one row of values copied from it
     binding: str = Field(default="", max_length=400)  # what the values measure, what has them, under what
     reading: str = Field(default="", max_length=20)
     why: str = Field(default="", max_length=400)
@@ -490,8 +490,9 @@ def review_question(asked, answer, g):
     return "\n".join(lines)
 
 IMAGED = """THE TABLE'S IMAGE is attached. The cells above are its text layer, which can be wrong (a symbol lost, a
-cell split or joined). Also copy the cells of one sample row from the image as you read them there, empty cells left
-out: "transcribed": {"row": "<its number>", "cells": ["...", "..."]}.
+cell split or joined). Also copy the cells of one sample row from the image as you read them there: a row of values
+(a number in it), not a header line, by its number above, empty cells left out:
+"transcribed": {"row": "<its number>", "cells": ["...", "..."]}.
 """
 
 def _plain(text):
@@ -556,7 +557,7 @@ def _fill(template, g, i, star=None, subject=""):
             k = star
         else:
             k = _index(g, name)
-        if not part or part in ("value", "cell", "text"):  # the cell itself, however the model names it
+        if not part or part in ("value", "cell", "text", "cell_value", "cell_text"):  # the cell, however it's named
             used.append(k)
             return g.rows[i][k]
         if part in ("cell_name", "cell_unit"):
@@ -664,6 +665,9 @@ def _missed(rules, g, i, written):
             continue  # no claim, by the templates' own rule
         match = next((m for m in made if _same_value(m[0]["value"], claim.value)
                       and _fold(m[0]["unit"]) == _fold(claim.unit)), None)
+        if match is None:  # the same text parted differently between value and unit (10.2" against 10.2 and ")
+            whole = _fold(claim.value + claim.unit).replace(" ", "")
+            match = next((m for m in made if _fold(m[0]["value"] + m[0]["unit"]).replace(" ", "") == whole), None)
         if match is None:
             got = "; ".join(f"{m[0]['value']} {m[0]['unit']}".strip() for m in every) or "nothing"
             said = f"the templates give {got}, not {claim.value} {claim.unit}".rstrip()

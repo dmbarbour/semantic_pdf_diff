@@ -75,3 +75,175 @@ def pdf_grid(header, body, boxes, title="", place=""):
                         [str(k + 2) for k in range(len(rows))], [0] * len(rows), title, place, kept_boxes)
     g.keys = [keys[k] for k in g.keys]
     return g
+
+def _filled(row):
+    return [c for c in row if c is not None and str(c).strip()]
+
+def _words_only(row):
+    """A row of labels: filled, and no digit in it ("up to 173" is a value, "Capacity (gpm)" a label)."""
+    cells = _filled(row)
+    return bool(cells) and not any(ch.isdigit() for c in cells for ch in str(c))
+
+def _numbers(rows):
+    from . import tablerules
+    return any(tablerules.number(" ".join(str(c).split())) is not None for r in rows for c in _filled(r))
+
+class Marks:
+    """A page's drawn marks, read once: horizontal rules (lines, thin boxes, stroked boxes' edges), filled boxes, and
+    text spans with their styles. In the page's coordinates, as its tables' boxes are (pages without rotation)."""
+    def __init__(self, page):
+        self.page, self._drawn, self._spans = page, None, None
+
+    def _draw(self):
+        if self._drawn is None:
+            segs, fills = [], []
+            for d in self.page.get_drawings():
+                stroked = d.get("color") is not None and d.get("type") in ("s", "fs")
+                for item in d["items"]:
+                    if item[0] == "l" and abs(item[1].y - item[2].y) <= 1:
+                        segs.append((min(item[1].x, item[2].x), max(item[1].x, item[2].x), (item[1].y + item[2].y) / 2))
+                    elif item[0] == "re":
+                        r = item[1]
+                        if r.height <= 1.5:
+                            segs.append((r.x0, r.x1, (r.y0 + r.y1) / 2))
+                        elif stroked:
+                            segs += [(r.x0, r.x1, r.y0), (r.x0, r.x1, r.y1)]
+                r = d["rect"]
+                if d.get("fill") is not None and r.height > 1.5 and r.width > 1.5:
+                    fills.append((pymupdf.Rect(r), tuple(round(c, 1) for c in d["fill"])))
+            self._drawn = (segs, fills)
+        return self._drawn
+
+    def rules(self, bbox, cover=0.6):
+        """The y of each horizontal rule drawn across most of a table's width."""
+        x0, y0, x1, y1 = bbox
+        segs = sorted(((max(a, x0), min(b, x1), y) for a, b, y in self._draw()[0]
+                       if y0 - 2 <= y <= y1 + 2 and min(b, x1) > max(a, x0)), key=lambda s: s[2])
+        groups = []
+        for seg in segs:
+            if groups and seg[2] - groups[-1][-1][2] <= 1.5:
+                groups[-1].append(seg)
+            else:
+                groups.append([seg])
+        out = []
+        for g in groups:
+            covered, end = 0.0, None
+            for a, b, _ in sorted(g):
+                covered += max(0.0, b - max(a, end if end is not None else a))
+                end = b if end is None else max(end, b)
+            if covered >= cover * (x1 - x0):
+                out.append(sum(y for _, _, y in g) / len(g))
+        return out
+
+    def styles(self, bbox, boxes):
+        """Each row's look, right of its first column (often styled as labels): the fill under it and whether most
+        of its text is bold. None for a row without a box."""
+        if self._spans is None:
+            self._spans = [sp for b in self.page.get_text("dict")["blocks"] for line in b.get("lines", [])
+                           for sp in line["spans"] if sp["text"].strip()]
+        fills = self._draw()[1]
+        out = []
+        for box in boxes:
+            if box is None:
+                out.append(None)
+                continue
+            x0, y0, x1, y1 = box
+            inner = [sp for sp in self._spans if x0 - 1 <= sp["bbox"][0] and sp["bbox"][2] <= x1 + 1
+                     and y0 < (sp["bbox"][1] + sp["bbox"][3]) / 2 < y1]
+            left = min((sp["bbox"][0] for sp in inner), default=x0)
+            values = [sp for sp in inner if sp["bbox"][0] > left + 1]
+            bold = sum(len(sp["text"]) for sp in values if sp["flags"] & 16 or "bold" in sp["font"].lower())
+            total = sum(len(sp["text"]) for sp in values)
+            point = pymupdf.Point(x1 - (x1 - x0) * 0.25, (y0 + y1) / 2)
+            fill = None
+            for r, colour in fills:  # the last drawn is on top
+                if r.contains(point):
+                    fill = colour
+            out.append((fill, total > 0 and bold * 2 > total))
+        return out
+
+def _joined(upper, lower):
+    out = []
+    for k in range(max(len(upper), len(lower))):
+        a = upper[k] if k < len(upper) else None
+        b = lower[k] if k < len(lower) else None
+        texts = [" ".join(str(t).split()) for t in (a, b) if t is not None and str(t).strip()]
+        out.append(" ".join(texts) if texts else (a if a is not None else b))
+    return out
+
+def ruled_rows(rows, boxes, rules, least=3, share=0.4):
+    """(rows, boxes, how many joined): a table whose row boundaries are mostly ruled (3 or more, and 40% or more of
+    them, drawn across most of its width) has its rows joined across the boundaries without a rule, which are lines
+    of one row the parser took for rows (HabEx: each text line shaded with a box of its own). Two rows both labelled
+    and both with a digit in the same column stay apart. Else unchanged."""
+    if len(rows) < 3 or len(boxes) != len(rows) or any(b is None for b in boxes):
+        return rows, boxes, 0
+    ruled = [any(abs(boxes[k][1] - y) <= 1.5 for y in rules) for k in range(1, len(rows))]
+    if all(ruled) or sum(ruled) < max(least, share * len(ruled)):
+        return rows, boxes, 0
+    def apart(upper, lower):
+        digit = lambda c: c is not None and any(ch.isdigit() for ch in str(c))
+        return (bool(_filled(upper[:1])) and bool(_filled(lower[:1]))
+                and any(digit(a) and digit(b) for a, b in zip(upper[1:], lower[1:])))
+    out_rows, out_boxes = [list(rows[0])], [tuple(boxes[0])]
+    for k in range(1, len(rows)):
+        if ruled[k - 1] or apart(out_rows[-1], rows[k]):
+            out_rows.append(list(rows[k]))
+            out_boxes.append(tuple(boxes[k]))
+        else:
+            a, b = out_boxes[-1], boxes[k]
+            out_rows[-1] = _joined(out_rows[-1], rows[k])
+            out_boxes[-1] = (min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3]))
+    return out_rows, out_boxes, len(rows) - len(out_rows)
+
+def pdf_parts(header, body, boxes, styles=None):
+    """A detected table's parts, each (header, body rows, their boxes), repaired from its parsed rows (the one table
+    model's step 1, measured on the controlled PDFs' true tables):
+    - empty rows between the lines of a header dropped (others kept in place, so rows keep their numbers)
+    - a header over several lines: rows of labels (no digit in them) above rows of numbers join it, as a second
+      level ("Rated point > Capacity (gpm)") under a header with merged cells, else as its next line ("Entry" +
+      "speed")
+    - stacked tables split: a row of labels, two or more, followed by rows of numbers starts a new part with
+      its own header (blowers under pumps); with the rows' styles (Marks.styles), only a row styled unlike most
+      rows (a header's fill or bold), so a row of words ("Spectrometer type | IFS | IFS") stays a row"""
+    boxes = list(boxes) + [None] * (len(body) - len(boxes))
+    rows = list(zip(body, boxes))
+    seen = [st for st in styles or [] if st is not None]
+    usual = max(seen, key=seen.count) if seen else None
+    styled = lambda i: styles is None or (i < len(styles) and styles[i] is not None and styles[i] != usual)
+    parts, current, held = [], [list(header), []], []
+    i = 0
+    while i < len(rows):
+        row, box = rows[i]
+        if not _filled(row) and not current[1]:
+            held.append((row, box))  # an empty row under the header: dropped if a header line follows, else kept
+            i += 1  # in place, so the rows after it keep their numbers
+            continue
+        rest = [r for r, _ in rows[i + 1:i + 4]]
+        if not current[1] and _words_only(row) and _numbers(rest):  # the header's next line or level
+            merged = any(c is None for c in current[0][1:])
+            width = max(len(current[0]), len(row))
+            head = list(current[0]) + [None] * (width - len(current[0]))
+            joined, last = [], None
+            for k in range(width):
+                top = head[k] if head[k] is not None else (last if merged else None)
+                last = top if head[k] is not None else last
+                low = row[k] if k < len(row) else None
+                parts_ = [" ".join(str(t).split()) for t in (top, low) if t is not None and str(t).strip()]
+                joined.append((" > " if merged and len(parts_) == 2 else " ").join(parts_) or None)
+            current[0] = joined
+            held = []
+            i += 1
+            continue
+        # a stacked table's header
+        if current[1] and _words_only(row) and len(_filled(row)) >= 2 and _numbers(rest) and styled(i):
+            parts.append(current)
+            current = [list(row), []]
+            i += 1
+            continue
+        if not current[1]:
+            current[1], held = held, []
+        current[1].append((row, box))
+        i += 1
+    parts.append(current)
+    return [(head, [r for r, _ in rows_], [b for _, b in rows_]) for head, rows_ in parts if rows_]

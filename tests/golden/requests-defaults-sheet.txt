@@ -217,9 +217,9 @@ extract f49c89bf20743be73505e58671394a7303b165ecd762ce87f3de69d786608263 images=
 extract f5757ab5cdcb9261a989f0e655b8cb9789296c4f42e04de58086e41d10ad28e1 images=1
 extract f9717bbc0197ca132a1bb734ae2507629685d1fabf86a6accc50701d2ac4e666 images=0
 extract ff2d347bfda5ce1c0b6df70e5e417f87a70a138841528c48c61c1b68821744ce images=1
-table-rules 647335da63be5ad1d7feb581f5a2058a49755979a11cfb9108b5d76358cbac92 images=1
-table-rules 82c8cdda4e7c3655fc6f4e10e40cbf2b5bc678be227610fcb80e11648d654373 images=1
-table-rules 88aac27f82aa594987ee9ed114f0d48006b55eea67a9903b2b11dbd3357ba78b images=1
+table-rules 917132736bca66dff0da8be6973f9808a630355241e34968cc5c1161f1c5cfb7 images=1
+table-rules bb2297ca97d5cdf6c7322063c783c1b320666b0c1c4ae274ea41a143b22efe05 images=1
+table-rules e3b2a81920615b035229bb8ed046968e0a8fe5f5d5ec42b739b9ef751438abe9 images=1
 triage 091a80fb21037f332fd66e6d9a7c409bc3bbf02f8066e45491475b35682fec64 images=1
 triage 156887f9e00e143e872db899f495b2350e4e0766c91e4f3a2b2f0007247587a8 images=0
 triage 165ab89ff7363e2830b4c4772ef7cd3cda8db51bc84b94cbe1e1f21d2563bbe6 images=0
@@ -347,8 +347,9 @@ row | A | B | C
 3 | Fan F-2 | 3 kW | 900 rpm
 OUR HEURISTIC OPINION (a guess from the size and the analysis above; decide yourself): claims from rows by rules: about 4 claims, 2 a row
 THE TABLE'S IMAGE is attached. The cells above are its text layer, which can be wrong (a symbol lost, a
-cell split or joined). Also copy the cells of one sample row from the image as you read them there, empty cells left
-out: "transcribed": {"row": "<its number>", "cells": ["...", "..."]}.
+cell split or joined). Also copy the cells of one sample row from the image as you read them there: a row of values
+(a number in it), not a header line, by its number above, empty cells left out:
+"transcribed": {"row": "<its number>", "cells": ["...", "..."]}.
 
 
 === the first triage prompt

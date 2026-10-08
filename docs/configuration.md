@@ -94,6 +94,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `figure_tasks` | `true` | selecting | figure_tasks | extract | figure |
 | `table_rules` | `0` | selecting | table_rules | extract | table |
 | `table_review` | `10` | shaping | table_review | extract | table |
+| `table_structure` | `true` | selecting | table_structure | extract | table |
 | `visual_text_layer` | `1500` | shaping | visual_text_layer | extract | figure, overview, tile, vision |
 | `table_filter` | `false` | selecting | table_filter | extract | table, table-detection |
 | `quote_match` | `"fragments"` | post | quote_match | extract | table, text |

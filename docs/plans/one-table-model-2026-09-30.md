@@ -148,6 +148,47 @@
 
 **Decided (the owner, 2026-10-07):** "The recommendations look good." Repair after rules, only where measured; the image in every PDF rules query; the vision check folded into the rules query. And a new lever, asked in the same breath: "is there a good way to show the model a few sample outcomes? Sort of an 'is this your final answer' opportunity? For tables, which are super-efficient due to rules-driven processing, this seems a cheap lever to add." (The adapters plan has its design and measurement.)
 
+## Structure rules, in detail (2026-10-07), for the owner's review
+
+**Where it comes from:**
+- The image check (one row copied from the image) failed on 254 of 394 controlled PDF tables, almost all on structure: two-line headers split by the parser, not wrong cell text.
+- On HabEx p4 (sc01 item 1), every row boundary the parser drew without a drawn rule under it is a false split: header lines, "µm" under "Wavelength bands", "CCD201" under "Detector", "resolution" under "Spectrometer". The table shades each text line with its own box, and the parser takes the boxes' edges as row lines.
+- Rules drawn under row boundaries: corpus tables 108 all ruled, 17 mostly, 16 few or none; dev slices 10 all, 12 mostly, 140 few or none.
+- **The owner (2026-10-07):** "this is closer to what I was imagining with regards to aiming image checks at suspects. The ability to get a 'pretty good' merge heuristically based on our samples is good. Ideally, we'd not provide the full table in bands for processing via vision, instead getting some comprehensible suggestions/rules about how to work around confusing formatting, with feedback similar to how we approach claims rules."
+
+**Proposed** (Claude's):
+1. **Heuristics, no model:** two-line headers merged and stacked tables split (`pdf_parts`); where most row boundaries are ruled, rows merged across the unruled ones.
+2. **Suspects:** each remaining row boundary is scored by named signals:
+   - no drawn rule under it, in a mostly ruled table
+   - a text gap no wider than the line spacing inside cells
+   - one cell's shading spanning both rows
+   - the lower row's first cell empty, or only its first cell filled
+   - the lower row holding only units, or only words under rows of numbers
+   - a row half the usual height
+3. **A structure rules query, only for tables with suspects,** before the claims rules query:
+   - shown: the parsed lines, numbered, each with its signals as short tags (`12 | | CCD201 | CCD201 | LMAPD  [first cell empty; no rule above]`), the heuristics' proposal, and the image (the whole table, plus a crop around the worst suspects when the table is too large to read at the endpoint's fixed image size)
+   - answered with rules from a closed vocabulary: a condition built from the signals ("first cell empty", "no rule above"...), or rows named as exceptions, and an action:
+     - join the row above, cell by cell
+     - join the header, as its next line or level
+     - a section row over the rows below
+     - a new table with its own header
+     - a column holding two values split in two
+     - not part of the table (read as text)
+   - with two or three example rows as the model reads them in the image, one of them the worst suspect named in the question: the image check, aimed
+4. **Applied mechanically and checked**, as claims rules are:
+   - restructuring only, so no text added or lost (a split column checked to keep every character)
+   - the examples compared with the rules' outcome; a mismatch is shown back once ("your rules give row 11 as ..., your example ..."); failing twice, the heuristic grid is kept and the table is marked
+   - the review: the changed rows shown before and after, with the suspects no rule touched ("is this your final answer"), up to `table_review` times, ending when nothing changes
+5. **Reported in how the table was read:** the rules in words, with the rows each changed.
+6. **Measured:** the structure benchmark for the heuristics; a corpus run and HabEx p4 by eye for the query; the image check's failures before and after.
+
+**For the owner's review:**
+1. **A separate structure query before the claims rules,** rather than one query doing both. Proposed: separate; both are cheap, and each is checked on its own.
+2. **Rules from a closed vocabulary, with named rows as exceptions,** rather than edits by row index (the design above, section 2). Proposed: rules, which read as reasons and apply to rows the model didn't single out.
+3. **Only tables with suspects asked,** rather than every PDF table. Proposed: only with suspects.
+
+**Decided (the owner, 2026-10-07):** "The recommendations look good, please proceed." A separate structure query before the claims rules; rules from a closed vocabulary with named rows as exceptions; only tables with suspects asked.
+
 ## Progress
 
 - **PDF tables asked how they're read (2026-10-07): steps 1 and 2 built.** The owner approved the design above: "The recommendations look good."
@@ -174,6 +215,65 @@
   - **The development slices,** recorded for their replay fixture (repacked): 118 tables; 15 read by rules, 28 row by row by the model's choice, 67 failing the vision check, 2 answers malformed JSON (inch marks; read row by row).
   - Cost: $0.39 (the corpus $0.21 and its unaligned pairs $0.18), the slices $0.19.
   - **Next (step 4, "only where measured"; measured):** repair of cell boundaries. A table whose copied row has the same text in other cells gets its structure mended (cells joined, a wrapped header merged) from the image before the rules apply. A table whose text differs stays row by row.
+
+- **PDF table structure (2026-10-07): steps 1 to 4 of the image-check follow-up, then structure rules.** The owner: "Please do. The cost is also negligible, so 1-4 is go."; then the structure rules above ("The recommendations look good, please proceed.").
+  - **Offline benchmark** (Claude's; not committed): the corpus's true cells (row label, column label, value), 1,688 of them, found in the parsed grids:
+
+    | Parser and repairs | Found |
+    |---|---|
+    | PyMuPDF as is | 0.907 |
+    | a two-line header merged | 0.937 |
+    | **parts: header merged, stacked tables split (`pdf_parts`; adopted)** | **0.966** |
+    | parts, strategy `lines_strict` | 0.961 |
+    | parts, PyMuPDF's `refine` | 0.951 |
+    | parts, strategy `text` | 0.212 |
+    | the layout add-on (`pymupdf-layout`), its own table detection | 0.057 |
+    | the layout add-on's union with line detection | 0.963 |
+    | parts and rows joined across unruled boundaries (adopted) | 0.966 |
+
+    - PyMuPDF's detected header (`TableHeader`) gains nothing over the first row.
+    - **The layout add-on isn't adopted** (a library choice, Claude's): its own detection misses nearly every generated table, its union with line detection is no better than the heuristics, and it brings 261 MB of dependencies (onnxruntime and others).
+    - The remaining misses: cells holding two values ("2.58 0.69" under "g (vertical / lateral)") and the dense "all" knob.
+  - **The heuristics** (`tables.py`; reader `pdf/3`):
+    - `pdf_parts`: rows of labels (no digit) above rows of numbers join the header, as a second level under merged cells ("Rated point > Capacity (gpm)") or as its next line; a row of labels styled as the header (fill or bold) starts a stacked table; empty rows between header lines dropped, others kept in place
+    - `ruled_rows`: where 3 or more, and 40% or more, of a table's row boundaries have a rule drawn under them, rows are joined across the others; two rows both labelled with a digit in one column stay apart. **HabEx p4 (sc01 item 1) now reads as printed:** two tables (cameras, spectrometers), "Detector | 1×1 CCD201", "Spectrometer resolution | 7". On the development slices it joined rows in HabEx p4 and p8 only, both right; every other table it changed is a chart or drawing that `real_table` rejects (the table filter, off by default, would drop them; with it off they're read as before, joined).
+    - `Marks`: a page's rules, fills and text styles, read once (pages without rotation)
+  - **The image check copies a row of values** (a number in it), not a header line.
+  - **The controlled PDFs, measured after the header merge and the aimed check** (before the structure query):
+
+    | | Before | After |
+    |---|---|---|
+    | tables failing the image check | 254 of 394 | 111 of 409 |
+    | misbound, read by rules | 229 | 203 |
+    | misbound, row by row | 226 | 199 |
+    | facts read right | 3,207 | 3,207 |
+
+    - Of the 111 left: 68 the same text in other cells (columns cutting through words: "7. | 4", "speed ( | mph)"), 37 other text (mostly floor plans and chart legends taken for tables), 6 a row that isn't the table's.
+  - **The structure query** (`tablestructure.py`, `table_structure`; the design above):
+    - **The development slices:** 96 table parts asked, most on drawing sheets' title blocks. 15 rules used, 42 answered "not a table", 19 failing twice (the heuristics kept). On the real reports every "not a table" answer is a chart the parser took for a table (the turbine plots, a scoring figure).
+    - **HabEx p7, by eye:** the two-line header joined, a spacer line dropped, each "(science)" or "(guide)" line joined to its row; the rules then read all 9 values right ("UV Science | IR bandpass | 1.6–1.8 μm | mode guide").
+    - **Mended after the first recording:** H named among a rule's lines is ignored (it failed 25 parts); rules leaving no rows keep the heuristics without asking again (the model reads no table there); examples are compared by each row's whole text, cells parted otherwise in the image noted, not failed (row grouping is what's checked).
+    - **Bugs found on real pages:** line numbers given as numbers; a late answer read by the next page's table (its continuation looked up by name when it came; now bound when asked; a test holds it).
+  - **Claims rules' checks, from the same pages:** an example parting value and unit otherwise than its cell (10.2 and ″ against 10.2″) passes; `{B.cell_value}` names the cell.
+  - **The controlled PDFs with everything** (fresh stores; against the last commit):
+
+    | | Last commit | Now |
+    |---|---|---|
+    | misbound, read by rules | 229 | 209 |
+    | misbound, row by row | 226 | 199 |
+    | loose (rules) | 472 | 434 |
+    | facts read right | 3,207 | 3,207 |
+    | conditions kept | 746 of 756 | 746 of 756 |
+    | tables failing the image check | 254 of 394 | 114 of 408 |
+
+    - The PDF revision pairs are found exactly as before (changes 26 of 27 by rules, 27 of 27 row by row; additions, removals and unchanged facts alike; no false changes).
+    - 209 against step 4's 203: the joined rows (6 tables), the styled stacked-table test and the answers asked again; not traced further.
+    - **The structure query on the corpus:** 40 parts asked, nearly all floor plans, charts and diagrams taken for tables; 20 answered "not a table", 5 restructured, the rest failing twice (dimension strings and legends that no row grouping makes a table). The one real table asked (the attachment study's sequence) fails on columns cutting through words ("1. P | robe Request").
+  - **Cost:** the corpus $0.23 (step 4) and $0.04 (the final run); the slices $0.29 and $0.08; the HabEx trials a few cents.
+  - **Next** (candidates, in the lever index):
+    - a part the model calls "not a table" read as a figure instead (the turbine plots)
+    - a "join columns" action (the model asked for one) and columns cutting through words, the corpus's remaining image-check failures
+    - title blocks on drawing sheets kept out of the table path
 
 ## Relation to other plans and levers
 
