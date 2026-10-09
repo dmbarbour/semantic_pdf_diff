@@ -38,7 +38,7 @@ import re
 import posixpath
 from dataclasses import dataclass, field
 
-from . import chartxml, tablerules
+from . import chartxml, keyvalue, tablerules
 from .docxdocs import Cell, _header_rows, _joined, _labels
 from .textdocs import Block, Picture, TextDocument
 
@@ -264,8 +264,11 @@ class _Writer:
         ruled = tablerules.grid([_letter(c) for c in range(region.left, region.right + 1)], labels, aligned,
                                 [r for r, _ in grid[heads:]], row_lines[1:], title,
                                 f"{sheet}!{region.ref}" if sheet else region.ref)
+        # a block of two columns standing alone, perhaps a key-value list (code review 2026-10-08, B5); a defined
+        # table's header is marked
+        key_value = keyvalue.candidate(ruled, marked=bool(region.name) or heads != 1)
         blocks.append(Block(page, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
-                            row_lines, row_headers, grid=ruled))
+                            row_lines, row_headers, grid=ruled, key_value=key_value))
         region.lines += list(range(first, len(lines) + 1))
 
     def sheet(self, page, sheet, heading=True):

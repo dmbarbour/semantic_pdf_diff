@@ -52,7 +52,7 @@ import io
 import re
 from dataclasses import dataclass, field
 
-from . import chartxml, tablerules
+from . import chartxml, keyvalue, tablerules
 from .textdocs import Block, Picture, TextDocument
 
 HEADING = re.compile(r"^(?:Heading|heading)\s*(\d)$")
@@ -633,8 +633,10 @@ def read_docx(data):
         counted[0] += 1
         ruled = tablerules.from_cells(grid, heads, labels, row_lines[1:], place.rstrip(":") if place else "",
                                       f"table {counted[0]}")
+        # two columns, perhaps a key-value list (code review 2026-10-08, B5); repeated header rows are marked
+        marked = heads != 1 or _property(grid[0][0], "w:trPr", "w:tblHeader") is not None
         blocks.append(Block(1, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
-                            row_lines, row_headers, grid=ruled))
+                            row_lines, row_headers, grid=ruled, key_value=keyvalue.candidate(ruled, marked)))
         if place is None:
             note(child, first, "table", boxes=True)
         if place is None:

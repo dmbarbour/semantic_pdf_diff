@@ -45,6 +45,9 @@ def markdown(project):
             elif kind == "table":
                 _, caption, header, rows = block
                 out += _table(caption, header, rows)
+            elif kind == "datasheet":  # a key-value list: Markdown's tables have a header, so its first row is one
+                _, caption, rows = block
+                out += _table(caption, rows[0], rows[1:])
             elif kind == "rooms":
                 _, (caption_trap, caption_plain), header, rows = block
                 trap = project.has("traps")

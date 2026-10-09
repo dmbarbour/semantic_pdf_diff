@@ -206,19 +206,22 @@ class TaskCore:
 
     # --- text and table tasks, the same for every format
 
-    def text_task(self, page_no, segments, task, depth=0):
-        """segments: [(bbox, text)] of consecutive blocks sent together."""
+    def text_task(self, page_no, segments, task, depth=0, derivation=None, context=None):
+        """segments: [(bbox, text)] of consecutive blocks sent together; derivation: the steps to its claims, and
+        context: its context lines, if not a text block's (a key-value list's: a table's)."""
         s = self.s
         text = "\n\n".join(t for _, t in segments)
-        context = self.reader.for_text(page_no, segments, text)
+        given = context  # a refined part is given the same override, else gets its own text's context
+        context = self.reader.for_text(page_no, segments, text) if given is None else given
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
         match = lambda q: quoted(q, text) or s.loose_match(q, text)
         self.consume(page_no, union(b for b, _ in segments), task, text, check=match, locate=locate,
-                     context=context,
-                     then=lambda status: self.refine_text(page_no, segments, text, task, depth, status))
+                     context=context, derivation=derivation,
+                     then=lambda status: self.refine_text(page_no, segments, text, task, depth, status, derivation,
+                                                          given))
 
-    def refine_text(self, page_no, segments, text, task, depth, status):
+    def refine_text(self, page_no, segments, text, task, depth, status, derivation=None, context=None):
         if status not in ("partial", "failed") or depth >= self.s.refinement_depth:
             return
         if len(segments) > 1:
@@ -230,7 +233,7 @@ class TaskCore:
         else:
             return
         for i, part in enumerate(parts):
-            self.text_task(page_no, part, f"{task}:r{i}", depth + 1)
+            self.text_task(page_no, part, f"{task}:r{i}", depth + 1, derivation, context)
 
     def table_task(self, page_no, bbox, task, header, row, columns, depth=0, derivation=None, repeat_key=None):
         """Send one table row with its header; split wide or partial rows by column.

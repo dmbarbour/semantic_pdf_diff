@@ -58,6 +58,8 @@ class Recorder:
     def ask(self, prompt, schema, images=(), key=None):
         if schema.__name__ == 'Rules':  # a table's rules query: each row read by itself, as these tests read tables
             return schema(reading='rows')
+        if schema.__name__ == 'Check':  # a block of two columns: a table, as these tests read it (B5)
+            return schema(reading='table')
         source = prompt.split('Source type: ')[1].split('\n')[0]
         self.tasks.append((source, prompt, list(images)))
         return self.respond(source, prompt)

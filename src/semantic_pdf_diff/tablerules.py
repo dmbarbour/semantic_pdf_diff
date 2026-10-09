@@ -847,8 +847,8 @@ def read(core, page, g, task, by_itself, source, image=None):
     """Read a table by rules: ask for them, check them (once more if they fail), and apply them; by_itself(key) reads
     one of the table's rows (a grid row's key, or a section row's that is a note) as a table row without rules, as
     the grid holds it. Possible notes (possible_notes) are read by themselves where the model names them as notes,
-    and where there's no answer to say. source: the reader's first derivation step. image: the
-    table's crop (a PDF's), sent with the query, which then copies a row from it to check the text layer."""
+    and where there's no answer to say. source: the reader's first derivation step (or its steps, as a list). image:
+    the table's crop (a PDF's), sent with the query, which then copies a row from it to check the text layer."""
     from .llm import CallLimitReached, NotRecorded
     cols = analyse(g)
     if g.boxes:  # a PDF's rows: their own boxes
@@ -969,10 +969,9 @@ def read(core, page, g, task, by_itself, source, image=None):
 
     def use(name, answer, issues, review=""):
         reading = answer.reading.strip().lower()
+        source_ = list(source) if isinstance(source, list) else [source]  # a list: a key-value check's step after it
         if review:  # the review's outcome, in each claim's derivation
-            source_ = [source, DerivationStep(step="table-review", detail=review)]
-        else:
-            source_ = [source]
+            source_.append(DerivationStep(step="table-review", detail=review))
         why = f" ({answer.why})" if answer.why else ""
         if answer.binding:
             why += f" [binding: {answer.binding}]"

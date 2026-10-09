@@ -525,6 +525,8 @@ class Detection(unittest.TestCase):
                 self.asked.append(key[3])
                 if situating_answer(prompt):
                     return schema.model_validate(situating_answer(prompt))
+                if key[0] == "key-value":  # a block of two columns: a table, as read before the check (B5)
+                    return schema(reading="table")
                 said = ask(key[3]) if ask else None
                 return said or Extraction(claims=[], complete=True)
 

@@ -40,6 +40,8 @@ class Recorder:
             return schema.model_validate(situating_answer(prompt))
         if schema.__name__ == 'Rules':  # a table's rules query: each row read by itself, as these tests read tables
             return schema(reading='rows')
+        if schema.__name__ == 'Check':  # a block of two columns: a table, as these tests read it (B5)
+            return schema(reading='table')
         data = prompt.split('SOURCE DATA:\n')[1]
         if ' kW' in data:
             value = data.split(' kW')[0].split()[-1]

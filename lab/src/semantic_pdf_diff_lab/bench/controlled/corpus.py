@@ -84,7 +84,8 @@ class Project:
     id: str
     title: str
     facts: list
-    sections: list    # [(heading, [blocks])]; a block is ("p", text), ("table", caption, header, rows) or ("schedule", Schedule)
+    sections: list    # [(heading, [blocks])]; a block is ("p", text), ("table", caption, header, rows), ("datasheet",
+                      # caption, rows: a key-value list, no header) or ("schedule", Schedule)
     knob: str = "clean"  # how schedules are drawn (TABLE_KNOBS), or prose, pages and charts (kinds)
     texts: dict = None   # {name: (plain, trap)} phrasings, filled from values
     values: dict = None
@@ -356,7 +357,54 @@ def link_protocol(seed=1):
     ]
     return Project(f"spec-s{seed}", "Lakeshore Telemetry Link: Protocol Specification", F, sections)
 
-PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster, "spec": link_protocol}
+def equipment_datasheets(seed=1):
+    """Equipment data sheets (code review 2026-10-08, B5): each pump's and the clearwell's data as a key-value list,
+    a block of two columns standing alone with no header, its first row a key and its value ("Pump | P-201A"; the
+    clearwell's first row a fact, "Volume (MG) | 2.4"); and, unlike them, a table of two columns under a real
+    header."""
+    d = Draw(f"wtp-datasheets-{seed}")
+    F = []
+    add = lambda *a, **k: F.append(Fact(*a, **k)) or F[-1]
+    sheets = []
+    for k, tag in enumerate(("P-201A", "P-201B", "P-201C"), 1):
+        pump = (f"Pump {tag}", (tag, f"pump {tag}", f"high service pump {tag}"))
+        capacity = add(f"{tag}.capacity", *pump, "capacity", ("flow", "rated flow", "rated capacity"),
+                       d.number(3000, 6000), "gpm")
+        head = add(f"{tag}.tdh", *pump, "total dynamic head", ("TDH", "head", "rated head"), d.number(50, 120, 1), "ft")
+        power = add(f"{tag}.power", *pump, "motor power", ("power", "motor", "motor rating"), d.number(75, 250), "hp")
+        speed = add(f"{tag}.speed", *pump, "motor speed", ("speed", "rpm"), d.number(1150, 1790), "rpm")
+        sheets.append(("datasheet", f"Data sheet {k}. High service pump {tag}",
+                       [["Pump", tag], ["Service", "High service"], ["Capacity (gpm)", capacity.value],
+                        ["TDH (ft)", head.value], ["Motor power (hp)", power.value], ["Speed (rpm)", speed.value]]))
+    well = ("Clearwell", ("clearwell", "finished water storage", "clear well"))
+    volume = add("clearwell.volume", *well, "volume", ("storage volume", "capacity"), d.number(1.5, 4.5, 1), "MG")
+    diameter = add("clearwell.diameter", *well, "diameter", ("inside diameter",), d.number(120, 220), "ft")
+    depth = add("clearwell.depth", *well, "side water depth", ("water depth", "depth", "SWD"), d.number(16, 30, 1), "ft")
+    baffle = add("clearwell.baffle", *well, "baffle factor", ("baffling factor", "T10/T"), d.number(0.3, 0.7, 2), "")
+    sheets.append(("datasheet", "Data sheet 4. Clearwell",
+                   [["Volume (MG)", volume.value], ["Diameter (ft)", diameter.value],
+                    ["Side water depth (ft)", depth.value], ["Baffle factor", baffle.value]]))
+    stored = [add(f"storage.{name.split()[-1].lower()}", name, (name.lower(),), "storage volume",
+                  ("storage", "stored volume", "tank volume"), d.number(lo, hi), "gal")
+              for name, lo, hi in (("Alum", 8000, 20000), ("Sodium hypochlorite", 3000, 7900),
+                                   ("Caustic soda", 2000, 2900))]
+    sections = [
+        ("1 High Service Pumps", [
+            ("p", "Each high service pump's data sheet gives its rated point and its motor."),
+            *sheets[:3],
+        ]),
+        ("2 Storage", [
+            ("p", "The clearwell stores finished water ahead of the high service pumps."),
+            sheets[3],
+            ("p", "Bulk chemicals are stored in the chemical building."),
+            ("table", "Table 1. Chemical storage", ["Chemical", "Storage (gal)"],
+             [[f.entity, f.value] for f in stored]),
+        ]),
+    ]
+    return Project(f"wtp-datasheets-s{seed}", "Harrow Creek WTP: Equipment Data Sheets", F, sections)
+
+PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster, "spec": link_protocol,
+            "wtp-datasheets": equipment_datasheets}
 
 # --- table knobs (milestone 2) -------------------------------------------------------------------
 # Schedules rendered clean or with one knob, the same facts either way, so a knob's effect is the difference.
@@ -1033,6 +1081,11 @@ def html(project, breaks=()):
                            "".join(f"<th>{esc(h)}</th>" for h in header) + "</tr>" +
                            "".join(f"<tr{_last(number, r == len(shown) - 1)}>" + "".join(f"<td>{esc(c)}</td>" for c in row)
                                    + "</tr>" for r, row in enumerate(shown)) +
+                           "</table>")
+            elif block[0] == "datasheet":  # a key-value list: no header row
+                _, caption, rows = block
+                out.append(f"<p class='caption'>{esc(caption)}</p><table>" +
+                           "".join("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in row) + "</tr>" for row in rows) +
                            "</table>")
             else:
                 _, caption, header, rows = block

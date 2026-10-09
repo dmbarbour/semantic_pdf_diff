@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Items 1 (E3), 2 (D2) and 3 (B2) are done; item 4 (B5) is designed (2026-10-09) and next.
+- **Status:** Active (2026-10-09). The order is agreed. All four items are done (2026-10-09); the trials' two small bugs wait on the owner's answer (see *For the owner*).
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -167,6 +167,33 @@
 
 ### 4. B5: label and value blocks
 
+**Done (2026-10-09)** as designed below. The owner: "Please proceed with B5." What was built:
+- **`keyvalue.py`:** `candidate` (the heuristic), the key-value check (`question`, `Check`), and `read`, which asks and then reads the block as a table or as "key: value" lines.
+- **Readers mark candidates:** sheets and CSV (not a defined table, one header row), Word (one header row, not marked to repeat). PDFs are checked in `proceed`, before the rules query, with the table's crop.
+- **A key-value list is read by a text task** (`text:p<n>:kv<table>`), each line placed on its row. It's given the context a table row gets ("Above the table", the headings), since a text block's context leaves out the block's caption: without it, the clearwell was read as "tank/basin".
+- **Traced:** a `key-value-check` step in every claim's derivation, on both readings (`tablerules.read` takes a list of source steps).
+- **A guard found by measuring:** a PDF table of one row is read with its header as its body. 169 of the corpus's 178 PDF candidates were such phantoms, most of them a header cell PyMuPDF detects as a tiny table of its own ("Rating | (psi)"). A block whose rows all repeat its header isn't a candidate.
+- **Readers:** pdf/8, docx/8, xlsx/12, csv/8. Decks aren't marked (not in the design; see *Found along the way*).
+- **Tests:** `tests/test_key_value.py`, 12 tests. Eight fail without the fix; one guards a slip of mine on the way (refined text parts were given their parent's context).
+- **The measuring knob:** the corpus had no key-value list (its two-column blocks are real tables: Field / Length (bits), a one-series chart's data, Area / Valves). So a new clean project was added, `wtp-datasheets-s1`, in every format:
+  - Three pump data sheets, each headed by the pair "Pump | P-201A".
+  - A clearwell data sheet whose first row is a fact ("Volume (MG) | 4.2").
+  - A real two-column table with a header (chemical storage).
+  - No header styling on the data sheets in any format.
+- **The model's checks, 2026-10-09:** 36 a run, the 35 on real tables and data sheets all right.
+  - Every real table was read as a table: Field / Length in 17 documents, Peak Loads ×2, Area / Valves, chemical storage ×3.
+  - Every data sheet was read as a key-value list, in PDF, Word and the workbook.
+  - The drawing pseudo-table (lcc-plan-s1-clean) was read as a key-value list (its title block's labels and values).
+- **Measured on the controlled corpus** (before: the committed code on the new corpus):
+  - **Word and workbook data sheets** (the bug): 18 right of 21 claims, recall 0.947 (the clearwell's volume lost as a header), became 19 right of 19, recall 1.0. Read row by row: the workbook went from 19 of 22 to 19 of 19; Word's was unchanged at 18 right, one misbound, 3 fewer claims.
+  - **PDF data sheets:** every fact found before and after; 4 fewer duplicate claims.
+  - **The pseudo-table:** one claim more, misbound.
+  - **Totals:** PDF right 3330 to 3326 (the duplicates), misbound 208 to 209; docx right 1572 to 1573; xlsx 979 to 980; Markdown and decks unchanged.
+  - **Revision pairs:** changes found 120 of 120 both; unchanged confirmed 2841 to 2843 (lcc-plan, 33 to 35 of 35).
+- **Spent:** $0.26 in all.
+  - Corpus: $0.036 for the before run and $0.026 for the after runs.
+  - Slices re-record: $0.20. Of that, $0.164 was wasted on the refinement-context slip above, its answers pruned. About $0.03 went on phantom checks in a recording stopped to add the guard.
+
 - **The bug** (`xlsxdocs.py:176-186`, `docxdocs.py:381-400`):
   - A sheet splits narrow pairs off only when a wider table follows them.
   - A two-column block standing alone becomes a table, headed by its first row. Word does the same with any two-column table.
@@ -236,4 +263,5 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
 
 ## Found along the way
 
+- **Decks' two-column tables aren't checked** (B5, 2026-10-09): B5's design named sheets, CSV, Word and PDFs. A deck's table of two columns is headed by its first row as Word's was. Decks would need only their reader to mark candidates (`pptxdocs.py`'s table), a reader version and a measure; the corpus's decks have none.
 - **A section row right under a PDF table's header is taken for the header's second line** (B2's tests, 2026-10-09): `pdf_parts` merged "Pumps" into "Tag" ("Tag Pumps"), so the rows below it lose their section label and the first column's header is wrong. Not fixed here; a bug for after this plan's items, to be confirmed on real tables first.

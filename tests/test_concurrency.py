@@ -41,6 +41,8 @@ def jittery_model():
             digest = hashlib.sha256(json.dumps(parts).encode()).hexdigest()
             if prompt.startswith('This is one table'):  # a table's rules query: each row read by itself
                 answer = {'reading': 'rows', 'why': 'stub'}
+            elif prompt.startswith('This is a block of two columns'):  # the key-value check: a table, as before it
+                answer = {'reading': 'table', 'why': 'stub'}
             elif prompt.startswith('You wrote the rules below') or prompt.startswith('You wrote structure rules'):
                 answer = {'verdict': 'keep'}
             elif prompt.startswith('These are the lines of one table'):  # its structure: every line a row, the
@@ -65,7 +67,8 @@ def jittery_model():
                 answer = {'claims': claims, 'complete': True, 'issues': []}
             # What reached the model, for tests of what settings change: the body without the model's
             # name or how the answer travels (docs/plans/content-addressed-queries).
-            role = ('table-rules' if prompt.startswith('This is one table') else 'table-review'
+            role = ('table-rules' if prompt.startswith('This is one table') else 'key-value'
+                    if prompt.startswith('This is a block of two columns') else 'table-review'
                     if prompt.startswith('You wrote the rules below') else 'table-structure'
                     if prompt.startswith('These are the lines of one table') else 'compare' if 'Compare exactly' in prompt
                     or 'Explain a difference' in prompt else 'triage' if situating_answer(prompt) else 'extract')

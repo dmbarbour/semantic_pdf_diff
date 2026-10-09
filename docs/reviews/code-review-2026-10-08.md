@@ -269,11 +269,12 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 | E3 | Fixed: the lab's rounds and review batches read every format through one document view; a text format is shown as its lines ([plan](../plans/review-bugs-2026-10-09.md), item 1) | |
 | D2 | Fixed: the two alignment passes' outcomes combined, so an unchanged file changes no status or grouping ([plan](../plans/review-bugs-2026-10-09.md), item 2); the three-way alignment recorded as a lever idea | |
 | B2, and B10's wording | Fixed: rows read by themselves as the grid holds them (wrapped lines joined); one-cell rows holding a number proposed as notes, confirmed by the rules query, read by themselves and labelling nothing; the structure prompt says union. Readers pdf/7, docx/7, pptx/6, xlsx/11, csv/7. Slices re-recorded ($0.174); corpus: PDF right 3287 to 3295, loose 426 to 416, misbound 203 to 205, hallucinated 6 to 8 (pseudo-tables), one more change found ([plan](../plans/review-bugs-2026-10-09.md), item 3) | |
+| B5 | Fixed: a block of two columns, its left column holding no number, is proposed as a key-value list and the model asked (a PDF's with its crop); confirmed, its rows are read as "key: value" lines. On the corpus, the 35 checks of real tables and data sheets were all answered right. Readers pdf/8, docx/8, xlsx/12, csv/8. A data sheets project added to the corpus: Word and workbook recall on it 0.947 to 1.0; elsewhere one misbound claim more (a drawing's pseudo-table). $0.26 ([plan](../plans/review-bugs-2026-10-09.md), item 4) | |
 | Reader versions | pdf/6, text/2 (.txt), docx/6, pptx/5, xlsx/10, csv/6, for the readers whose output changed | `8056c5a` |
 
 **Measured on the controlled corpus** (`e2a6f67`, $0.001): PDF misbound claims 205 to 203 (2 fewer claims); every other format, and every revision pair, unchanged.
 
 **Still open:**
-- **Bugs needing more than a small fix:** B5 (label and value blocks on sheets): in the [remediation plan](../plans/review-bugs-2026-10-09.md).
+- **Bugs needing more than a small fix:** none; the [remediation plan](../plans/review-bugs-2026-10-09.md)'s four are done.
 - **Performance** (C2 and the rest), **architecture** (items 1 to 13), **simplification:** after the bugs, as the owner ordered (2026-10-09).
 

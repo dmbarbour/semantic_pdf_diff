@@ -347,6 +347,8 @@ class Rules(unittest.TestCase):
                     sheet2_read.set()
                 if schema is Extraction:
                     return Extraction(claims=[], complete=True)
+                if schema.__name__ == "Check":  # two columns: tables, as they were read before the check (B5)
+                    return schema(reading="table")
                 return schema.model_validate({})
 
         client = Client()

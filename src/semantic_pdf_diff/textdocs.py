@@ -49,6 +49,7 @@ class Block:
                                                      # cells); empty: every row is read under rows[0]
     source: str = ""    # where a table came from, if not a table: "chart" (a Word chart's data)
     grid: object = None  # a table's cells as its rules see them (tablerules.Grid): a workbook's tables, for now
+    key_value: bool = False  # proposed as a key-value list (keyvalue.candidate): the model asked before it's read
 
     @property
     def box(self):
@@ -399,26 +400,46 @@ def text_job(data, job, output, client, dispatch, progress, extension):
 
             # every loop name it uses bound now: rules answer late, after the loop has moved to another page
             # (code review 2026-10-08, B1: rows were filed under the next sheet)
-            def by_itself(ri, page=page, table=table, ti=ti, header=header, body=body, width=width):
+            def by_itself(ri, page=page, table=table, ti=ti, header=header, body=body, width=width, checked=None):
                 row = body[ri]
                 if not any(c.strip() for c in row):
                     return
                 line = table.row_lines[ri + 1]
                 labels = table.row_headers[ri] if table.row_headers else header
+                steps = None if checked is None else [core.derivation["table"][0], checked, core.derivation["table"][1]]
                 core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", labels,
                                 row, list(range(len(labels) if table.row_headers else width)),
-                                derivation=chart_derivation(extension) if table.source == "chart" else None)
-            from . import tablerules
-            if table.grid is not None and table.grid.rows and limit is not None and len(body) > limit:
-                tablerules.read(core, page, table.grid, f"rules:p{page}:{ti}", by_itself,
-                                DerivationStep(step=core.derivation["table"][0].step, detail="the table's cells"))
+                                derivation=chart_derivation(extension) if table.source == "chart" else steps)
+
+            def as_table(checked=None, page=page, table=table, ti=ti, body=body, by_itself=by_itself, limit=limit):
+                """The table read as one (checked: the key-value check's step, when it was asked)."""
+                from . import tablerules
+                read = by_itself if checked is None else lambda ri: by_itself(ri, checked=checked)
+                if table.grid is not None and table.grid.rows and limit is not None and len(body) > limit:
+                    source = DerivationStep(step=core.derivation["table"][0].step, detail="the table's cells")
+                    tablerules.read(core, page, table.grid, f"rules:p{page}:{ti}", read,
+                                    source if checked is None else [source, checked])
+                    return
+                if table.grid is not None and table.grid.rows:  # without rules: the grid's rows, and possible notes
+                    for key in table.grid.keys + [r.key for r in tablerules.possible_notes(table.grid)]:
+                        read(key)
+                    return
+                for ri in range(len(body)):
+                    read(ri)
+
+            if not table.key_value:
+                as_table()
                 continue
-            if table.grid is not None and table.grid.rows:  # without rules: the grid's rows, and possible notes
-                for key in table.grid.keys + [r.key for r in tablerules.possible_notes(table.grid)]:
-                    by_itself(key)
-                continue
-            for ri in range(len(body)):
-                by_itself(ri)
+            # a key-value list, as proposed, if the model confirms it (code review 2026-10-08, B5)
+            from . import keyvalue
+            g = table.grid
+            boxes = [(0.0, float(n), 1.0, float(n + 1)) for n in [table.row_lines[0]] + g.lines]
+
+            def as_pairs(checked, context, page=page, ti=ti, boxes=boxes, g=g):
+                core.text_task(page, list(zip(boxes, keyvalue.pairs(g))), f"text:p{page}:kv{ti}", derivation=[
+                    DerivationStep(step=core.derivation["table"][0].step, detail="a key and its value a line"),
+                    checked, core.derivation["text"][-1]], context=context)
+            keyvalue.read(core, page, g, f"key-value:p{page}:{ti}", boxes, as_table, as_pairs)
         seen = Counter()
         for pg, line, alt, target in doc.images:
             if pg == page:

@@ -2327,7 +2327,7 @@
    "changes_found": "3/3",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "33/35",
+   "unchanged_confirmed": "35/35",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -2339,34 +2339,29 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 33,
-    "uncertain": 2
+    "confirmed": 35
    },
    "different": {
     "change": 7
    },
    "equivalent": {
-    "no change": 93,
+    "no change": 95,
     "unscored": 16
    },
    "findings": {
     "different": 7,
-    "equivalent": 109,
-    "uncertain": 2
+    "equivalent": 111
    },
-   "unmatched": 21,
-   "pairs": 15,
+   "unmatched": 18,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
-    "right": 9,
-    "scored": 9,
+    "right": 7,
+    "scored": 7,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 7
-     },
-     "no change": {
-      "restated": 2
      }
     }
    },
@@ -2401,13 +2396,13 @@
     "room104.area": "confirmed",
     "room104.depth": "confirmed",
     "room104.width": "confirmed",
-    "room110.area": "uncertain",
+    "room110.area": "confirmed",
     "room110.depth": "confirmed",
     "room110.width": "confirmed",
     "room111.area": "confirmed",
     "room111.depth": "confirmed",
     "room111.width": "confirmed",
-    "room112.area": "uncertain",
+    "room112.area": "confirmed",
     "room112.depth": "confirmed",
     "room112.width": "confirmed"
    }
@@ -17577,7 +17572,7 @@
    "changes_found": "3/3",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "33/35",
+   "unchanged_confirmed": "35/35",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -17589,34 +17584,29 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 33,
-    "uncertain": 2
+    "confirmed": 35
    },
    "different": {
     "change": 7
    },
    "equivalent": {
-    "no change": 100,
+    "no change": 102,
     "unscored": 16
    },
    "findings": {
     "different": 7,
-    "equivalent": 116,
-    "uncertain": 2
+    "equivalent": 118
    },
-   "unmatched": 22,
-   "pairs": 15,
+   "unmatched": 19,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
-    "right": 9,
-    "scored": 9,
+    "right": 7,
+    "scored": 7,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 7
-     },
-     "no change": {
-      "restated": 2
      }
     }
    },
@@ -17651,13 +17641,13 @@
     "room104.area": "confirmed",
     "room104.depth": "confirmed",
     "room104.width": "confirmed",
-    "room110.area": "uncertain",
+    "room110.area": "confirmed",
     "room110.depth": "confirmed",
     "room110.width": "confirmed",
     "room111.area": "confirmed",
     "room111.depth": "confirmed",
     "room111.width": "confirmed",
-    "room112.area": "uncertain",
+    "room112.area": "confirmed",
     "room112.depth": "confirmed",
     "room112.width": "confirmed"
    }

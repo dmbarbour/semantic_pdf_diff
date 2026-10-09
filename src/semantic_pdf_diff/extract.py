@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pymupdf
 
+from . import keyvalue
 from .dispatch import Dispatcher
 from .models import DerivationStep, PdfLocator, coverage_row
 from .pages import PYMUPDF_ERRORS, lines as _lines, native, native_page, reading_blocks, shown  # noqa: F401 (_lines, for callers)
@@ -261,19 +262,20 @@ def office_installed(workbook=False):
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/7",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
+READERS = {".pdf": "pdf/8",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
            # 4: a part the model reads as no table read as a figure; 5: columns joined where words are cut; 6: a
            # structure answer's new tables tagged apart, a structure asked again recorded once (review A2, B7); 7: rows
-           # read by themselves as the grid holds them, notes confirmed and read, the structure rules' union said (B2)
+           # read by themselves as the grid holds them, notes confirmed and read, the structure rules' union said (B2);
+           # 8: a table of two columns asked whether it's a key-value list (B5)
            ".txt": "text/2", ".md": "text/1",  # text/2: "A pump ..." isn't a heading (review B4)
-           ".docx": "docx/7",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
+           ".docx": "docx/8",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
            # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1); 7: a
-           # table's notes confirmed and read, its rows without rules read from its grid (review B2)
+           # table's notes confirmed and read, its rows without rules read from its grid (review B2); 8: as pdf/8
            ".pptx": "pptx/6",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6;
            # 6: as docx/7
-           ".xlsx": "xlsx/11", ".xlsm": "xlsx/11",  # xlsx/7: vague conditions guarded against; 8-9: header name,
-           # group; 10: late table answers on their own sheet (review B1); 11: as docx/7
-           ".csv": "csv/7", ".tsv": "csv/7",  # csv/6: as xlsx/10; csv/7: as xlsx/11
+           ".xlsx": "xlsx/12", ".xlsm": "xlsx/12",  # xlsx/7: vague conditions guarded against; 8-9: header name,
+           # group; 10: late table answers on their own sheet (review B1); 11: as docx/7; 12: as docx/8
+           ".csv": "csv/8", ".tsv": "csv/8",  # csv/6: as xlsx/10; csv/7: as xlsx/11; csv/8: as xlsx/12
            **{extension: "image/1" for extension in IMAGE_EXTENSIONS}}
 
 def reader_version(extension):
@@ -505,8 +507,12 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                         render(page, displayed, assets / crop[0], s.image_side)
                     return f"assets/{crop[0]}"
 
+                # the header's box, where it's the table's first line (a key-value list's first pair, B5)
+                head = tuple(boxes[0]) if header is rows[0] and len(rows) > 1 and boxes and boxes[0] else None
+
                 def proceed(parts, step, apart, base, original, label, table=True, ti=ti, bbox=bbox, width=width,
-                            derivation=derivation, image=image, number=number, page=page, displayed=displayed):
+                            derivation=derivation, image=image, number=number, page=page, displayed=displayed,
+                            head=head):
                     """Each part read: by rules where tables are, else row by row; lines apart read by themselves; a
                     part the model reads as no table, as a figure (with vision)."""
                     if not table and s.vision:
@@ -532,7 +538,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                         ruled = pdf_grid(part_header, part_body, part_boxes, "", place)
 
                         def by_itself(ri, tag=tag, header=part_header, body=part_body, body_boxes=part_boxes,
-                                      ruled=ruled):
+                                      ruled=ruled, steps=steps):
                             row = body[ri]
                             row_box = body_boxes[ri] if ri < len(body_boxes) and body_boxes[ri] else tuple(bbox)
                             if ruled is not None and ri in ruled.joined:  # its lines joined, as the grid holds it
@@ -550,19 +556,40 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                                             list(range(max(width, len(header), len(row)))), derivation=steps,
                                             repeat_key=key)
 
-                        from . import tablerules
-                        if ruled is not None and ruled.rows and limit is not None and len(part_body) > limit:
-                            # asked how it's read, with its image (the one table model)
-                            detail = "the table's cells, on its grid" + (f"; its structure {step.detail}" if step else "")
-                            tablerules.read(core, number, ruled, f"rules:p{number}:{tag}", by_itself,
-                                            DerivationStep(step="pdf-table-detection", detail=detail[:400]),
-                                            image=image())
-                        elif ruled is not None and ruled.rows:  # without rules: the grid's rows, and possible notes
-                            for key in ruled.keys + [r.key for r in tablerules.possible_notes(ruled)]:
-                                by_itself(key)
-                        else:
-                            for ri in range(len(part_body)):
-                                by_itself(ri)
+                        def as_table(checked=None, tag=tag, part_body=part_body, ruled=ruled, by_itself=by_itself):
+                            """The part read as a table (checked: the key-value check's step, when it was asked)."""
+                            from . import tablerules
+                            read = by_itself
+                            if checked is not None:  # the check's step before the model's, in each claim's derivation
+                                checked_steps = list(steps or DERIVATION["table"])
+                                checked_steps.insert(len(checked_steps) - 1, checked)
+                                read = lambda ri: by_itself(ri, steps=checked_steps)
+                            if ruled is not None and ruled.rows and limit is not None and len(part_body) > limit:
+                                # asked how it's read, with its image (the one table model)
+                                detail = "the table's cells, on its grid" + (f"; its structure {step.detail}" if step else "")
+                                source = DerivationStep(step="pdf-table-detection", detail=detail[:400])
+                                tablerules.read(core, number, ruled, f"rules:p{number}:{tag}", read,
+                                                source if checked is None else [source, checked], image=image())
+                            elif ruled is not None and ruled.rows:  # without rules: the grid's rows, and possible notes
+                                for key in ruled.keys + [r.key for r in tablerules.possible_notes(ruled)]:
+                                    read(key)
+                            else:
+                                for ri in range(len(part_body)):
+                                    read(ri)
+
+                        if not keyvalue.candidate(ruled):
+                            as_table()
+                            continue
+                        # two columns, perhaps a key-value list, asked with its crop (code review 2026-10-08, B5)
+                        pairs_boxes = [head if pi == 0 and head and base == f"{ti}" else tuple(bbox)] + ruled.boxes
+
+                        def as_pairs(checked, context, tag=tag, ruled=ruled, pairs_boxes=pairs_boxes):
+                            core.text_task(number, list(zip(pairs_boxes, keyvalue.pairs(ruled))), f"text:p{number}:kv{tag}",
+                                           derivation=[DerivationStep(step="pdf-table-detection",
+                                                                      detail="a key and its value a line"),
+                                                       checked, DerivationStep(step="model-extraction")], context=context)
+                        keyvalue.read(core, number, ruled, f"key-value:p{number}:{tag}", pairs_boxes, as_table,
+                                      as_pairs, image=image())
                     for i in apart:  # lines the structure rules say aren't the table's: each read by itself
                         header_, body_, boxes_ = original
                         row_box = boxes_[i] if i < len(boxes_) and boxes_[i] else tuple(bbox)
