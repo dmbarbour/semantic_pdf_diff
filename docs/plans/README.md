@@ -24,6 +24,7 @@ Statuses:
 
 | Plan | Summary | Depends on |
 |---|---|---|
+| [Remediating the review's larger bugs](review-bugs-2026-10-09.md) | The [2026-10-08 review](../reviews/code-review-2026-10-08.md)'s bugs left after its small fixes. In order: lab scoring of every format (E3); revisions with unchanged files, the two alignment passes' outcomes combined (D2); table rows read by themselves from the grid the rules saw, wrapped lines joined and note rows read (B2, with B10's prompt wording); label and value blocks read as pairs (B5). One re-record and corpus measurement at the end. Then the behaviour-preserving phase (performance, durability, architecture), then features (the owner, 2026-10-09). | The owner's review of the designs (B5's choice) |
 | [Units and normalization](units-and-normalization-2026-09-24.md) | Structured quantities (intervals, bounds, tolerances), compound units with explicit ambiguity rules, money compared only in the same currency and price basis, same-source normalization for criteria, statistics in common units. Abstain, never guess. | None strictly |
 | [Criteria-first comparison](n-way-comparison-2026-09-23.md) | Criteria first (for two-way proposals too): compare N sources by reviewed, evidence-based criteria (extracted from rules, requirements or the user's rubrics, or recommended), with applicability, per-source synthesis and a criteria × sources matrix. Compares, never judges. Revisions stay claim-level. | Evidence store; triage for "about" statements |
 | [Single-source outputs](single-source-outputs-2026-09-23.md) | `check` for internal consistency; RAG `export` as self-contained Markdown chunks with provenance; a fact sheet built without the model; a shared writing style for people. (Cited summaries within it are tentative.) | Evidence store; triage for "about" statements |
@@ -74,6 +75,8 @@ Statuses:
 Nobody uses the tool between now and implementation (the stable baseline is tagged `v0.2.0`), so plans and checkpoints can be reordered, split or merged freely.
 
 Done: the evidence store, content-addressed queries, record/replay, the architecture clean-up, `.txt`/`.md` and `.docx` (2026-10-04).
+
+First, before the plans below (the owner, 2026-10-09: "bugfixes, then architecture, then new features"): the [review's larger bugs](review-bugs-2026-10-09.md), then its performance and architecture moves, behaviour-preserving.
 
 1. ~~**Multi-format adapters**~~ (done 2026-10-07; images the last milestone). External converters stay a very low priority, never assumed (tentative row "More formats").
 2. **Comparing revisions:** more real revision series (the RAN1 feature-lead summaries, 2026-10-04), identity at extraction with the one table model.

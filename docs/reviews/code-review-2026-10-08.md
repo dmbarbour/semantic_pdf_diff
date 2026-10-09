@@ -241,10 +241,14 @@ The order is Claude's (the owner leaves order to Claude); the architecture moves
 4. **The orchestrators:** `PdfTable` and `Task` (A9, A10), the shared asking machine (B: A1, A11), the grid's owner and the text-format split (B: A2–A4), `pipeline.run` and the plan (C6, C7), `compare` and alignment (D6–D8).
 5. **Simplification and dead code** alongside the modules each step touches; the lab's recording module, evaluator helper and test stubs (E4, E7, E10).
 
-**For the owner:**
+**For the owner** (answered 2026-10-09):
 - **Durability:** `synchronous=NORMAL` trades the last few transactions after a power cut (not a crash) for commits 40 times cheaper. Proposed: yes for the store, with the diagnostic writes batched in any case. Paid answers are also in the fixture.
+  - **The owner:** "I think it's safe to reduce durability of commits. This system is designed to resume from what is known to be committed, IIRC. The main exceptions should be the things humans manipulate manually, e.g. adding/removing items to project, updating configurations, etc."
 - **Drawing sheets:** skip table detection on pages recognised as drawing sheets (A20; 1.4 s a page). It changes what's read, so it would be a lever, measured.
+  - **The owner:** "We can add skipping table detection as a lever, np."
 - **The architecture moves (3 and 4)** before the next features, or interleaved with them.
+  - **The owner:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
+  - The plan: [remediating the review's larger bugs](../plans/review-bugs-2026-10-09.md). Performance with requests byte-identical (step 2 above) joins the architecture phase, as behaviour-preserving; the A20 lever goes with the features.
 
 ## Fixes so far
 
@@ -267,6 +271,6 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 **Measured on the controlled corpus** (`e2a6f67`, $0.001): PDF misbound claims 205 to 203 (2 fewer claims); every other format, and every revision pair, unchanged.
 
 **Still open:**
-- **Bugs needing more than a small fix:** B2 (rows by themselves from the raw rows), D2 (revisions with unchanged files aligned in two passes), B5 (label and value blocks on sheets), E3 (lab scoring by extension).
-- **Performance** (C2 and the rest), **architecture** (items 1 to 13), **simplification:** as proposed above, after the owner's answers below.
+- **Bugs needing more than a small fix:** B2 (rows by themselves from the raw rows), D2 (revisions with unchanged files aligned in two passes), B5 (label and value blocks on sheets), E3 (lab scoring by extension), and B10's prompt wording: in the [remediation plan](../plans/review-bugs-2026-10-09.md).
+- **Performance** (C2 and the rest), **architecture** (items 1 to 13), **simplification:** after the bugs, as the owner ordered (2026-10-09).
 
