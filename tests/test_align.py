@@ -201,6 +201,35 @@ class Alignment(unittest.TestCase):
             self.assertEqual(key(*written), ("in", 33.5), written)
 
 class Report(unittest.TestCase):
+    def test_unchanged_files_change_no_status_or_grouping(self):
+        """Revisions with an unchanged file are aligned in two passes; a claim's outcome comes from every pass it was
+        in (code review 2026-10-08, D2: a later claim pass 1 aligned was "possibly added or removed" because pass 2
+        found no counterpart among the unchanged file's claims, and groupings contradicted each other)."""
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent))
+        from test_pipeline import Fake, ev
+        from semantic_pdf_diff.compare import compare
+        earlier = [ev("X-1", entity="P-1", attribute="capacity", value="100", unit="gpm"),
+                   ev("X-2", entity="P-1", attribute="head", value="50", unit="ft"),
+                   ev("X-3", entity="M-7", attribute="power", value="10", unit="kW")]
+        unchanged = [ev("U-1", entity="F-1", attribute="flow", value="2000", unit="cfm"),
+                     ev("U-2", entity="F-1", attribute="power", value="3", unit="kW")]
+        later = [ev("Y-1", entity="P-1", attribute="capacity", value="120", unit="gpm"),
+                 ev("Y-2", entity="P-1", attribute="head", value="50", unit="ft"),
+                 ev("Y-3", entity="P-1", attribute="NPSH required", value="12", unit="ft"),
+                 ev("Y-4", entity="V-9", attribute="size", value="4", unit="in")]
+        alone = compare(earlier, later, Path("."), Fake(relation="different"), "revisions")
+        both = compare(earlier + unchanged, later + unchanged, Path("."), Fake(relation="different"), "revisions")
+        statuses = lambda r: {u["id"]: u["status"] for u in r["unmatched"]}
+        self.assertEqual(statuses(alone), {"X-3": "unaligned", "Y-3": "not_compared", "Y-4": "unaligned"})
+        self.assertEqual(statuses(both), statuses(alone))
+        shape = lambda r: [(g["kind"], g["earlier_claims"], g["later_claims"]) for g in r["groupings"]]
+        self.assertEqual(shape(both), shape(alone))
+        self.assertEqual([(f["a"], f["b"]) for f in both["findings"]], [(f["a"], f["b"]) for f in alone["findings"]])
+        self.assertEqual([x["pass"] for x in both["retrieval"]["alignment"]],
+                         ["earlier own against later own and shared", "shared against later own"])
+
     def test_the_report_shows_the_groupings_and_marks_regrouped_claims(self):
         import sys
         from pathlib import Path

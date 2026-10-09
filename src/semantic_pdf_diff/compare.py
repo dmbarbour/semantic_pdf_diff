@@ -290,8 +290,13 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     findings, matched, attempted = [], set(), set()
     left = [e for e in left if e.id not in shared_ids]
     right = [e for e in right if e.id not in shared_ids]
-    scored, settled, unaligned, regrouped, alignment, groupings = {}, {}, set(), set(), [], []
-    for a_side, b_side in ((left, right + shared), (shared, right)):
+    # Two passes, so shared content is never compared with itself: the earlier revision's own claims against the
+    # later's and the shared, then the shared against the later's own. A claim's outcome is taken from every pass it
+    # was in (code review 2026-10-08, D2: unioned, a claim one pass aligned was "possibly added or removed" when the
+    # other found no counterpart among the shared).
+    scored, settled, unaligned, regrouped, aligned, alignment, groupings = {}, {}, set(), set(), set(), [], []
+    for label, a_side, b_side in (("earlier own against later own and shared", left, right + shared),
+                                  ("shared against later own", shared, right)):
         if not a_side or not b_side:
             continue
         found = client.s.correspondence(a_side, b_side, mode)
@@ -300,10 +305,13 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
             scored[a.id, b.id] = (max(score, scored.get((a.id, b.id), (0,))[0]), a, b)
         for i, j, score in found.settled:
             settled.setdefault((a_side[i].id, b_side[j].id), (score, a_side[i], b_side[j]))
-        unaligned |= {a_side[i].id for i in found.unaligned[0]} | {b_side[j].id for j in found.unaligned[1]}
-        regrouped |= {a_side[i].id for i in found.regrouped[0]} | {b_side[j].id for j in found.regrouped[1]}
+        lone = {a_side[i].id for i in found.unaligned[0]} | {b_side[j].id for j in found.unaligned[1]}
+        apart = {a_side[i].id for i in found.regrouped[0]} | {b_side[j].id for j in found.regrouped[1]}
+        unaligned |= lone
+        regrouped |= apart
+        aligned |= {e.id for e in a_side + b_side} - lone - apart
         if found.summary:
-            alignment.append(found.summary)
+            alignment.append({"pass": label, **found.summary})
         groupings += [{**g, "earlier_claims": [a_side[i].id for i in g["earlier_claims"]],
                        "later_claims": [b_side[j].id for j in g["later_claims"]]} for g in found.groups]
     pairs = sorted(scored.values(), key=lambda x: (-x[0], x[1].id, x[2].id))
@@ -376,11 +384,14 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     def status(e):
         if e.id in attempted:
             return "no_confirmed_counterpart"
+        if e.id in aligned:  # a pass found its item a counterpart: not compared, whatever another pass found
+            return "not_compared"
         return "regrouped" if e.id in regrouped else "unaligned" if e.id in unaligned else "not_compared"
     notes = {"unaligned": UNALIGNED, "regrouped": REGROUPED}
     unmatched = [{"id": e.id, "status": status(e),
                   "note": notes.get(status(e), "No confirmed counterpart in retrieved evidence; this does not establish absence.")}
                  for e in left + right if e.id not in matched]
+    groupings = _combined(groupings, aligned, shared_ids)
     for g in groupings:  # what was done with each group's claims, as the findings say
         mine = set(g["earlier_claims"]), set(g["later_claims"])
         found = [f for f in findings if f["a"] in mine[0] and f["b"] in mine[1]]
@@ -399,6 +410,24 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
         retrieval["explained"] = dict(sorted(explained.items()))
     return {"mode": mode, "findings": findings, "unmatched": unmatched, "shared": sorted(shared_ids),
             "retrieval": retrieval, "groupings": groupings}
+
+def _combined(groupings, aligned, shared_ids):
+    """The two passes' groupings as one list: an unaligned group keeps only the claims no pass aligned (dropped when
+    none is left), a group of shared claims alone is dropped (unchanged content says nothing about change), and a
+    group both passes formed is listed once."""
+    out, seen = [], set()
+    for g in groupings:
+        if g["kind"] == "unaligned":
+            g = {**g, "earlier_claims": [c for c in g["earlier_claims"] if c not in aligned],
+                 "later_claims": [c for c in g["later_claims"] if c not in aligned]}
+        claims = g["earlier_claims"] + g["later_claims"]
+        if not claims or all(c in shared_ids for c in claims):
+            continue
+        key = (g["kind"], tuple(g["earlier_claims"]), tuple(g["later_claims"]))
+        if key not in seen:
+            seen.add(key)
+            out.append(g)
+    return out
 
 EXPLAINED = ("different", "uncertain")
 

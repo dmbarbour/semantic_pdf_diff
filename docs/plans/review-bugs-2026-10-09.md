@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Item 1 (E3) is done; items 2–4 await the owner's review of their designs (B5's settled 2026-10-09; D2 and B2 being read).
+- **Status:** Active (2026-10-09). The order is agreed. Items 1 (E3) and 2 (D2) are done; B5's design is settled (2026-10-09); B2's awaits the owner's reading.
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -61,6 +61,14 @@
 
 ### 2. D2: revisions with unchanged files
 
+**Done (2026-10-09).** The owner: "Okay. Record the option as a lever, then fix D2." What was built (`compare.py`):
+- A claim aligned in any pass is "not compared" (or its pairs' outcome), never "possibly added or removed".
+- `_combined` merges the passes' groupings: unaligned groups keep only the claims no pass aligned, groups of shared claims alone are dropped, and a group both passes formed is listed once.
+- Each alignment summary names its pass; they stay two, since their counts can't be added (an item can be in both).
+- **Test:** `test_align.Report`: the reproduction below, whose statuses, groupings and pairs are now the same with the unchanged file as without it.
+- **Measured:** no corpus run. No requests change, the committed comparisons hold no alignment summaries, and the controlled revision pairs have no unchanged files.
+- **The three-way alignment:** recorded as a lever idea in the [lever index](../reviews/levers.md).
+
 - **The bug:** `compare` aligns in two passes, so that shared (unchanged) content is never compared with itself:
   - pass 1: earlier unique against later unique plus shared
   - pass 2: shared against later unique
@@ -75,7 +83,7 @@
 - **Fix, keeping the two passes:**
   - **A claim's status comes from every pass it took part in.** It's "possibly added or removed" only if no pass aligned it; aligned in any pass, its status is "not compared" or the outcome of its pairs.
   - **Groupings are merged.** A claim's "unaligned" group is dropped where another pass aligned it.
-  - **One alignment summary,** with each pass's counts labelled.
+  - **The alignment summaries labelled** by pass.
   - **Groupings of shared claims only are dropped.** Unchanged content listed as "unaligned" says nothing.
 - **Reproduced (2026-10-09):**
   - **Setup:** a changed file plus one unchanged file (a fan, F-1).
@@ -92,7 +100,7 @@
     - The report shows two alignment summaries.
 - **Effects:** no requests change (the pairs judged are the same). Only the reports' statuses, groupings and summary change. Saved comparisons keep what they said.
 - **Test:** the reviewer's reproduction: a revision with one unchanged file, and a later claim aligned in pass 1 but lone in pass 2.
-- **Later option:** a three-way alignment (earlier against later, with shared content open to both sides, never paired with itself), measured on revision pairs after the `Alignment` object exists. It goes as a tentative row only if this plan's fix leaves a visible gap.
+- **Later option:** a three-way alignment (earlier against later, with shared content open to both sides, never paired with itself), measured on revision pairs after the `Alignment` object exists. Recorded as a lever idea in the [lever index](../reviews/levers.md) (the owner, 2026-10-09).
 
 ### 3. B2 (with B10's wording): table rows read by themselves come from the grid
 
@@ -179,7 +187,7 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
 ## For the owner
 
 - **B5, answered 2026-10-09** (above): PDFs included with their crop; sheets, CSV and Word checked by text alone; "key-value" proposed in place of "pairs".
-- **D2 and B2:** may I go ahead with their designs as written? (The owner, 2026-10-09: "I'm still reading D2 and B2.")
+- **B2:** may I go ahead with its design as written? (The owner, 2026-10-09: "I'm still reading D2 and B2"; D2 since done.)
 - **The trials' bugs:** they were deferred on 2026-10-08 ("before working on these, we'll focus on the architecture and bugs found in your review"). Should they join this plan's bug phase?
   - **Trials finding 1:** `--fixture` with a file that doesn't exist yet fails; the default mode, `replay`, can't create one. A small fix.
   - **Finding 5's refinement cut:** a failed tile is halved down its middle, through its text. A small fix, measured.

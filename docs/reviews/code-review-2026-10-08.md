@@ -267,11 +267,12 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 | B6, B7 | Fixed without the shared asking machine: each review call finishes its progress once; a structure asked again records its outcome under `:again` | `7ab18da` |
 | B10 | Column letters past AZ, and a second "no rows" answer read as no table (two parts of the drawing slice, recorded anew). The prompt's "and/or" left as it is: the next sentence states the union, and a wording change needs re-recording and measuring. The slices fixture re-recorded for the two parts ($0.25 spent, nearly all on held-out runs recorded by mistake and pruned) | `7ab18da` |
 | E3 | Fixed: the lab's rounds and review batches read every format through one document view; a text format is shown as its lines ([plan](../plans/review-bugs-2026-10-09.md), item 1) | |
+| D2 | Fixed: the two alignment passes' outcomes combined, so an unchanged file changes no status or grouping ([plan](../plans/review-bugs-2026-10-09.md), item 2); the three-way alignment recorded as a lever idea | |
 | Reader versions | pdf/6, text/2 (.txt), docx/6, pptx/5, xlsx/10, csv/6, for the readers whose output changed | `8056c5a` |
 
 **Measured on the controlled corpus** (`e2a6f67`, $0.001): PDF misbound claims 205 to 203 (2 fewer claims); every other format, and every revision pair, unchanged.
 
 **Still open:**
-- **Bugs needing more than a small fix:** B2 (rows by themselves from the raw rows), D2 (revisions with unchanged files aligned in two passes), B5 (label and value blocks on sheets), and B10's prompt wording: in the [remediation plan](../plans/review-bugs-2026-10-09.md).
+- **Bugs needing more than a small fix:** B2 (rows by themselves from the raw rows), B5 (label and value blocks on sheets), and B10's prompt wording: in the [remediation plan](../plans/review-bugs-2026-10-09.md).
 - **Performance** (C2 and the rest), **architecture** (items 1 to 13), **simplification:** after the bugs, as the owner ordered (2026-10-09).
 
