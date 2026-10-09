@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Items 1–4 (the review's) are done; the trials' two bugs joined as items 5 and 6 (the owner, 2026-10-09). Item 5 is done; item 6's design waits on the owner's answers.
+- **Status:** Active (2026-10-09). The order is agreed. Items 1–4 (the review's) are done; the trials' two bugs joined as items 5 and 6 (the owner, 2026-10-09). Item 5 is done; item 6's design is answered (2026-10-09) and being built.
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -286,10 +286,10 @@
    - About 200 parent tiles, so about 800 half requests over both cuts: under $0.50.
 3. **The usual runs after:** slices re-recorded (dev only), the controlled corpus run and scored.
 
-**Questions for the owner:**
-1. **A fix, or a lever?** The bug phase replaces behaviour, measured before and after (as B2 and B5). A lever choosing the cut would be a feature (the owner's order, 2026-10-09). I'd make it a fix: the middle cut has no case where it's the better choice by design, and the measure above compares both anyway.
-2. **The forced-refinement switch:** a lab-only setting, not a product setting. Is that acceptable for measuring, or should the measure use only refinements that happen naturally (fewer cases, longer to gather)?
-3. **The 25% minimum share for a half:** a guess. With it, a band with one long paragraph at its top and a figure below cuts between them, not in the paragraph. Without a whitespace cut that meets it, today's middle cut stands. Should a smaller share be allowed before falling back?
+**Answered, 2026-10-09:**
+1. **A fix.** The owner: "a fix, we can look into levers after we're in a better position for tweaks rather than so obviously, blatantly wrong."
+2. **The forced-refinement switch, lab only.** The owner: "seems reasonable, though I'm beginning to believe that having some sort of quality heuristics spot-check for runtime behavior would be useful for both confidence decisions and part of the report." The spot checks are a new direction: a tentative row in the plans index.
+3. **25% to start, a tuning lever later.** The owner: "This seems like a tuning lever, we can start with 25% but I cannot say it's \"right\" without hindsight, and I don't expect anyone else could either." It's a named constant for now; making it a lever waits for the features phase.
 
 ## Re-recording and measuring
 
@@ -316,12 +316,13 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
 - **Features, after:**
   - **A20 as a lever.** The owner: "We can add skipping table detection as a lever, np." It skips table detection on pages recognised as drawing sheets, and is measured like other levers.
   - **The trials' plans:** configuration in the store, the progress display, tile selection.
+  - **Refinement's least share of a half as a lever** (item 6; the owner: "a tuning lever, we can start with 25%").
 
 ## For the owner
 
 - **B5, answered 2026-10-09** (above): PDFs included with their crop; sheets, CSV and Word checked by text alone; "key-value" proposed in place of "pairs".
 - **The trials' bugs, answered 2026-10-09:** both join, as items 5 and 6. The rest of finding 5, and findings 2–4, stay with their plans.
-- **Item 6's three questions** (above): a fix or a lever; the forced-refinement switch for measuring; the minimum share of a half.
+- **Item 6's three questions, answered 2026-10-09** (above): a fix; the lab-only switch; 25% to start, a lever later.
 
 ## Found along the way
 
