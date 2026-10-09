@@ -25,7 +25,7 @@
     - **by running them:** A1, B1, D1, and the commit costs (C2)
     - **by reading the code:** C1, C10
   - Other findings rest on the reviewer's reproduction or reading, marked as such.
-- **Changed nothing; no model was called.**
+- **Changed nothing; no model was called.** Fixes followed (see *Fixes so far*, at the end).
 
 ## Summary
 
@@ -245,3 +245,26 @@ The order is Claude's (the owner leaves order to Claude); the architecture moves
 - **Durability:** `synchronous=NORMAL` trades the last few transactions after a power cut (not a crash) for commits 40 times cheaper. Proposed: yes for the store, with the diagnostic writes batched in any case. Paid answers are also in the fixture.
 - **Drawing sheets:** skip table detection on pages recognised as drawing sheets (A20; 1.4 s a page). It changes what's read, so it would be a lever, measured.
 - **The architecture moves (3 and 4)** before the next features, or interleaved with them.
+
+## Fixes so far
+
+The owner, 2026-10-08: "before working on these, we'll focus on the architecture and bugs found in your review. Please start with all low-hanging fruit that has obvious fixes and doesn't need my attention." Each fix has a test that fails without it, unless noted.
+
+| Finding | Status | Commit |
+|---|---|---|
+| E9: the suite one module at a time | `scripts/run_tests.py`, one module per process: about 2.5 minutes instead of 9 | `5a3a0f1` |
+| B1, A1, D1 (the high bugs) | Fixed | `f77c56e` |
+| C1, A2, A3, A4 | Fixed (A4: a mending bug of ours is named and the table read as detected) | `f77c56e` |
+| C10, C12, C9, C8, E2 | Fixed (C10: a stream cut off still retried, as a connection fault; E2 has no test) | `8056c5a` |
+| D9, B3, B4, B8, B9, C23, C24, D11, E19, A15 | Fixed (C24: a rebind nobody was asked about keeps saved comparisons; a reset still clears them, as decision 0004 says) | `8056c5a` |
+| A14 | Fixed; latent today (only image tasks continue, and only table rows repeat) | `8056c5a` |
+| `dispatch._same` reading a gone `Client._sample` | Fixed | `8056c5a` |
+| Dead code (product) | Removed: the unused names and imports, PyMuPDF fallbacks, `scripts/alignment_sketch.py`. Kept: test-only helpers, and the lab's `QuoteCheck`, `claim_shares` and `suggested_verdict` (tested parts of paused rating tools) | `8056c5a` |
+| B6, B7 | Fixed without the shared asking machine: each review call finishes its progress once; a structure asked again records its outcome under `:again` | `7ab18da` |
+| B10 | Column letters past AZ, and a second "no rows" answer read as no table (two parts of the drawing slice, recorded anew). The prompt's "and/or" left as it is: the next sentence states the union, and a wording change needs re-recording and measuring. The slices fixture re-recorded for the two parts ($0.25 spent, nearly all on held-out runs recorded by mistake and pruned) | `7ab18da` |
+| Reader versions | pdf/6, text/2 (.txt), docx/6, pptx/5, xlsx/10, csv/6, for the readers whose output changed | `8056c5a` |
+
+**Still open:**
+- **Bugs needing more than a small fix:** B2 (rows by themselves from the raw rows), D2 (revisions with unchanged files aligned in two passes), B5 (label and value blocks on sheets), E3 (lab scoring by extension).
+- **Performance** (C2 and the rest), **architecture** (items 1 to 13), **simplification:** as proposed above, after the owner's answers below.
+
