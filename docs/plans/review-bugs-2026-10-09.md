@@ -76,6 +76,20 @@
   - **A claim's status comes from every pass it took part in.** It's "possibly added or removed" only if no pass aligned it; aligned in any pass, its status is "not compared" or the outcome of its pairs.
   - **Groupings are merged.** A claim's "unaligned" group is dropped where another pass aligned it.
   - **One alignment summary,** with each pass's counts labelled.
+  - **Groupings of shared claims only are dropped.** Unchanged content listed as "unaligned" says nothing.
+- **Reproduced (2026-10-09):**
+  - **Setup:** a changed file plus one unchanged file (a fan, F-1).
+  - **The later pump P-1** gains a new attribute (NPSH, claim Y-3), in an item that pass 1 aligned with the earlier pump.
+  - **Without the unchanged file:**
+    - Y-3 is "not compared".
+    - The groupings are: P-1 matched, M-7 unaligned (removed), V-9 unaligned (added).
+  - **With it:**
+    - The same pairs are judged. The alignment isn't hindered.
+    - Y-3 becomes "possibly added or removed".
+    - The later pump's claims are listed as matched and as unaligned.
+    - V-9 is listed unaligned twice.
+    - The unchanged fan is listed unaligned in both directions.
+    - The report shows two alignment summaries.
 - **Effects:** no requests change (the pairs judged are the same). Only the reports' statuses, groupings and summary change. Saved comparisons keep what they said.
 - **Test:** the reviewer's reproduction: a revision with one unchanged file, and a later claim aligned in pass 1 but lone in pass 2.
 - **Later option:** a three-way alignment (earlier against later, with shared content open to both sides, never paired with itself), measured on revision pairs after the `Alignment` object exists. It goes as a tentative row only if this plan's fix leaves a visible gap.
