@@ -264,6 +264,8 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 | B10 | Column letters past AZ, and a second "no rows" answer read as no table (two parts of the drawing slice, recorded anew). The prompt's "and/or" left as it is: the next sentence states the union, and a wording change needs re-recording and measuring. The slices fixture re-recorded for the two parts ($0.25 spent, nearly all on held-out runs recorded by mistake and pruned) | `7ab18da` |
 | Reader versions | pdf/6, text/2 (.txt), docx/6, pptx/5, xlsx/10, csv/6, for the readers whose output changed | `8056c5a` |
 
+**Measured on the controlled corpus** (`e2a6f67`, $0.001): PDF misbound claims 205 to 203 (2 fewer claims); every other format, and every revision pair, unchanged.
+
 **Still open:**
 - **Bugs needing more than a small fix:** B2 (rows by themselves from the raw rows), D2 (revisions with unchanged files aligned in two passes), B5 (label and value blocks on sheets), E3 (lab scoring by extension).
 - **Performance** (C2 and the rest), **architecture** (items 1 to 13), **simplification:** as proposed above, after the owner's answers below.
