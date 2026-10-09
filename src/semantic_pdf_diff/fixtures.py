@@ -35,6 +35,25 @@ SCHEMA_VERSION = 4  # 2: failures recorded; 3: response.used; 4: keyed by the qu
 FOLDER_FIXTURE = "replay.zip"
 FOLDER_WORKING = "replay.sqlite"  # the working copy beside it (git-ignored)
 MODES = ("replay", "replay-or-record", "record-new")
+
+def default_mode(path):
+    """The mode a fixture named without one is used in (trials 2026-10-08, finding 1: a new file named alone failed,
+    `replay` creating nothing): a .sqlite file records and replays, created if missing; a .zip, or a folder, is
+    replayed, as nothing records into one. Strict replay is asked for by name (tests, CI)."""
+    path = Path(path)
+    return "replay" if path.suffix == ".zip" or path.is_dir() else "replay-or-record"
+
+def check(path, mode):
+    """Raise FixtureError if the fixture can't be used in this mode, without opening it: so a run fails before its
+    store is bound or a source scanned."""
+    path = Path(path)
+    if path.is_dir():
+        return
+    if mode == "replay" and not path.exists():
+        raise FixtureError(f"{path}: no such fixture (replay only reads one; name it without --fixture-mode replay "
+                           "to create it and record into it)")
+    if mode != "replay" and path.suffix == ".zip":
+        raise FixtureError(f"{path}: record into a .sqlite fixture, then pack it (pdf-semantic-diff fixtures pack)")
 OUTCOMES = ("ok", "invalid", "transient")
 
 SCHEMA = """

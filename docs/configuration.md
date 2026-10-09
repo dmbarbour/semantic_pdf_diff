@@ -143,10 +143,12 @@ The `--out` folder is an evidence store: `store.sqlite` (sources, files, content
 - **Maintenance:** `show VIEW` prints `sources`, `source_files`, `evidence_occurrences`, `coverage_by_source`, `orphaned_content` or `comparisons` (the same names are SQL views in `store.sqlite`). `report` regenerates a report from a saved comparison (`--comparison ID`, default latest). `gc` deletes orphaned content with its evidence, tasks, sections, cached extraction responses and crops; `--dry-run` previews, and `--orphaned-sources` also removes sources whose linked manifest file is gone.
 - **Schema changes** during development aren't migrated: an older store refuses to open; use a new folder.
 
-- **Recorded answers:** `--fixture FILE` takes answers from a replay fixture (a `.sqlite` working file, or a `.zip` to replay). `--fixture-mode` sets the policy:
-  - `replay`: fail what isn't recorded
-  - `replay-or-record`: ask the model and record it, recorded failures too
+- **Recorded answers:** `--fixture FILE` keeps the model's answers in a fixture and replays them. A `.sqlite` file is created if missing and records new answers; a `.zip` is replayed only. `--fixture-mode` sets the policy:
+  - `replay` (a `.zip`'s default): fail what isn't recorded, as tests and CI want
+  - `replay-or-record` (a `.sqlite` file's default): ask the model and record it, recorded failures too
   - `record-new`: record only what was never asked
+
+  A fixture that can't be used as asked (a missing file under `replay`, a `.zip` to record into) fails the run before the store is changed.
 
   `--responder` names whose answers to use. `--fresh-regions` re-asks extraction for some regions as a second sample (an A/A control).
 - **Cost:** `--max-cost` stops sending once the provider-reported cost reaches that many dollars. `--ledger FILE` appends every response's reported cost, tagged with `--ledger-tag KEY=VALUE`.

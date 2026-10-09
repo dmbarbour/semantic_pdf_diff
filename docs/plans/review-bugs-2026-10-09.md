@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Items 1–4 (the review's) are done; the trials' two bugs joined as items 5 and 6 (the owner, 2026-10-09). Item 5 is designed and next; item 6's design waits on the owner's answers.
+- **Status:** Active (2026-10-09). The order is agreed. Items 1–4 (the review's) are done; the trials' two bugs joined as items 5 and 6 (the owner, 2026-10-09). Item 5 is done; item 6's design waits on the owner's answers.
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -228,6 +228,8 @@
   - Requests change for candidate blocks only: one check each, then their reading.
 
 ### 5. Trials finding 1: `--fixture` with a new file
+
+**Done (2026-10-09)** as designed below: `fixtures.default_mode` and `fixtures.check`; `RunOptions.fixture_mode` None unless asked (`answers_mode` resolves it); checked at both entry points before the store is touched; help and `docs/configuration.md` say the defaults. Two tests in `test_fixtures` fail without it; the strict-replay tests there now ask for `replay` by name. No requests changed.
 
 - **The owner, 2026-10-09:** "Let's go ahead and add those to pre-architecture. Fixing fixture should be a relatively simple fix, but the slicing seems a bigger task that needs careful design, an approach to measuring improvements, etc.."
 - **The bug** ([trials](../reviews/trials-2026-10-08.md), finding 1): `--fixture new.sqlite` fails with "no such fixture", because the default mode, `replay`, never creates a file. The error comes after the sources are scanned and the store bound.

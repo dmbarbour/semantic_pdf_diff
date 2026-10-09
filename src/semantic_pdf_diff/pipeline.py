@@ -60,7 +60,7 @@ class RunOptions:
     reset: bool = False               # clear derived data a changed interpreter affects, then run
     dry_run: bool = False             # with reset: report what would be cleared, change nothing
     fixture: Path | None = None       # replay fixture (.sqlite, or a .zip to replay)
-    fixture_mode: str = "replay"      # fixtures.MODES
+    fixture_mode: str | None = None   # fixtures.MODES; None: the fixture's default (fixtures.default_mode)
     responder: str | None = None      # whose recorded answers (default: the model's name)
     fresh_regions: tuple = ()         # the A/A control's regions, answered afresh
     ledger: Path | None = None        # every response's reported cost appended here
@@ -70,15 +70,23 @@ class RunOptions:
     def from_args(cls, args):
         get = lambda name, default=None: getattr(args, name, default)
         return cls(mode=get("mode", "proposals"), reset=bool(get("reset", False)), dry_run=bool(get("dry_run", False)),
-                   fixture=get("fixture"), fixture_mode=get("fixture_mode", "replay"), responder=get("responder"),
+                   fixture=get("fixture"), fixture_mode=get("fixture_mode"), responder=get("responder"),
                    fresh_regions=tuple(r for r in (get("fresh_regions", "") or "").split(",") if r),
                    ledger=get("ledger"),
                    ledger_tags=dict(t.split("=", 1) for t in (get("ledger_tag", []) or []) if "=" in t))
+
+    @property
+    def answers_mode(self):
+        """The fixture's mode: as asked, else its default (fixtures.default_mode); None without a fixture."""
+        if not self.fixture:
+            return None
+        return self.fixture_mode or fixtures.default_mode(self.fixture)
 
 def compare_paths(a, b, out, settings, options=None):
     """Compare two sources given as paths (files, folders or zips), each a shortcut source in the store at `out`:
     the CLI's `pdf-semantic-diff A B --out DIR`. Returns its exit code (0, 2 incomplete, 3 paused for budget)."""
     options = options or RunOptions()
+    check_fixture(options)  # before the sources are declared in the store
     names = shortcut_names([Path(a), Path(b)])
     with Store(out) as store:
         for name, path in zip(names, [Path(a), Path(b)]):
@@ -93,6 +101,15 @@ LIMITATIONS = ['Image-token budgeting must be calibrated to the serving backend.
                'Retrieval may miss synonyms and implicit relationships; configure domain aliases.',
                'Small VLMs can misread plots, tables, scales and diagram arrows.',
                'No global engineering consistency proof or automatic proposal ranking.']
+
+def check_fixture(options):
+    """A fixture that can't be used as asked fails the run before the store is changed (trials 2026-10-08, finding 1:
+    the error came after the sources were scanned)."""
+    if options.fixture:
+        try:
+            fixtures.check(options.fixture, options.answers_mode)
+        except fixtures.FixtureError as e:
+            raise ValueError(str(e)) from e
 
 def attach_ledger(client, options):
     if options.ledger:
@@ -114,6 +131,7 @@ def run(options, settings, store, names, out, force_rescan=False):
             would['triage'] = store.bind(triage, reset=True, dry_run=True)
         print(json.dumps({'would_clear': would}, indent=2))
         return 0
+    check_fixture(options)
     # Check both before clearing either, so a rejected run changes nothing.
     for role in filter(None, (interpreter, triage)):
         if not options.reset:
@@ -188,16 +206,16 @@ def make_client(options, settings, store):
     fixture = None
     if options.fixture:
         try:
-            fixture = fixtures.open(options.fixture, 'replay' if options.fixture_mode == 'replay' else 'record')
+            fixture = fixtures.open(options.fixture, 'replay' if options.answers_mode == 'replay' else 'record')
         except fixtures.FixtureError as e:
             raise ValueError(str(e)) from e
-        if options.fixture_mode != 'replay':  # text and rendering depend on it: replay tests compare versions
+        if options.answers_mode != 'replay':  # text and rendering depend on it: replay tests compare versions
             import pymupdf
             fixture.note('pymupdf', pymupdf.VersionBind)
     if fixture is None:
         return attach_ledger(Client(settings, store), options)
     fresh = list(options.fresh_regions)
-    return attach_ledger(Client(settings, store, fixture=fixture, mode=options.fixture_mode, responder=options.responder,
+    return attach_ledger(Client(settings, store, fixture=fixture, mode=options.answers_mode, responder=options.responder,
                                 fresh_regions=fresh), options)
 
 def fixture_usage(client):

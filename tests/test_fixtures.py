@@ -98,11 +98,31 @@ class RecordAndReplay(unittest.TestCase):
                                            *extra)
         return code, report, state['requests']
 
+    def test_a_fixture_named_alone_is_created_recorded_into_and_replayed(self):
+        # trials 2026-10-08, finding 1, the owner: "it just errored out because the fixture file did not already exist"
+        self.assertFalse(self.fixture.exists())
+        with jittery_model() as (url, state):
+            code, report, _ = self.run_cli('alone', url, '--fixture', str(self.fixture))
+        self.assertIn(code, (0, 2))
+        self.assertTrue(self.fixture.exists())
+        self.assertGreater(state['requests'], 10)
+        self.assertEqual(report['usage']['fixture']['recorded'], state['requests'])
+        _, again, _ = self.run_cli('again', UNREACHABLE, '--fixture', str(self.fixture))
+        self.assertEqual(again['usage']['api_calls'], 0)  # every answer replayed from it
+        self.assertEqual(self.outcome(again), self.outcome(report))
+
+    def test_a_missing_fixture_under_strict_replay_fails_before_the_store_is_touched(self):
+        code, report, log = self.run_cli('strict', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
+        self.assertEqual((code, report), (1, None))
+        self.assertIn('no such fixture', log)
+        self.assertFalse((self.root / 'strict').exists())  # no store made, no source declared or scanned
+        self.assertFalse(self.fixture.exists())
+
     def test_replay_reproduces_a_recorded_run_offline(self):
         code, live, requests = self.record()
         self.assertGreater(requests, 10)
         self.assertEqual(live['usage']['fixture']['recorded'], requests)
-        replay_code, replayed, _ = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture))
+        replay_code, replayed, _ = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
         self.assertEqual(replay_code, code)
         self.assertEqual(self.outcome(replayed), self.outcome(live))
         self.assertEqual(replayed['usage']['api_calls'], 0)
@@ -118,8 +138,8 @@ class RecordAndReplay(unittest.TestCase):
         from unittest.mock import patch
         self.record()
         with patch.dict(os.environ, {'SOURCE_DATE_EPOCH': '1790000000'}):
-            self.run_cli('one', UNREACHABLE, '--fixture', str(self.fixture))
-            self.run_cli('two', UNREACHABLE, '--fixture', str(self.fixture))
+            self.run_cli('one', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
+            self.run_cli('two', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
         for name in ('evidence.json', 'report.json', 'report.html'):
             self.assertEqual((self.root / 'one' / name).read_bytes(), (self.root / 'two' / name).read_bytes(), name)
         self.assertIn('"created_at": "2026-09-21T', (self.root / 'one' / 'report.json').read_text())
@@ -130,7 +150,7 @@ class RecordAndReplay(unittest.TestCase):
         with sqlite3.connect(self.fixture) as db:
             db.execute("DELETE FROM response WHERE rowid IN (SELECT r.rowid FROM response r JOIN recipe q "
                        "ON q.query = r.query WHERE q.role = 'extract' LIMIT 2)")
-        code, report, log = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture))
+        code, report, log = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
         self.assertEqual(code, 2)
         # The two tasks weren't reached (nothing was learnt), so they aren't refined into smaller requests
         # that weren't recorded either; the next run asks them again (code review 2026-10-01, item 5).
@@ -149,7 +169,7 @@ class RecordAndReplay(unittest.TestCase):
             db.execute("UPDATE response SET outcome = 'invalid', answer = '', error = 'ValueError: Truncated model output' "
                        "WHERE rowid IN (SELECT r.rowid FROM response r JOIN recipe q ON q.query = r.query "
                        "WHERE q.role = 'triage' LIMIT 2)")  # situating failures aren't refined into new requests
-        code, report, _ = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture))
+        code, report, _ = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
         self.assertEqual(report['usage']['fixture']['missing'], 0)
         failed = [i for x in report['situation'].values() for i in x['issues'] if i['failed']]
         self.assertEqual(len(failed), 2)
@@ -180,7 +200,7 @@ class RecordAndReplay(unittest.TestCase):
         with sqlite3.connect(self.fixture) as db:  # a second sample of each image query, beside the first
             fresh = db.execute("SELECT COUNT(*) FROM response WHERE sample = 1").fetchone()[0]
         self.assertEqual(fresh, state['requests'])  # each asked once, even where both documents share a page
-        code, report, _ = self.run_cli('aa-replay', UNREACHABLE, '--fixture', str(self.fixture),
+        code, report, _ = self.run_cli('aa-replay', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay',
                                        '--fresh-regions', 'tile,overview', '--no-situate')
         self.assertEqual(report['usage']['fixture']['missing'], 0)  # replayed from the control's own answers
 
@@ -195,11 +215,11 @@ class RecordAndReplay(unittest.TestCase):
         time.sleep(1.1)
         mark = _now()
         time.sleep(1.1)
-        self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture))
+        self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
         with Fixture(self.fixture) as f:
             self.assertEqual(f.prune(mark, dry_run=True)['answers_removed'], 1)
             f.prune(mark)
-        _, report, _ = self.run_cli('again', UNREACHABLE, '--fixture', str(self.fixture))
+        _, report, _ = self.run_cli('again', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
         self.assertEqual(report['usage']['fixture']['missing'], 0)
 
     @slow
@@ -214,7 +234,7 @@ class RecordAndReplay(unittest.TestCase):
             with self.assertRaisesRegex(FixtureError, 'no run replayed'):
                 f.prune(mark)
         # A replay under the wrong responder answers nothing, as when .env wasn't loaded (2026-09-28).
-        self.run_cli('wrong', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'someone-else')
+        self.run_cli('wrong', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay', '--responder', 'someone-else')
         with Fixture(self.fixture) as f:
             refused = f.prune(mark, dry_run=True)['refused']
             self.assertTrue(any('missed' in r for r in refused) and any('would drop' in r for r in refused))
@@ -257,17 +277,17 @@ class RecordAndReplay(unittest.TestCase):
     @slow
     def test_responders_and_changed_queries_are_kept_apart(self):
         self.record('--responder', 'model-a')
-        _, other, _ = self.run_cli('b', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-b')
+        _, other, _ = self.run_cli('b', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay', '--responder', 'model-b')
         self.assertEqual(other['usage']['fixture']['replayed'], 0)
         # A setting that shapes extraction queries changes them: none of their answers applies.
-        _, changed, _ = self.run_cli('c', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-a',
+        _, changed, _ = self.run_cli('c', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay', '--responder', 'model-a',
                                      settings={'claims_per_request': 9})
         self.assertGreater(changed['usage']['fixture']['missing'], 0)
         with sqlite3.connect(self.fixture) as db:
             extraction = {q for (q,) in db.execute("SELECT query FROM recipe WHERE role = 'extract'")}
         self.assertTrue(extraction)
         # The model name isn't part of it: the responder is.
-        _, same, _ = self.run_cli('d', UNREACHABLE, '--fixture', str(self.fixture), '--responder', 'model-a',
+        _, same, _ = self.run_cli('d', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay', '--responder', 'model-a',
                                   '--model', 'renamed')
         self.assertEqual(same['usage']['fixture']['missing'], 0)
 
@@ -286,7 +306,7 @@ class RecordAndReplay(unittest.TestCase):
                              db.execute('SELECT COUNT(*) FROM response').fetchone()[0])
         self.assertEqual({a['role'] for a in summary['answers']}, {'extract', 'triage', 'compare'})
         self.assertEqual(len(summary['contents']), 2)  # the documents recorded from, for the replay test
-        _, replayed, _ = self.run_cli('zip', UNREACHABLE, '--fixture', str(first))
+        _, replayed, _ = self.run_cli('zip', UNREACHABLE, '--fixture', str(first))  # a .zip named alone: replayed
         self.assertEqual(self.outcome(replayed), self.outcome(live))
         code, _, log = self.run_cli('zip2', UNREACHABLE, '--fixture', str(first), '--fixture-mode', 'replay-or-record')
         self.assertEqual(code, 1)

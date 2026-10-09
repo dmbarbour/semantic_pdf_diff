@@ -73,10 +73,12 @@ def add_run_options(parser):
     parser.add_argument('--no-vision', action='store_true', help='Explicitly incomplete text-only run')
     parser.add_argument('--no-situate', action='store_true', help='Skip figure and section "about" statements')
     parser.add_argument('--fixture', type=Path,
-                        help='Replay fixture (.sqlite, or a .zip for replay only): answers come from it, not the model')
-    parser.add_argument('--fixture-mode', choices=fixtures.MODES, default='replay',
-                        help='replay: fail requests with no recorded answer; replay-or-record: ask the model and record '
-                             '(recorded failures too); record-new: record only requests never asked')
+                        help='Answers fixture: answers recorded in it are replayed, not asked again. A .sqlite file '
+                             'also records new answers (created if missing); a .zip is replayed only')
+    parser.add_argument('--fixture-mode', choices=fixtures.MODES,
+                        help='replay: fail requests with no recorded answer (tests, CI); replay-or-record (a .sqlite '
+                             "file's default): ask the model and record, recorded failures asked again; record-new: "
+                             'record only requests never asked')
     parser.add_argument('--responder', help='Whose recorded answers to use or record (default: the model name)')
     parser.add_argument('--fresh-regions', default='', metavar='REGIONS',
                         help='A/A control: answer extraction for these regions (e.g. tile,figure,overview) afresh, '
