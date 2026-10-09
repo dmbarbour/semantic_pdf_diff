@@ -3058,10 +3058,10 @@
    "missed": [
     "D111.part-of.room111"
    ],
-   "claims": 76,
+   "claims": 74,
    "outcomes": {
     "loose": 29,
-    "misbound": 8,
+    "misbound": 6,
     "misread": 1,
     "right": 38
    },
@@ -3080,15 +3080,14 @@
     "relation": 0.8571
    },
    "by_reader": {
-    "table": 0.4889,
+    "table": 0.1778,
     "text": 0.4222,
     "visual": 0.9778
    },
    "outcomes_by_reader": {
     "table": {
      "loose": 2,
-     "misbound": 2,
-     "right": 20
+     "right": 6
     },
     "text": {
      "misbound": 1,
@@ -16857,10 +16856,10 @@
    "missed": [
     "D111.part-of.room111"
    ],
-   "claims": 76,
+   "claims": 74,
    "outcomes": {
     "loose": 29,
-    "misbound": 8,
+    "misbound": 6,
     "misread": 1,
     "right": 38
    },
@@ -16879,15 +16878,14 @@
     "relation": 0.8571
    },
    "by_reader": {
-    "table": 0.4889,
+    "table": 0.1778,
     "text": 0.4222,
     "visual": 0.9778
    },
    "outcomes_by_reader": {
     "table": {
      "loose": 2,
-     "misbound": 2,
-     "right": 20
+     "right": 6
     },
     "text": {
      "misbound": 1,
