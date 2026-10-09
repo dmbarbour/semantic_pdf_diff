@@ -216,6 +216,11 @@ class Store:
         self.close()
 
     # --- interpreter binding -------------------------------------------------
+    def interpreter(self, role):
+        """The description the store is bound to for a role (Interpreter's fields), or None if it isn't bound."""
+        row = self.db.execute("SELECT description FROM interpreter WHERE role=?", (role,)).fetchone()
+        return json.loads(row[0]) if row else None
+
     def bind(self, interpreter: Interpreter, reset=False, dry_run=False):
         """Bind the store to an interpreter. Returns a summary of what was (or would be) cleared."""
         new = interpreter.model_dump()

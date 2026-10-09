@@ -331,6 +331,22 @@ def groups(blocks, text_bytes, section_of):
             size += extra
     return out
 
+def read_text(raw, extension):
+    """A text format's bytes as its reader reads them (a TextDocument). Raises on a damaged office file."""
+    if extension == ".docx":
+        from .docxdocs import read_docx
+        return read_docx(raw)
+    if extension == ".pptx":
+        from .pptxdocs import read_pptx
+        return read_pptx(raw)
+    if extension in (".xlsx", ".xlsm"):
+        from .xlsxdocs import read_xlsx
+        return read_xlsx(raw)
+    if extension in (".csv", ".tsv"):  # a CSV file, read as a one-sheet workbook of text cells
+        from .xlsxdocs import read_csv
+        return read_csv(raw)
+    return parse(raw.decode("utf-8", errors="replace"), markdown=extension in (".md", ".markdown"))
+
 def text_job(data, job, output, client, dispatch, progress, extension):
     """Generator doing one text file's extraction, as extract's PDF job does a PDF's: yields "page" before each page,
     then "waiting" while its requests are pending; job.state["result"] is set at the end."""
@@ -345,23 +361,17 @@ def text_job(data, job, output, client, dispatch, progress, extension):
                     CSV_DERIVATION if sheet else DERIVATION)
     raw = data if isinstance(data, (bytes, bytearray)) else open(data, "rb").read()
     if office:
-        from .docxdocs import read_docx
-        from .pptxdocs import read_pptx
         try:
-            if book:
-                from .xlsxdocs import read_xlsx
-            doc = read_docx(raw) if word else read_pptx(raw) if deck else read_xlsx(raw)
+            doc = read_text(raw, extension)
         except Exception as error:  # not a Word document, deck or workbook after all, or a damaged one
             core.record(coverage_row(content=job.content, task="open", status="failed",
                                      issues=[f"{name}: unreadable ({type(error).__name__}: {error})"]))
             job.state["result"] = ([], core.coverage)
             return
-    elif sheet:  # a CSV file, read as a one-sheet workbook of text cells
-        from .xlsxdocs import read_csv
-        doc = read_csv(raw)
-        core.locator = lambda page, bbox, region, task: csv_locator(doc.places, page, bbox, region, task)
     else:
-        doc = parse(raw.decode("utf-8", errors="replace"), markdown=extension in (".md", ".markdown"))
+        doc = read_text(raw, extension)
+    if sheet:
+        core.locator = lambda page, bbox, region, task: csv_locator(doc.places, page, bbox, region, task)
     if book:  # a workbook's claims are placed by sheet and cells, known once it's read
         core.locator = lambda page, bbox, region, task: xlsx_locator(doc.places, page, bbox, region, task)
     if not doc.blocks:

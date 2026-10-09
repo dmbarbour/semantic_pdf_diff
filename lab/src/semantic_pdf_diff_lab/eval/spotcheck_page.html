@@ -141,7 +141,7 @@ function setSummary(side, it, a) {
 function show() {
   const it = current(), a = answer();
   let html = `<h2>Item ${state.at + 1} of ${DATA.items.length}: ${esc(it.title)}</h2>`
-    + `<div class="top"><div class="pages"><div><img src="${esc(it.image)}" alt="the part of the page read"><div class="muted">The part of the page read. Click to enlarge.</div></div>`
+    + `<div class="top"><div class="pages">` + (it.image ? `<div><img src="${esc(it.image)}" alt="the part of the page read"><div class="muted">The part of the page read. Click to enlarge.</div></div>` : `<div class="muted">A text format, read as text: its lines are below, no page image.</div>`)
     + (it.page_image ? `<div><img src="${esc(it.page_image)}" alt="the whole page, the part read outlined"><div class="muted">The whole page (the part read outlined, if it's a part), for headers and captions.</div></div>` : '')
     + '</div><div>'
     + (it.headings ? `<div class="muted">Under the headings: ${esc(it.headings)}</div>` : '')

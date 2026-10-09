@@ -6,6 +6,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from semantic_pdf_diff.regions import FAMILY, region_of
+from ..documents import contents
 from .units import _reader
 
 def gains(baseline_dir, variant_dir, fixture=None):
@@ -52,7 +53,7 @@ def mechanical(runs_dir):
         if not (folder / "store.sqlite").exists():
             continue
         with Store.open(folder) as store:
-            for content in sorted({f.content for f in store.files() if f.content.endswith(".pdf")}):
+            for content in contents(store):  # every format a reader reads (PDFs alone before: review E3)
                 for row in store.coverage(content):
                     family = FAMILY.get(region_of(row["task"]))
                     if not family:

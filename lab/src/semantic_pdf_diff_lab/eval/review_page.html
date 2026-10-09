@@ -110,7 +110,8 @@ function suggested(kind, fields) {
 function showItem() {
   const item = current(), l = label();
   const sent = item.request ? item.request.images : [];
-  $('#images').innerHTML = [...sent, ...item.images].map(i => `<figure><img src="${esc(i.src)}" alt="${esc(i.caption)}" loading="lazy"><figcaption>${esc(i.caption)}</figcaption></figure>`).join('');
+  $('#images').innerHTML = [...sent, ...item.images].map(i => `<figure><img src="${esc(i.src)}" alt="${esc(i.caption)}" loading="lazy"><figcaption>${esc(i.caption)}</figcaption></figure>`).join('')
+    + (item.texts || []).map(t => `<figure><pre>${esc(t.text)}</pre><figcaption>${esc(t.caption)}</figcaption></figure>`).join('');
   const kind = DATA.taxonomy[item.type];
   let html = `<div class="question">${esc(QUESTIONS[item.type])}</div><h2>Item ${state.at + 1} of ${DATA.items.length} · ${esc(item.type)}</h2>`;
   if (item.type === 'pair') {

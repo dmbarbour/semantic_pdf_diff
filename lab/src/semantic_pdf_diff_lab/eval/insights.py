@@ -184,7 +184,8 @@ def page(round_folder):
                 + f"<div class='grid'><div><b>Only in baseline</b> <span class='muted'>(of the claims shown to judges)</span>"
                   f"<ul class='claims'>{_claims(u['only_baseline'])}</ul></div><div><b>Only in variant</b>"
                   f"<ul class='claims'>{_claims(u['only_variant'])}</ul></div></div>"
-                + f"<p><a href='pairs-{esc(variant)}/{esc(u['image'])}'>page image</a></p></details>")
+                + (f"<p><a href='pairs-{esc(variant)}/{esc(u['image'])}'>page image</a></p>" if u["image"] else
+                   "<p class='muted'>Read as text: no page image.</p>") + "</details>")
     target = round_folder / "insights.html"
     target.write_text(html_page(f"Round {spec['name']} insights", "\n".join(out), STYLE), encoding="utf-8")
     return target

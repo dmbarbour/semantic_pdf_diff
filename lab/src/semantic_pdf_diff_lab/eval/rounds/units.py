@@ -10,6 +10,8 @@ from pathlib import Path
 
 from semantic_pdf_diff.pages import native, shown_by_matrix
 from semantic_pdf_diff.regions import FAMILY, region_of
+from semantic_pdf_diff.extract import IMAGE_EXTENSIONS
+from ..documents import Document, contents, extension, layout
 
 MAX_CLAIMS = 25     # claims shown per side (sampled when there are more)
 PAGE_TEXT = 6000    # characters of the page's text layer shown to judges
@@ -59,9 +61,7 @@ def collect(runs_dir, unit="family"):
         if not (folder / "store.sqlite").exists():
             continue
         with Store.open(folder) as store:
-            from semantic_pdf_diff.extract import TEXT_EXTENSIONS  # every format a reader reads
-            contents = sorted({f.content for f in store.files() if f.content.endswith((".pdf",) + TEXT_EXTENSIONS)})
-            for content in contents:
+            for content in contents(store):  # every format a reader reads (images were left out: review E3)
                 for row in store.coverage(content):
                     family = family_of(region_of(row["task"]))
                     if family and row.get("page"):
@@ -94,19 +94,15 @@ MAX_BANDS = 4  # a unit is cut into at most this many bands
 BANDS = "as displayed"  # how a band's y0, y1 are measured (batches record it; before 2026-10-02, unrotated)
 
 def rotations(runs_dir):
-    """rotation(run, content, page): the page's rotation matrix (None: upright), from the document
-    the run's store read; each document is opened once."""
-    import pymupdf
-    from semantic_pdf_diff.scan import read_origin
+    """rotation(run, content, page): the page's rotation matrix (None: upright, and a text format's lines), from the
+    document the run's store read; each document is opened once."""
     from semantic_pdf_diff.store import Store
     cache = {}
     def rotation(run, content, page):
         if (run, content) not in cache:
-            with Store.open(Path(runs_dir) / run) as store:
-                file = next(f for f in store.files() if f.content == content)
-                data = read_origin(store.origin(file.source, file.path))
-            with pymupdf.open(stream=data, filetype="pdf") as doc:
-                cache[(run, content)] = [p.rotation_matrix if p.rotation else None for p in doc]
+            with Store.open(Path(runs_dir) / run) as store, Document.of(store, content) as doc:
+                cache[(run, content)] = [p.rotation_matrix if p.rotation else None for p in doc.pdf] \
+                    if doc.pdf is not None else [None] * doc.pages
         return cache[(run, content)][page - 1]
     return rotation
 
@@ -253,6 +249,27 @@ def _lead(doc, page, region, cache, key):
     before = " ".join(" ".join(above).split())[-LEAD:]
     return before, " > ".join(context.stem_path(page, tuple(region)))
 
+def _text_lead(doc, page, box):
+    """_lead for a text format (a documents.Document's lines): the text of the lines before the unit, and the headings
+    it sits under."""
+    first = int(box[1]) if box is not None else min((n for n, _ in doc.lines(page)), default=1)
+    before = " ".join(" ".join(text for _, text in doc.text.lines[:first - 1]).split())[-LEAD:]
+    return before, " > ".join(doc.headings(page, first))
+
+def _view(doc, folder, name, page, band, cache, key):
+    """(image, page text, before, within) of a unit: a page's crop (a band's own, at full size) and its text layer,
+    or, for a text format, its lines and no image."""
+    from ..review import render
+    if doc.pdf is None:
+        box = (0.0, band[2], 1.0, band[3]) if band else None
+        return None, doc.page_text(page, box)[:PAGE_TEXT], *_text_lead(doc, page, box)
+    region = band_region(doc.pdf[page - 1], band) if band else None
+    if not (folder / "images" / name).exists():  # a band is shown as its own crop, at full size
+        (folder / "images" / name).write_bytes(render(doc.pdf, page, region, None, 1400))
+    text = doc.page_text(page, region)[:PAGE_TEXT]
+    return f"images/{name}", text, *_lead(doc.pdf, page, region or native(doc.pdf[page - 1], doc.pdf[page - 1].rect),
+                                          cache, key)
+
 # A batch's page text (what judges and people read beside each crop) is the document's content, so like its images
 # it isn't committed (the owner, 2026-10-02): pairs.json holds the rest, and PAGES (git-ignored) the text, restored
 # from the public slices by rerender.
@@ -284,10 +301,7 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
     the baseline or hold claims read by another kind of task: those are bugs. Others are recorded:
     unique claims a sample hides, changed units a lever shouldn't touch, units of no document family
     (documents: {slice name: family})."""
-    from ..review import render
     from semantic_pdf_diff.store import Store
-    from semantic_pdf_diff.scan import read_origin
-    import pymupdf
     folder = Path(folder)
     (folder / "images").mkdir(parents=True, exist_ok=True)
     picked, counts = pair_units(baseline_dir, variant_dir, n, seed, unit=unit, limit=limit)
@@ -297,37 +311,40 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
                          f"is the baseline, {checks['foreign_readings']} claims sit in units of another kind")
     rng = random.Random(seed + 1)
     items = []
-    docs = {}
+    docs, opened = {}, {}
     hidden_unique = 0  # claims only one side has that a unit's sample leaves out (rubric v4 says there are none)
-    for (run, content, page, family, *band), a, b in picked:
-        if (run, content) not in docs:
-            with Store.open(Path(baseline_dir) / run) as store:
-                file = next(f for f in store.files() if f.content == content)
-                docs[(run, content)] = read_origin(store.origin(file.source, file.path))
-                docs[(run, content, "sections")] = store.sections(content)
-        headings = [" > ".join(x.heading_path) for x in docs[(run, content, "sections")]
-                    if x.heading_path and x.first_page <= page <= x.last_page]
-        with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
+    try:
+        for (run, content, page, family, *band), a, b in picked:
+            if (run, content) not in opened:
+                with Store.open(Path(baseline_dir) / run) as store:
+                    opened[(run, content)] = Document.of(store, content)
+                    docs[(run, content, "sections")] = store.sections(content)
+                    docs[(run, content, "layout")] = vars(layout(store))
+            headings = [" > ".join(x.heading_path) for x in docs[(run, content, "sections")]
+                        if x.heading_path and x.first_page <= page <= x.last_page]
             part, parts, y0, y1 = band[0] if band else (0, 1, None, None)
-            region = band_region(doc[page - 1], band[0]) if band else None
             # a band's crop is its own: a text and a visual unit cut into bands of the same number once shared one, so
             # one of them was judged on the other's crop (rounds 9, 9b and 9h; found 2026-10-02)
             name = f"{run}-{content.split(':')[1][:8]}-p{page}" + (f"-{family}-b{part}of{parts}" if band else "") + ".jpg"
-            if not (folder / "images" / name).exists():  # a band is shown as its own crop, at full size
-                (folder / "images" / name).write_bytes(render(doc, page, region, None, 1400))
-            text = doc[page - 1].get_text("text", clip=region)[:PAGE_TEXT]
-            before, within = _lead(doc, page, region or native(doc[page - 1], doc[page - 1].rect), docs, (run, content))
-        shown_a, shown_b = shown(a, b, rng, limit)
-        shared = set(a) & set(b)
-        hidden_unique += len((set(a) - set(b)) - set(shown_a)) + len((set(b) - set(a)) - set(shown_b))
-        items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}" + (f"-b{part}of{parts}" if band else ""),
-                      "run": run, "content": content, "page": page, "family": family,
-                      "band": [part, parts, y0, y1] if band else None,
-                      "image": f"images/{name}", "page_text": text, "sections": headings,
-                      "before": before, "within": within,
-                      "baseline": [a[i] for i in shown_a], "variant": [b[i] for i in shown_b],
-                      "hidden_shared": len(shared - set(shown_a)),
-                      "counts": {"baseline": len(a), "variant": len(b), "shared": len(shared)}})
+            image, text, before, within = _view(opened[(run, content)], folder, name, page, band[0] if band else None,
+                                                docs, (run, content))
+            shown_a, shown_b = shown(a, b, rng, limit)
+            shared = set(a) & set(b)
+            hidden_unique += len((set(a) - set(b)) - set(shown_a)) + len((set(b) - set(a)) - set(shown_b))
+            items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}" + (f"-b{part}of{parts}" if band else ""),
+                          "run": run, "content": content, "page": page, "family": family,
+                          "band": [part, parts, y0, y1] if band else None,
+                          "image": image, "page_text": text, "sections": headings,
+                          "before": before, "within": within,
+                          "baseline": [a[i] for i in shown_a], "variant": [b[i] for i in shown_b],
+                          "hidden_shared": len(shared - set(shown_a)),
+                          "counts": {"baseline": len(a), "variant": len(b), "shared": len(shared)},
+                          # an image's page is laid out by the run's settings (rerender lays it out again)
+                          **({"layout": docs[(run, content, "layout")]} if extension(content) in IMAGE_EXTENSIONS
+                             else {})})
+    finally:
+        for doc in opened.values():
+            doc.close()
     checks["hidden_unique_claims"] = hidden_unique
     if documents is not None:
         checks["without_family"] = sorted({i["run"] for i in items if not documents.get(i["run"])})
@@ -345,7 +362,6 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
     - the whole page with the unit's region outlined, and the page's whole text layer;
     - for text and table claims, the input their request was given (from each side's own run store).
     Units are recomputed exactly as build_batch sampled them."""
-    import pymupdf
     from ..review import render
     from semantic_pdf_diff.scan import read_origin
     from semantic_pdf_diff.store import Store
@@ -390,8 +406,13 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
         if (run, content) not in docs:
             with Store.open(Path(baseline_dir) / run) as store:
                 file = next(f for f in store.files() if f.content == content)
-                docs[(run, content)] = read_origin(store.origin(file.source, file.path))
-        with pymupdf.open(stream=docs[(run, content)], filetype="pdf") as doc:
+                docs[(run, content)] = read_origin(store.origin(file.source, file.path)), layout(store)
+        with Document(docs[(run, content)][0], content, docs[(run, content)][1]) as shown_doc:
+            if shown_doc.pdf is None:  # a text format: its whole page's lines, no image (review E3)
+                item["page_image"] = None
+                item["page_text_full"] = shown_doc.page_text(page)[:PAGE_TEXT]
+                continue
+            doc = shown_doc.pdf
             if band and doc[page - 1].rotation and batch.get("bands") != BANDS:
                 raise ValueError(f"{folder}'s bands were cut by unrotated y; rebuild the batch to add context")
             region = band_region(doc[page - 1], band[0]) if band else None
@@ -403,25 +424,37 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
     return batch
 
 def rerender(folder, slices, target=None):
-    """A batch's images and page text made again from the PDFs its runs read (`slices`: a folder of them, the public
-    slices): the images into `target` (default: the batch's own images folder, and then the text into PAGES), what
+    """A batch's images and page text made again from the documents its runs read (`slices`: a folder of them, the
+    public slices): the images into `target` (default: the batch's own images folder, and then the text into PAGES), what
     build_batch and add_context wrote, byte for byte under the same PyMuPDF. Development rounds' images aren't committed (the owner, 2026-10-02: "we should not be
     committing images ... for development rounds"); this brings them back. Returns the image names written."""
     import pymupdf
+    from semantic_pdf_diff.extract import READERS
     from semantic_pdf_diff.pages import native_page
     from semantic_pdf_diff.provenance import content_id
+    from types import SimpleNamespace
     from ..review import render
     folder = Path(folder)
     target = Path(target) if target else folder / "images"
     target.mkdir(parents=True, exist_ok=True)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))
-    pdfs = {content_id(p.read_bytes(), p.name): p for p in sorted(Path(slices).glob("*.pdf"))}
+    sources = {content_id(p.read_bytes(), p.name): p for p in sorted(Path(slices).iterdir())
+               if p.suffix.lower() in READERS}
     written, pages = [], {}
     for item in batch["items"]:
-        source = pdfs.get(item["content"])
+        source = sources.get(item["content"])
         if source is None:
-            raise FileNotFoundError(f"{item['content']} ({item['run']}): not among {slices}'s PDFs")
-        with pymupdf.open(source) as doc:
+            raise FileNotFoundError(f"{item['content']} ({item['run']}): not among {slices}'s documents")
+        laid_out = SimpleNamespace(**item["layout"]) if item.get("layout") else None
+        with Document(source.read_bytes(), item["content"], laid_out) as shown_doc:
+            if shown_doc.pdf is None:  # a text format: its lines, no image (review E3)
+                band = item.get("band")
+                pages[item["id"]] = {"page_text": shown_doc.page_text(item["page"], (0.0, band[2], 1.0, band[3])
+                                                                      if band else None)[:PAGE_TEXT],
+                                     **({"page_text_full": shown_doc.page_text(item["page"])[:PAGE_TEXT]}
+                                        if "page_image" in item else {})}
+                continue
+            doc = shown_doc.pdf
             page = doc[item["page"] - 1]
             band = item.get("band")
             if band and batch.get("bands") == BANDS:

@@ -37,6 +37,11 @@ def _whole_view(item, a, b):
     titles = {"S": "CLAIMS IN BOTH SETS", "A": "CLAIMS ONLY IN SET A", "B": "CLAIMS ONLY IN SET B"}
     claims = "\n\n".join(f"{titles[g]} ({len(c)}):\n{_claims_text(c, g)}" for g, c in groups.items())
     whole = item.get("page_text_full") or item["page_text"]
+    if not item["image"]:  # a text format: lines, no images
+        view = TEXT_FORMAT + f"The whole page's lines:\n{whole}"
+        if item.get("band"):
+            view += f"\n\nThis part's lines:\n{item['page_text']}"
+        return view, claims, (shared, only_a, only_b)
     view = f"The whole page's text layer:\n{whole}"
     if item.get("band"):
         view = ("The first image shows this part of the page; the second, the whole page with this part "
@@ -56,6 +61,9 @@ def _claim_marks(entries, shown):
                         "mark": entry["mark"],
                         "problems": sorted({str(p).lower() for p in entry.get("problems") or ()} & set(CLAIM_PROBLEMS))})
     return out
+
+# Before a text format's lines (a unit with no image), as the rubrics speak of a page image and its text layer.
+TEXT_FORMAT = "(A text format, read as text: there is no page image, and these lines are the source.)\n"
 
 def pair_requests(folder, batch, rubric="v1"):
     """Every judge request a batch makes under a rubric, in order: (item, order, prompt, images,
@@ -78,8 +86,11 @@ def pair_requests(folder, batch, rubric="v1"):
             if whole and "page_image" not in item:
                 raise ValueError(f"rubric {rubric} needs the whole page: run rounds.add_context on {folder} first")
             view, grouped, groups = _whole_view(item, a, b) if whole else ("", "", None)
-            images = [folder / item["image"]] + ([folder / item["page_image"]] if whole and band else [])
-            prompt = template.format(page=item["page"], family=item["family"], page_text=item["page_text"],
+            # a text format's unit has no image: its lines are its page text (review E3)
+            images = ([folder / item["image"]] if item["image"] else []) \
+                + ([folder / item["page_image"]] if whole and band and item["page_image"] else [])
+            page_text = item["page_text"] if item["image"] else TEXT_FORMAT + item["page_text"]
+            prompt = template.format(page=item["page"], family=item["family"], page_text=page_text,
                                      page_view=view, claims=grouped,
                                      a=_claims_text(a, "A" if numbered else None),
                                      b=_claims_text(b, "B" if numbered else None),

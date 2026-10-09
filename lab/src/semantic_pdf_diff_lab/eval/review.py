@@ -21,6 +21,7 @@ from pathlib import Path
 
 from semantic_pdf_diff.pages import native_page, shown
 from semantic_pdf_diff.provenance import now
+from .documents import Document, contents
 from .taxonomy import (ADEQUACY, CLARITY, CONFIDENCE, CORE_FIELDS, FIELD_ANSWERS, FIELDS, MISSING, TAXONOMY, USABLE,
                        USEFULNESS, WORTH, field_names, flag_names)
 
@@ -30,6 +31,7 @@ CROP_PAD = 36        # points around a claim's region
 TILE_MARGIN = 0.35   # share of a tile's size shown around it, so reviewers see what the model didn't
 CROP_SIDE = 1100     # longest side of a crop, pixels
 PAGE_SIDE = 800      # longest side of a page view, pixels
+PAGE_TEXT = 6000     # characters of a text format's page shown (it has no page image)
 OUTLINE = 3          # highlight line width, pixels
 
 # --- rendering ---------------------------------------------------------------------------
@@ -82,27 +84,23 @@ class Source:
             self.docs.setdefault(f.content, (f.source, f.path))
 
     def doc(self, content):
-        import pymupdf
-        from semantic_pdf_diff.scan import read_origin
-        source, path = self.docs[content]
-        return pymupdf.open(stream=read_origin(self.store.origin(source, path)), filetype="pdf")
+        """The document behind a content ID (documents.Document: a PDF's or an image's pages, or a text format's
+        lines)."""
+        return Document.of(self.store, content)
 
     def close(self):
         self.store.close()
 
     def claim(self, claim_id):
-        for content in sorted(self.docs):
-            for e in self.store.evidence(content) if content.endswith(".pdf") else ():
+        for content in contents(self.store):
+            for e in self.store.evidence(content):
                 if e.id == claim_id:
                     return e.model_dump()
         raise KeyError(claim_id)
 
     def claims(self):
-        out = []
-        for content in sorted(self.docs):
-            if content.endswith(".pdf"):
-                out += [e.model_dump() for e in self.store.evidence(content)]
-        return out
+        """Every claim of every format a reader reads (PDFs alone before: code review 2026-10-08, E3)."""
+        return [e.model_dump() for content in contents(self.store) for e in self.store.evidence(content)]
 
     def abouts(self):
         items = []
@@ -165,7 +163,7 @@ class Requests:
                 ident = ("triage", r["content"], r["kind"], r["id"])
             else:
                 ident = ("compare", r["a"], r["b"])
-            self.index[ident] = (r, q["prompt"], len(q["images"]))
+            self.index[ident] = (r, q["prompt"], q["images"])
 
     def describe(self, item, source, folder):
         """{summary, instructions, query, images} for an item, or None if it wasn't recorded."""
@@ -180,7 +178,8 @@ class Requests:
             found = self.index.get(("compare", item["target"]["a"], item["target"]["b"]))
         if found is None:
             return None
-        r, prompt, sent = found
+        r, prompt, hashes = found
+        sent = len(hashes)
         if r["role"] == "extract":
             from semantic_pdf_diff.extract import ExtractQuery
             asked = ExtractQuery.read(prompt)
@@ -194,8 +193,9 @@ class Requests:
         if r["role"] == "extract" and r["crop"]:
             rect, side = r["crop"]
             content, page_no = item["target"].get("content") or e["content"], e["locator"]["page"]
-            images.append({"src": self._render(source, folder, content, page_no, rect, side, item["id"]),
-                           "caption": "The image the model was sent"})
+            src = self._render(source, folder, content, page_no, rect, side, item["id"], hashes)
+            if src:
+                images.append({"src": src, "caption": "The image the model was sent"})
         elif sent and r["role"] == "triage":  # the figure's crop (re-rendered for review)
             images.append(dict(item["images"][0], caption="The figure image the model was sent (re-rendered)"))
         elif sent:  # comparisons: each claim's source crop
@@ -208,22 +208,43 @@ class Requests:
             described["heading"] = r["heading"] or "(none)"
         return described
 
-    def _render(self, source, folder, content, page_no, rect, side, stem):
+    def _render(self, source, folder, content, page_no, rect, side, stem, hashes=()):
+        """The crop a request was sent, rendered again from its page; a text format's (a Word picture's) is the run's
+        own image, found by its hash among the store folder's assets (None if it's gone)."""
+        import hashlib
         import pymupdf
         from semantic_pdf_diff.extract import render
         target = folder / "images" / f"{stem}-input.png"
         with source.doc(content) as doc:
-            render(doc[page_no - 1], pymupdf.Rect(rect), target, side)
-        return f"images/{target.name}"
+            if doc.pdf is not None:
+                render(doc.pdf[page_no - 1], pymupdf.Rect(rect), target, side)
+                return f"images/{target.name}"
+        assets = source.folder / "assets"
+        for path in sorted(assets.glob("*.png")) if assets.exists() else ():
+            if hashlib.sha256(path.read_bytes()).hexdigest() in hashes:
+                target.write_bytes(path.read_bytes())
+                return f"images/{target.name}"
+        return None
 
 def _save(folder, name, data):
     (folder / "images" / name).write_bytes(data)
     return f"images/{name}"
 
+LINES_AROUND = 3  # lines shown around a text format's claim
+
 def _claim_views(source, folder, e, prefix):
-    """(images, context) for one claim: what the model read, and where it sits on the page."""
+    """(images, context, texts) for one claim: what the model read, and where it sits on the page; a text format's
+    claim is shown as its lines (texts), with those around them, and no image."""
     loc = e["locator"]
-    with source.doc(e["content"]) as doc:
+    with source.doc(e["content"]) as shown_doc:
+        if shown_doc.pdf is None:
+            first, last = loc.get("lines") or loc.get("paragraphs")
+            around = shown_doc.lines(loc["page"], (0, first - LINES_AROUND, 1, last + 1 + LINES_AROUND))
+            text = "\n".join(("» " if first <= n <= last else "  ") + line for n, line in around)
+            context = {"document": source.names[e["content"]], "page": loc["page"], "region": loc["region"],
+                       "section": _headings(source, e["content"]).get(e.get("section", ""), "")}
+            return [], context, [{"text": text, "caption": "The source lines (marked »), with the lines around them"}]
+        doc = shown_doc.pdf
         page = doc[loc["page"] - 1]
         native = tuple(native_page(page))
         visual = loc["region"] in ("tile", "overview")
@@ -239,7 +260,7 @@ def _claim_views(source, folder, e, prefix):
                    "caption": f"Page {loc['page']} of {len(doc)}"}]
     context = {"document": source.names[e["content"]], "page": loc["page"], "region": loc["region"],
                "section": _headings(source, e["content"]).get(e.get("section", ""), "")}
-    return images, context
+    return images, context, []
 
 def _stratified(rng, groups, n):
     """Up to n picks, round-robin over groups (each shuffled), so rare kinds are represented."""
@@ -258,9 +279,9 @@ def _sample_claims(source, folder, rng, n):
     items = []
     for e in _stratified(rng, groups, n):
         iid = item_id("claim", source.label, e["id"])
-        images, context = _claim_views(source, folder, e, iid)
+        images, context, texts = _claim_views(source, folder, e, iid)
         items.append({"id": iid, "type": "claim", "store": source.label, "target": {"claim": e["id"]},
-                      "images": images, "context": context, "shown": _claim_fields(e)})
+                      "images": images, "context": context, "shown": _claim_fields(e), **({"texts": texts} if texts else {})})
     return items
 
 def _sample_abouts(source, folder, rng, n):
@@ -271,8 +292,19 @@ def _sample_abouts(source, folder, rng, n):
     items = []
     for kind, content, x in _stratified(rng, groups, n):
         iid = item_id("about", source.label, content, kind, x["id"])
-        with source.doc(content) as doc:
-            if kind == "figure":
+        with source.doc(content) as shown_doc:
+            doc = shown_doc.pdf
+            texts = []
+            if doc is None:  # a text format's section: its first pages' lines, no image
+                pages = list(range(x["first_page"], x["last_page"] + 1))[:3]
+                images = []
+                texts = [{"text": shown_doc.page_text(p)[:PAGE_TEXT], "caption": f"Page {p} of {shown_doc.pages}"}
+                         for p in pages]
+                shown = {"about": x["about"], "type": x.get("section_type", ""), "density": x.get("density", ""),
+                         "keywords": ", ".join(x.get("keywords", []))}
+                context = {"document": source.names[content], "section": " > ".join(x["heading_path"]) or "(no heading)",
+                           "pages": f"{x['first_page']}-{x['last_page']}"}
+            elif kind == "figure":
                 images = [{"src": _save(folder, f"{iid}-figure.jpg", render(doc, x["page"], x["bbox"])),
                            "caption": "The figure"},
                           {"src": _save(folder, f"{iid}-page.jpg", render(doc, x["page"], None, x["bbox"], PAGE_SIDE)),
@@ -289,7 +321,8 @@ def _sample_abouts(source, folder, rng, n):
                 context = {"document": source.names[content], "section": " > ".join(x["heading_path"]) or "(no heading)",
                            "pages": f"{x['first_page']}-{x['last_page']}"}
         items.append({"id": iid, "type": "about", "store": source.label,
-                      "target": {"content": content, kind: x["id"]}, "images": images, "context": context, "shown": shown})
+                      "target": {"content": content, kind: x["id"]}, "images": images, "context": context, "shown": shown,
+                      **({"texts": texts} if texts else {})})
     return items
 
 def _sample_pairs(source, folder, rng, n):
@@ -301,14 +334,17 @@ def _sample_pairs(source, folder, rng, n):
     items = []
     for f in _stratified(rng, groups, n):
         iid = item_id("pair", source.label, f["a"], f["b"])
-        a_images, a_context = _claim_views(source, folder, evidence[f["a"]], iid + "-a")
-        b_images, b_context = _claim_views(source, folder, evidence[f["b"]], iid + "-b")
+        a_images, a_context, a_texts = _claim_views(source, folder, evidence[f["a"]], iid + "-a")
+        b_images, b_context, b_texts = _claim_views(source, folder, evidence[f["b"]], iid + "-b")
+        texts = [dict(t, caption="A: " + t["caption"]) for t in a_texts] + [dict(t, caption="B: " + t["caption"])
+                                                                              for t in b_texts]
         items.append({"id": iid, "type": "pair", "store": source.label, "target": {"a": f["a"], "b": f["b"]},
                       "images": [dict(i, caption="A: " + i["caption"]) for i in a_images]
                                 + [dict(i, caption="B: " + i["caption"]) for i in b_images],
                       "context": {"A": a_context, "B": b_context},
                       "shown": {"A": _claim_fields(evidence[f["a"]]), "B": _claim_fields(evidence[f["b"]]),
-                                "relation": f["relation"], "rationale": f.get("rationale", "")}})
+                                "relation": f["relation"], "rationale": f.get("rationale", "")},
+                      **({"texts": texts} if texts else {})})
     return items
 
 # --- the review page ---------------------------------------------------------------------
@@ -588,7 +624,8 @@ def _options(entries):
 def judge_prompt(item):
     kind = TAXONOMY[item["type"]]
     shown = {"shown": item["shown"], "context": item["context"],
-             "images": [f"image {n + 1}: {i['caption']}" for n, i in enumerate(item["images"])]}
+             "images": [f"image {n + 1}: {i['caption']}" for n, i in enumerate(item["images"])],
+             **({"source text": item["texts"]} if item.get("texts") else {})}
     return JUDGE.format(question=QUESTIONS[item["type"]], verdicts=_options(kind["verdicts"]),
                         fields=_options(FIELDS[item["type"]]),
                         flags=_options(kind["flags"]), clarity=_options(CLARITY), confidence=_options(CONFIDENCE),

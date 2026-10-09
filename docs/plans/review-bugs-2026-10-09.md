@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Planned (2026-10-09). The order is agreed; the designs below await the owner's review.
+- **Status:** Active (2026-10-09). The order is agreed. Item 1 (E3) is done; items 2–4 await the owner's review of their designs (B5's choice).
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -25,6 +25,23 @@
 ## Items, in order
 
 ### 1. E3: lab scoring sees every format
+
+**Done (2026-10-09).** The owner: "Please proceed with E3." What was built:
+- **`eval/documents.py`**, the lab's one view of a stored document:
+  - `contents(store)`: every content whose extension has a reader
+  - `Document`: a PDF's pages; an image's pages as its reader laid them out, under the store's bound `tile_points` and `image_side`; a text format's lines, with the headings above a line
+- **Rounds:**
+  - units and mechanical measures read every format
+  - a text format's unit has no image; its page text is its lines, cut into bands by line
+  - judges are told a text unit has no page image (`judging.TEXT_FORMAT`); image units keep their layout for `rerender`, which restores every format from the slices
+- **Review batches:**
+  - every format's claims are sampled
+  - a text format's claim is shown as its lines, the claim's own marked, in `texts` (on the review page and in the panel's prompt)
+  - a Word picture's crop is the run's own image, found by its hash
+- **Product (behaviour-preserving, for the lab):** `textdocs.read_text` (the readers' parsing, which `text_job` now calls) and `Store.interpreter(role)`.
+- **Found while fixing:** the units already collected text formats, but a batch with one would have failed: every document was opened as a PDF.
+- **Unchanged:** PDF batches and prompts, byte for byte (the rounds tests rerender and compare them).
+- **Test:** `tests/test_lab_documents.py`: a PDF, a Markdown file and an image through units, measures, batches, context, rerender and review samples.
 
 - **The bug** (lab only):
   - The rounds' units (`eval/rounds/units.py:62-63`) read PDFs and text formats, but not images.
