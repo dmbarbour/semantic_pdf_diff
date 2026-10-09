@@ -405,6 +405,95 @@ class NewTables(unittest.TestCase):
         self.assertIn("table:p1:0.1:0", tables)  # B-1, in pdf_parts' part 1
         self.assertEqual(len(tables), len(set(tables)))
 
+class Recorded(unittest.TestCase):
+    def test_a_structure_asked_again_records_each_task_once(self):
+        # code review 2026-10-08, B7: the first answer's tag was recorded partial, then complete with the second's
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        import pymupdf
+        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.provenance import content_id
+        from stubs import situating_answer
+        rows = [["Tag", "Model"], ["P-1", "X1"], ["", "CCD201"], ["P-2", "X2"]]
+
+        class Table:
+            bbox = (20, 20, 280, 120)
+            def extract(self): return rows
+
+        class Client:
+            s = Settings(vision=False)
+            calls, cache_hits, usage = 0, 0, {}
+
+            def ask(self, prompt, schema, images=(), key=None):
+                if schema is ts.Structure:
+                    examples = [{"line": "1", "cells": ["P-1", "X1 CCD201"]}] if key[3].endswith(":again") else []
+                    return ts.Structure.model_validate({"rules": [{"action": "join above", "lines": ["2"]}],
+                                                        "examples": examples})
+                if schema is ts.StructureReview:
+                    return ts.StructureReview(verdict="keep")
+                if situating_answer(prompt):
+                    return schema.model_validate(situating_answer(prompt))
+                if schema.__name__ == "Rules":
+                    return schema(reading="rows")
+                return Extraction(claims=[], complete=True)
+
+        with tempfile.TemporaryDirectory() as d, \
+                patch.object(pymupdf.Page, "find_tables", lambda page, *a, **k: type("T", (), {"tables": [Table()]})()):
+            doc = pymupdf.open()
+            doc.new_page(width=300, height=300)
+            path = Path(d) / "t.pdf"
+            doc.save(path)
+            _, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), Client())
+        rows_ = [(r["task"], r["status"]) for r in coverage if r["task"].startswith("structure:")]
+        self.assertEqual(rows_, [("structure:p1:0", "partial"), ("structure:p1:0:again", "complete")])
+
+class SecondNoRows(unittest.TestCase):
+    def test_no_rows_in_a_second_answer_is_read_as_no_table_too(self):
+        # code review 2026-10-08, B10: the first answer's "no rows" went to a figure, the second's stayed a table
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        import pymupdf
+        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.provenance import content_id
+        from stubs import situating_answer
+        rows = [["Room", "Size"], ["", "25'-0\""], ["MEETING 102", "732 SF"]]
+
+        class Table:
+            bbox = (20, 20, 280, 120)
+            def extract(self): return rows
+
+        class Client:
+            s = Settings(vision=True)
+            calls, cache_hits, usage = 0, 0, {}
+            asked = []
+
+            def ask(self, prompt, schema, images=(), key=None):
+                self.asked.append(key[3])
+                if schema is ts.Structure:
+                    if key[3].endswith(":again"):
+                        return ts.Structure.model_validate({"rules": [{"action": "not table", "lines": ["1", "2"]}],
+                                                            "why": "a floor plan"})
+                    return ts.Structure.model_validate({"rules": [{"action": "merge", "lines": ["1"]}]})
+                if situating_answer(prompt):
+                    return schema.model_validate(situating_answer(prompt))
+                return Extraction(claims=[], complete=True)
+
+        with tempfile.TemporaryDirectory() as d, \
+                patch.object(pymupdf.Page, "find_tables", lambda page, *a, **k: type("T", (), {"tables": [Table()]})()):
+            doc = pymupdf.open()
+            doc.new_page(width=300, height=300)
+            path = Path(d) / "t.pdf"
+            doc.save(path)
+            client = Client()
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+        self.assertIn("structure:p1:0:again", client.asked)
+        self.assertIn("figure:p1:t0", client.asked)
+        self.assertFalse([t for t in client.asked if t.startswith(("table:", "rules:"))])
+
 class Detection(unittest.TestCase):
     """Table detection's failures in a PDF's extraction (code review 2026-10-08, A3 and A4)."""
     def extract(self, tables, ask=None, patches=()):

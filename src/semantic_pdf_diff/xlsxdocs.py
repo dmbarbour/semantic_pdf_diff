@@ -74,12 +74,7 @@ class Region:
     def rows(self):
         return self.bottom - self.top + 1
 
-def _letter(column):
-    out = ""
-    while column:
-        column, rest = divmod(column - 1, 26)
-        out = chr(65 + rest) + out
-    return out
+_letter = tablerules.letter  # a column's letter, from 1
 
 def shown(cell, formula=None):
     """A cell's value as Excel shows it: its number format applied, a date as an ISO date, an error as written; a

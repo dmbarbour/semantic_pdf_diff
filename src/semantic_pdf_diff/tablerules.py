@@ -883,7 +883,8 @@ def read(core, page, g, task, by_itself, source, image=None):
 
         def finish(result, error):
             core.state["pending"] -= 1
-            if error is not None or result is None:
+            core.progress.finish("failed" if error is not None else "complete")  # each review asked, finished once
+            if error is not None or result is None:  # (code review 2026-10-08, B6: never, so totals never closed)
                 return use(name, answer, list(notes) + [f"Not reviewed: {error}"[:300]], done() if revised else
                            "not reviewed")
             if result.verdict.strip().lower() != "revise" or result.rules is None:

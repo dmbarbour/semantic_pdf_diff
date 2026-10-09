@@ -17,6 +17,7 @@ import statistics
 from pydantic import Field, field_validator
 
 from .models import DerivationStep, Lenient, coverage_row
+from .tablerules import letter
 
 UNIT = re.compile(r"^[(\[]?\s*(µm|μm|nm|mm|cm|m|km|in|ft|mas|%|°|°c|°f|k|w|kw|mw|hp|gpm|psi|psig|rpm|kg|lb|s|ms|hz|khz|"
                   r"mhz|v|kv|a|db)\s*[)\]]?$", re.I)
@@ -148,7 +149,8 @@ Return JSON only: {"verdict": "keep" | "revise", "problems": ["..."], "structure
 """
 
 def _letter(k):
-    return chr(ord("A") + k) if k < 26 else f"A{chr(ord('A') + k - 26)}"
+    """Column k's letter, from 0 (the spreadsheet's naming, past "AZ" too: code review 2026-10-08, B10)."""
+    return letter(k + 1)
 
 def _line(row):
     return " | ".join("" if c is None else " ".join(str(c).split()) for c in row)
@@ -507,7 +509,7 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
             return failed(task, error)
         wrong, applied = check(answer)
         if not wrong:
-            return review(answer, applied)
+            return review(task, answer, applied)
         if wrong == [NO_ROWS]:  # the model reads no table here: asking again won't change that
             return heuristic(task, "complete", f"{NO_ROWS} ({answer.why or 'no reason given'})", table=False)
         again = (asked + "\nYOUR EARLIER ANSWER:\n" + answer.model_dump_json(exclude_defaults=True)
@@ -519,33 +521,38 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
         if error is not None:
             return failed(task + ":again", error)
         wrong, applied = check(answer)
+        if wrong == [NO_ROWS]:  # as for the first answer (code review 2026-10-08, B10: read as a table regardless)
+            return heuristic(task + ":again", "complete", f"{NO_ROWS} ({answer.why or 'no reason given'})", table=False)
         if wrong:
             return heuristic(task + ":again", "partial", "the rules failed twice (" + "; ".join(wrong) + ")")
-        review(answer, applied)
+        review(task + ":again", answer, applied)
 
-    def review(answer, applied, round_=1, notes=()):
+    # named: the task whose answer is used ("<task>:again" for the second), so a task's row is recorded once
+    # (code review 2026-10-08, B7: the first's tag was recorded partial, then complete)
+    def review(named, answer, applied, round_=1, notes=()):
         cap = core.s.reviews_tables()
         if round_ > cap or not answer.rules:
-            return use(answer, applied, list(notes))
+            return use(named, answer, applied, list(notes))
         prompt = review_question(asked, answer, applied, header, body, tags)
         name = task + ":review" + (str(round_) if round_ > 1 else "")
 
         def finish(result, error):
-            if error is not None or result is None:
-                return use(answer, applied, list(notes) + [f"Not reviewed: {error}"[:300]])
+            core.progress.finish("failed" if error is not None else "complete")  # each review asked, finished once
+            if error is not None or result is None:  # (code review 2026-10-08, B6: never, so totals never closed)
+                return use(named, answer, applied, list(notes) + [f"Not reviewed: {error}"[:300]])
             if result.verdict.strip().lower() != "revise" or result.structure is None:
-                return use(answer, applied, list(notes) + ["Reviewed: kept"])
+                return use(named, answer, applied, list(notes) + ["Reviewed: kept"])
             same = lambda s: [r.model_dump(exclude={"why"}) for r in s.rules]
             if same(result.structure) == same(answer):
-                return use(answer, applied, list(notes) + ["Reviewed: a revision changing nothing, kept"])
+                return use(named, answer, applied, list(notes) + ["Reviewed: a revision changing nothing, kept"])
             wrong, revised = check(result.structure)
             if wrong:
-                return use(answer, applied, list(notes) + [f"Reviewed: a revision with problems ({'; '.join(wrong)}), "
-                                                           "the last rules passing the checks kept"[:400]])
+                return use(named, answer, applied, list(notes) + [
+                    f"Reviewed: a revision with problems ({'; '.join(wrong)}), the last rules passing the checks kept"[:400]])
             note = f"Reviewed: revised ({'; '.join(result.problems)})"[:400]
             if round_ >= cap:
-                return use(result.structure, revised, list(notes) + [note, f"Review cap ({cap}) reached"])
-            review(result.structure, revised, round_ + 1, list(notes) + [note])
+                return use(named, result.structure, revised, list(notes) + [note, f"Review cap ({cap}) reached"])
+            review(named, result.structure, revised, round_ + 1, list(notes) + [note])
 
         ask(prompt, name, StructureReview, "table-structure-review", finish)
 
@@ -555,10 +562,10 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
             return then([(header, body, boxes)], None, [], True)
         heuristic(name, "failed", f"the structure query failed ({error})")
 
-    def use(answer, applied, notes):
+    def use(named, answer, applied, notes):
         said = describe(applied) or "every line a row as it is"
         parted = cells_parted_otherwise(answer, applied, body)
-        record(task, "complete", [f"Structure by rules: {said}"[:500]] + notes[:6] + applied.misfits[:4] + parted[:2])
+        record(named, "complete", [f"Structure by rules: {said}"[:500]] + notes[:6] + applied.misfits[:4] + parted[:2])
         step = DerivationStep(step="table-structure", detail=f"by rules a model wrote: {said}"[:400])
         then(applied.parts, step, applied.apart, True)
 

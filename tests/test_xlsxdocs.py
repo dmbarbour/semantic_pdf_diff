@@ -213,9 +213,17 @@ class Rules(unittest.TestCase):
         from semantic_pdf_diff.extract import Job, reader_for, run_jobs
         model = RulesModel(answers, reviews, **settings)
         data = workbook()
+
+        class Counted:  # every task queued is finished once (code review 2026-10-08, B6: reviews never were)
+            added = finished = 0
+            def add(self, n=1): self.added += n
+            def finish(self, status="complete"): self.finished += 1
+            def close(self): pass
+        progress = Counted()
         with tempfile.TemporaryDirectory() as d:
             job = Job("sha256:" + "a" * 64 + ".xlsx", lambda: data, reader=reader_for(".xlsx"))
-            run_jobs([[job]], Path(d), model)
+            run_jobs([[job]], Path(d), model, progress=progress)
+        self.assertEqual(progress.finished, progress.added)
         evidence, coverage = job.state["result"]
         return evidence, coverage, model
 

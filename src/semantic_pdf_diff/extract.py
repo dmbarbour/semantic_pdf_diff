@@ -263,7 +263,7 @@ def office_installed(workbook=False):
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
 READERS = {".pdf": "pdf/6",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
            # 4: a part the model reads as no table read as a figure; 5: columns joined where words are cut; 6: a
-           # structure answer's new tables tagged apart (code review 2026-10-08, A2)
+           # structure answer's new tables tagged apart, a structure asked again recorded once (review A2, B7)
            ".txt": "text/2", ".md": "text/1",  # text/2: "A pump ..." isn't a heading (review B4)
            ".docx": "docx/6",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
            # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1)
