@@ -8,6 +8,11 @@ once because conversions were fixed site by site (docs/reviews/meta-audit-2026-0
 """
 import pymupdf
 
+# What PyMuPDF raises on input it can't read: its own errors (FileDataError is a RuntimeError; MuPDF's FzError*
+# aren't), and ValueError on bad arguments. Caught by name so our own errors aren't taken for unreadable input
+# (code review 2026-10-08, A15).
+PYMUPDF_ERRORS = (RuntimeError, ValueError, pymupdf.mupdf.FzErrorBase)
+
 def shown(page, box):
     """A box (unrotated page coordinates) as the page is displayed."""
     return pymupdf.Rect(box) * page.rotation_matrix

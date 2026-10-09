@@ -255,7 +255,7 @@ Claude's reading of where proposals mode begins to make sense:
     - Patience diff and GumTree align containers by shared unique anchors, as design item 1 does.
     - Origin analysis, group linkage and iMAP cover splits and merges (decision 11).
     - BM25F handles fielded names.
-  - **Measured offline** on the six pairs, with no model calls (`scripts/alignment_sketch.py`):
+  - **Measured offline** on the six pairs, with no model calls (`scripts/alignment_sketch.py`, removed 2026-10-08; in git history from `fbb1d9d` back):
     - **Claims scored alone lose changes:** 24 of the 59 claim pairs of changed facts scored as non-matches.
     - **Items first:**
       - the judge gets 47 pairs instead of 1,798, 15 of them false

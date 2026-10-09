@@ -97,7 +97,7 @@ def _overlap(a, b):
     return _area((max(a[0], b[0]), max(a[1], b[1]), min(a[2], b[2]), min(a[3], b[3])))
 
 def page_drawings(page):
-    return page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings()
+    return page.get_cdrawings()
 
 def _banner(d, page_width):
     """A heading bar or a frame around a heading: one wide, thin rectangle."""
@@ -255,7 +255,7 @@ def find_references(doc, figures):
 def attach_claims(figures, evidence):
     """Link visual claims inside each figure, and claims extracted from citing text."""
     for figure in figures:
-        inside, citing = [], []
+        inside = []
         for e in evidence:
             for o in e.occurrences or [e]:
                 where = o.locator

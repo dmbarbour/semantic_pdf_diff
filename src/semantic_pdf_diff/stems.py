@@ -4,7 +4,6 @@ abbreviations a document defines, and the figures and tables a text cites. Split
 import re
 
 from .pages import display_y, reading_dict_blocks
-from .quotes import terms
 
 # Numbered markers, from outer to inner: "Contest 9.", "9-2." or "3.1", "c.", "(iii)", "4.".
 STEM = re.compile(r"^\s*(Contest \d+\.|\d+-\d+\.|\d+(?:\.\d+)+\.?|[a-z]\.|\((?:[ivx]+|\d+|[a-z])\)\.?|\d+\.)(?=\s|$)")

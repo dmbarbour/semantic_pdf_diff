@@ -27,7 +27,7 @@ def main(argv=None):
     run = sub.add_parser("run", help="ask models the suite's cards (records answers)")
     run.add_argument("--model", action="append", required=True)
     run.add_argument("--suite", default="standard", choices=["standard", "quick"])
-    run.add_argument("--max-cost", type=float, default=0.5, help="per model, in dollars")
+    run.add_argument("--max-cost", type=float, default=0.5, help="for the whole command (every model), in dollars")
     run.add_argument("--concurrency", type=int, default=8)
     run.add_argument("--base-url", help="another OpenAI-compatible endpoint (default: OPENAI_BASE_URL)")
     run.add_argument("--responder", help="whose answers these are (default: the model name); name a model at "
@@ -37,7 +37,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.bench import eyetest
     from semantic_pdf_diff import ledger
-    from semantic_pdf_diff.llm import evaluator_settings, folder_client
+    from semantic_pdf_diff.llm import Budget, evaluator_settings, folder_client
     from semantic_pdf_diff.models import Settings
     from semantic_pdf_diff.progress import Progress
     import pymupdf
@@ -45,11 +45,15 @@ def main(argv=None):
     if args.command == "run":
         if args.responder and len(args.model) > 1:
             parser.error("--responder names one model's answers: give one --model with it")
+        budget = Budget(args.max_cost)  # for the whole command, not each model (code review 2026-10-08, E2)
         for model in args.model:
             name = args.responder or model
+            if budget.exhausted():
+                print(f"Paused: cost cap of ${args.max_cost:.2f} reached before {name}")
+                return 3
             before = ledger.spent(LEDGER, round="eyetest", judge=name)
             settings = evaluator_settings(model, eyetest.EYE_SETTINGS, concurrency=args.concurrency, timeout=300,
-                                         retries=2, max_cost=args.max_cost,
+                                         retries=2, **budget.settings(),
                                          **({"base_url": args.base_url} if args.base_url else {}))
             with folder_client(FOLDER, settings, responder=name) as client:
                 client.fixture.note("pymupdf", pymupdf.VersionBind)  # images are drawn by it: replays need the same
@@ -57,6 +61,7 @@ def main(argv=None):
                 progress = Progress(f"eye test {name}", client, heartbeat=settings.heartbeat_seconds)
                 answers = eyetest.ask(FOLDER, client, cards, progress)
                 progress.close()
+            budget.add(client)
             failed = [a["error"] for a in answers.values() if "error" in a]
             print(f"{name}: {len(answers) - len(failed)} answered, {len(failed)} failed, "
                   f"${ledger.spent(LEDGER, round='eyetest', judge=name) - before:.3f}", flush=True)

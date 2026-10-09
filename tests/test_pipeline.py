@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 import pymupdf
 from semantic_pdf_diff.models import Evidence, FileRef, PdfLocator, Settings, Source, Extraction, Judgment, Explanation
-from semantic_pdf_diff.llm import Client, BudgetExceeded, ModelFailure
+from semantic_pdf_diff.llm import Client, BudgetExceeded, Invalid, ModelFailure
 from semantic_pdf_diff.compare import candidates, numeric_check, compare
 from semantic_pdf_diff.extract import extract_pdf, split_utf8, tiles
 from semantic_pdf_diff.report import write_report
@@ -99,7 +99,9 @@ class Tests(unittest.TestCase):
                 store = Store(Path(d) / 'store')
                 self.addCleanup(store.close)
                 c = Client(s,store)
-                self.assertTrue(c.ask('extract',Extraction).complete)
+                with self.assertRaises(Invalid): c.ask('extract',Extraction)  # not retried: it'd be as bad again
+                self.assertEqual(state['calls'],1)  # (code review 2026-10-08, C10)
+                self.assertTrue(c.ask('extract',Extraction).complete)  # a failure isn't cached: asked again
                 c.ask('extract',Extraction)
                 self.assertEqual(state['calls'],2)
                 self.assertEqual(c.cache_hits,1)

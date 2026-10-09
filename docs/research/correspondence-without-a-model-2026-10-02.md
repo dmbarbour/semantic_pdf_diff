@@ -5,7 +5,7 @@
 - **Asked by:** the owner: "We should do some research on what can help here, making it more soft/probabilistic/heuristic in nature without fully intelligent. Tools like BM25F or similar might apply, or a weighted mixture of techniques that each can output confidence between 0 and 1. Pairwise analyses of all pairs of things is super-expensive, so if we can use other means and filter it down that's good." Also the owner's margin rule and splits and merges (the plan's decisions 10 and 11).
 - **Method:**
   - **Primary sources,** read by three research agents: record linkage and blocking; BM25F, the ratio test and assignment; diff, alignment and schema matching. Each reference below was opened, or checked against Crossref where the publisher blocks fetching.
-  - **Offline measurements** on the six controlled revision pairs' recorded comparisons (`scripts/alignment_sketch.py`), with no model calls. Two claims correspond when the extraction scorer binds both to the same fact of the key.
+  - **Offline measurements** on the six controlled revision pairs' recorded comparisons (`scripts/alignment_sketch.py`, removed 2026-10-08 as superseded by the align lever; in git history from `fbb1d9d` back), with no model calls. Two claims correspond when the extraction scorer binds both to the same fact of the key.
 
 ## Summary
 

@@ -127,5 +127,21 @@ class Determinism(unittest.TestCase):
                 with self.subTest(part=part):
                     self.assertEqual(concurrent[part], sequential[part])
 
+class Merging(unittest.TestCase):
+    def test_one_query_asked_for_two_samples_isnt_merged(self):
+        # code review 2026-10-08: the merge key read a sample method long gone, so the A/A control's fresh regions
+        # (another sample of the same query) took the first sample's answer when both were in flight
+        from types import SimpleNamespace
+        from semantic_pdf_diff.dispatch import Dispatcher
+        from semantic_pdf_diff.fixtures import Replayer
+        replay = Replayer(SimpleNamespace(), 'replay', 'm', fresh_regions=['tile'])
+        client = SimpleNamespace(replay=replay, s=SimpleNamespace(concurrency=1))
+        dispatch = Dispatcher.__new__(Dispatcher)
+        dispatch.client = client
+        tile = SimpleNamespace(query='q1', key=('extract', 'tile'))
+        text = SimpleNamespace(query='q1', key=('extract', 'text'))
+        self.assertNotEqual(dispatch._same(tile), dispatch._same(text))
+        self.assertEqual(dispatch._same(text), dispatch._same(SimpleNamespace(query='q1', key=('extract', 'table'))))
+
 if __name__ == '__main__':
     unittest.main()

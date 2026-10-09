@@ -83,7 +83,7 @@ class TaskCore:
 
     def consume(self, page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None,
                 then=None, repeat_key=None, repeat_after=1, place=None, context="", extra_images=(), continued=(),
-                origin=None):
+                origin=None, leading=None):
         """Queue one extraction task; when it finishes, record it and call then(status).
 
         An answer incomplete with its claims at the limit is the model asking for more: the task is asked again
@@ -155,17 +155,22 @@ class TaskCore:
             self.evidence.extend(found)
             self.record(row, found)
             self.progress.finish(row["status"])
-            if entry is not None:  # the first occurrence of a repeated block: release its followers
-                entry.update(done=True, ok=row["status"] in ("complete", "partial"), found=list(found), row=row)
-                for followed, again in entry.pop("followers"):
-                    followed() if entry["ok"] else again()
-                entry["followers"] = []
+            # the first occurrence of a repeated block (or a continuation of it): its followers are released after
+            # its last turn, with every turn's claims (code review 2026-10-08, A14: only the first turn's)
+            lead = entry if entry is not None else leading
+            if lead is not None:
+                lead["found"].extend(found)
+                if not asked:
+                    lead.update(done=True, ok=row["status"] in ("complete", "partial"), row=row)
+                    for followed, again in lead.pop("followers"):
+                        followed() if lead["ok"] else again()
+                    lead["followers"] = []
             log.debug("%s %s: %s, %d claim(s)%s", Path(self.name).name, task, row["status"], row["claims"],
                       f" ({'; '.join(row['issues'])[:200]})" if row["issues"] else "")
             if asked:
                 self.consume(page_no, bbox, f"{origin}-c{turn + 1}", text, image, check, locate, crop, derivation, then,
                              place=place, context=context, extra_images=extra_images,
-                             continued=tuple(continued) + tuple(more), origin=origin)
+                             continued=tuple(continued) + tuple(more), origin=origin, leading=lead)
             elif then:
                 then(row["status"])
 

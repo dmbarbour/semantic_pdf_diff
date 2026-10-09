@@ -103,6 +103,15 @@ class Maintenance(unittest.TestCase):
         self.assertIn('no comparison 99', err)
         self.assertEqual(self.cli('show', 'sources', '--store', self.root / 'nowhere')[0], 1)
 
+    def test_show_and_report_work_while_a_run_holds_the_store(self):
+        # code review 2026-10-08, C8: they took the writer's lock, so a store couldn't be looked at during a run
+        with Store(self.store):  # the run's lock
+            code, out, err = self.cli('show', 'sources', '--store', self.store)
+            self.assertEqual(code, 0, err)
+            self.assertIn('team-a', out)
+            self.assertEqual(self.cli('report', '--store', self.store)[0], 0)
+            self.assertEqual(self.cli('gc', '--store', self.store, '--dry-run')[0], 1)  # gc writes: it waits its turn
+
 class LedgerRotation(unittest.TestCase):
     """The ledger rotates by month between rounds (architecture clean-up, milestone 9): spend checks read the live file
     only, and a full accounting reads the archives too."""

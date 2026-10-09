@@ -240,7 +240,10 @@ class Store:
                 raise InterpreterMismatch(interpreter.role, differences, regions,
                                           self.clear_extraction(regions, dry_run=True),
                                           self.rerun_estimate(interpreter.role, regions))
-            counts = self.clear_extraction(regions, dry_run=dry_run, rebind=None if dry_run else new)
+            # a rebind nobody was asked about keeps the saved comparisons, self-contained records of earlier runs
+            # (code review 2026-10-08, C24: deleted silently); a reset clears them, as it says (decision 0004)
+            counts = self.clear_extraction(regions, dry_run=dry_run, rebind=None if dry_run else new,
+                                           keep_comparisons=automatic)
         if automatic:
             counts["automatic"] = [describe(k, a, b) for k, (a, b) in differences.items()]
         return counts
@@ -259,20 +262,22 @@ class Store:
             images += len(json.loads(pictures or "[]"))
         return {"requests": requests, "text_bytes": text, "images": images}
 
-    def clear_extraction(self, regions, dry_run=False, rebind=None):
+    def clear_extraction(self, regions, dry_run=False, rebind=None, keep_comparisons=False):
         marks = ",".join("?" * len(regions))
         regions = sorted(regions)
         counts = {
             "tasks": self.db.execute(f"SELECT COUNT(*) FROM task WHERE region IN ({marks})", regions).fetchone()[0],
             "evidence": self.db.execute(f"SELECT COUNT(*) FROM evidence WHERE region IN ({marks})", regions).fetchone()[0],
-            "comparisons": self.db.execute("SELECT COUNT(*) FROM comparison").fetchone()[0],
+            **({} if keep_comparisons else
+               {"comparisons": self.db.execute("SELECT COUNT(*) FROM comparison").fetchone()[0]}),
             "regions": regions,
         }
         if not dry_run:
             with self.db:
                 self.db.execute(f"DELETE FROM task WHERE region IN ({marks})", regions)
                 self.db.execute(f"DELETE FROM evidence WHERE region IN ({marks})", regions)
-                self.db.execute("DELETE FROM comparison")
+                if not keep_comparisons:
+                    self.db.execute("DELETE FROM comparison")
                 self.db.execute("UPDATE content SET extracted=0")
                 self.db.execute("DELETE FROM situation")  # situating reads the evidence
                 if rebind is not None:

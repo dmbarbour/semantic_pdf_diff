@@ -76,6 +76,26 @@ class Reading(unittest.TestCase):
         self.assertEqual(polar.rows[0], ["alpha [deg]", "c_l", "c_d"])
         self.assertEqual(polar.grid.title, "Configuration: default; Reynolds: 8100000")  # the pairs heading it
 
+    def test_a_headerless_defined_table_and_a_comment_on_an_empty_cell(self):
+        # code review 2026-10-08: B9, a defined table with no header row took its first row as one; B8, a comment
+        # on a cell in no region was dropped
+        from openpyxl.comments import Comment
+        from openpyxl.worksheet.table import Table
+        from semantic_pdf_diff.xlsxdocs import read_xlsx
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        for r, row in enumerate([["P-1", 120], ["P-2", 95]], 1):
+            for c, value in enumerate(row, 1):
+                ws.cell(r, c, value)
+        ws.add_table(Table(displayName="Pumps", ref="A1:B2", headerRowCount=0))
+        ws["E9"].comment = Comment("Flows to be confirmed.", "Ana")
+        out = io.BytesIO()
+        wb.save(out)
+        doc = read_xlsx(out.getvalue())
+        table = next(b for b in doc.blocks if b.kind == "table")
+        self.assertEqual(table.rows, [["Column1", "Column2"], ["P-1", "120"], ["P-2", "95"]])
+        self.assertIn("Comment by Ana on E9: Flows to be confirmed.", [t for _, t in doc.lines])
+
     def test_an_ambiguous_region_is_recorded_and_a_long_table_kept_whole(self):
         from semantic_pdf_diff.xlsxdocs import read_xlsx
         doc = read_xlsx(workbook())

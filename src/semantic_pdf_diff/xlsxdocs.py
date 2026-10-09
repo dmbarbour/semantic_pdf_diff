@@ -59,8 +59,9 @@ class Region:
     bottom: int
     right: int
     kind: str = "table"
-    header_rows: int = 0  # 0: found by the heuristic
+    header_rows: int | None = None  # None: found by the heuristic; a defined table's own count (0: none)
     name: str = ""
+    columns: tuple = ()  # a defined table's column names ("Column1"), its labels when it has no header row
     lines: list = field(default_factory=list)
 
     @property
@@ -135,8 +136,10 @@ def regions(sheet):
     columns); a lone cell heading a wider block split off as its title."""
     cells, merges = sheet.cells, sheet.merges
     found, taken = [], set()
-    for top, left, bottom, right, heads, name in sheet.tables:
-        found.append(Region(sheet.title, top, left, bottom, right, "table", max(1, heads or 0), name))
+    for top, left, bottom, right, heads, name, columns in sheet.tables:
+        # no header row is no header row (code review 2026-10-08, B9: one was taken from the data)
+        found.append(Region(sheet.title, top, left, bottom, right, "table", 1 if heads is None else heads, name,
+                            tuple(columns)))
         taken |= {(r, c) for r in range(top, bottom + 1) for c in range(left, right + 1)}
     occupied, boxes = (set(cells) | set(merges)) - taken, []
     while occupied:
@@ -240,7 +243,7 @@ class _Writer:
     def table(self, page, sheet, region, cells, merges, title):
         lines, images, blocks = self.lines, self.images, self.blocks
         grid = _grid(region, cells, merges)
-        heads = min(region.header_rows or _header_rows(grid, marked=0), len(grid))
+        heads = min(_header_rows(grid, marked=0) if region.header_rows is None else region.header_rows, len(grid))
         row_ref = lambda r: f"{_letter(region.left)}{r}:{_letter(region.right)}{r}"
         if not region.name and _unheaded(grid, heads):
             region.kind = "ambiguous"
@@ -250,6 +253,10 @@ class _Writer:
             return
         labels = _labels(grid, heads)
         header_lines = [self.line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))) for r, row in grid[:heads]]
+        if not heads:  # a defined table without a header row: its columns' names, as its structured references use
+            labels = [str(n) for n in region.columns][:len(labels)] or labels
+            labels += [""] * (region.right - region.left + 1 - len(labels))
+            header_lines = [self.line(page, " | ".join(labels), (sheet, row_ref(region.top)))]
         rows, row_lines, row_headers, aligned = [labels], [header_lines[0]], [], []
         for r, row in grid[heads:]:
             rows.append([c.text for c in row])
@@ -276,6 +283,7 @@ class _Writer:
         if sheet.hidden:
             self.block(page, "(Hidden sheet)", (sheet.title, "A1"))
         above = None  # the last text cell or pairs read: a table's title when just above it
+        placed = set()  # the comments read after their region
         for region in regions(sheet):
             self.mapped.append(region)
             if region.kind == "pairs":  # a label and its value: one line each
@@ -300,8 +308,15 @@ class _Writer:
                 self.table(page, sheet.title, region, cells, merges, title)
             for (r, c), (author, note) in sorted(sheet.comments.items()):
                 if region.top <= r <= region.bottom and region.left <= c <= region.right:
-                    self.block(page, f"Comment by {author or 'an unnamed author'} on {_letter(c)}{r}: "
-                                     f"{' '.join(note.split())}", (sheet.title, f"{_letter(c)}{r}"))
+                    self.comment(page, sheet.title, r, c, author, note)
+                    placed.add((r, c))
+        for (r, c), (author, note) in sorted(sheet.comments.items()):  # on a cell in no region (an empty one):
+            if (r, c) not in placed:  # after the sheet's regions (code review 2026-10-08, B8: dropped)
+                self.comment(page, sheet.title, r, c, author, note)
+
+    def comment(self, page, sheet, r, c, author, note):
+        self.block(page, f"Comment by {author or 'an unnamed author'} on {_letter(c)}{r}: {' '.join(note.split())}",
+                   (sheet, f"{_letter(c)}{r}"))
 
     def document(self, pages):
         return TextDocument(max(1, pages), self.lines, self.blocks, self.headings, self.images, self.pictures,
@@ -368,7 +383,8 @@ def read_xlsx(data):
         tables = []
         for table in ws.tables.values():  # (openpyxl's items() gives each table's range, not the table)
             left, top, right, bottom = range_boundaries(table.ref)
-            tables.append((top, left, bottom, right, table.headerRowCount, table.displayName or table.name))
+            tables.append((top, left, bottom, right, table.headerRowCount, table.displayName or table.name,
+                           [column.name for column in table.tableColumns]))
         comments = {(cell.row, cell.column): (cell.comment.author, cell.comment.text)
                     for cell in ws._cells.values() if cell.comment}
         out.sheet(page, Sheet(ws.title, _filled(ws, formulas), _merges(ws), comments, tables,

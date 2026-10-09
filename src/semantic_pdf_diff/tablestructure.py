@@ -317,7 +317,12 @@ def apply(answer, header, body, boxes, tags, cuts=None):
     index = list(range(width))  # each column's place after joins (splits name columns as they were shown)
     joins = [(rule, _span(rule.column, width)) for rule in answer.rules
              if rule.action.strip().lower() == "join columns" and _span(rule.column, width)]
-    for rule, (first, last) in sorted(joins, key=lambda j: -j[1][0]):  # columns joined, in every part
+    # columns joined, in every part. Spans name columns as shown, so each is mapped through the joins before it
+    # (code review 2026-10-08, B3: overlapping joins joined one column too many)
+    for rule, shown_span in sorted(joins, key=lambda j: -j[1][0]):
+        first, last = index[shown_span[0]], index[shown_span[1]]
+        if first >= last:
+            continue  # already one column
         joined_rows = []
 
         def join(row, lines, body_row=True):
@@ -372,6 +377,8 @@ def apply(answer, header, body, boxes, tags, cuts=None):
             parts.append((head_, new, bxs_))
         out.parts = parts
         out.did[id(rule)] = (rule, split_rows)
+        # the columns after it move along: a second split names a column as shown (code review 2026-10-08, B3)
+        index = [i + len(into) - 1 if i > k else i for i in index]
     return out
 
 def example_mismatches(answer, applied, body, worst=None):

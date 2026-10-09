@@ -96,6 +96,31 @@ class Repeats(unittest.TestCase):
         pages = sorted(o.locator.page for o in designer.occurrences)
         self.assertEqual(pages, [1, 2, 3, 4, 4])  # every sighting, including page 4's other table
 
+    def test_followers_carry_every_turn_of_a_continued_answer(self):
+        # code review 2026-10-08, A14: followers copied the first turn's claims only, not its continuations'.
+        # Latent: only image tasks continue today, and only table rows repeat; continuations forced on here.
+        class Continued(Recorder):
+            def ask(self, prompt, schema, images=(), key=None):
+                answer = super().ask(prompt, schema, images, key)
+                if '"Designer", "ACME"' not in prompt.split('SOURCE DATA:\n')[1]:
+                    return answer
+                if key[3].endswith('-c1'):  # the rest, asked for
+                    return Extraction(claims=[{'entity': 'title block', 'attribute': 'designer', 'value': 'ACME',
+                                               'kind': 'table', 'quote': 'ACME', 'confidence': .9}], complete=True)
+                return Extraction(claims=[c.model_dump() for c in answer.claims], complete=False)  # at the limit: more
+        self.dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.dir.cleanup)
+        path = build(Path(self.dir.name) / 'r.pdf')
+        client = Continued(claims_per_request=1)
+        with patch.object(pymupdf.Page, 'find_tables', title_blocks), \
+                patch.object(type(client.s), 'continuation_limit', lambda self, region: 3):
+            evidence, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(self.dir.name), client)
+        followed = [r for r in coverage if r.get('duplicate_of', '').startswith('table:p1:0')]
+        self.assertTrue(followed)
+        self.assertEqual({r['claims'] for r in followed}, {2})
+        (acme,) = [e for e in evidence if e.value == 'ACME' and e.attribute == 'designer']
+        self.assertIn(3, [o.locator.page for o in acme.occurrences])
+
     def test_section_signals(self):
         _, _, _ = self.run_extraction()
         from semantic_pdf_diff.extract import pdf_sections

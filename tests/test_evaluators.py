@@ -21,6 +21,12 @@ class EvaluatorSettings(unittest.TestCase):
         self.assertEqual(quiet.model_dump(exclude={"timeout"}),
                          Settings(model="judge-model", **EVALUATOR_SETTINGS).model_dump(exclude={"timeout"}))
 
+    def test_a_small_context_profile_in_the_environment_doesnt_break_judges(self):
+        # code review 2026-10-08, C9: the whole environment was validated, against the judges' own budget
+        with patch.dict(os.environ, {"PDF_DIFF_CONTEXT_TOKENS": "4096"}):
+            self.assertEqual(evaluator_settings("judge-model").context_tokens, EVALUATOR_SETTINGS.get(
+                "context_tokens", Settings().context_tokens))
+
     def test_runtime_settings_must_be_endpoint_settings(self):
         self.assertEqual(evaluator_settings("m", concurrency=3, max_cost=1.5).max_cost, 1.5)
         with self.assertRaises(ValueError):

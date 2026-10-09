@@ -12,9 +12,15 @@ import unicodedata
 
 # --- numbers and dates
 
+def vulgar_fractions(text):
+    """"9½" as "9 1/2": a fraction character written out, apart from a whole number before it (NFKC alone makes
+    "9½" read 91/2; code review 2026-10-08, E19)."""
+    return "".join(" " + unicodedata.normalize("NFKC", ch).replace("⁄", "/") + " "
+                   if unicodedata.decomposition(ch).startswith("<fraction>") else ch for ch in str(text))
+
 def parse_number(text):
     """The first number in a value as printed ("1,250" → 1250.0, "-0.8" → -0.8, "±0.05" → 0.05), or None."""
-    text = unicodedata.normalize("NFKC", str(text)).replace("−", "-").replace("–", "-")
+    text = unicodedata.normalize("NFKC", vulgar_fractions(text)).replace("−", "-").replace("–", "-")
     m = re.search(r"-?\d[\d,]*(?:\.\d+)?|-?\.\d+", text)
     if not m:
         return None
@@ -51,7 +57,8 @@ def _inch(groups):
 def inches(value, unit=""):
     """A length in inches, from 58'-6\", 2'-9 1/2\", 58 ft 6 in, 58.5 ft, 702 in, 9 1/2" or 58.5 with unit ft; None
     if it isn't one. (Fractions were read as their whole part, or not at all: code review 2026-10-01, item 10.)"""
-    text = str(value).strip().replace("′", "'").replace("″", '"').replace("’", "'").replace("”", '"')
+    text = " ".join(vulgar_fractions(value).split()).replace("′", "'").replace("″", '"').replace("’", "'") \
+        .replace("”", '"').replace(' "', '"')
     m = FEET_INCHES.match(text)
     if m:
         rest = _inch(m.groups()[1:])

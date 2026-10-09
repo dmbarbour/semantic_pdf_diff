@@ -357,7 +357,8 @@ def store_command(command, argv):
     start_logging(args)
     if not (args.store / 'store.sqlite').exists():
         raise StoreError(f'{args.store} is not a store')
-    with Store(args.store) as store:
+    # show and report only read: no writer's lock, so a store can be looked at during a run (review 2026-10-08, C8)
+    with (Store(args.store) if command == 'gc' else Store.open(args.store)) as store:
         if command == 'show':
             print_rows(store.view(args.view), args.format)
         elif command == 'gc':

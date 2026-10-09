@@ -9,7 +9,7 @@ import pymupdf
 
 from .dispatch import Dispatcher
 from .models import DerivationStep, PdfLocator, coverage_row
-from .pages import lines as _lines, native, native_page, reading_blocks, shown  # noqa: F401 (_lines, for callers)
+from .pages import PYMUPDF_ERRORS, lines as _lines, native, native_page, reading_blocks, shown  # noqa: F401 (_lines, for callers)
 from .progress import NoProgress
 from .regions import crop_name, crop_stem, region_of
 # The pieces extraction is made of (architecture clean-up, milestone 7), and the names callers import from here.
@@ -140,7 +140,7 @@ REQUIREMENT = re.compile(r"\b(?:shall|must|required|requirement)\b", re.IGNORECA
 def page_signals(page, tables):
     """Cheap triage signals for one page; summed per section."""
     text = page.get_text("text")
-    drawings = page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings()
+    drawings = page.get_cdrawings()
     return {"numbers": len(re.findall(r"\d+(?:[.,]\d+)?", text)), "units": len(UNIT.findall(text)),
             "requirements": len(REQUIREMENT.findall(text)), "tables": tables, "images": len(page.get_images()),
             "drawings": len(drawings), "characters": len(text.strip())}
@@ -261,13 +261,16 @@ def office_installed(workbook=False):
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/5",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
-           # 4: a part the model reads as no table read as a figure; 5: columns joined where words are cut
-           ".txt": "text/1", ".md": "text/1",
-           ".docx": "docx/5",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers
-           ".pptx": "pptx/4",  # pptx/2: tables asked how they're read; 3-4: a header's name and group
-           ".xlsx": "xlsx/9", ".xlsm": "xlsx/9",  # xlsx/7: vague conditions guarded against; 8-9: header name, group
-           ".csv": "csv/5", ".tsv": "csv/5",
+READERS = {".pdf": "pdf/6",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
+           # 4: a part the model reads as no table read as a figure; 5: columns joined where words are cut; 6: a
+           # structure answer's new tables tagged apart (code review 2026-10-08, A2)
+           ".txt": "text/2", ".md": "text/1",  # text/2: "A pump ..." isn't a heading (review B4)
+           ".docx": "docx/6",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
+           # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1)
+           ".pptx": "pptx/5",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6
+           ".xlsx": "xlsx/10", ".xlsm": "xlsx/10",  # xlsx/7: vague conditions guarded against; 8-9: header name,
+           # group; 10: late table answers on their own sheet (review B1)
+           ".csv": "csv/6", ".tsv": "csv/6",  # csv/6: as xlsx/10
            **{extension: "image/1" for extension in IMAGE_EXTENSIONS}}
 
 def reader_version(extension):
@@ -296,17 +299,16 @@ def image_pdf(data, extension, settings):
     to one at image_side. b"" if it can't be read (recorded as unreadable)."""
     try:
         data = data if isinstance(data, (bytes, bytearray)) else Path(data).read_bytes()
-        frames = pymupdf.open(stream=data, filetype=extension.lstrip("."))
-        dpi = pymupdf.Pixmap(data).xres or 96
-        per_point = 1.0 if dpi >= SCAN_DPI else dpi / 72 * settings.tile_points / settings.image_side
-        pages = pymupdf.open("pdf", frames.convert_to_pdf())
-        out = pymupdf.open()
-        for number, page in enumerate(pages):
-            rect = page.rect * per_point  # the frame's own size, in points of the page it becomes
-            out.new_page(width=rect.width, height=rect.height).show_pdf_page(pymupdf.Rect(0, 0, rect.width, rect.height),
-                                                                              pages, number)
-        return out.tobytes()
-    except Exception:  # PyMuPDF raises assorted errors on images it can't decode
+        with pymupdf.open(stream=data, filetype=extension.lstrip(".")) as frames:
+            dpi = pymupdf.Pixmap(data).xres or 96
+            per_point = 1.0 if dpi >= SCAN_DPI else dpi / 72 * settings.tile_points / settings.image_side
+            with pymupdf.open("pdf", frames.convert_to_pdf()) as pages, pymupdf.open() as out:
+                for number, page in enumerate(pages):
+                    rect = page.rect * per_point  # the frame's own size, in points of the page it becomes
+                    out.new_page(width=rect.width, height=rect.height).show_pdf_page(
+                        pymupdf.Rect(0, 0, rect.width, rect.height), pages, number)
+                return out.tobytes()
+    except (OSError, *PYMUPDF_ERRORS):  # an image PyMuPDF can't decode, or a file gone
         return b""
 
 def extract_pdf(path, content, output, client, on_task=None, on_sections=None, dispatcher=None, progress=None):

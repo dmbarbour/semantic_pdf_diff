@@ -24,8 +24,9 @@ from .tasks import TaskCore, split_utf8
 
 MD_HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
 SETEXT = re.compile(r"^(=+|-+)\s*$")
-# "7.2.  Stream Concurrency", "Appendix A.  Pseudocode" at the left margin (an RFC's body is indented)
-RFC_HEADING = re.compile(r"^((?:\d+|Appendix [A-Z]|[A-Z])(?:\.\d+)*)\.?\s{1,4}(\S.{0,90})$")
+# "7.2.  Stream Concurrency", "Appendix A.  Pseudocode", "A.1.  Details" at the left margin (an RFC's body is
+# indented). A lone letter needs its dot: "A pump runs" and "I note" are sentences (code review 2026-10-08, B4).
+RFC_HEADING = re.compile(r"^((?:\d+|Appendix [A-Z])(?:\.\d+)*|[A-Z](?:\.\d+)+|[A-Z](?=\.))\.?\s{1,4}(\S.{0,90})$")
 FENCE = re.compile(r"^\s*(```|~~~)")
 TABLE_RULE = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)*\|?\s*$")
 IMAGE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")

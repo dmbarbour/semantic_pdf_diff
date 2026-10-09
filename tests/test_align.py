@@ -196,6 +196,9 @@ class Alignment(unittest.TestCase):
         self.assertNotEqual(key("$5"), key("5"))
         self.assertEqual(key("about 5", "m"), key("5", "m"))
         self.assertEqual(key("5", "m"), ("length", 5.0))  # unqualified keys are as before
+        # every length in inches, however written (code review 2026-10-08, D11 and E19)
+        for written in [('33.5"',), ("33.5", "in"), ("33.5 in",), ("2'-9 1/2\"",), ("2'-9½\"",), ("33½ in",)]:
+            self.assertEqual(key(*written), ("in", 33.5), written)
 
 class Report(unittest.TestCase):
     def test_the_report_shows_the_groupings_and_marks_regrouped_claims(self):

@@ -69,6 +69,19 @@ class Readings(unittest.TestCase):
         found = reconcile([sighting('pump', 'power', '10', 'kW'), sighting('pump', 'power', '10 kW', task='tile:p1:1')])
         self.assertEqual(len(found), 1)
 
+    def test_a_units_case_and_a_decimal_comma_tell_values_apart(self):
+        # code review 2026-10-08, D9: "5 MW" merged with "5 mW" (decision 0005), and "12,50" with "1,250"
+        apart = [('5', 'MW', '5', 'mW'), ('12,50', '', '1,250', '')]
+        for v1, u1, v2, u2 in apart:
+            with self.subTest(v1=v1, v2=v2):
+                found = reconcile([sighting('cell', 'power', v1, u1), sighting('cell', 'power', v2, u2, task='tile:p1:1')])
+                self.assertEqual(len(found), 2)
+        alike = [('1,250', '', '1250', ''), ('5', 'kw', '5', 'kW'), ('TBC', '', 'tbc', '')]
+        for v1, u1, v2, u2 in alike:
+            with self.subTest(v1=v1, v2=v2):
+                found = reconcile([sighting('cell', 'power', v1, u1), sighting('cell', 'power', v2, u2, task='tile:p1:1')])
+                self.assertEqual(len(found), 1)
+
     def test_result_does_not_depend_on_order(self):
         claims = [sighting('handrails', 'material', '2x4 cedar', task=f'tile:p1:{i}') for i in range(3)] + \
                  [sighting('Handrail', 'material/size', '2x4 cedar', task='tile:p1:9'),

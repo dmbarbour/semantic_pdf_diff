@@ -50,10 +50,12 @@ class Dispatcher:
             self.inflight[self.pool.submit(self.client.send, request)] = (request, finish)
 
     def _same(self, request):
-        """What makes two requests the same ask: the query, and which answer to it (see Client._sample)."""
+        """What makes two requests the same ask: the query, and which answer to it (the replay's sample: the A/A
+        control's fresh regions want another). Code review 2026-10-08: this read a `Client._sample` long gone, so
+        every merged query was sample 0."""
         query = getattr(request, "query", None)
-        sample = getattr(self.client, "_sample", None)
-        return (query, sample(request) if sample else 0) if query else None
+        replay = getattr(self.client, "replay", None)
+        return (query, replay.sample(request.key) if replay else 0) if query else None
 
     def _complete(self, request, finish, call, *args):
         waiting = self.waiting.pop(self._same(request), [])

@@ -68,6 +68,17 @@ class Applying(unittest.TestCase):
         self.assertEqual(rows, [["E1", "2.58", "0.69"], ["E2", "1.9", "0.4"], ["E3", "n/a", ""]])
         self.assertEqual(got.misfits, ["E3: column B not split ('n/a')"])
 
+    def test_columns_are_named_as_shown_whatever_rules_came_before(self):
+        # code review 2026-10-08, B3: a second split acted on the column the first had moved into its place, and
+        # overlapping joins joined one column too many
+        splits = answer(rules=[{"action": "split column", "column": "B", "into": ["b1", "b2"]},
+                               {"action": "split column", "column": "C", "into": ["c1", "c2"]}])
+        (head, rows, _), = ts.apply(splits, ["E", "B", "C"], [["E1", "1 2", "3 4"]], BOXES[:1], [[]]).parts
+        self.assertEqual((head, rows), (["E", "b1", "b2", "c1", "c2"], [["E1", "1", "2", "3", "4"]]))
+        joins = answer(rules=[{"action": "join columns", "column": "B:D"}, {"action": "join columns", "column": "C:E"}])
+        (head, rows, _), = ts.apply(joins, list("ABCDEF"), [list("abcdef")], BOXES[:1], [[]]).parts
+        self.assertEqual((head, rows), (["A", "B C D E", "F"], [["a", "b c d e", "f"]]))
+
     def test_problems_before_applying(self):
         a = answer(rules=[{"action": "merge", "lines": ["2"]}, {"action": "join above", "when": ["odd"], "lines": ["99"]},
                           {"action": "keep"}, {"action": "split column", "column": "Q", "into": ["x"]}],

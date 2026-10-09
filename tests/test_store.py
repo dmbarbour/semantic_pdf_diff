@@ -171,6 +171,17 @@ class Binding(unittest.TestCase):
             store.bind(extraction_interpreter(Settings(tile_points=500, model='other-model')), reset=True)
             self.assertEqual(self.count(store, 'evidence'), 0)
 
+    def test_saved_comparisons_outlive_a_free_rebind_not_a_reset(self):
+        # code review 2026-10-08, C24: a rebind nobody was asked about deleted them silently
+        with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
+            store.save_comparison('2026-10-08T00:00:00', {'note': 'kept'})
+            cleared = store.bind(extraction_interpreter(Settings(quote_match='exact')))  # post-processing only
+            self.assertTrue(cleared.get('automatic'))
+            self.assertNotIn('comparisons', cleared)
+            self.assertEqual(self.count(store, 'comparison'), 1)
+            cleared = store.bind(extraction_interpreter(Settings(quote_match='exact', tile_points=500)), reset=True)
+            self.assertEqual((cleared['comparisons'], self.count(store, 'comparison')), (1, 0))
+
 class ContentAddressedCache(unittest.TestCase):
     def test_answers_are_found_by_what_reached_the_model(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(d) as store:

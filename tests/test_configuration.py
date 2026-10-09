@@ -29,6 +29,14 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual(Client(s,None).api_key,'test-only-key')
             self.assertNotIn('test-only-key',s.model_dump_json())
 
+    def test_an_optional_setting_can_be_switched_off_from_the_environment(self):
+        # code review 2026-10-08, C23: "none" failed validation as a number
+        for off in ("none", "None", "null"):
+            with patch.dict(os.environ, {"PDF_DIFF_TABLE_RULES": off}):
+                self.assertIsNone(Settings.from_env().table_rules)
+        with patch.dict(os.environ, {"PDF_DIFF_TABLE_RULES": "12"}):
+            self.assertEqual(Settings.from_env().table_rules, 12)
+
     def test_empty_fallback_and_invalid_values(self):
         with patch.dict(os.environ, {'OPENAI_BASE_URL':'  ', 'OPENAI_MODEL':''}, clear=True):
             self.assertEqual(Settings.from_env(),Settings())

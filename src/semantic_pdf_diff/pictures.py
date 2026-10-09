@@ -13,6 +13,7 @@ from collections import Counter
 import pymupdf
 
 from .models import DerivationStep, coverage_row
+from .pages import PYMUPDF_ERRORS
 
 METAFILES = (".emf", ".wmf")
 RASTER = (".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff")
@@ -35,18 +36,19 @@ def page_of(picture):
             raise PictureError(f"{picture.name}: not drawn ({type(error).__name__}: {error})") from error
     elif extension in RASTER:
         try:
-            image = pymupdf.open(stream=picture.data, filetype=extension[1:])
-            pixels = image[0].rect
-            source = pymupdf.open("pdf", image.convert_to_pdf())
-        except Exception as error:
+            with pymupdf.open(stream=picture.data, filetype=extension[1:]) as image:
+                pixels = image[0].rect
+                source = pymupdf.open("pdf", image.convert_to_pdf())
+        except PYMUPDF_ERRORS as error:  # PyMuPDF's, not ours (code review 2026-10-08, A15)
             raise PictureError(f"{picture.name}: unreadable image ({type(error).__name__}: {error})") from error
         if not size:
             size = (pixels.width * 72 / RASTER_DPI, pixels.height * 72 / RASTER_DPI)
     else:
         raise PictureError(f"{picture.name}: a picture of a kind not read ({extension})")
-    width, height = size if size and size[0] > 1 and size[1] > 1 else (source[0].rect.width, source[0].rect.height)
-    out = pymupdf.open()
-    out.new_page(width=width, height=height).show_pdf_page(pymupdf.Rect(0, 0, width, height), source, 0)
+    with source:  # closed once shown on the picture's page (it was left open)
+        width, height = size if size and size[0] > 1 and size[1] > 1 else (source[0].rect.width, source[0].rect.height)
+        out = pymupdf.open()
+        out.new_page(width=width, height=height).show_pdf_page(pymupdf.Rect(0, 0, width, height), source, 0)
     return out
 
 class Reading:

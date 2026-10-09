@@ -27,7 +27,7 @@ FIGURE_PAD = 8.0  # points around a figure's region
 def _graphics(page):
     """Drawings (smaller than half the page: not frames) and images, as displayed."""
     boxes = []
-    for d in page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings():
+    for d in page.get_cdrawings():
         r = shown(page, d["rect"])
         if r.height < 0.5 * page.rect.height:
             boxes.append(r)
@@ -86,7 +86,7 @@ BORDER = 0.6  # a vertical line this share of the page height is a frame or titl
 def _borders(page):
     """Long vertical lines as displayed: [(x, y0, y1)], merged when closer than 30 points."""
     found = []
-    for d in page.get_cdrawings() if hasattr(page, "get_cdrawings") else page.get_drawings():
+    for d in page.get_cdrawings():
         for item in d.get("items") or ():
             if item[0] == "l":
                 a, b = (shown_point(page, p) for p in item[1:3])

@@ -89,6 +89,12 @@ class Parsing(unittest.TestCase):
         self.assertEqual(code.text, "  raw water --> rapid mix --> flocculation")  # as laid out
         self.assertEqual([(alt, target) for _, _, alt, target in doc.images], [("Process flow diagram", "flow.png")])
 
+    def test_a_sentence_starting_with_a_lone_letter_isnt_a_heading(self):
+        # code review 2026-10-08, B4: "A pump ..." and "I note ..." became headings
+        doc = textdocs.parse("A pump runs at 5 kW.\n\nI note the flow.\n\nA.  Overview\n\nA.1.  Details\n",
+                             markdown=False)
+        self.assertEqual([(level, title) for _, _, level, title in doc.headings], [(1, "A. Overview"), (2, "A.1. Details")])
+
     def test_plain_text_has_rfc_headings_pages_and_no_running_furniture(self):
         doc = textdocs.parse(RFC, markdown=False)
         self.assertEqual(doc.pages, 3)

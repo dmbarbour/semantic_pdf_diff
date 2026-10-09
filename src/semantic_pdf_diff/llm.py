@@ -58,6 +58,10 @@ class Truncated(ModelFailure):
     """The answer hit the output limit. Not retried: at temperature 0 it would stop at the same place, and every
     attempt is billed. Refinement asks again in smaller pieces."""
 
+class Invalid(ModelFailure):
+    """The answer isn't the JSON its schema asks for. Not retried, like Truncated: at temperature 0 the same request
+    gets the same answer, and every attempt is billed (code review 2026-10-08, C10: each was asked three times)."""
+
 class NotRecorded(ModelFailure):
     """Replay found no recorded answer for a request."""
 
@@ -130,13 +134,14 @@ def json_text(answer):
 def read_stream(response):
     """An OpenAI-style server-sent event stream, assembled into the shape of a plain response:
     {"choices": [{"message": {"content": ...}, "finish_reason": ...}], "usage": ...}."""
-    parts, finish, usage = [], None, None
+    parts, finish, usage, done = [], None, None, False
     for raw in response:
         line = raw.decode("utf-8", errors="replace").strip()
         if not line.startswith("data:"):
             continue
         payload = line[5:].strip()
         if payload == "[DONE]":
+            done = True
             break
         chunk = json.loads(payload)
         if not isinstance(chunk, dict):
@@ -150,7 +155,10 @@ def read_stream(response):
             if isinstance(delta.get("content"), str):
                 parts.append(delta["content"])
             finish = choice.get("finish_reason") or finish
-    return {"choices": [{"message": {"content": "".join(parts)}, "finish_reason": finish}], "usage": usage}
+    # "cut": no [DONE] and no finish, the connection's fault, not the answer's: asked again once its cost is counted
+    # (an invalid answer isn't asked again)
+    return {"choices": [{"message": {"content": "".join(parts)}, "finish_reason": finish}], "usage": usage,
+            **({"cut": True} if not done and finish is None else {})}
 
 VALID_ESCAPE = re.compile(r'\\(["\\/bfnrt]|u[0-9a-fA-F]{4})?')
 
@@ -205,8 +213,10 @@ def evaluator_settings(model, base=None, **runtime):
     shaping = sorted(k for k in runtime if SETTING_CLASSES[k] != "endpoint")
     if shaping:
         raise ValueError(f"evaluator runtime settings must be endpoint settings, not {shaping}")
-    env = Settings.from_env(model=model)
-    endpoint = {k: getattr(env, k) for k, kind in SETTING_CLASSES.items() if kind == "endpoint" and k != "model"}
+    endpoint_names = {k for k, kind in SETTING_CLASSES.items() if kind == "endpoint" and k != "model"}
+    # only the endpoint's variables read: a profile's PDF_DIFF_CONTEXT_TOKENS made every judge's settings invalid
+    env = Settings.from_env(only=endpoint_names, model=model)  # (code review 2026-10-08, C9)
+    endpoint = {k: getattr(env, k) for k in endpoint_names}
     return Settings(**{**endpoint, **(EVALUATOR_SETTINGS if base is None else base), **runtime, "model": model})
 
 class Budget:
@@ -354,6 +364,8 @@ class Transport:
                         reported += n
                 if reported:
                     self.limiter.settle(entry, reported)
+                if result.get("cut"):
+                    raise ConnectionError("The stream ended before the answer finished")
                 choice = (result.get("choices") or [None])[0]
                 if not isinstance(choice, dict):
                     raise ValueError("Response has no choices")
@@ -365,7 +377,10 @@ class Transport:
                 requests_log.debug("%s %s: ok in %.2fs (%s tokens)", request.schema.__name__,
                                    request.key[:2] + request.key[3:4] if request.key else "", time.monotonic() - started,
                                    reported or "?")
-                return request.schema.model_validate_json(json_text(answer))
+                try:
+                    return request.schema.model_validate_json(json_text(answer))
+                except ValueError as e:  # pydantic's ValidationError too
+                    raise Invalid(f"{type(e).__name__}: {e}") from e
             except urllib.error.HTTPError as e:
                 requests_log.debug("%s %s: HTTP %s after %.2fs", request.schema.__name__,
                                    request.key[:2] + request.key[3:4] if request.key else "", e.code, time.monotonic() - started)

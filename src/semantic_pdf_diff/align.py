@@ -27,7 +27,7 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 
-from .values import printed_value, unit
+from .values import inches, printed_value, unit
 
 TAG = re.compile(r"\b[A-Z]{1,4}-?\d{1,4}[A-Z]?\b")
 # Not "a": single letters name things (Option A, Revision A, valve A).
@@ -106,6 +106,10 @@ def value_key(claim):
     text = str(claim.value).strip()
     if TAG.fullmatch(text):
         return ("id", text)
+    marks = qualifier(text)
+    length = inches(text[PREFIX.match(text).end():], claim.unit or "")  # 33.5", 33.5 in, 2'-9½": all inches
+    if length is not None:  # (code review 2026-10-08, D11: keyed as '"' and 'in' apart)
+        return ("in", round(length, 9)) + ((marks,) if marks else ())
     v = printed_value(text)
     if isinstance(v, tuple):  # ("in", 33.5), ("date", "2026-01-10")
         return v
@@ -116,7 +120,6 @@ def value_key(claim):
     said = (claim.unit or "").strip() or re.sub(r"^[^\d]*[\d,.]+\s*", "", text)  # "63.3 mph": the unit in the value
     known = unit(said)
     key = (known[0], round(v * float(known[1]), 9)) if known else (re.sub(r"\s", "", said).casefold(), round(v, 9))
-    marks = qualifier(text)
     return key + (marks,) if marks else key
 
 # What a number's prefix says beyond the number: a bound, a tolerance, a currency. "≤ 5" isn't "≥ 5", "±0.5" isn't

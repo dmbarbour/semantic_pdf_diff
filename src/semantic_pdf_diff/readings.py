@@ -22,6 +22,7 @@ chains of near-matches don't merge distinct facts.
 import re
 from functools import lru_cache
 from .models import Occurrence, representative_rank
+from .values import unit
 
 # Not "a": single letters name modules, details and grid lines ("Module A" and "Module B" are two
 # things; round 8 merged them when "a" was dropped as an article).
@@ -30,8 +31,17 @@ STOPWORDS = {"the", "of", "for", "and", "or", "in", "on", "at", "to", "by", "wit
 QUOTES = str.maketrans({"’": "'", "‘": "'", "′": "'", "″": '"', "“": '"', "”": '"', "×": "x", "−": "-", "–": "-",
                         "—": "-"})
 
+THOUSANDS = re.compile(r"(?<=\d),(?=\d{3}(?!\d))")  # "1,250": a separator; "12,50" keeps its decimal comma
+NUMBER_THEN = re.compile(r"^([-+±~≈<>≤≥=]*\d[\d.]*)(.+)$")
+
 def _stated(e):
-    return re.sub(r"[\s,]", "", f"{e.value}{e.unit}".translate(QUOTES)).casefold()
+    """A claim's value and unit as stated, for telling readings of one fact: spacing, quote forms and thousands
+    separators folded, and case, except a known unit's (5 MW isn't 5 mW: decision 0005), which is named by its kind
+    and size (code review 2026-10-08, D9: every comma and every unit's case were folded)."""
+    text = re.sub(r"\s", "", THOUSANDS.sub("", f"{e.value}{e.unit}".translate(QUOTES)))
+    split = NUMBER_THEN.match(text)
+    known = unit(split.group(2)) if split else None
+    return f"{split.group(1)}[{known[0]}:{known[1]}]" if known else text.casefold()
 
 @lru_cache(maxsize=1 << 16)
 def _words(text):

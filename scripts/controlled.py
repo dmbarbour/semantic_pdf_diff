@@ -76,7 +76,6 @@ def main(argv=None):
     sub.add_parser("pack", help="pack the answers the standard runs replay into replay.zip (offline)")
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.bench import controlled
-    from semantic_pdf_diff import fixtures
     if args.command == "generate":
         for project in controlled.corpus(tuple(args.seed or (1,)), knobs=True, revisions=True):
             print(f"{controlled.write(project, DOCS)}: {len(project.facts)} facts")

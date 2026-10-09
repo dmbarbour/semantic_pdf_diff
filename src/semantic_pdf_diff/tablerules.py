@@ -34,7 +34,6 @@ to produce claims from rows or how to summarize things within a few known templa
 """
 import datetime
 import hashlib
-import json
 import re
 from collections import Counter
 from dataclasses import dataclass, field

@@ -9,7 +9,7 @@ from .models import Explanation, Judgment
 from .dispatch import Dispatcher
 from .progress import NoProgress
 from .provenance import comparison_interpreter, text_hash
-from .values import FOLDED, UNITS, unit  # noqa: F401 (the product's units, values.py)
+from .values import unit
 
 def numeric_check(a, b):
     """A supporting calculation, never independent evidence of semantic equivalence."""

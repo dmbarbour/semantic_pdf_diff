@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff.models import MAX_CLAIMS, Claim, Evidence, Extraction, Judgment, PdfLocator, Settings
-from semantic_pdf_diff.llm import Client, ModelFailure, redact_url
+from semantic_pdf_diff.llm import Client, Invalid, ModelFailure, redact_url
 from semantic_pdf_diff.compare import numeric_check
 from semantic_pdf_diff.extract import extract_pdf, tiles
 from semantic_pdf_diff.cli import main
@@ -100,8 +100,9 @@ class ResponseShapeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, stub([reply('not json', usage=paid), reply(EMPTY, usage=paid)]) as (url, _):
             client = Client(Settings(base_url=url, retries=1), None)
             client.ledger = Ledger(Path(d) / 'ledger.jsonl', round='t')
-            with patch('semantic_pdf_diff.llm.time.sleep'):
-                client.ask('x', Extraction)
+            with patch('semantic_pdf_diff.llm.time.sleep'), self.assertRaises(Invalid):
+                client.ask('x', Extraction)  # not retried (code review 2026-10-08, C10)
+            client.ask('x', Extraction)
             self.assertEqual(len(read(Path(d) / 'ledger.jsonl')), 2)  # the bad answer was paid for too
             self.assertAlmostEqual(client.cost, 0.002)
 
@@ -190,6 +191,12 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(len(result.claims), 2)
         self.assertFalse(result.complete)
         self.assertIn('Discarded 3 malformed claim(s)', result.issues)
+
+    def test_an_answer_without_complete_keeps_its_claims(self):
+        # code review 2026-10-08, C12: it was rejected whole, then asked again
+        result = Extraction.model_validate({'claims': [GOOD]})
+        self.assertEqual((len(result.claims), result.complete), (1, False))
+        self.assertEqual(result.issues, ["The answer didn't say whether it was complete"])
 
     def test_salvage_caps_claims_and_issues(self):
         result = Extraction.model_validate({'complete': True, 'claims': [GOOD] * (MAX_CLAIMS + 3),

@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import PurePath
 from . import __version__
-from .levers import declared, lever_settings, role_settings
+from .levers import declared, role_settings
 from .models import Interpreter, Settings
 
 # Only aliases known to share an interpretation collapse.
@@ -19,7 +19,6 @@ EXTENSION_ALIASES = {".jpeg": ".jpg", ".tif": ".tiff", ".htm": ".html", ".yml": 
 # The settings each role's stored results depend on (levers.Declared roles): what shapes what it sends to the
 # model or how content is chunked. Timeouts, retries, call limits, credentials and the endpoint URL are excluded.
 EXTRACTION_SETTINGS = role_settings(Settings, "extract")
-TRIAGE_SETTINGS = role_settings(Settings, "triage")
 COMPARISON_SETTINGS = role_settings(Settings, "compare")
 
 def normalized_extension(name):
@@ -53,8 +52,6 @@ def library_versions():
         except metadata.PackageNotFoundError:
             versions[package] = "unknown"
     return versions
-
-LEVERS = lever_settings()  # the settings levers own (levers.py)
 
 def interpreter(role, settings, prompts, names):
     """A role's binding: every setting it depends on, resolved. Levers were once bound only when they differed

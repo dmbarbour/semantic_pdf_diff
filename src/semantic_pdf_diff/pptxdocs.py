@@ -25,7 +25,6 @@ Needs lxml (with the `office` extra).
 """
 import io
 import posixpath
-import re
 import zipfile
 from dataclasses import dataclass
 
@@ -40,7 +39,6 @@ MC = "{http://schemas.openxmlformats.org/markup-compatibility/2006}"
 CHART = "http://schemas.openxmlformats.org/drawingml/2006/chart"
 TABLE = "http://schemas.openxmlformats.org/drawingml/2006/table"
 DIAGRAM = "http://schemas.openxmlformats.org/drawingml/2006/diagram"
-RELS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/"
 EMU_PER_POINT = 12700
 TITLES = ("title", "ctrTitle")
 BANDS = 24  # reading order: a slide's height in bands, shapes read band by band, left to right within one

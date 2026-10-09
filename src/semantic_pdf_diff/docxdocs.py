@@ -191,7 +191,6 @@ def _footnotes(document):
 class Numbering:
     """Word's list numbering: each numbered paragraph's label ("Condition 3:", "a)"), counted as Word counts them
     (by list and level; a level restarts when one above it advances)."""
-    FORMATS = {"decimal", "decimalZero", "lowerLetter", "upperLetter", "lowerRoman", "upperRoman", "bullet", "none"}
 
     def __init__(self, document):
         self.levels, self.lists, self.counts = {}, {}, {}

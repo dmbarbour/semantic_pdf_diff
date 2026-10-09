@@ -2,7 +2,7 @@ import hashlib
 import json
 import os
 from functools import lru_cache
-from typing import Annotated, Literal, get_origin
+from typing import Annotated, Literal, get_args, get_origin
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 from .levers import DEFAULT_LEVERS, EVERY_ROLE, Declared, compose, setting_classes
 
@@ -67,6 +67,9 @@ class Extraction(Strict):
             except ValidationError:
                 dropped += 1
         complete = data.get("complete")
+        if complete is None:  # left out: the claims kept, the answer not complete
+            issues.append("The answer didn't say whether it was complete")  # (code review 2026-10-08, C12)
+            complete = False
         if dropped:
             issues.append(f"Discarded {dropped} malformed claim(s)")
             complete = False
@@ -367,8 +370,7 @@ DIFFERENCE_KINDS = ("changed", "conditions", "renamed", "moved", "restated", "sp
                     "not_same_item", "unclear")
 
 class Explanation(Strict):
-    kind: Literal["changed", "conditions", "renamed", "moved", "restated", "split_or_merge", "misread",
-                  "not_same_item", "unclear"]
+    kind: Literal[DIFFERENCE_KINDS]  # the one list (a tuple in Literal is its members)
     rationale: str = Field(min_length=1, max_length=800)
     confidence: float = Field(ge=0, le=1)
 
@@ -444,11 +446,11 @@ class SettingsBase(Strict):
         return (cls if levers is None else settings_class(tuple(levers)))(**values)
 
     @classmethod
-    def from_env(cls, **overrides):
+    def from_env(cls, only=None, **overrides):
         """Load environment defaults, then explicit file/CLI/programmatic overrides.
 
         Keep plain Settings() deterministic for library callers and fixtures.
-        Empty environment values are treated as unset.
+        Empty environment values are treated as unset. `only`: the fields read from the environment (default all).
         """
         levers = overrides.pop("levers", None)
         target = cls if levers is None else settings_class(tuple(levers))
@@ -457,7 +459,7 @@ class SettingsBase(Strict):
         # An explicit legacy json_mode must beat an environment response_format.
         explicit = set(overrides) | ({"response_format"} if "json_mode" in overrides else set())
         for field in [*target.model_fields, "json_mode"]:
-            if field in explicit:
+            if field in explicit or (only is not None and field not in only):
                 continue
             name = names.get(field, "PDF_DIFF_" + field.upper())
             raw = os.environ.get(name)
@@ -470,6 +472,9 @@ class SettingsBase(Strict):
                     shape = {"aliases": "object mapping aliases to canonical names",
                              "rate_limits": "list of rate-limit rules"}.get(field, "list of strings")
                     raise ValueError(f"{name} must be a JSON {shape}") from exc
+            elif raw.strip().casefold() in ("none", "null") and field in target.model_fields \
+                    and type(None) in get_args(target.model_fields[field].annotation):
+                values[field] = None  # an optional setting switched off (code review 2026-10-08, C23: table_rules)
             else:
                 values[field] = raw.strip()
         values.update(overrides)
