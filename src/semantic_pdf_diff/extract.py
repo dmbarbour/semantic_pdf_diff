@@ -17,7 +17,7 @@ from .regions import crop_name, crop_stem, region_of
 from .context import CONTEXT_NOTE, LEVER_MARKS, Context, lever_notes  # noqa: F401
 from .quotes import FOLD, covered, excerpted, quoted  # noqa: F401
 from .sections import SectionIndex, heading_y, pdf_sections, section_text  # noqa: F401
-from .segmentation import grown, sheet_details, tiles  # noqa: F401
+from .segmentation import grown, halves, sheet_details, tiles  # noqa: F401
 from .stems import _long_form, glossary, stem_index  # noqa: F401
 from .tables import (Marks, column_edges, cut_columns, pdf_grid, pdf_parts, real_table,  # noqa: F401
                      row_boxes, ruled_rows, same_form, split_cuts)
@@ -262,17 +262,19 @@ def office_installed(workbook=False):
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/8",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
+READERS = {".pdf": "pdf/9",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
            # 4: a part the model reads as no table read as a figure; 5: columns joined where words are cut; 6: a
            # structure answer's new tables tagged apart, a structure asked again recorded once (review A2, B7); 7: rows
            # read by themselves as the grid holds them, notes confirmed and read, the structure rules' union said (B2);
-           # 8: a table of two columns asked whether it's a key-value list (B5)
+           # 8: a table of two columns asked whether it's a key-value list (B5); 9: a partial tile refined in halves
+           # cut between lines or columns, grown to whole lines, its text by whole lines (trials finding 5)
            ".txt": "text/2", ".md": "text/1",  # text/2: "A pump ..." isn't a heading (review B4)
-           ".docx": "docx/8",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
+           ".docx": "docx/9",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
            # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1); 7: a
-           # table's notes confirmed and read, its rows without rules read from its grid (review B2); 8: as pdf/8
-           ".pptx": "pptx/6",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6;
-           # 6: as docx/7
+           # table's notes confirmed and read, its rows without rules read from its grid (review B2); 8: as pdf/8; 9: a
+           # picture's partial tiles refined as pdf/9
+           ".pptx": "pptx/7",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6;
+           # 6: as docx/7; 7: as docx/9
            ".xlsx": "xlsx/12", ".xlsm": "xlsx/12",  # xlsx/7: vague conditions guarded against; 8-9: header name,
            # group; 10: late table answers on their own sheet (review B1); 11: as docx/7; 12: as docx/8
            ".csv": "csv/8", ".tsv": "csv/8",  # csv/6: as xlsx/10; csv/7: as xlsx/11; csv/8: as xlsx/12
@@ -343,7 +345,9 @@ class Visuals:
         name = crop_name(self.stem, tag)
         render(page, rect, self.assets / name, s.image_side)
         native_rect = native(page, rect)
-        layer = page.get_text("text", clip=native_rect)
+        layer = (page.get_text("text", clip=native_rect) if not depth  # a refined half's by whole lines (review item 6)
+                 else "".join(line + "\n" for line_box, line in self.context_of.lines(page)
+                              if (line_box.tl + line_box.br) / 2 in rect))
         check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
         if box is None:
             blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", clip=native_rect) if b[6] == 0]
@@ -368,13 +372,7 @@ class Visuals:
         if (status not in ("partial", "failed") or region_of(tag) in ("overview", "figure") or depth >= s.refinement_depth
                 or min(rect.width, rect.height) < MIN_REFINE_POINTS):
             return
-        if rect.width > rect.height:
-            mid = (rect.x0 + rect.x1) / 2
-            children = [pymupdf.Rect(rect.x0, rect.y0, mid + 12, rect.y1), pymupdf.Rect(mid - 12, rect.y0, rect.x1, rect.y1)]
-        else:
-            mid = (rect.y0 + rect.y1) / 2
-            children = [pymupdf.Rect(rect.x0, rect.y0, rect.x1, mid + 12), pymupdf.Rect(rect.x0, mid - 12, rect.x1, rect.y1)]
-        for i, child in enumerate(children):
+        for i, child in enumerate(halves(page, rect, self.context_of.lines(page), self.context_of.graphics(page))):
             self.task(page_no, page, f"{tag}-r{i}", child, depth + 1, text, box, derivation)
 
 def _pdf_job(path, job, output, client, dispatch, progress):

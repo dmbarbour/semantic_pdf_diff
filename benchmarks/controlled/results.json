@@ -5188,9 +5188,8 @@
    "recall": 1.0,
    "found_right": 19,
    "missed": [],
-   "claims": 39,
+   "claims": 37,
    "outcomes": {
-    "loose": 2,
     "misbound": 3,
     "right": 31,
     "text": 3
@@ -5214,7 +5213,6 @@
      "right": 16
     },
     "visual": {
-     "loose": 2,
      "right": 19,
      "text": 3
     }
@@ -7102,9 +7100,8 @@
    "recall": 1.0,
    "found_right": 84,
    "missed": [],
-   "claims": 93,
+   "claims": 84,
    "outcomes": {
-    "loose": 9,
     "right": 84
    },
    "conditions_kept": "0/0",
@@ -7124,7 +7121,6 @@
      "right": 48
     },
     "visual": {
-     "loose": 9,
      "right": 84
     }
    },
@@ -18826,9 +18822,8 @@
    "recall": 1.0,
    "found_right": 19,
    "missed": [],
-   "claims": 42,
+   "claims": 40,
    "outcomes": {
-    "loose": 2,
     "misbound": 3,
     "right": 34,
     "text": 3
@@ -18852,7 +18847,6 @@
      "right": 16
     },
     "visual": {
-     "loose": 2,
      "right": 19,
      "text": 3
     }
@@ -20471,9 +20465,8 @@
    "recall": 1.0,
    "found_right": 84,
    "missed": [],
-   "claims": 93,
+   "claims": 84,
    "outcomes": {
-    "loose": 9,
     "right": 84
    },
    "conditions_kept": "0/0",
@@ -20493,7 +20486,6 @@
      "right": 48
     },
     "visual": {
-     "loose": 9,
      "right": 84
     }
    },

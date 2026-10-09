@@ -7,6 +7,7 @@ from .levers import lever_marks
 from .models import Settings
 from .pages import display_y, lines as _lines, reading_blocks, shown
 from .regions import crop_name
+from .segmentation import _graphics
 from .situate import page_figures
 from .stems import glossary, references, stem_index
 
@@ -24,7 +25,7 @@ class Context:
     def __init__(self, doc, s, assets=None, stem=""):
         self.doc, self.s = doc, s
         self.assets, self.stem = assets, stem  # where the locator's images go, and their names' stem
-        self.blocks, self.stems, self.cited_by, self.page_lines = {}, {}, {}, {}
+        self.blocks, self.stems, self.cited_by, self.page_lines, self.page_graphics = {}, {}, {}, {}, {}
         self.tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
 
     @staticmethod
@@ -53,6 +54,13 @@ class Context:
         if page.number not in self.page_lines:
             self.page_lines[page.number] = _lines(page)
         return self.page_lines[page.number]
+
+    def graphics(self, page):
+        """A page's drawings and images as displayed (segmentation's, frames left out), once per page: a drawing
+        sheet's take up to a second, and each refined tile reads them."""
+        if page.number not in self.page_graphics:
+            self.page_graphics[page.number] = _graphics(page)
+        return self.page_graphics[page.number]
 
     def figures(self, page, number):
         """The page's detected figures (situate.page_figures)."""

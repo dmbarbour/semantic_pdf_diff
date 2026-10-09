@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Items 1–4 (the review's) are done; the trials' two bugs joined as items 5 and 6 (the owner, 2026-10-09). Item 5 is done; item 6's design is answered (2026-10-09) and being built.
+- **Status:** Active (2026-10-09). The order is agreed. Items 1–4 (the review's) are done; the trials' two bugs joined as items 5 and 6 (the owner, 2026-10-09). Items 5 and 6 are done (2026-10-09).
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -244,6 +244,27 @@
 
 ### 6. Trials finding 5, cause 1: refinement cuts a tile through its text
 
+**Done (2026-10-09)** as designed below, with one change found by measuring: the cut's middle and its 25% share are measured on what the tile holds, not on the tile. Cut at the tile's middle, a band whose text filled its top third was halved in its blank part, and the samples' empty halves rose from 529 to 839; measured on its contents, they fell to 35.
+- **Built:** `segmentation.halves` (the cut, `LEAST_HALF` 25%, halves grown to whole lines); `Visuals.refine` uses it; a refined half's text layer is its whole lines; a page's graphics cached by the reader (`Context.graphics`; a drawing sheet's take up to a second). Reader versions pdf/9, docx/9, pptx/7 (pictures are refined too).
+- **Tests:** `tests/test_refinement.py`, six. The partial band's halves fail on the old code (each half's text ended "…at its ra").
+- **The lab's switch:** `semantic_pdf_diff_lab/bench/refinement.py` (`forced()`: every unrefined tile's answer taken as partial) and `scripts/refinement.py` (`run`, with `--src` to read with another tree; `report`). The old code was read from a worktree at the commit before.
+- **Measured without the model** (every band and grid tile of the samples' 803 pages refined once; 7,365 tiles):
+
+  | | Old cut | New cut |
+  |---|---|---|
+  | Lines cut by a tile's halves, mean | 3.08 | 0.05 |
+  | Bands with 5 or more lines cut (of 783) | 584 | 13 |
+  | Tiles with any line cut | 2,974 | 80 |
+  | Empty halves | 529 | 35 |
+
+- **Measured with the model, halves only** (every tile refined once, both trees, one shared fixture):
+  - **Controlled corpus, 80 PDFs, 321 tiles:** right claims 1,870 → 2,153; loose 905 → 482; misbound 232 → 107; wrong unit 29 → 0; hallucinated 12 → 1; facts found right 2,002 → 2,371. Empty halves 193 → 216.
+  - **By project:** tables gained most (wtp-tables right 703 → 851, misbound 61 → 0; coaster-tables 397 → 524). Charts about even (lcc-enduse 71 → 99; lcc-energy and lcc-metered 232 → 209: a chart now kept whole in one half, where the middle cut zoomed into each half of it). The drawing sheet (lcc-plan): facts right 213 → 202, misbound 117 → 42, misread 14 → 32.
+  - **Real pages, 16 pages of 9 sources** (the worst bands by lines cut, HabEx p4, LCIT's slide 27, a drawing sheet; no key; a tenth source's pages left out, the old tree's run stopped at its cap): claims from halves 323 → 464, empty halves 68 of 140 → 55 of 138. The pairwise judge wasn't run: the key measured quality, and the measure had used its budget.
+- **The usual runs:** the slices fixture re-recorded (dev runs: 85 answers in, 85 pruned, $0.021). The controlled corpus re-read: only PDFs change, loose claims 418 → 407 (rows variant 408 → 397); revision pairs unchanged. Refinement is rare in a normal run (8 refined tiles in the corpus), so the forced measure is the one that shows the change.
+- **Cost:** $0.57 for the forced measure (about $0.00038 a half; I'd estimated less), $0.023 for the re-records.
+- **For the tile-selection plan:** whether a refined chart or drawing is better kept whole or zoomed into is a lever question, as is the 25% share.
+
 - **The owner, 2026-10-09** (above): "the slicing seems a bigger task that needs careful design, an approach to measuring improvements, etc.."
 - **The bug** (`extract.py`, `Visuals.refine`): a tile answered partial or failed is halved at its midpoint along its longer side, with 12 pt of overlap.
   - The halves aren't grown to whole lines, and each half's text layer is clipped to the half-lines (`get_text(clip=…)`). So the model gets fragments in both the image and the text.
@@ -322,7 +343,7 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
 
 - **B5, answered 2026-10-09** (above): PDFs included with their crop; sheets, CSV and Word checked by text alone; "key-value" proposed in place of "pairs".
 - **The trials' bugs, answered 2026-10-09:** both join, as items 5 and 6. The rest of finding 5, and findings 2–4, stay with their plans.
-- **Item 6's three questions, answered 2026-10-09** (above): a fix; the lab-only switch; 25% to start, a lever later.
+- **Item 6, done 2026-10-09** (above): a fix; the lab-only switch; 25% to start, a lever later. Every item of this plan is done; next is the behaviour-preserving phase.
 
 ## Found along the way
 

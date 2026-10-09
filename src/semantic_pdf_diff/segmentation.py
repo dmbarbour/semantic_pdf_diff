@@ -2,6 +2,7 @@
 sheet's details, and blank tiles found. The geometry only: which of it a run uses is the segmentation levers'
 choice (levers.py: Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks). Rectangles are as displayed.
 """
+import bisect
 import math
 import re
 
@@ -79,6 +80,78 @@ def grown(page, rect, limit=0.25, lines=None):
         if not changed:
             break
     return out & page.rect
+
+LEAST_HALF = 0.25  # a refined half's least share of its tile (the owner, 2026-10-09: "a tuning lever ... start with 25%")
+REFINE_OVERLAP = 12.0  # points a cut's halves share, within its gap where it has one
+
+def _gaps(boxes, axis, lo, hi):
+    """The ranges of [lo, hi] along an axis (0: x, 1: y) that no box covers."""
+    reach, out = lo, []
+    for a, z in sorted((b.x0, b.x1) if axis == 0 else (b.y0, b.y1) for b in boxes):
+        if a > reach:
+            out.append((reach, min(a, hi)))
+        reach = max(reach, z)
+        if reach >= hi:
+            break
+    if reach < hi:
+        out.append((reach, hi))
+    return [g for g in out if g[1] >= g[0]]
+
+def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFINE_OVERLAP):
+    """A partial tile's two halves for refinement (review-bugs-2026-10-09, item 6), each grown to whole lines.
+
+    The cut crosses no text line where it can: in a gap between lines or between columns (no graphic crossed either,
+    if possible), nearest the middle of what the tile holds, each side holding at least `least` of its extent, ties
+    going to the cut across the tile's shorter side (a band is cut between its lines, not down them). Otherwise the
+    cut crossing the fewest lines. Measured on what the tile holds, not on the tile, so neither half is left blank.
+    A tile without text, such as a drawing or a scan, is cut at the middle of its longer side, as before."""
+    lines = _lines(page) if lines is None else lines
+    texts = [box & rect for box, _ in lines if box.intersects(rect)]
+    if not texts:
+        return _middle(rect, overlap)
+    marks = texts + [g & rect for g in (_graphics(page) if graphics is None else graphics) if g.intersects(rect)]
+    shorter = 1 if rect.height < rect.width else 0  # the axis whose cut divides the shorter side
+    best = None
+
+    def extent(boxes, axis):
+        return min(b.x0 if axis == 0 else b.y0 for b in boxes), max(b.x1 if axis == 0 else b.y1 for b in boxes)
+
+    def rank(crossed, cut, lo, hi, axis):
+        return (crossed, round(abs(cut - (lo + hi) / 2) / (hi - lo) / 0.05), axis != shorter)
+    for axis in (0, 1):
+        for tier, blockers in enumerate((marks, texts)):
+            lo, hi = extent(blockers, axis)
+            first, last = lo + least * (hi - lo), hi - least * (hi - lo)
+            for g0, g1 in _gaps(blockers, axis, lo, hi):
+                if max(g0, first) <= min(g1, last) and g1 > g0:
+                    cut = min(max((lo + hi) / 2, g0, first), g1, last)
+                    found = ((tier, *rank(0, cut, lo, hi, axis)), axis, cut, (g0, g1))
+                    best = min(best, found) if best else found
+    if best is None:  # no gap: the cut crossing the fewest lines
+        for axis in (0, 1):
+            lo, hi = extent(texts, axis)
+            first, last = lo + least * (hi - lo), hi - least * (hi - lo)
+            spans = [(a + 1, z - 1) for a, z in ((b.x0, b.x1) if axis == 0 else (b.y0, b.y1) for b in texts) if z - a > 2]
+            starts, ends = sorted(a for a, _ in spans), sorted(z for _, z in spans)
+            for cut in {(lo + hi) / 2} | {v for span in spans for v in span if first <= v <= last}:
+                crossed = bisect.bisect_left(starts, cut) - bisect.bisect_right(ends, cut)  # spans strictly around it
+                found = ((2, *rank(crossed, cut, lo, hi, axis)), axis, cut, (cut, cut))
+                best = min(best, found) if best else found
+    _, axis, cut, (g0, g1) = best
+    end, start = (min(cut + overlap, g1), max(cut - overlap, g0)) if g1 > g0 else (cut + overlap, cut - overlap)
+    if axis == 0:
+        parts = [pymupdf.Rect(rect.x0, rect.y0, end, rect.y1), pymupdf.Rect(start, rect.y0, rect.x1, rect.y1)]
+    else:
+        parts = [pymupdf.Rect(rect.x0, rect.y0, rect.x1, end), pymupdf.Rect(rect.x0, start, rect.x1, rect.y1)]
+    return [grown(page, part & rect, lines=lines) for part in parts]
+
+def _middle(rect, overlap):
+    """Today's cut: the middle of the longer side."""
+    if rect.width > rect.height:
+        mid = (rect.x0 + rect.x1) / 2
+        return [pymupdf.Rect(rect.x0, rect.y0, mid + overlap, rect.y1), pymupdf.Rect(mid - overlap, rect.y0, rect.x1, rect.y1)]
+    mid = (rect.y0 + rect.y1) / 2
+    return [pymupdf.Rect(rect.x0, rect.y0, rect.x1, mid + overlap), pymupdf.Rect(rect.x0, mid - overlap, rect.x1, rect.y1)]
 
 DETAIL_NUMBER = re.compile(r"^[A-H]\d{1,2}$")  # grid-referenced detail numbers (US National CAD Standard)
 BORDER = 0.6  # a vertical line this share of the page height is a frame or title-block border
