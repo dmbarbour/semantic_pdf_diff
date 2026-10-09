@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Item 1 (E3) is done; items 2–4 await the owner's review of their designs (B5's choice).
+- **Status:** Active (2026-10-09). The order is agreed. Item 1 (E3) is done; items 2–4 await the owner's review of their designs (B5's chosen 2026-10-09, two details open).
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -107,20 +107,33 @@
   - A sheet splits narrow pairs off only when a wider table follows them.
   - A two-column block standing alone becomes a table, headed by its first row. Word does the same with any two-column table.
   - So in "Pump | P-2", "Flow | 95 L/s", "Head | 30 m", the first pair is the header. "P-2" is never read as a value, and the other rows are read under the labels "Pump" and "P-2".
-- **Choices** (the owner's review):
-  - **(a) Recommended: a two-column block whose left column holds no numbers, and whose header isn't marked, is read as pairs.**
-    - A sheet's defined table and Word's repeated header rows are marked headers; a marked header keeps the table.
-    - Pairs are "label: value" lines, as sheets already read the pairs above a table.
-    - The costs:
-      - A real "Parameter | Value" header becomes a harmless "Parameter: Value" line.
-      - A two-column table keyed by text ("Room | Area") is read by the text task as lines under a "Room: Area" line, not row by row with its header. It's cheaper, and the header is still in the text the model reads.
-  - **(b) Narrower: keep the table, and also read its first row as a pair** when the row holds a digit or its label ends with ":".
-    - Nothing else changes.
-    - It misses "Owner | Acme Corp" (no digit, no colon), whose rows would still be read under "Acme Corp".
+- **Choices offered:** (a) a two-column block whose left column holds no numbers, and whose header isn't marked, read as pairs (recommended); (b) keep the table and also read its first row as a pair when it holds a digit or its label ends with ":".
+- **The owner, 2026-10-09:** "Regarding the B5 choice, I think that you recommendation is a good heuristic to start, but you should still be asking a model (likely vision) to confirm the proposed 'rule' for reading a table."
+- **Design** (as decision 0023: our heuristics propose, the model decides):
+  - **Candidates:** (a)'s heuristic marks them.
+    - The block has two columns, its left column holds no numbers, and no header is marked. A sheet's defined table and Word's repeated header rows are marked headers.
+    - Only candidates are asked, so no other table's requests change.
+  - **One small query per candidate: the pairs check.**
+    - It shows the block's rows as lines and the text just above it, and states the proposal: every row is a label and its value, the first row included.
+    - It asks which reading holds: `{"reading": "pairs" | "table", "why": "..."}`. "table" means the first row heads the rows below.
+  - **Vision where there's an image:**
+    - Sheets, CSV and Word have no page image; nothing lays them out. Their check is text alone. Rendering them, styles included, would be a feature of its own.
+    - PDFs: a two-column PDF table is headed by its first row too (`extract.py:478`). There the check is sent the table's crop, already rendered for the rules query. Proposed: include PDFs (see *For the owner*).
+  - **The outcome:**
+    - **"pairs":** the rows are read as "label: value" lines by a text task, as sheets already read pairs above a table.
+    - **"table":** the block is read as a table, as now (the rules query).
+    - **A failed check:** the heuristic's proposal is used (pairs), and the task is recorded as partial with the error.
+    - **Not reached** (a call limit, an answer not recorded): recorded as not reached, and asked on the next run.
+  - **Traced:** a `pairs-check` step in each claim's derivation says what the model answered, or that it wasn't confirmed.
+  - **Where:**
+    - Readers mark candidates on their table blocks; the check is asked when the job reaches the block (`text_job`).
+    - For PDFs, the check is asked before the rules query.
 - **Measured:**
-  - A knob in the controlled workbooks and Word documents: a label and value block standing alone, with and without a header-like first row. Added only if the corpus has none.
-  - Scored before and after on the controlled corpus.
-- **Effects:** reader versions xlsx, csv and docx; requests change for those blocks.
+  - A knob in the controlled workbooks and Word documents: a label and value block standing alone, with a pair as its first row and with a real header. Added only if the corpus has none.
+  - Scored before and after on the controlled corpus, with the checks' answers and cost counted.
+- **Effects:**
+  - Reader versions xlsx, csv and docx (and pdf, if included).
+  - Requests change for candidate blocks only: one check each, then their reading.
 
 ## Re-recording and measuring
 
@@ -150,7 +163,10 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
 
 ## For the owner
 
-- **B5:** choice (a) or (b)?
+- **B5, answered 2026-10-09** (above). Two details of the design:
+  - **PDFs:** include two-column PDF tables, checked with their crop (vision)?
+  - **Sheets, CSV and Word:** checked by text alone, since nothing renders them?
+- **D2 and B2:** may I go ahead with their designs as written?
 - **The trials' bugs:** they were deferred on 2026-10-08 ("before working on these, we'll focus on the architecture and bugs found in your review"). Should they join this plan's bug phase?
   - **Trials finding 1:** `--fixture` with a file that doesn't exist yet fails; the default mode, `replay`, can't create one. A small fix.
   - **Finding 5's refinement cut:** a failed tile is halved down its middle, through its text. A small fix, measured.
