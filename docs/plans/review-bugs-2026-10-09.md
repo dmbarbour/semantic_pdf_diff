@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Items 1 (E3) and 2 (D2) are done; B5's design is settled (2026-10-09); B2's awaits the owner's reading.
+- **Status:** Active (2026-10-09). The order is agreed. Items 1 (E3) and 2 (D2) are done; B2 is being fixed; B5's design is settled (2026-10-09).
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -104,24 +104,45 @@
 
 ### 3. B2 (with B10's wording): table rows read by themselves come from the grid
 
-- **The bug:** a table's rules see its grid, but rows read by themselves come from the raw rows (`tables.py:57-76`, `tablerules.py:140-158,844-847`, `extract.py:527-553`, `textdocs.py:392-407`):
-  - **A wrapped PDF row is split again.** Its continuation line is joined in the grid, but a row read by itself is the raw first line. This happens on every path that reads rows by themselves: a "rows" answer, rows that misfit the rules, failed rules, an image mismatch. On the small-table path (no rules), the continuation line is also read alone, as a fragment.
-  - **A row holding only its first cell becomes a section row** (in tables of three columns or more). It has no key, so no path reads it: "Note: P-2 ... rated 95 L/s" is lost in every format. Only the small-table path reads it, as a raw row.
-- **Fix:**
-  - **`by_itself` reads a grid row:** its cells (wrapped lines joined), its box (the union of its lines' boxes), and the raw row's index as the task tag's key, so tags stay as they are.
-  - **The small-table path reads the grid's rows too,** so every path reads the same rows. A PDF table whose rows lack boxes still gets a grid, placed at the table's box.
-  - **A section row holding a digit is read by itself** on every path, besides labelling the rows below it. A section row without a digit stays a label only.
-  - **Headers are unchanged:** the row prompt still shows the table's header as now.
+- **The bug:** a table's rules see its grid, but rows read by themselves come from the raw rows (`tables.py:57-76`, `tablerules.py:140-158,844-847`, `extract.py:527-553`, `textdocs.py:392-407`). Reproduced (2026-10-09) on a PDF table with a "Pumps" section row, P-2's service wrapped onto a second line, a one-cell note "Note: P-2 is rated 95 L/s at 28 m ..." and P-3 below it.
+- **Part 1, wrapped rows (a consistency bug):**
+  - **The problem:**
+    - The grid joins P-2's continuation line ("Condenser water, standby duty"), but a row read by itself is the raw first line ("Condenser water,").
+    - This happens on every path that reads rows by themselves: a "rows" answer, rows that misfit the rules, rules failing twice or failing outright, an image mismatch.
+    - On the path without rules, the continuation line is also read alone, as a fragment.
+  - **Fix:**
+    - Every path reads the grid's rows.
+    - A row the grid joined is read whole: its lines' cells joined, and its box the union of theirs. Any other row is read exactly as now, so its request doesn't change.
+    - Tags keep the raw index of the row's first line.
+    - A PDF table whose rows lack boxes has no grid and is read as now.
+- **Part 2, one-cell rows (a heuristic misfiring on a hazard):**
+  - **The problem:** a row holding only its first cell (in tables of three columns or more) is a section label for the rows below. A note is classed the same way:
+    - **Its facts are never read:** labels aren't rows, so no path reads it (only the path without rules, which reads every raw row).
+    - **It labels the rows below:** the reproduction files P-3 under the section "Note: P-2 is rated 95 L/s ...", which the rules query is told labels P-3. P-3's claims can carry it, e.g. as a condition.
+  - **Design** (as in B5 and decision 0023: our heuristics propose, the model decides), in the owner's words of 2026-10-09: "Yes, update the plan that way, then fix B2.":
+    - **The proposal:** a section row holding a number is a possible note. The rules query lists such rows in a "POSSIBLE NOTES" line, only when a table has them, and asks for any that are notes by row number in a new `notes` field.
+    - **Confirmed notes:**
+      - Each is read by itself.
+      - It labels nothing: the rows below it take the section above it.
+    - **No answer** (the rules query failed or wasn't reached): the proposal stands, and the possible notes are read by themselves.
+    - **The path without rules:** possible notes are read by themselves; digitless section rows are no longer asked alone.
+    - **Unconfirmed rows** stay labels.
+  - **Requests:** the rules query changes only for tables with possible notes. The answer has no JSON schema in the request (`response_format` is "none" by default), so the new field changes nothing else.
 - **B10's wording, folded in:** the structure prompt's "and/or" (read as an intersection; the code takes the union) says union. It changes only the structure query, and it's re-recorded with B2's changes.
 - **Effects:**
-  - Row prompts change for wrapped PDF rows. Section rows with digits are new tasks. On the small-table path, continuation lines and digitless section rows are no longer asked alone (fewer calls).
-  - Reader versions: every format with tables (pdf, docx, pptx, xlsx, csv, and `.md`'s text reader).
+  - Row prompts change for wrapped PDF rows.
+  - Confirmed notes (or, without an answer, possible notes) are new row tasks.
+  - The rules query changes for tables with possible notes.
+  - On the path without rules, continuation lines and digitless section rows are no longer asked alone (fewer calls).
+  - Reader versions: every format whose tables reach the grid (pdf, docx, pptx, xlsx, csv).
 - **Tests:**
   - a wrapped row read whole on the "rows" path and on the misfit path
-  - the note row read on the rules path
-  - a digitless section row not asked alone
-  - Word and sheet section rows with digits read
-  - tags unchanged for unwrapped rows
+  - unwrapped rows' requests and tags unchanged
+  - a confirmed note read by itself, labelling nothing
+  - an unconfirmed possible note left a label
+  - possible notes read when the rules query fails
+  - the path without rules reading grid rows and possible notes
+  - a Word or sheet table's note
 
 ### 4. B5: label and value blocks
 
@@ -187,7 +208,6 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
 ## For the owner
 
 - **B5, answered 2026-10-09** (above): PDFs included with their crop; sheets, CSV and Word checked by text alone; "key-value" proposed in place of "pairs".
-- **B2:** may I go ahead with its design as written? (The owner, 2026-10-09: "I'm still reading D2 and B2"; D2 since done.)
 - **The trials' bugs:** they were deferred on 2026-10-08 ("before working on these, we'll focus on the architecture and bugs found in your review"). Should they join this plan's bug phase?
   - **Trials finding 1:** `--fixture` with a file that doesn't exist yet fails; the default mode, `replay`, can't create one. A small fix.
   - **Finding 5's refinement cut:** a failed tile is halved down its middle, through its text. A small fix, measured.
