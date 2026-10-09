@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Item 1 (E3) is done; items 2–4 await the owner's review of their designs (B5's chosen 2026-10-09, two details open).
+- **Status:** Active (2026-10-09). The order is agreed. Item 1 (E3) is done; items 2–4 await the owner's review of their designs (B5's settled 2026-10-09; D2 and B2 being read).
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -113,18 +113,19 @@
   - **Candidates:** (a)'s heuristic marks them.
     - The block has two columns, its left column holds no numbers, and no header is marked. A sheet's defined table and Word's repeated header rows are marked headers.
     - Only candidates are asked, so no other table's requests change.
-  - **One small query per candidate: the pairs check.**
-    - It shows the block's rows as lines and the text just above it, and states the proposal: every row is a label and its value, the first row included.
-    - It asks which reading holds: `{"reading": "pairs" | "table", "why": "..."}`. "table" means the first row heads the rows below.
-  - **Vision where there's an image:**
+  - **One small query per candidate: the key-value check.**
+    - It shows the block's rows as lines and the text just above it, and states the proposal: "a key-value list, as on a form or data sheet: each row is a key (column A) and its value (column B), the first row included".
+    - It asks which reading holds: `{"reading": "key-value" | "table", "why": "..."}`. "table" means the first row is a header naming the columns below.
+    - **Naming:** the owner, 2026-10-09: "I'm not sure "pairs" is the best word here, it doesn't seem conventional and might confuse a model about what you're pairing, is there a more common naming for this layout?" "Key-value pairs" is document AI's usual term for this layout (forms extraction, e.g. AWS Textract, Azure Document Intelligence). The sheets' internal "pairs" region kind keeps its name until the architecture phase (a rename is behaviour-preserving).
+  - **Vision where there's an image** (both points agreed by the owner, 2026-10-09: "We can go with 1 and 2 decisions for now"):
     - Sheets, CSV and Word have no page image; nothing lays them out. Their check is text alone. Rendering them, styles included, would be a feature of its own.
-    - PDFs: a two-column PDF table is headed by its first row too (`extract.py:478`). There the check is sent the table's crop, already rendered for the rules query. Proposed: include PDFs (see *For the owner*).
+    - PDFs are included: a two-column PDF table is headed by its first row too (`extract.py:478`). There the check is sent the table's crop, already rendered for the rules query.
   - **The outcome:**
-    - **"pairs":** the rows are read as "label: value" lines by a text task, as sheets already read pairs above a table.
+    - **"key-value":** the rows are read as "key: value" lines by a text task, as sheets already read the label-and-value rows above a table.
     - **"table":** the block is read as a table, as now (the rules query).
-    - **A failed check:** the heuristic's proposal is used (pairs), and the task is recorded as partial with the error.
+    - **A failed check:** the heuristic's proposal is used (key-value), and the task is recorded as partial with the error.
     - **Not reached** (a call limit, an answer not recorded): recorded as not reached, and asked on the next run.
-  - **Traced:** a `pairs-check` step in each claim's derivation says what the model answered, or that it wasn't confirmed.
+  - **Traced:** a `key-value-check` step in each claim's derivation says what the model answered, or that it wasn't confirmed.
   - **Where:**
     - Readers mark candidates on their table blocks; the check is asked when the job reaches the block (`text_job`).
     - For PDFs, the check is asked before the rules query.
@@ -132,7 +133,7 @@
   - A knob in the controlled workbooks and Word documents: a label and value block standing alone, with a pair as its first row and with a real header. Added only if the corpus has none.
   - Scored before and after on the controlled corpus, with the checks' answers and cost counted.
 - **Effects:**
-  - Reader versions xlsx, csv and docx (and pdf, if included).
+  - Reader versions xlsx, csv, docx and pdf.
   - Requests change for candidate blocks only: one check each, then their reading.
 
 ## Re-recording and measuring
@@ -163,10 +164,8 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
 
 ## For the owner
 
-- **B5, answered 2026-10-09** (above). Two details of the design:
-  - **PDFs:** include two-column PDF tables, checked with their crop (vision)?
-  - **Sheets, CSV and Word:** checked by text alone, since nothing renders them?
-- **D2 and B2:** may I go ahead with their designs as written?
+- **B5, answered 2026-10-09** (above): PDFs included with their crop; sheets, CSV and Word checked by text alone; "key-value" proposed in place of "pairs".
+- **D2 and B2:** may I go ahead with their designs as written? (The owner, 2026-10-09: "I'm still reading D2 and B2.")
 - **The trials' bugs:** they were deferred on 2026-10-08 ("before working on these, we'll focus on the architecture and bugs found in your review"). Should they join this plan's bug phase?
   - **Trials finding 1:** `--fixture` with a file that doesn't exist yet fails; the default mode, `replay`, can't create one. A small fix.
   - **Finding 5's refinement cut:** a failed tile is halved down its middle, through its text. A small fix, measured.
