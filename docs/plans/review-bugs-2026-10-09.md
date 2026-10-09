@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. All four items are done (2026-10-09); the trials' two small bugs wait on the owner's answer (see *For the owner*).
+- **Status:** Active (2026-10-09). The order is agreed. Items 1–4 (the review's) are done; the trials' two bugs joined as items 5 and 6 (the owner, 2026-10-09). Item 5 is designed and next; item 6's design waits on the owner's answers.
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -227,6 +227,68 @@
   - Reader versions xlsx, csv, docx and pdf.
   - Requests change for candidate blocks only: one check each, then their reading.
 
+### 5. Trials finding 1: `--fixture` with a new file
+
+- **The owner, 2026-10-09:** "Let's go ahead and add those to pre-architecture. Fixing fixture should be a relatively simple fix, but the slicing seems a bigger task that needs careful design, an approach to measuring improvements, etc.."
+- **The bug** ([trials](../reviews/trials-2026-10-08.md), finding 1): `--fixture new.sqlite` fails with "no such fixture", because the default mode, `replay`, never creates a file. The error comes after the sources are scanned and the store bound.
+- **Fix** (the trials' proposal):
+  - **A fixture named without a mode** records and replays (`replay-or-record`), creating a `.sqlite` file. A `.zip` (or a folder) is replayed, as a `.zip` can't be recorded into.
+  - **Strict replay stays explicit,** `--fixture-mode replay`, for tests and CI. The scripts pass their modes already. `test_fixtures`' replay tests now say `replay`.
+  - **Checked first:** a fixture that can't be opened as asked fails the run before the store is bound or a source scanned.
+  - The help text says what each mode does and that a new file is created.
+- **Later:** this folds into finding 2's per-user cache (the cache becomes the fixture format), a design for the architecture phase's configuration work.
+- **Tests:** a new `.sqlite` named alone is created and recorded into; a missing fixture under `replay` fails before scanning, the store left as it was; a `.zip` named alone replays.
+- **No requests change;** nothing to re-record.
+
+### 6. Trials finding 5, cause 1: refinement cuts a tile through its text
+
+- **The owner, 2026-10-09** (above): "the slicing seems a bigger task that needs careful design, an approach to measuring improvements, etc.."
+- **The bug** (`extract.py`, `Visuals.refine`): a tile answered partial or failed is halved at its midpoint along its longer side, with 12 pt of overlap.
+  - The halves aren't grown to whole lines, and each half's text layer is clipped to the half-lines (`get_text(clip=…)`). So the model gets fragments in both the image and the text.
+  - Bands are wider than tall, so every refined band is cut vertically, down every line. On the public samples: 5.7 lines cut on average, and 336 of 822 bands have 5 or more lines cut.
+  - In the slices fixture, 28 of 36 refined halves answered with no claims.
+- **Scope:** refinement only. Where tiles are first cut (grid tiles on wide pages, decoration counted as graphics, text-only grid tiles) stays with the tentative tile-selection plan.
+
+**Design (proposed):**
+- **Where to cut:** in whitespace, not at the middle.
+  - **Candidates:**
+    - Horizontal gaps between text lines.
+    - Vertical gaps between columns: x-ranges no line and no graphic crosses.
+    - Both are taken from the page's lines (`pages.lines`) and graphics (`segmentation._graphics`) inside the tile.
+  - **Choice:** the candidate crossing no line, nearest the middle, with each half at least 25% of the tile.
+    - Ties go to the cut along the shorter side, so a band is cut between lines, not down them.
+    - If no candidate crosses no line, the one crossing the fewest is taken, then the middle as today. A drawing with no text keeps today's cut.
+- **The halves:**
+  - Each half is grown to the whole lines it touches (`segmentation.grown`), so a line cut by an overlap is read whole in one of them.
+  - Its text layer is taken by whole lines (lines whose centre lies in the half), not clipped.
+- **Unchanged:**
+  - Refinement still happens only on partial or failed tiles, with the same depth and minimum size.
+  - Overviews and figures still aren't refined.
+  - Word pictures (no text lines) keep the middle cut.
+- **Version:** the PDF reader's (refined tiles' requests change); nothing else.
+
+**Measuring (proposed):**
+1. **Without the model, on the public samples' first 40 pages each** (the trials' 803 pages): every band and grid tile refined once, as if partial. Counted, before and after:
+   - lines cut by each half
+   - halves holding no text and no graphic
+   - each half's share of its parent
+   - Today's figures: 5.7 lines cut per refined band on average, and 336 bands with 5 or more.
+2. **With the model, on the halves themselves:** refinement is rare in a run (36 refined tiles in the slices fixture), too few to judge.
+   - So the measure forces it: a lab-only switch refines every tile of chosen pages once, whatever its answer, both ways.
+   - Pages: the trials' worst bands (HabEx p4, the cut-lines leaders) and the controlled corpus's tiled pages.
+   - Compared per parent tile:
+     - empty answers among the halves (today 28 of 36)
+     - claims per half, and right claims where a key exists (the controlled corpus)
+     - the halves' claims judged against the parent tile's (the rounds' pairwise judge, both orders)
+     - cost per right claim
+   - About 200 parent tiles, so about 800 half requests over both cuts: under $0.50.
+3. **The usual runs after:** slices re-recorded (dev only), the controlled corpus run and scored.
+
+**Questions for the owner:**
+1. **A fix, or a lever?** The bug phase replaces behaviour, measured before and after (as B2 and B5). A lever choosing the cut would be a feature (the owner's order, 2026-10-09). I'd make it a fix: the middle cut has no case where it's the better choice by design, and the measure above compares both anyway.
+2. **The forced-refinement switch:** a lab-only setting, not a product setting. Is that acceptable for measuring, or should the measure use only refinements that happen naturally (fewer cases, longer to gather)?
+3. **The 25% minimum share for a half:** a guess. With it, a band with one long paragraph at its top and a figure below cuts between them, not in the paragraph. Without a whitespace cut that meets it, today's middle cut stands. Should a smaller share be allowed before falling back?
+
 ## Re-recording and measuring
 
 - **Once, after items 3 and 4** (in the event: after item 3, and again for item 4's blocks; see item 3):
@@ -256,10 +318,8 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
 ## For the owner
 
 - **B5, answered 2026-10-09** (above): PDFs included with their crop; sheets, CSV and Word checked by text alone; "key-value" proposed in place of "pairs".
-- **The trials' bugs:** they were deferred on 2026-10-08 ("before working on these, we'll focus on the architecture and bugs found in your review"). Should they join this plan's bug phase?
-  - **Trials finding 1:** `--fixture` with a file that doesn't exist yet fails; the default mode, `replay`, can't create one. A small fix.
-  - **Finding 5's refinement cut:** a failed tile is halved down its middle, through its text. A small fix, measured.
-  - The rest of finding 5, and findings 2–4, are design work and stay with their plans.
+- **The trials' bugs, answered 2026-10-09:** both join, as items 5 and 6. The rest of finding 5, and findings 2–4, stay with their plans.
+- **Item 6's three questions** (above): a fix or a lever; the forced-refinement switch for measuring; the minimum share of a half.
 
 ## Found along the way
 
