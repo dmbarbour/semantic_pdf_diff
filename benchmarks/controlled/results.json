@@ -346,9 +346,10 @@
    "recall": 1.0,
    "found_right": 26,
    "missed": [],
-   "claims": 27,
+   "claims": 31,
    "outcomes": {
-    "right": 26,
+    "hallucinated": 1,
+    "right": 29,
     "text": 1
    },
    "conditions_kept": "0/0",
@@ -357,13 +358,14 @@
     "prose": 1.0
    },
    "by_reader": {
-    "table": 0.0769,
+    "table": 0.6154,
     "text": 1.0,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 2
+     "hallucinated": 1,
+     "right": 17
     },
     "text": {
      "right": 26
@@ -385,9 +387,11 @@
    "recall": 1.0,
    "found_right": 27,
    "missed": [],
-   "claims": 36,
+   "claims": 42,
    "outcomes": {
-    "right": 29,
+    "hallucinated": 1,
+    "misread": 1,
+    "right": 33,
     "text": 7
    },
    "conditions_kept": "0/0",
@@ -396,13 +400,15 @@
     "prose": 1.0
    },
    "by_reader": {
-    "table": 0.0741,
+    "table": 0.7037,
     "text": 1.0,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 2
+     "hallucinated": 1,
+     "misread": 1,
+     "right": 19
     },
     "text": {
      "right": 27
@@ -1987,9 +1993,8 @@
    "recall": 1.0,
    "found_right": 21,
    "missed": [],
-   "claims": 46,
+   "claims": 40,
    "outcomes": {
-    "loose": 6,
     "misbound": 9,
     "misread": 3,
     "right": 26,
@@ -2001,14 +2006,10 @@
     "prose": 1.0
    },
    "by_reader": {
-    "table": 0.2857,
     "text": 0.2381,
     "visual": 1.0
    },
    "outcomes_by_reader": {
-    "table": {
-     "loose": 6
-    },
     "text": {
      "misbound": 9,
      "misread": 3,
@@ -2020,7 +2021,6 @@
     }
    },
    "conditions_by_reader": {
-    "table": "0/6",
     "text": "3/3",
     "visual": "19/19"
    }
@@ -2864,13 +2864,12 @@
     "relation": 1.0
    },
    "by_reader": {
-    "table": 0.4667,
+    "table": 0.4444,
     "text": 0.2222,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 1,
      "right": 20
     },
     "text": {
@@ -2895,9 +2894,9 @@
    "recall": 1.0,
    "found_right": 43,
    "missed": [],
-   "claims": 83,
+   "claims": 82,
    "outcomes": {
-    "loose": 30,
+    "loose": 29,
     "misbound": 5,
     "misread": 2,
     "right": 46
@@ -2916,13 +2915,12 @@
     "relation": 1.0
    },
    "by_reader": {
-    "table": 0.1522,
+    "table": 0.1304,
     "text": 0.2174,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 1,
      "right": 6
     },
     "text": {
@@ -2947,12 +2945,12 @@
    "recall": 1.0,
    "found_right": 31,
    "missed": [],
-   "claims": 97,
+   "claims": 103,
    "outcomes": {
-    "loose": 37,
-    "misbound": 15,
+    "loose": 39,
+    "misbound": 18,
     "misread": 4,
-    "right": 41
+    "right": 42
    },
    "conditions_kept": "3/3",
    "recall_by_form": {
@@ -2969,14 +2967,15 @@
     "relation": 1.0
    },
    "by_reader": {
-    "table": 0.5778,
+    "table": 0.6,
     "text": 0.5333,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 7,
-     "right": 33
+     "loose": 8,
+     "misbound": 3,
+     "right": 35
     },
     "text": {
      "loose": 5,
@@ -3003,10 +3002,10 @@
    "recall": 1.0,
    "found_right": 41,
    "missed": [],
-   "claims": 87,
+   "claims": 81,
    "outcomes": {
-    "loose": 37,
-    "misbound": 6,
+    "loose": 32,
+    "misbound": 5,
     "misread": 2,
     "right": 42
    },
@@ -3024,21 +3023,20 @@
     "relation": 1.0
    },
    "by_reader": {
-    "table": 0.4,
+    "table": 0.1333,
     "text": 0.4444,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 12,
-     "misbound": 1,
-     "right": 6
+     "loose": 1,
+     "right": 5
     },
     "text": {
      "right": 20
     },
     "visual": {
-     "loose": 32,
+     "loose": 31,
      "misbound": 5,
      "misread": 2,
      "right": 38
@@ -14411,12 +14409,11 @@
    "recall": 1.0,
    "found_right": 26,
    "missed": [],
-   "claims": 33,
+   "claims": 31,
    "outcomes": {
-    "loose": 1,
-    "misread": 2,
-    "right": 28,
-    "text": 2
+    "hallucinated": 1,
+    "right": 29,
+    "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -14424,16 +14421,14 @@
     "prose": 1.0
    },
    "by_reader": {
-    "table": 0.5,
+    "table": 0.6154,
     "text": 1.0,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 1,
-     "misread": 2,
-     "right": 14,
-     "text": 1
+     "hallucinated": 1,
+     "right": 17
     },
     "text": {
      "right": 26
@@ -14455,10 +14450,11 @@
    "recall": 1.0,
    "found_right": 27,
    "missed": [],
-   "claims": 41,
+   "claims": 42,
    "outcomes": {
-    "misread": 2,
-    "right": 32,
+    "hallucinated": 1,
+    "misread": 1,
+    "right": 33,
     "text": 7
    },
    "conditions_kept": "0/0",
@@ -14467,14 +14463,15 @@
     "prose": 1.0
    },
    "by_reader": {
-    "table": 0.5185,
+    "table": 0.7037,
     "text": 1.0,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "misread": 2,
-     "right": 14
+     "hallucinated": 1,
+     "misread": 1,
+     "right": 19
     },
     "text": {
      "right": 27
@@ -16639,10 +16636,10 @@
    "recall": 1.0,
    "found_right": 38,
    "missed": [],
-   "claims": 77,
+   "claims": 69,
    "outcomes": {
-    "loose": 36,
-    "misbound": 6,
+    "loose": 29,
+    "misbound": 5,
     "misread": 1,
     "right": 34
    },
@@ -16660,14 +16657,12 @@
     "relation": 1.0
    },
    "by_reader": {
-    "table": 0.6,
+    "table": 0.4444,
     "text": 0.2222,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 7,
-     "misbound": 1,
      "right": 20
     },
     "text": {
@@ -16692,9 +16687,9 @@
    "recall": 1.0,
    "found_right": 43,
    "missed": [],
-   "claims": 83,
+   "claims": 82,
    "outcomes": {
-    "loose": 30,
+    "loose": 29,
     "misbound": 5,
     "misread": 2,
     "right": 46
@@ -16719,7 +16714,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 9,
+     "loose": 8,
      "right": 6
     },
     "text": {
@@ -16744,12 +16739,12 @@
    "recall": 1.0,
    "found_right": 31,
    "missed": [],
-   "claims": 97,
+   "claims": 103,
    "outcomes": {
-    "loose": 37,
-    "misbound": 15,
+    "loose": 39,
+    "misbound": 18,
     "misread": 4,
-    "right": 41
+    "right": 42
    },
    "conditions_kept": "3/3",
    "recall_by_form": {
@@ -16766,14 +16761,15 @@
     "relation": 1.0
    },
    "by_reader": {
-    "table": 0.5778,
+    "table": 0.6,
     "text": 0.5333,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 7,
-     "right": 33
+     "loose": 8,
+     "misbound": 3,
+     "right": 35
     },
     "text": {
      "loose": 5,
@@ -16800,10 +16796,10 @@
    "recall": 1.0,
    "found_right": 41,
    "missed": [],
-   "claims": 87,
+   "claims": 81,
    "outcomes": {
-    "loose": 37,
-    "misbound": 6,
+    "loose": 32,
+    "misbound": 5,
     "misread": 2,
     "right": 42
    },
@@ -16813,7 +16809,6 @@
     "table": 1.0
    },
    "relations": {
-    "reversed": 4,
     "right": 7,
     "unscored": 3
    },
@@ -16822,21 +16817,20 @@
     "relation": 1.0
    },
    "by_reader": {
-    "table": 0.4,
+    "table": 0.1333,
     "text": 0.4444,
     "visual": 1.0
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 12,
-     "misbound": 1,
-     "right": 6
+     "loose": 1,
+     "right": 5
     },
     "text": {
      "right": 20
     },
     "visual": {
-     "loose": 32,
+     "loose": 31,
      "misbound": 5,
      "misread": 2,
      "right": 38

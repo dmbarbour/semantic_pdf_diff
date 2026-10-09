@@ -120,7 +120,8 @@ a row of its own:
 {lines}
 
 Answer with rules that regroup the lines into the table's real rows. A rule has an action and says which lines it
-acts on: "when", signals that must all hold for a line, and/or "lines", line numbers. The signals: {signals}.
+acts on: the lines its "lines" names (line numbers), and any line where all of its "when" signals hold; give either or
+both. The signals: {signals}.
 A line named in a rule's "lines" follows that rule; any other line follows the first rule whose "when" all hold; a line no rule
 fits stays a row. Actions:
 - "join above": the line's cells join the line above's, cell by cell (a wrapped cell, a unit under its value)

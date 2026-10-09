@@ -46,7 +46,7 @@ def pdf_grid(header, body, boxes, title="", place=""):
     text folded to one line, a header cell PyMuPDF merged (None) labelled as its left neighbour, and heuristic
     repairs: a row with an empty first cell and no number in it continues the row above (a wrapped cell) and joins
     it; a row of only its first cell is a section row (tablerules.grid). Rows keep their boxes and, as keys, the
-    index of their first body row."""
+    index of their first body row; `joined` holds the keys of rows joined from several lines."""
     from . import tablerules
     width = max([len(header)] + [len(r) for r in body])
     clean = lambda row: [" ".join(str(c).split()) if c is not None else "" for c in row] + [""] * (width - len(row))
@@ -54,7 +54,7 @@ def pdf_grid(header, body, boxes, title="", place=""):
     for c in list(header) + [None] * (width - len(header)):
         last = last if c is None else " ".join(str(c).split())
         labels.append(last)
-    rows, kept_boxes, keys = [], [], []
+    rows, kept_boxes, keys, joined = [], [], [], set()
     boxes = list(boxes) + [None] * (len(body) - len(boxes))
     for ri, (row, box) in enumerate(zip(body, boxes)):
         cells = clean(row)
@@ -62,6 +62,7 @@ def pdf_grid(header, body, boxes, title="", place=""):
             continue
         if rows and not cells[0] and not any(tablerules.number(c) is not None for c in cells if c):
             rows[-1] = [" ".join(t for t in (a, b) if t) for a, b in zip(rows[-1], cells)]  # a wrapped cell
+            joined.add(keys[-1])
             if box and kept_boxes[-1]:
                 a = kept_boxes[-1]
                 kept_boxes[-1] = (min(a[0], box[0]), min(a[1], box[1]), max(a[2], box[2]), max(a[3], box[3]))
@@ -74,6 +75,9 @@ def pdf_grid(header, body, boxes, title="", place=""):
     g = tablerules.grid([tablerules.letter(k) for k in range(1, width + 1)], labels, rows,
                         [str(k + 2) for k in range(len(rows))], [0] * len(rows), title, place, kept_boxes)
     g.keys = [keys[k] for k in g.keys]
+    for r in g.section_rows:
+        r.key = keys[r.key]
+    g.joined = joined & set(g.keys)
     return g
 
 def _filled(row):

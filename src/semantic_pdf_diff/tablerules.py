@@ -36,7 +36,7 @@ import datetime
 import hashlib
 import re
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from pydantic import Field, field_validator
 
@@ -135,6 +135,37 @@ class Grid:
     title: str = ""
     place: str = ""
     boxes: list = field(default_factory=list)  # each row's box on its page (a PDF's), where rows aren't lines
+    section_rows: list = field(default_factory=list)  # [SectionRow], in order
+    joined: set = field(default_factory=set)  # keys of rows joined from several lines (a PDF's wrapped cells)
+
+@dataclass
+class SectionRow:
+    """A row holding only its first cell: a label for the rows below it, from row `at` of the grid on (or a note
+    stating facts, which possible_notes proposes and the model confirms). key: as Grid.keys; name, line, box: as a
+    row's."""
+    key: int
+    text: str
+    name: str
+    line: int
+    box: tuple | None
+    at: int
+
+def possible_notes(g):
+    """Section rows holding a number: possibly notes stating facts ("Note: P-2 is rated 95 L/s ..."), not labels.
+    Our proposal; the rules query asks the model which are (code review 2026-10-08, B2: a note was a label, its facts
+    never read, the rows below filed under it)."""
+    return [r for r in g.section_rows if re.search(r"\d", r.text)]
+
+def noted(g, names):
+    """(the grid with the possible notes named (by row) as notes labelling nothing, those notes): the rows below a
+    note take the section above it."""
+    names = {str(n).strip() for n in names or ()}
+    notes = [r for r in possible_notes(g) if r.name in names]
+    if not notes:
+        return g, []
+    labels = [r for r in g.section_rows if r not in notes]
+    sections = [next((r.text for r in reversed(labels) if r.at <= i), "") for i in range(len(g.rows))]
+    return replace(g, sections=sections), notes
 
 def grid(columns, labels, rows, names, lines, title="", place="", boxes=None):
     """A Grid from a table's body rows (aligned to its columns). A row holding only its first cell, in a table of
@@ -146,6 +177,7 @@ def grid(columns, labels, rows, names, lines, title="", place="", boxes=None):
         filled = [k for k, text in enumerate(row) if text]
         if len(columns) > 2 and filled == [0]:
             section = row[0]
+            g.section_rows.append(SectionRow(key, row[0], str(name), line, box, len(g.rows)))
         elif filled:
             g.rows.append(row)
             g.names.append(str(name))
@@ -377,6 +409,12 @@ def question(g, cols=None, context=""):
                 spans[-1][2] = g.names[i]
         lines.append("SECTIONS (section rows label the rows below them): "
                      + "; ".join(f"{s} (rows {a} to {b})" for s, a, b in spans[:20]))
+    possible = possible_notes(g)
+    if possible:  # only tables that have them are asked (their query alone changes)
+        lines.append("POSSIBLE NOTES (section rows holding a number: a note states facts, where a section row only "
+                     "names the rows below it): " + "; ".join(f"row {r.name}: {cut(r.text)}" for r in possible[:10])
+                     + '. List any that are notes by row in "notes" (e.g. "notes":["' + possible[0].name
+                     + '"]): a note is read by itself, and labels no rows.')
     lines += ["SAMPLE ROWS (the row's number, then its cells by column):", "row | " + " | ".join(g.columns)]
     last = -1
     for i in samples(g):
@@ -452,8 +490,9 @@ class Rules(Lenient):
     quantities: list[str] = Field(default_factory=list, max_length=40)
     categories: list[str] = Field(default_factory=list, max_length=10)
     points: list[str] = Field(default_factory=list, max_length=20)
+    notes: list[str] = Field(default_factory=list, max_length=20)  # rows of POSSIBLE NOTES that are notes
 
-    @field_validator("quantities", "categories", "points", mode="before")
+    @field_validator("quantities", "categories", "points", "notes", mode="before")
     @classmethod
     def _texts(cls, value):
         return [v if isinstance(v, str) else str(v) for v in value] if isinstance(value, list) else value
@@ -806,7 +845,9 @@ def describe_rule(rule):
 
 def read(core, page, g, task, by_itself, source, image=None):
     """Read a table by rules: ask for them, check them (once more if they fail), and apply them; by_itself(key) reads
-    one of the table's body rows as a table row without rules. source: the reader's first derivation step. image: the
+    one of the table's rows (a grid row's key, or a section row's that is a note) as a table row without rules, as
+    the grid holds it. Possible notes (possible_notes) are read by themselves where the model names them as notes,
+    and where there's no answer to say. source: the reader's first derivation step. image: the
     table's crop (a PDF's), sent with the query, which then copies a row from it to check the text layer."""
     from .llm import CallLimitReached, NotRecorded
     cols = analyse(g)
@@ -840,19 +881,28 @@ def read(core, page, g, task, by_itself, source, image=None):
         core.record(row, list(found))
         core.progress.finish(status)
 
-    def everyone(name, why):
+    def everyone(name, why, notes=None):
+        """Every row read by itself, and the notes (none named: our proposal, the possible notes)."""
+        notes = possible_notes(g) if notes is None else notes
         for key in g.keys:
             by_itself(key)
-        return f"every row read by itself: {why}"
+        return f"every row read by itself: {why}" + read_notes(notes)
+
+    def read_notes(notes):
+        for r in notes:
+            by_itself(r.key)
+        return f"; notes read by themselves: rows {', '.join(r.name for r in notes)}" if notes else ""
 
     def first_answer(name, answer, error):
         if error is not None:
             return failed(name, error)
+        g_, notes = noted(g, answer.notes)
         if image:  # the vision check (the one table model's decision 1): a row copied from the image
             mismatch = transcription_mismatch(answer, g)
             if mismatch:
-                return record(name, "partial", [everyone(name, f"the image and the text layer disagree ({mismatch})")[:500]])
-        wrong = problems(answer, g, cols)
+                return record(name, "partial", [everyone(name, f"the image and the text layer disagree ({mismatch})",
+                                                         notes)[:500]])
+        wrong = problems(answer, g_, cols)
         if not wrong:
             return reviewed(name, answer)
         record(name, "partial", [f"The rules asked again: {'; '.join(wrong)}"[:500]])
@@ -863,9 +913,11 @@ def read(core, page, g, task, by_itself, source, image=None):
     def second_answer(name, answer, error):
         if error is not None:
             return failed(name, error)
-        wrong = problems(answer, g, cols)
+        g_, notes = noted(g, answer.notes)
+        wrong = problems(answer, g_, cols)
         if wrong:
-            return record(name, "partial", [everyone(name, "the rules failed twice (" + "; ".join(wrong) + ")")[:500]])
+            return record(name, "partial", [everyone(name, "the rules failed twice (" + "; ".join(wrong) + ")",
+                                                     notes)[:500]])
         reviewed(name, answer)
 
     def reviewed(name, answer, round_=1, notes=()):
@@ -875,7 +927,7 @@ def read(core, page, g, task, by_itself, source, image=None):
         cap = int(REVIEW) if REVIEW is not None else core.s.reviews_tables()
         if round_ > cap or answer.reading.strip().lower() not in ("rules", "summary"):
             return use(name, answer, list(notes))
-        prompt = review_question(asked, answer, g)
+        prompt = review_question(asked, answer, noted(g, answer.notes)[0])
         suffix = ":review" + (str(round_) if round_ > 1 else "")
         key = ("table-review", "table", core.content, name + suffix, hashlib.sha256(prompt.encode()).hexdigest())
         revised = round_ - 1
@@ -889,11 +941,13 @@ def read(core, page, g, task, by_itself, source, image=None):
                            "not reviewed")
             if result.verdict.strip().lower() != "revise" or result.rules is None:
                 return use(name, answer, list(notes) + ["Reviewed: kept"], done())
+            if not result.rules.notes:  # a revision silent on the notes keeps the ones named before
+                result.rules.notes = answer.notes
             same = lambda r: r.model_dump(exclude={"why", "binding", "examples", "transcribed"})
             if same(result.rules) == same(answer):  # a revision changing nothing: shown again, it'd repeat itself
                 return use(name, answer, list(notes) + [f"Reviewed: a revision changing nothing ({'; '.join(result.problems)}), "
                                                         "kept"[:400]], done())
-            wrong = problems(result.rules, g, cols)
+            wrong = problems(result.rules, noted(g, result.rules.notes)[0], cols)
             if wrong:
                 return use(name, answer, list(notes) + [f"Reviewed: a revision with problems ({'; '.join(wrong)}), "
                                                         "the last rules passing the checks kept"[:400]],
@@ -922,12 +976,13 @@ def read(core, page, g, task, by_itself, source, image=None):
         why = f" ({answer.why})" if answer.why else ""
         if answer.binding:
             why += f" [binding: {answer.binding}]"
+        g_, notes = noted(g, answer.notes)  # the notes it names: read by themselves, labelling no rows
         if reading == "rows":
-            return record(name, "complete", [everyone(name, f"the model's reading{why}")[:500]])
+            return record(name, "complete", [everyone(name, f"the model's reading{why}", notes)[:500]])
         found, misfits = [], []
         if reading == "summary":
             template = answer.template.strip().lower()
-            for stat in summarise(answer, g):
+            for stat in summarise(answer, g_):
                 if stat.computed:  # quoted by the headers it was computed under
                     quote, verified = " | ".join(g.labels[k] for k in stat.columns if g.labels[k]) or g.place, None
                 else:
@@ -938,10 +993,10 @@ def read(core, page, g, task, by_itself, source, image=None):
                                                                          + (", computed" if stat.computed else ""))],
                     approximate=stat.computed and stat.fields["attribute"].startswith("mean ")))
             return record(name, "complete", issues + [f"Summarised by the {template} template: {len(g.rows)} rows, "
-                                                      f"{len(found)} claims{why}"[:500]], found)
+                                                      f"{len(found)} claims{why}{read_notes(notes)}"[:500]], found)
         for i in range(len(g.rows)):
             try:
-                made = row_claims(answer, g, i)
+                made = row_claims(answer, g_, i)
             except (Misfit, Broken) as error:
                 misfits.append(i)
                 issues.append(f"Row {g.names[i]} read by itself: {error}")
@@ -953,7 +1008,7 @@ def read(core, page, g, task, by_itself, source, image=None):
         for i in misfits:
             by_itself(g.keys[i])
         summary = (f"Read by rules: {len(g.rows) - len(misfits)} of {len(g.rows)} rows, {len(found)} claims"
-                   + (f"; {len(misfits)} rows read by themselves" if misfits else "") + why)
+                   + (f"; {len(misfits)} rows read by themselves" if misfits else "") + read_notes(notes) + why)
         record(name, "complete", [summary[:500]] + issues[:8], found)
 
     ask(asked, 0, first_answer)

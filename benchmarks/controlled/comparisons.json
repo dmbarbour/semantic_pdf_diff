@@ -2012,7 +2012,7 @@
     "equivalent": 30,
     "unrelated": 1
    },
-   "unmatched": 8,
+   "unmatched": 2,
    "pairs": 8,
    "omitted": 0,
    "kinds": {
@@ -2324,15 +2324,14 @@
     "removed": 0,
     "unchanged": 35
    },
-   "changes_found": "2/3",
+   "changes_found": "3/3",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "31/35",
+   "unchanged_confirmed": "33/35",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
-    "reported": 2,
-    "uncertain": 1
+    "reported": 3
    },
    "conditions": {},
    "added": {
@@ -2340,34 +2339,34 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 31,
-    "uncertain": 4
+    "confirmed": 33,
+    "uncertain": 2
    },
    "different": {
-    "change": 6
+    "change": 7
    },
    "equivalent": {
-    "no change": 92,
+    "no change": 93,
     "unscored": 16
    },
    "findings": {
-    "different": 6,
-    "equivalent": 108,
-    "uncertain": 5
+    "different": 7,
+    "equivalent": 109,
+    "uncertain": 2
    },
-   "unmatched": 27,
-   "pairs": 17,
+   "unmatched": 21,
+   "pairs": 15,
    "omitted": 0,
    "kinds": {
-    "right": 11,
-    "scored": 11,
+    "right": 9,
+    "scored": 9,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 7
      },
      "no change": {
-      "restated": 4
+      "restated": 2
      }
     }
    },
@@ -2393,13 +2392,13 @@
     "room101.area": "confirmed",
     "room101.depth": "confirmed",
     "room101.width": "confirmed",
-    "room102.area": "uncertain",
+    "room102.area": "reported",
     "room102.depth": "confirmed",
     "room102.width": "reported",
-    "room103.area": "uncertain",
+    "room103.area": "confirmed",
     "room103.depth": "confirmed",
     "room103.width": "confirmed",
-    "room104.area": "uncertain",
+    "room104.area": "confirmed",
     "room104.depth": "confirmed",
     "room104.width": "confirmed",
     "room110.area": "uncertain",
@@ -6668,13 +6667,13 @@
     "change": 2
    },
    "equivalent": {
-    "no change": 26
+    "no change": 27
    },
    "findings": {
     "different": 2,
-    "equivalent": 26
+    "equivalent": 27
    },
-   "unmatched": 19,
+   "unmatched": 26,
    "pairs": 5,
    "omitted": 0,
    "kinds": {
@@ -17597,15 +17596,15 @@
     "change": 7
    },
    "equivalent": {
-    "no change": 101,
+    "no change": 100,
     "unscored": 16
    },
    "findings": {
     "different": 7,
-    "equivalent": 117,
+    "equivalent": 116,
     "uncertain": 2
    },
-   "unmatched": 23,
+   "unmatched": 22,
    "pairs": 15,
    "omitted": 0,
    "kinds": {
@@ -21058,15 +21057,14 @@
     "removed": 0,
     "unchanged": 24
    },
-   "changes_found": "1/2",
+   "changes_found": "2/2",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "23/24",
+   "unchanged_confirmed": "24/24",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
-    "reported": 1,
-    "uncertain": 1
+    "reported": 2
    },
    "conditions": {},
    "added": {
@@ -21074,39 +21072,28 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 23,
-    "uncertain": 1
+    "confirmed": 24
    },
    "different": {
-    "change": 1
+    "change": 2
    },
    "equivalent": {
-    "no change": 29,
-    "unscored": 1
+    "no change": 27
    },
    "findings": {
-    "different": 1,
-    "equivalent": 30,
-    "uncertain": 4
+    "different": 2,
+    "equivalent": 27
    },
-   "unmatched": 30,
-   "pairs": 15,
+   "unmatched": 26,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 4,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 1,
-      "conditions": 1
-     },
-     "no change": {
-      "not_same_item": 1,
-      "restated": 1
-     },
-     "unscored": {
-      "conditions": 1
+      "changed": 2
      }
     }
    },
@@ -21114,7 +21101,7 @@
     "attach.attempts": "confirmed",
     "attach.deadline": "confirmed",
     "challenge.timeout": "reported",
-    "msg1.interval": "uncertain",
+    "msg1.interval": "confirmed",
     "msg10.budget": "confirmed",
     "msg11.timeout": "confirmed",
     "msg12.lifetime": "confirmed",
@@ -21133,7 +21120,7 @@
     "msg24.hysteresis": "confirmed",
     "msg3.interval": "confirmed",
     "msg4.depth": "confirmed",
-    "msg5.timeout": "uncertain",
+    "msg5.timeout": "reported",
     "msg6.size": "confirmed",
     "msg7.rate": "confirmed",
     "msg8.period": "confirmed",

@@ -408,10 +408,14 @@ def text_job(data, job, output, client, dispatch, progress, extension):
                 core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", labels,
                                 row, list(range(len(labels) if table.row_headers else width)),
                                 derivation=chart_derivation(extension) if table.source == "chart" else None)
+            from . import tablerules
             if table.grid is not None and table.grid.rows and limit is not None and len(body) > limit:
-                from . import tablerules
                 tablerules.read(core, page, table.grid, f"rules:p{page}:{ti}", by_itself,
                                 DerivationStep(step=core.derivation["table"][0].step, detail="the table's cells"))
+                continue
+            if table.grid is not None and table.grid.rows:  # without rules: the grid's rows, and possible notes
+                for key in table.grid.keys + [r.key for r in tablerules.possible_notes(table.grid)]:
+                    by_itself(key)
                 continue
             for ri in range(len(body)):
                 by_itself(ri)

@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Items 1 (E3) and 2 (D2) are done; B2 is being fixed; B5's design is settled (2026-10-09).
+- **Status:** Active (2026-10-09). The order is agreed. Items 1 (E3), 2 (D2) and 3 (B2) are done; item 4 (B5) is designed (2026-10-09) and next.
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).
@@ -104,6 +104,27 @@
 
 ### 3. B2 (with B10's wording): table rows read by themselves come from the grid
 
+**Done (2026-10-09)** as designed below:
+- **What was built:**
+  - `tablerules`: `SectionRow`, `possible_notes`, `noted`, the POSSIBLE NOTES line, `Rules.notes`.
+  - `tables.pdf_grid`: `joined`.
+  - The PDF and text table paths read the grid's rows and notes.
+  - The structure prompt's union is said.
+  - Readers: pdf/7, docx/7, pptx/6, xlsx/11, csv/7.
+- **Tests:** `tests/test_table_rows.py`. The misfit path isn't tested apart: it calls the same `by_itself` as the "rows" path.
+- **Re-recorded** (2026-10-09, the dev runs only), here and not once after B5: the owner asked for B2 to be fixed now, and a commit needs the replay to pass. B5 will re-record its own blocks.
+  - 563 calls, $0.174, most of them the structure queries' new wording.
+  - 489 unused answers pruned.
+- **Measured on the controlled corpus** ($0.035):
+  - **Only PDFs changed.** The other formats' tables have no wrapped rows or one-cell notes with numbers.
+  - **Standard runs:** claims 4100 to 4103; right 3287 to 3295; loose 426 to 416; misbound 203 to 205; misread 24 to 25; hallucinated 6 to 8.
+  - **Tables read row by row:** right 3395 to 3398; loose 418 to 406; misread 28 to 25; misbound 195 to 196; hallucinated 6 to 8.
+  - **Revision pairs:** changes found 119 to 120 of 120; unchanged confirmed 2839 to 2841 (row by row: 100 to 101 of 101).
+  - **Where:**
+    - The sequence diagram that table detection takes for a table (attach-s1): the table reader's right claims went from 2 to 17, its rows now read with their lines joined. One join of cut labels ("cache lifetime 5" + "s) 72 s)") was read as 72 s, hallucinated; the fact is 572 s.
+    - Room labels on the rotated floor plan, detected as small tables: three dimensions once loose are now misbound (a width read as a height).
+    - Both are pseudo-tables: the lever idea "recognise charts and diagrams parsed as tables" in the [lever index](../reviews/levers.md).
+
 - **The bug:** a table's rules see its grid, but rows read by themselves come from the raw rows (`tables.py:57-76`, `tablerules.py:140-158,844-847`, `extract.py:527-553`, `textdocs.py:392-407`). Reproduced (2026-10-09) on a PDF table with a "Pumps" section row, P-2's service wrapped onto a second line, a one-cell note "Note: P-2 is rated 95 L/s at 28 m ..." and P-3 below it.
 - **Part 1, wrapped rows (a consistency bug):**
   - **The problem:**
@@ -181,7 +202,7 @@
 
 ## Re-recording and measuring
 
-- **Once, after items 3 and 4:**
+- **Once, after items 3 and 4** (in the event: after item 3, and again for item 4's blocks; see item 3):
   1. The slices fixture: the dev runs only. Unpack the zip, note the time, run `record_runs.py --set dev`, prune answers unused since then, and pack.
   2. The controlled corpus re-run, then scored and compared with the committed results.
 - **Expected cost:** cents. The changed requests are a small share; the earlier re-record cost $0.25 only because it recorded the held-out runs.
@@ -215,4 +236,4 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
 
 ## Found along the way
 
-(Nothing yet.)
+- **A section row right under a PDF table's header is taken for the header's second line** (B2's tests, 2026-10-09): `pdf_parts` merged "Pumps" into "Tag" ("Tag Pumps"), so the rows below it lose their section label and the first column's header is wrong. Not fixed here; a bug for after this plan's items, to be confirmed on real tables first.

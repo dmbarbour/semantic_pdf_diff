@@ -261,16 +261,19 @@ def office_installed(workbook=False):
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/6",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
+READERS = {".pdf": "pdf/7",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
            # 4: a part the model reads as no table read as a figure; 5: columns joined where words are cut; 6: a
-           # structure answer's new tables tagged apart, a structure asked again recorded once (review A2, B7)
+           # structure answer's new tables tagged apart, a structure asked again recorded once (review A2, B7); 7: rows
+           # read by themselves as the grid holds them, notes confirmed and read, the structure rules' union said (B2)
            ".txt": "text/2", ".md": "text/1",  # text/2: "A pump ..." isn't a heading (review B4)
-           ".docx": "docx/6",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
-           # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1)
-           ".pptx": "pptx/5",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6
-           ".xlsx": "xlsx/10", ".xlsm": "xlsx/10",  # xlsx/7: vague conditions guarded against; 8-9: header name,
-           # group; 10: late table answers on their own sheet (review B1)
-           ".csv": "csv/6", ".tsv": "csv/6",  # csv/6: as xlsx/10
+           ".docx": "docx/7",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
+           # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1); 7: a
+           # table's notes confirmed and read, its rows without rules read from its grid (review B2)
+           ".pptx": "pptx/6",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6;
+           # 6: as docx/7
+           ".xlsx": "xlsx/11", ".xlsm": "xlsx/11",  # xlsx/7: vague conditions guarded against; 8-9: header name,
+           # group; 10: late table answers on their own sheet (review B1); 11: as docx/7
+           ".csv": "csv/7", ".tsv": "csv/7",  # csv/6: as xlsx/10; csv/7: as xlsx/11
            **{extension: "image/1" for extension in IMAGE_EXTENSIONS}}
 
 def reader_version(extension):
@@ -523,9 +526,18 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                         # a structure answer's new tables: "+" apart from pdf_parts' ".", or its part 1 ("0.1") would be
                         # the tag of pdf_parts' part 1 (code review 2026-10-08, A2)
                         tag = base if pi == 0 else f"{base}+{pi}"
+                        place = f"page {number}, table {ti + 1}{label}" + (f", part {pi + 1}" if len(parts) > 1 else "")
+                        # its rows as the rules see them, read so on every path (code review 2026-10-08, B2: rows read
+                        # by themselves were the raw lines, a wrapped cell's second line lost or read alone)
+                        ruled = pdf_grid(part_header, part_body, part_boxes, "", place)
 
-                        def by_itself(ri, tag=tag, header=part_header, body=part_body, body_boxes=part_boxes):
+                        def by_itself(ri, tag=tag, header=part_header, body=part_body, body_boxes=part_boxes,
+                                      ruled=ruled):
                             row = body[ri]
+                            row_box = body_boxes[ri] if ri < len(body_boxes) and body_boxes[ri] else tuple(bbox)
+                            if ruled is not None and ri in ruled.joined:  # its lines joined, as the grid holds it
+                                at = ruled.keys.index(ri)
+                                row, row_box = ruled.rows[at], ruled.boxes[at]
                             # Rows with no content (common where drawing geometry is detected as a
                             # table) cost a model call and can't yield a claim.
                             if all(c is None or not str(c).strip() for c in row):
@@ -534,20 +546,20 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                             # first occurrence from the third sighting on; text is never de-duplicated.
                             key = ("table", json.dumps([header, row], ensure_ascii=False, default=str),
                                    tuple(round(v / 2) * 2 for v in bbox))
-                            row_box = body_boxes[ri] if ri < len(body_boxes) and body_boxes[ri] else tuple(bbox)
                             core.table_task(number, tuple(row_box), f"table:p{number}:{tag}:{ri}", header, row,
                                             list(range(max(width, len(header), len(row)))), derivation=steps,
                                             repeat_key=key)
 
-                        place = f"page {number}, table {ti + 1}{label}" + (f", part {pi + 1}" if len(parts) > 1 else "")
-                        ruled = pdf_grid(part_header, part_body, part_boxes, "", place) \
-                            if limit is not None and len(part_body) > limit else None
-                        if ruled is not None and ruled.rows:  # asked how it's read, with its image (the one table model)
-                            from . import tablerules
+                        from . import tablerules
+                        if ruled is not None and ruled.rows and limit is not None and len(part_body) > limit:
+                            # asked how it's read, with its image (the one table model)
                             detail = "the table's cells, on its grid" + (f"; its structure {step.detail}" if step else "")
                             tablerules.read(core, number, ruled, f"rules:p{number}:{tag}", by_itself,
                                             DerivationStep(step="pdf-table-detection", detail=detail[:400]),
                                             image=image())
+                        elif ruled is not None and ruled.rows:  # without rules: the grid's rows, and possible notes
+                            for key in ruled.keys + [r.key for r in tablerules.possible_notes(ruled)]:
+                                by_itself(key)
                         else:
                             for ri in range(len(part_body)):
                                 by_itself(ri)
