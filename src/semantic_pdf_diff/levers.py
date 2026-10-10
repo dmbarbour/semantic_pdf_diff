@@ -288,7 +288,7 @@ class SheetDetails(Lever):
         found = sheet_details(page, reader.lines(page))
         if not found:
             return areas
-        from .situate import title_block
+        from .figures import title_block
         label, heading = title_block(page)
         sheet = " ".join(x for x in (label.title() if label else "Drawing sheet", heading) if x)
         return areas + [(rect, f"{sheet}. " + (f"Detail {number}: {title}" if title else f"Detail {number}") if number

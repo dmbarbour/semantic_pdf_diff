@@ -25,7 +25,7 @@ from .progress import log, setup_logging
 from .throttle import RateLimiter
 from .report import write_report
 from .scan import read_origin, scan
-from .situate import find_figures
+from .figures import find_figures
 from .store import Store, StoreError
 
 

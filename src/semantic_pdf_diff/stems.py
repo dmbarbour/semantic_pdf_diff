@@ -137,7 +137,7 @@ MAX_REFERENCES = 3  # definitions, and cited figures or tables, added per chunk
 def references(text, terms, figures):
     """Context lines for what a chunk cites but doesn't hold: abbreviations defined elsewhere in
     the document, and the captions of the figures and tables it mentions (research round 1)."""
-    from .situate import MENTION, label_key, label_of, targets
+    from .figures import MENTION, label_key, label_of, targets
     lines = []
     defined = [f"{short} = {long}" for short, long in terms.items()
                if f"({short})" not in text and re.search(rf"\b{re.escape(short)}s?\b", text)]

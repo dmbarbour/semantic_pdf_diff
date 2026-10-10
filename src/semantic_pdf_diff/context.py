@@ -6,7 +6,7 @@ import pymupdf
 from .pages import display_y, lines as _lines, reading_blocks, shown
 from .regions import crop_name
 from .segmentation import _graphics
-from .situate import page_figures
+from .figures import page_figures
 from .stems import glossary, references, stem_index
 
 CONTEXT_NOTE = "CONTEXT (for reference only: do not extract claims from it):"
@@ -80,7 +80,7 @@ class Context:
         return self.page_graphics[page.number]
 
     def figures(self, page, number):
-        """The page's detected figures (situate.page_figures)."""
+        """The page's detected figures (figures.page_figures)."""
         return page_figures(page, number, self.drawings(page))
 
     def pixmap(self, page, matrix, clip=None):

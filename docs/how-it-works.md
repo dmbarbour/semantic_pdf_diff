@@ -92,7 +92,8 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `jobs.py` | The extraction scheduler (a page at a time, sources in turn) and the readers by extension, with their versions |
 | `extract.py` | The PDF job: a PDF's text, tables, figures and tiles made into tasks |
 | `visuals.py` | Image tasks: a region rendered to a crop, its text layer and context, a partial tile refined in halves |
-| `situate.py` | Figures, captions and citing prose; figure and section "about" requests |
+| `figures.py` | Figures found on a page: captions, drawing clusters and images paired with them, drawing sheets; figure labels |
+| `situate.py` | The prose citing figures and the claims inside them; figure and section "about" requests |
 | `tasks.py` | The task core every reader shares: the extraction prompt, requests, quote checks, evidence, coverage, refinement |
 | `textdocs.py` | Plain text and Markdown: pages, sections, paragraphs and pipe tables, line locators |
 | `docxdocs.py` | Word documents read into the text reader's form: paragraphs, headings by style, tables, tracked changes, pictures |

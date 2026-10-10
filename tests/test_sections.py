@@ -404,7 +404,7 @@ class SectionContext(unittest.TestCase):
         captioned figure (its box as displayed) and the same section text (code review 2026-10-01, item 6)."""
         from semantic_pdf_diff.sections import section_text
         from semantic_pdf_diff.pages import shown
-        from semantic_pdf_diff.situate import page_figures
+        from semantic_pdf_diff.figures import page_figures
         with tempfile.TemporaryDirectory() as d:
             figures, texts = {}, {}
             for rotated in (False, True):

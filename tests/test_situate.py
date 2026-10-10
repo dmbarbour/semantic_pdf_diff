@@ -14,8 +14,8 @@ from semantic_pdf_diff.schema import Evidence, Occurrence, PdfLocator, Section
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.progress import NoProgress
 from semantic_pdf_diff.provenance import triage_interpreter
-from semantic_pdf_diff.situate import (CAPTION, figure_map, find_figures, grounding, quality, situate, targets,
-                                      values_in)
+from semantic_pdf_diff.figures import CAPTION, find_figures, targets
+from semantic_pdf_diff.situate import figure_map, grounding, quality, situate, values_in
 from semantic_pdf_diff.store import InterpreterMismatch, Store
 import stubs
 from stubs import situating_answer
