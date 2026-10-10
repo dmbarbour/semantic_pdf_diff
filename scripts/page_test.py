@@ -50,7 +50,7 @@ def main(argv=None):
     import pymupdf
     from semantic_pdf_diff_lab.bench import eyetest, pagetest
     from semantic_pdf_diff import ledger
-    from semantic_pdf_diff_lab.eval.clients import Budget, evaluator_settings, folder_client
+    from semantic_pdf_diff_lab.eval.clients import Budget, evaluator, folder_client
     from semantic_pdf_diff.settings import Settings
     if args.command == "run":
         budget = Budget(args.max_cost)  # for the whole command, not each model (code review 2026-10-08, E2)
@@ -60,14 +60,11 @@ def main(argv=None):
                 print(f"Paused: cost cap of ${args.max_cost:.2f} reached before {name}")
                 return 3
             before = ledger.spent(LEDGER, round="pagetest", judge=name)
-            settings = evaluator_settings(model, eyetest.EYE_SETTINGS, concurrency=args.concurrency, timeout=300,
-                                         retries=2, **budget.settings(),
-                                         **({"base_url": args.base_url} if args.base_url else {}))
-            with folder_client(FOLDER, settings, responder=name) as client:
+            with evaluator(FOLDER, model, budget, eyetest.EYE_SETTINGS, ledger.Ledger(LEDGER, round="pagetest",
+                           step=args.only or "all", judge=name), name, concurrency=args.concurrency, timeout=300,
+                           retries=2, **({"base_url": args.base_url} if args.base_url else {})) as client:
                 client.fixture.note("pymupdf", pymupdf.VersionBind)
-                client.ledger = ledger.Ledger(LEDGER, round="pagetest", step=args.only or "all", judge=name)
                 read_all(client, name, (args.only,) if args.only else ("static", "zoom"), args.seed, args.max_tiles)
-            budget.add(client)
             print(f"{name}: ${ledger.spent(LEDGER, round='pagetest', judge=name) - before:.3f}", flush=True)
             if client.out_of_budget:
                 print(f"Paused: {client.out_of_budget}")

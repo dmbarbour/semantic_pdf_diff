@@ -57,5 +57,35 @@ class PublicSlices(unittest.TestCase):
         self.assertEqual(rounds.private_slices(["fine", "leaky"], self.MANIFEST), ["client-c"])
         self.assertEqual(rounds.private_slices(["mystery"], self.MANIFEST), ["mystery"])  # unknown: refused too
 
+
+class Evaluator(unittest.TestCase):
+    """The commands' evaluator client (code review 2026-10-08, E7: the rating loop written in each command)."""
+    def test_capped_by_the_budget_ledgered_and_counted_after_its_work(self):
+        import tempfile
+        from pathlib import Path
+        from semantic_pdf_diff.ledger import Ledger
+        from semantic_pdf_diff.schema import Judgment
+        from semantic_pdf_diff_lab.eval.clients import Budget, evaluator
+        from stubs import chat_answer, request_body, serving
+        def post(handler):
+            request_body(handler)
+            chat_answer(handler, {"relation": "equivalent", "rationale": "stub", "confidence": 0.9,
+                                  "same_conditions": True}, usage={"prompt_tokens": 10, "completion_tokens": 2,
+                                                                   "estimated_cost": 0.25})
+        budget = Budget(1.0)
+        with serving(post) as url, tempfile.TemporaryDirectory() as d:
+            ledger = Ledger(Path(d) / "ledger.jsonl", round="test")
+            with evaluator(Path(d) / "batch", "judge", budget, ledger=ledger, base_url=url, retries=0) as client:
+                self.assertEqual(client.s.max_cost, 1.0)  # what's left of the budget
+                self.assertIs(client.ledger, ledger)
+                client.ask("compare these", Judgment)
+                self.assertEqual(budget.spent, 0.0)  # counted when it's done
+            self.assertEqual(budget.spent, 0.25)
+            with self.assertRaises(RuntimeError):
+                with evaluator(Path(d) / "batch", "judge", budget, base_url=url, retries=0) as client:
+                    self.assertEqual(client.s.max_cost, 0.75)
+                    raise RuntimeError("the work failed")
+            self.assertEqual(budget.spent, 0.25)  # not counted: as before
+
 if __name__ == "__main__":
     unittest.main()

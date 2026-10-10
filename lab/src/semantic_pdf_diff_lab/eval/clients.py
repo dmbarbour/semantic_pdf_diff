@@ -61,3 +61,16 @@ def folder_client(folder, settings, mode="replay-or-record", responder=None):
         yield client
     finally:
         client.close()
+
+@contextmanager
+def evaluator(folder, model, budget, base=None, ledger=None, responder=None, mode="replay-or-record", **runtime):
+    """A client evaluating with `model` over a folder's fixture (folder_client): its settings evaluator_settings',
+    capped at what's left of the command's budget; its spending in `ledger` (a Ledger), if given; its cost added to
+    the budget when it's done (not if the work fails). runtime: endpoint settings (code review 2026-10-08, E7: this was
+    written in each command that rates with several models)."""
+    settings = evaluator_settings(model, base, **runtime, **budget.settings())
+    with folder_client(folder, settings, mode, responder) as client:
+        if ledger is not None:
+            client.ledger = ledger
+        yield client
+    budget.add(client)

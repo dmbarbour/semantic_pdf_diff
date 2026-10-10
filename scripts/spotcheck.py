@@ -93,8 +93,7 @@ def main(argv=None):
     elif args.command == "judge":
         from semantic_pdf_diff_lab.eval.raters import ModelJudge
         from semantic_pdf_diff.ledger import Ledger
-        from semantic_pdf_diff_lab.eval.clients import folder_client
-        from semantic_pdf_diff_lab.eval.clients import Budget, evaluator_settings
+        from semantic_pdf_diff_lab.eval.clients import Budget, evaluator
         judges = args.judge or ["XiaomiMiMo/MiMo-V2.6-Pro"]
         escalate = args.escalate or ["Qwen/Qwen3.5-397B-A17B"]
         budget = Budget(args.max_cost)  # for the whole command: every judge and escalation shares it
@@ -105,12 +104,10 @@ def main(argv=None):
         def ask(model, only=None, retry_failed=False):
             if budget.exhausted():
                 raise Paused(f"the cap of ${args.max_cost:.2f} is spent")
-            settings = evaluator_settings(model, concurrency=16, timeout=900, retries=0, **budget.settings())
-            with folder_client(args.folder, settings) as client:
-                client.ledger = Ledger(LEDGER, round="spotcheck", step="judge", variant=args.folder.name, judge=model)
+            with evaluator(args.folder, model, budget, ledger=Ledger(LEDGER, round="spotcheck", step="judge",
+                           variant=args.folder.name, judge=model), concurrency=16, timeout=900, retries=0) as client:
                 records = ModelJudge(client, model, args.rubric, verdicts(args.rubric)).rate(
                     args.folder, only=only, retry_failed=retry_failed)
-            budget.add(client)
             if client.out_of_budget:
                 raise Paused(client.out_of_budget)
             return records

@@ -38,7 +38,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.bench import eyetest
     from semantic_pdf_diff import ledger
-    from semantic_pdf_diff_lab.eval.clients import Budget, evaluator_settings, folder_client
+    from semantic_pdf_diff_lab.eval.clients import Budget, evaluator, folder_client
     from semantic_pdf_diff.settings import Settings
     from semantic_pdf_diff.progress import Progress
     import pymupdf
@@ -53,16 +53,13 @@ def main(argv=None):
                 print(f"Paused: cost cap of ${args.max_cost:.2f} reached before {name}")
                 return 3
             before = ledger.spent(LEDGER, round="eyetest", judge=name)
-            settings = evaluator_settings(model, eyetest.EYE_SETTINGS, concurrency=args.concurrency, timeout=300,
-                                         retries=2, **budget.settings(),
-                                         **({"base_url": args.base_url} if args.base_url else {}))
-            with folder_client(FOLDER, settings, responder=name) as client:
+            with evaluator(FOLDER, model, budget, eyetest.EYE_SETTINGS, ledger.Ledger(LEDGER, round="eyetest",
+                           step=args.suite, judge=name), name, concurrency=args.concurrency, timeout=300, retries=2,
+                           **({"base_url": args.base_url} if args.base_url else {})) as client:
                 client.fixture.note("pymupdf", pymupdf.VersionBind)  # images are drawn by it: replays need the same
-                client.ledger = ledger.Ledger(LEDGER, round="eyetest", step=args.suite, judge=name)
-                progress = Progress(f"eye test {name}", client, heartbeat=settings.heartbeat_seconds)
+                progress = Progress(f"eye test {name}", client, heartbeat=client.s.heartbeat_seconds)
                 answers = eyetest.ask(FOLDER, client, cards, progress)
                 progress.close()
-            budget.add(client)
             failed = [a["error"] for a in answers.values() if "error" in a]
             print(f"{name}: {len(answers) - len(failed)} answered, {len(failed)} failed, "
                   f"${ledger.spent(LEDGER, round='eyetest', judge=name) - before:.3f}", flush=True)

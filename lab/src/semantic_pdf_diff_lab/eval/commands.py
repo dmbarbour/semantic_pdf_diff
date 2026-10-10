@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 
 from semantic_pdf_diff.cli import add_budget_options, add_log_options, start_logging
-from semantic_pdf_diff_lab.eval.clients import Budget, evaluator_settings, folder_client
+from semantic_pdf_diff_lab.eval.clients import Budget, evaluator
 from semantic_pdf_diff.pipeline import RunOptions, attach_ledger, budget_note
 from semantic_pdf_diff.progress import Progress, log
 
@@ -45,13 +45,11 @@ def queries_command(argv):
             return 3
         # Reasoning models think at length: 4,000 output tokens truncated most of Qwen's and Kimi's
         # answers in the first trial (paid for, and lost). Few at a time, so a cap overshoots little.
-        settings = evaluator_settings(model, concurrency=4, timeout=600, retries=1, **budget.settings())
-        with folder_client(args.folder, settings) as client:
+        with evaluator(args.folder, model, budget, concurrency=4, timeout=600, retries=1) as client:
             attach_ledger(client, RunOptions.from_args(args))
-            progress = Progress(f'check {model}', client, heartbeat=settings.heartbeat_seconds)
+            progress = Progress(f'check {model}', client, heartbeat=client.s.heartbeat_seconds)
             target, count, failures = queries.check(args.folder, client, model, progress)
             progress.close()
-        budget.add(client)
         for failure in failures[:5]:
             log.warning(f'{model}: {failure}')
         print(f"{model}: {count} checks -> {target}; ${client.cost:.3f}")
@@ -120,13 +118,11 @@ def review_command(argv):
             if budget.exhausted():
                 log.warning(f'cost cap of ${args.max_cost:.2f} reached before judging with {model}')
                 return 3
-            settings = evaluator_settings(model, concurrency=16, timeout=600, retries=2, **budget.settings())
-            with folder_client(args.batch, settings) as client:
+            with evaluator(args.batch, model, budget, concurrency=16, timeout=600, retries=2) as client:
                 attach_ledger(client, RunOptions.from_args(args))
-                progress = Progress(f'judge {model}', client, heartbeat=settings.heartbeat_seconds)
+                progress = Progress(f'judge {model}', client, heartbeat=client.s.heartbeat_seconds)
                 target, count, failures = review.judge(args.batch, client, model, args.limit, progress, args.stage)
                 progress.close()
-            budget.add(client)
             for failure in failures[:5]:
                 log.warning(f'{model}: {failure}')
             print(f"{model}: {count} labels -> {target}; {client.calls} calls, "
