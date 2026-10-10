@@ -83,7 +83,7 @@ class RunOptions:
             return None
         return self.fixture_mode or fixtures.default_mode(self.fixture)
 
-def compare_paths(a, b, out, settings, options=None):
+def compare_paths(a, b, out, settings, options=None, client=None):
     """Compare two sources given as paths (files, folders or zips), each a shortcut source in the store at `out`:
     the CLI's `pdf-semantic-diff A B --out DIR`. Returns its exit code (0, 2 incomplete, 3 paused for budget)."""
     options = options or RunOptions()
@@ -95,7 +95,7 @@ def compare_paths(a, b, out, settings, options=None):
             if existing and existing.kind != 'shortcut':
                 raise StoreError(f"{out} already has a declared source named {name!r}; use 'compare' instead")
             store.save_source(Source(name=name, kind='shortcut', roots=[str(Path(path).resolve())]), replace=True)
-        return run(options, settings, store, names, Path(out), force_rescan=True)
+        return run(options, settings, store, names, Path(out), force_rescan=True, client=client)
 
 LIMITATIONS = ['Image-token budgeting must be calibrated to the serving backend.',
                'Confidence scores are uncalibrated model self-reports.',
@@ -123,7 +123,11 @@ def budget_note(client):
     reason = getattr(client, 'out_of_budget', None)
     return f"Paused: {reason}. Rerun the same command to resume; finished work is kept." if reason else None
 
-def run(options, settings, store, names, out, force_rescan=False):
+def run(options, settings, store, names, out, force_rescan=False, client=None):
+    """A comparison of a store's sources: bound and scanned (prepare), read (read_sources), its evidence written
+    (write_evidence), compared and reported (compare_and_report). Returns the exit code: 0, 2 incomplete, 3 paused for
+    budget. client: a model client to use (a caller's, kept open); by default one made from the options (code review
+    2026-10-08, C6: run did all six jobs, and tests patched its client in)."""
     interpreter = extraction_interpreter(settings)
     triage = triage_interpreter(settings) if settings.situate else None
     if options.dry_run:
@@ -132,12 +136,26 @@ def run(options, settings, store, names, out, force_rescan=False):
             would['triage'] = bind(store, triage, reset=True, dry_run=True)
         print(json.dumps({'would_clear': would}, indent=2))
         return 0
+    prepare(options, settings, store, names, (interpreter, triage), force_rescan)
+    own = client is None
+    client = make_client(options, settings, store) if own else client
+    try:
+        read = read_sources(store, client, settings, names, triage)
+        document = write_evidence(store, names, read, {'extract': interpreter.model_dump(),
+                                                        **({'triage': triage.model_dump()} if triage else {})}, out)
+        return compare_and_report(options, settings, store, client, names, read, document, out)
+    finally:  # also on failure, so the answers this run used stay marked as used
+        if own and getattr(client, 'replay', None) is not None:
+            client.close()
+
+def prepare(options, settings, store, names, roles, force_rescan):
+    """The store bound to the run's interpreters (each checked before either clears anything, so a rejected run
+    changes nothing), readings merged as the settings say, the sources scanned."""
     check_fixture(options)
-    # Check both before clearing either, so a rejected run changes nothing.
-    for role in filter(None, (interpreter, triage)):
+    for role in filter(None, roles):
         if not options.reset:
             bind(store, role, dry_run=True)
-    for role in filter(None, (interpreter, triage)):
+    for role in filter(None, roles):
         cleared = bind(store, role, reset=options.reset)
         if cleared.get("automatic"):
             log.info(f"Changed settings that only post-process answers ({'; '.join(cleared['automatic'])}): what they "
@@ -151,59 +169,72 @@ def run(options, settings, store, names, out, force_rescan=False):
             summary = store.rescan(name, limits(settings), document_properties)
             changes = {k: len(summary[k]) for k in ('added', 'removed', 'changed') if summary[k]}
             log.info(f"Scanned {name}: {summary['files']} files" + (f", {changes}" if changes else ''))
-    client = make_client(options, settings, store)
-    try:
-        files = {name: store.files(name) for name in names}
-        progress = Progress('extract', client, heartbeat=settings.heartbeat_seconds)
-        by_content, coverage, sections = extract_sources(store, client, names, files, progress)
-        progress.close()
-        situations = situate_sources(store, client, names, files, by_content, sections, coverage) if triage else {}
-        evidence = [e for items in by_content.values() for e in items]
-        situation_data = {c: Situation(figures=[f.model_dump() for f in figures], unresolved=[r.model_dump() for r in unresolved],
-                                       issues=issues, quality=checks).model_dump()
-                          for c, (figures, unresolved, issues, checks) in sorted(situations.items())}
-        source_data = [store.source(n).model_dump() for n in names]
-        file_data = [f.model_dump() for n in names for f in files[n]]
-        scan_issues = [{'source': n, 'path': p, 'reason': r} for n in names for p, r in store.issues(n)]
-        interpreters = {'extract': interpreter.model_dump(), **({'triage': triage.model_dump()} if triage else {})}
-        out.mkdir(parents=True, exist_ok=True)
-        document = EvidenceDocument(sources=source_data, files=file_data, interpreters=interpreters,
-            evidence=[e.model_dump() for e in evidence], coverage=coverage,
-            sections=[{'content': c, **x.model_dump()} for c, items in sorted(sections.items()) for x in items],
-            situation=situation_data, scan_issues=scan_issues)
-        (out / 'evidence.json').write_text(json.dumps(document.model_dump(), indent=2, ensure_ascii=False), encoding='utf-8')
-        left, right = ([e for c in dict.fromkeys(f.content for f in files[n]) for e in by_content[c]] for n in names)
-        log.info(f"Comparing {len(left)} × {len(right)} extracted claims via retrieval")
-        progress = Progress('compare', client, heartbeat=settings.heartbeat_seconds)
-        headings = {(c, x.id): " > ".join(x.heading_path) for c, items in sections.items() for x in items}
-        comparing = comparison_interpreter(settings)
-        data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
-                       label=provenance.text_hash(comparing.model_dump_json()))
-        progress.close()
-        interpreters['compare'] = comparing.model_dump()
-        data = Report(**data, created_at=provenance.now().isoformat(),
-            sources=source_data, files=file_data, interpreters=interpreters, scan_issues=scan_issues,
-            file_difference=file_difference(files[names[0]], files[names[1]]),
-            sections=document.sections, situation=situation_data, evidence=document.evidence, coverage=coverage,
-            settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
-            usage={'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage, **fixture_usage(client)},
-            limitations=LIMITATIONS).model_dump()
-        store.save_comparison(data['created_at'], data)
-        write_report(data, out, assets=store.folder / 'assets')
-        incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
-                      or data['retrieval']['omitted_by_pair_limit'] > 0
-                      or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error') for f in data['findings']))
-        print(f"Report: {out / 'report.html'}" + (' (incomplete source coverage)' if incomplete else ''))
-        note = budget_note(client)
-        if note:
-            log.warning(note)
-            return 3
-        # 2 makes automation aware of incomplete processing; uncertainty still appears
-        # in the report even when all tasks completed successfully.
-        return 2 if incomplete else 0
-    finally:  # also on failure, so the answers this run used stay marked as used
-        if getattr(client, 'replay', None) is not None:
-            client.close()
+
+@dataclass
+class Read:
+    """What a run read: each source's files, the claims by content, coverage, sections, situating results."""
+    files: dict
+    by_content: dict
+    coverage: list
+    sections: dict
+    situations: dict
+
+def read_sources(store, client, settings, names, triage):
+    """The sources' content extracted, and situated if the run situates."""
+    files = {name: store.files(name) for name in names}
+    progress = Progress('extract', client, heartbeat=settings.heartbeat_seconds)
+    by_content, coverage, sections = extract_sources(store, client, names, files, progress)
+    progress.close()
+    situations = situate_sources(store, client, names, files, by_content, sections, coverage) if triage else {}
+    return Read(files, by_content, coverage, sections, situations)
+
+def write_evidence(store, names, read, interpreters, out):
+    """evidence.json, what was read, written before comparing (so it stands if comparing fails); the document."""
+    evidence = [e for items in read.by_content.values() for e in items]
+    situation_data = {c: Situation(figures=[f.model_dump() for f in figures], unresolved=[r.model_dump() for r in unresolved],
+                                   issues=issues, quality=checks).model_dump()
+                      for c, (figures, unresolved, issues, checks) in sorted(read.situations.items())}
+    out.mkdir(parents=True, exist_ok=True)
+    document = EvidenceDocument(sources=[store.source(n).model_dump() for n in names],
+        files=[f.model_dump() for n in names for f in read.files[n]], interpreters=interpreters,
+        evidence=[e.model_dump() for e in evidence], coverage=read.coverage,
+        sections=[{'content': c, **x.model_dump()} for c, items in sorted(read.sections.items()) for x in items],
+        situation=situation_data, scan_issues=[{'source': n, 'path': p, 'reason': r} for n in names for p, r in store.issues(n)])
+    (out / 'evidence.json').write_text(json.dumps(document.model_dump(), indent=2, ensure_ascii=False), encoding='utf-8')
+    return document
+
+def compare_and_report(options, settings, store, client, names, read, document, out):
+    """The two sides' claims compared, the report saved in the store and written; the exit code."""
+    files, by_content, coverage, sections = read.files, read.by_content, read.coverage, read.sections
+    left, right = ([e for c in dict.fromkeys(f.content for f in files[n]) for e in by_content[c]] for n in names)
+    log.info(f"Comparing {len(left)} × {len(right)} extracted claims via retrieval")
+    progress = Progress('compare', client, heartbeat=settings.heartbeat_seconds)
+    headings = {(c, x.id): " > ".join(x.heading_path) for c, items in sections.items() for x in items}
+    comparing = comparison_interpreter(settings)
+    data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
+                   label=provenance.text_hash(comparing.model_dump_json()))
+    progress.close()
+    interpreters = {**document.interpreters, 'compare': comparing.model_dump()}
+    data = Report(**data, created_at=provenance.now().isoformat(),
+        sources=document.sources, files=document.files, interpreters=interpreters, scan_issues=document.scan_issues,
+        file_difference=file_difference(files[names[0]], files[names[1]]),
+        sections=document.sections, situation=document.situation, evidence=document.evidence, coverage=coverage,
+        settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
+        usage={'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage, **fixture_usage(client)},
+        limitations=LIMITATIONS).model_dump()
+    store.save_comparison(data['created_at'], data)
+    write_report(data, out, assets=store.folder / 'assets')
+    incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
+                  or data['retrieval']['omitted_by_pair_limit'] > 0
+                  or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error') for f in data['findings']))
+    print(f"Report: {out / 'report.html'}" + (' (incomplete source coverage)' if incomplete else ''))
+    note = budget_note(client)
+    if note:
+        log.warning(note)
+        return 3
+    # 2 makes automation aware of incomplete processing; uncertainty still appears
+    # in the report even when all tasks completed successfully.
+    return 2 if incomplete else 0
 
 def make_client(options, settings, store):
     fixture = None

@@ -36,13 +36,14 @@ def lab_commands():
     from importlib.metadata import entry_points
     return {e.name: e.load() for e in entry_points(group=COMMANDS)}
 
-def main(argv=None):
+def main(argv=None, client=None):
+    """The command line. client: a model client the comparing commands use (a caller's: tests)."""
     argv = list(sys.argv[1:] if argv is None else argv)
     try:
         if argv and argv[0] == 'source':
             return source_command(argv[1:])
         if argv and argv[0] == 'compare':
-            return compare_command(argv[1:])
+            return compare_command(argv[1:], client)
         if argv and argv[0] in ('show', 'gc', 'report'):
             return store_command(argv[0], argv[1:])
         if argv and argv[0] == 'fixtures':
@@ -50,7 +51,7 @@ def main(argv=None):
         command = argv and lab_commands().get(argv[0])
         if command:
             return command(argv[1:])
-        return shortcut_command(argv)
+        return shortcut_command(argv, client)
     except (OSError, ValueError, RuntimeError) as e:
         print(f'Error: {e}', file=sys.stderr)
         return 1
@@ -116,7 +117,7 @@ def load_settings(args):
 
 # --- shortcut: two paths ------------------------------------------------------------
 
-def shortcut_command(argv):
+def shortcut_command(argv, client=None):
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff',
         description='Evidence-first comparison of two sources (files, folders or zip archives) using a small '
                     'OpenAI-compatible VLM. See also: pdf-semantic-diff source --help, compare --help.')
@@ -132,12 +133,12 @@ def shortcut_command(argv):
         names = shortcut_names([args.a, args.b])
         return plan([Source(name=n, kind='shortcut', roots=[str(p.resolve())]) for n, p in zip(names, [args.a, args.b])],
                     settings)
-    return compare_paths(args.a, args.b, args.out, settings, RunOptions.from_args(args))
+    return compare_paths(args.a, args.b, args.out, settings, RunOptions.from_args(args), client)
 
 
 # --- compare declared sources ---------------------------------------------------------
 
-def compare_command(argv):
+def compare_command(argv, client=None):
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff compare', description='Compare two sources declared in a store.')
     parser.add_argument('sources', nargs='*', help='Names of declared sources')
     parser.add_argument('--manifest', action='append', type=Path, default=[],
@@ -159,7 +160,7 @@ def compare_command(argv):
             raise StoreError(f"no declared source named {', '.join(map(repr, missing))} in {args.store}")
         if args.plan:
             return plan([store.source(n) for n in names], settings)
-        return run(RunOptions.from_args(args), settings, store, names, args.report or args.store)
+        return run(RunOptions.from_args(args), settings, store, names, args.report or args.store, client=client)
 
 def link_manifest(store, path):
     """Declare or refresh a source linked to a manifest file; returns its name."""

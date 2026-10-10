@@ -5,7 +5,6 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 from semantic_pdf_diff.cli import main
 from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.schema import Extraction
@@ -113,9 +112,8 @@ class DocumentTypes(unittest.TestCase):
 class CliTests(unittest.TestCase):
     def run_cli(self, root, a, b):
         client = Recorder(vision=False)
-        with patch('semantic_pdf_diff.pipeline.Client', lambda settings, cache: client), \
-             contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
-            code = main([str(a), str(b), '--out', str(root / 'out'), '--no-vision'])
+        with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
+            code = main([str(a), str(b), '--out', str(root / 'out'), '--no-vision'], client=client)
         return code, client
 
     def test_same_content_is_extracted_once_and_never_compared(self):

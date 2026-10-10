@@ -5,7 +5,6 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.dispatch import Dispatcher
@@ -341,9 +340,8 @@ class Storage(unittest.TestCase):
 
     def run_cli(self, root, a, b, *extra, client=None):
         client = client or Recorder(vision=False)
-        with patch('semantic_pdf_diff.pipeline.Client', lambda settings, store: client), \
-             contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
-            code = cli.main([str(a), str(b), '--out', str(root / 'out'), '--no-vision', *extra])
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+            code = cli.main([str(a), str(b), '--out', str(root / 'out'), '--no-vision', *extra], client=client)
         return code, client, err.getvalue()
 
     def situating_calls(self, client):
