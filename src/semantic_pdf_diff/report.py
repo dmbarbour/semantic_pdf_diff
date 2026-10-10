@@ -43,24 +43,49 @@ def traced(data):
         findings.append({**kept, "tables_read": differ} if differ else kept)
     return {**data, "findings": findings}
 
-def write_report(data, output, assets=None):
-    """Write report.json and report.html; assets is the folder holding rendered crops
-    (default: output/assets), linked relative to the report."""
-    output = Path(output)
-    output.mkdir(exist_ok=True, parents=True)
-    prefix = os.path.relpath(Path(assets), output).replace(os.sep, "/") + "/" if assets else "assets/"
-    link = lambda image: prefix + image.split("/", 1)[1] if image.startswith("assets/") else image
-    evidence = {e["id"]:e for e in data["evidence"]}
-    (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-    occurrences = {}
-    for f in data["files"]:
-        occurrences.setdefault(f["content"], []).append(f"{f['source']} / {f['path']}")
-    where = lambda content: "; ".join(occurrences.get(content, ["unregistered content"]))
-    headings = {(x["content"], x["id"]): " > ".join(x["heading_path"]) for x in data.get("sections", [])}
-    def card(eid):
-        e = evidence[eid]
+# How each format names where a claim is: the unit a page is (a PDF's page, a deck's slide), and the place within it.
+PAGE_WORDS = {"pptx": "slide", "xlsx": "sheet", "csv": "file"}
+PLACES = {"text": lambda loc: f"lines {loc['lines'][0]}–{loc['lines'][1]}",
+          "docx": lambda loc: f"paragraphs {loc['paragraphs'][0]}–{loc['paragraphs'][1]}",
+          "pptx": lambda loc: f"slide {loc['page']}, lines {loc['lines'][0]}–{loc['lines'][1]}",
+          "xlsx": lambda loc: f"sheet {loc['sheet']}, cells {loc['cells']}",
+          "csv": lambda loc: f"lines {loc['file_lines'][0]}–{loc['file_lines'][1]}, fields {loc['fields'][0]}–"
+                             f"{loc['fields'][1]}"}
+
+def place(loc):
+    """Where a claim is within its page, as its format names it (a PDF's: its box)."""
+    named = PLACES.get(loc.get('format'))
+    return named(loc) if named else f"PDF bbox {list(loc['bbox'])}"
+
+STYLE = '''
+:root{font-family:system-ui,sans-serif}body{max-width:1200px;margin:32px auto;padding:0 24px}
+h1{font-size:36px;letter-spacing:-1px}h2{font-size:20px}h3{font-size:15px;color:var(--accent)}.meta{color:var(--muted)}
+article,header,details.coverage{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin:18px 0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}section{min-width:0;padding:12px;background:var(--panel);border-radius:8px}
+img{display:block;max-width:100%;max-height:500px;margin:14px auto}blockquote{border-left:3px solid var(--rule);margin:14px 0;padding-left:12px}
+small{overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;border-bottom:1px solid var(--line);padding:8px}
+select,input{padding:10px;border:1px solid var(--field);border-radius:6px;margin:8px;background:var(--card);color:var(--fg)}
+pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{color:var(--accent)}
+@media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
+'''
+SCRIPT = '''<script>function filter(){const r=document.querySelector('#filter').value,k=document.querySelector('#kind')?.value||'all',q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||(k!=='all'&&a.dataset.kind!==k)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;const kind=document.querySelector('#kind');if(kind)kind.onchange=filter;document.querySelector('#query').oninput=filter;</script>'''
+
+class Cards:
+    """A report's claims as cards: each with where it is, what it says, its quote and how it was read."""
+    def __init__(self, data, link):
+        self.evidence, self.link = {e["id"]: e for e in data["evidence"]}, link
+        self.occurrences = {}
+        for f in data["files"]:
+            self.occurrences.setdefault(f["content"], []).append(f"{f['source']} / {f['path']}")
+        self.headings = {(x["content"], x["id"]): " > ".join(x["heading_path"]) for x in data.get("sections", [])}
+
+    def where(self, content):
+        return "; ".join(self.occurrences.get(content, ["unregistered content"]))
+
+    def __call__(self, eid):
+        e, link = self.evidence[eid], self.link
         image = ('<a href="'+esc(link(e['image']))+'"><img loading="lazy" src="'+esc(link(e['image']))+'" alt="Source crop"></a>') if e.get('image') else ''
-        verified = {True: '<p>Quote found in the file\'s text.</p>' if e['locator'].get('format') in ('text', 'docx', 'pptx', 'xlsx', 'csv')
+        verified = {True: '<p>Quote found in the file\'s text.</p>' if e['locator'].get('format') in PLACES
                     else '<p>Quote found in PDF text layer.</p>',
                     False: '<p class="warning">Quote not found in the PDF text layer for this region; possible misread or raster-only label.</p>'
                     }.get(e.get('quote_verified'), '')
@@ -72,53 +97,33 @@ def write_report(data, output, assets=None):
                 + esc('; '.join(f"p.{o['locator']['page']} {o['locator']['region']}" for o in e['occurrences'])) + "</p>") if others else ''
         how = how_read(e)
         read = f"<p>Read {esc(read_as(how))}.</p>" if how else ''
-        heading = headings.get((e['content'], e.get('section', '')), '')
+        heading = self.headings.get((e['content'], e.get('section', '')), '')
         heading = f" · § {esc(heading)}" if heading else ''
-        return f'''<section><h3>{esc(where(e['content']))}{heading} · {'slide' if loc.get('format') == 'pptx' else 'sheet' if loc.get('format') == 'xlsx' else 'file' if loc.get('format') == 'csv' else 'page'} {loc['page']} · {esc(e['kind'])}</h3>
+        return f'''<section><h3>{esc(self.where(e['content']))}{heading} · {PAGE_WORDS.get(loc.get('format'), 'page')} {loc['page']} · {esc(e['kind'])}</h3>
         <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
         <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}<blockquote>{esc(e['quote'])}</blockquote>{verified}{read}{also}
         <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>{image}</section>'''
-    counts = Counter(f['relation'] for f in data['findings'])
-    place = lambda loc: (f"lines {loc['lines'][0]}–{loc['lines'][1]}" if loc.get('format') == 'text'
-                         else f"paragraphs {loc['paragraphs'][0]}–{loc['paragraphs'][1]}" if loc.get('format') == 'docx'
-                         else f"slide {loc['page']}, lines {loc['lines'][0]}–{loc['lines'][1]}" if loc.get('format') == 'pptx'
-                         else f"sheet {loc['sheet']}, cells {loc['cells']}" if loc.get('format') == 'xlsx'
-                         else (f"lines {loc['file_lines'][0]}–{loc['file_lines'][1]}, fields {loc['fields'][0]}–"
-                               f"{loc['fields'][1]}") if loc.get('format') == 'csv'
-                         else f"PDF bbox {list(loc['bbox'])}")
-    issues = [r for r in data['coverage'] if r['status'] != 'complete']
-    rows = []
-    # explained differences first, value changes leading (KINDS' order); the rest as found
-    order = {k: i for i, k in enumerate(KINDS)}
-    shown = sorted(data['findings'], key=lambda f: order.get(f.get('explanation', {}).get('kind'), len(KINDS)))
-    for f in shown:
-        numeric = '<pre>'+esc(json.dumps(f['numeric'],indent=2))+'</pre>' if f.get('numeric') else ''
-        title = f['relation'].title() + (' (settled without a model)' if f.get('settled') else '')
-        why = f.get('explanation')
-        if why:
-            title += ': ' + KINDS[why['kind']][0].lower()
-            why = (f"<p><b>{esc(KINDS[why['kind']][1])}.</b> {esc(why['rationale'])}"
-                   f" <small>(explanation confidence {why['confidence']})</small></p>")
-        differ = (f"<p class='warning'>Their tables were read differently: A {esc(f['tables_read']['a'])}; B "
-                  f"{esc(f['tables_read']['b'])}. The difference may come from the reading.</p>") if f.get('tables_read') else ''
-        rows.append(f'''<article data-relation="{esc(f['relation'])}" data-kind="{esc(f.get('explanation', {}).get('kind', ''))}"><h2>{esc(title)}</h2>
+
+def finding_html(f, card):
+    """One finding: its relation (and kind, if explained), why, and its two claims' cards."""
+    numeric = '<pre>'+esc(json.dumps(f['numeric'],indent=2))+'</pre>' if f.get('numeric') else ''
+    title = f['relation'].title() + (' (settled without a model)' if f.get('settled') else '')
+    why = f.get('explanation')
+    if why:
+        title += ': ' + KINDS[why['kind']][0].lower()
+        why = (f"<p><b>{esc(KINDS[why['kind']][1])}.</b> {esc(why['rationale'])}"
+               f" <small>(explanation confidence {why['confidence']})</small></p>")
+    differ = (f"<p class='warning'>Their tables were read differently: A {esc(f['tables_read']['a'])}; B "
+              f"{esc(f['tables_read']['b'])}. The difference may come from the reading.</p>") if f.get('tables_read') else ''
+    return f'''<article data-relation="{esc(f['relation'])}" data-kind="{esc(f.get('explanation', {}).get('kind', ''))}"><h2>{esc(title)}</h2>
         {why or ''}<p>{esc(f['rationale'])}</p>{differ}<div class="pair">{card(f['a'])}{card(f['b'])}</div>
-        <details><summary>Calculation and matching details</summary>{numeric}<p>Retrieval score {f['retrieval_score']}; {'alignment' if f.get('settled') else 'model'} confidence {f['confidence']}</p></details></article>''')
-    unmatched = ''.join('<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched'])
-    shared = ''.join(card(eid) for eid in data.get('shared', []))
-    issues_found = ''.join('<tr><td>'+esc(i['source'])+'</td><td>'+esc(i['path'])+'</td><td>'+esc(i['reason'])+'</td></tr>' for i in data.get('scan_issues', []))
-    coverage = ''.join('<tr><td>'+esc(where(r['content']))+'</td><td>'+esc(r['page'] if r['page'] is not None else '')+'</td><td>'+esc(r['task'])+'</td><td>'+esc(r['status'])+'</td><td>'+esc('; '.join(r['issues']))+'</td></tr>' for r in data['coverage'])
-    style = '''
-:root{font-family:system-ui,sans-serif}body{max-width:1200px;margin:32px auto;padding:0 24px}
-h1{font-size:36px;letter-spacing:-1px}h2{font-size:20px}h3{font-size:15px;color:var(--accent)}.meta{color:var(--muted)}
-article,header,details.coverage{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin:18px 0}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}section{min-width:0;padding:12px;background:var(--panel);border-radius:8px}
-img{display:block;max-width:100%;max-height:500px;margin:14px auto}blockquote{border-left:3px solid var(--rule);margin:14px 0;padding-left:12px}
-small{overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;border-bottom:1px solid var(--line);padding:8px}
-select,input{padding:10px;border:1px solid var(--field);border-radius:6px;margin:8px;background:var(--card);color:var(--fg)}
-pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{color:var(--accent)}
-@media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
-'''
+        <details><summary>Calculation and matching details</summary>{numeric}<p>Retrieval score {f['retrieval_score']}; {'alignment' if f.get('settled') else 'model'} confidence {f['confidence']}</p></details></article>'''
+
+def header_html(data):
+    """The report's header: the sources, the mode, the findings counted, the files' differences, the caveats and the
+    run's metadata."""
+    counts = Counter(f['relation'] for f in data['findings'])
+    issues = [r for r in data['coverage'] if r['status'] != 'complete']
     page = '<header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1>'
     page += f"<p>{' ↔ '.join(esc(x['name']) for x in data['sources'])}</p><p>Mode: {esc(data['mode'])}</p>"
     differently = sum(1 for f in data['findings'] if f.get('tables_read'))
@@ -134,18 +139,35 @@ pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{col
     page += '<p>Model conclusions require review. “Complete” means the extractor reported no local issue, not proof of exhaustive coverage. Unmatched claims do not establish additions or deletions.</p>'
     page += '<p>Revision mode treats the first source as the earlier version and the second as the later one. Proposal mode treats both symmetrically; neither is ranked.</p>'
     page += '<details><summary>Run metadata and limitations</summary><pre>'+esc(json.dumps({k:v for k,v in data.items() if k not in ('evidence','coverage','findings','unmatched')},indent=2))+'</pre></details></header>'
+    return page
+
+def write_report(data, output, assets=None):
+    """Write report.json and report.html; assets is the folder holding rendered crops
+    (default: output/assets), linked relative to the report."""
+    output = Path(output)
+    output.mkdir(exist_ok=True, parents=True)
+    prefix = os.path.relpath(Path(assets), output).replace(os.sep, "/") + "/" if assets else "assets/"
+    card = Cards(data, lambda image: prefix + image.split("/", 1)[1] if image.startswith("assets/") else image)
+    (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    # explained differences first, value changes leading (KINDS' order); the rest as found
+    order = {k: i for i, k in enumerate(KINDS)}
+    shown = sorted(data['findings'], key=lambda f: order.get(f.get('explanation', {}).get('kind'), len(KINDS)))
+    unmatched = ''.join('<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched'])
+    shared = ''.join(card(eid) for eid in data.get('shared', []))
+    issues_found = ''.join('<tr><td>'+esc(i['source'])+'</td><td>'+esc(i['path'])+'</td><td>'+esc(i['reason'])+'</td></tr>' for i in data.get('scan_issues', []))
+    coverage = ''.join('<tr><td>'+esc(card.where(r['content']))+'</td><td>'+esc(r['page'] if r['page'] is not None else '')+'</td><td>'+esc(r['task'])+'</td><td>'+esc(r['status'])+'</td><td>'+esc('; '.join(r['issues']))+'</td></tr>' for r in data['coverage'])
+    page = header_html(data)
     page += '<label>Show <select id="filter"><option value="all">All relations</option>'+''.join('<option>'+r+'</option>' for r in ['different','equivalent','complementary','uncertain','unrelated'])+'</select></label>'
     if any('explanation' in f for f in data['findings']):
         page += '<label>Kind <select id="kind"><option value="all">All kinds</option>'+''.join(f'<option value="{k}">{esc(v[0])}</option>' for k, v in KINDS.items())+'</select></label>'
     page += '<input id="query" placeholder="Search findings" aria-label="Search findings">'
-    page += '<main>'+''.join(rows)+'</main><details><summary>Unmatched evidence ('+str(len(data['unmatched']))+')</summary>'+unmatched+'</details>'
+    page += '<main>'+''.join(finding_html(f, card) for f in shown)+'</main><details><summary>Unmatched evidence ('+str(len(data['unmatched']))+')</summary>'+unmatched+'</details>'
     page += groupings_html(data.get('groupings', []), esc)
     page += '<details><summary>Shared evidence ('+str(len(data.get('shared', [])))+'): identical content in both sources, not compared</summary>'+shared+'</details>'
-    page += situating(data.get('situation', {}), data.get('sections', []), where, esc)
+    page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
     page += '<details class="coverage"><summary>Files not scanned ('+str(len(data.get('scan_issues', [])))+'): hidden, unsafe or over limits</summary><table><thead><tr><th>Source</th><th>Path</th><th>Reason</th></tr></thead><tbody>'+issues_found+'</tbody></table></details>'
     page += '<details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>File</th><th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody>'+coverage+'</tbody></table></details>'
-    page += '''<script>function filter(){const r=document.querySelector('#filter').value,k=document.querySelector('#kind')?.value||'all',q=document.querySelector('#query').value.toLowerCase();document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)||(k!=='all'&&a.dataset.kind!==k)||!a.textContent.toLowerCase().includes(q))}document.querySelector('#filter').onchange=filter;const kind=document.querySelector('#kind');if(kind)kind.onchange=filter;document.querySelector('#query').oninput=filter;</script>'''
-    page = html_page('Semantic PDF comparison', page, style)
+    page = html_page('Semantic PDF comparison', page + SCRIPT, STYLE)
     (output/'report.html').write_text(page,encoding='utf-8')
 
 # A difference's kind (explain.py): its name, and what it means, in the order the report lists them.

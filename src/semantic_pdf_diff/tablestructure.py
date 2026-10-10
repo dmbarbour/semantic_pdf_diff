@@ -229,8 +229,19 @@ def problems(answer, n, width, tags):
     return wrong
 
 def apply(answer, header, body, boxes, tags, cuts=None):
-    """Structure rules applied to a part's lines. cuts: as signals takes them, to join cut words without a space."""
+    """Structure rules applied to a part's lines. cuts: as signals takes them, to join cut words without a space. In
+    three phases: each line's action, the lines into rows and parts, then the columns joined and split in every part,
+    each named as shown, so mapped through the joins and splits before it (code review 2026-10-08, B3)."""
     out = Applied()
+    _rows_applied(out, _line_actions(answer, body, tags), header, body, boxes)
+    width = max(len(r) for r in [header] + list(body))
+    index = list(range(width))  # each column's place after joins (splits name columns as they were shown)
+    index = _columns_joined(out, answer, width, index, cuts)
+    _columns_split(out, answer, width, index)
+    return out
+
+def _line_actions(answer, body, tags):
+    """{line: (action, rule)}: a rule naming the line, else the first rule whose "when" tags the line all has."""
     act, named = {}, {}
     for rule in answer.rules:
         action = rule.action.strip().lower()
@@ -248,6 +259,11 @@ def apply(answer, header, body, boxes, tags, cuts=None):
             if rule.action.strip().lower() not in COLUMN_ACTIONS and when and all(w in tags[i - 1] for w in when):
                 act[i] = (rule.action.strip().lower(), rule)
                 break
+    return act
+
+def _rows_applied(out, act, header, body, boxes):
+    """The lines into out's parts by their actions: joined to the header or the row above, a new table, apart, a
+    section row, or kept."""
     head, rows, bxs, origins, heads = list(header), [], [], [], []
     header_open = True
 
@@ -292,12 +308,13 @@ def apply(answer, header, body, boxes, tags, cuts=None):
             origins.append([i])
             header_open = False
     close()
-    width = max(len(r) for r in [header] + list(body))
-    index = list(range(width))  # each column's place after joins (splits name columns as they were shown)
+
+def _columns_joined(out, answer, width, index, cuts):
+    """The "join columns" rules applied in every part, right to left; each column's place after them (the index)."""
     joins = [(rule, _span(rule.column, width)) for rule in answer.rules
              if rule.action.strip().lower() == "join columns" and _span(rule.column, width)]
-    # columns joined, in every part. Spans name columns as shown, so each is mapped through the joins before it
-    # (code review 2026-10-08, B3: overlapping joins joined one column too many)
+    # Spans name columns as shown, so each is mapped through the joins before it (code review 2026-10-08, B3:
+    # overlapping joins joined one column too many)
     for rule, shown_span in sorted(joins, key=lambda j: -j[1][0]):
         first, last = index[shown_span[0]], index[shown_span[1]]
         if first >= last:
@@ -332,7 +349,12 @@ def apply(answer, header, body, boxes, tags, cuts=None):
         out.parts = parts
         out.did[id(rule)] = (rule, joined_rows)
         index = [i if i <= first else first if i <= last else i - (last - first) for i in index]
-    for rule in answer.rules:  # columns split, in every part
+    return index
+
+def _columns_split(out, answer, width, index):
+    """The "split column" rules applied in every part; the columns after each move along, so a second split names a
+    column as shown (code review 2026-10-08, B3)."""
+    for rule in answer.rules:
         if rule.action.strip().lower() != "split column":
             continue
         letters = [_letter(c) for c in range(width)]
@@ -356,9 +378,7 @@ def apply(answer, header, body, boxes, tags, cuts=None):
             parts.append((head_, new, bxs_))
         out.parts = parts
         out.did[id(rule)] = (rule, split_rows)
-        # the columns after it move along: a second split names a column as shown (code review 2026-10-08, B3)
         index = [i + len(into) - 1 if i > k else i for i in index]
-    return out
 
 def example_mismatches(answer, applied, body, worst=None):
     """Each example against what the rules gave for the row (or header) holding its line, and the row holding the

@@ -226,18 +226,11 @@ class Transport:
                   file=sys.stderr)
 
     def send(self, request):
-        """Call the model, with retries (thread-safe)."""
+        """Call the model, with retries (thread-safe): each attempt admitted under the caps, posted, its usage and cost
+        accounted, its answer read; a refusal stops, fails or waits to retry."""
         last = "Unknown model failure"
         for attempt in range(self.s.retries + 1):
-            with self.lock:
-                if self.out_of_budget:
-                    raise OutOfBudget(self.out_of_budget)
-                if self.s.max_cost is not None and self.cost >= self.s.max_cost:
-                    self.out_of_budget = f"cost cap reached (${self.cost:.2f} of ${self.s.max_cost:.2f})"
-                    raise OutOfBudget(self.out_of_budget)
-                if self.calls >= self.s.max_calls:
-                    raise CallLimitReached("API call limit reached; rerun with cache and a higher --max-calls")
-                self.calls += 1
+            self._admit()
             wait = min(2 ** attempt, 8)
             http = urllib.request.Request(self.s.base_url.rstrip("/") + "/chat/completions", data=request.raw,
                 headers={"Content-Type": "application/json", **({"Authorization": "Bearer " + self.api_key} if self.api_key else {})})
@@ -245,73 +238,13 @@ class Transport:
             self.gate.acquire()
             started, throttled, generated = time.monotonic(), False, 0
             try:
-                # Streamed, the timeout is between chunks: a slow judge still writing isn't cut off
-                # (and billed for an answer never received), only a silent connection is.
-                with urllib.request.urlopen(http, timeout=self.s.timeout) as response:
-                    streamed = "text/event-stream" in (response.headers.get("Content-Type") or "")
-                    result = read_stream(response) if streamed else json.load(response)
-                if not isinstance(result, dict):
-                    raise ValueError("Response is not a JSON object")
+                result = self._post(http)
                 usage = result.get("usage") or {}
-                reported = 0
                 generated = int(usage.get("completion_tokens") or 0) if isinstance(usage, dict) else 0
-                if isinstance(usage, dict):
-                    request.usage = {k: usage[k] for k in ("prompt_tokens", "completion_tokens", "estimated_cost")
-                                     if isinstance(usage.get(k), (int, float))}
-                    with self.lock:  # every attempt is paid for, including ones retried after a bad answer
-                        self.cost += float(request.usage.get("estimated_cost") or 0.0)
-                        if self.ledger is not None:  # without a cost too: marked unpriced, not left out
-                            self.ledger.add(self.s.model, request.key.role if request.key else "raw", request.usage)
-                        if "estimated_cost" not in request.usage:
-                            self.unpriced += 1
-                            if self.s.max_cost is not None and not self.warned_cost:
-                                self.warned_cost = True
-                                shape = {"keys": sorted(result), "finish": ((result.get("choices") or [{}])[0] or {}).get(
-                                    "finish_reason"), "usage": usage}
-                                log.warning("A response came without a cost (%s): it may still be billed, so the "
-                                            "cost cap can be overrun; the ledger marks such responses unpriced",
-                                            json.dumps(shape, default=str)[:300])
-                with self.lock:
-                    for k in self.usage:
-                        n = int(usage.get(k) or 0) if isinstance(usage, dict) else 0
-                        self.usage[k] += n
-                        reported += n
-                if reported:
-                    self.limiter.settle(entry, reported)
-                if result.get("cut"):
-                    raise ConnectionError("The stream ended before the answer finished")
-                choice = (result.get("choices") or [None])[0]
-                if not isinstance(choice, dict):
-                    raise ValueError("Response has no choices")
-                if choice.get("finish_reason") == "length":  # the same words as when it was retried, so recorded
-                    raise Truncated("ValueError: Truncated model output; reduce crop/text size or increase output budget")
-                answer = (choice.get("message") or {}).get("content")
-                if not isinstance(answer, str) or not answer.strip():
-                    raise ValueError("Response has no text content")
-                requests_log.debug("%s %s: ok in %.2fs (%s tokens)", request.schema.__name__,
-                                   request.key.label if request.key else "", time.monotonic() - started,
-                                   reported or "?")
-                try:
-                    return request.schema.model_validate_json(json_text(answer))
-                except ValueError as e:  # pydantic's ValidationError too
-                    raise Invalid(f"{type(e).__name__}: {e}") from e
+                reported = self._account(request, result, usage, entry)
+                return self._answer(request, result, started, reported)
             except urllib.error.HTTPError as e:
-                requests_log.debug("%s %s: HTTP %s after %.2fs", request.schema.__name__,
-                                   request.key.label if request.key else "", e.code, time.monotonic() - started)
-                last = f"HTTP {e.code}: {e.reason}"
-                try:
-                    body = e.read(2000).decode(errors="replace").lower()
-                except Exception:
-                    body = ""
-                if e.code == 402 or (e.code in (400, 403) and any(word in body for word in BILLING)) \
-                        or (e.code == 429 and any(word in body for word in BILLING_429)):
-                    with self.lock:
-                        self.out_of_budget = f"provider balance exhausted ({last}); top up and resume"
-                    raise OutOfBudget(self.out_of_budget) from e
-                throttled = e.code in (429, 503)
-                if e.code not in RETRYABLE:
-                    raise ModelFailure(last) from e
-                wait = max(wait, retry_after(e))
+                last, wait, throttled = self._refused(request, e, started, wait)
             except (ValueError, KeyError, IndexError, TypeError, AttributeError, OSError, HTTPException) as e:
                 last = f"{type(e).__name__}: {e}"
             finally:
@@ -322,6 +255,98 @@ class Transport:
             if attempt < self.s.retries:
                 time.sleep(wait)
         raise ModelFailure(last)
+
+    def _admit(self):
+        """One more call counted, unless sending has stopped, the cost cap is reached or the call limit."""
+        with self.lock:
+            if self.out_of_budget:
+                raise OutOfBudget(self.out_of_budget)
+            if self.s.max_cost is not None and self.cost >= self.s.max_cost:
+                self.out_of_budget = f"cost cap reached (${self.cost:.2f} of ${self.s.max_cost:.2f})"
+                raise OutOfBudget(self.out_of_budget)
+            if self.calls >= self.s.max_calls:
+                raise CallLimitReached("API call limit reached; rerun with cache and a higher --max-calls")
+            self.calls += 1
+
+    def _post(self, http):
+        """The endpoint's response, streamed or not, as a JSON object."""
+        # Streamed, the timeout is between chunks: a slow judge still writing isn't cut off
+        # (and billed for an answer never received), only a silent connection is.
+        with urllib.request.urlopen(http, timeout=self.s.timeout) as response:
+            streamed = "text/event-stream" in (response.headers.get("Content-Type") or "")
+            result = read_stream(response) if streamed else json.load(response)
+        if not isinstance(result, dict):
+            raise ValueError("Response is not a JSON object")
+        return result
+
+    def _account(self, request, result, usage, entry):
+        """An attempt's usage and cost counted (every attempt is paid for, including ones retried after a bad answer)
+        and its tokens settled with the rate limiter: the tokens reported."""
+        reported = 0
+        if isinstance(usage, dict):
+            request.usage = {k: usage[k] for k in ("prompt_tokens", "completion_tokens", "estimated_cost")
+                             if isinstance(usage.get(k), (int, float))}
+            with self.lock:
+                self.cost += float(request.usage.get("estimated_cost") or 0.0)
+                if self.ledger is not None:  # without a cost too: marked unpriced, not left out
+                    self.ledger.add(self.s.model, request.key.role if request.key else "raw", request.usage)
+                if "estimated_cost" not in request.usage:
+                    self.unpriced += 1
+                    if self.s.max_cost is not None and not self.warned_cost:
+                        self.warned_cost = True
+                        shape = {"keys": sorted(result), "finish": ((result.get("choices") or [{}])[0] or {}).get(
+                            "finish_reason"), "usage": usage}
+                        log.warning("A response came without a cost (%s): it may still be billed, so the "
+                                    "cost cap can be overrun; the ledger marks such responses unpriced",
+                                    json.dumps(shape, default=str)[:300])
+        with self.lock:
+            for k in self.usage:
+                n = int(usage.get(k) or 0) if isinstance(usage, dict) else 0
+                self.usage[k] += n
+                reported += n
+        if reported:
+            self.limiter.settle(entry, reported)
+        return reported
+
+    def _answer(self, request, result, started, reported):
+        """The response's answer, validated against the request's schema; a cut stream, no choice, a truncated or
+        empty answer raised (to be retried), an answer not fitting the schema Invalid (not retried)."""
+        if result.get("cut"):
+            raise ConnectionError("The stream ended before the answer finished")
+        choice = (result.get("choices") or [None])[0]
+        if not isinstance(choice, dict):
+            raise ValueError("Response has no choices")
+        if choice.get("finish_reason") == "length":  # the same words as when it was retried, so recorded
+            raise Truncated("ValueError: Truncated model output; reduce crop/text size or increase output budget")
+        answer = (choice.get("message") or {}).get("content")
+        if not isinstance(answer, str) or not answer.strip():
+            raise ValueError("Response has no text content")
+        requests_log.debug("%s %s: ok in %.2fs (%s tokens)", request.schema.__name__,
+                           request.key.label if request.key else "", time.monotonic() - started,
+                           reported or "?")
+        try:
+            return request.schema.model_validate_json(json_text(answer))
+        except ValueError as e:  # pydantic's ValidationError too
+            raise Invalid(f"{type(e).__name__}: {e}") from e
+
+    def _refused(self, request, e, started, wait):
+        """(the failure, the wait before retrying, whether throttled) for an HTTP error; the provider's balance
+        exhausted stops sending (OutOfBudget), an error not worth retrying fails (ModelFailure)."""
+        requests_log.debug("%s %s: HTTP %s after %.2fs", request.schema.__name__,
+                           request.key.label if request.key else "", e.code, time.monotonic() - started)
+        last = f"HTTP {e.code}: {e.reason}"
+        try:
+            body = e.read(2000).decode(errors="replace").lower()
+        except Exception:
+            body = ""
+        if e.code == 402 or (e.code in (400, 403) and any(word in body for word in BILLING)) \
+                or (e.code == 429 and any(word in body for word in BILLING_429)):
+            with self.lock:
+                self.out_of_budget = f"provider balance exhausted ({last}); top up and resume"
+            raise OutOfBudget(self.out_of_budget) from e
+        if e.code not in RETRYABLE:
+            raise ModelFailure(last) from e
+        return last, max(wait, retry_after(e)), e.code in (429, 503)
 
 class Client:
     """Chat Completions client with a response cache.

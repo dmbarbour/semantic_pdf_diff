@@ -637,69 +637,86 @@ def _number(text):
         return None
 
 def score(card, truth, answer):
-    """{"score": the share of items right, and counts by kind of error} for one answer (a dict)."""
+    """{"score": the share of items right, and counts by kind of error} for one answer (a dict), by the card's
+    family: lines read, name-value pairs, a graph's edges, or lookups (table, chart-values, chart-axis)."""
     family = card.family if isinstance(card, Card) else card
     if family in READING:
-        lines = lambda ls: [str(line).translate(SAME_GLYPH) if truth.get("confusable") else str(line) for line in ls or ()]
-        expected = [norm(t) for line in lines(truth["lines"]) for t in line.split()]
-        given = [norm(t) for line in lines(answer.get("lines")) for t in line.split()]
-        matched = sum(b.size for b in SequenceMatcher(None, expected, given, autojunk=False).get_matching_blocks())
-        want, got = "".join(expected), "".join(given)
-        out = {"score": round(matched / len(expected), 4), "items": len(expected), "right": matched,
-               "cer": round(min(1.0, edit_distance(want, got) / len(want)), 4), "unread": got.count("?")}
-        if truth.get("confusable"):  # look-alikes swapped, counted where a token was read at its length
-            raw_expected = [t for line in lines(truth["lines"]) for t in line.split()]
-            raw_given = [t for line in lines(answer.get("lines")) for t in line.split()]
-            swaps = 0
-            for op, i1, i2, j1, j2 in SequenceMatcher(None, expected, given, autojunk=False).get_opcodes():
-                if op == "replace":
-                    for a, b in zip(raw_expected[i1:i2], raw_given[j1:j2]):
-                        if len(a) == len(b):
-                            swaps += sum(1 for x, y in zip(a, b) if x != y and y in CONFUSABLE.get(x, ()))
-            out["confused"] = swaps
-        if truth.get("sources"):  # pseudo-words read as the word they came from
-            out["autocorrected"] = sum(1 for t in given if t in {norm(w) for w in truth["sources"]})
-        return out
+        return _scored_reading(truth, answer)
     if family == "pairs":
-        expected = {compact(k): compact(v) for k, v in truth["pairs"].items()}
-        owner = {v: k for k, v in expected.items()}
-        counts = {"right": 0, "misbound": 0, "misread": 0, "unknown_name": 0}
-        seen = set()
-        for p in answer.get("pairs") or ():
-            name, value = compact(p.get("name", "")), compact(p.get("value", ""))
-            if name not in expected or name in seen:
-                counts["unknown_name"] += name not in expected
-                continue
-            seen.add(name)
-            kind = "right" if value == expected[name] else "misbound" if value in owner else "misread"
-            counts[kind] += 1
-        return {"score": round(counts["right"] / len(expected), 4), "items": len(expected),
-                "missed": len(expected) - len(seen), **counts}
+        return _scored_pairs(truth, answer)
     if family == "graph":
-        expected = [tuple(compact(e[k]) for k in ("start", "end", "label")) for e in truth["edges"]]
-        labels = {e[2]: e for e in expected}
-        counts = {"right": 0, "reversed": 0, "label_misread": 0, "label_misbound": 0, "ends_wrong": 0, "spurious": 0}
-        left = list(expected)
-        for a in answer.get("edges") or ():
-            got = tuple(compact(a.get(k, "")) for k in ("start", "end", "label"))
-            if got in left:
-                left.remove(got)
-                counts["right"] += 1
-                continue
-            same_ends = [e for e in left if {e[0], e[1]} == {got[0], got[1]}]
-            if (got[1], got[0], got[2]) in left:
-                left.remove((got[1], got[0], got[2]))
-                counts["reversed"] += 1
-            elif same_ends:
-                left.remove(same_ends[0])
-                counts["label_misbound" if got[2] in labels else "label_misread"] += 1
-            elif got[2] in labels and labels[got[2]] in left:
-                left.remove(labels[got[2]])
-                counts["ends_wrong"] += 1
-            else:
-                counts["spurious"] += 1
-        return {"score": round(counts["right"] / len(expected), 4), "items": len(expected), "missed": len(left), **counts}
-    # lookups: table, chart-values, chart-axis
+        return _scored_graph(truth, answer)
+    return _scored_lookups(truth, answer)
+
+def _scored_reading(truth, answer):
+    """Tokens read in order; the character error rate; look-alikes swapped, pseudo-words autocorrected."""
+    lines = lambda ls: [str(line).translate(SAME_GLYPH) if truth.get("confusable") else str(line) for line in ls or ()]
+    expected = [norm(t) for line in lines(truth["lines"]) for t in line.split()]
+    given = [norm(t) for line in lines(answer.get("lines")) for t in line.split()]
+    matched = sum(b.size for b in SequenceMatcher(None, expected, given, autojunk=False).get_matching_blocks())
+    want, got = "".join(expected), "".join(given)
+    out = {"score": round(matched / len(expected), 4), "items": len(expected), "right": matched,
+           "cer": round(min(1.0, edit_distance(want, got) / len(want)), 4), "unread": got.count("?")}
+    if truth.get("confusable"):  # look-alikes swapped, counted where a token was read at its length
+        raw_expected = [t for line in lines(truth["lines"]) for t in line.split()]
+        raw_given = [t for line in lines(answer.get("lines")) for t in line.split()]
+        swaps = 0
+        for op, i1, i2, j1, j2 in SequenceMatcher(None, expected, given, autojunk=False).get_opcodes():
+            if op == "replace":
+                for a, b in zip(raw_expected[i1:i2], raw_given[j1:j2]):
+                    if len(a) == len(b):
+                        swaps += sum(1 for x, y in zip(a, b) if x != y and y in CONFUSABLE.get(x, ()))
+        out["confused"] = swaps
+    if truth.get("sources"):  # pseudo-words read as the word they came from
+        out["autocorrected"] = sum(1 for t in given if t in {norm(w) for w in truth["sources"]})
+    return out
+
+def _scored_pairs(truth, answer):
+    """Each name's value: right, another name's (misbound), or misread; names not on the card."""
+    expected = {compact(k): compact(v) for k, v in truth["pairs"].items()}
+    owner = {v: k for k, v in expected.items()}
+    counts = {"right": 0, "misbound": 0, "misread": 0, "unknown_name": 0}
+    seen = set()
+    for p in answer.get("pairs") or ():
+        name, value = compact(p.get("name", "")), compact(p.get("value", ""))
+        if name not in expected or name in seen:
+            counts["unknown_name"] += name not in expected
+            continue
+        seen.add(name)
+        kind = "right" if value == expected[name] else "misbound" if value in owner else "misread"
+        counts[kind] += 1
+    return {"score": round(counts["right"] / len(expected), 4), "items": len(expected),
+            "missed": len(expected) - len(seen), **counts}
+
+def _scored_graph(truth, answer):
+    """Each edge: right, reversed, its label misread or misbound, its ends wrong, or spurious."""
+    expected = [tuple(compact(e[k]) for k in ("start", "end", "label")) for e in truth["edges"]]
+    labels = {e[2]: e for e in expected}
+    counts = {"right": 0, "reversed": 0, "label_misread": 0, "label_misbound": 0, "ends_wrong": 0, "spurious": 0}
+    left = list(expected)
+    for a in answer.get("edges") or ():
+        got = tuple(compact(a.get(k, "")) for k in ("start", "end", "label"))
+        if got in left:
+            left.remove(got)
+            counts["right"] += 1
+            continue
+        same_ends = [e for e in left if {e[0], e[1]} == {got[0], got[1]}]
+        if (got[1], got[0], got[2]) in left:
+            left.remove((got[1], got[0], got[2]))
+            counts["reversed"] += 1
+        elif same_ends:
+            left.remove(same_ends[0])
+            counts["label_misbound" if got[2] in labels else "label_misread"] += 1
+        elif got[2] in labels and labels[got[2]] in left:
+            left.remove(labels[got[2]])
+            counts["ends_wrong"] += 1
+        else:
+            counts["spurious"] += 1
+    return {"score": round(counts["right"] / len(expected), 4), "items": len(expected), "missed": len(left), **counts}
+
+def _scored_lookups(truth, answer):
+    """Each question's value: right (within its tolerance), another cell's (misbound; in its row or column?),
+    misread, or declined."""
     given = {a.get("n"): a.get("value", "") for a in answer.get("answers") or ()}
     cells = truth["cells"]
     counts = {"right": 0, "misbound": 0, "misread": 0, "declined": 0, "same_row_or_column": 0}

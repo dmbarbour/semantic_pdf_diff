@@ -127,14 +127,19 @@ def regions(sheet):
     """A sheet's regions: its defined tables; then blocks of filled (or merged-over) cells joined through shared edges
     (two tables touching only at a corner stay two), blocks whose bounds overlap merged into one (a list's sparse
     columns); a lone cell heading a wider block split off as its title."""
-    cells, merges = sheet.cells, sheet.merges
     found, taken = [], set()
     for top, left, bottom, right, heads, name, columns in sheet.tables:
         # no header row is no header row (code review 2026-10-08, B9: one was taken from the data)
         found.append(Region(sheet.title, top, left, bottom, right, "table", 1 if heads is None else heads, name,
                             tuple(columns)))
         taken |= {(r, c) for r in range(top, bottom + 1) for c in range(left, right + 1)}
-    occupied, boxes = (set(cells) | set(merges)) - taken, []
+    for box in _overlaps_merged(_blocks((set(sheet.cells) | set(sheet.merges)) - taken)):
+        found += _block_regions(sheet, *box)
+    return sorted(found, key=lambda g: (g.top, g.left))
+
+def _blocks(occupied):
+    """The bounds [top, left, bottom, right] of each block of cells joined through shared edges."""
+    occupied, boxes = set(occupied), []
     while occupied:
         start = min(occupied)
         block, todo = {start}, [start]
@@ -147,8 +152,12 @@ def regions(sheet):
         occupied -= block
         boxes.append([min(r for r, _ in block), min(c for _, c in block), max(r for r, _ in block),
                       max(c for _, c in block)])
+    return boxes
+
+def _overlaps_merged(boxes):
+    """Blocks whose bounds overlap, as one."""
     merged = True
-    while merged:  # blocks whose bounds overlap are one region
+    while merged:
         merged = False
         for i in range(len(boxes)):
             for j in range(i + 1, len(boxes)):
@@ -160,27 +169,31 @@ def regions(sheet):
                     break
             if merged:
                 break
-    for top, left, bottom, right in boxes:
-        while top < bottom and right > left:  # a lone first-row cell over a wider block: its title
-            first = [c for c in range(left, right + 1) if (top, c) in cells]
-            if len(first) != 1:
-                break
-            found.append(Region(sheet.title, top, first[0], top, first[0], "text"))
-            top += 1
-            while top < bottom and not any((top, c) in cells for c in range(left, right + 1)):
-                top += 1  # rows under the title merged over, empty: skipped
-        pairs = top
-        while pairs < bottom and right > left + 1 and all(c <= left + 1 for c in range(left, right + 1)
-                                                            if (pairs, c) in cells):
-            pairs += 1  # narrow leading rows (a label and its value) over a wider table: pairs
-        if pairs > top and any((r, c) in cells for r in range(pairs, bottom + 1) for c in range(left + 2, right + 1)):
-            found.append(Region(sheet.title, top, left, pairs - 1, left + 1, "pairs"))
-            top = pairs
-        held = [c for (r, c) in set(cells) | set(merges) if top <= r <= bottom and left <= c <= right]
-        left, right = min(held, default=left), max(held, default=right)  # what's left, without the split rows' width
-        kind = "text" if top == bottom or left == right else "table"
-        found.append(Region(sheet.title, top, left, bottom, right, kind))
-    return sorted(found, key=lambda g: (g.top, g.left))
+    return boxes
+
+def _block_regions(sheet, top, left, bottom, right):
+    """One block's regions: lone first-row cells over it as titles, narrow leading rows (a label and its value) over
+    a wider table as pairs, then the rest, a table (or text, a row or a column)."""
+    cells, merges, found = sheet.cells, sheet.merges, []
+    while top < bottom and right > left:  # a lone first-row cell over a wider block: its title
+        first = [c for c in range(left, right + 1) if (top, c) in cells]
+        if len(first) != 1:
+            break
+        found.append(Region(sheet.title, top, first[0], top, first[0], "text"))
+        top += 1
+        while top < bottom and not any((top, c) in cells for c in range(left, right + 1)):
+            top += 1  # rows under the title merged over, empty: skipped
+    pairs = top
+    while pairs < bottom and right > left + 1 and all(c <= left + 1 for c in range(left, right + 1)
+                                                        if (pairs, c) in cells):
+        pairs += 1  # narrow leading rows (a label and its value) over a wider table: pairs
+    if pairs > top and any((r, c) in cells for r in range(pairs, bottom + 1) for c in range(left + 2, right + 1)):
+        found.append(Region(sheet.title, top, left, pairs - 1, left + 1, "pairs"))
+        top = pairs
+    held = [c for (r, c) in set(cells) | set(merges) if top <= r <= bottom and left <= c <= right]
+    left, right = min(held, default=left), max(held, default=right)  # what's left, without the split rows' width
+    found.append(Region(sheet.title, top, left, bottom, right, "text" if top == bottom or left == right else "table"))
+    return found
 
 def _grid(region, cells, merges):
     """[(row number, [Cell])]: a table region's rows on its columns (counted from 0). A merged cell spans its columns;

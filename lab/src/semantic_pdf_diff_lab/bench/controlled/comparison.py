@@ -29,6 +29,7 @@ A revision's key logs its edits from its base (revisions.py), read in the direct
   it (a split candidate, or apart), and whether the old item's claims were compared with the new items' at all
 """
 from collections import Counter, defaultdict
+from dataclasses import dataclass, field
 
 from .score import classify, key_facts, ranges
 
@@ -81,48 +82,91 @@ def sides(report):
     return {e["id"]: min(side[e["content"]]) for e in report["evidence"]}
 
 def score_comparison(earlier, later, report):
-    """A comparison report (report.json's data) scored against the two revisions' keys (see the module's note)."""
+    """A comparison report (report.json's data) scored against the two revisions' keys (see the module's note): the
+    claims bound to their facts, the findings read, each fact's outcome, the splits, the explanations' kinds."""
     side, keys = sides(report), (earlier, later)
     renames, splits = edits(earlier, later)
+    bound = _bound(report, side, keys, renames)
+    kinds = changes(earlier, later)
+    claims_of = defaultdict(lambda: ([], []))  # fact id: its claims in each revision
+    for claim, s in side.items():
+        for fid in bound[claim]:
+            claims_of[fid][s].append(claim)
+    read = _findings_read(report, side, bound, kinds, splits)
+    detail = _outcomes(report, kinds, claims_of, read)
+    count = lambda kind, status: sum(1 for f in kinds[kind] if detail[f] == status)
+    classes = read.classes
+    differences = sum(classes["different"].values())
+    split_detail = [_split(report, old, new, claims_of, read.of_claim) for old, new in splits]
+    return {"facts": {k: len(v) for k, v in kinds.items()},
+            "changes_found": f"{count('changed', 'reported')}/{len(kinds['changed'])}",
+            "additions_found": f"{count('added', 'reported')}/{len(kinds['added'])}",
+            "removals_found": f"{count('removed', 'reported')}/{len(kinds['removed'])}",
+            "unchanged_confirmed": f"{count('unchanged', 'confirmed')}/{len(kinds['unchanged'])}",
+            "false_changes": count("unchanged", "false change"),
+            "difference_precision": round(classes["different"]["change"] / differences, 4) if differences else None,
+            **{kind: dict(sorted(Counter(detail[f] for f in kinds[kind]).items())) for kind in kinds},
+            "different": dict(sorted(classes["different"].items())),
+            "equivalent": dict(sorted(classes["equivalent"].items())),
+            "findings": dict(sorted(Counter(f["relation"] for f in report["findings"]).items())),
+            "unmatched": len(report["unmatched"]),
+            "pairs": report["retrieval"]["attempted_pairs"], "omitted": report["retrieval"]["omitted_by_pair_limit"],
+            **({"splits": split_detail} if splits else {}),
+            **({"kinds": _explained(read.kinds_found)} if read.kinds_found else {}),
+            "detail": dict(sorted(detail.items()))}
+
+def _bound(report, side, keys, renames):
+    """{claim id: {fact id: outcome}}: the facts each claim is bound to, the later revision's renamed to the
+    earlier's ids."""
     facts = [[f for f in key_facts(k) if not f.relation] for k in keys]
-    bound = {}  # claim id: {fact id: outcome}, the facts it's bound to (the later's renamed to the earlier's ids)
+    bound = {}
     for e in report["evidence"]:
         s = side[e["id"]]
         read = [classify(part, facts[s], keys[s]["printed"]) for part in ranges([e])]
         bound[e["id"]] = {(renames.get(fid, fid) if s else fid): outcome for outcome, fid in read
                           if outcome in BOUND + READ_WRONG}
-    kinds = changes(earlier, later)
+    return bound
+
+@dataclass
+class _Read:
+    """What the findings say: the relations found between each fact's claims (between) and each claim's with any of
+    the other revision's (of_claim), the "different" and "equivalent" findings classed, the kinds explanations named
+    by what their claims are."""
+    between: defaultdict = field(default_factory=lambda: defaultdict(set))
+    of_claim: defaultdict = field(default_factory=lambda: defaultdict(set))
+    classes: dict = field(default_factory=lambda: {"different": Counter(), "equivalent": Counter()})
+    kinds_found: defaultdict = field(default_factory=lambda: defaultdict(Counter))
+
+def _findings_read(report, side, bound, kinds, splits):
     kind_of = {fid: kind for kind, ids in kinds.items() for fid in ids}
-    claims_of = defaultdict(lambda: ([], []))  # fact id: its claims in each revision
-    for claim, s in side.items():
-        for fid in bound[claim]:
-            claims_of[fid][s].append(claim)
-    between = defaultdict(set)   # fact id: relations found between its claims in the two revisions
-    of_claim = defaultdict(set)  # claim id: relations found with any claim of the other revision
-    classes = {"different": Counter(), "equivalent": Counter()}
     split_pairs = {(x, y) for old, new in splits for x in old for y in new}
-    kinds_found = defaultdict(Counter)  # what the claims are: the kinds explanations named
+    out = _Read()
     for finding in report["findings"]:
         a, b = (finding["a"], finding["b"]) if side[finding["a"]] == 0 else (finding["b"], finding["a"])
         relation = finding["relation"]
-        of_claim[a].add(relation)
-        of_claim[b].add(relation)
+        out.of_claim[a].add(relation)
+        out.of_claim[b].add(relation)
         fa, fb = bound[a], bound[b]
         common = fa.keys() & fb.keys()
         for fid in common:
-            between[fid].add(relation)
+            out.between[fid].add(relation)
         what = ("unscored" if not fa or not fb else "across facts" if not common
                 else "misreading" if any(fa[f] in READ_WRONG or fb[f] in READ_WRONG for f in common)
                 else "change" if any(kind_of.get(f) in ("changed", "conditions") for f in common)
                 else "no change")
-        if relation in classes:
-            classes[relation][what] += 1
+        if relation in out.classes:
+            out.classes[relation][what] += 1
         if "explanation" in finding:
             if what == "change" and not any(kind_of.get(f) == "changed" for f in common):
                 what = "conditions"
             elif what == "across facts" and any((x, y) in split_pairs for x in fa for y in fb):
                 what = "split"
-            kinds_found[what][finding["explanation"]["kind"]] += 1
+            out.kinds_found[what][finding["explanation"]["kind"]] += 1
+    return out
+
+def _outcomes(report, kinds, claims_of, read):
+    """{fact id: what the report says of it}, by the fact's kind of change (see the module's note)."""
+    between, of_claim = read.between, read.of_claim
     unmatched = {u["id"] for u in report["unmatched"]}
     settled = {(f["a"], f["b"]) for f in report["findings"] if f.get("settled")}
     detail = {}
@@ -145,41 +189,28 @@ def score_comparison(earlier, later, report):
             detail[fid] = ("unextracted" if not mine else "called equivalent" if "equivalent" in found
                            else "as a change" if "different" in found
                            else "reported" if any(c in unmatched for c in mine) else "other")
-    count = lambda kind, status: sum(1 for f in kinds[kind] if detail[f] == status)
-    differences = sum(classes["different"].values())
-    split_detail = []
-    for old, new in splits:  # was the old item compared with its parts at all?
-        olds = {c for f in old for c in claims_of[f][0]}
-        news = {c for f in new for c in claims_of[f][1]}
-        relations = sorted({r for c in olds for r in of_claim[c]} if olds else set())
-        found = sorted({f["relation"] for f in report["findings"]
-                        if (f["a"] in olds and f["b"] in news) or (f["b"] in olds and f["a"] in news)})
-        viewed = [g["kind"] for g in report.get("groupings", [])
-                  if olds & set(g["earlier_claims"]) and news & set(g["later_claims"])]
-        split_detail.append({"from": old, "to": new, "viewed_as": sorted(set(viewed)), "compared": found,
-                             "old_claims": len(olds), "new_claims": len(news), "old_claims_relations": relations})
+    return detail
+
+def _split(report, old, new, claims_of, of_claim):
+    """A split: whether the old item was compared with its parts at all, and how the groupings viewed it."""
+    olds = {c for f in old for c in claims_of[f][0]}
+    news = {c for f in new for c in claims_of[f][1]}
+    relations = sorted({r for c in olds for r in of_claim[c]} if olds else set())
+    found = sorted({f["relation"] for f in report["findings"]
+                    if (f["a"] in olds and f["b"] in news) or (f["b"] in olds and f["a"] in news)})
+    viewed = [g["kind"] for g in report.get("groupings", [])
+              if olds & set(g["earlier_claims"]) and news & set(g["later_claims"])]
+    return {"from": old, "to": new, "viewed_as": sorted(set(viewed)), "compared": found,
+            "old_claims": len(olds), "new_claims": len(news), "old_claims_relations": relations}
+
+def _explained(kinds_found):
+    """The explanations' kinds scored against what their claims are (EXPECTED), and the value changes' precision."""
     scored = {w: k for w, k in kinds_found.items() if w != "unscored"}
     named_changes = sum(n for k in scored.values() for kind, n in k.items() if kind in VALUE_CHANGES)
-    explained = {"right": sum(n for w, k in scored.items() for kind, n in k.items() if kind in EXPECTED[w]),
-                 "scored": sum(sum(k.values()) for k in scored.values()),
-                 "value_change_precision": round(sum(n for w in ("change", "conditions") for kind, n in
-                                                     kinds_found.get(w, {}).items() if kind in VALUE_CHANGES)
-                                                 / named_changes, 4)
-                 if named_changes else None,
-                 "by_claims": {w: dict(sorted(k.items())) for w, k in sorted(kinds_found.items())}}
-    return {"facts": {k: len(v) for k, v in kinds.items()},
-            "changes_found": f"{count('changed', 'reported')}/{len(kinds['changed'])}",
-            "additions_found": f"{count('added', 'reported')}/{len(kinds['added'])}",
-            "removals_found": f"{count('removed', 'reported')}/{len(kinds['removed'])}",
-            "unchanged_confirmed": f"{count('unchanged', 'confirmed')}/{len(kinds['unchanged'])}",
-            "false_changes": count("unchanged", "false change"),
-            "difference_precision": round(classes["different"]["change"] / differences, 4) if differences else None,
-            **{kind: dict(sorted(Counter(detail[f] for f in kinds[kind]).items())) for kind in kinds},
-            "different": dict(sorted(classes["different"].items())),
-            "equivalent": dict(sorted(classes["equivalent"].items())),
-            "findings": dict(sorted(Counter(f["relation"] for f in report["findings"]).items())),
-            "unmatched": len(report["unmatched"]),
-            "pairs": report["retrieval"]["attempted_pairs"], "omitted": report["retrieval"]["omitted_by_pair_limit"],
-            **({"splits": split_detail} if splits else {}),
-            **({"kinds": explained} if kinds_found else {}),
-            "detail": dict(sorted(detail.items()))}
+    return {"right": sum(n for w, k in scored.items() for kind, n in k.items() if kind in EXPECTED[w]),
+            "scored": sum(sum(k.values()) for k in scored.values()),
+            "value_change_precision": round(sum(n for w in ("change", "conditions") for kind, n in
+                                                kinds_found.get(w, {}).items() if kind in VALUE_CHANGES)
+                                            / named_changes, 4)
+            if named_changes else None,
+            "by_claims": {w: dict(sorted(k.items())) for w, k in sorted(kinds_found.items())}}

@@ -624,71 +624,87 @@ class Statistic:
     detail: str
 
 def summarise(rules, g):
-    """The answer's template applied: [Statistic]."""
+    """The answer's template applied: [Statistic]. A list's entries counted, by category too; a series' or a log's
+    input column's range, then each quantity's extremes, and a series' values at the points asked for, or a log's mean
+    and last value."""
     template, subject = rules.template.strip().lower(), rules.subject or g.title or g.place
     claim = lambda attribute, value, unit="", conditions="": {"entity": subject, "attribute": attribute,
                                                               "value": value, "unit": unit, "conditions": conditions}
-    out, n = [], len(g.rows)
     if template == "list":
-        out.append(Statistic(claim("number of entries", str(n)), list(range(n)), [], True,
-                             f"rows {g.names[0]} to {g.names[-1]} counted"))
-        for c in (_index(g, c) for c in rules.categories):
-            name = header_name(g.labels[c]) or g.columns[c]
-            counts = Counter(row[c] or "(blank)" for row in g.rows).most_common()
-            for value, count in counts[:CATEGORIES]:
-                out.append(Statistic(claim("number of entries", str(count), "", f"{name} = {value}"),
-                                     [i for i, row in enumerate(g.rows) if (row[c] or "(blank)") == value], [c], True,
-                                     f"rows counted by column {g.columns[c]}"))
-            if len(counts) > CATEGORIES:
-                rest = counts[CATEGORIES:]
-                out.append(Statistic(claim("number of entries", str(sum(k for _, k in rest)), "",
-                                           f"{name}: {len(rest)} other values"), [], [c], True,
-                                     f"rows counted by column {g.columns[c]}"))
-        return out
+        return _counted(rules, g, claim)
     x = _index(g, rules.input)
-    xname, xunit = header_name(g.labels[x]) or g.columns[x], header_unit(g.labels[x])
-    at = lambda i: f"at {xname} = {g.rows[i][x]}" + (f" {xunit}" if xunit else "")
+    held, out = _input_range(g, x, template, claim)
+    for q in (_index(g, q) for q in rules.quantities):
+        out += _quantity(rules, g, template, x, q, held, claim)
+    return out
+
+def _counted(rules, g, claim):
+    """A list's statistics: its entries counted, and by each category column's commonest values."""
+    n = len(g.rows)
+    out = [Statistic(claim("number of entries", str(n)), list(range(n)), [], True,
+                     f"rows {g.names[0]} to {g.names[-1]} counted")]
+    for c in (_index(g, c) for c in rules.categories):
+        name = header_name(g.labels[c]) or g.columns[c]
+        counts = Counter(row[c] or "(blank)" for row in g.rows).most_common()
+        for value, count in counts[:CATEGORIES]:
+            out.append(Statistic(claim("number of entries", str(count), "", f"{name} = {value}"),
+                                 [i for i, row in enumerate(g.rows) if (row[c] or "(blank)") == value], [c], True,
+                                 f"rows counted by column {g.columns[c]}"))
+        if len(counts) > CATEGORIES:
+            rest = counts[CATEGORIES:]
+            out.append(Statistic(claim("number of entries", str(sum(k for _, k in rest)), "",
+                                       f"{name}: {len(rest)} other values"), [], [c], True,
+                                 f"rows counted by column {g.columns[c]}"))
+    return out
+
+def _input_range(g, x, template, claim):
+    """(the rows holding an input value, [Statistic]): a series' input range with its step, or a log's span."""
+    n, (xname, xunit) = len(g.rows), (header_name(g.labels[x]) or g.columns[x], header_unit(g.labels[x]))
     if template == "series":
         held = [i for i in range(n) if number(g.rows[i][x]) is not None]
         low = min(held, key=lambda i: number(g.rows[i][x]))
         high = max(held, key=lambda i: number(g.rows[i][x]))
         step, mostly = _step([number(g.rows[b][x]) - number(g.rows[a][x]) for a, b in zip(held, held[1:])])
-        out.append(Statistic(claim(f"{xname} range", f"{g.rows[low][x]} to {g.rows[high][x]}", xunit,
-                                   f"{len(held)} points" + (f", {'mostly ' if mostly else ''}in steps of {step}"
-                                                            if step else "")),
-                             [low, high], [x], False, f"the range of column {g.columns[x]}"))
-    else:
-        held = [i for i in range(n) if (moment(g.rows[i][x]) or number(g.rows[i][x])) is not None]
-        out.append(Statistic(claim(f"{xname} span", f"{g.rows[held[0]][x]} to {g.rows[held[-1]][x]}", xunit,
-                                   f"{len(held)} samples"), [held[0], held[-1]], [x], False,
-                             f"the span of column {g.columns[x]}"))
-    for q in (_index(g, q) for q in rules.quantities):
-        qname, qunit = header_name(g.labels[q]) or g.columns[q], header_unit(g.labels[q])
-        rows = [i for i in held if number(g.rows[i][q]) is not None]
-        if not rows:
-            continue
-        top = max(rows, key=lambda i: number(g.rows[i][q]))
-        bottom = min(rows, key=lambda i: number(g.rows[i][q]))
-        out.append(Statistic(claim(f"maximum {qname}", g.rows[top][q], qunit, at(top)), [top], [x, q], False,
-                             f"the maximum of column {g.columns[q]}"))
-        out.append(Statistic(claim(f"minimum {qname}", g.rows[bottom][q], qunit, at(bottom)), [bottom], [x, q], False,
-                             f"the minimum of column {g.columns[q]}"))
-        if template == "log":
-            values = [number(g.rows[i][q]) for i in rows]
-            places = _decimals([g.rows[i][q] for i in rows]) + 1
-            out.append(Statistic(claim(f"mean {qname}", f"{sum(values) / len(values):.{places}f}", qunit,
-                                       f"over {len(rows)} samples"), rows, [q], True,
-                                 f"the mean of column {g.columns[q]}"))
-            out.append(Statistic(claim(f"last {qname}", g.rows[rows[-1]][q], qunit, at(rows[-1])), [rows[-1]], [x, q],
-                                 False, f"the last value of column {g.columns[q]}"))
-        else:
-            for point in rules.points:
-                wanted = number(point.strip())
-                i = next((i for i in rows if g.rows[i][x] == point.strip()
-                          or (wanted is not None and number(g.rows[i][x]) == wanted)), None)
-                if i is not None:
-                    out.append(Statistic(claim(qname, g.rows[i][q], qunit, at(i)), [i], [x, q], False,
-                                         f"column {g.columns[q]} at {xname} = {g.rows[i][x]}"))
+        return held, [Statistic(claim(f"{xname} range", f"{g.rows[low][x]} to {g.rows[high][x]}", xunit,
+                                      f"{len(held)} points" + (f", {'mostly ' if mostly else ''}in steps of {step}"
+                                                               if step else "")),
+                                [low, high], [x], False, f"the range of column {g.columns[x]}")]
+    held = [i for i in range(n) if (moment(g.rows[i][x]) or number(g.rows[i][x])) is not None]
+    return held, [Statistic(claim(f"{xname} span", f"{g.rows[held[0]][x]} to {g.rows[held[-1]][x]}", xunit,
+                                  f"{len(held)} samples"), [held[0], held[-1]], [x], False,
+                            f"the span of column {g.columns[x]}")]
+
+def _quantity(rules, g, template, x, q, held, claim):
+    """One quantity column's statistics over the rows held: its maximum and minimum, then a log's mean and last value,
+    or a series' values at the points asked for."""
+    xname, xunit = header_name(g.labels[x]) or g.columns[x], header_unit(g.labels[x])
+    at = lambda i: f"at {xname} = {g.rows[i][x]}" + (f" {xunit}" if xunit else "")
+    qname, qunit = header_name(g.labels[q]) or g.columns[q], header_unit(g.labels[q])
+    rows = [i for i in held if number(g.rows[i][q]) is not None]
+    if not rows:
+        return []
+    top = max(rows, key=lambda i: number(g.rows[i][q]))
+    bottom = min(rows, key=lambda i: number(g.rows[i][q]))
+    out = [Statistic(claim(f"maximum {qname}", g.rows[top][q], qunit, at(top)), [top], [x, q], False,
+                     f"the maximum of column {g.columns[q]}"),
+           Statistic(claim(f"minimum {qname}", g.rows[bottom][q], qunit, at(bottom)), [bottom], [x, q], False,
+                     f"the minimum of column {g.columns[q]}")]
+    if template == "log":
+        values = [number(g.rows[i][q]) for i in rows]
+        places = _decimals([g.rows[i][q] for i in rows]) + 1
+        out.append(Statistic(claim(f"mean {qname}", f"{sum(values) / len(values):.{places}f}", qunit,
+                                   f"over {len(rows)} samples"), rows, [q], True,
+                             f"the mean of column {g.columns[q]}"))
+        out.append(Statistic(claim(f"last {qname}", g.rows[rows[-1]][q], qunit, at(rows[-1])), [rows[-1]], [x, q],
+                             False, f"the last value of column {g.columns[q]}"))
+        return out
+    for point in rules.points:
+        wanted = number(point.strip())
+        i = next((i for i in rows if g.rows[i][x] == point.strip()
+                  or (wanted is not None and number(g.rows[i][x]) == wanted)), None)
+        if i is not None:
+            out.append(Statistic(claim(qname, g.rows[i][q], qunit, at(i)), [i], [x, q], False,
+                                 f"column {g.columns[q]} at {xname} = {g.rows[i][x]}"))
     return out
 
 # --- the task
