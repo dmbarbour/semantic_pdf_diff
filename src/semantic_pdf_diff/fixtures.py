@@ -116,11 +116,12 @@ class Fixture:
                                 (_now(), json.dumps(sorted(responders)), replayed, recorded, missing))
 
     def close(self):
-        if self.used and not self.readonly:
-            with self.db:
-                now = _now()
-                self.db.executemany("UPDATE response SET used=? WHERE query=? AND responder=? AND sample=?",
-                                    [(now, *u) for u in sorted(self.used)])
+        if not self.readonly:
+            with self.db:  # the last recipes noted (note_recipe), and which answers were used
+                if self.used:
+                    now = _now()
+                    self.db.executemany("UPDATE response SET used=? WHERE query=? AND responder=? AND sample=?",
+                                        [(now, *u) for u in sorted(self.used)])
         self.used = set()
         self.db.close()
         if self.packed_to is not None:  # packed again when its packed bytes would differ (packing is reproducible):
@@ -169,12 +170,13 @@ class Fixture:
             self.note_recipe(query, recipe)
 
     def note_recipe(self, query, recipe):
-        """A way the pipeline built a query (for summaries; several recipes may build one query)."""
+        """A way the pipeline built a query (for summaries; several recipes may build one query). Not committed
+        alone: with the next answer recorded, or on close. Answers are committed waiting on the disk, a recipe
+        for every answer replayed needn't be (code review 2026-10-08, C2)."""
         if self.readonly:
             return
-        with self.db:
-            self.db.execute("INSERT OR IGNORE INTO recipe VALUES (?, ?, ?, ?, ?, ?, ?)",
-                            (query, *recipe_labels(recipe), json.dumps(list(recipe), default=str)))
+        self.db.execute("INSERT OR IGNORE INTO recipe VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        (query, *recipe_labels(recipe), json.dumps(list(recipe), default=str)))
 
     def prune(self, before, responder=None, dry_run=False, force=False):
         """Drop answers not used (replayed or recorded) since `before` (ISO time), and side-table
@@ -290,7 +292,8 @@ def open(path, mode="read"):  # noqa: A001 (fixtures.open, as the module's reade
     """A fixture, open for one use (code review 2026-10-01, A1: five ways to open one, three working-file
     conventions, and read-only uses that could write):
     - read: to look at; nothing is written. A .zip is read from a temporary copy.
-    - replay: answers served are marked used (prune's guard). A .zip is replayed from a temporary copy.
+    - replay: answers served are marked used (prune's guard). A .zip is replayed from a temporary copy, read-only: there
+      is nothing to mark in a copy removed on close.
     - record: a .sqlite working file, created if missing; a .zip is refused (record, then pack).
     A folder is its own fixture (folder_fixture), whatever the mode."""
     import tempfile
@@ -303,7 +306,9 @@ def open(path, mode="read"):  # noqa: A001 (fixtures.open, as the module's reade
         if mode == "record":
             raise FixtureError(f"{path}: record into a .sqlite fixture, then pack it (pdf-semantic-diff fixtures pack)")
         temp = tempfile.TemporaryDirectory(prefix="fixture-")
-        fixture = Fixture(unpack(path, temp.name), readonly=mode == "read")
+        # read-only in either mode: a replay's marks would go to the copy, removed on close (code review
+        # 2026-10-08, C3)
+        fixture = Fixture(unpack(path, temp.name), readonly=True)
         fixture.temp = temp  # removed when the fixture closes
         return fixture
     return Fixture(path, create=mode == "record", readonly=mode == "read")

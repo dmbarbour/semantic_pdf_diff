@@ -7,6 +7,7 @@ import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 from semantic_pdf_diff import cli
 from test_concurrency import jittery_model, make_pdf
 
@@ -122,9 +123,18 @@ class RecordAndReplay(unittest.TestCase):
         code, live, requests = self.record()
         self.assertGreater(requests, 10)
         self.assertEqual(live['usage']['fixture']['recorded'], requests)
-        replay_code, replayed, _ = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
+        commits, connect = [0], sqlite3.connect
+        def counted(*args, **kwargs):
+            db = connect(*args, **kwargs)
+            db.set_trace_callback(lambda statement: commits.__setitem__(0, commits[0] + (statement == 'COMMIT')))
+            return db
+        with mock.patch('sqlite3.connect', counted):
+            replay_code, replayed, _ = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture), '--fixture-mode', 'replay')
         self.assertEqual(replay_code, code)
         self.assertEqual(self.outcome(replayed), self.outcome(live))
+        # Commits are per task, not per query: the query log and recipes ride along (code review 2026-10-08, C2;
+        # measured 65 commits for 182 answers, 429 before)
+        self.assertLess(commits[0], replayed['usage']['fixture']['replayed'] / 2)
         self.assertEqual(replayed['usage']['api_calls'], 0)
         # Every query replays, including those answered once for several tasks (identical queries,
         # e.g. the same page in both documents, share one answer and are asked once).

@@ -14,7 +14,7 @@
   - `assets/`: rendered crops
   - reports, generated from the database
 - **SQLite:** in the standard library, so no new dependency. WAL mode, so readers work while extraction writes.
-- **Each task's evidence and coverage commit in their own transaction.** A rerun resumes by replaying cached answers.
+- **Each task's evidence and coverage commit in their own transaction.** A rerun resumes by replaying cached answers. How long a commit waits on the disk: [0025](0025-commits-wait-on-the-disk-only-for-peoples-changes.md).
 - **One writer at a time:** an exclusive lock on the folder. A second writer gets "is in use by another process" (`store.StoreInUse`).
   - `Store.open` opens a store read-only, without the lock, so a reader neither waits on a run nor stops one.
 - **Owner-only permissions:** folder `0700`, files `0600`. A store is as sensitive as its sources.

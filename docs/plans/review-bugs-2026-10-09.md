@@ -374,6 +374,7 @@ The owner's answers of 2026-10-09, placed in the agreed order. Each phase is ano
        - Checked: a task's row and claims commit in one transaction (`Store.record_task`). A transaction lost to a power cut is a task asked again, its answer usually still in the fixture.
        - The store: WAL with `synchronous=NORMAL`.
        - The fixture: WAL with NORMAL too, checkpointed before packing. It uses the default rollback journal today, and NORMAL without WAL can corrupt a file on a power cut.
+         - **Built otherwise (2026-10-09):** the fixture kept its rollback journal at FULL, only its recipe notes batched. A read-only connection to a WAL file leaves `-wal` and `-shm` files beside it, and recording commits once per paid answer, little next to the model's answer ([decision 0025](../decisions/0025-commits-wait-on-the-disk-only-for-peoples-changes.md)).
        - The writes people make are committed at FULL: sources added or removed, binding and resets, the reconcile setting, `gc`, and configuration once it's in the store.
        - The diagnostic writes are batched into the next task's transaction.
        - A decision record when it lands.

@@ -280,14 +280,17 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 
 | Finding | Done | Replay of the 8 dev runs | Commit |
 |---|---|---|---|
-| A5 | A page's rotation matrices built once per page object (`pages._matrices`) | 151.0 s to 127.0 s, with A6 and C19 | |
+| A5 | A page's rotation matrices built once per page object (`pages._matrices`) | 151.0 s to 127.0 s, with A6 and C19 | `d7c7e71` |
 | A6 | One text page for a crop's text layer and its blocks (the same flags) | | |
 | C19 | A request's body built only when it's sent (`Request.raw`, on first use) | | |
 | E9 | `@slow` on `RecordedJudging` and `UnderTheNull`. `test_fixtures`' recordings left as they are: 4.8 s of a 7.5 s test is commits, which C2 removes | | |
 | E6 | The boundary test walks subpackages (`vendor/`, `eval/rounds`) | | |
 | E18 | `stubs.needs_lab()`: product tests building input with the lab's generators skip without it (13 tests) | | |
 | C14 | `recipes.py`: `Recipe`, its shared slots read by name (role, region, content, task, label), `RECIPES` and `recipe_fields` moved there; stored recipes and fixture labels unchanged | | |
-| Small copies | Locators by lines share `InLines.bbox`; `Judgment` and `Explanation` share `DropsUnknown`; schemas unchanged. `_filled`, `_joined` and `_plain` wait for `tablegrid.py` (architecture item 6), their owner | | |
+| Small copies | Locators by lines share `InLines.bbox`; `Judgment` and `Explanation` share `DropsUnknown`; schemas unchanged. `_filled`, `_joined` and `_plain` wait for `tablegrid.py` (architecture item 6), their owner | `d7c7e71` |
+| E1 | The controlled scorer's words, vocabularies, rarity, units and fact numbers cached on what they're made from; a claim's names weighed once per claim, not per fact. Results identical (every run, by reader too); `controlled.py score` 401 s to 67 s, its scoring 155 s to 22 s | (lab only) | |
+| C2 | The store commits at NORMAL and people's changes at FULL; the query log and the fixture's recipes ride in the next transaction; a test bounds commits per replay (65 for 182 answers; 429 before). The fixture keeps its rollback journal at FULL, unlike the plan's WAL: see [decision 0025](../decisions/0025-commits-wait-on-the-disk-only-for-peoples-changes.md). Store tables after a run identical; the suite 136 s to 113 s (`test_fixtures` 161 s to 61 s) | 127.0 s to 97.9 s, with C3 | |
+| C3 | A zipped fixture replayed from a read-only copy | | |
 
 **Status, 2026-10-09:** every finding in *Bugs and risks* is fixed. The [remediation plan](../plans/review-bugs-2026-10-09.md)'s six items are done.
 

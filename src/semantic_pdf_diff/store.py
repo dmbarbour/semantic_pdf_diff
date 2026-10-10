@@ -17,6 +17,7 @@ that has gained a reader): its tasks are made again, and those whose queries did
 import json
 import os
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
 from .levers import ALL_REGIONS, TEXTUAL, VISUAL, declared, setting_regions  # noqa: F401 (region names, for callers)
 from .regions import crops_of, region_of  # noqa: F401 (region_of, for callers)
@@ -175,6 +176,10 @@ class Store:
         self.db = sqlite3.connect(path)
         os.chmod(path, 0o600)
         self.db.execute("PRAGMA journal_mode=WAL")
+        # A commit doesn't wait on the disk, but for the changes people make (_durable): a power cut, not a crash,
+        # may lose a run's last tasks, which the next run asks again, their answers usually in the fixture
+        # (code review 2026-10-08, C2; decision 0025).
+        self.db.execute("PRAGMA synchronous=NORMAL")
         self.db.execute("PRAGMA foreign_keys=ON")
         if new:
             with self.db:
@@ -205,6 +210,7 @@ class Store:
         return self
 
     def close(self):
+        self.db.commit()  # the query log's last rows (note_query)
         self.db.close()
         if self._lock is not None:
             self._lock.close()
@@ -214,6 +220,18 @@ class Store:
 
     def __exit__(self, *exc):
         self.close()
+
+    @contextmanager
+    def _durable(self):
+        """A transaction of a change people make (sources, binding and resets, the reconcile setting, gc), committed
+        waiting on the disk (synchronous FULL); the rest commit at NORMAL (see __init__)."""
+        self.db.commit()  # what's pending (the query log) commits first, as it would have
+        self.db.execute("PRAGMA synchronous=FULL")
+        try:
+            with self.db:
+                yield
+        finally:
+            self.db.execute("PRAGMA synchronous=NORMAL")
 
     # --- interpreter binding -------------------------------------------------
     def interpreter(self, role):
@@ -227,7 +245,7 @@ class Store:
         row = self.db.execute("SELECT description FROM interpreter WHERE role=?", (interpreter.role,)).fetchone()
         if row is None:
             if not dry_run:
-                with self.db:
+                with self._durable():
                     self.db.execute("INSERT INTO interpreter VALUES (?, ?)", (interpreter.role, json.dumps(new)))
             return {}
         differences = interpreter_differences(json.loads(row[0]), new)
@@ -278,7 +296,7 @@ class Store:
             "regions": regions,
         }
         if not dry_run:
-            with self.db:
+            with self._durable():
                 self.db.execute(f"DELETE FROM task WHERE region IN ({marks})", regions)
                 self.db.execute(f"DELETE FROM evidence WHERE region IN ({marks})", regions)
                 if not keep_comparisons:
@@ -296,7 +314,7 @@ class Store:
             "regions": ["situating"],
         }
         if not dry_run:
-            with self.db:
+            with self._durable():
                 self.db.execute("DELETE FROM situation")
                 for content, sid, data in self.db.execute("SELECT content, id, data FROM section").fetchall():
                     plain = Section.model_validate_json(data).model_copy(
@@ -313,7 +331,7 @@ class Store:
         exists = self.source(source.name) is not None
         if exists and not replace:
             raise StoreError(f"source {source.name!r} is already declared; use 'source update' or another name")
-        with self.db:
+        with self._durable():
             self.db.execute("INSERT INTO source (name, data, manifest_hash) VALUES (?, ?, ?) "
                             "ON CONFLICT(name) DO UPDATE SET data=excluded.data, manifest_hash=excluded.manifest_hash",
                             (source.name, source.model_dump_json(), manifest_hash))
@@ -331,7 +349,7 @@ class Store:
 
     def remove_source(self, name):
         """Unregister a source; its content stays until gc finds it orphaned."""
-        with self.db:
+        with self._durable():
             removed = self.db.execute("DELETE FROM source WHERE name=?", (name,)).rowcount
         if not removed:
             raise StoreError(f"no source named {name!r}")
@@ -354,7 +372,7 @@ class Store:
             if tuple(json.loads(key)) in reuse:
                 reuse[tuple(json.loads(key))][2] = [tuple(i) for i in found]
         result = scan(source.roots, limits or Limits(), reuse, describe)
-        with self.db:
+        with self._durable():
             self.db.execute("DELETE FROM file WHERE source=?", (name,))
             for f in result.files:
                 self.db.execute("INSERT OR IGNORE INTO content (id, size) VALUES (?, ?)", (f.content, f.size))
@@ -461,7 +479,7 @@ class Store:
         if bool(on) == self.reconciles():
             return {}
         cleared = self.clear_situating() if self.db.execute("SELECT COUNT(*) FROM situation").fetchone()[0] else {}
-        with self.db:
+        with self._durable():
             self.db.execute("INSERT OR REPLACE INTO meta VALUES ('reconcile', ?)", ("1" if on else "0",))
         return cleared
 
@@ -491,13 +509,13 @@ class Store:
                             (key, kind, region, query, response, content))
 
     def note_query(self, query, recipe, prompt, images):
-        """Log a query's recipe and text (diagnostics: what a task was asked)."""
+        """Log a query's recipe and text (diagnostics: what a task was asked). Not committed alone: the row is
+        committed with the next transaction, or on close (code review 2026-10-08, C2: half a replay's commits)."""
         from .fixtures import recipe_labels
         digest, role, region, content, task = recipe_labels(recipe)
-        with self.db:
-            self.db.execute("INSERT OR IGNORE INTO query VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                            (query, json.dumps(list(recipe), default=str), role, region, content, task, prompt,
-                             json.dumps(list(images))))
+        self.db.execute("INSERT OR IGNORE INTO query VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                        (query, json.dumps(list(recipe), default=str), role, region, content, task, prompt,
+                         json.dumps(list(images))))
 
     def queries(self, content=None, task=None, role=None):
         """Logged queries: [{hash, recipe, role, region, content, task, prompt, images}], latest last."""
@@ -554,7 +572,7 @@ class Store:
             summary["cached_responses"] = self.db.execute(
                 f"SELECT COUNT(*) FROM response_cache WHERE content IN ({marks})", orphans).fetchone()[0]
             if not dry_run:
-                with self.db:
+                with self._durable():
                     for table in ("evidence", "task", "section", "situation", "response_cache", "query"):
                         self.db.execute(f"DELETE FROM {table} WHERE content IN ({marks})", orphans)
                     self.db.execute(f"DELETE FROM content WHERE id IN ({marks})", orphans)
