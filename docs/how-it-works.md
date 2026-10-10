@@ -104,6 +104,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `xlsxdocs.py` | Excel workbooks and CSV files read into the text reader's form: sheets as pages, regions and the sheet map, cells as Excel shows them (a CSV's as written), tables on the grid |
 | `tablegrid.py` | A table as rules see it, the one owner of its grid: columns, header labels and units, section rows, cells' values as shown; readers' cells placed on a grid |
 | `office.py` | What Word, PowerPoint and Excel files share: their package, the XML namespaces, EMUs, list numbers |
+| `asking.py` | The exchange the table queries hold with the model: ask, check, ask again once, review until kept or capped |
 | `tablerules.py` | A table read by rules a model writes for it: the column analysis and our opinion it's shown, the rules applied to every row and checked, the summary templates |
 | `tablestructure.py` | A PDF table's lines grouped into rows by rules a model writes where the heuristics leave suspects: the signals, the rules applied and checked against rows copied from the image |
 | `chartxml.py` | Charts stored as chart XML (Word's and PowerPoint's): their cached series as tables, values in their number formats |

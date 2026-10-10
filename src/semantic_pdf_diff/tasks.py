@@ -168,6 +168,20 @@ class TaskCore:
         self.coverage.sort(key=sort)
         return merge_occurrences(self.evidence), self.coverage
 
+    def ask(self, role, name, prompt, schema, images, finish):
+        """Ask a table query (the rules, structure and key-value queries, their reviews) for a schema object, its images
+        relative to the output folder: finish(answer, error) is called when it's answered, the pending count kept
+        (code review 2026-10-08, architecture 5: four copies of this)."""
+        key = (role, "table", self.content, name, hashlib.sha256(prompt.encode()).hexdigest())
+
+        def done(answer, error):
+            self.state["pending"] -= 1
+            finish(answer, error)
+
+        self.progress.add()
+        self.state["pending"] += 1
+        self.dispatch.submit(prompt, schema, [self.output / x for x in images], key, done)
+
     def follow(self, entry, page_no, bbox, task, region):
         """Record a repeated block from its first occurrence's result, without a model call."""
         note = f"identical to {entry['task']} on page {entry['page']}; not re-sent"

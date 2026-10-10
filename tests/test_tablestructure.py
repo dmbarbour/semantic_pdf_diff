@@ -3,7 +3,9 @@ import unittest
 from types import SimpleNamespace
 
 import stubs  # noqa: F401 (a clean environment)
+from functools import partial
 from semantic_pdf_diff import tablestructure as ts
+from semantic_pdf_diff.tasks import TaskCore
 
 HEADER = ["Camera", "UV", "IR"]
 BODY = [["FOV", "10.2", "3.8"], ["Detector", "1×1", "1×1"], ["", "CCD201", "LMAPD"], ["Spectrometer", "7", "40"],
@@ -170,6 +172,8 @@ class CutWords(unittest.TestCase):
                                progress=SimpleNamespace(add=lambda: None, finish=lambda status: None),
                                dispatch=SimpleNamespace(submit=submit), s=SimpleNamespace(reviews_tables=lambda: 0),
                                record=lambda row, claims: None)
+
+        core.ask = partial(TaskCore.ask, core)  # the task core's protocol, on the fake
         out = {}
         ts.read(core, 1, "structure:p1:0", self.HEADER, [self.BODY[0]], BOXES[:1], None, None, lambda: [],
                 lambda parts, step, apart, table: out.update(parts=parts), {0: {3}, 1: set()})
@@ -190,6 +194,8 @@ class Asked(unittest.TestCase):
                                progress=SimpleNamespace(add=lambda: None, finish=lambda status: None),
                                dispatch=SimpleNamespace(submit=submit), s=SimpleNamespace(reviews_tables=lambda: review),
                                record=lambda row, claims: recorded.append(row))
+
+        core.ask = partial(TaskCore.ask, core)  # the task core's protocol, on the fake
         ts.read(core, 4, "structure:p4:0", HEADER, BODY, BOXES, None, [10, 20, 40, 60, 80], lambda: ["assets/t.png"],
                 lambda parts, step, apart, table: out.update(parts=parts, step=step, apart=apart, table=table))
         return asked, recorded, out

@@ -14,7 +14,6 @@ model (likely vision) to confirm the proposed 'rule' for reading a table"):
   not reached (the call limit, an answer a replay lacks), recorded so and asked on the next run, the block unread.
 - **Traced:** each claim's derivation has a "key-value-check" step saying what the model answered, or that it didn't.
 """
-import hashlib
 
 from pydantic import Field
 
@@ -74,7 +73,6 @@ def read(core, page, g, task, boxes, as_table, as_pairs, image=None):
     span = (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
     context = core.reader.for_table(page, span, " ".join(g.labels))
     prompt = question(g, context, bool(image))
-    key = ("key-value", "table", core.content, task, hashlib.sha256(prompt.encode()).hexdigest())
 
     def record(status, issue):
         core.record(coverage_row(content=core.content, page=page, bbox=list(span), task=task, status=status,
@@ -82,7 +80,6 @@ def read(core, page, g, task, boxes, as_table, as_pairs, image=None):
         core.progress.finish(status)
 
     def finish(answer, error):
-        core.state["pending"] -= 1
         if isinstance(error, (CallLimitReached, NotRecorded)):  # nothing learnt: the next run asks again
             return record("not_reached", str(error))
         reading = answer.reading.strip().lower() if error is None else ""
@@ -98,6 +95,4 @@ def read(core, page, g, task, boxes, as_table, as_pairs, image=None):
         record("partial", f"Read as a key-value list, our proposal, not confirmed ({said})")
         as_pairs(DerivationStep(step="key-value-check", detail="a key-value list, our proposal, not confirmed"), context)
 
-    core.progress.add()
-    core.state["pending"] += 1
-    core.dispatch.submit(prompt, Check, [core.output / image] if image else [], key, finish)
+    core.ask("key-value", task, prompt, Check, [image] if image else [], finish)

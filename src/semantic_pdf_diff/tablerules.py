@@ -32,13 +32,13 @@ to produce claims from rows or how to summarize things within a few known templa
 - **Claims made mechanically** quote the cells they came from, and their derivation names the rules ("table-rules")
   or the template ("table-summary"; a mean or a count is computed, its quote the column's header).
 """
-import hashlib
 import re
 from collections import Counter
 from dataclasses import dataclass, field
 
 from pydantic import Field, field_validator
 
+from .asking import Asking
 from .schema import DerivationStep, Evidence, Lenient, claim_id, coverage_row
 from .tablegrid import (header_name, header_unit, kind, moment, noted, number, plain as _plain,
                         possible_notes)
@@ -720,7 +720,6 @@ def read(core, page, g, task, by_itself, source, image=None):
     the grid holds it. Possible notes (possible_notes) are read by themselves where the model names them as notes,
     and where there's no answer to say. source: the reader's first derivation step (or its steps, as a list). image:
     the table's crop (a PDF's), sent with the query, which then copies a row from it to check the text layer."""
-    from .failures import CallLimitReached, NotRecorded
     cols = analyse(g)
     if g.boxes:  # a PDF's rows: their own boxes
         span = (min(b[0] for b in g.boxes), min(b[1] for b in g.boxes), max(b[2] for b in g.boxes),
@@ -732,18 +731,6 @@ def read(core, page, g, task, by_itself, source, image=None):
         row_box = lambda i: (0.0, float(g.lines[i]), 1.0, float(g.lines[i] + 1))
     images = [image] if image else []
     asked = question(g, cols, core.reader.for_table(page, span, " ".join(g.labels))) + ("\n" + IMAGED if image else "")
-
-    def ask(prompt, attempt, then):
-        name = task + (":again" if attempt else "")
-        key = ("table-rules", "table", core.content, name, hashlib.sha256(prompt.encode()).hexdigest())
-
-        def finish(answer, error):
-            core.state["pending"] -= 1
-            then(name, answer, error)
-
-        core.progress.add()
-        core.state["pending"] += 1
-        core.dispatch.submit(prompt, Rules, [core.output / x for x in images], key, finish)
 
     def record(name, status, issues, found=()):
         row = coverage_row(content=core.content, page=page, bbox=list(span), task=name, status=status,
@@ -764,79 +751,65 @@ def read(core, page, g, task, by_itself, source, image=None):
             by_itself(r.key)
         return f"; notes read by themselves: rows {', '.join(r.name for r in notes)}" if notes else ""
 
-    def first_answer(name, answer, error):
-        if error is not None:
-            return failed(name, error)
-        g_, notes = noted(g, answer.notes)
-        if image:  # the vision check (the one table model's decision 1): a row copied from the image
-            mismatch = transcription_mismatch(answer, g)
-            if mismatch:
-                return record(name, "partial", [everyone(name, f"the image and the text layer disagree ({mismatch})",
-                                                         notes)[:500]])
-        wrong = problems(answer, g_, cols)
-        if not wrong:
-            return reviewed(name, answer)
-        record(name, "partial", [f"The rules asked again: {'; '.join(wrong)}"[:500]])
-        again = (asked + "\nYOUR EARLIER ANSWER:\n" + answer.model_dump_json(exclude_defaults=True)
-                 + "\nITS PROBLEMS:\n" + "\n".join(f"- {w}" for w in wrong) + "\nAnswer again, mending them.")
-        ask(again, 1, second_answer)
+    class Rules_(Asking):  # the exchange (asking.py), its hooks this query's
+        schema, review_schema, role, review_role, what = Rules, Review, "table-rules", "table-review", "rules"
 
-    def second_answer(name, answer, error):
-        if error is not None:
-            return failed(name, error)
-        g_, notes = noted(g, answer.notes)
-        wrong = problems(answer, g_, cols)
-        if wrong:
-            return record(name, "partial", [everyone(name, "the rules failed twice (" + "; ".join(wrong) + ")",
-                                                     notes)[:500]])
-        reviewed(name, answer)
+        def record(self, name, status, issues):
+            record(name, status, issues)
 
-    def reviewed(name, answer, round_=1, notes=()):
-        """The rules' outcome shown to the model, again after each revision that passes the checks, until it keeps
-        its rules or the cap (table_review) is reached; the last rules passing the checks are used (the owner,
-        2026-10-07: "a cap of e.g. 10 will surely be safe ... just keeping the last revision")."""
-        cap = int(REVIEW) if REVIEW is not None else core.s.reviews_tables()
-        if round_ > cap or answer.reading.strip().lower() not in ("rules", "summary"):
-            return use(name, answer, list(notes))
-        prompt = review_question(asked, answer, noted(g, answer.notes)[0])
-        suffix = ":review" + (str(round_) if round_ > 1 else "")
-        key = ("table-review", "table", core.content, name + suffix, hashlib.sha256(prompt.encode()).hexdigest())
-        revised = round_ - 1
-        done = lambda: f"revised {revised} time{'s' if revised != 1 else ''}" if revised else "kept"
+        def check(self, answer):
+            return problems(answer, noted(g, answer.notes)[0], cols), None
 
-        def finish(result, error):
-            core.state["pending"] -= 1
-            core.progress.finish("failed" if error is not None else "complete")  # each review asked, finished once
-            if error is not None or result is None:  # (code review 2026-10-08, B6: never, so totals never closed)
-                return use(name, answer, list(notes) + [f"Not reviewed: {error}"[:300]], done() if revised else
-                           "not reviewed")
-            if result.verdict.strip().lower() != "revise" or result.rules is None:
-                return use(name, answer, list(notes) + ["Reviewed: kept"], done())
-            if not result.rules.notes:  # a revision silent on the notes keeps the ones named before
-                result.rules.notes = answer.notes
+        def settled(self, name, answer, wrong, first):
+            if first and image:  # the vision check (the one table model's decision 1): a row copied from the image
+                mismatch = transcription_mismatch(answer, g)
+                if mismatch:
+                    record(name, "partial", [everyone(name, f"the image and the text layer disagree ({mismatch})",
+                                                      noted(g, answer.notes)[1])[:500]])
+                    return True
+            return False
+
+        def fallback(self, name, answer, wrong):
+            record(name, "partial", [everyone(name, "the rules failed twice (" + "; ".join(wrong) + ")",
+                                              noted(g, answer.notes)[1])[:500]])
+
+        def not_reached(self, name, error):
+            record(name, "not_reached", [str(error)])
+
+        def failed(self, name, error):
+            record(name, "failed", [everyone(name, f"the rules query failed ({error})")[:500]])
+
+        def cap(self):
+            return int(REVIEW) if REVIEW is not None else core.s.reviews_tables()
+
+        def reviewable(self, answer):
+            return answer.reading.strip().lower() in ("rules", "summary")
+
+        def review_name(self, named, round_):  # the answer reviewed's task: "<task>:again:review" for the second
+            return named + ":review" + (str(round_) if round_ > 1 else "")
+
+        def review_prompt(self, answer, applied):
+            return review_question(asked, answer, noted(g, answer.notes)[0])
+
+        def revision(self, result):
+            return result.rules
+
+        def prepare(self, revision, answer):
+            if not revision.notes:  # a revision silent on the notes keeps the ones named before
+                revision.notes = answer.notes
+
+        def unchanged(self, revision, answer):
             same = lambda r: r.model_dump(exclude={"why", "binding", "examples", "transcribed"})
-            if same(result.rules) == same(answer):  # a revision changing nothing: shown again, it'd repeat itself
-                return use(name, answer, list(notes) + [f"Reviewed: a revision changing nothing ({'; '.join(result.problems)}), "
-                                                        "kept"[:400]], done())
-            wrong = problems(result.rules, noted(g, result.rules.notes)[0], cols)
-            if wrong:
-                return use(name, answer, list(notes) + [f"Reviewed: a revision with problems ({'; '.join(wrong)}), "
-                                                        "the last rules passing the checks kept"[:400]],
-                           done() + ", its next revision failing the checks")
-            note = f"Reviewed: revised ({'; '.join(result.problems)})"[:400]
-            if round_ >= cap:
-                return use(name, result.rules, list(notes) + [note, f"Review cap ({cap}) reached: the last revision used"],
-                           f"revised {round_} time{'s' if round_ != 1 else ''}, the cap reached")
-            reviewed(name, result.rules, round_ + 1, list(notes) + [note])
+            return same(revision) == same(answer)
 
-        core.progress.add()
-        core.state["pending"] += 1
-        core.dispatch.submit(prompt, Review, [core.output / x for x in images], key, finish)
+        def unchanged_note(self, result):
+            return f"Reviewed: a revision changing nothing ({'; '.join(result.problems)}), " "kept"[:400]
 
-    def failed(name, error):
-        if isinstance(error, (CallLimitReached, NotRecorded)):  # nothing learnt: the next run asks again
-            return record(name, "not_reached", [str(error)])
-        record(name, "failed", [everyone(name, f"the rules query failed ({error})")[:500]])
+        def cap_note(self, cap):
+            return f"Review cap ({cap}) reached: the last revision used"
+
+        def use(self, named, answer, applied, notes, review):
+            use(named, answer, notes, review)
 
     def use(name, answer, issues, review=""):
         reading = answer.reading.strip().lower()
@@ -881,7 +854,7 @@ def read(core, page, g, task, by_itself, source, image=None):
                    + (f"; {len(misfits)} rows read by themselves" if misfits else "") + read_notes(notes) + why)
         record(name, "complete", [summary[:500]] + issues[:8], found)
 
-    ask(asked, 0, first_answer)
+    Rules_(core, task, asked, images).start()
 
 def _evidence(core, page, box, task, fields, quote, verified, derivation, approximate=False):
     from .schema import Claim

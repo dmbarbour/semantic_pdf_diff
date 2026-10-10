@@ -10,13 +10,13 @@ named, and an action: ACTIONS) and two or three lines as it reads them in the im
 examples are compared with what the rules give, a mismatch is shown back once, and the outcome is reviewed ("is this
 your final answer", up to table_review times) as claims rules are. Failing, the heuristics' parts are kept.
 """
-import hashlib
 import re
 import statistics
 
 from pydantic import Field, field_validator
 
 from .schema import DerivationStep, Lenient, coverage_row
+from .asking import Asking
 from .tablegrid import filled as _filled, joined as _joined, letter, plain as _plain
 
 UNIT = re.compile(r"^[(\[]?\s*(µm|μm|nm|mm|cm|m|km|in|ft|mas|%|°|°c|°f|k|w|kw|mw|hp|gpm|psi|psig|rpm|kg|lb|s|ms|hz|khz|"
@@ -442,7 +442,6 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
     left it), apart the body lines read by themselves ("not table"), table False where the model reads no table
     (rules leaving no rows: a chart, a floor plan). images: a callable giving the table's crop(s), relative to the
     output folder, rendered only for a part that's asked."""
-    from .failures import CallLimitReached, NotRecorded
     tags = signals(header, body, boxes, styles, rules, cuts)
     flagged = [i + 1 for i, (t, row) in enumerate(zip(tags, body)) if suspect(t, row)]
     if cuts and cuts.get(0):  # the header's words cut by a column line
@@ -456,17 +455,6 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
                              signals=", ".join(f'"{s}"' for s in SIGNALS), worst="H" if worst == 0 else worst)
     span = boxes and all(boxes) and (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes),
                                      max(b[3] for b in boxes))
-
-    def ask(prompt, name, model, role, finish):
-        key = (role, "table", core.content, name, hashlib.sha256(prompt.encode()).hexdigest())
-
-        def done(answer, error):
-            core.state["pending"] -= 1
-            finish(answer, error)
-
-        core.progress.add()
-        core.state["pending"] += 1
-        core.dispatch.submit(prompt, model, [core.output / x for x in images], key, done)
 
     def record(name, status, issues):
         core.record(coverage_row(content=core.content, page=page, bbox=list(span) if span else None, task=name,
@@ -488,63 +476,47 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
             return applied.unsupported[:3], None
         return example_mismatches(answer, applied, body, worst), applied
 
-    def first(answer, error):
-        if error is not None:
-            return failed(task, error)
-        wrong, applied = check(answer)
-        if not wrong:
-            return review(task, answer, applied)
-        if wrong == [NO_ROWS]:  # the model reads no table here: asking again won't change that
-            return heuristic(task, "complete", f"{NO_ROWS} ({answer.why or 'no reason given'})", table=False)
-        again = (asked + "\nYOUR EARLIER ANSWER:\n" + answer.model_dump_json(exclude_defaults=True)
-                 + "\nITS PROBLEMS:\n" + "\n".join(f"- {w}" for w in wrong) + "\nAnswer again, mending them.")
-        record(task, "partial", [f"The structure asked again: {'; '.join(wrong)}"[:500]])
-        ask(again, task + ":again", Structure, "table-structure", second)
+    class Structure_(Asking):  # the exchange (asking.py), its hooks this query's
+        schema, review_schema, what = Structure, StructureReview, "structure"
+        role, review_role = "table-structure", "table-structure-review"
 
-    def second(answer, error):
-        if error is not None:
-            return failed(task + ":again", error)
-        wrong, applied = check(answer)
-        if wrong == [NO_ROWS]:  # as for the first answer (code review 2026-10-08, B10: read as a table regardless)
-            return heuristic(task + ":again", "complete", f"{NO_ROWS} ({answer.why or 'no reason given'})", table=False)
-        if wrong:
-            return heuristic(task + ":again", "partial", "the rules failed twice (" + "; ".join(wrong) + ")")
-        review(task + ":again", answer, applied)
+        def record(self, name, status, issues):
+            record(name, status, issues)
 
-    # named: the task whose answer is used ("<task>:again" for the second), so a task's row is recorded once
-    # (code review 2026-10-08, B7: the first's tag was recorded partial, then complete)
-    def review(named, answer, applied, round_=1, notes=()):
-        cap = core.s.reviews_tables()
-        if round_ > cap or not answer.rules:
-            return use(named, answer, applied, list(notes))
-        prompt = review_question(asked, answer, applied, header, body, tags)
-        name = task + ":review" + (str(round_) if round_ > 1 else "")
+        def check(self, answer):
+            return check(answer)
 
-        def finish(result, error):
-            core.progress.finish("failed" if error is not None else "complete")  # each review asked, finished once
-            if error is not None or result is None:  # (code review 2026-10-08, B6: never, so totals never closed)
-                return use(named, answer, applied, list(notes) + [f"Not reviewed: {error}"[:300]])
-            if result.verdict.strip().lower() != "revise" or result.structure is None:
-                return use(named, answer, applied, list(notes) + ["Reviewed: kept"])
-            same = lambda s: [r.model_dump(exclude={"why"}) for r in s.rules]
-            if same(result.structure) == same(answer):
-                return use(named, answer, applied, list(notes) + ["Reviewed: a revision changing nothing, kept"])
-            wrong, revised = check(result.structure)
-            if wrong:
-                return use(named, answer, applied, list(notes) + [
-                    f"Reviewed: a revision with problems ({'; '.join(wrong)}), the last rules passing the checks kept"[:400]])
-            note = f"Reviewed: revised ({'; '.join(result.problems)})"[:400]
-            if round_ >= cap:
-                return use(named, result.structure, revised, list(notes) + [note, f"Review cap ({cap}) reached"])
-            review(named, result.structure, revised, round_ + 1, list(notes) + [note])
+        def settled(self, name, answer, wrong, first):
+            if wrong == [NO_ROWS]:  # the model reads no table here: asking again won't change that (on the second
+                heuristic(name, "complete", f"{NO_ROWS} ({answer.why or 'no reason given'})", table=False)  # too, B10)
+                return True
+            return False
 
-        ask(prompt, name, StructureReview, "table-structure-review", finish)
+        def fallback(self, name, answer, wrong):
+            heuristic(name, "partial", "the rules failed twice (" + "; ".join(wrong) + ")")
 
-    def failed(name, error):
-        if isinstance(error, (CallLimitReached, NotRecorded)):
+        def not_reached(self, name, error):
             record(name, "not_reached", [str(error)])
-            return then([(header, body, boxes)], None, [], True)
-        heuristic(name, "failed", f"the structure query failed ({error})")
+            then([(header, body, boxes)], None, [], True)
+
+        def failed(self, name, error):
+            heuristic(name, "failed", f"the structure query failed ({error})")
+
+        def reviewable(self, answer):
+            return bool(answer.rules)
+
+        def review_prompt(self, answer, applied):
+            return review_question(asked, answer, applied, header, body, tags)
+
+        def revision(self, result):
+            return result.structure
+
+        def unchanged(self, revision, answer):
+            same = lambda s: [r.model_dump(exclude={"why"}) for r in s.rules]
+            return same(revision) == same(answer)
+
+        def use(self, named, answer, applied, notes, review):
+            use(named, answer, applied, notes)
 
     def use(named, answer, applied, notes):
         said = describe(applied) or "every line a row as it is"
@@ -553,4 +525,4 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
         step = DerivationStep(step="table-structure", detail=f"by rules a model wrote: {said}"[:400])
         then(applied.parts, step, applied.apart, True)
 
-    ask(asked, task, Structure, "table-structure", first)
+    Structure_(core, task, asked, images).start()
