@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = Path(__file__).with_name("slices.json")
 # The settings every recording shares (they shape the queries, so they decide which answers replay).
-BASE_SETTINGS = {"claims_per_request": 20, "output_tokens": 4000, "context_tokens": 262144, "image_tokens": 300}
+from semantic_pdf_diff_lab.bench.recording import BASE_SETTINGS  # noqa: E402 (every recording's)
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
@@ -69,7 +69,7 @@ def main(argv=None):
     worst = 0
     from semantic_pdf_diff import ledger
     tags = dict(t.split("=", 1) for t in args.tag)
-    spent_before = ledger.spent(args.ledger, **tags) if args.ledger and args.ledger.exists() else 0.0
+    spent_before = ledger.spent(args.ledger, **tags) if args.ledger else 0.0
     for run in runs:
         a, b = (ROOT / "samples/slices" / f"{name}.pdf" for name in run["slices"])
         command = [str(a), str(b), "--config", str(config), "-q"] + (["--no-situate"] if args.extract_only else [])
@@ -83,7 +83,7 @@ def main(argv=None):
         if args.replay:
             overrides["base_url"] = pipeline.NO_MODEL
         if args.max_cost:  # a cap for the whole recording, not per slice (each run's client starts at 0)
-            spent = (ledger.spent(args.ledger, **tags) - spent_before) if args.ledger and args.ledger.exists() else 0.0
+            spent = (ledger.spent(args.ledger, **tags) - spent_before) if args.ledger else 0.0
             left = args.max_cost - spent
             if left <= 0:
                 print(f"{run['name']}: cap of ${args.max_cost} reached", flush=True)

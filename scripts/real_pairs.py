@@ -21,10 +21,11 @@ WORKING = FOLDER / "fixture.sqlite"   # recorded answers (git-ignored); packed i
 PACKED = FOLDER / "replay.zip"
 SETTINGS = FOLDER / "settings.json"   # every setting that shapes a query, resolved when first recorded (committed)
 RUNS = ROOT / "benchmarks/runs/real-pairs"
-LEDGER = ROOT / "benchmarks/ledger.jsonl"
+from semantic_pdf_diff_lab.bench import recording  # noqa: E402
+LEDGER = ROOT / recording.LEDGER
 SAMPLES = ROOT / "samples"
 # The settings recordings share (scripts/record_runs.py, scripts/controlled.py).
-BASE_SETTINGS = {"claims_per_request": 20, "output_tokens": 4000, "context_tokens": 262144, "image_tokens": 300}
+BASE_SETTINGS = recording.BASE_SETTINGS  # the settings recordings share: they shape the queries
 # pair: (earlier, later), paths under samples/
 PAIRS = {
     "quic-34-rfc9000": ("ietf-quic-transport/draft-ietf-quic-transport-34.txt", "ietf-quic-transport/rfc9000.txt"),
@@ -57,7 +58,7 @@ def main(argv=None):
         from semantic_pdf_diff.progress import setup_logging
         setup_logging(quiet=True)
         config = settings_file()
-        before = ledger.spent(LEDGER, round="real-pairs") if LEDGER.exists() else 0.0
+        before = ledger.spent(LEDGER, round="real-pairs")
         out = RUNS / ("replay" if args.replay else "recorded")
         responder = None
         if args.replay:

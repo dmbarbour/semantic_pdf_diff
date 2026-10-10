@@ -19,7 +19,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 FOLDER = ROOT / "benchmarks/eyetest"
-LEDGER = ROOT / "benchmarks/ledger.jsonl"
+from semantic_pdf_diff_lab.bench import recording  # noqa: E402
+LEDGER = ROOT / recording.LEDGER
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])

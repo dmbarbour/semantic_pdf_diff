@@ -17,7 +17,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 FOLDER = ROOT / "benchmarks/pagetest"
 EYES = ROOT / "benchmarks/eyetest/results.json"
-LEDGER = ROOT / "benchmarks/ledger.jsonl"
+from semantic_pdf_diff_lab.bench import recording  # noqa: E402
+LEDGER = ROOT / recording.LEDGER
 
 def read_all(client, model, only=("static", "zoom"), seeds=None, max_tiles=None):
     from semantic_pdf_diff_lab.bench import pagetest

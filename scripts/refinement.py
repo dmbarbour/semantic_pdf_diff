@@ -19,7 +19,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SETTINGS = ROOT / "benchmarks/controlled/settings.json"  # the corpus's settings; refinement_depth is 1
 KEYS = ROOT / "benchmarks/controlled/docs"
-LEDGER = ROOT / "benchmarks/ledger.jsonl"
+from semantic_pdf_diff_lab.bench import recording  # noqa: E402
+LEDGER = ROOT / recording.LEDGER
 
 def run(src, out, fixture, max_cost, documents, tag, fresh=False):
     sys.path.insert(0, str(Path(src).resolve()))
@@ -29,11 +30,11 @@ def run(src, out, fixture, max_cost, documents, tag, fresh=False):
     import semantic_pdf_diff
     print(f"reading with {Path(semantic_pdf_diff.__file__).parent}")
     setup_logging(quiet=True)
-    before = ledger.spent(LEDGER, round="refinement") if LEDGER.exists() else 0.0
+    before = ledger.spent(LEDGER, round="refinement")
     worst = 0
     with refinement.forced(fresh_halves=fresh):
         for document in map(Path, documents):
-            left = max_cost - ((ledger.spent(LEDGER, round="refinement") if LEDGER.exists() else 0.0) - before)
+            left = max_cost - (ledger.spent(LEDGER, round="refinement") - before)
             if left <= 0:
                 print(f"cap of ${max_cost} reached")
                 return 3
@@ -43,7 +44,7 @@ def run(src, out, fixture, max_cost, documents, tag, fresh=False):
             code = pipeline.attempt(pipeline.compare_paths, document, document, Path(out) / document.stem, settings, options)
             print(f"{document.name}: exit {code}", flush=True)
             worst = max(worst, code)
-    spent = (ledger.spent(LEDGER, round="refinement") if LEDGER.exists() else 0.0) - before
+    spent = ledger.spent(LEDGER, round="refinement") - before
     print(f"spent ${spent:.3f}")
     return worst
 

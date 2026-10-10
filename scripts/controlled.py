@@ -42,13 +42,15 @@ DOCS_MD = FOLDER / "docs-md"  # the same projects as Markdown (representations.p
 DOCS_DOCX = FOLDER / "docs-docx"  # and as Word documents
 DOCS_PPTX = FOLDER / "docs-pptx"  # and as slide decks
 DOCS_XLSX = FOLDER / "docs-xlsx"  # and as workbooks
+# The representations' documents by suffix, in the order they're read and compared (code review 2026-10-08, E4).
+REPRESENTATIONS = {".md": DOCS_MD, ".docx": DOCS_DOCX, ".pptx": DOCS_PPTX, ".xlsx": DOCS_XLSX}
 WORKING = FOLDER / "fixture.sqlite"   # recorded answers (git-ignored); packed into replay.zip
 PACKED = FOLDER / "replay.zip"
 RUNS = ROOT / "benchmarks/runs/controlled"
 PAIR_RUNS = ROOT / "benchmarks/runs/controlled-pairs"
-LEDGER = ROOT / "benchmarks/ledger.jsonl"
-# The settings recordings share (scripts/record_runs.py): they shape the queries, so they decide what replays.
-BASE_SETTINGS = {"claims_per_request": 20, "output_tokens": 4000, "context_tokens": 262144, "image_tokens": 300}
+from semantic_pdf_diff_lab.bench import recording  # noqa: E402
+LEDGER = ROOT / recording.LEDGER
+BASE_SETTINGS = recording.BASE_SETTINGS  # the settings recordings share: they shape the queries
 
 SETTINGS = FOLDER / "settings.json"  # every setting that shapes a query, resolved when first recorded (committed)
 
@@ -145,19 +147,17 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
         responder = held[0]
     from semantic_pdf_diff_lab.bench.controlled import revisions
     config = settings_file()
-    before = ledger.spent(LEDGER, round="controlled") if LEDGER.exists() else 0.0
+    before = ledger.spent(LEDGER, round="controlled")
     worst = 0
     setup_logging(quiet=True)
     # each document alone (the same PDF on both sides: extraction only), then each pair in revisions mode
     jobs = [(pdf, pdf, out / pdf.stem, pdf.stem, "proposals") for pdf in sorted(DOCS.glob("*.pdf"))]
-    jobs += [(md, md, out / md.name, md.name, "proposals") for md in sorted(DOCS_MD.glob("*.md"))]
-    jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(DOCS_DOCX.glob("*.docx"))]
-    jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(DOCS_PPTX.glob("*.pptx"))]
-    jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(DOCS_XLSX.glob("*.xlsx"))]
+    for suffix, folder in REPRESENTATIONS.items():
+        jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(folder.glob(f"*{suffix}"))]
     jobs += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", pair_runs / out.name / p.id, f"pair {p.id}",
               "revisions") for p in revisions.pairs()]
     from semantic_pdf_diff_lab.bench.controlled import word
-    for folder, suffix in ((DOCS_MD, ".md"), (DOCS_DOCX, ".docx"), (DOCS_PPTX, ".pptx"), (DOCS_XLSX, ".xlsx")):
+    for suffix, folder in REPRESENTATIONS.items():
         listed = revisions.pairs() + (word.pairs() if suffix == ".docx" else [])  # Word's own: word.py
         jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}", pair_runs / out.name / f"{p.id}{suffix}",
                   f"pair {p.id}{suffix}", "revisions") for p in listed
@@ -297,14 +297,9 @@ def score():
 def key_path(run):
     """A run's key: a PDF's in docs, a Markdown's ("<id>.md") in docs-md, a Word document's ("<id>.docx") in
     docs-docx, a deck's ("<id>.pptx") in docs-pptx, a workbook's ("<id>.xlsx") in docs-xlsx."""
-    if run.endswith(".md"):
-        return DOCS_MD / f"{run[:-3]}.key.json"
-    if run.endswith(".docx"):
-        return DOCS_DOCX / f"{run[:-5]}.key.json"
-    if run.endswith(".pptx"):
-        return DOCS_PPTX / f"{run[:-5]}.key.json"
-    if run.endswith(".xlsx"):
-        return DOCS_XLSX / f"{run[:-5]}.key.json"
+    for suffix, folder in REPRESENTATIONS.items():
+        if run.endswith(suffix):
+            return folder / f"{run[:-len(suffix)]}.key.json"
     return DOCS / f"{run}.key.json"
 
 def same_document(earlier, later):
@@ -319,7 +314,7 @@ def compare_pairs():
     compared = {}
     for which in ("recorded", "replay", "recorded-unaligned", "replay-unaligned", "recorded-rows", "replay-rows"):
         for pair in revisions.pairs() + word.pairs():
-            for suffix in (("", ".md", ".docx", ".pptx", ".xlsx") if pair in revisions.pairs() else (".docx",)):
+            for suffix in (("", *REPRESENTATIONS) if pair in revisions.pairs() else (".docx",)):
                 report = PAIR_RUNS / which / f"{pair.id}{suffix}" / "report.json"
                 documents = [key_path(d + suffix).with_name(f"{d}{suffix or '.pdf'}") for d in (pair.earlier, pair.later)]
                 if report.exists() and not same_document(*documents):

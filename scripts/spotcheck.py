@@ -20,7 +20,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
-LEDGER = ROOT / "benchmarks/ledger.jsonl"
+from semantic_pdf_diff_lab.bench import recording  # noqa: E402
+LEDGER = ROOT / recording.LEDGER
 MANIFEST = json.loads((ROOT / "scripts/slices.json").read_text())
 DOCUMENTS = {s["name"]: s.get("family") for s in MANIFEST["slices"]}
 
