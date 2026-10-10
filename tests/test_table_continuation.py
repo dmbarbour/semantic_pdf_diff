@@ -109,6 +109,24 @@ class Continuation(unittest.TestCase):
                 self.assertTrue(all(not data.startswith(f"Header: {as_json(HEADER)}") for data in second.values()))
                 self.assertEqual(len(second), 1)  # its first row its header
 
+class Continues(unittest.TestCase):
+    """The rule itself (extract.continues), pure (code review 2026-10-08, A9)."""
+    def test_the_rule(self):
+        import pymupdf
+        from semantic_pdf_diff.extract import continues
+        page, top, lower = pymupdf.Rect(0, 0, 300, 300), pymupdf.Rect(20, 20, 280, 70), pymupdf.Rect(20, 100, 280, 150)
+        carried = (HEADER, 3)
+        cases = [("a first table at the top, as wide", NEXT, top, carried, True, True),
+                 ("its header repeated", [HEADER] + NEXT, top, carried, True, True),
+                 ("a header of the same form", [["Tag", "Service", "Flow (m3/h)"]] + NEXT, top, carried, True, False),
+                 ("not the page's first table", NEXT, top, carried, False, False),
+                 ("down the page", NEXT, lower, carried, True, False),
+                 ("another width", [r[:2] for r in NEXT], top, carried, True, False),
+                 ("nothing carried", NEXT, top, None, True, False)]
+        for name, rows, displayed, continuing, first, expected in cases:
+            with self.subTest(name):
+                self.assertIs(continues(rows, displayed, page, continuing, first), expected)
+
 def as_json(row):
     return json.dumps(row)
 
