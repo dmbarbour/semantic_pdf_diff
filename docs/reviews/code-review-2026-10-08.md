@@ -327,5 +327,5 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 - **Tests:** none left. (Done: E6, E9, E10, E18, the guard on commits per replay, and the gaps: A19, the table queries' failure paths, alignment at scale, the vetoes.)
 - **Architecture:** item 13's scripts reduced to argument parsing; item 12's client jobs (no proposal). (Done: items 1–11 but D8; item 12's proposals; item 13's E4, E5, E7, E8 and `controlled/model.py`.)
 - **Simplification:** normalisers and number parsers (D10, S1), the long functions. (Done: C14, the models' copies, the table helpers' three copies.)
-- **Not in this phase:** A20, a lever with the features (the owner's answer, above). Of the two bugs found under the remediation plan (its *Found along the way*), decks' two-column tables are checked since 2026-10-10; a section row under a PDF table's header taken for its second line is open.
+- **Not in this phase:** A20, a lever with the features (the owner's answer, above). Of the two bugs found under the remediation plan (its *Found along the way*), decks' two-column tables are checked since 2026-10-10, and a section row under a PDF table's header stays a row (pdf/10).
 

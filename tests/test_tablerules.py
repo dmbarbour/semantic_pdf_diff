@@ -279,6 +279,12 @@ class PdfTables(unittest.TestCase):
         # a wrapped header line, without merged cells, joins as the next line
         (head, body, _), = pdf_parts(["Ride", "Entry"], [["", "speed (mph)"], ["Coaster", "55"]], [box(0), box(1)])
         self.assertEqual((head, body), (["Ride", "Entry speed (mph)"], [["Coaster", "55"]]))
+        # a section row right under the header stays a row, labelling the rows below it, unless it fills an empty
+        # first header cell (found under the bug plan of 2026-10-09: "Pumps" made the header "Tag Pumps")
+        (head, body, _), = pdf_parts(["Tag", "Flow (gpm)"], [["Pumps", ""], ["P-1", "450"]], [box(0), box(1)])
+        self.assertEqual((head, body), (["Tag", "Flow (gpm)"], [["Pumps", ""], ["P-1", "450"]]))
+        (head, body, _), = pdf_parts(["", "Requirement"], [["Parameter", ""], ["Mass", "35,000"]], [box(0), box(1)])
+        self.assertEqual((head, body), (["Parameter", "Requirement"], [["Mass", "35,000"]]))
         # a table of words alone is left as it was
         self.assertEqual(pdf_parts(["Tag", "Service"], [["P-1", "Raw water"], ["P-2", "Backwash"]], [box(0), box(1)]),
                          [(["Tag", "Service"], [["P-1", "Raw water"], ["P-2", "Backwash"]], [box(0), box(1)])])

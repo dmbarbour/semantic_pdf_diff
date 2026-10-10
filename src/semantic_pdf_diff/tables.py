@@ -86,6 +86,14 @@ def _words_only(row):
     cells = _filled(row)
     return bool(cells) and not any(ch.isdigit() for c in cells for ch in str(c))
 
+def _a_section(row, header):
+    """A row holding only its first cell, under a header whose first cell is filled: a section row ("Pumps" under
+    "Tag"), not the header's next line, which fills an empty first cell ("Parameter" under ""). On the samples every
+    such row was a section or a title: "HabEx Coronagraph (HCG) - Channel A" under "Instrument", "INDOOR LIGHTING
+    TARGETS" under "IESNA MINIMUM LIGHTING TARGETS"."""
+    first = lambda r: bool(r) and r[0] is not None and bool(str(r[0]).strip())
+    return first(row) and len(_filled(row)) == 1 and first(header)
+
 def _numbers(rows):
     return any(tablegrid.number(" ".join(str(c).split())) is not None for r in rows for c in _filled(r))
 
@@ -261,7 +269,7 @@ def pdf_parts(header, body, boxes, styles=None):
     - empty rows between the lines of a header dropped (others kept in place, so rows keep their numbers)
     - a header over several lines: rows of labels (no digit in them) above rows of numbers join it, as a second
       level ("Rated point > Capacity (gpm)") under a header with merged cells, else as its next line ("Entry" +
-      "speed")
+      "speed"); a row of its first cell alone, under a filled first header cell, is a section row and stays a row
     - stacked tables split: a row of labels, two or more, followed by rows of numbers starts a new part with
       its own header (blowers under pumps); with the rows' styles (Marks.styles), only a row styled unlike most
       rows (a header's fill or bold), so a row of words ("Spectrometer type | IFS | IFS") stays a row"""
@@ -279,7 +287,8 @@ def pdf_parts(header, body, boxes, styles=None):
             i += 1  # in place, so the rows after it keep their numbers
             continue
         rest = [r for r, _ in rows[i + 1:i + 4]]
-        if not current[1] and _words_only(row) and _numbers(rest):  # the header's next line or level
+        if not current[1] and _words_only(row) and _numbers(rest) and not _a_section(row, current[0]):
+            # the header's next line or level
             merged = any(c is None for c in current[0][1:])
             width = max(len(current[0]), len(row))
             head = list(current[0]) + [None] * (width - len(current[0]))
