@@ -25,7 +25,7 @@ Needs lxml (with the `office` extra).
 """
 from dataclasses import dataclass
 
-from . import chartxml, tablegrid
+from . import chartxml, keyvalue, tablegrid
 from .office import A, CHART, EMU_PER_POINT, MC, R, Package, number_format
 from .tablegrid import Cell, header_labels, header_rows, joined_labels
 from .textmodel import Block, Picture, TextDocument
@@ -279,8 +279,10 @@ def read_pptx(data):
             counted[page] = counted.get(page, 0) + 1
             ruled = tablegrid.from_cells(grid, heads, labels, row_lines[1:], title,
                                           f"slide {page}, table {counted[page]}")
+            # two columns, perhaps a key-value list, as Word's (code review 2026-10-08, B5; a deck's "header row"
+            # style is on by default, so it marks nothing)
             blocks.append(Block(page, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
-                                row_lines, row_headers, grid=ruled))
+                                row_lines, row_headers, grid=ruled, key_value=keyvalue.candidate(ruled, heads != 1)))
 
         def chart(page, part):
             try:

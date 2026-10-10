@@ -5407,32 +5407,33 @@
   },
   "wtp-datasheets-s1.pptx": {
    "facts": 19,
-   "found": 18,
-   "recall": 0.9474,
-   "found_right": 18,
-   "missed": [
-    "clearwell.volume"
-   ],
-   "claims": 21,
+   "found": 19,
+   "recall": 1.0,
+   "found_right": 19,
+   "missed": [],
+   "claims": 19,
    "outcomes": {
-    "right": 18,
-    "text": 3
+    "right": 19
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "pptx-table": 0.9474
+    "pptx-table": 1.0
    },
    "by_reader": {
-    "table": 0.9474
+    "table": 0.1579,
+    "text": 0.8421
    },
    "outcomes_by_reader": {
     "table": {
-     "right": 18,
-     "text": 3
+     "right": 3
+    },
+    "text": {
+     "right": 16
     }
    },
    "conditions_by_reader": {
-    "table": "0/0"
+    "table": "0/0",
+    "text": "0/0"
    }
   },
   "wtp-datasheets-s1.xlsx": {

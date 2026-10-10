@@ -169,6 +169,24 @@ class Word(unittest.TestCase):
         _, _, model = run("p.docx", self.document(header_marked=True), "key-value")
         self.assertEqual(model.checked, [])
 
+class Deck(unittest.TestCase):
+    def deck(self, rows):
+        from stubs import needs_lab
+        needs_lab()
+        from semantic_pdf_diff_lab.bench.controlled.slides import Deck
+        d = Deck()
+        d.slide("Pump data").table(rows)
+        return d.save()
+
+    def test_a_two_column_table_is_asked_and_read_by_line(self):
+        evidence, _, model = run("p.pptx", self.deck(PAIRS), "key-value")
+        self.assertEqual(len(model.checked), 1)
+        self.assertTrue(any("Pump: P-2" in q.data for q in model.queries))
+        claim = next(e for e in evidence if e.value == "95")
+        self.assertEqual([s.step for s in claim.derivation], ["pptx-table", "key-value-check", "model-extraction"])
+        _, _, model = run("p.pptx", self.deck([["Flow (L/s)", "Head (m)"], ["95", "30"]]), "key-value")
+        self.assertEqual(model.checked, [])  # numbers on the left: a table
+
 class Pdf(unittest.TestCase):
     """The PDF job's table path, on a detected table of two columns (find_tables patched)."""
     BOXES = tuple((20, 40 + 12 * k, 280, 52 + 12 * k) for k in range(len(PAIRS)))

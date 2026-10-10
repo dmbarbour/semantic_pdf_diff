@@ -128,8 +128,8 @@ READERS = {".pdf": "pdf/9",  # pdf/2: tables asked how they're read; 3: two-line
            # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1); 7: a
            # table's notes confirmed and read, its rows without rules read from its grid (review B2); 8: as pdf/8; 9: a
            # picture's partial tiles refined as pdf/9
-           ".pptx": "pptx/7",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6;
-           # 6: as docx/7; 7: as docx/9
+           ".pptx": "pptx/8",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6;
+           # 6: as docx/7; 7: as docx/9; 8: as docx/8 (a table of two columns asked whether it's a key-value list)
            ".xlsx": "xlsx/12", ".xlsm": "xlsx/12",  # xlsx/7: vague conditions guarded against; 8-9: header name,
            # group; 10: late table answers on their own sheet (review B1); 11: as docx/7; 12: as docx/8
            ".csv": "csv/8", ".tsv": "csv/8",  # csv/6: as xlsx/10; csv/7: as xlsx/11; csv/8: as xlsx/12
