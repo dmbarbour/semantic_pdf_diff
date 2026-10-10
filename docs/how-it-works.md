@@ -123,7 +123,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `progress.py` | Progress bars, heartbeats and logging |
 | `store.py` | SQLite evidence store: per-task records, the response cache keyed by query and model, the reader version each content item was read with, comparisons |
 | `binding.py` | A store's binding to its interpreters: what differs, whether going ahead can cost a model call, what it clears, the refusal that says so |
-| `cli.py` | Commands: arguments into settings and run options, planning, exit semantics; the lab's commands by entry point |
+| `cli.py` | Commands: arguments into settings and run options, exit semantics; the lab's commands by entry point |
 | `pipeline.py` | A run: bind the store, scan, extract, situate, compare, report |
 | `levers.py` | Settings' declarations, levers as mixins on the platform, configurations |
 | `context.py`, `quotes.py`, `stems.py`, `sections.py`, `tables.py`, `segmentation.py` | Extraction's pieces: the document reader, quote checks, numbered items, sections, tables, page segmentation |

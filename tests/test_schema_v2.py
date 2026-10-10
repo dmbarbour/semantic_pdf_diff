@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 from semantic_pdf_diff.cli import main
 from semantic_pdf_diff.jobs import extract_pdf
+from semantic_pdf_diff.pipeline import shortcut_names
 from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import (COMPARISON_SETTINGS, EXTRACTION_SETTINGS, comparison_interpreter,
@@ -149,10 +150,7 @@ class CliTests(unittest.TestCase):
             root = Path(d)
             (root / 'x').mkdir(); (root / 'y').mkdir()
             a = make_pdf(root / 'x/report.pdf'); b = make_pdf(root / 'y/report.pdf', 'Pump rated power 12 kW')
-            with contextlib.redirect_stdout(io.StringIO()) as out:
-                main([str(a), str(b), '--plan'])
-            names = [s['source'] for s in json.loads(out.getvalue())['sources']]
-            self.assertEqual(names, ['report.pdf', 'report.pdf-2'])
+            self.assertEqual(shortcut_names([a, b]), ['report.pdf', 'report.pdf-2'])
 
 if __name__ == '__main__':
     unittest.main()

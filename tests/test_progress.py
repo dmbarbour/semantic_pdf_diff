@@ -1,7 +1,6 @@
 import stubs  # noqa: F401 (a clean environment)
 import contextlib
 import io
-import json
 import logging
 import sys
 import tempfile
@@ -75,24 +74,6 @@ class Verbosity(unittest.TestCase):
                 cli.main([str(root / 'a.pdf'), str(root / 'b.pdf'), '--out', str(root / 'out'), '--base-url', url,
                           '--no-vision', '-q'])
             self.assertEqual(quiet.getvalue(), '')
-
-class PlanEstimates(unittest.TestCase):
-    def test_estimates_and_call_limit_warning(self):
-        with tempfile.TemporaryDirectory() as d:
-            root = Path(d)
-            (root / 'a.pdf').write_bytes(pdf_bytes('Pump rated power 10 kW'))
-            (root / 'b.pdf').write_bytes(pdf_bytes('Pump rated power 12 kW'))
-            config = root / 'c.json'
-            config.write_text(json.dumps({'rate_limits': [{'tokens_per_minute': 10000}], 'max_calls': 3}))
-            with contextlib.redirect_stdout(io.StringIO()) as out:
-                cli.main([str(root / 'a.pdf'), str(root / 'b.pdf'), '--plan', '--config', str(config)])
-            plan = json.loads(out.getvalue())
-            self.assertEqual([s['text_tasks'] for s in plan['sources']], [1, 1])
-            self.assertEqual([s['situating_tasks'] for s in plan['sources']], [1, 1])  # one section each
-            total = plan['total']
-            self.assertEqual(total['calls'], sum(s['text_tasks'] + s['visual_tasks'] + s['situating_tasks'] for s in plan['sources']))
-            self.assertEqual(total['minutes_at_that_limit'], round(total['tokens'] / 10000, 1))
-            self.assertIn('max_calls is 3', plan['warning'])
 
 if __name__ == '__main__':
     unittest.main()

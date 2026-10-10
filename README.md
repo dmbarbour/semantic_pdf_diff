@@ -35,11 +35,11 @@ pdf-semantic-diff team-a.pdf team-b.pdf --out result
 
 Open `result/report.html`, keeping its `assets/` folder alongside it. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
 
-Either argument can also be a folder or a zip archive. For revisions, supply the old version first. `--plan` estimates the work without calling the model:
+Either argument can also be a folder or a zip archive. For revisions, supply the old version first:
 
 ```bash
 pdf-semantic-diff old.pdf new.pdf --mode revisions --out revision-diff
-pdf-semantic-diff team-a/ team-b.zip --plan
+pdf-semantic-diff team-a/ team-b.zip --out team-diff
 ```
 
 For repeated work, declare **sources** in a store, each with a name, provenance metadata and one or more roots, and compare them by name. Sources are rescanned on every run, so edited, added or deleted files are picked up:
@@ -58,7 +58,7 @@ Model requests run in parallel (`concurrency`, default 4, adapting down when the
                                    {"tokens_per_minute": 500000}]}
 ```
 
-Runs show progress bars on a terminal and heartbeat lines otherwise; `-q`, `-v`, `-vv` and `--log-file` control the detail. `--plan` estimates calls, tokens and time under the current limit.
+Runs show progress bars on a terminal and heartbeat lines otherwise; `-q`, `-v`, `-vv` and `--log-file` control the detail.
 
 Inspect and maintain a store with `show` (views as Markdown, CSV or JSON Lines), `report` (regenerate a report without model calls) and `gc` (delete content no source references any more):
 

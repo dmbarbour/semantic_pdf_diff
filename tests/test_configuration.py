@@ -1,15 +1,12 @@
 import stubs  # noqa: F401 (a clean environment)
-import contextlib
-import io
-import json
+import argparse
 import os
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-import pymupdf
 from semantic_pdf_diff.settings import Settings
-from semantic_pdf_diff.cli import main
+from semantic_pdf_diff.cli import add_run_options, load_settings
 from semantic_pdf_diff.llm import Client
 
 class ConfigurationTests(unittest.TestCase):
@@ -55,15 +52,10 @@ class ConfigurationTests(unittest.TestCase):
     def test_cli_file_environment_precedence(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ,{'PDF_DIFF_MAX_CALLS':'13'},clear=True):
             root=Path(directory)
-            pdf=root/'test.pdf'
-            doc=pymupdf.open();doc.new_page();doc.save(pdf);doc.close()
             config=root/'config.json';config.write_text('{"max_calls": 17}')
             for extra,expected in [([],13),(['--config',str(config)],17),
                                    (['--config',str(config),'--max-calls','19'],19)]:
-                stream=io.StringIO()
-                with contextlib.redirect_stdout(stream):
-                    code=main([str(pdf),str(pdf),'--plan',*extra])
-                self.assertEqual(code,0)
-                self.assertEqual(json.loads(stream.getvalue())['max_calls'],expected)
+                parser=argparse.ArgumentParser();add_run_options(parser)
+                self.assertEqual(load_settings(parser.parse_args(extra)).max_calls,expected)
 
 if __name__=='__main__': unittest.main()

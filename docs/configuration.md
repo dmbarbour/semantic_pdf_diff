@@ -26,7 +26,7 @@ Configuration precedence, highest first: **CLI flags > JSON config file > enviro
 
 Every other field in `Settings` follows `PDF_DIFF_<UPPERCASE_FIELD_NAME>` (for example `PDF_DIFF_TEXT_BYTES`, `PDF_DIFF_RETRIES`, `PDF_DIFF_RESPONSE_FORMAT`). Model and base URL use only the `OPENAI_*` names above. `OPENAI_MODEL` and the `PDF_DIFF_*` names are application conventions. Empty or whitespace-only setting variables are treated as unset; invalid active values fail validation. Explicit overrides take precedence even over invalid environment values. Export variables through your shell or process manager; `.env` files are not loaded automatically.
 
-For Python callers, use `Settings.from_env(...)` to get the same environment defaults with explicit keyword overrides. Plain `Settings(...)` remains deterministic and does not consult the environment. Output paths, comparison mode and planning remain CLI options.
+For Python callers, use `Settings.from_env(...)` to get the same environment defaults with explicit keyword overrides. Plain `Settings(...)` remains deterministic and does not consult the environment. Output paths and comparison mode remain CLI options.
 
 ## Settings
 
@@ -125,13 +125,12 @@ Defaults are model-neutral and target a 32,768-token context, with a generous 1,
 - **`concurrency`** (default 4): the most model requests in flight. An adaptive gate halves it when the server returns 429/503 or latency jumps, and grows it back by one after a run of successes. Results don't depend on it: concurrent and sequential runs produce identical evidence and findings.
 - **`rate_limits`**: time-of-day rules, the first matching one applies (local time), each with `tokens_per_minute` and/or `requests_per_minute`, optionally `days` (`"mon-fri"`, `"sat,sun"`) and `hours` (`"08:00-18:00"`, or overnight like `"22:00-06:00"`). Token use is estimated before each request and corrected from the server's reported usage. As an environment variable, `PDF_DIFF_RATE_LIMITS` takes the same JSON list.
 - **Progress:** a `tqdm` bar per stage on a terminal; otherwise a heartbeat line every `heartbeat_seconds` (30) with tasks done, tokens per minute and time remaining. `-q` shows warnings only, `-v` each task, `-vv` each model request; `--log-file` writes a detailed log.
-- **`--plan`** estimates calls, tokens and minutes at the limit in force now (excluding table rows, refinement, retries and comparisons), and warns when `max_calls` would stop the run early.
 
 None of these affect output, so changing them never needs `--reset`.
 
 ## Calls, caching and exit codes
 
-A typical page needs multiple calls, so large PDFs can require hundreds or thousands. `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--plan` makes no API calls and counts initial visual tasks; text, table, comparison, retries and refinement calls are additional. `--max-calls` caps actual HTTP attempts for one invocation, including retries.
+A typical page needs multiple calls, so large PDFs can require hundreds or thousands. `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--max-calls` caps actual HTTP attempts for one invocation, including retries.
 
 The `--out` folder is an evidence store: `store.sqlite` (sources, files, content, evidence, coverage, cached model responses, comparisons) plus `assets/` for rendered crops. Stores are created with owner-only permissions and are as sensitive as the documents they were built from.
 

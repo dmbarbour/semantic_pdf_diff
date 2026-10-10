@@ -13,19 +13,11 @@ import json
 import sys
 from pathlib import Path
 from . import fixtures, manifest
-from .tasks import EXTRACT
-from .context import Context
-from .sections import pdf_sections
-from .extract import text_groups
-from .pipeline import RunOptions, compare_paths, document_properties, limits, run, shortcut_names
-from .llm import SYSTEM
+from .pipeline import RunOptions, compare_paths, document_properties, limits, run
 from .schema import Source
 from .settings import Settings
 from .progress import log, setup_logging
-from .throttle import RateLimiter
 from .report import write_report
-from .scan import read_origin, scan
-from .figures import find_figures
 from .store import Store, StoreError
 
 
@@ -89,7 +81,6 @@ def add_run_options(parser):
                         help='A/A control: answer extraction for these regions (e.g. tile,figure,overview) afresh, '
                              'as a second sample of each query')
     add_budget_options(parser)
-    parser.add_argument('--plan', action='store_true', help='Inspect sources and estimate visual tasks without API calls')
     parser.add_argument('--reset', action='store_true',
                         help='Clear derived data affected by a changed extraction interpreter, then run')
     parser.add_argument('--dry-run', action='store_true', help='With --reset: report what would be cleared, change nothing')
@@ -129,10 +120,6 @@ def shortcut_command(argv, client=None):
     args = parser.parse_args(argv)
     start_logging(args)
     settings = load_settings(args)
-    if args.plan:
-        names = shortcut_names([args.a, args.b])
-        return plan([Source(name=n, kind='shortcut', roots=[str(p.resolve())]) for n, p in zip(names, [args.a, args.b])],
-                    settings)
     return compare_paths(args.a, args.b, args.out, settings, RunOptions.from_args(args), client)
 
 
@@ -158,8 +145,6 @@ def compare_command(argv, client=None):
         missing = [n for n in names if store.source(n) is None]
         if missing:
             raise StoreError(f"no declared source named {', '.join(map(repr, missing))} in {args.store}")
-        if args.plan:
-            return plan([store.source(n) for n in names], settings)
         return run(RunOptions.from_args(args), settings, store, names, args.report or args.store, client=client)
 
 def link_manifest(store, path):
@@ -172,54 +157,6 @@ def link_manifest(store, path):
         store.save_source(source, replace=True, manifest_hash=digest)
         log.info(f"{'Updated' if existing else 'Linked'} source {source.name!r} from {path}")
     return source.name
-
-# --- the run -----------------------------------------------------------------------
-
-def plan(sources, settings):
-    """Estimate calls, tokens and time without calling the model."""
-    import pymupdf
-    scaffold = len((SYSTEM + EXTRACT).encode()) + 160   # prompt text per request; bytes overestimate tokens
-    answer = settings.output_tokens // 2                # assume answers use half the output reserve
-    rows, calls, tokens = [], 0, 0
-    for source in sources:
-        scanned = scan(source.roots, limits(settings))
-        pdfs = pages = text_calls = text_bytes = visual = situating = 0
-        for f in scanned.files:
-            if not f.content.endswith('.pdf'):
-                continue
-            pdfs += 1
-            with pymupdf.open(stream=read_origin(f.origin), filetype='pdf') as doc:
-                pages += len(doc)
-                reader = Context(doc, settings)
-                for page in doc:
-                    groups = text_groups(page, settings.text_bytes)
-                    text_calls += len(groups)
-                    text_bytes += sum(len(t.encode()) for _, segments in groups for _, t in segments)
-                    if settings.vision:
-                        visual += len(settings.visual_regions(reader, page, 0))
-                if settings.situate:  # one request per figure and per section (plus re-asks, not counted)
-                    situating += (len(find_figures(doc))
-                                  + len(pdf_sections(doc, settings.section_depth, settings.section_pages)[0]))
-        estimate = (text_calls * (scaffold + answer) + text_bytes
-                    + visual * (scaffold + settings.image_tokens + answer)
-                    + situating * (scaffold + settings.image_tokens + answer))  # text excluded: roughly one more read
-        estimate += text_bytes if situating else 0
-        calls, tokens = calls + text_calls + visual + situating, tokens + estimate
-        rows.append({'source': source.name, 'files': len(scanned.files), 'pdfs': pdfs, 'pages': pages,
-                     'text_tasks': text_calls, 'visual_tasks': visual, 'situating_tasks': situating, 'estimated_tokens': estimate,
-                     'issues': len(scanned.issues)})
-    tpm, _ = RateLimiter(settings.rate_limits).limits()
-    print(json.dumps({'sources': rows, 'total': {
-        'calls': calls, 'tokens': tokens, 'tokens_per_minute_limit_now': tpm,
-        'minutes_at_that_limit': round(tokens / tpm, 1) if tpm else None},
-        'max_calls': settings.max_calls,
-        **({'warning': f'about {calls} calls are expected but max_calls is {settings.max_calls}; '
-                       'the run would stop early (raise --max-calls)'} if calls > settings.max_calls else {}),
-        'note': 'Estimates exclude table rows (found during extraction), refinement, retries and comparisons; '
-                'image tokens use the configured image_tokens, so calibrate it for your server. No API requests made.'},
-        indent=2))
-    return 0
-
 
 def fixtures_command(argv):
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff fixtures', description='Replay fixtures of recorded answers.')

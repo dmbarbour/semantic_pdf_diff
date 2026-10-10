@@ -15,6 +15,7 @@ from semantic_pdf_diff.compare import numeric_check
 from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.segmentation import tiles
 from semantic_pdf_diff.cli import main
+from semantic_pdf_diff.context import Context
 import stubs
 from stubs import ROUND0, source_data
 
@@ -370,17 +371,15 @@ class CliTests(unittest.TestCase):
             config = Path(d)/'c.json'; config.write_text('[1, 2]')
             path = pdf(Path(d)/'t.pdf', lambda p: None)
             with contextlib.redirect_stderr(io.StringIO()) as err:
-                self.assertEqual(main([str(path), str(path), '--plan', '--config', str(config)]), 1)
+                self.assertEqual(main([str(path), str(path), '--out', str(Path(d)/'out'), '--config', str(config)]), 1)
             self.assertIn('JSON object', err.getvalue())
 
-    def test_plan_counts_even_tiles(self):
+    def test_even_tiles_on_a_blank_page(self):
         with tempfile.TemporaryDirectory() as d:
             path = pdf(Path(d)/'t.pdf', lambda p: None, width=612, height=792)
-            config = Path(d) / 'round0.json'  # a grid over a blank page: nothing to skip, nothing to band
-            config.write_text(json.dumps(ROUND0))
-            with contextlib.redirect_stdout(io.StringIO()) as out:
-                main([str(path), str(path), '--plan', '--config', str(config)])
-            self.assertEqual(json.loads(out.getvalue())['sources'][0]['visual_tasks'], 7)
+            s = Settings(**ROUND0)  # a grid over a blank page: nothing to skip, nothing to band
+            with pymupdf.open(path) as doc:
+                self.assertEqual(len(s.visual_regions(Context(doc, s), doc[0], 1)), 7)
 
     def test_url_credentials_redacted(self):
         self.assertEqual(redact_url('https://user:secret@api.example:8443/v1'), 'https://api.example:8443/v1')

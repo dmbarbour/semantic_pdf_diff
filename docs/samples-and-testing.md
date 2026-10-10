@@ -41,7 +41,7 @@ The 3GPP files are kept as downloaded zips, since zips are meant to be read as f
 
 ```bash
 pdf-semantic-diff samples/wind-reference-turbines/nrel-5mw/NREL-5MW-reference-turbine.pdf \
-  samples/wind-reference-turbines/iea-15mw/IEA-15MW-reference-turbine.pdf --plan
+  samples/wind-reference-turbines/iea-15mw/IEA-15MW-reference-turbine.pdf --out wind-diff
 ```
 
 ## Recorded answers (replay fixtures)
