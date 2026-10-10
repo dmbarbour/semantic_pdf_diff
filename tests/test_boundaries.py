@@ -67,18 +67,19 @@ def cycles():
             visit(v)
     return found
 
-# The import cycle left (code review 2026-10-08, C4: 21 modules, held by models importing the levers). Each
-# architecture move that breaks a part of it shrinks this; a change that grows it fails.
-CYCLE = {"compare", "context", "dispatch", "docxdocs", "extract", "fixtures", "keyvalue", "levers", "llm", "pictures",
-         "pptxdocs", "provenance", "settings", "situate", "stems", "tablerules", "tables", "tablestructure", "tasks",
-         "textdocs", "xlsxdocs"}
+# The import cycles left (code review 2026-10-08, C4: one of 21 modules, held by models importing the levers; A12:
+# extract's five jobs apart). Each architecture move that breaks a part of them shrinks this; a change that grows
+# them fails.
+CYCLES = [{"compare", "dispatch", "fixtures", "levers", "llm", "provenance", "settings", "situate", "tablerules",
+           "tables", "tasks"},
+          {"docxdocs", "pptxdocs", "textdocs", "xlsxdocs"}]
 
 class Layers(unittest.TestCase):
     def test_the_schema_imports_nothing_of_the_product(self):
         self.assertEqual(runtime_imports(PRODUCT / "schema.py"), set())
 
     def test_the_import_cycle_doesnt_grow(self):
-        self.assertEqual(cycles(), [CYCLE] if CYCLE else [])
+        self.assertEqual(sorted(cycles(), key=sorted), sorted(CYCLES, key=sorted))
 
 class Boundaries(unittest.TestCase):
     def test_the_product_imports_nothing_from_the_lab(self):

@@ -115,7 +115,7 @@ class DefaultConfiguration(unittest.TestCase):
             lever.model_validate(lever.off)  # valid values
 
     def test_order_is_the_order_of_context_lines(self):
-        from semantic_pdf_diff.extract import CONTEXT_NOTE, Context
+        from semantic_pdf_diff.context import CONTEXT_NOTE, Context
         import pymupdf
         doc = pymupdf.open()
         page = doc.new_page()

@@ -11,7 +11,8 @@ from semantic_pdf_diff.schema import MAX_CLAIMS, Claim, Evidence, Extraction, Ju
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.llm import Client, Invalid, ModelFailure, redact_url
 from semantic_pdf_diff.compare import numeric_check
-from semantic_pdf_diff.extract import extract_pdf, tiles
+from semantic_pdf_diff.jobs import extract_pdf
+from semantic_pdf_diff.segmentation import tiles
 from semantic_pdf_diff.cli import main
 import stubs
 from stubs import ROUND0, source_data
@@ -392,7 +393,7 @@ class UnreadableDocuments(unittest.TestCase):
     def test_a_corrupt_pdf_beside_a_good_one(self):
         import tempfile
         from pathlib import Path
-        from semantic_pdf_diff.extract import Job, run_jobs
+        from semantic_pdf_diff.jobs import Job, run_jobs
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         import pymupdf

@@ -44,12 +44,12 @@ class Pdf(unittest.TestCase):
     """The PDF job's table path, on a detected table (find_tables patched)."""
     def extract(self, rules=None, answer=None):
         import pymupdf
-        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.jobs import extract_pdf
         from semantic_pdf_diff.llm import ModelFailure
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
-        from semantic_pdf_diff.extract import ExtractQuery
+        from semantic_pdf_diff.tasks import ExtractQuery
         from stubs import situating_answer
 
         class Table:
@@ -138,7 +138,7 @@ class Sheet(unittest.TestCase):
         except ImportError:
             self.skipTest("openpyxl isn't installed (the office extra)")
         from test_xlsxdocs import RulesModel
-        from semantic_pdf_diff.extract import Job, reader_for, run_jobs
+        from semantic_pdf_diff.jobs import Job, reader_for, run_jobs
         book = openpyxl.Workbook()
         sheet = book.active
         sheet.title = "Pumps"

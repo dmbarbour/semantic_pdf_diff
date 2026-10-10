@@ -10,7 +10,7 @@ from pathlib import Path
 from . import fixtures, provenance
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
-from .extract import Job, reader_for, reader_version, run_jobs
+from .jobs import Job, reader_for, reader_version, run_jobs
 from .llm import Client, redact_url
 from .schema import EvidenceDocument, Report, Situation, Source, coverage_row
 from .progress import Progress, log

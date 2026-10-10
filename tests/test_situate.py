@@ -49,7 +49,7 @@ def ev(eid, page, region, bbox):
 
 def visual_regions(page, side, number=1, **settings):
     """A page's image tasks under the given settings (the segmentation levers off unless named)."""
-    from semantic_pdf_diff.extract import Context
+    from semantic_pdf_diff.context import Context
     from semantic_pdf_diff.settings import Settings
     s = Settings(**{"tile_points": side, "tiling": "grid", "grow_tiles": False, "skip_empty": False,
                     "figure_tasks": False, **settings})
@@ -139,7 +139,8 @@ class Figures(unittest.TestCase):
         self.assertGreaterEqual(rect.y1, 290)     # the caption is included
 
     def test_bands_and_grown_tiles_keep_lines_whole(self):
-        from semantic_pdf_diff.extract import _lines, grown
+        from semantic_pdf_diff.pages import lines as _lines
+        from semantic_pdf_diff.segmentation import grown
         doc = pymupdf.open()
         page = doc.new_page(width=612, height=792)
         for y in range(60, 760, 14):  # a page of text lines...
@@ -170,7 +171,7 @@ class Figures(unittest.TestCase):
         self.assertEqual(kept[-1], every[-1])
 
     def test_sheet_details_are_read_one_by_one_with_their_titles(self):
-        from semantic_pdf_diff.extract import sheet_details
+        from semantic_pdf_diff.segmentation import sheet_details
         doc = pymupdf.open()
         page = doc.new_page(width=2448, height=1584)
         page.draw_rect(pymupdf.Rect(108, 72, 2394, 1512))  # frame

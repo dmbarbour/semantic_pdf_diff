@@ -68,7 +68,7 @@ def interpreter(role, settings, prompts, names):
                        versions=library_versions())
 
 def extraction_interpreter(settings):
-    from .extract import PROMPT_VERSION, extraction_template
+    from .tasks import PROMPT_VERSION, extraction_template
     from .llm import SYSTEM
     return interpreter("extract", settings, (SYSTEM, extraction_template(settings), f"v{PROMPT_VERSION}"),
                        role_settings(type(settings), "extract"))

@@ -216,7 +216,7 @@ class QuoteCheck:
     kind, name = "check", "quote-check"
 
     def rate(self, folder):
-        from semantic_pdf_diff.extract import excerpted
+        from semantic_pdf_diff.quotes import excerpted
         from .rounds import load_batch
         batch = load_batch(folder)
         out = []

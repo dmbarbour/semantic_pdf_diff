@@ -9,7 +9,7 @@ A store marks each content item extracted once its tasks are done, and a later r
 
 ## Decision
 
-- **Each reader has a version** (`extract.READERS`: `pdf/1`, `text/1`, `docx/2`), raised whenever what it sends the model changes without a setting or prompt changing: its parsing, its blocks, its tasks.
+- **Each reader has a version** (`jobs.READERS`: `pdf/1`, `text/1`, `docx/2`), raised whenever what it sends the model changes without a setting or prompt changing: its parsing, its blocks, its tasks.
 - **The store records, per content item, the version that extracted it** (`content.extracted`), or `unsupported` where no reader could.
 - **A run re-reads an item whose recorded version differs from its reader's current one,** an earlier or later one alike, and an item that has gained a reader. Its tasks are made again; `keep_tasks` drops those the new reading doesn't have.
 - **Nothing is refused and no reset is needed:** a reader change touches only the content it reads, not the store's binding.

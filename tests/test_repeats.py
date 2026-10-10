@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 import pymupdf
-from semantic_pdf_diff.extract import extract_pdf
+from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id
@@ -124,7 +124,7 @@ class Repeats(unittest.TestCase):
 
     def test_section_signals(self):
         _, _, _ = self.run_extraction()
-        from semantic_pdf_diff.extract import pdf_sections
+        from semantic_pdf_diff.sections import pdf_sections
         seen = []
         client = Recorder()
         path = Path(self.dir.name) / 'r.pdf'

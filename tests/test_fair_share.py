@@ -2,7 +2,7 @@ import stubs  # noqa: F401 (a clean environment)
 import tempfile
 import unittest
 from pathlib import Path
-from semantic_pdf_diff.extract import Job, run_jobs
+from semantic_pdf_diff.jobs import Job, run_jobs
 
 class Recorder(stubs.Recorder):
     def __init__(self):

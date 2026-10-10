@@ -181,7 +181,7 @@ class Requests:
         r, prompt, hashes = found
         sent = len(hashes)
         if r["role"] == "extract":
-            from semantic_pdf_diff.extract import ExtractQuery
+            from semantic_pdf_diff.tasks import ExtractQuery
             asked = ExtractQuery.read(prompt)
             instructions, query = asked.instructions, asked.request
         else:  # the role's instructions, known, then what this request was given
@@ -213,7 +213,7 @@ class Requests:
         own image, found by its hash among the store folder's assets (None if it's gone)."""
         import hashlib
         import pymupdf
-        from semantic_pdf_diff.extract import render
+        from semantic_pdf_diff.visuals import render
         target = folder / "images" / f"{stem}-input.png"
         with source.doc(content) as doc:
             if doc.pdf is not None:

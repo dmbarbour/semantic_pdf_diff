@@ -263,7 +263,7 @@ class Extracted(unittest.TestCase):
         from pathlib import Path
         from unittest.mock import patch
         import pymupdf
-        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.jobs import extract_pdf
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
@@ -338,7 +338,7 @@ class Extracted(unittest.TestCase):
         from pathlib import Path
         from unittest.mock import patch
         import pymupdf
-        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.jobs import extract_pdf
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
@@ -385,7 +385,7 @@ class NewTables(unittest.TestCase):
         from pathlib import Path
         from unittest.mock import patch
         import pymupdf
-        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.jobs import extract_pdf
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
@@ -439,7 +439,7 @@ class Recorded(unittest.TestCase):
         from pathlib import Path
         from unittest.mock import patch
         import pymupdf
-        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.jobs import extract_pdf
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
@@ -484,7 +484,7 @@ class SecondNoRows(unittest.TestCase):
         from pathlib import Path
         from unittest.mock import patch
         import pymupdf
-        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.jobs import extract_pdf
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
@@ -531,7 +531,7 @@ class Detection(unittest.TestCase):
         from pathlib import Path
         from unittest.mock import patch
         import pymupdf
-        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.jobs import extract_pdf
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id

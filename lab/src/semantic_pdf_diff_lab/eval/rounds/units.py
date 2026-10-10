@@ -10,7 +10,7 @@ from pathlib import Path
 
 from semantic_pdf_diff.pages import native, shown_by_matrix
 from semantic_pdf_diff.regions import FAMILY, region_of
-from semantic_pdf_diff.extract import IMAGE_EXTENSIONS
+from semantic_pdf_diff.jobs import IMAGE_EXTENSIONS
 from ..documents import Document, contents, extension, layout
 
 MAX_CLAIMS = 25     # claims shown per side (sampled when there are more)
@@ -235,7 +235,8 @@ def _lead(doc, page, region, cache, key):
     """(text just before the region, the numbered items and headings it sits under), as the
     extractor saw them in its context (neighbouring text, "Within:" stems): the stems from the
     extractor's own provider (extract.Context.stem_path)."""
-    from semantic_pdf_diff.extract import Context, stem_index
+    from semantic_pdf_diff.context import Context
+    from semantic_pdf_diff.stems import stem_index
     from semantic_pdf_diff.pages import display_y, reading_blocks
     if key + ("stems",) not in cache:  # the document is opened afresh per unit; its stem index is kept
         cache[key + ("stems",)] = stem_index(doc)
@@ -382,7 +383,7 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
                 sources[(side_dir, run, content)] = {q["task"]: q["prompt"] for q in store.queries(content=content,
                                                                                                     role="extract")}
         prompt = sources[(side_dir, run, content)].get(task)
-        from semantic_pdf_diff.extract import ExtractQuery
+        from semantic_pdf_diff.tasks import ExtractQuery
         return ExtractQuery.read(prompt).data.strip() if prompt else None
 
     by_id = {i["id"]: i for i in batch["items"]}
@@ -429,7 +430,7 @@ def rerender(folder, slices, target=None):
     build_batch and add_context wrote, byte for byte under the same PyMuPDF. Development rounds' images aren't committed (the owner, 2026-10-02: "we should not be
     committing images ... for development rounds"); this brings them back. Returns the image names written."""
     import pymupdf
-    from semantic_pdf_diff.extract import READERS
+    from semantic_pdf_diff.jobs import READERS
     from semantic_pdf_diff.pages import native_page
     from semantic_pdf_diff.provenance import content_id
     from types import SimpleNamespace

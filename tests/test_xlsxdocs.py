@@ -191,7 +191,7 @@ class Csv(unittest.TestCase):
 
 class Readers(unittest.TestCase):
     def test_every_format_read_has_a_reader_version(self):
-        from semantic_pdf_diff.extract import IMAGE_EXTENSIONS, READERS, TEXT_EXTENSIONS
+        from semantic_pdf_diff.jobs import IMAGE_EXTENSIONS, READERS, TEXT_EXTENSIONS
         self.assertEqual(set(TEXT_EXTENSIONS) | set(IMAGE_EXTENSIONS) | {".pdf"}, set(READERS))
 
 class RulesModel:
@@ -239,7 +239,7 @@ class Rules(unittest.TestCase):
     def extract(self, answers, reviews=None, **settings):
         import tempfile
         from pathlib import Path
-        from semantic_pdf_diff.extract import Job, reader_for, run_jobs
+        from semantic_pdf_diff.jobs import Job, reader_for, run_jobs
         model = RulesModel(answers, reviews, **settings)
         data = workbook()
 
@@ -369,7 +369,7 @@ class Rules(unittest.TestCase):
         import threading
         from pathlib import Path
         from types import SimpleNamespace
-        from semantic_pdf_diff.extract import Job, reader_for, run_jobs
+        from semantic_pdf_diff.jobs import Job, reader_for, run_jobs
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.tablerules import Rules

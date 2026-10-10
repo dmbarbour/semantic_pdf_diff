@@ -10,7 +10,7 @@ responses are kept through a reset: they're keyed by the query that reached the 
 model), so unchanged queries replay and changed ones are asked afresh (decision 0004; the owner,
 2026-10-04, choosing this middle way: "I lean towards 3 with a friendly refusal.")
 
-Each content item records the version of the reader that extracted it ("docx/1"; extract.READERS),
+Each content item records the version of the reader that extracted it ("docx/1"; jobs.READERS),
 or "unsupported" where none could. A run re-reads an item whose reader has changed since (or one
 that has gained a reader): its tasks are made again, and those whose queries didn't change replay.
 """

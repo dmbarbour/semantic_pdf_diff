@@ -7,7 +7,9 @@ from semantic_pdf_diff.schema import Evidence, FileRef, PdfLocator, Source, Extr
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.llm import Client, BudgetExceeded, Invalid, ModelFailure
 from semantic_pdf_diff.compare import candidates, numeric_check, compare
-from semantic_pdf_diff.extract import extract_pdf, split_utf8, tiles
+from semantic_pdf_diff.jobs import extract_pdf
+from semantic_pdf_diff.tasks import split_utf8
+from semantic_pdf_diff.segmentation import tiles
 from semantic_pdf_diff.report import write_report
 from stubs import ROUND0, chat_answer, request_body, serving, situating_answer
 

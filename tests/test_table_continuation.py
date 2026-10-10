@@ -19,7 +19,8 @@ BOTTOM, TOP = (20, 200, 280, 290), (20, 20, 280, 70)  # on 300-point pages: endi
 def read(second, first=FIRST, at=(BOTTOM, TOP)):
     """{task: its request's data} and the evidence, for a two-page PDF whose pages hold the tables given."""
     import pymupdf
-    from semantic_pdf_diff.extract import ExtractQuery, extract_pdf
+    from semantic_pdf_diff.tasks import ExtractQuery
+    from semantic_pdf_diff.jobs import extract_pdf
     from semantic_pdf_diff.schema import Extraction
     from semantic_pdf_diff.settings import Settings
     from semantic_pdf_diff.provenance import content_id

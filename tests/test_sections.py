@@ -7,7 +7,8 @@ from pathlib import Path
 from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff import cli
-from semantic_pdf_diff.extract import extract_pdf, pdf_sections
+from semantic_pdf_diff.jobs import extract_pdf
+from semantic_pdf_diff.sections import pdf_sections
 from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id
@@ -80,7 +81,7 @@ class SectionContext(unittest.TestCase):
             self.assertTrue(evidence[0].quote_verified)
 
     def test_titles_on_the_page_divide_it(self):
-        from semantic_pdf_diff.extract import SectionIndex, section_text
+        from semantic_pdf_diff.sections import SectionIndex, section_text
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()
             first = doc.new_page(width=400, height=400)
@@ -130,7 +131,7 @@ class SectionContext(unittest.TestCase):
             self.assertEqual({e.value: e.section for e in evidence}, {'10': 'sec1', '3': 'sec2'})
 
     def test_rotated_sheets_tables_and_title_fragments(self):
-        from semantic_pdf_diff.extract import heading_y
+        from semantic_pdf_diff.sections import heading_y
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()
             page = doc.new_page(width=600, height=400)
@@ -220,7 +221,7 @@ class SectionContext(unittest.TestCase):
             self.assertFalse(any('Within:' in p for p, _ in plain.asked))
 
     def test_stem_context_skips_values_in_tables(self):
-        from semantic_pdf_diff.extract import stem_index
+        from semantic_pdf_diff.stems import stem_index
         doc = pymupdf.open()
         page = doc.new_page(width=400, height=500)
         lines = (('7.3 Baseline Blade-Pitch Controller', 14), ('3.83 -43.73E+6', 9), ('0.6 s', 9),
@@ -261,7 +262,7 @@ class SectionContext(unittest.TestCase):
                     self.assertIn(lever, notes({**off, lever: on[lever]}, sheet=lever == 'sheet_details'))
 
     def test_references_bring_definitions_and_cited_captions(self):
-        from semantic_pdf_diff.extract import _long_form, glossary
+        from semantic_pdf_diff.stems import _long_form, glossary
         self.assertEqual(_long_form('LCOE', 'we report the levelized cost of energy'), 'levelized cost of energy')
         self.assertIsNone(_long_form('LCOE', 'we report the annual yield'))
         with tempfile.TemporaryDirectory() as d:
@@ -327,7 +328,7 @@ class SectionContext(unittest.TestCase):
                 self.assertEqual(key == keys['visual'][task], task.startswith('text'))
 
     def test_excerpt_quotes_are_accepted_and_paraphrases_are_not(self):
-        from semantic_pdf_diff.extract import excerpted
+        from semantic_pdf_diff.quotes import excerpted
         text = ('The structural-damping ratio was set to 1% critical in all modes of the isolated tower. '
                 'This resulted in an equivalent driveshaft linear-\nspring constant of 867,637,000 N\u2022m/rad.\n'
                 'Wind speed Rotor speed Pitch\n22.0 12.1 19.94 -105.90E+6\ngelcoat glass_uniax E1 [Pa] 3.440E+09 4.370E+10')
@@ -401,7 +402,7 @@ class SectionContext(unittest.TestCase):
     def test_figures_and_section_text_are_the_same_upright_or_rotated(self):
         """Metamorphic, for situating: the same page as displayed, stored upright or sideways, has the same
         captioned figure (its box as displayed) and the same section text (code review 2026-10-01, item 6)."""
-        from semantic_pdf_diff.extract import section_text
+        from semantic_pdf_diff.sections import section_text
         from semantic_pdf_diff.pages import shown
         from semantic_pdf_diff.situate import page_figures
         with tempfile.TemporaryDirectory() as d:
@@ -440,7 +441,7 @@ class SectionContext(unittest.TestCase):
         return path
 
     def test_rotated_pages_read_in_displayed_order_and_tables_get_the_text_above(self):
-        from semantic_pdf_diff.extract import reading_blocks
+        from semantic_pdf_diff.pages import reading_blocks
         with tempfile.TemporaryDirectory() as d:
             path = self.rotated_sheet(Path(d) / 'sheet.pdf')
             with pymupdf.open(path) as doc:
@@ -455,7 +456,7 @@ class SectionContext(unittest.TestCase):
             self.assertFalse(any('SHEET NOTES' in p.split('SOURCE DATA')[0] for p in rows))  # beside, not above
 
     def test_table_filter_keeps_tables_and_drops_grids(self):
-        from semantic_pdf_diff.extract import real_table
+        from semantic_pdf_diff.tables import real_table
         doc = pymupdf.open()
         page = doc.new_page(width=600, height=800)
         def grid(x, y, rows, cols, w=150, h=30):
@@ -473,7 +474,7 @@ class SectionContext(unittest.TestCase):
         self.assertNotIn((False, True), verdicts)  # the grid, if detected at all, is dropped
 
     def test_split_headings_are_found_and_outline_order_is_kept(self):
-        from semantic_pdf_diff.extract import heading_y
+        from semantic_pdf_diff.sections import heading_y
         doc = pymupdf.open()
         page = doc.new_page(width=400, height=400)
         page.insert_text((40, 60), 'Contest 9. Home')

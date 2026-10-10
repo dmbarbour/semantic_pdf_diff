@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 from semantic_pdf_diff.cli import main
-from semantic_pdf_diff.extract import extract_pdf
+from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import (COMPARISON_SETTINGS, EXTRACTION_SETTINGS, comparison_interpreter,

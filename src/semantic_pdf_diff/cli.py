@@ -13,7 +13,10 @@ import json
 import sys
 from pathlib import Path
 from . import fixtures, manifest
-from .extract import EXTRACT, Context, pdf_sections, text_groups
+from .tasks import EXTRACT
+from .context import Context
+from .sections import pdf_sections
+from .extract import text_groups
 from .pipeline import RunOptions, compare_paths, document_properties, limits, run, shortcut_names
 from .llm import SYSTEM
 from .schema import Source

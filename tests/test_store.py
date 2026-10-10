@@ -201,7 +201,7 @@ class ContentAddressedCache(unittest.TestCase):
 class TaskIdentity(unittest.TestCase):
     def test_pages_never_share_tasks_or_cache_entries(self):
         """Same-sized pages have identical tile rectangles; the page must separate them."""
-        from semantic_pdf_diff.extract import extract_pdf
+        from semantic_pdf_diff.jobs import extract_pdf
         from semantic_pdf_diff.provenance import content_id
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(Path(d) / 's') as store:
             path = make_pdf(Path(d) / 'two.pdf', ['Pump rated power 10 kW', 'Fan motor 3 kW'])
@@ -275,12 +275,12 @@ class ResumeAndReuse(unittest.TestCase):
 
     def test_a_changed_reader_reads_its_content_again_replaying_unchanged_queries(self):
         from unittest import mock
-        from semantic_pdf_diff import extract
+        from semantic_pdf_diff import jobs
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
             root = Path(d); a, b = self.pdfs(root)
             self.run_cli(a, b, root / 'out', url)
             first, findings = state['requests'], self.findings(root / 'out')
-            with mock.patch.dict(extract.READERS, {'.pdf': 'pdf/999'}):  # a reader changed since
+            with mock.patch.dict(jobs.READERS, {'.pdf': 'pdf/999'}):  # a reader changed since
                 code, log = self.run_cli(a, b, root / 'out', url)
             self.assertNotIn('Loaded from store', log)          # read again,
             self.assertEqual(state['requests'], first)          # its unchanged queries answered from cache

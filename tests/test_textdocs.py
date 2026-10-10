@@ -7,7 +7,8 @@ import unittest
 from pathlib import Path
 
 from semantic_pdf_diff import textdocs
-from semantic_pdf_diff.extract import ExtractQuery, Job, reader_for, run_jobs
+from semantic_pdf_diff.tasks import ExtractQuery
+from semantic_pdf_diff.jobs import Job, reader_for, run_jobs
 from semantic_pdf_diff.schema import Extraction, TextLocator
 from semantic_pdf_diff.settings import Settings
 

@@ -292,7 +292,7 @@ def plans(sheet, max_tiles=None):
     """A sheet's static plans: (tile side in points, or None for the whole page; render px), leaving
     out those of more than max_tiles tiles."""
     import pymupdf
-    from semantic_pdf_diff.extract import tiles
+    from semantic_pdf_diff.segmentation import tiles
     rect = pymupdf.Rect(0, 0, *PAGES[paper(sheet.kind)])
     sides = [t for t in (None,) + TILES[paper(sheet.kind)]
              if max_tiles is None or t is None or len(list(tiles(rect, t))) <= max_tiles]
@@ -303,7 +303,7 @@ def run_static(folder, client, sheet, strategies=None):
     None for the whole page, render px)."""
     import pymupdf
     from semantic_pdf_diff.dispatch import Dispatcher
-    from semantic_pdf_diff.extract import tiles
+    from semantic_pdf_diff.segmentation import tiles
     doc, page, _ = draw(sheet)
     strategies = strategies or plans(sheet)
     target = Path(folder) / "images"
@@ -397,7 +397,7 @@ def score(sheet, answers):
 def whole_in_tiles(sheet, side):
     """Share of items lying wholly inside at least one tile of a plan (the rest are cut by tile edges)."""
     import pymupdf
-    from semantic_pdf_diff.extract import tiles
+    from semantic_pdf_diff.segmentation import tiles
     doc, page, items = draw(sheet)
     rects = [page.rect] if side is None else list(tiles(page.rect, side))
     doc.close()

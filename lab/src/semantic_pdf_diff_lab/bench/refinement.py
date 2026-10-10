@@ -241,7 +241,7 @@ def pairs(before, after, folder, grown=False, image_side=None):
                         shown |= rect
                     if shown.width <= pymupdf.Rect(row["bbox"]).width + 2 and shown.height <= pymupdf.Rect(row["bbox"]).height + 2:
                         continue
-                    from semantic_pdf_diff.extract import render
+                    from semantic_pdf_diff.visuals import render
                     render(page, shown, folder / image, image_side)
                 else:
                     shutil.copyfile(store.parent / row["image"], folder / image)

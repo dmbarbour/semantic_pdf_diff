@@ -31,7 +31,7 @@ class Answering(Model):
 
 def run(name, data, check, **settings):
     """(evidence, coverage, the model) of one file read by its reader, the check answered as `check`."""
-    from semantic_pdf_diff.extract import Job, reader_for, run_jobs
+    from semantic_pdf_diff.jobs import Job, reader_for, run_jobs
     model = Answering(check, **settings)
     with tempfile.TemporaryDirectory() as d:
         job = Job("sha256:" + "c" * 64 + Path(name).suffix, lambda: data, reader=reader_for(Path(name).suffix))
@@ -175,7 +175,8 @@ class Pdf(unittest.TestCase):
 
     def extract(self, check):
         import pymupdf
-        from semantic_pdf_diff.extract import ExtractQuery, extract_pdf
+        from semantic_pdf_diff.tasks import ExtractQuery
+        from semantic_pdf_diff.jobs import extract_pdf
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id

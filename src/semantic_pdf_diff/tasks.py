@@ -8,6 +8,7 @@ Split from extract.py; PDF requests are byte for byte what they were (tests/test
 import hashlib
 import re
 import json
+from dataclasses import dataclass
 from pathlib import Path
 
 from .llm import CallLimitReached, NotRecorded
@@ -17,6 +18,80 @@ from .quotes import covered, quoted
 from .regions import region_of
 
 # Text shorter than this is not split further during refinement.
+# Bump when prompt assembly or task construction changes, not only the template text;
+# it is part of the extraction interpreter. 2: section heading path in prompts.
+# 3: exactly repeated table rows follow their first occurrence. 4: claims per request configurable.
+# 5: headings by position on the page; table rows located by their own box.
+# 6: rules for unfamiliar charts, attributes free of conditions, parts of a whole; figure tasks.
+PROMPT_VERSION = 6
+
+EXTRACT = '''Extract atomic engineering claims from this one source. Return JSON:
+{"claims":[{"entity":"component/system", "attribute":"property or directed relationship",
+"value":"literal value or target", "unit":"literal unit or empty", "conditions":"load, scenario, time, tolerances, scope",
+"kind":"text|table|chart|diagram", "quote":"short exact supporting text or visible labels",
+"confidence":0.0, "approximate":false}], "complete":true, "issues":[]}
+Maximum {max_claims} claims. Set complete=false if content is clipped, ambiguous, unreadable, or more claims remain.
+For tables associate row labels, column headers and units. For charts preserve series, axes, units,
+operating point and trend; estimated plotted readings MUST be approximate. For diagrams extract
+labeled components and directed connections; never invent direction on unmarked edges.
+Preserve negation, requirements versus proposed capabilities, ranges and inequality signs.
+Extract evidence only, not commentary. Use a short canonical entity and attribute; keep numeric value separate from unit.
+The attribute names the property only: put conditions (e.g. "at theta = 0", "at rated speed") in conditions.
+If a value is one of several parts (one layer, one material, one member), say what it is part of in the attribute
+(e.g. "spar cap material"), not "composition".
+If you are not sure how to read a chart, diagram or drawing convention, say so in issues, lower confidence, and mark
+readings approximate; do not guess what an unexplained symbol, colour or line style means.
+'''
+
+@dataclass(frozen=True)
+class ExtractQuery:
+    """An extraction request's text in parts: the one owner of its layout (code review 2026-10-01, A1: prompts were
+    assembled inline and parsed back at markers in three places). prompt() is the bytes sent; read() takes a logged
+    prompt back into its parts, so no reader splits at markers of its own."""
+    instructions: str  # the template with its claim cap filled, then the rules (the configuration's, the region's)
+    region: str
+    heading: str = ""  # the headings the region falls under
+    context: str = ""  # CONTEXT_NOTE and the levers' lines
+    data: str = ""     # the source data: text, a table row, or an image task's note and text layer
+    continuation: str = ""  # CONTINUATION_NOTE and the claims earlier requests for this task returned
+
+    def prompt(self):
+        return (self.instructions + "\nSource type: " + self.region + (f"\nSection: {self.heading}" if self.heading else "")
+                + (f"\n{self.context}" if self.context else "")
+                + (f"\n{self.continuation}" if self.continuation else "") + "\nSOURCE DATA:\n" + self.data)
+
+    @property
+    def request(self):
+        """The part after the instructions: what this task, not every task, was given."""
+        return self.prompt()[len(self.instructions) + 1:]
+
+    @classmethod
+    def read(cls, prompt):
+        instructions, _, rest = prompt.partition("\nSource type: ")
+        head, _, data = rest.partition("\nSOURCE DATA:\n")
+        region, _, tail = head.partition("\n")
+        heading = ""
+        if tail.startswith("Section: "):
+            heading, _, tail = tail[len("Section: "):].partition("\n")
+        context, mark, continued = tail.partition(CONTINUATION_NOTE)
+        return cls(instructions, region, heading, context.rstrip("\n") if mark else tail, data,
+                   mark + continued if mark else "")
+
+# What a continued request is told (tasks.TaskCore.consume): the claims returned so far, not to be repeated.
+CONTINUATION_NOTE = ("ALREADY EXTRACTED from this same source by an earlier request (do not repeat these; extract the "
+                     "claims that remain):")
+
+def continuation(claims):
+    """A continued request's note: the claims earlier requests returned, one a line, by entity, attribute and value
+    only: enough not to repeat them, and conditions listed were copied onto the claims that followed (a valve's
+    stroke time given the "rated point" of the flow coefficients listed before it)."""
+    rows = [" | ".join(x for x in (c.entity, c.attribute, f"{c.value} {c.unit}".strip()) if x) for c in claims]
+    return CONTINUATION_NOTE + "".join("\n- " + r for r in rows)
+
+def extraction_template(s):
+    """The extraction instructions in force: the baseline, or a variant's (with {max_claims} unfilled)."""
+    return s.instructions(EXTRACT)
+
 MIN_REFINE_BYTES = 400
 
 def split_utf8(text, limit):
@@ -50,7 +125,6 @@ class TaskCore:
 
     def __init__(self, job, output, client, dispatch, progress, name, locator, derivation,
                  oversized="Table row exceeds text budget"):
-        from .extract import ExtractQuery, extraction_template
         self.query, self.template = ExtractQuery, extraction_template
         self.content, self.on_task, self.state = job.content, job.on_task, job.state
         self.s, self.output, self.dispatch, self.progress, self.name = client.s, output, dispatch, progress, name
@@ -127,7 +201,6 @@ class TaskCore:
         heading = " | ".join(" > ".join(x.heading_path) for x in self.sections.spanned_box(page_no, bbox)
                              if x.heading_path)
         rules = s.region_rules(region)
-        from .extract import continuation
         prompt = self.query(self.template(s).replace("{max_claims}", str(s.claims_per_request)) + rules,
                             region, heading, context, text, continuation(continued) if continued else "").prompt()
         key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)

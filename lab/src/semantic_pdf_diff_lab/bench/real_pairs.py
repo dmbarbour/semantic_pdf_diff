@@ -30,7 +30,7 @@ def document(path):
     one."""
     import zipfile
     from pathlib import Path
-    from semantic_pdf_diff.extract import TEXT_EXTENSIONS
+    from semantic_pdf_diff.jobs import TEXT_EXTENSIONS
     path = Path(path)
     if path.suffix == ".zip":
         with zipfile.ZipFile(path) as z:

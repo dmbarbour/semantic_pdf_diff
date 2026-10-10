@@ -89,9 +89,11 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `schema.py` | What the pipeline reads and writes: claims, locators, model answers, evidence, coverage rows, the report documents (imports no other module) |
 | `settings.py` | Settings: the endpoint's beside the platform the levers compose, loaded from the environment, a file and a caller |
 | `llm.py` | Compatible API transport, request budgeting, retries and cache |
-| `extract.py` | PDF text/tables, page/tile rendering, refinement and provenance |
+| `jobs.py` | The extraction scheduler (a page at a time, sources in turn) and the readers by extension, with their versions |
+| `extract.py` | The PDF job: a PDF's text, tables, figures and tiles made into tasks |
+| `visuals.py` | Image tasks: a region rendered to a crop, its text layer and context, a partial tile refined in halves |
 | `situate.py` | Figures, captions and citing prose; figure and section "about" requests |
-| `tasks.py` | The task core every reader shares: requests, quote checks, evidence, coverage, refinement |
+| `tasks.py` | The task core every reader shares: the extraction prompt, requests, quote checks, evidence, coverage, refinement |
 | `textdocs.py` | Plain text and Markdown: pages, sections, paragraphs and pipe tables, line locators |
 | `docxdocs.py` | Word documents read into the text reader's form: paragraphs, headings by style, tables, tracked changes, pictures |
 | `pptxdocs.py` | Slide decks read into the text reader's form: slides as pages, shapes in reading order, tables, charts, pictures, speaker notes |

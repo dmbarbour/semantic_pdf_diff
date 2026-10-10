@@ -469,7 +469,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
     def key(kind, ident, *parts):
         return ("triage", kind, content, ident, hashlib.sha256("\x00".join(parts).encode()).hexdigest())
 
-    from .extract import SectionIndex, section_text
+    from .sections import SectionIndex, section_text
     index = SectionIndex(sections, doc)
 
     def ask_figure(figure):
@@ -601,7 +601,7 @@ def quality(doc, figures, sections, unresolved, evidence):
         material = " ".join([f.caption, f.title, *around, *(r.paragraph or r.text for r in f.references),
                              claim_text(f.claims)])
         check("figure", f.id, f.about + " " + f.role if f.role else f.about, material, f"{f.caption} {f.title} {f.label or ''}")
-    from .extract import SectionIndex, section_text
+    from .sections import SectionIndex, section_text
     index = SectionIndex(sections, doc)
     for s in sections:
         inside = [e.id for e in in_section(evidence, s, index)]

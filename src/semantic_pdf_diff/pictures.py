@@ -3,7 +3,7 @@ in Word documents"; the owner: "we'll want similar context as what PDF pics get"
 
 Each picture becomes a page of a pictures document, at its displayed size: an EMF or WMF drawn by metafiles.py
 (vector, its labels a text layer), a raster image as it is. The page gets a PDF page's image tasks (visual_regions:
-the whole picture, and tiles when it's large; extract.Visuals), each with the picture's caption as its source text,
+the whole picture, and tiles when it's large; visuals.Visuals), each with the picture's caption as its source text,
 the page's text layer as a check on quotes and as context, and its section's headings. Its claims are located at the
 picture's paragraph (DocxLocator), each with the crop it was read from.
 """
@@ -62,7 +62,8 @@ class Reading:
         """Generator feeding each picture's image tasks, yielding "page" between pictures (fair share). Every picture
         is drawn into the document before any task is fed: adding a page invalidates the pages loaded before it, and
         a tile refined later renders from its page."""
-        from .extract import Context, Visuals
+        from .context import Context
+        from .visuals import Visuals
         from .regions import crop_stem
         s, doc = settings, self.doc
         assets = output / "assets"

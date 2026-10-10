@@ -25,7 +25,7 @@ def queries_command(argv):
     dump.add_argument('--against', type=Path, help="A baseline's runs: show only what changed, as diffs")
     dump.add_argument('--sample', type=int, default=30)
     dump.add_argument('--seed', type=int, default=1)
-    dump.add_argument('--lever', help='Only queries where this lever added something (see extract.LEVER_MARKS)')
+    dump.add_argument('--lever', help='Only queries where this lever added something (see settings.LEVER_MARKS)')
     dump.add_argument('--role', choices=['extract', 'triage', 'compare', 'all'], default='extract')
     check = sub.add_parser('check', help='Checker models look for obvious errors in a dump\'s queries')
     check.add_argument('folder', type=Path)

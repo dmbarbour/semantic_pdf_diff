@@ -47,7 +47,7 @@ class FolderScanning(unittest.TestCase):
             self.assertTrue(reasons['team-a/locked.pdf'].startswith('unreadable: PermissionError'))
 
     def test_a_file_gone_since_the_scan_is_a_failed_open_row(self):
-        from semantic_pdf_diff.extract import Job, run_jobs
+        from semantic_pdf_diff.jobs import Job, run_jobs
         rows = []
         job = Job('sha256:' + 'c' * 64 + '.pdf', lambda: Path('/nonexistent/x.pdf').read_bytes(),
                   on_task=lambda row, found: rows.append(row))
