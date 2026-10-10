@@ -97,7 +97,8 @@ class WordFeatures(unittest.TestCase):
         self.assertIn("Footnote 1: Chlorine is fed at 3.3 mg/L.", [b.text for b in doc.blocks])
 
     def test_numbered_lists_are_written_as_word_numbers_them(self):
-        from semantic_pdf_diff.docxdocs import Numbering, _format, read_docx
+        from semantic_pdf_diff.docxdocs import Numbering, read_docx
+        from semantic_pdf_diff.office import number_format
         needs_lab()
         from semantic_pdf_diff_lab.bench.controlled.word import Writer
         writer = Writer()
@@ -107,7 +108,7 @@ class WordFeatures(unittest.TestCase):
         self.assertEqual([t for _, t in doc.lines if t],
                          ["Condition 1: no acknowledgement within 856 ms", "Condition 2: 21 retransmissions fail",
                           "Condition 3: SNR below 4.3 dB"])
-        self.assertEqual([_format(n, f) for n, f in ((3, "lowerLetter"), (28, "upperLetter"), (14, "lowerRoman"),
+        self.assertEqual([number_format(n, f) for n, f in ((3, "lowerLetter"), (28, "upperLetter"), (14, "lowerRoman"),
                                                       (9, "upperRoman"), (7, "decimalZero"))],
                          ["c", "AB", "xiv", "IX", "07"])
         # Word's own List Number and List Bullet styles: numbered by their style; a deeper level restarts

@@ -6,18 +6,18 @@ import datetime
 import unittest
 from types import SimpleNamespace
 
-from semantic_pdf_diff import tablerules as tr
+from semantic_pdf_diff import tablegrid as tg, tablerules as tr
 
 def pumps():
     """A schedule: tags, two quantities with units in their headers, a section row, a provisional value."""
     rows = [["Duty pumps", "", ""], ["P-1", "118", "24.1"], ["P-2", "120", "25.5"],
             ["Standby", "", ""], ["P-3", "TBC", "25.5"]]
-    return tr.grid(["B", "C", "D"], ["Tag", "Flow (L/s)", "Head [m]"], rows, range(5, 10), range(11, 16),
+    return tg.grid(["B", "C", "D"], ["Tag", "Flow (L/s)", "Head [m]"], rows, range(5, 10), range(11, 16),
                    "Pump schedule", "Summary!B4:D9")
 
 def polar(n=331):
     rows = [[str(a), f"{0.11 * a:.3f}", f"{0.006 + 0.0001 * a * a:.4f}"] for a in range(-165, -165 + n)]
-    return tr.grid(["A", "B", "C"], ["alpha [deg]", "c_l", "c_d"], rows, range(4, 4 + n), range(10, 10 + n),
+    return tg.grid(["A", "B", "C"], ["alpha [deg]", "c_l", "c_d"], rows, range(4, 4 + n), range(10, 10 + n),
                    "FFA-W3-211", "Polar!A3:C334")
 
 class Analysis(unittest.TestCase):
@@ -32,10 +32,10 @@ class Analysis(unittest.TestCase):
         self.assertIn("text 3; all distinct", tr.describe(tag))
 
     def test_a_headers_own_name_and_unit(self):
-        self.assertEqual((tr.header_name("Hydraulics > Capacity (gpm)"), tr.header_unit("Hydraulics > Capacity (gpm)")),
+        self.assertEqual((tg.header_name("Hydraulics > Capacity (gpm)"), tg.header_unit("Hydraulics > Capacity (gpm)")),
                          ("Capacity", "gpm"))
-        self.assertEqual(tr.header_name("alpha [deg]"), "alpha")
-        g = tr.grid(["A", "B"], ["Valve", "Pressure (bar) > Inlet"], [["V-1", "6.2"]], [3], [5])
+        self.assertEqual(tg.header_name("alpha [deg]"), "alpha")
+        g = tg.grid(["A", "B"], ["Valve", "Pressure (bar) > Inlet"], [["V-1", "6.2"]], [3], [5])
         self.assertEqual(tr._fill("{B.group} | {B.name} | {B.unit}", g, 0)[0], "Pressure | Inlet | bar")
 
     def test_a_series_is_seen_and_summarising_suggested(self):
@@ -48,13 +48,13 @@ class Analysis(unittest.TestCase):
     def test_a_shape_of_points_suggests_a_summary_too(self):
         import math
         rows = [[f"{math.cos(k / 20):.4f}", f"{0.1 * math.sin(k / 20):.4f}"] for k in range(126)]
-        g = tr.grid(["A", "B"], ["x/c", "y/c"], rows, range(5, 131), range(5, 131))
+        g = tg.grid(["A", "B"], ["x/c", "y/c"], rows, range(5, 131), range(5, 131))
         self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("a set of points (mostly numbers, no column in order"))
 
     def test_sentences_are_prose_read_row_by_row(self):
         rows = [[f"REQ-{k:03d}", f"The pumping station shall deliver {k} L/s at the design head.",
                  ["Performance", "Controls"][k % 2]] for k in range(150)]
-        g = tr.grid(["A", "B", "C"], ["ID", "Requirement", "Type"], rows, range(5, 155), range(5, 155))
+        g = tg.grid(["A", "B", "C"], ["ID", "Requirement", "Type"], rows, range(5, 155), range(5, 155))
         cols = tr.analyse(g)
         self.assertEqual([c.prose for c in cols], [False, True, False])  # 11 words, under 60 characters
         said = tr.opinion(g, cols)
@@ -64,7 +64,7 @@ class Analysis(unittest.TestCase):
 
     def test_a_short_notes_column_is_an_aside(self):
         rows = [[f"M{k}"] + [f"{k + c}.25" for c in range(12)] + ["see note 4 of annex B"] for k in range(8)]
-        g = tr.grid([chr(65 + c) for c in range(14)], ["Material"] + [f"P{c}" for c in range(12)] + ["Notes"], rows,
+        g = tg.grid([chr(65 + c) for c in range(14)], ["Material"] + [f"P{c}" for c in range(12)] + ["Notes"], rows,
                     range(2, 10), range(2, 10))
         said = tr.opinion(g, tr.analyse(g))
         self.assertTrue(said.startswith("claims from rows by rules: about 104 claims"))
@@ -74,7 +74,7 @@ class Analysis(unittest.TestCase):
     def test_a_log_steps_in_minutes(self):
         start = datetime.datetime(2026, 7, 1)
         rows = [[(start + datetime.timedelta(minutes=5 * i)).isoformat(" "), f"{95 + i % 7}.5"] for i in range(200)]
-        g = tr.grid(["A", "B"], ["Timestamp", "Flow (L/s)"], rows, range(2, 202), range(2, 202))
+        g = tg.grid(["A", "B"], ["Timestamp", "Flow (L/s)"], rows, range(2, 202), range(2, 202))
         time = tr.analyse(g)[0]
         self.assertEqual((time.dates, time.order, time.step), (200, "rising", "5 min"))
         self.assertTrue(tr.opinion(g, tr.analyse(g)).startswith("a log (mostly numbers, column A rising in steps of "
@@ -131,14 +131,14 @@ class Applying(unittest.TestCase):
         self.assertTrue(tr.problems(tr.Rules(reading="sideways"), g)[0].startswith("unknown reading 'sideways'"))
         self.assertEqual(tr.problems(tr.Rules(reading="rows"), g), [])
         # the cell named {B.cell_value}; an example parting value and unit otherwise than the cell (10.2 and ")
-        g = tr.grid(["A", "B"], ["", "UV"], [["FOV", '10.2"'], ["Pixel", '14.2"']], [2, 3], [0, 0])
+        g = tg.grid(["A", "B"], ["", "UV"], [["FOV", '10.2"'], ["Pixel", '14.2"']], [2, 3], [0, 0])
         quoted = tr.Rules.model_validate({"reading": "rules", "claims": [{"entity": "{B.header}", "attribute": "{A}",
                                                                           "value": "{B.cell_value}"}],
                                           "examples": [{"row": 2, "claims": [{"value": "10.2", "unit": '"'}]}]})
         self.assertEqual(tr.problems(quoted, g), [])
 
     def test_a_tolerance_column_is_its_values_uncertainty(self):
-        g = tr.grid(["A", "B", "C"], ["Parameter", "Measured (L/s)", "±"], [["Flow", "118", "3"], ["Head", "24.1", ""]],
+        g = tg.grid(["A", "B", "C"], ["Parameter", "Measured (L/s)", "±"], [["Flow", "118", "3"], ["Head", "24.1", ""]],
                     [5, 6], [5, 6])
         rules = tr.Rules.model_validate({"reading": "rules", "claims": [
             {"entity": "pump", "attribute": "{A}", "value": "{B}", "unit": "{B.unit}", "uncertainty": "± {C} {B.unit}"}]})
@@ -151,7 +151,7 @@ class Applying(unittest.TestCase):
 
     def test_a_sideways_table_and_units_outside_brackets(self):
         rows = [["Capital cost ($M)", "6.35", "2.82"], ["Annual energy use (MWh/yr)", "771", "n/a"]]
-        g = tr.grid(["A", "B", "C"], ["", "Option A: UV", "Option B: chlorine"], rows, [5, 6], [11, 12])
+        g = tg.grid(["A", "B", "C"], ["", "Option A: UV", "Option B: chlorine"], rows, [5, 6], [11, 12])
         sideways = tr.Rules.model_validate({"reading": "rules", "claims": [{
             "columns": "B:C", "entity": "{*.header}", "attribute": "{A.cell_name}", "value": "{*.value}",
             "unit": "{A.cell_unit}", "number": True}], "examples": [{"row": "6", "claims": [
@@ -159,7 +159,7 @@ class Applying(unittest.TestCase):
         made = [(f["entity"], f["attribute"], f["value"], f["unit"]) for f, _, _ in tr.row_claims(sideways, g, 1)]
         self.assertEqual(made, [("Option A: UV", "Annual energy use", "771", "MWh/yr")])  # n/a: no claim
         self.assertEqual(tr.problems(sideways, g), [])  # an example's n/a: no claim by the templates' own rule
-        g = tr.grid(["A", "B", "C"], ["Element", "Height (ft)", "Vertical g"], [["E1", "129", "2.58"]], [5], [11])
+        g = tg.grid(["A", "B", "C"], ["Element", "Height (ft)", "Vertical g"], [["E1", "129", "2.58"]], [5], [11])
         unitless = tr.Rules.model_validate({"reading": "rules", "claims": [{
             "columns": "B:C", "entity": "{A}", "attribute": "{*.name}", "value": "{*}", "unit": "{*.unit}"}],
             "examples": [{"row": "5", "claims": [{"value": "129", "unit": "ft"}, {"value": "2.58", "unit": "g"}]}]})
@@ -168,7 +168,7 @@ class Applying(unittest.TestCase):
                                                     'such columns a template of their own, the unit written out)'])
 
     def test_no_stray_words_and_no_unitless_twin(self):
-        g = tr.grid(["A", "B"], ["Parameter", "Turbine"], [["Hub diameter [m]", "7.94"], ["Turbine class", "IB"]],
+        g = tg.grid(["A", "B"], ["Parameter", "Turbine"], [["Hub diameter [m]", "7.94"], ["Turbine class", "IB"]],
                     [2, 3], [5, 6])
         rules = tr.Rules.model_validate({"reading": "rules", "claims": [
             {"columns": "B", "entity": "{B.header}", "attribute": "{A.cell_name}", "value": "{*}", "unit": "{A.cell_unit}",
@@ -199,7 +199,7 @@ class Summaries(unittest.TestCase):
 
     def test_a_log_gives_span_extremes_mean_and_last(self):
         rows = [["2026-07-01 00:00:00", "95.0"], ["2026-07-01 00:05:00", "101.5"], ["2026-07-01 00:10:00", "98.0"]]
-        g = tr.grid(["A", "B"], ["Timestamp", "Flow (L/s)"], rows, range(2, 5), range(2, 5))
+        g = tg.grid(["A", "B"], ["Timestamp", "Flow (L/s)"], rows, range(2, 5), range(2, 5))
         rules = tr.Rules(reading="summary", template="log", subject="PS-3", input="A", quantities=["B"])
         found = {s.fields["attribute"]: (s.fields["value"], s.fields["conditions"], s.computed)
                  for s in tr.summarise(rules, g)}
@@ -210,7 +210,7 @@ class Summaries(unittest.TestCase):
 
     def test_a_list_counts_its_rows_by_category(self):
         rows = [[f"R1-{k}", ["Agreed", "Agreed", "Noted"][k % 3]] for k in range(30)]
-        g = tr.grid(["A", "B"], ["TDoc", "Status"], rows, range(2, 32), range(2, 32))
+        g = tg.grid(["A", "B"], ["TDoc", "Status"], rows, range(2, 32), range(2, 32))
         rules = tr.Rules(reading="summary", template="list", subject="RAN1 contributions", categories=["B"])
         found = [(s.fields["value"], s.fields["conditions"]) for s in tr.summarise(rules, g)]
         self.assertEqual(found, [("30", ""), ("20", "Status = Agreed"), ("10", "Status = Noted")])
@@ -352,14 +352,14 @@ class PdfTables(unittest.TestCase):
         self.assertEqual(len(parts[0][1]), 3)
 
     def test_a_row_copied_from_the_image_checks_the_text_layer(self):
-        g = tr.grid(["A", "B"], ["Tag", "Flow"], [["P-1", "1,450"], ["P-2", "Δp 3"]], [2, 3], [0, 0])
+        g = tg.grid(["A", "B"], ["Tag", "Flow"], [["P-1", "1,450"], ["P-2", "Δp 3"]], [2, 3], [0, 0])
         same = tr.Rules.model_validate({"transcribed": {"row": 2, "cells": ["P-1", "1450"]}})
         self.assertEqual(tr.transcription_mismatch(same, g), "")  # commas and case folded
         lost = tr.Rules.model_validate({"transcribed": {"row": "row 3", "cells": ["P-2", "Δp 3"]}})
         g.rows[1] = ["P-2", "p 3"]  # a symbol the text layer lost
         self.assertTrue(tr.transcription_mismatch(lost, g).startswith("row 3: the text layer reads P-2 | p 3"))
         self.assertEqual(tr.transcription_mismatch(tr.Rules(), g), "")  # nothing copied: nothing to check
-        words = tr.grid(["A", "B", "C"], ["", "", ""], [["Raw", "water", "pumps"]], [2], [0])
+        words = tg.grid(["A", "B", "C"], ["", "", ""], [["Raw", "water", "pumps"]], [2], [0])
         header = tr.Rules.model_validate({"transcribed": {"row": 2, "cells": ["Raw water pumps"]}})
         self.assertEqual(tr.transcription_mismatch(header, words), "")  # no value in the row: nothing claims rest on
 

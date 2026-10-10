@@ -19,7 +19,7 @@ The owner (2026-10-04): "Let's do Excel next. 99% of my spreadsheets are Excel."
 - **An ambiguous region is skipped, never silently** (the plan's contract): a table with a column, past its first,
   that holds values under no header, as two tables pressed together do. It's recorded as "skipped: ambiguous sheet
   layout", with its range.
-- **Every table is read whole,** each row a line, with its grid as rules see it (tablerules.Grid: its columns by
+- **Every table is read whole,** each row a line, with its grid as rules see it (tablegrid.Grid: its columns by
   letter, header labels, rows by sheet row number, the title above it). Whether its rows are read one by one or by
   rules a model writes is the text job's choice (the table_rules setting).
 - **Comments** on cells are content, as Word's: after the region holding them ('Comment by Ana on B5: ...').
@@ -38,16 +38,13 @@ import re
 import posixpath
 from dataclasses import dataclass, field
 
-from . import chartxml, keyvalue, tablerules
-from .docxdocs import Cell, _header_rows, _joined, _labels
+from . import chartxml, keyvalue, tablegrid
+from .office import A, CHART, EMU_PER_POINT, R, Package
+from .tablegrid import Cell, header_labels, header_rows, joined_labels
 from .textdocs import Block, Picture, TextDocument
 
 XDR = "{http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing}"
-A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
-R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 S = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
-CHART = "http://schemas.openxmlformats.org/drawingml/2006/chart"
-EMU_PER_POINT = 12700
 
 @dataclass
 class Region:
@@ -74,7 +71,7 @@ class Region:
     def rows(self):
         return self.bottom - self.top + 1
 
-_letter = tablerules.letter  # a column's letter, from 1
+_letter = tablegrid.letter  # a column's letter, from 1
 
 def shown(cell, formula=None):
     """A cell's value as Excel shows it: its number format applied, a date as an ISO date, an error as written; a
@@ -240,7 +237,7 @@ class _Writer:
     def table(self, page, sheet, region, cells, merges, title):
         lines, images, blocks = self.lines, self.images, self.blocks
         grid = _grid(region, cells, merges)
-        heads = min(_header_rows(grid, marked=0) if region.header_rows is None else region.header_rows, len(grid))
+        heads = min(header_rows(grid, marked=0) if region.header_rows is None else region.header_rows, len(grid))
         row_ref = lambda r: f"{_letter(region.left)}{r}:{_letter(region.right)}{r}"
         if not region.name and _unheaded(grid, heads):
             region.kind = "ambiguous"
@@ -248,7 +245,7 @@ class _Writer:
             images.append((page, len(lines), "sheet", f"skipped: ambiguous sheet layout ({where}): a column holds "
                                                      "values under no header, as tables pressed together do"))
             return
-        labels = _labels(grid, heads)
+        labels = header_labels(grid, heads)
         header_lines = [self.line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))) for r, row in grid[:heads]]
         if not heads:  # a defined table without a header row: its columns' names, as its structured references use
             labels = [str(n) for n in region.columns][:len(labels)] or labels
@@ -257,13 +254,13 @@ class _Writer:
         rows, row_lines, row_headers, aligned = [labels], [header_lines[0]], [], []
         for r, row in grid[heads:]:
             rows.append([c.text for c in row])
-            row_headers.append([_joined(labels[c.first:c.last + 1]) for c in row])
+            row_headers.append([joined_labels(labels[c.first:c.last + 1]) for c in row])
             row_lines.append(self.line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))))
             aligned.append([""] * (region.right - region.left + 1))
             for c in row:
                 aligned[-1][c.first] = c.text
         first = header_lines[0]
-        ruled = tablerules.grid([_letter(c) for c in range(region.left, region.right + 1)], labels, aligned,
+        ruled = tablegrid.grid([_letter(c) for c in range(region.left, region.right + 1)], labels, aligned,
                                 [r for r, _ in grid[heads:]], row_lines[1:], title,
                                 f"{sheet}!{region.ref}" if sheet else region.ref)
         # a block of two columns standing alone, perhaps a key-value list (code review 2026-10-08, B5); a defined
@@ -327,7 +324,6 @@ def read_xlsx(data):
     range), each sheet's name its heading; the sheet map in .regions."""
     import openpyxl
     from openpyxl.utils.cell import range_boundaries
-    from .pptxdocs import Package
     raw = bytes(data)
     book = openpyxl.load_workbook(io.BytesIO(raw), data_only=True)
     package = Package(raw)

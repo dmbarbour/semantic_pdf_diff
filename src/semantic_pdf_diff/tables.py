@@ -3,7 +3,9 @@ its grid for the rules query (pdf_grid). Split from extract.py (milestone 7).
 """
 import pymupdf
 
+from . import tablegrid
 from .pages import shown
+from .tablegrid import filled as _filled, joined as _joined
 
 def same_form(row, header):
     """True if a row matches most non-empty cells of a header, position by position."""
@@ -42,12 +44,11 @@ def row_boxes(table, extracted):
     return boxes if len(boxes) == len(extracted) else []
 
 def pdf_grid(header, body, boxes, title="", place=""):
-    """A detected table's grid as the rules query sees it (tablerules.Grid; the one table model's step 1): its cells'
+    """A detected table's grid as the rules query sees it (tablegrid.Grid; the one table model's step 1): its cells'
     text folded to one line, a header cell PyMuPDF merged (None) labelled as its left neighbour, and heuristic
     repairs: a row with an empty first cell and no number in it continues the row above (a wrapped cell) and joins
-    it; a row of only its first cell is a section row (tablerules.grid). Rows keep their boxes and, as keys, the
+    it; a row of only its first cell is a section row (tablegrid.grid). Rows keep their boxes and, as keys, the
     index of their first body row; `joined` holds the keys of rows joined from several lines."""
-    from . import tablerules
     width = max([len(header)] + [len(r) for r in body])
     clean = lambda row: [" ".join(str(c).split()) if c is not None else "" for c in row] + [""] * (width - len(row))
     labels, last = [], ""
@@ -60,7 +61,7 @@ def pdf_grid(header, body, boxes, title="", place=""):
         cells = clean(row)
         if not any(cells):
             continue
-        if rows and not cells[0] and not any(tablerules.number(c) is not None for c in cells if c):
+        if rows and not cells[0] and not any(tablegrid.number(c) is not None for c in cells if c):
             rows[-1] = [" ".join(t for t in (a, b) if t) for a, b in zip(rows[-1], cells)]  # a wrapped cell
             joined.add(keys[-1])
             if box and kept_boxes[-1]:
@@ -72,7 +73,7 @@ def pdf_grid(header, body, boxes, title="", place=""):
         keys.append(ri)
     if any(b is None for b in kept_boxes):
         return None  # rows without boxes can't be placed: read row by row
-    g = tablerules.grid([tablerules.letter(k) for k in range(1, width + 1)], labels, rows,
+    g = tablegrid.grid([tablegrid.letter(k) for k in range(1, width + 1)], labels, rows,
                         [str(k + 2) for k in range(len(rows))], [0] * len(rows), title, place, kept_boxes)
     g.keys = [keys[k] for k in g.keys]
     for r in g.section_rows:
@@ -80,17 +81,13 @@ def pdf_grid(header, body, boxes, title="", place=""):
     g.joined = joined & set(g.keys)
     return g
 
-def _filled(row):
-    return [c for c in row if c is not None and str(c).strip()]
-
 def _words_only(row):
     """A row of labels: filled, and no digit in it ("up to 173" is a value, "Capacity (gpm)" a label)."""
     cells = _filled(row)
     return bool(cells) and not any(ch.isdigit() for c in cells for ch in str(c))
 
 def _numbers(rows):
-    from . import tablerules
-    return any(tablerules.number(" ".join(str(c).split())) is not None for r in rows for c in _filled(r))
+    return any(tablegrid.number(" ".join(str(c).split())) is not None for r in rows for c in _filled(r))
 
 class Marks:
     """A page's drawn marks, read once: horizontal rules (lines, thin boxes, stroked boxes' edges), filled boxes, and
@@ -232,15 +229,6 @@ def cut_columns(rows, boxes, edges, marks):
             row = row[:j] + [merged] + row[j + 2:]
         out.append(row)
     return out, [x for k, x in enumerate(edges) if k not in join], len(join)
-
-def _joined(upper, lower):
-    out = []
-    for k in range(max(len(upper), len(lower))):
-        a = upper[k] if k < len(upper) else None
-        b = lower[k] if k < len(lower) else None
-        texts = [" ".join(str(t).split()) for t in (a, b) if t is not None and str(t).strip()]
-        out.append(" ".join(texts) if texts else (a if a is not None else b))
-    return out
 
 def ruled_rows(rows, boxes, rules, least=3, share=0.4):
     """(rows, boxes, how many joined): a table whose row boundaries are mostly ruled (3 or more, and 40% or more of

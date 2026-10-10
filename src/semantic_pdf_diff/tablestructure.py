@@ -17,7 +17,7 @@ import statistics
 from pydantic import Field, field_validator
 
 from .schema import DerivationStep, Lenient, coverage_row
-from .tablerules import letter
+from .tablegrid import filled as _filled, joined as _joined, letter, plain as _plain
 
 UNIT = re.compile(r"^[(\[]?\s*(µm|μm|nm|mm|cm|m|km|in|ft|mas|%|°|°c|°f|k|w|kw|mw|hp|gpm|psi|psig|rpm|kg|lb|s|ms|hz|khz|"
                   r"mhz|v|kv|a|db)\s*[)\]]?$", re.I)
@@ -29,9 +29,6 @@ SIGNALS = ("no rule above", "first cell empty", "only its first cell", "units on
 CUT = "a word cut by a column line"
 COLUMN_ACTIONS = ("split column", "join columns")  # acting on columns, in every row
 ACTIONS = ("join above", "join header", "section", "new table", "not table", "keep") + COLUMN_ACTIONS
-
-def _filled(row):
-    return [c for c in row if c is not None and str(c).strip()]
 
 def _digit(row):
     return any(ch.isdigit() for c in _filled(row) for ch in str(c))
@@ -175,24 +172,10 @@ def _span(column, width):
     first, last = letters.index(a), letters.index(b) if b else letters.index(a) + 1
     return (first, last) if first < last < width else None
 
-def _joined(upper, lower):
-    out = []
-    for k in range(max(len(upper), len(lower))):
-        a = upper[k] if k < len(upper) else None
-        b = lower[k] if k < len(lower) else None
-        texts = [" ".join(str(t).split()) for t in (a, b) if t is not None and str(t).strip()]
-        out.append(" ".join(texts) if texts else (a if a is not None else b))
-    return out
-
 def _box(a, b):
     if a is None or b is None:
         return a or b
     return (min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3]))
-
-def _plain(text):
-    import unicodedata
-    text = unicodedata.normalize("NFKC", str(text)).casefold()
-    return "".join(ch for ch in text if ch.isalnum() or ch in ".-+%/")
 
 def _number(text):
     text = str(text).strip()

@@ -19,7 +19,8 @@ import hashlib
 from pydantic import Field
 
 from .schema import DerivationStep, Lenient, coverage_row
-from .tablerules import SHOWN_CELL, kind
+from .tablegrid import kind
+from .tablerules import SHOWN_CELL
 
 SHOWN_ROWS = 12  # the rows a check shows; the rest counted
 
@@ -40,7 +41,7 @@ class Check(Lenient):
     why: str = Field(default="", max_length=400)
 
 def candidate(g, marked=False):
-    """Whether a table's grid (tablerules.Grid) is proposed as a key-value list: two columns, column A holding no
+    """Whether a table's grid (tablegrid.Grid) is proposed as a key-value list: two columns, column A holding no
     number or date (its header included), the header not marked as one and both its cells filled, and a row below."""
     if g is None or marked or len(g.columns) != 2 or all(row == g.labels for row in g.rows):
         return False  # no row below: a PDF table of one row is read with that row as its body, its header repeated

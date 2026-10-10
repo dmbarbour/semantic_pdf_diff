@@ -23,59 +23,22 @@ assumed): "This looks good to me, including the recommendation to read slides li
 
 Needs lxml (with the `office` extra).
 """
-import io
-import posixpath
-import zipfile
 from dataclasses import dataclass
 
-from . import chartxml, tablerules
-from .docxdocs import Cell, _format, _header_rows, _joined, _labels
+from . import chartxml, tablegrid
+from .office import A, CHART, EMU_PER_POINT, MC, R, Package, number_format
+from .tablegrid import Cell, header_labels, header_rows, joined_labels
 from .textdocs import Block, Picture, TextDocument
 
 P = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
-A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
-R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
-MC = "{http://schemas.openxmlformats.org/markup-compatibility/2006}"
-CHART = "http://schemas.openxmlformats.org/drawingml/2006/chart"
 TABLE = "http://schemas.openxmlformats.org/drawingml/2006/table"
 DIAGRAM = "http://schemas.openxmlformats.org/drawingml/2006/diagram"
-EMU_PER_POINT = 12700
 TITLES = ("title", "ctrTitle")
 BANDS = 24  # reading order: a slide's height in bands, shapes read band by band, left to right within one
 TOP = 0.15  # a text box starting this near the top (a share of the slide's height) may be an untitled slide's title
 TITLE_CHARS = 100
 NUMBERS = {"arabic": "decimal", "alphaLc": "lowerLetter", "alphaUc": "upperLetter", "romanLc": "lowerRoman",
            "romanUc": "upperRoman"}
-
-class Package:
-    """A zip of parts with relationships (Open Packaging Conventions): enough to follow a deck's parts."""
-    def __init__(self, data):
-        self.zip = zipfile.ZipFile(io.BytesIO(bytes(data)))
-        self.names = set(self.zip.namelist())
-
-    def read(self, name):
-        return self.zip.read(name)
-
-    def xml(self, name):
-        from lxml import etree
-        return etree.fromstring(self.read(name))
-
-    def rels(self, name):
-        """{relationship id: (its type's last word, the target part's name)}; external targets left out."""
-        folder, base = posixpath.split(name)
-        rels = posixpath.join(folder, "_rels", base + ".rels")
-        if rels not in self.names:
-            return {}
-        out = {}
-        for rel in self.xml(rels):
-            if rel.get("TargetMode") == "External":
-                continue
-            target = posixpath.normpath(posixpath.join(folder, rel.get("Target")))
-            out[rel.get("Id")] = (rel.get("Type").rsplit("/", 1)[-1], target.lstrip("/"))
-        return out
-
-    def related(self, name, kind):
-        return next((target for rel, target in self.rels(name).values() if rel == kind), None)
 
 @dataclass
 class Item:
@@ -148,7 +111,7 @@ def _paragraphs(body):
 def _number(n, kind):
     """An automatic number as its type writes it: arabicPeriod 3 is "3.", alphaLcParenR is "c)"."""
     style = next((s for s in NUMBERS if kind.startswith(s)), "arabic")
-    shown = _format(n, NUMBERS[style])
+    shown = number_format(n, NUMBERS[style])
     rest = kind[len(style):]
     return {"Period": f"{shown}.", "ParenR": f"{shown})", "ParenBoth": f"({shown})"}.get(rest, shown)
 
@@ -304,17 +267,17 @@ def read_pptx(data):
             grid = _grid(element)
             if not grid:
                 return
-            heads = _header_rows(grid)
-            labels = _labels(grid, heads)
+            heads = header_rows(grid)  # a deck marks no header rows
+            labels = header_labels(grid, heads)
             header_lines = [line(page, " | ".join(c.text for c in cells)) for _, cells in grid[:heads]]
             rows, row_lines, row_headers = [labels], [header_lines[0]], []
             for _, cells in grid[heads:]:
                 rows.append([c.text for c in cells])
-                row_headers.append([_joined(labels[c.first:c.last + 1]) for c in cells])
+                row_headers.append([joined_labels(labels[c.first:c.last + 1]) for c in cells])
                 row_lines.append(line(page, " | ".join(c.text for c in cells)))
             first = header_lines[0]
             counted[page] = counted.get(page, 0) + 1
-            ruled = tablerules.from_cells(grid, heads, labels, row_lines[1:], title,
+            ruled = tablegrid.from_cells(grid, heads, labels, row_lines[1:], title,
                                           f"slide {page}, table {counted[page]}")
             blocks.append(Block(page, first, len(lines), "\n".join(t for _, t in lines[first - 1:]), "table", rows,
                                 row_lines, row_headers, grid=ruled))

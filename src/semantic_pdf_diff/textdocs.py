@@ -48,7 +48,7 @@ class Block:
     row_headers: list = field(default_factory=list)  # each body row's own header labels (a Word table's merged
                                                      # cells); empty: every row is read under rows[0]
     source: str = ""    # where a table came from, if not a table: "chart" (a Word chart's data)
-    grid: object = None  # a table's cells as its rules see them (tablerules.Grid): a workbook's tables, for now
+    grid: object = None  # a table's cells as its rules see them (tablegrid.Grid): a workbook's tables, for now
     key_value: bool = False  # proposed as a key-value list (keyvalue.candidate): the model asked before it's read
 
     @property
@@ -413,7 +413,7 @@ def text_job(data, job, output, client, dispatch, progress, extension):
 
             def as_table(checked=None, page=page, table=table, ti=ti, body=body, by_itself=by_itself, limit=limit):
                 """The table read as one (checked: the key-value check's step, when it was asked)."""
-                from . import tablerules
+                from . import tablegrid, tablerules
                 read = by_itself if checked is None else lambda ri: by_itself(ri, checked=checked)
                 if table.grid is not None and table.grid.rows and limit is not None and len(body) > limit:
                     source = DerivationStep(step=core.derivation["table"][0].step, detail="the table's cells")
@@ -421,7 +421,7 @@ def text_job(data, job, output, client, dispatch, progress, extension):
                                     source if checked is None else [source, checked])
                     return
                 if table.grid is not None and table.grid.rows:  # without rules: the grid's rows, and possible notes
-                    for key in table.grid.keys + [r.key for r in tablerules.possible_notes(table.grid)]:
+                    for key in table.grid.keys + [r.key for r in tablegrid.possible_notes(table.grid)]:
                         read(key)
                     return
                 for ri in range(len(body)):

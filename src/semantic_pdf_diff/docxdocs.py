@@ -50,23 +50,20 @@ Needs python-docx (the `office` extra).
 """
 import io
 import re
-from dataclasses import dataclass, field
 
-from . import chartxml, keyvalue, tablerules
+from . import chartxml, keyvalue, tablegrid
+from .office import A, CHART, EMU_PER_POINT, MC, R, number_format
+from .tablegrid import Cell, header_labels, header_rows, joined_labels
 from .textdocs import Block, Picture, TextDocument
 
 HEADING = re.compile(r"^(?:Heading|heading)\s*(\d)$")
 # A caption: a paragraph in a caption style (Word's "Caption"; 3GPP's "TF", a figure's title), or one naming a figure
 CAPTION_STYLES = ("caption", "tf")
 FIGURE_TITLE = re.compile(r"^(?:Figure|Fig\.?|Diagram|Chart)\s*[A-Z]?[\d.\-\u2010-\u2013]+\w*", re.I)
-A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
-R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 WP = "{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}"
 V = "{urn:schemas-microsoft-com:vml}"
-MC = "{http://schemas.openxmlformats.org/markup-compatibility/2006}"
 M = "{http://schemas.openxmlformats.org/officeDocument/2006/math}"
 ANCHOR_CHARS = 100  # a comment's anchored text, at most this long (then "…")
-CHART = "http://schemas.openxmlformats.org/drawingml/2006/chart"
 CHARTEX = "http://schemas.microsoft.com/office/drawing/2014/chartex"
 SHAPES = ("{http://schemas.microsoft.com/office/word/2010/wordprocessingGroup}wgp",   # grouped shapes
           "{http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas}wpc",  # a drawing canvas
@@ -76,7 +73,6 @@ LAYOUT_CHARS = 200      # cells averaging this much text make a table without a 
 HEADER_CHARS = 40       # a header row's cells are filled and at most this long
 WRAPPERS = ("w:sdt", "w:sdtContent", "w:customXml")  # content controls and custom markup: read through
 DIGIT = re.compile(r"\d")
-EMU_PER_POINT = 12700
 LENGTH = re.compile(r"(width|height)\s*:\s*([\d.]+)\s*(pt|in|cm|mm|px)?", re.I)
 POINTS_PER = {"pt": 1.0, "in": 72.0, "cm": 72 / 2.54, "mm": 72 / 25.4, "px": 0.75, None: 0.75}
 
@@ -254,26 +250,8 @@ class Numbering:
             return "•"
         def number(match):
             k = int(match.group(1)) - 1
-            return _format(counts.get(k, start(k)), levels.get(k, (1, "decimal", ""))[1])
+            return number_format(counts.get(k, start(k)), levels.get(k, (1, "decimal", ""))[1])
         return re.sub(r"%(\d)", number, text).strip()
-
-def _format(n, form):
-    if form == "decimalZero":
-        return f"{n:02d}"
-    if form in ("lowerLetter", "upperLetter"):
-        letters = ""
-        while n > 0:
-            n, r = divmod(n - 1, 26)
-            letters = chr(97 + r) + letters
-        return letters.upper() if form == "upperLetter" else letters
-    if form in ("lowerRoman", "upperRoman"):
-        out = ""
-        for value, numeral in ((1000, "m"), (900, "cm"), (500, "d"), (400, "cd"), (100, "c"), (90, "xc"), (50, "l"),
-                               (40, "xl"), (10, "x"), (9, "ix"), (5, "v"), (4, "iv"), (1, "i")):
-            while n >= value:
-                out, n = out + numeral, n - value
-        return out.upper() if form == "upperRoman" else out
-    return "" if form == "none" else str(n)
 
 def _comments(document):
     """{comment id: (author, its text)} from the document's comments part (none: {})."""
@@ -322,16 +300,6 @@ def _number(element, props, name, default):
     found = _property(element, props, name)
     return int(found.get(_qn("w:val"), default)) if found is not None else default
 
-@dataclass
-class Cell:
-    """A table cell placed on the grid: its text (small nested tables written in), the columns it covers, whether
-    it continues a cell merged down from the row above, and its larger nested tables (read after the table)."""
-    text: str
-    first: int
-    last: int
-    continued: bool = False
-    nested: list = field(default_factory=list)
-
 def _grid(table, numbers):
     """[(w:tr, [Cell])]: each row's cells on the table's columns. A cell merged down repeats its text in the rows it
     covers; a deleted row (a tracked deletion) reads as empty."""
@@ -377,51 +345,14 @@ def _inline(cells):
     texts = [c.text for c in cells if c.text]
     return f"{texts[0]}: {texts[1]}" if len(texts) == 2 else ", ".join(texts)
 
-def _header_rows(grid, marked=None):
-    """How many rows head a table: those marked to repeat as a header (marked: their count, when the rows aren't Word's
-    elements); else the first, and the next while the row above has a cell merged across (or one merged down into
-    it) and the row holds no number (three at most)."""
-    if marked is None:
-        marked = 0
-        for tr, _ in grid:
-            if _property(tr, "w:trPr", "w:tblHeader") is None:
-                break
-            marked += 1
-    if marked:
-        return min(marked, len(grid))
-    n = 1
-    while n < min(len(grid) - 1, 3):
-        before, row = grid[n - 1][1], grid[n][1]
-        merged = any(c.last > c.first for c in before) or any(c.continued for c in row)
-        if not merged or any(DIGIT.search(c.text) for c in row) or not any(c.text for c in row):
+def _marked_rows(grid):
+    """How many of a Word table's first rows are marked to repeat as its header."""
+    marked = 0
+    for tr, _ in grid:
+        if _property(tr, "w:trPr", "w:tblHeader") is None:
             break
-        n += 1
-    return n
-
-def _labels(grid, heads):
-    """Each column's label: its header cells' texts top to bottom, a merged cell's once ("Rated point > TDH (ft)")."""
-    width = max((c.last + 1 for _, cells in grid for c in cells), default=0)
-    out = []
-    for column in range(width):
-        path = []
-        for _, cells in grid[:heads]:
-            cell = next((c for c in cells if c.first <= column <= c.last), None)
-            if cell is not None and cell.text and (not path or path[-1] != cell.text):
-                path.append(cell.text)
-        out.append(" > ".join(path))
-    return out
-
-def _joined(labels):
-    """One label for a cell merged across columns: their shared path once, then each leaf ("A > B / C")."""
-    labels = list(dict.fromkeys(label for label in labels if label))
-    if len(labels) < 2:
-        return labels[0] if labels else ""
-    paths = [label.split(" > ") for label in labels]
-    shared = 0
-    while all(len(p) > shared + 1 and p[shared] == paths[0][shared] for p in paths):
-        shared += 1
-    leaves = " / ".join(" > ".join(p[shared:]) for p in paths)
-    return " > ".join(paths[0][:shared] + [leaves])
+        marked += 1
+    return marked
 
 def _layout(table, styles):
     """Whether a table lays out content rather than holding data (see the module's notes)."""
@@ -620,18 +551,18 @@ def read_docx(data):
         if place:
             n = line(place)
             blocks.append(Block(1, n, n, place))
-        heads = _header_rows(grid)
-        labels = _labels(grid, heads)
+        heads = header_rows(grid, _marked_rows(grid))
+        labels = header_labels(grid, heads)
         header_lines = [line(" | ".join(c.text for c in cells)) for _, cells in grid[:heads]]
         rows, row_lines, row_headers, inner = [labels], [header_lines[0]], [], []
         for _, cells in grid[heads:]:
             rows.append([c.text for c in cells])
-            row_headers.append([_joined(labels[c.first:c.last + 1]) for c in cells])
+            row_headers.append([joined_labels(labels[c.first:c.last + 1]) for c in cells])
             row_lines.append(line(" | ".join(c.text for c in cells)))
             inner += [(cells, c) for c in cells if c.nested]
         first = header_lines[0]
         counted[0] += 1
-        ruled = tablerules.from_cells(grid, heads, labels, row_lines[1:], place.rstrip(":") if place else "",
+        ruled = tablegrid.from_cells(grid, heads, labels, row_lines[1:], place.rstrip(":") if place else "",
                                       f"table {counted[0]}")
         # two columns, perhaps a key-value list (code review 2026-10-08, B5); repeated header rows are marked
         marked = heads != 1 or _property(grid[0][0], "w:trPr", "w:tblHeader") is not None
@@ -645,7 +576,7 @@ def read_docx(data):
                 chart(found, first, "table")
         for cells, cell in inner:
             where = ", ".join(t for t in (cells[0].text if cells[0] is not cell else "",
-                                          _joined(labels[cell.first:cell.last + 1])) if t)
+                                          joined_labels(labels[cell.first:cell.last + 1])) if t)
             for nested in cell.nested:
                 table(nested, f"Table in {where}:" if where else "Table:")
         footnote_lines(ids)

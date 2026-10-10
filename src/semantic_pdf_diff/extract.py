@@ -253,7 +253,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
 
                         def as_table(checked=None, tag=tag, part_body=part_body, ruled=ruled, by_itself=by_itself):
                             """The part read as a table (checked: the key-value check's step, when it was asked)."""
-                            from . import tablerules
+                            from . import tablegrid, tablerules
                             read = by_itself
                             if checked is not None:  # the check's step before the model's, in each claim's derivation
                                 checked_steps = list(steps or DERIVATION["table"])
@@ -266,7 +266,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                                 tablerules.read(core, number, ruled, f"rules:p{number}:{tag}", read,
                                                 source if checked is None else [source, checked], image=image())
                             elif ruled is not None and ruled.rows:  # without rules: the grid's rows, and possible notes
-                                for key in ruled.keys + [r.key for r in tablerules.possible_notes(ruled)]:
+                                for key in ruled.keys + [r.key for r in tablegrid.possible_notes(ruled)]:
                                     read(key)
                             else:
                                 for ri in range(len(part_body)):

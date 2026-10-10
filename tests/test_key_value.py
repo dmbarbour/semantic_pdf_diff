@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from semantic_pdf_diff import keyvalue, tablerules
+from semantic_pdf_diff import keyvalue, tablegrid
 from semantic_pdf_diff.llm import CallLimitReached, ModelFailure
 from test_textdocs import Model
 
@@ -65,7 +65,7 @@ def office():
 
 class Candidates(unittest.TestCase):
     def grid(self, rows, columns=2):
-        return tablerules.grid([tablerules.letter(k) for k in range(1, columns + 1)], rows[0], rows[1:],
+        return tablegrid.grid([tablegrid.letter(k) for k in range(1, columns + 1)], rows[0], rows[1:],
                                [str(k) for k in range(2, len(rows) + 1)], list(range(2, len(rows) + 1)))
 
     def test_two_columns_with_no_numbers_on_the_left_are_proposed(self):

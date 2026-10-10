@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import stubs  # noqa: F401 (a clean environment)
-from semantic_pdf_diff import tablerules
+from semantic_pdf_diff import tablegrid, tablerules
 from semantic_pdf_diff.tables import pdf_grid
 
 HEADER = ["Tag", "Service", "Flow (L/s)", "Head (m)"]
@@ -29,12 +29,12 @@ class Grid(unittest.TestCase):
         self.assertEqual(g.rows[1][1], "Condenser water, standby duty")
         self.assertEqual([(r.key, r.text[:5]) for r in g.section_rows], [(1, "Stand"), (4, "Note:")])
         self.assertEqual(g.sections[2], BODY[4][0])  # P-3 filed under the note, as the heuristic has it
-        note, = tablerules.possible_notes(g)
+        note, = tablegrid.possible_notes(g)
         self.assertEqual(note.key, 4)
-        noted, notes = tablerules.noted(g, [note.name])
+        noted, notes = tablegrid.noted(g, [note.name])
         self.assertEqual(notes, [note])
         self.assertEqual(noted.sections, ["", "Standby", "Standby"])  # a note labels nothing
-        self.assertEqual(tablerules.noted(g, ["99"]), (g, []))  # only possible notes can be named
+        self.assertEqual(tablegrid.noted(g, ["99"]), (g, []))  # only possible notes can be named
         self.assertIn(f"POSSIBLE NOTES (section rows holding a number: a note states facts, where a section row only "
                       f"names the rows below it): row {note.name}: Note: P-2", tablerules.question(g))
         plain = pdf_grid(HEADER, BODY[:3], BOXES[1:4])
@@ -102,7 +102,7 @@ class Pdf(unittest.TestCase):
         self.assertIn("Note: P-2 is rated 95 L/s", rows[4])
 
     def test_a_note_the_model_confirms_is_read_and_one_it_doesnt_stays_a_label(self):
-        name = tablerules.possible_notes(pdf_grid(HEADER, BODY, BOXES[1:]))[0].name
+        name = tablegrid.possible_notes(pdf_grid(HEADER, BODY, BOXES[1:]))[0].name
         client, coverage = self.extract(rules=0, answer={"reading": "rows", "notes": [name]})
         self.assertIn("POSSIBLE NOTES", client.asked[0])
         rows = self.rows(client)
@@ -119,7 +119,7 @@ class Pdf(unittest.TestCase):
         self.assertEqual(next(r for r in coverage if r["task"] == "rules:p1:0")["status"], "failed")
 
     def test_rules_bind_rows_under_the_section_above_a_confirmed_note(self):
-        name = tablerules.possible_notes(pdf_grid(HEADER, BODY, BOXES[1:]))[0].name
+        name = tablegrid.possible_notes(pdf_grid(HEADER, BODY, BOXES[1:]))[0].name
         rules = {"reading": "rules", "notes": [name], "claims": [
             {"entity": "{A}", "attribute": "flow", "value": "{C}", "unit": "L/s", "conditions": "{section}",
              "number": True}], "examples": [  # P-3 under "Standby": checked against the grid without the note's label

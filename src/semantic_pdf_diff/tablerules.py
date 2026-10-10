@@ -32,15 +32,16 @@ to produce claims from rows or how to summarize things within a few known templa
 - **Claims made mechanically** quote the cells they came from, and their derivation names the rules ("table-rules")
   or the template ("table-summary"; a mean or a count is computed, its quote the column's header).
 """
-import datetime
 import hashlib
 import re
 from collections import Counter
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 
 from pydantic import Field, field_validator
 
 from .schema import DerivationStep, Evidence, Lenient, claim_id, coverage_row
+from .tablegrid import (header_name, header_unit, kind, moment, noted, number, plain as _plain,
+                        possible_notes)
 
 SAMPLE_FIRST, SAMPLE_MIDDLE, SAMPLE_LAST, SAMPLE_ODD = 5, 3, 2, 3  # the sample rows shown
 SHOWN_CELL = 120    # characters of a sample cell shown
@@ -51,11 +52,8 @@ CATEGORIES = 12     # a category's values counted one by one; the rest counted t
 RETRY_SHARE = 0.2   # rules failing more of the rows than this are asked for again
 CONFIDENCE = 0.9    # a claim made by rules: as sure as the rules
 
-NUMBER = re.compile(r"^[-+−]?[$€£¥]?(?=\.?\d)(?:\d{1,3}(?:,\d{3})+|\d*)(?:\.\d+)?(?:[eE][-+]?\d+)?%?$")
-DATE = re.compile(r"^\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)?$")
 PLACEHOLDER = re.compile(r"\{([^{}]*)\}")
 NOT_APPLICABLE = {"n/a", "na", "n.a.", "-", "–", "—", "not applicable"}  # a value cell saying there's no value
-BRACKETED = re.compile(r"[(\[]([^()\[\]]{1,24})[)\]]")
 
 RULES = '''This is one table from an engineering document. Decide how its rows become claims: atomic facts a reader
 might rely on (entity, attribute, value, unit, conditions), as an extraction of the table would give them. Choose one
@@ -116,128 +114,6 @@ Return JSON:
 "template":"series|log|list", "input":"A", "quantities":["B"], "categories":["C"], "points":["0"]}
 Leave out what your reading doesn't use.
 '''
-
-# --- the table as the rules see it
-
-@dataclass
-class Grid:
-    """A table as its rules see it: columns named by letter, each with its header label; body rows aligned to the
-    columns, each named (a sheet's row number), placed (its line in the document), with its section (a section row's
-    label above it, or "") and its index among the table's body rows (keys, for reading it by itself); the table's
-    title and place ("Polar!A3:C334")."""
-    columns: list
-    labels: list
-    rows: list = field(default_factory=list)
-    names: list = field(default_factory=list)
-    lines: list = field(default_factory=list)
-    sections: list = field(default_factory=list)
-    keys: list = field(default_factory=list)
-    title: str = ""
-    place: str = ""
-    boxes: list = field(default_factory=list)  # each row's box on its page (a PDF's), where rows aren't lines
-    section_rows: list = field(default_factory=list)  # [SectionRow], in order
-    joined: set = field(default_factory=set)  # keys of rows joined from several lines (a PDF's wrapped cells)
-
-@dataclass
-class SectionRow:
-    """A row holding only its first cell: a label for the rows below it, from row `at` of the grid on (or a note
-    stating facts, which possible_notes proposes and the model confirms). key: as Grid.keys; name, line, box: as a
-    row's."""
-    key: int
-    text: str
-    name: str
-    line: int
-    box: tuple | None
-    at: int
-
-def possible_notes(g):
-    """Section rows holding a number: possibly notes stating facts ("Note: P-2 is rated 95 L/s ..."), not labels.
-    Our proposal; the rules query asks the model which are (code review 2026-10-08, B2: a note was a label, its facts
-    never read, the rows below filed under it)."""
-    return [r for r in g.section_rows if re.search(r"\d", r.text)]
-
-def noted(g, names):
-    """(the grid with the possible notes named (by row) as notes labelling nothing, those notes): the rows below a
-    note take the section above it."""
-    names = {str(n).strip() for n in names or ()}
-    notes = [r for r in possible_notes(g) if r.name in names]
-    if not notes:
-        return g, []
-    labels = [r for r in g.section_rows if r not in notes]
-    sections = [next((r.text for r in reversed(labels) if r.at <= i), "") for i in range(len(g.rows))]
-    return replace(g, sections=sections), notes
-
-def grid(columns, labels, rows, names, lines, title="", place="", boxes=None):
-    """A Grid from a table's body rows (aligned to its columns). A row holding only its first cell, in a table of
-    three columns or more, is a section row, labelling the rows below it; an empty row is left out."""
-    g, section = Grid(list(columns), list(labels), title=title, place=place), ""
-    boxes = boxes or [None] * len(rows)
-    for key, (row, name, line, box) in enumerate(zip(rows, names, lines, boxes)):
-        row = [row[k] if k < len(row) else "" for k in range(len(columns))]
-        filled = [k for k, text in enumerate(row) if text]
-        if len(columns) > 2 and filled == [0]:
-            section = row[0]
-            g.section_rows.append(SectionRow(key, row[0], str(name), line, box, len(g.rows)))
-        elif filled:
-            g.rows.append(row)
-            g.names.append(str(name))
-            g.lines.append(line)
-            g.sections.append(section)
-            g.keys.append(key)
-            if box is not None:
-                g.boxes.append(box)
-    return g
-
-def letter(column):
-    """A column's letter as a spreadsheet names it, from 1 ("A", ..., "Z", "AA")."""
-    out = ""
-    while column:
-        column, rest = divmod(column - 1, 26)
-        out = chr(65 + rest) + out
-    return out
-
-def from_cells(rows, heads, labels, lines, title="", place=""):
-    """A Grid from a reader's table grid (Word's, a deck's: [(row, [Cell])], each cell with its first and last
-    column and its text), its header rows' count, its column labels and its body rows' lines; columns named A, B, ...
-    and rows by their number within the table."""
-    width = max([len(labels)] + [c.last + 1 for _, cells in rows for c in cells])
-    aligned = []
-    for _, cells in rows[heads:]:
-        aligned.append([""] * width)
-        for c in cells:
-            aligned[-1][c.first] = c.text
-    return grid([letter(k) for k in range(1, width + 1)], list(labels) + [""] * (width - len(labels)), aligned,
-                [str(k) for k in range(heads + 1, len(rows) + 1)], lines, title, place)
-
-def number(text):
-    """A cell's number as shown ("1,750", "12.5%", "$1,200", "−3"), or None."""
-    if not NUMBER.match(text):
-        return None
-    return float(re.sub(r"[,$€£¥%]", "", text).replace("−", "-"))
-
-def moment(text):
-    """A date or date and time as shown, or None."""
-    try:
-        return datetime.datetime.fromisoformat(text) if DATE.match(text) else None
-    except ValueError:
-        return None
-
-def kind(text):
-    return "empty" if not text else "number" if NUMBER.match(text) else "date" if DATE.match(text) else "text"
-
-def header_unit(label):
-    """The unit in a header's last brackets ("Flow (L/s)" → "L/s", "alpha [deg]" → "deg"), or ""."""
-    found = BRACKETED.findall(label)
-    return found[-1].strip() if found else ""
-
-def header_name(label):
-    """A header's own name: the last part of its path, without its unit's brackets ("Hydraulics > Capacity (gpm)" →
-    "Capacity"; the group stays in {B.header})."""
-    label = label.rsplit(" > ", 1)[-1]
-    found = list(BRACKETED.finditer(label))
-    if found:
-        label = label[:found[-1].start()] + label[found[-1].end():]
-    return " ".join(label.split()).strip(" ,;:")
 
 def _shown(value):
     return format(value, ".10g")
@@ -537,11 +413,6 @@ cell split or joined). Also copy the cells of one sample row from the image as y
 (a number in it), not a header line, by its number above, empty cells left out:
 "transcribed": {"row": "<its number>", "cells": ["...", "..."]}.
 """
-
-def _plain(text):
-    import unicodedata
-    text = unicodedata.normalize("NFKC", str(text)).casefold()
-    return "".join(ch for ch in text if ch.isalnum() or ch in ".-+%/")
 
 def transcription_mismatch(answer, g):
     """What a row copied from the image says against the text layer's cells: "" when they agree (folded for case,
