@@ -9,8 +9,6 @@ tagged in the ledger.
     python scripts/record_runs.py --replay --fixture tests/fixtures/replay-slices.zip --out benchmarks/runs/baseline
 """
 import argparse
-import contextlib
-import io
 import json
 import sys
 from pathlib import Path
@@ -36,13 +34,12 @@ def main(argv=None):
     parser.add_argument("--ledger", type=Path)
     parser.add_argument("--tag", action="append", default=[], metavar="KEY=VALUE")
     parser.add_argument("--max-cost", type=float)
-    parser.add_argument("--plan", action="store_true", help="estimate calls and tokens without calling the model")
     parser.add_argument("--extract-only", action="store_true",
                         help="extraction only: each slice on its own, without situating or comparisons")
     args = parser.parse_args(argv)
 
     sys.path.insert(0, str(ROOT / "src"))
-    from semantic_pdf_diff import cli, pipeline
+    from semantic_pdf_diff import pipeline
     from semantic_pdf_diff.progress import setup_logging
     setup_logging(quiet=True)
 
@@ -72,13 +69,6 @@ def main(argv=None):
     spent_before = ledger.spent(args.ledger, **tags) if args.ledger else 0.0
     for run in runs:
         a, b = (ROOT / "samples/slices" / f"{name}.pdf" for name in run["slices"])
-        command = [str(a), str(b), "--config", str(config), "-q"] + (["--no-situate"] if args.extract_only else [])
-        if args.plan:
-            buffer = io.StringIO()
-            with contextlib.redirect_stdout(buffer):
-                cli.main(command + ["--plan"])
-            print(run["name"], json.dumps(json.loads(buffer.getvalue())["total"]))
-            continue
         overrides = {"situate": False} if args.extract_only else {}
         if args.replay:
             overrides["base_url"] = pipeline.NO_MODEL
