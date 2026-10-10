@@ -149,7 +149,7 @@ def reader_for(extension):
             image_pdf(data, extension, client.s), job, output, client, dispatch, progress)
     if extension in TEXT_EXTENSIONS and (extension not in (".docx", ".pptx", ".xlsx", ".xlsm") or
                                          office_installed(workbook=extension in (".xlsx", ".xlsm"))):
-        from .textdocs import text_job
+        from .textjob import text_job
         return lambda data, job, output, client, dispatch, progress: text_job(data, job, output, client, dispatch,
                                                                               progress, extension)
     return None

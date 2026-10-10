@@ -1,7 +1,7 @@
 """What every reader does with an extraction task (docs/plans/multi-format-adapters-2026-09-23.md, milestone 1): queue
 the request, check the answer's quotes, make evidence and coverage rows, follow exactly repeated blocks, refine a
 partial answer, and the text and table tasks themselves, which take text segments and a reader for their context
-whatever the format. A reader (extract's PDF job, textdocs' text job) supplies its parts: where a task sits (a page
+whatever the format. A reader (extract's PDF job, textjob's text job) supplies its parts: where a task sits (a page
 and a box: PDF points, or lines of a text file), its sections, its context reader, and the locator a claim gets.
 Split from extract.py; PDF requests are byte for byte what they were (tests/test_golden_requests.py).
 """

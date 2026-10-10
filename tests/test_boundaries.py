@@ -69,10 +69,9 @@ def cycles():
 
 # The import cycles left (code review 2026-10-08, C4: one of 21 modules, held by models importing the levers; then
 # A12, extract's five jobs apart; C15, the evaluators' settings to the lab; D6, retrieval apart and compare's
-# recipe label given it). Each architecture move that breaks a
+# recipe label given it; architecture 7, textdocs' three jobs apart). Each architecture move that breaks a
 # part of them shrinks this; a change that grows them fails.
-CYCLES = [{"fixtures", "llm"},  # the model client's replay glue (C14)
-          {"docxdocs", "pptxdocs", "textdocs", "xlsxdocs"}]  # textdocs' three jobs (architecture 7)
+CYCLES = [{"fixtures", "llm"}]  # the model client's replay glue (C14)
 
 class Layers(unittest.TestCase):
     def test_the_schema_imports_nothing_of_the_product(self):

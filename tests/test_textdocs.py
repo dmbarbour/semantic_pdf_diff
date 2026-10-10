@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from semantic_pdf_diff import textdocs
+from semantic_pdf_diff import textdocs, textjob
 from semantic_pdf_diff.tasks import ExtractQuery
 from semantic_pdf_diff.jobs import Job, reader_for, run_jobs
 from semantic_pdf_diff.schema import Extraction, TextLocator
@@ -112,7 +112,7 @@ class Parsing(unittest.TestCase):
 
     def test_sections_carry_their_heading_paths(self):
         doc = textdocs.parse(MARKDOWN, markdown=True)
-        sections, index = textdocs.text_sections(doc, 2, 20)
+        sections, index = textjob.text_sections(doc, 2, 20)
         self.assertEqual([s.heading_path for s in sections],
                          [["Harrow Creek WTP"], ["Harrow Creek WTP", "Design Basis"],
                           ["Harrow Creek WTP", "Chlorine Feed"]])

@@ -1,5 +1,5 @@
-"""Word documents (.docx; docs/plans/multi-format-adapters-2026-09-23.md, milestone 2), read through the text reader
-(textdocs.py): a .docx becomes a TextDocument whose "lines" are its paragraphs and table rows in order, so sections,
+"""Word documents (.docx; docs/plans/multi-format-adapters-2026-09-23.md, milestone 2), read into the text document
+(textmodel.py): a .docx becomes a TextDocument whose "lines" are its paragraphs and table rows in order, so sections,
 grouping, the context levers and the task core work unchanged, and a claim's locator names its paragraphs.
 
 - **Text:** each paragraph's text as currently written: tracked insertions in, deletions out (w:delText isn't
@@ -54,7 +54,7 @@ import re
 from . import chartxml, keyvalue, tablegrid
 from .office import A, CHART, EMU_PER_POINT, MC, R, number_format
 from .tablegrid import Cell, header_labels, header_rows, joined_labels
-from .textdocs import Block, Picture, TextDocument
+from .textmodel import Block, Picture, TextDocument
 
 HEADING = re.compile(r"^(?:Heading|heading)\s*(\d)$")
 # A caption: a paragraph in a caption style (Word's "Caption"; 3GPP's "TF", a figure's title), or one naming a figure

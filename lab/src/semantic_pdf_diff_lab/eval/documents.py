@@ -40,7 +40,7 @@ class Document:
         elif ext in IMAGE_EXTENSIONS:
             self.pdf = pymupdf.open(stream=image_pdf(data, ext, settings or layout_defaults()), filetype="pdf")
         else:
-            from semantic_pdf_diff.textdocs import read_text
+            from semantic_pdf_diff.textjob import read_text
             self.text = read_text(data, ext)
 
     @classmethod

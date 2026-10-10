@@ -184,7 +184,7 @@ class Section(Strict):
     first_y: float = 0.0
     last_y: float | None = None        # None: to the bottom of last_page
     heading_path: list[str] = Field(default_factory=list)
-    origin: Literal["outline", "pages", "headings"]  # headings: a text file's (textdocs.py)
+    origin: Literal["outline", "pages", "headings"]  # headings: a text file's (textjob.text_sections)
     # Cheap triage signals summed over the section's pages (numbers, units, requirement
     # words, tables, images, vector drawings, text characters); filled as pages are read.
     signals: dict[str, int] = Field(default_factory=dict)

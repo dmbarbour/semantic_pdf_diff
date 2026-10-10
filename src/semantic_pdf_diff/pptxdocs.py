@@ -28,7 +28,7 @@ from dataclasses import dataclass
 from . import chartxml, tablegrid
 from .office import A, CHART, EMU_PER_POINT, MC, R, Package, number_format
 from .tablegrid import Cell, header_labels, header_rows, joined_labels
-from .textdocs import Block, Picture, TextDocument
+from .textmodel import Block, Picture, TextDocument
 
 P = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
 TABLE = "http://schemas.openxmlformats.org/drawingml/2006/table"

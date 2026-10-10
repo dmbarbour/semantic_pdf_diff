@@ -95,7 +95,9 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `figures.py` | Figures found on a page: captions, drawing clusters and images paired with them, drawing sheets; figure labels |
 | `situate.py` | The prose citing figures and the claims inside them; figure and section "about" requests |
 | `tasks.py` | The task core every reader shares: the extraction prompt, requests, quote checks, evidence, coverage, refinement |
-| `textdocs.py` | Plain text and Markdown: pages, sections, paragraphs and pipe tables, line locators |
+| `textmodel.py` | The text document every reader but the PDF's reads into: pages, lines, blocks, headings, pictures |
+| `textjob.py` | The job reading a text format, as extract's reads a PDF; each format's reader, derivation, locator and pictures in `FORMATS` |
+| `textdocs.py` | Plain text and Markdown: pages, paragraphs, headings, pipe tables, page furniture |
 | `docxdocs.py` | Word documents read into the text reader's form: paragraphs, headings by style, tables, tracked changes, pictures |
 | `pptxdocs.py` | Slide decks read into the text reader's form: slides as pages, shapes in reading order, tables, charts, pictures, speaker notes |
 | `xlsxdocs.py` | Excel workbooks and CSV files read into the text reader's form: sheets as pages, regions and the sheet map, cells as Excel shows them (a CSV's as written), tables on the grid |

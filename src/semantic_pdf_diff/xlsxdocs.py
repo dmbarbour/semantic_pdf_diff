@@ -41,7 +41,7 @@ from dataclasses import dataclass, field
 from . import chartxml, keyvalue, tablegrid
 from .office import A, CHART, EMU_PER_POINT, R, Package
 from .tablegrid import Cell, header_labels, header_rows, joined_labels
-from .textdocs import Block, Picture, TextDocument
+from .textmodel import Block, Picture, TextDocument
 
 XDR = "{http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing}"
 S = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
