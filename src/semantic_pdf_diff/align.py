@@ -196,16 +196,23 @@ def _score(a, b, ka, kb):
                                                                                 b.item_attributes[kb])
 
 def _candidates(a, b):
-    """{(ka, kb): score} above the floor, among item pairs sharing a value or a name word (no others can reach it)."""
-    by_value, by_word = defaultdict(set), defaultdict(set)
+    """{(ka, kb): score} above the floor, among item pairs sharing a value or a name word (no others can reach it).
+    A pair sharing only name words whose names hold different identifiers ("Room 101", "Room 102") can't either: its
+    name scores 0, so it scores at most ATTRIBUTES, under the floor. So name words are looked up among the items
+    whose identifiers are the same or none (code review 2026-10-08, D3: every room against every room)."""
+    by_value, by_word = defaultdict(set), defaultdict(lambda: defaultdict(set))  # by_word[word][identifiers]
     for kb in b.items:
         for v in b.item_values[kb]:
             by_value[v].add(kb)
         for w in b.names[kb]:
-            by_word[w].add(kb)
+            by_word[w][identifiers(b.names[kb])].add(kb)
+    none = frozenset()
     out = {}
     for ka in a.items:
-        near = set().union(*(by_value[v] for v in a.item_values[ka]), *(by_word[w] for w in a.names[ka]))
+        ids = identifiers(a.names[ka])
+        named = (by_word[w].values() if not ids or ATTRIBUTES >= FLOOR else (by_word[w][ids], by_word[w][none])
+                 for w in a.names[ka])
+        near = set().union(*(by_value[v] for v in a.item_values[ka]), *(kbs for sets in named for kbs in sets))
         for kb in near:
             s = _score(a, b, ka, kb)
             if s >= FLOOR:
@@ -281,18 +288,28 @@ def _within(a, b, ia, ib, settle):
         if not agreed:  # judged, not settled: still open to a leftover reading
             unsure_a |= covered_a
             unsure_b |= covered_b
-    similarity = lambda i, j: (jaccard(attribute(a.claims[i]), attribute(b.claims[j]))
-                               + 0.5 * jaccard(words(a.claims[i].conditions), words(b.claims[j].conditions)))
-    named = lambda i, j: jaccard(attribute(a.claims[i]), attribute(b.claims[j])) > 0  # unnamed: only by value
+    # each claim's words once, not once per pair: a large item paired its claims by the million (code review
+    # 2026-10-08, D4)
+    attr_a, attr_b = {i: attribute(a.claims[i]) for i in ia}, {j: attribute(b.claims[j]) for j in ib}
+    cond_a, cond_b = {i: words(a.claims[i].conditions) for i in ia}, {j: words(b.claims[j].conditions) for j in ib}
     best_a, best_b = {}, {}
     # each reading left over pairs with its best partner, left over too or in a value group sent to the judge: a later
     # revision may print the superseded value beside the new one ("raised from 178 ft to 230 ft"), and the old
     # reading paired with the old value under other conditions
     free_a = lambda i: i not in done_a or i in unsure_a
     free_b = lambda j: j not in done_b or j in unsure_b
-    same = lambda i, j: words(a.claims[i].attribute) == words(b.claims[j].attribute)  # with a judged reading: only
-    candidates = [(similarity(i, j), i, j) for i in ia for j in ib if (i not in done_a or j not in done_b)
-                  and free_a(i) and free_b(j) and named(i, j) and (a.values[i] is None or a.values[i] != b.values[j])
+    said_a, said_b = {i: words(a.claims[i].attribute) for i in ia}, {j: words(b.claims[j].attribute) for j in ib}
+    same = lambda i, j: said_a[i] == said_b[j]  # with a judged reading: only
+    # pairs whose attributes share a word (an unnamed reading pairs only by value), found by word, each scored by
+    # its attributes' and conditions' similarity; sorted below, so found in any order
+    by_word = defaultdict(list)
+    for j in ib:
+        for w in attr_b[j]:
+            by_word[w].append(j)
+    candidates = [(jaccard(attr_a[i], attr_b[j]) + 0.5 * jaccard(cond_a[i], cond_b[j]), i, j)
+                  for i in ia if free_a(i) for j in {j for w in attr_a[i] for j in by_word[w]}
+                  if (i not in done_a or j not in done_b) and free_b(j)
+                  and (a.values[i] is None or a.values[i] != b.values[j])
                   and ((i not in done_a and j not in done_b) or same(i, j))]
     for s, i, j in sorted(candidates, key=lambda x: (-x[0], x[1], x[2])):
         if s < PAIRING:
@@ -307,14 +324,16 @@ def _within(a, b, ia, ib, settle):
     left_a = [i for i in ia if i not in done_a and i not in best_a]
     left_b = [j for j in ib if j not in done_b and j not in best_b]
     whole = lambda c: words(f"{c.entity} {c.attribute} {c.value} {c.unit} {c.conditions}")
-    for s, i, j in sorted(((jaccard(whole(a.claims[i]), whole(b.claims[j])), i, j) for i in left_a for j in left_b),
+    whole_a, whole_b = {i: whole(a.claims[i]) for i in left_a}, {j: whole(b.claims[j]) for j in left_b}
+    open_a, open_b = set(left_a), set(left_b)
+    for s, i, j in sorted(((jaccard(whole_a[i], whole_b[j]), i, j) for i in left_a for j in left_b),
                           key=lambda x: (-x[0], x[1], x[2])):
         if s < WORDING:
             break
-        if i in left_a and j in left_b:
+        if i in open_a and j in open_b:
             judge.append((i, j, round(s, 4)))
-            left_a.remove(i)
-            left_b.remove(j)
+            open_a.remove(i)
+            open_b.remove(j)
     return judge, settled
 
 def _homes(src, dst, key):

@@ -200,6 +200,27 @@ class Alignment(unittest.TestCase):
         for written in [('33.5"',), ("33.5", "in"), ("33.5 in",), ("2'-9 1/2\"",), ("2'-9½\"",), ("33½ in",)]:
             self.assertEqual(key(*written), ("in", 33.5), written)
 
+class Scale(unittest.TestCase):
+    """Alignment at scale (code review 2026-10-08, D3, D4; a test gap it listed)."""
+    def test_many_items_named_alike_align_quickly(self):
+        """Every "Room N" was scored against every other, by the name word they share: 2,000 rooms took 19 s."""
+        import time
+        rooms = lambda shift: [claim(f"Room {i}", "area", str(10 + (i + shift) % 997), "m2") for i in range(2000)]
+        started = time.monotonic()
+        found = align.align(rooms(0), rooms(1))
+        self.assertLess(time.monotonic() - started, 5)
+        self.assertEqual(found.summary["items"], [2000, 2000])
+
+    def test_a_large_item_pairs_its_claims_quickly(self):
+        """One item's leftover claims were paired with every word recomputed per pair: 1,000 claims took 24 s."""
+        import time
+        claims = lambda shift: [claim("Building", f"attribute {k % 50} {chr(97 + k % 26)}", str(k + shift), "kW",
+                                      f"zone {k % 30}") for k in range(1000)]
+        started = time.monotonic()
+        found = align.align(claims(0), claims(100000))
+        self.assertLess(time.monotonic() - started, 10)
+        self.assertTrue(found.judge)
+
 class Report(unittest.TestCase):
     def test_unchanged_files_change_no_status_or_grouping(self):
         """Revisions with an unchanged file are aligned in two passes; a claim's outcome comes from every pass it was

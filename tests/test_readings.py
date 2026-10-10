@@ -106,3 +106,13 @@ class ReconcileScales(unittest.TestCase):
         started = time.monotonic()
         reconcile(claims)
         self.assertLess(time.monotonic() - started, 5)
+
+    def test_thousands_of_claims_of_one_value_reconcile_quickly(self):
+        """Each claim was compared with every cluster of its value: 4,000 rooms of one area took 50 s (code review
+        2026-10-08, D5); only clusters seen on its pages can take it."""
+        import time
+        claims = [sighting(f'Room {i}', 'area', '25', 'm2', page=1 + i % 20, task=f'text:p{1 + i % 20}:0',
+                           region='text') for i in range(4000)]
+        started = time.monotonic()
+        self.assertEqual(len(reconcile(claims)), 4000)
+        self.assertLess(time.monotonic() - started, 5)

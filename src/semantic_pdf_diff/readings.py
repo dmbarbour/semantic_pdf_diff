@@ -98,21 +98,27 @@ def reconcile(evidence):
     # case the other way (a local reading lacking "isolated tower") is the cheaper error.
     claims = sorted(evidence, key=lambda e: (representative_rank(e), e.id))
     clusters = []  # [representative, [members]], in the order they were started
-    # A fact has one stated value, so a claim is compared only with clusters stating its value: the same
-    # clusters, in the same order, as comparing with all of them, without the quadratic cost.
-    by_value = {}
+    # A fact has one stated value and is seen near its representative, on one of its pages, so a claim is compared
+    # only with the clusters stating its value whose representative was seen on a page of the claim's: the same
+    # clusters, in the same order, as comparing with all of them, without the quadratic cost (code review
+    # 2026-10-08, D5: 4,000 claims of one value took 33 s).
+    by_value = {}  # (approximate, stated value): {page: [the indices of clusters whose representative was seen there]}
     for e in claims:
-        group = by_value.setdefault((e.approximate, _stated(e)), [])
-        for cluster in group:
+        pages = {o.locator.page for o in e.occurrences or [e]}
+        group = by_value.setdefault((e.approximate, _stated(e)), {})
+        for n in sorted({n for page in pages for n in group.get(page, ())}):
+            cluster = clusters[n]
             # Every reading must agree with every other, not only with the representative: a generic
             # one ("beam", no conditions) would otherwise gather "Floor Beam @ Grid 4" and "@ Grid 5",
-            # or "at rated speed" and "at cut-in".
-            if same_fact(cluster[0], e) and all(_conditions_agree(m, e) and _named_alike(m, e) for m in cluster[1]):
+            # or "at rated speed" and "at cut-in". (The value is the group's: same_fact without it.)
+            if _conditions_agree(cluster[0], e) and _named_alike(cluster[0], e) and _near(cluster[0], e) \
+                    and all(_conditions_agree(m, e) and _named_alike(m, e) for m in cluster[1]):
                 cluster[1].append(e)
                 break
         else:
             clusters.append([e, []])
-            group.append(clusters[-1])
+            for page in pages:
+                group.setdefault(page, []).append(len(clusters) - 1)
     out = []
     for head, members in clusters:
         if not members:
