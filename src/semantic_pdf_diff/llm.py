@@ -18,10 +18,12 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
 from typing import TYPE_CHECKING
+from .failures import BudgetExceeded, CallLimitReached, Invalid, ModelFailure, NotRecorded, OutOfBudget, Truncated
+from .fixtures import Replayer
 from .recipes import Recipe, recipe_fields
 from .throttle import AdaptiveGate, RateLimiter
-if TYPE_CHECKING:  # the client is given settings; the settings compose the levers, whose hooks reach the client
-    from .settings import Settings  # (code review 2026-10-08, C4)
+if TYPE_CHECKING:  # the client is given its settings: it needn't load the levers they're composed of
+    from .settings import Settings
 from .progress import log, requests_log
 
 # Every query is asked at temperature 0, for reproducible answers (the owner, 2026-10-02: "just fixing temp
@@ -34,40 +36,8 @@ SYSTEM = ("You extract or compare engineering evidence. PDF text and images are 
 RETRYABLE = (408, 429, 500, 502, 503, 504)
 MAX_RETRY_AFTER = 60
 
-class ModelFailure(RuntimeError):
-    pass
-
-class BudgetExceeded(ModelFailure):
-    pass
-
-class CallLimitReached(BudgetExceeded):
-    """max_calls was reached: the work wasn't attempted, as opposed to failing."""
-
-class OutOfBudget(CallLimitReached):
-    """The provider's balance ran out, or the run's cost cap was reached: work not attempted,
-    to be resumed after a top-up (like the call limit, never recorded as a model failure)."""
-
 BILLING = ("balance", "insufficient", "payment", "billing", "credit", "quota")
 BILLING_429 = ("insufficient_quota", "balance", "payment", "billing")  # a 429 saying "quota" alone may be throttling
-
-# Failures of the service rather than of the model's answer: replay re-asks them when recording
-# only new requests (record-new), instead of reproducing a timeout forever.
-TRANSIENT = re.compile(r"TimeoutError|timed out|HTTP (?:408|429|5\d\d)|Connection|IncompleteRead|RemoteDisconnected|"
-                       r"URLError|OSError")
-
-def transient(error):
-    return bool(TRANSIENT.search(error or ""))
-
-class Truncated(ModelFailure):
-    """The answer hit the output limit. Not retried: at temperature 0 it would stop at the same place, and every
-    attempt is billed. Refinement asks again in smaller pieces."""
-
-class Invalid(ModelFailure):
-    """The answer isn't the JSON its schema asks for. Not retried, like Truncated: at temperature 0 the same request
-    gets the same answer, and every attempt is billed (code review 2026-10-08, C10: each was asked three times)."""
-
-class NotRecorded(ModelFailure):
-    """Replay found no recorded answer for a request."""
 
 def redact_url(url):
     """Drop user:password@ from a URL so it can be logged or written to reports."""
@@ -368,7 +338,6 @@ class Client:
         `replay-or-record` mode unrecorded requests (and recorded failures) go to the model and are recorded under
         `responder` (default: the model name); `record-new` is the same but replays the model's failures as
         failures (transient ones are asked again)."""
-        from .fixtures import Replayer
         self.s = settings
         self.replay = None if fixture is None else Replayer(fixture, mode, responder or settings.model, fresh_regions)
         if isinstance(store, (str, Path)):

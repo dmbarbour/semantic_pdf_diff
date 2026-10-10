@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.dispatch import Dispatcher
-from semantic_pdf_diff.llm import ModelFailure
+from semantic_pdf_diff.failures import ModelFailure
 from semantic_pdf_diff.schema import Evidence, Occurrence, PdfLocator, Section
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.progress import NoProgress

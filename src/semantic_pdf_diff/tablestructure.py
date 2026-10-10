@@ -442,7 +442,7 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
     left it), apart the body lines read by themselves ("not table"), table False where the model reads no table
     (rules leaving no rows: a chart, a floor plan). images: a callable giving the table's crop(s), relative to the
     output folder, rendered only for a part that's asked."""
-    from .llm import CallLimitReached, NotRecorded
+    from .failures import CallLimitReached, NotRecorded
     tags = signals(header, body, boxes, styles, rules, cuts)
     flagged = [i + 1 for i, (t, row) in enumerate(zip(tags, body)) if suspect(t, row)]
     if cuts and cuts.get(0):  # the header's words cut by a column line

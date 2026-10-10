@@ -11,7 +11,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from .llm import CallLimitReached, NotRecorded
+from .failures import CallLimitReached, NotRecorded
 from .schema import DerivationStep, Evidence, Extraction, claim_id, coverage_row, merge_occurrences
 from .progress import log
 from .quotes import covered, quoted

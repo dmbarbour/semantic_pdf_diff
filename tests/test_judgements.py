@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from semantic_pdf_diff_lab.eval import judgements, rounds
-from semantic_pdf_diff.llm import ModelFailure
+from semantic_pdf_diff.failures import ModelFailure
 from semantic_pdf_diff_lab.eval.models import PairVerdict
 from test_judge_prompts import ITEMS
 

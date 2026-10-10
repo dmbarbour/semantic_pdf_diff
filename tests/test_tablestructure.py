@@ -219,7 +219,7 @@ class Asked(unittest.TestCase):
     def test_failures_keep_the_heuristics(self):
         """Its failure paths (code review 2026-10-08: a test gap): failed or not reached, first or second, the table is
         read as the heuristics left it; a review failing, the rules are used unreviewed."""
-        from semantic_pdf_diff.llm import CallLimitReached, ModelFailure, NotRecorded
+        from semantic_pdf_diff.failures import CallLimitReached, ModelFailure, NotRecorded
         bad = {"rules": [{"action": "keep", "lines": ["3"]}], "examples": [{"line": "7", "cells": ["Bands", "x"]}]}
         heuristics = {"parts": [(HEADER, BODY, BOXES)], "step": None, "apart": [], "table": True}
         for answers, task, status in (([ModelFailure("the service failed")], "structure:p4:0", "failed"),
@@ -573,7 +573,7 @@ class Detection(unittest.TestCase):
         return client.asked, coverage
 
     def test_an_unreached_row_isnt_split_by_column(self):
-        from semantic_pdf_diff.llm import CallLimitReached
+        from semantic_pdf_diff.failures import CallLimitReached
         rows = [["Tag", "Flow", "Head", "Power"], ["P-1", "120", "25", "40"]]
 
         def ask(task):

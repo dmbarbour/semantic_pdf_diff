@@ -9,7 +9,8 @@ from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff.schema import MAX_CLAIMS, Claim, Evidence, Extraction, Judgment, PdfLocator
 from semantic_pdf_diff.settings import Settings
-from semantic_pdf_diff.llm import Client, Invalid, ModelFailure, redact_url
+from semantic_pdf_diff.llm import Client, redact_url
+from semantic_pdf_diff.failures import Invalid, ModelFailure
 from semantic_pdf_diff.compare import numeric_check
 from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.segmentation import tiles
@@ -121,7 +122,7 @@ class ResponseShapeTests(unittest.TestCase):
         self.assertEqual(len(seen), 2)
 
     def test_failure_classes(self):
-        from semantic_pdf_diff.llm import transient
+        from semantic_pdf_diff.failures import transient
         self.assertTrue(transient('ModelFailure: TimeoutError: The read operation timed out'))
         self.assertTrue(transient('ModelFailure: HTTP 503: Service Unavailable'))
         self.assertFalse(transient('ModelFailure: ValidationError: 1 validation error for Extraction'))

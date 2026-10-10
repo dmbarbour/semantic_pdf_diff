@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from semantic_pdf_diff import keyvalue, tablegrid
-from semantic_pdf_diff.llm import CallLimitReached, ModelFailure
+from semantic_pdf_diff.failures import CallLimitReached, ModelFailure
 from test_textdocs import Model
 
 PAIRS = [["Pump", "P-2"], ["Flow", "95 L/s"], ["Head", "30 m"]]

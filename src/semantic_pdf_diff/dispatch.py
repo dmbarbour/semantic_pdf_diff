@@ -5,7 +5,7 @@ saving responses and handling results (which may queue refinement requests) happ
 on the calling thread, which owns the PDF document and the store connection.
 """
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
-from .llm import ModelFailure
+from .failures import ModelFailure
 
 class Dispatcher:
     def __init__(self, client, workers=None):

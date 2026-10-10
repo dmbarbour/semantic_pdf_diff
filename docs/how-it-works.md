@@ -89,6 +89,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `schema.py` | What the pipeline reads and writes: claims, locators, model answers, evidence, coverage rows, the report documents (imports no other module) |
 | `settings.py` | Settings: the endpoint's beside the platform the levers compose, loaded from the environment, a file and a caller |
 | `llm.py` | Compatible API transport, request budgeting, retries and cache |
+| `failures.py` | How a model request fails: the failure classes callers catch, and which recorded failures were the service's |
 | `jobs.py` | The extraction scheduler (a page at a time, sources in turn) and the readers by extension, with their versions |
 | `extract.py` | The PDF job: a PDF's text, tables, figures and tiles made into tasks |
 | `visuals.py` | Image tasks: a region rendered to a crop, its text layer and context, a partial tile refined in halves |

@@ -67,18 +67,16 @@ def cycles():
             visit(v)
     return found
 
-# The import cycles left (code review 2026-10-08, C4: one of 21 modules, held by models importing the levers; then
-# A12, extract's five jobs apart; C15, the evaluators' settings to the lab; D6, retrieval apart and compare's
-# recipe label given it; architecture 7, textdocs' three jobs apart). Each architecture move that breaks a
-# part of them shrinks this; a change that grows them fails.
-CYCLES = [{"fixtures", "llm"}]  # the model client's replay glue (C14)
+# The product had an import cycle of 21 modules, held together by imports placed inside functions (code review
+# 2026-10-08, C4); the architecture moves broke it (C4, A12, C15, D6, architecture 7, C14's failures.py). A cycle
+# coming back fails.
 
 class Layers(unittest.TestCase):
     def test_the_schema_imports_nothing_of_the_product(self):
         self.assertEqual(runtime_imports(PRODUCT / "schema.py"), set())
 
-    def test_the_import_cycle_doesnt_grow(self):
-        self.assertEqual(sorted(cycles(), key=sorted), sorted(CYCLES, key=sorted))
+    def test_the_product_has_no_import_cycle(self):
+        self.assertEqual(cycles(), [])
 
 class Boundaries(unittest.TestCase):
     def test_the_product_imports_nothing_from_the_lab(self):

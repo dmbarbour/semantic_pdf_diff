@@ -70,7 +70,7 @@ def read(core, page, g, task, boxes, as_table, as_pairs, image=None):
     context) as a key-value list; step: the "key-value-check" derivation step; context: the context lines a table
     row is given (the text above it, its caption; a text block's context doesn't hold them). boxes: the header's
     box, then each grid row's (the check's span). image: the block's crop (a PDF's), sent with the check."""
-    from .llm import CallLimitReached, NotRecorded
+    from .failures import CallLimitReached, NotRecorded
     span = (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
     context = core.reader.for_table(page, span, " ".join(g.labels))
     prompt = question(g, context, bool(image))

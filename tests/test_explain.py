@@ -12,7 +12,7 @@ from test_pipeline import Fake, ev  # noqa: E402
 
 from semantic_pdf_diff.explain import Revisions, explanation_prompt  # noqa: E402
 from semantic_pdf_diff.compare import compare
-from semantic_pdf_diff.llm import ModelFailure  # noqa: E402
+from semantic_pdf_diff.failures import ModelFailure  # noqa: E402
 from semantic_pdf_diff.schema import Explanation  # noqa: E402
 from semantic_pdf_diff.settings import Settings
 

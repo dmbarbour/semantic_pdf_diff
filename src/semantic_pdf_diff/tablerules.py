@@ -720,7 +720,7 @@ def read(core, page, g, task, by_itself, source, image=None):
     the grid holds it. Possible notes (possible_notes) are read by themselves where the model names them as notes,
     and where there's no answer to say. source: the reader's first derivation step (or its steps, as a list). image:
     the table's crop (a PDF's), sent with the query, which then copies a row from it to check the text layer."""
-    from .llm import CallLimitReached, NotRecorded
+    from .failures import CallLimitReached, NotRecorded
     cols = analyse(g)
     if g.boxes:  # a PDF's rows: their own boxes
         span = (min(b[0] for b in g.boxes), min(b[1] for b in g.boxes), max(b[2] for b in g.boxes),

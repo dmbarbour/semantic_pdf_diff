@@ -9,7 +9,7 @@ from pathlib import Path
 from semantic_pdf_diff import cli
 from semantic_pdf_diff_lab.eval import rounds
 from unittest.mock import patch
-from semantic_pdf_diff.llm import ModelFailure
+from semantic_pdf_diff.failures import ModelFailure
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff_lab.eval.models import PairVerdict
 from test_concurrency import jittery_model, make_pdf

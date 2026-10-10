@@ -288,7 +288,7 @@ class Rules(unittest.TestCase):
     def test_failures_of_the_rules_query(self):
         """Its failure paths (code review 2026-10-08: a test gap): not reached, nothing is read, and the next run asks
         again; failed, every row read by itself; so with a second answer, after rules that failed their checks."""
-        from semantic_pdf_diff.llm import CallLimitReached, ModelFailure, NotRecorded
+        from semantic_pdf_diff.failures import CallLimitReached, ModelFailure, NotRecorded
         wrong = {**REQUIREMENTS, "examples": [{"row": "15", "claims": [{"value": "4"}]}]}
         for answers, task, status, read in (
                 (NotRecorded("no recorded answer"), "rules:p2:1", "not_reached", 0),
@@ -306,7 +306,7 @@ class Rules(unittest.TestCase):
 
     def test_a_review_that_fails_leaves_the_rules_unreviewed(self):
         from semantic_pdf_diff import tablerules
-        from semantic_pdf_diff.llm import ModelFailure
+        from semantic_pdf_diff.failures import ModelFailure
         tablerules.REVIEW = 10
         try:
             evidence, coverage, _ = self.extract({"Polar!A14:C74": REQUIREMENTS},

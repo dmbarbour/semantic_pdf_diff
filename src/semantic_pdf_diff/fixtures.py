@@ -26,6 +26,7 @@ import sqlite3
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
+from .failures import transient
 from .recipes import Recipe
 
 SCHEMA_VERSION = 4  # 2: failures recorded; 3: response.used; 4: keyed by the query's hash (see above)
@@ -274,7 +275,6 @@ class Replayer:
         """An answer, or the model's failure (error: its text), unless only replaying."""
         if self.mode == "replay":
             return
-        from .llm import transient
         outcome = "ok" if error is None else "transient" if transient(error) else "invalid"
         self.fixture.record(query, self.responder, self.sample(key), outcome=outcome, answer=answer, error=error,
                             usage=usage, description=description, recipe=key)

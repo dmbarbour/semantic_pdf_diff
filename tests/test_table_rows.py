@@ -45,7 +45,7 @@ class Pdf(unittest.TestCase):
     def extract(self, rules=None, answer=None):
         import pymupdf
         from semantic_pdf_diff.jobs import extract_pdf
-        from semantic_pdf_diff.llm import ModelFailure
+        from semantic_pdf_diff.failures import ModelFailure
         from semantic_pdf_diff.schema import Extraction
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
