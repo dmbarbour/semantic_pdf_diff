@@ -8,7 +8,7 @@ import unicodedata
 
 from semantic_pdf_diff.values import DATE, parse_number, printed_value, same_number, unit_kind
 
-from .corpus import Fact
+from .model import Fact
 
 # --- scoring -----------------------------------------------------------------------------------
 
@@ -257,14 +257,14 @@ def score(key_data, claims):
     related = [f for f in key_data["facts"] if f.get("relation")]
     outcomes, found, conditions, relation_outcomes = {}, {}, {}, {}
     if related:  # relations are scored by names (relations.py)
-        from . import relations
-        index = relations.Index(related)
-        things = [relations.Thing(p["name"], tuple(p.get("aliases", ()))) for p in key_data.get("parts", [])]
+        from .relations import RELATIONS, Index, Thing, classify_claim
+        index = Index(related)
+        things = [Thing(p["name"], tuple(p.get("aliases", ()))) for p in key_data.get("parts", [])]
         literal = {}
         for f in related:
-            if relations.RELATIONS[f["relation"]].literal:
+            if RELATIONS[f["relation"]].literal:
                 literal.setdefault(f["value"], set()).update(f.get("object_aliases") or ())
-        things += [relations.Thing(name, tuple(sorted(aliases)), True) for name, aliases in sorted(literal.items())]
+        things += [Thing(name, tuple(sorted(aliases)), True) for name, aliases in sorted(literal.items())]
     seen, seen_triples = {}, set()
     for c in ranges(claims):
         ident = (str(c.get("entity", "")).casefold(), str(c.get("attribute", "")).casefold(), str(c.get("value", "")))
@@ -272,7 +272,7 @@ def score(key_data, claims):
             if ident in seen:
                 continue
             seen[ident] = None
-            for outcome, fid, triple in relations.classify_claim(c, things, index):
+            for outcome, fid, triple in classify_claim(c, things, index):
                 if triple is not None and triple in seen_triples:
                     continue  # read twice, by other readers or in other words
                 seen_triples.add(triple)

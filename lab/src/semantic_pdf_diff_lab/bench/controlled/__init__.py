@@ -13,14 +13,16 @@ form and place known, so extraction is scored exactly (docs/plans/controlled-doc
 This façade keeps `controlled.X` working for corpus and score (architecture clean-up, milestone 8).
 """
 from .corpus import (  # noqa: F401
-    CHART_KNOBS, CHART_PROJECTS, CSS, Chart, Column, Draw,
-    Fact, LCC_PROSE, PAGE_BREAK, PROJECTS, PROSE_KNOBS, PROSE_PROJECTS,
-    Project, RUNNING_HEADER, SERIES_FILL, Schedule, TABLE_KNOBS, TABLE_PROJECTS,
+    CHART_KNOBS, CHART_PROJECTS, CSS, Chart, Column,
+    LCC_PROSE, PAGE_BREAK, PROJECTS, PROSE_KNOBS, PROSE_PROJECTS,
+    RUNNING_HEADER, SERIES_FILL, Schedule, TABLE_KNOBS, TABLE_PROJECTS,
     _esc, _last, _phrase, _schedule_facts, charts, convention_center,
-    corpus, draw_chart, draw_charts, draw_schematics, end_use_study, energy_study,
-    equipment_schedules, html, key, locate, metered_study, parse_number, printed_value,
+    draw_chart, draw_charts, draw_schematics, end_use_study, energy_study,
+    equipment_schedules, html, key, metered_study,
     raster, render, roller_coaster, scanned, schedule_html, track_schedules,
     water_treatment, write)
+from .catalog import corpus  # noqa: F401
+from .model import Draw, Fact, Project, locate  # noqa: F401
 from .score import (  # noqa: F401
     BOUNDS, DATE, FIT_WEIGHTS, INEXACT_STEPS, NUMBER, NUMERIC_VALUE,
     RANGE, REFERENCE, SAME, SIGNS, STOP, UNIT_AFTER,

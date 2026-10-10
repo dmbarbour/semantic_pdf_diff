@@ -31,8 +31,8 @@ def imports(path):
 def runtime_imports(path):
     """The product modules a module imports when it runs: at load or in a function, not for type checking only."""
     tree = ast.parse(path.read_text(encoding="utf-8"))
-    typing_only = {id(n) for node in ast.walk(tree) if isinstance(node, ast.If) and "TYPE_CHECKING" in ast.unparse(node.test)
-                   for n in ast.walk(node)}
+    typing_only = {id(n) for node in ast.walk(tree)
+                   if isinstance(node, ast.If) and "TYPE_CHECKING" in ast.unparse(node.test) for n in ast.walk(node)}
     out = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and id(node) not in typing_only:
@@ -71,12 +71,52 @@ def cycles():
 # 2026-10-08, C4); the architecture moves broke it (C4, A12, C15, D6, architecture 7, C14's failures.py). A cycle
 # coming back fails.
 
+def lab_cycles():
+    """The lab's import cycles (modules within its packages, a package being its __init__), as sets."""
+    modules = {}
+    for path in LAB.rglob("*.py"):
+        name = ".".join(path.relative_to(LAB.parent).with_suffix("").parts).removesuffix(".__init__")
+        modules[name] = path
+    graph = {}
+    for name, path in modules.items():
+        package = name if path.name == "__init__.py" else name.rsplit(".", 1)[0]
+        found = set()
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.ImportFrom):
+                parts = package.split(".")[:len(package.split(".")) - node.level + 1] if node.level else []
+                base = ".".join(parts + ([node.module] if node.module else [])) if node.level else node.module or ""
+                found |= {m for m in [base] + [f"{base}.{a.name}" for a in node.names] if m in modules and m != name}
+        graph[name] = found
+    index, low, stack, out = {}, {}, [], []
+    def visit(v):
+        index[v] = low[v] = len(index)
+        stack.append(v)
+        for w in graph[v]:
+            if w not in index:
+                visit(w)
+                low[v] = min(low[v], low[w])
+            elif w in stack:
+                low[v] = min(low[v], index[w])
+        if low[v] == index[v]:
+            component = set()
+            while not component or v not in component:
+                component.add(stack.pop())
+            if len(component) > 1:
+                out.append(component)
+    for v in sorted(graph):
+        if v not in index:
+            visit(v)
+    return out
+
 class Layers(unittest.TestCase):
     def test_the_schema_imports_nothing_of_the_product(self):
         self.assertEqual(runtime_imports(PRODUCT / "schema.py"), set())
 
     def test_the_product_has_no_import_cycle(self):
         self.assertEqual(cycles(), [])
+
+    def test_the_lab_has_no_import_cycle(self):  # (code review 2026-10-08, E8: three)
+        self.assertEqual(lab_cycles(), [])
 
 class Boundaries(unittest.TestCase):
     def test_the_product_imports_nothing_from_the_lab(self):

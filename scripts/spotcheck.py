@@ -90,7 +90,7 @@ def main(argv=None):
                            limit=args.claims)
         print(f"Context added; page: {rounds.write_spotcheck(args.folder)}")
     elif args.command == "judge":
-        from semantic_pdf_diff_lab.eval.judgements import ModelJudge
+        from semantic_pdf_diff_lab.eval.raters import ModelJudge
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff_lab.eval.clients import folder_client
         from semantic_pdf_diff_lab.eval.clients import Budget, evaluator_settings
@@ -127,7 +127,7 @@ def main(argv=None):
             return 3
         print(json.dumps(rounds.decide(args.folder, verdicts_dir=verdicts(args.rubric), documents=DOCUMENTS), indent=2))
     elif args.command == "import":
-        from semantic_pdf_diff_lab.eval.judgements import Person
+        from semantic_pdf_diff_lab.eval.raters import Person
         person = Person(args.answers)
         records = person.rate(args.folder)
         print(f"Imported {person.name}: {sum(r.question == 'pair' for r in records)} units, "

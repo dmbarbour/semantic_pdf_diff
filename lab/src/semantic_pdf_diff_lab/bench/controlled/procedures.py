@@ -16,7 +16,7 @@ diagrams and charts are in our control docs."
 import struct
 from dataclasses import dataclass
 
-from .corpus import Draw, Fact, Project
+from .model import Draw, Fact, Project
 
 PROCEDURE_KNOBS = ("clean", "raster")
 SIZE = 7.5          # the labels' font size, points

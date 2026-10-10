@@ -386,7 +386,7 @@ class RoundRunner:
 
     def ask(self, v, model, upto, only=None, retry_failed=False, step="judge", verdicts_dir="verdicts"):
         """One judge over a variant's first `upto` units; raises Paused at the cap or out of budget."""
-        from semantic_pdf_diff_lab.eval.judgements import ModelJudge
+        from semantic_pdf_diff_lab.eval.raters import ModelJudge
         from semantic_pdf_diff.ledger import Ledger
         from semantic_pdf_diff_lab.eval.clients import evaluator_settings
         batch = self.folder / f"pairs-{v}"

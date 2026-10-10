@@ -75,7 +75,7 @@ def judge(before, after, folder, models, max_cost, check=False, grown=False):
     from semantic_pdf_diff.ledger import Ledger
     from semantic_pdf_diff_lab.eval.clients import evaluator_settings, folder_client
     from semantic_pdf_diff_lab.bench import refinement
-    from semantic_pdf_diff_lab.eval.judgements import ModelJudge
+    from semantic_pdf_diff_lab.eval.raters import ModelJudge
     folder = Path(folder)
     built = (refinement.half_checks({"before": before, "after": after}, folder) if check
              else refinement.pairs(before, after, folder, grown,

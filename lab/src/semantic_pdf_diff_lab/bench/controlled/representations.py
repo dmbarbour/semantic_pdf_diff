@@ -117,7 +117,7 @@ MARKDOWN_KNOBS = ("clean", "traps")
 
 def corpus(seeds=(1,)):
     """[(project, Markdown lines)]: every corpus document Markdown carries, revisions included."""
-    from .corpus import corpus as projects
+    from .catalog import corpus as projects
     out = []
     for project in projects(seeds, knobs=True, revisions=True):
         lines = markdown(project) if project.knob in MARKDOWN_KNOBS else None

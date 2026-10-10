@@ -598,7 +598,7 @@ NOTE_ATTRIBUTES = {"hp": ("motor power", ("power", "rating", "horsepower", "rate
 
 def build(make, pid, title, seed):
     """A controlled project from a system: a fact per link and per number, prose and a figure, chosen by knob."""
-    from .corpus import Draw, Fact, Project
+    from .model import Draw, Fact, Project
     d = Draw(f"{pid}-{seed}")
     system = make(d)
     ids = {p.id for p in system.parts}
@@ -649,7 +649,7 @@ def prose_html(project, system, esc):
     """The arrangement in words: every link and number (clean, prose, prose-hard), half the links (all, in hard
     phrasing), or none, the figure cited instead. Each sentence is a span whose id names its links, so layout
     places their facts."""
-    from .corpus import Draw
+    from .model import Draw
     knob = project.knob
     which = ([i for i, l in enumerate(system.links) if l.kind != "intro"] if knob in ("clean", "prose", "prose-hard")
              else project.schematic["stated_in_all"] if knob == "all" else [])

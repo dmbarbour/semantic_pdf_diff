@@ -4,7 +4,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from semantic_pdf_diff_lab.eval import judgements, rounds
+from semantic_pdf_diff_lab.eval import judgements, raters, rounds
 from semantic_pdf_diff.failures import ModelFailure
 from semantic_pdf_diff_lab.eval.models import PairVerdict
 from test_judge_prompts import ITEMS
@@ -70,7 +70,7 @@ class Records(unittest.TestCase):
         items[0]["baseline"][0]["quote"] = "Pump P-1 10 kW"      # on the page
         items[0]["variant"][0]["quote"] = "Pump P-1 12 kW"       # not
         (folder / "pairs.json").write_text(json.dumps({"items": items}))
-        records = judgements.QuoteCheck().rate(folder)
+        records = raters.QuoteCheck().rate(folder)
         self.assertEqual(len(records), sum(len(i["baseline"]) + len(i["variant"]) for i in items))
         found = {(r.unit, r.side, r.index): r.answer["found"] for r in records}
         self.assertTrue(found[(items[0]["id"], "baseline", 0)])
@@ -141,7 +141,7 @@ class Raters(unittest.TestCase):
             folder = Path(d)
             (folder / "pairs.json").write_text(json.dumps({"items": ITEMS}))
             client = Judge(failing={ITEMS[1]["id"]})
-            judge = judgements.ModelJudge(client, "judge-a", rubric="v4")
+            judge = raters.ModelJudge(client, "judge-a", rubric="v4")
             records = judge.rate(folder)
             self.assertEqual(len(judge.errors), 2)  # both orders of the failing unit
             self.assertEqual({r.status for r in records}, {"answered", "failed"})

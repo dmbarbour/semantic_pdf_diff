@@ -25,7 +25,10 @@ conditions reworded without changing their meaning.
 import re
 from dataclasses import dataclass, replace
 
-from .corpus import (CHART_PROJECTS, Draw, Fact, PROJECTS, PROSE_PROJECTS, TABLE_PROJECTS, parse_number, render)
+from semantic_pdf_diff.values import parse_number
+
+from .corpus import CHART_PROJECTS, PROJECTS, PROSE_PROJECTS, TABLE_PROJECTS, render
+from .model import Draw, Fact
 from .procedures import PROCEDURE_PROJECTS
 from .sheets import SHEET_PROJECTS, sheet_project
 

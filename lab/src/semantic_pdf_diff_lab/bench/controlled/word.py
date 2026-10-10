@@ -455,7 +455,7 @@ def _plain(project):
 def merged(project, seed=1):
     """(the project with the knob's new facts, the document's bytes): see the module's notes."""
     from dataclasses import replace
-    from .corpus import Draw
+    from .model import Draw
     d = Draw(f"wtp-tables-{seed}-merged")
     d.used |= {f.value for f in project.facts}
     parts = _schedules(project)

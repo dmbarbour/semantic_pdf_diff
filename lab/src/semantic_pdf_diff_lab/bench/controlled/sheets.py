@@ -72,12 +72,12 @@ def floor_plan(d):
 
 def plan_sheet(seed=1):
     """A controlled project whose one page is the floor plan sheet."""
-    from .corpus import Draw
+    from .model import Draw
     return sheet_project(floor_plan(Draw(f"lcc-plan-{seed}")), f"lcc-plan-s{seed}")
 
 def sheet_project(plan, ident):
     """The project a plan draws: its facts read from the plan (so a revised plan gives the revision's facts)."""
-    from .corpus import Fact, Project
+    from .model import Fact, Project
     facts = []
     for r in plan.rooms:
         room = f"{r.name.title()} {r.number}"
@@ -118,7 +118,7 @@ REVISIONS = (("A", "2026-01-10", "ISSUED FOR REVIEW"), ("B", "2026-02-20", "REVI
 def render(project):
     """(pdf bytes, the printed numbers' log), like controlled.render, for a sheet drawn directly."""
     import pymupdf
-    from .corpus import locate
+    from .model import locate
     plan = project.sheet
     small, vertical, rotated = (project.has(k) for k in ("small", "vertical", "rotated"))
     tag_size, dim_size = (6.0, 4.5) if small else (10.0, 8.0)
