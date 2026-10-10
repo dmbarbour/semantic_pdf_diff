@@ -196,7 +196,7 @@ class Readers(unittest.TestCase):
 
 class RulesModel:
     """The text tests' model, answering a table's rules query with the given rules (keyed by the table's place), or
-    with each row read by itself."""
+    with each row read by itself. An answer may be a list (one an asking, in turn) or an error, raised."""
     def __init__(self, answers, reviews=None, **settings):
         import sys
         from pathlib import Path
@@ -216,12 +216,19 @@ class RulesModel:
             said = self.reviews.get(place, {"verdict": "keep"})  # a list: one answer a review, then keep
             if isinstance(said, list):
                 said = said.pop(0) if said else {"verdict": "keep"}
+            if isinstance(said, Exception):
+                raise said
             return Review.model_validate(said)
         if schema is not Rules:
             return self.base.ask(prompt, schema, images, key)
         self.asked.append(prompt)
         place = prompt.split("TABLE: ", 1)[1].split(";", 1)[0].split("\n", 1)[0]
-        return Rules.model_validate(self.answers.get(place, {"reading": "rows"}))
+        said = self.answers.get(place, {"reading": "rows"})
+        if isinstance(said, list):
+            said = said.pop(0) if len(said) > 1 else said[0]
+        if isinstance(said, Exception):
+            raise said
+        return Rules.model_validate(said)
 
 REQUIREMENTS = {"binding": "values of requirements, by ID", "reading": "rules", "subject": "requirements",
                 "claims": [{"entity": "{A}", "attribute": "{C.header}", "value": "{C}", "number": True}],
@@ -277,6 +284,41 @@ class Rules(unittest.TestCase):
         tasks = [r["task"] for r in coverage]
         self.assertIn("rules:p2:1:again", tasks)
         self.assertEqual(sum(t.startswith("table:p2:1:") for t in tasks), 60)  # every row read by itself
+
+    def test_failures_of_the_rules_query(self):
+        """Its failure paths (code review 2026-10-08: a test gap): not reached, nothing is read, and the next run asks
+        again; failed, every row read by itself; so with a second answer, after rules that failed their checks."""
+        from semantic_pdf_diff.llm import CallLimitReached, ModelFailure, NotRecorded
+        wrong = {**REQUIREMENTS, "examples": [{"row": "15", "claims": [{"value": "4"}]}]}
+        for answers, task, status, read in (
+                (NotRecorded("no recorded answer"), "rules:p2:1", "not_reached", 0),
+                (ModelFailure("the service failed"), "rules:p2:1", "failed", 60),
+                ([wrong, CallLimitReached("call limit")], "rules:p2:1:again", "not_reached", 0),
+                ([wrong, ModelFailure("the service failed")], "rules:p2:1:again", "failed", 60)):
+            with self.subTest(task=task, status=status):
+                evidence, coverage, _ = self.extract({"Polar!A14:C74": answers})
+                row = next(r for r in coverage if r["task"] == task)
+                self.assertEqual(row["status"], status)
+                self.assertEqual(sum(r["task"].startswith("table:p2:1:") for r in coverage), read)
+                if status == "failed":
+                    self.assertIn("every row read by itself: the rules query failed", row["issues"][0])
+                self.assertFalse([e for e in evidence if e.derivation[-1].step == "table-rules"])
+
+    def test_a_review_that_fails_leaves_the_rules_unreviewed(self):
+        from semantic_pdf_diff import tablerules
+        from semantic_pdf_diff.llm import ModelFailure
+        tablerules.REVIEW = 10
+        try:
+            evidence, coverage, _ = self.extract({"Polar!A14:C74": REQUIREMENTS},
+                                                 {"Polar!A14:C74": ModelFailure("the service failed")})
+        finally:
+            tablerules.REVIEW = None
+        ruled = [e for e in evidence if any(s.step == "table-rules" for s in e.derivation)]
+        self.assertEqual(len(ruled), 60)  # the rules used as they passed the checks
+        self.assertEqual({next(s.detail for s in e.derivation if s.step == "table-review") for e in ruled},
+                         {"not reviewed"})
+        row = next(r for r in coverage if r["task"] == "rules:p2:1")
+        self.assertIn("Not reviewed: the service failed", " ".join(row["issues"]))
 
     def test_a_review_shows_the_outcome_and_may_revise_the_rules(self):
         from semantic_pdf_diff import tablerules

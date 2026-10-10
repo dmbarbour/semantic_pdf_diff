@@ -181,9 +181,10 @@ class Asked(unittest.TestCase):
     def run_with(self, answers, review=2):
         asked, recorded, out = [], [], {}
 
-        def submit(prompt, model, images, key, finish):
+        def submit(prompt, model, images, key, finish):  # an answer may be an error, given as the dispatcher would
             asked.append((key[0], key[3], prompt))
-            finish(model.model_validate(answers.pop(0)), None)
+            said = answers.pop(0)
+            finish(*((None, said) if isinstance(said, Exception) else (model.model_validate(said), None)))
 
         core = SimpleNamespace(content="c", output=__import__("pathlib").Path("/tmp"), state={"pending": 0},
                                progress=SimpleNamespace(add=lambda: None, finish=lambda status: None),
@@ -214,6 +215,29 @@ class Asked(unittest.TestCase):
         self.assertIn("ITS PROBLEMS:\n- line 7: your rules give µm | µm; your example Bands | x", asked[1][2])
         self.assertEqual(out, {"parts": [(HEADER, BODY, BOXES)], "step": None, "apart": [], "table": True})
         self.assertTrue(recorded[-1]["issues"][0].startswith("Structure as the heuristics left it: the rules failed twice"))
+
+    def test_failures_keep_the_heuristics(self):
+        """Its failure paths (code review 2026-10-08: a test gap): failed or not reached, first or second, the table is
+        read as the heuristics left it; a review failing, the rules are used unreviewed."""
+        from semantic_pdf_diff.llm import CallLimitReached, ModelFailure, NotRecorded
+        bad = {"rules": [{"action": "keep", "lines": ["3"]}], "examples": [{"line": "7", "cells": ["Bands", "x"]}]}
+        heuristics = {"parts": [(HEADER, BODY, BOXES)], "step": None, "apart": [], "table": True}
+        for answers, task, status in (([ModelFailure("the service failed")], "structure:p4:0", "failed"),
+                                      ([NotRecorded("no recorded answer")], "structure:p4:0", "not_reached"),
+                                      ([bad, ModelFailure("the service failed")], "structure:p4:0:again", "failed"),
+                                      ([bad, CallLimitReached("call limit")], "structure:p4:0:again", "not_reached")):
+            with self.subTest(task=task, status=status):
+                asked, recorded, out = self.run_with(answers)
+                self.assertEqual(out, heuristics)
+                self.assertEqual((recorded[-1]["task"], recorded[-1]["status"]), (task, status))
+                if status == "failed":
+                    self.assertIn("the structure query failed (the service failed)", recorded[-1]["issues"][0])
+        good = {"rules": [{"action": "join above", "when": ["no rule above"]}],
+                "examples": [{"line": "7", "cells": ["Bands", "0.2–0.45 µm", "0.9–1.8 µm"]}]}
+        asked, recorded, out = self.run_with([good, ModelFailure("the service failed")])
+        self.assertEqual(out["step"].step, "table-structure")  # the rules used
+        self.assertEqual(len(out["parts"][0][1]), 4)
+        self.assertIn("Not reviewed: the service failed", recorded[-1]["issues"])
 
     def test_rules_leaving_no_rows_keep_the_heuristics_without_asking_again(self):
         none = {"rules": [{"action": "not table", "lines": [str(k) for k in range(1, 8)]}], "why": "a title block"}

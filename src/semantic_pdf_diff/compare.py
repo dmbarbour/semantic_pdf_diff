@@ -271,6 +271,22 @@ def explanation_prompt(a, b, finding, payload, revisions):
              "B's conditions in the earlier revision=" + dump(revisions.condition_echoes(b, 1, a))]
     return "\n".join(lines)
 
+def vetoes(judgment, a, b, calc):
+    """Why a judgment of claims a and b is made uncertain, if it is: numeric arithmetic (calc, numeric_check's) and
+    uncertain provenance can veto a confident judgment. Pure, so each rule is tested (code review 2026-10-08)."""
+    reasons = []
+    if judgment.relation in ("different", "equivalent") and not judgment.same_conditions:
+        reasons.append("Matching conditions were not established")
+    if calc and judgment.relation == "equivalent" and not calc["equal"]:
+        reasons.append("Numeric conversion disagrees with equivalence")
+    if calc and judgment.relation == "different" and calc["equal"]:
+        reasons.append("Numeric values are equal after conversion; review semantic difference")
+    if min(a.confidence,b.confidence,judgment.confidence) < .7 and judgment.relation != "unrelated":
+        reasons.append("Low model confidence (uncalibrated)")
+    if (a.approximate or b.approximate) and judgment.relation in ("equivalent","different"):
+        reasons.append("Approximate visual value requires review")
+    return reasons
+
 def compare(left, right, output, client, mode, dispatcher=None, progress=None, headings=None):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
 
@@ -325,18 +341,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
                 results[index] = {"a":a.id,"b":b.id,"retrieval_score":round(score,4),"relation":"uncertain",
                     "rationale":str(error),"confidence":0,"same_conditions":False,"numeric":calc,"processing_error":True}
                 return
-            # Numeric arithmetic and uncertain provenance can veto a confident judgment.
-            reasons = []
-            if judgment.relation in ("different", "equivalent") and not judgment.same_conditions:
-                reasons.append("Matching conditions were not established")
-            if calc and judgment.relation == "equivalent" and not calc["equal"]:
-                reasons.append("Numeric conversion disagrees with equivalence")
-            if calc and judgment.relation == "different" and calc["equal"]:
-                reasons.append("Numeric values are equal after conversion; review semantic difference")
-            if min(a.confidence,b.confidence,judgment.confidence) < .7 and judgment.relation != "unrelated":
-                reasons.append("Low model confidence (uncalibrated)")
-            if (a.approximate or b.approximate) and judgment.relation in ("equivalent","different"):
-                reasons.append("Approximate visual value requires review")
+            reasons = vetoes(judgment, a, b, calc)
             if reasons:
                 judgment.relation = "uncertain"
                 judgment.rationale = "; ".join(reasons) + ". " + judgment.rationale
