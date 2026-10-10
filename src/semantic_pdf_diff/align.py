@@ -405,62 +405,101 @@ def _regroup(a, b, lone_a, lone_b):
 
 def align(left, right):
     """The Correspondence of two revisions' claims (left the earlier, right the later)."""
-    a, b = Side(left), Side(right)
-    candidates = _candidates(a, b)
-    of_a, of_b = defaultdict(dict), defaultdict(dict)
-    for (ka, kb), s in candidates.items():
-        of_a[ka][kb] = s
-        of_b[kb][ka] = s
-    aligned, ambiguous = _assign(candidates, of_a, of_b)
-    judge, settled = [], []
-    for ka, kb in sorted(aligned.items()):
-        j, s = _within(a, b, a.items[ka], b.items[kb], settle=True)
-        judge += j
-        settled += s
-    # ambiguous items: each with the candidates it had left, for the judge to decide (nothing settled)
-    open_a = {ka for ka, _ in ambiguous} - set(aligned)
-    open_b = {kb for _, kb in ambiguous} - set(aligned.values())
-    pairs = {(ka, kb) for ka in open_a for kb in of_a[ka] if kb not in aligned.values()} | \
-            {(ka, kb) for kb in open_b for ka in of_b[kb] if ka not in aligned}
-    for ka, kb in sorted(pairs):
-        judge += _within(a, b, a.items[ka], b.items[kb], settle=False)[0]
-    # leftover items with a clear home on the other side: a second counterpart, compared like the first
-    attached = set()
-    for ka in sorted(k for k in a.items if k not in aligned and k not in open_a):
-        attached |= {(ka, kb) for kb in _homes(a, b, ka) if kb not in open_b}
-    taken_b = set(aligned.values())
-    for kb in sorted(k for k in b.items if k not in taken_b and k not in open_b):
-        attached |= {(ka, kb) for ka in _homes(b, a, kb) if ka not in open_a}
-    for ka, kb in sorted(attached):
-        j, s = _within(a, b, a.items[ka], b.items[kb], settle=True)
-        judge += j
-        settled += s
-    homed_a, homed_b = {ka for ka, _ in attached}, {kb for _, kb in attached}
-    lone_a = [k for k in a.items if k not in aligned and k not in open_a and k not in homed_a]
-    lone_b = [k for k in b.items if k not in taken_b and k not in open_b and k not in homed_b]
-    judge += _strays(a, b, judge + settled, lone_a, lone_b)
-    regroupings = _regroup(a, b, lone_a, lone_b)
-    regrouped_a = {k for _, ka, _, _ in regroupings for k in ka}
-    regrouped_b = {k for _, _, kb, _ in regroupings for k in kb}
-    lone_a = [k for k in lone_a if k not in regrouped_a]
-    lone_b = [k for k in lone_b if k not in regrouped_b]
-    unaligned_a = sorted(i for k in lone_a for i in a.items[k])
-    unaligned_b = sorted(i for k in lone_b for i in b.items[k])
-    judge = sorted(set(judge), key=lambda x: (-x[2], x[0], x[1]))
-    groups = _groups(a, b, candidates, aligned, attached, ambiguous, open_a, open_b, of_a, of_b, lone_a, lone_b,
-                     regroupings)
-    summary = {"strategy": "items aligned across revisions by shared values, names and attributes, best first with "
-                           "a margin; equal values in aligned items settled without a model",
-               "items": [len(a.items), len(b.items)], "aligned_items": len(aligned),
-               "ambiguous_items": [len(open_a), len(open_b)],
-               "attached_items": len(attached), "unaligned_items": [len(lone_a), len(lone_b)],
-               # items matched under another tag: P-101B now P-201B (by its values)
-               "renamed_items": sorted([ka, kb] for ka, kb in list(aligned.items()) + sorted(attached)
-                                       if ka != kb and TAG.fullmatch(ka) and TAG.fullmatch(kb)),
-               "regrouped_items": [len(regrouped_a), len(regrouped_b)],
-               "settled_pairs": len(settled)}
-    regrouped = (sorted(i for k in regrouped_a for i in a.items[k]), sorted(i for k in regrouped_b for i in b.items[k]))
-    return Correspondence(judge, sorted(settled), (unaligned_a, unaligned_b), summary, groups, regrouped)
+    return Alignment(left, right).correspondence()
+
+class Alignment:
+    """Two revisions' items aligned, step by step, each step's outcome kept for the next (code review 2026-10-08, D7:
+    loose locals, the report's groupings built from 13 parameters): items matched best first with a margin; the
+    matched items' claims compared, and the ambiguous items' with each candidate they had left; leftover items
+    attached to a clear home; the claims left over paired across items; split and merge candidates among the items
+    still alone."""
+
+    def __init__(self, left, right):
+        self.a, self.b = Side(left), Side(right)
+        self.judge, self.settled = [], []
+        self.match()
+        self.compare_matched()
+        self.compare_ambiguous()
+        self.attach()
+        self.leftovers()
+
+    def match(self):
+        a, b = self.a, self.b
+        self.candidates = _candidates(a, b)
+        self.of_a, self.of_b = defaultdict(dict), defaultdict(dict)
+        for (ka, kb), s in self.candidates.items():
+            self.of_a[ka][kb] = s
+            self.of_b[kb][ka] = s
+        self.aligned, self.ambiguous = _assign(self.candidates, self.of_a, self.of_b)
+
+    def compare(self, ka, kb, settle):
+        j, s = _within(self.a, self.b, self.a.items[ka], self.b.items[kb], settle=settle)
+        self.judge += j
+        if settle:
+            self.settled += s
+
+    def compare_matched(self):
+        for ka, kb in sorted(self.aligned.items()):
+            self.compare(ka, kb, settle=True)
+
+    def compare_ambiguous(self):
+        """Ambiguous items: each with the candidates it had left, for the judge to decide (nothing settled)."""
+        aligned = self.aligned
+        self.open_a = {ka for ka, _ in self.ambiguous} - set(aligned)
+        self.open_b = {kb for _, kb in self.ambiguous} - set(aligned.values())
+        pairs = {(ka, kb) for ka in self.open_a for kb in self.of_a[ka] if kb not in aligned.values()} | \
+                {(ka, kb) for kb in self.open_b for ka in self.of_b[kb] if ka not in aligned}
+        for ka, kb in sorted(pairs):
+            self.compare(ka, kb, settle=False)
+
+    def attach(self):
+        """Leftover items with a clear home on the other side: a second counterpart, compared like the first."""
+        a, b, aligned, open_a, open_b = self.a, self.b, self.aligned, self.open_a, self.open_b
+        self.attached = set()
+        for ka in sorted(k for k in a.items if k not in aligned and k not in open_a):
+            self.attached |= {(ka, kb) for kb in _homes(a, b, ka) if kb not in open_b}
+        self.taken_b = set(aligned.values())
+        for kb in sorted(k for k in b.items if k not in self.taken_b and k not in open_b):
+            self.attached |= {(ka, kb) for ka in _homes(b, a, kb) if ka not in open_a}
+        for ka, kb in sorted(self.attached):
+            self.compare(ka, kb, settle=True)
+
+    def leftovers(self):
+        """The items still alone: their claims left over paired with strays across items, then split and merge
+        candidates among them; the rest unaligned."""
+        a, b = self.a, self.b
+        homed_a, homed_b = {ka for ka, _ in self.attached}, {kb for _, kb in self.attached}
+        lone_a = [k for k in a.items if k not in self.aligned and k not in self.open_a and k not in homed_a]
+        lone_b = [k for k in b.items if k not in self.taken_b and k not in self.open_b and k not in homed_b]
+        self.judge += _strays(a, b, self.judge + self.settled, lone_a, lone_b)
+        self.regroupings = _regroup(a, b, lone_a, lone_b)
+        self.regrouped_a = {k for _, ka, _, _ in self.regroupings for k in ka}
+        self.regrouped_b = {k for _, _, kb, _ in self.regroupings for k in kb}
+        self.lone_a = [k for k in lone_a if k not in self.regrouped_a]
+        self.lone_b = [k for k in lone_b if k not in self.regrouped_b]
+
+    def summary(self):
+        a, b, aligned = self.a, self.b, self.aligned
+        return {"strategy": "items aligned across revisions by shared values, names and attributes, best first with "
+                            "a margin; equal values in aligned items settled without a model",
+                "items": [len(a.items), len(b.items)], "aligned_items": len(aligned),
+                "ambiguous_items": [len(self.open_a), len(self.open_b)],
+                "attached_items": len(self.attached), "unaligned_items": [len(self.lone_a), len(self.lone_b)],
+                # items matched under another tag: P-101B now P-201B (by its values)
+                "renamed_items": sorted([ka, kb] for ka, kb in list(aligned.items()) + sorted(self.attached)
+                                        if ka != kb and TAG.fullmatch(ka) and TAG.fullmatch(kb)),
+                "regrouped_items": [len(self.regrouped_a), len(self.regrouped_b)],
+                "settled_pairs": len(self.settled)}
+
+    def correspondence(self):
+        a, b = self.a, self.b
+        unaligned_a = sorted(i for k in self.lone_a for i in a.items[k])
+        unaligned_b = sorted(i for k in self.lone_b for i in b.items[k])
+        judge = sorted(set(self.judge), key=lambda x: (-x[2], x[0], x[1]))
+        regrouped = (sorted(i for k in self.regrouped_a for i in a.items[k]),
+                     sorted(i for k in self.regrouped_b for i in b.items[k]))
+        return Correspondence(judge, sorted(self.settled), (unaligned_a, unaligned_b), self.summary(), _groups(self),
+                              regrouped)
 
 def _strays(a, b, pairs, lone_a, lone_b):
     """Claims left without a partner in items that have counterparts, paired with the one such claim on the other side
@@ -483,8 +522,12 @@ def _strays(a, b, pairs, lone_a, lone_b):
             out.append((i, matches[0], 0.5))
     return out
 
-def _groups(a, b, candidates, aligned, attached, ambiguous, open_a, open_b, of_a, of_b, lone_a, lone_b, regroupings):
+def _groups(alignment):
     """The groupings as alignment formed them, for the report: each with its items' names, claims and evidence."""
+    a, b, candidates = alignment.a, alignment.b, alignment.candidates
+    aligned, attached = alignment.aligned, alignment.attached
+    open_a, open_b, of_a, of_b = alignment.open_a, alignment.open_b, alignment.of_a, alignment.of_b
+    lone_a, lone_b, regroupings = alignment.lone_a, alignment.lone_b, alignment.regroupings
     def group(kind, ka, kb, score=None, evidence=None):
         return {"kind": kind, "earlier": [a.display(k) for k in ka], "later": [b.display(k) for k in kb],
                 "earlier_claims": sorted(i for k in ka for i in a.items[k]),
