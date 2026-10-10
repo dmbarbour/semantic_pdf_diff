@@ -263,7 +263,51 @@
   - **Real pages, 16 pages of 9 sources** (the worst bands by lines cut, HabEx p4, LCIT's slide 27, a drawing sheet; no key; a tenth source's pages left out, the old tree's run stopped at its cap): claims from halves 323 → 464, empty halves 68 of 140 → 55 of 138. The pairwise judge wasn't run: the key measured quality, and the measure had used its budget.
 - **The usual runs:** the slices fixture re-recorded (dev runs: 85 answers in, 85 pruned, $0.021). The controlled corpus re-read: only PDFs change, loose claims 418 → 407 (rows variant 408 → 397); revision pairs unchanged. Refinement is rare in a normal run (8 refined tiles in the corpus), so the forced measure is the one that shows the change.
 - **Cost:** $0.57 for the forced measure (about $0.00038 a half; I'd estimated less), $0.023 for the re-records.
-- **For the tile-selection plan:** whether a refined chart or drawing is better kept whole or zoomed into is a lever question, as is the 25% share.
+- **Checked further, 2026-10-09.** The owner: "I'd like to stick with this for a bit longer. We could look into a few more metrics, e.g. do we get the same claims from our tiles-only image processing of text vs. actual text? … And I'm find spending some on judges, just provide an estimate." Then, of the six checks and the judging proposed: "I like all of 1-6, plus the relatively cheap $5 judging work." Built in the lab: `refinement.checks`, `against`, `pairs`, `half_checks`; `scripts/refinement.py` `report` (now with the checks), `judge`, `check`, `run --fresh-halves`.
+  - **Checks without a model** (old → new; per half, against the page's text and the parent tile's answer):
+
+    | | Controlled, old | Controlled, new | Real pages, old | Real pages, new |
+    |---|---|---|---|---|
+    | Halves complaining of a cut ("cut off", "partial", "truncated") | 86 | 27 | 14 | 0 |
+    | Quotes not in the page's text | 295 | 157 | 106 | 21 |
+    | Quotes starting or ending mid-word | 88 | 17 | 57 | 2 |
+    | A claim's value in the text, bound to the same words (token overlap ≥ 0.5) | 1,348 | 1,814 | 49 | 103 |
+    | … bound to nearby words | 206 | 173 | 66 | 135 |
+    | … bound to other words | 645 | 234 | 60 | 64 |
+    | The parent tile's values the halves lost | 570 | 498 | 104 | 63 |
+    | Values the halves found that the parent hadn't | 647 | 429 | 130 | 198 |
+
+    - The text-against-tile agreement asked about: of the claims whose value is in their half's text, the share bound to the same words as there, 61% → 82% on the controlled corpus, 28% → 34% on real pages.
+    - Old against new, values: controlled only old 701, only new 560, both 2,475; real pages only old 113, only new 179, both 170.
+  - **The noise floor** (the new halves asked afresh, every controlled document): right 2,153 → 2,150, misbound 107 → 104, facts right 2,371 → 2,376; values only in one run 57 and 57, both 2,984. Against old → new's 701 and 560, re-asking moves little: the differences above are the cut's.
+  - **Pairwise judges** (rubric v5, per tile, the old halves' claims against the new; 69 tiles from both measures, each shown grown to cover every half of both runs, with that rect's whole lines as text):
+
+    | | New better | Old better | Same | Split | Score (new) | Old claims called wrong | New claims called wrong |
+    |---|---|---|---|---|---|---|---|
+    | Gemini 3.1 Pro | 37 | 10 | 18 | 4 | 0.688 | 201 of 617 (33%) | 49 of 888 (5.5%) |
+    | Qwen3-VL | 38 | 5 | 16 | 10 | 0.736 | 174 of 587 (30%) | 31 of 883 (3.5%) |
+
+    - They agree on 54 tiles: new 34, same 16, old 4.
+    - **An artefact found and fixed:** first shown only the parent tile, Gemini called many of the new halves' claims invented (30 new, 17 old). 110 of 112 such quotes are in the page's text: the new halves are grown past the tile. The batch was rebuilt with the grown rect.
+    - **Old better, by the judges' notes:** HabEx paragraphs missed, a calg table's drawing references, tiles where the old halves had a claim or two and the new none.
+  - **Per half, each claim marked against its half's image** (Qwen3-VL): supported old 307 of 321, new 429 of 450. It doesn't tell them apart: a judge seeing only the half can't see a value bound to the wrong words.
+  - **Documents made for refinement, scored by key.** Three new knobs in the controlled corpus (`corpus.py`):
+    - `decorated`: side bars down the left margin, a logo and a rule, so most gaps between lines cross a graphic and the cut falls back to avoiding text only.
+    - `decorated+two-column`.
+    - `landscape`: a letter-landscape page, read as overlapping grid tiles.
+    - `ALONE` keeps the first and last out of `all`, so the existing documents regenerate byte for byte.
+
+    | Forced, old → new | Tiles | Facts right | Loose | Misbound | Hallucinated | Binding other | Quotes not in page |
+    |---|---|---|---|---|---|---|---|
+    | decorated | 4 | 20 → 19 | 0 → 0 | 3 → 4 | 0 → 0 | 5 → 0 | 2 → 0 |
+    | decorated+two-column | 4 | 23 → 23 | 2 → 0 | 0 → 0 | 0 → 0 | 1 → 0 | 0 → 0 |
+    | landscape | 12 | 21 → 23 | 27 → 0 | 3 → 0 | 2 → 0 | 36 → 0 | 7 → 0 |
+
+    - **Landscape's claims** were 76 → 81, but its distinct readings fell from 64 to 26. Its grid tiles overlap by up to 300 pt, and whole-line halves of neighbouring tiles now read the same lines alike, where fragments read them differently. The halves themselves overlap by 2–6% of their parent. Repeated reading of overlapping grid tiles is the tile-selection plan's to weigh.
+    - **In a normal run** (recorded and packed into the corpus): each finds all 23 of its facts. Landscape has 17 loose claims and 1 misbound, from its grid tiles. Adding them changes only the PDF totals: facts 3,226 → 3,295, right 3,326 → 3,413, loose 407 → 426. Revision pairs are unchanged.
+    - **Cost:** $0.107 for the forced runs (both arms), $0.017 to record.
+  - **Cost:** judges $3.56 (Gemini $3.35, Qwen3-VL $0.159, the per-half check $0.052); the noise floor $0.18.
+- **For the tile-selection plan:** whether a refined chart or drawing is better kept whole or zoomed into is a lever question, as is the 25% share. The old cut's wins above (HabEx, calg) are cases to keep in its measure.
 
 - **The owner, 2026-10-09** (above): "the slicing seems a bigger task that needs careful design, an approach to measuring improvements, etc.."
 - **The bug** (`extract.py`, `Visuals.refine`): a tile answered partial or failed is halved at its midpoint along its longer side, with 12 pt of overlap.

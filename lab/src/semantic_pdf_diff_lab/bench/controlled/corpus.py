@@ -95,8 +95,9 @@ class Project:
     revision_of: str = ""                      # the base document's id, for a revision
 
     def has(self, knob):
-        """Whether a prose, layout or chart knob applies: "all" applies every knob of the project's kind."""
-        return knob in self.kinds and self.knob in (knob, "all")
+        """Whether a prose, layout or chart knob applies: "all" applies every knob of the project's kind but those
+        named only alone (ALONE); knobs joined by "+" apply together."""
+        return knob in self.kinds and (knob in self.knob.split("+") or self.knob == "all" and knob not in ALONE)
 
     def fact(self, fact_id):
         return next(f for f in self.facts if f.id == fact_id)
@@ -515,8 +516,11 @@ TABLE_PROJECTS = {"wtp-tables": equipment_schedules, "coaster-tables": track_sch
 # (the "2 ton unit" read as a condition), a scope phrase ("across the four mission concepts"), a table whose
 # subject is named only in its caption, a requirement and a negation, a range, an abbreviation defined in another
 # section, and a component of a component. Each fact has a plain phrasing (clean) and the trap's (traps). Layout
-# knobs: page furniture (a running header of numbers that aren't facts) and two columns.
-PROSE_KNOBS = ("clean", "traps", "furniture", "two-column", "all")
+# knobs: page furniture (a running header of numbers that aren't facts) and two columns. For refinement (the bug
+# plan of 2026-10-09, item 6): decoration (side bars, a logo, a rule: graphics that send a page's prose as image
+# tiles), alone and with two columns, and a landscape page (wider than bands allow: tiled in a grid).
+PROSE_KNOBS = ("clean", "traps", "furniture", "two-column", "all", "decorated", "decorated+two-column", "landscape")
+ALONE = ("decorated", "landscape")  # not in "all", so the documents made before them stay as they were
 
 def convention_center(seed=1):
     """A convention centre expansion's design basis, written to the traps above."""
@@ -1101,7 +1105,7 @@ def render(project, page_size="letter"):
     if getattr(project, "sheet", None):  # a drawing sheet, drawn directly (sheets.py)
         from .sheets import render as render_sheet
         return render_sheet(project)
-    rect = pymupdf.paper_rect(page_size)
+    rect = pymupdf.paper_rect("letter-l" if project.has("landscape") else page_size)
     breaks = set()
     for _ in range(5):  # lay out; start any table Story split across pages on a new page; again
         buffer = io.BytesIO()
@@ -1157,6 +1161,13 @@ def render(project, page_size="letter"):
                          fontsize=8)
         if project.has("furniture"):  # a running header of numbers that aren't facts
             page.insert_text((54, 36), RUNNING_HEADER, fontname="helv", fontsize=8)
+        if project.has("decorated"):  # side bars down the margin (each under half the page: not taken for a frame),
+            w, h = rect.width, rect.height  # a logo and a rule under it
+            for top, bottom in ((0.08, 0.48), (0.5, 0.9)):
+                page.draw_rect(pymupdf.Rect(28, top * h, 34, bottom * h), color=None, fill=(0.12, 0.23, 0.36))
+            page.draw_circle(pymupdf.Point(w - 66, 34), 10, color=None, fill=(0.85, 0.55, 0.20))
+            page.draw_rect(pymupdf.Rect(w - 52, 24, w - 34, 44), color=None, fill=(0.55, 0.70, 0.86))
+            page.draw_line(pymupdf.Point(54, 48), pymupdf.Point(w - 54, 48), color=(0.5, 0.5, 0.5), width=0.75)
     drawn = draw_charts(project, doc, figures)
     project.chart_boxes = {n: (page_no, tuple(box)) for n, (page_no, box) in figures.items()  # for representations
                            if n <= len(charts(project))}
