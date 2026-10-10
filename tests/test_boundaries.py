@@ -67,12 +67,12 @@ def cycles():
             visit(v)
     return found
 
-# The import cycles left (code review 2026-10-08, C4: one of 21 modules, held by models importing the levers; A12:
-# extract's five jobs apart). Each architecture move that breaks a part of them shrinks this; a change that grows
-# them fails.
-CYCLES = [{"compare", "dispatch", "fixtures", "levers", "llm", "provenance", "settings", "situate", "tablerules",
-           "tables", "tasks"},
-          {"docxdocs", "pptxdocs", "textdocs", "xlsxdocs"}]
+# The import cycles left (code review 2026-10-08, C4: one of 21 modules, held by models importing the levers; then
+# A12, extract's five jobs apart, and C15, the evaluators' settings to the lab). Each architecture move that breaks a
+# part of them shrinks this; a change that grows them fails.
+CYCLES = [{"compare", "levers", "provenance", "settings"},  # compare's recipe label from provenance (D6)
+          {"fixtures", "llm"},  # the model client's replay glue (C14)
+          {"docxdocs", "pptxdocs", "textdocs", "xlsxdocs"}]  # textdocs' three jobs (architecture 7)
 
 class Layers(unittest.TestCase):
     def test_the_schema_imports_nothing_of_the_product(self):

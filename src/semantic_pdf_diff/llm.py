@@ -14,7 +14,6 @@ import urllib.request
 from datetime import datetime, timezone
 from http.client import HTTPException  # a connection dropped mid-answer (IncompleteRead); not an OSError
 from pathlib import Path
-from contextlib import contextmanager
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
@@ -199,57 +198,6 @@ class Request:
     def raw(self):
         return self.body()
 
-def evaluator_settings(model, base=None, **runtime):
-    """Settings for a judge, checker or analyst. What shapes its queries is fixed (`base`, by default
-    EVALUATOR_SETTINGS) and never read from the environment: an exported PDF_DIFF_RESPONSE_FORMAT or
-    PDF_DIFF_SEED would otherwise change every judge query, every recorded verdict would miss, and judging would
-    be paid again (code review 2026-10-01, item 2). Only endpoint settings (URL, timeouts, concurrency, rate
-    limits, cost cap) come from the environment, and `runtime` may set only those."""
-    from .settings import EVALUATOR_SETTINGS, SETTING_CLASSES, Settings
-    shaping = sorted(k for k in runtime if SETTING_CLASSES[k] != "endpoint")
-    if shaping:
-        raise ValueError(f"evaluator runtime settings must be endpoint settings, not {shaping}")
-    endpoint_names = {k for k, kind in SETTING_CLASSES.items() if kind == "endpoint" and k != "model"}
-    # only the endpoint's variables read: a profile's PDF_DIFF_CONTEXT_TOKENS made every judge's settings invalid
-    env = Settings.from_env(only=endpoint_names, model=model)  # (code review 2026-10-08, C9)
-    endpoint = {k: getattr(env, k) for k in endpoint_names}
-    return Settings(**{**endpoint, **(EVALUATOR_SETTINGS if base is None else base), **runtime, "model": model})
-
-class Budget:
-    """One cost cap for a whole command, shared by the clients it makes one after another (one per model): the
-    cap was once each client's, so a command with three models could spend three times it."""
-    def __init__(self, cap):
-        if cap is not None and cap <= 0:
-            raise ValueError("a cost cap must be more than $0 (leave it unset for none)")
-        self.cap, self.spent = cap, 0.0
-
-    def left(self):
-        """Dollars left, or None for no cap."""
-        return None if self.cap is None else max(self.cap - self.spent, 0.0)
-
-    def exhausted(self):
-        return self.cap is not None and self.left() <= 0
-
-    def settings(self):
-        """The `max_cost` keyword for the next client: what's left, or nothing without a cap."""
-        return {} if self.cap is None else {"max_cost": self.left()}
-
-    def add(self, client):
-        self.spent += client.cost
-
-@contextmanager
-def folder_client(folder, settings, mode="replay-or-record", responder=None):
-    """A client whose answers are recorded in a folder's own fixture (fixtures.folder_fixture):
-    judges, the post-mortem's analyst and query checkers, each folder apart from the main fixture.
-    Answers already recorded are served; the rest are asked (in replay mode: fail as unrecorded).
-    responder: whose answers they are (default: the model's name), e.g. a model at another host."""
-    from .fixtures import folder_fixture
-    client = Client(settings, None, fixture=folder_fixture(folder), mode=mode, responder=responder)
-    try:
-        yield client
-    finally:
-        client.close()
-
 def build_request(s, prompt, schema, images=(), key=None):
     """A request for a `schema` object under settings s: its body, its hashes (what it asks), and facts about it
     (main thread: reads image files). Raises BudgetExceeded if it would overrun the context budget."""
@@ -409,8 +357,9 @@ class Client:
     """Chat Completions client with a response cache.
 
     `store`: a Store, whose response cache is keyed by the query that reached the model and the model; or None, no
-    cache (a fixture holding every answer, see folder_client, or a caller that asks once). A folder of files keyed
-    by the request's bytes was once the cache without a store; only tests used it (removed 2026-10-02).
+    cache (a fixture holding every answer, see the lab's eval.clients.folder_client, or a caller that asks once). A
+    folder of files keyed by the request's bytes was once the cache without a store; only tests used it (removed
+    2026-10-02).
     """
     def __init__(self, settings: "Settings", store, api_key: str | None = None, fixture=None, mode="replay",
                  responder=None, fresh_regions=None):

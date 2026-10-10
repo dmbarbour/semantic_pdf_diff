@@ -73,7 +73,7 @@ def judge(before, after, folder, models, max_cost, check=False, grown=False):
     """The halves of two runs judged: pairwise per tile (rubric v5), or with check, each half's claims marked."""
     sys.path.insert(0, str(ROOT / "src"))
     from semantic_pdf_diff.ledger import Ledger
-    from semantic_pdf_diff.llm import evaluator_settings, folder_client
+    from semantic_pdf_diff_lab.eval.clients import evaluator_settings, folder_client
     from semantic_pdf_diff_lab.bench import refinement
     from semantic_pdf_diff_lab.eval.judgements import ModelJudge
     folder = Path(folder)

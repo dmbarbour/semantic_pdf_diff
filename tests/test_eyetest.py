@@ -135,7 +135,7 @@ class Asking(unittest.TestCase):
     def test_recorded_answers_replay(self):
         import pymupdf
         from semantic_pdf_diff.fixtures import Fixture, unpack
-        from semantic_pdf_diff.llm import folder_client
+        from semantic_pdf_diff_lab.eval.clients import folder_client
         from semantic_pdf_diff.settings import Settings
         with tempfile.TemporaryDirectory() as d, Fixture(unpack(FOLDER / "replay.zip", d)) as fixture:
             recorded = fixture.meta().get("pymupdf")

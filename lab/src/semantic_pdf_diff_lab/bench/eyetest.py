@@ -756,7 +756,7 @@ def images(folder, cards):
 
 def ask(folder, client, cards, progress=None):
     """Ask the client's model every card; {card id: answer dict, or {"error": ...}}. Answers are
-    recorded by query in the folder's fixture (llm.folder_client), so asking again is free."""
+    recorded by query in the folder's fixture (semantic_pdf_diff_lab.eval.clients.folder_client), so asking again is free."""
     from semantic_pdf_diff.dispatch import Dispatcher
     from semantic_pdf_diff.progress import NoProgress
     progress = progress or NoProgress()

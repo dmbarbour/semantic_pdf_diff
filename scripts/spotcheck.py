@@ -92,8 +92,8 @@ def main(argv=None):
     elif args.command == "judge":
         from semantic_pdf_diff_lab.eval.judgements import ModelJudge
         from semantic_pdf_diff.ledger import Ledger
-        from semantic_pdf_diff.llm import folder_client
-        from semantic_pdf_diff.llm import Budget, evaluator_settings
+        from semantic_pdf_diff_lab.eval.clients import folder_client
+        from semantic_pdf_diff_lab.eval.clients import Budget, evaluator_settings
         judges = args.judge or ["XiaomiMiMo/MiMo-V2.6-Pro"]
         escalate = args.escalate or ["Qwen/Qwen3.5-397B-A17B"]
         budget = Budget(args.max_cost)  # for the whole command: every judge and escalation shares it

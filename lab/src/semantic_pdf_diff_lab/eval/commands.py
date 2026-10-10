@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 
 from semantic_pdf_diff.cli import add_budget_options, add_log_options, start_logging
-from semantic_pdf_diff.llm import Budget, evaluator_settings, folder_client
+from semantic_pdf_diff_lab.eval.clients import Budget, evaluator_settings, folder_client
 from semantic_pdf_diff.pipeline import RunOptions, attach_ledger, budget_note
 from semantic_pdf_diff.progress import Progress, log
 

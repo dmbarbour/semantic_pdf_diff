@@ -22,7 +22,7 @@ Five hand-kept lists (`LEVERS`, `EXTRACTION_SETTINGS`, `SETTING_REGIONS`, `TRIAG
 - **Bindings follow the roles declared,** whatever the class. Endpoint settings never join one, except the model.
 - **The tables once kept by hand are read off the declarations:** `SETTING_CLASSES`, the role tuples, `LEVERS`, `SETTING_REGIONS`, `LEVER_MARKS`.
 - **`docs/configuration.md`'s settings table is generated** (`levers.settings_table`), and a test keeps it current.
-- **Endpoint settings are a plain object beside the platform** (`settings.Endpoint`): not bound, hashed or searched. Evaluator clients take only endpoint settings from the environment (`llm.evaluator_settings`).
+- **Endpoint settings are a plain object beside the platform** (`settings.Endpoint`): not bound, hashed or searched. Evaluator clients take only endpoint settings from the environment (the lab's `eval.clients.evaluator_settings`).
 
 ## Consequences
 

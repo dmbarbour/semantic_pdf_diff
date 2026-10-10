@@ -49,7 +49,7 @@ def main(argv=None):
     import pymupdf
     from semantic_pdf_diff_lab.bench import eyetest, pagetest
     from semantic_pdf_diff import ledger
-    from semantic_pdf_diff.llm import Budget, evaluator_settings, folder_client
+    from semantic_pdf_diff_lab.eval.clients import Budget, evaluator_settings, folder_client
     from semantic_pdf_diff.settings import Settings
     if args.command == "run":
         budget = Budget(args.max_cost)  # for the whole command, not each model (code review 2026-10-08, E2)

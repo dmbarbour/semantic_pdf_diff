@@ -115,11 +115,6 @@ def settings_class(levers=DEFAULT_LEVERS):
 
 Settings = settings_class()
 
-# What every evaluating model (judges, query checkers, the post-mortem's analyst) is asked with.
-# Its answers are recorded by query, so these must be the same wherever a folder is judged; the
-# transport (concurrency, timeouts, retries, caps) varies by caller and never changes a query.
-EVALUATOR_SETTINGS = {"context_tokens": 262144, "output_tokens": 16000, "image_tokens": 3000}
-
 # Each setting's class (levers.Declared), read off the declarations.
 SETTING_CLASSES = setting_classes(Settings)
 

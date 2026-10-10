@@ -209,7 +209,7 @@ class RoundRunner:
         if checks and self.wanted("check"):
             from semantic_pdf_diff_lab.eval import queries
             from semantic_pdf_diff.ledger import Ledger
-            from semantic_pdf_diff.llm import evaluator_settings
+            from semantic_pdf_diff_lab.eval.clients import evaluator_settings
             cap = float(checks.get("cap", 2.0))
             for v in self.spec["variants"]:
                 step = f"check:{v}"
@@ -380,15 +380,15 @@ class RoundRunner:
         return self.measured[v]
 
     def client_for(self, folder, settings):
-        """A model client over a folder's own fixture (llm.folder_client); tests answer with stubs instead."""
-        from semantic_pdf_diff.llm import folder_client
+        """A model client over a folder's own fixture (semantic_pdf_diff_lab.eval.clients.folder_client); tests answer with stubs instead."""
+        from semantic_pdf_diff_lab.eval.clients import folder_client
         return folder_client(folder, settings)
 
     def ask(self, v, model, upto, only=None, retry_failed=False, step="judge", verdicts_dir="verdicts"):
         """One judge over a variant's first `upto` units; raises Paused at the cap or out of budget."""
         from semantic_pdf_diff_lab.eval.judgements import ModelJudge
         from semantic_pdf_diff.ledger import Ledger
-        from semantic_pdf_diff.llm import evaluator_settings
+        from semantic_pdf_diff_lab.eval.clients import evaluator_settings
         batch = self.folder / f"pairs-{v}"
         if self.remaining() <= 0:
             raise Paused(f"round cap reached while judging {v} ({model}, units to {upto})")
@@ -443,7 +443,7 @@ class RoundRunner:
         from semantic_pdf_diff import ledger
         from semantic_pdf_diff_lab.eval import postmortem
         from semantic_pdf_diff.ledger import Ledger
-        from semantic_pdf_diff.llm import evaluator_settings
+        from semantic_pdf_diff_lab.eval.clients import evaluator_settings
         batch, pm = self.folder / f"pairs-{v}", self.spec["postmortem"]
         left = min(self.remaining(), pm["cap"] - ledger.spent(self.ledger_path, round=self.name, step="postmortem"))
         if pm["analyst"] and left > 0:
