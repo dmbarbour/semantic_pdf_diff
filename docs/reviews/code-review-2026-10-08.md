@@ -298,7 +298,7 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 | D4 | Within an item, each claim's words computed once; leftover pairs found by a shared attribute word. One item of 2,000 claims sharing no value 96.8 s to 8.6 s (its 133,340 pairs to judge are the rest) | | `25ec3d9` |
 | D5 | A claim compared only with its value's clusters seen on one of its pages, in the order they were started. 4,000 claims of one value 50.3 s to 0.5 s. D3–D5: 400 random revision pairs and 300 claim sets identical; the controlled corpus replayed into fresh stores gives all 280 reports as recorded | | `25ec3d9` |
 | Test gaps | Table continuation over pages (A19); the rules and structure queries' failure paths (not reached, failed, first or second answer, a failed review); alignment at scale (with D3–D5); the vetoes, lifted into the pure `compare.vetoes` | | `11ea2cb` |
-| E10 | `stubs`: a `Recorder` base with stock answers (six extraction fakes now subclass it), `source_data` (14 hand-made splits), `text_pdf` (five builders), `serving`, `request_body` and `chat_answer` (seven stub servers' boilerplate). Left as they are: the judge fake, the workbook tests' scripted model, and the builders that draw | | |
+| E10 | `stubs`: a `Recorder` base with stock answers (six extraction fakes now subclass it), `source_data` (14 hand-made splits), `text_pdf` (five builders), `serving`, `request_body` and `chat_answer` (seven stub servers' boilerplate). Left as they are: the judge fake, the workbook tests' scripted model, and the builders that draw | | `6dbcbaa` |
 
 **Status, 2026-10-09:** every finding in *Bugs and risks* is fixed. The [remediation plan](../plans/review-bugs-2026-10-09.md)'s six items are done.
 
