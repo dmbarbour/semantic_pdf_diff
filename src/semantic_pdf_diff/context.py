@@ -15,6 +15,21 @@ CONTEXT_NOTE = "CONTEXT (for reference only: do not extract claims from it):"
 
 LOCATOR_SIDE = 384  # pixels: the page thumbnail that shows where a tile sits
 
+class Recent:
+    """What a page yields, kept for the last few pages asked about: a page's crops and passes ask for the same again
+    and again, and a drawing sheet's drawings or display list is large, so only a few pages' are kept (code review
+    2026-10-08, A7, A8). By page number: one document's, which a reading doesn't change."""
+    def __init__(self, make, size=2):
+        self.make, self.size, self.kept = make, size, []  # [(page number, what it yielded)]
+
+    def __call__(self, page):
+        for number, value in self.kept:
+            if number == page.number:
+                return value
+        value = self.make(page)
+        self.kept = [(page.number, value)] + self.kept[:self.size - 1]
+        return value
+
 class Context:
     """A document's reader for the context levers (levers.py: text_lines, table_lines, tile_lines, tile_images):
     the caches and document access their hooks share. A query's context is CONTEXT_NOTE followed by the lines
@@ -27,6 +42,10 @@ class Context:
         self.assets, self.stem = assets, stem  # where the locator's images go, and their names' stem
         self.blocks, self.stems, self.cited_by, self.page_lines, self.page_graphics = {}, {}, {}, {}, {}
         self.tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
+        # a page's vector drawings (never changed by their readers), and its display list: Page.get_pixmap builds one
+        # for every crop, interpreting the whole page again
+        self.drawings = Recent(lambda page: page.get_cdrawings())
+        self._display_lists = Recent(lambda page: page.get_displaylist(annots=True))
 
     @staticmethod
     def compose(lines):
@@ -59,12 +78,16 @@ class Context:
         """A page's drawings and images as displayed (segmentation's, frames left out), once per page: a drawing
         sheet's take up to a second, and each refined tile reads them."""
         if page.number not in self.page_graphics:
-            self.page_graphics[page.number] = _graphics(page)
+            self.page_graphics[page.number] = _graphics(page, self.drawings(page))
         return self.page_graphics[page.number]
 
     def figures(self, page, number):
         """The page's detected figures (situate.page_figures)."""
-        return page_figures(page, number)
+        return page_figures(page, number, self.drawings(page))
+
+    def pixmap(self, page, matrix, clip=None):
+        """Page.get_pixmap(matrix=matrix, clip=clip, alpha=False), rendered as it does, from the page's display list."""
+        return self._display_lists(page).get_pixmap(matrix=matrix, colorspace=pymupdf.csRGB, alpha=False, clip=clip)
 
     def page_blocks(self, page_no):
         """The page's text blocks in reading order: [(bbox, text)]."""
@@ -108,7 +131,7 @@ class Context:
     def locator(self, page, rect, tag):
         """The whole page, small, with the region outlined: rendered once into the store, its path returned."""
         where = crop_name(self.stem, tag, "-where")
-        render_locator(page, rect, self.assets / where)
+        render_locator(page, rect, self.assets / where, pixmap=self.pixmap)
         return "assets/" + where
 
 # What each lever added to a query, found by the lines its builder writes (the levers' marks). For
@@ -126,10 +149,11 @@ def lever_notes(prompt):
             notes[lever] = joined if len(joined) <= 240 else joined[:237] + "..."
     return notes
 
-def render_locator(page, rect, target, side=LOCATOR_SIDE, width=3):
-    """The whole page, small, with rect (displayed coordinates) outlined in red."""
+def render_locator(page, rect, target, side=LOCATOR_SIDE, width=3, pixmap=None):
+    """The whole page, small, with rect (displayed coordinates) outlined in red. pixmap: Context.pixmap."""
     scale = side / max(page.rect.width, page.rect.height)
-    pix = page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), alpha=False)
+    matrix = pymupdf.Matrix(scale, scale)
+    pix = pixmap(page, matrix) if pixmap is not None else page.get_pixmap(matrix=matrix, alpha=False)
     box = (rect * pymupdf.Matrix(scale, scale)).irect & pix.irect
     for edge in (pymupdf.IRect(box.x0, box.y0, box.x1, box.y0 + width), pymupdf.IRect(box.x0, box.y1 - width, box.x1, box.y1),
                  pymupdf.IRect(box.x0, box.y0, box.x0 + width, box.y1), pymupdf.IRect(box.x1 - width, box.y0, box.x1, box.y1)):

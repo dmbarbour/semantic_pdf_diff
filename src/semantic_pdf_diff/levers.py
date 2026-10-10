@@ -304,7 +304,8 @@ class SkipEmpty(Lever):
         if not self.skip_empty or not regions:
             return regions
         from .segmentation import _empty
-        return [x for x, blank in zip(regions, _empty(page, [r for _, r, _ in regions], reader.lines(page))) if not blank]
+        return [x for x, blank in zip(regions, _empty(page, [r for _, r, _ in regions], reader.lines(page),
+                                                     reader.graphics(page))) if not blank]
 
 class FigureTasks(Lever):
     lever_name, stage, off = "figure_tasks", "segmentation", {"figure_tasks": False}

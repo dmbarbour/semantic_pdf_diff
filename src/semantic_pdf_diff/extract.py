@@ -100,10 +100,14 @@ def extraction_template(s):
 # Visual refinement stops at crops narrower than this (PDF points).
 MIN_REFINE_POINTS = 100
 
-def render(page, rect, target, max_side):
+def render(page, rect, target, max_side, context=None):
+    """A crop, saved: from the reader's display list of the page with a context (Context.pixmap), else as
+    Page.get_pixmap renders it (the same pixels)."""
     # clip is in rotated page coordinates, as used by Page.get_pixmap.
     scale = min(2.5, max_side / max(rect.width, rect.height))
-    page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=rect, alpha=False).save(target)
+    matrix = pymupdf.Matrix(scale, scale)
+    pix = context.pixmap(page, matrix, rect) if context is not None else page.get_pixmap(matrix=matrix, clip=rect, alpha=False)
+    pix.save(target)
 
 def text_pieces(page, text_bytes):
     pieces = []
@@ -138,10 +142,10 @@ def text_groups(page, text_bytes, section_of=None):
 UNIT = re.compile(r"\d\s?(?:[kMG]?W|kWh|[kM]?Pa|bar|psi|mm|cm|km|m²|m2|m³|m3|kg|L/s|l/s|L/min|°C|°F|K|%|Hz|kV|V|kVA|A|rpm|dB)\b")
 REQUIREMENT = re.compile(r"\b(?:shall|must|required|requirement)\b", re.IGNORECASE)
 
-def page_signals(page, tables):
-    """Cheap triage signals for one page; summed per section."""
+def page_signals(page, tables, drawings=None):
+    """Cheap triage signals for one page; summed per section. drawings: the page's, if already fetched."""
     text = page.get_text("text")
-    drawings = page.get_cdrawings()
+    drawings = page.get_cdrawings() if drawings is None else drawings
     return {"numbers": len(re.findall(r"\d+(?:[.,]\d+)?", text)), "units": len(UNIT.findall(text)),
             "requirements": len(REQUIREMENT.findall(text)), "tables": tables, "images": len(page.get_images()),
             "drawings": len(drawings), "characters": len(text.strip())}
@@ -343,7 +347,7 @@ class Visuals:
     def task(self, page_no, page, tag, rect, depth=0, text="", box=None, derivation=None):
         s = self.s
         name = crop_name(self.stem, tag)
-        render(page, rect, self.assets / name, s.image_side)
+        render(page, rect, self.assets / name, s.image_side, self.context_of)
         native_rect = native(page, rect)
         # one text page for the layer and the blocks, their flags the same (code review 2026-10-08, A6)
         textpage = (page.get_textpage(clip=native_rect, flags=pymupdf.TEXTFLAGS_TEXT) if not depth or box is None
@@ -505,7 +509,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 def image(ti=ti, displayed=displayed, page=page, crop=crop, number=number):
                     if not crop:
                         crop.append(crop_name(stem, f"rules:p{number}:{ti}"))
-                        render(page, displayed, assets / crop[0], s.image_side)
+                        render(page, displayed, assets / crop[0], s.image_side, context_of)
                     return f"assets/{crop[0]}"
 
                 # the header's box, where it's the table's first line (a key-value list's first pair, B5)
@@ -623,7 +627,7 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 else:
                     carried = None
             section = owner[number].id
-            for name_, value in page_signals(page, len(found)).items():
+            for name_, value in page_signals(page, len(found), context_of.drawings(page)).items():
                 signals.setdefault(section, {}).setdefault(name_, 0)
                 signals[section][name_] += value
             if s.vision:

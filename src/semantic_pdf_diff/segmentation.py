@@ -25,10 +25,11 @@ def tiles(rect, side, overlap=0.18):
 
 FIGURE_PAD = 8.0  # points around a figure's region
 
-def _graphics(page):
-    """Drawings (smaller than half the page: not frames) and images, as displayed."""
+def _graphics(page, drawings=None):
+    """Drawings (smaller than half the page: not frames) and images, as displayed. drawings: the page's, if already
+    fetched (Context.drawings)."""
     boxes = []
-    for d in page.get_cdrawings():
+    for d in page.get_cdrawings() if drawings is None else drawings:
         r = shown(page, d["rect"])
         if r.height < 0.5 * page.rect.height:
             boxes.append(r)
@@ -255,9 +256,9 @@ def sheet_details(page, lines=None):
     return out
 
 SCALE = re.compile(r"\d[\"']?\s*=\s*\d|\bSCALE\b|\bN\.?T\.?S\b", re.IGNORECASE)
-def _empty(page, rects, lines=None):
+def _empty(page, rects, lines=None, graphics=None):
     """Which rects hold no text line, drawing or image (blank paper: the model reports "the image is
     blank" and returns nothing; 7% of grid tiles on the development drawing sheets, round 5d)."""
     lines = _lines(page) if lines is None else lines
-    marks = [box for box, _ in lines] + _graphics(page)
+    marks = [box for box, _ in lines] + (_graphics(page) if graphics is None else graphics)
     return [not any(r.intersects(m) for m in marks) for r in rects]

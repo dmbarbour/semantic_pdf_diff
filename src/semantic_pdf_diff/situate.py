@@ -158,7 +158,7 @@ def find_figures(doc):
     A page with captions isn't a sheet: its drawings are captioned figures (e.g. charts)."""
     return [f for number, page in enumerate(doc, 1) for f in page_figures(page, number)]
 
-def page_figures(page, number):
+def page_figures(page, number, drawings=None):
     """One page's figures (see find_figures). Captions, drawings and their pairing are worked out as the
     page is displayed ("below", "beside" and the page's width are about what a reader sees; a drawing sheet
     is often stored sideways), and each figure's box is recorded in the page's unrotated coordinates."""
@@ -171,7 +171,7 @@ def page_figures(page, number):
                              KINDS[match.group(1).lower().rstrip(".")]))
     # Entries in a list of figures or tables look like captions but aren't figures.
     captions = [c for c in captions if not LIST_ENTRY.search(c[1])]
-    drawings = page_drawings(page)
+    drawings = page_drawings(page) if drawings is None else drawings  # the reader's, if fetched (Context.drawings)
     label, title = title_block(page) if not captions else (None, "")
     sheet = not captions and (label is not None or is_sheet(len(drawings), len(page.get_text("text").strip())))
     displayed = [dict(d, rect=tuple(shown(page, d["rect"]))) for d in drawings] if page.rotation else drawings
