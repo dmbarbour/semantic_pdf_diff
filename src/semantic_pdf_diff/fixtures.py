@@ -146,6 +146,23 @@ class Fixture:
     def meta(self):
         return dict(self.db.execute("SELECT key, value FROM meta"))
 
+    def responders(self):
+        """Whose answers the fixture holds (as SQLite lists them: sort for an order)."""
+        return [r for (r,) in self.db.execute("SELECT DISTINCT responder FROM response")]
+
+    def usage(self, query):
+        """The usage a query's first answer (sample 0) was recorded with, or None."""
+        row = self.db.execute("SELECT usage FROM response WHERE query=? AND sample=0 ORDER BY rowid LIMIT 1",
+                              (query,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def recipe_usage(self, role, responder):
+        """[(region, parts, usage)] of a responder's answers to queries a recipe of this role built: the recipe's
+        region and parts (its tuple), the usage recorded (for the lab's cost tables; code review 2026-10-08, E5)."""
+        return [(region, json.loads(parts), json.loads(used or "{}")) for region, parts, used in self.db.execute(
+            "SELECT r.region, r.parts, s.usage FROM response s JOIN recipe r ON r.query = s.query "
+            "WHERE s.responder = ? AND r.role = ?", (responder, role))]
+
     def answer(self, query, responder, sample=0):
         """(outcome, answer, error) as recorded, or None. Marks the answer as used (see prune)."""
         row = self.db.execute("SELECT outcome, answer, error FROM response WHERE query=? AND responder=? AND sample=?",

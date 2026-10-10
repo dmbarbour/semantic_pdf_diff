@@ -63,7 +63,7 @@ def main(argv=None):
         responder = None
         if args.replay:
             with fixtures.open(PACKED, "read") as f:
-                responder = f.db.execute("SELECT DISTINCT responder FROM response").fetchone()[0]
+                responder = f.responders()[0]
         worst = 0
         for name, (earlier, later) in PAIRS.items():
             if args.only and name not in args.only:

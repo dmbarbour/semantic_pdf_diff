@@ -105,9 +105,9 @@ class Source:
     def abouts(self):
         items = []
         for content in sorted(self.docs):
-            row = self.store.db.execute("SELECT data FROM situation WHERE content=?", (content,)).fetchone()
-            if row:
-                items += [("figure", content, f) for f in json.loads(row[0])["figures"] if f.get("about")]
+            data = self.store.situation_data(content)
+            if data:
+                items += [("figure", content, f) for f in data["figures"] if f.get("about")]
             items += [("section", content, s.model_dump()) for s in self.store.sections(content) if s.about]
         return items
 

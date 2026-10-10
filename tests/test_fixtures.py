@@ -41,6 +41,21 @@ class OpenModes(unittest.TestCase):
             with self.assertRaises(fixtures.FixtureError):
                 fixtures.open(Path(d) / 'missing.sqlite', 'replay')
 
+    def test_what_the_lab_reads_of_a_fixture(self):
+        """Its responders, a query's usage, and usage by recipe (code review 2026-10-08, E5: the lab read these with
+        SQL of its own)."""
+        from semantic_pdf_diff import fixtures
+        with tempfile.TemporaryDirectory() as d, fixtures.open(Path(d) / 'f.sqlite', 'record') as f:
+            f.record('q1', 'model-b', outcome='ok', answer='{}', usage={'prompt_tokens': 10, 'completion_tokens': 2},
+                     recipe=('eyetest', 'card-1', 'x'))
+            f.record('q2', 'model-a', outcome='ok', answer='{}', usage={'prompt_tokens': 7}, recipe=('pagetest', 'p', 'y'))
+            self.assertEqual(sorted(f.responders()), ['model-a', 'model-b'])
+            self.assertEqual(f.usage('q1'), {'completion_tokens': 2, 'prompt_tokens': 10})
+            self.assertIsNone(f.usage('missing'))
+            self.assertEqual(f.recipe_usage('eyetest', 'model-b'),
+                             [('card-1', ['eyetest', 'card-1', 'x'], {'completion_tokens': 2, 'prompt_tokens': 10})])
+            self.assertEqual(f.recipe_usage('eyetest', 'model-a'), [])
+
     def test_prune_refuses_a_zip_instead_of_crashing(self):
         from semantic_pdf_diff import cli, fixtures
         with tempfile.TemporaryDirectory() as d:

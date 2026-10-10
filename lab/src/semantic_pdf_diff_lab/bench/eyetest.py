@@ -778,13 +778,12 @@ def prompt_tokens(folder, responder):
     from semantic_pdf_diff.fixtures import folder_fixture
     fixture = folder_fixture(folder)
     try:
-        rows = fixture.db.execute("SELECT r.region, s.usage FROM response s JOIN recipe r ON r.query = s.query "
-                                  "WHERE s.responder = ? AND r.role = 'eyetest'", (responder,)).fetchall()
+        rows = fixture.recipe_usage("eyetest", responder)
     finally:
         fixture.close()
     out = {}
-    for card, usage in rows:
-        tokens = json.loads(usage or "{}").get("prompt_tokens")
+    for card, _, usage in rows:
+        tokens = usage.get("prompt_tokens")
         if tokens:
             out[card] = tokens
     return out
@@ -905,7 +904,7 @@ def responders(folder):
     from semantic_pdf_diff.fixtures import folder_fixture
     fixture = folder_fixture(folder)
     try:
-        return [r for (r,) in fixture.db.execute("SELECT DISTINCT responder FROM response ORDER BY responder")]
+        return sorted(fixture.responders())
     finally:
         fixture.close()
 

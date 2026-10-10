@@ -330,13 +330,17 @@ class Store:
                                 (section.model_dump_json(), content, section.id))
             self.db.execute("INSERT OR REPLACE INTO situation VALUES (?, ?)", (content, json.dumps(data)))
 
+    def situation_data(self, content):
+        """A content item's situating record as kept (figures, unresolved, issues, complete), or None."""
+        row = self.db.execute("SELECT data FROM situation WHERE content=?", (content,)).fetchone()
+        return json.loads(row[0]) if row else None
+
     def situation(self, content):
         """(figures, unresolved references, issues) if situating completed, else None."""
         from .schema import Reference
-        row = self.db.execute("SELECT data FROM situation WHERE content=?", (content,)).fetchone()
-        if row is None:
+        data = self.situation_data(content)
+        if data is None:
             return None
-        data = json.loads(row[0])
         if not data["complete"]:
             return None
         return ([Figure.model_validate(f) for f in data["figures"]],

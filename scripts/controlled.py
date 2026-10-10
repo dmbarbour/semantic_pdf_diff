@@ -140,7 +140,7 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
     out = runs / ("replay" if replay else "recorded")
     if replay and not responder:  # the responder the fixture holds, whatever the environment says
         with fixtures.open(fixture, "read") as f:
-            held = [r for (r,) in f.db.execute("SELECT DISTINCT responder FROM response")]
+            held = f.responders()
         if len(held) != 1:
             (error or print)(f"the fixture holds {held}: name one with --responder")
             return 1

@@ -1,7 +1,6 @@
 """What a round measures without judges (from the replay stores and the fixture), the gains named in its
 criteria, and the history report. Split from rounds.py (milestone 8).
 """
-import json
 from collections import defaultdict
 from pathlib import Path
 
@@ -13,7 +12,7 @@ def gains(baseline_dir, variant_dir, fixture=None):
     """Measured relative changes a named gain can refer to (models.Gain): "claims" (distinct claims)
     and, given the fixture the runs were replayed from, "tokens" (prompt and completion tokens of the
     queries the runs made). None where it can't be measured."""
-    import sqlite3
+    from semantic_pdf_diff import fixtures
     from semantic_pdf_diff.store import Store
     def claims(runs_dir):
         return mechanical(runs_dir).get("all", {}).get("distinct_claims")
@@ -24,14 +23,12 @@ def gains(baseline_dir, variant_dir, fixture=None):
         for folder in (p for p in Path(runs_dir).iterdir() if (p / "store.sqlite").exists()):
             with Store.open(folder) as store:
                 queries |= {q["hash"] for q in store.queries()}
-        db = sqlite3.connect(f"file:{fixture}?mode=ro", uri=True)
         total = 0
-        for query in queries:
-            row = db.execute("SELECT usage FROM response WHERE query=? AND sample=0 ORDER BY rowid LIMIT 1", (query,)).fetchone()
-            if row:
-                usage = json.loads(row[0])
-                total += int(usage.get("prompt_tokens") or 0) + int(usage.get("completion_tokens") or 0)
-        db.close()
+        with fixtures.open(fixture, "read") as answers:
+            for query in queries:
+                usage = answers.usage(query)
+                if usage is not None:
+                    total += int(usage.get("prompt_tokens") or 0) + int(usage.get("completion_tokens") or 0)
         return total
     out = {}
     for metric, measure in (("claims", claims), ("tokens", tokens)):

@@ -451,14 +451,12 @@ def usage(folder, responder):
     from semantic_pdf_diff.fixtures import folder_fixture
     fixture = folder_fixture(folder)
     try:
-        rows = fixture.db.execute("SELECT r.region, r.parts, s.usage FROM response s JOIN recipe r ON r.query = s.query "
-                                  "WHERE s.responder = ? AND r.role = 'pagetest'", (responder,)).fetchall()
+        rows = fixture.recipe_usage("pagetest", responder)
     finally:
         fixture.close()
     out = {}
-    for label, parts, used in rows:
-        u = json.loads(used or "{}")
-        region = tuple(round(v, 1) for v in json.loads(parts)[2])  # recorded at 2 decimals; matched at 1
+    for label, parts, u in rows:
+        region = tuple(round(v, 1) for v in parts[2])  # recorded at 2 decimals; matched at 1
         out[(label, region)] = (u.get("prompt_tokens") or 0, u.get("completion_tokens") or 0)
     return out
 
