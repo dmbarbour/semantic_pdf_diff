@@ -34,6 +34,12 @@ DATE = re.compile(r"^\s*(\d{4})-(\d{2})-(\d{2})\s*$")
 def same_number(a, b):
     return a is not None and b is not None and abs(a - b) <= 1e-9 * max(1.0, abs(a), abs(b))
 
+# --- words
+
+def singular(word):
+    """A word's plural "s" dropped ("pumps" → "pump"), not a word's own ("glass", "gas")."""
+    return word[:-1] if len(word) > 3 and word.endswith("s") and not word.endswith("ss") else word
+
 # --- lengths in feet and inches
 
 # Inches as a drafter writes them: 6, 6.5, 6 1/2 or 1/2 (a fraction, as on dimension strings).

@@ -193,8 +193,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     dispatch = dispatcher or Dispatcher(client)
     with (dispatch if own else contextlib.nullcontext()):
         for index, (score, a, b) in enumerate(pairs[:client.s.max_pairs]):
-            while dispatch.pending() >= max(4, 2 * dispatch.workers):
-                dispatch.wait_one()
+            dispatch.make_room()
             attempted.update((a.id,b.id))
             images, payload = [], []
             for e in (a,b):

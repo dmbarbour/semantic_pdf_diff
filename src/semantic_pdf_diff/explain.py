@@ -151,8 +151,7 @@ def explain(results, payloads, earlier, later, headings, dispatch, progress, key
         return finish
 
     for index in chosen:
-        while dispatch.pending() >= max(4, 2 * dispatch.workers):
-            dispatch.wait_one()
+        dispatch.make_room()
         a, b, payload, images = payloads[index]  # A is always the earlier revision's
         shown = [{**p, **({"section": headings[e.content, e.section]} if (e.content, e.section) in headings else {})}
                  for p, e in zip(payload, (a, b))]

@@ -27,7 +27,7 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 
-from .values import inches, printed_value, unit
+from .values import inches, printed_value, singular, unit
 
 TAG = re.compile(r"\b[A-Z]{1,4}-?\d{1,4}[A-Z]?\b")
 # Not "a": single letters name things (Option A, Revision A, valve A).
@@ -61,7 +61,7 @@ def words(text):
     out = set()
     for w in re.findall(r"[a-z0-9]+", str(text).casefold()):
         if w not in STOP:
-            w = w[:-1] if len(w) > 3 and w.endswith("s") and not w.endswith("ss") else w
+            w = singular(w)
             out.add(SAME.get(w, w))
     return frozenset(out)
 

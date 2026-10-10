@@ -53,6 +53,11 @@ def shown_by_matrix(matrix, bbox):
     """shown for a page known only by its rotation matrix (None: not rotated)."""
     return pymupdf.Rect(bbox) * matrix if matrix is not None else pymupdf.Rect(bbox)
 
+def union(boxes):
+    """The smallest box (x0, y0, x1, y1) holding every box given, in whichever frame they share."""
+    boxes = list(boxes)
+    return (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
+
 def reading_blocks(page):
     """Text-layer blocks in reading order as displayed. PyMuPDF's sort=True orders unrotated
     coordinates, which on a rotated page (drawing sheets) is across the page as displayed; there

@@ -4,7 +4,7 @@ its grid for the rules query (pdf_grid). Split from extract.py (milestone 7).
 import pymupdf
 
 from . import tablegrid
-from .pages import shown
+from .pages import shown, union
 from .tablegrid import filled as _filled, joined as _joined
 
 def same_form(row, header):
@@ -260,7 +260,7 @@ def ruled_rows(rows, boxes, rules, least=3, share=0.4):
         else:
             a, b = out_boxes[-1], boxes[k]
             out_rows[-1] = _joined(out_rows[-1], rows[k])
-            out_boxes[-1] = (min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3]))
+            out_boxes[-1] = union((a, b))
     return out_rows, out_boxes, len(rows) - len(out_rows)
 
 def pdf_parts(header, body, boxes, styles=None):

@@ -194,6 +194,13 @@ class Section(Strict):
     density: str = ""
     keywords: list[str] = Field(default_factory=list)
 
+def as_text(value):
+    """Numbers a model gives where text is asked for (a line as 7, a cell as 1024), as text; a list's item by item. For
+    Lenient models' fields, as field_validator(..., mode="before")(lambda cls, v: as_text(v))."""
+    if isinstance(value, list):
+        return [v if isinstance(v, str) else str(v) for v in value]
+    return value if isinstance(value, str) or value is None else str(value)
+
 class Lenient(Strict):
     """Model output: unknown keys are dropped, nulls become defaults, and overlong
     strings and lists are cut to their limits rather than failing the answer."""

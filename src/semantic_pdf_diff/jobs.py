@@ -36,9 +36,6 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
     """
     own = dispatcher is None
     dispatch = dispatcher or Dispatcher(client)
-    # Pages are fed only while few requests are pending, so prepared requests
-    # (which hold image data) stay bounded however large the documents.
-    bound = max(4, 2 * dispatch.workers)
     queues = [deque(q) for q in queues]
     active, draining = [None] * len(queues), []
 
@@ -66,8 +63,7 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
                     job = active[i]
                     if job is None:
                         break
-                    while dispatch.pending() >= bound:
-                        dispatch.wait_one()
+                    dispatch.make_room()  # pages fed only while few requests are pending
                     step = next(job.steps, "done")
                     fed = True
                     if step == "page":

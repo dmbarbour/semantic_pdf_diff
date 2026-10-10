@@ -40,6 +40,7 @@ from dataclasses import dataclass, field
 
 from . import chartxml, keyvalue, tablegrid
 from .office import A, CHART, EMU_PER_POINT, R, Package
+from .pages import union
 from .tablegrid import Cell, header_labels, header_rows, joined_labels
 from .textmodel import Block, Picture, TextDocument
 
@@ -153,7 +154,7 @@ def regions(sheet):
             for j in range(i + 1, len(boxes)):
                 a, b = boxes[i], boxes[j]
                 if a[0] <= b[2] and b[0] <= a[2] and a[1] <= b[3] and b[1] <= a[3]:
-                    boxes[i] = [min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3])]
+                    boxes[i] = list(union((a, b)))
                     del boxes[j]
                     merged = True
                     break

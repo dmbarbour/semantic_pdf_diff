@@ -22,7 +22,7 @@ chains of near-matches don't merge distinct facts.
 import re
 from functools import lru_cache
 from .schema import Occurrence, representative_rank
-from .values import unit
+from .values import singular, unit
 
 # Not "a": single letters name modules, details and grid lines ("Module A" and "Module B" are two
 # things; round 8 merged them when "a" was dropped as an article).
@@ -50,7 +50,7 @@ def _words(text):
     for w in re.findall(r"[a-z0-9]+", text.translate(QUOTES).casefold()):
         if w in STOPWORDS:
             continue
-        words.add(w[:-1] if len(w) > 3 and w.endswith("s") and not w.endswith("ss") else w)
+        words.add(singular(w))
     return frozenset(words)
 
 def _conditions_agree(a, b):

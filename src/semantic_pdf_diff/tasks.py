@@ -12,6 +12,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from .failures import CallLimitReached, NotRecorded
+from .pages import union
 from .schema import DerivationStep, Evidence, Extraction, claim_id, coverage_row, merge_occurrences
 from .progress import log
 from .quotes import covered, quoted
@@ -106,10 +107,6 @@ def split_utf8(text, limit):
         size += n
     if chunk:
         yield "".join(chunk)
-
-def union(boxes):
-    boxes = list(boxes)
-    return (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
 
 # An incomplete answer's issue saying the claim limit stopped it ("more steps (17-22) than the 20 claim limit
 # allowed"), as a request to continue; not clipping or illegibility, which another request wouldn't mend

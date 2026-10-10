@@ -43,6 +43,8 @@ def settings_from(config=None, **overrides):
     """Settings as the CLI's --config gives them (the environment, then the file), then overrides."""
     from .settings import Settings
     options = json.loads(Path(config).read_text()) if config else {}
+    if not isinstance(options, dict):
+        raise ValueError(f'{config}: settings file must contain a JSON object')
     return Settings.from_env(**{**options, **overrides})
 
 def attempt(run_it, *args, **kwargs):

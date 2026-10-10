@@ -74,6 +74,12 @@ class Dispatcher:
     def pending(self):
         return len(self.inflight)
 
+    def make_room(self):
+        """Wait while as many requests are pending as the bound (twice the workers, at least 4), so prepared requests,
+        which hold image data, stay bounded however much is fed."""
+        while self.pending() >= max(4, 2 * self.workers):
+            self.wait_one()
+
     def wait_one(self):
         """Handle at least one finished request (results may queue more)."""
         done, _ = wait(list(self.inflight), return_when=FIRST_COMPLETED)

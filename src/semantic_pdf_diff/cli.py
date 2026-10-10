@@ -13,9 +13,8 @@ import json
 import sys
 from pathlib import Path
 from . import fixtures, manifest
-from .pipeline import RunOptions, compare_paths, document_properties, limits, run
+from .pipeline import RunOptions, attempt, compare_paths, document_properties, limits, run, settings_from
 from .schema import Source
-from .settings import Settings
 from .progress import log, setup_logging
 from .report import write_report
 from .store import Store, StoreError
@@ -30,23 +29,22 @@ def lab_commands():
 
 def main(argv=None, client=None):
     """The command line. client: a model client the comparing commands use (a caller's: tests)."""
-    argv = list(sys.argv[1:] if argv is None else argv)
-    try:
-        if argv and argv[0] == 'source':
-            return source_command(argv[1:])
-        if argv and argv[0] == 'compare':
-            return compare_command(argv[1:], client)
-        if argv and argv[0] in ('show', 'gc', 'report'):
-            return store_command(argv[0], argv[1:])
-        if argv and argv[0] == 'fixtures':
-            return fixtures_command(argv[1:])
-        command = argv and lab_commands().get(argv[0])
-        if command:
-            return command(argv[1:])
-        return shortcut_command(argv, client)
-    except (OSError, ValueError, RuntimeError) as e:
-        print(f'Error: {e}', file=sys.stderr)
-        return 1
+    return attempt(command, list(sys.argv[1:] if argv is None else argv), client)
+
+def command(argv, client):
+    """The command argv names, run: its exit code."""
+    if argv and argv[0] == 'source':
+        return source_command(argv[1:])
+    if argv and argv[0] == 'compare':
+        return compare_command(argv[1:], client)
+    if argv and argv[0] in ('show', 'gc', 'report'):
+        return store_command(argv[0], argv[1:])
+    if argv and argv[0] == 'fixtures':
+        return fixtures_command(argv[1:])
+    lab = argv and lab_commands().get(argv[0])
+    if lab:
+        return lab(argv[1:])
+    return shortcut_command(argv, client)
 
 # --- options shared by commands that run the model ---------------------------------
 
@@ -93,17 +91,14 @@ def add_budget_options(parser):
 
 
 def load_settings(args):
-    options = json.loads(args.config.read_text()) if getattr(args, 'config', None) else {}
-    if not isinstance(options, dict):
-        raise ValueError(f'{args.config}: settings file must contain a JSON object')
-    for name in ['model', 'base_url', 'context_tokens', 'max_calls', 'top_k', 'max_cost']:
-        if getattr(args, name, None) is not None:
-            options[name] = getattr(args, name)
+    """The environment, then --config, then the flags."""
+    flags = {name: getattr(args, name) for name in ['model', 'base_url', 'context_tokens', 'max_calls', 'top_k', 'max_cost']
+             if getattr(args, name, None) is not None}
     if getattr(args, 'no_vision', False):
-        options['vision'] = False
+        flags['vision'] = False
     if getattr(args, 'no_situate', False):
-        options['situate'] = False
-    return Settings.from_env(**options)
+        flags['situate'] = False
+    return settings_from(getattr(args, 'config', None), **flags)
 
 
 # --- shortcut: two paths ------------------------------------------------------------

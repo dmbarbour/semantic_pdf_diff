@@ -39,7 +39,7 @@ from dataclasses import dataclass, field
 from pydantic import Field, field_validator
 
 from .asking import Asking
-from .schema import DerivationStep, Evidence, Lenient, claim_id, coverage_row
+from .schema import DerivationStep, Evidence, Lenient, as_text, claim_id, coverage_row
 from .tablegrid import (header_name, header_unit, kind, moment, noted, number, plain as _plain,
                         possible_notes)
 
@@ -323,34 +323,22 @@ class Written(Lenient):
     unit: str = Field(default="", max_length=80)
     conditions: str = Field(default="", max_length=300)
 
-    @field_validator("entity", "attribute", "value", "unit", "conditions", mode="before")
-    @classmethod
-    def _text(cls, value):
-        return value if isinstance(value, str) else str(value)
+    _text = field_validator("entity", "attribute", "value", "unit", "conditions", mode="before")(lambda cls, v: as_text(v))
 
 class Example(Lenient):
     row: str = Field(default="", max_length=20)
     claims: list[Written] = Field(default_factory=list, max_length=60)
 
-    @field_validator("row", mode="before")
-    @classmethod
-    def _text(cls, value):
-        return value if isinstance(value, str) else str(value)
+    _text = field_validator("row", mode="before")(lambda cls, v: as_text(v))
 
 class Transcribed(Lenient):
     """A row copied from the table's image (a PDF's), to check its text layer."""
     row: str = Field(default="", max_length=20)
     cells: list[str] = Field(default_factory=list, max_length=60)
 
-    @field_validator("row", mode="before")
-    @classmethod
-    def _text(cls, value):
-        return value if isinstance(value, str) else str(value)
+    _text = field_validator("row", mode="before")(lambda cls, v: as_text(v))
 
-    @field_validator("cells", mode="before")
-    @classmethod
-    def _texts(cls, value):
-        return [v if isinstance(v, str) else str(v) for v in value] if isinstance(value, list) else value
+    _texts = field_validator("cells", mode="before")(lambda cls, v: as_text(v))
 
 class Rules(Lenient):
     """A model's answer to the rules query (RULES)."""
@@ -368,10 +356,7 @@ class Rules(Lenient):
     points: list[str] = Field(default_factory=list, max_length=20)
     notes: list[str] = Field(default_factory=list, max_length=20)  # rows of POSSIBLE NOTES that are notes
 
-    @field_validator("quantities", "categories", "points", "notes", mode="before")
-    @classmethod
-    def _texts(cls, value):
-        return [v if isinstance(v, str) else str(v) for v in value] if isinstance(value, list) else value
+    _texts = field_validator("quantities", "categories", "points", "notes", mode="before")(lambda cls, v: as_text(v))
 
 REVIEWING = '''You wrote the rules below for a table. Here is what they give for some of its rows, applied mechanically.
 Check each claim against its row as a careful reader would: is the value the row's own; does the attribute name what

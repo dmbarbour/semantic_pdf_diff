@@ -15,8 +15,9 @@ import statistics
 
 from pydantic import Field, field_validator
 
-from .schema import DerivationStep, Lenient, coverage_row
+from .schema import DerivationStep, Lenient, as_text, coverage_row
 from .asking import Asking
+from .pages import union
 from .tablegrid import filled as _filled, joined as _joined, letter, plain as _plain
 
 UNIT = re.compile(r"^[(\[]?\s*(µm|μm|nm|mm|cm|m|km|in|ft|mas|%|°|°c|°f|k|w|kw|mw|hp|gpm|psi|psig|rpm|kg|lb|s|ms|hz|khz|"
@@ -74,12 +75,6 @@ def signals(header, body, boxes, styles=None, rules=None, cuts=None):
 def suspect(tags, row):
     return bool(tags) and not (tags == ["first cell empty"] and not _digit(row))
 
-def _texts(value):
-    """Numbers given where text is asked for (a line as 7, a cell as 1024), as text."""
-    if isinstance(value, list):
-        return [v if isinstance(v, str) else str(v) for v in value]
-    return value if isinstance(value, str) or value is None else str(value)
-
 class StructureRule(Lenient):
     action: str = Field(default="", max_length=20)
     when: list[str] = Field(default_factory=list, max_length=6)
@@ -88,13 +83,13 @@ class StructureRule(Lenient):
     into: list[str] = Field(default_factory=list, max_length=6)
     why: str = Field(default="", max_length=200)
 
-    _numbers = field_validator("lines", "into", "column", mode="before")(lambda cls, v: _texts(v))
+    _numbers = field_validator("lines", "into", "column", mode="before")(lambda cls, v: as_text(v))
 
 class LineExample(Lenient):
     line: str = Field(default="", max_length=10)
     cells: list[str] = Field(default_factory=list, max_length=30)
 
-    _numbers = field_validator("line", "cells", mode="before")(lambda cls, v: _texts(v))
+    _numbers = field_validator("line", "cells", mode="before")(lambda cls, v: as_text(v))
 
 class Structure(Lenient):
     """A model's answer to the structure query (STRUCTURE)."""
@@ -173,9 +168,7 @@ def _span(column, width):
     return (first, last) if first < last < width else None
 
 def _box(a, b):
-    if a is None or b is None:
-        return a or b
-    return (min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3]))
+    return a or b if a is None or b is None else union((a, b))
 
 def _number(text):
     text = str(text).strip()

@@ -5,7 +5,7 @@ which asks a model about the figures found (code review 2026-10-08, A13).
 import math
 import re
 
-from .pages import native, reading_blocks, shown
+from .pages import native, reading_blocks, shown, union
 from .schema import Figure
 
 KINDS = {"figure": "figure", "figures": "figure", "fig": "figure", "figs": "figure", "table": "table",
@@ -86,9 +86,6 @@ def title_block(page):
 
 def _area(b):
     return max(0.0, b[2] - b[0]) * max(0.0, b[3] - b[1])
-
-def _union(a, b):
-    return (min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3]))
 
 def _overlap(a, b):
     return _area((max(a[0], b[0]), max(a[1], b[1]), min(a[2], b[2]), min(a[3], b[3])))
@@ -191,7 +188,7 @@ def page_figures(page, number, drawings=None):
     items = []
     for ci, (cbox, text, label, kind) in enumerate(captions):
         if ci in paired:
-            items.append(dict(bbox=_union(cbox, regions[paired[ci]]), caption=text, label=label, kind=kind))
+            items.append(dict(bbox=union((cbox, regions[paired[ci]])), caption=text, label=label, kind=kind))
         else:
             items.append(dict(bbox=cbox, caption=text, label=label, kind=kind, region=False))
     items += [dict(bbox=r) for ri, r in enumerate(regions) if ri not in used_r]
