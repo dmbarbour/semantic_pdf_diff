@@ -291,15 +291,15 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 | E1 | The controlled scorer's words, vocabularies, rarity, units and fact numbers cached on what they're made from; a claim's names weighed once per claim, not per fact. Results identical (every run, by reader too); `controlled.py score` 401 s to 67 s, its scoring 155 s to 22 s | (lab only) | `e696d89` |
 | C2 | The store commits at NORMAL and people's changes at FULL; the query log and the fixture's recipes ride in the next transaction; a test bounds commits per replay (65 for 182 answers; 429 before). The fixture keeps its rollback journal at FULL, unlike the plan's WAL: see [decision 0025](../decisions/0025-commits-wait-on-the-disk-only-for-peoples-changes.md). Store tables after a run identical; the suite 136 s to 113 s (`test_fixtures` 161 s to 61 s) | 127.0 s to 97.9 s, with C3 | `f4a2734` |
 | C3 | A zipped fixture replayed from a read-only copy | | `f4a2734` |
-| A7 | A page's display list built once and every crop rendered from it (`Context.pixmap`, as `Page.get_pixmap` renders): crops byte-identical, as every query's image hash replayed | 97.9 s to 91.9 s, with A8 | |
-| A8 | A page's drawings fetched once for figures, graphics, the empty-tile check and the page's signals (`Context.drawings`). Both kept for the last two pages only (`context.Recent`): a drawing sheet's are large. Not shared: situating's figures, read from its own copy of the document, and the clipped text pages of crops (PyMuPDF ignores a clip given a text page) | | |
+| A7 | A page's display list built once and every crop rendered from it (`Context.pixmap`, as `Page.get_pixmap` renders): crops byte-identical, as every query's image hash replayed | 97.9 s to 91.9 s, with A8 | `2956969` |
+| A8 | A page's drawings fetched once for figures, graphics, the empty-tile check and the page's signals (`Context.drawings`). Both kept for the last two pages only (`context.Recent`): a drawing sheet's are large. Not shared: situating's figures, read from its own copy of the document, and the clipped text pages of crops (PyMuPDF ignores a clip given a text page) | | `2956969` |
 
 **Status, 2026-10-09:** every finding in *Bugs and risks* is fixed. The [remediation plan](../plans/review-bugs-2026-10-09.md)'s six items are done.
 
-**Still open** (the behaviour-preserving phase, as the owner ordered on 2026-10-09; nothing below has been started):
-- **Performance:** C2 with C3 (durability answered by the owner, above), A5, A6, A7, A8 (lines and graphics cached; figures and drawings still rebuilt per consumer), P1, D3–D5, C19, E1.
-- **Tests:** E9's rest (a class-level recording in `test_fixtures`, `@slow` on two classes; the runner is done), E6 (the boundary test doesn't recurse), E10 (test helpers), E18 (product tests import lab generators), and the gaps listed under *Tests* that no fix covered: table continuation over pages (A19), the table queries' failure paths, alignment at scale, the veto rules, a guard on commits per replay.
+**Still open** (the behaviour-preserving phase, as the owner ordered on 2026-10-09; the steps done are in the table above):
+- **Performance:** P1, D3–D5. (Done: A5–A8, C2, C3, C19, E1.)
+- **Tests:** E10 (test helpers), and the gaps listed under *Tests* that no fix covered: table continuation over pages (A19), the table queries' failure paths, alignment at scale, the veto rules. (Done: E6, E9, E18, the guard on commits per replay.)
 - **Architecture:** items 1–13.
-- **Simplification:** normalisers and number parsers (D10, S1), the small copies, the long functions; the recipe tuple (C14).
+- **Simplification:** normalisers and number parsers (D10, S1), `_filled`, `_joined` and `_plain` (with architecture item 6), the long functions. (Done: C14, the models' copies.)
 - **Not in this phase:** A20, a lever with the features (the owner's answer, above). Two bugs found under the remediation plan wait on the owner's order: decks' two-column tables aren't checked, and a section row under a PDF table's header is taken for its second line (the plan's *Found along the way*).
 
