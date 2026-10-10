@@ -76,6 +76,28 @@ class Reading(unittest.TestCase):
         self.assertEqual(polar.rows[0], ["alpha [deg]", "c_l", "c_d"])
         self.assertEqual(polar.grid.title, "Configuration: default; Reynolds: 8100000")  # the pairs heading it
 
+    def test_formulas_are_loaded_again_only_where_a_cell_was_left_uncalculated(self):
+        """A second load for the formulas was half a large workbook's reading (code review 2026-10-08, P1); Excel
+        saves every formula's value, so it's needed only for a workbook saved without them, as openpyxl saves."""
+        from unittest import mock
+        from semantic_pdf_diff.xlsxdocs import read_xlsx
+        load = openpyxl.load_workbook
+        calls = []
+        def counted(*args, **kwargs):
+            calls.append(kwargs.get("data_only"))
+            return load(*args, **kwargs)
+        with mock.patch("openpyxl.load_workbook", counted):
+            read_xlsx(workbook())  # a formula without its value: loaded again, for the formula
+            self.assertEqual(calls, [True, False])
+            del calls[:]
+            book = openpyxl.Workbook()
+            book.active.append(["Pump", 10])
+            book.active["D9"].font = openpyxl.styles.Font(bold=True)  # a stored cell without a value, no formula
+            buffer = io.BytesIO()
+            book.save(buffer)
+            read_xlsx(buffer.getvalue())
+            self.assertEqual(calls, [True])
+
     def test_a_headerless_defined_table_and_a_comment_on_an_empty_cell(self):
         # code review 2026-10-08: B9, a defined table with no header row took its first row as one; B8, a comment
         # on a cell in no region was dropped

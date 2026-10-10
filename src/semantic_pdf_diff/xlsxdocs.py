@@ -210,6 +210,8 @@ def _unheaded(grid, heads):
     used = {c.first for _, row in grid[heads:] for c in row if c.text}
     return any(k not in labelled for k in used if k > 0)
 
+FORMULA = re.compile(rb"<(?:\w+:)?f[\s>/]")  # a cell's formula element in a worksheet part: <f>, <x:f t="shared"/>
+
 def _sheet_parts(package):
     """{sheet name: its worksheet part's name}, from the workbook's own list."""
     book = "xl/workbook.xml"
@@ -328,9 +330,15 @@ def read_xlsx(data):
     from .pptxdocs import Package
     raw = bytes(data)
     book = openpyxl.load_workbook(io.BytesIO(raw), data_only=True)
-    written = openpyxl.load_workbook(io.BytesIO(raw), data_only=False)  # the formulas, for cells left uncalculated
     package = Package(raw)
     parts = _sheet_parts(package)
+    # The formulas, for cells left uncalculated: loaded again only where a sheet holds a cell without a value and its
+    # part a formula. Excel saves every formula's value, and the second load was half a large workbook's reading
+    # (code review 2026-10-08, P1). A sheet whose part isn't found is loaded, to be safe.
+    written = openpyxl.load_workbook(io.BytesIO(raw), data_only=False) if any(
+        any(cell.value is None for cell in ws._cells.values())
+        and (ws.title not in parts or FORMULA.search(package.read(parts[ws.title])))
+        for ws in book.worksheets) else None
     out = _Writer()
     line, blocks, images, pictures = out.line, out.blocks, out.images, out.pictures
 
@@ -377,7 +385,7 @@ def read_xlsx(data):
 
     for page, ws in enumerate(book.worksheets, 1):
         formulas = {key: cell.value for key, cell in written[ws.title]._cells.items()
-                    if isinstance(cell.value, str) and cell.value.startswith("=")}
+                    if isinstance(cell.value, str) and cell.value.startswith("=")} if written is not None else {}
         tables = []
         for table in ws.tables.values():  # (openpyxl's items() gives each table's range, not the table)
             left, top, right, bottom = range_boundaries(table.ref)
