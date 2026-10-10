@@ -12,7 +12,8 @@ from test_pipeline import Fake, ev  # noqa: E402
 
 from semantic_pdf_diff.compare import Revisions, compare, explanation_prompt  # noqa: E402
 from semantic_pdf_diff.llm import ModelFailure  # noqa: E402
-from semantic_pdf_diff.models import Explanation, Settings  # noqa: E402
+from semantic_pdf_diff.schema import Explanation  # noqa: E402
+from semantic_pdf_diff.settings import Settings
 
 def pump(id, attribute, value, unit="gpm", entity="Pump P-1"):
     return ev(id, entity=entity, attribute=attribute, value=value, unit=unit, conditions="", quote=f"{value} {unit}")

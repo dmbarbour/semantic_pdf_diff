@@ -26,7 +26,7 @@ from dataclasses import asdict, dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
 from pydantic import ConfigDict, Field
-from semantic_pdf_diff.models import Lenient
+from semantic_pdf_diff.schema import Lenient
 
 CAP = {"helv": 0.718, "cour": 0.562, "tiro": 0.662}  # cap height per em (the fonts' metrics)
 LETTERS = "ABCDEFGHJKLMNPRSTUVWXYZ"                    # no I, O or Q, as drawings avoid them

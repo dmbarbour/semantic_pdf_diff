@@ -9,7 +9,7 @@ import unittest
 import zipfile
 from pathlib import Path
 from semantic_pdf_diff import cli
-from semantic_pdf_diff.models import Source
+from semantic_pdf_diff.schema import Source
 from semantic_pdf_diff.report import write_report
 from semantic_pdf_diff.store import Store, StoreError
 

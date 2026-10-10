@@ -6,7 +6,8 @@ import unittest
 from pathlib import Path
 import pymupdf
 from semantic_pdf_diff.extract import extract_pdf
-from semantic_pdf_diff.models import Claim, Evidence, Extraction, PdfLocator, Settings, Source, claim_id, merge_occurrences
+from semantic_pdf_diff.schema import Claim, Evidence, Extraction, PdfLocator, Source, claim_id, merge_occurrences
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
 from semantic_pdf_diff.store import Store
 

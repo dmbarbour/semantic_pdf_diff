@@ -17,7 +17,7 @@ import unittest
 from pathlib import Path
 from semantic_pdf_diff_lab.eval import postmortem, review, rounds
 from semantic_pdf_diff.llm import folder_client
-from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
+from semantic_pdf_diff.settings import EVALUATOR_SETTINGS, Settings
 from semantic_pdf_diff_lab.eval.models import PairVerdict
 
 GOLDEN = Path(__file__).resolve().parent / "golden"

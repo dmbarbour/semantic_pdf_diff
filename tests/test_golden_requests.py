@@ -103,7 +103,7 @@ class AbsentIsOff(unittest.TestCase):
 
     def test_round_0_without_its_levers_that_are_off(self):
         from semantic_pdf_diff.levers import REGISTRY
-        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.settings import Settings
         settings = Settings(**ROUND0)
         off = [n for n in ROUND0["levers"] if all(getattr(settings, f) == v for f, v in REGISTRY[n].off.items())]
         self.assertGreater(len(off), 10)

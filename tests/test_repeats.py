@@ -6,7 +6,8 @@ from pathlib import Path
 from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff.extract import extract_pdf
-from semantic_pdf_diff.models import Extraction, Settings
+from semantic_pdf_diff.schema import Extraction
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id
 
 HEADER = 'ACME Pumping Station - Design Report'

@@ -275,7 +275,7 @@ class Report(unittest.TestCase):
 
 class Lever(unittest.TestCase):
     def test_revisions_align_and_proposals_keep_retrieval(self):
-        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.settings import Settings
         left = [claim("Pump P-1", "capacity", "100", "gpm"), claim("Pump P-2", "capacity", "200", "gpm")]
         right = [claim("Pump P-1", "capacity", "100", "gpm"), claim("Pump P-2", "capacity", "250", "gpm")]
         s = Settings()

@@ -9,7 +9,7 @@ from argparse import Namespace
 from pathlib import Path
 from pydantic import ValidationError
 from semantic_pdf_diff import levers as L
-from semantic_pdf_diff.models import Settings, settings_class
+from semantic_pdf_diff.settings import Settings, settings_class
 from semantic_pdf_diff.provenance import extraction_interpreter
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -199,7 +199,7 @@ class Rubrics(unittest.TestCase):
 
 class Marks(unittest.TestCase):
     def test_a_detail_noted_without_a_sheet_label_is_found(self):
-        from semantic_pdf_diff.extract import lever_notes  # the review: "Drawing sheet. Detail B4" was missed
+        from semantic_pdf_diff.settings import lever_notes  # the review: "Drawing sheet. Detail B4" was missed
         self.assertIn("sheet_details", lever_notes("SOURCE DATA:\nDrawing sheet. Detail B4: FOOTING PLAN"))
         self.assertIn("sheet_details", lever_notes("SOURCE DATA:\nSheet S-522 Deck Details. Detail C1: ELEVATION"))
         self.assertNotIn("sheet_details", lever_notes("SOURCE DATA:\nSee the detail on sheet S-522."))
@@ -207,7 +207,7 @@ class Marks(unittest.TestCase):
 class Comparison(unittest.TestCase):
     def test_retrieval_is_the_platforms_and_images_are_a_lever(self):
         from semantic_pdf_diff.compare import candidates
-        from semantic_pdf_diff.models import Evidence, PdfLocator
+        from semantic_pdf_diff.schema import Evidence, PdfLocator
         ev = lambda i, v: Evidence(id=i, content="sha256:" + "a" * 64 + ".pdf", entity="pump", attribute="power",
                                    value=v, unit="kW", kind="table", quote=v, confidence=0.9, image="assets/x.png",
                                    locator=PdfLocator(page=1, bbox=(0, 0, 1, 1), region="table", task="table:0"))

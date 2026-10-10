@@ -5,7 +5,7 @@ import re
 
 import pymupdf
 
-from .models import Section
+from .schema import Section
 from .pages import display_y, native, shown, shown_by_matrix, top_by_matrix
 
 HEADING_GAP = 40.0  # an outline entry this close above the next one is only its parent heading

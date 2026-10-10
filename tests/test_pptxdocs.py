@@ -105,7 +105,7 @@ class Reading(unittest.TestCase):
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent))
         from test_textdocs import extract
-        from semantic_pdf_diff.models import PptxLocator
+        from semantic_pdf_diff.schema import PptxLocator
         evidence, coverage, sections, _ = extract("deck.pptx", deck())
         values = {e.value: e for e in evidence}
         self.assertIsInstance(values["25.9"].locator, PptxLocator)

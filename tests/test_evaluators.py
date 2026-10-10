@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 from semantic_pdf_diff_lab.eval import rounds
 from semantic_pdf_diff.llm import Budget, evaluator_settings
-from semantic_pdf_diff.models import EVALUATOR_SETTINGS, Settings
+from semantic_pdf_diff.settings import EVALUATOR_SETTINGS, Settings
 
 class EvaluatorSettings(unittest.TestCase):
     def test_the_environment_reaches_the_endpoint_only(self):

@@ -8,7 +8,7 @@ For one decided batch (pairs-<variant>/):
   lever added anything to the unit's queries, with the groups whose interval lies clearly off the
   overall rate (where the lever might be applied, or left out);
 - for each sampled unit: the claims only one side has, the judges' notes and tags, and what the lever
-  added to its queries (extract.lever_notes, from the runs' query logs);
+  added to its queries (settings.lever_notes, from the runs' query logs);
 - a strong model's reading of all this: patterns, tweaks, partitions, what to test next.
 Written as postmortem.json and postmortem.html beside pairs.json. Claude writes the round's review
 from it (docs/reviews/round-*.md).
@@ -19,7 +19,7 @@ import random
 from collections import defaultdict
 from pathlib import Path
 from pydantic import Field
-from semantic_pdf_diff.models import Lenient
+from semantic_pdf_diff.schema import Lenient
 
 WON, LOST = 0.75, 0.25  # a unit clearly won or lost (its mean score over judges and orders)
 
@@ -54,7 +54,7 @@ def describe(levers, index=LEVER_INDEX):
     """[{lever, class, mechanism}]: what each lever does, from models.SETTING_CLASSES and the lever
     index's "Mechanism:" lines (so the analyst doesn't guess)."""
     import re
-    from semantic_pdf_diff.models import SETTING_CLASSES
+    from semantic_pdf_diff.settings import SETTING_CLASSES
     text = Path(index).read_text(encoding="utf-8") if Path(index).exists() else ""
     out = []
     for lever in levers:
@@ -94,7 +94,7 @@ def _unit_queries(runs_dir, item, side):
 
 def build(folder, documents=None, units=5, seed=1):
     """The post-mortem's evidence for one decided batch (no model calls)."""
-    from semantic_pdf_diff.extract import lever_notes
+    from semantic_pdf_diff.settings import lever_notes
     from .rounds import interval, region, unit_scores
     folder = Path(folder)
     batch = json.loads((folder / "pairs.json").read_text(encoding="utf-8"))

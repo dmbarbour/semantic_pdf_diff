@@ -21,7 +21,8 @@ from contextlib import contextmanager
 from pathlib import Path
 from .levers import ALL_REGIONS, TEXTUAL, VISUAL, declared, setting_regions  # noqa: F401 (region names, for callers)
 from .regions import crops_of, region_of  # noqa: F401 (region_of, for callers)
-from .models import Evidence, Figure, FileRef, Interpreter, Section, Settings, Source, merge_occurrences
+from .schema import Evidence, Figure, FileRef, Interpreter, Section, Source, merge_occurrences
+from .settings import Settings
 
 SCHEMA_VERSION = 8  # 8: responses cached by query hash and model; the query log
 
@@ -436,7 +437,7 @@ class Store:
 
     def situation(self, content):
         """(figures, unresolved references, issues) if situating completed, else None."""
-        from .models import Reference
+        from .schema import Reference
         row = self.db.execute("SELECT data FROM situation WHERE content=?", (content,)).fetchone()
         if row is None:
             return None

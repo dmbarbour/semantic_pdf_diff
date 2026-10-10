@@ -30,7 +30,7 @@ For Python callers, use `Settings.from_env(...)` to get the same environment def
 
 ## Settings
 
-Settings are in `config.example.json`; all omitted settings have defaults in `models.py` and `levers.py`.
+Settings are in `config.example.json`; all omitted settings have defaults in `settings.py` and `levers.py`.
 
 - **Levers** are the settings that shape how documents are read (context lines, tiling, quote matching and so on). Each is a mixin in `levers.py` that declares its settings, the stores' bindings it is part of, and the regions a change clears. A settings file may name its levers in order (`"levers": [...]`); without, the default order. `benchmarks/round0.json` and `benchmarks/champion.json` name theirs. A lever left out asks exactly what it asks switched off; a lever's place orders its lines among others' (context lines, for one).
 - **A store binds every setting that shapes its results,** resolved, and the levers' order. A store made before 2026-10-02 bound only levers changed from the defaults of its day, so it asks for `--reset` once; recorded answers replay.

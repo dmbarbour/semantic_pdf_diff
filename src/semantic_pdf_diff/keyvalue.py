@@ -18,7 +18,7 @@ import hashlib
 
 from pydantic import Field
 
-from .models import DerivationStep, Lenient, coverage_row
+from .schema import DerivationStep, Lenient, coverage_row
 from .tablerules import SHOWN_CELL, kind
 
 SHOWN_ROWS = 12  # the rows a check shows; the rest counted

@@ -21,7 +21,7 @@ chains of near-matches don't merge distinct facts.
 """
 import re
 from functools import lru_cache
-from .models import Occurrence, representative_rank
+from .schema import Occurrence, representative_rank
 from .values import unit
 
 # Not "a": single letters name modules, details and grid lines ("Module A" and "Module B" are two

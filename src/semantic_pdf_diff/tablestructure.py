@@ -16,7 +16,7 @@ import statistics
 
 from pydantic import Field, field_validator
 
-from .models import DerivationStep, Lenient, coverage_row
+from .schema import DerivationStep, Lenient, coverage_row
 from .tablerules import letter
 
 UNIT = re.compile(r"^[(\[]?\s*(µm|μm|nm|mm|cm|m|km|in|ft|mas|%|°|°c|°f|k|w|kw|mw|hp|gpm|psi|psig|rpm|kg|lb|s|ms|hz|khz|"

@@ -7,7 +7,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 import pymupdf
-from semantic_pdf_diff.models import MAX_CLAIMS, Claim, Evidence, Extraction, Judgment, PdfLocator, Settings
+from semantic_pdf_diff.schema import MAX_CLAIMS, Claim, Evidence, Extraction, Judgment, PdfLocator
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.llm import Client, Invalid, ModelFailure, redact_url
 from semantic_pdf_diff.compare import numeric_check
 from semantic_pdf_diff.extract import extract_pdf, tiles
@@ -392,7 +393,8 @@ class UnreadableDocuments(unittest.TestCase):
         import tempfile
         from pathlib import Path
         from semantic_pdf_diff.extract import Job, run_jobs
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         import pymupdf
         good = pymupdf.open()
         good.new_page().insert_text((72, 72), "Pump P-1 is rated 10 kW.")

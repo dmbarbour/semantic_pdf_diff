@@ -6,7 +6,7 @@ import unittest
 from types import SimpleNamespace
 
 from semantic_pdf_diff.compare import vetoes
-from semantic_pdf_diff.models import Judgment
+from semantic_pdf_diff.schema import Judgment
 
 def claim(confidence=0.9, approximate=False):
     return SimpleNamespace(confidence=confidence, approximate=approximate)

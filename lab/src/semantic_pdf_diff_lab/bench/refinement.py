@@ -306,7 +306,7 @@ def half_checks(runs, folder):
 def check_halves(folder, client, rater):
     """Ask a model to mark each half's claims (checks.json); {run: {mark: count}} written to marks-<rater>.json."""
     from pydantic import Field
-    from semantic_pdf_diff.models import Lenient
+    from semantic_pdf_diff.schema import Lenient
     from semantic_pdf_diff_lab.eval.judgements import rate
 
     class Mark(Lenient):

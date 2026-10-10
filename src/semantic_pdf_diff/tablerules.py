@@ -40,7 +40,7 @@ from dataclasses import dataclass, field, replace
 
 from pydantic import Field, field_validator
 
-from .models import DerivationStep, Evidence, Lenient, claim_id, coverage_row
+from .schema import DerivationStep, Evidence, Lenient, claim_id, coverage_row
 
 SAMPLE_FIRST, SAMPLE_MIDDLE, SAMPLE_LAST, SAMPLE_ODD = 5, 3, 2, 3  # the sample rows shown
 SHOWN_CELL = 120    # characters of a sample cell shown
@@ -1013,7 +1013,7 @@ def read(core, page, g, task, by_itself, source, image=None):
     ask(asked, 0, first_answer)
 
 def _evidence(core, page, box, task, fields, quote, verified, derivation, approximate=False):
-    from .models import Claim
+    from .schema import Claim
     claim = Claim(entity=fields["entity"][:160], attribute=fields["attribute"][:160], value=fields["value"][:300],
                   unit=fields["unit"][:40], conditions=fields["conditions"][:300], kind="table", quote=quote[:400],
                   confidence=CONFIDENCE, approximate=approximate, uncertainty=fields.get("uncertainty", "")[:200])

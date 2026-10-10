@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 import pymupdf
 from semantic_pdf_diff.extract import extract_pdf
-from semantic_pdf_diff.models import Extraction
+from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.pages import lines
 from semantic_pdf_diff.segmentation import halves
 from test_robustness import CID, Recorder, pdf

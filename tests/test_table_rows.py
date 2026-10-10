@@ -46,7 +46,8 @@ class Pdf(unittest.TestCase):
         import pymupdf
         from semantic_pdf_diff.extract import extract_pdf
         from semantic_pdf_diff.llm import ModelFailure
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
         from semantic_pdf_diff.extract import ExtractQuery
         from stubs import situating_answer

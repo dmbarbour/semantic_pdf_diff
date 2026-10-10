@@ -11,7 +11,8 @@ from pathlib import Path
 from unittest.mock import patch
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.llm import Client
-from semantic_pdf_diff.models import Claim, Extraction, Judgment, PdfLocator, Evidence, Settings
+from semantic_pdf_diff.schema import Claim, Extraction, Judgment, PdfLocator, Evidence
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
 from semantic_pdf_diff.store import InterpreterMismatch, Store, StoreError, StoreInUse
 from stubs import chat_answer, request_body, serving, situating_answer, source_data, text_pdf
@@ -65,7 +66,7 @@ class ReadOnly(unittest.TestCase):
 
 class ReadingsInStore(unittest.TestCase):
     def test_the_store_reads_merged_readings_and_forgets_situating_when_that_changes(self):
-        from semantic_pdf_diff.models import Claim, claim_id
+        from semantic_pdf_diff.schema import Claim, claim_id
         content = 'sha256:' + 'a' * 64 + '.pdf'
         def sighting(entity, task):
             claim = Claim(entity=entity, attribute='material', value='2x4 cedar', kind='diagram', quote='2x4 CEDAR',
@@ -205,7 +206,7 @@ class TaskIdentity(unittest.TestCase):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(Path(d) / 's') as store:
             path = make_pdf(Path(d) / 'two.pdf', ['Pump rated power 10 kW', 'Fan motor 3 kW'])
             cid = content_id(path.read_bytes(), path.name)
-            from semantic_pdf_diff.models import Source
+            from semantic_pdf_diff.schema import Source
             store.save_source(Source(name='two', roots=[str(path)]))
             store.rescan('two')
             client = Client(Settings(base_url=url, retries=0, tile_points=200), store)

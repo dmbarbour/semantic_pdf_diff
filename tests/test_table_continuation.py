@@ -20,7 +20,8 @@ def read(second, first=FIRST, at=(BOTTOM, TOP)):
     """{task: its request's data} and the evidence, for a two-page PDF whose pages hold the tables given."""
     import pymupdf
     from semantic_pdf_diff.extract import ExtractQuery, extract_pdf
-    from semantic_pdf_diff.models import Extraction, Settings
+    from semantic_pdf_diff.schema import Extraction
+    from semantic_pdf_diff.settings import Settings
     from semantic_pdf_diff.provenance import content_id
     from stubs import situating_answer
     pages = {0: (at[0], first), 1: (at[1], second)}

@@ -11,7 +11,8 @@ from importlib import metadata
 from pathlib import PurePath
 from . import __version__
 from .levers import declared, role_settings
-from .models import Interpreter, Settings
+from .schema import Interpreter
+from .settings import Settings
 
 # Only aliases known to share an interpretation collapse.
 EXTENSION_ALIASES = {".jpeg": ".jpg", ".tif": ".tiff", ".htm": ".html", ".yml": ".yaml", ".markdown": ".md"}

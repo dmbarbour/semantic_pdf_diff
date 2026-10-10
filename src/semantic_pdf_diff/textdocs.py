@@ -18,7 +18,7 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
-from .models import DerivationStep, DocxLocator, PptxLocator, Section, TextLocator, XlsxLocator, coverage_row
+from .schema import DerivationStep, DocxLocator, PptxLocator, Section, TextLocator, XlsxLocator, coverage_row
 from .sections import SectionIndex
 from .tasks import TaskCore, split_utf8
 
@@ -293,7 +293,7 @@ CSV_DERIVATION = {
 
 def csv_locator(places, page, bbox, region, task):
     """A CSV claim's locator: its lines, and the file's lines and fields they were read from (their union)."""
-    from .models import CsvLocator
+    from .schema import CsvLocator
     first, last = int(bbox[1]), max(int(bbox[1]), int(bbox[3]) - 1)
     found = [places[n] for n in range(first, last + 1) if n in places] or [((0, 0), (0, 0))]
     return CsvLocator(file_lines=(min(f[0][0] for f in found), max(f[0][1] for f in found)),

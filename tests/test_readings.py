@@ -1,7 +1,7 @@
 import stubs  # noqa: F401 (a clean environment)
 import random
 import unittest
-from semantic_pdf_diff.models import Claim, Evidence, PdfLocator, claim_id
+from semantic_pdf_diff.schema import Claim, Evidence, PdfLocator, claim_id
 from semantic_pdf_diff.readings import reconcile
 
 CID = 'sha256:' + 'c' * 64 + '.pdf'

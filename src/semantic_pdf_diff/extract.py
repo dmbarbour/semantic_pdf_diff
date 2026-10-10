@@ -9,12 +9,12 @@ import pymupdf
 
 from . import keyvalue
 from .dispatch import Dispatcher
-from .models import DerivationStep, PdfLocator, coverage_row
+from .schema import DerivationStep, PdfLocator, coverage_row
 from .pages import PYMUPDF_ERRORS, lines as _lines, native, native_page, reading_blocks, shown  # noqa: F401 (_lines, for callers)
 from .progress import NoProgress
 from .regions import crop_name, crop_stem, region_of
 # The pieces extraction is made of (architecture clean-up, milestone 7), and the names callers import from here.
-from .context import CONTEXT_NOTE, LEVER_MARKS, Context, lever_notes  # noqa: F401
+from .context import CONTEXT_NOTE, Context  # noqa: F401
 from .quotes import FOLD, covered, excerpted, quoted  # noqa: F401
 from .sections import SectionIndex, heading_y, pdf_sections, section_text  # noqa: F401
 from .segmentation import grown, halves, sheet_details, tiles  # noqa: F401

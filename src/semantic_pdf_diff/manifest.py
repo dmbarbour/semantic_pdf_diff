@@ -9,7 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from .models import Source
+from .schema import Source
 
 FORMAT = "semantic-pdf-diff-source"
 VERSION = 1

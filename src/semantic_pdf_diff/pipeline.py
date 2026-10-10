@@ -12,7 +12,7 @@ from .compare import compare, file_difference
 from .dispatch import Dispatcher
 from .extract import Job, reader_for, reader_version, run_jobs
 from .llm import Client, redact_url
-from .models import EvidenceDocument, Report, Situation, Source, coverage_row
+from .schema import EvidenceDocument, Report, Situation, Source, coverage_row
 from .progress import Progress, log
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
 from .readings import reconcile
@@ -40,7 +40,7 @@ NO_MODEL = "http://127.0.0.1:9/v1"  # an address nothing answers: for replays th
 
 def settings_from(config=None, **overrides):
     """Settings as the CLI's --config gives them (the environment, then the file), then overrides."""
-    from .models import Settings
+    from .settings import Settings
     options = json.loads(Path(config).read_text()) if config else {}
     return Settings.from_env(**{**options, **overrides})
 

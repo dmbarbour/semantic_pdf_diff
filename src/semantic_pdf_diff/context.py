@@ -3,8 +3,6 @@
 """
 import pymupdf
 
-from .levers import lever_marks
-from .models import Settings
 from .pages import display_y, lines as _lines, reading_blocks, shown
 from .regions import crop_name
 from .segmentation import _graphics
@@ -34,7 +32,7 @@ class Context:
     """A document's reader for the context levers (levers.py: text_lines, table_lines, tile_lines, tile_images):
     the caches and document access their hooks share. A query's context is CONTEXT_NOTE followed by the lines
     the configuration's levers give, in their order. What a lever added is found again by its marks
-    (lever_notes). The reader works on the page as displayed (see pages), so rotated sheets read like upright
+    (settings.lever_notes). The reader works on the page as displayed (see pages), so rotated sheets read like upright
     ones."""
 
     def __init__(self, doc, s, assets=None, stem=""):
@@ -133,21 +131,6 @@ class Context:
         where = crop_name(self.stem, tag, "-where")
         render_locator(page, rect, self.assets / where, pixmap=self.pixmap)
         return "assets/" + where
-
-# What each lever added to a query, found by the lines its builder writes (the levers' marks). For
-# diagnostics only (the queries dump, docs/plans/content-addressed-queries-2026-09-28.md): a query is found by
-# its hash, never by these. tests/test_sections.py checks each builder against its mark.
-LEVER_MARKS = lever_marks(Settings)
-
-def lever_notes(prompt):
-    """{lever: what it added (shortened)} for the levers whose lines a query's text holds."""
-    notes = {}
-    for lever, mark in LEVER_MARKS:
-        found = [m.group(1).strip() for m in mark.finditer(prompt)]
-        if found:
-            joined = " | ".join(found)
-            notes[lever] = joined if len(joined) <= 240 else joined[:237] + "..."
-    return notes
 
 def render_locator(page, rect, target, side=LOCATOR_SIDE, width=3, pixmap=None):
     """The whole page, small, with rect (displayed coordinates) outlined in red. pixmap: Context.pixmap."""

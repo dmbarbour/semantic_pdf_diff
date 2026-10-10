@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 from .llm import CallLimitReached, NotRecorded
-from .models import DerivationStep, Evidence, Extraction, claim_id, coverage_row, merge_occurrences
+from .schema import DerivationStep, Evidence, Extraction, claim_id, coverage_row, merge_occurrences
 from .progress import log
 from .quotes import covered, quoted
 from .regions import region_of

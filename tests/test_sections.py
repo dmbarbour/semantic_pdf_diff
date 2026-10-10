@@ -8,7 +8,8 @@ from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.extract import extract_pdf, pdf_sections
-from semantic_pdf_diff.models import Extraction, Settings
+from semantic_pdf_diff.schema import Extraction
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id
 import stubs
 from stubs import ROUND0, source_data
@@ -237,7 +238,7 @@ class SectionContext(unittest.TestCase):
     def test_each_lever_leaves_its_mark(self):
         """lever_notes (the queries dump's diagnostics) finds what each lever's builder writes: with the
         lever off no query carries its note, with it on some query does."""
-        from semantic_pdf_diff.extract import lever_notes
+        from semantic_pdf_diff.settings import lever_notes
         from test_robustness import Recorder
         from test_settings import document
         off = {'context_before': 0, 'context_after': 0, 'table_context': 0, 'stem_context': False,

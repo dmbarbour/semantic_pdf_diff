@@ -176,7 +176,8 @@ class Pdf(unittest.TestCase):
     def extract(self, check):
         import pymupdf
         from semantic_pdf_diff.extract import ExtractQuery, extract_pdf
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
         from stubs import situating_answer
 
@@ -241,7 +242,7 @@ class Refined(unittest.TestCase):
         # a key-value list's text task is given a table's context; its parts keep it. A text block's parts compute
         # their own, as before (B5's first version passed the parent's on, changing every refined text request).
         from types import SimpleNamespace
-        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.tasks import TaskCore
         job = SimpleNamespace(content="sha256:" + "d" * 64 + ".txt", on_task=None, state={"pending": 0})
         client = SimpleNamespace(s=Settings(refinement_depth=1))

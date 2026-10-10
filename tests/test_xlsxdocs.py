@@ -133,7 +133,7 @@ class Reading(unittest.TestCase):
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent))
         from test_textdocs import extract
-        from semantic_pdf_diff.models import XlsxLocator
+        from semantic_pdf_diff.schema import XlsxLocator
         evidence, coverage, sections, _ = extract("book.xlsx", workbook())
         values = {e.value: e for e in evidence}
         located = values["118"].locator
@@ -182,7 +182,7 @@ class Csv(unittest.TestCase):
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent))
         from test_textdocs import extract
-        from semantic_pdf_diff.models import CsvLocator
+        from semantic_pdf_diff.schema import CsvLocator
         evidence, coverage, sections, _ = extract("export.csv", CSV.encode())
         located = {e.value: e.locator for e in evidence}["8420"]
         self.assertIsInstance(located, CsvLocator)
@@ -370,7 +370,8 @@ class Rules(unittest.TestCase):
         from pathlib import Path
         from types import SimpleNamespace
         from semantic_pdf_diff.extract import Job, reader_for, run_jobs
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.tablerules import Rules
         wb = openpyxl.Workbook()
         for title, header, rows in [("Pumps", ["Tag", "Flow (L/s)"], [["P-1", 120], ["P-2", 95]]),

@@ -2,7 +2,7 @@
 
 A dump samples queries from a folder of runs (each run's store logs every query's recipe and text),
 stratified by document and kind of region, with the images each was sent and what each lever added
-(extract.lever_notes). Against a baseline's runs it keeps only what a variant changed, as diffs.
+(settings.lever_notes). Against a baseline's runs it keeps only what a variant changed, as diffs.
 Checker models then look for obvious errors (junk context, wrong headings, cut-off text, bad
 images) before a round spends money judging answers. The dump is a folder: queries.jsonl, the
 images, index.html, and checks/<model>.json. (docs/plans/content-addressed-queries-2026-09-28.md)
@@ -16,7 +16,7 @@ import shutil
 from collections import defaultdict
 from pathlib import Path
 from pydantic import Field
-from semantic_pdf_diff.models import Lenient
+from semantic_pdf_diff.schema import Lenient
 
 PROBLEMS = {
     "junk-context": "context that is junk (table cells, page furniture) or comes from elsewhere on the page",
@@ -71,7 +71,7 @@ class QueryCheck(Lenient):
 def collect(runs_dir, role="extract"):
     """{(run, content, task): query} for every run under runs_dir, each with its document's name,
     its lever notes and the paths of the images it was sent."""
-    from semantic_pdf_diff.extract import lever_notes
+    from semantic_pdf_diff.settings import lever_notes
     from semantic_pdf_diff.store import Store
     out = {}
     for folder in sorted(p for p in Path(runs_dir).iterdir() if (p / "store.sqlite").exists()):

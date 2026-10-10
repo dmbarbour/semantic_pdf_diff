@@ -10,7 +10,7 @@ from semantic_pdf_diff import cli
 from semantic_pdf_diff_lab.eval import rounds
 from unittest.mock import patch
 from semantic_pdf_diff.llm import ModelFailure
-from semantic_pdf_diff.models import Settings
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff_lab.eval.models import PairVerdict
 from test_concurrency import jittery_model, make_pdf
 
@@ -401,7 +401,7 @@ class Rounds(unittest.TestCase):
 
     def test_units_show_each_reading_as_its_own_task_gave_it(self):
         from types import SimpleNamespace
-        from semantic_pdf_diff.models import Claim, Evidence, PdfLocator, claim_id
+        from semantic_pdf_diff.schema import Claim, Evidence, PdfLocator, claim_id
         from semantic_pdf_diff.store import Store
         content = 'sha256:' + 'a' * 64 + '.pdf'
         def reading(entity, attribute, task, region, quote='10 kW'):
@@ -436,7 +436,7 @@ class Rounds(unittest.TestCase):
 
     def test_every_lever_gets_a_post_mortem(self):
         from semantic_pdf_diff_lab.eval import postmortem
-        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.settings import Settings
         folder = self.root / 'post-mortem'
         rounds.build_batch(self.root / 'baseline', self.root / 'variant', folder, n=8)
         rounds.judge_pairs(folder, Judge(), 'counter')

@@ -86,7 +86,8 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 
 | Module | Responsibility |
 | --- | --- |
-| `models.py` | Validated settings and evidence schemas |
+| `schema.py` | What the pipeline reads and writes: claims, locators, model answers, evidence, coverage rows, the report documents (imports no other module) |
+| `settings.py` | Settings: the endpoint's beside the platform the levers compose, loaded from the environment, a file and a caller |
 | `llm.py` | Compatible API transport, request budgeting, retries and cache |
 | `extract.py` | PDF text/tables, page/tile rendering, refinement and provenance |
 | `situate.py` | Figures, captions and citing prose; figure and section "about" requests |

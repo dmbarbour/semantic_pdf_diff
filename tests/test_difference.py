@@ -3,7 +3,7 @@ import sys
 import unittest
 from pathlib import Path
 from semantic_pdf_diff.compare import compare, file_difference, relative_path
-from semantic_pdf_diff.models import FileRef
+from semantic_pdf_diff.schema import FileRef
 
 sys.path.insert(0, str(Path(__file__).parent))
 from test_pipeline import Fake, ev  # noqa: E402

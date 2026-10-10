@@ -10,7 +10,8 @@ from datetime import datetime
 from stubs import chat_answer, request_body, serving
 from pathlib import Path
 from semantic_pdf_diff.llm import Client
-from semantic_pdf_diff.models import Extraction, RateRule, Settings
+from semantic_pdf_diff.schema import Extraction
+from semantic_pdf_diff.settings import RateRule, Settings
 from semantic_pdf_diff.throttle import AdaptiveGate, RateLimiter, rule_applies
 
 EMPTY = json.dumps({'claims': [], 'complete': True, 'issues': []})

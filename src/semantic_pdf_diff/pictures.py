@@ -12,7 +12,7 @@ from collections import Counter
 
 import pymupdf
 
-from .models import DerivationStep, coverage_row
+from .schema import DerivationStep, coverage_row
 from .pages import PYMUPDF_ERRORS
 
 METAFILES = (".emf", ".wmf")

@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from semantic_pdf_diff import cli
 from semantic_pdf_diff_lab.eval import queries
-from semantic_pdf_diff.models import Settings
+from semantic_pdf_diff.settings import Settings
 from test_concurrency import jittery_model
 from test_settings import document
 

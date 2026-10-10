@@ -5,7 +5,7 @@ import math
 import re
 from collections import Counter, defaultdict
 from decimal import Decimal, InvalidOperation
-from .models import Explanation, Judgment
+from .schema import Explanation, Judgment
 from .dispatch import Dispatcher
 from .progress import NoProgress
 from .provenance import comparison_interpreter, text_hash

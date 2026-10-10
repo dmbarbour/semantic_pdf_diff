@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 import pymupdf
-from semantic_pdf_diff.models import Settings
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.cli import main
 from semantic_pdf_diff.llm import Client
 

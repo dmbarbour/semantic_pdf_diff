@@ -38,7 +38,7 @@ def main(argv=None):
     from semantic_pdf_diff_lab.bench import eyetest
     from semantic_pdf_diff import ledger
     from semantic_pdf_diff.llm import Budget, evaluator_settings, folder_client
-    from semantic_pdf_diff.models import Settings
+    from semantic_pdf_diff.settings import Settings
     from semantic_pdf_diff.progress import Progress
     import pymupdf
     cards = eyetest.suite(args.suite)

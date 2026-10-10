@@ -8,7 +8,8 @@ from pathlib import Path
 from unittest.mock import patch
 from semantic_pdf_diff.cli import main
 from semantic_pdf_diff.extract import extract_pdf
-from semantic_pdf_diff.models import Extraction, Settings
+from semantic_pdf_diff.schema import Extraction
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import (COMPARISON_SETTINGS, EXTRACTION_SETTINGS, comparison_interpreter,
                                           content_id, extraction_interpreter, normalized_extension)
 import stubs
@@ -97,7 +98,7 @@ class DocumentTypes(unittest.TestCase):
     """Coverage rows and the report have one owner each (code review 2026-10-01, A1)."""
     def test_coverage_rows_and_reports_hold_only_their_fields(self):
         from pydantic import ValidationError
-        from semantic_pdf_diff.models import REPORT_SCHEMA, EvidenceDocument, coverage_row
+        from semantic_pdf_diff.schema import REPORT_SCHEMA, EvidenceDocument, coverage_row
         row = coverage_row(content='sha256:x.pdf', task='open', status='failed', issues=['a.pdf: encrypted'])
         self.assertEqual(list(row), ['content', 'page', 'bbox', 'task', 'image', 'status', 'issues', 'claims'])
         self.assertEqual(coverage_row(content='c', task='t', status='complete', duplicate_of='u')['duplicate_of'], 'u')

@@ -55,7 +55,7 @@ def source_data(prompt):
 def stock_answer(prompt, schema):
     """The answer a fake gives a query its test doesn't answer itself, or None: comparisons equivalent, situating
     from the prompt (situating_answer), a table's rules query each row read by itself, a two-column block a table."""
-    from semantic_pdf_diff.models import Judgment
+    from semantic_pdf_diff.schema import Judgment
     if schema is Judgment:
         return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)
     if situating_answer(prompt):
@@ -70,7 +70,7 @@ class Recorder:
     """A fake client for pipeline tests: settings and the counters the pipeline reads. ask records the request
     (record), gives the stock answer where there is one, and leaves the rest to answer (no claims, by default)."""
     def __init__(self, **settings):
-        from semantic_pdf_diff.models import Settings
+        from semantic_pdf_diff.settings import Settings
         self.s = Settings(**settings)
         self.calls, self.cache_hits, self.usage = 0, 0, {}
 
@@ -83,7 +83,7 @@ class Recorder:
         pass
 
     def answer(self, prompt, schema, images, key):
-        from semantic_pdf_diff.models import Extraction
+        from semantic_pdf_diff.schema import Extraction
         return Extraction(claims=[], complete=True)
 
 def text_pdf(path, pages, width=300, height=None, at=(40, 40), toc=None, metadata=None):

@@ -299,13 +299,14 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 | D5 | A claim compared only with its value's clusters seen on one of its pages, in the order they were started. 4,000 claims of one value 50.3 s to 0.5 s. D3–D5: 400 random revision pairs and 300 claim sets identical; the controlled corpus replayed into fresh stores gives all 280 reports as recorded | | `25ec3d9` |
 | Test gaps | Table continuation over pages (A19); the rules and structure queries' failure paths (not reached, failed, first or second answer, a failed review); alignment at scale (with D3–D5); the vetoes, lifted into the pure `compare.vetoes` | | `11ea2cb` |
 | E10 | `stubs`: a `Recorder` base with stock answers (six extraction fakes now subclass it), `source_data` (14 hand-made splits), `text_pdf` (five builders), `serving`, `request_body` and `chat_answer` (seven stub servers' boilerplate). Left as they are: the judge fake, the workbook tests' scripted model, and the builders that draw | | `6dbcbaa` |
+| C4 (architecture 1) | `models` split into `schema.py` (claims, locators, answers, evidence, coverage, the report documents; imports nothing of the product) and `settings.py` (Settings and their loading; the lever marks, moved from `context`, which never used them); every importer imports from the owner; `llm` imports Settings for type checking only. A test pins the import cycle: still 21 modules, now held by edges later items break (`compare` → `provenance`, A12's `extract` ↔ `tasks`, A13's `situate` → `extract`, C14's `llm` ↔ `fixtures`, C15's evaluator settings, item 7's `textdocs` ↔ `docxdocs`). The corpus replayed into fresh stores: 280 of 280 reports as recorded | 8 dev runs identical | |
 
 **Status, 2026-10-09:** every finding in *Bugs and risks* is fixed. The [remediation plan](../plans/review-bugs-2026-10-09.md)'s six items are done.
 
 **Still open** (the behaviour-preserving phase, as the owner ordered on 2026-10-09; the steps done are in the table above):
 - **Performance:** none left. (Done: A5–A8, C2, C3, C19, D3–D5, E1, P1.)
 - **Tests:** none left. (Done: E6, E9, E10, E18, the guard on commits per replay, and the gaps: A19, the table queries' failure paths, alignment at scale, the vetoes.)
-- **Architecture:** items 1–13.
+- **Architecture:** items 2–13. (Done: item 1, C4.)
 - **Simplification:** normalisers and number parsers (D10, S1), `_filled`, `_joined` and `_plain` (with architecture item 6), the long functions. (Done: C14, the models' copies.)
 - **Not in this phase:** A20, a lever with the features (the owner's answer, above). Two bugs found under the remediation plan wait on the owner's order: decks' two-column tables aren't checked, and a section row under a PDF table's header is taken for its second line (the plan's *Found along the way*).
 

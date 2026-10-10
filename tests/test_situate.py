@@ -10,7 +10,8 @@ import pymupdf
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.dispatch import Dispatcher
 from semantic_pdf_diff.llm import ModelFailure
-from semantic_pdf_diff.models import Evidence, Occurrence, PdfLocator, Section, Settings
+from semantic_pdf_diff.schema import Evidence, Occurrence, PdfLocator, Section
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.progress import NoProgress
 from semantic_pdf_diff.provenance import triage_interpreter
 from semantic_pdf_diff.situate import (CAPTION, figure_map, find_figures, grounding, quality, situate, targets,
@@ -49,7 +50,7 @@ def ev(eid, page, region, bbox):
 def visual_regions(page, side, number=1, **settings):
     """A page's image tasks under the given settings (the segmentation levers off unless named)."""
     from semantic_pdf_diff.extract import Context
-    from semantic_pdf_diff.models import Settings
+    from semantic_pdf_diff.settings import Settings
     s = Settings(**{"tile_points": side, "tiling": "grid", "grow_tiles": False, "skip_empty": False,
                     "figure_tasks": False, **settings})
     return s.visual_regions(Context(page.parent, s), page, number)

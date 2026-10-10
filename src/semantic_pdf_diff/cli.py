@@ -16,7 +16,8 @@ from . import fixtures, manifest
 from .extract import EXTRACT, Context, pdf_sections, text_groups
 from .pipeline import RunOptions, compare_paths, document_properties, limits, run, shortcut_names
 from .llm import SYSTEM
-from .models import Settings, Source
+from .schema import Source
+from .settings import Settings
 from .progress import log, setup_logging
 from .throttle import RateLimiter
 from .report import write_report

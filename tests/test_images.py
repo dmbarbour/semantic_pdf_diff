@@ -7,7 +7,8 @@ import pymupdf
 
 import stubs  # noqa: F401 (a clean environment)
 from semantic_pdf_diff.extract import IMAGE_EXTENSIONS, Job, image_pdf, reader_for, reader_version, run_jobs
-from semantic_pdf_diff.models import Extraction, Settings
+from semantic_pdf_diff.schema import Extraction
+from semantic_pdf_diff.settings import Settings
 from stubs import situating_answer
 
 def png(width, height, dpi=None):

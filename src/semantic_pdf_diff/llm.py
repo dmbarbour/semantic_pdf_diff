@@ -18,9 +18,11 @@ from contextlib import contextmanager
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
-from .models import Settings
+from typing import TYPE_CHECKING
 from .recipes import Recipe, recipe_fields
 from .throttle import AdaptiveGate, RateLimiter
+if TYPE_CHECKING:  # the client is given settings; the settings compose the levers, whose hooks reach the client
+    from .settings import Settings  # (code review 2026-10-08, C4)
 from .progress import log, requests_log
 
 # Every query is asked at temperature 0, for reproducible answers (the owner, 2026-10-02: "just fixing temp
@@ -203,7 +205,7 @@ def evaluator_settings(model, base=None, **runtime):
     PDF_DIFF_SEED would otherwise change every judge query, every recorded verdict would miss, and judging would
     be paid again (code review 2026-10-01, item 2). Only endpoint settings (URL, timeouts, concurrency, rate
     limits, cost cap) come from the environment, and `runtime` may set only those."""
-    from .models import EVALUATOR_SETTINGS, SETTING_CLASSES, Settings
+    from .settings import EVALUATOR_SETTINGS, SETTING_CLASSES, Settings
     shaping = sorted(k for k in runtime if SETTING_CLASSES[k] != "endpoint")
     if shaping:
         raise ValueError(f"evaluator runtime settings must be endpoint settings, not {shaping}")
@@ -410,7 +412,7 @@ class Client:
     cache (a fixture holding every answer, see folder_client, or a caller that asks once). A folder of files keyed
     by the request's bytes was once the cache without a store; only tests used it (removed 2026-10-02).
     """
-    def __init__(self, settings: Settings, store, api_key: str | None = None, fixture=None, mode="replay",
+    def __init__(self, settings: "Settings", store, api_key: str | None = None, fixture=None, mode="replay",
                  responder=None, fresh_regions=None):
         """fixture: an open fixtures.Fixture, replayed under its policy (fixtures.Replayer: mode, responder,
         fresh_regions). In `replay` mode answers come only from it and unrecorded requests fail; in

@@ -68,7 +68,7 @@ class Reading(unittest.TestCase):
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent))
         from test_textdocs import extract
-        from semantic_pdf_diff.models import DocxLocator
+        from semantic_pdf_diff.schema import DocxLocator
         data = build()
         evidence, coverage, sections, model = extract("basis.docx", data)
         values = {e.value: e for e in evidence}

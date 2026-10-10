@@ -12,7 +12,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from semantic_pdf_diff.extract import IMAGE_EXTENSIONS, READERS, image_pdf
-from semantic_pdf_diff.models import Settings
+from semantic_pdf_diff.settings import Settings
 
 def extension(content):
     """A content ID's extension ("sha256:<hex>.pdf" → ".pdf")."""

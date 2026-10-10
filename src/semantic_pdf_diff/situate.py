@@ -6,7 +6,7 @@ requests that write "about" statements build on it.
 """
 import math
 import re
-from .models import Figure, Reference
+from .schema import Figure, Reference
 from .pages import native, native_page, reading_blocks, shown
 from .regions import crop_name, crop_stem
 
@@ -448,7 +448,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
     """
     import hashlib
     import pymupdf
-    from .models import FigureAbout, SectionAbout
+    from .schema import FigureAbout, SectionAbout
     figures, unresolved = figure_map(doc, evidence)
     by_id = {e.id: e for e in evidence}
     stem = crop_stem(content)

@@ -264,7 +264,8 @@ class Extracted(unittest.TestCase):
         from unittest.mock import patch
         import pymupdf
         from semantic_pdf_diff.extract import extract_pdf
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
         from stubs import situating_answer
 
@@ -338,7 +339,8 @@ class Extracted(unittest.TestCase):
         from unittest.mock import patch
         import pymupdf
         from semantic_pdf_diff.extract import extract_pdf
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
         from stubs import situating_answer
 
@@ -384,7 +386,8 @@ class NewTables(unittest.TestCase):
         from unittest.mock import patch
         import pymupdf
         from semantic_pdf_diff.extract import extract_pdf
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
         from stubs import situating_answer
 
@@ -437,7 +440,8 @@ class Recorded(unittest.TestCase):
         from unittest.mock import patch
         import pymupdf
         from semantic_pdf_diff.extract import extract_pdf
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
         from stubs import situating_answer
         rows = [["Tag", "Model"], ["P-1", "X1"], ["", "CCD201"], ["P-2", "X2"]]
@@ -481,7 +485,8 @@ class SecondNoRows(unittest.TestCase):
         from unittest.mock import patch
         import pymupdf
         from semantic_pdf_diff.extract import extract_pdf
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
         from stubs import situating_answer
         rows = [["Room", "Size"], ["", "25'-0\""], ["MEETING 102", "732 SF"]]
@@ -527,7 +532,8 @@ class Detection(unittest.TestCase):
         from unittest.mock import patch
         import pymupdf
         from semantic_pdf_diff.extract import extract_pdf
-        from semantic_pdf_diff.models import Extraction, Settings
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.provenance import content_id
         from stubs import situating_answer
 
@@ -578,7 +584,7 @@ class Detection(unittest.TestCase):
         self.assertEqual(next(r for r in coverage if r["task"] == "table:p1:0:0")["status"], "not_reached")
 
     def test_a_partial_row_is_still_split_by_column(self):
-        from semantic_pdf_diff.models import Extraction
+        from semantic_pdf_diff.schema import Extraction
         rows = [["Tag", "Flow", "Head", "Power"], ["P-1", "120", "25", "40"]]
         partial = lambda task: Extraction(claims=[], complete=False) if task == "table:p1:0:0" else None
         asked, _ = self.extract([((20, 20, 280, 120), rows)], partial)

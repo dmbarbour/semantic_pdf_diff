@@ -14,7 +14,7 @@ import unittest
 from pathlib import Path
 import pymupdf
 from semantic_pdf_diff import cli
-from semantic_pdf_diff.models import SETTING_CLASSES, Settings
+from semantic_pdf_diff.settings import SETTING_CLASSES, Settings
 from test_concurrency import jittery_model
 from test_situate import diagram
 
@@ -180,7 +180,8 @@ class Declarations(unittest.TestCase):
         self.assertEqual({k for k in bound if SETTING_CLASSES[k] == "endpoint"}, {"model"})  # the model answers
 
     def test_scopes_and_marks(self):
-        from semantic_pdf_diff import extract, levers, store
+        from semantic_pdf_diff import levers, store
+        from semantic_pdf_diff import settings as settings_module
         self.assertFalse({k for k in store.SETTING_REGIONS if SETTING_CLASSES[k] == "endpoint"})
         # a bound lever setting without a scope clears every region when changed: only the instructions should,
         # and the row dedupe (it can drop rows from any task's text)
@@ -188,14 +189,14 @@ class Declarations(unittest.TestCase):
         unscoped = {n for n in levers.lever_settings() if "extract" in declared(Settings, n).roles
                     and n not in store.SETTING_REGIONS}  # (regions are extraction's)
         self.assertEqual(unscoped, {"extract_prompt", "extract_rules", "dedupe_repeated"})
-        for name, _ in extract.LEVER_MARKS:  # each mark is its lever's own setting, or the headings
+        for name, _ in settings_module.LEVER_MARKS:  # each mark is its lever's own setting, or the headings
             self.assertTrue(name == "section" or any(name in c.model_fields and name in c.marks
                                                      for c in levers.LEVER_CLASSES), name)
 
 class Documented(unittest.TestCase):
     """Every setting is documented (code review 2026-10-01: configuration.md missed 26 of 56): docs/configuration.md
     holds the table levers.settings_table generates. After changing a setting, regenerate it:
-    python -c "from semantic_pdf_diff.levers import settings_table; from semantic_pdf_diff.models import Settings;
+    python -c "from semantic_pdf_diff.levers import settings_table; from semantic_pdf_diff.settings import Settings;
     print(settings_table(Settings))" and paste it between the markers."""
     def test_the_settings_table_is_current(self):
         from semantic_pdf_diff.levers import settings_table

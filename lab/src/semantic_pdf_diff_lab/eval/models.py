@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
-from semantic_pdf_diff.models import Lenient, Strict
+from semantic_pdf_diff.schema import Lenient, Strict
 
 class PanelLabel(Lenient):
     """A panel model's review of one item; checked against the taxonomy afterwards."""

@@ -10,7 +10,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from semantic_pdf_diff.extract import CONTINUATION_NOTE, ExtractQuery, Job, reader_for, run_jobs  # noqa: E402
-from semantic_pdf_diff.models import Extraction, Settings  # noqa: E402
+from semantic_pdf_diff.schema import Extraction  # noqa: E402
+from semantic_pdf_diff.settings import Settings
 
 TEXT = "# Plant\n\nPumps draw 110 kW, 120 kW, 130 kW, 140 kW and 150 kW.\n"
 

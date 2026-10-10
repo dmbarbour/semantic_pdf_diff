@@ -65,7 +65,7 @@ def _image_relationship():
 class Pictures(unittest.TestCase):
     def test_pictures_are_read_with_their_captions_at_their_paragraphs(self):
         from semantic_pdf_diff.docxdocs import read_docx
-        from semantic_pdf_diff.models import DocxLocator
+        from semantic_pdf_diff.schema import DocxLocator
         from test_textdocs import extract
         data = build()
         doc = read_docx(data)

@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from semantic_pdf_diff import cli
 from semantic_pdf_diff_lab.eval import review
-from semantic_pdf_diff.models import Settings
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff_lab.eval.models import PanelLabel
 from semantic_pdf_diff_lab.eval.taxonomy import CLARITY, CONFIDENCE, FIELDS, TAXONOMY, flag_names, suggested_verdict
 from test_concurrency import jittery_model, make_pdf

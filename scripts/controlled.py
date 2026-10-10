@@ -54,7 +54,7 @@ SETTINGS = FOLDER / "settings.json"  # every setting that shapes a query, resolv
 
 def settings_file():
     """The corpus's settings: written once, then kept, so replays ask exactly the recorded queries."""
-    from semantic_pdf_diff.models import Settings
+    from semantic_pdf_diff.settings import Settings
     if not SETTINGS.exists():
         SETTINGS.parent.mkdir(parents=True, exist_ok=True)
         SETTINGS.write_text(json.dumps(Settings.from_env(**BASE_SETTINGS).configuration(), indent=2) + "\n")

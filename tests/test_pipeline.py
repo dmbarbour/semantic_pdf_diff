@@ -3,7 +3,8 @@ import tempfile
 import unittest
 from pathlib import Path
 import pymupdf
-from semantic_pdf_diff.models import Evidence, FileRef, PdfLocator, Settings, Source, Extraction, Judgment, Explanation
+from semantic_pdf_diff.schema import Evidence, FileRef, PdfLocator, Source, Extraction, Judgment, Explanation
+from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.llm import Client, BudgetExceeded, Invalid, ModelFailure
 from semantic_pdf_diff.compare import candidates, numeric_check, compare
 from semantic_pdf_diff.extract import extract_pdf, split_utf8, tiles
@@ -106,7 +107,7 @@ class Tests(unittest.TestCase):
     def test_extraction_coverage_and_unsupported_quote(self):
         class Extractor(Fake):
             def ask(self,prompt,schema,images=(),key=None):
-                from semantic_pdf_diff.models import Claim
+                from semantic_pdf_diff.schema import Claim
                 data=ev().model_dump(include=set(Claim.model_fields))
                 data['quote']='invented support'
                 return Extraction(claims=[data],complete=True)
@@ -120,7 +121,7 @@ class Tests(unittest.TestCase):
 
     def test_cli_end_to_end_with_images_and_cache(self):
         from semantic_pdf_diff.cli import main
-        from semantic_pdf_diff.models import Claim
+        from semantic_pdf_diff.schema import Claim
         state = {'images':0,'calls':0}
         def post(handler):
             data = request_body(handler)
@@ -162,7 +163,7 @@ class Tests(unittest.TestCase):
                 self.assertEqual(state['calls'],before)
 
     def test_refinement_preserves_failure_ledger(self):
-        from semantic_pdf_diff.models import Claim
+        from semantic_pdf_diff.schema import Claim
         class Extractor(Fake):
             count=0
             def ask(self,prompt,schema,images=(),key=None):
