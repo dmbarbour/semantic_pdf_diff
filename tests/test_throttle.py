@@ -1,4 +1,5 @@
 import stubs  # noqa: F401 (a clean environment)
+import contextlib
 import json
 import tempfile
 import threading
@@ -6,7 +7,7 @@ import time
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from stubs import chat_answer, request_body, serving
 from pathlib import Path
 from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.models import Extraction, RateRule, Settings
@@ -93,30 +94,25 @@ class Gate(unittest.TestCase):
 
 class ConcurrentClient(unittest.TestCase):
     def serve(self, handler_state):
-        class Handler(BaseHTTPRequestHandler):
-            def log_message(self, *args): pass
-            def do_POST(self):
-                self.rfile.read(int(self.headers['Content-Length']))
-                with handler_state['lock']:
-                    handler_state['active'] += 1
-                    handler_state['peak'] = max(handler_state['peak'], handler_state['active'])
-                    handler_state['count'] += 1
-                    throttle = handler_state['count'] <= handler_state.get('throttle_first', 0)
-                delay, generated = handler_state.get('answer', lambda n: (handler_state.get('delay', 0.2), 5))(
-                    handler_state['count'])
-                time.sleep(delay)
-                with handler_state['lock']:
-                    handler_state['active'] -= 1
-                if throttle:
-                    self.send_response(429); self.send_header('Retry-After', '0'); self.end_headers()
-                    return
-                self.send_response(200); self.end_headers()
-                self.wfile.write(json.dumps({'choices': [{'finish_reason': 'stop', 'message': {'content': EMPTY}}],
-                                             'usage': {'prompt_tokens': 10, 'completion_tokens': generated}}).encode())
-        server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
-        thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
-        self.addCleanup(lambda: (server.shutdown(), server.server_close(), thread.join()))
-        return f'http://127.0.0.1:{server.server_port}/v1'
+        def post(handler):
+            request_body(handler)
+            with handler_state['lock']:
+                handler_state['active'] += 1
+                handler_state['peak'] = max(handler_state['peak'], handler_state['active'])
+                handler_state['count'] += 1
+                throttle = handler_state['count'] <= handler_state.get('throttle_first', 0)
+            delay, generated = handler_state.get('answer', lambda n: (handler_state.get('delay', 0.2), 5))(
+                handler_state['count'])
+            time.sleep(delay)
+            with handler_state['lock']:
+                handler_state['active'] -= 1
+            if throttle:
+                handler.send_response(429); handler.send_header('Retry-After', '0'); handler.end_headers()
+                return
+            chat_answer(handler, EMPTY, usage={'prompt_tokens': 10, 'completion_tokens': generated})
+        stack = contextlib.ExitStack()  # served for the test's life (TestCase.enterContext needs Python 3.11)
+        self.addCleanup(stack.close)
+        return stack.enter_context(serving(post, threaded=True))
 
     def test_parallel_requests_respect_the_cap(self):
         state = {'lock': threading.Lock(), 'active': 0, 'peak': 0, 'count': 0}

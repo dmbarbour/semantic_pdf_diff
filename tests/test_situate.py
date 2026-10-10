@@ -10,12 +10,13 @@ import pymupdf
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.dispatch import Dispatcher
 from semantic_pdf_diff.llm import ModelFailure
-from semantic_pdf_diff.models import Evidence, Extraction, Judgment, Occurrence, PdfLocator, Section, Settings
+from semantic_pdf_diff.models import Evidence, Occurrence, PdfLocator, Section, Settings
 from semantic_pdf_diff.progress import NoProgress
 from semantic_pdf_diff.provenance import triage_interpreter
 from semantic_pdf_diff.situate import (CAPTION, figure_map, find_figures, grounding, quality, situate, targets,
                                       values_in)
 from semantic_pdf_diff.store import InterpreterMismatch, Store
+import stubs
 from stubs import situating_answer
 
 def diagram(page, x, y, paths=16):
@@ -252,21 +253,16 @@ class Sheets(unittest.TestCase):
             doc.close()
         self.assertEqual((drawing.kind, drawing.label), ('sheet', None))
 
-class Recorder:
-    """Answers situating requests from the stub; extraction finds nothing; records requests."""
+class Recorder(stubs.Recorder):
+    """Answers situating requests from the stub; extraction finds nothing; records requests, failing those holding a
+    text of `fail`."""
     def __init__(self, fail=(), **settings):
-        self.s = Settings(**settings)
-        self.calls, self.cache_hits, self.usage = 0, 0, {}
+        super().__init__(**settings)
         self.asked, self.fail = [], fail
-    def ask(self, prompt, schema, images=(), key=None):
+    def record(self, prompt, schema, images, key):
         self.asked.append((prompt, list(images), key))
         if any(f in prompt for f in self.fail):
             raise ModelFailure('stub failure')
-        if schema is Judgment:
-            return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)
-        if situating_answer(prompt):
-            return schema.model_validate(situating_answer(prompt))
-        return Extraction(claims=[], complete=True)
 
 class Requests(unittest.TestCase):
     def setUp(self):

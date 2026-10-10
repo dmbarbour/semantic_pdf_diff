@@ -1,4 +1,5 @@
 import stubs  # noqa: F401 (a clean environment)
+from stubs import source_data
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,14 +11,13 @@ from semantic_pdf_diff.provenance import content_id
 
 HEADER = 'ACME Pumping Station - Design Report'
 
-class Recorder:
+class Recorder(stubs.Recorder):
     """Claims the header, 'kW' values and table rows it's shown; records what was sent."""
     def __init__(self, **settings):
-        self.s = Settings(vision=False, **settings)
-        self.calls, self.cache_hits, self.usage = 0, 0, {}
+        super().__init__(vision=False, **settings)
         self.sent = []
-    def ask(self, prompt, schema, images=(), key=None):
-        data = prompt.split('SOURCE DATA:\n')[1]
+    def answer(self, prompt, schema, images, key):
+        data = stubs.source_data(prompt)
         self.sent.append((key[3], data))
         claims = []
         if HEADER in data:
@@ -102,7 +102,7 @@ class Repeats(unittest.TestCase):
         class Continued(Recorder):
             def ask(self, prompt, schema, images=(), key=None):
                 answer = super().ask(prompt, schema, images, key)
-                if '"Designer", "ACME"' not in prompt.split('SOURCE DATA:\n')[1]:
+                if '"Designer", "ACME"' not in source_data(prompt):
                     return answer
                 if key[3].endswith('-c1'):  # the rest, asked for
                     return Extraction(claims=[{'entity': 'title block', 'attribute': 'designer', 'value': 'ACME',

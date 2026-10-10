@@ -1,8 +1,6 @@
 import json
 import tempfile
-import threading
 import unittest
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 import pymupdf
 from semantic_pdf_diff.models import Evidence, FileRef, PdfLocator, Settings, Source, Extraction, Judgment, Explanation
@@ -10,7 +8,7 @@ from semantic_pdf_diff.llm import Client, BudgetExceeded, Invalid, ModelFailure
 from semantic_pdf_diff.compare import candidates, numeric_check, compare
 from semantic_pdf_diff.extract import extract_pdf, split_utf8, tiles
 from semantic_pdf_diff.report import write_report
-from stubs import ROUND0, situating_answer
+from stubs import ROUND0, chat_answer, request_body, serving, situating_answer
 
 
 def ev(id='A-1', **kw):
@@ -80,22 +78,15 @@ class Tests(unittest.TestCase):
 
     def test_api_retry_cache_truncation_and_budget(self):
         state = {'calls':0,'truncate':False}
-        class Handler(BaseHTTPRequestHandler):
-            def log_message(self,*args): pass
-            def do_POST(self):
-                body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-                self.server.payload = body
-                state['calls'] += 1
-                answer = 'bad json' if state['calls']==1 else '{"claims":[],"complete":true,"issues":[]}'
-                self.send_response(200); self.end_headers()
-                self.wfile.write(json.dumps({'choices':[{'finish_reason':'length' if state['truncate'] else 'stop',
-                    'message':{'content':answer}}]}).encode())
-        server = HTTPServer(('127.0.0.1',0),Handler)
-        thread = threading.Thread(target=server.serve_forever,daemon=True);thread.start()
-        try:
+        def post(handler):
+            request_body(handler)
+            state['calls'] += 1
+            answer = 'bad json' if state['calls']==1 else '{"claims":[],"complete":true,"issues":[]}'
+            chat_answer(handler, answer, finish='length' if state['truncate'] else 'stop')
+        with serving(post) as url:
             with tempfile.TemporaryDirectory() as d:
                 from semantic_pdf_diff.store import Store
-                s = Settings(base_url=f'http://127.0.0.1:{server.server_port}/v1',retries=1,max_calls=4)
+                s = Settings(base_url=url,retries=1,max_calls=4)
                 store = Store(Path(d) / 'store')
                 self.addCleanup(store.close)
                 c = Client(s,store)
@@ -111,8 +102,6 @@ class Tests(unittest.TestCase):
                 self.assertEqual(state['calls'],3)  # a truncated answer isn't retried: it would truncate again
                 with self.assertRaises(ModelFailure): c.ask('one more',Extraction)  # the fourth and last call
                 with self.assertRaises(BudgetExceeded): c.ask('limit',Extraction)
-        finally:
-            server.shutdown();server.server_close();thread.join()
 
     def test_extraction_coverage_and_unsupported_quote(self):
         class Extractor(Fake):
@@ -133,30 +122,25 @@ class Tests(unittest.TestCase):
         from semantic_pdf_diff.cli import main
         from semantic_pdf_diff.models import Claim
         state = {'images':0,'calls':0}
-        class Handler(BaseHTTPRequestHandler):
-            def log_message(self,*args): pass
-            def do_POST(self):
-                data = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-                state['calls'] += 1
-                parts=data['messages'][1]['content']
-                for part in parts:
-                    if part['type']=='image_url':
-                        state['images'] += 1
-                        assert part['image_url']['url'].startswith('data:image/png;base64,')
-                prompt=parts[0]['text']
-                if 'Compare exactly' in prompt:
-                    answer=Judgment(relation='equivalent',rationale='Controlled same-value fixture',confidence=.95,same_conditions=True).model_dump()
-                elif situating_answer(prompt):
-                    answer=situating_answer(prompt)
-                else:
-                    claim=ev().model_dump(include=set(Claim.model_fields))
-                    claim['quote']='10 kW'
-                    answer={'claims':[claim],'complete':True,'issues':[]}
-                self.send_response(200); self.end_headers()
-                self.wfile.write(json.dumps({'choices':[{'finish_reason':'stop','message':{'content':json.dumps(answer)}}]}).encode())
-        server=HTTPServer(('127.0.0.1',0),Handler)
-        thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
-        try:
+        def post(handler):
+            data = request_body(handler)
+            state['calls'] += 1
+            parts=data['messages'][1]['content']
+            for part in parts:
+                if part['type']=='image_url':
+                    state['images'] += 1
+                    assert part['image_url']['url'].startswith('data:image/png;base64,')
+            prompt=parts[0]['text']
+            if 'Compare exactly' in prompt:
+                answer=Judgment(relation='equivalent',rationale='Controlled same-value fixture',confidence=.95,same_conditions=True).model_dump()
+            elif situating_answer(prompt):
+                answer=situating_answer(prompt)
+            else:
+                claim=ev().model_dump(include=set(Claim.model_fields))
+                claim['quote']='10 kW'
+                answer={'claims':[claim],'complete':True,'issues':[]}
+            chat_answer(handler, answer)
+        with serving(post) as url:
             with tempfile.TemporaryDirectory() as directory:
                 root=Path(directory)
                 for name in ['a','b']:
@@ -166,7 +150,7 @@ class Tests(unittest.TestCase):
                     page.draw_line(pymupdf.Point(120,100),pymupdf.Point(220,100))
                     doc.save(root/(name+'.pdf'));doc.close()
                 config=root/'config.json'
-                config.write_text(json.dumps({'base_url':f'http://127.0.0.1:{server.server_port}/v1','retries':0}))
+                config.write_text(json.dumps({'base_url':url,'retries':0}))
                 args=[str(root/'a.pdf'),str(root/'b.pdf'),'--out',str(root/'out'),'--config',str(config)]
                 self.assertEqual(main(args),0)
                 result=json.loads((root/'out/report.json').read_text())
@@ -176,8 +160,6 @@ class Tests(unittest.TestCase):
                 before=state['calls']
                 self.assertEqual(main(args),0)
                 self.assertEqual(state['calls'],before)
-        finally:
-            server.shutdown();server.server_close();thread.join()
 
     def test_refinement_preserves_failure_ledger(self):
         from semantic_pdf_diff.models import Claim

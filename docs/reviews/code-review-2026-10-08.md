@@ -293,12 +293,18 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 | C3 | A zipped fixture replayed from a read-only copy | | `f4a2734` |
 | A7 | A page's display list built once and every crop rendered from it (`Context.pixmap`, as `Page.get_pixmap` renders): crops byte-identical, as every query's image hash replayed | 97.9 s to 91.9 s, with A8 | `2956969` |
 | A8 | A page's drawings fetched once for figures, graphics, the empty-tile check and the page's signals (`Context.drawings`). Both kept for the last two pages only (`context.Recent`): a drawing sheet's are large. Not shared: situating's figures, read from its own copy of the document, and the clipped text pages of crops (PyMuPDF ignores a clip given a text page) | | `2956969` |
+| P1 | A workbook's formulas loaded again only where a sheet holds a cell without a value and its part a formula (Excel saves every formula's value). The 35 workbooks in the samples and the corpus, and two made for it, read to identical documents, 14.0 s to 8.9 s | (no workbooks) | `66361b4` |
+| D3 | Name words looked up among items with the same identifiers or none: a pair sharing no value whose names hold different identifiers can't reach the floor. 2,000 rooms 18.6 s to 0.5 s | | `25ec3d9` |
+| D4 | Within an item, each claim's words computed once; leftover pairs found by a shared attribute word. One item of 2,000 claims sharing no value 96.8 s to 8.6 s (its 133,340 pairs to judge are the rest) | | `25ec3d9` |
+| D5 | A claim compared only with its value's clusters seen on one of its pages, in the order they were started. 4,000 claims of one value 50.3 s to 0.5 s. D3–D5: 400 random revision pairs and 300 claim sets identical; the controlled corpus replayed into fresh stores gives all 280 reports as recorded | | `25ec3d9` |
+| Test gaps | Table continuation over pages (A19); the rules and structure queries' failure paths (not reached, failed, first or second answer, a failed review); alignment at scale (with D3–D5); the vetoes, lifted into the pure `compare.vetoes` | | `11ea2cb` |
+| E10 | `stubs`: a `Recorder` base with stock answers (six extraction fakes now subclass it), `source_data` (14 hand-made splits), `text_pdf` (five builders), `serving`, `request_body` and `chat_answer` (seven stub servers' boilerplate). Left as they are: the judge fake, the workbook tests' scripted model, and the builders that draw | | |
 
 **Status, 2026-10-09:** every finding in *Bugs and risks* is fixed. The [remediation plan](../plans/review-bugs-2026-10-09.md)'s six items are done.
 
 **Still open** (the behaviour-preserving phase, as the owner ordered on 2026-10-09; the steps done are in the table above):
-- **Performance:** P1, D3–D5. (Done: A5–A8, C2, C3, C19, E1.)
-- **Tests:** E10 (test helpers), and the gaps listed under *Tests* that no fix covered: table continuation over pages (A19), the table queries' failure paths, alignment at scale, the veto rules. (Done: E6, E9, E18, the guard on commits per replay.)
+- **Performance:** none left. (Done: A5–A8, C2, C3, C19, D3–D5, E1, P1.)
+- **Tests:** none left. (Done: E6, E9, E10, E18, the guard on commits per replay, and the gaps: A19, the table queries' failure paths, alignment at scale, the vetoes.)
 - **Architecture:** items 1–13.
 - **Simplification:** normalisers and number parsers (D10, S1), `_filled`, `_joined` and `_plain` (with architecture item 6), the long functions. (Done: C14, the models' copies.)
 - **Not in this phase:** A20, a lever with the features (the owner's answer, above). Two bugs found under the remediation plan wait on the owner's order: decks' two-column tables aren't checked, and a section row under a PDF table's header is taken for its second line (the plan's *Found along the way*).

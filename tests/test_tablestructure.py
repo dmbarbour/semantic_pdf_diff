@@ -324,7 +324,7 @@ class Extracted(unittest.TestCase):
             doc.save(path)
             client = Client()
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
-        rows = {task: prompt.split("SOURCE DATA:\n")[1] for task, prompt in client.asked if task.startswith("table:")}
+        rows = {task: stubs.source_data(prompt) for task, prompt in client.asked if task.startswith("table:")}
         page1 = {task: text for task, text in rows.items() if task.startswith("table:p1:")}
         self.assertTrue(client.late)  # the answer did come after page 2's table was read
         self.assertEqual(len(page1), 2)  # P-1 (with CCD201 joined) and P-2

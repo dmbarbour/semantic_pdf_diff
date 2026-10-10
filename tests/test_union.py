@@ -1,4 +1,5 @@
 import stubs  # noqa: F401 (a clean environment)
+from stubs import source_data
 import itertools
 import tempfile
 import unittest
@@ -55,7 +56,7 @@ class Extraction_(unittest.TestCase):
             self.s = Settings(**settings)
             self.calls, self.cache_hits, self.usage = 0, 0, {}
         def ask(self, prompt, schema, images=(), key=None):
-            data = prompt.split('SOURCE DATA:\n')[1]
+            data = source_data(prompt)
             if images or '10 kW' in data:
                 quote = '10 kW' if not images else 'Pump 10 kW'
                 return Extraction(claims=[{**FACT, 'quote': quote, 'kind': 'chart' if images else 'text'}], complete=True)

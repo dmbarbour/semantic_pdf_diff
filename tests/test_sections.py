@@ -8,41 +8,24 @@ from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.extract import extract_pdf, pdf_sections
-from semantic_pdf_diff.models import Extraction, Judgment, Settings
+from semantic_pdf_diff.models import Extraction, Settings
 from semantic_pdf_diff.provenance import content_id
-from stubs import ROUND0, situating_answer
+import stubs
+from stubs import ROUND0, source_data
 
 def make_pdf(path, pages, toc=None, metadata=None, height=300):
-    doc = pymupdf.open()
-    for text in pages:
-        page = doc.new_page(width=300, height=height)
-        if text:
-            page.insert_text((40, 40), text)
-    if toc:
-        doc.set_toc(toc)
-    if metadata:
-        doc.set_metadata(metadata)
-    doc.save(path); doc.close()
-    return path
+    return stubs.text_pdf(path, pages, height=height, toc=toc, metadata=metadata)
 
-class Recorder:
+class Recorder(stubs.Recorder):
     """Records prompts and keys; answers with a claim quoting any 'N kW' in the source."""
     def __init__(self, **settings):
-        self.s = Settings(**settings)
-        self.calls, self.cache_hits, self.usage = 0, 0, {}
+        super().__init__(**settings)
         self.asked = []
-    def ask(self, prompt, schema, images=(), key=None):
+    def record(self, prompt, schema, images, key):
         self.asked.append((prompt, key))
         self.images = getattr(self, 'images', []) + [(prompt, list(images))]
-        if schema is Judgment:
-            return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)
-        if situating_answer(prompt):
-            return schema.model_validate(situating_answer(prompt))
-        if schema.__name__ == 'Rules':  # a table's rules query: each row read by itself, as these tests read tables
-            return schema(reading='rows')
-        if schema.__name__ == 'Check':  # a block of two columns: a table, as these tests read it (B5)
-            return schema(reading='table')
-        data = prompt.split('SOURCE DATA:\n')[1]
+    def answer(self, prompt, schema, images, key):
+        data = source_data(prompt)
         if ' kW' in data:
             value = data.split(' kW')[0].split()[-1]
             return Extraction(claims=[{'entity': 'pump', 'attribute': 'power', 'value': value, 'unit': 'kW',
@@ -118,7 +101,7 @@ class SectionContext(unittest.TestCase):
             client = Recorder(vision=False)
             evidence, _ = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
             headings = {k: p.split('\nSection: ', 1)[1].split('\n', 1)[0] for p, _ in client.asked
-                        for k in ('10 kW', '3 kW', '5 kW') if k in p.split('SOURCE DATA:')[1]}
+                        for k in ('10 kW', '3 kW', '5 kW') if k in source_data(p)}
             self.assertEqual(headings, {'10 kW': '1 Pumps', '3 kW': '2 Fans', '5 kW': '2 Fans'})
             self.assertEqual({e.value: e.section for e in evidence}, {'10': 'sec1', '3': 'sec2', '5': 'sec2'})
 
@@ -207,7 +190,7 @@ class SectionContext(unittest.TestCase):
                                    'text_bytes': 260, 'extract_rules': ['Say which loop a pump serves.']})):
                 client = Recorder(vision=False, **{**ROUND0, **settings})
                 extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
-                prompts[name] = next((p, k) for p, k in client.asked if '10 kW' in p.split('SOURCE DATA:\n')[1])
+                prompts[name] = next((p, k) for p, k in client.asked if '10 kW' in source_data(p))
             base_prompt, base_key = prompts['base']
             prompt, key = prompts['lever']
             self.assertNotIn('CONTEXT', base_prompt)
@@ -229,7 +212,7 @@ class SectionContext(unittest.TestCase):
             doc.save(path); doc.close()
             client = Recorder(vision=False, stem_context=True)
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
-            prompt = next(p for p, _ in client.asked if '96 oz' in p.split('SOURCE DATA:')[1])
+            prompt = next(p for p, _ in client.asked if '96 oz' in source_data(p))
             self.assertIn('Within: 9-2. Cooking > a. Reduced points are earned', prompt)
             plain = Recorder(vision=False, stem_context=False)
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), plain)
@@ -296,7 +279,7 @@ class SectionContext(unittest.TestCase):
             doc.close()
             client = Recorder(vision=False, references=True)
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
-            prompt = next(p for p, _ in client.asked if '12 kW' in p.split('SOURCE DATA:')[1])
+            prompt = next(p for p, _ in client.asked if '12 kW' in source_data(p))
             self.assertIn('Defined elsewhere: PI = proportional-integral', prompt)
             self.assertIn('Cited: Figure 3: Pitch response to a wind step (page 2); Table 9: not found in this document',
                           prompt)
@@ -516,7 +499,7 @@ class SectionContext(unittest.TestCase):
             path = make_pdf(Path(d) / 't.pdf', ['', ''])
             client = Recorder(vision=False)
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
-            return [(k[3], p.split('SOURCE DATA:\n')[1]) for p, k in client.asked if k[1] == 'table']
+            return [(k[3], source_data(p)) for p, k in client.asked if k[1] == 'table']
 
     def test_table_continues_across_pages(self):
         prompts = self.table_prompts({0: [((20, 200, 280, 290), [['Tag', 'Flow'], ['P-1', '10']])],

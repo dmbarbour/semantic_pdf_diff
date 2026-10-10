@@ -2,25 +2,17 @@ import stubs  # noqa: F401 (a clean environment)
 import tempfile
 import unittest
 from pathlib import Path
-import pymupdf
 from semantic_pdf_diff.extract import Job, run_jobs
-from semantic_pdf_diff.models import Extraction, Settings
 
-class Recorder:
+class Recorder(stubs.Recorder):
     def __init__(self):
-        self.s = Settings(vision=False)
-        self.calls, self.cache_hits, self.usage = 0, 0, {}
+        super().__init__(vision=False)
         self.order = []
-    def ask(self, prompt, schema, images=(), key=None):
+    def record(self, prompt, schema, images, key):
         self.order.append((key[2], key[3]))  # (content, task)
-        return Extraction(claims=[], complete=True)
 
 def pdf(path, pages):
-    doc = pymupdf.open()
-    for i in range(pages):
-        doc.new_page(width=200, height=200).insert_text((20, 20), f'{path.stem} page {i + 1}')
-    doc.save(path); doc.close()
-    return path
+    return stubs.text_pdf(path, [f'{path.stem} page {i + 1}' for i in range(pages)], width=200, at=(20, 20))
 
 class FairShare(unittest.TestCase):
     def test_sources_advance_together(self):

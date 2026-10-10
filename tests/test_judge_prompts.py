@@ -125,22 +125,15 @@ class RecordedJudging(unittest.TestCase):
                     self.assertEqual((copy / "replay.zip").read_bytes(), (folder / "replay.zip").read_bytes())
 
     def test_a_folder_records_its_answers_once_and_packs_them(self):
-        import http.server, threading
+        import contextlib
         asked = []
-        class Handler(http.server.BaseHTTPRequestHandler):
-            def log_message(self, *args): pass
-            def do_POST(self):
-                asked.append(json.loads(self.rfile.read(int(self.headers["Content-Length"]))))
-                answer = {"better": "B", "note": "stub"}
-                body = json.dumps({"choices": [{"message": {"content": json.dumps(answer)}, "finish_reason": "stop"}],
-                                   "usage": {"prompt_tokens": 10, "completion_tokens": 5, "estimated_cost": 0.001}})
-                self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers()
-                self.wfile.write(body.encode())
-        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
-        threading.Thread(target=server.serve_forever, daemon=True).start()
-        self.addCleanup(server.server_close)
-        self.addCleanup(server.shutdown)
-        settings = Settings(model="judge", base_url=f"http://127.0.0.1:{server.server_port}/v1", retries=0,
+        def post(handler):
+            asked.append(stubs.request_body(handler))
+            stubs.chat_answer(handler, {"better": "B", "note": "stub"},
+                              usage={"prompt_tokens": 10, "completion_tokens": 5, "estimated_cost": 0.001})
+        stack = contextlib.ExitStack()
+        self.addCleanup(stack.close)
+        settings = Settings(model="judge", base_url=stack.enter_context(stubs.serving(post, threaded=True)), retries=0,
                             **EVALUATOR_SETTINGS)
         with tempfile.TemporaryDirectory() as d:
             folder = Path(d)

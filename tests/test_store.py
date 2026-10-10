@@ -6,18 +6,15 @@ import shutil
 import sqlite3
 import stat
 import tempfile
-import threading
 import unittest
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from unittest.mock import patch
-import pymupdf
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.models import Claim, Extraction, Judgment, PdfLocator, Evidence, Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
 from semantic_pdf_diff.store import InterpreterMismatch, Store, StoreError, StoreInUse
-from stubs import situating_answer
+from stubs import chat_answer, request_body, serving, situating_answer, source_data, text_pdf
 
 EMPTY = {'claims': [], 'complete': True, 'issues': []}
 
@@ -25,39 +22,26 @@ EMPTY = {'claims': [], 'complete': True, 'issues': []}
 def model_server():
     """Stub model: one claim for text containing 'kW', equivalence for comparisons."""
     state = {'requests': 0}
-    class Handler(BaseHTTPRequestHandler):
-        def log_message(self, *args): pass
-        def do_POST(self):
-            body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-            state['requests'] += 1
-            prompt = body['messages'][1]['content'][0]['text']
-            if 'Compare exactly' in prompt:
-                answer = {'relation': 'equivalent', 'rationale': 'stub', 'confidence': .9, 'same_conditions': True}
-            elif situating_answer(prompt):
-                answer = situating_answer(prompt)
-            elif 'SOURCE DATA:\n' in prompt and 'kW' in prompt.split('SOURCE DATA:\n')[1]:
-                value = prompt.split('SOURCE DATA:\n')[1].split(' kW')[0].split()[-1]
-                answer = {'claims': [{'entity': 'pump', 'attribute': 'rated power', 'value': value, 'unit': 'kW',
-                                      'kind': 'text', 'quote': f'{value} kW', 'confidence': .9}],
-                          'complete': True, 'issues': []}
-            else:
-                answer = EMPTY
-            self.send_response(200); self.end_headers()
-            self.wfile.write(json.dumps({'choices': [{'finish_reason': 'stop',
-                                                      'message': {'content': json.dumps(answer)}}]}).encode())
-    server = HTTPServer(('127.0.0.1', 0), Handler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
-    try:
-        yield f'http://127.0.0.1:{server.server_port}/v1', state
-    finally:
-        server.shutdown(); server.server_close(); thread.join()
+    def post(handler):
+        body = request_body(handler)
+        state['requests'] += 1
+        prompt = body['messages'][1]['content'][0]['text']
+        if 'Compare exactly' in prompt:
+            answer = {'relation': 'equivalent', 'rationale': 'stub', 'confidence': .9, 'same_conditions': True}
+        elif situating_answer(prompt):
+            answer = situating_answer(prompt)
+        elif 'SOURCE DATA:\n' in prompt and 'kW' in source_data(prompt):
+            value = source_data(prompt).split(' kW')[0].split()[-1]
+            answer = {'claims': [{'entity': 'pump', 'attribute': 'rated power', 'value': value, 'unit': 'kW',
+                                  'kind': 'text', 'quote': f'{value} kW', 'confidence': .9}],
+                      'complete': True, 'issues': []}
+        else:
+            answer = EMPTY
+        chat_answer(handler, answer)
+    with serving(post) as url:
+        yield url, state
 
-def make_pdf(path, lines):
-    doc = pymupdf.open()
-    for text in lines:
-        page = doc.new_page(width=300, height=300); page.insert_text((40, 40), text)
-    doc.save(path); doc.close()
-    return path
+make_pdf = text_pdf  # (path, a text a page)
 
 def evidence(eid, task, region):
     return Evidence(id=eid, content='sha256:' + 'a' * 64 + '.pdf', entity='e', attribute='a', value='1', kind='text',

@@ -6,34 +6,27 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-import pymupdf
 from semantic_pdf_diff.cli import main
 from semantic_pdf_diff.extract import extract_pdf
-from semantic_pdf_diff.models import Extraction, Judgment, Settings
+from semantic_pdf_diff.models import Extraction, Settings
 from semantic_pdf_diff.provenance import (COMPARISON_SETTINGS, EXTRACTION_SETTINGS, comparison_interpreter,
                                           content_id, extraction_interpreter, normalized_extension)
-from stubs import situating_answer
+import stubs
 
 GOOD = {'entity': 'primary pump', 'attribute': 'rated power', 'value': '10', 'unit': 'kW',
         'kind': 'text', 'quote': '10 kW', 'confidence': .9}
 
 def make_pdf(path, text='Pump rated power 10 kW'):
-    doc = pymupdf.open(); page = doc.new_page(width=300, height=300); page.insert_text((40, 40), text)
-    doc.save(path); doc.close()
-    return path
+    return stubs.text_pdf(path, [text])
 
-class Recorder:
+class Recorder(stubs.Recorder):
     """Answers extraction with one claim quoting '10 kW'; comparison calls are recorded."""
     def __init__(self, **settings):
-        self.s = Settings(**settings)
+        super().__init__(**settings)
         self.prompts = []
-        self.calls, self.cache_hits, self.usage = 0, 0, {}
-    def ask(self, prompt, schema, images=(), key=None):
+    def record(self, prompt, schema, images, key):
         self.prompts.append(prompt)
-        if schema is Judgment:
-            return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)
-        if situating_answer(prompt):
-            return schema.model_validate(situating_answer(prompt))
+    def answer(self, prompt, schema, images, key):
         return Extraction(claims=[GOOD] if 'SOURCE DATA:\nPump' in prompt else [], complete=True)
 
 class ContentTests(unittest.TestCase):

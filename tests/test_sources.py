@@ -8,7 +8,6 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
-import pymupdf
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.models import Source
 from semantic_pdf_diff.report import write_report
@@ -18,9 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from test_store import model_server  # noqa: E402
 
 def pdf_bytes(text):
-    doc = pymupdf.open(); page = doc.new_page(width=300, height=300); page.insert_text((40, 40), text)
-    data = doc.tobytes(); doc.close()
-    return data
+    return stubs.text_pdf(None, [text])
 
 def touch_later(path):
     """Make sure a rewritten file's modification time differs from the scan's."""

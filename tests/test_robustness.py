@@ -3,9 +3,7 @@ import io
 import json
 import os
 import tempfile
-import threading
 import unittest
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from unittest.mock import patch
 import pymupdf
@@ -14,7 +12,8 @@ from semantic_pdf_diff.llm import Client, Invalid, ModelFailure, redact_url
 from semantic_pdf_diff.compare import numeric_check
 from semantic_pdf_diff.extract import extract_pdf, tiles
 from semantic_pdf_diff.cli import main
-from stubs import ROUND0
+import stubs
+from stubs import ROUND0, source_data
 
 CID = 'sha256:' + 'a' * 64 + '.pdf'
 GOOD = {'entity':'primary pump','attribute':'rated power','value':'10','unit':'kW','conditions':'',
@@ -29,37 +28,27 @@ def ev(id, value, unit):
 def stub(replies):
     """Serve (status, headers, body) replies in order, repeating the last; records requests."""
     seen = []
-    class Handler(BaseHTTPRequestHandler):
-        def log_message(self,*args): pass
-        def do_POST(self):
-            seen.append(json.loads(self.rfile.read(int(self.headers['Content-Length']))))
-            status, headers, body = replies[min(len(seen), len(replies)) - 1]
-            self.send_response(status)
-            for k, v in headers.items(): self.send_header(k, v)
-            self.end_headers()
-            self.wfile.write(body if isinstance(body, bytes) else json.dumps(body).encode())
-    server = HTTPServer(('127.0.0.1',0),Handler)
-    thread = threading.Thread(target=server.serve_forever,daemon=True); thread.start()
-    try:
-        yield f'http://127.0.0.1:{server.server_port}/v1', seen
-    finally:
-        server.shutdown(); server.server_close(); thread.join()
+    def post(handler):
+        seen.append(stubs.request_body(handler))
+        status, headers, body = replies[min(len(seen), len(replies)) - 1]
+        handler.send_response(status)
+        for k, v in headers.items(): handler.send_header(k, v)
+        handler.end_headers()
+        handler.wfile.write(body if isinstance(body, bytes) else json.dumps(body).encode())
+    with stubs.serving(post) as url:
+        yield url, seen
 
 def reply(content, **extra):
     return (200, {}, {'choices':[{'finish_reason':'stop','message':{'content':content}}], **extra})
 
 EMPTY = '{"claims":[],"complete":true,"issues":[]}'
 
-class Recorder:
+class Recorder(stubs.Recorder):
     """Extraction fake: records (source type, prompt, images) and answers via respond()."""
     def __init__(self, respond, **settings):
-        self.s = Settings(**settings)
+        super().__init__(**settings)
         self.respond, self.tasks = respond, []
-    def ask(self, prompt, schema, images=(), key=None):
-        if schema.__name__ == 'Rules':  # a table's rules query: each row read by itself, as these tests read tables
-            return schema(reading='rows')
-        if schema.__name__ == 'Check':  # a block of two columns: a table, as these tests read it (B5)
-            return schema(reading='table')
+    def answer(self, prompt, schema, images, key):
         source = prompt.split('Source type: ')[1].split('\n')[0]
         self.tasks.append((source, prompt, list(images)))
         return self.respond(source, prompt)
@@ -293,7 +282,7 @@ class ExtractionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             client = Recorder(lambda s, p: Extraction(claims=[], complete=False), vision=False)
             extract_pdf(pdf(Path(d)/'t.pdf', build), CID, Path(d), client)
-            bodies = [p.split('SOURCE DATA:\n')[1] for _, p, _ in client.tasks]
+            bodies = [source_data(p) for _, p, _ in client.tasks]
             self.assertEqual(len(bodies), 3)
             self.assertIn('Primary', bodies[1]); self.assertNotIn('Secondary', bodies[1])
             self.assertIn('Secondary', bodies[2]); self.assertNotIn('Primary', bodies[2])
@@ -320,7 +309,7 @@ class ExtractionTests(unittest.TestCase):
             tables = [p for s, p, _ in client.tasks if s == 'table']
             self.assertEqual(len(tables), 3)
             for prompt in tables:
-                header, row = [json.loads(line.split(': ', 1)[1]) for line in prompt.split('SOURCE DATA:\n')[1].splitlines()]
+                header, row = [json.loads(line.split(': ', 1)[1]) for line in source_data(prompt).splitlines()]
                 self.assertEqual((header[0], row[0]), ('Item', 'Pump P1'))
                 self.assertEqual(len(header), len(row))
             self.assertEqual(sorted(r['task'] for r in coverage if r['task'].startswith('table')),
@@ -334,7 +323,7 @@ class ExtractionTests(unittest.TestCase):
             tables = [r for r in coverage if r['task'].startswith('table')]
             self.assertGreater(len(tables), 1)
             self.assertTrue(all(r['status'] == 'complete' for r in tables))
-            self.assertTrue(all(len(p.split('SOURCE DATA:\n')[1].encode()) <= 300 for s, p, _ in client.tasks if s == 'table'))
+            self.assertTrue(all(len(source_data(p).encode()) <= 300 for s, p, _ in client.tasks if s == 'table'))
 
     def test_visual_duplicates_are_merged_across_refinement(self):
         claim = {**GOOD, 'kind':'diagram'}
