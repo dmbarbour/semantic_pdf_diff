@@ -14,6 +14,7 @@ can still leverage caching and fast testing."
   loose (the fact's value and attribute, a vague entity), misbound, wrong unit (the fact's number in a unit of
   another kind or size), misread (a non-fact number), hallucinated (a value printed nowhere), and facts missed.
 """
+import functools
 import io
 import json
 import random
@@ -45,7 +46,13 @@ class Fact:
 
     @property
     def number(self):
-        return None if self.relation else parse_number(self.value)
+        return None if self.relation else _parsed(self.value)
+
+@functools.lru_cache(maxsize=1 << 14)
+def _parsed(value):
+    """A value's number, parsed once per value: the scorer asks each fact's for every claim (code review 2026-10-08,
+    E1). By value, not on the fact: a revision changes a fact's value in place."""
+    return parse_number(value)
 
 class Draw:
     """Seeded values, each printed string unique within a document (so a value names one fact)."""

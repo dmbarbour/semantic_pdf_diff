@@ -2,6 +2,7 @@
 misread, hallucinated, ...), facts found and missed, conditions kept, relations read. Split from controlled.py
 (architecture clean-up, milestone 8).
 """
+import functools
 import re
 import unicodedata
 
@@ -18,9 +19,17 @@ SAME = {"weight": "mass", "number": "count", "quantity": "count", "qty": "count"
         "seating": "seat", "rider": "seat", "tonnage": "ton", "max": "maximum", "min": "minimum", "avg": "average",
         "dia": "diameter", "temp": "temperature", "rated": "rating"}
 
+# Scoring asks for the same names' words again and again: a claim's against every fact, every fact's for every claim
+# (code review 2026-10-08, E1: most of the scorer's time). tokens, vocabulary and rarity are cached on what they're
+# made from. Each returns a set its callers only read: never change one in place.
+
 def tokens(text):
     """A name's words: case-folded, hyphens split, stop words dropped, plurals and synonyms folded."""
-    text = unicodedata.normalize("NFKC", str(text)).casefold().replace("-", " ")
+    return _tokens(str(text))
+
+@functools.lru_cache(maxsize=1 << 16)
+def _tokens(text):
+    text = unicodedata.normalize("NFKC", text).casefold().replace("-", " ")
     out = set()
     for t in re.findall(r"[a-z0-9]+", text):
         if t in STOP:
@@ -30,10 +39,18 @@ def tokens(text):
         out.add(SAME.get(t, t))
     return out
 
+def _names(fact):
+    """What a fact's vocabulary is made from."""
+    return fact.entity, fact.attribute, fact.conditions, tuple(fact.aliases), tuple(fact.synonyms)
+
 def vocabulary(fact):
     """Every word naming a fact: its entity and aliases, attribute and synonyms, and conditions."""
-    return set().union(*(tokens(o) for o in (fact.entity, fact.attribute, fact.conditions) + tuple(fact.aliases)
-                         + tuple(fact.synonyms)))
+    return _vocabulary(_names(fact))
+
+@functools.lru_cache(maxsize=1 << 14)
+def _vocabulary(names):
+    entity, attribute, conditions, aliases, synonyms = names
+    return set().union(*(tokens(o) for o in (entity, attribute, conditions) + aliases + synonyms))
 
 FIT_WEIGHTS = {"attribute": 2.0, "entity": 1.0, "conditions": 0.25}  # conditions only break ties
 # A reference to where a value was read isn't a name: "Figure 1" mustn't pick "Option 1".
@@ -43,21 +60,33 @@ def fit(claim, fact, weights):
     """How well a claim's names describe a fact: the rare-word-weighted share of its attribute's words, entity's
     words and conditions' words found among the fact's words (all of them, however the claim split its names),
     the attribute counting most and the conditions least (a model may put a table's section name there)."""
-    vocab = vocabulary(fact)
-    score = 0.0
+    return _fit(_named(claim, weights), vocabulary(fact), weights)
+
+def _named(claim, weights):
+    """A claim's names for fit, once per claim: [(weight, words, their weights' total)] by part."""
+    out = []
     for part, weight in FIT_WEIGHTS.items():
         words = tokens(REFERENCE.sub(" ", str(claim.get(part, ""))))
-        total = sum(weights.get(w, weights[None]) for w in words)
+        out.append((weight, words, sum(weights.get(w, weights[None]) for w in words)))
+    return out
+
+def _fit(named, vocab, weights):
+    score = 0.0
+    for weight, words, total in named:
         if total:
             score += weight * sum(weights.get(w, weights[None]) for w in words & vocab) / total
     return score
 
 def rarity(facts):
     """{word: weight}: log(1 + facts / facts using the word); None for words no fact uses."""
+    return _rarity(tuple(_names(f) for f in facts))
+
+@functools.lru_cache(maxsize=256)
+def _rarity(facts):
     import math
     counts = {}
-    for f in facts:
-        for w in vocabulary(f):
+    for names in facts:
+        for w in _vocabulary(names):
             counts[w] = counts.get(w, 0) + 1
     n = len(facts)
     return {**{w: math.log(1 + n / c) for w, c in counts.items()}, None: math.log(1 + n)}
@@ -78,10 +107,12 @@ def claimed_unit(claim):
     m = UNIT_AFTER.match(str(claim.get("value", "")))
     return m.group(1) if m else ""
 
+_unit_kind = functools.lru_cache(maxsize=1 << 12)(unit_kind)  # asked of each fact's unit for every claim (E1)
+
 def holds_as(fact, number, unit):
     """Whether a value with its unit is the fact's (holds), compared in the fact's unit when both units are known.
     None when the number is the fact's but the units are of two kinds or sizes: a wrong unit."""
-    mine, theirs = unit_kind(unit), unit_kind(fact.unit)
+    mine, theirs = _unit_kind(unit), _unit_kind(fact.unit)
     if mine is None or theirs is None or mine == theirs:
         return holds(fact, number)
     if mine[0] == theirs[0]:  # converted: within the rounding of a conversion
@@ -127,7 +158,8 @@ def classify(claim, facts, printed):
     unit_checked = lambda outcome, fid: (("wrong unit" if outcome in ("right", "loose") and typed.get(fid, True) is None
                                           else outcome), fid)
     weights = rarity(facts) if holders or any(f.tolerance for f in facts) else None
-    scores = {f.id: fit(claim, f, weights) for f in facts} if weights else {}
+    named = _named(claim, weights) if weights else None
+    scores = {f.id: _fit(named, vocabulary(f), weights) for f in facts} if weights else {}
     if any(f.tolerance for f in facts):  # read against an axis: the names pick the bar, its height is checked
         best = max(scores.values())
         top = [f for f in facts if scores[f.id] == best]
