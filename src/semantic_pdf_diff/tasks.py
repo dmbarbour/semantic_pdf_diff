@@ -8,7 +8,7 @@ Split from extract.py; PDF requests are byte for byte what they were (tests/test
 import hashlib
 import re
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from .failures import CallLimitReached, NotRecorded
@@ -116,6 +116,32 @@ def union(boxes):
 LIMIT_SAID = re.compile(r"claim limit|limit of \d+ claims|maximum (?:of )?\d+ claims|\d+[- ]claim (?:limit|maximum|cap)"
                         r"|more (?:claims|facts|steps|items|rows|entries) (?:than|remain)|(?:claims|facts) remain", re.I)
 
+@dataclass(frozen=True, eq=False)
+class Task:
+    """One extraction request's making (TaskCore.consume): where it sits (page, box) and its tag, its source text,
+    its image (and extra images) and context; how its claims are checked, located and placed, and the steps that
+    derived them; what follows it (then); a repeated block's key; and, for a continuation, the claims returned so
+    far, the task it continues and the repeated block it leads. A continuation or a repeat's follower is this task
+    again, as replace() makes it (code review 2026-10-08, A10: 17 parameters, re-listed by hand twice)."""
+    page: int
+    bbox: tuple
+    tag: str
+    text: str
+    image: str | None = None
+    check: object = None
+    locate: object = None
+    crop: object = None
+    derivation: list | None = None
+    then: object = None
+    repeat_key: tuple | None = None
+    repeat_after: int = 1
+    place: object = None
+    context: str = ""
+    extra_images: tuple = ()
+    continued: tuple = ()
+    origin: str | None = None
+    leading: dict | None = field(default=None, repr=False)
+
 class TaskCore:
     """One content item's extraction tasks: the evidence and coverage they make, as tasks finish.
 
@@ -155,10 +181,8 @@ class TaskCore:
         self.evidence.extend(copies)
         self.record(row, copies)
 
-    def consume(self, page_no, bbox, task, text, image=None, check=None, locate=None, crop=None, derivation=None,
-                then=None, repeat_key=None, repeat_after=1, place=None, context="", extra_images=(), continued=(),
-                origin=None, leading=None):
-        """Queue one extraction task; when it finishes, record it and call then(status).
+    def consume(self, made):
+        """Queue one extraction task (a Task); when it finishes, record it and call then(status).
 
         An answer incomplete with its claims at the limit is the model asking for more: the task is asked again
         ("<task>-c<n>", up to the continuation limit), told the claims returned so far (continued), and then(status)
@@ -174,6 +198,12 @@ class TaskCore:
         Each claim found becomes one occurrence; sightings of the same claim by other
         tasks are merged into one piece of evidence afterwards (union provenance).
         """
+        page_no, bbox, task, text, image, check, locate, crop, derivation, then = (
+            made.page, made.bbox, made.tag, made.text, made.image, made.check, made.locate, made.crop, made.derivation,
+            made.then)
+        repeat_key, repeat_after, place, context, extra_images = (made.repeat_key, made.repeat_after, made.place,
+                                                                  made.context, made.extra_images)
+        continued, origin, leading = made.continued, made.origin, made.leading
         s, content, state = self.s, self.content, self.state
         region = region_of(task)
         entry = None
@@ -182,8 +212,7 @@ class TaskCore:
                                                          "ok": False, "found": [], "row": None, "followers": []})
             entry["seen"] += 1
             if entry["task"] != task and entry["seen"] - 1 >= repeat_after:
-                again = lambda: self.consume(page_no, bbox, task, text, image, check, locate, crop, derivation, then,
-                                             place=place, context=context, extra_images=extra_images)
+                again = lambda: self.consume(replace(made, repeat_key=None, repeat_after=1))
                 if not entry["done"]:
                     entry["followers"].append((lambda: self.follow(entry, page_no, bbox, task, region), again))
                 elif entry["ok"]:
@@ -241,9 +270,8 @@ class TaskCore:
             log.debug("%s %s: %s, %d claim(s)%s", Path(self.name).name, task, row["status"], row["claims"],
                       f" ({'; '.join(row['issues'])[:200]})" if row["issues"] else "")
             if asked:
-                self.consume(page_no, bbox, f"{origin}-c{turn + 1}", text, image, check, locate, crop, derivation, then,
-                             place=place, context=context, extra_images=extra_images,
-                             continued=tuple(continued) + tuple(more), origin=origin, leading=lead)
+                self.consume(replace(made, tag=f"{origin}-c{turn + 1}", repeat_key=None, repeat_after=1,
+                                     continued=tuple(continued) + tuple(more), origin=origin, leading=lead))
             elif then:
                 then(row["status"])
 
@@ -289,10 +317,10 @@ class TaskCore:
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
         match = lambda q: quoted(q, text) or s.loose_match(q, text)
-        self.consume(page_no, union(b for b, _ in segments), task, text, check=match, locate=locate,
-                     context=context, derivation=derivation,
-                     then=lambda status: self.refine_text(page_no, segments, text, task, depth, status, derivation,
-                                                          given))
+        self.consume(Task(page_no, union(b for b, _ in segments), task, text, check=match, locate=locate,
+                          context=context, derivation=derivation,
+                          then=lambda status: self.refine_text(page_no, segments, text, task, depth, status, derivation,
+                                                               given)))
 
     def refine_text(self, page_no, segments, text, task, depth, status, derivation=None, context=None):
         if status not in ("partial", "failed") or depth >= self.s.refinement_depth:
@@ -333,9 +361,9 @@ class TaskCore:
             context = self.reader.for_table(page_no, bbox, flat)
             if repeat_key is not None and context:  # the same row under another lead-in or stem isn't a repeat
                 repeat_key += (hashlib.sha256(context.encode()).hexdigest(),)
-            self.consume(page_no, bbox, task, text, derivation=derivation,
-                         check=lambda q: quoted(q, text) or covered(q, flat) or s.loose_match(q, text),
-                         then=then, repeat_key=repeat_key, repeat_after=2, context=context)
+            self.consume(Task(page_no, bbox, task, text, derivation=derivation,
+                              check=lambda q: quoted(q, text) or covered(q, flat) or s.loose_match(q, text),
+                              then=then, repeat_key=repeat_key, repeat_after=2, context=context))
         else:
             self.split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
 

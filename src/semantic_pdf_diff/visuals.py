@@ -8,6 +8,7 @@ from .pages import native
 from .quotes import covered
 from .regions import crop_name, region_of
 from .segmentation import halves
+from .tasks import Task
 
 # Visual refinement stops at crops narrower than this (PDF points).
 MIN_REFINE_POINTS = 100
@@ -55,10 +56,11 @@ class Visuals:
         source = s.region_text(self.context_of, page, rect, layer, text)
         context, extra = self.context_of.for_tile(page, rect, tag)
         kept = text if box is not None else ""
-        self.core.consume(page_no, native_rect if box is None else box, tag, source, "assets/" + name, check=check,
-                          place=place, crop=(tuple(round(v, 3) for v in rect), s.image_side), context=context,
-                          extra_images=extra, derivation=derivation,
-                          then=lambda status: self.refine(page_no, page, tag, rect, depth, status, kept, box, derivation))
+        self.core.consume(Task(page_no, native_rect if box is None else box, tag, source, "assets/" + name, check=check,
+                               place=place, crop=(tuple(round(v, 3) for v in rect), s.image_side), context=context,
+                               extra_images=extra, derivation=derivation,
+                               then=lambda status: self.refine(page_no, page, tag, rect, depth, status, kept, box,
+                                                               derivation)))
 
     def refine(self, page_no, page, tag, rect, depth, status, text, box, derivation):
         # Refine only local tiles; an overview or a whole figure may be incomplete because

@@ -251,10 +251,10 @@ class Refined(unittest.TestCase):
         core.reader = SimpleNamespace(for_text=lambda page, segments, text: f"context of {segments[0][1]}")
         sent = []
 
-        def consume(page, box, task, text, context="", then=None, **_):
-            sent.append((task, context))
-            if then and ":r" not in task:
-                then("partial")
+        def consume(made):  # a Task
+            sent.append((made.tag, made.context))
+            if made.then and ":r" not in made.tag:
+                made.then("partial")
         core.consume = consume
         segments = [((0, 1, 1, 2), "first"), ((0, 2, 1, 3), "second")]
         core.text_task(1, segments, "text:p1:0")
