@@ -1,6 +1,7 @@
 """Levers as mixins on a platform class (levers.py; architecture clean-up, milestone 3): composition from data,
 hooks chained or chosen, assumptions on the final type, configurations and their binding."""
 import stubs  # noqa: F401 (a clean environment)
+from stubs import needs_lab
 import json
 import tempfile
 import unittest
@@ -171,6 +172,7 @@ class Rubrics(unittest.TestCase):
     """Judges' rubrics on the same model (rubrics.py; milestone 5): each version an ordered list of clauses. The
     versions' bytes are pinned by tests/golden/pairwise-*.txt (test_judge_prompts)."""
     def test_each_version_composes_from_its_clauses(self):
+        needs_lab()
         from semantic_pdf_diff_lab.eval import rubrics as R
         v6 = R.rubric("v6")
         self.assertEqual((v6.tagged(), v6.numbered(), v6.whole()), (True, True, True))
@@ -179,6 +181,7 @@ class Rubrics(unittest.TestCase):
                       type(v6).explain())
 
     def test_a_clause_out_of_order_or_alone_is_refused(self):
+        needs_lab()
         from semantic_pdf_diff_lab.eval import rubrics as R
         for clauses, problem in (((R.Tags, R.Sections, R.Whole, R.Context), "whole needs claim_marks before it"),
                                  ((R.Context, R.Sections), "context needs sections before it"),
@@ -189,6 +192,7 @@ class Rubrics(unittest.TestCase):
                     L.compose(clauses, R.Rubric)()
 
     def test_a_change_that_misses_its_mark_says_so(self):
+        needs_lab()
         from semantic_pdf_diff_lab.eval import rubrics as R
         with self.assertRaisesRegex(ValueError, "doesn't hold"):
             R._swap("PAGE {page}", "SET A:", "SET A ({a_note}):")

@@ -8,6 +8,7 @@ The replays judge five rounds' batches again from their own fixtures (tests/fixt
 and must reproduce the committed verdicts: the answers are found by the queries rebuilt today.
 """
 import stubs  # noqa: F401 (a clean environment)
+from stubs import slow
 import json
 import os
 import shutil
@@ -96,6 +97,7 @@ REPLAYED = {"v1": "r05/pairs-details", "v2": "r07/pairs-locator", "v3": "r08/pai
 
 SLICES = Path(__file__).resolve().parent.parent / "samples/slices"
 
+@slow
 class RecordedJudging(unittest.TestCase):
     def test_committed_batches_judge_again_to_the_same_verdicts(self):
         for rubric, name in REPLAYED.items():

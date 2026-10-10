@@ -345,12 +345,15 @@ class Visuals:
         name = crop_name(self.stem, tag)
         render(page, rect, self.assets / name, s.image_side)
         native_rect = native(page, rect)
-        layer = (page.get_text("text", clip=native_rect) if not depth  # a refined half's by whole lines (review item 6)
+        # one text page for the layer and the blocks, their flags the same (code review 2026-10-08, A6)
+        textpage = (page.get_textpage(clip=native_rect, flags=pymupdf.TEXTFLAGS_TEXT) if not depth or box is None
+                    else None)
+        layer = (page.get_text("text", textpage=textpage) if not depth  # a refined half's by whole lines (review item 6)
                  else "".join(line + "\n" for line_box, line in self.context_of.lines(page)
                               if (line_box.tl + line_box.br) / 2 in rect))
         check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
         if box is None:
-            blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", clip=native_rect) if b[6] == 0]
+            blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", textpage=textpage) if b[6] == 0]
 
             def place(quote):  # the first text block in the region holding the quote
                 return next((found for found, text in blocks if covered(quote, text, fold=True)), None)

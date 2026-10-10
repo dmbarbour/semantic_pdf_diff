@@ -30,13 +30,13 @@ def imports(path):
 
 class Boundaries(unittest.TestCase):
     def test_the_product_imports_nothing_from_the_lab(self):
-        for path in sorted(PRODUCT.glob("*.py")):
-            with self.subTest(module=path.name):
+        for path in sorted(PRODUCT.rglob("*.py")):  # subpackages too, vendor/ among them (code review 2026-10-08, E6)
+            with self.subTest(module=str(path.relative_to(PRODUCT))):
                 self.assertFalse({m for m in imports(path) if m.startswith("semantic_pdf_diff_lab")})
 
     def test_evaluation_doesnt_reach_into_the_benches(self):
-        for path in sorted((LAB / "eval").glob("*.py")):
-            with self.subTest(module=path.name):
+        for path in sorted((LAB / "eval").rglob("*.py")):  # eval/rounds too
+            with self.subTest(module=str(path.relative_to(LAB))):
                 self.assertFalse({m for m in imports(path) if m.startswith("semantic_pdf_diff_lab.bench")})
 
     def test_the_lab_adds_its_commands_through_entry_points(self):

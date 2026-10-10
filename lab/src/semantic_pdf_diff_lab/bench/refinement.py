@@ -26,18 +26,23 @@ def forced(fresh_halves=False):
     the halves are asked afresh, as another sample of each query (the noise floor: a run against itself)."""
     from semantic_pdf_diff.dispatch import Dispatcher
     from semantic_pdf_diff.fixtures import Replayer
+    from semantic_pdf_diff.recipes import Recipe
     from semantic_pdf_diff.regions import region_of
     submit, sample = Dispatcher.submit, Replayer.sample
 
+    def tile(key, refined):
+        recipe = Recipe(key or ())
+        return recipe.role == "extract" and region_of(recipe.task) == "tile" and ("-r" in recipe.task) == refined
+
     def forcing(self, prompt, schema, images, key, finish):
-        if key and key[0] == "extract" and region_of(key[3]) == "tile" and "-r" not in key[3]:
+        if tile(key, refined=False):
             inner = finish
 
             def finish(value, error):
                 inner(value.model_copy(update={"complete": False}) if value is not None else None, error)
         return submit(self, prompt, schema, images, key, finish)
     def fresh(self, key):
-        return 1 if key and key[0] == "extract" and region_of(key[3]) == "tile" and "-r" in key[3] else sample(self, key)
+        return 1 if tile(key, refined=True) else sample(self, key)
     Dispatcher.submit = forcing
     if fresh_halves:
         Replayer.sample = fresh

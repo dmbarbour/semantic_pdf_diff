@@ -1,6 +1,7 @@
 """Word documents (docxdocs.py; the adapters plan, milestone 2): read through the text reader, paragraphs and table
 rows as lines, headings by style, tracked changes applied, contents and pictures left out."""
 import stubs  # noqa: F401 (a clean environment)
+from stubs import needs_lab
 import io
 import unittest
 
@@ -82,6 +83,7 @@ class WordFeatures(unittest.TestCase):
     """Footnotes and numbered lists: what Word holds outside a paragraph's own text (the Word knobs, word.py)."""
     def test_a_footnote_follows_the_paragraph_citing_it(self):
         from semantic_pdf_diff.docxdocs import read_docx
+        needs_lab()
         from semantic_pdf_diff_lab.bench.controlled.word import Writer
         writer = Writer()
         writer.heading("1 Design Basis", 1)
@@ -96,6 +98,7 @@ class WordFeatures(unittest.TestCase):
 
     def test_numbered_lists_are_written_as_word_numbers_them(self):
         from semantic_pdf_diff.docxdocs import Numbering, _format, read_docx
+        needs_lab()
         from semantic_pdf_diff_lab.bench.controlled.word import Writer
         writer = Writer()
         for text in ("no acknowledgement within 856 ms", "21 retransmissions fail", "SNR below 4.3 dB"):
@@ -223,6 +226,7 @@ class WordTextBoxes(unittest.TestCase):
     """Text boxes (the adapters plan, "Text boxes"): read once, after the paragraph anchoring them."""
     def test_a_text_box_follows_its_paragraph_once_and_isnt_an_unread_object(self):
         from semantic_pdf_diff.docxdocs import read_docx
+        needs_lab()
         from semantic_pdf_diff_lab.bench.controlled.word import Writer
         writer = Writer()
         p = writer.paragraph("The plant serves 89,000 persons.")
@@ -244,6 +248,7 @@ class WordTextBoxes(unittest.TestCase):
     def test_grouped_shapes_are_read_as_text_and_recorded_as_a_drawing(self):
         from docx.oxml import parse_xml
         from semantic_pdf_diff.docxdocs import read_docx
+        needs_lab()
         from semantic_pdf_diff_lab.bench.controlled.word import NAMESPACES
         d = docx.Document()
         p = d.add_paragraph("Figure 3 shows the monitoring loop.")
@@ -253,6 +258,7 @@ class WordTextBoxes(unittest.TestCase):
         table.cell(0, 0).text, table.cell(0, 1).text, table.cell(1, 0).text = "Item", "Note", "Blower B-401"
         cell = table.cell(1, 1)
         cell.paragraphs[0].add_run("Note")
+        needs_lab()
         from semantic_pdf_diff_lab.bench.controlled.word import Writer
         boxed = Writer()
         boxed.text_box(cell.paragraphs[0]._p, [boxed.paragraph("rated at 75 kW")])
@@ -270,6 +276,7 @@ class WordCharts(unittest.TestCase):
     """Word charts (the adapters plan, "Word charts"): read from the values they cache, after their paragraph."""
     def chart_document(self, broken=False, newer=False):
         from docx.oxml import parse_xml
+        needs_lab()
         from semantic_pdf_diff_lab.bench.controlled.corpus import Chart, Fact
         from semantic_pdf_diff_lab.bench.controlled.word import NAMESPACES, Writer
         fact = lambda v: Fact("x", "x", (), "x", (), v)
@@ -342,6 +349,7 @@ class WordEquationsAndComments(unittest.TestCase):
 
     def test_a_comment_follows_the_paragraph_it_comments_on(self):
         from semantic_pdf_diff.docxdocs import read_docx
+        needs_lab()
         from semantic_pdf_diff_lab.bench.controlled.word import Writer
         writer = Writer()
         p = writer.paragraph("The design flow is 25.9 MGD.")

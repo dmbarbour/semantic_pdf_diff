@@ -1,4 +1,5 @@
 """Answers shared by test stub models, and round 0's settings for tests of pipeline mechanics."""
+import importlib.util
 import json
 import os
 import re
@@ -18,6 +19,12 @@ QUICK = bool(os.environ.get("QUICK"))
 def slow(item):
     """Mark a test, or a class whose setup is the slow part, to be skipped in a quick run."""
     return unittest.skipIf(QUICK, "slow: skipped in a quick run (QUICK=1)")(item)
+
+def needs_lab():
+    """Skip a product test whose input the lab's generators build, where the lab isn't installed (a plain install of
+    the diff tool; code review 2026-10-08, E18). Called before the lab's import."""
+    if importlib.util.find_spec("semantic_pdf_diff_lab") is None:
+        raise unittest.SkipTest("needs the lab (pip install -e lab)")
 
 # The query settings before the improvement rounds' champion became the defaults (2026-09-28):
 # tests of mechanics (refinement, tiling, prompt layout) that don't depend on the levers use these.

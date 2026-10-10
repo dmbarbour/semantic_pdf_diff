@@ -6,6 +6,7 @@ stored sideways. Reading order, "above", "before" and positions on the page are 
 displayed. Every conversion between the two goes through here: the rotated-sheet bugs came back
 once because conversions were fixed site by site (docs/reviews/meta-audit-2026-09-28.md).
 """
+import weakref
 import pymupdf
 
 # What PyMuPDF raises on input it can't read: its own errors (FileDataError is a RuntimeError; MuPDF's FzError*
@@ -13,20 +14,31 @@ import pymupdf
 # (code review 2026-10-08, A15).
 PYMUPDF_ERRORS = (RuntimeError, ValueError, pymupdf.mupdf.FzErrorBase)
 
+# A page's two matrices, built once per page object: PyMuPDF builds them from the page's PDF objects on every access,
+# and boxes are converted by the hundred thousand (code review 2026-10-08, A5). Pages aren't rotated or cropped here.
+_MATRICES = weakref.WeakKeyDictionary()
+
+def _matrices(page):
+    try:
+        return _MATRICES[page]
+    except KeyError:
+        found = _MATRICES[page] = (page.rotation_matrix, page.derotation_matrix)
+        return found
+
 def shown(page, box):
     """A box (unrotated page coordinates) as the page is displayed."""
-    return pymupdf.Rect(box) * page.rotation_matrix
+    return pymupdf.Rect(box) * _matrices(page)[0]
 
 def shown_point(page, point):
-    return pymupdf.Point(point) * page.rotation_matrix
+    return pymupdf.Point(point) * _matrices(page)[0]
 
 def native(page, rect):
     """A displayed rectangle in the page's unrotated coordinates (what locators record)."""
-    return pymupdf.Rect(rect) * page.derotation_matrix
+    return pymupdf.Rect(rect) * _matrices(page)[1]
 
 def native_page(page):
     """The whole page in its unrotated coordinates."""
-    return page.rect * page.derotation_matrix
+    return page.rect * _matrices(page)[1]
 
 def display_y(page, bbox):
     """The top of a box (unrotated page coordinates) as the page is displayed: section

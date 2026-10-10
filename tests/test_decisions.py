@@ -7,6 +7,7 @@ changes nothing else. Its 32 unit scores, symmetrised: judges mostly pick a side
 nothing to choose. Units sit in 27 regions, 5 cut into two bands whose scores often agree.
 """
 import stubs  # noqa: F401 (a clean environment)
+from stubs import slow
 import collections
 import random
 import unittest
@@ -46,6 +47,7 @@ def rates(rounds_run, effect=0.0, criteria=None, variants=1, gains=None, held_ou
     return {"accepted": counts["accepted"] / per_variant, "no worse": counts["no worse"] / per_variant,
             "any": counts["any"] / rounds_run, "promoted": counts["promoted"] / rounds_run}
 
+@slow
 class UnderTheNull(unittest.TestCase):
     def test_a_lever_with_no_effect_is_rarely_accepted(self):
         r = rates(1000)

@@ -1,6 +1,7 @@
 """Slide decks (pptxdocs.py; the adapters plan, milestone 3): read as Word documents are, a slide a page, its shapes
 in reading order, tables on their grid, charts from their data, pictures with their slide, speaker notes after."""
 import stubs  # noqa: F401 (a clean environment)
+from stubs import needs_lab
 import io
 import unittest
 
@@ -25,6 +26,7 @@ def deck():
     """A deck: a titled slide of shapes out of reading order, a numbered list, a group and a connector; a slide with a
     merged table and speaker notes; an untitled slide with a chart and a picture; a hidden slide whose title takes
     its place from its layout."""
+    needs_lab()
     from semantic_pdf_diff_lab.bench.controlled.corpus import Chart, Fact
     from semantic_pdf_diff_lab.bench.controlled.slides import Deck
     from semantic_pdf_diff_lab.bench.controlled.word import chart_xml

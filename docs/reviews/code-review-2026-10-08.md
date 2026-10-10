@@ -276,6 +276,19 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 
 **Also fixed under the remediation plan** (the [trials review](trials-2026-10-08.md)'s two bugs, not this review's): a fixture named alone created and recorded into (`94966c7`); refinement cutting tiles between lines or columns (`6c914e7`, checked further in `992cfef`). The latter added `Context.lines` and `Context.graphics`, page caches that are part of A8.
 
+**The behaviour-preserving phase** (the owner, 2026-10-09: "let's move forward on behavior-preserving improvements first"). Each step is proven offline: the eight development runs of the slices replayed with no model (`samples/slices`, the committed fixture), every report identical to the one before the step, no request unrecorded; the golden requests unchanged; the full suite.
+
+| Finding | Done | Replay of the 8 dev runs | Commit |
+|---|---|---|---|
+| A5 | A page's rotation matrices built once per page object (`pages._matrices`) | 151.0 s to 127.0 s, with A6 and C19 | |
+| A6 | One text page for a crop's text layer and its blocks (the same flags) | | |
+| C19 | A request's body built only when it's sent (`Request.raw`, on first use) | | |
+| E9 | `@slow` on `RecordedJudging` and `UnderTheNull`. `test_fixtures`' recordings left as they are: 4.8 s of a 7.5 s test is commits, which C2 removes | | |
+| E6 | The boundary test walks subpackages (`vendor/`, `eval/rounds`) | | |
+| E18 | `stubs.needs_lab()`: product tests building input with the lab's generators skip without it (13 tests) | | |
+| C14 | `recipes.py`: `Recipe`, its shared slots read by name (role, region, content, task, label), `RECIPES` and `recipe_fields` moved there; stored recipes and fixture labels unchanged | | |
+| Small copies | Locators by lines share `InLines.bbox`; `Judgment` and `Explanation` share `DropsUnknown`; schemas unchanged. `_filled`, `_joined` and `_plain` wait for `tablegrid.py` (architecture item 6), their owner | | |
+
 **Status, 2026-10-09:** every finding in *Bugs and risks* is fixed. The [remediation plan](../plans/review-bugs-2026-10-09.md)'s six items are done.
 
 **Still open** (the behaviour-preserving phase, as the owner ordered on 2026-10-09; nothing below has been started):

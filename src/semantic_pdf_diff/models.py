@@ -104,7 +104,14 @@ class PdfLocator(Strict):
     region: Literal["text", "table", "tile", "figure", "overview"]
     task: str
 
-class TextLocator(Strict):
+class InLines:
+    """A locator by lines (text, decks, workbooks, CSV): `bbox` is its lines as a box, (0, first, 1, last + 1), so
+    sections and the task core place text in lines as PDF in points (code review 2026-10-08: four copies)."""
+    @property
+    def bbox(self):
+        return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
+
+class TextLocator(InLines, Strict):
     """Where a claim sits within a text file (.txt, .md): its page (a form feed starts one) and its lines, counted
     from 1 through the file; never a path."""
     format: Literal["text"] = "text"
@@ -112,11 +119,6 @@ class TextLocator(Strict):
     lines: tuple[int, int]
     region: Literal["text", "table"]
     task: str
-
-    @property
-    def bbox(self):
-        """Its lines as a box, (0, first, 1, last + 1): sections and the task core place text in lines as PDF in points."""
-        return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
 
 class DocxLocator(Strict):
     """Where a claim sits within a Word document: its paragraphs (a table row counts as one), counted from 1 through
@@ -134,7 +136,7 @@ class DocxLocator(Strict):
         return (0.0, float(self.paragraphs[0]), 1.0, float(self.paragraphs[1] + 1))
 
 # Each format has its locator shape, told apart by `format`.
-class PptxLocator(Strict):
+class PptxLocator(InLines, Strict):
     """Where a claim sits within a slide deck: its slide (page) and its lines (each shape's paragraph, table row and
     speaker notes paragraph, counted from 1 through the deck); never a path. A claim read from a picture is at the
     picture's line, in the region of the picture it was read from, with its crop (pictures.py)."""
@@ -144,12 +146,7 @@ class PptxLocator(Strict):
     region: Literal["text", "table", "tile", "figure", "overview"]
     task: str
 
-    @property
-    def bbox(self):
-        """Its lines as a box, (0, first, 1, last + 1), as TextLocator's."""
-        return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
-
-class XlsxLocator(Strict):
+class XlsxLocator(InLines, Strict):
     """Where a claim sits within a workbook: its sheet (by number, page, and by name) and its cells ("B5:D5"; "chart"
     or "picture" for what a sheet's drawing holds), and its lines (each region's row or cell, counted from 1 through
     the workbook); never a path."""
@@ -161,12 +158,7 @@ class XlsxLocator(Strict):
     region: Literal["text", "table", "tile", "figure", "overview"]
     task: str
 
-    @property
-    def bbox(self):
-        """Its lines as a box, (0, first, 1, last + 1), as TextLocator's."""
-        return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
-
-class CsvLocator(Strict):
+class CsvLocator(InLines, Strict):
     """Where a claim sits within a CSV file: the file's lines (a quoted field may span several) and fields (counted
     from 1) its cells came from, and its lines in the reader's own count; never a path."""
     format: Literal["csv"] = "csv"
@@ -176,11 +168,6 @@ class CsvLocator(Strict):
     lines: tuple[int, int]
     region: Literal["text", "table", "tile", "figure", "overview"]
     task: str
-
-    @property
-    def bbox(self):
-        """Its lines as a box, (0, first, 1, last + 1), as TextLocator's."""
-        return (0.0, float(self.lines[0]), 1.0, float(self.lines[1] + 1))
 
 Locator = Annotated[PdfLocator | TextLocator | DocxLocator | PptxLocator | XlsxLocator | CsvLocator,
                     Field(discriminator="format")]
@@ -352,34 +339,30 @@ class Interpreter(Strict):
     settings: dict
     versions: dict[str, str]
 
-class Judgment(Strict):
+# A comparison's answers: unknown keys dropped, everything else checked strictly (unlike Lenient's tidying). No
+# docstring: a model's docstring is its schema's description, which a json_schema request sends.
+class DropsUnknown(Strict):
+    @model_validator(mode="before")
+    @classmethod
+    def drop_unknown(cls, data):
+        if isinstance(data, dict):
+            return {k: v for k, v in data.items() if k in cls.model_fields}
+        return data
+
+class Judgment(DropsUnknown):
     relation: Literal["equivalent", "different", "complementary", "unrelated", "uncertain"]
     rationale: str = Field(min_length=1, max_length=800)
     confidence: float = Field(ge=0, le=1)
     same_conditions: bool
 
-    @model_validator(mode="before")
-    @classmethod
-    def drop_unknown(cls, data):
-        if isinstance(data, dict):
-            return {k: v for k, v in data.items() if k in cls.model_fields}
-        return data
-
 # Why two claims of a revisions finding differ (compare.explain): value changes, editorial changes, not changes.
 DIFFERENCE_KINDS = ("changed", "conditions", "renamed", "moved", "restated", "split_or_merge", "misread",
                     "not_same_item", "unclear")
 
-class Explanation(Strict):
+class Explanation(DropsUnknown):
     kind: Literal[DIFFERENCE_KINDS]  # the one list (a tuple in Literal is its members)
     rationale: str = Field(min_length=1, max_length=800)
     confidence: float = Field(ge=0, le=1)
-
-    @model_validator(mode="before")
-    @classmethod
-    def drop_unknown(cls, data):
-        if isinstance(data, dict):
-            return {k: v for k, v in data.items() if k in cls.model_fields}
-        return data
 
 class RateRule(Strict):
     """A throughput ceiling, applying on the given days and hours (local time).

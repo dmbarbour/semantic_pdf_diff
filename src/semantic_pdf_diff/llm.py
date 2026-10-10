@@ -15,8 +15,11 @@ from datetime import datetime, timezone
 from http.client import HTTPException  # a connection dropped mid-answer (IncompleteRead); not an OSError
 from pathlib import Path
 from contextlib import contextmanager
+from collections.abc import Callable
 from dataclasses import dataclass
+from functools import cached_property
 from .models import Settings
+from .recipes import Recipe, recipe_fields
 from .throttle import AdaptiveGate, RateLimiter
 from .progress import log, requests_log
 
@@ -170,19 +173,6 @@ def query_hash(prompt, image_hashes, params):
     canonical = {"system": SYSTEM, "user": prompt, "images": list(image_hashes), "params": params}
     return hashlib.sha256(json.dumps(canonical, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
-# A recipe (the caller's key tuple: how the pipeline built a query; labels only, never how answers are found) is
-# read by position; these name the positions, by role. What follows the named ones is the role's extras.
-RECIPES = {"extract": ("region", "content", "task", "text", "crop", "heading"),
-           "triage": ("kind", "content", "id", "inputs"),
-           "compare": ("mode", "settings", "a", "b")}
-
-def recipe_fields(parts):
-    """{role, its named fields, extras} of a recipe."""
-    parts = list(parts or ())
-    role = parts[0] if parts else ""
-    names = RECIPES.get(role, ())
-    return {"role": role, **dict(zip(names, parts[1:])), "extras": parts[1 + len(names):]}
-
 def describe(prompt, image_sizes, params, key=None):
     """Facts about a query's own content, for fixture summaries: nothing the model didn't see."""
     fields = recipe_fields(key)
@@ -192,8 +182,8 @@ def describe(prompt, image_sizes, params, key=None):
 
 @dataclass
 class Request:
-    raw: bytes
-    key: tuple | None          # the caller's recipe: how the query was built (role, region, content, task, ...); labels only
+    body: Callable[[], bytes]  # the body as sent, built on first use (raw)
+    key: Recipe | None         # the caller's recipe: how the query was built (role, region, content, task, ...); labels only
     schema: type
     estimate: int  # tokens, input plus output reserve, for rate limiting
     prompt: str = ""
@@ -202,6 +192,10 @@ class Request:
     unrecorded: bool = False   # replay found no answer: send fails without calling the model
     query: str = ""            # the query's hash (query_hash): the name answers are recorded and cached under
     description: dict | None = None  # facts about the query's content (describe)
+
+    @cached_property
+    def raw(self):
+        return self.body()
 
 def evaluator_settings(model, base=None, **runtime):
     """Settings for a judge, checker or analyst. What shapes its queries is fixed (`base`, by default
@@ -262,32 +256,32 @@ def build_request(s, prompt, schema, images=(), key=None):
     estimate = len((SYSTEM + prompt).encode()) + len(images) * s.image_tokens + 128
     if estimate + s.output_tokens + s.safety_tokens > s.context_tokens:
         raise BudgetExceeded(f"Request exceeds configured context budget ({estimate} estimated input tokens)")
-    content = [{"type": "text", "text": prompt}]
-    hashes, sizes = [], []
-    for path in images:
-        raw_image = Path(path).read_bytes()
-        hashes.append(hashlib.sha256(raw_image).hexdigest())
-        sizes.append(len(raw_image))
-        data = base64.b64encode(raw_image).decode()
-        content.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + data}})
-    body = {"model": s.model, "messages": [
-        {"role": "system", "content": SYSTEM}, {"role": "user", "content": content}],
-        s.max_token_field: s.output_tokens}
-    body["temperature"] = TEMPERATURE
+    raw_images = [Path(path).read_bytes() for path in images]
+    hashes = [hashlib.sha256(raw_image).hexdigest() for raw_image in raw_images]
+    params = {s.max_token_field: s.output_tokens, "temperature": TEMPERATURE}
     if s.seed is not None:
-        body["seed"] = s.seed
+        params["seed"] = s.seed
     if s.response_format == "json_object":
-        body["response_format"] = {"type": "json_object"}
+        params["response_format"] = {"type": "json_object"}
     elif s.response_format == "json_schema":
-        body["response_format"] = {"type": "json_schema", "json_schema": {
+        params["response_format"] = {"type": "json_schema", "json_schema": {
             "name": schema.__name__, "schema": schema.model_json_schema()}}
-    params = {k: v for k, v in body.items() if k not in ("model", "messages")}
     query = query_hash(prompt, hashes, params)
-    if s.stream:
-        body.update(stream=True, stream_options={"include_usage": True})
-    raw = json.dumps(body).encode()
-    return Request(raw, key, schema, estimate + s.output_tokens, prompt, tuple(hashes),
-                   query=query, description=describe(prompt, sizes, params, key))
+    model, stream = s.model, s.stream
+    key = Recipe(key) if key is not None else None
+
+    def body():  # built only when sent: a replayed answer never needs it (code review 2026-10-08, C19)
+        content = [{"type": "text", "text": prompt}]
+        for raw_image in raw_images:
+            data = base64.b64encode(raw_image).decode()
+            content.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + data}})
+        sent = {"model": model, "messages": [
+            {"role": "system", "content": SYSTEM}, {"role": "user", "content": content}], **params}
+        if stream:
+            sent.update(stream=True, stream_options={"include_usage": True})
+        return json.dumps(sent).encode()
+    return Request(body, key, schema, estimate + s.output_tokens, prompt, tuple(hashes),
+                   query=query, description=describe(prompt, [len(r) for r in raw_images], params, key))
 
 class Transport:
     """Sending requests to the endpoint: retries, rate limits and adaptive concurrency, streamed answers, usage and
@@ -347,7 +341,7 @@ class Transport:
                     with self.lock:  # every attempt is paid for, including ones retried after a bad answer
                         self.cost += float(request.usage.get("estimated_cost") or 0.0)
                         if self.ledger is not None:  # without a cost too: marked unpriced, not left out
-                            self.ledger.add(self.s.model, request.key[0] if request.key else "raw", request.usage)
+                            self.ledger.add(self.s.model, request.key.role if request.key else "raw", request.usage)
                         if "estimated_cost" not in request.usage:
                             self.unpriced += 1
                             if self.s.max_cost is not None and not self.warned_cost:
@@ -375,7 +369,7 @@ class Transport:
                 if not isinstance(answer, str) or not answer.strip():
                     raise ValueError("Response has no text content")
                 requests_log.debug("%s %s: ok in %.2fs (%s tokens)", request.schema.__name__,
-                                   request.key[:2] + request.key[3:4] if request.key else "", time.monotonic() - started,
+                                   request.key.label if request.key else "", time.monotonic() - started,
                                    reported or "?")
                 try:
                     return request.schema.model_validate_json(json_text(answer))
@@ -383,7 +377,7 @@ class Transport:
                     raise Invalid(f"{type(e).__name__}: {e}") from e
             except urllib.error.HTTPError as e:
                 requests_log.debug("%s %s: HTTP %s after %.2fs", request.schema.__name__,
-                                   request.key[:2] + request.key[3:4] if request.key else "", e.code, time.monotonic() - started)
+                                   request.key.label if request.key else "", e.code, time.monotonic() - started)
                 last = f"HTTP {e.code}: {e.reason}"
                 try:
                     body = e.read(2000).decode(errors="replace").lower()
@@ -529,7 +523,7 @@ class Client:
         """Call the model through the transport (thread-safe; touches neither the cache nor the store)."""
         if request.unrecorded:
             raise NotRecorded(f"No recorded answer from {self.responder} for "
-                              f"{request.key[:2] + request.key[3:4] if request.key else request.query}")
+                              f"{request.key.label if request.key else request.query}")
         return self.transport.send(request)
 
     def _cache_key(self, request):
@@ -551,6 +545,6 @@ class Client:
     def _save(self, request, value):
         if self.store is None:
             return
-        key = request.key or ("raw", "")
-        content = key[2] if key[0] in ("extract", "triage") else ""
-        self.store.cache(self._cache_key(request), key[0], key[1], request.query, value.model_dump_json(), content)
+        key = request.key or Recipe(("raw", ""))
+        self.store.cache(self._cache_key(request), key.role, key.region, request.query, value.model_dump_json(),
+                         key.content)

@@ -76,7 +76,7 @@ class Structure(unittest.TestCase):
     """A request's layout has one owner per role (code review 2026-10-01, A1): readers don't split at markers."""
     def test_every_extraction_prompt_reads_back_into_its_parts(self):
         from semantic_pdf_diff.extract import ExtractQuery
-        from semantic_pdf_diff.llm import RECIPES, recipe_fields
+        from semantic_pdf_diff.recipes import RECIPES, recipe_fields
         for name, (settings, sheet) in PROFILES.items():
             with self.subTest(profile=name):
                 sent, logged = requests(settings, sheet, logged=True)

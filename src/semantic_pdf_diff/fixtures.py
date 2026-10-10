@@ -26,6 +26,7 @@ import sqlite3
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
+from .recipes import Recipe
 
 SCHEMA_VERSION = 4  # 2: failures recorded; 3: response.used; 4: keyed by the query's hash (see above)
 # Each folder evaluated by models (a round's batch, a spot check, a review batch) keeps the answers
@@ -79,13 +80,9 @@ class FixtureError(RuntimeError):
 
 def recipe_labels(parts):
     """(recipe hash, role, region, content, task) from a recipe (the caller's key tuple)."""
-    parts = list(parts)
-    role = str(parts[0]) if parts else ""
-    region = str(parts[1]) if len(parts) > 1 else ""
-    content = str(parts[2]) if role in ("extract", "triage") and len(parts) > 2 else ""
-    task = str(parts[3]) if len(parts) > 3 else ""
-    digest = hashlib.sha256(json.dumps(parts, default=str).encode()).hexdigest()[:16]
-    return digest, role, region, content, task
+    recipe = Recipe(parts)
+    digest = hashlib.sha256(json.dumps(list(recipe), default=str).encode()).hexdigest()[:16]
+    return digest, str(recipe.role), str(recipe.region), str(recipe.content), str(recipe.task)
 
 class Fixture:
     """An open fixture database: storage only (the replay policy is Replayer's). Used from the main thread only.
@@ -250,7 +247,8 @@ class Replayer:
 
     def sample(self, key):
         """Which answer to a query this run wants: 0, or 1 for the A/A control's fresh regions."""
-        return 1 if key and key[0] == "extract" and key[1] in self.fresh_regions else 0
+        recipe = Recipe(key or ())
+        return 1 if recipe.role == "extract" and recipe.region in self.fresh_regions else 0
 
     def lookup(self, query, key, parse):
         """("answer", parse(recorded)), ("failure", its error), ("ask", None) to ask the model, or ("unrecorded",

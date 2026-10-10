@@ -154,7 +154,7 @@ class Requests:
 
     def __init__(self, store):
         self.index = {}
-        from semantic_pdf_diff.llm import recipe_fields
+        from semantic_pdf_diff.recipes import recipe_fields
         for q in store.queries():
             r = recipe_fields(q["recipe"])
             if r["role"] == "extract":
