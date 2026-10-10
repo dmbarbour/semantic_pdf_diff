@@ -1,6 +1,6 @@
 # Remediating the review's larger bugs
 
-- **Status:** Active (2026-10-09). The order is agreed. Items 1–4 (the review's) are done; the trials' two bugs joined as items 5 and 6 (the owner, 2026-10-09). Items 5 and 6 are done (2026-10-09).
+- **Status:** Completed (2026-10-10), with the review it came from. The owner, 2026-10-10: "Yes, let's close the review." Items 1–6 done 2026-10-09; the behaviour-preserving phase (*After the bugs*) and the bugs *Found along the way* done 2026-10-10. Decisions and leftovers: see the [plans index](README.md)'s row.
 - **The owner, 2026-10-09:** "We'll focus on bugfixes, then architecture, then new features, except in cases where a bugfix would be much easier after an architecture fix (if you recommend them). To explain this order: I'm not fond of mixing bugfixes (behavior modifying) with architecture updates (behavior preserving), nor of trying to preserve known bugs. For the larger bugs, please develop a remediation plan."
 - **From:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), "Still open". Its small fixes are done; its "Fixes so far" section lists them.
 - **Then:** the behaviour-preserving phase: performance with requests byte-identical, then the architecture moves (see [After the bugs](#after-the-bugs)).

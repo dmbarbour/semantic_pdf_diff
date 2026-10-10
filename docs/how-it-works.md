@@ -106,6 +106,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `office.py` | What Word, PowerPoint and Excel files share: their package, the XML namespaces, EMUs, list numbers |
 | `asking.py` | The exchange the table queries hold with the model: ask, check, ask again once, review until kept or capped |
 | `tablerules.py` | A table read by rules a model writes for it: the column analysis and our opinion it's shown, the rules applied to every row and checked, the summary templates |
+| `keyvalue.py` | A block of two columns proposed as a key-value list, the model asked to confirm, its rows read as "key: value" lines |
 | `tablestructure.py` | A PDF table's lines grouped into rows by rules a model writes where the heuristics leave suspects: the signals, the rules applied and checked against rows copied from the image |
 | `chartxml.py` | Charts stored as chart XML (Word's and PowerPoint's): their cached series as tables, values in their number formats |
 | `pictures.py` | A Word document's pictures as pages, read with a PDF figure's image tasks and context |
@@ -131,6 +132,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `pages.py` | Page coordinates as displayed and as stored |
 | `regions.py`, `values.py` | Region names and crop names; numbers, dates, lengths and units as printed |
 | `fixtures.py` | Replay fixtures: recorded answers, the replay policy |
+| `recipes.py` | How each query was built (role, region, content, task, label), kept for diagnostics, never for lookup |
 | `ledger.py` | Cost ledger and measured figures |
 | `html_pages.py` | What every generated page shares: escaping, embedded data, the palette |
 | `lab/` (`semantic_pdf_diff_lab`) | The lab, its own distribution: `eval/` (rounds, judges, rubrics, review panels, spot checks, query checks, post-mortems) and `bench/` (controlled documents, eye and page tests) |

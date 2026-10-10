@@ -1,6 +1,6 @@
 # 0023. Every table is read by rules a model writes for it, per document
 
-- **Status:** Accepted (2026-10-04 to 2026-10-07)
+- **Status:** Accepted (2026-10-04 to 2026-10-07; amended 2026-10-09 and 2026-10-10)
 - **Source:** [one table model](../plans/one-table-model-2026-09-30.md) (its decisions of 2026-09-30); [multi-format adapters](../plans/multi-format-adapters-2026-09-23.md), "Excel, in detail" (decision 1), its progress and open question 1
 
 ## Context
@@ -20,6 +20,12 @@ Table rows were sent to the model one at a time with their header: one query per
 - **Rules are asked per document, never shared between revisions.** The owner (2026-10-05): "I think we cannot effectively identify the 'same table' between revisions in the general case. Each document's claims are processed in any order, and there may be more than two revisions. Trying to avoid vague conditions, and tracing/reporting how a table was read, might be useful."
 - **How a table was read is traced** in each claim's derivation, and a finding between claims whose tables were read differently is flagged.
 - **Every format's tables take this path:** Excel, CSV, Word, PowerPoint and PDF (PDF's structure: [0024](0024-pdf-table-structure.md)).
+- **A row read by itself is read as the grid the rules saw holds it** (amended 2026-10-09; the [2026-10-08 review](../reviews/code-review-2026-10-08.md), B2): wrapped lines joined, a one-cell row holding a number proposed as a note, confirmed by the rules query and read by itself.
+- **A block of two columns may be a key-value list** (amended 2026-10-09 and 2026-10-10; the review's B5): a form's or data sheet's "Pump | P-2", "Flow | 95 L/s", not a table headed by its first pair.
+  - **Our heuristic proposes:** two columns, the left one holding no number or date, the header not marked as one.
+  - **The model confirms** (`keyvalue.py`), with the table's crop where there is one (PDF). The owner (2026-10-09): "you should still be asking a model (likely vision) to confirm the proposed 'rule' for reading a table."
+  - Confirmed, its rows are read as "key: value" lines; else it's a table, as before.
+  - Asked of sheets, CSV, Word, PDF and, since 2026-10-10, decks.
 
 ## Consequences
 

@@ -1,6 +1,7 @@
 # Code review: architecture, separation of concerns, simplification, complexity
 
 - **Date:** 2026-10-08
+- **Status:** Closed 2026-10-10 (the owner: "Yes, let's close the review."). Every finding is fixed, done or moved; see [Closed](#closed).
 - **Asked by:** the owner. "I think it's time for a big code review. This review should focus on architecture, separation of concerns, refactoring and simplification opportunities, code quality and discovery of messy or complex code. Download some python tools to make measurements, e.g. complexity metrics, where appropriate. Of course, any bugs or performance concerns, etc. discovered should also be opportunistically captured in the review findings."
 - **Scope:**
   - the product: `src/semantic_pdf_diff` (12,450 lines in 42 modules, the vendored metafile renderer left out)
@@ -331,3 +332,28 @@ The owner, 2026-10-08: "before working on these, we'll focus on the architecture
 - **Simplification:** none left. (Done: C14, the models' copies, the table helpers' three copies, the small copies, the seven long functions named; D10 found not to be duplication.)
 - **Not in this phase:** A20, a lever with the features (the owner's answer, above). Of the two bugs found under the remediation plan (its *Found along the way*), decks' two-column tables are checked since 2026-10-10, and a section row under a PDF table's header stays a row (pdf/10).
 
+## Closed
+
+Closed 2026-10-10. The owner: "Yes, let's close the review."
+
+- **Bugs:** every finding in *Bugs and risks* fixed, each with a test; the bug plan's two found along the way fixed too (decks' key-value tables, pptx/8; a section row under a PDF table's header, pdf/10).
+- **Performance, tests, architecture, simplification:** done as the tables above say, each step proven by replay.
+- **Behaviour changes found on the way:** `--plan` dropped (C7); the saved comparison holds what the report marks (D8).
+- **Decisions recorded:**
+  - [0025](../decisions/0025-commits-wait-on-the-disk-only-for-peoples-changes.md): commits wait on the disk only for people's changes
+  - [0026](../decisions/0026-plan-estimates-dropped.md): `--plan` dropped
+  - [0027](../decisions/0027-behaviour-changes-apart-from-refactors.md): behaviour changes kept apart from refactors, refactors proven by replay
+  - [0028](../decisions/0028-modules-layered-without-import-cycles.md): the modules layered without import cycles, one module per concept
+  - amendments to [0023](../decisions/0023-tables-read-by-rules-a-model-writes.md) (rows read from the grid, key-value lists) and [0024](../decisions/0024-pdf-table-structure.md) (the section row)
+- **Lasting docs:** how to prove a refactor, in [samples and testing](../samples-and-testing.md#proving-a-refactor-changes-nothing); the new modules in the [code map](../how-it-works.md#code-map).
+- **Moved, not dropped:**
+  - **Levers, in the [lever index](levers.md):** A20 (skip table detection on drawing sheets), the three-way alignment (D2), refinement's least share of a half.
+  - **To *Code health* (Tentative) in the [plans index](../plans/README.md):**
+    - the lab's scripts reduced to argument parsing
+    - the client's remaining jobs
+    - one office writer
+    - the refinement bench's store reads
+    - the long functions not named here
+    - a committed refactor check
+    - the 2026-10-01 review's items 14 and 15
+  - **To *Dry runs* (Tentative):** estimates before a run.
