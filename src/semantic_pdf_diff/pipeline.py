@@ -19,6 +19,7 @@ from .readings import reconcile
 from .report import write_report
 from .scan import ARCHIVES, Limits, read_origin
 from .situate import quality, situate
+from .binding import bind
 from .store import Store, StoreError
 
 def limits(settings):
@@ -126,18 +127,18 @@ def run(options, settings, store, names, out, force_rescan=False):
     interpreter = extraction_interpreter(settings)
     triage = triage_interpreter(settings) if settings.situate else None
     if options.dry_run:
-        would = {'extract': store.bind(interpreter, reset=True, dry_run=True)}
+        would = {'extract': bind(store, interpreter, reset=True, dry_run=True)}
         if triage:
-            would['triage'] = store.bind(triage, reset=True, dry_run=True)
+            would['triage'] = bind(store, triage, reset=True, dry_run=True)
         print(json.dumps({'would_clear': would}, indent=2))
         return 0
     check_fixture(options)
     # Check both before clearing either, so a rejected run changes nothing.
     for role in filter(None, (interpreter, triage)):
         if not options.reset:
-            store.bind(role, dry_run=True)
+            bind(store, role, dry_run=True)
     for role in filter(None, (interpreter, triage)):
-        cleared = store.bind(role, reset=options.reset)
+        cleared = bind(store, role, reset=options.reset)
         if cleared.get("automatic"):
             log.info(f"Changed settings that only post-process answers ({'; '.join(cleared['automatic'])}): what they "
                      f"affect is recomputed from cached answers")

@@ -222,7 +222,7 @@ class Binding(unittest.TestCase):
     """Levers were bound only when they differed from the defaults of the day, so a moved default went
     unnoticed and old evidence was served as current (code review 2026-10-01, item 4)."""
     def test_every_resolved_setting_and_the_order_are_bound(self):
-        from semantic_pdf_diff.store import affected_regions, interpreter_differences
+        from semantic_pdf_diff.binding import affected_regions, interpreter_differences
         bound = extraction_interpreter(Settings()).settings
         self.assertEqual(bound["context_before"], 400)  # at its default, still bound
         # extraction's: matching's merge and comparison's levers aren't

@@ -180,14 +180,14 @@ class Declarations(unittest.TestCase):
         self.assertEqual({k for k in bound if SETTING_CLASSES[k] == "endpoint"}, {"model"})  # the model answers
 
     def test_scopes_and_marks(self):
-        from semantic_pdf_diff import levers, store
+        from semantic_pdf_diff import binding, levers
         from semantic_pdf_diff import settings as settings_module
-        self.assertFalse({k for k in store.SETTING_REGIONS if SETTING_CLASSES[k] == "endpoint"})
+        self.assertFalse({k for k in binding.SETTING_REGIONS if SETTING_CLASSES[k] == "endpoint"})
         # a bound lever setting without a scope clears every region when changed: only the instructions should,
         # and the row dedupe (it can drop rows from any task's text)
         from semantic_pdf_diff.levers import declared
         unscoped = {n for n in levers.lever_settings() if "extract" in declared(Settings, n).roles
-                    and n not in store.SETTING_REGIONS}  # (regions are extraction's)
+                    and n not in binding.SETTING_REGIONS}  # (regions are extraction's)
         self.assertEqual(unscoped, {"extract_prompt", "extract_rules", "dedupe_repeated"})
         for name, _ in settings_module.LEVER_MARKS:  # each mark is its lever's own setting, or the headings
             self.assertTrue(name == "section" or any(name in c.model_fields and name in c.marks

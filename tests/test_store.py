@@ -14,7 +14,8 @@ from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.schema import Claim, Extraction, Judgment, PdfLocator, Evidence
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
-from semantic_pdf_diff.store import InterpreterMismatch, Store, StoreError, StoreInUse
+from semantic_pdf_diff.binding import InterpreterMismatch, bind
+from semantic_pdf_diff.store import Store, StoreError, StoreInUse
 from stubs import chat_answer, request_body, serving, situating_answer, source_data, text_pdf
 
 EMPTY = {'claims': [], 'complete': True, 'issues': []}
@@ -117,7 +118,7 @@ class StoreBasics(unittest.TestCase):
 class Binding(unittest.TestCase):
     def seeded(self, d):
         store = Store(d)
-        store.bind(extraction_interpreter(Settings()))
+        bind(store, extraction_interpreter(Settings()))
         store.db.execute("INSERT INTO content (id, size) VALUES (?, 1)", ('sha256:' + 'a' * 64 + '.pdf',))
         for task, region in [('text:0.0', 'text'), ('tile:0', 'tile'), ('overview', 'overview')]:
             store.record_task({'content': 'sha256:' + 'a' * 64 + '.pdf', 'task': task, 'status': 'complete'},
@@ -129,42 +130,42 @@ class Binding(unittest.TestCase):
 
     def test_same_interpreter_binds_quietly(self):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
-            self.assertEqual(store.bind(extraction_interpreter(Settings())), {})
+            self.assertEqual(bind(store, extraction_interpreter(Settings())), {})
 
     def test_changed_interpreter_is_rejected_with_explanation(self):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
             with self.assertRaises(InterpreterMismatch) as caught:
-                store.bind(extraction_interpreter(Settings(tile_points=500)))
+                bind(store, extraction_interpreter(Settings(tile_points=500)))
             self.assertIn('settings.tile_points', caught.exception.differences)
             self.assertIn('--reset', str(caught.exception))
             self.assertEqual(self.count(store, 'evidence'), 3)
 
     def test_dry_run_changes_nothing(self):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
-            preview = store.bind(extraction_interpreter(Settings(tile_points=500)), reset=True, dry_run=True)
+            preview = bind(store, extraction_interpreter(Settings(tile_points=500)), reset=True, dry_run=True)
             self.assertEqual((preview['tasks'], preview['evidence']), (2, 2))
             self.assertEqual(self.count(store, 'evidence'), 3)
             with self.assertRaises(InterpreterMismatch):
-                store.bind(extraction_interpreter(Settings(tile_points=500)))
+                bind(store, extraction_interpreter(Settings(tile_points=500)))
 
     def test_reset_is_selective(self):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
-            store.bind(extraction_interpreter(Settings(tile_points=500)), reset=True)
+            bind(store, extraction_interpreter(Settings(tile_points=500)), reset=True)
             regions = {r for (r,) in store.db.execute('SELECT region FROM evidence')}
             self.assertEqual(regions, {'text'})
-            self.assertEqual(store.bind(extraction_interpreter(Settings(tile_points=500))), {})
-            store.bind(extraction_interpreter(Settings(tile_points=500, model='other-model')), reset=True)
+            self.assertEqual(bind(store, extraction_interpreter(Settings(tile_points=500))), {})
+            bind(store, extraction_interpreter(Settings(tile_points=500, model='other-model')), reset=True)
             self.assertEqual(self.count(store, 'evidence'), 0)
 
     def test_saved_comparisons_outlive_a_free_rebind_not_a_reset(self):
         # code review 2026-10-08, C24: a rebind nobody was asked about deleted them silently
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
             store.save_comparison('2026-10-08T00:00:00', {'note': 'kept'})
-            cleared = store.bind(extraction_interpreter(Settings(quote_match='exact')))  # post-processing only
+            cleared = bind(store, extraction_interpreter(Settings(quote_match='exact')))  # post-processing only
             self.assertTrue(cleared.get('automatic'))
             self.assertNotIn('comparisons', cleared)
             self.assertEqual(self.count(store, 'comparison'), 1)
-            cleared = store.bind(extraction_interpreter(Settings(quote_match='exact', tile_points=500)), reset=True)
+            cleared = bind(store, extraction_interpreter(Settings(quote_match='exact', tile_points=500)), reset=True)
             self.assertEqual((cleared['comparisons'], self.count(store, 'comparison')), (1, 0))
 
 class ContentAddressedCache(unittest.TestCase):
@@ -190,11 +191,11 @@ class ContentAddressedCache(unittest.TestCase):
 
     def test_a_reset_keeps_cached_answers(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(d) as store:
-            store.bind(extraction_interpreter(Settings()))
+            bind(store, extraction_interpreter(Settings()))
             client = Client(Settings(base_url=url, retries=0), store)
             key = ('extract', 'tile', 'sha256:x.pdf', 'tile:p1:0', 'input-hash', None)
             client.ask('a tile', Extraction, key=key)
-            store.bind(extraction_interpreter(Settings(tile_points=500)), reset=True)
+            bind(store, extraction_interpreter(Settings(tile_points=500)), reset=True)
             client.ask('a tile', Extraction, key=key)
             self.assertEqual(state['requests'], 1)  # unchanged queries aren't paid for again
 

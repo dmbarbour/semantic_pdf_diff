@@ -9,6 +9,7 @@ from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.schema import Claim, Evidence, Extraction, PdfLocator, Source, claim_id, merge_occurrences
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
+from semantic_pdf_diff.binding import bind
 from semantic_pdf_diff.store import Store
 
 CID = 'sha256:' + 'c' * 64 + '.pdf'
@@ -95,8 +96,8 @@ class Extraction_(unittest.TestCase):
             for row, found in recorded:  # replaying every task changes nothing
                 store.record_task(row, found)
             self.assertEqual([e.model_dump() for e in store.evidence(cid)], [e.model_dump() for e in evidence])
-            store.bind(extraction_interpreter(Settings(tile_points=300)))
-            store.bind(extraction_interpreter(Settings(tile_points=200)), reset=True)  # clears visual sightings only
+            bind(store, extraction_interpreter(Settings(tile_points=300)))
+            bind(store, extraction_interpreter(Settings(tile_points=200)), reset=True)  # clears visual sightings only
             (kept,) = store.evidence(cid)
             self.assertEqual(kept.id, evidence[0].id)
             self.assertEqual({o.locator.region for o in kept.occurrences}, {'text'})

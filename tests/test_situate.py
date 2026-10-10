@@ -16,7 +16,8 @@ from semantic_pdf_diff.progress import NoProgress
 from semantic_pdf_diff.provenance import triage_interpreter
 from semantic_pdf_diff.figures import CAPTION, find_figures, targets
 from semantic_pdf_diff.situate import figure_map, grounding, quality, situate, values_in
-from semantic_pdf_diff.store import InterpreterMismatch, Store
+from semantic_pdf_diff.binding import InterpreterMismatch, bind
+from semantic_pdf_diff.store import Store
 import stubs
 from stubs import situating_answer
 
@@ -403,10 +404,10 @@ class Storage(unittest.TestCase):
                 evidence_before = store.db.execute('SELECT COUNT(*) FROM task').fetchone()[0]
                 changed = triage_interpreter(Settings()).model_copy(update={'prompt_hash': 'different'})
                 with self.assertRaises(InterpreterMismatch):
-                    store.bind(changed)
-                preview = store.bind(changed, reset=True, dry_run=True)
+                    bind(store, changed)
+                preview = bind(store, changed, reset=True, dry_run=True)
                 self.assertEqual(preview['situated_content'], 2)
-                store.bind(changed, reset=True)
+                bind(store, changed, reset=True)
                 self.assertEqual(store.db.execute('SELECT COUNT(*) FROM situation').fetchone()[0], 0)
                 self.assertEqual(store.db.execute('SELECT COUNT(*) FROM task').fetchone()[0], evidence_before)
                 self.assertTrue(all(s.about == '' for (c,) in store.db.execute('SELECT DISTINCT content FROM section')

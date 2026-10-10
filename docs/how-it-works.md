@@ -113,7 +113,8 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `throttle.py` | Rate limits with time-of-day rules; adaptive concurrency |
 | `dispatch.py` | Worker threads for model requests; everything else stays on the main thread |
 | `progress.py` | Progress bars, heartbeats and logging |
-| `store.py` | SQLite evidence store: binding, per-task records, the response cache keyed by query and model, the reader version each content item was read with, comparisons |
+| `store.py` | SQLite evidence store: per-task records, the response cache keyed by query and model, the reader version each content item was read with, comparisons |
+| `binding.py` | A store's binding to its interpreters: what differs, whether going ahead can cost a model call, what it clears, the refusal that says so |
 | `cli.py` | Commands: arguments into settings and run options, planning, exit semantics; the lab's commands by entry point |
 | `pipeline.py` | A run: bind the store, scan, extract, situate, compare, report |
 | `levers.py` | Settings' declarations, levers as mixins on the platform, configurations |

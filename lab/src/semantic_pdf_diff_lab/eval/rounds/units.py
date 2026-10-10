@@ -161,9 +161,10 @@ def split_units(base, var, limit=MAX_CLAIMS, rotation=None):
 
 def lever_scope(baseline_dir, variant_dir, unit="family"):
     """The kinds of unit the settings that differ between two runs' folders can change (from
-    store.SETTING_REGIONS), or None when none differ (an A/A control, a code change) or a folder
+    binding.SETTING_REGIONS), or None when none differ (an A/A control, a code change) or a folder
     has no settings.json."""
-    from semantic_pdf_diff.store import ALL_REGIONS, SETTING_REGIONS
+    from semantic_pdf_diff.binding import SETTING_REGIONS
+    from semantic_pdf_diff.levers import ALL_REGIONS
     paths = [Path(d) / "settings.json" for d in (baseline_dir, variant_dir)]
     if not all(p.exists() for p in paths):
         return None
