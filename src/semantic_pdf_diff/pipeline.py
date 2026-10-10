@@ -16,7 +16,7 @@ from .schema import EvidenceDocument, Report, Situation, Source, coverage_row
 from .progress import Progress, log
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
 from .readings import reconcile
-from .report import write_report
+from .report import traced, write_report
 from .scan import ARCHIVES, Limits, read_origin
 from .situate import quality, situate
 from .binding import bind
@@ -222,6 +222,7 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
         usage={'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage, **fixture_usage(client)},
         limitations=LIMITATIONS).model_dump()
+    data = traced(data)
     store.save_comparison(data['created_at'], data)
     write_report(data, out, assets=store.folder / 'assets')
     incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right

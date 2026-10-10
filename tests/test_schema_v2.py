@@ -117,6 +117,24 @@ class CliTests(unittest.TestCase):
             code = main([str(a), str(b), '--out', str(root / 'out'), '--no-vision'], client=client)
         return code, client
 
+    def test_the_saved_comparison_holds_what_the_report_marks(self):
+        """Findings between tables read differently are marked before the comparison is saved, so the store keeps
+        what the report shows (code review 2026-10-08, D8)."""
+        from unittest.mock import patch
+        from semantic_pdf_diff.store import Store
+        marked = {'a': 'its row read by itself', 'b': 'by rules a model wrote for its table (value {B})'}
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            a = make_pdf(root / 'a.pdf'); b = make_pdf(root / 'b.pdf', 'Pump rated power 10 kW, design load')
+            with patch('semantic_pdf_diff.report.tables_read', lambda x, y: marked):
+                self.run_cli(root, a, b)
+            report = json.loads((root / 'out/report.json').read_text())
+            with Store.open(root / 'out') as store:
+                saved = store.comparison()
+            self.assertTrue(report['findings'])
+            self.assertEqual([f.get('tables_read') for f in saved['findings']], [marked] * len(report['findings']))
+            self.assertEqual(saved['findings'], report['findings'])
+
     def test_same_content_is_extracted_once_and_never_compared(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

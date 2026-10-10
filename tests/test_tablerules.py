@@ -234,6 +234,23 @@ class Traced(unittest.TestCase):
         self.assertIsNone(tables_read(row, row))
         self.assertIsNone(tables_read(row, text))
 
+    def test_the_report_is_traced_before_it_is_saved(self):
+        """traced marks a copy: a finding between tables read differently gains tables_read, a stale mark goes,
+        and the document given is left as it was (code review 2026-10-08, D8)."""
+        import copy
+        from semantic_pdf_diff.report import traced
+        row = {"id": "a", "derivation": [{"step": "xlsx-table"}, {"step": "model-extraction"}]}
+        rules = {"id": "b", "derivation": [{"step": "xlsx-table"}, {"step": "table-rules", "detail": "value {B}"}]}
+        text = {"id": "c", "derivation": [{"step": "xlsx-cells"}, {"step": "model-extraction"}]}
+        data = {"evidence": [row, rules, text], "findings": [{"a": "a", "b": "b", "relation": "different"},
+                                                             {"a": "a", "b": "c", "tables_read": {"a": "stale"}}]}
+        before = copy.deepcopy(data)
+        findings = traced(data)["findings"]
+        self.assertEqual(findings[0], {"a": "a", "b": "b", "relation": "different", "tables_read": {
+            "a": "its row read by itself", "b": "by rules a model wrote for its table (value {B})"}})
+        self.assertEqual(findings[1], {"a": "a", "b": "c"})
+        self.assertEqual(data, before)
+
 
 
 class PdfTables(unittest.TestCase):

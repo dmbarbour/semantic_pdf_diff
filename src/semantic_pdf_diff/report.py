@@ -31,6 +31,18 @@ def tables_read(a, b):
         return None
     return {"a": read_as(ha), "b": read_as(hb)}
 
+def traced(data):
+    """The report document with each finding between claims whose tables were read differently marked (tables_read),
+    settled before the comparison is saved, so the store keeps what the report shows (code review 2026-10-08, D8:
+    write_report marked them after the save)."""
+    evidence = {e["id"]: e for e in data["evidence"]}
+    findings = []
+    for f in data["findings"]:
+        differ = tables_read(evidence[f["a"]], evidence[f["b"]]) if f["a"] in evidence and f["b"] in evidence else None
+        kept = {k: v for k, v in f.items() if k != "tables_read"}
+        findings.append({**kept, "tables_read": differ} if differ else kept)
+    return {**data, "findings": findings}
+
 def write_report(data, output, assets=None):
     """Write report.json and report.html; assets is the folder holding rendered crops
     (default: output/assets), linked relative to the report."""
@@ -39,12 +51,6 @@ def write_report(data, output, assets=None):
     prefix = os.path.relpath(Path(assets), output).replace(os.sep, "/") + "/" if assets else "assets/"
     link = lambda image: prefix + image.split("/", 1)[1] if image.startswith("assets/") else image
     evidence = {e["id"]:e for e in data["evidence"]}
-    for f in data["findings"]:  # traced: findings between claims whose tables were read differently
-        differ = tables_read(evidence[f["a"]], evidence[f["b"]]) if f["a"] in evidence and f["b"] in evidence else None
-        if differ:
-            f["tables_read"] = differ
-        else:
-            f.pop("tables_read", None)
     (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     occurrences = {}
     for f in data["files"]:
