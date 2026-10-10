@@ -176,9 +176,11 @@ def run(options, settings, store, names, out, force_rescan=False):
         log.info(f"Comparing {len(left)} × {len(right)} extracted claims via retrieval")
         progress = Progress('compare', client, heartbeat=settings.heartbeat_seconds)
         headings = {(c, x.id): " > ".join(x.heading_path) for c, items in sections.items() for x in items}
-        data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings)
+        comparing = comparison_interpreter(settings)
+        data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
+                       label=provenance.text_hash(comparing.model_dump_json()))
         progress.close()
-        interpreters['compare'] = comparison_interpreter(settings).model_dump()
+        interpreters['compare'] = comparing.model_dump()
         data = Report(**data, created_at=provenance.now().isoformat(),
             sources=source_data, files=file_data, interpreters=interpreters, scan_issues=scan_issues,
             file_difference=file_difference(files[names[0]], files[names[1]]),

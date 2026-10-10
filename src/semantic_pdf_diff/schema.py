@@ -357,7 +357,7 @@ class Judgment(DropsUnknown):
     confidence: float = Field(ge=0, le=1)
     same_conditions: bool
 
-# Why two claims of a revisions finding differ (compare.explain): value changes, editorial changes, not changes.
+# Why two claims of a revisions finding differ (explain.py): value changes, editorial changes, not changes.
 DIFFERENCE_KINDS = ("changed", "conditions", "renamed", "moved", "restated", "split_or_merge", "misread",
                     "not_same_item", "unclear")
 

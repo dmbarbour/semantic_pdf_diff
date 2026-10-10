@@ -444,7 +444,7 @@ class VerifyVisuals(Lever):
 class ExplainDifferences(Lever):
     lever_name, stage, off = "explain_differences", "comparison", {"explain_differences": False}
     # revisions: ask why each "different" or "uncertain" finding differs (a change, a renaming, not the same item...),
-    # with the claims' items around them (compare.explain; docs/plans/revision-comparison-2026-10-02.md, milestone 4)
+    # with the claims' items around them (explain.py; docs/plans/revision-comparison-2026-10-02.md, milestone 4)
     explain_differences: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def explains(self, mode):
@@ -590,8 +590,8 @@ class Platform(Composable):
     @chosen
     def candidates(self, left, right):
         """Pairs worth comparing, [(i, j, score)]: the platform's are a sparse TF-IDF bidirectional top-k union
-        (compare.candidates); another retrieval (BM25, a reranker) would be a lever choosing otherwise."""
-        from .compare import candidates
+        (retrieval.candidates); another retrieval (BM25, a reranker) would be a lever choosing otherwise."""
+        from .retrieval import candidates
         return candidates(left, right, self)
 
     @chosen
@@ -609,7 +609,7 @@ class Platform(Composable):
     @chosen
     def explains(self, mode):
         """Whether each "different" or "uncertain" finding is explained by a second call, which names the kind of
-        difference (compare.explain): the platform's, never; the explain_differences lever's, in revisions mode."""
+        difference (explain.py): the platform's, never; the explain_differences lever's, in revisions mode."""
         return False
 
     # --- matching: how answers are checked and kept

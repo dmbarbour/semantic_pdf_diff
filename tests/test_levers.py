@@ -206,7 +206,7 @@ class Marks(unittest.TestCase):
 
 class Comparison(unittest.TestCase):
     def test_retrieval_is_the_platforms_and_images_are_a_lever(self):
-        from semantic_pdf_diff.compare import candidates
+        from semantic_pdf_diff.retrieval import candidates
         from semantic_pdf_diff.schema import Evidence, PdfLocator
         ev = lambda i, v: Evidence(id=i, content="sha256:" + "a" * 64 + ".pdf", entity="pump", attribute="power",
                                    value=v, unit="kW", kind="table", quote=v, confidence=0.9, image="assets/x.png",

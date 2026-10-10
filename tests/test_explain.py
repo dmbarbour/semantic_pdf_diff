@@ -1,4 +1,4 @@
-"""Explaining differences (compare.explain; docs/plans/revision-comparison-2026-10-02.md, milestone 4): in revisions
+"""Explaining differences (explain.py; docs/plans/revision-comparison-2026-10-02.md, milestone 4): in revisions
 mode each "different" or "uncertain" finding gets a second call naming its kind, shown its claims' items and where the
 other revision still states each value."""
 import stubs  # noqa: F401 (a clean environment)
@@ -10,7 +10,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from test_pipeline import Fake, ev  # noqa: E402
 
-from semantic_pdf_diff.compare import Revisions, compare, explanation_prompt  # noqa: E402
+from semantic_pdf_diff.explain import Revisions, explanation_prompt  # noqa: E402
+from semantic_pdf_diff.compare import compare
 from semantic_pdf_diff.llm import ModelFailure  # noqa: E402
 from semantic_pdf_diff.schema import Explanation  # noqa: E402
 from semantic_pdf_diff.settings import Settings

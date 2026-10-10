@@ -142,7 +142,7 @@ pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{col
     page = html_page('Semantic PDF comparison', page, style)
     (output/'report.html').write_text(page,encoding='utf-8')
 
-# A difference's kind (compare.explain): its name, and what it means, in the order the report lists them.
+# A difference's kind (explain.py): its name, and what it means, in the order the report lists them.
 KINDS = {"changed": ("Changed", "The same item and property under the same conditions; its value was revised"),
          "conditions": ("Conditions changed", "The same item and property; the conditions or scope it's stated for changed"),
          "renamed": ("Renamed", "The same item and value under a new name, tag or number"),

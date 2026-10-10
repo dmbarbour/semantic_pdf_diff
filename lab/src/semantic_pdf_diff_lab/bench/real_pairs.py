@@ -9,7 +9,7 @@ aligned by difflib; a block found in both is unchanged text.
   uncertain) and no claim without a counterpart touches is a possible miss.
 - References aren't numbers that matter here: bracketed citations ("[RFC9001]") and section numbers ("Section 7.2")
   are left out of the comparison of a block's numbers.
-- Explained findings (compare.explain) are counted by kind and by where their claims sit: a value change named in
+- Explained findings (explain.py) are counted by kind and by where their claims sit: a value change named in
   unchanged text is suspect, as a "different" finding there is.
 - **Pictures** (a Word document's): a picture whose bytes differ from its counterpart's (the picture with the same
   caption, else in the same place among the pictures), or that has none, is changed text at its paragraph; one alike

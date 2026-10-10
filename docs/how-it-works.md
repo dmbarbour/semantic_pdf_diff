@@ -104,7 +104,9 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `chartxml.py` | Charts stored as chart XML (Word's and PowerPoint's): their cached series as tables, values in their number formats |
 | `pictures.py` | A Word document's pictures as pages, read with a PDF figure's image tasks and context |
 | `metafiles.py` | EMF, EMF+ and WMF pictures drawn into PDF pages (vector, text as text), from the vendored `vendor/metafile_render` |
-| `compare.py` | Retrieval, local reasoning, numeric checks, and (revisions) explaining differences |
+| `compare.py` | Each candidate pair judged with its reasoning restricted to the pair, numeric checks and vetoes, revisions aligned first; file differences |
+| `retrieval.py` | The candidate pairs a comparison judges, by shared words and values |
+| `explain.py` | The explain stage of a revisions comparison: the kind of each difference, shown its claims' items |
 | `align.py` | Revisions mode: items matched across revisions before judging; equal values settled |
 | `report.py` | Escaped HTML and JSON reports |
 | `provenance.py` | Content IDs, extension normalization, interpreter descriptions |

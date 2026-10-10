@@ -13,7 +13,7 @@ fact is then classed by what the report says of it:
 Every "different" and "equivalent" finding is classed too: a change, no change, a misreading (a claim bound to its
 fact but read wrong), across facts (two facts' claims paired), or unscored (a claim bound to no fact).
 
-**Kinds** (compare.explain, revisions mode): an explained finding's kind is scored against what its claims are, per
+**Kinds** (explain.py, revisions mode): an explained finding's kind is scored against what its claims are, per
 the keys (EXPECTED): a changed value "changed", a conditions change "conditions", the same fact unchanged an
 editorial kind (renamed, moved, restated), two facts' claims "not_same_item" (or "split_or_merge", the old item's and
 a new one's of a split), a misreading "misread". The kinds named as value changes are also checked: of the
