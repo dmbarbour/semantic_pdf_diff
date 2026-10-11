@@ -265,18 +265,10 @@ class Tiling(Lever):
     # pages up to this many tiles wide get bands; past 1.6, a band is lower, keeping its area (segmentation.band_height)
     band_width: Annotated[float, _selecting(VISUAL)] = Field(default=1.6, ge=1.0, le=6.0)
 
-    def tiles(self, reader, page):
-        """On a report-sized page, full-width bands cut at whitespace gaps, skipping bands with no graphics that count
-        (text tasks already cover them); otherwise the platform's tiles."""
-        side = self.tile_points
-        if self.tiling != "bands" or page.rect.width > self.band_width * side:
-            return super().tiles(reader, page)
-        from .segmentation import band_height, bands
-        graphics = self.content_graphics(reader, page)
-        return [(f"tile:{i}", r, "") for i, r in enumerate(
-            b for b in bands(page, band_height(page.rect.width, side), lines=reader.lines(page),
-                             graphics=reader.graphics(page))
-            if any(b.intersects(g) for g in graphics))]
+    def tiling_of(self, reader, page):
+        """Bands on a report-sized page (bands skip those no graphic that counts touches: text tasks cover them)."""
+        how = super().tiling_of(reader, page)
+        return "bands" if self.tiling == "bands" and page.rect.width <= self.band_width * self.tile_points else how
 
 class TileCut(Lever):
     lever_name, stage, off = "tile_cut", "segmentation", {"tile_cut": "grid"}
@@ -284,16 +276,9 @@ class TileCut(Lever):
     # overlapping only where they cross something), xycut (blocks found by whitespace both ways, merged into tiles)
     tile_cut: Annotated[Literal["grid", "snapped", "xycut"], _selecting(VISUAL)] = "grid"
 
-    def cut_page(self, reader, page, rect):
-        if self.tile_cut == "grid":
-            return super().cut_page(reader, page, rect)
-        from .segmentation import BAND_AREA, STRIP_REACH, snapped, xy_cut
-        lines, graphics = reader.lines(page), self.content_graphics(reader, page)
-        if self.tile_cut == "snapped":
-            return snapped(rect, self.tile_points, lines, graphics)
-        # longer blocks where they're rendered by their area, as detailed as today's widest band
-        reach = STRIP_REACH if getattr(self, "render_area", False) else BAND_AREA
-        return xy_cut(rect, self.tile_points, lines, graphics, most=reach)
+    def tiling_of(self, reader, page):
+        how = super().tiling_of(reader, page)
+        return self.tile_cut if how == "grid" else how
 
 class GrowTiles(Lever):
     lever_name, stage, off = "grow_tiles", "segmentation", {"grow_tiles": False}
@@ -749,17 +734,41 @@ class Platform(Composable):
             parts += [(self.grow(reader, page, r, rect), note) for r in pieces]
         return [(f"tile:{i}", r, note) for i, (r, note) in enumerate(parts) if not r.is_empty]
 
-    @chosen
     def tiles(self, reader, page):
-        """A page's tiles, [(tag, Rect, note)]: the page cut (cut_page), each tile grown."""
-        return [(f"tile:{i}", self.grow(reader, page, r, page.rect), "")
-                for i, r in enumerate(self.cut_page(reader, page, page.rect))]
+        """A page's tiles, [(tag, Rect, note)]: cut as tiling_of names (tiles_for)."""
+        return self.tiles_for(reader, page, self.tiling_of(reader, page))
 
     @chained
-    def cut_page(self, reader, page, rect):
-        """[Rect]: an area cut into tiles; the platform's cut is an overlapping grid."""
-        from .segmentation import tiles
-        return list(tiles(rect, self.tile_points))
+    def tiling_of(self, reader, page):
+        """How a page not divided into viewports is cut, by name (cut_named): the platform's is the grid."""
+        return "grid"
+
+    def tiles_for(self, reader, page, how):
+        """[(tag, Rect, note)]: a page's tiles cut as `how` names. Bands no graphic that counts touches are skipped;
+        the other cuts' tiles are each grown."""
+        cut = self.cut_named(reader, page, how)
+        if how == "bands":
+            graphics = self.content_graphics(reader, page)
+            kept = [b for b in cut if any(b.intersects(g) for g in graphics)]
+            return [(f"tile:{i}", r, "") for i, r in enumerate(kept)]
+        return [(f"tile:{i}", self.grow(reader, page, r, page.rect), "") for i, r in enumerate(cut)]
+
+    def cut_named(self, reader, page, how):
+        """[Rect]: the page cut, before any tile is grown or skipped. bands: full width, at whitespace gaps
+        (segmentation.bands); grid: evenly, overlapping; snapped: the grid's cuts moved to whitespace, overlapping only
+        where they cross something; xycut: blocks found by whitespace both ways, merged into tiles."""
+        from .segmentation import BAND_AREA, STRIP_REACH, band_height, bands, snapped, tiles, xy_cut
+        side, lines = self.tile_points, reader.lines(page)
+        if how == "bands":
+            return bands(page, band_height(page.rect.width, side), lines=lines, graphics=reader.graphics(page))
+        if how == "grid":
+            return list(tiles(page.rect, side))
+        graphics = self.content_graphics(reader, page)
+        if how == "snapped":
+            return snapped(page.rect, side, lines, graphics)
+        # longer blocks where they're rendered by their area, as detailed as today's widest band
+        reach = STRIP_REACH if getattr(self, "render_area", False) else BAND_AREA
+        return xy_cut(page.rect, side, lines, graphics, most=reach)
 
     @chained
     def content_graphics(self, reader, page):
