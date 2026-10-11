@@ -1,6 +1,6 @@
 # Tile selection for vision tasks
 
-- **Status:** Active (2026-10-10). Written; the design questions at the end wait for the owner. The owner, 2026-10-10: "Alright, please begin developing the plan."
+- **Status:** Active (2026-10-10). Written, and its design questions answered the same day (see [the end](#design-questions-answered-2026-10-10)). The owner, 2026-10-10: "Alright, please begin developing the plan."
 - **The owner, 2026-10-08:** "We probably need a whole plan just to improve tile selection and find/create examples that lead to such perverse outcomes." Then, 2026-10-09: "I'm tempted to push on tile selection a bit".
 - **The model choosing, the owner, 2026-10-10:** "send the vision model itself a small version of the image, perhaps one to three small sketches of heuristic tile selection (the most promising), and asking which tiling is the best, e.g. with labeled translucent overlays. The model cannot easily read the shrunk down page, but can probably identify areas of interest from a zoomed out view. We can also measure the quality of those answers by injecting some known-bad tiling test cases." Then: "one shrunk-down image without tiling, plus one per candidate with that candidate's tiling. We could also include a calibration step that tests if a model is any good at this sort of question, tuned with known-bad cuts and pseudo-random candidate ordering. Your variant seems useful, too, but could include a mixed or nonsense option for classifying bad tiles."
 - **From:** the [trials review](../reviews/trials-2026-10-08.md), finding 5, and what the [bug plan](review-bugs-2026-10-09.md)'s item 6 left open.
@@ -10,7 +10,8 @@
 - **In:** which parts of a page are sent to the vision model, in what shapes, and how much they overlap. That is the first cut: tiles, bands, which tiles are kept. Also refinement's open questions: the second cut, made when a tile's answer is partial.
 - **Out, with their own rows in the plans index:**
   - **How small text may get:** tile size and render size from a model's eye-test profile (*Vision profiles and adaptive slicing*). This plan keeps `tile_points` 420 and decides where the cuts go.
-  - **Close-ups a model asks for while reading** (*Progressive disclosure*). Here the model only chooses among tilings, or labels regions, before reading.
+  - **Close-ups a model asks for while reading** (*Progressive disclosure*). Here the model chooses among tilings, labels regions, or asks for another of the candidate tilings; it never draws its own boxes.
+  - **Tiles the model draws itself.** The owner, 2026-10-10: "Eventually, maybe, but that would require some difficult measurement and calibration so I wouldn't be confident in the quality."
   - **Figure detection and the table reader's regions.** They're inputs here: a figure split by a tile is a measure, and figure tasks stay as they are.
 - **Formats:** PDF pages and images. Word and deck pictures go through the same page code (`pictures.py`), so they follow.
 
@@ -123,6 +124,7 @@ The owner's step, built before either model query below is trusted.
   - each position's share of choices against its expected share (position bias)
   - the same choice in both orders
   - for labelling (milestone 6), a confusion matrix by label: the known-bad tiles' "nonsense" and "mixed" above all
+  - for extraction of a known-bad tile, whether the answer asks for another tiling (milestone 7)
 - **The result is a profile per model,** like the eye test's. A model under its threshold doesn't get the levers below. The threshold is set by judgement first.
 - **Reused by *Model discovery and per-task selection*** as a probe.
 - **Cost:** about 1,300 input tokens per question (four images at about 260 tokens each, and the prompt), about $0.0002 with gemma-4. 400 cases in two orders cost about $0.16.
@@ -131,9 +133,10 @@ The owner's step, built before either model query below is trusted.
 
 The owner's idea, as a lever.
 
-- **Candidates:** the best one to three heuristic tilings by milestone 1's measures.
-  - No question when one candidate is at least as good on every measure (design question 1).
-  - A known-bad candidate is never sent outside calibration.
+- **When** (the owner, 2026-10-10: "I'd suggest two options. First, heuristics determine the best tiling is ambiguous. Second, models could feasibly request an alternative tiling as a refinement option."):
+  - **Before reading, where the heuristics can't tell:** milestone 1's measures leave no candidate at least as good as the others on every measure, or the best are within a margin. Most report pages won't be asked.
+  - **After reading, as a refinement option:** see milestone 7.
+- **Candidates:** the best one to three heuristic tilings by milestone 1's measures. A known-bad candidate is never sent outside calibration.
 - **The question:** one shrunk image of the page without tiles, then one per candidate with its tiles outlined and labelled.
   - Labels sit in the margin or at a tile's corner, and the prompt says they aren't part of the page (the page tests' lesson).
   - Candidate order is pseudo-random, as in calibration.
@@ -158,12 +161,14 @@ Claude's variant, with the owner's addition: a mixed and a nonsense label.
   - decoration
   - blank
   - mixed: several of these
-  - nonsense: fragments that make no sense on their own, such as cut lines or part of a figure
+  - nonsense: the owner, 2026-10-10: "A tiling that does not make sense, e.g. cut lines or part of a figure."
+  - other: the owner: "another distinct label for items of interest that aren't in the expected type list", with a few words naming what it is
 - **What follows by rule:**
   - text: skipped, since the text tasks read it
   - decoration and blank: skipped
   - nonsense: the tile is re-cut, or joined to its neighbour
   - mixed: kept, or cut along the parts
+  - other: kept, its words noted with the tile; the words are collected across the samples, as candidates for new labels
   - the rest: kept
 - **One answer serves every candidate tiling, and refinement.** The labels and the measures are checked against each other where the measures can see (text only, blank).
 - **A lever of its own,** measured against milestone 5's choice and the heuristic best, with milestone 4's calibration covering it.
@@ -171,6 +176,15 @@ Claude's variant, with the owner's addition: a mixed and a nonsense label.
 ### 7. Refinement's open questions
 
 Each is a lever, measured with the forced-refinement bench on the gallery's pages and the knobs:
+
+- **Another tiling as a refinement option** (the owner, 2026-10-10, above).
+  - A tile's answer that marks itself partial may ask for its halves, as now, or for the page under another tiling. The other tiling is the next candidate, or milestone 5's question among the rest.
+  - **Claims from both tilings are kept.** The owner: "It isn't necessarily a problem to combine claims from two different tilings of the same page." The same claim from both is one piece of evidence with two occurrences already ([how it works](../how-it-works.md)).
+  - **Measured:**
+    - claims both tilings found, and those only one found
+    - different values for one entity and attribute
+    - how often the model asks
+  - **The page tests' warning:** prompted only to zoom "as needed", neither model did, because a model doesn't know what it can't read. So calibration includes extraction of known-bad tiles, scored on whether the answer asks for another tiling.
 
 - **A refined chart or drawing kept whole, zoomed into, or cut.** With the image budget fixed, kept whole means one more look at the same size, with a note of what was missed.
 - **The least share of a half** (`LEAST_HALF`, 25%): the owner, 2026-10-09: "a tuning lever ... start with 25%".
@@ -197,8 +211,8 @@ Each is a lever, measured with the forced-refinement bench on the gallery's page
 - What the measures found, in *how it works*.
 - Leftovers moved to rows, as usual.
 
-## Design questions for the owner
+## Design questions, answered 2026-10-10
 
-1. **When the model chooses** (milestone 5). Recommended: only where the heuristic candidates differ on the measures, which saves a question on most report pages. Otherwise it's every page with more than one tile.
-2. **The model proposing its own tiles** (boxes, as in the page tests). Recommended: not in this plan. Choosing and labelling are easier to check, and boxes belong to *Progressive disclosure*.
-3. **"Nonsense"** as I've read it: a tile whose content makes no sense on its own, such as cut lines or part of a figure. Is that the meaning, or did you mean the model's escape when none of the labels fit?
+1. **When the model chooses.** The owner: "I'd suggest two options. First, heuristics determine the best tiling is ambiguous. Second, models could feasibly request an alternative tiling as a refinement option. It isn't necessarily a problem to combine claims from two different tilings of the same page." Milestones 5 and 7.
+2. **The model proposing its own tiles.** The owner: "Eventually, maybe, but that would require some difficult measurement and calibration so I wouldn't be confident in the quality." Out of this plan (see Scope).
+3. **"Nonsense".** The owner: "A tiling that does not make sense, e.g. cut lines or part of a figure. We could have another distinct label for items of interest that aren't in the expected type list, though." Milestone 6, with an "other" label.
