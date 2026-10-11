@@ -107,6 +107,23 @@ class Gallery(unittest.TestCase):
         picked = gallery.pick(rows)["lines_cut_sideways"]
         self.assertEqual([(r["file"], r["page"]) for r in picked], [("a.pdf", 2), ("b.pdf", 1)])
 
+    def test_a_rotated_page_is_drawn_as_displayed(self):
+        from semantic_pdf_diff.pages import shown
+        from semantic_pdf_diff_lab.bench import gallery
+        doc = pymupdf.open()
+        page = doc.new_page(width=400, height=600)
+        page.draw_rect(pymupdf.Rect(20, 20, 120, 60), fill=(0, 0, 0), color=None)
+        page.set_rotation(90)
+        box = shown(page, pymupdf.Rect(20, 20, 120, 60))  # where the block is displayed, as the tiles' coordinates are
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "page.png"
+            gallery.draw(page, [], path, side=600)
+            pix = pymupdf.Pixmap(str(path))
+        self.assertEqual((pix.width, pix.height), (600, 400))
+        dark = lambda x, y: pix.pixel(int(x), int(y))[0] < 60
+        self.assertTrue(dark((box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2))
+        self.assertFalse(dark(70, 40))  # where the unrotated page would put it
+
     def test_a_gallery_draws_each_page_under_each_configuration(self):
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff_lab.bench import gallery, tiling

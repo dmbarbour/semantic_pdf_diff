@@ -69,9 +69,11 @@ def pick(rows, failures=FAILURES):
 def draw(page, regions, path, side=SIDE):
     """The page as displayed with its tiles outlined and numbered and its figure tasks dashed, as a PNG."""
     rect = page.rect
+    zoom = side / max(rect.width, rect.height)
     with pymupdf.open() as out:
         sheet = out.new_page(width=rect.width, height=rect.height)
-        sheet.show_pdf_page(sheet.rect, page.parent, page.number)
+        # the page as rendered (its /Rotate applied, as the tiles' coordinates are); show_pdf_page draws it unrotated
+        sheet.insert_image(sheet.rect, pixmap=page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False))
         width = max(1.0, max(rect.width, rect.height) / side * 2.5)
         tiles = [(tag, r) for tag, r, _ in regions if tag.startswith("tile")]
         for i, (tag, r) in enumerate(tiles):
@@ -86,7 +88,6 @@ def draw(page, regions, path, side=SIDE):
         for tag, r, _ in regions:
             if tag.startswith("figure"):
                 sheet.draw_rect(r, color=(0.1, 0.1, 0.1), width=width, dashes=f"[{3 * width}] 0")
-        zoom = side / max(rect.width, rect.height)
         sheet.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False).save(str(path))
 
 SHOWN = ("tiles", "lines_cut_sideways", "lines_cut_across", "words_cut", "text_only", "lines_read_twice", "overlap",

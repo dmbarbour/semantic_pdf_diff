@@ -156,7 +156,7 @@
   - Counts favour large pages, so slides and landscape pages are also ranked by lines cut per line, among pages up to 1,000 points wide.
   - "Lines cut across" is ranked on band pages only, where it's a separate failure.
 - **Seen by eye in the gallery:**
-  - **Drawing sheets drawn sideways without a rotation** (`sd15-stevens` p118): the text runs vertically, and grid tiles cut every line of it. The model is shown sideways text. A new candidate (milestone 3): a tile turned upright where its text runs vertically.
+  - ~~**Drawing sheets drawn sideways without a rotation** (`sd15-stevens` p118).~~ **Withdrawn (2026-10-11):** the gallery's mistake, not the page's. The sheet is rotated by `/Rotate` 90, and the product reads and renders it upright; the gallery drew pages unrotated (`show_pdf_page`), under tiles in displayed coordinates. Fixed: the gallery draws the page as rendered. Grid tiles do cut that sheet's lines, as on other sheets.
   - **Band pages cut lines across in dense tables.** A table with no gap between rows (HabEx's target list, p403) makes a band fall back to an overlapping cut. The band's edge runs through a row, and five rows are read twice. The table reader reads those tables anyway.
   - **A landscape schedule chart** (the 2013 rules, p44): a figure task reads it whole, and six grid tiles overlapping 2.3 times read 952 lines twice besides.
   - **Slides:** six tiles on a 960 × 540 slide cut its headings and pictures. The template's banner and footer bar count as graphics.
@@ -206,7 +206,7 @@ Each is a lever, measured first by milestone 1's measures and the gallery, then 
 - **Text-only tiles skipped on every page,** as bands already are.
 - **Bands on wide pages** whose bands fit the image budget (the eye tests: gemma-4 reads 4:1 bands 1.3 × finer rendered at 1584 × 384 than at 1000 × 250), instead of the grid.
 - **Cuts by columns as well as rows** (XY-cut): blocks found by whitespace both ways, merged into tiles of up to the tile size.
-- **A tile turned upright where its text runs vertically** (found in milestone 2's gallery: drawing sheets drawn sideways without a rotation).
+- ~~**A tile turned upright where its text runs vertically.**~~ **Withdrawn (2026-10-11):** its cause was the gallery's mistake (milestone 2). Of 5,063 sample pages, 12 have 30% or more of their text running vertically as displayed, all mixed with horizontal text (schedule charts, vertical table headings). Kept as an idea in the [lever index](../reviews/levers.md).
 - **Less overlap on grids:**
   - Overlap kept only where a cut crosses content.
   - Growing a tile limited where its neighbour already holds the line.
