@@ -130,7 +130,7 @@
   - **Grid pages almost always cut lines:** 800 of the 867 grid pages cut at least one line sideways.
   - **Decks drawn on a template have no text-only tiles:** NASA's 4:3 decks and DOE's hydrogen deck, 0 of 1,274 tiles. Their backgrounds count as graphics, which is cause 4 on slides.
   - **One poster has no text layer** (`poster-sic`, dev): it's read by vision alone.
-  - **Posters are the densest:** 40 to 96 tiles each, and up to 1,089 lines read twice on one poster.
+  - **Posters are the densest:** 35 to 110 tiles each, and up to 1,089 lines read twice on one poster. One poster printed at landscape Letter (`poster-multisorb`) takes 6 tiles, so its text is tiny.
 - **Not found:** pages slightly wider than Letter (680 to 712 points), as the jury sheets are. They're rare in published documents, so the controlled knob covers them.
 - **Development keeps the existing samples' grid pages** (the 2013 Solar Decathlon drawings, 589 pages) beside `dev/`.
 
