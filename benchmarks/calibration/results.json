@@ -1,0 +1,172 @@
+{
+ "models": {
+  "google/gemma-4-31B-it": {
+   "outlined": {
+    "questions": 371,
+    "answered": 371,
+    "asked": 742,
+    "invalid": 0,
+    "good_chosen": 0.902,
+    "same_in_both_orders": 0.868,
+    "good_in_both_orders": 0.836,
+    "by_kind": {
+     "border": {
+      "asked": 284,
+      "good_chosen": 0.965,
+      "this_chosen": 0.004,
+      "fault_named": 0.968
+     },
+     "decoration": {
+      "asked": 10,
+      "good_chosen": 1.0,
+      "this_chosen": 0.0,
+      "fault_named": 1.0
+     },
+     "figure split": {
+      "asked": 214,
+      "good_chosen": 0.911,
+      "this_chosen": 0.014,
+      "fault_named": 0.57
+     },
+     "grid": {
+      "asked": 278,
+      "good_chosen": 0.932,
+      "this_chosen": 0.0,
+      "fault_named": 0.924
+     },
+     "midline": {
+      "asked": 282,
+      "good_chosen": 0.904,
+      "this_chosen": 0.035,
+      "fault_named": 0.709
+     },
+     "missing": {
+      "asked": 270,
+      "good_chosen": 0.789,
+      "this_chosen": 0.204,
+      "fault_named": 0.585
+     },
+     "overlap": {
+      "asked": 84,
+      "good_chosen": 0.905,
+      "this_chosen": 0.048,
+      "fault_named": 0.012
+     },
+     "shifted": {
+      "asked": 62,
+      "good_chosen": 0.903,
+      "this_chosen": 0.0,
+      "fault_named": 0.935
+     }
+    },
+    "good_faulted": 0.121,
+    "good_faults": {
+     "cuts text": 10,
+     "decoration or blank": 71,
+     "misses content": 1,
+     "repeats text": 4,
+     "splits a figure": 6
+    },
+    "passes": true,
+    "positions": {
+     "3": {
+      "asked": 742,
+      "chosen": [
+       0.329,
+       0.357,
+       0.314
+      ],
+      "good_at": [
+       0.333,
+       0.345,
+       0.322
+      ]
+     }
+    }
+   },
+   "dimmed": {
+    "questions": 371,
+    "answered": 371,
+    "asked": 742,
+    "invalid": 0,
+    "good_chosen": 0.951,
+    "same_in_both_orders": 0.914,
+    "good_in_both_orders": 0.908,
+    "by_kind": {
+     "border": {
+      "asked": 284,
+      "good_chosen": 0.975,
+      "this_chosen": 0.018,
+      "fault_named": 0.972
+     },
+     "decoration": {
+      "asked": 10,
+      "good_chosen": 1.0,
+      "this_chosen": 0.0,
+      "fault_named": 1.0
+     },
+     "figure split": {
+      "asked": 214,
+      "good_chosen": 0.963,
+      "this_chosen": 0.014,
+      "fault_named": 0.523
+     },
+     "grid": {
+      "asked": 278,
+      "good_chosen": 0.932,
+      "this_chosen": 0.0,
+      "fault_named": 0.924
+     },
+     "midline": {
+      "asked": 282,
+      "good_chosen": 0.947,
+      "this_chosen": 0.035,
+      "fault_named": 0.716
+     },
+     "missing": {
+      "asked": 270,
+      "good_chosen": 0.944,
+      "this_chosen": 0.044,
+      "fault_named": 0.693
+     },
+     "overlap": {
+      "asked": 84,
+      "good_chosen": 0.94,
+      "this_chosen": 0.06,
+      "fault_named": 0.012
+     },
+     "shifted": {
+      "asked": 62,
+      "good_chosen": 0.952,
+      "this_chosen": 0.016,
+      "fault_named": 0.935
+     }
+    },
+    "good_faulted": 0.061,
+    "good_faults": {
+     "cuts text": 2,
+     "decoration or blank": 38,
+     "misses content": 3,
+     "repeats text": 1,
+     "splits a figure": 2
+    },
+    "passes": true,
+    "positions": {
+     "3": {
+      "asked": 742,
+      "chosen": [
+       0.348,
+       0.346,
+       0.306
+      ],
+      "good_at": [
+       0.333,
+       0.345,
+       0.322
+      ]
+     }
+    }
+   }
+  }
+ }
+}

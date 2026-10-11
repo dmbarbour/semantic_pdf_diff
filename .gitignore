@@ -12,6 +12,8 @@ benchmarks/**/replay.sqlite
 benchmarks/controlled/fixture.sqlite
 benchmarks/report.html
 benchmarks/eyetest/images/
+benchmarks/calibration/images/
+benchmarks/calibration/report.html
 # Working data stays local (the owner, 2026-10-03): rounds, spot checks, review batches and the page tests are
 # recorded in docs (docs/research/rounds.md); the spend ledgers and the rounds' history feed the budget caps
 benchmarks/rounds/

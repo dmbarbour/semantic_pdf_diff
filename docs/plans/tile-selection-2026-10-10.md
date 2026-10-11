@@ -306,6 +306,71 @@ Each is a lever, measured first by milestone 1's measures and the gallery, then 
 
 The owner's step, built before either model query below is trusted.
 
+**Done for the choice (2026-10-11).** The owner: "Please proceed." The labelling and extraction scores come with milestones 6 and 7, whose questions they test. Spent $0.460 with the model.
+- **Built:**
+  - **The question** (`tilechoice.py`, in the product for milestone 5; no lever asks it yet):
+    - one shrunk page, then one sketch per candidate: tiles outlined, washed and numbered beside their corner, and "Tiling A" in a strip above the page
+    - the prompt says the marks aren't part of the page, and gives no example answer
+    - the answer: the best letter, and each candidate's problems from a closed list: cuts text, splits a figure, misses content, decoration or blank, repeats text
+  - **The cases** (`bench/calibration.py`), from the controlled corpus:
+    - **Known-good:** XY-cut over the text and the graphics other than decoration, each detected figure kept as one block. It's accepted only where the measures find no line or word cut, every line and figure held whole, no graphic missed, and no tile of decoration or blank space alone.
+    - **Known-good found:** 126 of 146 pages. None on the scans or the plan sheets, whose figure is larger than a tile.
+    - **Known-bad, each kept only where the measures find its fault:**
+
+      | Kind | What it is | Pages |
+      |---|---|---|
+      | midline | refinement's old cut | 126 |
+      | grid | the plain grid | 126 |
+      | shifted | edges between rows moved into a line | 31 |
+      | decoration | a tile of decoration alone | 4 |
+      | border | a tile of margin alone | 126 |
+      | figure split | a figure cut through its middle | 93 |
+      | missing | the tile holding most graphics or lines dropped | 123 |
+      | overlap | tiles grown into their neighbours, cutting nothing, so lines are read twice | 38 |
+
+      Overlap was added for the "repeats text" problem, which no listed case tested.
+    - **Questions:** each pairs the known-good with two bad kinds; 371 questions in all.
+    - **Order:** pseudo-random, seeded by the page's text. Each question is asked twice, every candidate moving one place on.
+  - **The profile:** `benchmarks/calibration/results.json`, committed with its answers (`replay.zip`), as the eye test's is. `scripts/calibration.py run`, then `report` offline (`report.html`: the profiles, then every question's pictures, the wrong ones first).
+  - **Two arms:**
+    - **outlined:** tiles outlined only
+    - **dimmed:** also greys out what no tile holds. Added after the first arm's misses.
+  - **Tests:** `tests/test_calibration.py`, 8 tests (a simulated judge scores full marks; one always taking the first shows its bias).
+- **gemma-4, by arm** (742 asks each):
+
+  | | Outlined | Dimmed |
+  |---|---|---|
+  | known-good chosen | 90.2% | 95.1% |
+  | the same tiling in both orders | 86.8% | 91.4% |
+  | the known-good chosen in both orders | 83.6% | 90.8% |
+  | known-good tilings given a problem | 12.1% | 6.1% |
+  | invalid answers | 0 | 0 |
+  | choices by position (A, B, C; the known-good at 33%, 35%, 32%) | 33%, 36%, 31% | 35%, 35%, 31% |
+
+- **Each bad kind chosen over the known-good, and its own fault named** (dimmed arm):
+
+  | Kind | Asks | Chosen | Fault named |
+  |---|---|---|---|
+  | missing | 270 | 4.4% (outlined: 20.4%) | 69% |
+  | overlap | 84 | 6.0% | 1% |
+  | midline | 282 | 3.5% | 72% |
+  | border | 284 | 1.8% | 97% |
+  | shifted | 62 | 1.6% | 94% |
+  | figure split | 214 | 1.4% | 52% |
+  | grid | 278 | 0% | 92% |
+  | decoration | 10 | 0% | 100% |
+
+- **What it shows:**
+  - **gemma-4 judges stark tilings well, with no position bias to speak of.**
+  - **Outlines alone hide what a tiling misses.** A tiling missing a page's table, keeping only a tile around the page number, looked like the page untouched: chosen over the known-good in both orders on several table pages. Greying out what no tile holds took "missing" from 20% to 4%. Milestone 5 asks with the dimmed sketches.
+  - **The problems named are reliable for some faults only:** cut text, decoration and blank tiles (92 to 100%). Figure splits are named half the time; overlap almost never ("repeats text" 1%) though the overlapping tiling is rarely chosen. Milestone 5 checks only the reliable problems against the measures.
+  - **Complaints about known-good tilings are mostly "decoration or blank"** (38 of 46 named, dimmed). In 37 of those 38 asks, the tiling has a tile holding one short line, the page number. That's a fair reading: a page number is page furniture, though the measures count it as text. A known-good tiling might leave a lone page number out.
+- **Threshold, set by judgement:** the known-good chosen in 90% of asks, and the same tiling in both orders in 85% (`calibration.PASS`). gemma-4 passes under both arms.
+- **What it doesn't show yet:**
+  - **No drawing sheets or scans:** they have no known-good tiling by these rules.
+  - **Stark faults only:** milestone 5's candidates are all heuristic tilings, much closer to each other. Before its lever is trusted, calibration adds near cases: a single line cut, a little overlap, a known-good against today's tiling where today's cuts a few lines.
+  - **The corpus is synthetic,** its pages built from a few templates.
+
 - **The cases:** pages with a known-good tiling among known-bad ones:
   - the old midline cut
   - a plain grid on a text page
