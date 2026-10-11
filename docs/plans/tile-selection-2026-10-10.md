@@ -52,6 +52,38 @@
 
 ### 1. Measures without the model
 
+**Done without the model (2026-10-10).** The measures with the model come with milestone 2's baseline, their first use.
+- **Built:**
+  - `tiling.py` (`measure`, `measure_tile`)
+  - `bench/tiling.py` (`run`, `summary`, `compare`, `worst`)
+  - `scripts/tiling.py` (`measure`, `report`, `compare`)
+  - `tests/test_tiling.py`, seven tests
+- **The trials review reproduced exactly** (the first 40 pages of each sample PDF, 803 pages):
+  - grid: 244 pages, 6,582 tiles, 6,400 lines cut sideways, on 236 pages
+  - bands: 559 pages, 822 tiles, none cut sideways
+- **Every page of the samples** (4,157 pages) and the controlled corpus (133 pages):
+
+  | | Samples: bands | Samples: grid | Controlled: bands | Controlled: grid |
+  |---|---|---|---|---|
+  | Pages | 3,568 | 589 | 125 | 8 |
+  | Tiles | 5,006 | 16,235 | 177 | 174 |
+  | Lines cut sideways | 0 | 13,320 (on 567 pages) | 0 | 101 (on 6 pages) |
+  | Lines cut across | 2,598 | 1,504 | 28 | 5 |
+  | Words cut | 12,572 | 17,347 | 74 | 152 |
+  | Text-only tiles | 0 | 725 | 0 | 44 |
+  | Lines read twice | 4,046 | 53,985 | 70 | 537 |
+  | Tiles under 5% graphics | 2,479 | 5,252 | 26 | 45 |
+  | Figures not seen whole | 109 | 480 | 10 | 6 |
+
+- **What they show:**
+  - **Grid pages are 14% of the samples' pages but 76% of their tiles.** They hold every line cut sideways, and 93% of the lines read twice.
+  - **Bands cut no line sideways, but 2,598 across.** Where a page has no gap in a band's window, the band's edge runs through a line.
+  - **No tile is blank** (`skip_empty` drops them), and none is decoration only, because decoration isn't told apart until milestone 3.
+- **Caveats:**
+  - **Figures not seen whole** include those the product leaves to the overview: a figure covering 90% of the page, such as a drawing sheet or a cover. The gallery will tell those apart.
+  - **Graphics share** is measured on a 2-point raster, so a hairline counts as 2 points wide. A drawing with no height (a rule drawn as one line) meets no tile, as in `segmentation`.
+- **Speed:** about 0.2 s a page, mostly PyMuPDF reading the text layer. The product's own segmentation reads a page's lines and graphics again (`bands`, `Tiling.tiles`) instead of taking the reader's: a behaviour-preserving fix for later (*Code health*).
+
 - **Product:** a module of pure geometry, `tiling.py`, with a measure of any tiling of a page. It belongs in the product, not the lab, because milestones 3 and 5 rank candidates at run time, and the *Runtime quality spot checks* row wants the same signals. Per tile and per page:
   - **lines cut** sideways and across, and words cut
   - **figures split:** a detected figure crossing a tile's edge, unless a figure task reads it whole

@@ -128,6 +128,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `pipeline.py` | A run: bind the store, scan, extract, situate, compare, report |
 | `levers.py` | Settings' declarations, levers as mixins on the platform, configurations |
 | `context.py`, `quotes.py`, `stems.py`, `sections.py`, `tables.py`, `segmentation.py` | Extraction's pieces: the document reader, quote checks, numbered items, sections, tables, page segmentation |
+| `tiling.py` | A page's tiling measured without the model: lines and words cut, text-only, decoration-only and blank tiles, graphics share, lines read twice, overlap, figures not seen whole, graphics missed |
 | `readings.py` | Merging readings of one fact by different tasks |
 | `pages.py` | Page coordinates as displayed and as stored |
 | `regions.py`, `values.py` | Region names and crop names; numbers, dates, lengths and units as printed |
@@ -135,6 +136,6 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `recipes.py` | How each query was built (role, region, content, task, label), kept for diagnostics, never for lookup |
 | `ledger.py` | Cost ledger and measured figures |
 | `html_pages.py` | What every generated page shares: escaping, embedded data, the palette |
-| `lab/` (`semantic_pdf_diff_lab`) | The lab, its own distribution: `eval/` (rounds, judges, rubrics, review panels, spot checks, query checks, post-mortems) and `bench/` (controlled documents, eye and page tests) |
+| `lab/` (`semantic_pdf_diff_lab`) | The lab, its own distribution: `eval/` (rounds, judges, rubrics, review panels, spot checks, query checks, post-mortems) and `bench/` (controlled documents, eye and page tests, refinement and tiling measures) |
 
 API contracts were checked against the [OpenAI Chat Completions reference](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create) and [PyMuPDF Page documentation](https://pymupdf.readthedocs.io/en/latest/page.html). Provider compatibility still needs a live smoke test.
