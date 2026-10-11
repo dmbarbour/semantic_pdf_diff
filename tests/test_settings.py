@@ -33,17 +33,21 @@ TOGGLES = {
     'tile_points': 300, 'refinement_depth': 0, 'vision': False, 'figure_tasks': False, 'tiling': 'grid', 'table_rules': None,
     'sheet_details': True, 'skip_empty': False, 'table_filter': True, 'situate': False, 'verify_visuals': False,
     'top_k': 1, 'min_score': 0.9, 'max_pairs': 1, 'aliases': {'drawing': 'equipment', 'label': 'power'},
-    'reconcile': False, 'quote_match': 'exact',
+    'reconcile': False, 'quote_match': 'exact', 'skip_text_only': True, 'tile_cut': 'xycut', 'band_width': 6.0,
+    'render_area': True,
 }
 # Settings that act only on the drawing sheet: grid tiles (report pages are cut into bands), its details,
 # and its frame (a false table); and refinement, which only grid tiles are large enough for (the stub answers
 # some tiles "incomplete"). A slower document: most of a run's time is its tiles.
 # The budget settings' values bite under the model-neutral defaults (32,768 tokens of context): 8,192, or a
 # per-image or safety reserve that leaves little room, changes what situating sends and what's refused.
-ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refinement_depth'}
+ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refinement_depth', 'skip_text_only', 'tile_cut',
+             'band_width'}
 # Settings these documents can't exercise, and why (each still needs its class checked elsewhere).
 NOT_EXERCISED = {
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
+    'decoration': 'changes which graphics count, so it shows only through bands, skip_text_only or tile_cut; these '
+                  'documents hold no decoration (tests/test_tiling.py)',
     'dedupe_repeated': 'needs a table row repeated on three or more pages (tests/test_repeats.py)',
     'table_review': "the stub reads every table's rows by themselves, so no rules are reviewed (tests/test_xlsxdocs.py)",
     'table_structure': "no table in these documents has a suspect line (tests/test_tablestructure.py)",

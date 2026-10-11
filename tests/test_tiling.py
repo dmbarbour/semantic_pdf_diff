@@ -77,6 +77,116 @@ class Pages(unittest.TestCase):
         self.assertEqual((found["figures_not_whole"], found["graphics_missed"]), (0, 0.0))
         self.assertEqual((found["tiles"], found["images"]), (2, 3))
 
+class Candidates(unittest.TestCase):
+    """Milestone 3's candidate tilings, each a lever off by default."""
+
+    def test_decoration_rules_bars_furniture_and_a_backdrop_but_not_a_figure_or_a_scan(self):
+        # furniture is drawn alike in the same place: a picture where a neighbour has the figure is still a figure
+        from semantic_pdf_diff.segmentation import decoration
+        doc = pymupdf.open()
+        for _ in range(3):
+            page = doc.new_page(width=612, height=792)
+            page.draw_rect(pymupdf.Rect(560, 20, 590, 50), fill=(0.8, 0.4, 0.1), color=None)  # a logo on every page
+        page = doc[1]
+        page.draw_rect(pymupdf.Rect(40, 60, 572, 61), fill=(0.5, 0.5, 0.5), color=None)  # a rule under the header
+        page.draw_rect(pymupdf.Rect(20, 80, 26, 380), fill=(0.1, 0.2, 0.4), color=None)  # a bar down the margin
+        page.draw_rect(pymupdf.Rect(300, 500, 450, 600), fill=(0, 0, 0), color=None)  # a figure
+        for i in range(10):
+            page.insert_text((60, 100 + 14 * i), "the pump delivers 10 kW at its rated point", fontsize=10)
+        from semantic_pdf_diff.segmentation import marks
+        for other, colour in ((doc[0], (0.6, 0, 0)), (doc[2], (0, 0.6, 0))):  # other figures in the same place
+            other.draw_rect(pymupdf.Rect(300, 500, 450, 600), fill=colour, color=None)
+        found = decoration(page, _graphics(page), lines(page), [marks(doc[0]), marks(doc[2])])
+        graphics = [_graphics(p) for p in doc]
+        self.assertEqual({tuple(round(v) for v in g): d for g, d in zip(graphics[1], found)},
+                         {(560, 20, 590, 50): True, (40, 60, 572, 61): True, (20, 80, 26, 380): True,
+                          (300, 500, 450, 600): False})
+        backdrop = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, 60, 80), False)
+        backdrop.clear_with(230)
+        _doc, page = text_page(width=612, height=792, count=20)
+        page.insert_image(page.rect, pixmap=backdrop, overlay=False)
+        self.assertEqual(decoration(page, _graphics(page), lines(page)), [True])
+        scan = pymupdf.open()
+        page = scan.new_page(width=612, height=792)
+        page.insert_image(page.rect, pixmap=backdrop)
+        for i in range(20):  # an OCR layer: invisible text over the scan
+            page.insert_text((40, 60 + 14 * i), "the pump delivers 10 kW at its rated point", fontsize=10,
+                             render_mode=3)
+        self.assertEqual(decoration(page, _graphics(page), lines(page)), [False])
+
+    def test_decoration_underlines_text_masks_and_text_panels_but_not_a_figure_with_labels(self):
+        from semantic_pdf_diff.segmentation import decoration
+        doc = pymupdf.open()
+        page = doc.new_page(width=612, height=792)
+        page.insert_text((60, 100), "GENERAL NOTES", fontsize=10)
+        heading = lines(page)[0][0]
+        page.draw_rect(pymupdf.Rect(heading.x0, heading.y1 + 1, heading.x1 - 5, heading.y1 + 2), fill=(0, 0, 0),
+                       color=None)  # an underline
+        page.insert_text((60, 140), "ALL WORK SHALL CONFORM", fontsize=10)
+        note = lines(page)[1][0]
+        page.draw_rect(note + (-1, -1, 1, 1), fill=(1, 1, 1), color=None, overlay=False)  # a mask behind the note
+        panel = pymupdf.Rect(300, 200, 560, 330)  # a section's panel, a heading bar inside it
+        page.draw_rect(panel, fill=(0.9, 0.9, 0.95), color=None, overlay=False)
+        page.draw_rect(pymupdf.Rect(310, 210, 550, 236), fill=(0.1, 0.2, 0.4), color=None)
+        page.insert_text((320, 228), "Background", fontsize=12, color=(1, 1, 1))
+        for i in range(5):
+            page.insert_text((310, 260 + 14 * i), "space radiation can cause cancer", fontsize=10)
+        figure = pymupdf.Rect(60, 400, 300, 600)  # a figure: labels, and a curve that isn't text
+        page.draw_rect(figure, color=(0, 0, 0), width=0.5)
+        page.draw_polyline([(80, 580), (150, 480), (220, 450), (280, 420)], color=(0.8, 0, 0), width=1.5)
+        page.insert_text((70, 595), "flow (gpm)", fontsize=8)
+        graphics = _graphics(page)
+        found = {tuple(round(v) for v in g): d for g, d in zip(graphics, decoration(page, graphics, lines(page)))}
+        self.assertTrue(found[tuple(round(v) for v in pymupdf.Rect(heading.x0, heading.y1 + 1, heading.x1 - 5,
+                                                                  heading.y1 + 2))])
+        self.assertTrue(found[tuple(round(v) for v in note + (-1, -1, 1, 1))])
+        self.assertTrue(found[tuple(round(v) for v in panel)])
+        self.assertTrue(found[(310, 210, 550, 236)])
+        self.assertFalse(found[tuple(round(v) for v in figure)])
+        self.assertFalse(found[(80, 420, 280, 580)])
+
+    def test_a_snapped_grid_cuts_at_whitespace_without_overlap(self):
+        from semantic_pdf_diff.segmentation import snapped, tiles
+        doc = pymupdf.open()
+        page = doc.new_page(width=900, height=300)
+        for x in (40, 480):  # two columns, a gutter between 420 and 480
+            for i in range(15):
+                page.insert_text((x, 30 + 16 * i), "a short line of text here ok", fontsize=10)
+        cut = snapped(page.rect, 420, lines(page), [])
+        self.assertEqual(len(cut), len(list(tiles(page.rect, 420))))
+        self.assertEqual(measure(page, regions(*cut), lines(page), [])["page"]["lines_cut_sideways"], 0)
+        self.assertAlmostEqual(cut[0].x1, cut[1].x0)  # the gutter: no overlap
+
+    def test_xy_cut_holds_columns_whole_in_tiles_that_fit(self):
+        from semantic_pdf_diff.segmentation import xy_cut
+        doc = pymupdf.open()
+        page = doc.new_page(width=1200, height=800)
+        for x in (40, 440, 840):  # three columns of 40 lines
+            for i in range(40):
+                page.insert_text((x, 40 + 18 * i), "a column line of some words", fontsize=12)
+        cut = xy_cut(page.rect, 420, lines(page), [])
+        found = measure(page, regions(*cut), lines(page), [])["page"]
+        self.assertEqual((found["lines_cut_sideways"], found["lines_cut_across"], found["lines_read_twice"]), (0, 0, 0))
+        for r in cut:
+            self.assertLessEqual(max(r.width, r.height), 1.6 * 420 + 0.01)
+            self.assertLessEqual(min(r.width, r.height), 420 + 0.01)
+
+    def test_the_levers_skip_text_only_tiles_band_wide_pages_and_render_by_area(self):
+        from semantic_pdf_diff.context import Context
+        from semantic_pdf_diff.settings import Settings
+        doc, page = text_page(width=960, height=540, count=25, top=40)
+        page.draw_rect(pymupdf.Rect(700, 300, 900, 500), fill=(0, 0, 0), color=None)
+        tiles = lambda **kw: [r for tag, r, _ in Settings(**kw).visual_regions(Context(doc, Settings(**kw)), page, 0)
+                              if tag.startswith("tile")]
+        every, kept = tiles(), tiles(skip_text_only=True)
+        self.assertLess(len(kept), len(every))
+        self.assertTrue(all(r.intersects(pymupdf.Rect(700, 300, 900, 500)) for r in kept))
+        banded = tiles(band_width=2.4)
+        self.assertTrue(banded and all(r.height <= 1.6 * 420 * 420 / 960 + 0.01 for r in banded))
+        self.assertEqual(Settings().render_side(pymupdf.Rect(0, 0, 800, 200)), 1000)
+        self.assertEqual(Settings(render_area=True).render_side(pymupdf.Rect(0, 0, 800, 200)), 2000)
+        self.assertEqual(Settings(render_area=True).render_side(pymupdf.Rect(0, 0, 400, 400)), 1000)
+
 class LabRuns(unittest.TestCase):
     def test_a_folder_measured_under_two_settings_compares_page_by_page(self):
         from semantic_pdf_diff.settings import Settings

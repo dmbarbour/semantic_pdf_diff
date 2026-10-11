@@ -157,6 +157,222 @@ def _middle(rect, overlap):
     mid = (rect.y0 + rect.y1) / 2
     return [pymupdf.Rect(rect.x0, rect.y0, rect.x1, mid + overlap), pymupdf.Rect(rect.x0, mid - overlap, rect.x1, rect.y1)]
 
+# --- candidate tilings (tile-selection-2026-10-10, milestone 3): each a lever, off by default (levers.py)
+
+RULE_POINTS = 8.0  # a graphic no thicker than this, and at least RULE_REACH of the page's width or height long, is a
+RULE_REACH = 1 / 3  # rule, a bar down a margin or a frame's side
+NEIGHBOURS = 3     # pages either side where a graphic is looked for in the same place
+REPEATED = 2       # neighbours holding it (or all, if fewer) make it furniture: a header, footer, logo, template banner
+PLACE = 1.0        # points: the same place
+BACKDROP = 0.6     # an image covering this share of the page, under most of its visible text, is a backdrop
+UNDERLINE_POINTS, UNDERLINE_GAP = 2.0, 4.0  # a line this thin, this close under a text line and no wider, underlines it
+MASK_POINTS = 3.0  # a graphic no larger than the text lines it holds, by this much a side, is the text's background
+
+def _place(box):
+    return tuple(round(v / PLACE) for v in box)
+
+def visible_share(page):
+    """The share of a page's text layer drawn visibly: an OCR'd scan's text is invisible (render mode 3), a page's
+    own text isn't. None if the page has no text."""
+    seen = total = 0
+    for span in page.get_texttrace():
+        n = len(span["chars"])
+        total += n
+        seen += n if span["type"] != 3 and span.get("opacity", 1) > 0 else 0
+    return seen / total if total else None
+
+def marks(page, drawings=None):
+    """{place: {signature}}: what a page draws where, to find what repeats on its neighbours (decoration): an image
+    by its digest, a drawing by its paths' kinds, colours and stroke. Not the place alone: a report's appendix may
+    put a different picture in the same place on every page."""
+    out = {}
+    for d in page.get_cdrawings() if drawings is None else drawings:
+        signature = ("drawing", "".join(item[0] for item in d.get("items") or ()), str(d.get("fill")),
+                     str(d.get("color")), round(d.get("width") or 0, 1))
+        out.setdefault(_place(shown(page, d["rect"])), set()).add(signature)
+    for image in page.get_image_info(hashes=True):
+        out.setdefault(_place(shown(page, image["bbox"])), set()).add(("image", image["digest"]))
+    return out
+
+def decoration(page, graphics, lines, nearby=(), own=None):
+    """Which of a page's graphics (Context.graphics) are decoration, [bool]: what a tile can hold and still be text
+    only, as displayed.
+
+    - **rules:** no thicker than RULE_POINTS and at least RULE_REACH of the page long (rules, margin bars, a frame
+      drawn as lines; a frame drawn as one path isn't a graphic at all)
+    - **furniture:** drawn alike in the same place on REPEATED of the pages around it, or on all of them if there
+      are fewer (nearby: marks(page) of those the same size; own: this page's, found if None)
+    - **underlines:** no thicker than UNDERLINE_POINTS, within a text line's width and at most UNDERLINE_GAP below it
+    - **text masks:** no larger than the text lines it holds, by MASK_POINTS a side (a box behind a drawing's notes)
+    - **text panels:** a filled drawing holding text lines and no other graphic but decoration and hairlines (a
+      poster's section box, a callout, a heading's bar), found smallest first so a panel may hold panels. Filled: a
+      chart's line holds its labels in its box too
+    - **a backdrop:** an image over BACKDROP of the page with most of the page's text lines on it, the text drawn
+      visibly. A scan has no text layer, or an invisible one, so it stays a graphic."""
+    area = abs(page.rect)
+    own = marks(page) if own is None else own
+    repeated = min(REPEATED, len(nearby)) or None
+    images = {_place(shown(page, i["bbox"])) for i in page.get_image_info()}
+    visible = None
+    texts = sorted((box for box, _ in lines if not box.is_empty), key=lambda b: b.y1)
+    bottoms = [b.y1 for b in texts]
+    middles = sorted(((b.y0 + b.y1) / 2, (b.x0 + b.x1) / 2, i) for i, b in enumerate(texts))
+    heights = [m[0] for m in middles]
+    out, holding = [], []
+    for g in graphics:
+        holding.append(False)
+        thin, long = min(g.width, g.height), max(g.width / page.rect.width, g.height / page.rect.height)
+        if thin <= RULE_POINTS and long >= RULE_REACH:
+            out.append(True)
+            continue
+        above = texts[bisect.bisect_left(bottoms, g.y0 - UNDERLINE_GAP):bisect.bisect_right(bottoms, g.y1 + 1)]
+        if g.height <= UNDERLINE_POINTS and any(b.x0 - 2 <= g.x0 and g.x1 <= b.x1 + 2 and b.y0 < g.y0 for b in above):
+            out.append(True)
+            continue
+        held = [texts[i] for _, x, i in middles[bisect.bisect_left(heights, g.y0):bisect.bisect_right(heights, g.y1)]
+                if g.x0 <= x <= g.x1]
+        if held:
+            holding[-1] = True
+            around = pymupdf.Rect(held[0])
+            for b in held[1:]:
+                around |= b
+            if g in around + (-MASK_POINTS, -MASK_POINTS, MASK_POINTS, MASK_POINTS):
+                out.append(True)
+                continue
+        key = _place(g)
+        if repeated and sum(bool(own.get(key, set()) & other.get(key, set())) for other in nearby) >= repeated:
+            out.append(True)
+            continue
+        backdrop = False
+        if key in images and abs(g & page.rect) >= BACKDROP * area and lines:
+            on = sum(1 for box, _ in lines if (box.tl + box.br) / 2 in g)
+            if on >= 0.5 * len(lines):
+                visible = visible_share(page) if visible is None else visible
+                backdrop = bool(visible) and visible >= 0.5
+        out.append(backdrop)
+    filled = {place for place, found in own.items() if any(m[0] == "drawing" and m[2] != "None" for m in found)}
+    return _panels(graphics, out, holding, filled)
+
+def _panels(graphics, out, holding, filled):
+    """decoration's text panels, smallest first: [bool] with them set. filled: the places of filled drawings."""
+    order = sorted(range(len(graphics)), key=lambda i: graphics[i].x0)
+    starts = [graphics[i].x0 for i in order]
+    for i in sorted((i for i, g in enumerate(graphics) if holding[i] and not out[i] and _place(g) in filled),
+                    key=lambda i: abs(graphics[i])):
+        g = graphics[i]
+        inside = (graphics[j] for j in order[bisect.bisect_left(starts, g.x0):bisect.bisect_right(starts, g.x1)]
+                  if j != i and not out[j])
+        if not any(h in g and min(h.width, h.height) > UNDERLINE_POINTS for h in inside):
+            out[i] = True
+    return out
+
+BAND_AREA = 1.6  # a band's largest area in square tiles: today's widest band, 1.6 tiles by one
+STRIP_REACH = 2.4  # a block's longest side in tiles where it's rendered by its area (render_area)
+
+def band_height(width, side):
+    """How tall a page's bands may be: a tile's side, or less on a page wider than BAND_AREA tiles, so a band's area
+    stays at most BAND_AREA tiles (bands on wide pages, a candidate)."""
+    return min(side, BAND_AREA * side * side / width)
+
+def _crossings(boxes, axis):
+    """f(v): how many boxes a cut at v along an axis (0: x, 1: y) runs through."""
+    starts = sorted(b.x0 if axis == 0 else b.y0 for b in boxes)
+    ends = sorted(b.x1 if axis == 0 else b.y1 for b in boxes)
+    return lambda v: bisect.bisect_left(starts, v) - bisect.bisect_right(ends, v)
+
+def _snapped_cuts(lo, hi, side, texts, graphics, axis, overlap, reach):
+    """[(start, end)] along an axis: the grid's pieces (tiles' count), each cut moved within reach x side of the grid's
+    place to where it crosses the fewest text lines, then graphics, then nearest the grid's place. A cut crossing
+    nothing gets no overlap; one crossing something keeps the grid's, shared either side of it."""
+    span = hi - lo
+    if span <= side:
+        return [(lo, hi)]
+    n = math.ceil((span - side) / (side * (1 - overlap))) + 1
+    lines_crossed, graphics_crossed = _crossings(texts, axis), _crossings(graphics, axis)
+    edges = sorted({v for b in texts + graphics for v in ((b.x0, b.x1) if axis == 0 else (b.y0, b.y1))})
+    cuts = []
+    for k in range(1, n):
+        nominal = lo + k * span / n
+        window = (nominal - reach * side, nominal + reach * side)
+        candidates = [nominal] + [v + d for v in edges[bisect.bisect_left(edges, window[0] - 1):
+                                                       bisect.bisect_right(edges, window[1] + 1)]
+                                  for d in (-0.5, 0.5) if window[0] <= v + d <= window[1]]
+        best = min(candidates, key=lambda v: (lines_crossed(v), graphics_crossed(v), abs(v - nominal)))
+        cuts.append((best, lines_crossed(best) + graphics_crossed(best) > 0))
+    half = overlap * side / 2
+    out, start = [], lo
+    for cut, crossing in cuts:
+        out.append((start, min(hi, cut + half) if crossing else cut))
+        start = max(lo, cut - half) if crossing else cut
+    out.append((start, hi))
+    return out
+
+def snapped(rect, side, lines, graphics, overlap=0.18, reach=0.12):
+    """A grid whose cuts move to whitespace (less overlap on grids, a candidate): rows cut across the whole page, then
+    each row's tiles cut within it, as _snapped_cuts. lines: [(Rect, text)]; graphics: those that count."""
+    texts = [b for b, _ in lines if not b.is_empty]
+    graphics = [g for g in graphics if not g.is_empty]
+    out = []
+    for y0, y1 in _snapped_cuts(rect.y0, rect.y1, side, texts, graphics, 1, overlap, reach):
+        row = pymupdf.Rect(rect.x0, y0, rect.x1, y1)
+        in_row = [b for b in texts if b.intersects(row)], [g for g in graphics if g.intersects(row)]
+        for x0, x1 in _snapped_cuts(rect.x0, rect.x1, side, *in_row, 0, overlap, reach):
+            out.append(pymupdf.Rect(x0, y0, x1, y1))
+    return out
+
+XY_PAD = 4.0  # points around a block's content
+
+def xy_cut(rect, side, lines, graphics, most=BAND_AREA, pad=XY_PAD):
+    """Blocks found by whitespace both ways (XY-cut, a candidate), merged into tiles: a block is cut at its widest gap,
+    down to blocks that fit (longer side at most `most` x side, area at most BAND_AREA tiles: no more than today's
+    widest band; `most` is longer where a region is rendered by its area, render_area), then neighbouring blocks
+    merged while their union fits and covers no other block. A block with no gap is cut as the grid cuts it. Tiles
+    hug their content (pad), so blank margins aren't sent."""
+    boxes = [b for b, _ in lines if not b.is_empty] + [g for g in graphics if not g.is_empty]
+    boxes = [b & rect for b in boxes if b.intersects(rect)]
+    if not boxes:
+        return []
+
+    def fits(r):
+        return max(r.width, r.height) <= most * side + 0.01 and r.width * r.height <= BAND_AREA * side * side + 1
+
+    def cut(boxes, bound):  # bound: up to the middle of the gaps around these boxes
+        extent = pymupdf.Rect(boxes[0])
+        for b in boxes[1:]:
+            extent |= b
+        extent = (extent + (-pad, -pad, pad, pad)) & bound
+        if fits(extent):
+            return [extent]
+        best = None
+        for axis in (0, 1):
+            lo, hi = (extent.x0 + pad, extent.x1 - pad) if axis == 0 else (extent.y0 + pad, extent.y1 - pad)
+            for g0, g1 in _gaps(boxes, axis, lo, hi):
+                if g0 > lo and g1 < hi and g1 > g0:
+                    middle = (g0 + g1) / 2
+                    found = (-(g1 - g0), abs(middle - (lo + hi) / 2), axis, middle)
+                    best = min(best, found) if best else found
+        if best is None:
+            return list(tiles(extent, side))
+        _, _, axis, at = best
+        before = [b for b in boxes if (b.x1 if axis == 0 else b.y1) <= at]
+        after = [b for b in boxes if (b.x1 if axis == 0 else b.y1) > at]
+        first, second = pymupdf.Rect(bound), pymupdf.Rect(bound)
+        if axis == 0:
+            first.x1 = second.x0 = at
+        else:
+            first.y1 = second.y0 = at
+        pieces = cut(before, first) + cut(after, second)
+        out = [pieces[0]]
+        for i, piece in enumerate(pieces[1:], 1):
+            union = out[-1] | piece
+            others = out[:-1] + pieces[i + 1:]
+            if fits(union) and all(abs(union & o) <= 0.05 * abs(o) for o in others):
+                out[-1] = union
+            else:
+                out.append(piece)
+        return out
+    return cut(boxes, rect)
+
 DETAIL_NUMBER = re.compile(r"^[A-H]\d{1,2}$")  # grid-referenced detail numbers (US National CAD Standard)
 BORDER = 0.6  # a vertical line this share of the page height is a frame or title-block border
 

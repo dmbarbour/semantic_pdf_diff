@@ -87,10 +87,15 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `stem_context` | `true` | shaping | stem_context | extract | table, text |
 | `references` | `false` | shaping | references | extract | table, text |
 | `tile_locator` | `false` | shaping | tile_locator | extract | figure, overview, tile, vision |
+| `decoration` | `false` | selecting | decoration | extract | figure, overview, tile, vision |
 | `tiling` | `"bands"` | selecting | tiling | extract | figure, overview, tile, vision |
+| `band_width` | `1.6` | selecting | tiling | extract | figure, overview, tile, vision |
+| `tile_cut` | `"grid"` | selecting | tile_cut | extract | figure, overview, tile, vision |
 | `grow_tiles` | `true` | shaping | grow_tiles | extract | figure, overview, tile, vision |
 | `sheet_details` | `false` | selecting | sheet_details | extract | figure, overview, tile, vision |
 | `skip_empty` | `true` | selecting | skip_empty | extract | figure, overview, tile, vision |
+| `skip_text_only` | `false` | selecting | skip_text_only | extract | figure, overview, tile, vision |
+| `render_area` | `false` | shaping | render_area | extract | figure, overview, tile, vision |
 | `figure_tasks` | `true` | selecting | figure_tasks | extract | figure |
 | `table_rules` | `0` | selecting | table_rules | extract | table |
 | `table_review` | `10` | shaping | table_review | extract | table |

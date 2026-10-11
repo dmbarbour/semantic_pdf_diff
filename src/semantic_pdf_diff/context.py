@@ -39,7 +39,7 @@ class Context:
         self.doc, self.s = doc, s
         self.assets, self.stem = assets, stem  # where the locator's images go, and their names' stem
         self.blocks, self.stems, self.cited_by, self.page_lines, self.page_graphics = {}, {}, {}, {}, {}
-        self.page_figures = {}
+        self.page_figures, self.page_decoration, self.page_marks = {}, {}, {}
         self.tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
         # a page's vector drawings (never changed by their readers), and its display list: Page.get_pixmap builds one
         # for every crop, interpreting the whole page again
@@ -79,6 +79,26 @@ class Context:
         if page.number not in self.page_graphics:
             self.page_graphics[page.number] = _graphics(page, self.drawings(page))
         return self.page_graphics[page.number]
+
+    def decoration(self, page):
+        """The page's graphics that are decoration (segmentation.decoration), once per page: [Rect]. Its neighbours'
+        graphics are read to find what repeats in the same place."""
+        if page.number not in self.page_decoration:
+            from .segmentation import NEIGHBOURS, decoration
+            graphics = self.graphics(page)
+            nearby = [self.marks(self.doc[n]) for n in range(max(0, page.number - NEIGHBOURS),
+                                                            min(len(self.doc), page.number + NEIGHBOURS + 1))
+                      if n != page.number and self.doc[n].rect == page.rect]
+            found = decoration(page, graphics, self.lines(page), nearby, self.marks(page))
+            self.page_decoration[page.number] = [g for g, d in zip(graphics, found) if d]
+        return self.page_decoration[page.number]
+
+    def marks(self, page):
+        """What the page draws where (segmentation.marks), once per page."""
+        if page.number not in self.page_marks:
+            from .segmentation import marks
+            self.page_marks[page.number] = marks(page, self.drawings(page))
+        return self.page_marks[page.number]
 
     def figures(self, page, number):
         """The page's detected figures (figures.page_figures), once per page: the figure tasks and the tiling

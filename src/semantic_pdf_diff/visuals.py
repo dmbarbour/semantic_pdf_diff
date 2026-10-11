@@ -36,7 +36,8 @@ class Visuals:
     def task(self, page_no, page, tag, rect, depth=0, text="", box=None, derivation=None):
         s = self.s
         name = crop_name(self.stem, tag)
-        render(page, rect, self.assets / name, s.image_side, self.context_of)
+        side = s.render_side(rect)
+        render(page, rect, self.assets / name, side, self.context_of)
         native_rect = native(page, rect)
         # one text page for the layer and the blocks, their flags the same (code review 2026-10-08, A6)
         textpage = (page.get_textpage(clip=native_rect, flags=pymupdf.TEXTFLAGS_TEXT) if not depth or box is None
@@ -57,7 +58,7 @@ class Visuals:
         context, extra = self.context_of.for_tile(page, rect, tag)
         kept = text if box is not None else ""
         self.core.consume(Task(page_no, native_rect if box is None else box, tag, source, "assets/" + name, check=check,
-                               place=place, crop=(tuple(round(v, 3) for v in rect), s.image_side), context=context,
+                               place=place, crop=(tuple(round(v, 3) for v in rect), side), context=context,
                                extra_images=extra, derivation=derivation,
                                then=lambda status: self.refine(page_no, page, tag, rect, depth, status, kept, box,
                                                                derivation)))

@@ -196,6 +196,96 @@
 
 ### 3. Heuristic candidates
 
+**Done (2026-10-11).** The owner: "Please proceed with milestone 3." Five levers, all off by default; the lever index has a section on them. Spent $0.307 with the model.
+- **Built:**
+  - **Levers:**
+    - `decoration` (`segmentation.decoration`, `Context.decoration`)
+    - `skip_text_only`
+    - `band_width` (on `tiling`)
+    - `tile_cut`: `snapped` or `xycut` (`segmentation.snapped`, `segmentation.xy_cut`)
+    - `render_area`
+  - **Platform hooks** (each a no-op by default):
+    - `cut_page`, the tiler's cut
+    - `content_graphics`, what makes a tile worth sending
+    - `render_side`
+  - **The measures:**
+    - Text-only tiles now count with decoration set aside, so every configuration's run finds decoration.
+    - The lab adds each tile's detail: pixels per point as gemma-4 sees it, after the host shrinks the image to its budget.
+  - **`scripts/tiling.py`:**
+    - `measure --exclude heldout/`
+    - `read`: documents read with the model under each configuration, recorded into a fixture of its own (`benchmarks/tiling/`), scored by their keys
+  - **Tests:** six added to `tests/test_tiling.py`.
+- **Before the candidates, two separate commits:**
+  - **A behaviour-preserving step:** segmentation takes the reader's lines and graphics, and finds a page's figures once (the Code health item). The measures of all 5,063 sample pages came out identical.
+  - **A gallery bug:** it drew rotated pages unrotated. That withdrew milestone 2's sideways-sheet finding and this milestone's sixth candidate, a tile turned upright.
+- **Measured without the model,** on every development page of the samples (held-out pages left out):
+
+  | Pages | Configuration | Tiles | Lines cut sideways | Lines cut across | Lines read twice | Text-only tiles | Detail, 10th percentile (px/pt) |
+  |---|---|---|---|---|---|---|---|
+  | Report (up to 672 pt wide; 3,607) | today | 5,058 | 0 | 2,603 | 4,059 | 2,602 | 1.72 |
+  | | decoration | 2,450 | 0 | 1,776 | 2,858 | 0 | 1.63 |
+  | Slides, landscape (672 to 1,000 pt; 435) | today | 1,688 | 7,092 | 390 | 12,782 | 510 | 1.67 |
+  | | text-only skipped (with decoration) | 1,178 | 4,305 | 277 | 10,594 | 0 | 1.64 |
+  | | wide bands (2.4, by area) | 531 | 0 | 495 | 728 | 0 | 1.51 |
+  | | snapped | 1,662 | 5,800 | 300 | 6,830 | 529 | 1.89 |
+  | | XY-cut | 1,504 | 768 | 91 | 1,818 | 826 | 1.52 |
+  | | XY-cut, by area | 1,015 | 492 | 82 | 1,751 | 473 | 1.55 |
+  | | combined | 542 | 490 | 75 | 1,751 | 0 | 1.54 |
+  | Drawings, posters (over 1,000 pt; 663) | today | 21,838 | 17,842 | 1,973 | 59,679 | 6,363 | 1.76 |
+  | | text-only skipped | 15,475 | 9,241 | 1,162 | 34,435 | 0 | 1.75 |
+  | | snapped | 21,243 | 9,741 | 1,361 | 27,588 | 8,108 | 1.92 |
+  | | XY-cut | 17,305 | 3,212 | 509 | 9,131 | 7,375 | 1.68 |
+  | | XY-cut, by area | 14,133 | 2,635 | 509 | 8,752 | 5,446 | 1.75 |
+  | | combined | 8,687 | 2,088 | 402 | 8,739 | 0 | 1.71 |
+
+  - **Combined:** decoration, text-only tiles skipped, XY-cut, rendered by area.
+  - **A configuration not shown for some pages** tiles them as the row above it: decoration doesn't change wide pages, and wide bands don't change drawings.
+  - **Figures not seen whole on report pages:** 110 rise to 180 with decoration. Most are tables the figure finder calls figures, their fills taken as text panels (LUVOIR's tables), so the table reader reads them.
+- **Read with the model:**
+  - **The knobs** (one reading each; facts found right of 23 in every configuration):
+
+    | Knob | today: images, misbound, loose | text-only skipped | wide bands | XY-cut, by area | combined |
+    |---|---|---|---|---|---|
+    | slide | 17, 10, 1 (and 1 hallucinated) | 5, 8, 0 | 5, 0, 0 | 7, 0, 0 | 5, 0, 0 |
+    | wide-letter | 14, 4, 5 | 6, 4, 5 | 4, 0, 1 | 7, 0, 1 | 4, 0, 1 |
+    | landscape | 14, 1, 17 | 6, 0, 16 | 4, 0, 0 (1 hallucinated) | 7, 0, 0 (1 hallucinated, 1 text) | 4, 0, 0 (1 hallucinated) |
+    | background | 8, 0, 0 | 3, 0, 0 | 3, 0, 0 | 3, 0, 0 | 3, 0, 0 |
+    | decorated | 6, 0, 0 | 3, 0, 0 | 3, 0, 0 | 3, 0, 0 | 3, 0, 0 |
+
+  - **The controlled corpus** (89 documents):
+    - Decoration: 11 tiles fewer, facts right 3,438 as before.
+    - Text-only skipped: 73 tiles fewer, facts right 3,419. Every fact lost is on the six plan sheets (`lcc-plan`), 3 or 4 each.
+    - Rendered by area (ten documents, one per family): facts right 372 → 366, loose 57 → 48, inexact 62 → 69. No gain on Letter pages.
+  - **Six gallery pages** (no key: distinct numeric values found by every task together):
+
+    | Page | today: values, images | XY-cut, by area: values (lost), images | combined: values (lost), images |
+    |---|---|---|---|
+    | h2-amr p8 (slide) | 7, 7 | 6 (1), 7 | 6 (1), 5 |
+    | nesc-thermal p20 (text slide) | 0, 5 | 0, 3 | 0, 1 |
+    | 2013 rules p44 (schedule) | 54, 13 | 53 (2), 4 | 53 (2), 4 |
+    | poster-radiation | 4, 117 | 7 (1), 82 | 6 (2), 44 |
+    | scical p7 (notes sheet) | 88, 37 | 63 (26), 21 | 62 (27), 10 |
+    | dc p23 (drawing sheet) | 78, 37 | 60 (20), 24 | 50 (28), 3 |
+
+- **What it shows:**
+  - **On slides and landscape pages, XY-cut and skipping text-only tiles hold up.** Combined, they cut the tiles by two thirds (images by 43%), lose no fact on the knobs, and leave almost no misbound claims.
+  - **Wide bands** cut no line on slides, but a slide's columns leave no full-width gap. The band then falls back to an overlapping cut through every column (h2-amr p8). XY-cut cuts at the columns.
+  - **Decoration** halves the bands sent on report pages at no cost in facts.
+  - **Drawing sheets are the exception.** Text-only tiles skipped lose facts there: the corpus's plan sheets, and both gallery sheets. A drawing's labels mean what they sit beside, and its text tasks come back partial (12 of 19 on dc p23). XY-cut's larger tiles also found fewer values there than the overlapping grid, even without skipping. One reading per page and no key, so not every lost value was right.
+  - **Snapped** halves the lines read twice but keeps nearly every tile. Paragraphs that run the page's width leave its cuts nowhere to go.
+- **Fixed by eye on the way:**
+  - Furniture by place alone took a report appendix's picture strips (HabEx p429 to p441), so it now needs the same drawing or image.
+  - A chart's lines hold their labels in their boxes (LUVOIR p203), so a text panel must be filled.
+  - Underlines, masks behind a drawing's notes, and panels joined the decoration after the gallery showed them keeping text tiles.
+  - XY-cut blocks fit by area, longer where rendered by area: a poster's text column, about 680 points wide, fell back to the grid.
+- **Directions for milestone 8 (tweaks and partitions):**
+  - **Partition:** skip text-only tiles everywhere but drawing sheets.
+  - **Tweak:** on drawing sheets, XY-cut blocks no larger than a tile; a block with no gap cut into strips, not the grid.
+  - **Tweak:** quotation bars beside text as decoration (HabEx p4 still sends a band).
+  - **Wide bands:** dropped in favour of XY-cut.
+  - **Rendered by area:** only with long tiles.
+  - **Before any default:** the held-out pages measured, and the slices read.
+
 Each is a lever, measured first by milestone 1's measures and the gallery, then with the model on the knobs, the gallery's pages and the controlled corpus.
 
 - **Decoration set aside:** what doesn't count as a graphic, for keeping or skipping tiles.

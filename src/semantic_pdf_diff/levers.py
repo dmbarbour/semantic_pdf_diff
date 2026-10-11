@@ -23,6 +23,7 @@ from is in segmentation.py; a document's caches and access are in the reader the
 """
 import hashlib
 import json
+import math
 import re
 from dataclasses import dataclass
 from functools import lru_cache
@@ -244,22 +245,55 @@ class TileLocator(Lever):
         images = super().tile_images(reader, page, rect, tag)
         return images + ([reader.locator(page, rect, tag)] if self.tile_locator and tag.startswith("tile") else [])
 
+class Decoration(Lever):
+    lever_name, stage, off = "decoration", "segmentation", {"decoration": False}
+    # set decoration aside when a tile's graphics are counted: rules, margin bars, a frame's sides, what repeats in
+    # the same place on neighbouring pages, an image behind a page's visible text (segmentation.decoration)
+    decoration: Annotated[bool, _selecting(VISUAL)] = False
+
+    def content_graphics(self, reader, page):
+        graphics = super().content_graphics(reader, page)
+        if not self.decoration:
+            return graphics
+        found = set(map(tuple, reader.decoration(page)))
+        return [g for g in graphics if tuple(g) not in found]
+
 class Tiling(Lever):
-    lever_name, stage, off = "tiling", "segmentation", {"tiling": "grid"}
+    lever_name, stage, off = "tiling", "segmentation", {"tiling": "grid", "band_width": 1.6}
     # bands: full-width, cut at whitespace gaps, on report-sized pages
     tiling: Annotated[Literal["grid", "bands"], _selecting(VISUAL)] = "bands"
+    # pages up to this many tiles wide get bands; past 1.6, a band is lower, keeping its area (segmentation.band_height)
+    band_width: Annotated[float, _selecting(VISUAL)] = Field(default=1.6, ge=1.0, le=6.0)
 
     def tiles(self, reader, page):
-        """On a report-sized page, full-width bands cut at whitespace gaps, skipping bands with no graphics (text
-        tasks already cover them); otherwise the platform's grid."""
+        """On a report-sized page, full-width bands cut at whitespace gaps, skipping bands with no graphics that count
+        (text tasks already cover them); otherwise the platform's tiles."""
         side = self.tile_points
-        if self.tiling != "bands" or page.rect.width > 1.6 * side:
+        if self.tiling != "bands" or page.rect.width > self.band_width * side:
             return super().tiles(reader, page)
-        from .segmentation import bands
-        graphics = reader.graphics(page)
+        from .segmentation import band_height, bands
+        graphics = self.content_graphics(reader, page)
         return [(f"tile:{i}", r, "") for i, r in enumerate(
-            b for b in bands(page, side, lines=reader.lines(page), graphics=graphics)
+            b for b in bands(page, band_height(page.rect.width, side), lines=reader.lines(page),
+                             graphics=reader.graphics(page))
             if any(b.intersects(g) for g in graphics))]
+
+class TileCut(Lever):
+    lever_name, stage, off = "tile_cut", "segmentation", {"tile_cut": "grid"}
+    # how a page not cut into bands is cut: grid (evenly, overlapping), snapped (the grid's cuts moved to whitespace,
+    # overlapping only where they cross something), xycut (blocks found by whitespace both ways, merged into tiles)
+    tile_cut: Annotated[Literal["grid", "snapped", "xycut"], _selecting(VISUAL)] = "grid"
+
+    def cut_page(self, reader, page, rect):
+        if self.tile_cut == "grid":
+            return super().cut_page(reader, page, rect)
+        from .segmentation import BAND_AREA, STRIP_REACH, snapped, xy_cut
+        lines, graphics = reader.lines(page), self.content_graphics(reader, page)
+        if self.tile_cut == "snapped":
+            return snapped(rect, self.tile_points, lines, graphics)
+        # longer blocks where they're rendered by their area, as detailed as today's widest band
+        reach = STRIP_REACH if getattr(self, "render_area", False) else BAND_AREA
+        return xy_cut(rect, self.tile_points, lines, graphics, most=reach)
 
 class GrowTiles(Lever):
     lever_name, stage, off = "grow_tiles", "segmentation", {"grow_tiles": False}
@@ -307,6 +341,32 @@ class SkipEmpty(Lever):
         from .segmentation import _empty
         return [x for x, blank in zip(regions, _empty(page, [r for _, r, _ in regions], reader.lines(page),
                                                      reader.graphics(page))) if not blank]
+
+class SkipTextOnly(Lever):
+    lever_name, stage, off = "skip_text_only", "segmentation", {"skip_text_only": False}
+    # don't send tiles holding text and no graphic that counts (the text tasks read them), on every page, as bands
+    skip_text_only: Annotated[bool, _selecting(VISUAL)] = False
+
+    def kept_tiles(self, reader, page, regions):
+        regions = super().kept_tiles(reader, page, regions)
+        if not self.skip_text_only or not regions:
+            return regions
+        texts = [box for box, _ in reader.lines(page) if not box.is_empty]
+        graphics = self.content_graphics(reader, page)
+        return [x for x in regions if not any(x[1].intersects(b) for b in texts)
+                or any(x[1].intersects(g) for g in graphics)]
+
+class RenderArea(Lever):
+    lever_name, stage, off = "render_area", "segmentation", {"render_area": False}
+    # render a long region to a square's pixel area (image_side squared), not its longer side to image_side: a 4:1
+    # band gets twice the detail; the model's image budget is an area (research: gemma4-images-2026-09-30)
+    render_area: Annotated[bool, _shaping(VISUAL)] = False
+
+    def render_side(self, rect):
+        side = super().render_side(rect)
+        if not self.render_area or rect.is_empty:
+            return side
+        return round(side * math.sqrt(max(rect.width, rect.height) / min(rect.width, rect.height)))
 
 class FigureTasks(Lever):
     lever_name, stage, off = "figure_tasks", "segmentation", {"figure_tasks": False}
@@ -463,7 +523,8 @@ class DedupeRepeated(Lever):
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
-                 TileLocator, Tiling, GrowTiles, SheetDetails, SkipEmpty, FigureTasks, TableRules, TableReview,
+                 TileLocator, Decoration, Tiling, TileCut, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly, RenderArea,
+                 FigureTasks, TableRules, TableReview,
                  TableStructure, VisualTextLayer, TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading,
                  Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
@@ -690,10 +751,25 @@ class Platform(Composable):
 
     @chosen
     def tiles(self, reader, page):
-        """A page's tiles, [(tag, Rect, note)]: the platform's are an overlapping grid, each tile grown."""
-        from .segmentation import tiles
+        """A page's tiles, [(tag, Rect, note)]: the page cut (cut_page), each tile grown."""
         return [(f"tile:{i}", self.grow(reader, page, r, page.rect), "")
-                for i, r in enumerate(tiles(page.rect, self.tile_points))]
+                for i, r in enumerate(self.cut_page(reader, page, page.rect))]
+
+    @chained
+    def cut_page(self, reader, page, rect):
+        """[Rect]: an area cut into tiles; the platform's cut is an overlapping grid."""
+        from .segmentation import tiles
+        return list(tiles(rect, self.tile_points))
+
+    @chained
+    def content_graphics(self, reader, page):
+        """[Rect]: the page's graphics that make a tile worth sending (Context.graphics: drawings and images)."""
+        return reader.graphics(page)
+
+    @chained
+    def render_side(self, rect):
+        """Pixels a region's longer side is rendered at."""
+        return self.image_side
 
     @chained
     def grow(self, reader, page, rect, within):

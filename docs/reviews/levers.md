@@ -29,6 +29,11 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Table rules | `table_rules: 0` | Default for Excel's tables: every table asked how it's read (2026-10-05; the owner's design, not a round) | see the lever's section |
 | Table review | `table_review: 10` (the most reviews) | Default (2026-10-07; the owner's idea, not a round) | the controlled corpus: 30 of 137 tables' rules revised on review; facts as before; one revision pair more read alike |
 | Table structure | `table_structure: true` (with the PDF heuristics, reader `pdf/3`) | Default (2026-10-07; the owner's design, not a round) | HabEx p4 and p7 read as printed; the development slices: 15 of 96 parts restructured by rules, 42 called not a table; see the lever's section |
+| Decoration set aside | `decoration` | Off; measured (2026-10-11, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 3) | Report pages: half their bands not sent, no fact lost on the controlled corpus (11 tiles fewer); see the lever's section |
+| Text-only tiles skipped | `skip_text_only` | Off; measured (milestone 3) | Slides and landscape pages: no fact lost, misbound claims mostly gone; drawing sheets: facts lost (the corpus's plan sheets, 3 or 4 each) |
+| Bands on wide pages | `band_width: 2.4` | Off (1.6); measured (milestone 3) | Slides: no line cut sideways, a third of the tiles; but bands cut multi-column slides across |
+| Tile cut | `tile_cut: snapped, xycut` | Off (`grid`); measured (milestone 3) | XY-cut: lines cut and read twice down by 80% to 90% on wide pages, no fact lost on the knobs; values lost on two drawing sheets |
+| Render by area | `render_area` | Off; measured (milestone 3) | Ten corpus documents: facts right 372 → 366, loose 57 → 48; no gain on Letter pages |
 
 ## Levers
 
@@ -207,6 +212,26 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
   - a larger thumbnail on sheets
   - the thumbnail only for tiles that cut a figure
 
+### Tile selection candidates (`decoration`, `skip_text_only`, `band_width`, `tile_cut`, `render_area`)
+
+Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 3 (2026-10-11), each off by default. Measured without the model on every development page of the samples (`scripts/tiling.py measure`, the plan has the tables), and with the model on the knobs, the controlled corpus and six gallery pages (`scripts/tiling.py read`).
+
+- **Decoration set aside** (`decoration`, `segmentation.decoration`): graphics that don't make a tile worth sending. Rules and margin bars (up to 8 pt thick, a third of the page long), what's drawn alike in the same place on neighbouring pages, underlines, masks behind text, filled panels holding only text, and an image behind most of a page's visible text.
+  - **Got:** report pages send half their bands; the knobs' background page sends one tile, not six. The corpus read with the model: 11 tiles fewer, the same facts.
+  - **Fixed on the way:** furniture by place alone took a report appendix's picture strips (a different picture in the same place on each page); it must be drawn alike. A chart's lines hold their labels in their boxes, so a panel must be filled.
+  - **Next:** quotation bars beside text (HabEx p4 still sends a band); measure on the held-out pages before any default.
+- **Text-only tiles skipped** (`skip_text_only`): as bands already are, on every page.
+  - **Got:** slides and landscape pages lose no fact and most misbound claims (the slide knob: 10 misbound to none, with XY-cut). Drawing sheets lose facts: the corpus's six plan sheets 3 or 4 each, and the gallery's two sheets their notes' values. Labels on a drawing mean what they sit next to, and a drawing's text tasks come back partial.
+  - **Next (partition):** skip on pages that aren't drawing sheets only.
+- **Bands on wide pages** (`band_width`), lower so a band's area stays today's widest band's (`segmentation.band_height`).
+  - **Got:** on slides no line cut sideways, a third of the tiles. But a slide's columns leave no full-width gap, so a band falls back to an overlapping cut through all of them (h2-amr p8).
+  - **Next:** none for now; XY-cut does better on slides.
+- **Tile cut** (`tile_cut`): `snapped` moves the grid's cuts to whitespace, overlapping only where they cross something; `xycut` cuts at whitespace both ways and merges blocks into tiles no larger than today's widest band (longer, 2.4 tiles, with `render_area`).
+  - **Got:** snapped halves the lines cut and read twice but keeps nearly every tile. XY-cut cuts 80% to 90% fewer lines on wide pages; the knob slide's misbound claims are gone, and slides go from six tiles to two (h2-amr p8). On the two gallery drawing sheets, XY-cut's larger tiles found 20 and 26 fewer distinct values than the grid's overlapping tiles. One reading each and no key, so not every lost value was right.
+  - **Next (tweak):** on drawing sheets, XY-cut blocks no larger than a tile; a block with no gap cut into strips, not the grid.
+- **Render by area** (`render_area`): a region rendered to the pixel area of a square at `image_side`, so a long band isn't enlarged by the model. A variant of the idea below (*Render every image at gemma-4's budget size*).
+  - **Got:** no gain on Letter pages (ten corpus documents: facts right 372 → 366, loose 57 → 48, inexact 62 → 69: likely noise). It's what makes long tiles affordable for XY-cut and wide bands.
+
 ## Ideas not built yet
 
 Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so none is forgotten.
@@ -218,7 +243,7 @@ Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so no
 | Send a one-row table's row without repeating it as its header | Query checks, 2026-09-28 | Ken manual "AC Rating ... 6.4 kW", and an NREL "table" made of equation debris |
 | Drop text tasks that hold only a watermark or title-block boilerplate | Query checks, 2026-09-28 | A ken-cd text task holding only "PRODUCED BY AN AUTODESK STUDENT PRODUCT" |
 | Recognise charts and diagrams parsed as tables (axis labels, legends, empty cells; a sequence diagram's lifelines taken for column rules) | Query checks, 2026-09-28; the table filter lever (r01b); [controlled documents](../plans/controlled-documents-2026-10-01.md), the procedure diagram (2026-10-04) | IEA-15 airfoil polar legends sent as tables; the table filter was inconclusive in r01b. The controlled sequence chart's labels were cut at its lifelines into cells: of the table reader's 7 claims, 2 hallucinated ("5\|72 s" read as 72 s), 2 misread (step numbers as values), 1 loose |
-| Render every image at gemma-4's budget size (about 645,000 px, sides in multiples of 48): 768 × 768 tiles, 1584 × 396 for 4:1 bands | [How gemma-4 sees images](../research/gemma4-images-2026-09-30.md) | Bands rendered at 1000 px wide are enlarged to 1584 px: ~250,000 real pixels against ~590,000 for a tile Measured by the [eye tests](../research/eye-tests-2026-09-30.md): 4:1 bands read 1.3 × finer at 1584 × 384 than at 1000 × 250; tiles read the same at 768² as at 1000². |
+| Render every image at gemma-4's budget size (about 645,000 px, sides in multiples of 48): 768 × 768 tiles, 1584 × 396 for 4:1 bands. A variant built as `render_area` (2026-10-11): every region at `image_side` squared, the host shrinking it | [How gemma-4 sees images](../research/gemma4-images-2026-09-30.md) | Bands rendered at 1000 px wide are enlarged to 1584 px: ~250,000 real pixels against ~590,000 for a tile Measured by the [eye tests](../research/eye-tests-2026-09-30.md): 4:1 bands read 1.3 × finer at 1584 × 384 than at 1000 × 250; tiles read the same at 768² as at 1000². |
 | Smaller tiles on drawings (e.g. 280 points) | The same note | 1.5 × the linear detail at 2.25 × the tiles; small dimension text misread on sheets |
 | Images before the text in each query | Google's guidance for gemma-4 | Not yet measured |
 | Repeat the request after long inputs (a "sandwich"): short headers and the query again at the end. Variants: a brief reminder of the task and output format after the data; the whole prompt twice; headings repeated beside the data | The owner, 2026-09-30: gemma-4's long context may not hold equal quality at start and end | Models use the start and end of long inputs best ([Liu et al., "Lost in the Middle", TACL 2024](https://arxiv.org/abs/2307.03172)). Repeating the whole prompt won 47 of 70 tests with no losses for models not reasoning ([Leviathan et al., Google, 2025](https://arxiv.org/abs/2512.14982)); it lets early tokens attend to what comes later, and costs only input tokens. Our longest prompts are situating's (median 1,400 tokens, up to 14,000), the judges' v6 and future summaries; extraction prompts are short (median ~750 tokens), where repeating costs about $0.0001 a query. Whether gemma-4 reasons by default on DeepInfra is unchecked |

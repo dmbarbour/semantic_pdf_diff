@@ -6,10 +6,10 @@ counted, not measured). Each tile is measured against the page's text lines, wor
 - **lines cut sideways:** a line the tile holds in height but not in length (the trials review's measure: 6,400 on
   the samples' grid pages); **lines cut across:** a line a tile's top or bottom edge runs through
 - **words cut:** a word the tile touches but doesn't hold
-- **graphics share:** the part of the tile graphics cover (on a 2-point raster, rounded outward: a hairline rule
-  counts as 2 points wide)
-- **text only:** text and no graphic (a text task already reads it); **decoration only:** graphics, all of them
-  decoration (the caller's), and no text; **blank:** neither
+- **graphics share:** the part of the tile graphics other than decoration cover (on a 2-point raster, rounded
+  outward: a hairline rule counts as 2 points wide)
+- **text only:** text and no graphic other than decoration (a text task already reads it); **decoration only:**
+  graphics, all of them decoration (the caller's), and no text; **blank:** neither
 
 and the page as a whole:
 
@@ -99,14 +99,14 @@ def measure_tile(rect, lines, word_boxes, graphics, decoration=()):
     content = [g for g in touching if g not in decoration]
     has_text = any(_meets(b, rect) for b in boxes)
     raster = _Raster(rect)
-    for g in touching:
+    for g in content:
         raster.add(g)
     return {
         "lines_cut_sideways": sum(1 for b in boxes if _cut_sideways(b, rect)),
         "lines_cut_across": sum(1 for b in boxes if _cut_across(b, rect)),
         "words_cut": sum(1 for w in map(_box, word_boxes) if _meets(w, rect) and not _held(w, rect)),
-        "graphics_share": round(raster.share(), 4) if touching else 0.0,
-        "text_only": has_text and not touching,
+        "graphics_share": round(raster.share(), 4) if content else 0.0,
+        "text_only": has_text and not content,
         "decoration_only": not has_text and bool(touching) and not content,
         "blank": not has_text and not touching,
     }

@@ -7,6 +7,7 @@ review's table can be read off a run (`summary`). Two runs over the same pages c
 With the model, a run's store says how its image tasks were answered (`answers`).
 """
 import json
+import math
 from collections import defaultdict
 from pathlib import Path
 
@@ -19,12 +20,15 @@ from semantic_pdf_diff.tiling import measure, words
 COUNTS = ("tiles", "images", "lines_cut_sideways", "lines_cut_across", "words_cut", "text_only", "decoration_only",
           "blank", "lines_read_twice", "figures_not_whole")
 
-def documents(folder, first=None):
-    """(name, an open PDF) for each PDF and image under folder, sorted by path; first: only the first n pages are
-    measured (the trials review measured the first 40 of each)."""
+def documents(folder, first=None, exclude=()):
+    """(name, an open PDF) for each PDF and image under folder, sorted by path, but those whose path holds any of
+    `exclude` (such as "heldout/"); first: only the first n pages are measured (the trials review measured the first
+    40 of each)."""
     for path in sorted(Path(folder).rglob("*")):
         extension = path.suffix.lower()
         if extension != ".pdf" and extension not in IMAGE_EXTENSIONS:
+            continue
+        if any(part in str(path.relative_to(folder)) for part in exclude):
             continue
         try:
             doc = (pymupdf.open(path) if extension == ".pdf"
@@ -41,27 +45,45 @@ def _settings():
     return _DEFAULT[0]
 
 def mode(settings, page):
-    """How the configuration tiles a page: "bands", "grid", or "one" (no larger than a tile)."""
+    """How the configuration tiles a page: "bands", the cut of a page not in bands ("grid", "snapped", "xycut"), or
+    "one" (no larger than a tile)."""
     if max(page.rect.width, page.rect.height) <= settings.tile_points:
         return "one"
-    if getattr(settings, "tiling", "grid") == "bands" and page.rect.width <= 1.6 * settings.tile_points:
+    if (getattr(settings, "tiling", "grid") == "bands"
+            and page.rect.width <= getattr(settings, "band_width", 1.6) * settings.tile_points):
         return "bands"
-    return "grid"
+    return getattr(settings, "tile_cut", "grid")
 
 def measure_page(settings, reader, page, number):
-    """One page's measures under settings, with its mode and size."""
+    """One page's measures under settings, with its mode and size. Decoration is found whatever the settings
+    (segmentation.decoration), so text-only tiles count alike in every configuration."""
     regions = settings.visual_regions(reader, page, number)
     figures = [shown(page, f.bbox) for f in reader.figures(page, number) if f.region]
-    result = measure(page, regions, reader.lines(page), reader.graphics(page), words(page), figures)
-    result["page"].update(mode=mode(settings, page), width=round(page.rect.width), height=round(page.rect.height))
+    result = measure(page, regions, reader.lines(page), reader.graphics(page), words(page), figures,
+                     reader.decoration(page))
+    tiles = [r for tag, r, _ in regions if tag.startswith("tile")]
+    for t, r in zip(result["tiles"], tiles):
+        t["detail"] = detail(r, settings.render_side(r))
+    result["page"].update(mode=mode(settings, page), width=round(page.rect.width), height=round(page.rect.height),
+                          detail=min((t["detail"] for t in result["tiles"]), default=None))
     return result
 
-def run(folder, settings=None, first=None, errors=None):
+BUDGET_PIXELS = 645_000  # what gemma-4 sees of an image at its default budget, whatever its shape (research:
+# gemma4-images-2026-09-30): a larger render is shrunk to this area, a smaller one enlarged without new detail
+
+def detail(rect, side):
+    """Pixels per point the model sees of a region rendered with its longer side at `side` (visuals.render)."""
+    if rect.is_empty:
+        return None
+    scale = min(2.5, side / max(rect.width, rect.height))
+    return round(min(scale, math.sqrt(BUDGET_PIXELS / (rect.width * rect.height))), 3)
+
+def run(folder, settings=None, first=None, errors=None, exclude=()):
     """[{"file", "page", **measures}] for every page under folder (per-tile measures under "per_tile")."""
     from semantic_pdf_diff.context import Context
     settings = settings or _settings()
     rows = []
-    for name, doc in documents(folder, first):
+    for name, doc in documents(folder, first, exclude):
         with doc:
             reader = Context(doc, settings)
             for number, page in enumerate(doc):
@@ -133,11 +155,43 @@ def answers(store, key=None):
         c["claims"] += len(found)
         if kind.startswith("tile"):
             tile_claims += found
-    if key is not None and tile_claims:
+    if key is not None:
         from .controlled import score
-        result = score(key, tile_claims)
-        out["tile outcomes"], out["tile facts right"] = result["outcomes"], result["found_right"]
+        if tile_claims:
+            result = score(key, tile_claims)
+            out["tile outcomes"], out["tile facts right"] = result["outcomes"], result["found_right"]
+        result = score(key, [c for found in claims.values() for c in found])
+        out["outcomes"], out["facts right"], out["facts"] = (result["outcomes"], result["found_right"],
+                                                             len(key["facts"]))
     return out
+
+def read(paths, configurations, out, base, fixture, max_cost, ledger=None, tags=None):
+    """Each document read alone (the same document both sides: extraction only) under each configuration, its answers
+    recorded into `fixture` (only queries it doesn't hold are asked). paths: PDFs, each scored against the answer key
+    beside it (NAME.key.json) if there is one; configurations: {label: overrides}; base: the settings file the
+    overrides apply to, with the default levers (a candidate's lever is off when absent, so queries are the same).
+    Returns {label: {document: answers}} and the spend, stopping when max_cost is reached."""
+    from semantic_pdf_diff import ledger as ledgers, pipeline
+    from semantic_pdf_diff.levers import DEFAULT_LEVERS
+    found, spent = {}, 0.0
+    for label, overrides in configurations.items():
+        for path in map(Path, paths):
+            left = max_cost - spent
+            if left <= 0:
+                return found, spent
+            before = ledgers.spent(ledger, **(tags or {})) if ledger else 0.0
+            settings = pipeline.settings_from(base, levers=list(DEFAULT_LEVERS), situate=False, max_cost=round(left, 4),
+                                              **overrides)
+            options = pipeline.RunOptions(mode="proposals", fixture=fixture, fixture_mode="record-new")
+            if ledger:
+                options.ledger, options.ledger_tags = ledger, {**(tags or {}), "run": f"{label}:{path.stem}"}
+            folder = Path(out) / label / path.stem
+            code = pipeline.attempt(pipeline.compare_paths, path, path, folder, settings, options)
+            spent += (ledgers.spent(ledger, **(tags or {})) - before) if ledger else 0.0
+            key_path = path.with_name(path.stem + ".key.json")
+            key = json.loads(key_path.read_text()) if key_path.exists() else None
+            found.setdefault(label, {})[path.stem] = {"exit": code, **answers(folder / "store.sqlite", key)}
+    return found, spent
 
 def save(rows, path):
     Path(path).write_text(json.dumps(rows))
