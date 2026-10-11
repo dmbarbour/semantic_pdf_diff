@@ -168,13 +168,14 @@
   | clean | 1 | 0 | 8 | 8 | 0 | 0 | 8 of 23 |
   | slide | 12 | 2 | 49 | 26 | 1 | 11 | 22 of 23 |
   | wide-letter | 12 | 3 | 47 | 30 | 8 | 5 | 22 of 23 |
-  | landscape (before) | 12 | 1 | 65 | 34 | 17 | 1 | 23 of 23 |
+  | landscape (2026-10-09) | 12 | 1 | 65 | 34 | 17 | 1 | 23 of 23 |
   | background | 6 | 3 | 22 | 23 | 0 | 0 | 23 of 23 |
   | frame, frame-lines | 1 | 0 | 8 | 8 | 0 | 0 | 8 of 23 |
   | scanned-frame | 6 | 3 | 22 | 23 | 0 | 0 | 23 of 23 |
 
-  - **The grid knobs** (slide, wide-letter, landscape) bring loose and misbound claims from cut lines. The text tasks read every fact already.
-  - **Background:** six tiles where the clean page sends one; half come back empty, and every fact they find the text tasks find too. That's the cost of cause 4.
+  - **Every knob's document finds all 23 facts:** the text reader 83% of them (landscape 100%), the table reader 35%, the overview all 23.
+  - **The grid knobs** (slide, wide-letter, landscape) add loose and misbound claims from cut lines, and no facts. The slide's tiles give 11 misbound claims and the document's one hallucinated claim; the clean page gives 25 right claims and nothing else.
+  - **Background:** six tiles where the clean page sends one, half of them empty. The document scores as the clean page does (23 facts, no loose or misbound claims), at five more image queries. That's the cost of cause 4.
   - **The frames change nothing today.** A one-path frame is left out as a frame, and lines with no height meet no tile. They stay as regression cases for decoration filters.
   - **The scanned frame is read by tiles alone,** as it should be: the page has no text layer.
 - **Found on the way:** the row-by-row run of a deck (`wtp-datasheets-s1.pptx`) still held its reading from before decks' key-value tables (pptx/8). It caught up when recorded, and now matches the standard run.
