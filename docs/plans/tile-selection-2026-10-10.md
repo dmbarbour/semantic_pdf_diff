@@ -77,7 +77,7 @@
 
 - **What they show:**
   - **Grid pages are 14% of the samples' pages but 76% of their tiles.** They hold every line cut sideways, and 93% of the lines read twice.
-  - **Bands cut no line sideways, but 2,598 across.** Where a page has no gap in a band's window, the band's edge runs through a line.
+  - **Bands cut no line sideways, but 2,598 across.** Likely where a band's window holds no gap and the band falls back to an overlapping cut, not yet checked; the gallery will show them.
   - **No tile is blank** (`skip_empty` drops them), and none is decoration only, because decoration isn't told apart until milestone 3.
 - **Caveats:**
   - **Figures not seen whole** include those the product leaves to the overview: a figure covering 90% of the page, such as a drawing sheet or a cover. The gallery will tell those apart.
