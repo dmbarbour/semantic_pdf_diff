@@ -36,6 +36,7 @@ python scripts/fetch_samples.py --all --make-zips
 | `3gpp-rel19-aiml-views` | Nine companies' competing views in `.pptx`, `.docx` and PDF |
 | `archive-edge-cases` | Nested zips |
 | `nasa-flagship-concepts` (optional, ~320 MB) | Competing mission-concept reports, interim and final |
+| `wide-pages` (optional, ~145 MB) | Pages wider than bands serve, for tile selection: slide decks, landscape text pages, construction drawings and posters, split into `dev/` and a held-out test set, `heldout/` (measured only to check a change already chosen on `dev/`) |
 
 The 3GPP files are kept as downloaded zips, since zips are meant to be read as folders. Sources and terms are in `scripts/samples.json`. For example:
 

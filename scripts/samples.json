@@ -596,6 +596,263 @@
           "bytes": 1850465
         }
       ]
+    },
+    "wide-pages": {
+      "default": false,
+      "use": "Pages wider than bands serve (over 1.6 x 420 = 672 points), where the image tasks fall back to an overlapping grid: slide decks (4:3 and 16:9), landscape text pages, construction drawings (ARCH D and tabloid sheets), and conference posters (one has no text layer). For tile selection (docs/plans/tile-selection-2026-10-10.md). dev/ is for developing heuristics and levers; heldout/ is a test set, measured only to check a change already chosen on dev/. Families (one publisher's template, or one author's posters) never straddle the two; the held-out families were chosen by rule before any comparison: within each category, families sorted by the SHA-256 of their first file, every third from the first held out.",
+      "terms": "U.S. government works and U.S. government-funded reports: NREL (docs.nlr.gov), NASA (NTRS), DOE (energy.gov), NIST, EIA, NPS, and DOE Solar Decathlon 2015 team drawings (Internet Archive first; solardecathlon.gov fails TLS verification). Downloaded for local testing only, not redistributed.",
+      "files": [
+        {
+          "path": "dev/drawings/nps-crissy.pdf",
+          "urls": [
+            "https://parkplanning.nps.gov/showFile.cfm?sfid=245931&projectID=63094"
+          ],
+          "sha256": "dbe4501e65a02eeb013de717d295b8c1a383061c5de83ffbcd4334c0ec5a4964",
+          "bytes": 5244078
+        },
+        {
+          "path": "dev/drawings/sd15-stevens-drawings.pdf",
+          "urls": [
+            "https://web.archive.org/web/20160323172346id_/http://www.solardecathlon.gov/2015/assets/pdfs/stevens-drawings.pdf",
+            "https://www.solardecathlon.gov/2015/assets/pdfs/stevens-drawings.pdf"
+          ],
+          "sha256": "e1f2fcbba717ca0f9d89e515401f37fb8580a15e86296b2382382b79a6613cc0",
+          "bytes": 13842339
+        },
+        {
+          "path": "dev/landscape-text/eia-aeo2023.pdf",
+          "urls": [
+            "https://www.eia.gov/outlooks/aeo/pdf/AEO2023_Narrative.pdf"
+          ],
+          "sha256": "571c10176dad2f2a4fe0a3d36bb9870980fd77e289b5b1fdb2a1d0df35866855",
+          "bytes": 3824628
+        },
+        {
+          "path": "dev/posters/poster-ablation.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20220016674/downloads/AW_FraileIzquierdo_Poster_36x48.pdf"
+          ],
+          "sha256": "47c2fb7acd1fea4553464f101b92ff1cc64bf6a480abedc579cef39b6517af6a",
+          "bytes": 2079697
+        },
+        {
+          "path": "dev/posters/poster-applepies.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20230015497/downloads/APPLEPIES_Lostroscio_Poster.pdf"
+          ],
+          "sha256": "cfc5debd0861621b45ad04518ff49fd1a0700848f6949f4b13802fb9571261d5",
+          "bytes": 946185
+        },
+        {
+          "path": "dev/posters/poster-dust.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20260002821/downloads/Dust%20Mitigation%20Roadmap%20poster%2020260413%20JHL.pdf"
+          ],
+          "sha256": "1af83f68fecce115461b4dde93a0fdfc1a71ee056932256e161904cfbe50d6ce",
+          "bytes": 1101938
+        },
+        {
+          "path": "dev/posters/poster-evanav.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20260003128/downloads/EVA_Nav_Solutions_Poster_LSIC_April_2026_RevD.pdf"
+          ],
+          "sha256": "939699187f173289eca3d5a193f3dbeb6421cd8df582f13b8937ace253291591",
+          "bytes": 1551343
+        },
+        {
+          "path": "dev/posters/poster-htsc.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20250008606/downloads/HTSCPoster_GAR_STRIVES_8-20-25.pdf"
+          ],
+          "sha256": "bb8a8bd06e2044a8bc56871d938d48651d18585cecf0fb22f835236f43a62b08",
+          "bytes": 2189123
+        },
+        {
+          "path": "dev/posters/poster-lpsc.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20240002849/downloads/Patridge_LPSC_Poster_2553_4%20Edited.pdf"
+          ],
+          "sha256": "607b2bca1dfcea12404a51a6b66e2076db57b3f38e70dc6d6587113ac2b777eb",
+          "bytes": 2626739
+        },
+        {
+          "path": "dev/posters/poster-mmpact.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20230008890/downloads/MMPACT%20Jamboree%20Poster%202023%20-%20final.pdf"
+          ],
+          "sha256": "0b58354f40c176ee2b84bf94d40d361f5ddab1f68d08d9f3965ae334dcd28e03",
+          "bytes": 2850745
+        },
+        {
+          "path": "dev/posters/poster-multisorb.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20230016796/downloads/Vary%20et%20al%20MultiSORB%20poster%2011_16_23%20.pdf"
+          ],
+          "sha256": "6ed6f918cea14a8a914ad5e6bf3caf94e545dcaeec002067265b0924802578d6",
+          "bytes": 11944837
+        },
+        {
+          "path": "dev/posters/poster-radiation.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20240011288/downloads/Rad_Res_Poster.pdf"
+          ],
+          "sha256": "a5d9904f7a02fd2d3811eaeb7085c0218184b11b0775378470fa5d51c37d0f77",
+          "bytes": 3799137
+        },
+        {
+          "path": "dev/posters/poster-sic.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20230013079/downloads/ICSCRMPosterNeudeckFinal.pdf"
+          ],
+          "sha256": "d214cffac0e244b979506e909eee0e779c73fb8954618b4efffdbcfc2d91cedd",
+          "bytes": 9910049
+        },
+        {
+          "path": "dev/slides-16x9/atb2024.pdf",
+          "urls": [
+            "https://docs.nlr.gov/docs/fy24osti/89960.pdf"
+          ],
+          "sha256": "48aad67e23181fbb3d67e9c29cc4d57da5631a48f798029b79bbd8ec3f30ce1c",
+          "bytes": 4236622
+        },
+        {
+          "path": "dev/slides-16x9/cowe2024.pdf",
+          "urls": [
+            "https://docs.nlr.gov/docs/fy25osti/91775.pdf"
+          ],
+          "sha256": "e2ebc2fbf9d701d4d5792d3554db8a9c94c8eeb161dd613e6d37ab55e06c769b",
+          "bytes": 2932140
+        },
+        {
+          "path": "dev/slides-16x9/h2-amr-2023.pdf",
+          "urls": [
+            "https://www.energy.gov/sites/default/files/2023-06/h2amr-plenary-satyapal-2023_0.pdf"
+          ],
+          "sha256": "4ce3d574613cf403bf489bd144cecd7632a63329ea24fe1d0f6a707272d2deb7",
+          "bytes": 10604703
+        },
+        {
+          "path": "dev/slides-16x9/sam2023.pdf",
+          "urls": [
+            "https://docs.nlr.gov/docs/fy24osti/87987.pdf"
+          ],
+          "sha256": "899d6c15b9ae3e1a5261771362088c086bec5c65de6322d0bade17366d8e38bf",
+          "bytes": 1527111
+        },
+        {
+          "path": "dev/slides-4x3/nesc-thermal.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20220010258/downloads/NESC_Course_Instrument_Rapid_Thermal_Design_Final.pptx.pdf"
+          ],
+          "sha256": "c6a88c34c926ea6eb64a1165495d320038a5db4b4db93c76660747d795d39872",
+          "bytes": 1873458
+        },
+        {
+          "path": "heldout/drawings/sd15-calpoly-drawings.pdf",
+          "urls": [
+            "https://web.archive.org/web/20160411182809id_/http://www.solardecathlon.gov/2015/assets/pdfs/cal-poly-drawings.pdf",
+            "https://www.solardecathlon.gov/2015/assets/pdfs/cal-poly-drawings.pdf"
+          ],
+          "sha256": "d4dc3ccc65ec5626d98aa8fb18dc215ef4b1abc7f41c6afa3d81544afa9859ca",
+          "bytes": 37590581
+        },
+        {
+          "path": "heldout/landscape-text/nist-sp1300.pdf",
+          "urls": [
+            "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.1300.pdf"
+          ],
+          "sha256": "1e77c1bd63d1e15c48c870b7c17b7c9a2edf6bd5103b0940e72828515c9f1881",
+          "bytes": 934230
+        },
+        {
+          "path": "heldout/landscape-text/nist-sp1302.pdf",
+          "urls": [
+            "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.1302.pdf"
+          ],
+          "sha256": "9e10b6f32781732fa24a28d0a986564f2c3f40f6d6af5d2b98cf38ee128b67f2",
+          "bytes": 610760
+        },
+        {
+          "path": "heldout/landscape-text/nist-sp1305.pdf",
+          "urls": [
+            "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.1305.pdf"
+          ],
+          "sha256": "d81e11d9afe103a879d81556952913e45fa1022de3461014caa461579d3a6088",
+          "bytes": 710946
+        },
+        {
+          "path": "heldout/posters/poster-condensation.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20230010024/downloads/Poster_CEC_condensation.pdf"
+          ],
+          "sha256": "697c5960c72b42c13c47c68d6a4e0e8d4a311aac96214c69dcd6654b10a4243b",
+          "bytes": 1719601
+        },
+        {
+          "path": "heldout/posters/poster-cryo.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20260006789/downloads/Pinakidis_Poster_Cryo_Testing_Comp_SLAMS_2026.pdf"
+          ],
+          "sha256": "c897bad9c03bf6bffe1defcfd43e7f118c42506cecc40fd26c8ee0d31bed4796",
+          "bytes": 876771
+        },
+        {
+          "path": "heldout/posters/poster-ippw.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20240006329/downloads/IPPW24_poster_deshmukh_STRIVES.pdf"
+          ],
+          "sha256": "f0bac958c86b0dc48fbea97e55e220c83e2ae2d15d4fe11950bdccd8ad215164",
+          "bytes": 1370813
+        },
+        {
+          "path": "heldout/posters/poster-nsrec.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20240008403/downloads/2024-Obryan-NSREC-poster-v4.pdf"
+          ],
+          "sha256": "0874c80e904b0767858bdca663d9bef878b595f99652a585abbfbdddc69111e5",
+          "bytes": 1371893
+        },
+        {
+          "path": "heldout/posters/poster-protons.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20230004389/downloads/LaBel-2023-SEE-MAPLD-Protons-Poster.pdf"
+          ],
+          "sha256": "3ee7d44e1ce5ec6b96959cf0ab63911f71eb7ee5988188fecdb5bb9a066d5de8",
+          "bytes": 205630
+        },
+        {
+          "path": "heldout/posters/poster-stenvi.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20230016792/downloads/Poster%206103%20-%20STENVI%20Conversion.pdf"
+          ],
+          "sha256": "9646e4fb1ddc2892eee2a2e7ec27de9c0cf476b103f2225f996a5a092fc4bf9b",
+          "bytes": 4161007
+        },
+        {
+          "path": "heldout/slides-16x9/arcjet.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20250007899/downloads/TFAWS_ArcJetShortCourse_jdm.pdf"
+          ],
+          "sha256": "108dc6196f3d980dbdbb366cd6e1fbd71d725ef813fc7845279f7ccf53c4d022",
+          "bytes": 5383432
+        },
+        {
+          "path": "heldout/slides-16x9/liftoff-itiac.pdf",
+          "urls": [
+            "https://www.energy.gov/sites/default/files/2024-12/itiac-march-2024-goldman-liftoff-reports.pdf"
+          ],
+          "sha256": "507273ed9edc4fc7ba8d3fc5937379ebee27092ff9a55fcc2f7bc94a4fbb5b17",
+          "bytes": 1420170
+        },
+        {
+          "path": "heldout/slides-4x3/gsfc-thermal.pdf",
+          "urls": [
+            "https://ntrs.nasa.gov/api/citations/20230003714/downloads/Thermal%20Design%20for%20Spaceflight.pptx.pdf"
+          ],
+          "sha256": "63282dfff704e95cc50b9c5de9add040508779e22fda6ba203d207029607147b",
+          "bytes": 4956979
+        }
+      ]
     }
   }
 }

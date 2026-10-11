@@ -105,6 +105,35 @@
   - against a controlled key: right, loose and misbound claims
 - **Tests:** synthetic pages with known cuts.
 
+### 1b. More wide pages, with a held-out set
+
+**Done (2026-10-10).** The owner: "Look to the internet for a few more PDFs with grid pages. We can obtain more samples for metrics and reserve some as a test set to avoid overfitting. We can begin milestone 2 after we have more than 8 pages for the areas where our heuristics are failing."
+- **A new sample set, `wide-pages`** (`scripts/samples.json`, optional, about 145 MB; fetched and verified by `fetch_samples.py`).
+  - 31 PDFs, all U.S. government works or government-funded: NREL, NASA (NTRS), DOE, NIST, EIA, NPS, and two 2015 Solar Decathlon drawing sets.
+  - Five categories: slide decks 4:3, slide decks 16:9, landscape text pages, construction drawings, conference posters.
+- **Split before any comparison,** into `dev/` and `heldout/`:
+  - **Families never straddle the two.** A family is one publisher's template (NREL's three decks; NIST's three guides) or one author's posters.
+  - **The rule:** within each category, families sorted by the SHA-256 of their first file, every third from the first held out.
+  - **`heldout/` is measured only** to check a change already chosen on `dev/`.
+- **Measured** (no model; today's settings):
+
+  | Category | Dev: files | Dev: grid pages | Dev: lines cut sideways | Held out: files | Held out: grid pages | Held out: lines cut sideways |
+  |---|---|---|---|---|---|---|
+  | Slide decks, 4:3 | 1 | 50 | 1,532 | 1 | 141 | 3,809 |
+  | Slide decks, 16:9 | 4 | 264 | 3,133 | 2 | 61 | 1,687 |
+  | Landscape text | 1 | 11 | 102 | 3 | 19 | 986 |
+  | Drawings | 2 | 174 | 4,516 | 1 | 131 | 2,522 |
+  | Posters | 10 | 10 | 2,331 | 6 | 6 | 1,708 |
+  | **All** | 18 | 509 | 11,614 | 13 | 358 | 10,712 |
+
+- **What the new pages show:**
+  - **Grid pages almost always cut lines:** 800 of the 867 grid pages cut at least one line sideways.
+  - **Decks drawn on a template have no text-only tiles:** NASA's 4:3 decks and DOE's hydrogen deck, 0 of 1,274 tiles. Their backgrounds count as graphics, which is cause 4 on slides.
+  - **One poster has no text layer** (`poster-sic`, dev): it's read by vision alone.
+  - **Posters are the densest:** 40 to 96 tiles each, and up to 1,089 lines read twice on one poster.
+- **Not found:** pages slightly wider than Letter (680 to 712 points), as the jury sheets are. They're rare in published documents, so the controlled knob covers them.
+- **Development keeps the existing samples' grid pages** (the 2013 Solar Decathlon drawings, 589 pages) beside `dev/`.
+
 ### 2. A gallery and the knobs
 
 - **A gallery of the worst pages:**
