@@ -30,3 +30,5 @@ benchmarks/real-pairs/replay.zip
 
 # rendered sample metafiles (scripts/metafiles.py): working data
 benchmarks/metafiles/
+# tile selection's measures and gallery (scripts/tiling.py): working data
+benchmarks/tiling/

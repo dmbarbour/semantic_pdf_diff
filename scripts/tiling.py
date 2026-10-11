@@ -5,8 +5,11 @@
     python scripts/tiling.py measure samples --first 40 --set tiling=grid --out runs/tiling-grid.json
     python scripts/tiling.py report runs/tiling-default.json --worst lines_cut_sideways
     python scripts/tiling.py compare runs/tiling-default.json runs/tiling-grid.json
+    python scripts/tiling.py gallery runs/tiling-samples.json --samples samples --out benchmarks/tiling/gallery \
+        --config today --config "grid:tiling=grid"
 
-No model calls. `--set` overrides a setting (its value read as JSON where it parses, else as text).
+No model calls. `--set` overrides a setting (its value read as JSON where it parses, else as text); a gallery's
+`--config` is a label and its overrides, "label:name=value;name=value" (bench/gallery.py).
 """
 import argparse
 import json
@@ -36,7 +39,22 @@ def main(argv=None):
     both = sub.add_parser("compare", help="two runs over the same pages, page by page")
     both.add_argument("before")
     both.add_argument("after")
+    show = sub.add_parser("gallery", help="the worst development pages drawn under each configuration, as a page")
+    show.add_argument("run", help="a measure run over the samples folder")
+    show.add_argument("--samples", default="samples", help="the folder the run measured")
+    show.add_argument("--out", required=True)
+    show.add_argument("--config", action="append", default=[], metavar="LABEL[:NAME=VALUE;...]")
     args = parser.parse_args(argv)
+    if args.command == "gallery":
+        from semantic_pdf_diff.settings import Settings
+        from semantic_pdf_diff_lab.bench import gallery
+        configurations = {}
+        for text in args.config or ["today"]:
+            label, _, overrides = text.partition(":")
+            configurations[label] = Settings(**dict(_setting(o) for o in overrides.split(";") if o))
+        n = gallery.build(args.samples, tiling.load(args.run), configurations, args.out)
+        print(f"{n} pages drawn: {args.out}/index.html")
+        return 0
     if args.command == "measure":
         from semantic_pdf_diff.settings import Settings
         errors = []

@@ -4,6 +4,7 @@ Every page of a folder's PDFs and images, tiled as a configuration's visual_regi
 product's tiling.measure: lines and words cut, text-only and blank tiles, graphics share, lines read twice, overlap,
 figures not seen whole, graphics missed. A page's tiling mode is noted (bands, grid, or details), so the trials
 review's table can be read off a run (`summary`). Two runs over the same pages compare page by page (`compare`).
+With the model, a run's store says how its image tasks were answered (`answers`).
 """
 import json
 from collections import defaultdict
@@ -119,6 +120,35 @@ def compare(before, after):
 def worst(rows, measure_name, n=10):
     """The n pages highest on a measure (ties by file and page)."""
     return sorted((r for r in rows if r[measure_name]), key=lambda r: (-r[measure_name], r["file"], r["page"]))[:n]
+
+IMAGE_KINDS = ("tile", "figure", "overview")
+
+def answers(store, key=None):
+    """The image tasks' answers in a run's store, by kind (tile, refined tile, figure, overview): tasks, those
+    answered with no claim, those whose issues complain of fragments or crops (refinement.COMPLAINT), claims; with a
+    controlled document's key, the tiles' claims scored (right, loose, misbound...; controlled.score)."""
+    from .refinement import COMPLAINT, _stored
+    rows, claims, _ = _stored(store)
+    out = {}
+    tile_claims = []
+    for task, row in rows.items():
+        kind = task.split(":")[0]
+        if kind not in IMAGE_KINDS:
+            continue
+        kind += " refined" if "-r" in task else ""
+        found = claims.get(task, [])
+        c = out.setdefault(kind, dict.fromkeys(("tasks", "empty", "complaints", "claims"), 0))
+        c["tasks"] += 1
+        c["empty"] += not found
+        c["complaints"] += bool(COMPLAINT.search(" ".join(row.get("issues", []))))
+        c["claims"] += len(found)
+        if kind.startswith("tile"):
+            tile_claims += found
+    if key is not None and tile_claims:
+        from .controlled import score
+        result = score(key, tile_claims)
+        out["tile outcomes"], out["tile facts right"] = result["outcomes"], result["found_right"]
+    return out
 
 def save(rows, path):
     Path(path).write_text(json.dumps(rows))

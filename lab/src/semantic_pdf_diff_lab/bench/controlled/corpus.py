@@ -438,8 +438,15 @@ TABLE_PROJECTS = {"wtp-tables": equipment_schedules, "coaster-tables": track_sch
 # section, and a component of a component. Each fact has a plain phrasing (clean) and the trap's (traps). Layout
 # knobs: page furniture (a running header of numbers that aren't facts) and two columns. For refinement (the bug
 # plan of 2026-10-09, item 6): decoration (side bars, a logo, a rule: graphics that send a page's prose as image
-# tiles), alone and with two columns, and a landscape page (wider than bands allow: tiled in a grid).
-PROSE_KNOBS = ("clean", "traps", "furniture", "two-column", "all", "decorated", "decorated+two-column", "landscape")
+# tiles), alone and with two columns, and a landscape page (wider than bands allow: tiled in a grid). For tile
+# selection (docs/plans/tile-selection-2026-10-10.md, milestone 2), each a cause of a bad tiling: a text-only slide
+# (720 x 540), a page slightly wider than Letter (690 points: a grid, where bands stop at 672), a border frame drawn
+# as one path and as four lines, a full-page background image behind the text, and a scan of a framed page.
+PROSE_KNOBS = ("clean", "traps", "furniture", "two-column", "all", "decorated", "decorated+two-column", "landscape",
+               "slide", "wide-letter", "frame", "frame-lines", "background", "scanned-frame")
+SLIDE = (720, 540)
+WIDE_LETTER = (690, 792)
+FRAME_INSET = 24  # points from the page's edge
 
 def convention_center(seed=1):
     """A convention centre expansion's design basis, written to the traps above."""
@@ -1001,7 +1008,8 @@ def render(project, page_size="letter"):
     if getattr(project, "sheet", None):  # a drawing sheet, drawn directly (sheets.py)
         from .sheets import render as render_sheet
         return render_sheet(project)
-    rect = pymupdf.paper_rect("letter-l" if project.has("landscape") else page_size)
+    rect = (pymupdf.paper_rect("letter-l") if project.has("landscape") else pymupdf.Rect(0, 0, *SLIDE) if project.has("slide")
+            else pymupdf.Rect(0, 0, *WIDE_LETTER) if project.has("wide-letter") else pymupdf.paper_rect(page_size))
     breaks = set()
     for _ in range(5):  # lay out; start any table Story split across pages on a new page; again
         buffer = io.BytesIO()
@@ -1064,6 +1072,14 @@ def render(project, page_size="letter"):
             page.draw_circle(pymupdf.Point(w - 66, 34), 10, color=None, fill=(0.85, 0.55, 0.20))
             page.draw_rect(pymupdf.Rect(w - 52, 24, w - 34, 44), color=None, fill=(0.55, 0.70, 0.86))
             page.draw_line(pymupdf.Point(54, 48), pymupdf.Point(w - 54, 48), color=(0.5, 0.5, 0.5), width=0.75)
+        if project.has("frame") or project.has("scanned-frame"):  # a border as one path
+            page.draw_rect(rect + (FRAME_INSET, FRAME_INSET, -FRAME_INSET, -FRAME_INSET), color=(0.2, 0.2, 0.2), width=1.5)
+        if project.has("frame-lines"):  # the same border as four lines
+            x0, y0, x1, y1 = rect + (FRAME_INSET, FRAME_INSET, -FRAME_INSET, -FRAME_INSET)
+            for a, b in (((x0, y0), (x1, y0)), ((x1, y0), (x1, y1)), ((x1, y1), (x0, y1)), ((x0, y1), (x0, y0))):
+                page.draw_line(pymupdf.Point(*a), pymupdf.Point(*b), color=(0.2, 0.2, 0.2), width=1.5)
+        if project.has("background"):  # a pale picture behind the page's text
+            page.insert_image(rect, pixmap=_background(rect), overlay=False)
     drawn = draw_charts(project, doc, figures)
     project.chart_boxes = {n: (page_no, tuple(box)) for n, (page_no, box) in figures.items()  # for representations
                            if n <= len(charts(project))}
@@ -1072,7 +1088,17 @@ def render(project, page_size="letter"):
     doc.set_metadata({})
     data = doc.tobytes(garbage=3, deflate=True, no_new_id=True)
     log = locate(project, pymupdf.open("pdf", data), placed, drawn)
-    return (scanned(data) if project.has("scan") else data), log
+    return (scanned(data) if project.has("scan") or project.has("scanned-frame") else data), log
+
+def _background(rect):
+    """A pale wash, lighter toward the top: a full-page picture as templates put behind a page's text."""
+    import pymupdf
+    width, height = round(rect.width / 4), round(rect.height / 4)
+    pix = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, width, height), False)
+    for y in range(height):
+        shade = 255 - round(24 * y / height)
+        pix.set_rect(pymupdf.IRect(0, y, width, y + 1), (shade, shade, 255))
+    return pix
 
 def draw_charts(project, doc, figures):
     """Draw each chart into the room left for it, as a drawing or a picture (raster), with or without its values

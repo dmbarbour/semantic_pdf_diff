@@ -96,5 +96,29 @@ class LabRuns(unittest.TestCase):
         found = tiling.compare(default, grid)
         self.assertEqual([p["file"] for p in found["pages_changed"]], ["report.pdf"])
 
+class Gallery(unittest.TestCase):
+    def test_the_worst_development_pages_are_picked_one_per_document(self):
+        from semantic_pdf_diff_lab.bench import gallery
+        row = lambda file, page, cut: {"file": file, "page": page, "lines_cut_sideways": cut, "per_tile": [],
+                                       "lines_cut_across": 0, "text_only": 0, "lines_read_twice": 0,
+                                       "figures_not_whole": 0, "lines": 40, "mode": "grid", "width": 720}
+        rows = [row("a.pdf", 1, 5), row("a.pdf", 2, 9), row("b.pdf", 1, 3), row("heldout/c.pdf", 1, 50),
+                row("d.pdf", 1, 0)]
+        picked = gallery.pick(rows)["lines_cut_sideways"]
+        self.assertEqual([(r["file"], r["page"]) for r in picked], [("a.pdf", 2), ("b.pdf", 1)])
+
+    def test_a_gallery_draws_each_page_under_each_configuration(self):
+        from semantic_pdf_diff.settings import Settings
+        from semantic_pdf_diff_lab.bench import gallery, tiling
+        with tempfile.TemporaryDirectory() as folder:
+            doc, _ = text_page(width=792, height=612, count=30, top=40)
+            doc.save(Path(folder) / "wide.pdf")
+            rows = tiling.run(folder, Settings())
+            out = Path(folder) / "gallery"
+            drawn = gallery.build(folder, rows, {"today": Settings(), "grid": Settings(tiling="grid")}, out, named=())
+            self.assertGreater(drawn, 0)
+            self.assertEqual(len(list((out / "pages").glob("*.png"))), 2 * drawn)
+            self.assertIn("wide.pdf, page 1", (out / "index.html").read_text())
+
 if __name__ == "__main__":
     unittest.main()

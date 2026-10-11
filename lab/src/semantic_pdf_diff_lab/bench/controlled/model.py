@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from semantic_pdf_diff.values import parse_number, printed_value
 
 # Knobs not in "all" (corpus.PROSE_KNOBS), so the documents made before them stay as they were.
-ALONE = ("decorated", "landscape")
+ALONE = ("decorated", "landscape", "slide", "wide-letter", "frame", "frame-lines", "background", "scanned-frame")
 
 @dataclass
 class Fact:
