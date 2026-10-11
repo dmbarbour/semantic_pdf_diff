@@ -39,6 +39,7 @@ class Context:
         self.doc, self.s = doc, s
         self.assets, self.stem = assets, stem  # where the locator's images go, and their names' stem
         self.blocks, self.stems, self.cited_by, self.page_lines, self.page_graphics = {}, {}, {}, {}, {}
+        self.page_figures = {}
         self.tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
         # a page's vector drawings (never changed by their readers), and its display list: Page.get_pixmap builds one
         # for every crop, interpreting the whole page again
@@ -80,8 +81,11 @@ class Context:
         return self.page_graphics[page.number]
 
     def figures(self, page, number):
-        """The page's detected figures (figures.page_figures)."""
-        return page_figures(page, number, self.drawings(page))
+        """The page's detected figures (figures.page_figures), once per page: the figure tasks and the tiling
+        measures both ask."""
+        if number not in self.page_figures:
+            self.page_figures[number] = page_figures(page, number, self.drawings(page))
+        return self.page_figures[number]
 
     def pixmap(self, page, matrix, clip=None):
         """Page.get_pixmap(matrix=matrix, clip=clip, alpha=False), rendered as it does, from the page's display list."""

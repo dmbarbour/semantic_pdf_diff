@@ -255,10 +255,11 @@ class Tiling(Lever):
         side = self.tile_points
         if self.tiling != "bands" or page.rect.width > 1.6 * side:
             return super().tiles(reader, page)
-        from .segmentation import _graphics, bands
-        graphics = _graphics(page)
+        from .segmentation import bands
+        graphics = reader.graphics(page)
         return [(f"tile:{i}", r, "") for i, r in enumerate(
-            b for b in bands(page, side) if any(b.intersects(g) for g in graphics))]
+            b for b in bands(page, side, lines=reader.lines(page), graphics=graphics)
+            if any(b.intersects(g) for g in graphics))]
 
 class GrowTiles(Lever):
     lever_name, stage, off = "grow_tiles", "segmentation", {"grow_tiles": False}

@@ -37,11 +37,14 @@ def _graphics(page, drawings=None):
         boxes.append(shown(page, image["bbox"]))
     return boxes
 
-def bands(page, height, gap_from=0.5, pad=4.0, overlap=0.15):
+def bands(page, height, gap_from=0.5, pad=4.0, overlap=0.15, lines=None, graphics=None):
     """Full-width bands down a page, each cut at the widest empty horizontal gap in the lower
     part of its window, so lines, charts and legends aren't split (research round 1: on the
-    report slices this cut 7 lines where a grid cut 2,126). Falls back to an overlapping cut."""
-    boxes = [b for b in [r for r, _ in _lines(page)] + _graphics(page) if not b.is_empty or b.height > 0]
+    report slices this cut 7 lines where a grid cut 2,126). Falls back to an overlapping cut. lines, graphics: the
+    page's, if already read (Context.lines, Context.graphics)."""
+    lines = _lines(page) if lines is None else lines
+    graphics = _graphics(page) if graphics is None else graphics
+    boxes = [b for b in [r for r, _ in lines] + graphics if not b.is_empty or b.height > 0]
     if not boxes:
         return []
     content = pymupdf.Rect(boxes[0])

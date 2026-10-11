@@ -96,7 +96,7 @@ def build(samples, rows, configurations, out, named=NAMED):
     """Write out/index.html and its pictures. samples: the folder rows' paths are under; rows: a run's measures
     (bench/tiling.run); configurations: {label: Settings}. Returns the number of pages drawn."""
     from semantic_pdf_diff.context import Context
-    from .tiling import _figures_once, measure_page
+    from .tiling import measure_page
     out = Path(out)
     (out / "pages").mkdir(parents=True, exist_ok=True)
     picked = pick(rows)
@@ -115,7 +115,6 @@ def build(samples, rows, configurations, out, named=NAMED):
                 cells = []
                 for label, settings in configurations.items():
                     reader = Context(doc, settings)
-                    _figures_once(reader)
                     regions = settings.visual_regions(reader, page, number - 1)
                     measured = measure_page(settings, reader, page, number - 1)["page"]
                     name = f"{drawn:03d}-{len(cells)}.png"

@@ -64,7 +64,6 @@ def run(folder, settings=None, first=None, errors=None):
     for name, doc in documents(folder, first):
         with doc:
             reader = Context(doc, settings)
-            _figures_once(reader)
             for number, page in enumerate(doc):
                 if first is not None and number >= first:
                     break
@@ -76,16 +75,6 @@ def run(folder, settings=None, first=None, errors=None):
                     continue
                 rows.append({"file": name, "page": number + 1, **result["page"], "per_tile": result["tiles"]})
     return rows
-
-def _figures_once(reader):
-    """A page's figures found once: the figure tasks and the measure both ask (Context doesn't keep them)."""
-    found, find = {}, reader.figures
-
-    def figures(page, number):
-        if number not in found:
-            found[number] = find(page, number)
-        return found[number]
-    reader.figures = figures
 
 def summary(rows):
     """{mode: {"pages", "pages with cuts", sums of COUNTS, "low graphics" (tiles under 5% graphics, not text only
