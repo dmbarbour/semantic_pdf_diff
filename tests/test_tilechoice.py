@@ -13,7 +13,8 @@ from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.tilechoice import Choice
 
 CORPUS = Path(__file__).resolve().parent.parent / "benchmarks/controlled/docs"
-SLIDE, REPORT, PLAN = ("lcc-s1-slide", 1), ("lcc-s1-clean", 0), ("lcc-plan-s1-clean", 0)  # PLAN: no cut is best
+SLIDE, REPORT, PLAN = ("lcc-s1-slide", 1), ("lcc-s1-clean", 0), ("lcc-plan-s1-clean", 0)
+UNSETTLED = ("coaster-s1", 0)  # no cut is best: bands, the grid, snapped and XY-cut unbeaten
 
 class Asker:
     """The model, as the reader asks it: answers `best`, or fails; counts the questions."""
@@ -64,10 +65,12 @@ class Choosing(unittest.TestCase):
 
     def test_where_none_is_best_the_model_chooses_among_those_no_other_beats(self):
         asker = Asker("B")
-        how, record, reader, s, page = self.choose(PLAN, asker)
+        how, record, reader, s, page = self.choose(UNSETTLED, asker)
         self.assertTrue(record["asked"])
         self.assertGreaterEqual(len(record["front"]), 2)
-        self.assertEqual(set(record["order"]), set(record["front"][:3]))
+        from semantic_pdf_diff.tilechoice import MEASURES, MOST
+        best = sorted(record["front"], key=lambda h: [record["scores"][h][m] for m in MEASURES])[:MOST]
+        self.assertEqual(set(record["order"]), set(best))  # the best by the measures of those no other beats
         self.assertEqual(how, record["order"][1])
         _, images, key = asker.asked[0]
         self.assertEqual(len(images), 1 + len(record["order"]))  # the page, then a sketch per candidate
@@ -81,7 +84,7 @@ class Choosing(unittest.TestCase):
         from semantic_pdf_diff import tilechoice
         for best, n in (("A and B", 2), ("A, B and C", 3)):
             asker = Asker(best)
-            how, record, reader, s, page = self.choose(PLAN, asker)
+            how, record, reader, s, page = self.choose(UNSETTLED, asker)
             with self.subTest(best=best):
                 self.assertIn('joined by "and"', asker.asked[0][0])
                 by_measures = sorted(record["order"][:n], key=lambda h: [record["scores"][h][m]
@@ -96,22 +99,32 @@ class Choosing(unittest.TestCase):
 
     def test_a_failed_question_or_an_answer_naming_none_falls_back_to_the_measures(self):
         for asker in (Asker(fail=True), Asker("Z")):
-            how, record, *_ = self.choose(PLAN, asker)
+            how, record, *_ = self.choose(UNSETTLED, asker)
             with self.subTest(fail=asker.fail):
                 self.assertTrue(record["asked"])
                 self.assertIsNone(record["answer"])
-                self.assertEqual(how, "grid")  # the default: no other cut beats it
+                self.assertEqual(how, "bands")  # the default: no other cut beats it
                 self.assertTrue(record["issues"][0].endswith("the cut chosen by the measures"))
 
     def test_by_the_measures_alone_the_model_is_never_asked(self):
         asker = Asker()
-        how, record, *_ = self.choose(PLAN, asker, mode="measures")
-        self.assertEqual((how, record["asked"], asker.asked), ("grid", False, []))
+        how, record, *_ = self.choose(UNSETTLED, asker, mode="measures")
+        self.assertEqual((how, record["asked"], asker.asked), ("bands", False, []))
+
+    def test_a_drawing_sheet_keeps_the_tilers_cut(self):  # XY-cut's larger tiles lost facts there (milestones 3, 5)
+        for mode in ("measures", "model"):
+            doc = pymupdf.open(CORPUS / f"{PLAN[0]}.pdf")
+            with doc:
+                s = Settings(tile_choice=mode, decoration=True)  # with decoration the rule took XY-cut on a sheet
+                reader = Context(doc, s)
+                reader.ask = Asker()
+                self.assertEqual(s.tiling_of(reader, doc[PLAN[1]]), "grid")
+                self.assertEqual((reader.page_choices, reader.ask.asked), ({}, []))
 
     def test_off_leaves_the_tilers_cut(self):
         doc = pymupdf.open(CORPUS / f"{SLIDE[0]}.pdf")
         with doc:
-            s = Settings()
+            s = Settings(tile_choice="off")
             reader = Context(doc, s)
             self.assertEqual(s.tiling_of(reader, doc[SLIDE[1]]), "grid")
             self.assertEqual(reader.page_choices, {})
@@ -131,9 +144,9 @@ class Job(unittest.TestCase):
                     return Choice(best="A", problems={"A": ["cuts text"]})
                 return Extraction(claims=[], complete=True) if schema is Extraction else schema.model_validate({})
         with tempfile.TemporaryDirectory() as d:
-            doc = pymupdf.open(CORPUS / f"{PLAN[0]}.pdf")
+            doc = pymupdf.open(CORPUS / f"{UNSETTLED[0]}.pdf")
             path = Path(d) / "t.pdf"
-            doc.select([PLAN[1]])
+            doc.select([UNSETTLED[1]])
             doc.save(path)
             doc.close()
             client = Client(tile_choice="model")
@@ -142,8 +155,9 @@ class Job(unittest.TestCase):
         (row,) = [r for r in coverage if r["task"] == "vision:p1:tiling"]
         self.assertEqual(row["status"], "complete")
         self.assertTrue(row["issues"][0].startswith("Cut as "))
-        self.assertIn('grid: "decoration or blank" found by the measures, not named by the model', row["issues"])
-        self.assertFalse([i for i in row["issues"] if i.startswith('grid: "cuts text"')])  # both find it
+        self.assertEqual(row["issues"][0], "Cut as bands (offered bands, xycut, snapped; the default bands)")
+        self.assertIn('bands: "cuts text" named by the model, not found by the measures', row["issues"])
+        self.assertIn('snapped: "decoration or blank" found by the measures, not named by the model', row["issues"])
 
 if __name__ == "__main__":
     unittest.main()

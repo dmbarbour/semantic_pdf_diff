@@ -287,12 +287,13 @@ class TileChoice(Lever):
     # which cut a page gets, among the tilers' (bands where they apply, grid, snapped, xycut), each measured
     # (tilechoice.choose): the one at least as good as the rest on every measure; where none is, the default unless
     # another beats it (measures), or the model's choice among those no other beats (model; calibrated first:
-    # scripts/calibration.py), read with each of two it names as equally good
+    # scripts/calibration.py), read with each of two it names as equally good. A drawing sheet keeps the tiler's cut:
+    # XY-cut's larger tiles lost facts there (milestones 3 and 5), and the small-text measure doesn't see why
     tile_choice: Annotated[Literal["off", "measures", "model"], _selecting(VISUAL)] = "off"
 
     def tiling_of(self, reader, page):
         how = super().tiling_of(reader, page)
-        if self.tile_choice == "off":
+        if self.tile_choice == "off" or any(f.kind == "sheet" for f in reader.figures(page, page.number + 1)):
             return how
         from .tilechoice import choose
         return choose(self, reader, page, how, ask=self.tile_choice == "model")
