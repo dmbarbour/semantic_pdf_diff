@@ -739,7 +739,7 @@ class Platform(Composable):
         if max(page.rect.width, page.rect.height) > self.tile_points:
             areas = self.viewports(reader, page)
             regions = self._tile_areas(reader, page, areas) if areas else self.tiles(reader, page)
-        regions = self.kept_tiles(reader, page, regions)
+        regions = self.sent_tiles(reader, page, self.kept_tiles(reader, page, regions))
         grid = [r for _, r, _ in regions] or [page.rect]
         return regions + self.figure_regions(reader, page, number, grid) + [("overview", page.rect, "")]
 
@@ -816,6 +816,12 @@ class Platform(Composable):
     @chained
     def kept_tiles(self, reader, page, regions):
         """The tiles worth sending."""
+        return regions
+
+    @chained
+    def sent_tiles(self, reader, page, regions):
+        """The tiles sent, from those kept: once a page, after the keep rules (kept_tiles also counts each candidate
+        cut's images: tilechoice.candidates)."""
         return regions
 
     @chained
