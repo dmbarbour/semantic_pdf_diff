@@ -35,6 +35,10 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Tile cut | `tile_cut: snapped, xycut` | Off (`grid`); measured (milestone 3) | XY-cut: lines cut and read twice down by 80% to 90% on wide pages, no fact lost on the knobs; values lost on two drawing sheets |
 | Render by area | `render_area` | Off; measured (milestone 3) | Ten corpus documents: facts right 372 → 366, loose 57 → 48; no gain on Letter pages |
 | Region labels | `region_labels: model` | Off; measured (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 6) | The corpus: 450 → 390 tiles with no fact lost (359 with tile_choice's rule, 3 facts more); 132 questions for 60 tiles fewer; only skips the measures agree with |
+| Another tiling for a partial tile | `another_tiling: measures, said, asked` | Off; measured (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 7) | Every tile refined, the corpus: refined reads 197 → 134, their facts right 453 → 479, misbound 38 → 24; real pages: claims bound to other words 246 → 114; asking (said, asked) adds nothing the measures don't know |
+| Halves cut around figures | `halve_parts` | Off; measured (milestone 7) | Every tile refined, the corpus: loose claims from halves 93 → 51; with `another_tiling: measures`, 23, and facts right 514 |
+| A figure looked at again | `refine_figures: again` | Off; measured (milestone 7) | Loose 93 → 49 but right 431 → 412: told what it found, the model returns less |
+| A half's least share | `least_half` | 0.25; measured (milestone 7) | 0.1 a little better (misbound 38 → 30), 0.4 worse by the measures; kept |
 | Tile choice | `tile_choice: measures, model` | Off; measured (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5) | The corpus by the measures alone: 450 → 408 tiles, facts 3,438 → 3,439, misbound 261 → 236; asked, gemma-4 chose XY-cut on the plan sheets and lost 24 facts there |
 
 ## Levers
@@ -284,6 +288,19 @@ Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 6, of
   - Measure skipping text-only tiles except on sheets by the measures alone. The labels only ever skip what the measures could.
   - One question for the cut and the labels.
 
+### Refinement (`another_tiling`, `halve_parts`, `refine_figures`, `least_half`)
+
+Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 7, all off by default (`least_half` at 25%, as before). A partial tile's next reads come from `Platform.refined_tile`, given its answer.
+
+- **The levers:**
+  - `another_tiling` (`retiling.py`): the page's next candidate cut by the measures, its tiles holding what the partial tile cuts, each read once a page. Always (`measures`), where the answer says it's cut (`said`), or where it names the edges cutting content when a rule asks (`asked`). Halves where the measures find nothing cut.
+  - `halve_parts`: halves cut around the detected figures the tile holds, where they can be.
+  - `refine_figures: again`: a tile mostly one figure looked at again whole, told its claims and issues.
+  - `least_half`: the least share of what a tile holds each half keeps.
+- **Calibrated** (`scripts/asking.py`, gemma-4): asked to name a cut, it names one for 48.8% of tiles that cut content and 0.8% of whole ones; today's prompt, 31.2% and 10.5%. Neither passes (half the cut tiles).
+- **Got** (every tile refined, `scripts/refinement.py`): `measures` with `halve_parts` is the best arm. On the controlled corpus, refined reads 197 → 135, their facts right 453 → 514, loose 93 → 23, misbound 38 → 24; whole documents' facts unchanged. On 16 real pages, refined reads 257 → 151, quotes not in the page 78 → 54, claims bound to other words 246 → 114.
+- **Next:** milestone 8 measures `another_tiling: measures` with `halve_parts` as a default. Refinement is rare in a normal run, so the forced measure is where they show.
+
 ## Ideas not built yet
 
 Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so none is forgotten.
@@ -336,7 +353,7 @@ Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so no
 | A higher image budget (560 or 1120 tokens) | The same note | Document reading improves markedly at 1120 in Google's report. DeepInfra ignores the setting (measured), so this needs a host that sets it, e.g. the in-house deployment |
 | One three-way alignment for revisions with unchanged files: earlier against later in one pass, the unchanged files' claims open to both sides as counterparts, never paired with themselves (in place of today's two passes, earlier against later plus unchanged, then unchanged against later) | Claude, explaining D2 of the [2026-10-08 code review](code-review-2026-10-08.md); the owner, 2026-10-09: "Okay. Record the option as a lever, then fix D2." | Not measured. Each pass sees only part of the revision: pass 2 aligns later claims against unchanged content without the earlier changed claims competing, so a later claim can take two counterparts. Measure on revision pairs that include unchanged files ([plan](../plans/review-bugs-2026-10-09.md), item 2) |
 | Skip table detection on pages recognised as drawing sheets | The [2026-10-08 code review](code-review-2026-10-08.md), A20; the owner, 2026-10-09: "We can add skipping table detection as a lever, np." | Table detection costs 1.4 s a page on drawing sheets (11 s on the drawing slice); a features-phase item in the [plan](../plans/review-bugs-2026-10-09.md) |
-| A refined half's least share of its tile (`segmentation.LEAST_HALF`, 25% today) | The [bug plan](../plans/review-bugs-2026-10-09.md), item 6; the owner, 2026-10-09: "This seems like a tuning lever, we can start with 25% but I cannot say it's \"right\" without hindsight, and I don't expect anyone else could either." | A named constant until the features phase. With every tile refined, facts found right by the halves 2,002 → 2,371 on the controlled corpus (the cut's fix as a whole, not this share); measure with the tile-selection plan |
+| A refined half's least share of its tile (`segmentation.LEAST_HALF`, 25% today) | The [bug plan](../plans/review-bugs-2026-10-09.md), item 6; the owner, 2026-10-09: "This seems like a tuning lever, we can start with 25% but I cannot say it's \"right\" without hindsight, and I don't expect anyone else could either." | Built as `least_half` (2026-10-12, tile selection milestone 7): 0.1 a little better, 0.4 worse; 25% kept (see the table) |
 | A tile turned upright where most of its text runs vertically as displayed (vertical table headings, a schedule chart's labels) | [Tile selection](../plans/tile-selection-2026-10-10.md), milestone 3; withdrawn as a candidate there (2026-10-11), its cause having been the gallery drawing rotated pages unrotated | Not built. Of 5,063 sample pages, 12 have 30% or more of their text vertical, all mixed with horizontal text (the 2013 rules p41 to p46, a calg and a Stevens sheet, a figure in the IEA report) |
 
 ## Measurement notes (affect how to read the table)

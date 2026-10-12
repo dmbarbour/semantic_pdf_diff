@@ -584,6 +584,81 @@ Claude's variant, with the owner's addition: a mixed and a nonsense label.
 
 ### 7. Refinement's open questions
 
+**Done (2026-10-12).** The owner: "Please proceed with milestone 7." Four levers, all off by default, a calibration and the forced measure. Spent $1.24 with the model: $0.575 on the asking calibration, $0.66 on the forced measure.
+- **Built:**
+  - **A refactor first:** a partial tile's next reads come from a chained hook, `Platform.refined_tile`, given the tile's answer (its row, its claims, the edges it says cut content). Its halves as before; proven by the replay tests.
+  - **`another_tiling`** (`retiling.py`): a partial tile is read again as the page's next candidate cut by the measures holds it, not in halves.
+    - It reads that cut's tiles holding whole the lines and figures the tile cuts, each once a page.
+    - They're tagged by that cut, `tile:p3:xycut1`, so a replay doesn't depend on which tile asked first.
+    - Where the measures find nothing cut, or no other tile holds it, the tile is halved as before.
+    - When it asks: always (`measures`); where the answer's issues say it's cut (`said`); or where it names the edges cutting content, which a rule for tiles asks for (`asked`, a `cut` field in the answer).
+    - Claims from both tilings are kept, as any two tasks' are.
+  - **`refine_figures: again`** (`figure_refinement`): a partial tile mostly one detected figure it holds is looked at again whole, not halved. It's told the claims it returned and what its issues noted.
+  - **`halve_parts`:** a tile's halves are cut around the detected figures it holds where they can be, as around a graphic. This is how the cut follows the parts (below).
+  - **`least_half`:** `LEAST_HALF` as a setting, 25% as before.
+  - **The asking calibration** (`bench/asking.py`, `scripts/asking.py`, `benchmarks/asking/`): tiles whose cuts the measures know, read as the product reads a tile (the corpus's settings, refinement off).
+    - Whole: the known-good tilings' tiles (256).
+    - Cut: calibration's midline, shifted and figure split tiles that cut a line or a figure (250), with the edges they cut at.
+  - **The forced bench** counts the new refined tasks, takes `--set` for an arm's settings, and scores whole documents besides the refined tasks.
+  - **Tests:** `tests/test_retiling.py` (8), `tests/test_asking.py` (2), 3 in `tests/test_refinement.py`.
+- **The asking calibration** (gemma-4, $0.575 with the trials; the pass mark, set before the run: asks about at least half the tiles cutting content, at most a fifth of the whole ones):
+
+  | Arm | Asks about cut tiles | Asks about whole tiles | Partial: cut / whole | Passes |
+  |---|---|---|---|---|
+  | today's prompt (issues say it's cut) | 31.2% | 10.5% | 34% / 23% | no |
+  | asked (the rule) | 48.8% | 0.8% | 59% / 22% | no, narrowly |
+
+  - **Asked, by kind:** midline 48%, figure split 60%, shifted (one line cut at an edge) 19%.
+  - **The edges named are right:** every answer naming edges named one the measures find; 7.3% of the edges named cut nothing.
+  - **"Partial" doesn't tell a cut tile from a whole one** under today's prompt (34% against 23%). It's what triggers refinement today.
+  - **The page tests' warning holds, softened:** asked outright, the model names a cut half the time. The measures know every one.
+- **The forced measure** (every tile refined once; 18 controlled documents, the knobs and the figure and table documents, scored by key; 16 real pages from the gallery, among them the old cut's wins, HabEx p4 and calg's sheet p21; one shared fixture a group):
+
+  Controlled documents:
+
+  | Arm | Refined tasks | Their facts right | Right | Loose | Misbound | Whole documents: facts right | Right | Loose | Misbound |
+  |---|---|---|---|---|---|---|---|---|---|
+  | today (halves) | 197 | 453 | 431 | 93 | 38 | 601 | 767 | 171 | 119 |
+  | `halve_parts` | 198 | 488 | 473 | 51 | 38 | 601 | 785 | 129 | 119 |
+  | `least_half` 0.1 | 197 | 463 | 439 | 93 | 30 | 601 | 770 | 171 | 111 |
+  | `refine_figures: again` | 191 | 408 | 412 | 49 | 38 | 601 | 762 | 129 | 119 |
+  | `another_tiling: measures` | 134 | 479 | 444 | 65 | 24 | 601 | 773 | 143 | 117 |
+  | `another_tiling: said` | 196 | 453 | 432 | 93 | 38 | 601 | 767 | 171 | 119 |
+  | `another_tiling: asked` | 187 | 451 | 428 | 91 | 49 | 599 | 772 | 170 | 127 |
+  | `measures` and `halve_parts` | 135 | 514 | 486 | 23 | 24 | 601 | 791 | 101 | 117 |
+
+  Real pages (no key: the bench's checks):
+
+  | Arm | Refined tasks | Empty | Their claims | Complaints of a cut | Quotes not in the page | Bound as the text tasks bind the value | Near it | Other words | Value not in the text tasks |
+  |---|---|---|---|---|---|---|---|---|---|
+  | today (halves) | 257 | 116 | 1,317 | 16 | 78 | 323 | 316 | 246 | 432 |
+  | `halve_parts` | 257 | 116 | 1,317 | 16 | 78 | 323 | 316 | 246 | 432 |
+  | `least_half` 0.1 | 257 | 119 | 1,292 | 16 | 78 | 324 | 326 | 217 | 425 |
+  | `refine_figures: again` | 257 | 116 | 1,317 | 16 | 78 | 323 | 316 | 246 | 432 |
+  | `another_tiling: measures` | 151 | 70 | 823 | 8 | 54 | 261 | 162 | 114 | 286 |
+  | `another_tiling: said` | 246 | 107 | 1,365 | 10 | 78 | 323 | 332 | 267 | 443 |
+  | `measures` and `halve_parts` | 151 | 70 | 823 | 8 | 54 | 261 | 162 | 114 | 286 |
+
+  - **`asked`, on the first eight pages only** (stopped: it re-reads every tile with its rule, the drawing sheets slowly): 116 → 98 refined tasks, quotes not in the page 38 → 28, other words 98 → 92; `measures` on the same pages, 51 tasks, 5 and 62.
+  - **`halve_parts` and `refine_figures` change no read on the real pages:** no tile there is mostly a figure, and none holds one a cut could go around.
+
+- **What it shows:**
+  - **Another tiling, by the measures, is the better refinement:** fewer reads, more facts right on the corpus, and on real pages half the complaints, a third fewer quotes not in the page and half the claims bound to other words. On a grid page, 8 to 24 halves become 1 to 3 tiles of the XY-cut, whole panels of a slide (seen by eye).
+  - **Asking adds nothing the measures don't know.** `said` hardly retiles (answers rarely say they're cut); `asked` re-asks every tile with a new rule, retiles a little more, and its misbound claims rise (38 → 49 on the corpus). A cut the model doesn't see is one the measures find anyway.
+  - **Halves cut around figures:** loose claims from halves 93 → 51 on the corpus, and with `measures` 23. Measured without the model on 496 tiles: figures split by halves 40 → 20, lines cut unchanged, 27 tiles' halves moved.
+    - **As first built,** a figure the tile didn't hold counted as a part too. On rules-p44, a schedule chart over most of the page, every half moved off its line gaps, and the claims bound as the text tasks bind the value fell 131 → 42. Fixed: only figures the tile holds whole; the arms were read again ($0.004).
+  - **The least share:** 0.1 changes 28 of 496 tiles' halves (lines they cut 648 → 624), 0.4 changes 68 for the worse (662, figures split 40 → 57). With the model, 0.1 is a little better (misbound 38 → 30), from the 28 tiles it moves: too little to change the default. 25% stays.
+  - **A figure looked at again** gives fewer loose claims (93 → 49) and fewer right ones (431 → 412): told what it found, the model returns less. Not worth it over halves cut around the figure.
+  - **No document's facts change** in any arm: the text tasks and tiles read them first. What refinement changes is the claims beside them.
+  - **The old cut's wins aren't won back:** HabEx p4's band halves find nothing in any arm; on calg's sheet, `measures` reads 33 tasks for today's 66, complaints 3 → 0.
+  - **Refinement is rare in a normal run** (8 refined tiles in the corpus). The forced measure is where these levers show; a normal run changes little.
+- **Not built:**
+  - **Milestone 5's question among the other cuts:** the other cut is the measures' next. The asking calibration says the model's view adds little here.
+  - **Labels guiding the cut:** the detected figures give the parts' places; a label has none, and calibration found "mixed" 54% of the time (milestone 6).
+- **For milestone 8:** `another_tiling: measures` with `halve_parts` is the candidate default.
+
+**As planned:**
+
 Each is a lever, measured with the forced-refinement bench on the gallery's pages and the knobs:
 
 - **Another tiling as a refinement option** (the owner, 2026-10-10, above).
