@@ -13,7 +13,7 @@ from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.tilechoice import Choice
 
 CORPUS = Path(__file__).resolve().parent.parent / "benchmarks/controlled/docs"
-SLIDE, REPORT, TABLES = ("lcc-s1-slide", 1), ("lcc-s1-clean", 0), ("wtp-tables-s1-clean", 0)
+SLIDE, REPORT, PLAN = ("lcc-s1-slide", 1), ("lcc-s1-clean", 0), ("lcc-plan-s1-clean", 0)  # PLAN: no cut is best
 
 class Asker:
     """The model, as the reader asks it: answers `best`, or fails; counts the questions."""
@@ -64,7 +64,7 @@ class Choosing(unittest.TestCase):
 
     def test_where_none_is_best_the_model_chooses_among_those_no_other_beats(self):
         asker = Asker("B")
-        how, record, reader, s, page = self.choose(TABLES, asker)
+        how, record, reader, s, page = self.choose(PLAN, asker)
         self.assertTrue(record["asked"])
         self.assertGreaterEqual(len(record["front"]), 2)
         self.assertEqual(set(record["order"]), set(record["front"][:3]))
@@ -81,7 +81,7 @@ class Choosing(unittest.TestCase):
         from semantic_pdf_diff import tilechoice
         for best, n in (("A and B", 2), ("A, B and C", 3)):
             asker = Asker(best)
-            how, record, reader, s, page = self.choose(TABLES, asker)
+            how, record, reader, s, page = self.choose(PLAN, asker)
             with self.subTest(best=best):
                 self.assertIn('joined by "and"', asker.asked[0][0])
                 by_measures = sorted(record["order"][:n], key=lambda h: [record["scores"][h][m]
@@ -96,17 +96,17 @@ class Choosing(unittest.TestCase):
 
     def test_a_failed_question_or_an_answer_naming_none_falls_back_to_the_measures(self):
         for asker in (Asker(fail=True), Asker("Z")):
-            how, record, *_ = self.choose(TABLES, asker)
+            how, record, *_ = self.choose(PLAN, asker)
             with self.subTest(fail=asker.fail):
                 self.assertTrue(record["asked"])
                 self.assertIsNone(record["answer"])
-                self.assertEqual(how, "bands")  # the default: no other cut beats it
+                self.assertEqual(how, "grid")  # the default: no other cut beats it
                 self.assertTrue(record["issues"][0].endswith("the cut chosen by the measures"))
 
     def test_by_the_measures_alone_the_model_is_never_asked(self):
         asker = Asker()
-        how, record, *_ = self.choose(TABLES, asker, mode="measures")
-        self.assertEqual((how, record["asked"], asker.asked), ("bands", False, []))
+        how, record, *_ = self.choose(PLAN, asker, mode="measures")
+        self.assertEqual((how, record["asked"], asker.asked), ("grid", False, []))
 
     def test_off_leaves_the_tilers_cut(self):
         doc = pymupdf.open(CORPUS / f"{SLIDE[0]}.pdf")
@@ -129,11 +129,11 @@ class Job(unittest.TestCase):
                 if schema is Choice:
                     self.choices += 1
                     return Choice(best="A", problems={"A": ["cuts text"]})
-                return Extraction(claims=[], complete=True)
+                return Extraction(claims=[], complete=True) if schema is Extraction else schema.model_validate({})
         with tempfile.TemporaryDirectory() as d:
-            doc = pymupdf.open(CORPUS / f"{TABLES[0]}.pdf")
+            doc = pymupdf.open(CORPUS / f"{PLAN[0]}.pdf")
             path = Path(d) / "t.pdf"
-            doc.select([TABLES[1]])
+            doc.select([PLAN[1]])
             doc.save(path)
             doc.close()
             client = Client(tile_choice="model")
@@ -142,7 +142,8 @@ class Job(unittest.TestCase):
         (row,) = [r for r in coverage if r["task"] == "vision:p1:tiling"]
         self.assertEqual(row["status"], "complete")
         self.assertTrue(row["issues"][0].startswith("Cut as "))
-        self.assertIn('grid: "cuts text" found by the measures, not named by the model', row["issues"])
+        self.assertIn('grid: "decoration or blank" found by the measures, not named by the model', row["issues"])
+        self.assertFalse([i for i in row["issues"] if i.startswith('grid: "cuts text"')])  # both find it
 
 if __name__ == "__main__":
     unittest.main()

@@ -15,7 +15,8 @@ and the page as a whole:
 
 - **lines read twice:** lines held whole by more than one tile
 - **overlap:** the tiles' summed area over the area they cover (1.0: no overlap)
-- **figures not whole:** detected figures that no tile or figure task holds whole
+- **figures not whole:** detected figures that no tile or figure task holds whole: what's drawn or written in the
+  figure's box, not its white margin (2026-10-12: a tile 2 points short of a chart's box was counted as splitting it)
 - **graphics missed:** the share of the page's graphics no tile or figure task covers
 - **images:** image tasks sent, the overview included
 
@@ -51,6 +52,14 @@ def _cut_sideways(box, rect):
 
 def _cut_across(box, rect):
     return _meets(box, rect) and (box[1] < rect[1] - SLACK or box[3] > rect[3] + SLACK)
+
+def _inked(box, lines, graphics):
+    """A detected figure's box trimmed to the text and graphics inside it (a box with none is kept whole)."""
+    inside = [b for b in (*lines, *graphics) if _meets(b, box)]
+    if not inside:
+        return box
+    return (max(box[0], min(b[0] for b in inside)), max(box[1], min(b[1] for b in inside)),
+            min(box[2], max(b[2] for b in inside)), min(box[3], max(b[3] for b in inside)))
 
 def words(page):
     """A page's words as displayed: [Rect]."""
@@ -130,9 +139,9 @@ def measure(page, regions, lines, graphics, word_boxes=None, figures=(), decorat
         covered.add(r)
     area = sum(abs(pymupdf.Rect(r) & page.rect) for _, r in tiles)
     union = covered.count() * PAGE_RASTER * PAGE_RASTER
-    for g in graphics:
-        if g not in decoration:
-            drawn.add(g)
+    content = [g for g in graphics if g not in decoration]
+    for g in content:
+        drawn.add(g)
     for r in wholes:
         seen.add(r)
     drawn_cells = drawn.count()
@@ -149,7 +158,8 @@ def measure(page, regions, lines, graphics, word_boxes=None, figures=(), decorat
         "blank": sum(t["blank"] for t in per_tile),
         "lines_read_twice": sum(1 for n in holders if n > 1),
         "overlap": round(area / union, 4) if union else None,
-        "figures_not_whole": sum(1 for f in map(_box, figures) if not any(_held(f, r) for r in wholes)),
+        "figures_not_whole": sum(1 for f in map(_box, figures)
+                                 if not any(_held(_inked(f, boxes, content), r) for r in wholes)),
         "graphics_missed": round(missed / drawn_cells, 4) if drawn_cells else None,
     }
     return {"tiles": per_tile, "page": page_measures}

@@ -77,6 +77,15 @@ class Pages(unittest.TestCase):
         self.assertEqual((found["figures_not_whole"], found["graphics_missed"]), (0, 0.0))
         self.assertEqual((found["tiles"], found["images"]), (2, 3))
 
+    def test_a_figure_is_held_by_what_is_drawn_in_it_not_its_white_margin(self):
+        _doc, page = text_page(count=2)
+        drawn = pymupdf.Rect(300, 150, 500, 300)
+        page.draw_rect(drawn, fill=(0, 0, 0))
+        detected = drawn + (-6, -6, 6, 6)  # a figure's box, a margin around what's drawn
+        for tile, split in (((0, 0, 502, 400), 0), ((0, 0, 498, 400), 1)):  # short of the box; then of the drawing
+            found = measure(page, regions(tile), lines(page), _graphics(page), figures=[detected])["page"]
+            self.assertEqual(found["figures_not_whole"], split, tile)
+
 class Candidates(unittest.TestCase):
     """Milestone 3's candidate tilings, each a lever off by default."""
 
