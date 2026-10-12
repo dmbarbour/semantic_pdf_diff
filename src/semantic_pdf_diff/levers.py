@@ -790,6 +790,12 @@ class Platform(Composable):
     # --- inclusion: what a task carries, and which detected tables are read
 
     @chained
+    def text_left_out(self, reader, page, number, tables):
+        """Unrotated boxes whose text blocks a PDF page's text tasks leave out, to the readers of what they hold
+        (tables: the boxes of the tables detected and read): the platform's, none."""
+        return []
+
+    @chained
     def region_text(self, reader, page, rect, layer, text):
         """An image task's source text, from its note (a caption, a detail's titles) and the region's text layer."""
         return text

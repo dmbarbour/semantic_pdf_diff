@@ -19,23 +19,28 @@ from .tables import Marks, column_edges, cut_columns, pdf_grid, pdf_parts, row_b
 from .tasks import TaskCore, split_utf8
 from .visuals import Visuals, render
 
-def text_pieces(page, text_bytes):
+def text_pieces(page, text_bytes, left_out=()):
+    """A page's text blocks in reading order, oversized ones split: [(id, bbox, text)]. left_out: unrotated boxes; a
+    block whose middle is in one is left out (its id kept for the others, so their tasks keep their names)."""
     pieces = []
     for bi, block in enumerate(reading_blocks(page)):
         if block[6] != 0:
+            continue
+        middle = ((block[0] + block[2]) / 2, (block[1] + block[3]) / 2)
+        if any(b[0] <= middle[0] <= b[2] and b[1] <= middle[1] <= b[3] for b in left_out):
             continue
         for ci, chunk in enumerate(split_utf8(block[4].strip(), text_bytes)):
             if chunk.strip():
                 pieces.append((f"{bi}.{ci}", tuple(block[:4]), chunk))
     return pieces
 
-def text_groups(page, text_bytes, section_of=None):
+def text_groups(page, text_bytes, section_of=None, left_out=()):
     """Consecutive text blocks grouped up to the byte budget (oversized blocks split),
-    never across a section boundary (section_of(bbox) names a block's section).
+    never across a section boundary (section_of(bbox) names a block's section); blocks in left_out's boxes left out.
 
     Returns [(ids, [(bbox, text)])], where ids like '3.0-5.0' name the blocks grouped.
     """
-    pieces = text_pieces(page, text_bytes)
+    pieces = text_pieces(page, text_bytes, left_out)
     part = section_of or (lambda bbox: None)
     groups, group, size = [], [], 0
     for piece in pieces + [None]:
@@ -145,17 +150,20 @@ class PdfReading:
         return "read by a figure task"
 
     def page(self, number, page):
-        """Read one page: its text, tables, signals and image tasks."""
-        self.text(number, page)
+        """Read one page: its tables detected, then its text, tables, signals and image tasks."""
         found, marks = self.detect(number, page)
+        self.text(number, page, found)
         self.tables(number, page, found, marks)
         self.page_signals(number, page, found)
         self.vision(number, page)
 
-    def text(self, number, page):
+    def text(self, number, page, found):
         # Native coordinates stay unrotated (PDF point coordinates). Consecutive
-        # blocks are grouped up to the byte budget; oversized blocks are split.
-        for ids, segments in text_groups(page, self.s.text_bytes, lambda b, n=number: self.owner.box(n, b).id):
+        # blocks are grouped up to the byte budget; oversized blocks are split; blocks the configuration leaves to
+        # other readers (text_left_out, given the tables detected) are left out.
+        left_out = self.s.text_left_out(self.context_of, page, number, [f[0] for f in found if f[1]])
+        for ids, segments in text_groups(page, self.s.text_bytes, lambda b, n=number: self.owner.box(n, b).id,
+                                         left_out):
             self.core.text_task(number, segments, f"text:p{number}:{ids}")
 
     def detect(self, number, page):
