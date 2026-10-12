@@ -407,8 +407,8 @@ class FigureRefinement(Lever):
 
 class HalveParts(Lever):
     lever_name, stage, off = "halve_parts", "segmentation", {"halve_parts": False}
-    # a refined tile's halves are cut around its detected figures where they can be, as around a graphic: the cut
-    # follows the parts (milestone 7; a figure of several graphics was cut through a gap inside it)
+    # a refined tile's halves are cut around the detected figures it holds where they can be, as around a graphic: the
+    # cut follows the parts (milestone 7; a figure of several graphics was cut through a gap inside it)
     halve_parts: Annotated[bool, _selecting(VISUAL)] = False
 
     def tile_parts(self, reader, page):

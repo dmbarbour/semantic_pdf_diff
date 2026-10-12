@@ -78,7 +78,7 @@ class Halves(unittest.TestCase):
         self.assertFalse(any(figure in half for half in through))  # cut down a gap between its bars
         around = halves(page, tile, boxes, bars, parts=[figure])
         self.assertTrue(any(figure in half for half in around))
-        self.assertEqual(halves(page, tile, boxes, bars, parts=[pymupdf.Rect(0, 0, 400, 300)]), through)  # too large
+        self.assertEqual(halves(page, tile, boxes, bars, parts=[pymupdf.Rect(140, 40, 400, 300)]), through)  # not held
 
 class Again(unittest.TestCase):  # figure_refinement: a partial tile mostly one figure is looked at again whole
     def test_a_tile_mostly_a_chart_is_asked_again_told_its_claims_and_issues(self):

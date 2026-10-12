@@ -105,18 +105,18 @@ def _gaps(boxes, axis, lo, hi):
 def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFINE_OVERLAP, parts=()):
     """A partial tile's two halves for refinement (review-bugs-2026-10-09, item 6), each grown to whole lines.
 
-    The cut crosses no text line where it can: in a gap between lines or between columns (no graphic or part crossed
-    either, if possible: parts, boxes such as a figure's), nearest the middle of what the tile holds, each side holding
-    at least `least` of its extent, ties
-    going to the cut across the tile's shorter side (a band is cut between its lines, not down them). Otherwise the
-    cut crossing the fewest lines. Measured on what the tile holds, not on the tile, so neither half is left blank.
-    A tile without text, such as a drawing or a scan, is cut at the middle of its longer side, as before."""
+    The cut crosses no text line where it can: in a gap between lines or between columns (no graphic crossed either,
+    nor a part the tile holds, if possible: parts, boxes such as a figure's), nearest the middle of what the tile
+    holds, each side holding at least `least` of its extent, ties going to the cut across the tile's shorter side (a
+    band is cut between its lines, not down them). Otherwise the cut crossing the fewest lines. Measured on what the
+    tile holds, not on the tile, so neither half is left blank. A tile without text, such as a drawing or a scan, is
+    cut at the middle of its longer side, as before."""
     lines = _lines(page) if lines is None else lines
     texts = [box & rect for box, _ in lines if box.intersects(rect)]
     if not texts:
         return _middle(rect, overlap)
-    marks = texts + [g & rect for g in [*(_graphics(page) if graphics is None else graphics),
-                                        *(x for x in parts if not x.contains(rect))]  # a part the tile is in: no help
+    held = [x for x in parts if x in rect]  # a part the tile doesn't hold is cut already
+    marks = texts + [g & rect for g in [*(_graphics(page) if graphics is None else graphics), *held]
                      if g.intersects(rect)]
     shorter = 1 if rect.height < rect.width else 0  # the axis whose cut divides the shorter side
     best = None
