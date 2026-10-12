@@ -285,7 +285,7 @@ class TileChoice(Lever):
     # which cut a page gets, among the tilers' (bands where they apply, grid, snapped, xycut), each measured
     # (tilechoice.choose): the one at least as good as the rest on every measure; where none is, the default unless
     # another beats it (measures), or the model's choice among those no other beats (model; calibrated first:
-    # scripts/calibration.py)
+    # scripts/calibration.py), read with each of two it names as equally good
     tile_choice: Annotated[Literal["off", "measures", "model"], _selecting(VISUAL)] = "off"
 
     def tiling_of(self, reader, page):
@@ -760,7 +760,11 @@ class Platform(Composable):
 
     def tiles_for(self, reader, page, how):
         """[(tag, Rect, note)]: a page's tiles cut as `how` names. Bands no graphic that counts touches are skipped;
-        the other cuts' tiles are each grown."""
+        the other cuts' tiles are each grown. Cuts joined, "xycut+grid" (tile_choice's ties): each one's tiles,
+        numbered on."""
+        if "+" in how:
+            regions = [x for part in how.split("+") for x in self.tiles_for(reader, page, part)]
+            return [(f"tile:{i}", r, note) for i, (_, r, note) in enumerate(regions)]
         cut = self.cut_named(reader, page, how)
         if how == "bands":
             graphics = self.content_graphics(reader, page)

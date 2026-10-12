@@ -1,9 +1,9 @@
 """The model chooses a page's tiling: the question (docs/plans/tile-selection-2026-10-10.md, milestones 4 and 5).
 
 One shrunk image of the page as it is, then one per candidate tiling: the page with that candidate's tiles outlined,
-washed and numbered, and the candidate's letter in a strip above it. The model names the best candidate and, for each,
-its problems from a closed list (PROBLEMS). The page tests' lesson: marks drawn on an image are read as the page's own
-until the prompt says they aren't.
+washed and numbered, and the candidate's letter in a strip above it. The model names the best candidate (or, asked with
+ties, those it can't choose between) and, for each, its problems from a closed list (PROBLEMS). The page tests'
+lesson: marks drawn on an image are read as the page's own until the prompt says they aren't.
 
 Calibration asks it with known-good and known-bad candidates (lab: bench/calibration.py) before any answer is trusted.
 
@@ -11,11 +11,16 @@ The tile_choice lever (levers.py) asks it where the tilers' cuts can't be ranked
 measured (tiling.measure), and where one is at least as good as every other on every measure (MEASURES) it's taken
 without asking. Otherwise the cuts no other beats on every measure are the candidates: the default among them is kept
 (tile_choice "measures"), or the model chooses (tile_choice "model"), falling back to that rule when it can't be asked
-or its answer names none.
+or its answer names none. Where the model names several as equally good, the page is read with each (up to TIED).
+
+The owner, 2026-10-12: "We should probably enable models to say that there isn't a best choice betwee two options.
+Would make it easier to identify which calibration tilings need extra inspection from you, and would allow us to just
+send both tilings when those cases are live."
 """
 import hashlib
 import json
 import random
+import re
 
 import pymupdf
 
@@ -75,9 +80,9 @@ def sketch(page, tiles=None, letter=None, side=SKETCH_SIDE, pixmap=None, dimmed=
                                color=(1, 1, 1))
         return canvas.get_pixmap(dpi=72, alpha=False).tobytes("png")
 
-def prompt(letters, dimmed=False):
+def prompt(letters, dimmed=False, ties=False):
     """The question, for candidates named by these letters, in the order their images follow the page's; dimmed: the
-    sketches grey out what no tile holds."""
+    sketches grey out what no tile holds; ties: the model may name several it can't choose between."""
     names = ", ".join(letters[:-1]) + f" and {letters[-1]}" if len(letters) > 1 else letters[0]
     example = {"best": " or ".join(letters), "problems": {x: ["..."] for x in letters}}  # no answer suggested
     return (
@@ -93,7 +98,9 @@ def prompt(letters, dimmed=False):
         "- has no tile holding only decoration (rules, borders, logos, a background) or blank space\n"
         "- repeats little: few lines lie inside more than one tile\n"
         "You can't read the page's text at this size, and needn't: judge where the text and figures are.\n"
-        "Which tiling is best? For each tiling, list its problems, using only these words: "
+        "Which tiling is best?"
+        + (' Where you can\'t choose between two or more because they are equally good, name each, joined by "and".'
+           if ties else "") + " For each tiling, list its problems, using only these words: "
         + ", ".join(f'"{p}"' for p in PROBLEMS) + " (an empty list if it has none).\n"
         f"Return only JSON: {json.dumps(example)}")
 
@@ -101,10 +108,19 @@ class Choice(Lenient):
     best: str = ""
     problems: dict = Field(default_factory=dict)
 
+def named(answer, letters):
+    """The letters the answer names as best ("A", or tied: "A and C", "A, C"), in the order offered; none where it
+    names one it wasn't offered, or none, or hedges ("A or C")."""
+    parts = re.split(r"\s*(?:,|&|\bAND\b|\n)\s*", (answer.best or "").strip().upper())
+    found = {x.removeprefix("TILINGS").removeprefix("TILING").strip(" .:") for x in parts if x.strip(" .:")}
+    if not found or not found <= set(letters):
+        return []
+    return [x for x in letters if x in found]
+
 def chosen(answer, letters):
-    """The letter the answer names as best, or None (a letter it wasn't offered, or none)."""
-    text = (answer.best or "").strip().upper().removeprefix("TILING").strip(" .:")
-    return text if text in letters else None
+    """The one letter the answer names as best, or None (several, a letter it wasn't offered, or none)."""
+    found = named(answer, letters)
+    return found[0] if len(found) == 1 else None
 
 def problems(answer, letters):
     """{letter: [problem]}: what the answer lists for each candidate offered, only PROBLEMS' words, in their order."""
@@ -127,6 +143,7 @@ RELIABLE = ("cuts text", "decoration or blank")  # the problems calibration foun
 FAULTS = {"cuts": "cuts text", "figures split": "splits a figure", "missed": "misses content",
           "empty": "decoration or blank", "read twice": "repeats text"}
 MOST = 3  # candidates shown at most
+TIED = 2  # cuts a page is read with where the model names several as equally good: the first by the measures
 
 def scores(measured, lines, rects, sides):
     """A cut's MEASURES from its page measures (tiling.measure's "page"): lines cut sideways or across, figures no
@@ -183,7 +200,8 @@ def choose(settings, reader, page, default, ask=False):
     """The cut a page gets, by name, its record kept in reader.page_choices: a candidate at least as good as the rest
     on every measure (the default, if it's one); where there's none, the default if no other beats it, else the first
     of those no other beats that beats it; with ask, the model's choice among those no other beats (up to MOST), the
-    rule above where it can't be asked or names none."""
+    rule above where it can't be asked or names none. Cuts the model names as equally good are joined, "xycut+grid":
+    the page is read with each (Platform.tiles_for)."""
     if page.number in reader.page_choices:
         return reader.page_choices[page.number]["chosen"]
     found = candidates(settings, reader, page, default)
@@ -203,7 +221,8 @@ def choose(settings, reader, page, default, ask=False):
     return record["chosen"]
 
 def _asked(reader, page, tilings, scored):
-    """The question asked: {"order", "answer" (a cut's name, or None), "problems" {how: [problem]}, "issues"}."""
+    """The question asked: {"order", "answer" (a cut's name, cuts' joined by "+" where tied, or None), "problems"
+    {how: [problem]}, "issues"}. tilings: in the measures' order."""
     from .failures import ModelFailure
     from .regions import crop_name
     seed = hashlib.sha256(f"{page.get_text()}|{page.number}".encode()).hexdigest()
@@ -220,17 +239,22 @@ def _asked(reader, page, tilings, scored):
     out = {"order": order, "answer": None, "problems": {}, "issues": []}
     try:
         key = ("tilechoice", f"p{page.number}", reader.stem)
-        answer = reader.ask(prompt(letters, dimmed=True), Choice, images, key)
+        answer = reader.ask(prompt(letters, dimmed=True, ties=True), Choice, images, key)
     except ModelFailure as e:
         out["issues"].append(f"The tiling question failed ({e}); the cut chosen by the measures")
         return out
-    letter = chosen(answer, letters)
-    if letter is None:
+    best = [order[letters.index(x)] for x in named(answer, letters)]
+    if not best:
         out["issues"].append(f"The tiling answer named no candidate ({answer.best!r}); the cut chosen by the measures")
+    elif len(best) == 1:
+        out["answer"] = best[0]
     else:
-        out["answer"] = order[letters.index(letter)]
-    named = problems(answer, letters)
-    out["problems"] = {order[letters.index(x)]: found for x, found in named.items()}
+        read = [h for h in tilings if h in best][:TIED]
+        out["answer"] = "+".join(read)
+        out["issues"].append(f"The model named {' and '.join(best)} as equally good: the page read with "
+                             + " and ".join(read))
+    listed = problems(answer, letters)
+    out["problems"] = {order[letters.index(x)]: found for x, found in listed.items()}
     for how in order:  # the reliable problems checked against the measures: a diagnostic
         measured = {FAULTS[m] for m in FAULTS if scored[how][m]}
         said = set(out["problems"].get(how, []))

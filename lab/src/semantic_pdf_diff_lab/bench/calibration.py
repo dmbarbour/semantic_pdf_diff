@@ -11,7 +11,9 @@ only where the measures find its fault (KINDS). A question offers the good tilin
 twice: the second time each candidate moves one place on, so position bias and consistency can be measured.
 
 The question is the product's (tilechoice.py). Scored: the good tiling chosen, by the kinds beside it; each position's
-share of choices; the same tiling chosen in both orders; and the problems named, against each kind's fault.
+share of choices; the same tiling chosen in both orders; and the problems named, against each kind's fault. Asked with
+ties (the ties arms), the model may name several tilings it can't choose between: how often it does, and with what,
+is scored too, and the report lists those questions for inspection.
 """
 import hashlib
 import json
@@ -49,10 +51,13 @@ NEAR = {
 }
 # how the candidates are drawn (tilechoice.sketch), their pictures' suffix, and which questions are asked: outlined;
 # or with what no tile holds greyed out, after the first run's misses (a tiling missing most of a page looked like the
-# page untouched); near, dimmed
-ARMS = {"outlined": {"suffix": "", "dimmed": False, "near": False},
-        "dimmed": {"suffix": "-dimmed", "dimmed": True, "near": False},
-        "near": {"suffix": "-dimmed", "dimmed": True, "near": True}}
+# page untouched); near, dimmed; and both dimmed, asked with ties (the owner, 2026-10-12: "We should probably enable
+# models to say that there isn't a best choice betwee two options.")
+ARMS = {"outlined": {"suffix": "", "dimmed": False, "near": False, "ties": False},
+        "dimmed": {"suffix": "-dimmed", "dimmed": True, "near": False, "ties": False},
+        "near": {"suffix": "-dimmed", "dimmed": True, "near": True, "ties": False},
+        "ties": {"suffix": "-dimmed", "dimmed": True, "near": False, "ties": True},
+        "near-ties": {"suffix": "-dimmed", "dimmed": True, "near": True, "ties": True}}
 # a model passes, under an arm, at these shares or more (set by judgement, 2026-10-11: gemma-4 chose the known-good
 # 95% of the time, the same in both orders 91%, with the dimmed sketches; 90% and 87% with outlines alone)
 PASS = {"good_chosen": 0.9, "same_in_both_orders": 0.85}
@@ -323,11 +328,11 @@ def cases(folder, only=None, near=False):
                 yield p, found, (near_questions if near else questions)(p, found)
 
 def ask_all(folder, client, corpus, only=None, arm="outlined"):
-    """{question id: {"page", "kinds", "orders", "answers": [per order: {"best", "problems", "error"}],
+    """{question id: {"page", "kinds", "orders", "answers": [per order: {"named", "problems", "error"}],
     "measures": {kind: page measures}}}: every question asked in both orders, under an arm of ARMS. Pictures go to
     folder/images."""
     from semantic_pdf_diff.dispatch import Dispatcher
-    from semantic_pdf_diff.tilechoice import LETTERS, SKETCH_SIDE, Choice, chosen, problems, prompt, sketch
+    from semantic_pdf_diff.tilechoice import LETTERS, SKETCH_SIDE, Choice, named, problems, prompt, sketch
     target = Path(folder) / "images"
     target.mkdir(parents=True, exist_ok=True)
     out = {}
@@ -356,11 +361,12 @@ def ask_all(folder, client, corpus, only=None, arm="outlined"):
                     key = ("tilechoice", f"{q['id']}|o{o}", arm)
 
                     def finish(value, error, record=record, o=o, letters=letters):
-                        record["answers"][o] = ({"best": None, "problems": {}, "error": str(error)[:200]}
+                        record["answers"][o] = ({"named": [], "problems": {}, "error": str(error)[:200]}
                                                 if error is not None else
-                                                {"best": chosen(value, letters), "problems": problems(value, letters),
+                                                {"named": named(value, letters), "problems": problems(value, letters),
                                                  "error": None, "raw": value.best})
-                    dispatch.submit(prompt(letters, dimmed=ARMS[arm]["dimmed"]), Choice, images, key, finish)
+                    dispatch.submit(prompt(letters, dimmed=ARMS[arm]["dimmed"], ties=ARMS[arm]["ties"]), Choice,
+                                    images, key, finish)
                     dispatch.make_room()
         dispatch.drain()
     return out
@@ -371,54 +377,62 @@ def _share(a, b):
     return round(a / b, 3) if b else None
 
 def score(asked):
-    """A model's profile from ask_all's answers (questions never answered, as unrecorded in a replay, left out)."""
+    """A model's profile from ask_all's answers (questions never answered, as unrecorded in a replay, left out). A
+    tiling is chosen where it's named alone; a tie (several named) chooses none, and is counted apart."""
     from semantic_pdf_diff.tilechoice import LETTERS
     answered = {k: q for k, q in asked.items() if all(a and not a["error"] for a in q["answers"])}
-    picks = [(q, o, q["orders"][o][LETTERS.index(a["best"])] if a["best"] else None)
-             for q in answered.values() for o, a in enumerate(q["answers"])]
+    picks = [(q, o, _picks(q, o)) for q in answered.values() for o in (0, 1)]
     out = {"questions": len(asked), "answered": len(answered), "asked": len(picks),
-           "invalid": sum(1 for _, _, kind in picks if kind is None)}
-    out["good_chosen"] = _share(sum(1 for _, _, kind in picks if kind == "good"), len(picks))
-    both = [q for q in answered.values()]
-    same = [q for q in both if _pick(q, 0) is not None and _pick(q, 0) == _pick(q, 1)]
+           "invalid": sum(1 for _, _, kinds in picks if not kinds)}
+    out["good_chosen"] = _share(sum(1 for _, _, kinds in picks if kinds == ("good",)), len(picks))
+    out["tied"] = _share(sum(1 for _, _, kinds in picks if len(kinds) > 1), len(picks))
+    out["good_tied"] = _share(sum(1 for _, _, kinds in picks if len(kinds) > 1 and "good" in kinds), len(picks))
+    both = list(answered.values())
+    same = [q for q in both if _picks(q, 0) and set(_picks(q, 0)) == set(_picks(q, 1))]
     out["same_in_both_orders"] = _share(len(same), len(both))
-    out["good_in_both_orders"] = _share(sum(1 for q in same if _pick(q, 0) == "good"), len(both))
+    out["good_in_both_orders"] = _share(sum(1 for q in same if _picks(q, 0) == ("good",)), len(both))
+    out["tied_questions"] = sum(1 for q in both if len(_picks(q, 0)) > 1 or len(_picks(q, 1)) > 1)
     by_kind = {}
-    for q, o, kind in picks:
+    for q, o, kinds in picks:
         for bad in q["kinds"][1:]:
-            k = by_kind.setdefault(bad, {"asked": 0, "good_chosen": 0, "this_chosen": 0, "fault_named": 0})
+            k = by_kind.setdefault(bad, {"asked": 0, "good_chosen": 0, "this_chosen": 0, "tied_with_good": 0,
+                                         "fault_named": 0})
             k["asked"] += 1
-            k["good_chosen"] += kind == "good"
-            k["this_chosen"] += kind == bad
+            k["good_chosen"] += kinds == ("good",)
+            k["this_chosen"] += kinds == (bad,)
+            k["tied_with_good"] += len(kinds) > 1 and {"good", bad} <= set(kinds)
             letter = LETTERS[q["orders"][o].index(bad)]
             k["fault_named"] += q["faults"][bad] in q["answers"][o]["problems"].get(letter, [])
-    out["by_kind"] = {bad: {"asked": k["asked"], "good_chosen": _share(k["good_chosen"], k["asked"]),
-                            "this_chosen": _share(k["this_chosen"], k["asked"]),
-                            "fault_named": _share(k["fault_named"], k["asked"])} for bad, k in sorted(by_kind.items())}
+    out["by_kind"] = {bad: {"asked": k["asked"], **{m: _share(k[m], k["asked"]) for m in (
+        "good_chosen", "this_chosen", "tied_with_good", "fault_named")}} for bad, k in sorted(by_kind.items())}
     good_named = [q["answers"][o]["problems"].get(LETTERS[q["orders"][o].index("good")], []) for q, o, _ in picks]
     out["good_faulted"] = _share(sum(1 for g in good_named if g), len(good_named))
     out["good_faults"] = {p: sum(1 for g in good_named if p in g) for p in sorted({p for g in good_named for p in g})}
     out["passes"] = all((out[k] or 0) >= least for k, least in PASS.items())
     positions = {}
-    for q, o, kind in picks:
+    for q, o, kinds in picks:
         n = len(q["orders"][o])
         row = positions.setdefault(str(n), {"asked": 0, "chosen": [0] * n, "good_at": [0] * n})
         row["asked"] += 1
         row["good_at"][q["orders"][o].index("good")] += 1
-        if kind is not None:
-            row["chosen"][q["orders"][o].index(kind)] += 1
+        if len(kinds) == 1:
+            row["chosen"][q["orders"][o].index(kinds[0])] += 1
     out["positions"] = {n: {"asked": r["asked"], "chosen": [_share(c, r["asked"]) for c in r["chosen"]],
                             "good_at": [_share(c, r["asked"]) for c in r["good_at"]]} for n, r in positions.items()}
     return out
 
-def _pick(q, o):
+def _picks(q, o):
+    """The kinds an answer names as best, in the order asked: one, several (a tie), or none."""
     from semantic_pdf_diff.tilechoice import LETTERS
-    best = q["answers"][o]["best"]
-    return q["orders"][o][LETTERS.index(best)] if best else None
+    return tuple(q["orders"][o][LETTERS.index(x)] for x in q["answers"][o]["named"])
+
+def _tied(q):
+    return any(a and not a["error"] and len(a["named"]) > 1 for a in q["answers"])
 
 def page(folder, data, asked_by_arm):
-    """report.html: each model's profile under each arm, then every question's pictures and answers, the wrong ones
-    first. data: {"models": {model: {arm: profile}}}; asked_by_arm: {(model, arm): ask_all's answers}."""
+    """report.html: each model's profile under each arm and the questions it tied (each linked), then every
+    question's pictures and answers, the wrong ones first, then the tied. data: {"models": {model: {arm: profile}}};
+    asked_by_arm: {(model, arm): ask_all's answers}."""
     from semantic_pdf_diff.html_pages import esc, page as html_page
     from semantic_pdf_diff.tilechoice import LETTERS
     body = ["<h1>Tiling calibration</h1>",
@@ -427,9 +441,14 @@ def page(folder, data, asked_by_arm):
     for (model, arm), asked in asked_by_arm.items():
         profile = data["models"][model][arm]
         body.append(f"<h2>{esc(model)}, {esc(arm)}</h2><pre>{esc(json.dumps(profile, indent=1))}</pre>")
-        wrong = sorted(asked.items(), key=lambda kv: (sum(_pick(kv[1], o) == "good" for o in (0, 1)
+        anchor = f"{model}|{arm}|"
+        tied = [qid for qid, q in sorted(asked.items()) if _tied(q)]
+        if tied:
+            body.append("<p><b>Tied</b> (several named as equally good, in either order): " + ", ".join(
+                f"<a href='#{esc(anchor + qid)}'>{esc(qid)}</a>" for qid in tied) + "</p>")
+        wrong = sorted(asked.items(), key=lambda kv: (sum(_picks(kv[1], o) == ("good",) for o in (0, 1)
                                                           if kv[1]["answers"][o] and not kv[1]["answers"][o]["error"]),
-                                                      kv[0]))
+                                                      not _tied(kv[1]), kv[0]))
         for qid, q in wrong:
             cells = [f"<figure><img src='images/{esc(q['page'])}.png' loading='lazy' alt=''><figcaption>the page"
                      "</figcaption></figure>"]
@@ -444,12 +463,13 @@ def page(folder, data, asked_by_arm):
             for o, a in enumerate(q["answers"]):
                 if a is None:
                     continue
-                pick = _pick(q, o) if not a["error"] else None
-                said.append(f"order {o + 1} ({esc(', '.join(q['orders'][o]))}): chose {esc(str(a['best']))} = "
-                            f"<b>{esc(str(pick))}</b>; problems {esc(json.dumps(a['problems']))}"
+                pick = " and ".join(_picks(q, o)) if not a["error"] else ""
+                said.append(f"order {o + 1} ({esc(', '.join(q['orders'][o]))}): chose "
+                            f"{esc(' and '.join(a['named']) or str(a.get('raw')))} = <b>{esc(pick or 'none')}</b>; "
+                            f"problems {esc(json.dumps(a['problems']))}"
                             + (f"; error {esc(a['error'])}" if a["error"] else ""))
-            body.append(f"<section><h3>{esc(qid)}</h3><p>{'<br>'.join(said)}</p><div class='row'>{''.join(cells)}</div>"
-                        "</section>")
+            body.append(f"<section id='{esc(anchor + qid)}'><h3>{esc(qid)}{' (tied)' if _tied(q) else ''}</h3>"
+                        f"<p>{'<br>'.join(said)}</p><div class='row'>{''.join(cells)}</div></section>")
     style = ("body{font:15px/1.45 system-ui,sans-serif;margin:0 auto;max-width:1400px;padding:16px}"
              ".muted{color:var(--muted)}section{background:var(--card);border:1px solid var(--line);"
              "border-radius:8px;padding:12px;margin:12px 0}h3{margin:0 0 4px;font-size:15px}pre{font-size:12px}"

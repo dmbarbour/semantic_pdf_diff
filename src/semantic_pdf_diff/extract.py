@@ -105,8 +105,8 @@ class PdfReading:
                 self.record(coverage_row(
                     content=self.content, page=number, bbox=list(native_page(page)), task=f"vision:p{number}:tiling",
                     status="complete" if choice["answer"] else "failed",
-                    issues=[f"Cut as {choice['chosen']} (offered {', '.join(choice['order'])}; the default "
-                            f"{choice['default']})", *choice["issues"]]))
+                    issues=[f"Cut as {' and '.join(choice['chosen'].split('+'))} (offered "
+                            f"{', '.join(choice['order'])}; the default {choice['default']})", *choice["issues"]]))
         return self.regions[number]
 
     def as_figure(self, number, page, rect, tag):

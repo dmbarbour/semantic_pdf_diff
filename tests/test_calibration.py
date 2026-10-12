@@ -48,6 +48,8 @@ class Question(unittest.TestCase):
         for problem in tilechoice.PROBLEMS:
             self.assertIn(f'"{problem}"', text)
         self.assertIn('"best": "A or B or C"', text)
+        self.assertNotIn('joined by "and"', text)
+        self.assertIn('equally good, name each, joined by "and"', tilechoice.prompt(list("ABC"), ties=True))
 
     def test_answers_are_read_leniently_and_only_as_offered(self):
         answer = tilechoice.Choice.model_validate({"best": "Tiling b.", "problems": {
@@ -57,6 +59,16 @@ class Question(unittest.TestCase):
                          {"A": ["cuts text"], "C": ["splits a figure", "repeats text"]})
         self.assertIsNone(tilechoice.chosen(tilechoice.Choice.model_validate({"best": "D"}), list("ABC")))
         self.assertIsNone(tilechoice.chosen(tilechoice.Choice.model_validate({}), list("ABC")))
+
+    def test_a_tie_names_several_and_chooses_none(self):
+        def named(best):
+            return tilechoice.named(tilechoice.Choice.model_validate({"best": best}), list("ABC"))
+        self.assertEqual(named("C and A"), ["A", "C"])
+        self.assertEqual(named("Tilings A, B and C."), ["A", "B", "C"])
+        self.assertEqual(named(["B", "A"]), ["A", "B"])  # a list, read as lines
+        for hedged in ("A or B", "A and D", ""):
+            self.assertEqual(named(hedged), [], hedged)
+        self.assertIsNone(tilechoice.chosen(tilechoice.Choice.model_validate({"best": "A and B"}), list("ABC")))
 
 class Cases(unittest.TestCase):
     def test_the_good_tiling_has_no_fault_and_each_bad_one_shows_its_own(self):
@@ -103,8 +115,9 @@ class Cases(unittest.TestCase):
             self.assertEqual(second, first[::-1])
 
 class Judge:
-    """A simulated model: chooses the candidate whose picture is named for `prefer` (the known-good, or always the
-    first), and names each candidate's own fault, read from its picture's name."""
+    """A simulated model: chooses the candidate whose picture is named for `prefer` (the known-good, always the
+    first, or the known-good tied with the first other), and names each candidate's own fault, read from its picture's
+    name."""
 
     def __init__(self, prefer="good"):
         self.prefer = prefer
@@ -112,15 +125,18 @@ class Judge:
     def ask(self, prompt, schema, images=(), key=None):
         letters = re.search(r"tilings ([A-F](?:, [A-F])*(?: and [A-F])?)", prompt).group(1)
         letters = re.findall(r"[A-F]", letters)
-        kinds = [Path(i).stem.rsplit("-", 1)[0].split("-p1-", 1)[1].replace("-", " ") for i in images[1:]]
-        best = letters[kinds.index("good")] if self.prefer == "good" else letters[0]
+        kinds = [Path(i).stem.removesuffix("-dimmed").rsplit("-", 1)[0].split("-p1-", 1)[1].replace("-", " ")
+                 for i in images[1:]]
+        good = letters[kinds.index("good")]
+        other = next(x for x in letters if x != good)
+        best = {"good": good, "first": letters[0], "tie": f"{good} and {other}"}[self.prefer]
         return schema.model_validate({"best": best, "problems": {
             x: ([] if k == "good" else [calibration.KINDS[k]]) for x, k in zip(letters, kinds)}})
 
 class Scoring(unittest.TestCase):
-    def ask(self, judge):
+    def ask(self, judge, arm="outlined"):
         with tempfile.TemporaryDirectory() as folder:
-            return calibration.ask_all(folder, judge, CORPUS, {f"{TABLES}-p1"})
+            return calibration.ask_all(folder, judge, CORPUS, {f"{TABLES}-p1"}, arm)
 
     def test_a_judge_that_knows_scores_full_marks(self):
         found = calibration.score(self.ask(Judge()))
@@ -134,6 +150,16 @@ class Scoring(unittest.TestCase):
         self.assertEqual(found["positions"]["3"]["chosen"], [1.0, 0.0, 0.0])
         self.assertEqual(found["same_in_both_orders"], 0.0)  # the candidates moved; its choice didn't
         self.assertEqual(found["good_chosen"], found["positions"]["3"]["good_at"][0])
+
+    def test_a_judge_that_ties_chooses_none_and_its_ties_are_counted(self):
+        asked = self.ask(Judge("tie"), "ties")
+        found = calibration.score(asked)
+        self.assertEqual((found["good_chosen"], found["tied"], found["good_tied"], found["invalid"]),
+                         (0.0, 1.0, 1.0, 0))
+        self.assertEqual(found["tied_questions"], found["answered"])
+        self.assertEqual(sum(r["tied_with_good"] * r["asked"] for r in found["by_kind"].values()), found["asked"])
+        self.assertTrue(all(c == 0 for row in found["positions"].values() for c in row["chosen"]))
+        self.assertTrue(all(len(a["named"]) == 2 for q in asked.values() for a in q["answers"]))
 
 if __name__ == "__main__":
     unittest.main()

@@ -77,6 +77,23 @@ class Choosing(unittest.TestCase):
         self.assertEqual(tiles, [r for _, r, _ in s.kept_tiles(reader, page, s.tiles_for(reader, page, how))])
         self.assertEqual(len(asker.asked), 1)  # the choice kept: asked once a page
 
+    def test_cuts_the_model_names_as_equally_good_are_each_read(self):
+        from semantic_pdf_diff import tilechoice
+        for best, n in (("A and B", 2), ("A, B and C", 3)):
+            asker = Asker(best)
+            how, record, reader, s, page = self.choose(TABLES, asker)
+            with self.subTest(best=best):
+                self.assertIn('joined by "and"', asker.asked[0][0])
+                by_measures = sorted(record["order"][:n], key=lambda h: [record["scores"][h][m]
+                                                                         for m in tilechoice.MEASURES])
+                self.assertEqual(how.split("+"), by_measures[:tilechoice.TIED])
+                self.assertEqual(record["answer"], how)
+                self.assertTrue(record["issues"][0].startswith("The model named "))
+                tiles = [r for tag, r, _ in s.visual_regions(reader, page, page.number) if tag.startswith("tile")]
+                each = [r for part in how.split("+") for _, r, _ in s.tiles_for(reader, page, part)]
+                self.assertEqual(tiles, [r for _, r, _ in s.kept_tiles(reader, page, s.tiles_for(reader, page, how))])
+                self.assertEqual([r for _, r, _ in s.tiles_for(reader, page, how)], each)
+
     def test_a_failed_question_or_an_answer_naming_none_falls_back_to_the_measures(self):
         for asker in (Asker(fail=True), Asker("Z")):
             how, record, *_ = self.choose(TABLES, asker)
