@@ -7,6 +7,7 @@ import pymupdf
 from semantic_pdf_diff.pages import lines
 from semantic_pdf_diff.segmentation import _graphics
 from semantic_pdf_diff.tiling import measure, measure_tile, words
+from stubs import TILING_BEFORE
 
 def text_page(width=600, height=400, count=10, x=40, top=60):
     """A page of `count` lines, each about 330 points long."""
@@ -197,8 +198,9 @@ class Candidates(unittest.TestCase):
         from semantic_pdf_diff.settings import Settings
         doc, page = text_page(width=960, height=540, count=25, top=40)
         page.draw_rect(pymupdf.Rect(700, 300, 900, 500), fill=(0, 0, 0), color=None)
-        tiles = lambda **kw: [r for tag, r, _ in Settings(**kw).visual_regions(Context(doc, Settings(**kw)), page, 0)
-                              if tag.startswith("tile")]
+        def tiles(**kw):
+            s = Settings(**{**TILING_BEFORE, **kw})  # the grid, so text-only tiles are there to skip
+            return [r for tag, r, _ in s.visual_regions(Context(doc, s), page, 0) if tag.startswith("tile")]
         every, kept = tiles(), tiles(skip_text_only=True)
         self.assertLess(len(kept), len(every))
         self.assertTrue(all(r.intersects(pymupdf.Rect(700, 300, 900, 500)) for r in kept))
@@ -236,6 +238,22 @@ class Candidates(unittest.TestCase):
             self.assertLess(len(tiles(skip_text_only=True)), len(every))
             self.assertEqual(tiles(skip_text_only="except_sheets"), every)
 
+class Figures(unittest.TestCase):
+    def test_a_pages_figures_are_its_own_whatever_number_it_is_asked_by(self):
+        # once kept by the number asked: a 0-based caller (2 for the third page) got the second page's, kept under 2
+        from semantic_pdf_diff.context import Context
+        from semantic_pdf_diff.settings import Settings
+        corpus = Path(__file__).resolve().parent.parent / "benchmarks/controlled/docs"
+        doc = pymupdf.open()
+        for name in ("lcc-s1-clean", "lcc-enduse-s1-clean", "lcc-plan-s1-clean"):
+            with pymupdf.open(corpus / f"{name}.pdf") as source:
+                doc.insert_pdf(source, from_page=0, to_page=0)
+        reader = Context(doc, Settings())
+        kinds = [[f.kind for f in reader.figures(page, page.number + 1)] for page in doc]
+        self.assertIn("sheet", kinds[2])
+        self.assertEqual([f.kind for f in reader.figures(doc[2], 2)], kinds[2])
+        self.assertEqual([f.id for f in reader.figures(doc[2], 2)], [f.id for f in reader.figures(doc[2], 3)])
+
 class LabRuns(unittest.TestCase):
     def test_a_folder_measured_under_two_settings_compares_page_by_page(self):
         from semantic_pdf_diff.settings import Settings
@@ -246,8 +264,8 @@ class LabRuns(unittest.TestCase):
             doc, page = text_page(width=612, height=792, count=30, top=40)
             page.draw_rect(pymupdf.Rect(40, 500, 400, 700), fill=(0, 0, 0))
             doc.save(Path(folder) / "report.pdf")
-            default = tiling.run(folder, Settings())
-            grid = tiling.run(folder, Settings(tiling="grid"))
+            default = tiling.run(folder, Settings(**TILING_BEFORE))  # bands and the grid as before milestone 8
+            grid = tiling.run(folder, Settings(tiling="grid", **TILING_BEFORE))
         modes = {r["file"]: r["mode"] for r in default}
         self.assertEqual(modes, {"report.pdf": "bands", "wide.pdf": "grid"})
         self.assertGreater(tiling.summary(default)["grid"]["lines_cut_sideways"], 0)
@@ -289,9 +307,10 @@ class Gallery(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             doc, _ = text_page(width=792, height=612, count=30, top=40)
             doc.save(Path(folder) / "wide.pdf")
-            rows = tiling.run(folder, Settings())
+            before = Settings(**TILING_BEFORE)  # the grid cuts this page's lines: something to draw
+            rows = tiling.run(folder, before)
             out = Path(folder) / "gallery"
-            drawn = gallery.build(folder, rows, {"today": Settings(), "grid": Settings(tiling="grid")}, out, named=())
+            drawn = gallery.build(folder, rows, {"today": before, "grid": Settings(tiling="grid")}, out, named=())
             self.assertGreater(drawn, 0)
             self.assertEqual(len(list((out / "pages").glob("*.png"))), 2 * drawn)
             self.assertIn("wide.pdf, page 1", (out / "index.html").read_text())

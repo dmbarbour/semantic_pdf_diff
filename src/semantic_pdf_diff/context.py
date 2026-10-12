@@ -108,12 +108,13 @@ class Context:
             self.page_marks[page.number] = marks(page, self.drawings(page))
         return self.page_marks[page.number]
 
-    def figures(self, page, number):
+    def figures(self, page, number=None):
         """The page's detected figures (figures.page_figures), once per page: the figure tasks and the tiling
-        measures both ask."""
-        if number not in self.page_figures:
-            self.page_figures[number] = page_figures(page, number, self.drawings(page))
-        return self.page_figures[number]
+        measures both ask. Kept by the page, and numbered from 1 (their ids carry it), whatever number a caller has
+        (once kept by it: a 0-based caller got the page before's figures)."""
+        if page.number not in self.page_figures:
+            self.page_figures[page.number] = page_figures(page, page.number + 1, self.drawings(page))
+        return self.page_figures[page.number]
 
     def pixmap(self, page, matrix, clip=None):
         """Page.get_pixmap(matrix=matrix, clip=clip, alpha=False), rendered as it does, from the page's display list."""
