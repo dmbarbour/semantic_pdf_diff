@@ -362,6 +362,29 @@ class SkipTextOnly(Lever):
         return [x for x in regions if not any(x[1].intersects(b) for b in texts)
                 or any(x[1].intersects(g) for g in graphics)]
 
+MOST_OF_PAGE = 0.5  # a table covering more of a page than this is a frame or a layout to the leave_text lever
+
+class LeaveText(Lever):
+    lever_name, stage, off = "leave_text", "inclusion", {"leave_text": "none"}
+    # a PDF page's text tasks leave out the text of what other readers read: its detected tables (the table reader),
+    # and with figures, its detected figures but their captions (the figure task or a tile). Flattened, a table's
+    # columns shift and a chart's values pair with the wrong months (the corpus's text tasks: 139 misbound claims, 116
+    # in tables and charts; docs/reviews/levers.md's ideas). A drawing sheet keeps its text (its frame is found as
+    # tables), as does a page under a "table" covering most of it (a frame, a layout)
+    leave_text: Annotated[Literal["none", "tables", "tables and figures"], _shaping(TEXTUAL)] = "none"
+
+    def text_left_out(self, reader, page, number, tables):
+        boxes = super().text_left_out(reader, page, number, tables)
+        figures = reader.figures(page, number)
+        if self.leave_text == "none" or any(f.kind == "sheet" for f in figures):
+            return boxes
+        area = page.mediabox.width * page.mediabox.height
+        boxes = boxes + [tuple(t) for t in tables if (t[2] - t[0]) * (t[3] - t[1]) <= MOST_OF_PAGE * area]
+        if self.leave_text == "tables and figures":
+            from .figures import drawn_without_caption
+            boxes += [drawn_without_caption(page, f) for f in figures if f.region]
+        return boxes
+
 class RegionLabels(Lever):
     lever_name, stage, off = "region_labels", "segmentation", {"region_labels": "off"}
     # the model labels the tiles a page sends (regionlabels.py; calibrated first: scripts/labelling.py): text,
@@ -595,7 +618,8 @@ LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableCont
                  TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
                  RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,
                  TableReview,
-                 TableStructure, VisualTextLayer, TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading,
+                 TableStructure, VisualTextLayer, TableFilter, LeaveText, QuoteMatch, Reconcile, DedupeRepeated,
+                 ContinueReading,
                  Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)

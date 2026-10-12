@@ -27,6 +27,7 @@
     "table_structure",
     "visual_text_layer",
     "table_filter",
+    "leave_text",
     "quote_match",
     "reconcile",
     "dedupe_repeated",

@@ -203,3 +203,22 @@ def page_figures(page, number, drawings=None):
             item = dict(item, bbox=tuple(native(page, item["bbox"])))
         figures.append(Figure(id=f"fig:p{number}:{i}", page=number, **item))
     return figures
+
+def drawn_without_caption(page, figure):
+    """A figure's box (unrotated, as the text blocks are) without its caption: cut above or below the caption's text
+    block where the box holds it, so the text tasks keep the caption (the leave_text lever)."""
+    from .pages import reading_blocks
+    x0, y0, x1, y1 = figure.bbox
+    start = " ".join((figure.caption or "").split())[:24]
+    if not start:
+        return (x0, y0, x1, y1)
+    for b in reading_blocks(page):
+        if b[6] != 0 or not " ".join(b[4].split()).startswith(start):
+            continue
+        middle = (b[1] + b[3]) / 2
+        if x0 <= (b[0] + b[2]) / 2 <= x1 and y0 <= middle <= y1:
+            if middle > (y0 + y1) / 2:
+                y1 = min(y1, b[1])
+            else:
+                y0 = max(y0, b[3])
+    return (x0, y0, x1, y1)
