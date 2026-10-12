@@ -284,8 +284,11 @@ class RecordAndReplay(unittest.TestCase):
             code, _, log = self.run_cli('live', url, '--fixture', str(self.fixture),
                                         '--fixture-mode', 'replay-or-record', '--ledger', str(ledger_path),
                                         '--ledger-tag', 'round=r00', '--ledger-tag', 'step=record')
+            sent = state['requests']
         self.assertEqual(code, 3)
         self.assertIn('Paused: provider balance exhausted', log)
+        self.assertGreater(sent, 12)  # the refusal was met
+        self.assertLessEqual(sent, 12 + 1 + 4)  # and nothing sent after it, but requests already in flight
         with sqlite3.connect(self.fixture) as db:  # running out isn't the model's failure
             self.assertEqual(db.execute('SELECT COUNT(*) FROM response WHERE error IS NOT NULL').fetchone()[0], 0)
         records = ledger.read(ledger_path)
