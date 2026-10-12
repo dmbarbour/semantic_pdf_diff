@@ -838,6 +838,13 @@ class Platform(Composable):
         return regions
 
     @chained
+    def refined_tile(self, reader, page, tag, rect, done):
+        """[(tag, Rect)] read next for a tile whose answer was partial or failed (done: the answer's coverage row and
+        claims, tasks.TaskCore.consume): the platform's, its halves, "<tag>-r0" and "-r1" (segmentation.halves)."""
+        from .segmentation import halves
+        return [(f"{tag}-r{i}", r) for i, r in enumerate(halves(page, rect, reader.lines(page), reader.graphics(page)))]
+
+    @chained
     def figure_regions(self, reader, page, number, grid):
         """[(tag, Rect, note)] read besides the tiles (grid: the tiles kept, or the page)."""
         return []

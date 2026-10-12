@@ -7,7 +7,6 @@ import pymupdf
 from .pages import native
 from .quotes import covered
 from .regions import crop_name, region_of
-from .segmentation import halves
 from .tasks import Task
 
 # Visual refinement stops at crops narrower than this (PDF points).
@@ -62,15 +61,15 @@ class Visuals:
         self.core.consume(Task(page_no, native_rect if box is None else box, tag, source, "assets/" + name, check=check,
                                place=place, crop=(tuple(round(v, 3) for v in rect), side), context=context,
                                extra_images=extra, derivation=derivation,
-                               then=lambda status: self.refine(page_no, page, tag, rect, depth, status, kept, box,
-                                                               derivation)))
+                               then=lambda status, done: self.refine(page_no, page, tag, rect, depth, status, kept,
+                                                                     box, derivation, done)))
 
-    def refine(self, page_no, page, tag, rect, depth, status, text, box, derivation):
+    def refine(self, page_no, page, tag, rect, depth, status, text, box, derivation, done):
         # Refine only local tiles; an overview or a whole figure may be incomplete because
         # it spans many facts, and all its areas already have tile coverage.
         s = self.s
         if (status not in ("partial", "failed") or region_of(tag) in ("overview", "figure")
                 or depth >= s.refinement_depth or min(rect.width, rect.height) < MIN_REFINE_POINTS):
             return
-        for i, child in enumerate(halves(page, rect, self.context_of.lines(page), self.context_of.graphics(page))):
-            self.task(page_no, page, f"{tag}-r{i}", child, depth + 1, text, box, derivation)
+        for child_tag, child in s.refined_tile(self.context_of, page, tag, rect, done):
+            self.task(page_no, page, child_tag, child, depth + 1, text, box, derivation)

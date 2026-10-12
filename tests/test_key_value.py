@@ -272,7 +272,7 @@ class Refined(unittest.TestCase):
         def consume(made):  # a Task
             sent.append((made.tag, made.context))
             if made.then and ":r" not in made.tag:
-                made.then("partial")
+                made.then("partial", {"row": {}, "claims": ()})
         core.consume = consume
         segments = [((0, 1, 1, 2), "first"), ((0, 2, 1, 3), "second")]
         core.text_task(1, segments, "text:p1:0")

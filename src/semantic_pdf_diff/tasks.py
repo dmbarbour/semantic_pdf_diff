@@ -197,11 +197,12 @@ class TaskCore:
         self.record(row, copies)
 
     def consume(self, made):
-        """Queue one extraction task (a Task); when it finishes, record it and call then(status).
+        """Queue one extraction task (a Task); when it finishes, record it and call then(status, done): done, the last
+        turn's coverage row and every turn's claims ({"row", "claims"}).
 
         An answer incomplete with its claims at the limit is the model asking for more: the task is asked again
-        ("<task>-c<n>", up to the continuation limit), told the claims returned so far (continued), and then(status)
-        waits for the last of them.
+        ("<task>-c<n>", up to the continuation limit), told the claims returned so far (continued), and then waits
+        for the last of them.
 
         repeat_key identifies exactly repeated boilerplate: once `repeat_after` earlier
         sightings prove the repetition, the task follows the first occurrence's result
@@ -259,6 +260,7 @@ class TaskCore:
         turn = int(task.rsplit("-c", 1)[1]) if task != origin else 0
         more = []  # the answer's claims, when it asks to be continued
         asked = []  # [True] when it does (it may ask with no claim of its own)
+        said = []  # the answer's claims
 
         def finish(result, error):
             state["pending"] -= 1
@@ -288,11 +290,12 @@ class TaskCore:
                 self.consume(replace(made, tag=f"{origin}-c{turn + 1}", repeat_key=None, repeat_after=1,
                                      continued=tuple(continued) + tuple(more), origin=origin, leading=lead))
             elif then:
-                then(row["status"])
+                then(row["status"], {"row": row, "claims": tuple(continued) + tuple(said)})
 
         def handle(result):
             row["status"] = "complete" if result.complete else "partial"
             row["issues"] = list(result.issues)
+            said.extend(result.claims)
             if (not result.complete and turn < s.continuation_limit(region)
                     and (len(result.claims) >= s.claims_per_request
                          or any(LIMIT_SAID.search(i) for i in result.issues))):
@@ -335,8 +338,8 @@ class TaskCore:
         match = lambda q: quoted(q, text) or s.loose_match(q, text)
         self.consume(Task(page_no, union(b for b, _ in segments), task, text, check=match, locate=locate,
                           context=context, derivation=derivation,
-                          then=lambda status: self.refine_text(page_no, segments, text, task, depth, status, derivation,
-                                                               given)))
+                          then=lambda status, _: self.refine_text(page_no, segments, text, task, depth, status,
+                                                                  derivation, given)))
 
     def refine_text(self, page_no, segments, text, task, depth, status, derivation=None, context=None):
         if status not in ("partial", "failed") or depth >= self.s.refinement_depth:
@@ -369,7 +372,7 @@ class TaskCore:
                                      issues=[self.oversized]))
             return
         if fits:
-            def then(status):
+            def then(status, _):
                 # as text and pictures: only a partial or failed answer is refined; "not reached" (the call limit, an
                 # answer a replay lacks) learnt nothing (code review 2026-10-08, A3: it tripled the unreached rows)
                 if status in ("partial", "failed") and depth < s.refinement_depth and splittable:
