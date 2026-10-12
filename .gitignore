@@ -16,6 +16,7 @@ benchmarks/calibration/images/
 benchmarks/calibration/report.html
 benchmarks/labelling/images/
 benchmarks/labelling/report.html
+benchmarks/asking/reads/
 # Working data stays local (the owner, 2026-10-03): rounds, spot checks, review batches and the page tests are
 # recorded in docs (docs/research/rounds.md); the spend ledgers and the rounds' history feed the budget caps
 benchmarks/rounds/

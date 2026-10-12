@@ -34,7 +34,8 @@ TOGGLES = {
     'sheet_details': True, 'skip_empty': False, 'table_filter': True, 'situate': False, 'verify_visuals': False,
     'top_k': 1, 'min_score': 0.9, 'max_pairs': 1, 'aliases': {'drawing': 'equipment', 'label': 'power'},
     'reconcile': False, 'quote_match': 'exact', 'skip_text_only': True, 'tile_cut': 'xycut', 'band_width': 6.0,
-    'render_area': True, 'tile_choice': 'measures', 'region_labels': 'model',
+    'render_area': True, 'tile_choice': 'measures', 'region_labels': 'model', 'another_tiling': 'asked',
+    'least_half': 0.5,
 }
 # Settings that act only on the drawing sheet: grid tiles (report pages are cut into bands), its details,
 # and its frame (a false table); and refinement, which only grid tiles are large enough for (the stub answers
@@ -42,7 +43,7 @@ TOGGLES = {
 # The budget settings' values bite under the model-neutral defaults (32,768 tokens of context): 8,192, or a
 # per-image or safety reserve that leaves little room, changes what situating sends and what's refused.
 ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refinement_depth', 'skip_text_only',
-             'tile_cut', 'band_width'}
+             'tile_cut', 'band_width', 'least_half'}
 # Settings these documents can't exercise, and why (each still needs its class checked elsewhere).
 NOT_EXERCISED = {
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
@@ -56,6 +57,10 @@ NOT_EXERCISED = {
     'explain_differences': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
     'continuations': "only an answer incomplete at the claim limit is continued; the stub's never are "
                      "(tests/test_continuation.py)",
+    'refine_figures': "only a refined tile mostly one detected figure it holds is looked at again; the documents' "
+                      "refined tiles are the sheet's, whose figure is the sheet (tests/test_refinement.py)",
+    'halve_parts': "only a refined tile holding a detected figure smaller than it is cut around it; the sheet's figure "
+                   "is the sheet (tests/test_refinement.py)",
     'base_url': 'the stub model is the endpoint',
     'rescan': 'reads sources, not the documents given on the command line',
     'max_zip_depth': 'archives only', 'max_source_bytes': 'sources only', 'zip_ratio_limit': 'archives only',

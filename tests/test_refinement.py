@@ -65,6 +65,51 @@ class Halves(unittest.TestCase):
         parts = halves(page, tile)
         self.assertTrue(any(boxes[0] in half for half in parts))
 
+    def test_parts_are_cut_around_where_they_can_be(self):  # halve_parts: the cut follows the parts
+        doc = pymupdf.open(); page = doc.new_page(width=400, height=300)
+        for i in range(18):
+            page.insert_text((20, 30 + 14 * i), 'note text', fontsize=10)  # a column of text, x 20 to about 70
+        bars = [pymupdf.Rect(x, 50, x + 20, 250) for x in (150, 190, 230, 270, 310)]  # a chart: bars with gaps
+        for bar in bars:
+            page.draw_rect(bar, fill=(0, 0, 0))
+        boxes = lines(page)
+        tile, figure = pymupdf.Rect(10, 10, 390, 290), pymupdf.Rect(150, 50, 330, 250)
+        through = halves(page, tile, boxes, bars)
+        self.assertFalse(any(figure in half for half in through))  # cut down a gap between its bars
+        around = halves(page, tile, boxes, bars, parts=[figure])
+        self.assertTrue(any(figure in half for half in around))
+        self.assertEqual(halves(page, tile, boxes, bars, parts=[pymupdf.Rect(0, 0, 400, 300)]), through)  # too large
+
+class Again(unittest.TestCase):  # figure_refinement: a partial tile mostly one figure is looked at again whole
+    def test_a_tile_mostly_a_chart_is_asked_again_told_its_claims_and_issues(self):
+        from semantic_pdf_diff.context import Context
+        from semantic_pdf_diff.schema import Claim
+        from semantic_pdf_diff.settings import Settings
+        corpus = Path(__file__).resolve().parent.parent / 'benchmarks/controlled/docs'
+        with pymupdf.open(corpus / 'lcc-enduse-s1-clean.pdf') as doc:
+            page = doc[0]
+            claim = Claim(entity='Hall C', attribute='lighting', value='12', unit='kWh', quote='12', kind='chart',
+                          confidence=0.8)
+            done = {'row': {'issues': ['legend partly unreadable']}, 'claims': (claim,), 'cut': []}
+            for mode, expected in (('again', [('tile:0-a', {'continued': (claim,),
+                                                            'noted': ['legend partly unreadable']})]),
+                                   ('halves', [('tile:0-r0', {}), ('tile:0-r1', {})])):
+                s = Settings(refine_figures=mode)
+                reader = Context(doc, s)
+                tiles = [r for r in s.visual_regions(reader, page, 0) if r[0].startswith('tile')]
+                found = s.refined_tile(reader, page, *tiles[0][:2], done)
+                self.assertEqual([(t, again) for t, _, again in found], expected)
+                text = [r for r in tiles if r[0] == 'tile:1']  # the tile below the chart: text
+                self.assertEqual(len(s.refined_tile(reader, page, *text[0][:2], done)), 2)
+
+    def test_the_note_names_what_the_earlier_answer_noted(self):
+        from semantic_pdf_diff.schema import Claim
+        from semantic_pdf_diff.tasks import NOTED_NOTE, continuation
+        fan = Claim(entity='fan', attribute='power', value='3', unit='kW', quote='3 kW', kind='text', confidence=0.9)
+        text = continuation([fan],
+                            ['the legend is cut'])
+        self.assertTrue(text.endswith(f'- fan | power | 3 kW\n{NOTED_NOTE}\n- the legend is cut'))
+
 class Refined(unittest.TestCase):
     def test_a_partial_bands_halves_hold_whole_lines_in_their_image_and_text(self):
         def build(page):

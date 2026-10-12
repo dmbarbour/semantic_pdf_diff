@@ -33,7 +33,7 @@ class Visuals:
     def __init__(self, core, context_of, assets, stem, settings):
         self.core, self.context_of, self.assets, self.stem, self.s = core, context_of, assets, stem, settings
 
-    def task(self, page_no, page, tag, rect, depth=0, text="", box=None, derivation=None):
+    def task(self, page_no, page, tag, rect, depth=0, text="", box=None, derivation=None, continued=(), noted=()):
         s = self.s
         name = crop_name(self.stem, tag)
         side = s.render_side(rect)
@@ -60,7 +60,8 @@ class Visuals:
         kept = text if box is not None else ""
         self.core.consume(Task(page_no, native_rect if box is None else box, tag, source, "assets/" + name, check=check,
                                place=place, crop=(tuple(round(v, 3) for v in rect), side), context=context,
-                               extra_images=extra, derivation=derivation,
+                               extra_images=extra, derivation=derivation, continued=tuple(continued),
+                               noted=tuple(noted),
                                then=lambda status, done: self.refine(page_no, page, tag, rect, depth, status, kept,
                                                                      box, derivation, done)))
 
@@ -71,5 +72,5 @@ class Visuals:
         if (status not in ("partial", "failed") or region_of(tag) in ("overview", "figure")
                 or depth >= s.refinement_depth or min(rect.width, rect.height) < MIN_REFINE_POINTS):
             return
-        for child_tag, child in s.refined_tile(self.context_of, page, tag, rect, done):
-            self.task(page_no, page, child_tag, child, depth + 1, text, box, derivation)
+        for child_tag, child, again in s.refined_tile(self.context_of, page, tag, rect, done):
+            self.task(page_no, page, child_tag, child, depth + 1, text, box, derivation, **again)

@@ -62,6 +62,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `image_side` | `1000` | shaping |  | extract, triage | figure, overview, tile, vision |
 | `tile_points` | `420` | selecting |  | extract | figure, overview, tile, vision |
 | `refinement_depth` | `1` | selecting |  | extract | all |
+| `least_half` | `0.25` | selecting |  | extract | figure, overview, tile, vision |
 | `section_depth` | `2` | shaping |  | extract | all |
 | `section_pages` | `20` | shaping |  | extract | all |
 | `top_k` | `4` | selecting |  | compare | - |
@@ -97,6 +98,9 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `skip_empty` | `true` | selecting | skip_empty | extract | figure, overview, tile, vision |
 | `skip_text_only` | `false` | selecting | skip_text_only | extract | figure, overview, tile, vision |
 | `region_labels` | `"off"` | selecting | region_labels | extract | figure, overview, tile, vision |
+| `another_tiling` | `"off"` | shaping | another_tiling | extract | figure, overview, tile, vision |
+| `refine_figures` | `"halves"` | selecting | figure_refinement | extract | figure, overview, tile, vision |
+| `halve_parts` | `false` | selecting | halve_parts | extract | figure, overview, tile, vision |
 | `render_area` | `false` | shaping | render_area | extract | figure, overview, tile, vision |
 | `figure_tasks` | `true` | selecting | figure_tasks | extract | figure |
 | `table_rules` | `0` | selecting | table_rules | extract | table |

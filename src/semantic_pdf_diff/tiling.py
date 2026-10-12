@@ -61,6 +61,17 @@ def _inked(box, lines, graphics):
     return (max(box[0], min(b[0] for b in inside)), max(box[1], min(b[1] for b in inside)),
             min(box[2], max(b[2] for b in inside)), min(box[3], max(b[3] for b in inside)))
 
+def cut_by(rect, boxes):
+    """(the edges of rect running through a box, [the boxes it cuts]): boxes it meets without holding."""
+    rect, edges, cut = _box(rect), set(), []
+    for b in map(_box, boxes):
+        if not _meets(b, rect) or _held(b, rect):
+            continue
+        cut.append(b)
+        edges |= {e for e, out in (("top", b[1] < rect[1] - SLACK), ("bottom", b[3] > rect[3] + SLACK),
+                                   ("left", b[0] < rect[0] - SLACK), ("right", b[2] > rect[2] + SLACK)) if out}
+    return [e for e in ("top", "bottom", "left", "right") if e in edges], cut
+
 def words(page):
     """A page's words as displayed: [Rect]."""
     return [shown(page, w[:4]) for w in page.get_text("words")]

@@ -102,11 +102,12 @@ def _gaps(boxes, axis, lo, hi):
         out.append((reach, hi))
     return [g for g in out if g[1] >= g[0]]
 
-def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFINE_OVERLAP):
+def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFINE_OVERLAP, parts=()):
     """A partial tile's two halves for refinement (review-bugs-2026-10-09, item 6), each grown to whole lines.
 
-    The cut crosses no text line where it can: in a gap between lines or between columns (no graphic crossed either,
-    if possible), nearest the middle of what the tile holds, each side holding at least `least` of its extent, ties
+    The cut crosses no text line where it can: in a gap between lines or between columns (no graphic or part crossed
+    either, if possible: parts, boxes such as a figure's), nearest the middle of what the tile holds, each side holding
+    at least `least` of its extent, ties
     going to the cut across the tile's shorter side (a band is cut between its lines, not down them). Otherwise the
     cut crossing the fewest lines. Measured on what the tile holds, not on the tile, so neither half is left blank.
     A tile without text, such as a drawing or a scan, is cut at the middle of its longer side, as before."""
@@ -114,7 +115,9 @@ def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFI
     texts = [box & rect for box, _ in lines if box.intersects(rect)]
     if not texts:
         return _middle(rect, overlap)
-    marks = texts + [g & rect for g in (_graphics(page) if graphics is None else graphics) if g.intersects(rect)]
+    marks = texts + [g & rect for g in [*(_graphics(page) if graphics is None else graphics),
+                                        *(x for x in parts if not x.contains(rect))]  # a part the tile is in: no help
+                     if g.intersects(rect)]
     shorter = 1 if rect.height < rect.width else 0  # the axis whose cut divides the shorter side
     best = None
 
@@ -150,6 +153,30 @@ def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFI
     else:
         parts = [pymupdf.Rect(rect.x0, rect.y0, rect.x1, end), pymupdf.Rect(rect.x0, start, rect.x1, rect.y1)]
     return [grown(page, part & rect, lines=lines) for part in parts]
+
+MOSTLY = 0.5  # a figure covering this share of what a tile holds makes the tile mostly that figure
+
+def inked_figures(settings, reader, page):
+    """A page's detected figures as displayed, each trimmed to the lines and content graphics in it (tiling._inked)."""
+    from .tiling import _inked
+    lines = [tuple(b) for b, _ in reader.lines(page)]
+    content = [tuple(g) for g in settings.content_graphics(reader, page)]
+    return [pymupdf.Rect(_inked(tuple(shown(page, f.bbox)), lines, content))
+            for f in reader.figures(page, page.number) if f.region]
+
+def mostly_figure(settings, reader, page, rect):
+    """Whether a tile holds a detected figure whole covering MOSTLY of the extent of what it holds (its lines and
+    content graphics, within it)."""
+    from .tiling import _held
+    held = [f for f in inked_figures(settings, reader, page) if _held(tuple(f), tuple(rect))]
+    if not held:
+        return False
+    inside = [b & rect for b in [*(b for b, _ in reader.lines(page)), *settings.content_graphics(reader, page)]
+              if b.intersects(rect)]
+    extent = pymupdf.Rect(rect.x1, rect.y1, rect.x0, rect.y0)
+    for b in inside:
+        extent |= b
+    return any(abs(f) >= MOSTLY * abs(extent) for f in held) if not extent.is_empty else False
 
 def _middle(rect, overlap):
     """Today's cut: the middle of the longer side."""

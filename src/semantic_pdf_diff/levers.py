@@ -371,6 +371,53 @@ class RegionLabels(Lever):
         from .regionlabels import label_tiles
         return label_tiles(self, reader, page, regions)
 
+class AnotherTiling(Lever):
+    lever_name, stage, off = "another_tiling", "segmentation", {"another_tiling": "off"}
+    # a partial tile is read again under the page's next candidate cut, not in halves (retiling.py): the tiles of
+    # that cut holding what the measures find it cuts. Always (measures), or where it asks: its issues say it's cut
+    # (said), or it names the edges cutting content when a rule asks (asked; calibrated first: scripts/asking.py)
+    another_tiling: Annotated[Literal["off", "measures", "said", "asked"], _shaping(VISUAL)] = "off"
+
+    def region_rules(self, region):
+        from .retiling import RULE
+        rules = super().region_rules(region)
+        return rules + (_rules([RULE]) if self.another_tiling == "asked" and region == "tile" else "")
+
+    def refined_tile(self, reader, page, tag, rect, done):
+        if self.another_tiling != "off":
+            from .retiling import asks, retiled
+            found = retiled(self, reader, page, tag, rect, done) if asks(done, self.another_tiling) else None
+            if found is not None:  # [] where the tiles that hold what it cuts are read already
+                return [(t, r, {}) for t, r in found]
+        return super().refined_tile(reader, page, tag, rect, done)
+
+class FigureRefinement(Lever):
+    lever_name, stage, off = "figure_refinement", "segmentation", {"refine_figures": "halves"}
+    # a partial tile mostly one figure it holds whole (a chart or drawing no figure task reads, since the tile does) is
+    # looked at again whole, told what it returned and what it noted, not cut in halves (again); with the image budget
+    # fixed, a half is no closer a look than the whole is (milestone 7)
+    refine_figures: Annotated[Literal["halves", "again"], _selecting(VISUAL)] = "halves"
+
+    def refined_tile(self, reader, page, tag, rect, done):
+        if self.refine_figures == "again":
+            from .segmentation import mostly_figure
+            if mostly_figure(self, reader, page, rect):
+                return [(f"{tag}-a", rect, {"continued": done["claims"], "noted": done["row"].get("issues", ())})]
+        return super().refined_tile(reader, page, tag, rect, done)
+
+class HalveParts(Lever):
+    lever_name, stage, off = "halve_parts", "segmentation", {"halve_parts": False}
+    # a refined tile's halves are cut around its detected figures where they can be, as around a graphic: the cut
+    # follows the parts (milestone 7; a figure of several graphics was cut through a gap inside it)
+    halve_parts: Annotated[bool, _selecting(VISUAL)] = False
+
+    def tile_parts(self, reader, page):
+        parts = super().tile_parts(reader, page)
+        if not self.halve_parts:
+            return parts
+        from .segmentation import inked_figures
+        return parts + inked_figures(self, reader, page)
+
 class RenderArea(Lever):
     lever_name, stage, off = "render_area", "segmentation", {"render_area": False}
     # render a long region to a square's pixel area (image_side squared), not its longer side to image_side: a 4:1
@@ -539,7 +586,8 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
-                 RegionLabels, RenderArea, FigureTasks, TableRules, TableReview,
+                 RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,
+                 TableReview,
                  TableStructure, VisualTextLayer, TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading,
                  Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
@@ -597,6 +645,9 @@ class Platform(Composable):
     image_side: Annotated[int, _shaping(VISUAL, roles=EXTRACT + TRIAGE)] = Field(default=1000, ge=256, le=2000)
     tile_points: Annotated[int, _selecting(VISUAL)] = Field(default=420, ge=100)
     refinement_depth: Annotated[int, _selecting()] = Field(default=1, ge=0, le=3)
+    # a refined tile's half holds at least this share of what the tile holds (segmentation.halves; the owner,
+    # 2026-10-09: "a tuning lever ... start with 25%")
+    least_half: Annotated[float, _selecting(VISUAL)] = Field(default=0.25, ge=0.05, le=0.5)
     # Sections come from the PDF outline down to this depth, else fixed page ranges.
     section_depth: Annotated[int, _shaping()] = Field(default=2, ge=1, le=6)
     section_pages: Annotated[int, _shaping()] = Field(default=20, ge=1, le=1000)
@@ -839,10 +890,19 @@ class Platform(Composable):
 
     @chained
     def refined_tile(self, reader, page, tag, rect, done):
-        """[(tag, Rect)] read next for a tile whose answer was partial or failed (done: the answer's coverage row and
-        claims, tasks.TaskCore.consume): the platform's, its halves, "<tag>-r0" and "-r1" (segmentation.halves)."""
+        """[(tag, Rect, {"continued": claims, "noted": issues} or {})] read next for a tile whose answer was partial or
+        failed (done: the answer's coverage row, claims and cut edges, tasks.TaskCore.consume): the platform's, its
+        halves, "<tag>-r0" and "-r1" (segmentation.halves, each holding least_half of what the tile holds), cut
+        around the parts tile_parts gives where they can be."""
         from .segmentation import halves
-        return [(f"{tag}-r{i}", r) for i, r in enumerate(halves(page, rect, reader.lines(page), reader.graphics(page)))]
+        found = halves(page, rect, reader.lines(page), reader.graphics(page), self.least_half,
+                       parts=self.tile_parts(reader, page))
+        return [(f"{tag}-r{i}", r, {}) for i, r in enumerate(found)]
+
+    @chained
+    def tile_parts(self, reader, page):
+        """Boxes a tile's halves are cut around where they can be, as around a graphic (segmentation.halves): none."""
+        return []
 
     @chained
     def figure_regions(self, reader, page, number, grid):

@@ -17,6 +17,13 @@ import re
 import sqlite3
 from pathlib import Path
 
+# a refined tile's task: a half ("tile:p2:3-r0"), the tile looked at again ("-a", figure_refinement), or a tile of the
+# page's other cut ("tile:p2:xycut1", another_tiling); a continuation of one ("-c1") is one too
+OTHER_CUT = re.compile(r":(?:bands|grid|snapped|xycut)\d+")
+
+def child(task):
+    return "-r" in task or "-a" in task or bool(OTHER_CUT.search(task))
+
 COMPLAINT = re.compile(r"fragment|crop|cut off|truncat|partial (?:view|image|section)|incomplete (?:view|image|text)"
                        r"|illegib|unreadable|blank", re.I)
 
@@ -32,7 +39,7 @@ def forced(fresh_halves=False):
 
     def tile(key, refined):
         recipe = Recipe(key or ())
-        return recipe.role == "extract" and region_of(recipe.task) == "tile" and ("-r" in recipe.task) == refined
+        return recipe.role == "extract" and region_of(recipe.task) == "tile" and child(recipe.task) == refined
 
     def forcing(self, prompt, schema, images, key, finish):
         if tile(key, refined=False):
@@ -52,7 +59,9 @@ def forced(fresh_halves=False):
         Dispatcher.submit, Replayer.sample = submit, sample
 
 def halves(store):
-    """{parent tile's task: {half's task: [claims]}} from a run's store; a half's continuations count as the half."""
+    """{parent tile's task: {half's task: [claims]}} from a run's store; a half's continuations count as the half. A
+    tile looked at again is its parent's one "half"; the tiles of a page's other cut are the halves of a parent of
+    their own, "tile:p<n>:<cut>"."""
     with contextlib.closing(sqlite3.connect(f"file:{store}?mode=ro", uri=True)) as db:
         tasks = [t for (t,) in db.execute("SELECT task FROM task WHERE task LIKE 'tile:%'")]
         claims = {}
@@ -60,10 +69,9 @@ def halves(store):
             claims.setdefault(task, []).append(json.loads(data))
     out = {}
     for task in tasks:
-        parent, _, rest = task.partition("-r")
-        if rest:
-            half = f"{parent}-r{rest.split('-')[0]}"
-            out.setdefault(parent, {}).setdefault(half, []).extend(claims.get(task, []))
+        if child(task):
+            half = task.partition("-c")[0]
+            out.setdefault(_parent(task), {}).setdefault(half, []).extend(claims.get(task, []))
     return out
 
 def summary(store, key=None):
@@ -98,7 +106,11 @@ def _value(claim):
     return _norm(claim.get("value")), _norm(claim.get("unit"))
 
 def _parent(task):
-    return task.partition("-r")[0].partition("-c")[0]
+    """A refined tile's parent: its tile's task, or for a tile of the page's other cut, "tile:p<n>:<cut>"."""
+    found = OTHER_CUT.search(task)
+    if found:
+        return task[:found.start()] + ":" + found.group().strip(":0123456789")
+    return task.partition("-r")[0].partition("-a")[0].partition("-c")[0]
 
 def _stored(store):
     """(task rows, claims by task, the document's path on disk) from a run's store."""
@@ -142,7 +154,7 @@ def checks(store):
         parent = _parent(task)
         mine = by_parent.setdefault(parent, {"parent": set(), "halves": set(), "refined": False})
         values = {_value(c) for c in claims.get(task, [])}
-        if "-r" in task:
+        if child(task):
             mine["halves"] |= values
             mine["refined"] = True
             out["complaints"] += bool(COMPLAINT.search(" ".join(row.get("issues", []))))
@@ -153,7 +165,7 @@ def checks(store):
             out["parent values lost"] += len(parent["parent"] - parent["halves"])
             out["values gained"] += len(parent["halves"] - parent["parent"])
     for task, found in claims.items():
-        if not (task.startswith("tile:") and "-r" in task):
+        if not (task.startswith("tile:") and child(task)):
             continue
         for c in found:
             out["claims"] += 1
@@ -182,7 +194,7 @@ def against(before, after):
     def by_parent(claims):
         out = {}
         for task, found in claims.items():
-            if task.startswith("tile:") and "-r" in task:
+            if task.startswith("tile:") and child(task):
                 out.setdefault(_parent(task), set()).update(_value(c) for c in found)
         return out
     a, b = by_parent(one), by_parent(other)

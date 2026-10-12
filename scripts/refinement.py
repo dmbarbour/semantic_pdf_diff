@@ -22,7 +22,7 @@ KEYS = ROOT / "benchmarks/controlled/docs"
 from semantic_pdf_diff_lab.bench import recording  # noqa: E402
 LEDGER = ROOT / recording.LEDGER
 
-def run(src, out, fixture, max_cost, documents, tag, fresh=False):
+def run(src, out, fixture, max_cost, documents, tag, fresh=False, given=None):
     sys.path.insert(0, str(Path(src).resolve()))
     from semantic_pdf_diff import ledger, pipeline
     from semantic_pdf_diff.progress import setup_logging
@@ -38,7 +38,8 @@ def run(src, out, fixture, max_cost, documents, tag, fresh=False):
             if left <= 0:
                 print(f"cap of ${max_cost} reached")
                 return 3
-            settings = pipeline.settings_from(SETTINGS, situate=False, refinement_depth=1, max_cost=round(left, 4))
+            settings = pipeline.settings_from(SETTINGS, situate=False, refinement_depth=1, max_cost=round(left, 4),
+                                              **(given or {}))
             options = pipeline.RunOptions(mode="proposals", fixture=fixture, fixture_mode="replay-or-record",
                                           ledger=LEDGER,
                                          ledger_tags={"round": "refinement", "run": f"{tag}-{document.stem}"})
@@ -71,6 +72,19 @@ def report(before, after):
                 else:
                     mine[k] = mine.get(k, 0) + v
     print(json.dumps(totals, indent=1))
+    from semantic_pdf_diff_lab.bench.tiling import answers
+    every = {}  # every task's claims scored, the documents summed: what both tilings' claims kept together give
+    for arm, folder in (("before", before), ("after", after)):
+        mine = every.setdefault(arm, {"facts right": 0, "outcomes": {}, "tile refined": {}})
+        for name in found:
+            got = answers(Path(folder) / name / "store.sqlite", json.loads(keys[name].read_text(encoding="utf-8"))
+                          if name in keys else None)
+            mine["facts right"] += got.get("facts right", 0)
+            for o, n in got.get("outcomes", {}).items():
+                mine["outcomes"][o] = mine["outcomes"].get(o, 0) + n
+            for k, n in got.get("tile refined", {}).items():
+                mine["tile refined"][k] = mine["tile refined"].get(k, 0) + n
+    print(json.dumps(every, indent=1))
 
 def judge(before, after, folder, models, max_cost, check=False, grown=False):
     """The halves of two runs judged: pairwise per tile (rubric v5), or with check, each half's claims marked."""
@@ -105,6 +119,8 @@ def main(argv=None):
     go.add_argument("--max-cost", type=float, default=0.3, help="for the whole command, in dollars")
     go.add_argument("--tag", default="", help="the ledger's run tag prefix (before, after)")
     go.add_argument("--fresh-halves", action="store_true", help="the halves asked afresh: a run against itself")
+    go.add_argument("--set", action="append", default=[], metavar="NAME=VALUE",
+                    help="a setting over the corpus's (a JSON value, else a string): another_tiling=measures")
     show = sub.add_parser("report", help="the two runs' halves compared, offline")
     show.add_argument("before")
     show.add_argument("after")
@@ -124,8 +140,15 @@ def main(argv=None):
         return judge(args.before, args.after, args.folder, args.model, args.max_cost, args.command == "check",
                      getattr(args, "grown", False))
     if args.command == "run":
+        given = {}
+        for item in args.set:
+            name, _, value = item.partition("=")
+            try:
+                given[name] = json.loads(value)
+            except json.JSONDecodeError:
+                given[name] = value
         return run(args.src, args.out, args.fixture, args.max_cost, args.documents, args.tag or Path(args.out).name,
-                   args.fresh_halves)
+                   args.fresh_halves, given)
     return report(args.before, args.after)
 
 if __name__ == "__main__":

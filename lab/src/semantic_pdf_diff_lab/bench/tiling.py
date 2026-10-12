@@ -131,7 +131,7 @@ def answers(store, key=None):
     """The image tasks' answers in a run's store, by kind (tile, refined tile, figure, overview): tasks, those
     answered with no claim, those whose issues complain of fragments or crops (refinement.COMPLAINT), claims; with a
     controlled document's key, the tiles' claims scored (right, loose, misbound...; controlled.score)."""
-    from .refinement import COMPLAINT, _stored
+    from .refinement import COMPLAINT, _stored, child
     rows, claims, _ = _stored(store)
     out = {}
     tile_claims = []
@@ -139,7 +139,7 @@ def answers(store, key=None):
         kind = task.split(":")[0]
         if kind not in IMAGE_KINDS:
             continue
-        kind += " refined" if "-r" in task else ""
+        kind += " refined" if child(task) else ""
         found = claims.get(task, [])
         c = out.setdefault(kind, dict.fromkeys(("tasks", "empty", "complaints", "claims"), 0))
         c["tasks"] += 1

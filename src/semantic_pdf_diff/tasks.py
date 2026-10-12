@@ -17,6 +17,7 @@ from .schema import DerivationStep, Evidence, Extraction, claim_id, coverage_row
 from .progress import log
 from .quotes import covered, quoted
 from .regions import region_of
+from .retiling import CUT_NOTE
 
 # Text shorter than this is not split further during refinement.
 # Bump when prompt assembly or task construction changes, not only the template text;
@@ -85,12 +86,17 @@ class ExtractQuery:
 CONTINUATION_NOTE = ("ALREADY EXTRACTED from this same source by an earlier request (do not repeat these; extract the "
                      "claims that remain):")
 
-def continuation(claims):
+# And what a region looked at again is told its earlier answer noted (levers.FigureRefinement).
+NOTED_NOTE = "THE EARLIER REQUEST NOTED (look again for what these say was missed or unclear):"
+
+def continuation(claims, noted=()):
     """A continued request's note: the claims earlier requests returned, one a line, by entity, attribute and value
     only: enough not to repeat them, and conditions listed were copied onto the claims that followed (a valve's
-    stroke time given the "rated point" of the flow coefficients listed before it)."""
+    stroke time given the "rated point" of the flow coefficients listed before it); then what their answer noted, if
+    it's given."""
     rows = [" | ".join(x for x in (c.entity, c.attribute, f"{c.value} {c.unit}".strip()) if x) for c in claims]
-    return CONTINUATION_NOTE + "".join("\n- " + r for r in rows)
+    return (CONTINUATION_NOTE + "".join("\n- " + r for r in rows)
+            + (f"\n{NOTED_NOTE}" + "".join("\n- " + n for n in noted) if noted else ""))
 
 def extraction_template(s):
     """The extraction instructions in force: the baseline, or a variant's (with {max_claims} unfilled)."""
@@ -140,6 +146,7 @@ class Task:
     context: str = ""
     extra_images: tuple = ()
     continued: tuple = ()
+    noted: tuple = ()  # a region looked at again: what its earlier answer's issues said
     origin: str | None = None
     leading: dict | None = field(default=None, repr=False)
 
@@ -198,7 +205,8 @@ class TaskCore:
 
     def consume(self, made):
         """Queue one extraction task (a Task); when it finishes, record it and call then(status, done): done, the last
-        turn's coverage row and every turn's claims ({"row", "claims"}).
+        turn's coverage row, every turn's claims, and the image's edges its answer said cut content ({"row", "claims",
+        "cut"}).
 
         An answer incomplete with its claims at the limit is the model asking for more: the task is asked again
         ("<task>-c<n>", up to the continuation limit), told the claims returned so far (continued), and then waits
@@ -219,7 +227,7 @@ class TaskCore:
             made.then)
         repeat_key, repeat_after, place, context, extra_images = (made.repeat_key, made.repeat_after, made.place,
                                                                   made.context, made.extra_images)
-        continued, origin, leading = made.continued, made.origin, made.leading
+        continued, origin, leading, noted = made.continued, made.origin, made.leading, made.noted
         s, content, state = self.s, self.content, self.state
         region = region_of(task)
         entry = None
@@ -247,7 +255,8 @@ class TaskCore:
                              if x.heading_path)
         rules = s.region_rules(region)
         prompt = self.query(self.template(s).replace("{max_claims}", str(s.claims_per_request)) + rules,
-                            region, heading, context, text, continuation(continued) if continued else "").prompt()
+                            region, heading, context, text,
+                            continuation(continued, noted) if continued or noted else "").prompt()
         key = ("extract", region, content, task, hashlib.sha256(text.encode()).hexdigest(), crop, heading)
         if context:  # only then, so requests without context keep their recorded keys
             key += (hashlib.sha256(context.encode()).hexdigest(),)
@@ -255,12 +264,14 @@ class TaskCore:
             key += ("visual rules", hashlib.sha256(rules.encode()).hexdigest())  # so they're in the key
         if continued:
             key += ("continued", len(continued))
+        if noted:
+            key += ("noted", hashlib.sha256("\n".join(noted).encode()).hexdigest())
 
         origin = origin or task
         turn = int(task.rsplit("-c", 1)[1]) if task != origin else 0
         more = []  # the answer's claims, when it asks to be continued
         asked = []  # [True] when it does (it may ask with no claim of its own)
-        said = []  # the answer's claims
+        said, cut = [], []  # the answer's claims, and the image's edges it says cut content
 
         def finish(result, error):
             state["pending"] -= 1
@@ -290,12 +301,16 @@ class TaskCore:
                 self.consume(replace(made, tag=f"{origin}-c{turn + 1}", repeat_key=None, repeat_after=1,
                                      continued=tuple(continued) + tuple(more), origin=origin, leading=lead))
             elif then:
-                then(row["status"], {"row": row, "claims": tuple(continued) + tuple(said)})
+                then(row["status"], {"row": row, "claims": tuple(continued) + tuple(said), "cut": cut})
 
         def handle(result):
             row["status"] = "complete" if result.complete else "partial"
             row["issues"] = list(result.issues)
             said.extend(result.claims)
+            if result.cut:  # where the rules ask (retiling.RULE)
+                cut.extend(result.cut)
+                plural = "s" if len(result.cut) > 1 else ""
+                row["issues"].append(f"{CUT_NOTE} {', '.join(result.cut)} edge{plural}")
             if (not result.complete and turn < s.continuation_limit(region)
                     and (len(result.claims) >= s.claims_per_request
                          or any(LIMIT_SAID.search(i) for i in result.issues))):

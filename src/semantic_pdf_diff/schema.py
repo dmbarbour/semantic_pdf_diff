@@ -5,6 +5,7 @@ load, which held a cycle of 21 modules together).
 """
 import hashlib
 import json
+import re
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -35,11 +36,20 @@ OPTIONAL_CLAIM_FIELDS = ("unit", "conditions", "approximate", "topic", "basis", 
 
 # Sanity bounds on one answer; the requested maximum is Settings.claims_per_request.
 MAX_CLAIMS, MAX_ISSUES = 200, 10
+EDGES = ("top", "bottom", "left", "right")  # an image's edges, as an answer names those cutting content
+EDGE_WORDS = {"upper": "top", "lower": "bottom"}
+
+def edges(said):
+    """The EDGES an answer names (a list, or words in a string: "the bottom and right edges"), in EDGES' order."""
+    words = " ".join(map(str, said)) if isinstance(said, (list, tuple)) else str(said or "")
+    found = {EDGE_WORDS.get(w, w) for w in re.findall(r"[a-z]+", words.lower())}
+    return [e for e in EDGES if e in found]
 
 class Extraction(Strict):
     claims: list[Claim] = Field(max_length=MAX_CLAIMS)
     complete: bool
     issues: list[str] = Field(default_factory=list, max_length=MAX_ISSUES)
+    cut: list[str] = Field(default_factory=list)  # an image's edges cutting content, where the rules ask (EDGES)
 
     @model_validator(mode="before")
     @classmethod
@@ -80,7 +90,8 @@ class Extraction(Strict):
             claims, complete = claims[:MAX_CLAIMS], False
         if len(issues) > MAX_ISSUES:
             issues = issues[:MAX_ISSUES - 1] + [f"{len(issues) - MAX_ISSUES + 1} further issue(s) omitted"]
-        return {"claims": claims, "complete": complete, "issues": [i[:500] for i in issues]}
+        return {"claims": claims, "complete": complete, "issues": [i[:500] for i in issues],
+                **({"cut": edges(data["cut"])} if data.get("cut") else {})}
 
 class Source(Strict):
     """A comparison object declared in the store: a name, provenance metadata and the
