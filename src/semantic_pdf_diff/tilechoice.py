@@ -36,11 +36,11 @@ COLOURS = ((0.85, 0.20, 0.20), (0.15, 0.45, 0.85), (0.10, 0.60, 0.30), (0.80, 0.
 
 DIM = 0.6  # how far what no tile holds is greyed out (dimmed sketches)
 
-def sketch(page, tiles=None, letter=None, side=SKETCH_SIDE, pixmap=None, dimmed=False):
+def sketch(page, tiles=None, letter=None, side=SKETCH_SIDE, pixmap=None, dimmed=False, title=None):
     """PNG bytes: the page as displayed, its longer side at `side` pixels; with tiles ([Rect], as displayed), each
     outlined in its colour, washed and numbered from 1 beside its top left corner (inside it at the page's edge), and
-    "Tiling <letter>" in a strip above the page; dimmed, what no tile holds greyed out. pixmap: the page already
-    rendered at this size."""
+    "Tiling <letter>" (or the title) in a strip above the page; dimmed, what no tile holds greyed out. pixmap: the page
+    already rendered at this size."""
     rect = page.rect
     zoom = side / max(rect.width, rect.height)
     pixmap = pixmap or page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False)
@@ -62,8 +62,8 @@ def sketch(page, tiles=None, letter=None, side=SKETCH_SIDE, pixmap=None, dimmed=
                     if not r.is_empty:
                         canvas.show_pdf_page(r, source, 0, clip=r - (0, strip, 0, strip))
         canvas.draw_line((0, strip - 1), (pixmap.width, strip - 1), color=(0.3, 0.3, 0.3), width=1)
-        if letter:
-            canvas.insert_text((12, strip * 0.72), f"Tiling {letter}", fontname="hebo", fontsize=strip * 0.6,
+        if letter or title:
+            canvas.insert_text((12, strip * 0.72), title or f"Tiling {letter}", fontname="hebo", fontsize=strip * 0.6,
                                color=(0, 0, 0))
         width = max(2.0, side / 400)
         for i, r in enumerate(shown):

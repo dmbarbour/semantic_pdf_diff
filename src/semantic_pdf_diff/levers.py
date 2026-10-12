@@ -358,6 +358,19 @@ class SkipTextOnly(Lever):
         return [x for x in regions if not any(x[1].intersects(b) for b in texts)
                 or any(x[1].intersects(g) for g in graphics)]
 
+class RegionLabels(Lever):
+    lever_name, stage, off = "region_labels", "segmentation", {"region_labels": "off"}
+    # the model labels the tiles a page sends (regionlabels.py; calibrated first: scripts/labelling.py): text,
+    # decoration and blank tiles aren't sent, a nonsense tile is joined to its neighbour
+    region_labels: Annotated[Literal["off", "model"], _selecting(VISUAL)] = "off"
+
+    def sent_tiles(self, reader, page, regions):
+        regions = super().sent_tiles(reader, page, regions)
+        if self.region_labels == "off" or not regions:
+            return regions
+        from .regionlabels import label_tiles
+        return label_tiles(self, reader, page, regions)
+
 class RenderArea(Lever):
     lever_name, stage, off = "render_area", "segmentation", {"render_area": False}
     # render a long region to a square's pixel area (image_side squared), not its longer side to image_side: a 4:1
@@ -526,7 +539,7 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
-                 RenderArea, FigureTasks, TableRules, TableReview,
+                 RegionLabels, RenderArea, FigureTasks, TableRules, TableReview,
                  TableStructure, VisualTextLayer, TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading,
                  Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}

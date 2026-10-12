@@ -16,6 +16,7 @@
     "sheet_details",
     "skip_empty",
     "skip_text_only",
+    "region_labels",
     "render_area",
     "figure_tasks",
     "table_rules",

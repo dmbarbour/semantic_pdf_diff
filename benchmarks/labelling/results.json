@@ -1,0 +1,192 @@
+{
+ "models": {
+  "google/gemma-4-31B-it": {
+   "questions": 271,
+   "answered": 271,
+   "labelled": 2856,
+   "unlabelled": 33,
+   "right": 0.745,
+   "lost": 0.008,
+   "saved": 0.973,
+   "same_in_both_numberings": 0.807,
+   "by_key": {
+    "text": {
+     "asked": 1574,
+     "right": 0.947,
+     "said": {
+      "text": 1217,
+      "table": 6,
+      "chart": 1,
+      "decoration": 280,
+      "blank": 26,
+      "mixed": 5,
+      "nonsense": 11,
+      "None": 28
+     }
+    },
+    "table": {
+     "asked": 364,
+     "right": 0.566,
+     "said": {
+      "text": 3,
+      "table": 206,
+      "mixed": 155
+     }
+    },
+    "chart": {
+     "asked": 64,
+     "right": 0.812,
+     "said": {
+      "text": 1,
+      "chart": 52,
+      "mixed": 11
+     }
+    },
+    "drawing": {
+     "asked": 30,
+     "right": 0.767,
+     "said": {
+      "drawing": 23,
+      "mixed": 7
+     }
+    },
+    "photo or scan": {
+     "asked": 10,
+     "right": 0.2,
+     "said": {
+      "chart": 2,
+      "mixed": 8
+     }
+    },
+    "decoration": {
+     "asked": 24,
+     "right": 0.708,
+     "said": {
+      "text": 1,
+      "decoration": 17,
+      "blank": 6
+     }
+    },
+    "blank": {
+     "asked": 460,
+     "right": 0.678,
+     "said": {
+      "text": 5,
+      "decoration": 138,
+      "blank": 312,
+      "None": 5
+     }
+    },
+    "mixed": {
+     "asked": 26,
+     "right": 0.538,
+     "said": {
+      "chart": 6,
+      "drawing": 6,
+      "mixed": 14
+     }
+    },
+    "nonsense": {
+     "asked": 304,
+     "right": 0.039,
+     "said": {
+      "text": 90,
+      "table": 58,
+      "chart": 36,
+      "drawing": 19,
+      "decoration": 1,
+      "mixed": 88,
+      "nonsense": 12
+     }
+    }
+   },
+   "other": [],
+   "by_why": {
+    "blank: a margin": {
+     "blank": 312,
+     "decoration": 138,
+     "None": 5,
+     "text": 5
+    },
+    "chart: a detected figure": {
+     "chart": 32,
+     "mixed": 11,
+     "text": 1
+    },
+    "chart: the key's chart, undetected": {
+     "chart": 20
+    },
+    "decoration: a tile around decoration": {
+     "decoration": 17,
+     "blank": 6,
+     "text": 1
+    },
+    "drawing: a detected figure": {
+     "drawing": 23,
+     "mixed": 7
+    },
+    "mixed: a chart and a paragraph": {
+     "chart": 6
+    },
+    "mixed: a detected sheet": {
+     "mixed": 6,
+     "drawing": 6
+    },
+    "mixed: a table and a paragraph": {
+     "mixed": 8
+    },
+    "nonsense: a strip through a paragraph's lines": {
+     "text": 90
+    },
+    "nonsense: half a chart": {
+     "chart": 36,
+     "mixed": 12,
+     "nonsense": 6
+    },
+    "nonsense: half a drawing": {
+     "drawing": 19,
+     "mixed": 11
+    },
+    "nonsense: half a table": {
+     "mixed": 65,
+     "table": 58,
+     "nonsense": 6,
+     "decoration": 1
+    },
+    "photo or scan: a scanned page": {
+     "mixed": 8,
+     "chart": 2
+    },
+    "table: a detected figure": {
+     "table": 62,
+     "mixed": 17,
+     "text": 1
+    },
+    "table: a detected table": {
+     "table": 140,
+     "mixed": 138,
+     "text": 2
+    },
+    "table: the key's table, undetected": {
+     "table": 4
+    },
+    "text: a header or footer": {
+     "decoration": 273,
+     "text": 50,
+     "None": 28,
+     "blank": 26,
+     "mixed": 5,
+     "table": 2
+    },
+    "text: a text block": {
+     "text": 1167,
+     "nonsense": 11,
+     "decoration": 7,
+     "table": 4,
+     "chart": 1
+    }
+   },
+   "passes": true
+  }
+ }
+}

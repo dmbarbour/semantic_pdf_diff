@@ -34,6 +34,7 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Bands on wide pages | `band_width: 2.4` | Off (1.6); measured (milestone 3) | Slides: no line cut sideways, a third of the tiles; but bands cut multi-column slides across |
 | Tile cut | `tile_cut: snapped, xycut` | Off (`grid`); measured (milestone 3) | XY-cut: lines cut and read twice down by 80% to 90% on wide pages, no fact lost on the knobs; values lost on two drawing sheets |
 | Render by area | `render_area` | Off; measured (milestone 3) | Ten corpus documents: facts right 372 → 366, loose 57 → 48; no gain on Letter pages |
+| Region labels | `region_labels: model` | Off; measured (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 6) | The corpus: 450 → 390 tiles with no fact lost (359 with tile_choice's rule, 3 facts more); 132 questions for 60 tiles fewer; only skips the measures agree with |
 | Tile choice | `tile_choice: measures, model` | Off; measured (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5) | The corpus by the measures alone: 450 → 408 tiles, facts 3,438 → 3,439, misbound 261 → 236; asked, gemma-4 chose XY-cut on the plan sheets and lost 24 facts there |
 
 ## Levers
@@ -262,6 +263,26 @@ Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5, of
 - **Next:**
   - Offer the model only cuts no worse on small text, or say in the question that larger tiles show less detail and calibrate it again.
   - Measure the rule alone on the held-out pages and the slices before any default.
+
+### Region labels (`region_labels`)
+
+Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 6, off by default. The model labels the tiles a page sends (`regionlabels.py`), once a page (`Platform.sent_tiles`): text, table, chart, drawing, photo or scan, decoration, blank, mixed, nonsense or other.
+
+- **The rules:**
+  - Tiles of text, decoration or blank aren't sent, but only where the measures find no graphic that counts in them.
+  - On a drawing sheet, text is sent.
+  - A nonsense tile is joined to its neighbour.
+- **Calibrated** (`scripts/labelling.py`, gemma-4):
+  - Labels right 74.5%.
+  - Content lost 0.8% (called text, decoration or blank) and tiles saved 97.3%, the pass mark.
+  - Nonsense is almost never seen (3.9%).
+- **Got** (the controlled corpus):
+  - 450 → 390 tiles with no fact lost.
+  - With tile_choice's rule, 359 tiles and 3 facts more than today.
+  - As first built, the model called a plan sheet's small print blank (17 facts lost). The measures' veto and sending a sheet's text fixed it.
+- **Next:**
+  - Measure skipping text-only tiles except on sheets by the measures alone. The labels only ever skip what the measures could.
+  - One question for the cut and the labels.
 
 ## Ideas not built yet
 

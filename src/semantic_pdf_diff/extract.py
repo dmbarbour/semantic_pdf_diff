@@ -112,6 +112,19 @@ class PdfReading:
                     status="complete" if choice["answer"] else "failed",
                     issues=[f"Cut as {' and '.join(choice['chosen'].split('+'))} (offered "
                             f"{', '.join(choice['order'])}; the default {choice['default']})", *choice["issues"]]))
+            labelled = self.context_of.page_labels.get(page.number)
+            if labelled and labelled["found"] is not None:  # the model labelled the page's tiles (region_labels)
+                found = labelled["found"]
+                said = ", ".join(f"{tag.partition(':')[2]} {label or '?'}"
+                                 for tag, label in zip(labelled["tags"], found["labels"]))
+                done = ([f"Not sent: {', '.join(labelled['dropped'])}"] if labelled["dropped"] else []) + [
+                    f"{tag} joined to {into}" for tag, into in labelled["joined"].items()] + [
+                    f"{labelled['tags'][n - 1]} holds {words or 'something unnamed'} (other)"
+                    for n, words in found["other"].items()]
+                self.record(coverage_row(
+                    content=self.content, page=number, bbox=list(native_page(page)), task=f"vision:p{number}:labels",
+                    status="failed" if all(x is None for x in found["labels"]) else "complete",
+                    issues=[f"Tiles labelled: {said}", *done, *labelled["issues"]]))
         return self.regions[number]
 
     def as_figure(self, number, page, rect, tag):

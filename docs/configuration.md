@@ -96,6 +96,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `sheet_details` | `false` | selecting | sheet_details | extract | figure, overview, tile, vision |
 | `skip_empty` | `true` | selecting | skip_empty | extract | figure, overview, tile, vision |
 | `skip_text_only` | `false` | selecting | skip_text_only | extract | figure, overview, tile, vision |
+| `region_labels` | `"off"` | selecting | region_labels | extract | figure, overview, tile, vision |
 | `render_area` | `false` | shaping | render_area | extract | figure, overview, tile, vision |
 | `figure_tasks` | `true` | selecting | figure_tasks | extract | figure |
 | `table_rules` | `0` | selecting | table_rules | extract | table |

@@ -478,6 +478,10 @@ The owner's idea, as a lever.
   - **Inspected:** on lcc-enduse's pages, today's tiling looks the same as the known-good. Its "split figure" is 2 points of a detected figure's box (548 against 550), white margin. The measures allowed a box 1 point past a tile's edge, and fixed it next (below). The tie was right.
 - **The corpus** (`model`, 45 pages asked, $0.014): no page tied. Four pages took a different cut under the new prompt (three bands → XY-cut, one back). Tiles 334 → 339, and the facts are the same: right 3,415, misbound 189, loose 385.
 
+**After the figure fix (2026-10-12).** A figure is now held by what's drawn in it, not its box's white margin (`tiling._inked`). Measured again, at no cost:
+- **The rule over the development pages:** report pages' figures split are 571 today and 425 under the rule (773 → 670 before). 1,111 report pages would be asked (1,125), and 336 take XY-cut (316). Slides barely move; drawing sheets don't. Lines cut and read twice change by under 1%.
+- **Calibration replayed:** the near cases drop 19 questions whose only fault was a figure's margin (239 → 220). Known-good chosen alone: near 96.1% (94.6%), near-ties 93.9% with ties 3.6% (91.8%, 4.6%). The stark arms don't change.
+
 - **When** (the owner, 2026-10-10: "I'd suggest two options. First, heuristics determine the best tiling is ambiguous. Second, models could feasibly request an alternative tiling as a refinement option."):
   - **Before reading, where the heuristics can't tell:** milestone 1's measures leave no candidate at least as good as the others on every measure, or the best are within a margin. Most report pages won't be asked.
   - **After reading, as a refinement option:** see milestone 7.
@@ -495,6 +499,66 @@ The owner's idea, as a lever.
 ### 6. The model labels regions
 
 Claude's variant, with the owner's addition: a mixed and a nonsense label.
+
+**Done (2026-10-12).** The owner: "After linting cleanup commits, go ahead and fix up bugs discovered here, commit, then begin the next milestone." The lever is built, off by default, calibrated and measured. Spent $0.151 with the model.
+- **Built:**
+  - **A hook** (`Platform.sent_tiles`, a refactor of its own): once a page, after the keep rules. `kept_tiles` was the wrong place, since tile_choice also calls it for each candidate cut.
+  - **The question** (`regionlabels.py`): the page, then its tiles outlined and numbered with what no tile holds greyed out, as calibrated in milestone 4. Each tile gets one of the ten labels, "other" with a few words.
+  - **The lever** (`region_labels: off, model`): asks about the tiles a page sends. Text, decoration and blank tiles aren't sent, and a nonsense tile is joined to the neighbour it touches most. A row `vision:p<n>:labels` records the labels, what wasn't sent and why.
+  - **Two rules found in the corpus reads** (below):
+    - The measures veto a skip: a tile is skipped only where they find no graphic that counts in it.
+    - On a drawing sheet, text is sent (milestone 3's lesson).
+  - **Calibration** (`bench/labelling.py`, `scripts/labelling.py`, `benchmarks/labelling/`):
+    - The regions come from the controlled corpus, keyed by the key's facts and the document's family.
+    - **Plain questions:** detected figures and tables, figures the detector missed (the key's facts and the graphics they touch), text blocks (a header or footer may be called decoration), a tile around decoration, a margin.
+    - **Hard questions:** half a figure and a strip through a paragraph's lines (nonsense), and a figure with the paragraph beside it (mixed).
+    - Each is asked numbered twice, the second time reversed. 271 questions on 146 pages, 1,428 regions.
+  - **Tests:** `tests/test_regionlabels.py` (12, one a whole PDF job), `tests/test_labelling.py` (4).
+- **Calibration** (gemma-4, $0.107):
+
+  | Key | Asks | Right | Said instead |
+  |---|---|---|---|
+  | text | 1,574 | 94.7% | decoration 280 (headers and footers, accepted), blank 26 |
+  | table | 364 | 56.6% | mixed 155 (a detected table's box holds its caption) |
+  | chart | 64 | 81.2% | mixed 11 |
+  | drawing | 30 | 76.7% | mixed 7 |
+  | photo or scan | 10 | 20% | mixed 8 (a scanned page of text and a chart) |
+  | decoration | 24 | 70.8% | blank 6 |
+  | blank | 460 | 67.8% | decoration 138 (a margin) |
+  | mixed | 26 | 53.8% | chart 6, drawing 6 |
+  | nonsense | 304 | 3.9% | text 90 (every strip through a paragraph), mixed 88, table 58, chart 36 |
+  | all | 2,856 | 74.5% (same in both numberings 80.7%) | |
+
+  - **What the lever acts on holds:** content lost 0.8% (a table, chart, drawing, scan or mixed region called text, decoration or blank: 4 of 494), tiles saved 97.3% (text, decoration or blank called so).
+  - **The pass mark was revised after the run.** It was set as labels right ≥ 85% and content lost < 3%. It's now content lost < 3% and saved ≥ 90%, since most misses don't change what's sent. gemma-4 passes it.
+  - **Nonsense isn't seen.** As with the tiling question's "repeats text", the model judges what a region holds, not how it's cut. A half-figure is labelled by its kind and sent, and a strip of a paragraph as text.
+  - **"Other"** was never said.
+- **The corpus** (one reading each; 132 pages asked; $0.041, the later readings replayed):
+
+  | | Tiles | Facts right (of 3,582) | Misbound | Loose |
+  |---|---|---|---|---|
+  | today | 450 | 3,438 | 261 | 490 |
+  | labels, as first built | 272 | 3,416 | 228 | 421 |
+  | labels, the measures vetoing skips | 382 | 3,426 | 256 | 486 |
+  | labels, and a sheet's text sent | 390 | 3,438 | 256 | 486 |
+  | the rule (`tile_choice: measures`), milestone 5 | 408 | 3,439 | 236 | 426 |
+  | the rule and labels | 359 | 3,441 | 236 | 424 |
+
+  - **As first built,** the plan sheets lost 17 facts. Shrunk to 1,024 px, their small print looked blank, and 20 tiles holding it were called blank. The measures flagged every one.
+  - **With the veto,** 12 facts were still lost on the plan sheets, from tiles of text alone. On a drawing sheet the text tasks miss what its tiles read, as milestone 3 found.
+  - **As kept:** 60 tiles fewer with no fact lost: lcc's report pages 65 → 29, the plan sheets 162 → 138. The veto fired 102 times; one nonsense tile was joined.
+  - **With the rule:** 49 tiles fewer than the rule alone, and the facts kept.
+  - **Cost:**
+    - Each page with tiles is asked once: 132 questions saved 60 tile reads.
+    - A labels question cost about $0.0002 in calibration, less than a tile's extraction, so spend comes out about even.
+    - The claims are barely better without the rule: misbound 261 → 256.
+- **What it shows:**
+  - **The labels are good enough to act on,** but only within what the measures can see. With the veto, a tile is skipped only where the measures could skip it themselves (text alone, decoration alone, blank). The model adds a second opinion that keeps text-only tables and other text-only tiles it sees as content.
+  - **The labels can't see small print,** like the tiling question.
+- **Directions for milestone 8:**
+  - **Measure the measures alone:** skip text-only tiles except on drawing sheets, with no question asked. If that loses nothing, the question isn't worth its calls.
+  - **Ask once for both choices:** one question choosing the cut and labelling its tiles.
+  - **Labels where the measures can't see:** scans and rasters, where a tile's graphic is the page itself. The corpus has few (10 regions).
 
 - **The regions:** the chosen tiling's tiles, or the XY-cut blocks, numbered on the page (one clean image beside it).
 - **The labels:**
@@ -515,7 +579,7 @@ Claude's variant, with the owner's addition: a mixed and a nonsense label.
   - mixed: kept, or cut along the parts
   - other: kept, its words noted with the tile; the words are collected across the samples, as candidates for new labels
   - the rest: kept
-- **One answer serves every candidate tiling, and refinement.** The labels and the measures are checked against each other where the measures can see (text only, blank).
+- **One answer serves every candidate tiling, and refinement** (not built: the lever asks about the tiles sent). The labels and the measures are checked against each other where the measures can see (text only, blank).
 - **A lever of its own,** measured against milestone 5's choice and the heuristic best, with milestone 4's calibration covering it.
 
 ### 7. Refinement's open questions
