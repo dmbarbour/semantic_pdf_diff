@@ -363,6 +363,8 @@ class SkipTextOnly(Lever):
                 or any(x[1].intersects(g) for g in graphics)]
 
 MOST_OF_PAGE = 0.5  # a table covering more of a page than this is a frame or a layout to the leave_text lever
+NUMERIC = 0.6  # and one with fewer of its cells holding a number is left to the text tasks too (set on the corpus:
+# its schedules and charts 0.75 to 1, a drawing's labels found as a table 0.5, a specification table 0.42)
 
 class LeaveText(Lever):
     lever_name, stage, off = "leave_text", "inclusion", {"leave_text": "none"}
@@ -370,7 +372,8 @@ class LeaveText(Lever):
     # and with figures, its detected figures but their captions (the figure task or a tile). Flattened, a table's
     # columns shift and a chart's values pair with the wrong months (the corpus's text tasks: 139 misbound claims, 116
     # in tables and charts; docs/reviews/levers.md's ideas). A drawing sheet keeps its text (its frame is found as
-    # tables), as does a page under a "table" covering most of it (a frame, a layout)
+    # tables), as does a page under a "table" covering most of it (a frame, a layout), and a table of words more than
+    # numbers (a drawing's labels found as a table, a specification: the text tasks read facts there it missed)
     leave_text: Annotated[Literal["none", "tables", "tables and figures"], _shaping(TEXTUAL)] = "none"
 
     def text_left_out(self, reader, page, number, tables):
@@ -379,7 +382,11 @@ class LeaveText(Lever):
         if self.leave_text == "none" or any(f.kind == "sheet" for f in figures):
             return boxes
         area = page.mediabox.width * page.mediabox.height
-        boxes = boxes + [tuple(t) for t in tables if (t[2] - t[0]) * (t[3] - t[1]) <= MOST_OF_PAGE * area]
+        def numeric(rows):
+            cells = [str(c) for row in rows for c in row if c is not None and str(c).strip()]
+            return sum(any(ch.isdigit() for ch in c) for c in cells) >= NUMERIC * len(cells) if cells else False
+        boxes = boxes + [tuple(t) for t, rows in tables
+                         if (t[2] - t[0]) * (t[3] - t[1]) <= MOST_OF_PAGE * area and numeric(rows)]
         if self.leave_text == "tables and figures":
             from .figures import drawn_without_caption
             boxes += [drawn_without_caption(page, f) for f in figures if f.region]
@@ -816,7 +823,7 @@ class Platform(Composable):
     @chained
     def text_left_out(self, reader, page, number, tables):
         """Unrotated boxes whose text blocks a PDF page's text tasks leave out, to the readers of what they hold
-        (tables: the boxes of the tables detected and read): the platform's, none."""
+        (tables: [(box, rows)] of the tables detected and read): the platform's, none."""
         return []
 
     @chained

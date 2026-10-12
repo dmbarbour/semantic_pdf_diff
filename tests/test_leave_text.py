@@ -17,7 +17,7 @@ def texts(stem, mode, number=0):
     with pymupdf.open(CORPUS / f"{stem}.pdf") as doc:
         page = doc[number]
         s = Settings(leave_text=mode)
-        tables = [tuple(t.bbox) for t in page.find_tables().tables]
+        tables = [(tuple(t.bbox), t.extract()) for t in page.find_tables().tables]
         boxes = s.text_left_out(Context(doc, s), page, number + 1, tables)
         return [t for _, segments in text_groups(page, s.text_bytes, None, boxes) for _, t in segments]
 
@@ -37,6 +37,9 @@ class LeaveText(unittest.TestCase):
 
     def test_a_drawing_sheet_keeps_its_text(self):  # its frame is found as tables covering it
         self.assertEqual(texts("lcc-plan-s1-clean", "tables and figures"), texts("lcc-plan-s1-clean", "none"))
+
+    def test_a_table_of_words_more_than_numbers_keeps_its_text(self):  # the drawing's labels found as a table
+        self.assertEqual(texts("uv-layout-s1-folded", "tables"), texts("uv-layout-s1-folded", "none"))
 
     def test_a_caption_is_cut_from_its_figures_box(self):
         with pymupdf.open(CORPUS / "lcc-energy-s1-clean.pdf") as doc:

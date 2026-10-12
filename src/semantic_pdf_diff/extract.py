@@ -161,7 +161,7 @@ class PdfReading:
         # Native coordinates stay unrotated (PDF point coordinates). Consecutive
         # blocks are grouped up to the byte budget; oversized blocks are split; blocks the configuration leaves to
         # other readers (text_left_out, given the tables detected) are left out.
-        left_out = self.s.text_left_out(self.context_of, page, number, [f[0] for f in found if f[1]])
+        left_out = self.s.text_left_out(self.context_of, page, number, [(f[0], f[1]) for f in found if f[1]])
         for ids, segments in text_groups(page, self.s.text_bytes, lambda b, n=number: self.owner.box(n, b).id,
                                          left_out):
             self.core.text_task(number, segments, f"text:p{number}:{ids}")
