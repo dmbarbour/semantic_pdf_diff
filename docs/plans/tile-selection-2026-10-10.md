@@ -458,6 +458,26 @@ The owner's idea, as a lever.
   - **Tweak:** offer the model only cuts no worse than the rest on small text, or tell it larger tiles show less detail and calibrate that.
   - **Before any default:** the rule measured on the held-out pages, and the slices read.
 
+**Ties (2026-10-12).** The owner: "We should probably enable models to say that there isn't a best choice betwee two options. Would make it easier to identify which calibration tilings need extra inspection from you, and would allow us to just send both tilings when those cases are live."
+- **Built:**
+  - **The question:** with ties, it adds "Where you can't choose between two or more because they are equally good, name each, joined by "and"" (`tilechoice.prompt(ties=True)`). A hedge ("A or C") names none.
+  - **The lever:** `model` asks with ties. A tied page is read with each cut named, at most two (`TIED`), the first by the measures. The cuts are joined, `xycut+grid`, and `tiles_for` reads each one's tiles, numbered on. Readings from both merge as usual.
+  - **Calibration:** two arms, `ties` and `near-ties` (dimmed). The old arms keep their prompt, so their answers replay. The report lists each arm's tied questions, linked.
+- **Calibration** (gemma-4, $0.345):
+
+  | Arm | Asks | Known-good chosen alone | Same in both orders | Tied |
+  |---|---|---|---|---|
+  | dimmed, no ties | 742 | 95.1% | 91.4% | |
+  | ties | 742 | 94.3% | 89.5% | 0.7% |
+  | near, no ties | 478 | 94.6% | 90.0% | |
+  | near-ties | 478 | 91.8% | 91.2% | 4.6% |
+
+  - **Every tie included the known-good.** No two bad tilings were tied.
+  - **Stark ties** (5 questions, each in one order only): four tie the known-good with the margin-strip tiling ("border"), one with "overlap".
+  - **Near ties** (16 questions): "one tile grown three lines into the next" is tied 30% of the time, the known-good chosen alone 62% (82% without ties). Six questions tie in both orders: lcc-enduse's chart pages (today's tiling, one overlap) and lcc-s1-wide-letter (one overlap).
+  - **Inspected:** on lcc-enduse's pages, today's tiling looks the same as the known-good. Its "split figure" is 2 points of a detected figure's box (548 against 550), white margin. The measures allowed a box 1 point past a tile's edge, and fixed it next (below). The tie was right.
+- **The corpus** (`model`, 45 pages asked, $0.014): no page tied. Four pages took a different cut under the new prompt (three bands → XY-cut, one back). Tiles 334 → 339, and the facts are the same: right 3,415, misbound 189, loose 385.
+
 - **When** (the owner, 2026-10-10: "I'd suggest two options. First, heuristics determine the best tiling is ambiguous. Second, models could feasibly request an alternative tiling as a refinement option."):
   - **Before reading, where the heuristics can't tell:** milestone 1's measures leave no candidate at least as good as the others on every measure, or the best are within a margin. Most report pages won't be asked.
   - **After reading, as a refinement option:** see milestone 7.

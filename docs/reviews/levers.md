@@ -258,6 +258,7 @@ Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5, of
   - The model picks the cut that looks cleanest, mostly XY-cut, which has the fewest tiles.
   - On the corpus's six plan sheets it chose XY-cut each time: facts 231 → 207 (the rule alone: 231). On the gallery's scical sheet it lost 27 values, and 10 of the h2-amr slide's 18.
   - The question asks about cuts and coverage, not how small the text becomes, and calibration tested only that.
+- **Ties** (2026-10-12): asked, the model may name tilings it can't choose between, and the page is read with both. Calibration's tie arms pass (known-good alone 94.3%, ties 0.7%; near cases 91.8%, ties 4.6%). Every tie held the known-good, and the both-orders ties found a fault in the measures (a figure's white margin counted as split). No corpus page tied.
 - **Next:**
   - Offer the model only cuts no worse on small text, or say in the question that larger tiles show less detail and calibrate it again.
   - Measure the rule alone on the held-out pages and the slices before any default.

@@ -7,55 +7,66 @@
     "asked": 742,
     "invalid": 0,
     "good_chosen": 0.902,
+    "tied": 0.0,
+    "good_tied": 0.0,
     "same_in_both_orders": 0.868,
     "good_in_both_orders": 0.836,
+    "tied_questions": 0,
     "by_kind": {
      "border": {
       "asked": 284,
       "good_chosen": 0.965,
       "this_chosen": 0.004,
+      "tied_with_good": 0.0,
       "fault_named": 0.968
      },
      "decoration": {
       "asked": 10,
       "good_chosen": 1.0,
       "this_chosen": 0.0,
+      "tied_with_good": 0.0,
       "fault_named": 1.0
      },
      "figure split": {
       "asked": 214,
       "good_chosen": 0.911,
       "this_chosen": 0.014,
+      "tied_with_good": 0.0,
       "fault_named": 0.57
      },
      "grid": {
       "asked": 278,
       "good_chosen": 0.932,
       "this_chosen": 0.0,
+      "tied_with_good": 0.0,
       "fault_named": 0.924
      },
      "midline": {
       "asked": 282,
       "good_chosen": 0.904,
       "this_chosen": 0.035,
+      "tied_with_good": 0.0,
       "fault_named": 0.709
      },
      "missing": {
       "asked": 270,
       "good_chosen": 0.789,
       "this_chosen": 0.204,
+      "tied_with_good": 0.0,
       "fault_named": 0.585
      },
      "overlap": {
       "asked": 84,
       "good_chosen": 0.905,
       "this_chosen": 0.048,
+      "tied_with_good": 0.0,
       "fault_named": 0.012
      },
      "shifted": {
       "asked": 62,
       "good_chosen": 0.903,
       "this_chosen": 0.0,
+      "tied_with_good": 0.0,
       "fault_named": 0.935
      }
     },
@@ -90,55 +101,66 @@
     "asked": 742,
     "invalid": 0,
     "good_chosen": 0.951,
+    "tied": 0.0,
+    "good_tied": 0.0,
     "same_in_both_orders": 0.914,
     "good_in_both_orders": 0.908,
+    "tied_questions": 0,
     "by_kind": {
      "border": {
       "asked": 284,
       "good_chosen": 0.975,
       "this_chosen": 0.018,
+      "tied_with_good": 0.0,
       "fault_named": 0.972
      },
      "decoration": {
       "asked": 10,
       "good_chosen": 1.0,
       "this_chosen": 0.0,
+      "tied_with_good": 0.0,
       "fault_named": 1.0
      },
      "figure split": {
       "asked": 214,
       "good_chosen": 0.963,
       "this_chosen": 0.014,
+      "tied_with_good": 0.0,
       "fault_named": 0.523
      },
      "grid": {
       "asked": 278,
       "good_chosen": 0.932,
       "this_chosen": 0.0,
+      "tied_with_good": 0.0,
       "fault_named": 0.924
      },
      "midline": {
       "asked": 282,
       "good_chosen": 0.947,
       "this_chosen": 0.035,
+      "tied_with_good": 0.0,
       "fault_named": 0.716
      },
      "missing": {
       "asked": 270,
       "good_chosen": 0.944,
       "this_chosen": 0.044,
+      "tied_with_good": 0.0,
       "fault_named": 0.693
      },
      "overlap": {
       "asked": 84,
       "good_chosen": 0.94,
       "this_chosen": 0.06,
+      "tied_with_good": 0.0,
       "fault_named": 0.012
      },
      "shifted": {
       "asked": 62,
       "good_chosen": 0.952,
       "this_chosen": 0.016,
+      "tied_with_good": 0.0,
       "fault_named": 0.935
      }
     },
@@ -173,31 +195,38 @@
     "asked": 478,
     "invalid": 0,
     "good_chosen": 0.946,
+    "tied": 0.0,
+    "good_tied": 0.0,
     "same_in_both_orders": 0.9,
     "good_in_both_orders": 0.895,
+    "tied_questions": 0,
     "by_kind": {
      "one cut": {
       "asked": 62,
       "good_chosen": 0.984,
       "this_chosen": 0.016,
+      "tied_with_good": 0.0,
       "fault_named": 0.968
      },
      "one overlap": {
       "asked": 50,
       "good_chosen": 0.82,
       "this_chosen": 0.18,
+      "tied_with_good": 0.0,
       "fault_named": 0.22
      },
      "snapped": {
       "asked": 252,
       "good_chosen": 1.0,
       "this_chosen": 0.0,
+      "tied_with_good": 0.0,
       "fault_named": 0.897
      },
      "today": {
       "asked": 114,
       "good_chosen": 0.86,
       "this_chosen": 0.14,
+      "tied_with_good": 0.0,
       "fault_named": 0.307
      }
     },
@@ -216,6 +245,162 @@
       "chosen": [
        0.517,
        0.483
+      ],
+      "good_at": [
+       0.5,
+       0.5
+      ]
+     }
+    }
+   },
+   "ties": {
+    "questions": 371,
+    "answered": 371,
+    "asked": 742,
+    "invalid": 6,
+    "good_chosen": 0.943,
+    "tied": 0.007,
+    "good_tied": 0.007,
+    "same_in_both_orders": 0.895,
+    "good_in_both_orders": 0.892,
+    "tied_questions": 5,
+    "by_kind": {
+     "border": {
+      "asked": 284,
+      "good_chosen": 0.968,
+      "this_chosen": 0.011,
+      "tied_with_good": 0.014,
+      "fault_named": 0.958
+     },
+     "decoration": {
+      "asked": 10,
+      "good_chosen": 1.0,
+      "this_chosen": 0.0,
+      "tied_with_good": 0.0,
+      "fault_named": 1.0
+     },
+     "figure split": {
+      "asked": 214,
+      "good_chosen": 0.935,
+      "this_chosen": 0.009,
+      "tied_with_good": 0.0,
+      "fault_named": 0.5
+     },
+     "grid": {
+      "asked": 278,
+      "good_chosen": 0.928,
+      "this_chosen": 0.0,
+      "tied_with_good": 0.0,
+      "fault_named": 0.921
+     },
+     "midline": {
+      "asked": 282,
+      "good_chosen": 0.954,
+      "this_chosen": 0.018,
+      "tied_with_good": 0.0,
+      "fault_named": 0.709
+     },
+     "missing": {
+      "asked": 270,
+      "good_chosen": 0.937,
+      "this_chosen": 0.052,
+      "tied_with_good": 0.0,
+      "fault_named": 0.656
+     },
+     "overlap": {
+      "asked": 84,
+      "good_chosen": 0.917,
+      "this_chosen": 0.071,
+      "tied_with_good": 0.012,
+      "fault_named": 0.0
+     },
+     "shifted": {
+      "asked": 62,
+      "good_chosen": 0.935,
+      "this_chosen": 0.016,
+      "tied_with_good": 0.0,
+      "fault_named": 0.952
+     }
+    },
+    "good_faulted": 0.08,
+    "good_faults": {
+     "cuts text": 4,
+     "decoration or blank": 50,
+     "misses content": 3,
+     "splits a figure": 2
+    },
+    "passes": true,
+    "positions": {
+     "3": {
+      "asked": 742,
+      "chosen": [
+       0.35,
+       0.346,
+       0.288
+      ],
+      "good_at": [
+       0.333,
+       0.345,
+       0.322
+      ]
+     }
+    }
+   },
+   "near-ties": {
+    "questions": 239,
+    "answered": 239,
+    "asked": 478,
+    "invalid": 2,
+    "good_chosen": 0.918,
+    "tied": 0.046,
+    "good_tied": 0.046,
+    "same_in_both_orders": 0.912,
+    "good_in_both_orders": 0.874,
+    "tied_questions": 16,
+    "by_kind": {
+     "one cut": {
+      "asked": 62,
+      "good_chosen": 0.984,
+      "this_chosen": 0.0,
+      "tied_with_good": 0.016,
+      "fault_named": 0.935
+     },
+     "one overlap": {
+      "asked": 50,
+      "good_chosen": 0.62,
+      "this_chosen": 0.04,
+      "tied_with_good": 0.3,
+      "fault_named": 0.16
+     },
+     "snapped": {
+      "asked": 252,
+      "good_chosen": 1.0,
+      "this_chosen": 0.0,
+      "tied_with_good": 0.0,
+      "fault_named": 0.857
+     },
+     "today": {
+      "asked": 114,
+      "good_chosen": 0.833,
+      "this_chosen": 0.114,
+      "tied_with_good": 0.053,
+      "fault_named": 0.254
+     }
+    },
+    "good_faulted": 0.096,
+    "good_faults": {
+     "cuts text": 5,
+     "decoration or blank": 38,
+     "misses content": 2,
+     "splits a figure": 1
+    },
+    "passes": true,
+    "positions": {
+     "2": {
+      "asked": 478,
+      "chosen": [
+       0.494,
+       0.456
       ],
       "good_at": [
        0.5,
