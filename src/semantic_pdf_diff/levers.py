@@ -352,7 +352,7 @@ class SkipTextOnly(Lever):
 
     def kept_tiles(self, reader, page, regions):
         regions = super().kept_tiles(reader, page, regions)
-        if not self.skip_text_only or not regions:
+        if not self.skip_text_only or not regions or not reader.text_read:
             return regions
         if self.skip_text_only == "except_sheets" and any(f.kind == "sheet" for f in reader.figures(page, page.number)):
             return regions
@@ -831,15 +831,17 @@ class Platform(Composable):
         return "grid"
 
     def tiles_for(self, reader, page, how):
-        """[(tag, Rect, note)]: a page's tiles cut as `how` names. Bands no graphic that counts touches are skipped;
-        the other cuts' tiles are each grown. Cuts joined, "xycut+grid" (tile_choice's ties): each one's tiles,
-        numbered on."""
+        """[(tag, Rect, note)]: a page's tiles cut as `how` names. Bands no graphic that counts touches are skipped
+        (where text tasks read the page: reader.text_read; else blank ones); the other cuts' tiles are each grown.
+        Cuts joined, "xycut+grid" (tile_choice's ties): each one's tiles, numbered on."""
         if "+" in how:
             regions = [x for part in how.split("+") for x in self.tiles_for(reader, page, part)]
             return [(f"tile:{i}", r, note) for i, (_, r, note) in enumerate(regions)]
         cut = self.cut_named(reader, page, how)
         if how == "bands":
             graphics = self.content_graphics(reader, page)
+            if not reader.text_read:
+                graphics = graphics + [box for box, _ in reader.lines(page)]
             kept = [b for b in cut if any(b.intersects(g) for g in graphics)]
             return [(f"tile:{i}", r, "") for i, r in enumerate(kept)]
         return [(f"tile:{i}", self.grow(reader, page, r, page.rect), "") for i, r in enumerate(cut)]

@@ -209,6 +209,20 @@ class Candidates(unittest.TestCase):
         self.assertEqual(Settings(render_area=True).render_side(pymupdf.Rect(0, 0, 800, 200)), 2000)
         self.assertEqual(Settings(render_area=True).render_side(pymupdf.Rect(0, 0, 400, 400)), 1000)
 
+    def test_text_only_tiles_are_sent_where_no_text_task_reads_the_page(self):  # a Word document's pictures
+        from semantic_pdf_diff.context import Context
+        from semantic_pdf_diff.settings import Settings
+        for width, settings in ((612, {}), (960, {"skip_text_only": True, "tile_choice": "off"})):
+            doc, page = text_page(width=width, height=792, count=30, top=40)  # text alone: bands, or a grid
+
+            def tiles(text_read, doc=doc, page=page, settings=settings):
+                s = Settings(**settings)
+                reader = Context(doc, s)
+                reader.text_read = text_read
+                return [r for tag, r, _ in s.visual_regions(reader, page, 0) if tag.startswith("tile")]
+            self.assertEqual(tiles(True), [])
+            self.assertTrue(tiles(False))
+
     def test_a_drawing_sheets_text_only_tiles_are_kept_except_sheets(self):  # milestones 3 and 6: facts lost there
         from semantic_pdf_diff.context import Context
         from semantic_pdf_diff.settings import Settings

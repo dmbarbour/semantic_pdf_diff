@@ -176,6 +176,7 @@ def label_tiles(settings, reader, page, regions):
     word_boxes = [tuple(w) for w in words(page)]
     measured = [measure_tile(tuple(r), lines, word_boxes, graphics, decoration) for r in rects]
     sheet = any(f.kind == "sheet" for f in reader.figures(page, page.number))
-    sent, done = act(regions, found, measured, tuple(x for x in SKIPPED if x != "text") if sheet else SKIPPED)
+    text_sent = sheet or not reader.text_read  # no text task reads a picture's labels
+    sent, done = act(regions, found, measured, tuple(x for x in SKIPPED if x != "text") if text_sent else SKIPPED)
     record.update(sent=sent, dropped=done["dropped"], joined=done["joined"], issues=found["issues"] + done["issues"])
     return sent

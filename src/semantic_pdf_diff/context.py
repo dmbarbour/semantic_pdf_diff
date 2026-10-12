@@ -45,6 +45,9 @@ class Context:
         # each page's choice of cut, its record (tilechoice.choose); its tiles' labels (regionlabels); the cut a partial
         # tile is read again under (retiling.other_cut)
         self.ask, self.page_choices, self.page_labels, self.page_retilings = None, {}, {}, {}
+        # whether text tasks read the pages' text layers: a PDF's do; a Word document's pictures' don't (its text tasks
+        # read its paragraphs), so a picture's text-only tiles are sent (pictures.Reading)
+        self.text_read = True
         # a page's vector drawings (never changed by their readers), and its display list: Page.get_pixmap builds one
         # for every crop, interpreting the whole page again
         self.drawings = Recent(lambda page: page.get_cdrawings())
