@@ -19,9 +19,9 @@
     "prose": 0.9167
    },
    "relations": {
-    "implied": 3,
+    "implied": 1,
     "right": 18,
-    "wrong": 4
+    "wrong": 3
    },
    "recall_by_kind": {
     "number": 1.0,
@@ -150,9 +150,9 @@
     "prose": 1.0
    },
    "relations": {
-    "implied": 2,
+    "implied": 3,
     "right": 27,
-    "wrong": 4
+    "wrong": 3
    },
    "recall_by_kind": {
     "number": 1.0,
@@ -238,7 +238,7 @@
     "prose": 1.0
    },
    "relations": {
-    "implied": 11,
+    "implied": 1,
     "right": 23,
     "unscored": 3,
     "wrong": 4
@@ -430,9 +430,10 @@
    "recall": 1.0,
    "found_right": 27,
    "missed": [],
-   "claims": 27,
+   "claims": 34,
    "outcomes": {
-    "right": 27
+    "right": 27,
+    "text": 7
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -448,7 +449,8 @@
      "right": 2
     },
     "visual": {
-     "right": 25
+     "right": 25,
+     "text": 7
     }
    },
    "conditions_by_reader": {
@@ -1086,24 +1088,31 @@
   },
   "coaster-tables-s1-all": {
    "facts": 92,
-   "found": 92,
-   "recall": 1.0,
+   "found": 86,
+   "recall": 0.9348,
    "found_right": 86,
-   "missed": [],
-   "claims": 129,
+   "missed": [
+    "BR1.brake fins",
+    "BR1.exit speed",
+    "BR2.brake fins",
+    "BR2.exit speed",
+    "BR3.brake fins",
+    "BR3.exit speed"
+   ],
+   "claims": 123,
    "outcomes": {
-    "loose": 8,
+    "loose": 2,
     "misbound": 19,
     "right": 102
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "table": 1.0
+    "table": 0.9348
    },
    "by_reader": {
     "table": 0.9348,
     "text": 0.6739,
-    "visual": 1.0
+    "visual": 0.9348
    },
    "outcomes_by_reader": {
     "table": {
@@ -1116,7 +1125,6 @@
      "right": 64
     },
     "visual": {
-     "loose": 6,
      "misbound": 6,
      "right": 94
     }
@@ -1315,9 +1323,9 @@
    "recall": 1.0,
    "found_right": 92,
    "missed": [],
-   "claims": 117,
+   "claims": 105,
    "outcomes": {
-    "loose": 19,
+    "loose": 7,
     "right": 98
    },
    "conditions_kept": "0/0",
@@ -1338,7 +1346,6 @@
      "right": 47
     },
     "visual": {
-     "loose": 12,
      "right": 92
     }
    },
@@ -3172,7 +3179,7 @@
      "right": 19
     },
     "visual": {
-     "right": 24
+     "right": 23
     }
    },
    "conditions_by_reader": {
@@ -3376,7 +3383,7 @@
      "right": 19
     },
     "visual": {
-     "right": 24
+     "right": 23
     }
    },
    "conditions_by_reader": {
@@ -3391,10 +3398,9 @@
    "recall": 1.0,
    "found_right": 23,
    "missed": [],
-   "claims": 33,
+   "claims": 30,
    "outcomes": {
-    "loose": 2,
-    "right": 28,
+    "right": 27,
     "text": 3
    },
    "conditions_kept": "12/12",
@@ -3416,8 +3422,7 @@
      "text": 3
     },
     "visual": {
-     "loose": 2,
-     "right": 26
+     "right": 23
     }
    },
    "conditions_by_reader": {
@@ -3545,11 +3550,9 @@
    "recall": 1.0,
    "found_right": 23,
    "missed": [],
-   "claims": 51,
+   "claims": 25,
    "outcomes": {
-    "loose": 17,
-    "misbound": 1,
-    "right": 33
+    "right": 25
    },
    "conditions_kept": "12/12",
    "recall_by_form": {
@@ -3569,9 +3572,7 @@
      "right": 23
     },
     "visual": {
-     "loose": 17,
-     "misbound": 1,
-     "right": 33
+     "right": 25
     }
    },
    "conditions_by_reader": {
@@ -3613,12 +3614,9 @@
    "recall": 1.0,
    "found_right": 23,
    "missed": [],
-   "claims": 43,
+   "claims": 23,
    "outcomes": {
-    "hallucinated": 1,
-    "loose": 1,
-    "misbound": 11,
-    "right": 30
+    "right": 23
    },
    "conditions_kept": "12/12",
    "recall_by_form": {
@@ -3638,10 +3636,7 @@
      "right": 19
     },
     "visual": {
-     "hallucinated": 1,
-     "loose": 1,
-     "misbound": 11,
-     "right": 30
+     "right": 23
     }
    },
    "conditions_by_reader": {
@@ -4029,12 +4024,9 @@
    "recall": 1.0,
    "found_right": 23,
    "missed": [],
-   "claims": 52,
+   "claims": 23,
    "outcomes": {
-    "loose": 8,
-    "misbound": 5,
-    "right": 35,
-    "text": 4
+    "right": 23
    },
    "conditions_kept": "12/12",
    "recall_by_form": {
@@ -4054,10 +4046,7 @@
      "right": 19
     },
     "visual": {
-     "loose": 8,
-     "misbound": 5,
-     "right": 35,
-     "text": 4
+     "right": 23
     }
    },
    "conditions_by_reader": {
@@ -5237,10 +5226,11 @@
   },
   "uv-layout-s1-all": {
    "facts": 22,
-   "found": 20,
-   "recall": 0.9091,
-   "found_right": 20,
+   "found": 19,
+   "recall": 0.8636,
+   "found_right": 19,
    "missed": [
+    "fs.precedes.em",
     "oap.part-of.uv",
     "oap.precedes.fs"
    ],
@@ -5248,23 +5238,23 @@
    "outcomes": {},
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "figure": 0.9091,
+    "figure": 0.8636,
     "prose": 1.0
    },
    "relations": {
-    "implied": 13,
-    "reversed": 1,
-    "right": 28,
+    "implied": 5,
+    "reversed": 4,
+    "right": 27,
     "unscored": 2,
-    "wrong": 5
+    "wrong": 3
    },
    "recall_by_kind": {
     "number": null,
-    "relation": 0.9091
+    "relation": 0.8636
    },
    "by_reader": {
     "text": 0.4545,
-    "visual": 0.9091
+    "visual": 0.8636
    },
    "outcomes_by_reader": {
     "text": {},
@@ -5361,7 +5351,7 @@
    },
    "relations": {
     "implied": 1,
-    "right": 26,
+    "right": 22,
     "unscored": 2,
     "wrong": 7
    },
@@ -5371,7 +5361,7 @@
    },
    "by_reader": {
     "text": 0.4545,
-    "visual": 0.6818
+    "visual": 0.5909
    },
    "outcomes_by_reader": {
     "text": {},
@@ -5440,7 +5430,7 @@
    },
    "relations": {
     "implied": 2,
-    "right": 24,
+    "right": 18,
     "wrong": 6
    },
    "recall_by_kind": {
@@ -7311,9 +7301,8 @@
    "recall": 1.0,
    "found_right": 84,
    "missed": [],
-   "claims": 93,
+   "claims": 84,
    "outcomes": {
-    "loose": 9,
     "right": 84
    },
    "conditions_kept": "0/0",
@@ -7333,7 +7322,6 @@
      "right": 46
     },
     "visual": {
-     "loose": 9,
      "right": 84
     }
    },

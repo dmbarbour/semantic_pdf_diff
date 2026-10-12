@@ -677,7 +677,7 @@ Each is a lever, measured with the forced-refinement bench on the gallery's page
 
 ### 8. Measured with the model, and defaults
 
-**Done (2026-10-12).** The owner: "Please proceed." Four levers became defaults by judgement on the evidence below (not a round): `tile_choice: measures`, `decoration`, `another_tiling: measures` and `halve_parts`. `skip_text_only` stays off. Measuring found four bugs, each fixed in a commit of its own before the defaults. Spent $1.52 with the model, $1.03 of it a slices recording made before the decoration fix, whose answers no run now uses.
+**Done (2026-10-12).** The owner: "Please proceed." Four levers became defaults by judgement on the evidence below (not a round): `tile_choice: measures`, `decoration`, `another_tiling: measures` and `halve_parts`. `skip_text_only` stays off. Measuring found four bugs, each fixed in a commit of its own before the defaults. Spent $1.56 with the model, $1.03 of it a slices recording made before the decoration fix, whose answers no run now uses.
 - **Built:**
   - **`skip_text_only: except_sheets`:** every page but a drawing sheet's, the partition milestones 3 and 6 pointed to.
 - **Four bugs found by measuring, fixed first:**
@@ -759,6 +759,7 @@ Each is a lever, measured with the forced-refinement bench on the gallery's page
   - **Not:** `skip_text_only` (costs facts once the rule is in), `region_labels` (questions for few tiles), `refine_figures: again`, `tile_cut`, `band_width`, `render_area`, `tile_choice: model`, `another_tiling: said, asked`. They stay as levers.
   - **Round 0** (`benchmarks/round0.json`) pins the five off, so it stays round 0. `champion.json` pins only what the rounds chose; the new defaults are recorded here and in the lever index, not as a round's.
 - **The tests:** those of a mechanism written against the old cut name it, `stubs.TILING_BEFORE`. The golden requests, the settings table and the slices' replay fixture were regenerated.
+- **The controlled corpus re-recorded** under the defaults (`scripts/controlled.py run`, `score`, `pack`; $0.042), every representation's standard runs (210): facts found right 7,895 → 7,894, loose 617 → 562, misbound 262 → 245, hallucinated 9 → 8. Nine runs changed: the grid knobs, the dense table documents, one Word document's pictures.
 
 **As planned:**
 
