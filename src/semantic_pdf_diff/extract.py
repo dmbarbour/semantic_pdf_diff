@@ -91,6 +91,7 @@ class PdfReading:
             core, doc, s, content, assets, stem, owner)
         self.record = core.record
         self.context_of = Context(doc, s, assets, stem)  # the task functions read it when they run
+        self.context_of.ask = core.dispatch.client.ask  # the tiling question, asked while a page is planned
         self.visuals = Visuals(core, self.context_of, assets, stem, s)
         self.regions = {}  # page -> its image tasks' regions, worked out once (the vision step; tables read as figures)
         self.signals = {}
@@ -99,6 +100,13 @@ class PdfReading:
     def regions_of(self, number, page):
         if number not in self.regions:
             self.regions[number] = list(self.s.visual_regions(self.context_of, page, number))
+            choice = self.context_of.page_choices.get(page.number)
+            if choice and choice["asked"]:  # the model chose the page's cut (tile_choice): what it chose, and why
+                self.record(coverage_row(
+                    content=self.content, page=number, bbox=list(native_page(page)), task=f"vision:p{number}:tiling",
+                    status="complete" if choice["answer"] else "failed",
+                    issues=[f"Cut as {choice['chosen']} (offered {', '.join(choice['order'])}; the default "
+                            f"{choice['default']})", *choice["issues"]]))
         return self.regions[number]
 
     def as_figure(self, number, page, rect, tag):

@@ -41,6 +41,9 @@ class Context:
         self.blocks, self.stems, self.cited_by, self.page_lines, self.page_graphics = {}, {}, {}, {}, {}
         self.page_figures, self.page_decoration, self.page_marks = {}, {}, {}
         self.tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
+        # how the model is asked mid-reading (the client's ask), where a job can: the tiling question (tile_choice); and
+        # each page's choice of cut, its record (tilechoice.choose)
+        self.ask, self.page_choices = None, {}
         # a page's vector drawings (never changed by their readers), and its display list: Page.get_pixmap builds one
         # for every crop, interpreting the whole page again
         self.drawings = Recent(lambda page: page.get_cdrawings())

@@ -34,7 +34,7 @@ TOGGLES = {
     'sheet_details': True, 'skip_empty': False, 'table_filter': True, 'situate': False, 'verify_visuals': False,
     'top_k': 1, 'min_score': 0.9, 'max_pairs': 1, 'aliases': {'drawing': 'equipment', 'label': 'power'},
     'reconcile': False, 'quote_match': 'exact', 'skip_text_only': True, 'tile_cut': 'xycut', 'band_width': 6.0,
-    'render_area': True,
+    'render_area': True, 'tile_choice': 'measures',
 }
 # Settings that act only on the drawing sheet: grid tiles (report pages are cut into bands), its details,
 # and its frame (a false table); and refinement, which only grid tiles are large enough for (the stub answers

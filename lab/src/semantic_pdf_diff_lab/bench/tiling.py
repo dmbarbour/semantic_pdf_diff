@@ -7,7 +7,6 @@ review's table can be read off a run (`summary`). Two runs over the same pages c
 With the model, a run's store says how its image tasks were answered (`answers`).
 """
 import json
-import math
 from collections import defaultdict
 from pathlib import Path
 
@@ -15,7 +14,7 @@ import pymupdf
 
 from semantic_pdf_diff.jobs import IMAGE_EXTENSIONS, image_pdf
 from semantic_pdf_diff.pages import PYMUPDF_ERRORS, shown
-from semantic_pdf_diff.tiling import measure, words
+from semantic_pdf_diff.tiling import detail, measure, words
 
 COUNTS = ("tiles", "images", "lines_cut_sideways", "lines_cut_across", "words_cut", "text_only", "decoration_only",
           "blank", "lines_read_twice", "figures_not_whole")
@@ -66,17 +65,11 @@ def measure_page(settings, reader, page, number):
         t["detail"] = detail(r, settings.render_side(r))
     result["page"].update(mode=mode(settings, page), width=round(page.rect.width), height=round(page.rect.height),
                           detail=min((t["detail"] for t in result["tiles"]), default=None))
+    choice = reader.page_choices.get(page.number)  # tile_choice's: the cut chosen, and those no other beats
+    if choice:
+        result["page"]["choice"] = {k: choice[k] for k in ("default", "chosen", "front", "clear", "scores")}
+        result["page"]["mode"] = choice["chosen"]
     return result
-
-BUDGET_PIXELS = 645_000  # what gemma-4 sees of an image at its default budget, whatever its shape (research:
-# gemma4-images-2026-09-30): a larger render is shrunk to this area, a smaller one enlarged without new detail
-
-def detail(rect, side):
-    """Pixels per point the model sees of a region rendered with its longer side at `side` (visuals.render)."""
-    if rect.is_empty:
-        return None
-    scale = min(2.5, side / max(rect.width, rect.height))
-    return round(min(scale, math.sqrt(BUDGET_PIXELS / (rect.width * rect.height))), 3)
 
 def run(folder, settings=None, first=None, errors=None, exclude=()):
     """[{"file", "page", **measures}] for every page under folder (per-tile measures under "per_tile")."""

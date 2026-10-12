@@ -153,3 +153,13 @@ def measure(page, regions, lines, graphics, word_boxes=None, figures=(), decorat
         "graphics_missed": round(missed / drawn_cells, 4) if drawn_cells else None,
     }
     return {"tiles": per_tile, "page": page_measures}
+
+BUDGET_PIXELS = 645_000  # what gemma-4 sees of an image at its default budget, whatever its shape (research:
+# gemma4-images-2026-09-30): a larger render is shrunk to this area, a smaller one enlarged without new detail
+
+def detail(rect, side):
+    """Pixels per point the model sees of a region rendered with its longer side at `side` (visuals.render)."""
+    if rect.is_empty:
+        return None
+    scale = min(2.5, side / max(rect.width, rect.height))
+    return round(min(scale, math.sqrt(BUDGET_PIXELS / (rect.width * rect.height))), 3)

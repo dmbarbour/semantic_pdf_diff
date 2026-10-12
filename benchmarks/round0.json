@@ -11,6 +11,7 @@
     "decoration",
     "tiling",
     "tile_cut",
+    "tile_choice",
     "grow_tiles",
     "sheet_details",
     "skip_empty",

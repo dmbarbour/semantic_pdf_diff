@@ -394,6 +394,70 @@ The owner's step, built before either model query below is trusted.
 
 The owner's idea, as a lever.
 
+**Done (2026-10-12).** The owner: "Please proceed with milestone 5." The lever is built, off by default, and the rule it falls back on is measured with it. Spent $0.502 with the model, $0.223 of it re-reading the corpus's today before its recorded answers were found (`fixture-corpus.sqlite`).
+- **Built, in three commits:**
+  - **A refactor:** the tilers name their cuts.
+    - `tiling_of`, a chained hook, names a page's cut: Tiling gives bands, TileCut its cut.
+    - `cut_named` makes each cut; `tiles_for` makes the tiles.
+    - `cut_page` is gone.
+    - Proven unchanged on 5,492 regions of 168 pages under five configurations.
+  - **Near cases in calibration**, before the lever is trusted (below).
+  - **The lever** (`tile_choice: off, measures, model`; `tilechoice.choose`):
+    - **Candidates:** bands where today gives them, the grid, snapped, XY-cut.
+    - **Measures**, each fewer is better: lines cut, figures split, lines and graphics missed, tiles of decoration or blank alone, lines read twice, small text, images sent.
+    - **Small text:** lines whose capitals no tile shows 7 px tall (gemma-4's eye-test threshold), at the tile's detail as the host shrinks it.
+    - **Images sent:** counted after the keep rules (bands skip text-only bands).
+    - **The rule:** a cut at least as good as the rest on every measure is taken, today's first among ties. Where there's none, today's is kept unless another beats it; then the first unbeaten cut that beats it is taken.
+    - **`model`:** asks the calibrated question (dimmed) among the unbeaten cuts, up to three, in a seeded order. It's asked synchronously while the page is planned (`Context.ask`, the client's), so a replay replays the choice first.
+    - **Recorded:** a row `vision:p<n>:tiling` with the cut chosen, and the reliable problems (cut text, decoration or blank) checked against the measures.
+    - **Fallback:** a failed question or an answer naming none falls back to the rule.
+  - **Tests:** `tests/test_tilechoice.py` (8, one a whole PDF job with a stub model); a near-case test in `test_calibration.py`. The detail measure moved from the lab into `tiling.py`.
+- **Near cases** (gemma-4, dimmed, 239 questions in two orders, $0.113):
+
+  | Against the known-good | Asks | Known-good chosen | Fault named |
+  |---|---|---|---|
+  | one edge moved into a line | 62 | 98% | 97% |
+  | one tile grown three lines into the next | 50 | 82% | 22% |
+  | today's tiling, where the measures find a fault | 114 | 86% | 31% |
+  | the snapped grid, likewise | 252 | 100% | 90% |
+  | all | 478 | 94.6% (same in both orders 90.0%) | |
+
+  Today's tiling was never chosen where it cuts text (0 of 36). It was chosen 16 times of 78 where its bands split a detected figure, mostly a group of tables cut between two tables: a defensible cut, so a debatable key.
+- **The rule over every development page** (4,705; `scripts/tiling.py measure --set tile_choice=measures`):
+
+  | Pages | Asked if `model` | Cut chosen | Images | Lines cut | Lines read twice | Small text |
+  |---|---|---|---|---|---|---|
+  | Report (3,607) | 1,125 | bands 3,291, XY-cut 316 | 5,058 → 4,979 | 4,071 → 3,358 | 8,442 → 6,886 | 3,303 → 3,292 |
+  | Slides and landscape (435) | 219 | grid 156, snapped 92, XY-cut 187 | 1,688 → 1,459 | 7,482 → 3,699 | 12,782 → 6,903 | 3,576 → 2,651 |
+  | Drawings and posters (663) | 616 | grid 341, snapped 295, XY-cut 27 | 21,838 → 21,737 | 19,815 → 14,483 | 59,679 → 45,630 | 13,455 → 10,280 |
+
+  No measure gets worse on any kind of page; figures split fall too (773 → 670 on report pages).
+- **With the model** (one reading each):
+
+  | The controlled corpus (89 documents) | Tiles | Facts right (of 3,582) | Misbound | Loose |
+  |---|---|---|---|---|
+  | today | 450 | 3,438 | 261 | 490 |
+  | the rule (`measures`) | 408 | 3,439 | 236 | 426 |
+  | the model (`model`; asked on 45 pages) | 334 | 3,415 | 189 | 385 |
+
+  - **The rule:** loses no fact. The knobs' misbound claims go (17 → 0), and the plan sheets keep theirs (231).
+  - **The model:** chose XY-cut on all six plan sheets: facts 231 → 207, misbound 79 → 23.
+  - **The gallery's six pages** (distinct values against today's):
+    - The rule changes the cut on four: scical p7 loses 20 and gains 12 (snapped). The poster (89 → 88) and rules p44 (56 → 59) keep about as many, the poster with 15 lost and 14 new. nesc-thermal p20 has no values either way.
+    - The model chose XY-cut on scical p7 (27 lost, 6 new) and on the h2-amr slide (10 of 18 lost).
+- **What it shows:**
+  - **The rule alone holds up:** fewer tiles, cuts and repeats on every kind of page, and no fact lost on the corpus.
+  - **Asked, gemma-4 judges what it's asked:** cuts and coverage. It picks the cleanest-looking cut, usually XY-cut with the fewest tiles. On drawing sheets those tiles are too large for small text, which the question never mentions and calibration never tested.
+  - **The model would be asked often:** on 31% of report pages, half the slides and 93% of drawing sheets. Mostly these are trade-offs the measures can't settle, such as fewer cuts against smaller text.
+  - **Four faults of the rule, found in earlier runs and fixed:**
+    - Ties were asked.
+    - Bands were compared before their text-only bands were skipped (492 report pages moved to XY-cut for fewer tiles, sending more).
+    - A cut beating today's could lose to one that didn't.
+    - Without a measure of detail, XY-cut won the drawing sheets.
+- **Directions for milestone 8:**
+  - **Tweak:** offer the model only cuts no worse than the rest on small text, or tell it larger tiles show less detail and calibrate that.
+  - **Before any default:** the rule measured on the held-out pages, and the slices read.
+
 - **When** (the owner, 2026-10-10: "I'd suggest two options. First, heuristics determine the best tiling is ambiguous. Second, models could feasibly request an alternative tiling as a refinement option."):
   - **Before reading, where the heuristics can't tell:** milestone 1's measures leave no candidate at least as good as the others on every measure, or the best are within a margin. Most report pages won't be asked.
   - **After reading, as a refinement option:** see milestone 7.

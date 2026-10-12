@@ -280,6 +280,21 @@ class TileCut(Lever):
         how = super().tiling_of(reader, page)
         return self.tile_cut if how == "grid" else how
 
+class TileChoice(Lever):
+    lever_name, stage, off = "tile_choice", "segmentation", {"tile_choice": "off"}
+    # which cut a page gets, among the tilers' (bands where they apply, grid, snapped, xycut), each measured
+    # (tilechoice.choose): the one at least as good as the rest on every measure; where none is, the default unless
+    # another beats it (measures), or the model's choice among those no other beats (model; calibrated first:
+    # scripts/calibration.py)
+    tile_choice: Annotated[Literal["off", "measures", "model"], _selecting(VISUAL)] = "off"
+
+    def tiling_of(self, reader, page):
+        how = super().tiling_of(reader, page)
+        if self.tile_choice == "off":
+            return how
+        from .tilechoice import choose
+        return choose(self, reader, page, how, ask=self.tile_choice == "model")
+
 class GrowTiles(Lever):
     lever_name, stage, off = "grow_tiles", "segmentation", {"grow_tiles": False}
     grow_tiles: Annotated[bool, _shaping(VISUAL)] = True  # extend grid tiles to include every text line they cut
@@ -508,8 +523,8 @@ class DedupeRepeated(Lever):
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
-                 TileLocator, Decoration, Tiling, TileCut, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly, RenderArea,
-                 FigureTasks, TableRules, TableReview,
+                 TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
+                 RenderArea, FigureTasks, TableRules, TableReview,
                  TableStructure, VisualTextLayer, TableFilter, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading,
                  Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}

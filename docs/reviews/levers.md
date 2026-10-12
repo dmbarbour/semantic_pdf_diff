@@ -34,6 +34,7 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Bands on wide pages | `band_width: 2.4` | Off (1.6); measured (milestone 3) | Slides: no line cut sideways, a third of the tiles; but bands cut multi-column slides across |
 | Tile cut | `tile_cut: snapped, xycut` | Off (`grid`); measured (milestone 3) | XY-cut: lines cut and read twice down by 80% to 90% on wide pages, no fact lost on the knobs; values lost on two drawing sheets |
 | Render by area | `render_area` | Off; measured (milestone 3) | Ten corpus documents: facts right 372 → 366, loose 57 → 48; no gain on Letter pages |
+| Tile choice | `tile_choice: measures, model` | Off; measured (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5) | The corpus by the measures alone: 450 → 408 tiles, facts 3,438 → 3,439, misbound 261 → 236; asked, gemma-4 chose XY-cut on the plan sheets and lost 24 facts there |
 
 ## Levers
 
@@ -231,6 +232,35 @@ Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 3 (20
   - **Next (tweak):** on drawing sheets, XY-cut blocks no larger than a tile; a block with no gap cut into strips, not the grid.
 - **Render by area** (`render_area`): a region rendered to the pixel area of a square at `image_side`, so a long band isn't enlarged by the model. A variant of the idea below (*Render every image at gemma-4's budget size*).
   - **Got:** no gain on Letter pages (ten corpus documents: facts right 372 → 366, loose 57 → 48, inexact 62 → 69: likely noise). It's what makes long tiles affordable for XY-cut and wide bands.
+
+### Tile choice (`tile_choice`)
+
+Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5, off by default. Each tiler's cut is measured on the page (`tilechoice.choose`), and the page gets the cut at least as good as the rest on every measure. Where none is, `measures` keeps today's cut unless another beats it, and `model` asks the model among the cuts no other beats, with the calibrated question (`tilechoice.py`, milestone 4).
+
+- **The candidates:** bands where they apply today, the grid, snapped and XY-cut, each as tiles_for makes it.
+- **The measures** (each fewer is better):
+  - lines cut
+  - figures split
+  - lines and graphics missed
+  - tiles of decoration or blank alone
+  - lines read twice
+  - lines too small to read: capitals under 7 px at the tile's detail, gemma-4's eye-test threshold
+  - images sent, after the keep rules
+- **Got, by the measures alone:**
+  - The controlled corpus: 450 → 408 tiles; facts right 3,438 → 3,439; misbound 261 → 236; loose 490 → 426. The knobs' misbound claims are gone (17 → 0), and the plan sheets keep their facts.
+  - The gallery's drawing sheet scical p7 loses 20 values and gains 12 against today's grid.
+  - The rule's own faults, found in earlier runs and fixed before these:
+    - Ties were asked.
+    - Bands were compared on tiles before their text-only bands were skipped.
+    - A cut beating today's could be passed over for one that didn't.
+    - With no measure of detail, XY-cut's larger tiles won on drawing sheets.
+- **Got, asked:**
+  - The model picks the cut that looks cleanest, mostly XY-cut, which has the fewest tiles.
+  - On the corpus's six plan sheets it chose XY-cut each time: facts 231 → 207 (the rule alone: 231). On the gallery's scical sheet it lost 27 values, and 10 of the h2-amr slide's 18.
+  - The question asks about cuts and coverage, not how small the text becomes, and calibration tested only that.
+- **Next:**
+  - Offer the model only cuts no worse on small text, or say in the question that larger tiles show less detail and calibrate it again.
+  - Measure the rule alone on the held-out pages and the slices before any default.
 
 ## Ideas not built yet
 

@@ -91,6 +91,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `tiling` | `"bands"` | selecting | tiling | extract | figure, overview, tile, vision |
 | `band_width` | `1.6` | selecting | tiling | extract | figure, overview, tile, vision |
 | `tile_cut` | `"grid"` | selecting | tile_cut | extract | figure, overview, tile, vision |
+| `tile_choice` | `"off"` | selecting | tile_choice | extract | figure, overview, tile, vision |
 | `grow_tiles` | `true` | shaping | grow_tiles | extract | figure, overview, tile, vision |
 | `sheet_details` | `false` | selecting | sheet_details | extract | figure, overview, tile, vision |
 | `skip_empty` | `true` | selecting | skip_empty | extract | figure, overview, tile, vision |
