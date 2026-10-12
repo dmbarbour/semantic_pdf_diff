@@ -190,11 +190,25 @@ class Candidates(unittest.TestCase):
         every, kept = tiles(), tiles(skip_text_only=True)
         self.assertLess(len(kept), len(every))
         self.assertTrue(all(r.intersects(pymupdf.Rect(700, 300, 900, 500)) for r in kept))
+        self.assertEqual(tiles(skip_text_only="except_sheets"), kept)  # not a drawing sheet
         banded = tiles(band_width=2.4)
         self.assertTrue(banded and all(r.height <= 1.6 * 420 * 420 / 960 + 0.01 for r in banded))
         self.assertEqual(Settings().render_side(pymupdf.Rect(0, 0, 800, 200)), 1000)
         self.assertEqual(Settings(render_area=True).render_side(pymupdf.Rect(0, 0, 800, 200)), 2000)
         self.assertEqual(Settings(render_area=True).render_side(pymupdf.Rect(0, 0, 400, 400)), 1000)
+
+    def test_a_drawing_sheets_text_only_tiles_are_kept_except_sheets(self):  # milestones 3 and 6: facts lost there
+        from semantic_pdf_diff.context import Context
+        from semantic_pdf_diff.settings import Settings
+        corpus = Path(__file__).resolve().parent.parent / "benchmarks/controlled/docs"
+        with pymupdf.open(corpus / "lcc-plan-s1-clean.pdf") as doc:
+            page = doc[0]
+            def tiles(**kw):
+                s = Settings(**kw)
+                return [r for tag, r, _ in s.visual_regions(Context(doc, s), page, 0) if tag.startswith("tile")]
+            every = tiles()
+            self.assertLess(len(tiles(skip_text_only=True)), len(every))
+            self.assertEqual(tiles(skip_text_only="except_sheets"), every)
 
 class LabRuns(unittest.TestCase):
     def test_a_folder_measured_under_two_settings_compares_page_by_page(self):

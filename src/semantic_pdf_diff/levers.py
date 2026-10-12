@@ -346,12 +346,15 @@ class SkipEmpty(Lever):
 
 class SkipTextOnly(Lever):
     lever_name, stage, off = "skip_text_only", "segmentation", {"skip_text_only": False}
-    # don't send tiles holding text and no graphic that counts (the text tasks read them), on every page, as bands
-    skip_text_only: Annotated[bool, _selecting(VISUAL)] = False
+    # don't send tiles holding text and no graphic that counts (the text tasks read them), on every page, as bands; or
+    # on every page but a drawing sheet's (except_sheets: its text tasks miss what its tiles read, milestones 3 and 6)
+    skip_text_only: Annotated[bool | Literal["except_sheets"], _selecting(VISUAL)] = False
 
     def kept_tiles(self, reader, page, regions):
         regions = super().kept_tiles(reader, page, regions)
         if not self.skip_text_only or not regions:
+            return regions
+        if self.skip_text_only == "except_sheets" and any(f.kind == "sheet" for f in reader.figures(page, page.number)):
             return regions
         texts = [box for box, _ in reader.lines(page) if not box.is_empty]
         graphics = self.content_graphics(reader, page)
