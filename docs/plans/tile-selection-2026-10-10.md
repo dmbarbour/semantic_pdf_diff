@@ -677,6 +677,91 @@ Each is a lever, measured with the forced-refinement bench on the gallery's page
 
 ### 8. Measured with the model, and defaults
 
+**Done (2026-10-12).** The owner: "Please proceed." Four levers became defaults by judgement on the evidence below (not a round): `tile_choice: measures`, `decoration`, `another_tiling: measures` and `halve_parts`. `skip_text_only` stays off. Measuring found four bugs, each fixed in a commit of its own before the defaults. Spent $1.52 with the model, $1.03 of it a slices recording made before the decoration fix, whose answers no run now uses.
+- **Built:**
+  - **`skip_text_only: except_sheets`:** every page but a drawing sheet's, the partition milestones 3 and 6 pointed to.
+- **Four bugs found by measuring, fixed first:**
+  - **Decoration took a drawing's lines for rules.** A plan sheet's gridlines and a schematic's duct are long and thin. With decoration on, XY-cut then held only a plan sheet's text blocks, and the rule took it (the corpus's plan sheets: 27 tiles to 10, 15 facts lost). Now a long line inside a detected figure is the drawing.
+  - **A Word picture's text-only tiles were skipped,** as if the text tasks read them; they read the document's paragraphs, not its pictures' labels. Seen with decoration on: a picture of labels lost every tile. The reader now knows whether text tasks read its pages (`Context.text_read`).
+  - **A page's figures came from the page before.** `Context.figures` was kept by the number a caller gave, and callers mixed 1-based numbers with 0-based ones. Since milestone 5, tile choice's measures on a document's later pages could use the page before's figures, as could region labels' sheet test. With decoration on, a drawing sheet third in a document wasn't seen as one. It's now kept by the page.
+  - **`another_tiling` retiled a tile partial for being full.** HabEx p403's dense table, continued to the claim limit, lost 43 of 454 values read under the other cut. A tile continued at the claim limit is halved, for more room.
+- **And a rule for the levers:** `tile_choice` leaves a drawing sheet the tiler's cut. XY-cut's larger tiles lost facts there (milestones 3 and 5), the small-text measure doesn't see why, and with decoration on the rule took XY-cut on the rotated plan sheet and the tests' synthetic one.
+- **The controlled corpus** (89 documents, one reading each; every arm on the final code):
+
+  | Arm | Image tasks | Tiles | Facts right (of 3,582) | Right claims | Loose | Misbound |
+  |---|---|---|---|---|---|---|
+  | today | 873 | 450 | 3,438 | 3,882 | 490 | 261 |
+  | the new defaults (`skip_text_only` off) | 841 | 415 | 3,439 | 3,851 | 432 | 244 |
+  | and `skip_text_only: except_sheets` | 807 | 383 | 3,435 | 3,822 | 432 | 244 |
+  | that, `decoration` off | 817 | 394 | 3,437 | 3,850 | 434 | 246 |
+  | that, `tile_choice` off | 833 | 413 | 3,438 | 3,849 | 482 | 256 |
+  | that, `another_tiling` and `halve_parts` off | 807 | 383 | 3,435 | 3,822 | 432 | 244 |
+  | that, and `region_labels: model` (125 questions) | 782 | 358 | 3,435 | 3,809 | 432 | 244 |
+
+  - **The rule does most of it:** the knobs' slides and landscape pages take one XY-cut tile for 12 grid tiles, their loose and misbound claims gone (the slide 11 misbound to 0), and two dense table documents lose their loose claims (19 → 7, 9 → 0).
+  - **Decoration** sends a decorated or backdropped page one tile for four to six.
+  - **Skipping text-only tiles** saves 34 tiles and costs 4 facts: lcc-enduse's September readings, on two documents, where the chart and its text go into one larger tile. With the rule in place it removes no loose or misbound claim.
+  - **Refinement** changes nothing in a normal read of the corpus (8 refined tiles); milestone 7's forced measure is its evidence.
+  - **Region labels** save 25 tiles for 125 questions. Not worth it.
+- **The gallery's 16 real pages** (no key; distinct values found by every task together, against today's 968 from 179 image tasks):
+
+  | Page | Today: values, image tasks | New defaults: values (lost, new), image tasks |
+  |---|---|---|
+  | atb p35 (slide) | 2, 3 | 2 (1, 1), 3 |
+  | calg's sheet p21 | 118, 39 | 118 (1, 1), 38 |
+  | eng-calg p1 | 8, 12 | 8 (0, 0), 11 |
+  | h2-amr p8 (slide) | 6, 7 | 6 (0, 0), 8 |
+  | lcit p27 (text slide) | 7, 5 | 5 (3, 1), 4 |
+  | nesc-thermal p20 (text slide) | 0, 5 | 0 (0, 0), 3 |
+  | dc-manual p23 | 64, 5 | 65 (1, 2), 4 |
+  | luvoir-interim p282 | 39, 6 | 33 (13, 7), 6 |
+  | luvoir p283 | 82, 4 | 80 (2, 0), 1 |
+  | rules p44 (schedule) | 78, 10 | 84 (2, 8), 10 |
+  | the other six, HabEx p403 and the drawing sheets among them | as today | as today |
+  | all 16 | 968, 179 | 965 (23, 20), 171 |
+
+  - **luvoir-interim p282's 13 "lost"** are mostly the same chart counts read with a unit ("55" now "55 stars") or a bar read a point apart.
+  - **lcit p27** loses three percentages from a text slide, which its text tasks don't read either.
+
+- **The slices' development runs** (against today's, replayed):
+
+  | Run | Image tasks | Empty answers | Complaints | Image claims | Values (lost, new) |
+  |---|---|---|---|---|---|
+  | calg-sheets | 188 → 188 | 32 → 34 | 2 → 2 | 929 → 924 | 293 → 275 (58, 40) |
+  | dc-manual | 27 → 19 | 8 → 5 | 0 → 0 | 135 → 94 | 58 → 59 (4, 5) |
+  | dc-sheets | 292 → 292 | 91 → 94 | 4 → 3 | 1,111 → 1,115 | 351 → 361 (63, 73) |
+  | drawings | 169 → 164 | 68 → 61 | 4 → 3 | 540 → 543 | 190 → 197 (31, 38) |
+  | ken-cd | 143 → 140 | 71 → 65 | 23 → 21 | 483 → 540 | 118 → 120 (15, 17) |
+  | lcit | 42 → 35 | 32 → 26 | 0 → 1 | 51 → 42 | 10 → 10 (0, 0) |
+  | rules | 17 → 11 | 2 → 0 | 0 → 0 | 96 → 75 | 75 → 74 (14, 13) |
+  | turbines | 49 → 49 | 1 → 2 | 0 → 0 | 640 → 633 | 423 → 428 (54, 59) |
+  | all | 927 → 898 | 305 → 287 | 33 → 30 | 3,985 → 3,966 | 1,518 → 1,524 (239, 245) |
+
+  - **The drawing sheets** keep their tiles, whose answers replay; the values they lose and gain come from their partial tiles, now read under another cut or halved around their figures.
+
+- **The samples' pages without the model,** development and held-out apart:
+
+  | Set | Pages | Kind | Image tasks | Tiles | Lines cut sideways | Lines cut across | Lines read twice | Figures not whole | Text-only tiles |
+  |---|---|---|---|---|---|---|---|---|---|
+  | development | 3,607 | Report | 10,489 → 7,806 | 5,058 → 2,421 | 0 → 0 | 2,603 → 1,280 | 4,059 → 1,828 | 105 → 176 | 2,602 → 104 |
+  | development | 435 | Slides, landscape | 2,462 → 2,174 | 1,688 → 1,343 | 7,092 → 2,813 | 390 → 219 | 12,782 → 7,060 | 51 → 44 | 510 → 492 |
+  | development | 663 | Drawings, posters | 22,667 → 22,631 | 21,838 → 21,801 | 17,842 → 16,996 | 1,973 → 1,859 | 59,679 → 59,111 | 656 → 656 | 6,363 → 6,376 |
+  | held-out | 221 | Slides, landscape | 1,743 → 1,659 | 1,043 → 936 | 6,482 → 3,389 | 303 → 108 | 4,352 → 1,654 | 37 → 37 | 450 → 511 |
+  | held-out | 137 | Drawings, posters | 4,910 → 4,901 | 4,722 → 4,713 | 4,230 → 4,114 | 603 → 537 | 12,738 → 12,675 | 138 → 138 | 1,425 → 1,442 |
+
+  - **The held-out pages move as the development ones do** (none is a report page).
+  - **Report pages send half the tiles,** decoration's doing: bands of text beside a rule or a logo aren't sent.
+  - **Figures not whole on report pages rise, 105 → 176.** Milestone 3 traced the like to tables the figure finder takes for figures, their fills taken as text panels; the table reader reads those.
+  - **Drawings and posters change little:** a drawing sheet keeps the tiler's cut.
+
+- **Decided, by judgement:**
+  - **Defaults:** `tile_choice: measures`, `decoration`, `another_tiling: measures`, `halve_parts`. Fewer images, fewer loose and misbound claims, no fact lost on the corpus, and on real pages about as many values.
+  - **Not:** `skip_text_only` (costs facts once the rule is in), `region_labels` (questions for few tiles), `refine_figures: again`, `tile_cut`, `band_width`, `render_area`, `tile_choice: model`, `another_tiling: said, asked`. They stay as levers.
+  - **Round 0** (`benchmarks/round0.json`) pins the five off, so it stays round 0. `champion.json` pins only what the rounds chose; the new defaults are recorded here and in the lever index, not as a round's.
+- **The tests:** those of a mechanism written against the old cut name it, `stubs.TILING_BEFORE`. The golden requests, the settings table and the slices' replay fixture were regenerated.
+
+**As planned:**
+
 - **The candidates that hold up** on the knobs and the gallery are measured together:
   - the slices' development runs (re-recorded for each lever that becomes a default, about $0.02 each)
   - the controlled corpus

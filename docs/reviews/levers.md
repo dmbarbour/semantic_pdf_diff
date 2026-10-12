@@ -29,17 +29,17 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 | Table rules | `table_rules: 0` | Default for Excel's tables: every table asked how it's read (2026-10-05; the owner's design, not a round) | see the lever's section |
 | Table review | `table_review: 10` (the most reviews) | Default (2026-10-07; the owner's idea, not a round) | the controlled corpus: 30 of 137 tables' rules revised on review; facts as before; one revision pair more read alike |
 | Table structure | `table_structure: true` (with the PDF heuristics, reader `pdf/3`) | Default (2026-10-07; the owner's design, not a round) | HabEx p4 and p7 read as printed; the development slices: 15 of 96 parts restructured by rules, 42 called not a table; see the lever's section |
-| Decoration set aside | `decoration` | Off; measured (2026-10-11, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 3) | Report pages: half their bands not sent, no fact lost on the controlled corpus (11 tiles fewer); see the lever's section |
-| Text-only tiles skipped | `skip_text_only` | Off; measured (milestone 3) | Slides and landscape pages: no fact lost, misbound claims mostly gone; drawing sheets: facts lost (the corpus's plan sheets, 3 or 4 each) |
+| Decoration set aside | `decoration` | Default (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 8, by judgement, not a round) | With the rule, a decorated or backdropped page sends one tile for four to six (milestone 8, after a fix: a drawing's long lines were taken for rules). Report pages: half their bands not sent, no fact lost on the controlled corpus (11 tiles fewer); see the lever's section |
+| Text-only tiles skipped | `skip_text_only` | Off; measured (milestone 3; `except_sheets`, milestone 8) | With the rule in place (milestone 8), `except_sheets` saves 34 corpus tiles, removes no loose or misbound claim, and costs 4 facts. Slides and landscape pages: no fact lost, misbound claims mostly gone; drawing sheets: facts lost (the corpus's plan sheets, 3 or 4 each) |
 | Bands on wide pages | `band_width: 2.4` | Off (1.6); measured (milestone 3) | Slides: no line cut sideways, a third of the tiles; but bands cut multi-column slides across |
 | Tile cut | `tile_cut: snapped, xycut` | Off (`grid`); measured (milestone 3) | XY-cut: lines cut and read twice down by 80% to 90% on wide pages, no fact lost on the knobs; values lost on two drawing sheets |
 | Render by area | `render_area` | Off; measured (milestone 3) | Ten corpus documents: facts right 372 → 366, loose 57 → 48; no gain on Letter pages |
 | Region labels | `region_labels: model` | Off; measured (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 6) | The corpus: 450 → 390 tiles with no fact lost (359 with tile_choice's rule, 3 facts more); 132 questions for 60 tiles fewer; only skips the measures agree with |
-| Another tiling for a partial tile | `another_tiling: measures, said, asked` | Off; measured (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 7) | Every tile refined, the corpus: refined reads 197 → 134, their facts right 453 → 479, misbound 38 → 24; real pages: claims bound to other words 246 → 114; asking (said, asked) adds nothing the measures don't know |
-| Halves cut around figures | `halve_parts` | Off; measured (milestone 7) | Every tile refined, the corpus: loose claims from halves 93 → 51; with `another_tiling: measures`, 23, and facts right 514 |
+| Another tiling for a partial tile | `another_tiling: measures, said, asked` | Default (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 8, by judgement, not a round); `measures`, a tile continued at the claim limit halved | Every tile refined, the corpus: refined reads 197 → 134, their facts right 453 → 479, misbound 38 → 24; real pages: claims bound to other words 246 → 114; asking (said, asked) adds nothing the measures don't know |
+| Halves cut around figures | `halve_parts` | Default (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 8, by judgement, not a round) | Every tile refined, the corpus: loose claims from halves 93 → 51; with `another_tiling: measures`, 23, and facts right 514 |
 | A figure looked at again | `refine_figures: again` | Off; measured (milestone 7) | Loose 93 → 49 but right 431 → 412: told what it found, the model returns less |
 | A half's least share | `least_half` | 0.25; measured (milestone 7) | 0.1 a little better (misbound 38 → 30), 0.4 worse by the measures; kept |
-| Tile choice | `tile_choice: measures, model` | Off; measured (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5) | The corpus by the measures alone: 450 → 408 tiles, facts 3,438 → 3,439, misbound 261 → 236; asked, gemma-4 chose XY-cut on the plan sheets and lost 24 facts there |
+| Tile choice | `tile_choice: measures, model` | Default (2026-10-12, [tile selection](../plans/tile-selection-2026-10-10.md) milestone 8, by judgement, not a round); `measures`, a drawing sheet keeping the tiler's cut | Milestone 8, with the other defaults: the corpus 873 → 841 image tasks, facts 3,438 → 3,439, loose 490 → 432, misbound 261 → 244. The corpus by the measures alone: 450 → 408 tiles, facts 3,438 → 3,439, misbound 261 → 236; asked, gemma-4 chose XY-cut on the plan sheets and lost 24 facts there |
 
 ## Levers
 
@@ -220,7 +220,7 @@ Every query lever tried in the [improvement rounds](../plans/query-improvement-2
 
 ### Tile selection candidates (`decoration`, `skip_text_only`, `band_width`, `tile_cut`, `render_area`)
 
-Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 3 (2026-10-11), each off by default. Measured without the model on every development page of the samples (`scripts/tiling.py measure`, the plan has the tables), and with the model on the knobs, the controlled corpus and six gallery pages (`scripts/tiling.py read`).
+Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 3 (2026-10-11), each off by default; `decoration` a default since milestone 8 (2026-10-12), after a fix (a long line inside a detected figure is the drawing, not a rule). Measured without the model on every development page of the samples (`scripts/tiling.py measure`, the plan has the tables), and with the model on the knobs, the controlled corpus and six gallery pages (`scripts/tiling.py read`).
 
 - **Decoration set aside** (`decoration`, `segmentation.decoration`): graphics that don't make a tile worth sending. Rules and margin bars (up to 8 pt thick, a third of the page long), what's drawn alike in the same place on neighbouring pages, underlines, masks behind text, filled panels holding only text, and an image behind most of a page's visible text.
   - **Got:** report pages send half their bands; the knobs' background page sends one tile, not six. The corpus read with the model: 11 tiles fewer, the same facts.
@@ -240,7 +240,7 @@ Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 3 (20
 
 ### Tile choice (`tile_choice`)
 
-Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5, off by default. Each tiler's cut is measured on the page (`tilechoice.choose`), and the page gets the cut at least as good as the rest on every measure. Where none is, `measures` keeps today's cut unless another beats it, and `model` asks the model among the cuts no other beats, with the calibrated question (`tilechoice.py`, milestone 4).
+Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5; `measures` a default since milestone 8 (2026-10-12). A drawing sheet keeps the tiler's cut: XY-cut's larger tiles lost facts there. Each tiler's cut is measured on the page (`tilechoice.choose`), and the page gets the cut at least as good as the rest on every measure. Where none is, `measures` keeps today's cut unless another beats it, and `model` asks the model among the cuts no other beats, with the calibrated question (`tilechoice.py`, milestone 4).
 
 - **The candidates:** bands where they apply today, the grid, snapped and XY-cut, each as tiles_for makes it.
 - **The measures** (each fewer is better):
@@ -299,7 +299,7 @@ Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 7, al
   - `least_half`: the least share of what a tile holds each half keeps.
 - **Calibrated** (`scripts/asking.py`, gemma-4): asked to name a cut, it names one for 48.8% of tiles that cut content and 0.8% of whole ones; today's prompt, 31.2% and 10.5%. Neither passes (half the cut tiles).
 - **Got** (every tile refined, `scripts/refinement.py`): `measures` with `halve_parts` is the best arm. On the controlled corpus, refined reads 197 → 135, their facts right 453 → 514, loose 93 → 23, misbound 38 → 24; whole documents' facts unchanged. On 16 real pages, refined reads 257 → 151, quotes not in the page 78 → 54, claims bound to other words 246 → 114.
-- **Next:** milestone 8 measures `another_tiling: measures` with `halve_parts` as a default. Refinement is rare in a normal run, so the forced measure is where they show.
+- **Defaults since milestone 8** (2026-10-12): `another_tiling: measures` and `halve_parts`. A tile continued at the claim limit is halved, not retiled: read under the other cut, HabEx p403's dense table lost 43 of 454 values. Refinement is rare in a normal run, so the forced measure is where they show.
 
 ## Ideas not built yet
 
