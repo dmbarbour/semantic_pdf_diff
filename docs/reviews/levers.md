@@ -225,10 +225,10 @@ Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 3 (20
 - **Decoration set aside** (`decoration`, `segmentation.decoration`): graphics that don't make a tile worth sending. Rules and margin bars (up to 8 pt thick, a third of the page long), what's drawn alike in the same place on neighbouring pages, underlines, masks behind text, filled panels holding only text, and an image behind most of a page's visible text.
   - **Got:** report pages send half their bands; the knobs' background page sends one tile, not six. The corpus read with the model: 11 tiles fewer, the same facts.
   - **Fixed on the way:** furniture by place alone took a report appendix's picture strips (a different picture in the same place on each page); it must be drawn alike. A chart's lines hold their labels in their boxes, so a panel must be filled.
-  - **Next:** quotation bars beside text (HabEx p4 still sends a band); measure on the held-out pages before any default.
+  - **Next:** quotation bars beside text (HabEx p4 still sends a band; an idea below). Measured on the held-out pages and made a default in milestone 8.
 - **Text-only tiles skipped** (`skip_text_only`): as bands already are, on every page.
   - **Got:** slides and landscape pages lose no fact and most misbound claims (the slide knob: 10 misbound to none, with XY-cut). Drawing sheets lose facts: the corpus's six plan sheets 3 or 4 each, and the gallery's two sheets their notes' values. Labels on a drawing mean what they sit next to, and a drawing's text tasks come back partial.
-  - **Next (partition):** skip on pages that aren't drawing sheets only.
+  - **The partition** (`except_sheets`, milestone 8): every page but a drawing sheet's. With the rule in place it saves 34 corpus tiles, removes no loose or misbound claim and costs 4 facts (lcc-enduse's chart and text in one larger tile); not a default.
 - **Bands on wide pages** (`band_width`), lower so a band's area stays today's widest band's (`segmentation.band_height`).
   - **Got:** on slides no line cut sideways, a third of the tiles. But a slide's columns leave no full-width gap, so a band falls back to an overlapping cut through all of them (h2-amr p8).
   - **Next:** none for now; XY-cut does better on slides.
@@ -264,9 +264,7 @@ Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 5; `m
   - On the corpus's six plan sheets it chose XY-cut each time: facts 231 → 207 (the rule alone: 231). On the gallery's scical sheet it lost 27 values, and 10 of the h2-amr slide's 18.
   - The question asks about cuts and coverage, not how small the text becomes, and calibration tested only that.
 - **Ties** (2026-10-12): asked, the model may name tilings it can't choose between, and the page is read with both. Calibration's tie arms pass (known-good alone 94.3%, ties 0.7%; near cases 91.8%, ties 4.6%). Every tie held the known-good, and the both-orders ties found a fault in the measures (a figure's white margin counted as split). No corpus page tied.
-- **Next:**
-  - Offer the model only cuts no worse on small text, or say in the question that larger tiles show less detail and calibrate it again.
-  - Measure the rule alone on the held-out pages and the slices before any default.
+- **Since:** `measures` became a default in milestone 8, after the held-out pages and the slices were measured. `model` stays off; offering it only cuts no worse on small text is an idea below.
 
 ### Region labels (`region_labels`)
 
@@ -284,9 +282,7 @@ Built in [tile selection](../plans/tile-selection-2026-10-10.md) milestone 6, of
   - 450 → 390 tiles with no fact lost.
   - With tile_choice's rule, 359 tiles and 3 facts more than today.
   - As first built, the model called a plan sheet's small print blank (17 facts lost). The measures' veto and sending a sheet's text fixed it.
-- **Next:**
-  - Measure skipping text-only tiles except on sheets by the measures alone. The labels only ever skip what the measures could.
-  - One question for the cut and the labels.
+- **Since:** in milestone 8, with the new defaults, the labels saved 25 tiles for 125 questions, facts and loose and misbound claims as without them; skipping by the measures alone (`skip_text_only: except_sheets`) saved 34 and cost 4 facts. Neither is a default. One question for the cut and the labels, and labels on scans, are ideas below.
 
 ### Refinement (`another_tiling`, `halve_parts`, `refine_figures`, `least_half`)
 
@@ -355,6 +351,14 @@ Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so no
 | Skip table detection on pages recognised as drawing sheets | The [2026-10-08 code review](code-review-2026-10-08.md), A20; the owner, 2026-10-09: "We can add skipping table detection as a lever, np." | Table detection costs 1.4 s a page on drawing sheets (11 s on the drawing slice); a features-phase item in the [plan](../plans/review-bugs-2026-10-09.md) |
 | A refined half's least share of its tile (`segmentation.LEAST_HALF`, 25% today) | The [bug plan](../plans/review-bugs-2026-10-09.md), item 6; the owner, 2026-10-09: "This seems like a tuning lever, we can start with 25% but I cannot say it's \"right\" without hindsight, and I don't expect anyone else could either." | Built as `least_half` (2026-10-12, tile selection milestone 7): 0.1 a little better, 0.4 worse; 25% kept (see the table) |
 | A tile turned upright where most of its text runs vertically as displayed (vertical table headings, a schedule chart's labels) | [Tile selection](../plans/tile-selection-2026-10-10.md), milestone 3; withdrawn as a candidate there (2026-10-11), its cause having been the gallery drawing rotated pages unrotated | Not built. Of 5,063 sample pages, 12 have 30% or more of their text vertical, all mixed with horizontal text (the 2013 rules p41 to p46, a calg and a Stevens sheet, a figure in the IEA report) |
+| On drawing sheets, XY-cut blocks no larger than a tile, a block with no gap cut into strips rather than the grid (sheets keep the grid since milestone 8) | [tile selection](../plans/tile-selection-2026-10-10.md), milestone 3 | XY-cut's larger tiles found fewer values on two gallery sheets and lost facts on the corpus's plan sheets |
+| Quotation bars beside text taken as decoration | [tile selection](../plans/tile-selection-2026-10-10.md), milestone 3 | HabEx p4 still sends a band for a bar beside a quotation |
+| Render by area only where tiles are long (`render_area` with XY-cut's long blocks) | [tile selection](../plans/tile-selection-2026-10-10.md), milestone 3 | `render_area` alone: ten corpus documents' facts right 372 → 366, no gain on Letter pages |
+| Grow a tile only where its neighbour doesn't already hold the line | [tile selection](../plans/tile-selection-2026-10-10.md), milestone 3 | The landscape knob read the same lines in several tiles: 81 claims, 26 distinct readings |
+| Offer the model only cuts no worse than the rest on small text, or tell it larger tiles show less detail and calibrate that (`tile_choice: model`) | [tile selection](../plans/tile-selection-2026-10-10.md), milestone 5 | Asked, gemma-4 chose XY-cut's large tiles on all six plan sheets and lost 24 facts; the question never mentions detail |
+| One question choosing a page's cut and labelling its tiles | [tile selection](../plans/tile-selection-2026-10-10.md), milestone 6 | The labels cost a question a page (132 for 60 tiles fewer); the choice asks one where the measures can't tell |
+| Region labels where the measures can't see: scans and rasters, where a tile's graphic is the page itself | [tile selection](../plans/tile-selection-2026-10-10.md), milestone 6 | With the measures' veto the labels only skip what the measures could; the corpus has 10 scan regions |
+| A partial tile's other cut chosen by the model among the rest, rather than the measures' next | [tile selection](../plans/tile-selection-2026-10-10.md), milestone 7 | Asked to name a cut, gemma-4 named one for half the tiles cutting content |
 
 ## Measurement notes (affect how to read the table)
 

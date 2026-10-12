@@ -1,6 +1,6 @@
 # Tile selection for vision tasks
 
-- **Status:** Active (2026-10-10). Written, and its design questions answered the same day (see [the end](#design-questions-answered-2026-10-10)). The owner, 2026-10-10: "Alright, please begin developing the plan."
+- **Status:** Done (2026-10-12). Written 2026-10-10, and its design questions answered the same day (see [the end](#design-questions-answered-2026-10-10)). The owner, 2026-10-10: "Alright, please begin developing the plan." Decision: [0029](../decisions/0029-tiles-chosen-by-measures.md); leftovers in the [lever index](../reviews/levers.md)'s ideas and the plans index's *Tile selection, further*.
 - **The owner, 2026-10-08:** "We probably need a whole plan just to improve tile selection and find/create examples that lead to such perverse outcomes." Then, 2026-10-09: "I'm tempted to push on tile selection a bit".
 - **The model choosing, the owner, 2026-10-10:** "send the vision model itself a small version of the image, perhaps one to three small sketches of heuristic tile selection (the most promising), and asking which tiling is the best, e.g. with labeled translucent overlays. The model cannot easily read the shrunk down page, but can probably identify areas of interest from a zoomed out view. We can also measure the quality of those answers by injecting some known-bad tiling test cases." Then: "one shrunk-down image without tiling, plus one per candidate with that candidate's tiling. We could also include a calibration step that tests if a model is any good at this sort of question, tuned with known-bad cuts and pseudo-random candidate ordering. Your variant seems useful, too, but could include a mixed or nonsense option for classifying bad tiles."
 - **From:** the [trials review](../reviews/trials-2026-10-08.md), finding 5, and what the [bug plan](review-bugs-2026-10-09.md)'s item 6 left open.
@@ -775,6 +775,14 @@ Each is a lever, measured with the forced-refinement bench on the gallery's page
 - **Cost** for milestones 2 to 8: a few dollars, mostly calibration and the gallery's pages read under each candidate. Anything over $5 is estimated for the owner first.
 
 ### 9. Closing
+
+**Done (2026-10-12).** The owner: "Please proceed."
+- **The decision record:** [0029](../decisions/0029-tiles-chosen-by-measures.md), how a page's tiles are chosen.
+- **The lever index:** each lever's status and evidence current; eight ideas this plan left added to its ideas table.
+- ***How it works*:** visual extraction and refinement as they are now, and the three new modules.
+- **Leftovers:** the lever ideas in the lever index; the rest in the plans index's *Tile selection, further* (Tentative): calibration on sheets and scans, a measure weighing small text against fewer cuts, the old cut's wins, figures not held whole on report pages, real pages without a key.
+
+**As planned:**
 
 - A decision record for how tiles are chosen.
 - The lever index brought current.
