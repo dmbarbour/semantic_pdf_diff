@@ -27,3 +27,13 @@ where = ["src"]
 [tool.setuptools.package-data]
 # vendored code ships with its license (src/semantic_pdf_diff/vendor/README.md)
 "semantic_pdf_diff.vendor.metafile_render" = ["LICENSE", "py.typed"]
+
+[tool.ruff]
+line-length = 120
+# archived prototypes, and vendored code kept as its authors wrote it
+extend-exclude = ["docs/research", "src/semantic_pdf_diff/vendor"]
+
+[tool.ruff.lint]
+# pyflakes, long lines, and closures over a loop's variable (a callback run after the loop sees its last value);
+# tests/test_lint.py keeps the tree clean
+select = ["F", "E501", "B023"]
