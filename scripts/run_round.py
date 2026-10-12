@@ -154,8 +154,8 @@ class RoundRunner:
         from semantic_pdf_diff_lab.eval import rounds
         manifest = self.manifest()
         wanted_set = self.spec.get("set", "dev")
-        private = rounds.private_slices([r["name"] for r in manifest["runs"] if wanted_set == "all" or r["set"] == wanted_set],
-                                        manifest)
+        private = rounds.private_slices([r["name"] for r in manifest["runs"]
+                                         if wanted_set == "all" or r["set"] == wanted_set], manifest)
         if private:
             print(f"Refusing: slices not marked public in the slices manifest: {', '.join(private)}")
             return 2
@@ -169,7 +169,8 @@ class RoundRunner:
                     self.mark(step, "paused: round cap reached")
                     return 3
                 code = self.record_runs(self.extract + [
-                    "--fixture", str(self.fixture), "--set", self.spec.get("set", "dev"), "--variant", str(self.folder / path),
+                    "--fixture", str(self.fixture), "--set", self.spec.get("set", "dev"),
+                    "--variant", str(self.folder / path),
                     "--fresh-regions", self.fresh[v], "--out", str(self.runs_root / "record" / v),
                     "--ledger", str(self.ledger_path), "--tag", f"round={self.name}", "--tag", "step=record",
                     "--tag", f"variant={v}", "--max-cost", f"{self.remaining():.4f}"])
@@ -186,7 +187,8 @@ class RoundRunner:
             if self.wanted("replay") and not self.done(step):
                 code = self.record_runs(self.extract + [
                     "--replay", "--fixture", str(self.fixture), "--set", self.spec.get("set", "dev"),
-                    "--variant", str(self.folder / path), "--fresh-regions", self.fresh[v], "--out", str(self.runs_root / v)])
+                    "--variant", str(self.folder / path), "--fresh-regions", self.fresh[v],
+                    "--out", str(self.runs_root / v)])
                 self.mark(step, "done" if code in (0, 2) else f"failed: exit {code}")
 
     def measure(self):
@@ -242,7 +244,8 @@ class RoundRunner:
             self.save_state()
         held = [v for v, flags in self.state.get("query_flags", {}).items() if flags]
         if checks and held and not self.state.get("checks_accepted") and (self.wanted("pairs") or self.wanted("judge")):
-            print("Held: checkers flagged queries in " + ", ".join(f"{v} ({len(self.state['query_flags'][v])})" for v in held)
+            print("Held: checkers flagged queries in "
+                  + ", ".join(f"{v} ({len(self.state['query_flags'][v])})" for v in held)
                   + ". Look them over in " + ", ".join(str(self.folder / f"queries-{v}" / "index.html") for v in held)
                   + "; fix the lever, or rerun with --accept-checks.")
             return 4
@@ -270,7 +273,8 @@ class RoundRunner:
                 if rounds.rubric_of(self.rubric).whole():  # the whole page and every claim (v6)
                     rounds.add_context(batch, self.runs_root / "baseline", self.runs_root / v, n=self.target,
                                        unit=self.unit_of(v))
-                self.figure("units_changed", built["units"]["units"] - built["units"]["unchanged"], variant=v, step="pairs")
+                self.figure("units_changed", built["units"]["units"] - built["units"]["unchanged"], variant=v,
+                            step="pairs")
                 self.figure("units_total", built["units"]["units"], variant=v, step="pairs")
                 self.mark(f"pairs:{v}", "done")
 
@@ -297,7 +301,8 @@ class RoundRunner:
         stopped = self.state.setdefault("stopped", {})  # variant -> why judging stopped
         for v in self.spec["variants"]:  # rounds judged before chunking: all judges done means complete
             if self.judges and all(self.done(f"judge:{v}:{m}") for m in self.judges) and v not in stopped:
-                judged[v] = min(self.target, len(json.loads((self.folder / f"pairs-{v}" / "pairs.json").read_text())["items"]))
+                judged[v] = min(self.target,
+                                len(json.loads((self.folder / f"pairs-{v}" / "pairs.json").read_text())["items"]))
                 stopped[v] = f"complete at {judged[v]}"
         for v in list(stopped):  # "units" raised since a variant completed: judge on
             pairs = self.folder / f"pairs-{v}" / "pairs.json"
@@ -381,7 +386,8 @@ class RoundRunner:
         return self.measured[v]
 
     def client_for(self, folder, settings):
-        """A model client over a folder's own fixture (semantic_pdf_diff_lab.eval.clients.folder_client); tests answer with stubs instead."""
+        """A model client over a folder's own fixture (semantic_pdf_diff_lab.eval.clients.folder_client); tests answer
+        with stubs instead."""
         from semantic_pdf_diff_lab.eval.clients import folder_client
         return folder_client(folder, settings)
 
@@ -426,12 +432,14 @@ class RoundRunner:
         batch = self.folder / f"pairs-{v}"
         judged = self.state["judged"]
         self.state["stopped"][v] = reason
-        result = rounds.decide(batch, judged[v], documents=self.documents, criteria=self.criteria, gains=self.gains_of(v))
+        result = rounds.decide(batch, judged[v], documents=self.documents, criteria=self.criteria,
+                               gains=self.gains_of(v))
         (batch / "decision.json").write_text(json.dumps({**result, "stopped": reason}, indent=2) + "\n")
         insights.analyse(batch, judged[v])  # the clues to why: agreement, changes, issues, tags, remarks
         self.postmortem_of(v)
         if result["overall"]:
-            self.figure("win_rate", result["overall"], variant=v, stratum="all", step="decide", units=result["units_judged"])
+            self.figure("win_rate", result["overall"], variant=v, stratum="all", step="decide",
+                        units=result["units_judged"])
         for stratum, value in result["strata"].items():
             if value:
                 self.figure("win_rate", value, variant=v, stratum=stratum, step="decide", units=result["units_judged"])
@@ -478,7 +486,8 @@ class RoundRunner:
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("round", type=Path)
-    parser.add_argument("--only", choices=["record", "replay", "measure", "check", "pairs", "judge", "postmortem", "report"])
+    parser.add_argument("--only",
+                        choices=["record", "replay", "measure", "check", "pairs", "judge", "postmortem", "report"])
     parser.add_argument("--accept-checks", action="store_true",
                         help="the query checks' flags were looked over and accepted: go on to sampling and judging")
     args = parser.parse_args(argv)

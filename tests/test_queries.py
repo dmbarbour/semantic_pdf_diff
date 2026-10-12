@@ -27,11 +27,13 @@ class Dumps(unittest.TestCase):
         cls.dir = tempfile.TemporaryDirectory()
         root = cls.root = Path(cls.dir.name)
         a, b = document(root / 'a.pdf', 10), document(root / 'b.pdf', 12)
-        with jittery_model() as (url, _), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        with jittery_model() as (url, _), contextlib.redirect_stdout(io.StringIO()), \
+                contextlib.redirect_stderr(io.StringIO()):
             for side, settings in (('base', {'context_before': 0}), ('variant', {})):  # the variant adds text before
                 config = root / f'{side}.json'
                 config.write_text(json.dumps({**settings, 'situate': False}))
-                cli.main([str(a), str(b), '--out', str(root / side / 'run1'), '--base-url', url, '--config', str(config)])
+                cli.main([str(a), str(b), '--out', str(root / side / 'run1'), '--base-url', url,
+                          '--config', str(config)])
 
     @classmethod
     def tearDownClass(cls):
@@ -41,7 +43,8 @@ class Dumps(unittest.TestCase):
         out = self.root / 'dump'
         summary = queries.dump(self.root / 'variant', out, against=self.root / 'base', sample=50)
         self.assertGreater(summary['unchanged'], 0)  # image queries don't depend on text before
-        self.assertEqual(summary['by_status'], {'changed': summary['candidates'], 'added': 0, 'removed': 0, 'sampled': 0})
+        self.assertEqual(summary['by_status'],
+                         {'changed': summary['candidates'], 'added': 0, 'removed': 0, 'sampled': 0})
         shown = queries.items(out)
         self.assertEqual(len(shown), summary['candidates'])
         for item in shown:
@@ -69,7 +72,8 @@ class Dumps(unittest.TestCase):
         self.assertTrue(all('<<<REQUEST' in p and 'Compared with the baseline' in p for p, _ in checker.prompts))
         flagged = queries.flagged(out)
         self.assertEqual(len(flagged), shown)
-        self.assertEqual(next(iter(flagged.values()))['stub-checker']['problems'], ['junk-context'])  # tags kept to the list
+        # tags kept to the list
+        self.assertEqual(next(iter(flagged.values()))['stub-checker']['problems'], ['junk-context'])
         queries.check(out, checker, 'stub-checker')  # checked already: nothing asked again
         self.assertEqual(len(checker.prompts), shown)
         self.assertIn('Before: holds table cells', (out / 'index.html').read_text())
@@ -81,11 +85,13 @@ class LeverScope(unittest.TestCase):
         cls.dir = tempfile.TemporaryDirectory()
         root = cls.root = Path(cls.dir.name)
         a, b = document(root / 'a.pdf', 10), document(root / 'b.pdf', 12)
-        with jittery_model() as (url, _), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        with jittery_model() as (url, _), contextlib.redirect_stdout(io.StringIO()), \
+                contextlib.redirect_stderr(io.StringIO()):
             for side, settings in (('base', {}), ('variant', {'visual_text_layer': 0})):
                 config = root / f'{side}.json'
                 config.write_text(json.dumps({**settings, 'situate': False}))
-                cli.main([str(a), str(b), '--out', str(root / side / 'run1'), '--base-url', url, '--config', str(config)])
+                cli.main([str(a), str(b), '--out', str(root / side / 'run1'), '--base-url', url,
+                          '--config', str(config)])
 
     @classmethod
     def tearDownClass(cls):

@@ -76,7 +76,8 @@ def mechanical(runs_dir):
         out[key] = {"tasks": int(s["tasks"]), "failed_rate": round(s["failed"] / tasks, 4),
                     "partial_rate": round(s["partial"] / tasks, 4), "claims_per_task": round(s["claims"] / tasks, 3),
                     "distinct_claims": int(s["distinct_claims"]),
-                    "verified_quote_rate": round(s["verified_quotes"] / s["checked_quotes"], 4) if s["checked_quotes"] else None}
+                    "verified_quote_rate": (round(s["verified_quotes"] / s["checked_quotes"], 4)
+                                            if s["checked_quotes"] else None)}
     return out
 
 # --- the report ------------------------------------------------------------------------------
@@ -124,8 +125,10 @@ def report(history_path, target, title="Query improvement"):
                              % (colour, " ".join(f"{px:.1f},{py:.1f}" for px, py, _, _ in pts)))
             for px, py, a, b in pts:
                 if a is not None and b is not None:
-                    parts.append(f'<line x1="{px:.1f}" x2="{px:.1f}" y1="{a:.1f}" y2="{b:.1f}" stroke="{colour}" stroke-width="2"/>')
-                parts.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="4" fill="{colour}"><title>{esc(name)}</title></circle>')
+                    parts.append(f'<line x1="{px:.1f}" x2="{px:.1f}" y1="{a:.1f}" y2="{b:.1f}" '
+                                 f'stroke="{colour}" stroke-width="2"/>')
+                parts.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="4" fill="{colour}">'
+                             f'<title>{esc(name)}</title></circle>')
         for n, key in enumerate(keys):
             parts.append(f'<text x="{width - 12}" y="{top + 12 + 14 * n}" class="legend" text-anchor="end" '
                          f'style="fill:{colours[n % len(colours)]}">{esc(key)}</text>')
@@ -154,27 +157,33 @@ def report(history_path, target, title="Query improvement"):
         ("Variant win rate against the baseline (1 = variant always better; interval 90%)",
          chart(series("win_rate", where=lambda r: r.get("stratum") == "all", per_round=True), "win rate", band=0.5)),
         ("Win rate by kind of input (each point a round's variant; hover for its name)",
-         chart(series("win_rate", by=("variant", "stratum"), where=lambda r: r.get("stratum") != "all", per_round=True),
+         chart(series("win_rate", by=("variant", "stratum"), where=lambda r: r.get("stratum") != "all",
+                      per_round=True),
                "win rate", band=0.5, legend=lambda name: name.rsplit(" ", 1)[-1])),
-        ("Task outcomes (share partial)", chart(series("partial_rate", where=lambda r: r.get("stratum") == "all"), "partial")),
-        ("Claims per task", chart(series("claims_per_task", where=lambda r: r.get("stratum") == "all"), "claims", hi=10)),
-        ("Quotes verified against the text layer", chart(series("verified_quote_rate", where=lambda r: r.get("stratum") == "all"),
-                                                         "verified")),
-        ("Spend per round (US$)", chart(series("spent", by="step"), "$", hi=max([r["value"] for r in records
-                                                                                 if r["metric"] == "spent"] or [1]) * 1.2)),
+        ("Task outcomes (share partial)", chart(series("partial_rate", where=lambda r: r.get("stratum") == "all"),
+                                                "partial")),
+        ("Claims per task", chart(series("claims_per_task", where=lambda r: r.get("stratum") == "all"), "claims",
+                                  hi=10)),
+        ("Quotes verified against the text layer",
+         chart(series("verified_quote_rate", where=lambda r: r.get("stratum") == "all"), "verified")),
+        ("Spend per round (US$)", chart(series("spent", by="step"), "$",
+                                        hi=max([r["value"] for r in records if r["metric"] == "spent"] or [1]) * 1.2)),
     ]
     decisions = [r for r in records if r["metric"] == "decision"]
-    rows = "".join(f"<tr><td>{esc(r.get('round'))}</td><td>{esc(r.get('variant'))}</td><td>{esc(r['value'])}</td></tr>"
+    rows = "".join(f"<tr><td>{esc(r.get('round'))}</td><td>{esc(r.get('variant'))}</td>"
+                   f"<td>{esc(r['value'])}</td></tr>"
                    for r in decisions)
     from semantic_pdf_diff.html_pages import page as html_page
     style = """
 body{margin:0;font:15px/1.45 system-ui,sans-serif}main{max-width:980px;margin:auto;padding:16px}
 section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0}
 h1{font-size:22px}h2{font-size:15px;margin:0 0 8px}svg{width:100%;height:auto}
-.axis,.legend{font-size:11px;fill:var(--muted)}.legend{font-weight:600}.grid{stroke:var(--line)}.band{stroke:var(--muted);stroke-dasharray:4 4}
+.axis,.legend{font-size:11px;fill:var(--muted)}.legend{font-weight:600}.grid{stroke:var(--line)}\
+.band{stroke:var(--muted);stroke-dasharray:4 4}
 table{border-collapse:collapse;width:100%}td{border-bottom:1px solid var(--line);padding:6px}
 """
-    page = f"""<main><h1>{esc(title)}</h1><p>{len(records)} figures over {len(rounds)} round(s), from <code>{esc(Path(history_path).name)}</code>.</p>
+    page = f"""<main><h1>{esc(title)}</h1><p>{len(records)} figures over {len(rounds)} round(s), \
+from <code>{esc(Path(history_path).name)}</code>.</p>
 {"".join(f"<section><h2>{esc(h)}</h2>{svg}</section>" for h, svg in sections)}
 <section><h2>Decisions</h2><table>{rows or "<tr><td>none yet</td></tr>"}</table></section></main>"""
     page = html_page(title, page, style)

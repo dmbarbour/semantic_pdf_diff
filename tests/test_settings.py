@@ -9,7 +9,6 @@ import contextlib
 import io
 import json
 import tempfile
-import time
 import unittest
 from pathlib import Path
 import pymupdf
@@ -30,7 +29,8 @@ TOGGLES = {
     'context_after': 100, 'table_context': 60, 'visual_text_layer': 200, 'stem_context': False, 'grow_tiles': False,
     'tile_locator': True, 'references': True, 'response_format': 'json_object', 'seed': 7,
     'max_token_field': 'max_completion_tokens',
-    'tile_points': 300, 'refinement_depth': 0, 'vision': False, 'figure_tasks': False, 'tiling': 'grid', 'table_rules': None,
+    'tile_points': 300, 'refinement_depth': 0, 'vision': False, 'figure_tasks': False, 'tiling': 'grid',
+    'table_rules': None,
     'sheet_details': True, 'skip_empty': False, 'table_filter': True, 'situate': False, 'verify_visuals': False,
     'top_k': 1, 'min_score': 0.9, 'max_pairs': 1, 'aliases': {'drawing': 'equipment', 'label': 'power'},
     'reconcile': False, 'quote_match': 'exact', 'skip_text_only': True, 'tile_cut': 'xycut', 'band_width': 6.0,
@@ -41,15 +41,16 @@ TOGGLES = {
 # some tiles "incomplete"). A slower document: most of a run's time is its tiles.
 # The budget settings' values bite under the model-neutral defaults (32,768 tokens of context): 8,192, or a
 # per-image or safety reserve that leaves little room, changes what situating sends and what's refused.
-ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refinement_depth', 'skip_text_only', 'tile_cut',
-             'band_width'}
+ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refinement_depth', 'skip_text_only',
+             'tile_cut', 'band_width'}
 # Settings these documents can't exercise, and why (each still needs its class checked elsewhere).
 NOT_EXERCISED = {
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
     'decoration': 'changes which graphics count, so it shows only through bands, skip_text_only or tile_cut; these '
                   'documents hold no decoration (tests/test_tiling.py)',
     'dedupe_repeated': 'needs a table row repeated on three or more pages (tests/test_repeats.py)',
-    'table_review': "the stub reads every table's rows by themselves, so no rules are reviewed (tests/test_xlsxdocs.py)",
+    'table_review': "the stub reads every table's rows by themselves, so no rules are reviewed "
+                    "(tests/test_xlsxdocs.py)",
     'table_structure': "no table in these documents has a suspect line (tests/test_tablestructure.py)",
     'align': 'revisions mode only; these runs compare proposals (tests/test_align.py)',
     'explain_differences': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
@@ -205,7 +206,8 @@ class Documented(unittest.TestCase):
     def test_the_settings_table_is_current(self):
         from semantic_pdf_diff.levers import settings_table
         doc = (Path(__file__).resolve().parent.parent / "docs/configuration.md").read_text(encoding="utf-8")
-        table = doc.split("<!-- settings table: generated, do not edit -->\n", 1)[1].split("<!-- end of settings table -->")[0]
+        table = doc.split("<!-- settings table: generated, do not edit -->\n", 1)[1].split(
+            "<!-- end of settings table -->")[0]
         self.assertEqual(table, settings_table(Settings))
 
 class DefaultsFitTheirBudget(unittest.TestCase):

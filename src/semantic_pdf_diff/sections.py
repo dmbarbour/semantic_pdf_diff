@@ -122,7 +122,8 @@ def pdf_sections(doc, depth, pages_per_section):
                            "heading_path": heading})
         sections = [Section(id=f"sec{i}", origin="outline", **f) for i, f in enumerate(fields, 1)]
     else:
-        sections = [Section(id=f"sec{i}", origin="pages", first_page=first, last_page=min(count, first + pages_per_section - 1))
+        sections = [Section(id=f"sec{i}", origin="pages", first_page=first,
+                            last_page=min(count, first + pages_per_section - 1))
                     for i, first in enumerate(range(1, count + 1, pages_per_section), 1)]
     return sections, SectionIndex(sections, doc)
 

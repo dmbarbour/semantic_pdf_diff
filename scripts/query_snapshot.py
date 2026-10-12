@@ -29,7 +29,8 @@ CONFIGS = {  # name: (settings over the recording's base, whole pipeline or extr
     "defaults": ({}, True),
     "round0": (ROUND0, False),
     "all-levers": ({"references": True, "tile_locator": True, "sheet_details": True, "table_filter": True,
-                    "visual_rules": ["Read a chart's axes before its values."], "extract_rules": ["Keep units."]}, False),
+                    "visual_rules": ["Read a chart's axes before its values."],
+                   "extract_rules": ["Keep units."]}, False),
 }
 
 def take(target, fixture):
@@ -48,7 +49,8 @@ def take(target, fixture):
             for run, slices in runs:
                 out = Path(d) / name / run
                 a, b = (ROOT / "samples/slices" / f"{s}.pdf" for s in slices)
-                settings = pipeline.settings_from(config, base_url=pipeline.NO_MODEL, **({} if whole else {"situate": False}))
+                settings = pipeline.settings_from(config, base_url=pipeline.NO_MODEL,
+                                                  **({} if whole else {"situate": False}))
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                     pipeline.attempt(pipeline.compare_paths, a, b, out, settings,
                                      pipeline.RunOptions(fixture=Path(fixture), fixture_mode="replay"))

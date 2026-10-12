@@ -68,7 +68,8 @@ def unpriced(path, archives=False, **match):
 def spent(path, archives=False, **match):
     """Total reported cost of ledger records matching the given tags (unpriced ones count 0: see unpriced); with
     archives, the rotated months' too (a full accounting rather than a cap's)."""
-    return round(sum(r.get("cost", 0.0) for r in read(path, archives) if all(r.get(k) == v for k, v in match.items())), 6)
+    return round(sum(r.get("cost", 0.0) for r in read(path, archives)
+                     if all(r.get(k) == v for k, v in match.items())), 6)
 
 def figure(path, *, metric, value, **fields):
     """Record one measured figure (a metric's value with its context) in a history file."""

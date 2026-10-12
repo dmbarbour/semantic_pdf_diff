@@ -85,7 +85,8 @@ def grown(page, rect, limit=0.25, lines=None):
             break
     return out & page.rect
 
-LEAST_HALF = 0.25  # a refined half's least share of its tile (the owner, 2026-10-09: "a tuning lever ... start with 25%")
+# a refined half's least share of its tile (the owner, 2026-10-09: "a tuning lever ... start with 25%")
+LEAST_HALF = 0.25
 REFINE_OVERLAP = 12.0  # points a cut's halves share, within its gap where it has one
 
 def _gaps(boxes, axis, lo, hi):
@@ -135,7 +136,8 @@ def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFI
         for axis in (0, 1):
             lo, hi = extent(texts, axis)
             first, last = lo + least * (hi - lo), hi - least * (hi - lo)
-            spans = [(a + 1, z - 1) for a, z in ((b.x0, b.x1) if axis == 0 else (b.y0, b.y1) for b in texts) if z - a > 2]
+            spans = [(a + 1, z - 1) for a, z in ((b.x0, b.x1) if axis == 0 else (b.y0, b.y1) for b in texts)
+                     if z - a > 2]
             starts, ends = sorted(a for a, _ in spans), sorted(z for _, z in spans)
             for cut in {(lo + hi) / 2} | {v for span in spans for v in span if first <= v <= last}:
                 crossed = bisect.bisect_left(starts, cut) - bisect.bisect_right(ends, cut)  # spans strictly around it
@@ -153,9 +155,11 @@ def _middle(rect, overlap):
     """Today's cut: the middle of the longer side."""
     if rect.width > rect.height:
         mid = (rect.x0 + rect.x1) / 2
-        return [pymupdf.Rect(rect.x0, rect.y0, mid + overlap, rect.y1), pymupdf.Rect(mid - overlap, rect.y0, rect.x1, rect.y1)]
+        return [pymupdf.Rect(rect.x0, rect.y0, mid + overlap, rect.y1),
+                pymupdf.Rect(mid - overlap, rect.y0, rect.x1, rect.y1)]
     mid = (rect.y0 + rect.y1) / 2
-    return [pymupdf.Rect(rect.x0, rect.y0, rect.x1, mid + overlap), pymupdf.Rect(rect.x0, mid - overlap, rect.x1, rect.y1)]
+    return [pymupdf.Rect(rect.x0, rect.y0, rect.x1, mid + overlap),
+            pymupdf.Rect(rect.x0, mid - overlap, rect.x1, rect.y1)]
 
 # --- candidate tilings (tile-selection-2026-10-10, milestone 3): each a lever, off by default (levers.py)
 
@@ -421,7 +425,8 @@ def sheet_details(page, lines=None):
     its right (research round 1: this isolated all five details on dc S-522)."""
     lines = _lines(page) if lines is None else lines
     spans = [(s["size"], s["text"].strip(), shown(page, s["bbox"]))
-             for b in page.get_text("dict")["blocks"] for l in b.get("lines", ()) for s in l["spans"] if s["text"].strip()]
+             for b in page.get_text("dict")["blocks"] for l in b.get("lines", ()) for s in l["spans"]
+             if s["text"].strip()]
     if not spans:
         return []
     median = sorted(size for size, _, _ in spans)[len(spans) // 2]
@@ -436,7 +441,8 @@ def sheet_details(page, lines=None):
     area = pymupdf.Rect(x0, y0, right, y1)
     size = max(s for _, _, s in numbers)
     column = 6 * size  # titles closer than this in x share a column
-    boxes = [box for box, _ in lines] + [g for g in _graphics(page) if g.width < 0.5 * area.width and g.height < 0.5 * area.height]
+    boxes = [box for box, _ in lines] + [g for g in _graphics(page)
+                                         if g.width < 0.5 * area.width and g.height < 0.5 * area.height]
     boxes = [b for b in boxes if b.intersects(area)]
     view = {}
     for name, t, _ in numbers:

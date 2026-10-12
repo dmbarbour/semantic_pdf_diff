@@ -186,7 +186,8 @@ class Store:
         regions = sorted(regions)
         counts = {
             "tasks": self.db.execute(f"SELECT COUNT(*) FROM task WHERE region IN ({marks})", regions).fetchone()[0],
-            "evidence": self.db.execute(f"SELECT COUNT(*) FROM evidence WHERE region IN ({marks})", regions).fetchone()[0],
+            "evidence": self.db.execute(f"SELECT COUNT(*) FROM evidence WHERE region IN ({marks})",
+                                        regions).fetchone()[0],
             **({} if keep_comparisons else
                {"comparisons": self.db.execute("SELECT COUNT(*) FROM comparison").fetchone()[0]}),
             "regions": regions,
@@ -200,7 +201,8 @@ class Store:
                 self.db.execute("UPDATE content SET extracted=0")
                 self.db.execute("DELETE FROM situation")  # situating reads the evidence
                 if rebind is not None:
-                    self.db.execute("UPDATE interpreter SET description=? WHERE role=?", (json.dumps(rebind), rebind["role"]))
+                    self.db.execute("UPDATE interpreter SET description=? WHERE role=?",
+                                    (json.dumps(rebind), rebind["role"]))
         return counts
 
     def clear_situating(self, dry_run=False, rebind=None):
@@ -218,7 +220,8 @@ class Store:
                     self.db.execute("UPDATE section SET data=? WHERE content=? AND id=?",
                                     (plain.model_dump_json(), content, sid))
                 if rebind is not None:
-                    self.db.execute("UPDATE interpreter SET description=? WHERE role=?", (json.dumps(rebind), rebind["role"]))
+                    self.db.execute("UPDATE interpreter SET description=? WHERE role=?",
+                                    (json.dumps(rebind), rebind["role"]))
         return counts
 
     # --- sources, files and content -------------------------------------------
@@ -312,7 +315,8 @@ class Store:
         with self.db:
             self.db.execute("DELETE FROM section WHERE content=?", (content,))
             for section in sections:
-                self.db.execute("INSERT INTO section VALUES (?, ?, ?)", (content, section.id, section.model_dump_json()))
+                self.db.execute("INSERT INTO section VALUES (?, ?, ?)",
+                                (content, section.id, section.model_dump_json()))
 
     def sections(self, content):
         return [Section.model_validate_json(d) for (d,) in
@@ -357,7 +361,8 @@ class Store:
                             (row["content"], row["task"], region, json.dumps(row)))
             for e in evidence:
                 self.db.execute("INSERT OR REPLACE INTO evidence VALUES (?, ?, ?, ?, ?)",
-                                (e.id, e.content, row["task"], region, e.model_copy(update={"occurrences": []}).model_dump_json()))
+                                (e.id, e.content, row["task"], region,
+                                 e.model_copy(update={"occurrences": []}).model_dump_json()))
 
     def evidence(self, content, reconcile=None):
         """Claims for a piece of content, with occurrences merged (order-independent), and readings
@@ -397,7 +402,8 @@ class Store:
         return dropped
 
     def coverage(self, content):
-        return [json.loads(r) for (r,) in self.db.execute("SELECT row FROM task WHERE content=? ORDER BY rowid", (content,))]
+        return [json.loads(r)
+                for (r,) in self.db.execute("SELECT row FROM task WHERE content=? ORDER BY rowid", (content,))]
 
     # --- response cache (by query and model) and the query log -----------------
     def cached(self, key):
@@ -454,7 +460,8 @@ class Store:
         orphaned_sources also removes sources whose linked manifest file no longer exists.
         """
         from pathlib import Path as _Path
-        gone = [s.name for s in self.sources() if s.manifest and not _Path(s.manifest).exists()] if orphaned_sources else []
+        gone = ([s.name for s in self.sources() if s.manifest and not _Path(s.manifest).exists()]
+                if orphaned_sources else [])
         if gone and not dry_run:
             for name in gone:
                 self.remove_source(name)
@@ -468,7 +475,8 @@ class Store:
         summary = {"sources": gone, "content": len(orphans), "crops": len(crops), "dry_run": dry_run}
         if orphans:
             marks = ",".join("?" * len(orphans))
-            summary["evidence"] = self.db.execute(f"SELECT COUNT(*) FROM evidence WHERE content IN ({marks})", orphans).fetchone()[0]
+            summary["evidence"] = self.db.execute(
+                f"SELECT COUNT(*) FROM evidence WHERE content IN ({marks})", orphans).fetchone()[0]
             summary["cached_responses"] = self.db.execute(
                 f"SELECT COUNT(*) FROM response_cache WHERE content IN ({marks})", orphans).fetchone()[0]
             if not dry_run:

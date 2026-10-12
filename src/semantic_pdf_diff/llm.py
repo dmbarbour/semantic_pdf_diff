@@ -154,7 +154,8 @@ def describe(prompt, image_sizes, params, key=None):
 @dataclass
 class Request:
     body: Callable[[], bytes]  # the body as sent, built on first use (raw)
-    key: Recipe | None         # the caller's recipe: how the query was built (role, region, content, task, ...); labels only
+    # the caller's recipe: how the query was built (role, region, content, task, ...); labels only
+    key: Recipe | None
     schema: type
     estimate: int  # tokens, input plus output reserve, for rate limiting
     prompt: str = ""
@@ -233,7 +234,8 @@ class Transport:
             self._admit()
             wait = min(2 ** attempt, 8)
             http = urllib.request.Request(self.s.base_url.rstrip("/") + "/chat/completions", data=request.raw,
-                headers={"Content-Type": "application/json", **({"Authorization": "Bearer " + self.api_key} if self.api_key else {})})
+                headers={"Content-Type": "application/json",
+                         **({"Authorization": "Bearer " + self.api_key} if self.api_key else {})})
             entry = self.limiter.acquire(request.estimate)
             self.gate.acquire()
             started, throttled, generated = time.monotonic(), False, 0
@@ -403,7 +405,8 @@ class Client:
     limiter = property(lambda self: self.transport.limiter)
     gate = property(lambda self: self.transport.gate)
     api_key = property(lambda self: self.transport.api_key)
-    ledger = property(lambda self: self.transport.ledger, lambda self, ledger: setattr(self.transport, "ledger", ledger))
+    ledger = property(lambda self: self.transport.ledger,
+                      lambda self, ledger: setattr(self.transport, "ledger", ledger))
 
     @property
     def fixture(self):

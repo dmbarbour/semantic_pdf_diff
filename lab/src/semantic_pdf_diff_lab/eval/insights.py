@@ -106,7 +106,8 @@ h3 { font-size:1rem; } .muted { color:var(--muted); } table { border-collapse:co
 td, th { border-bottom:1px solid var(--line); padding:3px 10px 3px 0; text-align:left; vertical-align:top; }
 details { background:var(--card); border:1px solid var(--line); border-radius:6px; margin:6px 0; padding:6px 10px; }
 summary { cursor:pointer; } .win { color:var(--good); } .loss { color:var(--bad); } .even { color:var(--mid); }
-.tag { display:inline-block; border:1px solid var(--line); border-radius:10px; padding:0 7px; margin:1px; font-size:.85em; }
+.tag { display:inline-block; border:1px solid var(--line); border-radius:10px; padding:0 7px; \
+margin:1px; font-size:.85em; }
 .bar { display:inline-block; height:9px; vertical-align:middle; } .claims { font-size:.9em; }
 img { max-width:100%; border:1px solid var(--line); } .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 @media (max-width:700px) { .grid { grid-template-columns:1fr; } }
@@ -116,15 +117,18 @@ def _score_class(s):
     return "win" if s > 0.5 else "loss" if s < 0.5 else "even"
 
 def _claims(claims):
-    return "".join(f"<li>{esc(c['entity'])} | {esc(c['attribute'])} | <b>{esc(str(c['value']))} {esc(c.get('unit', ''))}</b>"
-                   + (f" | {esc(c['conditions'])}" if c.get("conditions") else "") + "</li>" for c in claims) or "<li>none</li>"
+    return "".join(f"<li>{esc(c['entity'])} | {esc(c['attribute'])} | "
+                   f"<b>{esc(str(c['value']))} {esc(c.get('unit', ''))}</b>"
+                   + (f" | {esc(c['conditions'])}" if c.get("conditions") else "") + "</li>"
+                   for c in claims) or "<li>none</li>"
 
 def page(round_folder):
     """insights.html for a round: per variant, its decision, where it won and lost, why (tags,
     notes, the model's issues), what changed, and the judges' remarks."""
     round_folder = Path(round_folder)
     spec = json.loads((round_folder / "round.json").read_text())
-    out = [f"<h1>Round {esc(spec['name'])}: why variants won or lost</h1><p class='muted'>{esc(spec.get('note', ''))}</p>"]
+    out = [f"<h1>Round {esc(spec['name'])}: why variants won or lost</h1>"
+           f"<p class='muted'>{esc(spec.get('note', ''))}</p>"]
     for variant in spec["variants"]:
         batch = round_folder / f"pairs-{variant}"
         if not (batch / "analysis.json").exists():
@@ -144,15 +148,19 @@ def page(round_folder):
             for k, v in s["by_family"].items()) + "</table></div>")
         tags = sorted(set(s["problems"]["baseline"]) | set(s["problems"]["variant"]))
         if tags:
-            top = max(max(s["problems"]["baseline"].values(), default=1), max(s["problems"]["variant"].values(), default=1))
-            out.append("<div><h3>Problems judges tagged</h3><table><tr><th>tag</th><th>baseline</th><th>variant</th></tr>"
+            top = max(max(s["problems"]["baseline"].values(), default=1),
+                      max(s["problems"]["variant"].values(), default=1))
+            out.append("<div><h3>Problems judges tagged</h3>"
+                       "<table><tr><th>tag</th><th>baseline</th><th>variant</th></tr>"
                        + "".join(f"<tr><td>{esc(t)}</td>"
-                                 + "".join(f"<td><span class='bar' style='width:{60 * s['problems'][side].get(t, 0) / top:.0f}px;"
+                                 + "".join(f"<td><span class='bar' "
+                                           f"style='width:{60 * s['problems'][side].get(t, 0) / top:.0f}px;"
                                            f"background:var(--{'bad' if side == 'variant' else 'accent'})'></span> "
                                            f"{s['problems'][side].get(t, 0)}</td>" for side in ("baseline", "variant"))
                                  + "</tr>" for t in tags) + "</table></div></div>")
         else:
-            out.append("<div><h3>Problems judges tagged</h3><p class='muted'>No tags: judged with rubric v1.</p></div></div>")
+            out.append("<div><h3>Problems judges tagged</h3>"
+                       "<p class='muted'>No tags: judged with rubric v1.</p></div></div>")
         issues = {side: Counter() for side in ("baseline", "variant")}
         for u in a["units"]:
             for side in issues:
@@ -160,28 +168,32 @@ def page(round_folder):
         for side in ("variant", "baseline"):
             if issues[side]:
                 out.append(f"<h3>The model's issue notes only on the {side} side</h3><ul class='claims'>" + "".join(
-                    f"<li>{esc(k)} <span class='muted'>×{n}</span></li>" for k, n in issues[side].most_common(12)) + "</ul>")
+                    f"<li>{esc(k)} <span class='muted'>×{n}</span></li>"
+                    for k, n in issues[side].most_common(12)) + "</ul>")
         remarks = [(u["run"], u["page"], r) for u in a["units"] for r in u["remarks"]]
         if remarks:
             out.append("<h3>Judges' remarks for us</h3><ul class='claims'>" + "".join(
-                f"<li><span class='muted'>{esc(run)} p{p}, {esc(r['judge'].split('/')[-1])}:</span> {esc(r['remark'])}</li>"
+                f"<li><span class='muted'>{esc(run)} p{p}, {esc(r['judge'].split('/')[-1])}:</span> "
+                f"{esc(r['remark'])}</li>"
                 for run, p, r in remarks) + "</ul>")
         out.append("<h3>Units, losses first</h3>")
         for u in sorted(a["units"], key=lambda u: (u["score"], u["id"])):
             flags = ("<span class='tag'>judges disagree</span>" if u["judges_disagree"] else "") + \
-                    ("<span class='tag'>order flip: " + esc(", ".join(j.split('/')[-1] for j in u["order_flipped"])) + "</span>"
-                     if u["order_flipped"] else "")
+                    ("<span class='tag'>order flip: " + esc(", ".join(j.split('/')[-1] for j in u["order_flipped"]))
+                     + "</span>" if u["order_flipped"] else "")
             tags = "".join(f"<span class='tag'>{side[0]}: {esc(t)} ×{n}</span>" for side in ("baseline", "variant")
                            for t, n in sorted(u["problems"][side].items()))
             out.append(
-                f"<details><summary><b class='{_score_class(u['score'])}'>{u['score']:.2f}</b> {esc(u['run'])} p{u['page']}"
+                f"<details><summary><b class='{_score_class(u['score'])}'>{u['score']:.2f}</b> "
+                f"{esc(u['run'])} p{u['page']}"
                 f" {esc(u['family'])} {flags}</summary><p>{tags}</p>"
                 + "".join(f"<p><span class='muted'>{esc(n['judge'].split('/')[-1])}, {esc(n['order'])},"
                           f" <span class='{_score_class(n['score'])}'>{n['score']}</span>:</span> {esc(n['note'])}</p>"
                           for n in u["notes"])
                 + "".join(f"<p><span class='muted'>model issue ({side} only):</span> {esc(k)}</p>"
                           for side in ("baseline", "variant") for k in u["issues"][side])
-                + f"<div class='grid'><div><b>Only in baseline</b> <span class='muted'>(of the claims shown to judges)</span>"
+                + f"<div class='grid'><div><b>Only in baseline</b> "
+                  f"<span class='muted'>(of the claims shown to judges)</span>"
                   f"<ul class='claims'>{_claims(u['only_baseline'])}</ul></div><div><b>Only in variant</b>"
                   f"<ul class='claims'>{_claims(u['only_variant'])}</ul></div></div>"
                 + (f"<p><a href='pairs-{esc(variant)}/{esc(u['image'])}'>page image</a></p>" if u["image"] else

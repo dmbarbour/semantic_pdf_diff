@@ -94,7 +94,8 @@ class Fixture:
         if not self.path.exists() and not create:
             raise FixtureError(f"{self.path}: no such fixture")
         new = not self.path.exists()
-        self.db = sqlite3.connect(self.path.resolve().as_uri() + "?mode=ro", uri=True) if readonly else sqlite3.connect(self.path)
+        self.db = (sqlite3.connect(self.path.resolve().as_uri() + "?mode=ro", uri=True) if readonly
+                   else sqlite3.connect(self.path))
         if new:
             with self.db:
                 self.db.executescript(SCHEMA)
@@ -234,7 +235,8 @@ class Fixture:
         """Answers per responder, role and outcome, with token usage, and the documents recorded
         from (from the side tables: a query's role is its first recipe's)."""
         rows = self.db.execute("""
-            SELECT r.responder, COALESCE((SELECT role FROM recipe WHERE recipe.query = r.query ORDER BY recipe LIMIT 1), ''),
+            SELECT r.responder, COALESCE((SELECT role FROM recipe WHERE recipe.query = r.query ORDER BY recipe \
+LIMIT 1), ''),
                    r.outcome, COUNT(*), SUM(json_extract(r.usage, '$.prompt_tokens')),
                    SUM(json_extract(r.usage, '$.completion_tokens'))
             FROM response r GROUP BY 1, 2, 3 ORDER BY 1, 2, 3""").fetchall()
@@ -276,7 +278,8 @@ class Replayer:
         row = self.fixture.answer(query, self.responder, self.sample(key))
         if row is not None and key is not None:
             self.fixture.note_recipe(query, key)
-        if row is not None and row[0] != "ok" and (self.mode == "replay" or self.mode == "record-new" and row[0] == "invalid"):
+        if row is not None and row[0] != "ok" and (self.mode == "replay"
+                                                    or self.mode == "record-new" and row[0] == "invalid"):
             self.replayed += 1
             return "failure", row[2]
         if row is not None and row[0] == "ok":  # recorded failures in record modes fall through: asked again
@@ -340,7 +343,8 @@ def packed(fixture):
     source = sqlite3.connect(fixture)
     memory = sqlite3.connect(":memory:")
     memory.executescript(SCHEMA)
-    columns = {"response": "query, responder, sample, outcome, answer, error, usage, recorded, NULL"}  # 'used' isn't packed
+    # 'used' isn't packed
+    columns = {"response": "query, responder, sample, outcome, answer, error, usage, recorded, NULL"}
     for table, order in (("meta", "key"), ("response", "query, responder, sample"), ("description", "query"),
                          ("recipe", "query, recipe")):
         rows = source.execute(f"SELECT {columns.get(table, '*')} FROM {table} ORDER BY {order}").fetchall()

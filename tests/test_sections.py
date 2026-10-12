@@ -58,7 +58,8 @@ class SectionDetection(unittest.TestCase):
 
     def test_pages_before_the_first_entry(self):
         sections, _ = self.sections(4, [[1, 'Body', 3]])
-        self.assertEqual([(x.first_page, x.last_page, x.heading_path) for x in sections], [(1, 2, []), (3, 4, ['Body'])])
+        self.assertEqual([(x.first_page, x.last_page, x.heading_path) for x in sections],
+                         [(1, 2, []), (3, 4, ['Body'])])
 
     def test_page_range_fallback(self):
         sections, owner = self.sections(45, per=20)
@@ -72,7 +73,8 @@ class SectionContext(unittest.TestCase):
             path = make_pdf(Path(d) / 't.pdf', ['Intro text', 'Overview', 'Pump rated power 10 kW', 'More', 'End'], TOC)
             client = Recorder(vision=False, **ROUND0)
             seen = []
-            evidence, _ = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client, on_sections=seen.extend)
+            evidence, _ = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client,
+                                      on_sections=seen.extend)
             prompt, key = next((p, k) for p, k in client.asked if '10 kW' in p)
             self.assertIn('\nSection: Design > Fans\n', prompt)
             self.assertEqual(key[-1], 'Design > Fans')
@@ -81,11 +83,12 @@ class SectionContext(unittest.TestCase):
             self.assertTrue(evidence[0].quote_verified)
 
     def test_titles_on_the_page_divide_it(self):
-        from semantic_pdf_diff.sections import SectionIndex, section_text
+        from semantic_pdf_diff.sections import section_text
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()
             first = doc.new_page(width=400, height=400)
-            for y, text in ((40, '1 Pumps'), (80, 'Pump rated power 10 kW'), (200, '2 Fans'), (240, 'Fan rated power 3 kW')):
+            for y, text in ((40, '1 Pumps'), (80, 'Pump rated power 10 kW'), (200, '2 Fans'),
+                            (240, 'Fan rated power 3 kW')):
                 first.insert_text((40, y), text)
             doc.new_page(width=400, height=400).insert_text((40, 40), 'Fan motor 5 kW')
             doc.set_toc([[1, '1 Pumps', 1], [1, '2 Fans', 1]])
@@ -97,7 +100,8 @@ class SectionContext(unittest.TestCase):
                 self.assertEqual((pumps.first_page, pumps.last_page, fans.first_page, fans.last_page), (1, 1, 1, 2))
                 self.assertLess(pumps.first_y, 40); self.assertGreater(fans.first_y, 150)
                 self.assertEqual(pumps.last_y, fans.first_y)
-                self.assertIs(index.at(1, 230), fans); self.assertIs(index.at(1, 70), pumps); self.assertIs(index[2], fans)
+                self.assertIs(index.at(1, 230), fans); self.assertIs(index.at(1, 70), pumps)
+                self.assertIs(index[2], fans)
                 self.assertIn('10 kW', section_text(doc, pumps)); self.assertNotIn('3 kW', section_text(doc, pumps))
                 self.assertIn('3 kW', section_text(doc, fans)); self.assertIn('5 kW', section_text(doc, fans))
             client = Recorder(vision=False)
@@ -112,14 +116,15 @@ class SectionContext(unittest.TestCase):
             def ask(self, prompt, schema, images=(), key=None):
                 if images:  # 'reads' both values off the image
                     self.asked.append((prompt, key))
-                    return Extraction(claims=[{'entity': e, 'attribute': 'power', 'value': v, 'unit': 'kW', 'kind': 'diagram',
-                                               'quote': f'{e} rated power {v} kW', 'confidence': .8}
+                    return Extraction(claims=[{'entity': e, 'attribute': 'power', 'value': v, 'unit': 'kW',
+                                               'kind': 'diagram', 'quote': f'{e} rated power {v} kW', 'confidence': .8}
                                               for e, v in (('Pump', '10'), ('Fan', '3'))], complete=True)
                 return super().ask(prompt, schema, images, key)
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()
             page = doc.new_page(width=400, height=400)
-            for y, text in ((40, '1 Pumps'), (80, 'Pump rated power 10 kW'), (200, '2 Fans'), (240, 'Fan rated power 3 kW')):
+            for y, text in ((40, '1 Pumps'), (80, 'Pump rated power 10 kW'), (200, '2 Fans'),
+                            (240, 'Fan rated power 3 kW')):
                 page.insert_text((40, y), text)
             doc.set_toc([[1, '1 Pumps', 1], [1, '2 Fans', 1]])
             path = Path(d) / 't.pdf'
@@ -177,19 +182,21 @@ class SectionContext(unittest.TestCase):
         r0 = lambda **levers: Settings(vision=False, **{**ROUND0, **levers})  # levers relative to round 0
         # A store binds levers: it mustn't mix evidence from different variants. (Answers are shared
         # wherever a variant's queries are the same: they're found by what reaches the model.)
-        self.assertNotEqual(extraction_interpreter(r0()).settings, extraction_interpreter(r0(table_filter=True)).settings)
+        self.assertNotEqual(extraction_interpreter(r0()).settings,
+                            extraction_interpreter(r0(table_filter=True)).settings)
         with tempfile.TemporaryDirectory() as d:
             doc = pymupdf.open()
             page = doc.new_page(width=400, height=400)
             pad = ' Further description follows in the operating manual for the plant room equipment.' * 2
-            for y, text in ((40, 'The pumps described here serve the chilled water loop.' + pad), (160, 'Pump rated power 10 kW.' + pad),
-                            (280, 'Both pumps are duty and standby.' + pad)):
+            for y, text in ((40, 'The pumps described here serve the chilled water loop.' + pad),
+                            (160, 'Pump rated power 10 kW.' + pad), (280, 'Both pumps are duty and standby.' + pad)):
                 page.insert_textbox(pymupdf.Rect(40, y - 12, 380, y + 90), text, fontsize=9)
             path = Path(d) / 't.pdf'
             doc.save(path); doc.close()
             prompts = {}
-            for name, settings in (('base', {'text_bytes': 260}), ('lever', {'context_before': 300, 'context_after': 300,
-                                   'text_bytes': 260, 'extract_rules': ['Say which loop a pump serves.']})):
+            for name, settings in (('base', {'text_bytes': 260}),
+                                   ('lever', {'context_before': 300, 'context_after': 300, 'text_bytes': 260,
+                                              'extract_rules': ['Say which loop a pump serves.']})):
                 client = Recorder(vision=False, **{**ROUND0, **settings})
                 extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
                 prompts[name] = next((p, k) for p, k in client.asked if '10 kW' in source_data(p))
@@ -271,7 +278,8 @@ class SectionContext(unittest.TestCase):
             first.insert_text((40, 40), 'The rotor uses a proportional-integral (PI) pitch controller.', fontsize=9)
             second = doc.new_page(width=400, height=400)
             for i in range(16):
-                second.draw_rect(pymupdf.Rect(60 + (i % 4) * 45, 60 + (i // 4) * 35, 90 + (i % 4) * 45, 80 + (i // 4) * 35))
+                second.draw_rect(pymupdf.Rect(60 + (i % 4) * 45, 60 + (i // 4) * 35,
+                                              90 + (i % 4) * 45, 80 + (i // 4) * 35))
             second.insert_text((60, 230), 'Figure 3: Pitch response to a wind step')
             third = doc.new_page(width=400, height=400)
             third.insert_text((40, 60), 'The PI gains give 12 kW of margin (Figure 3, Table 9).', fontsize=9)
@@ -283,8 +291,8 @@ class SectionContext(unittest.TestCase):
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
             prompt = next(p for p, _ in client.asked if '12 kW' in source_data(p))
             self.assertIn('Defined elsewhere: PI = proportional-integral', prompt)
-            self.assertIn('Cited: Figure 3: Pitch response to a wind step (page 2); Table 9: not found in this document',
-                          prompt)
+            self.assertIn('Cited: Figure 3: Pitch response to a wind step (page 2); '
+                          'Table 9: not found in this document', prompt)
             plain = Recorder(vision=False)
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), plain)
             self.assertFalse(any('Defined elsewhere' in p or 'Cited:' in p for p, _ in plain.asked))
@@ -331,8 +339,10 @@ class SectionContext(unittest.TestCase):
         from semantic_pdf_diff.quotes import excerpted
         text = ('The structural-damping ratio was set to 1% critical in all modes of the isolated tower. '
                 'This resulted in an equivalent driveshaft linear-\nspring constant of 867,637,000 N\u2022m/rad.\n'
-                'Wind speed Rotor speed Pitch\n22.0 12.1 19.94 -105.90E+6\ngelcoat glass_uniax E1 [Pa] 3.440E+09 4.370E+10')
-        for quote in ['structural-damping ratio ... 1% critical', 'The Structural\u2013Damping Ratio was set to 1% critical',
+                'Wind speed Rotor speed Pitch\n22.0 12.1 19.94 -105.90E+6\n'
+                'gelcoat glass_uniax E1 [Pa] 3.440E+09 4.370E+10')
+        for quote in ['structural-damping ratio ... 1% critical',
+                      'The Structural\u2013Damping Ratio was set to 1% critical',
                       'linear-spring constant of 867,637,000 N·m/rad', '22.0 | 12.1 | 19.94 | -105.90E+6',
                       'gelcoat E1 [Pa] 3.440E+09']:
             with self.subTest(quote=quote):
@@ -390,8 +400,9 @@ class SectionContext(unittest.TestCase):
                 prompts[rotated] = sorted(p for p, _ in client.asked)
                 with pymupdf.open(path) as doc:
                     page = doc[0]
+                    # the figure's box, unrotated
                     figure = pymupdf.Rect(pymupdf.Point(55, 265) * page.derotation_matrix,
-                                          pymupdf.Point(225, 353) * page.derotation_matrix)  # the figure's box, unrotated
+                                          pymupdf.Point(225, 353) * page.derotation_matrix)
                     around[rotated] = surroundings(page, tuple(figure))
             self.assertTrue(any('Above the table: ...' in p and 'Pump schedule for the chilled water loop:' in p
                                 for p in prompts[False]))
@@ -527,7 +538,8 @@ class SectionContext(unittest.TestCase):
                        ((20, 10, 280, 80), [['A', 'B', 'C'], ['1', '2', '3']]),  # different width
                        ((20, 10, 280, 80), [['Pump', 'Flow'], ['P-2', '12']])]:   # same form, own header
             with self.subTest(second=second):
-                prompts = self.table_prompts({0: [((20, 200, 280, 290), [['Tag', 'Flow'], ['P-1', '10']])], 1: [second]})
+                prompts = self.table_prompts({0: [((20, 200, 280, 290), [['Tag', 'Flow'], ['P-1', '10']])],
+                                              1: [second]})
                 page2 = [text for task, text in prompts if task.startswith('table:p2')]
                 self.assertTrue(all(not text.startswith('Header: ["Tag", "Flow"]') for text in page2))
 

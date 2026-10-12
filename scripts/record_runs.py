@@ -26,11 +26,15 @@ def main(argv=None):
     parser.add_argument("--variant", type=Path, help="settings JSON of a query variant, merged over the base settings")
     parser.add_argument("--responder", help="default: the configured model")
     parser.add_argument("--fresh-regions", default="",
-                        help="A/A control: extraction for these regions (comma-separated) answered afresh, recorded apart")
-    parser.add_argument("--out", type=Path, default=ROOT / "benchmarks/runs/scratch", help="folder for the runs' stores")
-    parser.add_argument("--replay", action="store_true", help="replay only (no model calls); fails on anything unrecorded")
+                        help="A/A control: extraction for these regions (comma-separated) answered afresh, "
+                             "recorded apart")
+    parser.add_argument("--out", type=Path, default=ROOT / "benchmarks/runs/scratch",
+                        help="folder for the runs' stores")
+    parser.add_argument("--replay", action="store_true",
+                        help="replay only (no model calls); fails on anything unrecorded")
     parser.add_argument("--retry-failures", action="store_true",
-                        help="ask recorded failures again (default: replay them, so variants differ only where they change requests)")
+                        help="ask recorded failures again "
+                             "(default: replay them, so variants differ only where they change requests)")
     parser.add_argument("--ledger", type=Path)
     parser.add_argument("--tag", action="append", default=[], metavar="KEY=VALUE")
     parser.add_argument("--max-cost", type=float)
@@ -44,7 +48,8 @@ def main(argv=None):
     setup_logging(quiet=True)
 
     manifest = json.loads(MANIFEST.read_text())
-    runs = [r for r in manifest["runs"] if (args.set == "all" or r["set"] == args.set) and (not args.run or r["name"] in args.run)]
+    runs = [r for r in manifest["runs"]
+            if (args.set == "all" or r["set"] == args.set) and (not args.run or r["name"] in args.run)]
     settings = dict(BASE_SETTINGS)
     if args.variant:
         settings.update(json.loads(args.variant.read_text()))
@@ -84,8 +89,8 @@ def main(argv=None):
             fixture_mode="replay" if args.replay else "replay-or-record" if args.retry_failures else "record-new",
             fresh_regions=tuple(r for r in (args.fresh_regions or "").split(",") if r),
             ledger=args.ledger, ledger_tags={**tags, "run": run["name"]} if args.ledger else {})
-        code = pipeline.attempt(pipeline.compare_paths, a, b, args.out / run["name"], pipeline.settings_from(config, **overrides),
-                                options)
+        code = pipeline.attempt(pipeline.compare_paths, a, b, args.out / run["name"],
+                                pipeline.settings_from(config, **overrides), options)
         print(f"{run['name']}: exit {code}", flush=True)
         if code == 3:  # out of budget: stop; rerunning resumes
             return 3

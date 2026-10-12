@@ -82,10 +82,12 @@ class Analysis(unittest.TestCase):
 
     def test_a_summary_is_weighed_by_size_without_a_cut_off(self):
         said = {n: tr.opinion(polar(n), tr.analyse(polar(n))) for n in (10, 30, 331)}
-        self.assertEqual(said[10], "claims from rows by rules: about 20 claims, 2 a row (a series, mostly numbers, column"
+        self.assertEqual(said[10], "claims from rows by rules: about 20 claims, 2 a row "
+                                   "(a series, mostly numbers, column"
                                    " A rising in steps of 1; with 10 rows a summary would save little)")
         self.assertEqual(said[30], "a series (mostly numbers, column A rising in steps of 1): a summary (series) or "
-                                   "claims from rows by rules (about 60): a summary if the rows are samples rather than "
+                                   "claims from rows by rules (about 60): "
+                                   "a summary if the rows are samples rather than "
                                    "facts each worth checking")
         self.assertIn("may serve better than 662 claims", said[331])
 
@@ -141,7 +143,8 @@ class Applying(unittest.TestCase):
         g = tg.grid(["A", "B", "C"], ["Parameter", "Measured (L/s)", "±"], [["Flow", "118", "3"], ["Head", "24.1", ""]],
                     [5, 6], [5, 6])
         rules = tr.Rules.model_validate({"reading": "rules", "claims": [
-            {"entity": "pump", "attribute": "{A}", "value": "{B}", "unit": "{B.unit}", "uncertainty": "± {C} {B.unit}"}]})
+            {"entity": "pump", "attribute": "{A}", "value": "{B}", "unit": "{B.unit}",
+             "uncertainty": "± {C} {B.unit}"}]})
         flow, = tr.row_claims(rules, g, 0)
         self.assertEqual((flow[0]["value"], flow[0]["uncertainty"]), ("118", "± 3 L/s"))
         self.assertEqual(flow[1], [0, 1, 2])  # the cells it came from, the tolerance's too
@@ -164,16 +167,18 @@ class Applying(unittest.TestCase):
             "columns": "B:C", "entity": "{A}", "attribute": "{*.name}", "value": "{*}", "unit": "{*.unit}"}],
             "examples": [{"row": "5", "claims": [{"value": "129", "unit": "ft"}, {"value": "2.58", "unit": "g"}]}]})
         self.assertEqual(tr.problems(unitless, g), ['row 5: the templates give 129 ft; 2.58, not 2.58 g (column C\'s '
-                                                    'header "Vertical g" has no unit in brackets for .unit to take: give '
+                                                    'header "Vertical g" has no unit in brackets '
+                                                    'for .unit to take: give '
                                                     'such columns a template of their own, the unit written out)'])
 
     def test_no_stray_words_and_no_unitless_twin(self):
         g = tg.grid(["A", "B"], ["Parameter", "Turbine"], [["Hub diameter [m]", "7.94"], ["Turbine class", "IB"]],
                     [2, 3], [5, 6])
         rules = tr.Rules.model_validate({"reading": "rules", "claims": [
-            {"columns": "B", "entity": "{B.header}", "attribute": "{A.cell_name}", "value": "{*}", "unit": "{A.cell_unit}",
-             "conditions": "in {title}"},
-            {"columns": "B", "entity": "{B.header}", "attribute": "{A.cell_name}", "value": "{*}", "conditions": "in {title}"}]})
+            {"columns": "B", "entity": "{B.header}", "attribute": "{A.cell_name}", "value": "{*}",
+             "unit": "{A.cell_unit}", "conditions": "in {title}"},
+            {"columns": "B", "entity": "{B.header}", "attribute": "{A.cell_name}", "value": "{*}",
+             "conditions": "in {title}"}]})
         made = [(f["attribute"], f["value"], f["unit"], f["conditions"]) for f, _, _ in tr.row_claims(rules, g, 0)]
         self.assertEqual(made, [("Hub diameter", "7.94", "m", "")])  # no "in", and the unitless twin left out
         self.assertEqual(len(tr.row_claims(rules, g, 1)), 1)  # a row with no unit: the two alike, kept once
@@ -221,14 +226,15 @@ class Traced(unittest.TestCase):
     """How a table was read, in reports (the owner, 2026-10-05: "tracing/reporting how a table was read")."""
     def test_findings_between_tables_read_differently_are_flagged(self):
         from semantic_pdf_diff.report import how_read, tables_read
-        rules = lambda conditions: {"derivation": [{"step": "xlsx-table"}, {"step": "table-rules",
-                                                                           "detail": f"value {{B}}; conditions {conditions}"}]}
+        rules = lambda conditions: {"derivation": [
+            {"step": "xlsx-table"}, {"step": "table-rules", "detail": f"value {{B}}; conditions {conditions}"}]}
         row = {"derivation": [{"step": "xlsx-table"}, {"step": "model-extraction"}]}
         text = {"derivation": [{"step": "xlsx-cells"}, {"step": "model-extraction"}]}
         self.assertEqual(how_read(row), ("row", ""))
         self.assertIsNone(how_read(text))
-        self.assertEqual(tables_read(row, rules("{A}")), {"a": "its row read by itself",
-                                                          "b": "by rules a model wrote for its table (value {B}; conditions {A})"})
+        self.assertEqual(tables_read(row, rules("{A}")),
+                         {"a": "its row read by itself",
+                          "b": "by rules a model wrote for its table (value {B}; conditions {A})"})
         self.assertIsNotNone(tables_read(rules("in the plant"), rules("{A}")))  # bound by different templates
         self.assertIsNone(tables_read(rules("{A}"), rules("{A}")))
         self.assertIsNone(tables_read(row, row))
@@ -270,11 +276,13 @@ class PdfTables(unittest.TestCase):
         box = lambda k: (0, k, 1, k + 1)
         # a header over two lines (a second level under merged cells), an empty row, then a stacked table
         parts = pdf_parts(["Tag", "Rated point", None],
-                          [["", "", ""], ["", "Capacity (gpm)", "Head (ft)"], ["P-1", "450", "120"], ["P-2", "up to 173", "95"],
-                           ["Blower", "Airflow (scfm)", "Power (hp)"], ["B-1", "900", "40"]], [box(k) for k in range(6)])
+                          [["", "", ""], ["", "Capacity (gpm)", "Head (ft)"], ["P-1", "450", "120"],
+                           ["P-2", "up to 173", "95"], ["Blower", "Airflow (scfm)", "Power (hp)"],
+                           ["B-1", "900", "40"]], [box(k) for k in range(6)])
         self.assertEqual([p[0] for p in parts], [["Tag", "Rated point > Capacity (gpm)", "Rated point > Head (ft)"],
                                                  ["Blower", "Airflow (scfm)", "Power (hp)"]])
-        self.assertEqual([p[1] for p in parts], [[["P-1", "450", "120"], ["P-2", "up to 173", "95"]], [["B-1", "900", "40"]]])
+        self.assertEqual([p[1] for p in parts],
+                         [[["P-1", "450", "120"], ["P-2", "up to 173", "95"]], [["B-1", "900", "40"]]])
         self.assertEqual([p[2] for p in parts], [[box(2), box(3)], [box(5)]])
         # a wrapped header line, without merged cells, joins as the next line
         (head, body, _), = pdf_parts(["Ride", "Entry"], [["", "speed (mph)"], ["Coaster", "55"]], [box(0), box(1)])
@@ -301,8 +309,9 @@ class PdfTables(unittest.TestCase):
         # labelled with numbers in the same column: they stay apart)
         joined, kept, n = ruled_rows(rows, boxes, [0, 12, 24, 36, 48, 72])
         self.assertEqual(n, 3)
-        self.assertEqual(joined, [["Cameras", "UV", "IR"], ["FOV", "10.2", "3.8"], ["Detector", "1×1 CCD201", "1×1 LMAPD"],
-                                  ["Spectrometer resolution", "7", "40"], ["Width", "1024", "256"], ["Height", "512", "128"]])
+        self.assertEqual(joined, [["Cameras", "UV", "IR"], ["FOV", "10.2", "3.8"],
+                                  ["Detector", "1×1 CCD201", "1×1 LMAPD"], ["Spectrometer resolution", "7", "40"],
+                                  ["Width", "1024", "256"], ["Height", "512", "128"]])
         self.assertEqual(kept[2], box(24, 36))
         self.assertEqual(ruled_rows(rows, boxes, [0, 72])[2], 0)  # too few rules to tell: unchanged
         self.assertEqual(ruled_rows(rows, boxes, [b[1] for b in boxes])[2], 0)  # every boundary ruled

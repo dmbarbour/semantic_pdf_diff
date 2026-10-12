@@ -117,8 +117,8 @@ class Context:
     def page_blocks(self, page_no):
         """The page's text blocks in reading order: [(bbox, text)]."""
         if page_no not in self.blocks:
-            self.blocks[page_no] = [(tuple(b[:4]), " ".join(b[4].split())) for b in reading_blocks(self.doc[page_no - 1])
-                                    if b[6] == 0 and b[4].strip()]
+            self.blocks[page_no] = [(tuple(b[:4]), " ".join(b[4].split()))
+                                    for b in reading_blocks(self.doc[page_no - 1]) if b[6] == 0 and b[4].strip()]
         return self.blocks[page_no]
 
     def table_top(self, page_no, row_box):
@@ -132,7 +132,8 @@ class Context:
         page = self.doc[page_no - 1]
         table = shown(page, bbox)  # as displayed (rotated sheets)
         return " ".join(t for b, t in self.page_blocks(page_no)
-                        if shown(page, b).y1 <= table.y0 + 2 and shown(page, b).x1 > table.x0 and shown(page, b).x0 < table.x1)
+                        if shown(page, b).y1 <= table.y0 + 2 and shown(page, b).x1 > table.x0
+                        and shown(page, b).x0 < table.x1)
 
     def stem_path(self, page_no, bbox):
         """The numbered items and headings a region sits under, e.g. ['9-2. Cooking', 'c. ...'] (also
@@ -165,7 +166,9 @@ def render_locator(page, rect, target, side=LOCATOR_SIDE, width=3, pixmap=None):
     matrix = pymupdf.Matrix(scale, scale)
     pix = pixmap(page, matrix) if pixmap is not None else page.get_pixmap(matrix=matrix, alpha=False)
     box = (rect * pymupdf.Matrix(scale, scale)).irect & pix.irect
-    for edge in (pymupdf.IRect(box.x0, box.y0, box.x1, box.y0 + width), pymupdf.IRect(box.x0, box.y1 - width, box.x1, box.y1),
-                 pymupdf.IRect(box.x0, box.y0, box.x0 + width, box.y1), pymupdf.IRect(box.x1 - width, box.y0, box.x1, box.y1)):
+    for edge in (pymupdf.IRect(box.x0, box.y0, box.x1, box.y0 + width),
+                 pymupdf.IRect(box.x0, box.y1 - width, box.x1, box.y1),
+                 pymupdf.IRect(box.x0, box.y0, box.x0 + width, box.y1),
+                 pymupdf.IRect(box.x1 - width, box.y0, box.x1, box.y1)):
         pix.set_rect(edge & pix.irect, (255, 0, 0))
     pix.save(target)

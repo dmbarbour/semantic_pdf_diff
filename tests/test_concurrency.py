@@ -69,7 +69,8 @@ def jittery_model():
                 if prompt.startswith('You wrote the rules below') else 'table-structure'
                 if prompt.startswith('These are the lines of one table') else 'compare' if 'Compare exactly' in prompt
                 or 'Explain a difference' in prompt else 'triage' if situating_answer(prompt) else 'extract')
-        seen = hashlib.sha256(json.dumps({k: v for k, v in body.items() if k not in ('model', 'stream', 'stream_options')},
+        seen = hashlib.sha256(json.dumps({k: v for k, v in body.items()
+                                          if k not in ('model', 'stream', 'stream_options')},
                                          sort_keys=True).encode()).hexdigest()
         images = [hashlib.sha256(base64.b64decode(p['image_url']['url'].split(',', 1)[1])).hexdigest()
                   for p in parts[1:] if p.get('type') == 'image_url']

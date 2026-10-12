@@ -28,7 +28,8 @@ PROMPT_VERSION = 6
 
 EXTRACT = '''Extract atomic engineering claims from this one source. Return JSON:
 {"claims":[{"entity":"component/system", "attribute":"property or directed relationship",
-"value":"literal value or target", "unit":"literal unit or empty", "conditions":"load, scenario, time, tolerances, scope",
+"value":"literal value or target", "unit":"literal unit or empty", \
+"conditions":"load, scenario, time, tolerances, scope",
 "kind":"text|table|chart|diagram", "quote":"short exact supporting text or visible labels",
 "confidence":0.0, "approximate":false}], "complete":true, "issues":[]}
 Maximum {max_claims} claims. Set complete=false if content is clipped, ambiguous, unreadable, or more claims remain.
@@ -36,7 +37,8 @@ For tables associate row labels, column headers and units. For charts preserve s
 operating point and trend; estimated plotted readings MUST be approximate. For diagrams extract
 labeled components and directed connections; never invent direction on unmarked edges.
 Preserve negation, requirements versus proposed capabilities, ranges and inequality signs.
-Extract evidence only, not commentary. Use a short canonical entity and attribute; keep numeric value separate from unit.
+Extract evidence only, not commentary. Use a short canonical entity and attribute; keep numeric value separate \
+from unit.
 The attribute names the property only: put conditions (e.g. "at theta = 0", "at rated speed") in conditions.
 If a value is one of several parts (one layer, one material, one member), say what it is part of in the attribute
 (e.g. "spar cap material"), not "composition".
@@ -57,7 +59,8 @@ class ExtractQuery:
     continuation: str = ""  # CONTINUATION_NOTE and the claims earlier requests for this task returned
 
     def prompt(self):
-        return (self.instructions + "\nSource type: " + self.region + (f"\nSection: {self.heading}" if self.heading else "")
+        return (self.instructions + "\nSource type: " + self.region
+                + (f"\nSection: {self.heading}" if self.heading else "")
                 + (f"\n{self.context}" if self.context else "")
                 + (f"\n{self.continuation}" if self.continuation else "") + "\nSOURCE DATA:\n" + self.data)
 
@@ -111,7 +114,8 @@ def split_utf8(text, limit):
 # An incomplete answer's issue saying the claim limit stopped it ("more steps (17-22) than the 20 claim limit
 # allowed"), as a request to continue; not clipping or illegibility, which another request wouldn't mend
 LIMIT_SAID = re.compile(r"claim limit|limit of \d+ claims|maximum (?:of )?\d+ claims|\d+[- ]claim (?:limit|maximum|cap)"
-                        r"|more (?:claims|facts|steps|items|rows|entries) (?:than|remain)|(?:claims|facts) remain", re.I)
+                        r"|more (?:claims|facts|steps|items|rows|entries) (?:than|remain)|(?:claims|facts) remain",
+                        re.I)
 
 @dataclass(frozen=True, eq=False)
 class Task:
@@ -187,8 +191,8 @@ class TaskCore:
         copies = [e.model_copy(update={"locator": self.locator(page_no, tuple(bbox), region, task),
                                        "section": section.id, "derivation": [*e.derivation, step]})
                   for e in entry["found"]]
-        row = coverage_row(content=self.content, page=page_no, bbox=list(bbox), task=task, status=entry["row"]["status"],
-                           issues=[note], claims=len(copies), duplicate_of=entry["task"])
+        row = coverage_row(content=self.content, page=page_no, bbox=list(bbox), task=task,
+                           status=entry["row"]["status"], issues=[note], claims=len(copies), duplicate_of=entry["task"])
         self.evidence.extend(copies)
         self.record(row, copies)
 
@@ -290,7 +294,8 @@ class TaskCore:
             row["status"] = "complete" if result.complete else "partial"
             row["issues"] = list(result.issues)
             if (not result.complete and turn < s.continuation_limit(region)
-                    and (len(result.claims) >= s.claims_per_request or any(LIMIT_SAID.search(i) for i in result.issues))):
+                    and (len(result.claims) >= s.claims_per_request
+                         or any(LIMIT_SAID.search(i) for i in result.issues))):
                 more.extend(result.claims)
                 asked.append(True)
                 row["issues"].append(f"Continued: the claim limit reached, the rest asked for ({origin}-c{turn + 1})")

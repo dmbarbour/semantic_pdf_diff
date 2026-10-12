@@ -29,7 +29,8 @@ class Fake:
         self.relation,self.same,self.kind = relation,same,kind
     def ask(self,prompt,schema,images=(),key=None):
         if schema is Judgment:
-            return Judgment(relation=self.relation,rationale='Fixture judgment',confidence=.95,same_conditions=self.same)
+            return Judgment(relation=self.relation,rationale='Fixture judgment',confidence=.95,
+                            same_conditions=self.same)
         if schema is Explanation:
             return Explanation(kind=self.kind,rationale='Fixture explanation',confidence=.9)
         raise AssertionError('Unexpected extraction')
@@ -117,7 +118,8 @@ class Tests(unittest.TestCase):
                 return Extraction(claims=[data],complete=True)
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/'test.pdf'
-            doc=pymupdf.open();page=doc.new_page();page.insert_text((40,40),'Pump rated power 10 kW');doc.save(path);doc.close()
+            doc=pymupdf.open();page=doc.new_page();page.insert_text((40,40),'Pump rated power 10 kW')
+            doc.save(path);doc.close()
             evidence,coverage=extract_pdf(path,'sha256:' + 'a' * 64 + '.pdf',Path(d),Extractor(Settings(vision=False)))
             self.assertEqual(evidence,[])
             self.assertTrue(any(r['status']=='partial' for r in coverage))
@@ -137,7 +139,8 @@ class Tests(unittest.TestCase):
                     assert part['image_url']['url'].startswith('data:image/png;base64,')
             prompt=parts[0]['text']
             if 'Compare exactly' in prompt:
-                answer=Judgment(relation='equivalent',rationale='Controlled same-value fixture',confidence=.95,same_conditions=True).model_dump()
+                answer=Judgment(relation='equivalent',rationale='Controlled same-value fixture',confidence=.95,
+                                same_conditions=True).model_dump()
             elif situating_answer(prompt):
                 answer=situating_answer(prompt)
             else:
@@ -167,7 +170,6 @@ class Tests(unittest.TestCase):
                 self.assertEqual(state['calls'],before)
 
     def test_refinement_preserves_failure_ledger(self):
-        from semantic_pdf_diff.schema import Claim
         class Extractor(Fake):
             count=0
             def ask(self,prompt,schema,images=(),key=None):
@@ -186,7 +188,8 @@ class Tests(unittest.TestCase):
         data=compare([a],[b],Path('.'),Fake(),'proposals')
         data.update(evidence=[a.model_dump(),b.model_dump()],coverage=[],
             sources=[Source(name='A').model_dump(),Source(name='B').model_dump()],
-            files=[FileRef(source='A',path='A.pdf',content=a.content).model_dump(),FileRef(source='B',path='B.pdf',content=b.content).model_dump()])
+            files=[FileRef(source='A',path='A.pdf',content=a.content).model_dump(),
+                   FileRef(source='B',path='B.pdf',content=b.content).model_dump()])
         with tempfile.TemporaryDirectory() as d:
             write_report(data,Path(d))
             html=(Path(d)/'report.html').read_text()

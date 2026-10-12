@@ -18,7 +18,8 @@ class Readings(unittest.TestCase):
         found = reconcile([
             sighting('handrails', 'material', '2x4 cedar', task='tile:p1:0'),
             sighting('Handrail', 'material/dimension', '2x4 Cedar', task='tile:p1:1', bbox=(200, 0, 600, 400)),
-            sighting('handrails', 'material', '2x4 cedar', task='overview:p1', region='overview', bbox=(0, 0, 2448, 1584)),
+            sighting('handrails', 'material', '2x4 cedar', task='overview:p1', region='overview',
+                     bbox=(0, 0, 2448, 1584)),
         ])
         self.assertEqual(len(found), 1)
         words = {o.wording for o in found[0].occurrences}
@@ -51,7 +52,8 @@ class Readings(unittest.TestCase):
         self.assertEqual(len(found), 2)  # the unconditioned reading doesn't join both
 
     def test_the_local_reading_represents_one_with_conditions_from_a_wide_region(self):
-        found = reconcile([sighting('member', 'section', 'W10X12', task='table:p1:0', region='table', bbox=(0, 0, 200, 50)),
+        found = reconcile([sighting('member', 'section', 'W10X12', task='table:p1:0', region='table',
+                                    bbox=(0, 0, 200, 50)),
                            sighting('member', 'section', 'W10X12', conditions='Structure South Elevation - Main',
                                     task='overview:p1', region='overview', bbox=(0, 0, 2448, 1584))])
         self.assertEqual(len(found), 1)
@@ -60,7 +62,8 @@ class Readings(unittest.TestCase):
                       {o.wording for o in found[0].occurrences})
 
     def test_a_generic_reading_does_not_gather_distinct_facts(self):
-        found = reconcile([sighting('beam', 'section', 'W10X15', task='text:p1:0', region='text', bbox=(0, 0, 300, 300)),
+        found = reconcile([sighting('beam', 'section', 'W10X15', task='text:p1:0', region='text',
+                                    bbox=(0, 0, 300, 300)),
                            sighting('Floor Beam @ Grid 4', 'section', 'W10X15', task='tile:p1:0'),
                            sighting('Floor Beam @ Grid 5', 'section', 'W10X15', task='tile:p1:1')])
         self.assertEqual(len(found), 2)  # grid 4 and grid 5 stay apart
@@ -74,12 +77,14 @@ class Readings(unittest.TestCase):
         apart = [('5', 'MW', '5', 'mW'), ('12,50', '', '1,250', '')]
         for v1, u1, v2, u2 in apart:
             with self.subTest(v1=v1, v2=v2):
-                found = reconcile([sighting('cell', 'power', v1, u1), sighting('cell', 'power', v2, u2, task='tile:p1:1')])
+                found = reconcile([sighting('cell', 'power', v1, u1),
+                                   sighting('cell', 'power', v2, u2, task='tile:p1:1')])
                 self.assertEqual(len(found), 2)
         alike = [('1,250', '', '1250', ''), ('5', 'kw', '5', 'kW'), ('TBC', '', 'tbc', '')]
         for v1, u1, v2, u2 in alike:
             with self.subTest(v1=v1, v2=v2):
-                found = reconcile([sighting('cell', 'power', v1, u1), sighting('cell', 'power', v2, u2, task='tile:p1:1')])
+                found = reconcile([sighting('cell', 'power', v1, u1),
+                                   sighting('cell', 'power', v2, u2, task='tile:p1:1')])
                 self.assertEqual(len(found), 1)
 
     def test_result_does_not_depend_on_order(self):

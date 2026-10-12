@@ -79,7 +79,8 @@ def main(argv=None):
                     return 3
                 settings = pipeline.settings_from(config, max_cost=round(left, 4))
                 options.ledger, options.ledger_tags = LEDGER, {"round": "real-pairs", "run": name}
-            code = pipeline.attempt(pipeline.compare_paths, SAMPLES / earlier, SAMPLES / later, out / name, settings, options)
+            code = pipeline.attempt(pipeline.compare_paths, SAMPLES / earlier, SAMPLES / later, out / name, settings,
+                                    options)
             print(f"{name}: exit {code}", flush=True)
             worst = max(worst, code)
         if not args.replay:

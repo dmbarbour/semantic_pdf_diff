@@ -50,9 +50,11 @@ it cannot establish entity or condition equivalence. Image order is described wi
 MODE_CONTEXT = {
     "proposals": "A and B come from different proposals: separate designs of the same kind of system, by different "
                  "authors. They are never the same physical object, so one cannot be measured relative to the other; "
-                 "they correspond only as counterparts (the same kind of component, property or condition in each design).",
-    "revisions": "A comes from an earlier revision and B from a later revision of the same document, describing the same "
-                 "design. Corresponding claims describe the same object, so a changed value is a change, not a different design.",
+                 "they correspond only as counterparts (the same kind of component, property or condition in each "
+                 "design).",
+    "revisions": "A comes from an earlier revision and B from a later revision of the same document, describing the "
+                 "same design. Corresponding claims describe the same object, so a changed value is a change, not a "
+                 "different design.",
 }
 
 def relative_path(path):
@@ -97,7 +99,8 @@ def file_difference(files_a, files_b):
 # How a settled finding and an unaligned claim read in the report (align.py: revisions mode only).
 SETTLED = ("Settled without a model: the same value in corresponding items of the two revisions, with conditions "
            "that agree.")
-UNALIGNED = "No corresponding item in the other revision (by shared values, names and attributes): possibly added or removed."
+UNALIGNED = ("No corresponding item in the other revision (by shared values, names and attributes): possibly added or "
+             "removed.")
 REGROUPED = "Viewed as part of a split or merge candidate (see the groupings); not compared claim by claim."
 
 # Provenance stays out of the model's view; it sees the claims and any source crops.
@@ -178,7 +181,8 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
             progress.finish("failed" if error is not None else "complete")
             if error is not None:
                 results[index] = {"a":a.id,"b":b.id,"retrieval_score":round(score,4),"relation":"uncertain",
-                    "rationale":str(error),"confidence":0,"same_conditions":False,"numeric":calc,"processing_error":True}
+                    "rationale":str(error),"confidence":0,"same_conditions":False,"numeric":calc,
+                    "processing_error":True}
                 return
             reasons = vetoes(judgment, a, b, calc)
             if reasons:
@@ -186,7 +190,8 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
                 judgment.rationale = "; ".join(reasons) + ". " + judgment.rationale
             if judgment.relation in ("equivalent","different","complementary"):
                 matched.update((a.id,b.id))
-            results[index] = {"a":a.id, "b":b.id, "retrieval_score":round(score,4), **judgment.model_dump(), "numeric":calc}
+            results[index] = {"a":a.id, "b":b.id, "retrieval_score":round(score,4), **judgment.model_dump(),
+                              "numeric":calc}
         return finish
 
     own = dispatcher is None
@@ -204,7 +209,8 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
                     images += extra
                 payload.append(p)
             calc = numeric_check(a,b)
-            prompt = instructions(mode) + "\nA=" + json.dumps(payload[0],ensure_ascii=False) + "\nB=" + json.dumps(payload[1],ensure_ascii=False)
+            prompt = (instructions(mode) + "\nA=" + json.dumps(payload[0],ensure_ascii=False)
+                      + "\nB=" + json.dumps(payload[1],ensure_ascii=False))
             prompt += "\nNumeric check=" + json.dumps(calc)
             payloads[index] = (a, b, payload, images)
             progress.add()
@@ -232,7 +238,8 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
         return "regrouped" if e.id in regrouped else "unaligned" if e.id in unaligned else "not_compared"
     notes = {"unaligned": UNALIGNED, "regrouped": REGROUPED}
     unmatched = [{"id": e.id, "status": status(e),
-                  "note": notes.get(status(e), "No confirmed counterpart in retrieved evidence; this does not establish absence.")}
+                  "note": notes.get(status(e), "No confirmed counterpart in retrieved evidence; this does not "
+                                               "establish absence.")}
                  for e in left + right if e.id not in matched]
     groupings = _combined(groupings, aligned, shared_ids)
     for g in groupings:  # what was done with each group's claims, as the findings say

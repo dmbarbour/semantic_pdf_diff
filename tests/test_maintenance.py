@@ -25,7 +25,8 @@ class Maintenance(unittest.TestCase):
         server = model_server()
         self.url, self.state = server.__enter__()
         self.addCleanup(server.__exit__, None, None, None)
-        self.cli('source', 'add', 'team-a', '--store', self.store, '--path', self.root / 'team-a', '--meta', 'revision=C')
+        self.cli('source', 'add', 'team-a', '--store', self.store, '--path', self.root / 'team-a',
+                 '--meta', 'revision=C')
         self.cli('source', 'add', 'team-b', '--store', self.store, '--path', self.root / 'team-b')
         self.compare()
 
@@ -73,7 +74,8 @@ class Maintenance(unittest.TestCase):
         self.assertEqual(self.show('orphaned_content'), [])
         with Store(self.store) as store:
             self.assertEqual(store.db.execute('SELECT COUNT(*) FROM evidence WHERE content=?', (old,)).fetchone()[0], 0)
-            self.assertEqual(store.db.execute('SELECT COUNT(*) FROM response_cache WHERE content=?', (old,)).fetchone()[0], 0)
+            self.assertEqual(store.db.execute('SELECT COUNT(*) FROM response_cache WHERE content=?',
+                                              (old,)).fetchone()[0], 0)
             self.assertGreater(store.db.execute('SELECT COUNT(*) FROM evidence').fetchone()[0], 0)
         before = self.state['requests']
         self.compare()  # nothing still referenced was collected, so nothing is re-extracted
@@ -84,7 +86,8 @@ class Maintenance(unittest.TestCase):
         self.cli('source', 'export', 'team-a', '--store', self.store, '--output', manifest)
         edited = json.loads(manifest.read_text()); edited['name'] = 'team-c'
         manifest.write_text(json.dumps(edited))
-        self.cli('compare', '--store', self.store, '--manifest', manifest, 'team-b', '--base-url', self.url, '--no-vision')
+        self.cli('compare', '--store', self.store, '--manifest', manifest, 'team-b', '--base-url', self.url,
+                 '--no-vision')
         manifest.unlink()
         self.assertEqual(json.loads(self.cli('gc', '--store', self.store)[1])['sources'], [])
         preview = json.loads(self.cli('gc', '--store', self.store, '--orphaned-sources', '--dry-run')[1])
@@ -119,7 +122,8 @@ class LedgerRotation(unittest.TestCase):
         from semantic_pdf_diff import ledger
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "ledger.jsonl"
-            for when, cost, round_ in (("2026-08-30T10:00:00+00:00", 1.0, "r00"), ("2026-09-15T10:00:00+00:00", 2.0, "r01"),
+            for when, cost, round_ in (("2026-08-30T10:00:00+00:00", 1.0, "r00"),
+                                       ("2026-09-15T10:00:00+00:00", 2.0, "r01"),
                                        ("2026-10-01T09:00:00+00:00", 4.0, "r10")):
                 path.open("a").write(json.dumps({"time": when, "cost": cost, "round": round_}) + "\n")
             self.assertEqual(ledger.rotate(path, "2026-10-01"), 2)

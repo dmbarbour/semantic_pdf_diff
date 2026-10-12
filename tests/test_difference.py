@@ -9,7 +9,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 from test_pipeline import Fake, ev  # noqa: E402
 
 def files(source, entries):
-    return [FileRef(source=source, path=p, content=f'sha256:{c * 64}.{p.rsplit(".", 1)[1].lower()}') for p, c in entries]
+    return [FileRef(source=source, path=p, content=f'sha256:{c * 64}.{p.rsplit(".", 1)[1].lower()}')
+            for p, c in entries]
 
 class FileDifference(unittest.TestCase):
     def test_relative_paths(self):
@@ -25,7 +26,8 @@ class FileDifference(unittest.TestCase):
                            ('rev2/pack.zip', 'Z'), ('rev2/pack.zip!/m.pdf', 'M')])
         diff = file_difference(a, b)
         self.assertEqual(diff['unchanged'], ['rev2/a.pdf'])
-        self.assertEqual(diff['modified'], [['rev1/b.pdf', 'rev2/b.pdf'], ['rev1/pack.zip!/m.pdf', 'rev2/pack.zip!/m.pdf']])
+        self.assertEqual(diff['modified'],
+                         [['rev1/b.pdf', 'rev2/b.pdf'], ['rev1/pack.zip!/m.pdf', 'rev2/pack.zip!/m.pdf']])
         self.assertEqual(diff['moved'], [['rev1/c.pdf', 'rev2/sub/c.pdf']])
         self.assertEqual((diff['added'], diff['removed']), (['rev2/d.pdf'], ['rev1/e.pdf']))
 
@@ -41,7 +43,8 @@ class SharedTargets(unittest.TestCase):
         unique_left = ev('A-1', value='10000', unit='W')
         unique_right = ev('B-2', entity='firewall', attribute='log retention', value='90', unit='days',
                           conditions='security policy')
-        result = compare([unique_left, shared], [shared, unique_right], Path('.'), Fake(relation='equivalent'), 'revisions')
+        result = compare([unique_left, shared], [shared, unique_right], Path('.'), Fake(relation='equivalent'),
+                         'revisions')
         pairs = {(f['a'], f['b']): f['relation'] for f in result['findings']}
         self.assertEqual(pairs.get(('A-1', 'S-1')), 'equivalent')
         self.assertNotIn(('S-1', 'S-1'), pairs)

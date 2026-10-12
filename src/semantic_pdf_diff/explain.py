@@ -98,7 +98,8 @@ class Revisions:
         if value is None and not numbers:
             return []
         same = lambda j: (value is not None and side.values[j] == value) or \
-            (bool(numbers) and value is not None and value[0] == "text" and sorted(NUMBERS.findall(side.claims[j].value)) == numbers)
+            (bool(numbers) and value is not None and value[0] == "text"
+             and sorted(NUMBERS.findall(side.claims[j].value)) == numbers)
         return [_brief(side.claims[j]) for j in self._others(e, s, other) if same(j)][:ECHOES]
 
     def condition_echoes(self, e, s, other):
@@ -138,7 +139,8 @@ def explain(results, payloads, earlier, later, headings, dispatch, progress, key
     """Each "different" or "uncertain" finding in results ({index: finding}) explained in place: its
     "explanation" ({kind, rationale, confidence}), from a second call (EXPLAIN). payloads: {index: (A, B, the
     claims as the judge saw them, the images sent)}; earlier and later: each revision's claims."""
-    chosen = [i for i in sorted(results) if results[i]["relation"] in EXPLAINED and not results[i].get("processing_error")]
+    chosen = [i for i in sorted(results)
+              if results[i]["relation"] in EXPLAINED and not results[i].get("processing_error")]
     if not chosen:
         return
     revisions = Revisions(earlier, later)

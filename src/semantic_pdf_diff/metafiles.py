@@ -150,7 +150,8 @@ class _Writer:
         width = pen.width if pen.cosmetic else pen.width * scale
         cap = {"flat": 0, "round": 1, "square": 2}[pen.cap]
         join = {"miter": 0, "round": 1, "bevel": 2}[pen.join]
-        out = f"{_color(pen.color, stroke=True)} {_number(max(width, 0.25))} w {cap} J {join} j {_number(max(miter_limit, 1))} M"
+        out = (f"{_color(pen.color, stroke=True)} {_number(max(width, 0.25))} w {cap} J {join} j "
+               f"{_number(max(miter_limit, 1))} M")
         if pen.dashes:
             dash = 1 if pen.cosmetic else scale
             out += " [" + " ".join(_number(max(d * dash, 0.1)) for d in pen.dashes) + "] 0 d"

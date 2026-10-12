@@ -15,7 +15,8 @@ class Reader:
         (x0, y0, x1, y1), px = key[2], key[3]
         self.asked.append(key[1])
         scale = px / max(x1 - x0, y1 - y0)
-        inside = [i for i in self.items if x0 <= i["box"][0] and i["box"][2] <= x1 and y0 <= i["box"][1] and i["box"][3] <= y1]
+        inside = [i for i in self.items
+                  if x0 <= i["box"][0] and i["box"][2] <= x1 and y0 <= i["box"][1] and i["box"][3] <= y1]
         read = [i["text"] for i in inside if CAP["helv"] * i["pt"] * scale >= 6]
         boxes = []
         if self.zoom and '"zoom"' in prompt:
@@ -70,7 +71,6 @@ class Reading(unittest.TestCase):
         self.assertEqual(whole["whole_in_tiles"], 1.0)
 
     def test_detail_sheets_keep_small_text_in_their_clusters(self):
-        import pymupdf
         for kind in ("letter-detail", "archd-detail"):
             _, page, items = pagetest.draw(pagetest.Sheet(kind, 1))
             scale = pagetest.OVERVIEW_PX / max(page.rect.width, page.rect.height)
@@ -78,15 +78,12 @@ class Reading(unittest.TestCase):
                 self.assertEqual(i["cluster"] is None, CAP["helv"] * i["pt"] * scale >= 6, (kind, i))
 
     def test_corner_sheets_put_a_cluster_across_four_cells(self):
-        import pymupdf
         for kind in pagetest.ZOOM_ONLY:
             sheet = pagetest.Sheet(kind, 1)
             _, page, items = pagetest.draw(sheet)
             w, h = page.rect.width, page.rect.height
             cols, rows = pagetest.grid_shape(w, h)
             corner = [i for i in items if i["cluster"] == 0]
-            box = pymupdf.Rect(min(i["box"][0] for i in corner), min(i["box"][1] for i in corner),
-                               max(i["box"][2] for i in corner), max(i["box"][3] for i in corner))
             cells = {(int(x * cols / w), int(y * rows / h)) for i in corner
                      for x, y in ((i["box"][0], i["box"][1]), (i["box"][2], i["box"][3]))}
             self.assertGreaterEqual(len(cells), 3, (kind, cells))  # the corner cluster spans cells

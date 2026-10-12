@@ -118,8 +118,8 @@ READERS = {".pdf": "pdf/10",  # pdf/2: tables asked how they're read; 3: two-lin
            # structure answer's new tables tagged apart, a structure asked again recorded once (review A2, B7); 7: rows
            # read by themselves as the grid holds them, notes confirmed and read, the structure rules' union said (B2);
            # 8: a table of two columns asked whether it's a key-value list (B5); 9: a partial tile refined in halves
-           # cut between lines or columns, grown to whole lines, its text by whole lines (trials finding 5); 10: a section
-           # row right under the header kept a row, not the header's next line
+           # cut between lines or columns, grown to whole lines, its text by whole lines (trials finding 5); 10: a
+           # section row right under the header kept a row, not the header's next line
            ".txt": "text/2", ".md": "text/1",  # text/2: "A pump ..." isn't a heading (review B4)
            ".docx": "docx/9",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
            # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1); 7: a

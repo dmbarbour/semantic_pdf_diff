@@ -19,7 +19,8 @@ def main(argv=None):
     parser.add_argument("--slices", type=Path, default=ROOT / "samples/slices")
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.eval import rounds
-    folders = [p.resolve() for p in args.rounds] or sorted(p for p in (ROOT / "benchmarks/rounds").iterdir() if p.is_dir())
+    folders = ([p.resolve() for p in args.rounds]
+               or sorted(p for p in (ROOT / "benchmarks/rounds").iterdir() if p.is_dir()))
     for folder in folders:
         for batch in sorted(p.parent for p in folder.glob("pairs-*/pairs.json")):
             print(f"{batch.relative_to(ROOT)}: {len(rounds.rerender(batch, args.slices))} images", flush=True)

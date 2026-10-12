@@ -114,7 +114,8 @@ a row of its own:
 Answer with rules that regroup the lines into the table's real rows. A rule has an action and says which lines it
 acts on: the lines its "lines" names (line numbers), and any line where all of its "when" signals hold; give either or
 both. The signals: {signals}.
-A line named in a rule's "lines" follows that rule; any other line follows the first rule whose "when" all hold; a line no rule
+A line named in a rule's "lines" follows that rule; any other line follows the first rule whose "when" all hold; \
+a line no rule
 fits stays a row. Actions:
 - "join above": the line's cells join the line above's, cell by cell (a wrapped cell, a unit under its value)
 - "join header": the line joins the header, cell by cell (a header over two lines)
@@ -219,11 +220,12 @@ def problems(answer, n, width, tags):
         if action == "split column":
             col = rule.column.strip().upper()
             if col not in [_letter(c) for c in range(width)] or len(rule.into) < 2:
-                wrong.append(f"rule {k}: a split names a column (A to {_letter(width - 1)}) and two or more new columns")
+                wrong.append(f"rule {k}: a split names a column (A to {_letter(width - 1)}) and two or more new "
+                             "columns")
         elif action == "join columns":
             if _span(rule.column, width) is None:
-                wrong.append(f"rule {k}: a join names a column with one after it (\"C\"), or a range (\"C:E\"), within A to "
-                             f"{_letter(width - 1)}")
+                wrong.append(f"rule {k}: a join names a column with one after it (\"C\"), or a range (\"C:E\"), "
+                             f"within A to {_letter(width - 1)}")
         elif not rule.when and not rule.lines:
             wrong.append(f"rule {k}: it says neither \"when\" nor \"lines\"")
     return wrong
@@ -324,17 +326,18 @@ def _columns_joined(out, answer, width, index, cuts):
         def join(row, lines, body_row=True):
             cut = set().union(*((cuts or {}).get(line, set()) for line in lines))
             text, pieces, before = "", 0, None
-            for k in range(first, last + 1):
+            for k in range(first, last + 1):  # noqa: B023 (called at once)
                 piece = " ".join(str(row[k]).split()) if k < len(row) and row[k] is not None else ""
                 if piece:  # no space where a boundary between this piece and the one before cut a word
                     glued = before is not None and any(j in cut for j in range(before, k))
                     if before is not None and not glued and body_row and cuts is not None:
-                        out.unsupported.append(f"columns {rule.column.upper()} hold separate values in the row of "
+                        out.unsupported.append(f"columns {rule.column.upper()} "  # noqa: B023 (called at once)
+                                               "hold separate values in the row of "
                                                f"line {lines[0]} ({row[before]!r}, {piece!r}; no word cut between "
                                                "them): join only columns a word is cut across")
                     text += ("" if not text or glued else " ") + piece
                     pieces, before = pieces + 1, k
-            return list(row[:first]) + [text] + list(row[last + 1:]), pieces > 1
+            return list(row[:first]) + [text] + list(row[last + 1:]), pieces > 1  # noqa: B023 (called at once)
 
         parts = []
         for p, ((head_, rows_, bxs_), origins, heads) in enumerate(zip(out.parts, out.origins, out.heads)):
@@ -433,7 +436,8 @@ def describe(applied):
 
 def review_question(asked, answer, applied, header, body, tags):
     shown_lines = asked[asked.index("THE LINES"):asked.index("Answer with")].rstrip()
-    lines = [REVIEWING, "THE LINES (as you were shown them):", shown_lines, "YOUR ANSWER:", answer.model_dump_json(exclude_defaults=True), "WHAT IT GAVE:"]
+    lines = [REVIEWING, "THE LINES (as you were shown them):", shown_lines, "YOUR ANSWER:",
+             answer.model_dump_json(exclude_defaults=True), "WHAT IT GAVE:"]
     for p, ((head, rows, _), origins) in enumerate(zip(applied.parts, applied.origins), 1):
         lines.append(f"table {p}, header: {_line(head)}")
         shown = 0

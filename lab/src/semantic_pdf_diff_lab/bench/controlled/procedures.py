@@ -221,24 +221,25 @@ def wmf(procedure, width):
         kind = shape[0]
         if kind == "rect":
             _, (x0, y0, x1, y1), fill, stroke = shape
-            select("brush", fill, lambda: _brush(0, fill))
-            select("pen", stroke or "null", lambda: _pen(0, t(0.8), stroke) if stroke else _pen(5, 0, (0, 0, 0)))
+            select("brush", fill, lambda: _brush(0, fill))  # noqa: B023 (called at once)
+            select("pen", stroke or "null",
+                   lambda: _pen(0, t(0.8), stroke) if stroke else _pen(5, 0, (0, 0, 0)))  # noqa: B023 (called at once)
             body.append(_record(0x041B, struct.pack("<hhhh", t(y1), t(x1), t(y0), t(x0))))  # META_RECTANGLE
         elif kind == "line":
             _, (x0, y0), (x1, y1), color, line_width, dashed = shape
-            select("pen", (color, line_width, dashed),
-                   lambda: _pen(1, 0, color) if dashed else _pen(0, t(line_width), color))  # PS_DASH is one pixel
+            select("pen", (color, line_width, dashed),  # PS_DASH is one pixel
+                   lambda: _pen(1, 0, color) if dashed else _pen(0, t(line_width), color))  # noqa: B023 (called at once)
             body.append(_record(0x0214, struct.pack("<hh", t(y0), t(x0))))  # META_MOVETO
             body.append(_record(0x0213, struct.pack("<hh", t(y1), t(x1))))  # META_LINETO
         elif kind == "polygon":
             _, points, fill = shape
-            select("brush", fill, lambda: _brush(0, fill))
+            select("brush", fill, lambda: _brush(0, fill))  # noqa: B023 (called at once)
             select("pen", "null", None)
             body.append(_record(0x0324, struct.pack("<h", len(points)) +
                                 b"".join(struct.pack("<hh", t(px), t(py)) for px, py in points)))  # META_POLYGON
         else:
             _, px, py, text, bold = shape
-            select("font", bold, lambda: _font(bold))
+            select("font", bold, lambda: _font(bold))  # noqa: B023 (called at once)
             raw = text.encode("cp1252")
             body.append(_record(0x0521, struct.pack("<h", len(raw)) + raw + b"\0" * (len(raw) % 2) +
                                 struct.pack("<hh", t(py), t(px))))  # META_TEXTOUT

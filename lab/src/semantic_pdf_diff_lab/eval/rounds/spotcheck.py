@@ -18,7 +18,8 @@ from .decisions import interval, region, unit_scores
 SPOTCHECK_FORMAT = "semantic-pdf-diff-spotcheck-answers"
 BETTER = [{"name": "A", "label": "A is better"}, {"name": "B", "label": "B is better"},
           {"name": "same", "label": "About the same"}, {"name": "unsure", "label": "Can't tell"}]
-SURE = [{"name": "high", "label": "Sure"}, {"name": "medium", "label": "Fairly sure"}, {"name": "low", "label": "Guessing"}]
+SURE = [{"name": "high", "label": "Sure"}, {"name": "medium", "label": "Fairly sure"},
+        {"name": "low", "label": "Guessing"}]
 
 def write_spotcheck(folder, seed=3):
     """spotcheck.html: a batch's units for a person, blind (each unit's sets shown as A and B in
@@ -49,7 +50,8 @@ def write_spotcheck(folder, seed=3):
         second = "variant" if first == "baseline" else "baseline"
         order[item["id"]] = first
         counts = item.get("counts") or {}
-        note = lambda side: _set_note(len(item[side]), counts.get(side, len(item[side])), item.get("hidden_shared", 0))
+        note = lambda side: _set_note(len(item[side]), counts.get(side, len(item[side])),  # noqa: B023 (called at once)
+                                      item.get("hidden_shared", 0))  # noqa: B023 (called at once)
         band = item.get("band")
         document = re.sub(r"-[0-9a-f]{8}$", "", item["run"])
         items.append({"id": item["id"], "image": item["image"], "page_text": item["page_text"],
@@ -60,7 +62,8 @@ def write_spotcheck(folder, seed=3):
                       "B": public(item, item[second], second, first), "page_image": item.get("page_image", ""),
                       "page_text_full": item.get("page_text_full", ""),
                       "a_note": note(first), "b_note": note(second)})
-    howto = PAIRWISE.split("Which set is better?")[1].split("{rubric}")[0].strip() + " " + rubric_of("v4").guidance().strip()
+    howto = (PAIRWISE.split("Which set is better?")[1].split("{rubric}")[0].strip() + " "
+             + rubric_of("v4").guidance().strip())
     data = {"format": SPOTCHECK_FORMAT, "batch": folder.name, "items": items, "howto": " ".join(howto.split()),
             "problems": [{"name": k, "label": k, "help": v} for k, v in PAIR_PROBLEMS.items()],
             "claim_problems": [{"name": k, "label": "duplicate" if k == "duplicates" else k, "help": v}
@@ -88,7 +91,8 @@ def import_spotcheck(folder, answers_file):
         if first is None:
             continue
         side = {"A": first, "B": "variant" if first == "baseline" else "baseline"}
-        marks = {"baseline": [], "variant": []}  # each marked claim, with the claim itself (A1 is baseline[0] or variant[0])
+        # each marked claim, with the claim itself (A1 is baseline[0] or variant[0])
+        marks = {"baseline": [], "variant": []}
         for letter, claims in (a.get("claims") or {}).items():
             shown = items[a["item"]][side[letter]]
             for k, c in sorted(claims.items(), key=lambda kv: int(kv[0])):
@@ -154,7 +158,9 @@ def anchor(folder, human_dir="verdicts-human", verdicts_dir="verdicts"):
         claim_agreement = {"claims": len(pairs), "same": sum(a == b for a, b in pairs)} if pairs else None
         out[name] = {"units": len(both), "same_lean": agree, "opposite": opposite, "claims_marked": wrong,
                                  "claim_agreement_with_judges": claim_agreement,
-                                 "person_win_rate": fmt(interval([person[u] for u in both], clusters=list(map(region, both)))),
-                                 "judges_win_rate": fmt(interval([judges[u] for u in both], clusters=list(map(region, both)))),
+                                 "person_win_rate": fmt(interval([person[u] for u in both],
+                                                                 clusters=list(map(region, both)))),
+                                 "judges_win_rate": fmt(interval([judges[u] for u in both],
+                                                                 clusters=list(map(region, both)))),
                                  "disagreements": [u for u in both if lean(person[u]) * lean(judges[u]) < 0]}
     return out

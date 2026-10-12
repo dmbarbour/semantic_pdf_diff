@@ -63,7 +63,7 @@ class Verbosity(unittest.TestCase):
             root = Path(d)
             for name, power in (('a.pdf', 10), ('b.pdf', 12)):
                 (root / name).write_bytes(pdf_bytes(f'Pump rated power {power} kW'))
-            with contextlib.redirect_stderr(io.StringIO()) as err, contextlib.redirect_stdout(io.StringIO()):
+            with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
                 cli.main([str(root / 'a.pdf'), str(root / 'b.pdf'), '--out', str(root / 'out'), '--base-url', url,
                           '--no-vision', '-vv', '--log-file', str(root / 'run.log')])
             logged = (root / 'run.log').read_text()

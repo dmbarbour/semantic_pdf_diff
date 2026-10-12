@@ -20,7 +20,8 @@ def queries_command(argv):
         description='Queries as the model saw them: dump a sample from runs, and have strong models check them.')
     sub = parser.add_subparsers(dest='command', required=True)
     dump = sub.add_parser('dump', help="Sample queries from a folder of runs (their stores' query logs) into a page")
-    dump.add_argument('runs', type=Path, help='A folder of runs (each with its store), e.g. benchmarks/runs/r09/excerpts')
+    dump.add_argument('runs', type=Path,
+                      help='A folder of runs (each with its store), e.g. benchmarks/runs/r09/excerpts')
     dump.add_argument('--out', type=Path, required=True, help='Folder to write the dump to')
     dump.add_argument('--against', type=Path, help="A baseline's runs: show only what changed, as diffs")
     dump.add_argument('--sample', type=int, default=30)
@@ -78,7 +79,8 @@ def review_command(argv):
     add.add_argument('labels', type=Path, nargs='+')
     panel = sub.add_parser('judge', help='Ask models to review a batch, each as its own reviewer')
     panel.add_argument('batch', type=Path)
-    panel.add_argument('--model', action='append', required=True, help='Model name at the configured endpoint; repeatable')
+    panel.add_argument('--model', action='append', required=True,
+                       help='Model name at the configured endpoint; repeatable')
     panel.add_argument('--limit', type=int, help='Only the first N items (to check cost first)')
     panel.add_argument('--stage', choices=['answers', 'questions'], default='answers',
                        help='Judge the answers (default), or the questions blind (the inputs, without answers)')

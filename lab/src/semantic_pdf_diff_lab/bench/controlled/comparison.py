@@ -173,7 +173,8 @@ def _outcomes(report, kinds, claims_of, read):
     for fid in kinds["conditions"]:  # the value kept: settled means the comparison saw no change
         a, b = claims_of[fid]
         pairs = {(x, y) for x in a for y in b}
-        detail[fid] = ("unextracted" if not a or not b else "settled" if pairs & settled and not between[fid] - {"equivalent"}
+        detail[fid] = ("unextracted" if not a or not b
+                       else "settled" if pairs & settled and not between[fid] - {"equivalent"}
                        else "judged " + "/".join(sorted(between[fid])) if between[fid] else "unpaired")
     for kind, (different, equivalent) in (("changed", ("reported", "called equivalent")),
                                           ("unchanged", ("false change", "confirmed"))):

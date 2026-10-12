@@ -46,7 +46,8 @@ def load(path, rubric=None):
         return {}
     data = json.loads(path.read_text(encoding="utf-8"))
     if rubric and data.get("rubric") not in (None, "", rubric):
-        raise JudgementError(f"{path} was judged under rubric {data['rubric']}, not {rubric}: judge into another folder")
+        raise JudgementError(f"{path} was judged under rubric {data['rubric']}, not {rubric}: "
+                             "judge into another folder")
     return data["verdicts"]
 
 def save(path, rater, verdicts, rubric=""):
@@ -82,7 +83,8 @@ def failures_folder(verdicts_dir):
     """Where a verdicts folder's failed verdicts are counted: failures/ for verdicts/, failures-<x>/
     for verdicts-<x>/. (All folders once shared failures/: a unit that failed twice under one rubric
     was then never asked under another.)"""
-    return "failures" + verdicts_dir[len("verdicts"):] if verdicts_dir.startswith("verdicts") else f"{verdicts_dir}-failures"
+    return ("failures" + verdicts_dir[len("verdicts"):] if verdicts_dir.startswith("verdicts")
+            else f"{verdicts_dir}-failures")
 
 def ask_again(attempts, retry_failed=False):
     """Whether to ask for a verdict that has failed `attempts` times: one that never failed is
@@ -133,7 +135,8 @@ class UnitVerdicts:
         self.orders = {}  # {unit: {rater: {order: score}}}
         rubrics = {r.rubric for r in answered(records) if r.rubric}
         if len(rubrics) > 1:
-            raise JudgementError(f"verdicts under more than one rubric ({', '.join(sorted(rubrics))}) can't be scored together")
+            raise JudgementError(f"verdicts under more than one rubric ({', '.join(sorted(rubrics))}) "
+                                 "can't be scored together")
         for r in answered(records):
             if raters is None or r.rater in raters:
                 self.orders.setdefault(r.unit, {}).setdefault(r.rater, {})[r.order] = r.answer["score"]

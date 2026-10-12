@@ -96,7 +96,8 @@ def hook_problems(cls):
     for hook, kind in hooks(cls).items():
         mine = [k for k in providers(cls, hook) if issubclass(k, Lever)]
         if kind == "chosen" and len(mine) > 1:
-            problems.append(f"{hook} is chosen by one lever, but {', '.join(k.lever_name for k in mine)} all provide it")
+            problems.append(f"{hook} is chosen by one lever, but {', '.join(k.lever_name for k in mine)} all "
+                            "provide it")
         if kind == "chained":
             problems += [f"{k.lever_name}'s {hook} doesn't call super(): the levers below it would be hidden"
                          for k in mine if not _calls_super(vars(k)[hook])]
@@ -149,7 +150,8 @@ class VisualRules(Lever):
     visual_rules: Annotated[list[str], _shaping(VISUAL)] = Field(default_factory=list)
 
     def region_rules(self, region):
-        return super().region_rules(region) + (_rules(self.visual_rules) if region in ("tile", "figure", "overview") else "")
+        return super().region_rules(region) + (_rules(self.visual_rules) if region in ("tile", "figure", "overview")
+                                               else "")
 
 class Neighbours(Lever):
     lever_name, stage = "neighbours", "context"
@@ -554,8 +556,9 @@ class Composable(BaseModel):
         lines = []
         for lever in cls.lever_classes:
             lines.append(f"{lever.lever_name} ({lever.stage or 'lever'}{', parked' if lever.parked else ''})"
-                         + (": " if lever.model_fields else "") + ", ".join(f"{f} [{declared(cls, f).kind}]" if any(isinstance(m, Declared) for m in
-                                                                              cls.model_fields[f].metadata) else f
+                         + (": " if lever.model_fields else "")
+                         + ", ".join(f"{f} [{declared(cls, f).kind}]"
+                                     if any(isinstance(m, Declared) for m in cls.model_fields[f].metadata) else f
                                      for f in lever.model_fields))
         for hook, kind in hooks(cls).items():
             chain = [k.lever_name if issubclass(k, Lever) else "platform" for k in providers(cls, hook)]
@@ -592,7 +595,8 @@ class Platform(Composable):
     situate: Annotated[bool, _selecting(roles=())] = True
     response_format: Annotated[Literal["none", "json_object", "json_schema"], _shaping(roles=EVERY_ROLE)] = "none"
     seed: Annotated[int | None, _shaping(roles=EVERY_ROLE)] = None
-    max_token_field: Annotated[Literal["max_tokens", "max_completion_tokens"], _shaping(roles=EVERY_ROLE)] = "max_tokens"
+    max_token_field: Annotated[Literal["max_tokens", "max_completion_tokens"],
+                               _shaping(roles=EVERY_ROLE)] = "max_tokens"
     aliases: Annotated[dict[str, str], _selecting(roles=COMPARE)] = Field(default_factory=dict)
     # Sources: rescan roots on every run ("auto") or only on `source update` ("manual").
     rescan: Annotated[Literal["auto", "manual"], _selecting(roles=())] = "auto"
@@ -823,7 +827,8 @@ class Platform(Composable):
         """The configuration as data: its levers in order and every setting the platform holds (endpoint
         settings aren't part of it). What store binding records, and what digest() hashes."""
         return {"levers": list(type(self).levers),
-                **{name: value for name, value in self.model_dump(mode="json").items() if name in platform_fields(type(self))}}
+                **{name: value for name, value in self.model_dump(mode="json").items()
+                   if name in platform_fields(type(self))}}
 
     def digest(self):
         return hashlib.sha256(json.dumps(self.configuration(), sort_keys=True).encode()).hexdigest()[:16]

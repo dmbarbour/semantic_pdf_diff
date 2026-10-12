@@ -106,7 +106,8 @@ class Figures(unittest.TestCase):
         self.assertFalse(CAPTION.match('Figure 1 shows the pumps'))
         self.assertFalse(CAPTION.match('Table 5-1 summarizes the drivetrain'))  # not 'Table 5' plus a separator
         self.assertEqual(CAPTION.match('Table 5-1. Drivetrain').group(2), '5-1')
-        self.assertTrue(all(CAPTION.match(t) for t in ('Figure 1: Pumps', 'Table 2 Pump sizes', 'TABLE 3 PUMP SCHEDULE')))
+        self.assertTrue(all(CAPTION.match(t)
+                            for t in ('Figure 1: Pumps', 'Table 2 Pump sizes', 'TABLE 3 PUMP SCHEDULE')))
         by_label = {'figure 24': ['fig'], 'sheet A101': ['sheet']}
         self.assertEqual(targets(by_label, 'figure 2-4A'), ['fig'])    # a panel cites its figure
         self.assertEqual(targets(by_label, 'sheet A-101'), ['sheet'])  # hyphens don't matter
@@ -296,7 +297,8 @@ class Requests(unittest.TestCase):
         self.assertIn('Label: figure 1 (from its caption)', fig1_prompt)
         self.assertIn('Caption: Figure 1: Pump arrangement', fig1_prompt)
         # The whole citing paragraph, with where it is.
-        self.assertIn('- (page 1, section: Pumps) The pump arrangement is shown in Figure 1. See also Table 7', fig1_prompt)
+        self.assertIn('- (page 1, section: Pumps) The pump arrangement is shown in Figure 1. See also Table 7',
+                      fig1_prompt)
         self.assertEqual(len(fig1_images), 1)
         self.assertEqual(key[:2], ('triage', 'figure'))
         uncaptioned = prompts[1]
@@ -361,8 +363,9 @@ class Storage(unittest.TestCase):
             again = json.loads((root / 'out/evidence.json').read_text())
             self.assertEqual(again['situation'], report['situation'])
             self.assertEqual(again['sections'], report['sections'])
+            # checks rerun on loaded results
             self.assertEqual({c: x['quality'] for c, x in again['situation'].items()},
-                             {c: x['quality'] for c, x in report['situation'].items()})  # checks rerun on loaded results
+                             {c: x['quality'] for c, x in report['situation'].items()})
             page = (root / 'out/report.html').read_text()
             self.assertIn('Situating: figures and sections', page)
             self.assertIn('stub figure: Figure 1: Pump arrangement', page)

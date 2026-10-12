@@ -8,7 +8,6 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from stubs import chat_answer, request_body, serving
-from pathlib import Path
 from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.settings import RateRule, Settings
@@ -118,7 +117,7 @@ class ConcurrentClient(unittest.TestCase):
     def test_parallel_requests_respect_the_cap(self):
         state = {'lock': threading.Lock(), 'active': 0, 'peak': 0, 'count': 0}
         url = self.serve(state)
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory():
             client = Client(Settings(base_url=url, concurrency=4, retries=0), None)
             requests = [client.prepare(f'prompt {i}', Extraction) for i in range(12)]
             started = time.monotonic()
@@ -135,7 +134,7 @@ class ConcurrentClient(unittest.TestCase):
         state = {'lock': threading.Lock(), 'active': 0, 'peak': 0, 'count': 0,
                  'answer': lambda n: (0.4, 400) if n % 4 == 0 else (0.04, 40)}
         url = self.serve(state)
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory():
             client = Client(Settings(base_url=url, concurrency=4, retries=0), None)
             requests = [client.prepare(f'prompt {i}', Extraction) for i in range(16)]
             with ThreadPoolExecutor(4) as pool:
@@ -145,7 +144,7 @@ class ConcurrentClient(unittest.TestCase):
     def test_throttling_shrinks_concurrency(self):
         state = {'lock': threading.Lock(), 'active': 0, 'peak': 0, 'count': 0, 'throttle_first': 4, 'delay': 0.05}
         url = self.serve(state)
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory():
             client = Client(Settings(base_url=url, concurrency=8, retries=2), None)
             requests = [client.prepare(f'prompt {i}', Extraction) for i in range(4)]
             with ThreadPoolExecutor(4) as pool:

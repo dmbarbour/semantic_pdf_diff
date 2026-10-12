@@ -10,7 +10,7 @@
 
 Answers are recorded by query in benchmarks/eyetest/replay.zip, so running again (or the report) pays
 only for what's missing.
-"""
+"""  # noqa: E501 (the first line is the --help description)
 import argparse
 import json
 import sys

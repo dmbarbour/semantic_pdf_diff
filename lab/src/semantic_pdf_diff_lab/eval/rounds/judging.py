@@ -15,7 +15,8 @@ def _set_note(shown, total, hidden):
 def _claims_text(claims, letter=None):
     """One line per claim; numbered (A1, A2, ...) when judges mark them one by one."""
     mark = (lambda k: f"{letter}{k + 1}. ") if letter else (lambda k: "- ")
-    return "\n".join(f"{mark(k)}{c['entity']} | {c['attribute']} | {c['value']}{' ' + c['unit'] if c.get('unit') else ''}"
+    return "\n".join(f"{mark(k)}{c['entity']} | {c['attribute']} | {c['value']}"
+                     f"{' ' + c['unit'] if c.get('unit') else ''}"
                      f"{' | conditions: ' + c['conditions'] if c.get('conditions') else ''} | quote: {c['quote']}"
                      for k, c in enumerate(claims)) or "(no claims)"
 
@@ -59,7 +60,8 @@ def _claim_marks(entries, shown):
         if 0 <= k < len(shown) and entry.get("mark") in CLAIM_MARKS:
             out.append({"index": k, "claim": {f: x for f, x in shown[k].items() if not f.startswith("_")},
                         "mark": entry["mark"],
-                        "problems": sorted({str(p).lower() for p in entry.get("problems") or ()} & set(CLAIM_PROBLEMS))})
+                        "problems": sorted({str(p).lower() for p in entry.get("problems") or ()}
+                                           & set(CLAIM_PROBLEMS))})
     return out
 
 # Before a text format's lines (a unit with no image), as the rubrics speak of a page image and its text layer.
@@ -77,7 +79,8 @@ def pair_requests(folder, batch, rubric="v1"):
             raise ValueError(f"{folder} has no page text: restore it and the images from the public slices "
                              "(rounds.rerender(folder, 'samples/slices'))")
         for order in ("baseline-first", "variant-first"):
-            a, b = (item["baseline"], item["variant"]) if order == "baseline-first" else (item["variant"], item["baseline"])
+            a, b = ((item["baseline"], item["variant"]) if order == "baseline-first"
+                    else (item["variant"], item["baseline"]))
             counts = item.get("counts") or {}
             notes = {side: _set_note(len(item[side]), counts.get(side, len(item[side])), item.get("hidden_shared", 0))
                      for side in ("baseline", "variant")}
@@ -95,7 +98,8 @@ def pair_requests(folder, batch, rubric="v1"):
                                      a=_claims_text(a, "A" if numbered else None),
                                      b=_claims_text(b, "B" if numbered else None),
                                      sections=" | ".join(item.get("sections") or ()) or "none",
-                                     part=(f", part {band[0] + 1} of {band[1]}" + ("" if whole else " (the image shows that part)"))
+                                     part=(f", part {band[0] + 1} of {band[1]}"
+                                           + ("" if whole else " (the image shows that part)"))
                                      if band else "",
                                      before=item.get("before") or "(start of the document)",
                                      within=item.get("within") or "nothing numbered",

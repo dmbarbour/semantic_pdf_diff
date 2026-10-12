@@ -14,7 +14,8 @@ def words(text, aliases):
 def candidates(left, right, settings):
     """Bidirectional top-k union; supports one-to-many and many-to-one, no page alignment."""
     all_e = left + right
-    docs = [Counter(words(f"{e.entity} {e.entity} {e.attribute} {e.attribute} {e.conditions} {e.value}", settings.aliases)) for e in all_e]
+    docs = [Counter(words(f"{e.entity} {e.entity} {e.attribute} {e.attribute} {e.conditions} {e.value}",
+                          settings.aliases)) for e in all_e]
     df = Counter(t for d in docs for t in d)
     vectors = []
     for d in docs:

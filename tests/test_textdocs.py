@@ -98,7 +98,8 @@ class Parsing(unittest.TestCase):
         # code review 2026-10-08, B4: "A pump ..." and "I note ..." became headings
         doc = textdocs.parse("A pump runs at 5 kW.\n\nI note the flow.\n\nA.  Overview\n\nA.1.  Details\n",
                              markdown=False)
-        self.assertEqual([(level, title) for _, _, level, title in doc.headings], [(1, "A. Overview"), (2, "A.1. Details")])
+        self.assertEqual([(level, title) for _, _, level, title in doc.headings],
+                         [(1, "A. Overview"), (2, "A.1. Details")])
 
     def test_plain_text_has_rfc_headings_pages_and_no_running_furniture(self):
         doc = textdocs.parse(RFC, markdown=False)
@@ -126,11 +127,13 @@ class Reading(unittest.TestCase):
         self.assertEqual(set(values), {"25.9", "5,151", "96.8", "5,590", "64.9", "3.3"})
         flow = values["25.9"]
         self.assertIsInstance(flow.locator, TextLocator)
-        self.assertEqual(MARKDOWN.splitlines()[flow.locator.lines[0] - 1], "The plant is sized for a design flow of 25.9 MGD.")
+        self.assertEqual(MARKDOWN.splitlines()[flow.locator.lines[0] - 1],
+                         "The plant is sized for a design flow of 25.9 MGD.")
         self.assertEqual(values["5,151"].locator.region, "table")
         self.assertEqual(MARKDOWN.splitlines()[values["5,151"].locator.lines[0] - 1], "| P-101A | 5,151 | 96.8 |")
         rows = [q for q in model.queries if q.region == "table"]
-        self.assertEqual(rows[0].data, 'Header: ["Tag", "Capacity (gpm)", "TDH (ft)"]\nRow: ["P-101A", "5,151", "96.8"]')
+        self.assertEqual(rows[0].data,
+                         'Header: ["Tag", "Capacity (gpm)", "TDH (ft)"]\nRow: ["P-101A", "5,151", "96.8"]')
         self.assertTrue(all(q.heading for q in model.queries))
         self.assertIn("raw water --> rapid mix", "\n".join(q.data for q in model.queries))
         self.assertEqual([r["status"] for r in coverage if r["task"].startswith("image")], ["skipped"])

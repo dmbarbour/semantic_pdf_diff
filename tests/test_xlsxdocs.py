@@ -61,8 +61,8 @@ class Reading(unittest.TestCase):
         doc = read_xlsx(workbook())
         self.assertEqual([title for _, _, _, title in doc.headings], ["Summary", "Polar", "Rev B (superseded)"])
         found = [(g.sheet, g.ref, g.kind) for g in doc.regions]
-        self.assertEqual(found[:4], [("Summary", "A1", "text"), ("Summary", "A2", "text"), ("Summary", "A4:D8", "table"),
-                                     ("Polar", "A1:B2", "pairs")])
+        self.assertEqual(found[:4], [("Summary", "A1", "text"), ("Summary", "A2", "text"),
+                                     ("Summary", "A4:D8", "table"), ("Polar", "A1:B2", "pairs")])
         summary = next(b for b in doc.blocks if b.kind == "table")
         self.assertEqual(summary.rows[0], ["Parameter", "Measured > value", "Measured > ±", "Design"])
         self.assertEqual(summary.rows[1], ["Flow (L/s)", "118", "3", "120"])
@@ -125,8 +125,8 @@ class Reading(unittest.TestCase):
         self.assertTrue(any(w.startswith("skipped: ambiguous sheet layout (Polar!A8:E11)") for w in unread))
         long = next(b for b in doc.blocks if b.kind == "table" and b.grid.place == "Polar!A14:C74")
         self.assertEqual((len(long.rows), long.grid.place, long.grid.columns), (61, "Polar!A14:C74", ["A", "B", "C"]))
-        self.assertEqual((long.grid.names[0], long.grid.rows[0], long.grid.labels), ("15", ["R-001", "Requirement 1", "3"],
-                                                                                      ["ID", "Requirement", "Value"]))
+        self.assertEqual((long.grid.names[0], long.grid.rows[0], long.grid.labels),
+                         ("15", ["R-001", "Requirement 1", "3"], ["ID", "Requirement", "Value"]))
 
     def test_a_workbook_is_extracted_with_cell_locators(self):
         import sys
@@ -202,7 +202,8 @@ class RulesModel:
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent))
         from test_textdocs import Model
-        self.base, self.answers, self.asked, self.reviews, self.reviewed = Model(**settings), answers, [], reviews or {}, []
+        self.base, self.answers, self.asked, self.reviews, self.reviewed = (Model(**settings), answers, [],
+                                                                            reviews or {}, [])
         self.s = self.base.s
 
     def __getattr__(self, name):
@@ -267,7 +268,8 @@ class Rules(unittest.TestCase):
         ruled = [e for e in evidence if e.derivation[-1].step == "table-rules"]
         self.assertEqual(len(ruled), 60)
         first = next(e for e in ruled if e.entity == "R-001")
-        self.assertEqual((first.attribute, first.value, first.quote, first.quote_verified), ("Value", "3", "R-001 | 3", True))
+        self.assertEqual((first.attribute, first.value, first.quote, first.quote_verified),
+                         ("Value", "3", "R-001 | 3", True))
         self.assertEqual((first.locator.sheet, first.locator.cells), ("Polar", "A15:C15"))
         row = next(r for r in coverage if r["task"] == "rules:p2:1")
         self.assertEqual((row["status"], row["claims"]), ("complete", 60))

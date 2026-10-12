@@ -15,7 +15,8 @@ from .textdocs import parse
 
 DERIVATION = {
     "text": [DerivationStep(step="text-file", detail="grouped paragraphs"), DerivationStep(step="model-extraction")],
-    "table": [DerivationStep(step="markdown-table", detail="row with its header"), DerivationStep(step="model-extraction")],
+    "table": [DerivationStep(step="markdown-table", detail="row with its header"),
+              DerivationStep(step="model-extraction")],
 }
 
 def text_sections(doc, depth, pages_per_section):
@@ -92,7 +93,8 @@ class TextReader:
         return ""  # no glossary or figure captions read from text files yet
 
 DOCX_DERIVATION = {
-    "text": [DerivationStep(step="docx-paragraphs", detail="grouped paragraphs"), DerivationStep(step="model-extraction")],
+    "text": [DerivationStep(step="docx-paragraphs", detail="grouped paragraphs"),
+             DerivationStep(step="model-extraction")],
     "table": [DerivationStep(step="docx-table", detail="row with its header"), DerivationStep(step="model-extraction")],
 }
 
@@ -196,9 +198,11 @@ class Format:
 
 _PLAIN, _MARKDOWN = (lambda raw: parse(raw.decode("utf-8", errors="replace"), markdown=False),
                      lambda raw: parse(raw.decode("utf-8", errors="replace"), markdown=True))
-_WORKBOOK = Format(_office("xlsxdocs", "read_xlsx"), XLSX_DERIVATION, lambda doc: partial(xlsx_locator, doc.places), "xlsx")
-_CSV = Format(_office("xlsxdocs", "read_csv"), CSV_DERIVATION, lambda doc: partial(csv_locator, doc.places))  # a one-sheet
-FORMATS = {".txt": Format(_PLAIN, DERIVATION, lambda doc: text_locator),                     # workbook of text cells
+_WORKBOOK = Format(_office("xlsxdocs", "read_xlsx"), XLSX_DERIVATION, lambda doc: partial(xlsx_locator, doc.places),
+                   "xlsx")
+# a one-sheet workbook of text cells
+_CSV = Format(_office("xlsxdocs", "read_csv"), CSV_DERIVATION, lambda doc: partial(csv_locator, doc.places))
+FORMATS = {".txt": Format(_PLAIN, DERIVATION, lambda doc: text_locator),
            ".md": Format(_MARKDOWN, DERIVATION, lambda doc: text_locator),
            ".docx": Format(_office("docxdocs", "read_docx"), DOCX_DERIVATION, lambda doc: docx_locator, "docx"),
            ".pptx": Format(_office("pptxdocs", "read_pptx"), PPTX_DERIVATION, lambda doc: pptx_locator, "pptx"),

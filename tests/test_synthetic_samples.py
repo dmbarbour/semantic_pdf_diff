@@ -47,7 +47,8 @@ class SyntheticSampleTests(unittest.TestCase):
                 owners = [b for b in boxes if b[0] <= column <= b[2] and b[1] <= row <= b[3]]
                 self.assertEqual(len(owners), 1, f"{name}!{openpyxl.utils.get_column_letter(column)}{row}")
             for region, (x0, y0, x1, y1) in zip(sheet["regions"], boxes):
-                self.assertTrue(any(x0 <= c <= x1 and y0 <= r <= y1 for c, r in filled), f"{name} {region['range']} is empty")
+                self.assertTrue(any(x0 <= c <= x1 and y0 <= r <= y1 for c, r in filled),
+                                f"{name} {region['range']} is empty")
 
     def test_formula_has_no_cached_value(self):
         wb = openpyxl.load_workbook(self.dest / "messy-workbook.xlsx", data_only=True)
@@ -65,7 +66,8 @@ class SyntheticSampleTests(unittest.TestCase):
     def test_output_is_deterministic(self):
         with tempfile.TemporaryDirectory() as other:
             load_generator().main(["--dest", other])
-            for name in ["messy-workbook.xlsx", "messy-workbook.expected.json", "messy-export.csv", "messy-export.expected.json"]:
+            for name in ["messy-workbook.xlsx", "messy-workbook.expected.json", "messy-export.csv",
+                         "messy-export.expected.json"]:
                 self.assertEqual((self.dest / name).read_bytes(), (Path(other) / name).read_bytes(), name)
 
 if __name__ == "__main__":

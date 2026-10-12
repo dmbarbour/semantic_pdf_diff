@@ -118,7 +118,8 @@ def locate(project, doc, placed=None, drawn=None):
                 log.append({"text": text, "page": n, "role": facts[0].role if facts else "structure",
                             "facts": [f.id for f in facts]})
         for w in page.get_text("words"):
-            if any(b[0] - 1 <= w[0] and w[2] <= b[2] + 1 and b[1] - 1 <= w[1] and w[3] <= b[3] + 1 for b in chart_boxes):
+            if any(b[0] - 1 <= w[0] and w[2] <= b[2] + 1 and b[1] - 1 <= w[1] and w[3] <= b[3] + 1
+                   for b in chart_boxes):
                 continue
             text = w[4].strip(",.;:()°")
             number = printed_value(text) if re.search(r"[0-9]", text) else None  # "ft²" is a unit, not a 2

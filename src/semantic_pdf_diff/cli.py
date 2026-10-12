@@ -20,7 +20,8 @@ from .report import write_report
 from .store import Store, StoreError
 
 
-COMMANDS = "semantic_pdf_diff.commands"  # the entry-point group installed extras add commands to (the lab's: review, queries)
+# the entry-point group installed extras add commands to (the lab's: review, queries)
+COMMANDS = "semantic_pdf_diff.commands"
 
 def lab_commands():
     """{name: command(argv) -> exit code} from installed distributions (pip install semantic-pdf-diff[lab])."""
@@ -58,7 +59,8 @@ def start_logging(args):
 
 def add_run_options(parser):
     add_log_options(parser)
-    parser.add_argument('--config', type=Path, help='Settings JSON; overrides environment defaults, CLI flags override it')
+    parser.add_argument('--config', type=Path,
+                        help='Settings JSON; overrides environment defaults, CLI flags override it')
     parser.add_argument('--mode', choices=['proposals', 'revisions'], default='proposals')
     parser.add_argument('--model')
     parser.add_argument('--base-url')
@@ -81,10 +83,12 @@ def add_run_options(parser):
     add_budget_options(parser)
     parser.add_argument('--reset', action='store_true',
                         help='Clear derived data affected by a changed extraction interpreter, then run')
-    parser.add_argument('--dry-run', action='store_true', help='With --reset: report what would be cleared, change nothing')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='With --reset: report what would be cleared, change nothing')
 
 def add_budget_options(parser):
-    parser.add_argument('--max-cost', type=float, help='Stop sending once the provider-reported cost reaches this many dollars')
+    parser.add_argument('--max-cost', type=float,
+                        help='Stop sending once the provider-reported cost reaches this many dollars')
     parser.add_argument('--ledger', type=Path, help='Append every response\'s reported cost to this JSON-lines file')
     parser.add_argument('--ledger-tag', action='append', default=[], metavar='KEY=VALUE',
                         help='Tag ledger records, e.g. round=r01 step=record (repeatable)')
@@ -92,7 +96,8 @@ def add_budget_options(parser):
 
 def load_settings(args):
     """The environment, then --config, then the flags."""
-    flags = {name: getattr(args, name) for name in ['model', 'base_url', 'context_tokens', 'max_calls', 'top_k', 'max_cost']
+    flags = {name: getattr(args, name)
+             for name in ['model', 'base_url', 'context_tokens', 'max_calls', 'top_k', 'max_cost']
              if getattr(args, name, None) is not None}
     if getattr(args, 'no_vision', False):
         flags['vision'] = False
@@ -121,7 +126,8 @@ def shortcut_command(argv, client=None):
 # --- compare declared sources ---------------------------------------------------------
 
 def compare_command(argv, client=None):
-    parser = argparse.ArgumentParser(prog='pdf-semantic-diff compare', description='Compare two sources declared in a store.')
+    parser = argparse.ArgumentParser(prog='pdf-semantic-diff compare',
+                                     description='Compare two sources declared in a store.')
     parser.add_argument('sources', nargs='*', help='Names of declared sources')
     parser.add_argument('--manifest', action='append', type=Path, default=[],
                         help='A manifest file as a source, linked live: re-imported when it changes')
@@ -154,7 +160,8 @@ def link_manifest(store, path):
     return source.name
 
 def fixtures_command(argv):
-    parser = argparse.ArgumentParser(prog='pdf-semantic-diff fixtures', description='Replay fixtures of recorded answers.')
+    parser = argparse.ArgumentParser(prog='pdf-semantic-diff fixtures',
+                                     description='Replay fixtures of recorded answers.')
     sub = parser.add_subparsers(dest='command', required=True)
     summary = sub.add_parser('summary', help='What a fixture holds: requests, answers per responder, tokens')
     summary.add_argument('fixture', type=Path)
@@ -167,7 +174,8 @@ def fixtures_command(argv):
     prune.add_argument('--responder')
     prune.add_argument('--dry-run', action='store_true')
     prune.add_argument('--force', action='store_true',
-                       help='prune even if no run since then used the fixture, a run missed requests, or most answers go')
+                       help='prune even if no run since then used the fixture, a run missed requests, '
+                            'or most answers go')
     args = parser.parse_args(argv)
     if args.command == 'prune':
         if args.fixture.suffix != '.sqlite' or not args.fixture.exists():  # a .zip once crashed here
@@ -211,21 +219,25 @@ def source_command(argv):
         return sub
     add = command('add', 'Declare a source and scan it')
     add.add_argument('name')
-    add.add_argument('--path', action='append', type=Path, required=True, help='A root: file, folder or zip (repeatable)')
-    add.add_argument('--meta', action='append', default=[], metavar='KEY=VALUE', help='Provenance metadata (repeatable)')
+    add.add_argument('--path', action='append', type=Path, required=True,
+                     help='A root: file, folder or zip (repeatable)')
+    add.add_argument('--meta', action='append', default=[], metavar='KEY=VALUE',
+                     help='Provenance metadata (repeatable)')
     command('list', 'List declared sources')
     show = command('show', "Show a source's definition, files and scan issues")
     show.add_argument('name')
     update = command('update', 'Change a source and rescan it')
     update.add_argument('name')
     update.add_argument('--path', action='append', type=Path, help='Replace the roots (repeatable)')
-    update.add_argument('--meta', action='append', default=[], metavar='KEY=VALUE', help='Set metadata; KEY= removes it')
+    update.add_argument('--meta', action='append', default=[], metavar='KEY=VALUE',
+                        help='Set metadata; KEY= removes it')
     remove = command('remove', 'Unregister a source (its content stays until gc)')
     remove.add_argument('name')
     exporting = command('export', 'Write a manifest for a source')
     exporting.add_argument('name')
     exporting.add_argument('--output', type=Path, help='Manifest file (default: standard output)')
-    exporting.add_argument('--with-hashes', action='store_true', help='Include content hashes so recipients can check files')
+    exporting.add_argument('--with-hashes', action='store_true',
+                           help='Include content hashes so recipients can check files')
     importing = command('import', 'Declare a source from a manifest (a copy, not a live link)')
     importing.add_argument('manifest', type=Path)
     importing.add_argument('--name', help='Declare under another name')
@@ -332,8 +344,9 @@ def require(store, name):
     return source
 
 def print_scan(summary, name):
-    log.info(f"Scanned {name}: {summary['files']} files ({len(summary['added'])} added, {len(summary['removed'])} removed, "
-             f"{len(summary['changed'])} changed), {len(summary['issues'])} issue(s)")
+    log.info(f"Scanned {name}: {summary['files']} files ({len(summary['added'])} added, "
+             f"{len(summary['removed'])} removed, {len(summary['changed'])} changed), "
+             f"{len(summary['issues'])} issue(s)")
     for path, reason in summary['issues'][:20]:
         log.info(f'  {path}: {reason}')
 

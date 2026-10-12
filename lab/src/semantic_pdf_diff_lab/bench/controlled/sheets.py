@@ -7,7 +7,6 @@ is, schedules on drawing sheets. Values are drawn as a drafter would: dimension 
 with areas, a door schedule; the facts are the rooms' sizes and areas, the doors' sizes, and which room each door
 serves.
 """
-import re
 from dataclasses import dataclass, field
 from semantic_pdf_diff.values import FEET_INCHES, INCH, _inch, ft_in, inches  # noqa: F401 (values.py)
 
@@ -96,14 +95,15 @@ def sheet_project(plan, ident):
         facts.append(Fact(f"{r.door}.height", door, (r.door,), "height", ("door height", "opening height"), ft_in(h),
                           "ft-in", drawn="table"))
         facts.append(Fact(f"{r.door}.part-of.room{r.number}", door, (r.door,), "part of", (), room, "",
-                          relation="part of", object_aliases=aliases, accepts=("within", "linked", "serves", "leads to"),
-                          drawn="table"))
+                          relation="part of", object_aliases=aliases,
+                          accepts=("within", "linked", "serves", "leads to"), drawn="table"))
     for rev, date, what in plan.revisions:  # the revision table's dates: fair claims, so facts
         facts.append(Fact(f"rev{rev}.date", f"Revision {rev}", (f"Rev {rev}", f"Rev. {rev}"), "date",
                           ("issue date", "revision date", "issued", "date issued"), date, "", what, drawn="table"))
     project = Project(ident, "Lakeshore Hall C: Meeting Rooms Floor Plan", facts, [], kinds=SHEET_KNOBS,
                       things=[(f"{r.name.title()} {r.number}", (f"Room {r.number}", f"{r.name.title()} Room {r.number}",
-                                                                 r.number, f"{r.name} {r.number}")) for r in plan.rooms] +
+                                                                 r.number, f"{r.name} {r.number}"))
+                              for r in plan.rooms] +
                              [(f"Door {r.door}", (r.door,)) for r in plan.rooms] +
                              [("Corridor C-100", ("C-100", "corridor"))])  # named on the sheet, though in no fact
     project.sheet = plan
@@ -129,7 +129,8 @@ def render(project):
     ox, oy = 260.0, 330.0  # where grid lines A and 1 cross
     X = lambda ft: ox + ft * SCALE
     Y = lambda ft: oy + ft * SCALE
-    text = lambda x, y, t, s, rotate=0, font="helv": page.insert_text((x, y), t, fontsize=s, fontname=font, rotate=rotate)
+    text = lambda x, y, t, s, rotate=0, font="helv": page.insert_text((x, y), t, fontsize=s, fontname=font,
+                                                                      rotate=rotate)
     width = lambda t, s: pymupdf.get_text_length(t, fontname="helv", fontsize=s)
 
     def lines(points, w=0.6, color=(0, 0, 0), dashes=None):

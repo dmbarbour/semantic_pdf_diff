@@ -54,7 +54,8 @@ def main(argv=None):
     context.add_argument("--seed", type=int, default=1)
     judge = sub.add_parser("judge", help="the panel's verdicts on the same units")
     judge.add_argument("folder", type=Path)
-    judge.add_argument("--rubric", default="v4", help="v4 (sc01's first verdicts, in verdicts/); others in verdicts-<rubric>/")
+    judge.add_argument("--rubric", default="v4",
+                       help="v4 (sc01's first verdicts, in verdicts/); others in verdicts-<rubric>/")
     judge.add_argument("--judge", action="append", default=[])
     judge.add_argument("--escalate", action="append", default=[])
     judge.add_argument("--max-cost", type=float, default=1.0)

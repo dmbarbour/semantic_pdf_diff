@@ -93,6 +93,7 @@ def read(core, page, g, task, boxes, as_table, as_pairs, image=None):
                                            detail=f"a key-value list, the model's reading{why}"[:300]), context)
         said = str(error) if error is not None else f"an answer naming neither reading: {answer.reading!r}"
         record("partial", f"Read as a key-value list, our proposal, not confirmed ({said})")
-        as_pairs(DerivationStep(step="key-value-check", detail="a key-value list, our proposal, not confirmed"), context)
+        as_pairs(DerivationStep(step="key-value-check", detail="a key-value list, our proposal, not confirmed"),
+                 context)
 
     core.ask("key-value", task, prompt, Check, [image] if image else [], finish)

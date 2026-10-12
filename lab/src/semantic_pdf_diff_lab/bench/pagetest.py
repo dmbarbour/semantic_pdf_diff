@@ -66,8 +66,8 @@ MAX_DEPTH, MAX_ZOOMS, QUOTA = 2, 6, 40
 GRID_CELLS = 12             # about this many cells in a labelled grid
 GRID_RED = (0.85, 0.1, 0.1)
 VARIANTS = ("free-boxes", "free-cells", "informed-boxes", "informed-cells", "informed-ranges")
-GRIDDED = ("cells", "ranges")
-RANGE = re.compile(r"[A-K]\d+\s*(?::|-|–|—|\bto\b)\s*[A-K]\d+", re.I)  # a request naming a rectangle of cells  # variants naming regions by a labelled grid drawn over the image
+GRIDDED = ("cells", "ranges")  # variants naming regions by a labelled grid drawn over the image
+RANGE = re.compile(r"[A-K]\d+\s*(?::|-|–|—|\bto\b)\s*[A-K]\d+", re.I)  # a request naming a rectangle of cells
 
 class Found(_Answer):
     items: list[str] = Field(default_factory=list)
@@ -108,7 +108,8 @@ def draw(sheet):
     margin = 54 if drawing else 36
     blocked = [(w - 700, h - 280, w - margin, h - margin)] if drawing else []  # a title block
     items, seen = [], set()
-    overlaps = lambda a, b, pad: not (a[2] + pad <= b[0] or b[2] + pad <= a[0] or a[3] + pad <= b[1] or b[3] + pad <= a[1])
+    overlaps = lambda a, b, pad: not (a[2] + pad <= b[0] or b[2] + pad <= a[0]
+                                      or a[3] + pad <= b[1] or b[3] + pad <= a[1])
 
     def place(pt, area, cluster=None):
         while True:
@@ -226,8 +227,8 @@ def picture(page, clip, px, grid=False):
 
 def _base(whole):
     return (f"The image shows {'a whole page' if whole else 'a close-up of part of a page'}. Codes and numbers are "
-            "scattered on it; they're random, so nothing can be guessed from context. List every code or number you can "
-            "read exactly as printed. Leave out anything you can't read exactly: don't guess.")
+            "scattered on it; they're random, so nothing can be guessed from context. List every code or number "
+            "you can read exactly as printed. Leave out anything you can't read exactly: don't guess.")
 
 def static_prompt(whole):
     return _base(whole) + '\nReturn only JSON: {"items": ["..."]}'
@@ -301,7 +302,6 @@ def plans(sheet, max_tiles=None):
 def run_static(folder, client, sheet, strategies=None):
     """{strategy: [(key, items read)]}: each plan's queries. Strategies are (tile side in points or
     None for the whole page, render px)."""
-    import pymupdf
     from semantic_pdf_diff.dispatch import Dispatcher
     from semantic_pdf_diff.segmentation import tiles
     doc, page, _ = draw(sheet)
@@ -333,7 +333,6 @@ def run_zoom(folder, client, sheet, variant, threshold=None):
     why, every request as given)]: an overview, then the
     close-ups the model asks for, depth-first within MAX_DEPTH and QUOTA. threshold(w, h): the
     model's reading threshold in px for an image of that size (for "informed")."""
-    import pymupdf
     from semantic_pdf_diff.dispatch import Dispatcher
     doc, page, _ = draw(sheet)
     target = Path(folder) / "images"
@@ -363,7 +362,8 @@ def run_zoom(folder, client, sheet, variant, threshold=None):
                 for n, request in enumerate(requests):
                     region = _region(request, rect, cells, page.rect) if n < MAX_ZOOMS else None
                     if region is None:
-                        unused.append((str(request)[:60], "over the limit" if n >= MAX_ZOOMS else "not a usable region"))
+                        unused.append((str(request)[:60],
+                                       "over the limit" if n >= MAX_ZOOMS else "not a usable region"))
                     elif any((region & r).get_area() > 0.8 * region.get_area() for r in regions):
                         unused.append((str(request)[:60], "repeats another"))
                     else:
@@ -401,7 +401,8 @@ def whole_in_tiles(sheet, side):
     doc, page, items = draw(sheet)
     rects = [page.rect] if side is None else list(tiles(page.rect, side))
     doc.close()
-    return round(sum(any(pymupdf.Rect(r).contains(pymupdf.Rect(i["box"])) for r in rects) for i in items) / len(items), 4)
+    return round(sum(any(pymupdf.Rect(r).contains(pymupdf.Rect(i["box"])) for r in rects) for i in items)
+                 / len(items), 4)
 
 def zoom_quality(sheet, log, threshold):
     """For a close-up run: of the items too small to read in the overview (by the model's threshold),
@@ -492,7 +493,8 @@ def results(static, zooms, tokens, threshold=None):
                 **score(sheet, answers), **_cost([(e[0], e[1]) for e in log], tokens),
                 "failed": sum(1 for e in log if e[5]),
                 "zooms_unused": sum(len(e[6]) for e in log if len(e) > 6),
-                "ranges_asked": sum(1 for e in log if len(e) > 7 for r in e[7] if RANGE.search(r)), "depths": {d: sum(1 for e in log if e[2] == d) for d in range(MAX_DEPTH + 1)},
+                "ranges_asked": sum(1 for e in log if len(e) > 7 for r in e[7] if RANGE.search(r)),
+                "depths": {d: sum(1 for e in log if e[2] == d) for d in range(MAX_DEPTH + 1)},
                 **zoom_quality(sheet, log, threshold)}
     return out
 
@@ -550,18 +552,20 @@ def page(folder, data):
                 if not plans:
                     continue
                 pts = [f"{p:g}" for p in fonts(kind)]
-                extra = ["whole_in_tiles"] if part == "static" else ["small_covered", "first_zooms", "first_zooms_useful",
-                                                                     "clusters_found"]
+                extra = (["whole_in_tiles"] if part == "static"
+                         else ["small_covered", "first_zooms", "first_zooms_useful", "clusters_found"])
                 out.append(f"<h3>{esc(model)}: {'static plans' if part == 'static' else 'close-ups'}</h3>"
                            "<div class='scroll'><table><tr><th>Plan</th>" + "".join(f"<th>{p} pt</th>" for p in pts) +
-                           "<th>All</th><th>Smallest read (pt)</th><th>Spurious</th><th>Queries</th><th>Prompt tokens</th>" +
+                           "<th>All</th><th>Smallest read (pt)</th><th>Spurious</th><th>Queries</th>"
+                           "<th>Prompt tokens</th>" +
                            "".join(f"<th>{esc(e)}</th>" for e in extra) + "</tr>")
                 for name, acc in plans.items():
                     out.append(f"<tr><td>{esc(name)}</td>" + "".join(_cell(acc.get("by_pt", {}).get(p)) for p in pts) +
                                _cell(acc.get("recall")) + f"<td>{_num(acc.get('min_pt'))}</td>"
                                f"<td>{acc.get('spurious', 0):g}</td><td>{acc.get('queries', 0):g}</td>"
                                f"<td>{acc.get('prompt_tokens', 0):g}</td>" +
-                               "".join(f"<td>{'–' if acc.get(e) is None else f'{acc[e]:g}'}</td>" for e in extra) + "</tr>")
+                               "".join(f"<td>{'–' if acc.get(e) is None else f'{acc[e]:g}'}</td>"
+                                       for e in extra) + "</tr>")
                 out.append("</table></div>")
     target = Path(folder) / "report.html"
     target.write_text(html_page("Page tests", "\n".join(out), STYLE) + "\n", encoding="utf-8")

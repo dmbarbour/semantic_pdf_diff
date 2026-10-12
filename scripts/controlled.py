@@ -20,8 +20,9 @@ With --unaligned the PDF pairs are compared again with alignment off (into "<rec
 retrieval candidate is judged, as before alignment, so most "different" findings aren't changes, and the
 explanations (compare.explain) are measured where non-changes abound.
 
-With --rows every document and pair is read again with every table read row by row (table_rules none), into "<recorded or replay>-rows": the baseline the standard runs' tables, each read as a model
-says (tablerules.py), are scored against by the same keys. Packed with the standard runs.
+With --rows every document and pair is read again with every table read row by row (table_rules none), into
+"<recorded or replay>-rows": the baseline the standard runs' tables, each read as a model says (tablerules.py), are
+scored against by the same keys. Packed with the standard runs.
 
 Recording adds to the working fixture (fixture.sqlite, git-ignored), which keeps every answer ever recorded. `pack`
 writes the committed replay.zip: the standard runs are replayed from fresh stores against a copy of the fixture, and
@@ -159,8 +160,8 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
     from semantic_pdf_diff_lab.bench.controlled import word
     for suffix, folder in REPRESENTATIONS.items():
         listed = revisions.pairs() + (word.pairs() if suffix == ".docx" else [])  # Word's own: word.py
-        jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}", pair_runs / out.name / f"{p.id}{suffix}",
-                  f"pair {p.id}{suffix}", "revisions") for p in listed
+        jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}",
+                  pair_runs / out.name / f"{p.id}{suffix}", f"pair {p.id}{suffix}", "revisions") for p in listed
                  if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
     jobs = [job for job in jobs if job[4] != "revisions" or not same_document(job[0], job[1])]
     overrides = {}
@@ -227,14 +228,15 @@ def score():
                     if run.startswith(project + "-s") and run[len(project) + 2:].partition("-")[0].isdigit()}
             if not mine:
                 continue
-            print(f"\n{which} {project}: knob      recall  right  loose  misbound  inexact  wrong unit  misread  hallucinated  claims"
-                  "  conditions   misbound by reader; conditions kept by reader")
+            print(f"\n{which} {project}: knob      recall  right  loose  misbound  inexact  wrong unit  misread"
+                  "  hallucinated  claims  conditions   misbound by reader; conditions kept by reader")
             for knob in knobs:
                 r = mine.get(knob)
                 if r:
                     o = r["outcomes"]
                     print(f"  {knob:12s} {r['recall']:7.3f} {r['found_right']:6d} {o.get('loose', 0):6d} "
-                          f"{o.get('misbound', 0):9d} {o.get('inexact', 0):8d} {o.get('wrong unit', 0):11d} {o.get('misread', 0):8d} "
+                          f"{o.get('misbound', 0):9d} {o.get('inexact', 0):8d} {o.get('wrong unit', 0):11d} "
+                          f"{o.get('misread', 0):8d} "
                           f"{o.get('hallucinated', 0):13d} {r['claims']:7d}"
                           f"  {r['conditions_kept']:>10s}   "
                           + " ".join(f"{f} {x.get('misbound', 0)}" for f, x in r["outcomes_by_reader"].items())
@@ -316,9 +318,11 @@ def compare_pairs():
         for pair in revisions.pairs() + word.pairs():
             for suffix in (("", *REPRESENTATIONS) if pair in revisions.pairs() else (".docx",)):
                 report = PAIR_RUNS / which / f"{pair.id}{suffix}" / "report.json"
-                documents = [key_path(d + suffix).with_name(f"{d}{suffix or '.pdf'}") for d in (pair.earlier, pair.later)]
+                documents = [key_path(d + suffix).with_name(f"{d}{suffix or '.pdf'}")
+                             for d in (pair.earlier, pair.later)]
                 if report.exists() and not same_document(*documents):
-                    keys = [json.loads(key_path(d + suffix).read_text(encoding="utf-8")) for d in (pair.earlier, pair.later)]
+                    keys = [json.loads(key_path(d + suffix).read_text(encoding="utf-8"))
+                            for d in (pair.earlier, pair.later)]
                     compared.setdefault(which, {})[pair.id + suffix] = comparison.score_comparison(
                         *keys, json.loads(report.read_text(encoding="utf-8")))
     (FOLDER / "comparisons.json").write_text(json.dumps(compared, indent=1) + "\n", encoding="utf-8")

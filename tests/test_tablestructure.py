@@ -56,7 +56,8 @@ class Applying(unittest.TestCase):
         a = answer(rules=[{"action": "join header", "lines": ["1"]}, {"action": "not table", "lines": ["3"]},
                           {"action": "new table", "lines": ["4"]}, {"action": "section", "lines": ["6"]}])
         got = ts.apply(a, HEADER, body, BOXES, [[]] * 7)
-        self.assertEqual([p[0] for p in got.parts], [["Camera", "UV Channel", "IR Channel"], ["Blowers", "Flow", "Power"]])
+        self.assertEqual([p[0] for p in got.parts],
+                         [["Camera", "UV Channel", "IR Channel"], ["Blowers", "Flow", "Power"]])
         self.assertEqual(got.parts[1][1], [["B-1", "900", "40"], ["Standby", "", ""], ["B-2", "800", "30"]])
         self.assertEqual((got.apart, got.heads), ([2], [[1], [4]]))
         self.assertEqual(got.holding(1, body), ["Camera", "UV Channel", "IR Channel"])
@@ -82,7 +83,8 @@ class Applying(unittest.TestCase):
         self.assertEqual((head, rows), (["A", "B C D E", "F"], [["a", "b c d e", "f"]]))
 
     def test_problems_before_applying(self):
-        a = answer(rules=[{"action": "merge", "lines": ["2"]}, {"action": "join above", "when": ["odd"], "lines": ["99"]},
+        a = answer(rules=[{"action": "merge", "lines": ["2"]},
+                          {"action": "join above", "when": ["odd"], "lines": ["99"]},
                           {"action": "keep"}, {"action": "split column", "column": "Q", "into": ["x"]}],
                    examples=[{"line": "1", "cells": ["FOV"]}])
         wrong = ts.problems(a, len(BODY), 3, self.tags)
@@ -107,7 +109,8 @@ class Applying(unittest.TestCase):
 
     def test_numbers_given_for_lines_and_cells_are_read_as_text(self):
         a = answer(rules=[{"action": "join above", "lines": [3, 5]}], examples=[{"line": 2, "cells": ["Detector", 7]}])
-        self.assertEqual((a.rules[0].lines, a.examples[0].line, a.examples[0].cells), (["3", "5"], "2", ["Detector", "7"]))
+        self.assertEqual((a.rules[0].lines, a.examples[0].line, a.examples[0].cells),
+                         (["3", "5"], "2", ["Detector", "7"]))
 
 class Mended(unittest.TestCase):
     """What the development slices showed (2026-10-07): the header named among lines, rules leaving no rows, and
@@ -192,7 +195,8 @@ class Asked(unittest.TestCase):
 
         core = SimpleNamespace(content="c", output=__import__("pathlib").Path("/tmp"), state={"pending": 0},
                                progress=SimpleNamespace(add=lambda: None, finish=lambda status: None),
-                               dispatch=SimpleNamespace(submit=submit), s=SimpleNamespace(reviews_tables=lambda: review),
+                               dispatch=SimpleNamespace(submit=submit),
+                               s=SimpleNamespace(reviews_tables=lambda: review),
                                record=lambda row, claims: recorded.append(row))
 
         core.ask = partial(TaskCore.ask, core)  # the task core's protocol, on the fake
@@ -220,7 +224,8 @@ class Asked(unittest.TestCase):
         self.assertEqual([a[1] for a in asked], ["structure:p4:0", "structure:p4:0:again"])
         self.assertIn("ITS PROBLEMS:\n- line 7: your rules give µm | µm; your example Bands | x", asked[1][2])
         self.assertEqual(out, {"parts": [(HEADER, BODY, BOXES)], "step": None, "apart": [], "table": True})
-        self.assertTrue(recorded[-1]["issues"][0].startswith("Structure as the heuristics left it: the rules failed twice"))
+        self.assertTrue(recorded[-1]["issues"][0].startswith(
+            "Structure as the heuristics left it: the rules failed twice"))
 
     def test_failures_keep_the_heuristics(self):
         """Its failure paths (code review 2026-10-08: a test gap): failed or not reached, first or second, the table is
@@ -250,7 +255,8 @@ class Asked(unittest.TestCase):
         asked, recorded, out = self.run_with([none])
         self.assertEqual(len(asked), 1)
         self.assertEqual((out["parts"], out["table"]), ([(HEADER, BODY, BOXES)], False))  # read as no table
-        self.assertEqual(recorded[-1]["issues"], ["Structure as the heuristics left it: the rules leave no rows (a title block)"])
+        self.assertEqual(recorded[-1]["issues"],
+                         ["Structure as the heuristics left it: the rules leave no rows (a title block)"])
 
     def test_a_table_without_suspects_isnt_asked(self):
         out = {}
@@ -594,7 +600,8 @@ class Detection(unittest.TestCase):
         rows = [["Tag", "Flow", "Head", "Power"], ["P-1", "120", "25", "40"]]
         partial = lambda task: Extraction(claims=[], complete=False) if task == "table:p1:0:0" else None
         asked, _ = self.extract([((20, 20, 280, 120), rows)], partial)
-        self.assertEqual([t for t in asked if t.startswith("table:")], ["table:p1:0:0", "table:p1:0:0:c0", "table:p1:0:0:c1"])
+        self.assertEqual([t for t in asked if t.startswith("table:")],
+                         ["table:p1:0:0", "table:p1:0:0:c0", "table:p1:0:0:c1"])
 
     def test_a_mending_bug_is_named_ours_and_the_table_read_as_detected(self):
         rows = [["Tag", "Flow"], ["P-1", "120"]]

@@ -11,7 +11,8 @@ from .regions import crop_name, crop_stem
 
 PARAGRAPH = 1500     # characters of a citing paragraph kept
 
-ABBREVIATIONS = {"fig", "figs", "no", "nos", "eq", "eqs", "ref", "refs", "approx", "e.g", "i.e", "vs", "cf", "dwg", "sec"}
+ABBREVIATIONS = {"fig", "figs", "no", "nos", "eq", "eqs", "ref", "refs", "approx", "e.g", "i.e", "vs", "cf", "dwg",
+                 "sec"}
 
 def sentence_around(text, match):
     """The sentence containing a match; periods after abbreviations such as 'fig.' don't end it."""
@@ -43,8 +44,8 @@ def find_references(doc, figures):
                 if label_key(label) in seen:  # one reference per paragraph and label
                     continue
                 seen.add(label_key(label))
-                reference = Reference(page=number, bbox=tuple(block[:4]), text=sentence_around(text, match), label=label,
-                                      paragraph=text[:PARAGRAPH])
+                reference = Reference(page=number, bbox=tuple(block[:4]), text=sentence_around(text, match),
+                                      label=label, paragraph=text[:PARAGRAPH])
                 cited = targets(by_label, label)
                 if not cited:
                     unresolved.append(reference)
@@ -200,7 +201,8 @@ def figure_material(doc, figure, index, by_id, text_by_page):
     page = doc[figure.page - 1]
     heading = lambda p, box=(0, 0, 0, 0): " > ".join(index.box(p, box).heading_path) if index.sections else ""
     where = heading(figure.page, figure.bbox)
-    part = {"location": f"page {figure.page} of {len(doc)}, {position(page, figure)}" + (f"; section: {where}" if where else "")}
+    part = {"location": f"page {figure.page} of {len(doc)}, {position(page, figure)}"
+                        + (f"; section: {where}" if where else "")}
     if figure.label:
         part["label"] = f"{figure.label} (from its {figure.label_source or 'caption'})"
     if figure.caption:
@@ -215,7 +217,8 @@ def figure_material(doc, figure, index, by_id, text_by_page):
         f"- (page {r.page}" + (f", section: {heading(r.page, r.bbox)}" if heading(r.page, r.bbox) else "")
         + f") {r.paragraph or r.text}"
         for r in figure.references[:MAX_CITATIONS])
-    part["claims extracted from it"] = "\n".join(claim_line(by_id[i]) for i in figure.claims[:MAX_FIGURE_CLAIMS] if i in by_id)
+    part["claims extracted from it"] = "\n".join(claim_line(by_id[i]) for i in figure.claims[:MAX_FIGURE_CLAIMS]
+                                                 if i in by_id)
     return part
 
 def instructions(kind):
@@ -264,7 +267,8 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
         rect = shown(page, rect)  # figure boxes are unrotated; rendering isn't
         whole = abs(rect & page.rect) >= 0.99 * abs(page.rect)
         scale = min(2.5, side / max(rect.width, rect.height, 1))
-        page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=None if whole else rect, alpha=False).save(assets / name)
+        page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=None if whole else rect,
+                        alpha=False).save(assets / name)
         return output / "assets" / name
 
     def key(kind, ident, *parts):
@@ -314,13 +318,15 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
         inside = in_section(evidence, section, index)
         claims = "\n".join(claim_line(e) for e in inside[:MAX_SECTION_CLAIMS]) or "(none)"
         mine = [f for f in figures if index.box(f.page, f.bbox).id == section.id][:MAX_SECTION_FIGURES]
-        figs = "\n".join(f"- {f.label or 'unlabelled ' + f.kind} (page {f.page}): {f.about or f.caption or '(not described)'}"
+        figs = "\n".join(f"- {f.label or 'unlabelled ' + f.kind} (page {f.page}): "
+                         f"{f.about or f.caption or '(not described)'}"
                          for f in mine) or "(none)"
         # Sheets are shown by their figure requests; scans only by an image of the page.
         overview = [p for p in pages if p not in sheets and scanned(doc[p - 1], text_by_page[p])][:MAX_OVERVIEWS]
         images = [render(p, native_page(doc[p - 1]), crop_name(stem, f"overview-p{p}")) for p in overview]
         heading = " > ".join(section.heading_path) or "(no heading)"
-        head = (SITUATE_SECTION + f"\nHeading path: {heading}\nPages: {section.first_page}-{section.last_page} of {len(doc)}"
+        head = (SITUATE_SECTION + f"\nHeading path: {heading}\nPages: {section.first_page}-{section.last_page} "
+                f"of {len(doc)}"
                 f"\nFigures:\n{figs}\nClaims:\n{claims}\nText:\n")
         body, trimmed = fit_text(text, client, head, images)
         if trimmed:
@@ -334,7 +340,8 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
                 updated[section.id] = section
                 return
             updated[section.id] = section.model_copy(update={"about": result.about, "section_type": result.type,
-                                                             "density": result.density, "keywords": list(result.keywords)})
+                                                             "density": result.density,
+                                                             "keywords": list(result.keywords)})
         progress.add()
         dispatch.submit(prompt, SectionAbout, images, key("section", section.id, prompt), finish)
     dispatch.drain()
@@ -401,7 +408,8 @@ def quality(doc, figures, sections, unresolved, evidence):
         around = [pages_text[f.page]] if position(page, f) == "the whole page" else surroundings(page, f.bbox, AROUND)
         material = " ".join([f.caption, f.title, *around, *(r.paragraph or r.text for r in f.references),
                              claim_text(f.claims)])
-        check("figure", f.id, f.about + " " + f.role if f.role else f.about, material, f"{f.caption} {f.title} {f.label or ''}")
+        check("figure", f.id, f.about + " " + f.role if f.role else f.about, material,
+              f"{f.caption} {f.title} {f.label or ''}")
     from .sections import SectionIndex, section_text
     index = SectionIndex(sections, doc)
     for s in sections:
@@ -414,7 +422,8 @@ def quality(doc, figures, sections, unresolved, evidence):
     resolved = sum(len(f.references) for f in figures)
     return {
         "references": {"resolved": resolved, "unresolved": len(unresolved),
-                       "rate": round(resolved / (resolved + len(unresolved)), 3) if resolved + len(unresolved) else None},
+                       "rate": (round(resolved / (resolved + len(unresolved)), 3) if resolved + len(unresolved)
+                                else None)},
         "figures": {"total": len(figures), "unlabelled": len(figures) - len(labelled),
                     "labelled_uncited": sum(1 for f in labelled if not f.references),
                     **{f"labelled_from_{source.replace(' ', '_')}": sum(1 for f in labelled if f.label_source == source)

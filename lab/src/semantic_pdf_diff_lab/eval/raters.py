@@ -18,8 +18,8 @@ class ModelJudge:
 
     def rate(self, folder, limit=None, only=None, retry_failed=False, progress=None):
         from .rounds import judge_pairs
-        _, _, self.errors = judge_pairs(folder, self.client, self.name, progress, limit, self.rubric, only, retry_failed,
-                                        self.verdicts_dir)
+        _, _, self.errors = judge_pairs(folder, self.client, self.name, progress, limit, self.rubric, only,
+                                        retry_failed, self.verdicts_dir)
         return [r for r in read(folder, self.verdicts_dir) if r.rater == self.name]
 
 class Person:

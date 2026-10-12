@@ -61,7 +61,8 @@ class Records(unittest.TestCase):
         self.assertEqual(judge.asked, [])
         rounds.judge_pairs(self.folder, judge, "judge-a", rubric="v6", verdicts_dir="verdicts-v6")
         self.assertIn(("judge", table, "v6", "baseline-first"), judge.asked)  # asked afresh under v6
-        self.assertEqual(json.loads((self.folder / "failures" / "judge-a.json").read_text())[f"{table}|baseline-first"], 2)
+        self.assertEqual(json.loads((self.folder / "failures" / "judge-a.json").read_text())[f"{table}|baseline-first"],
+                         2)
         self.assertEqual({r.status for r in judgements.read(self.folder, "verdicts-v6")}, {"answered"})
 
     def test_the_quote_check_rates_every_claim(self):

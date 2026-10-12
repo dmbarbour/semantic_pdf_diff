@@ -197,8 +197,9 @@ class Numbering:
             for abstract in root.iter(_qn("w:abstractNum")):
                 levels = {}
                 for level in abstract.iter(_qn("w:lvl")):
-                    value = lambda tag, default: (level.find(_qn(tag)).get(_qn("w:val"))
-                                                  if level.find(_qn(tag)) is not None else default)
+                    value = lambda tag, default: (level.find(_qn(tag)).get(_qn("w:val"))  # noqa: B023 (called at once)
+                                                  if level.find(_qn(tag)) is not None  # noqa: B023 (called at once)
+                                                  else default)
                     levels[int(level.get(_qn("w:ilvl")))] = (int(value("w:start", "1")), value("w:numFmt", "decimal"),
                                                             value("w:lvlText", ""))
                 self.levels[abstract.get(_qn("w:abstractNumId"))] = levels
@@ -225,7 +226,8 @@ class Numbering:
         if numbering is None:
             return None
         num, level = numbering.find(_qn("w:numId")), numbering.find(_qn("w:ilvl"))
-        return (num.get(_qn("w:val")) if num is not None else None, int(level.get(_qn("w:val"))) if level is not None else 0)
+        return (num.get(_qn("w:val")) if num is not None else None,
+                int(level.get(_qn("w:val"))) if level is not None else 0)
 
     def label(self, paragraph):
         """A paragraph's label, counted ("" when it isn't numbered)."""

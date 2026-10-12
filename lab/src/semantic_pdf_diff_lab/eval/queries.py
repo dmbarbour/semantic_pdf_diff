@@ -150,7 +150,8 @@ def dump(runs_dir, folder, against=None, sample=30, seed=1, lever=None, role="ex
     summary = {"runs": str(runs_dir), "against": str(against) if against else None, "role": role, "lever": lever,
                "seed": seed, "queries": len(variant), "unchanged": unchanged, "candidates": len(candidates),
                "shown": len(shown),
-               "by_status": {s: sum(1 for c in candidates if c[3] == s) for s in ("changed", "added", "removed", "sampled")}}
+               "by_status": {s: sum(1 for c in candidates if c[3] == s)
+                             for s in ("changed", "added", "removed", "sampled")}}
     with (folder / "queries.jsonl").open("w", encoding="utf-8") as f:
         for item in shown:
             f.write(json.dumps(item, ensure_ascii=False) + "\n")
@@ -159,14 +160,16 @@ def dump(runs_dir, folder, against=None, sample=30, seed=1, lever=None, role="ex
     return summary
 
 def items(folder):
-    return [json.loads(line) for line in (Path(folder) / "queries.jsonl").read_text(encoding="utf-8").splitlines() if line]
+    return [json.loads(line) for line in (Path(folder) / "queries.jsonl").read_text(encoding="utf-8").splitlines()
+            if line]
 
 def check_prompt(item):
     problems = "".join(f"- {k}: {v}\n" for k, v in PROBLEMS.items())
     diff = "\n".join(item["diff"])
     change = CHANGE.format(diff=diff[:3000] + ("\n..." if len(diff) > 3000 else "")) if diff else ""
     return CHECK.format(change=change, problems=problems, prompt=item["prompt"],
-                        in_change_field=IN_CHANGE_FIELD if diff else "", in_change_help=IN_CHANGE_HELP if diff else "")
+                        in_change_field=IN_CHANGE_FIELD if diff else "",
+                        in_change_help=IN_CHANGE_HELP if diff else "")
 
 def check(folder, client, model, progress=None):
     """Ask one checker model about every query in a dump; merged into checks/<model>.json. Answers are
@@ -177,8 +180,9 @@ def check(folder, client, model, progress=None):
     target = folder / "checks" / f"{reviewer_file(model)}.json"
     checks = json.loads(target.read_text(encoding="utf-8"))["checks"] if target.exists() else {}
     todo = {item["id"]: item for item in items(folder) if item["id"] not in checks}
-    answers, errors = judgements.rate(client, ((ident, check_prompt(item), QueryCheck, [folder / i for i in item["images"]],
-                                                ("check", ident)) for ident, item in todo.items()), progress)
+    answers, errors = judgements.rate(client, ((ident, check_prompt(item), QueryCheck,
+                                                [folder / i for i in item["images"]], ("check", ident))
+                                               for ident, item in todo.items()), progress)
     failures = [f"{ident}: {error}" for ident, error in errors.items()]
     for ident, value in answers.items():
         ok = value.ok and not value.problems
@@ -187,7 +191,8 @@ def check(folder, client, model, progress=None):
                          # a changed query's problem is the change's unless the checker says otherwise
                          "in_change": None if ok or not todo[ident]["diff"] else value.in_change is not False}
     target.parent.mkdir(exist_ok=True)
-    target.write_text(json.dumps({"model": model, "checks": checks}, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    target.write_text(json.dumps({"model": model, "checks": checks}, indent=2, ensure_ascii=False) + "\n",
+                      encoding="utf-8")
     page(folder)
     return target, len(checks), failures
 
@@ -217,23 +222,31 @@ def page(folder):
         notes = "".join(f"<tr><th>{esc(k)}</th><td>{esc(v)}</td></tr>" for k, v in item["notes"].items()) or \
             "<tr><td>(no lever lines)</td></tr>"
         verdicts = "".join(
-            f"<li class='{'ok' if c['ok'] else 'bad' if c.get('in_change') is not False else 'old'}'><b>{esc(m)}</b>: "
+            f"<li class='{'ok' if c['ok'] else 'bad' if c.get('in_change') is not False else 'old'}'>"
+            f"<b>{esc(m)}</b>: "
             f"{'ok' if c['ok'] else ', '.join(c['problems']) or 'problem'}"
             f"{' (there before the change)' if c.get('in_change') is False else ''}"
-            f"{' – ' + esc(c['note']) if c['note'] else ''}</li>" for m, c in sorted(checks.get(item["id"], {}).items()))
-        diff = "".join(f"<span class='{'add' if l.startswith('+') else 'del' if l.startswith('-') else 'hunk' if l.startswith('@@') else ''}'>"
-                       f"{esc(l)}</span>\n" for l in item["diff"])
-        images = "".join(f"<a href='{esc(i)}'><img src='{esc(i)}' alt='image sent with the query'></a>" for i in item["images"])
-        parts.append(f"""<section id="{item['id']}"><h2>{esc(item['id'])} · {esc(item['document'])} · {esc(item['task'])}
+            f"{' – ' + esc(c['note']) if c['note'] else ''}</li>"
+            for m, c in sorted(checks.get(item["id"], {}).items()))
+        diff = "".join(
+            f"<span class='"
+            f"{'add' if l.startswith('+') else 'del' if l.startswith('-') else 'hunk' if l.startswith('@@') else ''}'>"
+            f"{esc(l)}</span>\n" for l in item["diff"])
+        images = "".join(f"<a href='{esc(i)}'><img src='{esc(i)}' alt='image sent with the query'></a>"
+                         for i in item["images"])
+        parts.append(f"""<section id="{item['id']}"><h2>{esc(item['id'])} · {esc(item['document'])} · \
+{esc(item['task'])}
 <span class="status">{esc(item['status'])}</span></h2>
 {f'<ul class="checks">{verdicts}</ul>' if verdicts else ''}
 <table class="notes">{notes}</table>
 {f'<pre class="diff">{diff}</pre>' if diff else ''}
-<details{' open' if not diff else ''}><summary>The query as sent ({len(item['prompt'])} characters)</summary><pre>{esc(item['prompt'])}</pre></details>
+<details{' open' if not diff else ''}><summary>The query as sent ({len(item['prompt'])} characters)</summary>\
+<pre>{esc(item['prompt'])}</pre></details>
 <div class="images">{images}</div></section>""")
     flags = sum(1 for i in checks.values() if any(not c["ok"] for c in i.values()))
-    head = (f"{summary['shown']} of {summary['candidates']} queries" + (f" that differ from the baseline ({summary['unchanged']} unchanged)"
-            if summary["against"] else "") + (f", where {summary['lever']} added something" if summary["lever"] else "")
+    head = (f"{summary['shown']} of {summary['candidates']} queries"
+            + (f" that differ from the baseline ({summary['unchanged']} unchanged)" if summary["against"] else "")
+            + (f", where {summary['lever']} added something" if summary["lever"] else "")
             + (f"; {flags} flagged by a checker" if checks else ""))
     from semantic_pdf_diff.html_pages import page as html_page
     style = """

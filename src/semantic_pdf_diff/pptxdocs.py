@@ -246,22 +246,22 @@ def read_pptx(data):
             elif item.kind in ("text", "subtitle", "title"):
                 for text in item.payload:
                     if text:
-                        m = line(page, text)
-                        blocks.append(Block(page, m, m, text))
+                        m = line(page, text)  # noqa: B023 (called at once)
+                        blocks.append(Block(page, m, m, text))  # noqa: B023 (called at once)
             elif item.kind == "table":
-                table(page, item.payload)
+                table(page, item.payload)  # noqa: B023 (called at once)
             elif item.kind == "chart":
-                chart(page, item.payload)
+                chart(page, item.payload)  # noqa: B023 (called at once)
             elif item.kind == "picture":
                 name, data = item.payload
-                m = line(page, "")  # the picture's place among the slide's lines
+                m = line(page, "")  # the picture's place among the slide's lines  # noqa: B023 (called at once)
                 size = (item.box[2] / EMU_PER_POINT, item.box[3] / EMU_PER_POINT) if item.box[2] else None
                 pictures.append(Picture(m, data, "." + name.rsplit(".", 1)[-1].lower(), size,
-                                        title, name.rsplit("/", 1)[-1], page))
+                                        title, name.rsplit("/", 1)[-1], page))  # noqa: B023 (called at once)
             elif item.kind == "connector":
                 connectors += 1
             elif item.kind == "unread":
-                images.append((page, len(lines), "slide", item.payload))
+                images.append((page, len(lines), "slide", item.payload))  # noqa: B023 (called at once)
 
         def table(page, element):
             grid = _grid(element)
@@ -277,7 +277,7 @@ def read_pptx(data):
                 row_lines.append(line(page, " | ".join(c.text for c in cells)))
             first = header_lines[0]
             counted[page] = counted.get(page, 0) + 1
-            ruled = tablegrid.from_cells(grid, heads, labels, row_lines[1:], title,
+            ruled = tablegrid.from_cells(grid, heads, labels, row_lines[1:], title,  # noqa: B023 (called at once)
                                           f"slide {page}, table {counted[page]}")
             # two columns, perhaps a key-value list, as Word's (code review 2026-10-08, B5; a deck's "header row"
             # style is on by default, so it marks nothing)

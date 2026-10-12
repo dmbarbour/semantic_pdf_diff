@@ -56,7 +56,8 @@ def pick(rows, failures=FAILURES):
     for measure, _, n, value in failures:
         value = value or (lambda r, measure=measure: r[measure])
         seen, chosen = set(), []
-        for r in sorted((r for r in rows if "heldout/" not in r["file"]), key=lambda r: (-value(r), r["file"], r["page"])):
+        for r in sorted((r for r in rows if "heldout/" not in r["file"]),
+                        key=lambda r: (-value(r), r["file"], r["page"])):
             if value(r) <= 0 or r["file"] in seen:
                 continue
             seen.add(r["file"])

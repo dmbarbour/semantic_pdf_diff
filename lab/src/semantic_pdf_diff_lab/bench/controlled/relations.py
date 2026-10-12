@@ -365,7 +365,8 @@ class Index:
             return "implied", None  # what's upstream serves what's downstream
         if r in ("has part", "contains") or r in ("part of", "within"):
             whole, part = (s, o) if r in ("has part", "contains") else (o, s)
-            if any(whole in self.ancestors.get(x, ()) or (x, "part of", whole) in self.facts for x in self.options_of(part)):
+            if any(whole in self.ancestors.get(x, ()) or (x, "part of", whole) in self.facts
+                   for x in self.options_of(part)):
                 return "implied", None  # an option of one of its parts
         if rel.transitive and not rel.symmetric and s in self.closure(r, o):
             return "reversed", None

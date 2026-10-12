@@ -47,7 +47,8 @@ class Merging(unittest.TestCase):
         (merged,) = merge_occurrences(sightings)
         self.assertEqual(merged.locator.task, 'text:p3:0.0')  # native before visual
         self.assertEqual(merged.confidence, .95)
-        self.assertEqual([o.locator.task for o in merged.occurrences], ['overview:p1', 'tile:p1:0', 'tile:p1:1', 'text:p3:0.0'])
+        self.assertEqual([o.locator.task for o in merged.occurrences],
+                         ['overview:p1', 'tile:p1:0', 'tile:p1:1', 'text:p3:0.0'])
         (visual,) = merge_occurrences(sightings[:3])
         self.assertEqual(visual.locator.task, 'tile:p1:1')  # tile before overview, then the smallest region
 
@@ -61,7 +62,8 @@ class Extraction_(unittest.TestCase):
             data = source_data(prompt)
             if images or '10 kW' in data:
                 quote = '10 kW' if not images else 'Pump 10 kW'
-                return Extraction(claims=[{**FACT, 'quote': quote, 'kind': 'chart' if images else 'text'}], complete=True)
+                return Extraction(claims=[{**FACT, 'quote': quote, 'kind': 'chart' if images else 'text'}],
+                                  complete=True)
             return Extraction(claims=[], complete=True)
 
     def pdf(self, root):

@@ -37,16 +37,19 @@ PUMP, FAN, CHILLER = (claim("Pump P-1", "rated power", "10", "kW", ident="t-1~aa
 PUMP_12 = claim("Pump P-1", "rated power", "12", "kW", quote="Pump P-1 12 kW", ident="t-1~dd")
 ITEMS = [
     {"id": "u-run-aaaa1111-p2-text", "run": "run", "content": "sha256:aaaa1111.pdf", "page": 2, "family": "text",
-     "band": None, "image": "images/p2.png", "page_text": "3.1 Pumps\nPump P-1 10 kW\nFan F-2 3,000 cfm at 0.5 in. w.g.",
+     "band": None, "image": "images/p2.png",
+     "page_text": "3.1 Pumps\nPump P-1 10 kW\nFan F-2 3,000 cfm at 0.5 in. w.g.",
      "sections": ["3 Mechanical", "3.1 Pumps"], "before": "the pumps listed below serve the chilled water loop.",
      "within": "3.1 Pumps", "baseline": [PUMP, FAN], "variant": [PUMP_12, FAN, CHILLER], "hidden_shared": 2,
      "counts": {"baseline": 4, "variant": 5, "shared": 3},
-     "page_image": "images/p2-page.png", "page_text_full": "3 Mechanical\n3.1 Pumps\nPump P-1 10 kW\nFan F-2 3,000 cfm"},
+     "page_image": "images/p2-page.png",
+     "page_text_full": "3 Mechanical\n3.1 Pumps\nPump P-1 10 kW\nFan F-2 3,000 cfm"},
     {"id": "u-run-aaaa1111-p5-table-b0of2", "run": "run", "content": "sha256:aaaa1111.pdf", "page": 5,
      "family": "table", "band": [0, 2, 72.0, 300.0], "image": "images/p5-b0of2.png",
      "page_text": "TAG | CAPACITY\nCH-1 | 350 tons", "sections": [], "before": "", "within": "",
      "baseline": [CHILLER], "variant": [], "hidden_shared": 0, "counts": {"baseline": 1, "variant": 0, "shared": 0},
-     "page_image": "images/p5-page.png", "page_text_full": "SCHEDULE\nTAG | CAPACITY\nCH-1 | 350 tons\nCH-2 | 400 tons"},
+     "page_image": "images/p5-page.png",
+     "page_text_full": "SCHEDULE\nTAG | CAPACITY\nCH-1 | 350 tons\nCH-2 | 400 tons"},
 ]
 
 class Recorder:
@@ -67,7 +70,8 @@ class GoldenPrompts(unittest.TestCase):
             GOLDEN.mkdir(exist_ok=True)
             path.write_text(text, encoding="utf-8")
         self.assertTrue(path.exists(), f"{path}: no golden (run with GOLDEN_UPDATE=1)")
-        self.assertEqual(text, path.read_text(encoding="utf-8"), f"{name}'s prompts changed: judging would be paid again")
+        self.assertEqual(text, path.read_text(encoding="utf-8"),
+                         f"{name}'s prompts changed: judging would be paid again")
 
     def test_every_pairwise_rubric(self):
         for rubric in rounds.RUBRICS:
@@ -94,7 +98,8 @@ class GoldenPrompts(unittest.TestCase):
         self.check("review-panel", transcript(asked))
 
 ROUNDS = Path(__file__).resolve().parent / "fixtures" / "rounds"  # the batches replayed (docs/research/rounds.md)
-REPLAYED = {"v1": "r05/pairs-details", "v2": "r07/pairs-locator", "v3": "r08/pairs-charts", "v4": "r09h/pairs-fragments"}
+REPLAYED = {"v1": "r05/pairs-details", "v2": "r07/pairs-locator", "v3": "r08/pairs-charts",
+            "v4": "r09h/pairs-fragments"}
 
 SLICES = Path(__file__).resolve().parent.parent / "samples/slices"
 
@@ -117,7 +122,8 @@ class RecordedJudging(unittest.TestCase):
                     elif list(SLICES.glob("*.pdf")):
                         rounds.rerender(copy, SLICES)
                     else:
-                        self.skipTest(f"no crops or page text for {name}, nor slices to make them (scripts/make_slices.py)")
+                        self.skipTest(f"no crops or page text for {name}, "
+                                      "nor slices to make them (scripts/make_slices.py)")
                     settings = Settings(model=committed["reviewer"], **EVALUATOR_SETTINGS)
                     with folder_client(copy, settings, mode="replay") as client:
                         rounds.judge_pairs(copy, client, committed["reviewer"], rubric=rubric)
@@ -160,7 +166,8 @@ class RecordedJudging(unittest.TestCase):
         recorded = json.loads((folder / "postmortem.json").read_text(encoding="utf-8"))
         with tempfile.TemporaryDirectory() as d:
             shutil.copy(folder / "replay.zip", Path(d) / "replay.zip")
-            with folder_client(d, Settings(model="google/gemini-3.1-pro", **EVALUATOR_SETTINGS), mode="replay") as client:
+            with folder_client(d, Settings(model="google/gemini-3.1-pro", **EVALUATOR_SETTINGS),
+                               mode="replay") as client:
                 reading = postmortem.read(recorded, client)
         self.assertEqual(reading.model_dump(), recorded["reading"])
 

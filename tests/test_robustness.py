@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 import pymupdf
-from semantic_pdf_diff.schema import MAX_CLAIMS, Claim, Evidence, Extraction, Judgment, PdfLocator
+from semantic_pdf_diff.schema import MAX_CLAIMS, Evidence, Extraction, Judgment, PdfLocator
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.llm import Client, redact_url
 from semantic_pdf_diff.failures import Invalid, ModelFailure
@@ -63,7 +63,7 @@ def pdf(path, build, width=500, height=500):
 
 class ResponseShapeTests(unittest.TestCase):
     def ask(self, replies, **settings):
-        with stub(replies) as (url, seen), tempfile.TemporaryDirectory() as d:
+        with stub(replies) as (url, seen), tempfile.TemporaryDirectory():
             client = Client(Settings(**{'base_url': url, 'retries': 0, **settings}), None)
             return client.ask('x', Extraction), seen
 
@@ -92,7 +92,8 @@ class ResponseShapeTests(unittest.TestCase):
     def test_every_paid_attempt_reaches_the_ledger(self):
         from semantic_pdf_diff.ledger import Ledger, read
         paid = {'prompt_tokens': 10, 'completion_tokens': 5, 'estimated_cost': 0.001}
-        with tempfile.TemporaryDirectory() as d, stub([reply('not json', usage=paid), reply(EMPTY, usage=paid)]) as (url, _):
+        with tempfile.TemporaryDirectory() as d, \
+                stub([reply('not json', usage=paid), reply(EMPTY, usage=paid)]) as (url, _):
             client = Client(Settings(base_url=url, retries=1), None)
             client.ledger = Ledger(Path(d) / 'ledger.jsonl', round='t')
             with patch('semantic_pdf_diff.llm.time.sleep'), self.assertRaises(Invalid):
@@ -106,7 +107,8 @@ class ResponseShapeTests(unittest.TestCase):
         cut = f'data: {json.dumps({"choices": [{"delta": {"content": EMPTY[:15]}}]})}\n\n'  # no usage, no [DONE]
         paid = {'prompt_tokens': 10, 'completion_tokens': 5, 'estimated_cost': 0.001}
         with tempfile.TemporaryDirectory() as d, \
-                stub([(200, {'Content-Type': 'text/event-stream'}, cut.encode()), reply(EMPTY, usage=paid)]) as (url, _):
+                stub([(200, {'Content-Type': 'text/event-stream'}, cut.encode()),
+                      reply(EMPTY, usage=paid)]) as (url, _):
             client = Client(Settings(base_url=url, retries=1, max_cost=1.0), None)
             client.ledger = Ledger(Path(d) / 'ledger.jsonl', round='t')
             with patch('semantic_pdf_diff.llm.time.sleep'), self.assertLogs('semantic_pdf_diff', 'WARNING'):
@@ -151,7 +153,7 @@ class ResponseShapeTests(unittest.TestCase):
                   {'choices': [], 'usage': {'prompt_tokens': 12, 'completion_tokens': 9, 'estimated_cost': 0.0003}}]
         body = ''.join(f'data: {json.dumps(c)}\n\n' for c in chunks) + 'data: [DONE]\n\n'
         with stub([(200, {'Content-Type': 'text/event-stream'}, body.encode())]) as (url, seen), \
-                tempfile.TemporaryDirectory() as d:
+                tempfile.TemporaryDirectory():
             client = Client(Settings(base_url=url, retries=0), None)
             self.assertTrue(client.ask('x', Extraction).complete)
             self.assertTrue(seen[0]['stream'])
@@ -160,14 +162,14 @@ class ResponseShapeTests(unittest.TestCase):
             self.assertEqual(client.usage['completion_tokens'], 9)
 
     def test_streaming_does_not_change_what_a_cached_answer_is_found_by(self):
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory():
             streamed = Client(Settings(stream=True), None).prepare('x', Extraction)
             plain = Client(Settings(stream=False), None).prepare('x', Extraction)
             self.assertEqual(streamed.query, plain.query)  # answers are cached and recorded by the query
             self.assertNotEqual(streamed.raw, plain.raw)
 
     def test_http_key_warning(self):
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory():
             for url, warned in [('http://remote.example/v1', True), ('http://127.0.0.1:8000/v1', False),
                                 ('https://remote.example/v1', False)]:
                 stream = io.StringIO()
@@ -202,14 +204,15 @@ class ValidationTests(unittest.TestCase):
 
     def test_latex_backslashes_in_answers_are_repaired(self):
         from semantic_pdf_diff.llm import json_text
-        answer = '```json\n{"complete": true, "claims": [{"entity": "filter", "attribute": "state matrix", "value": "\\alpha", ' \
-                 '"kind": "text", "quote": "A_d = \\alpha", "confidence": 0.9}]}\n```'
+        answer = '```json\n{"complete": true, "claims": [{"entity": "filter", "attribute": "state matrix", ' \
+                 '"value": "\\alpha", "kind": "text", "quote": "A_d = \\alpha", "confidence": 0.9}]}\n```'
         result = Extraction.model_validate_json(json_text(answer))
         self.assertEqual(result.claims[0].value, '\\alpha')
         self.assertEqual(json_text('{"a": "line\\nbreak"}'), '{"a": "line\\nbreak"}')  # valid escapes untouched
 
     def test_judgment_ignores_extra_keys(self):
-        j = Judgment.model_validate({'relation':'equivalent','rationale':'r','confidence':.9,'same_conditions':True,'notes':'x'})
+        j = Judgment.model_validate({'relation':'equivalent','rationale':'r','confidence':.9,'same_conditions':True,
+                                     'notes':'x'})
         self.assertEqual(j.relation, 'equivalent')
 
     def test_legacy_json_mode(self):
@@ -300,7 +303,8 @@ class ExtractionTests(unittest.TestCase):
     def test_table_quote_may_span_cells(self):
         claim = {**GOOD, 'kind':'table', 'quote':'Pump 10 kW'}
         with tempfile.TemporaryDirectory() as d, self.fake_tables([['Item','Power'], ['Pump','10 kW']]):
-            client = Recorder(lambda s, p: Extraction(claims=[claim] if s == 'table' else [], complete=True), vision=False)
+            client = Recorder(lambda s, p: Extraction(claims=[claim] if s == 'table' else [], complete=True),
+                              vision=False)
             evidence, coverage = extract_pdf(pdf(Path(d)/'t.pdf', lambda p: None), CID, Path(d), client)
             self.assertEqual(len(evidence), 1)
             self.assertTrue(all(r['status'] != 'partial' for r in coverage))
@@ -343,7 +347,8 @@ class ExtractionTests(unittest.TestCase):
         for name, build, quote, expected in [('a', text, '10 kW', True), ('b', text, '99 kW', False),
                                              ('c', lambda page: None, '10 kW', None)]:
             def respond(source, prompt):
-                claims = [{**GOOD, 'kind':'chart', 'quote':quote}] if source == 'overview' else []
+                claims = ([{**GOOD, 'kind':'chart', 'quote':quote}]  # noqa: B023 (called at once)
+                          if source == 'overview' else [])
                 return Extraction(claims=claims, complete=True)
             with self.subTest(quote=quote), tempfile.TemporaryDirectory() as d:
                 evidence, _ = extract_pdf(pdf(Path(d)/(name + '.pdf'), build, height=300), CID, Path(d),
@@ -362,7 +367,8 @@ class ExtractionTests(unittest.TestCase):
             self.assertTrue({'text', 'tile', 'overview'} <= {e.entity for e in evidence})
             for e in evidence:
                 x0, y0, x1, y1 = e.locator.bbox
-                self.assertTrue(-0.01 <= x0 < x1 <= 800.01 and -0.01 <= y0 < y1 <= 300.01, (e.locator.task, e.locator.bbox))
+                self.assertTrue(-0.01 <= x0 < x1 <= 800.01 and -0.01 <= y0 < y1 <= 300.01,
+                                (e.locator.task, e.locator.bbox))
             self.assertTrue(all(e.quote_verified for e in evidence if e.entity == 'tile' and '10 kW' in e.quote))
 
 class CliTests(unittest.TestCase):

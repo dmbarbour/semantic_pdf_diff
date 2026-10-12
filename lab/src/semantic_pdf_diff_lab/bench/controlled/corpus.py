@@ -40,8 +40,9 @@ def water_treatment(seed=1):
                  d.number(40000, 120000), "persons")
     raw = add("plant.raw_turbidity", *plant, "raw water turbidity", ("source turbidity", "influent turbidity"),
               d.number(8, 40, 1), "NTU", "95th percentile", basis="measured")
-    limit = add("plant.finished_turbidity", *plant, "finished water turbidity", ("effluent turbidity", "turbidity limit"),
-                d.number(0.1, 0.3, 2), "NTU", "in 95% of monthly samples", basis="required")
+    limit = add("plant.finished_turbidity", *plant, "finished water turbidity",
+                ("effluent turbidity", "turbidity limit"), d.number(0.1, 0.3, 2), "NTU", "in 95% of monthly samples",
+                basis="required")
     mix = ("Rapid mix basin", ("rapid mix", "rapid-mix basin", "flash mix"))
     mix_t = add("mix.detention", *mix, "detention time", ("hydraulic detention time", "residence time", "HDT"),
                 d.number(20, 60), "s", "at design flow", basis="calculated")
@@ -80,7 +81,8 @@ def water_treatment(seed=1):
     cl = add("chem.chlorine", "Chlorine feed", ("chlorine", "sodium hypochlorite", "disinfectant"), "dose",
              ("dosage", "chlorine dose"), d.number(1.5, 4.5, 1), "mg/L")
     uv = ("Option A, UV disinfection", ("Option A", "UV disinfection", "UV system", "ultraviolet disinfection"))
-    cct = ("Option B, chlorine contact basin", ("Option B", "chlorine contact basin", "chlorine contact", "contact basin"))
+    cct = ("Option B, chlorine contact basin",
+           ("Option B", "chlorine contact basin", "chlorine contact", "contact basin"))
     uv_cost = add("optA.cost", *uv, "capital cost", ("cost", "construction cost"), d.number(3.1, 6.9, 2), "$M")
     uv_energy = add("optA.energy", *uv, "annual energy use", ("energy use", "energy", "annual energy"),
                     d.number(400, 900), "MWh/yr", basis="calculated")
@@ -100,17 +102,17 @@ def water_treatment(seed=1):
             ("p", f"The rapid mix basin provides a detention time of {mix_t.value} s at design flow, with a velocity "
                   f"gradient of {mix_g.value} 1/s. Flocculation follows in {floc_n.value} stages, for a total "
                   f"detention time of {floc_t.value} min at design flow."),
-            ("p", f"There are {sed_n.value} sedimentation basins, each {sed_l.value} ft long and {sed_w.value} ft wide, "
-                  f"with a side water depth of {sed_swd.value} ft; the surface loading rate is {sed_slr.value} gpm/ft² "
-                  f"at design flow."),
+            ("p", f"There are {sed_n.value} sedimentation basins, each {sed_l.value} ft long and {sed_w.value} ft "
+                  f"wide, with a side water depth of {sed_swd.value} ft; the surface loading rate is {sed_slr.value} "
+                  f"gpm/ft² at design flow."),
             ("p", f"Filtration uses {flt_n.value} dual-media filters of {flt_area.value} ft² each. With one filter out "
                   f"of service, the filtration rate is {flt_rate.value} gpm/ft²."),
             ("table", "Table 1. Raw water pumps", ["Tag", "Capacity (gpm)", "TDH (ft)", "Motor (hp)"],
              [[tag, c.value, h.value, m.value] for tag, c, h, m in pumps]),
         ]),
         ("3 Chemical Feed", [
-            ("p", f"Alum is dosed at {alum.value} mg/L on the average day and up to {alum_max.value} mg/L on the maximum "
-                  f"day. Chlorine is fed at {cl.value} mg/L ahead of the clearwell."),
+            ("p", f"Alum is dosed at {alum.value} mg/L on the average day and up to {alum_max.value} mg/L on the "
+                  f"maximum day. Chlorine is fed at {cl.value} mg/L ahead of the clearwell."),
         ]),
         ("4 Disinfection Options", [
             ("p", "Two options were compared for primary disinfection."),
@@ -153,9 +155,11 @@ def roller_coaster(seed=1):
     for name in ("First drop", "Vertical loop", "Zero-g roll", "Camelback", "Helix"):
         el = (name, (name.lower(),))
         elements.append((name,
-                         add(f"el.{name}.height", *el, "height", ("element height", "top height"), d.number(40, 175), "ft")
+                         add(f"el.{name}.height", *el, "height", ("element height", "top height"), d.number(40, 175),
+                             "ft")
                          if name != "First drop" else None,
-                         add(f"el.{name}.speed", *el, "entry speed", ("speed", "entrance speed"), d.number(40, 64, 1), "mph"),
+                         add(f"el.{name}.speed", *el, "entry speed", ("speed", "entrance speed"), d.number(40, 64, 1),
+                             "mph"),
                          add(f"el.{name}.g", *el, "peak g", ("g-force", "maximum g", "g"), d.number(1.5, 3.5, 1), "g",
                              basis="calculated")))
     supports = add("struct.columns", "Support structure", ("supports", "support columns", "structure"),
@@ -166,15 +170,16 @@ def roller_coaster(seed=1):
                ("wind speed", "wind load speed"), d.number(90, 120), "mph", "3-second gust", basis="required")
     sections = [
         ("1 Ride Overview", [
-            ("p", f"Ridgeback is a steel roller coaster with {length.value} ft of track and {inversions.value} inversions. "
-                  f"A ride lasts {duration.value} s and reaches a maximum speed of {speed.value} mph."),
+            ("p", f"Ridgeback is a steel roller coaster with {length.value} ft of track and {inversions.value} "
+                  f"inversions. A ride lasts {duration.value} s and reaches a maximum speed of {speed.value} mph."),
             ("p", f"In revision B the lift hill was raised from {lift_old.value} ft to {lift.value} ft. The first drop "
                   f"falls {drop.value} ft at an angle of {angle.value}°, and the maximum vertical acceleration is "
                   f"{g_max.value} g."),
         ]),
         ("2 Trains", [
             ("p", f"The ride operates {n_trains.value} trains of {cars.value} cars, each car seating {riders.value} "
-                  f"riders, for an hourly capacity of {capacity.value} riders/h. An empty train weighs {mass.value} lb."),
+                  f"riders, for an hourly capacity of {capacity.value} riders/h. An empty train weighs {mass.value} "
+                  f"lb."),
         ]),
         ("3 Track Elements", [
             ("table", "Table 1. Track elements", ["Element", "Height (ft)", "Entry speed (mph)", "Peak g"],
@@ -205,12 +210,13 @@ def link_protocol(seed=1):
     groups = add("long.groups", "Long status report", ("long report", "long format", "long status report format"),
                  "maximum channel groups", ("channel groups", "number of channel groups", "groups"), bits(15, 24), "")
     long_field = add("long.field", "Long status report", ("long report", "long format", "long status report format"),
-                     "buffer size field length", ("buffer size field", "field length", "field size"), bits(25, 32), "bits")
+                     "buffer size field length", ("buffer size field", "field length", "field size"), bits(25, 32),
+                     "bits")
     field = lambda fid, name, aliases, attribute, value: add(
         fid, name, aliases, attribute, ("length", "size", "field length", "length in bits"), value, "bits")
     version = field("hdr.version", "Version field", ("Version", "version field"), "length", bits(6, 16))
-    sid_len = field("hdr.sid_len", "Session ID Length field", ("Session ID Length", "session ID length field"), "length",
-                    bits(6, 16))
+    sid_len = field("hdr.sid_len", "Session ID Length field", ("Session ID Length", "session ID length field"),
+                    "length", bits(6, 16))
     sid = field("hdr.sid", "Session ID field", ("Session ID", "session ID"), "maximum length", bits(120, 240))
     pn_len = field("hdr.pn_len", "Packet Number Length field", ("Packet Number Length", "packet number length field"),
                    "length", bits(6, 16))
@@ -225,16 +231,16 @@ def link_protocol(seed=1):
     failure = ("Link failure detection", ("link failure", "failure detection", "link failure declaration"))
     ack = add("fail.ack", *failure, "acknowledgement timeout", ("ack timeout", "timeout", "acknowledgement window"),
               d.number(200, 900), "ms", basis="required")
-    retx = add("fail.retx", *failure, "consecutive failed retransmissions", ("failed retransmissions", "retransmissions"),
-               bits(6, 30), "", basis="required")
+    retx = add("fail.retx", *failure, "consecutive failed retransmissions",
+               ("failed retransmissions", "retransmissions"), bits(6, 30), "", basis="required")
     snr = add("fail.snr", *failure, "signal-to-noise threshold", ("SNR threshold", "signal-to-noise ratio"),
               d.number(1.5, 4.5, 1), "dB", basis="required")
     low = add("fail.duration", *failure, "low signal duration", ("duration", "time below threshold"), bits(33, 90), "s",
               basis="required")
     timer = ("Retransmission timer", ("retransmission timer", "RTO", "retransmit timer"))
     window = ("Send window", ("send window", "window", "transmit window"))
-    timer_busy = add("timer.congested", *timer, "duration", ("value", "timeout", "timer value"), d.number(300, 900), "ms",
-                     "link congested", basis="required")
+    timer_busy = add("timer.congested", *timer, "duration", ("value", "timeout", "timer value"), d.number(300, 900),
+                     "ms", "link congested", basis="required")
     window_busy = add("window.congested", *window, "size", ("window size", "packets"), d.number(91, 150), "packets",
                       "link congested", basis="required")
     timer_idle = add("timer.idle", *timer, "duration", ("value", "timeout", "timer value"), d.number(1000, 3000), "ms",
@@ -243,15 +249,15 @@ def link_protocol(seed=1):
                       "link idle", basis="required")
     sections = [
         ("1 Status Report Formats", [
-            ("p", f"Three formats carry buffer status to the gateway. The short status report carries the status of one "
-                  f"channel group in a buffer size field of {short.value} bits. The extended short status report also "
-                  f"carries the status of one channel group, in a buffer size field of {ext.value} bits. The long status "
-                  f"report carries up to {groups.value} channel groups, each in a buffer size field of "
+            ("p", f"Three formats carry buffer status to the gateway. The short status report carries the status of "
+                  f"one channel group in a buffer size field of {short.value} bits. The extended short status report "
+                  f"also carries the status of one channel group, in a buffer size field of {ext.value} bits. The long "
+                  f"status report carries up to {groups.value} channel groups, each in a buffer size field of "
                   f"{long_field.value} bits."),
         ]),
         ("2 Header Fields", [
-            ("p", "Every packet starts with the header fields of Table 1, in order. Each length field gives the length of "
-                  "the field that follows it."),
+            ("p", "Every packet starts with the header fields of Table 1, in order. Each length field gives the length "
+                  "of the field that follows it."),
             ("table", "Table 1. Header fields", ["Field", "Length (bits)"],
              [["Version", version.value], ["Session ID Length", sid_len.value], ["Session ID", f"up to {sid.value}"],
               ["Packet Number Length", pn_len.value], ["Packet Number", f"up to {pn.value}"]]),
@@ -271,9 +277,11 @@ def link_protocol(seed=1):
         ]),
         ("5 Timers by Link State", [
             ("p", "When the link is congested, the following values apply."),
-            ("p", f"The retransmission timer is {timer_busy.value} ms. The send window is {window_busy.value} packets."),
+            ("p", f"The retransmission timer is {timer_busy.value} ms. The send window is {window_busy.value} "
+                  f"packets."),
             ("p", "When the link is idle, the following values apply."),
-            ("p", f"The retransmission timer is {timer_idle.value} ms. The send window is {window_idle.value} packets."),
+            ("p", f"The retransmission timer is {timer_idle.value} ms. The send window is {window_idle.value} "
+                  f"packets."),
         ]),
     ]
     return Project(f"spec-s{seed}", "Lakeshore Telemetry Link: Protocol Specification", F, sections)
@@ -300,7 +308,8 @@ def equipment_datasheets(seed=1):
     well = ("Clearwell", ("clearwell", "finished water storage", "clear well"))
     volume = add("clearwell.volume", *well, "volume", ("storage volume", "capacity"), d.number(1.5, 4.5, 1), "MG")
     diameter = add("clearwell.diameter", *well, "diameter", ("inside diameter",), d.number(120, 220), "ft")
-    depth = add("clearwell.depth", *well, "side water depth", ("water depth", "depth", "SWD"), d.number(16, 30, 1), "ft")
+    depth = add("clearwell.depth", *well, "side water depth", ("water depth", "depth", "SWD"), d.number(16, 30, 1),
+                "ft")
     baffle = add("clearwell.baffle", *well, "baffle factor", ("baffling factor", "T10/T"), d.number(0.3, 0.7, 2), "")
     sheets.append(("datasheet", "Data sheet 4. Clearwell",
                    [["Volume (MG)", volume.value], ["Diameter (ft)", diameter.value],
@@ -376,7 +385,8 @@ def equipment_schedules(seed=1):
                  Column("Power (hp)", "motor power", ("power", "motor", "motor rating"), "hp", "Motor"),
                  Column("Speed (rpm)", "motor speed", ("speed", "rpm"), "rpm", "Motor")]
     blower_cols = [Column("Airflow (scfm)", "airflow", ("flow", "air flow", "capacity"), "scfm", "Rated point"),
-                   Column("Pressure (psig)", "discharge pressure", ("pressure", "outlet pressure"), "psig", "Rated point"),
+                   Column("Pressure (psig)", "discharge pressure", ("pressure", "outlet pressure"), "psig",
+                          "Rated point"),
                    Column("Power (hp)", "motor power", ("power", "motor", "motor rating"), "hp", "Motor"),
                    Column("Speed (rpm)", "motor speed", ("speed", "rpm"), "rpm", "Motor")]
     valve_cols = [Column("Cv", "flow coefficient", ("Cv", "valve coefficient"), ""),
@@ -424,7 +434,8 @@ def track_schedules(seed=1):
     sections = [
         ("1 Track and Structure", [
             ("p", "Element heights are above the station platform; speeds are design values at the element's entry."),
-            ("schedule", Schedule("Table 1. Track elements and brakes", elements, merge=(2, 3, "g (vertical / lateral)"))),
+            ("schedule", Schedule("Table 1. Track elements and brakes", elements,
+                                  merge=(2, 3, "g (vertical / lateral)"))),
             ("schedule", Schedule("Table 2. Support columns", columns, split=5)),
         ])]
     return Project(f"coaster-tables-s{seed}", "Ridgeback: Track and Structure Schedules", F, sections)
@@ -454,8 +465,10 @@ def convention_center(seed=1):
     F = []
     add = lambda *a, **k: F.append(Fact(*a, **k)) or F[-1]
     hall = ("Hall C", ("Hall C", "exhibit hall C", "the new hall", "Hall C exhibit hall"))
-    area = add("hallc.area", *hall, "exhibit floor area", ("floor area", "exhibit area", "area"), d.number(90000, 160000), "ft²")
-    height = add("hallc.height", *hall, "clear ceiling height", ("ceiling height", "clear height"), d.number(28, 45), "ft")
+    area = add("hallc.area", *hall, "exhibit floor area", ("floor area", "exhibit area", "area"),
+               d.number(90000, 160000), "ft²")
+    height = add("hallc.height", *hall, "clear ceiling height", ("ceiling height", "clear height"), d.number(28, 45),
+                 "ft")
     occupancy = add("hallc.occupancy", *hall, "occupant load", ("occupancy", "capacity", "occupants"),
                     d.number(6000, 14000), "persons")
     total = add("halls.area", "Halls A to D", ("Halls A-D", "the four halls", "all halls", "convention center"),
@@ -472,12 +485,14 @@ def convention_center(seed=1):
     t_high = add("hallc.tmax", *hall, "maximum indoor design temperature", ("indoor temperature", "design temperature"),
                  d.number(74, 78), "°F")
     ahu = ("AHU-3", ("air handling unit 3", "AHU 3", "air handler 3"))
-    airflow = add("ahu3.airflow", *ahu, "supply airflow", ("airflow", "air flow", "supply air"), d.number(40000, 90000), "cfm")
+    airflow = add("ahu3.airflow", *ahu, "supply airflow", ("airflow", "air flow", "supply air"),
+                  d.number(40000, 90000), "cfm")
     motor = add("ahu3.fanmotor", "AHU-3 supply fan motor", ("supply fan motor", "AHU-3 supply fan", "fan motor"),
                 "motor power", ("power", "motor rating", "rating"), d.number(60, 200), "hp")
     beams = ("Option 1, chilled beams", ("Option 1", "chilled beams", "chilled beam option"))
     vav = ("Option 2, VAV baseline", ("Option 2", "VAV", "VAV baseline", "variable air volume"))
-    beams_load = add("opt1.load", *beams, "peak cooling load", ("cooling load", "peak load"), d.number(700, 1000), "tons")
+    beams_load = add("opt1.load", *beams, "peak cooling load", ("cooling load", "peak load"), d.number(700, 1000),
+                     "tons")
     vav_load = add("opt2.load", *vav, "peak cooling load", ("cooling load", "peak load"), d.number(1050, 1400), "tons")
     beams_cost = add("opt1.cost", *beams, "first cost", ("cost", "capital cost"), d.number(14.0, 22.0, 1), "$M")
     vav_cost = add("opt2.cost", *vav, "first cost", ("cost", "capital cost"), d.number(9.0, 13.5, 1), "$M")
@@ -488,25 +503,25 @@ def convention_center(seed=1):
                              d.number(60, 480), "persons", "Hall C"),  # under traps, named only in the caption
                       add(f"room{r}.area", *room, "floor area", ("area",), d.number(1500, 6000), "ft²", "Hall C")))
     texts = {  # (plain, trap)
-        "intro": ("Hall C adds an exhibit floor area of {area} ft² to the convention center, with a clear ceiling height "
-                  "of {height} ft and an occupant load of {occ} persons. The four halls together will offer {total} ft² "
-                  "of exhibit space.",
-                  "Hall C adds {area} ft² of exhibit floor under a {height} ft clear ceiling, for {occ} occupants. Across "
-                  "the four halls, the total exhibit area becomes {total} ft²."),
+        "intro": ("Hall C adds an exhibit floor area of {area} ft² to the convention center, with a clear ceiling "
+                  "height of {height} ft and an occupant load of {occ} persons. The four halls together will offer "
+                  "{total} ft² of exhibit space.",
+                  "Hall C adds {area} ft² of exhibit floor under a {height} ft clear ceiling, for {occ} occupants. "
+                  "Across the four halls, the total exhibit area becomes {total} ft²."),
         "criteria": ("Hall C's background noise limit is {noise} dBA. Its floor live load is at least {live} psf. The "
-                     "existing roof's snow load rating is {snow} psf, and no higher. Hall C's indoor design temperature "
-                     "ranges from {tmin} °F to {tmax} °F.",
-                     "Background noise in Hall C shall not exceed {noise} dBA, and its floor shall carry a live load of "
-                     "no less than {live} psf. The existing roof is not rated for snow loads above {snow} psf. Indoor "
-                     "conditions are held between {tmin} and {tmax} °F."),
+                     "existing roof's snow load rating is {snow} psf, and no higher. Hall C's indoor design "
+                     "temperature ranges from {tmin} °F to {tmax} °F.",
+                     "Background noise in Hall C shall not exceed {noise} dBA, and its floor shall carry a live load "
+                     "of no less than {live} psf. The existing roof is not rated for snow loads above {snow} psf. "
+                     "Indoor conditions are held between {tmin} and {tmax} °F."),
         "ahu": ("Air handling units (AHUs) serve the hall. AHU-3 supplies {airflow} cfm. The AHU-3 supply fan motor is "
                 "rated {motor} hp.",
-                "Air handling units (AHUs) serve the hall. {airflow} cfm comes from AHU-3, whose supply fan is driven by "
-                "a {motor} hp motor."),
-        "options": ("Option 1, chilled beams: peak cooling load {l1} tons, first cost ${c1}M. Option 2, a VAV baseline: "
-                    "peak cooling load {l2} tons, first cost ${c2}M.",
-                    "With chilled beams the peak cooling load drops to {l1} tons, against {l2} tons for the VAV baseline, "
-                    "though their first cost of ${c1}M exceeds the baseline's ${c2}M."),
+                "Air handling units (AHUs) serve the hall. {airflow} cfm comes from AHU-3, whose supply fan is driven "
+                "by a {motor} hp motor."),
+        "options": ("Option 1, chilled beams: peak cooling load {l1} tons, first cost ${c1}M. Option 2, a VAV "
+                    "baseline: peak cooling load {l2} tons, first cost ${c2}M.",
+                    "With chilled beams the peak cooling load drops to {l1} tons, against {l2} tons for the VAV "
+                    "baseline, though their first cost of ${c1}M exceeds the baseline's ${c2}M."),
     }
     values = dict(area=area.value, height=height.value, occ=occupancy.value, total=total.value, noise=noise.value,
                   live=live.value, snow=snow.value, tmin=t_low.value, tmax=t_high.value, airflow=airflow.value,
@@ -587,7 +602,8 @@ def energy_study(seed=1):
     months = ("May", "June", "July", "August", "September", "October")
     season = (0.45, 0.75, 1.0, 0.95, 0.7, 0.4)
     series = []
-    for (name, aliases), short, peak in ((beams, "opt1", d.rng.uniform(330, 420)), (vav, "opt2", d.rng.uniform(470, 560))):
+    for (name, aliases), short, peak in ((beams, "opt1", d.rng.uniform(330, 420)),
+                                         (vav, "opt2", d.rng.uniform(470, 560))):
         facts = [add(f"{short}.{m.lower()}", name, aliases, "cooling energy",
                      ("monthly cooling energy", "energy use", "cooling energy use", "energy", "monthly energy"),
                      d.slot(peak * k * d.rng.uniform(0.92, 1.08), 25), "MWh", m, drawn="chart")
@@ -657,7 +673,8 @@ def end_use_study(seed=1):
     options = (("Option 1, chilled beams", ("Option 1", "chilled beams", "chilled beam option")),
                ("Option 2, VAV baseline", ("Option 2", "VAV", "VAV baseline", "variable air volume")))
     lines_ = []
-    for (name, aliases), short, peak in zip(options, ("opt1", "opt2"), (d.rng.uniform(600, 700), d.rng.uniform(800, 900))):
+    for (name, aliases), short, peak in zip(options, ("opt1", "opt2"),
+                                            (d.rng.uniform(600, 700), d.rng.uniform(800, 900))):
         lines_.append((name, [add(f"{short}.{m.lower()}", name, aliases, "peak cooling load",
                                   ("cooling load", "peak load", "monthly peak load"),
                                   d.slot(peak * k * d.rng.uniform(0.94, 1.06), 50), "tons", m, drawn="chart")
@@ -910,7 +927,8 @@ def schedule_html(sched, knob, counter, breaks=()):
     def table(caption, parts):
         """parts: [(title, columns, rows)], drawn in one table, each under its own header row (stacked)."""
         number = next(counter)
-        out = (PAGE_BREAK if number in breaks else "") + f"<p class='caption'>{_esc(caption)}</p><table id='schedule-{number}'>"
+        out = ((PAGE_BREAK if number in breaks else "") +
+               f"<p class='caption'>{_esc(caption)}</p><table id='schedule-{number}'>")
         for k, (title, columns, rows) in enumerate(parts):
             out += header(title, columns, k == 0)
             out += "".join(f"<tr{_last(number, k == len(parts) - 1 and r == len(rows) - 1)}><td>{_esc(tag)}</td>"
@@ -971,8 +989,8 @@ def html(project, breaks=()):
                                f"<p class='caption'>{esc(block[1].caption)}</p>")
             elif block[0] in FIGURES:  # room for the chart or diagram, drawn after layout; its caption below
                 chart = block[1]
-                caption = chart.caption + (f" ({chart.legend_words})" if chart.legend_words and project.has("legend-caption")
-                                           else "")
+                caption = chart.caption + (f" ({chart.legend_words})"
+                                           if chart.legend_words and project.has("legend-caption") else "")
                 number = next(figures)
                 out.append((PAGE_BREAK if f"figure-{number}" in breaks else "") +
                            f"<div id='figure-{number}' style='height:{chart.height:g}pt'></div>"
@@ -986,7 +1004,8 @@ def html(project, breaks=()):
                 out.append((PAGE_BREAK if number in breaks else "") +
                            f"<p class='caption'>{esc(caption)}</p><table id='schedule-{number}'><tr>" +
                            "".join(f"<th>{esc(h)}</th>" for h in header) + "</tr>" +
-                           "".join(f"<tr{_last(number, r == len(shown) - 1)}>" + "".join(f"<td>{esc(c)}</td>" for c in row)
+                           "".join(f"<tr{_last(number, r == len(shown) - 1)}>"
+                                   + "".join(f"<td>{esc(c)}</td>" for c in row)
                                    + "</tr>" for r, row in enumerate(shown)) +
                            "</table>")
             elif block[0] == "datasheet":  # a key-value list: no header row
@@ -1008,7 +1027,8 @@ def render(project, page_size="letter"):
     if getattr(project, "sheet", None):  # a drawing sheet, drawn directly (sheets.py)
         from .sheets import render as render_sheet
         return render_sheet(project)
-    rect = (pymupdf.paper_rect("letter-l") if project.has("landscape") else pymupdf.Rect(0, 0, *SLIDE) if project.has("slide")
+    rect = (pymupdf.paper_rect("letter-l") if project.has("landscape")
+            else pymupdf.Rect(0, 0, *SLIDE) if project.has("slide")
             else pymupdf.Rect(0, 0, *WIDE_LETTER) if project.has("wide-letter") else pymupdf.paper_rect(page_size))
     breaks = set()
     for _ in range(5):  # lay out; start any table Story split across pages on a new page; again
@@ -1021,15 +1041,17 @@ def render(project, page_size="letter"):
         def note(position):
             ident = getattr(position, "id", "") or ""
             if ident.startswith("rel-"):
-                at = spans.setdefault(ident, {})
+                at = spans.setdefault(ident, {})  # noqa: B023 (called at once)
                 r = pymupdf.Rect(position.rect)
                 at[position.page] = at[position.page] | r if position.page in at else r
             if ident.startswith("figure-") and position.open_close & 1:
-                figures[int(ident.split("-")[1])] = (position.page, pymupdf.Rect(position.rect))
+                figures[int(ident.split("-")[1])] = (position.page,  # noqa: B023 (called at once)
+                                                     pymupdf.Rect(position.rect))
             if ident.startswith("schedule-"):
-                pages.setdefault(ident.removesuffix("-end"), set()).add((position.page, position.column))
+                pages.setdefault(ident.removesuffix("-end"), set()).add((position.page,  # noqa: B023 (called at once)
+                                                                         position.column))
                 if position.open_close & 1 and not ident.endswith("-end"):
-                    placed.setdefault(position.page, []).append(tuple(position.rect))
+                    placed.setdefault(position.page, []).append(tuple(position.rect))  # noqa: B023 (called at once)
         page = 0
         two = project.has("two-column")
         body = rect + (54, 54, -54, -72)
@@ -1073,7 +1095,8 @@ def render(project, page_size="letter"):
             page.draw_rect(pymupdf.Rect(w - 52, 24, w - 34, 44), color=None, fill=(0.55, 0.70, 0.86))
             page.draw_line(pymupdf.Point(54, 48), pymupdf.Point(w - 54, 48), color=(0.5, 0.5, 0.5), width=0.75)
         if project.has("frame") or project.has("scanned-frame"):  # a border as one path
-            page.draw_rect(rect + (FRAME_INSET, FRAME_INSET, -FRAME_INSET, -FRAME_INSET), color=(0.2, 0.2, 0.2), width=1.5)
+            page.draw_rect(rect + (FRAME_INSET, FRAME_INSET, -FRAME_INSET, -FRAME_INSET), color=(0.2, 0.2, 0.2),
+                           width=1.5)
         if project.has("frame-lines"):  # the same border as four lines
             x0, y0, x1, y1 = rect + (FRAME_INSET, FRAME_INSET, -FRAME_INSET, -FRAME_INSET)
             for a, b in (((x0, y0), (x1, y0)), ((x1, y0), (x1, y1)), ((x1, y1), (x0, y1)), ((x0, y1), (x0, y0))):
@@ -1122,7 +1145,7 @@ def draw_charts(project, doc, figures):
             form = "chart"
         if project.has("raster"):
             bars, numbers = raster(page, box, draw)
-            shift = lambda r: pymupdf.Rect(r) + (box.x0, box.y0, box.x0, box.y0)
+            shift = lambda r: pymupdf.Rect(r) + (box.x0, box.y0, box.x0, box.y0)  # noqa: B023 (called at once)
             bars, numbers = [(f, shift(b)) for f, b in bars], [(t, fs, shift(b)) for t, fs, b in numbers]
         else:
             bars, numbers = draw(page, box)

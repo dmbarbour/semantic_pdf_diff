@@ -97,7 +97,8 @@ def parse(text, markdown):
             nxt = lines[n][1] if n < len(lines) else ""
             if heading or (line.strip() and not current and SETEXT.match(nxt) and "|" not in line):
                 close()
-                level, title = (len(heading.group(1)), heading.group(2)) if heading else (1 if nxt.startswith("=") else 2, line.strip())
+                level, title = ((len(heading.group(1)), heading.group(2)) if heading
+                                else (1 if nxt.startswith("=") else 2, line.strip()))
                 headings.append((pg, n, level, title))
                 blocks.append(Block(pg, n, n, line.strip()))
                 if not heading:

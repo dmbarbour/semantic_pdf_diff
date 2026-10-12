@@ -62,7 +62,8 @@ reading:
   every row mechanically. Placeholders: {B} the row's cell in column B; {B.header} column B's header; {B.name} the
   header's own name without its unit; {B.group} the group a header sits under ("Pressure" for
   "Pressure (bar) > Inlet": the group may be the attribute and the header's own name a condition, or the
-  group a category and the name the attribute); {B.unit} the unit in the header's brackets ("Flow (L/s)" gives L/s); {B.cell_name} and
+  group a category and the name the attribute); {B.unit} the unit in the header's brackets ("Flow (L/s)" gives L/s); \
+{B.cell_name} and
   {B.cell_unit} split the row's own cell the same way (a row label "Capital cost ($M)" gives Capital cost and $M);
   {section} the section row above the row; {title} the table's title; {subject} your subject. A template with
   "columns": "C:F" is applied to each of those columns in turn, {*} standing for the column's cell ({*.header},
@@ -108,9 +109,12 @@ For example:
 - a table "Motor options" with row labels such as "Rated power (kW)" and columns Motor A | Motor B: one template
   over columns B:C, entity {*.header}, attribute {A.cell_name}, value {*}, unit {A.cell_unit}
 Return JSON:
-{"binding":"what the values measure (the attribute), what has them (the entity), under what (the conditions)", "reading":"rules|rows|summary", "why":"one sentence", "subject":"...",
-"claims":[{"columns":"", "entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"...", "uncertainty":"", "number":true}],
-"examples":[{"row":"5", "claims":[{"entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"..."}]}],
+{"binding":"what the values measure (the attribute), what has them (the entity), under what (the conditions)", \
+"reading":"rules|rows|summary", "why":"one sentence", "subject":"...",
+"claims":[{"columns":"", "entity":"...", "attribute":"...", "value":"...", "unit":"...", "conditions":"...", \
+"uncertainty":"", "number":true}],
+"examples":[{"row":"5", "claims":[{"entity":"...", "attribute":"...", "value":"...", "unit":"...", \
+"conditions":"..."}]}],
 "template":"series|log|list", "input":"A", "quantities":["B"], "categories":["C"], "points":["0"]}
 Leave out what your reading doesn't use.
 '''
@@ -178,8 +182,8 @@ def analyse(g):
             values = [(moment(t), t) for t in filled]
             diffs = [(b[0] - a[0]).total_seconds() for a, b in zip(values, values[1:])]
             seconds = Counter(round(d) for d in diffs).most_common(1)[0][0] if diffs else 0
-            scale = next(((s, u) for s, u in ((86400, " d"), (3600, " h"), (60, " min")) if seconds and seconds % s == 0),
-                         (1, " s"))
+            scale = next(((s, u) for s, u in ((86400, " d"), (3600, " h"), (60, " min"))
+                          if seconds and seconds % s == 0), (1, " s"))
             diffs, unit = [d / scale[0] for d in diffs], scale[1]
         if values:
             c.low, c.high = min(values)[1], max(values)[1]
@@ -323,7 +327,8 @@ class Written(Lenient):
     unit: str = Field(default="", max_length=80)
     conditions: str = Field(default="", max_length=300)
 
-    _text = field_validator("entity", "attribute", "value", "unit", "conditions", mode="before")(lambda cls, v: as_text(v))
+    _text = field_validator("entity", "attribute", "value", "unit", "conditions",
+                            mode="before")(lambda cls, v: as_text(v))
 
 class Example(Lenient):
     row: str = Field(default="", max_length=20)
@@ -497,7 +502,8 @@ def row_claims(rules, g, i):
                     fields["uncertainty"].strip(" ±+-").casefold() in NOT_APPLICABLE:
                 fields["uncertainty"] = ""  # "±" alone, or "± n/a": no uncertainty stated
             if not fields["entity"] or not fields["attribute"]:
-                raise Misfit(f"row {g.names[i]} gives a claim with no {'entity' if not fields['entity'] else 'attribute'}")
+                raise Misfit(f"row {g.names[i]} gives a claim with no "
+                             f"{'entity' if not fields['entity'] else 'attribute'}")
             out.append((fields, sorted(set(used)), rule))
     # two templates giving one claim, one of them without its unit (as an overview's rules wrote): the one with it
     same = lambda f: (f["entity"], f["attribute"], f["value"], f["conditions"])
@@ -711,8 +717,9 @@ def _quantity(rules, g, template, x, q, held, claim):
 
 def describe_rule(rule):
     """A rule's derivation detail: "value {C}; attribute {C.name}; entity {A}; unit {C.unit}"."""
-    parts = [f"{name} {getattr(rule, name)}" for name in ("columns", "entity", "attribute", "value", "unit", "conditions",
-                                                          "uncertainty") if getattr(rule, name)]
+    parts = [f"{name} {getattr(rule, name)}"
+             for name in ("columns", "entity", "attribute", "value", "unit", "conditions", "uncertainty")
+             if getattr(rule, name)]
     return "; ".join(parts)[:300]
 
 def read(core, page, g, task, by_itself, source, image=None):

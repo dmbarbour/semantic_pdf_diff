@@ -45,7 +45,8 @@ class Reading(unittest.TestCase):
     def test_a_column_chart_is_categories_by_series(self):
         months = strings(["May", "June"])
         plot = ('<c:barChart><c:barDir val="col"/><c:grouping val="clustered"/>'
-                + series(0, "Option 1", months, [1750, 300], "#,##0") + series(1, "Option 2", months, [225, 325], "#,##0")
+                + series(0, "Option 1", months, [1750, 300], "#,##0")
+                + series(1, "Option 2", months, [225, 325], "#,##0")
                 + '<c:axId val="1"/><c:axId val="2"/></c:barChart>' + axis("catAx", 1, 2, "b", "Month")
                 + axis("valAx", 2, 1, "l", "MWh"))
         found = read(chart(plot, title("Readiness for a WI", " (%)")))
@@ -57,7 +58,8 @@ class Reading(unittest.TestCase):
 
     def test_a_combination_a_lone_series_title_and_points(self):
         quarters = strings(["Q1", "Q2"])
-        combo = ('<c:barChart><c:barDir val="bar"/><c:grouping val="stacked"/>' + series(0, "Energy", quarters, [10, 20])
+        combo = ('<c:barChart><c:barDir val="bar"/><c:grouping val="stacked"/>'
+                 + series(0, "Energy", quarters, [10, 20])
                  + '<c:axId val="1"/><c:axId val="2"/></c:barChart><c:lineChart><c:grouping val="standard"/>'
                  + series(1, "Peak", quarters, [0.5, 0.75], "0%") + '<c:axId val="1"/><c:axId val="3"/></c:lineChart>')
         found = read(chart(combo))

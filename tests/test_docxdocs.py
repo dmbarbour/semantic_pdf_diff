@@ -14,7 +14,6 @@ def build():
     """A small document: a title, two heading levels, prose, a table, a contents entry, a tracked insertion and
     deletion, and a picture."""
     from docx.oxml import OxmlElement
-    from docx.oxml.ns import qn
     d = docx.Document()
     d.add_heading("Harrow Creek WTP", level=0)
     toc = d.add_paragraph("1 Design Basis ..... 3")
@@ -97,7 +96,7 @@ class WordFeatures(unittest.TestCase):
         self.assertIn("Footnote 1: Chlorine is fed at 3.3 mg/L.", [b.text for b in doc.blocks])
 
     def test_numbered_lists_are_written_as_word_numbers_them(self):
-        from semantic_pdf_diff.docxdocs import Numbering, read_docx
+        from semantic_pdf_diff.docxdocs import read_docx
         from semantic_pdf_diff.office import number_format
         needs_lab()
         from semantic_pdf_diff_lab.bench.controlled.word import Writer
@@ -126,7 +125,6 @@ def tables():
     a large nested table; a one-row layout table holding a heading and paragraphs; and a table whose header row is
     marked to repeat, its rows inside a content control."""
     from docx.oxml import OxmlElement
-    from docx.oxml.ns import qn
     d = docx.Document()
     chillers = d.add_table(rows=4, cols=3)
     chillers.cell(0, 0).text = "Unit"
@@ -267,10 +265,12 @@ class WordTextBoxes(unittest.TestCase):
         d.save(raw)
         doc = read_docx(raw.getvalue())
         texts = [t for _, t in doc.lines if t]
-        self.assertEqual(texts[:3], ["Figure 3 shows the monitoring loop.", "Model inference", "Monitoring every 40 ms"])
+        self.assertEqual(texts[:3],
+                         ["Figure 3 shows the monitoring loop.", "Model inference", "Monitoring every 40 ms"])
         self.assertEqual([detail for *_, detail in doc.images],
                          ["a drawing of shapes (its text read, not its arrangement)"])
-        self.assertEqual(next(b for b in doc.blocks if b.kind == "table").rows[1], ["Blower B-401", "Note rated at 75 kW"])
+        self.assertEqual(next(b for b in doc.blocks if b.kind == "table").rows[1],
+                         ["Blower B-401", "Note rated at 75 kW"])
 
 @unittest.skipIf(docx is None, "python-docx isn't installed (the office extra)")
 class WordCharts(unittest.TestCase):
@@ -284,7 +284,8 @@ class WordCharts(unittest.TestCase):
         writer = Writer()
         writer.paragraph("Figure 1 compares the two options.")
         anchor = writer.chart(Chart("Figure 1. Monthly energy", ["May", "June"],
-                                    [("Option 1", [fact("1,750"), fact("300")]), ("Option 2", [fact("225"), fact("325")])],
+                                    [("Option 1", [fact("1,750"), fact("300")]),
+                                     ("Option 2", [fact("225"), fact("325")])],
                                     "MWh", 50, 2000))
         writer.document.add_paragraph("Figure 1. Monthly energy", style="Caption")
         if broken:  # the chart's part damaged

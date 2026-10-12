@@ -49,7 +49,8 @@ def text_groups(page, text_bytes, section_of=None):
             size += extra
     return groups
 
-UNIT = re.compile(r"\d\s?(?:[kMG]?W|kWh|[kM]?Pa|bar|psi|mm|cm|km|m²|m2|m³|m3|kg|L/s|l/s|L/min|°C|°F|K|%|Hz|kV|V|kVA|A|rpm|dB)\b")
+UNIT = re.compile(r"\d\s?(?:[kMG]?W|kWh|[kM]?Pa|bar|psi|mm|cm|km|m²|m2|m³|m3|kg|L/s|l/s|L/min|°C|°F|K|%|Hz|kV|V|kVA|A"
+                  r"|rpm|dB)\b")
 REQUIREMENT = re.compile(r"\b(?:shall|must|required|requirement)\b", re.IGNORECASE)
 
 def page_signals(page, tables, drawings=None):
@@ -65,12 +66,16 @@ def pdf_locator(page, bbox, region, task):
 
 # How each extraction pass gets from PDF bytes to a claim.
 DERIVATION = {
-    "text": [DerivationStep(step="pdf-text-layer", detail="grouped text blocks"), DerivationStep(step="model-extraction")],
-    "table": [DerivationStep(step="pdf-table-detection", detail="row with provisional header"), DerivationStep(step="model-extraction")],
-    "tile": [DerivationStep(step="pdf-render", detail="page tile"), DerivationStep(step="model-extraction", detail="vision")],
+    "text": [DerivationStep(step="pdf-text-layer", detail="grouped text blocks"),
+             DerivationStep(step="model-extraction")],
+    "table": [DerivationStep(step="pdf-table-detection", detail="row with provisional header"),
+              DerivationStep(step="model-extraction")],
+    "tile": [DerivationStep(step="pdf-render", detail="page tile"),
+             DerivationStep(step="model-extraction", detail="vision")],
     "figure": [DerivationStep(step="pdf-render", detail="detected figure with its caption"),
                DerivationStep(step="model-extraction", detail="vision")],
-    "overview": [DerivationStep(step="pdf-render", detail="whole page"), DerivationStep(step="model-extraction", detail="vision")],
+    "overview": [DerivationStep(step="pdf-render", detail="whole page"),
+                 DerivationStep(step="model-extraction", detail="vision")],
 }
 
 def continues(rows, displayed, page_rect, continuing, first):
@@ -380,7 +385,8 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                     oversized="Table row exceeds text budget; inspect visual tiles")
 
     try:
-        opened = pymupdf.open(stream=path, filetype="pdf") if isinstance(path, (bytes, bytearray)) else pymupdf.open(path)
+        opened = (pymupdf.open(stream=path, filetype="pdf") if isinstance(path, (bytes, bytearray))
+                  else pymupdf.open(path))
         problem = ("encrypted; it needs to be decrypted before comparison" if opened.needs_pass
                    else "not a nonempty PDF" if not opened.is_pdf or not len(opened) else None)
     except (RuntimeError, ValueError) as error:  # corrupt, or not a PDF at all

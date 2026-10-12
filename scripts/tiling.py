@@ -44,7 +44,8 @@ def main(argv=None):
                     help='leave out files whose path holds this, such as "heldout/"')
     show = sub.add_parser("report", help="a run's totals by tiling mode, and its worst pages")
     show.add_argument("run")
-    show.add_argument("--worst", action="append", default=[], metavar="MEASURE", help=f"one of {', '.join(tiling.COUNTS)}")
+    show.add_argument("--worst", action="append", default=[], metavar="MEASURE",
+                      help=f"one of {', '.join(tiling.COUNTS)}")
     show.add_argument("-n", type=int, default=10)
     both = sub.add_parser("compare", help="two runs over the same pages, page by page")
     both.add_argument("before")

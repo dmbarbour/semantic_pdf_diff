@@ -105,7 +105,8 @@ class CommandLine(unittest.TestCase):
         return self.cli('source', argv[0], '--store', self.store, *argv[1:])
 
     def test_manage_sources(self):
-        self.assertEqual(self.source('add', 'team-a', '--path', self.root / 'team-a', '--meta', 'organization=Team A')[0], 0)
+        self.assertEqual(self.source('add', 'team-a', '--path', self.root / 'team-a',
+                                     '--meta', 'organization=Team A')[0], 0)
         code, out, _ = self.source('list')
         self.assertIn('team-a\tdeclared\t3 files\t{"organization": "Team A"}', out)
         self.source('update', 'team-a', '--meta', 'revision=C', '--meta', 'organization=')
@@ -120,7 +121,8 @@ class CommandLine(unittest.TestCase):
         with model_server() as (url, state):
             self.source('add', 'team-a', '--path', self.root / 'team-a')
             self.source('add', 'team-b', '--path', self.root / 'team-b')
-            code, _, err = self.cli('compare', '--store', self.store, 'team-a', 'team-b', '--base-url', url, '--no-vision')
+            code, _, err = self.cli('compare', '--store', self.store, 'team-a', 'team-b', '--base-url', url,
+                                    '--no-vision')
             report = json.loads((self.store / 'report.json').read_text())
             self.assertEqual(code, 2)  # --no-vision and the unsupported .rtf are incomplete
             self.assertEqual(len(report['shared']), 1)  # the identical rules PDF
@@ -176,7 +178,8 @@ class CommandLine(unittest.TestCase):
                                    '--manifest', self.root / 'team-b.source.json', '--base-url', url, '--no-vision')
             code, _, err = run()
             self.assertIn("Linked source 'team-a'", err)
-            self.assertEqual({s['kind'] for s in json.loads((self.store / 'report.json').read_text())['sources']}, {'manifest'})
+            self.assertEqual({s['kind'] for s in json.loads((self.store / 'report.json').read_text())['sources']},
+                             {'manifest'})
             _, _, err = run()
             self.assertNotIn('Linked', err)
             edited = json.loads((self.root / 'team-a.source.json').read_text())
@@ -192,11 +195,12 @@ class CommandLine(unittest.TestCase):
             code, _, _ = self.cli(self.root / 'team-a', self.root / 'team-b', '--out', self.store, '--base-url', url,
                                   '--no-vision')
             sources = json.loads((self.store / 'report.json').read_text())['sources']
-            self.assertEqual([(s['name'], s['kind']) for s in sources], [('team-a', 'shortcut'), ('team-b', 'shortcut')])
-            other = self.root / 'other'
+            self.assertEqual([(s['name'], s['kind']) for s in sources],
+                             [('team-a', 'shortcut'), ('team-b', 'shortcut')])
             self.source('add', 'declared', '--path', self.root / 'team-a')
             (self.root / 'declared').mkdir()
-            code, _, err = self.cli(self.root / 'declared', self.root / 'team-b', '--out', self.store, '--base-url', url)
+            code, _, err = self.cli(self.root / 'declared', self.root / 'team-b', '--out', self.store,
+                                    '--base-url', url)
             self.assertEqual(code, 1)
             self.assertIn("already has a declared source named 'declared'", err)
 

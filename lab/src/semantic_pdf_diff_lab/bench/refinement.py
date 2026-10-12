@@ -228,7 +228,8 @@ def pairs(before, after, folder, grown=False, image_side=None):
             for task, row in rows.items():
                 if not task.startswith("tile:") or "-r" in task or "-c" in task:
                     continue
-                sides = [[c for t, cs in claims.items() if t.startswith(task + "-r") for c in cs] for claims in (old, new)]
+                sides = [[c for t, cs in claims.items() if t.startswith(task + "-r") for c in cs]
+                         for claims in (old, new)]
                 if not any(t.startswith(task + "-r") for t in rows):
                     continue
                 image = f"images/{store.parent.name}-{Path(row['image']).name}"
@@ -239,7 +240,8 @@ def pairs(before, after, folder, grown=False, image_side=None):
                     for rect in (pymupdf.Rect(r["bbox"]) for r in [*rows.values(), *_stored(other)[0].values()]
                                  if r.get("task", "").startswith(task + "-r")):
                         shown |= rect
-                    if shown.width <= pymupdf.Rect(row["bbox"]).width + 2 and shown.height <= pymupdf.Rect(row["bbox"]).height + 2:
+                    if (shown.width <= pymupdf.Rect(row["bbox"]).width + 2
+                            and shown.height <= pymupdf.Rect(row["bbox"]).height + 2):
                         continue
                     from semantic_pdf_diff.visuals import render
                     render(page, shown, folder / image, image_side)
@@ -256,7 +258,8 @@ def pairs(before, after, folder, grown=False, image_side=None):
     (folder / "pairs.json").write_text(json.dumps({"items": items}, indent=1) + "\n", encoding="utf-8")
     return len(items)
 
-HALF_CHECK = """This image is part of a page from an engineering document. Below are claims a reader extracted from it, one per line, \
+HALF_CHECK = """This image is part of a page from an engineering document. \
+Below are claims a reader extracted from it, one per line, \
 numbered. Check each claim against the image (and the text layer below it) only.
 
 Mark each claim:
@@ -320,7 +323,8 @@ def check_halves(folder, client, rater):
 
     def requests():
         for item in items:
-            lines = "\n".join(f"{k}. {c['entity']} | {c['attribute']} | {c['value']}{' ' + c['unit'] if c['unit'] else ''}"
+            lines = "\n".join(f"{k}. {c['entity']} | {c['attribute']} | {c['value']}"
+                              f"{' ' + c['unit'] if c['unit'] else ''}"
                               f"{' | conditions: ' + c['conditions'] if c['conditions'] else ''} | quote: {c['quote']}"
                               for k, c in enumerate(item["claims"], 1))
             yield (item["id"], HALF_CHECK.format(layer=item["layer"] or "(none)", claims=lines), Marks,

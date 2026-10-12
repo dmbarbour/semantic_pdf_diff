@@ -29,7 +29,8 @@ def simulated(rng, effect=0.0, regions=27, banded=5):
             unit = f"u-run-p{r}-{kind}" + (f"-b{b}of{bands}" if bands > 1 else "")
             scores[unit] = first if b == 0 or rng.random() < 0.5 else draw()
             family[unit], document[unit] = kind, doc
-    return scores, family, document, {"units": 60, "unchanged": 28, "changed_by_kind": {"text": 10, "table": 10, "visual": 12}}
+    return scores, family, document, {"units": 60, "unchanged": 28,
+                                      "changed_by_kind": {"text": 10, "table": 10, "visual": 12}}
 
 def rates(rounds_run, effect=0.0, criteria=None, variants=1, gains=None, held_out=None, seed=1):
     """Shares over simulated rounds: variants accepted, "no worse" calls, rounds with any variant
@@ -42,7 +43,8 @@ def rates(rounds_run, effect=0.0, criteria=None, variants=1, gains=None, held_ou
         counts["no worse"] += sum(r["decision"].startswith(("no worse", "accepted: no worse")) for r in results)
         counts["any"] += bool(accepted)
         if held_out is not None:
-            counts["promoted"] += any(rounds.decide_scores(*simulated(rng, effect), held_out)["accepted"] for _ in accepted)
+            counts["promoted"] += any(rounds.decide_scores(*simulated(rng, effect), held_out)["accepted"]
+                                      for _ in accepted)
     per_variant = rounds_run * variants
     return {"accepted": counts["accepted"] / per_variant, "no worse": counts["no worse"] / per_variant,
             "any": counts["any"] / rounds_run, "promoted": counts["promoted"] / rounds_run}
@@ -78,11 +80,11 @@ class UnderTheNull(unittest.TestCase):
 class WithARealEffect(unittest.TestCase):
     def test_a_clear_effect_is_usually_found(self):
         self.assertGreaterEqual(rates(400, effect=0.4)["accepted"], 0.65)  # true rate 0.70: found about 78% of the time
-        self.assertLessEqual(rates(400, effect=0.2)["accepted"], 0.5)      # true rate 0.60: missed more often than found
+        # true rate 0.60: missed more often than found
+        self.assertLessEqual(rates(400, effect=0.2)["accepted"], 0.5)
 
 class RoundSpecs(unittest.TestCase):
     def test_every_committed_round_validates_and_typos_fail(self):
-        import json
         from pathlib import Path
         from pydantic import ValidationError
         from semantic_pdf_diff_lab.eval.models import RoundSpec

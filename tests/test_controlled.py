@@ -125,7 +125,8 @@ class Knobs(unittest.TestCase):
             for folded in (False, True):
                 pos, _ = S.layout(system, 504, folded)
                 box_w = min(S.BOX_W, 504 / (4 if folded else len(system.path)) - 12)
-                box = lambda c: (c[0] - box_w / 2 - 2, c[1] - S.BOX_H / 2 - 2, c[0] + box_w / 2 + 2, c[1] + S.BOX_H / 2 + 2)
+                box = lambda c: (c[0] - box_w / 2 - 2, c[1] - S.BOX_H / 2 - 2,  # noqa: B023 (called at once)
+                                 c[0] + box_w / 2 + 2, c[1] + S.BOX_H / 2 + 2)  # noqa: B023 (called at once)
                 ids = {p.id for p in system.parts}
                 for l in system.links:
                     if l.object in ids and l.kind not in ("member", "intro"):  # drawn as lines
@@ -238,7 +239,8 @@ class Scoring(unittest.TestCase):
         low, high = project.fact("hallc.tmin"), project.fact("hallc.tmax")
         s = controlled.score(controlled.key(project, log), [
             {"entity": "Hall C", "attribute": "indoor design temperature", "value": f"{low.value} to {high.value} °F"},
-            {"entity": "Hall C", "attribute": "clear height", "value": "17'-9 1/2\""}])  # feet and inches: one value, printed nowhere
+            {"entity": "Hall C", "attribute": "clear height",
+             "value": "17'-9 1/2\""}])  # feet and inches: one value, printed nowhere
         self.assertEqual(s["outcomes"], {"right": 2, "hallucinated": 1})
         self.assertNotIn("hallc.tmax", s["missed"])
 
@@ -258,7 +260,8 @@ class Scoring(unittest.TestCase):
         s = controlled.score(key, [bar(july.number, conditions="August")])
         self.assertEqual(s["outcomes"], {"inexact": 1})
         exhibit = project.fact("zone.exhibit")  # bars of two charts near one value: the names choose
-        s = controlled.score(key, [{"entity": "Exhibit floor", "attribute": "peak cooling load", "value": exhibit.value}])
+        s = controlled.score(key, [{"entity": "Exhibit floor", "attribute": "peak cooling load",
+                                    "value": exhibit.value}])
         self.assertEqual(s["outcomes"], {"right": 1})
         self.assertNotIn("zone.exhibit", s["missed"])
 
@@ -378,7 +381,8 @@ class Scoring(unittest.TestCase):
         room = project.fact("room101.width")
         half = sheets.inches(room.value) + 0.5
         written = f"{int(half // 12)}'-{int(half % 12)} 1/2\""
-        s = controlled.score(controlled.key(project, log), [{"entity": "Meeting 101", "attribute": "width", "value": written}])
+        s = controlled.score(controlled.key(project, log),
+                             [{"entity": "Meeting 101", "attribute": "width", "value": written}])
         self.assertEqual(s["outcomes"], {"hallucinated": 1})  # half an inch off: not the room's width, nor 23 feet
 
     def test_a_superseded_value_reported_as_current_is_a_distractor(self):
@@ -396,7 +400,8 @@ class Revisions(unittest.TestCase):
         from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
         # (changed, added, removed, conditions changed with the value kept)
         expected = {"wtp-s1": (4, 3, 1, 0), "coaster-s1": (4, 3, 1, 0), "wtp-tables-s1-clean": (3, 4, 3, 0),
-                    "lcc-s1-traps": (3, 2, 2, 0), "lcc-energy-s1-clean": (5, 0, 0, 0), "lcc-plan-s1-clean": (3, 1, 0, 0),
+                    "lcc-s1-traps": (3, 2, 2, 0), "lcc-energy-s1-clean": (5, 0, 0, 0),
+                    "lcc-plan-s1-clean": (3, 1, 0, 0),
                     # the knobs for alignment: a rename and a reorder change no fact; a split is four facts gone,
                     # eight new
                     "wtp-tables-s1-clean-renamed": (0, 0, 0, 0), "wtp-tables-s1-clean-reordered": (0, 0, 0, 0),
@@ -527,7 +532,8 @@ class ComparisonScoring(unittest.TestCase):
     def report(self, claims, findings, unmatched):
         return {"sources": [{"name": "a"}, {"name": "b"}],
                 "files": [{"source": "a", "content": "a.pdf"}, {"source": "b", "content": "b.pdf"}],
-                "evidence": list(claims.values()), "findings": [{"a": a, "b": b, "relation": r} for (a, b), r in findings.items()],
+                "evidence": list(claims.values()),
+                "findings": [{"a": a, "b": b, "relation": r} for (a, b), r in findings.items()],
                 "unmatched": [{"id": i} for i in unmatched],
                 "retrieval": {"attempted_pairs": len(findings), "omitted_by_pair_limit": 0}}
 
@@ -579,13 +585,15 @@ class ComparisonScoring(unittest.TestCase):
         report = self.report(c, findings, unmatched)
         changed = comparison.changes(*self.keys)["changed"]
         named = {both(f): "changed" for f in changed[:3]} | {both(changed[3]): "not_same_item"} | \
-            {both("plant.peak_flow"): "restated", (ident(0, "P-101C.capacity"), ident(1, "P-101D.capacity")): "not_same_item"}
+            {both("plant.peak_flow"): "restated",
+             (ident(0, "P-101C.capacity"), ident(1, "P-101D.capacity")): "not_same_item"}
         for f in report["findings"]:
             if (f["a"], f["b"]) in named:
                 f["explanation"] = {"kind": named[f["a"], f["b"]]}
         s = comparison.score_comparison(*self.keys, report)["kinds"]
         self.assertEqual((s["right"], s["scored"], s["value_change_precision"]), (5, 6, 1.0))
-        self.assertEqual(s["by_claims"], {"across facts": {"not_same_item": 1}, "change": {"changed": 3, "not_same_item": 1},
+        self.assertEqual(s["by_claims"], {"across facts": {"not_same_item": 1},
+                                          "change": {"changed": 3, "not_same_item": 1},
                                           "no change": {"restated": 1}})
 
     def test_a_range_stands_for_both_its_bounds(self):
@@ -626,8 +634,9 @@ class Replay(unittest.TestCase):
                 pdf = controlled.write(project, d / "docs")
                 self.assertEqual(pdf.read_bytes(), (folder / "docs" / pdf.name).read_bytes())  # generated alike
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                    code = cli.main([str(pdf), str(pdf), "--config", str(folder / "settings.json"), "-q", "--no-situate",
-                                     "--out", str(d / "runs" / project.id), "--fixture", str(folder / "replay.zip"),
+                    code = cli.main([str(pdf), str(pdf), "--config", str(folder / "settings.json"), "-q",
+                                     "--no-situate", "--out", str(d / "runs" / project.id),
+                                     "--fixture", str(folder / "replay.zip"),
                                      "--fixture-mode", "replay", "--base-url", "http://127.0.0.1:9/v1",
                                      "--responder", responder])
                 self.assertIn(code, (0, 2))
@@ -637,7 +646,8 @@ class Replay(unittest.TestCase):
             for run, found in claims.items():
                 key = json.loads((d / "docs" / f"{run}.key.json").read_text())
                 result = controlled.score(key, found)
-                self.assertEqual((result["recall"], result["outcomes"]), (committed[run]["recall"], committed[run]["outcomes"]))
+                self.assertEqual((result["recall"], result["outcomes"]),
+                                 (committed[run]["recall"], committed[run]["outcomes"]))
 
     def test_a_revision_pair_compares_again_to_the_recorded_scores(self):
         import contextlib, io, json, tempfile
@@ -661,9 +671,10 @@ class Replay(unittest.TestCase):
             for pdf in pdfs:
                 self.assertEqual(pdf.read_bytes(), (folder / "docs" / pdf.name).read_bytes())  # generated alike
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                code = cli.main([*map(str, pdfs), "--mode", "revisions", "--config", str(folder / "settings.json"), "-q",
-                                 "--no-situate", "--out", str(d / "run"), "--fixture", str(folder / "replay.zip"),
-                                 "--fixture-mode", "replay", "--base-url", "http://127.0.0.1:9/v1", "--responder", responder])
+                code = cli.main([*map(str, pdfs), "--mode", "revisions", "--config", str(folder / "settings.json"),
+                                 "-q", "--no-situate", "--out", str(d / "run"), "--fixture", str(folder / "replay.zip"),
+                                 "--fixture-mode", "replay", "--base-url", "http://127.0.0.1:9/v1",
+                                 "--responder", responder])
             self.assertIn(code, (0, 2))
             keys = [json.loads((d / "docs" / f"{i}.key.json").read_text()) for i in (pair.earlier, pair.later)]
             result = comparison.score_comparison(*keys, json.loads((d / "run" / "report.json").read_text()))
@@ -675,7 +686,6 @@ class Corpus(unittest.TestCase):
     change that moved one chart's bytes once went unnoticed until a run had started)."""
     def test_every_committed_document_is_generated_alike(self):
         import json
-        import tempfile
         from pathlib import Path
         import pymupdf
         from semantic_pdf_diff import fixtures
@@ -689,7 +699,8 @@ class Corpus(unittest.TestCase):
         projects = controlled.corpus(knobs=True, revisions=True)
         # every committed document is still generated, and every generated one is committed
         self.assertEqual({p.id for p in projects}, {f.stem for f in (folder / "docs").glob("*.pdf")})
-        self.assertEqual({p.id for p in projects}, {f.name[:-len(".key.json")] for f in (folder / "docs").glob("*.key.json")})
+        self.assertEqual({p.id for p in projects},
+                         {f.name[:-len(".key.json")] for f in (folder / "docs").glob("*.key.json")})
         for project in projects:
             with self.subTest(document=project.id):
                 data, log = controlled.render(project)
@@ -701,13 +712,16 @@ class Corpus(unittest.TestCase):
         self.assertEqual({p.id for p, _ in written}, {f.stem for f in (folder / "docs-md").glob("*.md")})
         for project, lines in written:
             with self.subTest(markdown=project.id):
-                self.assertEqual("\n".join(lines) + "\n", (folder / "docs-md" / f"{project.id}.md").read_text(encoding="utf-8"))
+                self.assertEqual("\n".join(lines) + "\n",
+                                 (folder / "docs-md" / f"{project.id}.md").read_text(encoding="utf-8"))
                 key = json.loads((folder / "docs-md" / f"{project.id}.key.json").read_text(encoding="utf-8"))
                 self.assertEqual(json.loads(json.dumps(representations.key(project, lines), ensure_ascii=False)), key)
-                data = representations.docx(lines, representations.chart_pictures(project))  # and as Word, charts as pictures
+                # and as Word, charts as pictures
+                data = representations.docx(lines, representations.chart_pictures(project))
                 self.assertEqual(data, (folder / "docs-docx" / f"{project.id}.docx").read_bytes())
                 key = json.loads((folder / "docs-docx" / f"{project.id}.key.json").read_text(encoding="utf-8"))
-                self.assertEqual(json.loads(json.dumps(representations.docx_key(project, data), ensure_ascii=False)), key)
+                self.assertEqual(json.loads(json.dumps(representations.docx_key(project, data), ensure_ascii=False)),
+                                 key)
         from semantic_pdf_diff_lab.bench.controlled import workbooks
         self.assertEqual({p.id for p, _ in written}, {f.stem for f in (folder / "docs-xlsx").glob("*.xlsx")})
         for project, _ in written:
@@ -733,7 +747,8 @@ class Corpus(unittest.TestCase):
             with self.subTest(word=project.id):
                 self.assertEqual(data, (folder / "docs-docx" / f"{project.id}.docx").read_bytes())
                 key = json.loads((folder / "docs-docx" / f"{project.id}.key.json").read_text(encoding="utf-8"))
-                self.assertEqual(json.loads(json.dumps(representations.docx_key(project, data), ensure_ascii=False)), key)
+                self.assertEqual(json.loads(json.dumps(representations.docx_key(project, data), ensure_ascii=False)),
+                                 key)
 
 if __name__ == "__main__":
     unittest.main()

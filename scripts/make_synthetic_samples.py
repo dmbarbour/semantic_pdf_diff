@@ -86,11 +86,13 @@ def summary_sheet(ws):
         {"range": "A2", "kind": "note"},
         {"range": "M2", "kind": "note"},
         {"range": "B4:D10", "kind": "table", "name": "Design basis", "header_rows": [4], "strategy": "iterate",
-         "claims_per_row": 1, "notes": ["C8 is a formula (=C6+C7) with no cached value; its value is unknown to readers that don't evaluate formulas",
+         "claims_per_row": 1, "notes": ["C8 is a formula (=C6+C7) with no cached value; "
+                                        "its value is unknown to readers that don't evaluate formulas",
                                         "C10 is a text value; D10 (unit) is empty"]},
         {"range": "G4:K7", "kind": "table", "name": "Pump schedule", "header_rows": [4], "strategy": "iterate",
          "claims_per_row": 3, "notes": ["units are embedded in headers", "row label is the pump tag in column G"]},
-        {"range": "B13:F17", "kind": "table", "name": "Commissioning results", "header_rows": [13, 14], "strategy": "iterate",
+        {"range": "B13:F17", "kind": "table", "name": "Commissioning results", "header_rows": [13, 14],
+         "strategy": "iterate",
          "composite_columns": [["C", "D"]],
          "notes": ["C13:D13 is a merged header over value and ± columns", "units are embedded in row labels",
                    "measured (C) and design (E) values have different bases: measured vs specified",
@@ -164,7 +166,8 @@ def scratch_sheet(ws):
     ws["C8"] = "discount rate?"
     return [
         {"range": "A1:E6", "kind": "ambiguous", "expected": "skipped: ambiguous sheet layout",
-         "notes": ["really two tables, A1:C4 (options) and D2:E6 (energy by year), touching diagonally at C4/D2 without separation"]},
+         "notes": ["really two tables, A1:C4 (options) and D2:E6 (energy by year), "
+                   "touching diagonally at C4/D2 without separation"]},
         {"range": "B8:C8", "kind": "note", "notes": ["an unlabeled parameter with a question as its label"]},
     ]
 
@@ -177,9 +180,12 @@ def superseded_sheet(ws):
     ], bold_rows=(0,))
     ws.sheet_state = "hidden"
     return [
-        {"range": "A1:C4", "kind": "table", "name": "Superseded design basis", "header_rows": [1], "strategy": "iterate",
-         "notes": ["the sheet is hidden and its name says it is superseded; its values conflict with Summary (110 vs 120 L/s)",
-                   "expected: extracted but marked as coming from a hidden sheet, never silently merged with current values"]},
+        {"range": "A1:C4", "kind": "table", "name": "Superseded design basis", "header_rows": [1],
+         "strategy": "iterate",
+         "notes": ["the sheet is hidden and its name says it is superseded; "
+                   "its values conflict with Summary (110 vs 120 L/s)",
+                   "expected: extracted but marked as coming from a hidden sheet, "
+                   "never silently merged with current values"]},
     ]
 
 def deterministic_zip(data):
@@ -253,7 +259,8 @@ def main(argv=None):
         path = args.dest / name
         key = make(path)
         key["description"] = "Synthetic, invented content. Ranges are Excel A1 notation (CSV: 1-based line numbers)."
-        path.with_suffix(".expected.json").write_text(json.dumps(key, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        path.with_suffix(".expected.json").write_text(json.dumps(key, indent=2, ensure_ascii=False) + "\n",
+                                                      encoding="utf-8")
         print(path)
     return 0
 

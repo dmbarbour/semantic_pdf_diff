@@ -18,7 +18,8 @@ PAGE_TEXT = 6000    # characters of the page's text layer shown to judges
 
 def _ident(c):
     """A claim's identity (see collect); batches from before 2026-09-30 carry none: their exact text."""
-    return c.get("_id") or tuple(str(c.get(k, "")) for k in ("entity", "attribute", "value", "unit", "conditions", "quote"))
+    return c.get("_id") or tuple(str(c.get(k, ""))
+                                 for k in ("entity", "attribute", "value", "unit", "conditions", "quote"))
 
 def private_slices(runs, manifest):
     """The slices behind these runs (by run name, as in scripts/slices.json) not marked public. Rounds and
@@ -53,7 +54,8 @@ def collect(runs_dir, unit="family"):
     A claim's identity in a unit (its key, and `_id`) is its reading's ID and its quote: what judges
     and people are shown, so a lever that changes only quotes changes its units. `_claim` is the
     merged claim's ID (the evidence it belongs to). The meta-audit found three identities in use."""
-    family_of = (lambda region: FAMILY.get(region)) if unit == "family" else (lambda region: "page" if region in FAMILY else None)
+    family_of = ((lambda region: FAMILY.get(region)) if unit == "family"
+                 else (lambda region: "page" if region in FAMILY else None))
     from semantic_pdf_diff.store import Store
     units = defaultdict(lambda: {"claims": {}, "tasks": 0})
     read = _reader(runs_dir)
@@ -145,7 +147,7 @@ def split_units(base, var, limit=MAX_CLAIMS, rotation=None):
             for i, c in side["claims"].items():
                 box = tuple(shown_by_matrix(turn, c["_box"]))
                 position[i] = min(position[i], box) if i in position else box
-        centre = lambda i: (position[i][1] + position[i][3]) / 2
+        centre = lambda i: (position[i][1] + position[i][3]) / 2  # noqa: B023 (called at once)
         order = sorted(position, key=lambda i: (centre(i), i))
         k = min(MAX_BANDS, -(-size // limit))
         for part in range(k):
@@ -212,9 +214,11 @@ def pair_units(baseline_dir, variant_dir, n, seed=1, families=("text", "table", 
         for family in sorted(groups):
             if groups[family] and len(picked) < n:
                 picked.append(groups[family].pop())
-    same = sum(1 for k in keys if set(base.get(k, {"claims": {}})["claims"]) == set(var.get(k, {"claims": {}})["claims"]))
+    same = sum(1 for k in keys
+               if set(base.get(k, {"claims": {}})["claims"]) == set(var.get(k, {"claims": {}})["claims"]))
     changed_by_kind = {f: len(g) + sum(k[3] == f for k in picked) for f, g in groups.items()}
-    checks["changed_out_of_scope"] = 0 if scope is None else sum(n for f, n in changed_by_kind.items() if f not in scope)
+    checks["changed_out_of_scope"] = (0 if scope is None
+                                      else sum(n for f, n in changed_by_kind.items() if f not in scope))
     return [(k, base.get(k, {"claims": {}})["claims"], var.get(k, {"claims": {}})["claims"]) for k in picked], \
         {"units": len(keys), "unchanged": same, "changed_by_kind": changed_by_kind, "checks": checks}
 
@@ -327,13 +331,15 @@ def build_batch(baseline_dir, variant_dir, folder, n=60, seed=1, unit="family", 
             part, parts, y0, y1 = band[0] if band else (0, 1, None, None)
             # a band's crop is its own: a text and a visual unit cut into bands of the same number once shared one, so
             # one of them was judged on the other's crop (rounds 9, 9b and 9h; found 2026-10-02)
-            name = f"{run}-{content.split(':')[1][:8]}-p{page}" + (f"-{family}-b{part}of{parts}" if band else "") + ".jpg"
+            name = (f"{run}-{content.split(':')[1][:8]}-p{page}" + (f"-{family}-b{part}of{parts}" if band else "")
+                    + ".jpg")
             image, text, before, within = _view(opened[(run, content)], folder, name, page, band[0] if band else None,
                                                 docs, (run, content))
             shown_a, shown_b = shown(a, b, rng, limit)
             shared = set(a) & set(b)
             hidden_unique += len((set(a) - set(b)) - set(shown_a)) + len((set(b) - set(a)) - set(shown_b))
-            items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}" + (f"-b{part}of{parts}" if band else ""),
+            items.append({"id": f"u-{run}-{content.split(':')[1][:8]}-p{page}-{family}"
+                                + (f"-b{part}of{parts}" if band else ""),
                           "run": run, "content": content, "page": page, "family": family,
                           "band": [part, parts, y0, y1] if band else None,
                           "image": image, "page_text": text, "sections": headings,
@@ -370,7 +376,8 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
     folder = Path(folder)
     batch = load_batch(folder)
     if batch.get("unit_claims") != UNIT_CLAIMS:  # units recomputed another way wouldn't match the batch's
-        raise ValueError(f"{folder}'s units were built by an earlier collect ({batch.get('unit_claims', 'merged wording')}); "
+        raise ValueError(f"{folder}'s units were built by an earlier collect "
+                         f"({batch.get('unit_claims', 'merged wording')}); "
                          "rebuild the batch to add context")
     picked, _ = pair_units(baseline_dir, variant_dir, n, seed, unit=unit, limit=limit)
     sources, docs = {}, {}
@@ -427,9 +434,10 @@ def add_context(folder, baseline_dir, variant_dir, n, seed=1, limit=MAX_CLAIMS, 
 
 def rerender(folder, slices, target=None):
     """A batch's images and page text made again from the documents its runs read (`slices`: a folder of them, the
-    public slices): the images into `target` (default: the batch's own images folder, and then the text into PAGES), what
-    build_batch and add_context wrote, byte for byte under the same PyMuPDF. Development rounds' images aren't committed (the owner, 2026-10-02: "we should not be
-    committing images ... for development rounds"); this brings them back. Returns the image names written."""
+    public slices): the images into `target` (default: the batch's own images folder, and then the text into PAGES),
+    what build_batch and add_context wrote, byte for byte under the same PyMuPDF. Development rounds' images aren't
+    committed (the owner, 2026-10-02: "we should not be committing images ... for development rounds"); this brings
+    them back. Returns the image names written."""
     import pymupdf
     from semantic_pdf_diff.jobs import READERS
     from semantic_pdf_diff.pages import native_page
@@ -467,7 +475,8 @@ def rerender(folder, slices, target=None):
             else:
                 region = None
             pages[item["id"]] = {"page_text": page.get_text("text", clip=region)[:PAGE_TEXT],
-                                 **({"page_text_full": page.get_text("text")[:PAGE_TEXT]} if item.get("page_image") else {})}
+                                 **({"page_text_full": page.get_text("text")[:PAGE_TEXT]}
+                                    if item.get("page_image") else {})}
             name = Path(item["image"]).name
             if name not in written:  # as build_batch did: the first unit to name an image renders it
                 (target / name).write_bytes(render(doc, item["page"], region, None, 1400))

@@ -55,7 +55,8 @@ def _rewrite(project, edit):
                 blocks[i] = ("p", edit(block[1]))
             elif block[0] == "schedule":
                 for s, (title, kind, columns, rows) in enumerate(block[1].sections):
-                    block[1].sections[s] = (title, kind, columns, [(tag, [edit(c) for c in cells]) for tag, cells in rows])
+                    block[1].sections[s] = (title, kind, columns,
+                                            [(tag, [edit(c) for c in cells]) for tag, cells in rows])
             elif block[0] in ("table", "rooms"):
                 block[3][:] = [[edit(c) for c in row] for row in block[3]]
     if project.values:
@@ -231,7 +232,7 @@ def split_row(project, tag, tags, d, column):
             raise ValueError(f"{project.id}: no split of {whole.value}")
         new_facts = []
         for n, new_tag in enumerate(tags):
-            rename = lambda text: pattern.sub(new_tag, text)
+            rename = lambda text: pattern.sub(new_tag, text)  # noqa: B023 (called at once)
             values = {}
             for f in old:
                 value = (part if n == 0 else rest) if f is whole else near(d, f.value, -0.05, 0.05)
@@ -286,7 +287,8 @@ def insert_message(project, after_fact, sender, receiver, message, fact):
     procedure.steps.insert(k + 1, (sender, receiver, message, fact))
     project.facts.append(fact)
     project.edits += [{"kind": "added", "facts": [fact.id]},
-                      {"kind": "renumbered", "labels": {str(n): str(n + 1) for n in range(k + 2, len(procedure.steps))}}]
+                      {"kind": "renumbered",
+                       "labels": {str(n): str(n + 1) for n in range(k + 2, len(procedure.steps))}}]
 
 def reword(project, passages, facts):
     """Passages rewritten without changing what they state (conditions in other words): the facts unchanged."""
@@ -418,9 +420,11 @@ def members_later(p, d):
     member = lambda fid, what, value: Fact(fid, *report, f"{what} length", (what, f"{what} size", f"{what} field"),
                                            value, "bits")
     ta = p.fact("meas.ta")
-    replace_paragraph(p, "meas.beam", "– the battery level, {v} bits;", member("meas.battery", "battery level", d.number(6, 30)))
+    replace_paragraph(p, "meas.beam", "– the battery level, {v} bits;",
+                      member("meas.battery", "battery level", d.number(6, 30)))
     rewrite(p, f"the timing advance, {ta.value} bits.", f"the timing advance, {ta.value} bits;")
-    add_paragraph(p, "meas.ta", "– the transmit power, {v} bits.", member("meas.power", "transmit power", d.number(6, 30)))
+    add_paragraph(p, "meas.ta", "– the transmit power, {v} bits.",
+                  member("meas.power", "transmit power", d.number(6, 30)))
 
 def renumbered_later(p, d):
     """A new first condition for declaring a link failure, the others renumbered after it (2, 3, 4), their values

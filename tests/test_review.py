@@ -241,7 +241,8 @@ class Batches(unittest.TestCase):
         self.assertEqual((count, failures), (len(batch['items']), []))
         self.assertEqual(target.name, 'panel_model-x.json')
         data = json.loads(target.read_text())
-        self.assertTrue(all('made_up_flag' not in l['flags'] and 'unknown flags dropped' in l['note'] for l in data['labels']))
+        self.assertTrue(all('made_up_flag' not in l['flags'] and 'unknown flags dropped' in l['note']
+                            for l in data['labels']))
         self.assertEqual(review.validate(batch, data), [])
         prompt, images = panel.prompts[0]
         self.assertNotIn('SECRET-RESPONDER', prompt)

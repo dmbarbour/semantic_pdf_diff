@@ -104,9 +104,11 @@ def main(argv=None):
     parser.add_argument("--all", action="store_true", help="fetch every set, including large optional ones")
     parser.add_argument("--list", action="store_true", help="describe the sets and exit")
     parser.add_argument("--dest", type=Path, default=DEFAULT_DEST, help="output folder (default: samples/)")
-    parser.add_argument("--make-zips", action="store_true", help="also pack each project folder listed in zip_projects into <set>/zips/")
+    parser.add_argument("--make-zips", action="store_true",
+                        help="also pack each project folder listed in zip_projects into <set>/zips/")
     parser.add_argument("--timeout", type=float, default=120)
-    parser.add_argument("--record-hashes", action="store_true", help="maintainers: pin hashes for entries that lack one")
+    parser.add_argument("--record-hashes", action="store_true",
+                        help="maintainers: pin hashes for entries that lack one")
     args = parser.parse_args(argv)
 
     manifest = json.loads(MANIFEST.read_text())
@@ -114,7 +116,8 @@ def main(argv=None):
     if args.list:
         for name, spec in sets.items():
             size = sum(f.get("bytes", 0) for f in spec["files"])
-            print(f"{name}{' (default)' if spec.get('default') else ''}: {len(spec['files'])} files, {size / 1e6:.0f} MB")
+            print(f"{name}{' (default)' if spec.get('default') else ''}: "
+                  f"{len(spec['files'])} files, {size / 1e6:.0f} MB")
             print(f"  {spec['use']}\n  Terms: {spec['terms']}\n")
         return 0
     unknown = set(args.sets or ()) - set(sets)

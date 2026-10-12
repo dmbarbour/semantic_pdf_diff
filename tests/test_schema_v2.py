@@ -57,7 +57,8 @@ class ContentTests(unittest.TestCase):
     def test_locator_and_derivation(self):
         with tempfile.TemporaryDirectory() as d:
             path = make_pdf(Path(d) / 't.pdf')
-            evidence, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), Recorder(vision=False))
+            evidence, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d),
+                                             Recorder(vision=False))
             e = evidence[0]
             self.assertEqual((e.locator.format, e.locator.page, e.locator.region), ('pdf', 1, 'text'))
             self.assertEqual([step.step for step in e.derivation], ['pdf-text-layer', 'model-extraction'])

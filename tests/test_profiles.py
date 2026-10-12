@@ -11,7 +11,8 @@ class Profiles(unittest.TestCase):
     def test_predictions_follow_the_image(self):
         p = Profile("m", BUDGET)
         tile = profiles.card_prediction(p, 420, 420, 768)
-        self.assertAlmostEqual(profiles.card_prediction(p, 840, 840, 768), 2 * tile, places=6)  # twice the area per pixel
+        # twice the area per pixel
+        self.assertAlmostEqual(profiles.card_prediction(p, 840, 840, 768), 2 * tile, places=6)
         native = Profile("n", NATIVE)
         # a native-resolution model gains from a larger render; a fixed-budget one much less
         gain = lambda q: profiles.card_prediction(q, 420, 420, 768) / profiles.card_prediction(q, 420, 420, 1536)

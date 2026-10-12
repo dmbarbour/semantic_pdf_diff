@@ -213,7 +213,8 @@ def docx(lines, pictures=None):
     raw = io.BytesIO()
     document.save(raw)
     fixed = io.BytesIO()  # the same members, each dated FIXED_TIME
-    with zipfile.ZipFile(io.BytesIO(raw.getvalue())) as source, zipfile.ZipFile(fixed, "w", zipfile.ZIP_DEFLATED) as out:
+    with (zipfile.ZipFile(io.BytesIO(raw.getvalue())) as source,
+          zipfile.ZipFile(fixed, "w", zipfile.ZIP_DEFLATED) as out):
         for info in source.infolist():
             out.writestr(zipfile.ZipInfo(info.filename, FIXED_TIME), source.read(info.filename),
                          compress_type=zipfile.ZIP_DEFLATED)
@@ -250,6 +251,6 @@ def write_docx(project, lines, folder):
     data = docx(lines, chart_pictures(project))
     path = folder / f"{project.id}.docx"
     path.write_bytes(data)
-    (folder / f"{project.id}.key.json").write_text(json.dumps(docx_key(project, data), indent=1, ensure_ascii=False) + "\n",
-                                                   encoding="utf-8")
+    (folder / f"{project.id}.key.json").write_text(
+        json.dumps(docx_key(project, data), indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     return path

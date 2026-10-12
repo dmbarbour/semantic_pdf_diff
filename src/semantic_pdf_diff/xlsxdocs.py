@@ -260,7 +260,8 @@ class _Writer:
                                                      "values under no header, as tables pressed together do"))
             return
         labels = header_labels(grid, heads)
-        header_lines = [self.line(page, " | ".join(c.text for c in row), (sheet, row_ref(r))) for r, row in grid[:heads]]
+        header_lines = [self.line(page, " | ".join(c.text for c in row), (sheet, row_ref(r)))
+                        for r, row in grid[:heads]]
         if not heads:  # a defined table without a header row: its columns' names, as its structured references use
             labels = [str(n) for n in region.columns][:len(labels)] or labels
             labels += [""] * (region.right - region.left + 1 - len(labels))

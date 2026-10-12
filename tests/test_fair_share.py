@@ -21,7 +21,8 @@ class FairShare(unittest.TestCase):
             a1, a2 = pdf(root / 'a1.pdf', 3), pdf(root / 'a2.pdf', 2)
             b1 = pdf(root / 'b1.pdf', 4)
             client, done = Recorder(), []
-            job = lambda path: Job(f'sha256:{path.stem}.pdf', lambda: path, on_done=lambda ev, cov: done.append(path.stem))
+            job = lambda path: Job(f'sha256:{path.stem}.pdf', lambda: path,
+                                   on_done=lambda ev, cov: done.append(path.stem))
             run_jobs([[job(a1), job(a2)], [job(b1)]], root, client)
             sources = ['a' if content.startswith('sha256:a') else 'b' for content, _ in client.order]
             # One worker, yet pages alternate between sources while both have work left.

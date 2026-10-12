@@ -22,8 +22,8 @@ from collections import Counter
 from semantic_pdf_diff.textdocs import parse
 
 NUMBER = re.compile(r"(?<![\w.])\d[\d,]*(?:\.\d+)?(?![\w])")
-REFERENCE = re.compile(r"\[[^\]]*\]|\b(?:Section|Sections|Appendix|Figure|Table|RFC|draft)[- ]?[\w.\-]*(?:\s*(?:and|,)\s*[\d.]+)*",
-                       re.I)
+REFERENCE = re.compile(r"\[[^\]]*\]|\b(?:Section|Sections|Appendix|Figure|Table|RFC|draft)[- ]?[\w.\-]*"
+                       r"(?:\s*(?:and|,)\s*[\d.]+)*", re.I)
 
 def document(path):
     """A file's TextDocument as its reader sees it: plain text, Markdown, a Word document, a deck, or a zip holding
@@ -91,7 +91,8 @@ def changed_pictures(earlier, later):
                 for k, p in enumerate(mine)]
     changed = []
     for mine, theirs in ((one, two), (two, one)):
-        changed.append({p.line for p, q in zip(mine, counterparts(mine, theirs)) if q is None or digest(p) != digest(q)})
+        changed.append({p.line for p, q in zip(mine, counterparts(mine, theirs))
+                        if q is None or digest(p) != digest(q)})
     return tuple(changed)
 
 def rate(report, earlier, later):

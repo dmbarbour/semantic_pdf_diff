@@ -113,7 +113,8 @@ class Alignment(unittest.TestCase):
         self.assertEqual((len(found.settled), found.judge), (2, []))
 
     def test_a_fact_filed_under_another_entity_still_pairs_by_its_value(self):
-        left = [claim("first drop", "peak g", "2.3", "g"), claim("first drop", "maximum vertical acceleration", "3.8", "g"),
+        left = [claim("first drop", "peak g", "2.3", "g"),
+                claim("first drop", "maximum vertical acceleration", "3.8", "g"),
                 claim("Ridgeback", "track length", "6,694", "ft")]
         right = [claim("First drop", "peak g", "2.3", "g"), claim("Ridgeback", "track length", "6,694", "ft"),
                  claim("Ridgeback", "maximum vertical acceleration", "3.8", "g")]
@@ -164,7 +165,8 @@ class Alignment(unittest.TestCase):
         kinds = {g["kind"]: g for g in found.groups}
         split = kinds["split candidate"]
         self.assertEqual((split["earlier"], split["later"]), (["P-101C"], ["P-101E", "P-101F"]))
-        self.assertEqual(split["evidence"]["sums"], [{"attribute": "capacity", "whole": "7,650", "parts": ["4,102", "3,548"]}])
+        self.assertEqual(split["evidence"]["sums"],
+                         [{"attribute": "capacity", "whole": "7,650", "parts": ["4,102", "3,548"]}])
         self.assertEqual(kinds["matched"]["earlier"], ["P-101A"])
         self.assertEqual(found.judge, [])  # candidates are shown, not compared claim by claim
         self.assertEqual((found.regrouped[0], found.regrouped[1]), ([2, 3], [2, 3, 4, 5]))
@@ -284,7 +286,8 @@ class Lever(unittest.TestCase):
         proposals = s.correspondence(left, right, "proposals")
         self.assertEqual(proposals.settled, [])
         self.assertEqual(proposals.judge, s.candidates(left, right))
-        self.assertEqual(Settings(align=False).correspondence(left, right, "revisions").judge, s.candidates(left, right))
+        self.assertEqual(Settings(align=False).correspondence(left, right, "revisions").judge,
+                         s.candidates(left, right))
 
 if __name__ == "__main__":
     unittest.main()

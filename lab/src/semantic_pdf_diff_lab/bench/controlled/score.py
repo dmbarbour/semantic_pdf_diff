@@ -97,7 +97,8 @@ def holds(fact, number):
 
 INEXACT_STEPS = 10  # how many tolerances off a reading bound to a bar may be and still count as that bar's, misread
 
-UNIT_AFTER = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥]=?)?\s*[-+±]?\$?\d[\d,]*(?:\.\d+)?\s*(.*?)\s*$")
+UNIT_AFTER = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥]=?)?"
+                        r"\s*[-+±]?\$?\d[\d,]*(?:\.\d+)?\s*(.*?)\s*$")
 
 def claimed_unit(claim):
     """A claim's unit: its own field, or what follows the number in its value ("63.3 mph")."""
@@ -191,7 +192,8 @@ def classify(claim, facts, printed):
             return unit_checked("loose", holder.id)  # two things named, the value's own among them ("D104 MEETING 104")
         return "misbound", holder.id
     if date:
-        return ("misread", None) if any(printed_value(p["text"]) == ("date", date) for p in printed) else ("hallucinated", None)
+        return (("misread", None) if any(printed_value(p["text"]) == ("date", date) for p in printed)
+                else ("hallucinated", None))
     if length is not None and any(f.unit == "ft-in" for f in facts):
         if any(printed_value(p["text"]) == ("in", length) for p in printed):
             return "misread", None
@@ -232,8 +234,8 @@ def ranges(claims):
 
 def distinctive(fact, facts):
     """The words of a fact's conditions that tell it from its neighbours: not in the conditions of other facts
-    about the same entity, nor in its own name and attribute; failing that, not in the neighbours' conditions; failing that,
-    all of them. A condition is kept when a claim says one (code review 2026-10-01, item 10: "maximum day" kept
+    about the same entity, nor in its own name and attribute; failing that, not in the neighbours' conditions; failing
+    that, all of them. A condition is kept when a claim says one (code review 2026-10-01, item 10: "maximum day" kept
     "average day" by the word "day", and a claim naming "Filters" kept "with one filter out of service")."""
     words = tokens(fact.conditions)
     neighbours = set().union(*(tokens(f.conditions) for f in facts if f.entity == fact.entity and f.id != fact.id))

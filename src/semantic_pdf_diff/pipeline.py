@@ -23,7 +23,8 @@ from .binding import bind
 from .store import Store, StoreError
 
 def limits(settings):
-    return Limits(settings.max_zip_depth, settings.max_source_bytes, settings.zip_ratio_limit, settings.zip_ratio_min_bytes)
+    return Limits(settings.max_zip_depth, settings.max_source_bytes, settings.zip_ratio_limit,
+                  settings.zip_ratio_min_bytes)
 
 def document_properties(name, data):
     """Native title and author of a PDF, as extracted provenance for the file."""
@@ -193,7 +194,8 @@ def read_sources(store, client, settings, names, triage):
 def write_evidence(store, names, read, interpreters, out):
     """evidence.json, what was read, written before comparing (so it stands if comparing fails); the document."""
     evidence = [e for items in read.by_content.values() for e in items]
-    situation_data = {c: Situation(figures=[f.model_dump() for f in figures], unresolved=[r.model_dump() for r in unresolved],
+    situation_data = {c: Situation(figures=[f.model_dump() for f in figures],
+                                   unresolved=[r.model_dump() for r in unresolved],
                                    issues=issues, quality=checks).model_dump()
                       for c, (figures, unresolved, issues, checks) in sorted(read.situations.items())}
     out.mkdir(parents=True, exist_ok=True)
@@ -201,8 +203,10 @@ def write_evidence(store, names, read, interpreters, out):
         files=[f.model_dump() for n in names for f in read.files[n]], interpreters=interpreters,
         evidence=[e.model_dump() for e in evidence], coverage=read.coverage,
         sections=[{'content': c, **x.model_dump()} for c, items in sorted(read.sections.items()) for x in items],
-        situation=situation_data, scan_issues=[{'source': n, 'path': p, 'reason': r} for n in names for p, r in store.issues(n)])
-    (out / 'evidence.json').write_text(json.dumps(document.model_dump(), indent=2, ensure_ascii=False), encoding='utf-8')
+        situation=situation_data,
+        scan_issues=[{'source': n, 'path': p, 'reason': r} for n in names for p, r in store.issues(n)])
+    (out / 'evidence.json').write_text(json.dumps(document.model_dump(), indent=2, ensure_ascii=False),
+                                       encoding='utf-8')
     return document
 
 def compare_and_report(options, settings, store, client, names, read, document, out):
@@ -229,7 +233,8 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     write_report(data, out, assets=store.folder / 'assets')
     incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
                   or data['retrieval']['omitted_by_pair_limit'] > 0
-                  or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error') for f in data['findings']))
+                  or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
+                         for f in data['findings']))
     print(f"Report: {out / 'report.html'}" + (' (incomplete source coverage)' if incomplete else ''))
     note = budget_note(client)
     if note:
@@ -252,8 +257,8 @@ def make_client(options, settings, store):
     if fixture is None:
         return attach_ledger(Client(settings, store), options)
     fresh = list(options.fresh_regions)
-    return attach_ledger(Client(settings, store, fixture=fixture, mode=options.answers_mode, responder=options.responder,
-                                fresh_regions=fresh), options)
+    return attach_ledger(Client(settings, store, fixture=fixture, mode=options.answers_mode,
+                                responder=options.responder, fresh_regions=fresh), options)
 
 def fixture_usage(client):
     replay = getattr(client, 'replay', None)  # test doubles have none
@@ -290,7 +295,8 @@ def extract_sources(store, client, names, files, progress):
                 sections[file.content] = store.sections(file.content)
             elif reader_for(extension) is None:
                 reason = (f"Reading {extension} files needs the office extra: pip install 'semantic-pdf-diff[office]'"
-                          if extension in ('.docx', '.pptx', '.xlsx', '.xlsm') else f'No adapter for {extension} files yet' if extension
+                          if extension in ('.docx', '.pptx', '.xlsx', '.xlsm')
+                          else f'No adapter for {extension} files yet' if extension
                           else 'No file extension; not interpreted')
                 row = coverage_row(content=file.content, task='unsupported', status='skipped', issues=[reason])
                 store.record_task(row, [])
@@ -345,8 +351,9 @@ def situate_sources(store, client, names, files, by_content, sections, coverage)
     with Dispatcher(client) as dispatch:
         for name, path, content in todo:
             with open_pdf(name, path) as doc:
-                figures, found, unresolved, issues = situate(doc, content, by_content[content], sections.get(content, []),
-                                                             store.folder, client, dispatch, progress)
+                figures, found, unresolved, issues = situate(doc, content, by_content[content],
+                                                             sections.get(content, []), store.folder, client, dispatch,
+                                                             progress)
                 checks = quality(doc, figures, found, unresolved, by_content[content])
             store.record_situation(content, figures, found, unresolved, issues)
             sections[content] = found
@@ -376,8 +383,8 @@ def pdf_job(store, source, file, by_content, coverage, sections, reader=None, ve
         by_content[file.content] = reconcile(evidence) if store.reconciles() and evidence else evidence
         coverage.extend(ledger)
         log.debug(f'Extracted {file.path}: {len(evidence)} claim(s)')
-    return Job(file.content, lambda: read_origin(store.origin(source, file.path)), store.record_task, keep_sections, done,
-               reader=reader)
+    return Job(file.content, lambda: read_origin(store.origin(source, file.path)), store.record_task, keep_sections,
+               done, reader=reader)
 
 def shortcut_names(paths):
     """Source names from the paths' final components, made unique."""

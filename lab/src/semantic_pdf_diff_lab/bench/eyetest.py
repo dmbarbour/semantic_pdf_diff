@@ -67,8 +67,8 @@ class Arrow(_Answer):
 class Arrows(_Answer):
     edges: list[Arrow] = Field(default_factory=list)
 
-SCHEMAS = {"read": Lines, "confusable": Lines, "words": Lines, "pseudo": Lines, "pairs": Pairs, "table": Lookups, "graph": Arrows, "chart-values": Lookups,
-           "chart-axis": Lookups}
+SCHEMAS = {"read": Lines, "confusable": Lines, "words": Lines, "pseudo": Lines, "pairs": Pairs, "table": Lookups,
+           "graph": Arrows, "chart-values": Lookups, "chart-axis": Lookups}
 
 # --- random content -----------------------------------------------------------------------------
 
@@ -417,7 +417,8 @@ def _border(rect, towards):
     """Where the segment from a box's centre towards a point leaves the box."""
     cx, cy = (rect[0] + rect[2]) / 2, (rect[1] + rect[3]) / 2
     dx, dy = towards[0] - cx, towards[1] - cy
-    t = min((rect[2] - rect[0]) / 2 / abs(dx) if dx else math.inf, (rect[3] - rect[1]) / 2 / abs(dy) if dy else math.inf)
+    t = min((rect[2] - rect[0]) / 2 / abs(dx) if dx else math.inf,
+            (rect[3] - rect[1]) / 2 / abs(dy) if dy else math.inf)
     return cx + t * dx, cy + t * dy
 
 def _overlaps(a, b, pad=0.0):
@@ -485,7 +486,8 @@ def _graph(card, rng, c):
         c.centred((e["spot"][0] + e["spot"][2]) / 2, (e["spot"][1] + e["spot"][3] + c.glyph) / 2, e["label"])
     prompt = ("The image shows boxes joined by arrows, each arrow with a label. " + RANDOM + " List every arrow: "
               "the box it starts from, the box it points to, and its label, all exactly as printed. Write ? for "
-              "each character you can't read.\n" + JSON_ONLY + '{"edges": [{"start": "...", "end": "...", "label": "..."}]}')
+              "each character you can't read.\n" + JSON_ONLY
+              + '{"edges": [{"start": "...", "end": "...", "label": "..."}]}')
     truth = {"edges": [{k: e[k] for k in ("start", "end", "label")} for e in edges]}
     return truth, prompt, names + [e["label"] for e in edges]
 
@@ -568,8 +570,8 @@ def _chart_axis(card, rng, c):
                            for k, cat in enumerate(categories)], "cells": values}
     return truth, prompt, categories + ticks
 
-DRAW = {"read": _read, "confusable": _confusable, "words": _words, "pseudo": _pseudo, "pairs": _pairs, "table": _table, "graph": _graph, "chart-values": _chart_values,
-        "chart-axis": _chart_axis}
+DRAW = {"read": _read, "confusable": _confusable, "words": _words, "pseudo": _pseudo, "pairs": _pairs, "table": _table,
+        "graph": _graph, "chart-values": _chart_values, "chart-axis": _chart_axis}
 
 # --- suites -------------------------------------------------------------------------------------
 
@@ -728,7 +730,7 @@ def _scored_lookups(truth, answer):
         tolerance = q.get("tolerance")
         if tolerance is not None:
             got = _number(value)
-            close = lambda v: got is not None and abs(got - float(v)) <= tolerance
+            close = lambda v: got is not None and abs(got - float(v)) <= tolerance  # noqa: B023 (called at once)
             right = close(q["value"])
             others = [k for k, v in cells.items() if k != q["key"] and close(v) and not right]
         else:
@@ -772,8 +774,8 @@ def images(folder, cards):
     return out
 
 def ask(folder, client, cards, progress=None):
-    """Ask the client's model every card; {card id: answer dict, or {"error": ...}}. Answers are
-    recorded by query in the folder's fixture (semantic_pdf_diff_lab.eval.clients.folder_client), so asking again is free."""
+    """Ask the client's model every card; {card id: answer dict, or {"error": ...}}. Answers are recorded by query in
+    the folder's fixture (semantic_pdf_diff_lab.eval.clients.folder_client), so asking again is free."""
     from semantic_pdf_diff.dispatch import Dispatcher
     from semantic_pdf_diff.progress import NoProgress
     progress = progress or NoProgress()
@@ -856,7 +858,8 @@ def _scored(entry):
 
 def summarise(entries):
     entries = list(entries)
-    out = {"families": {}, "acuity": {}, "thresholds": {}, "relative": {}, "failed": sum(1 for e in entries if e.get("score") is None)}
+    out = {"families": {}, "acuity": {}, "thresholds": {}, "relative": {},
+           "failed": sum(1 for e in entries if e.get("score") is None)}
     for family in FAMILIES:
         mine = [e for e in entries if e["family"] == family]
         if not mine:
@@ -867,8 +870,9 @@ def summarise(entries):
         errors = {}
         for e in mine:
             for k, v in e.items():
-                if k in ("autocorrected", "confused", "misbound", "misread", "declined", "missed", "reversed", "label_misbound", "label_misread",
-                         "ends_wrong", "spurious", "unknown_name", "same_row_or_column") and isinstance(v, int):
+                if k in ("autocorrected", "confused", "misbound", "misread", "declined", "missed", "reversed",
+                         "label_misbound", "label_misread", "ends_wrong", "spurious", "unknown_name",
+                         "same_row_or_column") and isinstance(v, int):
                     errors[k] = errors.get(k, 0) + v
         out["families"][family] = {"cards": len(mine), "score": _mean(_scored(e) for e in mine),
                                    "failed": sum(1 for e in mine if e.get("score") is None),
@@ -963,7 +967,8 @@ def page(folder, data):
                "".join(f"<th>{esc(f)}</th>" for f in FAMILIES) + "<th>Failed</th></tr>")
     for m in models:
         s = data["models"][m]["summary"]
-        out.append(f"<tr><td>{esc(m)}</td>" + "".join(_cell((s["families"].get(f) or {}).get("score")) for f in FAMILIES)
+        out.append(f"<tr><td>{esc(m)}</td>"
+                   + "".join(_cell((s["families"].get(f) or {}).get("score")) for f in FAMILIES)
                    + f"<td>{s['failed']}</td></tr>")
     out.append("</table></div>")
     sizes = list(next(iter(data["models"].values()))["summary"]["thresholds"]) if models else []
@@ -980,8 +985,8 @@ def page(folder, data):
                    + "".join(f"<th>{esc(m)}</th>" for m in models) + "</tr>")
         for size in sizes:
             values = [data["models"][m]["summary"][field].get(size) for m in models]
-            out.append(f"<tr><td>{esc(size)}</td>" + "".join(f"<td>{'–' if v is None else f'{v:g}'}</td>" for v in values)
-                       + "</tr>")
+            out.append(f"<tr><td>{esc(size)}</td>"
+                       + "".join(f"<td>{'–' if v is None else f'{v:g}'}</td>" for v in values) + "</tr>")
         out.append("</table></div>")
     kinds = [(m, data["models"][m]["summary"].get("by_kind", {})) for m in models]
     KINDS = ("codes", "confusable", "words") + tuple(f"pseudo-{level}" for level in PSEUDO_LEVELS)
@@ -1028,8 +1033,8 @@ def page(folder, data):
                    "".join(f"<th>{esc(g)} px</th>" for g in glyphs) + "<th>All</th>" +
                    "".join(f"<th>{esc(k)}</th>" for k in kinds) + "</tr>")
         for m, f in rows:
-            out.append(f"<tr><td>{esc(m)}</td>" + "".join(_cell(f["by_glyph"].get(g)) for g in glyphs) + _cell(f["score"]) +
-                       "".join(f"<td>{f['errors'].get(k, 0)}</td>" for k in kinds) + "</tr>")
+            out.append(f"<tr><td>{esc(m)}</td>" + "".join(_cell(f["by_glyph"].get(g)) for g in glyphs) +
+                       _cell(f["score"]) + "".join(f"<td>{f['errors'].get(k, 0)}</td>" for k in kinds) + "</tr>")
         out.append("</table></div>")
     out.append("<h2>Cards</h2><p class='muted'>Images are drawn again by <code>scripts/eye_test.py report</code> "
                "(not kept in git).</p>")
@@ -1044,7 +1049,8 @@ def page(folder, data):
                 if entry is None:
                     continue
                 scored = "failed" if entry.get("score") is None else f"{entry['score']:.2f}"
-                answers.append(f"<p><b>{esc(m)}</b>: {scored}</p><pre>{esc(json.dumps(entry['answer'], ensure_ascii=False))}</pre>")
+                answers.append(f"<p><b>{esc(m)}</b>: {scored}</p>"
+                               f"<pre>{esc(json.dumps(entry['answer'], ensure_ascii=False))}</pre>")
             out.append(f"<details><summary>{esc(i)}</summary><img loading='lazy' src='images/{esc(i)}.png' alt=''>"
                        f"<p><b>Answer key</b></p><pre>{esc(json.dumps(card['truth'], ensure_ascii=False))}</pre>"
                        + "".join(answers) + "</details>")

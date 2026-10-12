@@ -34,7 +34,8 @@ def describe(key, old, new):
         shown = f"{old!r} -> {new!r}"
     effect = KIND_EFFECT.get(_kind(key)) or {"model": "another model: every request is asked again",
                                               "prompt_hash": "the prompts: every request changes",
-                                              "settings.levers": "the levers in use"}.get(key, "may change every request")
+                                              "settings.levers": "the levers in use"}.get(key,
+                                                                                          "may change every request")
     return f"{name}: {shown} ({effect})"
 
 class InterpreterMismatch(StoreError):

@@ -255,7 +255,8 @@ def _layout(system, width, folded):
     ids = {p.id for p in system.parts}
     wholes = {whole for whole, _ in system.enclosures}
     lines = [(l.subject, l.object) for l in system.links if l.object in ids and l.kind != "member"]
-    box = lambda c, pad=0: (c[0] - box_w / 2 - pad, c[1] - BOX_H / 2 - pad, c[0] + box_w / 2 + pad, c[1] + BOX_H / 2 + pad)
+    box = lambda c, pad=0: (c[0] - box_w / 2 - pad, c[1] - BOX_H / 2 - pad,
+                            c[0] + box_w / 2 + pad, c[1] + BOX_H / 2 + pad)
     apart = lambda r, q: r[2] < q[0] or q[2] < r[0] or r[3] < q[1] or q[3] < r[1]
 
     def along(a1, a2, b1, b2):
@@ -422,7 +423,8 @@ def draw_system(page, rect, system, facts, notes=None, leaders=False, folded=Fal
         shape.commit()
         if label and not legend:  # along the line, clear of boxes and other labels
             spots = [(a[0] + (b[0] - a[0]) * t + dx, a[1] + (b[1] - a[1]) * t + dy)
-                     for t in (0.5, 0.35, 0.65, 0.2, 0.8) for dx, dy in ((3, -9), (3, 2), (-3 - width(label, size - 1), -9))]
+                     for t in (0.5, 0.35, 0.65, 0.2, 0.8)
+                     for dx, dy in ((3, -9), (3, 2), (-3 - width(label, size - 1), -9))]
             place([label], spots, size - 1)
         return pymupdf.Rect(min(a[0], b[0]) - 2, min(a[1], b[1]) - 2, max(a[0], b[0]) + 2, max(a[1], b[1]) + 2)
 
@@ -520,8 +522,8 @@ def draw_system(page, rect, system, facts, notes=None, leaders=False, folded=Fal
     for p in system.parts:
         if p.note:
             box = shapes[p.id]
-            r = place([p.note], [(box.x1 + 3, box.y1 - size), (box.x1 + 3, box.y1 + 2), (box.x0 - width(p.note) - 3, box.y1 - size),
-                                 (box.x1 + 3, box.y0 - size - 2)])
+            r = place([p.note], [(box.x1 + 3, box.y1 - size), (box.x1 + 3, box.y1 + 2),
+                                 (box.x0 - width(p.note) - 3, box.y1 - size), (box.x1 + 3, box.y0 - size - 2)])
             fact = notes.get(p.id)
             numbers.append((p.note.split()[0], [fact] if fact else [], r))
             if fact:
@@ -593,8 +595,8 @@ def _symbol(shape, symbol, box):
 
 SCHEMATIC_KNOBS = ("clean", "prose", "prose-hard", "figure-only", "leaders", "folded", "legend", "all")
 NOTE_ATTRIBUTES = {"hp": ("motor power", ("power", "rating", "horsepower", "rated power")),
-                   "°F": ("supply air temperature setpoint", ("setpoint", "temperature setpoint", "supply air temperature",
-                                                             "set point"))}
+                   "°F": ("supply air temperature setpoint",
+                          ("setpoint", "temperature setpoint", "supply air temperature", "set point"))}
 
 def build(make, pid, title, seed):
     """A controlled project from a system: a fact per link and per number, prose and a figure, chosen by knob."""

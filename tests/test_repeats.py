@@ -61,7 +61,8 @@ class Repeats(unittest.TestCase):
         path = build(Path(self.dir.name) / 'r.pdf')
         client = Recorder(**settings)
         with patch.object(pymupdf.Page, 'find_tables', title_blocks):
-            evidence, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(self.dir.name), client)
+            evidence, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(self.dir.name),
+                                             client)
         return client, evidence, coverage
 
     def sent_containing(self, client, text):
@@ -71,7 +72,8 @@ class Repeats(unittest.TestCase):
         client, _, coverage = self.run_extraction()
         # The repeated header is sent with its page's text on every page: grouped text
         # costs no extra call, while isolating it would (see the triage review).
-        self.assertEqual(sorted({t.split(':')[1] for t in self.sent_containing(client, HEADER)}), ['p1', 'p2', 'p3', 'p4'])
+        self.assertEqual(sorted({t.split(':')[1] for t in self.sent_containing(client, HEADER)}),
+                         ['p1', 'p2', 'p3', 'p4'])
         self.assertFalse([r for r in coverage if r['task'].startswith('text') and r.get('duplicate_of')])
         for i in range(1, 5):
             self.assertTrue(self.sent_containing(client, f'day {i}'))
@@ -82,7 +84,8 @@ class Repeats(unittest.TestCase):
         # Sent on pages 1 and 2 while repetition is unproven, then followed; page 4's
         # copy in another table position is sent too.
         self.assertEqual(sorted(t.split(':')[1] for t in designer), ['p1', 'p2', 'p4'])
-        self.assertEqual(sorted(r['page'] for r in coverage if r.get('duplicate_of', '').startswith('table:p1:0')), [3, 4])
+        self.assertEqual(sorted(r['page'] for r in coverage if r.get('duplicate_of', '').startswith('table:p1:0')),
+                         [3, 4])
         sheets = [t for t, d in client.sent if '"Sheet"' in d]
         self.assertEqual(len(sheets), 4)  # the sheet number differs on every page
 
@@ -115,7 +118,8 @@ class Repeats(unittest.TestCase):
         client = Continued(claims_per_request=1)
         with patch.object(pymupdf.Page, 'find_tables', title_blocks), \
                 patch.object(type(client.s), 'continuation_limit', lambda self, region: 3):
-            evidence, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(self.dir.name), client)
+            evidence, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(self.dir.name),
+                                             client)
         followed = [r for r in coverage if r.get('duplicate_of', '').startswith('table:p1:0')]
         self.assertTrue(followed)
         self.assertEqual({r['claims'] for r in followed}, {2})
@@ -124,7 +128,6 @@ class Repeats(unittest.TestCase):
 
     def test_section_signals(self):
         _, _, _ = self.run_extraction()
-        from semantic_pdf_diff.sections import pdf_sections
         seen = []
         client = Recorder()
         path = Path(self.dir.name) / 'r.pdf'

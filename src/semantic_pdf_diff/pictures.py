@@ -77,14 +77,14 @@ class Reading:
             box = (0.0, float(picture.line), 1.0, float(picture.line + 1))
             task = f"picture:p{picture.page}:{ident}"
             if not s.vision:
-                core.record(coverage_row(content=content, page=picture.page, bbox=list(box), task=task, status="skipped",
-                                         issues=["Visual extraction disabled; pictures aren't read"]))
+                core.record(coverage_row(content=content, page=picture.page, bbox=list(box), task=task,
+                                         status="skipped", issues=["Visual extraction disabled; pictures aren't read"]))
                 continue
             try:
                 single = page_of(picture)
             except PictureError as error:
-                core.record(coverage_row(content=content, page=picture.page, bbox=list(box), task=task, status="skipped",
-                                         issues=[str(error)]))
+                core.record(coverage_row(content=content, page=picture.page, bbox=list(box), task=task,
+                                         status="skipped", issues=[str(error)]))
                 continue
             doc.insert_pdf(single)
             drawn_pages.append((picture, ident, len(doc)))

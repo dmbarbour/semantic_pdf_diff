@@ -12,7 +12,8 @@ from semantic_pdf_diff.report import write_report
 CONTENT={'A':'sha256:'+'a'*64+'.pdf','B':'sha256:'+'b'*64+'.pdf'}
 
 def claim(id,entity,attribute,value,unit,kind,conditions='design duty',**extra):
-    return Evidence(id=id,content=CONTENT[id[0]],locator=PdfLocator(page=1,bbox=(40,40,300,140),region='text',task='hand-authored fixture'),
+    return Evidence(id=id,content=CONTENT[id[0]],
+        locator=PdfLocator(page=1,bbox=(40,40,300,140),region='text',task='hand-authored fixture'),
         entity=entity,attribute=attribute,value=value,unit=unit,kind=kind,conditions=conditions,
         quote=f'{entity}: {attribute} {value} {unit} at {conditions}',confidence=.95,**extra)
 
@@ -49,6 +50,7 @@ data.update(schema_version=2,fixture=True,
     files=[FileRef(source='Team A (synthetic evidence)',path='team-a.pdf',content=CONTENT['A']).model_dump(),
            FileRef(source='Team B (synthetic evidence)',path='team-b.pdf',content=CONTENT['B']).model_dump()],
     evidence=[e.model_dump() for e in left+right],coverage=[],
-    note='HAND-AUTHORED FIXTURE: no PDF extraction or real model inference was used. This report demonstrates behavior, not measured accuracy.')
+    note='HAND-AUTHORED FIXTURE: no PDF extraction or real model inference was used. '
+         'This report demonstrates behavior, not measured accuracy.')
 write_report(data,out)
 print(out/'report.html')

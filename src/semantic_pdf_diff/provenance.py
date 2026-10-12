@@ -82,4 +82,5 @@ def triage_interpreter(settings):
 def comparison_interpreter(settings):
     from .compare import COMPARE, PROMPT_VERSION
     from .llm import SYSTEM
-    return interpreter("compare", settings, (SYSTEM, COMPARE, f"v{PROMPT_VERSION}"), role_settings(type(settings), "compare"))
+    return interpreter("compare", settings, (SYSTEM, COMPARE, f"v{PROMPT_VERSION}"),
+                       role_settings(type(settings), "compare"))

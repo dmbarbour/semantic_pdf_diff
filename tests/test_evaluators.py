@@ -50,7 +50,8 @@ class CommandBudget(unittest.TestCase):
 class PublicSlices(unittest.TestCase):
     MANIFEST = {"slices": [{"name": "open-a", "public": True}, {"name": "open-b", "public": True},
                            {"name": "client-c"}],
-                "runs": [{"name": "fine", "slices": ["open-a", "open-b"]}, {"name": "leaky", "slices": ["open-a", "client-c"]}]}
+                "runs": [{"name": "fine", "slices": ["open-a", "open-b"]},
+                         {"name": "leaky", "slices": ["open-a", "client-c"]}]}
 
     def test_runs_of_private_or_unknown_documents_are_refused(self):
         self.assertEqual(rounds.private_slices(["fine"], self.MANIFEST), [])

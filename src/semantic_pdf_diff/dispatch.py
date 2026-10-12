@@ -13,7 +13,8 @@ class Dispatcher:
         self.workers = workers or getattr(getattr(client, "s", None), "concurrency", 1)
         # Clients without the prepare/send split (e.g. simple test doubles) run inline.
         self.split = all(hasattr(client, m) for m in ("prepare", "cached", "send", "save"))
-        self.pool = ThreadPoolExecutor(self.workers, thread_name_prefix="model") if self.workers > 1 and self.split else None
+        self.pool = (ThreadPoolExecutor(self.workers, thread_name_prefix="model") if self.workers > 1 and self.split
+                     else None)
         self.inflight = {}
         # Queries asked again while the same query is in flight (the same page in two documents):
         # they wait for its answer rather than being sent (and paid for) twice.

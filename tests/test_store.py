@@ -11,7 +11,7 @@ from pathlib import Path
 from unittest.mock import patch
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.llm import Client
-from semantic_pdf_diff.schema import Claim, Extraction, Judgment, PdfLocator, Evidence
+from semantic_pdf_diff.schema import Extraction, PdfLocator, Evidence
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
 from semantic_pdf_diff.binding import InterpreterMismatch, bind
@@ -59,7 +59,7 @@ class ReadOnly(unittest.TestCase):
             with self.assertRaises(StoreError):
                 Store.open(folder)
             self.assertFalse(folder.exists())  # nothing created
-            with Store(folder) as writer:  # the writer holds its lock...
+            with Store(folder):  # the writer holds its lock...
                 with Store.open(folder) as reader:  # ...and a reader opens anyway
                     self.assertEqual(reader.files(), [])
                     with self.assertRaises(sqlite3.OperationalError):
@@ -313,7 +313,8 @@ class ResumeAndReuse(unittest.TestCase):
             self.assertEqual(code, 1)
             self.assertIn('--reset', log)
             with contextlib.redirect_stdout(io.StringIO()) as out:
-                cli.main([str(a), str(b), '--out', str(root / 'out'), '--model', 'another-model', '--reset', '--dry-run'])
+                cli.main([str(a), str(b), '--out', str(root / 'out'), '--model', 'another-model', '--reset',
+                          '--dry-run'])
             self.assertGreater(json.loads(out.getvalue())['would_clear']['extract']['evidence'], 0)
             code, _ = self.run_cli(a, b, root / 'out', url, '--model', 'another-model', '--reset')
             self.assertEqual(code, 2)  # --no-vision is deliberately incomplete

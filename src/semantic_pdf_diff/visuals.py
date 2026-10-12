@@ -19,7 +19,8 @@ def render(page, rect, target, max_side, context=None):
     # clip is in rotated page coordinates, as used by Page.get_pixmap.
     scale = min(2.5, max_side / max(rect.width, rect.height))
     matrix = pymupdf.Matrix(scale, scale)
-    pix = context.pixmap(page, matrix, rect) if context is not None else page.get_pixmap(matrix=matrix, clip=rect, alpha=False)
+    pix = (context.pixmap(page, matrix, rect) if context is not None
+           else page.get_pixmap(matrix=matrix, clip=rect, alpha=False))
     pix.save(target)
 
 class Visuals:
@@ -42,7 +43,8 @@ class Visuals:
         # one text page for the layer and the blocks, their flags the same (code review 2026-10-08, A6)
         textpage = (page.get_textpage(clip=native_rect, flags=pymupdf.TEXTFLAGS_TEXT) if not depth or box is None
                     else None)
-        layer = (page.get_text("text", textpage=textpage) if not depth  # a refined half's by whole lines (review item 6)
+        # a refined half's by whole lines (review item 6)
+        layer = (page.get_text("text", textpage=textpage) if not depth
                  else "".join(line + "\n" for line_box, line in self.context_of.lines(page)
                               if (line_box.tl + line_box.br) / 2 in rect))
         check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
@@ -67,8 +69,8 @@ class Visuals:
         # Refine only local tiles; an overview or a whole figure may be incomplete because
         # it spans many facts, and all its areas already have tile coverage.
         s = self.s
-        if (status not in ("partial", "failed") or region_of(tag) in ("overview", "figure") or depth >= s.refinement_depth
-                or min(rect.width, rect.height) < MIN_REFINE_POINTS):
+        if (status not in ("partial", "failed") or region_of(tag) in ("overview", "figure")
+                or depth >= s.refinement_depth or min(rect.width, rect.height) < MIN_REFINE_POINTS):
             return
         for i, child in enumerate(halves(page, rect, self.context_of.lines(page), self.context_of.graphics(page))):
             self.task(page_no, page, f"{tag}-r{i}", child, depth + 1, text, box, derivation)

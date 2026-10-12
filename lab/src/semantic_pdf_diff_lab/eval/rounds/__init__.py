@@ -15,8 +15,8 @@ façade keeps `rounds.X` working for every caller.
 from .units import (  # noqa: F401
     BANDS, LEAD, MAX_BANDS, MAX_CLAIMS, PAGE_TEXT, UNIT_CLAIMS,
     _lead, _reader, _unit_of, add_context, band_region, build_batch,
-    PAGES, PAGE_FIELDS, _ident, collect, lever_scope, load_batch, pair_units, private_slices, rerender, rotations, save_batch, shown,
-    split_units)
+    PAGES, PAGE_FIELDS, collect, lever_scope, load_batch, pair_units, private_slices, rerender, rotations, save_batch,
+    shown, split_units)
 from .judging import (  # noqa: F401
     _claim_marks, _claims_text, _grouped, _ident, _set_note, _whole_view,
     judge_pairs, pair_requests, pair_verdict)

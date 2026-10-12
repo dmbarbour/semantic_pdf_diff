@@ -48,7 +48,7 @@ class Slide:
         self.shapes, self.rels, self.notes = [], [], []
         self.y = TOP
         if title:
-            self.shapes.append(self._sp(f'<p:nvPr><p:ph type="title"/></p:nvPr>', (MARGIN, 365125, WIDTH - 2 * MARGIN,
+            self.shapes.append(self._sp('<p:nvPr><p:ph type="title"/></p:nvPr>', (MARGIN, 365125, WIDTH - 2 * MARGIN,
                                                                                     TOP - 457200), [title]))
 
     def _id(self):
@@ -145,7 +145,8 @@ class Deck:
         files = {}
         rels = lambda items: ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="'
                               'http://schemas.openxmlformats.org/package/2006/relationships">' + "".join(
-                                  f'<Relationship Id="{i}" Type="{TYPES.get(k, k)}" Target="{t}"/>' for i, k, t in items)
+                                  f'<Relationship Id="{i}" Type="{TYPES.get(k, k)}" Target="{t}"/>'
+                                  for i, k, t in items)
                               + "</Relationships>")
         files["_rels/.rels"] = rels([("rId1", f"{R}/officeDocument", "ppt/presentation.xml")])
         ids = "".join(f'<p:sldId id="{255 + s.number}" r:id="rId{s.number}"/>' for s in self.slides)

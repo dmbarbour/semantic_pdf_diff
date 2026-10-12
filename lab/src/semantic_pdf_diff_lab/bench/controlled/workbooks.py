@@ -104,7 +104,8 @@ def workbook(project):
     wb.save(raw)
     fixed = io.BytesIO()  # the same members, each dated FIXED_TIME; openpyxl stamps the save time as modified
     when = stamp.strftime("%Y-%m-%dT%H:%M:%SZ").encode()
-    with zipfile.ZipFile(io.BytesIO(raw.getvalue())) as source, zipfile.ZipFile(fixed, "w", zipfile.ZIP_DEFLATED) as out:
+    with (zipfile.ZipFile(io.BytesIO(raw.getvalue())) as source,
+          zipfile.ZipFile(fixed, "w", zipfile.ZIP_DEFLATED) as out):
         for info in source.infolist():
             member = source.read(info.filename)
             if info.filename == "docProps/core.xml":

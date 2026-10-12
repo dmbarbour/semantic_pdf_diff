@@ -49,7 +49,8 @@ class Explain(unittest.TestCase):
         self.assertIn('"attribute": "head"', prompt)  # A's item: its other claims
 
     def test_only_revisions_with_the_lever_and_only_differences(self):
-        for client, mode in ((Recording(), "proposals"), (Recording(s=Settings(explain_differences=False)), "revisions"),
+        for client, mode in ((Recording(), "proposals"),
+                             (Recording(s=Settings(explain_differences=False)), "revisions"),
                              (Recording(relation="complementary"), "revisions")):
             result = compare(self.left, self.right, Path("."), client, mode)
             self.assertFalse(any("explanation" in f for f in result["findings"]), (mode, client.relation))
@@ -93,13 +94,15 @@ class Explain(unittest.TestCase):
                                     [{"value": "4.1", "basis": "unknown", "role": ""}, {"value": "4.1"}],
                                     Revisions([a], [b]))
         lines = dict(line.split("=", 1) for line in prompt.splitlines() if "=" in line and line[:1] in "ABQ")
-        self.assertEqual((lines["A's value in the later revision"], lines["B's value in the earlier revision"]), ("[]", "[]"))
+        self.assertEqual((lines["A's value in the later revision"], lines["B's value in the earlier revision"]),
+                         ("[]", "[]"))
         self.assertEqual((lines["Quotes"], json.loads(lines["A"])), ("different text", {"value": "4.1"}))
 
     def test_values_in_words_echo_by_their_numbers_and_conditions_echo_too(self):
         # a condition inserted, the rest renumbered: "Condition 1" now names another; the old one is still stated
-        cond = lambda id, attribute, value, conditions="": ev(id, entity="link failure", attribute=attribute, value=value,
-                                                              unit="ms", conditions=conditions, quote=value)
+        cond = lambda id, attribute, value, conditions="": ev(id, entity="link failure", attribute=attribute,
+                                                              value=value, unit="ms", conditions=conditions,
+                                                              quote=value)
         a = cond("A-1", "declaration condition 1", "no acknowledgement received within 856")
         b = cond("B-1", "declaration condition 1", "peer reports a fatal error within 2,052")
         kept = cond("B-2", "declaration condition 2", "no acknowledgement is received within 856")

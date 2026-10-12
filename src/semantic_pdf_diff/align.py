@@ -54,7 +54,8 @@ class Correspondence:
     groups: list = field(default_factory=list)
     regrouped: tuple = ((), ())
 
-SAME = {"number": "count", "quantity": "count", "qty": "count", "no": "count"}  # "number of inversions", "inversion count"
+# "number of inversions", "inversion count"
+SAME = {"number": "count", "quantity": "count", "qty": "count", "no": "count"}
 
 def words(text):
     """A name's words: case-folded, stop words dropped, plurals and a few synonyms folded."""
@@ -96,7 +97,8 @@ def fits(x, y):
 
 # One number, perhaps signed or approximate, perhaps followed by a unit's word ("63.3 mph"): a range ("0..160",
 # "66 to 75") or a list is a value in words.
-NUMERIC = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥]=?)?\s*[-+±]?\$?\d[\d,]*(?:\.\d+)?\s*[^\d\s.,]*\s*$")
+NUMERIC = re.compile(r"^\s*(?:about|approx\.?|approximately|~|≈|[-+±<>≤≥]=?)?\s*[-+±]?\$?\d[\d,]*(?:\.\d+)?"
+                     r"\s*[^\d\s.,]*\s*$")
 
 def value_key(claim):
     """A value comparable across revisions: in its unit's base where the unit is known (1.2 MW is 1,200 kW), else

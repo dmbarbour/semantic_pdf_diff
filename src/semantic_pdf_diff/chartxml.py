@@ -190,7 +190,8 @@ def _tables(chart):
     if points:
         bubbles = any(s.sizes for s in points)
         header = ["Series", chart.category_axis or "X", (chart.value_axes or ["Y"])[0]] + (["Size"] if bubbles else [])
-        rows = [[s.name, s.categories.get(i, str(i + 1)), s.values.get(i, "")] + ([s.sizes.get(i, "")] if bubbles else [])
+        rows = [[s.name, s.categories.get(i, str(i + 1)), s.values.get(i, "")]
+                + ([s.sizes.get(i, "")] if bubbles else [])
                 for s in points for i in sorted(set(s.values) | set(s.categories))]
         out.append((header, rows))
     return out

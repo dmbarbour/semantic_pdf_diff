@@ -40,7 +40,8 @@ class FolderScanning(unittest.TestCase):
                 result = scan([root])
             finally:
                 locked.chmod(0o600)
-        self.assertEqual([f.path for f in result.files], ['team-a/a.pdf'] + (['team-a/locked.pdf'] if os.geteuid() == 0 else []))
+        self.assertEqual([f.path for f in result.files],
+                         ['team-a/a.pdf'] + (['team-a/locked.pdf'] if os.geteuid() == 0 else []))
         reasons = dict(result.issues)
         self.assertTrue(reasons['team-a/gone.pdf'].startswith('unreadable: FileNotFoundError'))
         if os.geteuid() != 0:  # root reads it anyway
@@ -112,7 +113,8 @@ class ArchiveScanning(unittest.TestCase):
         self.assertIn('bundle.zip!/middle.zip!/inner.zip!/deep.pdf', [f.path for f in result.files])
         limited = self.scan_zip(outer, Limits(max_depth=2))
         self.assertNotIn('bundle.zip!/middle.zip!/inner.zip!/deep.pdf', [f.path for f in limited.files])
-        self.assertIn(('bundle.zip!/middle.zip!/inner.zip', 'skipped: archive nested deeper than 2 levels'), limited.issues)
+        self.assertIn(('bundle.zip!/middle.zip!/inner.zip', 'skipped: archive nested deeper than 2 levels'),
+                      limited.issues)
 
     def test_unsafe_encrypted_bombs_and_budget(self):
         result = self.scan_zip({'../evil.pdf': b'e', '/abs.pdf': b'a', 'ok.pdf': b'fine'})

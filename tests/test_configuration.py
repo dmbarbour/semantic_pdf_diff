@@ -15,7 +15,7 @@ class ConfigurationTests(unittest.TestCase):
                'OPENAI_API_KEY':'test-only-key', 'PDF_DIFF_MAX_CALLS':'27',
                'PDF_DIFF_TIMEOUT':'3.5', 'PDF_DIFF_VISION':'false',
                'PDF_DIFF_ALIASES':'{"chw":"chilled water"}'}
-        with patch.dict(os.environ, env, clear=True), tempfile.TemporaryDirectory() as directory:
+        with patch.dict(os.environ, env, clear=True), tempfile.TemporaryDirectory():
             s=Settings.from_env()
             self.assertEqual(s.base_url,env['OPENAI_BASE_URL'])
             self.assertEqual(s.model,'small-vlm')

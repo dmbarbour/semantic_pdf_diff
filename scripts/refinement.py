@@ -40,8 +40,10 @@ def run(src, out, fixture, max_cost, documents, tag, fresh=False):
                 return 3
             settings = pipeline.settings_from(SETTINGS, situate=False, refinement_depth=1, max_cost=round(left, 4))
             options = pipeline.RunOptions(mode="proposals", fixture=fixture, fixture_mode="replay-or-record",
-                                          ledger=LEDGER, ledger_tags={"round": "refinement", "run": f"{tag}-{document.stem}"})
-            code = pipeline.attempt(pipeline.compare_paths, document, document, Path(out) / document.stem, settings, options)
+                                          ledger=LEDGER,
+                                         ledger_tags={"round": "refinement", "run": f"{tag}-{document.stem}"})
+            code = pipeline.attempt(pipeline.compare_paths, document, document, Path(out) / document.stem, settings,
+                                    options)
             print(f"{document.name}: exit {code}", flush=True)
             worst = max(worst, code)
     spent = ledger.spent(LEDGER, round="refinement") - before

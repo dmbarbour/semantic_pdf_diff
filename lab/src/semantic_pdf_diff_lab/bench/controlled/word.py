@@ -291,7 +291,8 @@ class Writer:
         raw = io.BytesIO()
         self.document.save(raw)
         fixed = io.BytesIO()  # the same members, each dated FIXED_TIME
-        with zipfile.ZipFile(io.BytesIO(raw.getvalue())) as source, zipfile.ZipFile(fixed, "w", zipfile.ZIP_DEFLATED) as out:
+        with (zipfile.ZipFile(io.BytesIO(raw.getvalue())) as source,
+              zipfile.ZipFile(fixed, "w", zipfile.ZIP_DEFLATED) as out):
             for info in source.infolist():
                 out.writestr(zipfile.ZipInfo(info.filename, FIXED_TIME), source.read(info.filename),
                              compress_type=zipfile.ZIP_DEFLATED)
@@ -440,7 +441,8 @@ def _schedules(project):
     """The equipment schedules' parts: {"pumps" | "blowers" | "valves": (title, columns, rows)}."""
     parts = [part for _, blocks in project.sections for block in blocks if block[0] == "schedule"
              for part in block[1].sections]
-    return {name: (title, columns, rows) for name, (title, _, columns, rows) in zip(("pumps", "blowers", "valves"), parts)}
+    return {name: (title, columns, rows)
+            for name, (title, _, columns, rows) in zip(("pumps", "blowers", "valves"), parts)}
 
 def _opening(writer, project):
     """The schedules' title, heading and lead-in, as the plain document has them."""

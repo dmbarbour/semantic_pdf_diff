@@ -19,7 +19,7 @@ import tempfile
 import unittest
 from pathlib import Path
 import pymupdf
-import stubs
+import stubs  # noqa: F401 (a clean environment)
 from stubs import ROUND0, slow
 from semantic_pdf_diff import cli
 from test_concurrency import jittery_model

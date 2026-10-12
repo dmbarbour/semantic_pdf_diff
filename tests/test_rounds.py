@@ -34,11 +34,14 @@ class Rounds(unittest.TestCase):
         root = cls.root = Path(cls.dir.name)
         a = make_pdf(root / 'a.pdf', ['Pump 10 kW, fan 3 kW', 'Chiller 350 kW'])
         b = make_pdf(root / 'b.pdf', ['Pump 12 kW, fan 3 kW', 'Heater 9 kW'])
-        with jittery_model() as (url, _), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        with jittery_model() as (url, _), contextlib.redirect_stdout(io.StringIO()), \
+                contextlib.redirect_stderr(io.StringIO()):
             for name, extra in (('baseline', {}), ('variant', {'extract_rules': ['A variant rule.']})):
                 config = root / f'{name}.json'
-                config.write_text(json.dumps({'concurrency': 4, 'tile_points': 180, 'retries': 0, 'situate': False, **extra}))
-                cli.main([str(a), str(b), '--out', str(root / name / 'run1'), '--base-url', url, '--config', str(config)])
+                config.write_text(json.dumps({'concurrency': 4, 'tile_points': 180, 'retries': 0, 'situate': False,
+                                              **extra}))
+                cli.main([str(a), str(b), '--out', str(root / name / 'run1'), '--base-url', url,
+                          '--config', str(config)])
 
     @classmethod
     def tearDownClass(cls):
@@ -125,7 +128,8 @@ class Rounds(unittest.TestCase):
             self.assertTrue(all('sections' in i for i in batch['items']))
 
     def test_large_units_are_cut_into_bands_by_where_claims_were_read(self):
-        claims = lambda ids, y: {i: {'entity': 'e', 'attribute': 'a', 'value': i, 'quote': i, '_box': [0, y(n), 10, y(n) + 5]}
+        claims = lambda ids, y: {i: {'entity': 'e', 'attribute': 'a', 'value': i, 'quote': i,
+                                     '_box': [0, y(n), 10, y(n) + 5]}
                                  for n, i in enumerate(ids)}
         key = ('run', 'c', 1, 'visual')
         base = {key: {'claims': claims([f'x{i:02}' for i in range(60)], lambda n: n * 10), 'tasks': 3},
@@ -155,7 +159,8 @@ class Rounds(unittest.TestCase):
         a, _ = rounds.split_units(units, units, limit=25, rotation=lambda run, content, number: page.rotation_matrix)
         bands = sorted(k for k in a if k[:4] == key)
         self.assertEqual(len(bands), 3)
-        spans = sorted((min(claims[i]['_box'][0] for i in a[k]['claims']), max(claims[i]['_box'][2] for i in a[k]['claims']))
+        spans = sorted((min(claims[i]['_box'][0] for i in a[k]['claims']),
+                        max(claims[i]['_box'][2] for i in a[k]['claims']))
                        for k in bands)
         self.assertTrue(all(one[1] < two[0] for one, two in zip(spans, spans[1:])))  # each band a stretch of the sheet
         for k in bands:
@@ -170,7 +175,8 @@ class Rounds(unittest.TestCase):
     def test_scores_average_each_judges_orders_and_skip_single_orders(self):
         with tempfile.TemporaryDirectory() as d:
             folder = Path(d)
-            (folder / 'pairs.json').write_text(json.dumps({'items': [{'id': 'u1', 'family': 'text'}, {'id': 'u2', 'family': 'text'}],
+            (folder / 'pairs.json').write_text(json.dumps({'items': [{'id': 'u1', 'family': 'text'},
+                                                                     {'id': 'u2', 'family': 'text'}],
                                                            'units': {'units': 10, 'unchanged': 8}}))
             (folder / 'verdicts').mkdir()
             both = {'baseline-first': {'score': 1.0}, 'variant-first': {'score': 0.0}}  # a flip: 0.5
@@ -190,7 +196,8 @@ class Rounds(unittest.TestCase):
             (folder / 'pairs.json').write_text(json.dumps({'items': items, 'units': {'units': 3, 'unchanged': 0}}))
             (folder / 'verdicts').mkdir()
             (folder / 'verdicts' / 'j.json').write_text(json.dumps({'reviewer': 'j', 'verdicts': {
-                u: {'baseline-first': {'score': s}, 'variant-first': {'score': s}} for u, s in (('u0', 1.0), ('u1', 1.0), ('u2', 0.0))}}))
+                u: {'baseline-first': {'score': s}, 'variant-first': {'score': s}}
+                for u, s in (('u0', 1.0), ('u1', 1.0), ('u2', 0.0))}}))
             self.assertEqual(rounds.decide(folder)['units_judged'], 3)
             left = rounds.decide(folder, exclude=['u2'])  # u2 judged on another unit's crop, say
             self.assertEqual((left['units_judged'], left['overall']['mean']), (2, 1.0))
@@ -235,7 +242,8 @@ class Rounds(unittest.TestCase):
             (folder / 'pairs.json').write_text(json.dumps({'items': items, 'units': {'units': 24, 'unchanged': 0}}))
             (folder / 'verdicts').mkdir()
             (folder / 'verdicts' / 'j.json').write_text(json.dumps({'reviewer': 'j', 'verdicts': {
-                f't{i}': {'baseline-first': {'score': x}, 'variant-first': {'score': x}} for i, x in enumerate(outcomes)}}))
+                f't{i}': {'baseline-first': {'score': x}, 'variant-first': {'score': x}}
+                for i, x in enumerate(outcomes)}}))
             decision = rounds.decide(folder)
             self.assertEqual(decision['decision'], 'accepted: wins')
             self.assertEqual(decision['borderline'], ['overall low 0.524 near 0.5'])
@@ -297,7 +305,8 @@ class Rounds(unittest.TestCase):
         items = list(order)
         answers = [{'item': items[0], 'better': 'A', 'a_problems': ['missing'], 'b_problems': [], 'confidence': 'high',
                     'note': 'A reads the whole row'},
-                   {'item': items[1], 'better': 'unsure', 'a_problems': [], 'b_problems': [], 'confidence': '', 'note': ''}]
+                   {'item': items[1], 'better': 'unsure', 'a_problems': [], 'b_problems': [], 'confidence': '',
+                   'note': ''}]
         file = self.root / 'answers.json'
         file.write_text(json.dumps({'format': rounds.SPOTCHECK_FORMAT, 'batch': 'spot', 'reviewer': 'Dana Q',
                                     'answers': answers}))
@@ -320,9 +329,11 @@ class Rounds(unittest.TestCase):
         class Marker(Judge):  # marks every claim of the first set shown wrong, the second right
             def ask(self, prompt, schema, images=(), key=None):
                 self.prompts.append(prompt)
-                count = lambda letter: sum(1 for line in prompt.splitlines() if line.startswith(letter) and '. ' in line[:4])
-                return PairVerdict(better='B', note='marked', a_claims=[{'n': k + 1, 'mark': 'wrong', 'problems': ['misread']}
-                                                                       for k in range(count('A'))],
+                count = lambda letter: sum(1 for line in prompt.splitlines()
+                                           if line.startswith(letter) and '. ' in line[:4])
+                return PairVerdict(better='B', note='marked',
+                                   a_claims=[{'n': k + 1, 'mark': 'wrong', 'problems': ['misread']}
+                                             for k in range(count('A'))],
                                    b_claims=[{'n': k + 1, 'mark': 'ok'} for k in range(count('B'))])
         judge = Marker()
         rounds.judge_pairs(folder, judge, 'marker', rubric='v5')
@@ -338,15 +349,16 @@ class Rounds(unittest.TestCase):
             self.assertEqual(shares[side]['wrong_share'], 0.5)
         # a person marks the first claim of set A right
         item = batch['items'][0]
-        answers = [{'item': item['id'], 'better': 'A', 'a_problems': [], 'b_problems': [], 'confidence': 'low', 'note': '',
-                    'claims': {'A': {'0': {'mark': 'ok', 'problems': []}}, 'B': {}}}]
+        answers = [{'item': item['id'], 'better': 'A', 'a_problems': [], 'b_problems': [], 'confidence': 'low',
+                    'note': '', 'claims': {'A': {'0': {'mark': 'ok', 'problems': []}}, 'B': {}}}]
         file = self.root / 'claim-answers.json'
         file.write_text(json.dumps({'format': rounds.SPOTCHECK_FORMAT, 'batch': 'spot-claims', 'reviewer': 'Kim',
                                     'answers': answers}))
         mine = json.loads(rounds.import_spotcheck(folder, file).read_text())['verdicts'][item['id']]
         marked = next(iter(mine.values()))['claims'][order[item['id']]]
         self.assertEqual((marked[0]['index'], marked[0]['mark']), (0, 'ok'))
-        self.assertEqual(marked[0]['claim'], {k: v for k, v in item[order[item['id']]][0].items() if not k.startswith('_')})
+        self.assertEqual(marked[0]['claim'],
+                         {k: v for k, v in item[order[item['id']]][0].items() if not k.startswith('_')})
         result = rounds.anchor(folder)['Kim']
         self.assertEqual(result['claims_marked'][order[item['id']]]['ok'], 1)
         self.assertIsNone(result['claim_agreement_with_judges'])  # the judges' two orders disagreed there: unsure
@@ -376,7 +388,8 @@ class Rounds(unittest.TestCase):
             def ask(self, prompt, schema, images=(), key=None):
                 self.prompts.append(prompt)
                 self.images = getattr(self, 'images', []) + [list(images)]
-                count = lambda letter: sum(1 for line in prompt.splitlines() if line.startswith(letter) and '. ' in line[:4])
+                count = lambda letter: sum(1 for line in prompt.splitlines()
+                                           if line.startswith(letter) and '. ' in line[:4])
                 marks = lambda letter, mark: [{'n': k + 1, 'mark': mark} for k in range(count(letter))]
                 return PairVerdict(better='B', s_claims=marks('S', 'ok'), a_claims=marks('A', 'wrong'),
                                    b_claims=marks('B', 'unsure'))
@@ -413,13 +426,16 @@ class Rounds(unittest.TestCase):
                 patch.object(Store, 'files', lambda self, source=None: [SimpleNamespace(content=content)]):
             # A text lever rewords the text reading; the tile's reading of the same fact is untouched.
             # A third run's tile reads the same fact but quotes it differently: that unit has changed.
-            for side, words, tile_quote in (('base', ('Pump', 'power'), '10 kW'), ('var', ('Pump P-1', 'power'), '10 kW'),
+            for side, words, tile_quote in (('base', ('Pump', 'power'), '10 kW'),
+                                            ('var', ('Pump P-1', 'power'), '10 kW'),
                                             ('quoted', ('Pump', 'power'), 'Pump P-1 10 kW')):
                 with Store(Path(d) / side / 'run1') as store:
                     store.db.execute("INSERT INTO content (id, size) VALUES (?, 1)", (content,))
                     for task, region, (entity, attribute), quote in (('text:p1:0', 'text', words, '10 kW'),
-                                                                     ('tile:p1:0', 'tile', ('pump P-1', 'rated power'), tile_quote)):
-                        store.record_task({'content': content, 'page': 1, 'task': task, 'status': 'complete', 'claims': 1},
+                                                                     ('tile:p1:0', 'tile', ('pump P-1', 'rated power'),
+                                                                      tile_quote)):
+                        store.record_task({'content': content, 'page': 1, 'task': task, 'status': 'complete',
+                                           'claims': 1},
                                           [reading(entity, attribute, task, region, quote)])
                     store.set_reconcile(True)
                     self.assertEqual(len(store.evidence(content)), 1)  # one fact, two readings
@@ -496,7 +512,8 @@ class Rounds(unittest.TestCase):
         self.assertAlmostEqual(mean, 0.8)
         self.assertTrue(0.65 < low < 0.8 < high < 0.92)
         self.assertIsNone(rounds.interval([]))
-        self.assertEqual(rounds.interval([1.0, 0.0], clusters=['r', 'r']), (0.5, 0.0, 1.0))  # one region: no information
+        # one region: no information
+        self.assertEqual(rounds.interval([1.0, 0.0], clusters=['r', 'r']), (0.5, 0.0, 1.0))
         self.assertAlmostEqual(rounds._t_quantile(0.90, 10), 1.812, places=3)
         # Bands of one region move together: counted as one, the interval widens.
         values = [1.0] * 24 + [0.0] * 8

@@ -33,7 +33,8 @@ CLAIM_FLAGS = [
        "e.g. '<= 85 dBA' recorded as 85 dBA; '10 +/- 0.5' as 10"),
     _f("Value and unit", "approximation_misflagged", "Approximate or estimated reading marked exact (or vice versa)",
        "e.g. '~12 t', or a value read off a chart, marked exact"),
-    _f("Value and unit", "value_fabricated", "Value not in the source at all", "e.g. a typical steel density filled in"),
+    _f("Value and unit", "value_fabricated", "Value not in the source at all",
+       "e.g. a typical steel density filled in"),
     # Qualifiers: the conditions under which the value holds.
     _f("Conditions and basis", "condition_dropped", "An operating condition or scope left out",
        "e.g. efficiency without 'at 50% load'"),
@@ -114,9 +115,11 @@ PAIR_FLAGS = [
 
 TAXONOMY = {
     "claim": {"verdicts": [
-        {"name": "correct", "label": "Correct", "help": "A faithful reading of the source (usefulness is judged by flags)"},
+        {"name": "correct", "label": "Correct",
+         "help": "A faithful reading of the source (usefulness is judged by flags)"},
         {"name": "flawed", "label": "Usable but flawed",
-         "help": "The core fact is right, but a qualifier, quote, scope or form is off, or part of the truth is stated as the whole"},
+         "help": "The core fact is right, but a qualifier, quote, scope or form is off, or part of the truth is stated "
+                 "as the whole"},
         {"name": "wrong", "label": "Wrong", "help": "The fact is misread, misbound or not supported"},
         {"name": "not_a_claim", "label": "Not a claim", "help": "Commentary, a heading or a fragment, not a fact"}],
         "flags": CLAIM_FLAGS},
@@ -127,8 +130,9 @@ TAXONOMY = {
         "flags": ABOUT_FLAGS},
     "pair": {"verdicts": [
         {"name": "right", "label": "Relation right",
-         "help": "Relations: equivalent = same engineering meaning; different = incompatible values under the same conditions; "
-                 "complementary = distinct compatible information about a corresponding subject; unrelated = different "
+         "help": "Relations: equivalent = same engineering meaning; different = incompatible values under the same "
+                 "conditions; complementary = distinct compatible information about a corresponding subject; "
+                 "unrelated = different "
                  "subject or property; uncertain = correspondence can't be established"},
         {"name": "wrong", "label": "Relation wrong", "help": "Flag what it should be"}],
         "flags": PAIR_FLAGS},
@@ -154,7 +158,8 @@ FIELDS = {
               _field("unit", "Unit", "Including scale factors; wrong if missing"),
               _field("conditions", "Conditions", "Load case, scenario, scope; wrong if a needed one is missing"),
               _field("basis", "Basis", "Requirement, target, measured, calculated... 'unknown' is right only "
-                     "when the source doesn't say; it is wrong for a 'shall' or 'must' (required) or a reported measurement"),
+                     "when the source doesn't say; it is wrong for a 'shall' or 'must' (required) or a reported "
+                     "measurement"),
               _field("approximate", "Approximate", "Readings off charts should be approximate"),
               _field("quote", "Quote", "Verbatim, and supports the claim"),
               _field("section", "Section", "The section it was attributed to")],
@@ -206,15 +211,21 @@ USEFULNESS = [
 
 # One line per kind of request, so reviewers learn to recognise the (folded) instructions.
 REQUEST_SUMMARIES = {
-    ("extract", "text"): "Extract up to N atomic engineering claims (entity, attribute, value, unit, conditions, quote) from a text chunk.",
+    ("extract", "text"): "Extract up to N atomic engineering claims (entity, attribute, value, unit, conditions, "
+                         "quote) from a text chunk.",
     ("extract", "table"): "Extract claims from one table row, given the table's header.",
-    ("extract", "tile"): "Extract claims from an image of part of a page (a tile), checked against the page's text where possible.",
+    ("extract", "tile"): "Extract claims from an image of part of a page (a tile), checked against the page's text "
+                         "where possible.",
     ("extract", "figure"): "Extract claims from an image of one detected figure, with its caption.",
     ("extract", "overview"): "Extract claims from a low-resolution image of the whole page.",
-    ("triage", "figure"): "Say what a figure depicts and why it's there, from its location, caption, surrounding text and citing paragraphs.",
-    ("triage", "section"): "Say what a section covers (type, density, keywords, about) from its heading, text, claims and figures.",
-    ("compare", "proposals"): "Relate two claims from competing designs: equivalent, different, complementary, unrelated or uncertain.",
-    ("compare", "revisions"): "Relate two claims from two revisions of one document: equivalent, different, complementary, unrelated or uncertain.",
+    ("triage", "figure"): "Say what a figure depicts and why it's there, from its location, caption, surrounding text "
+                          "and citing paragraphs.",
+    ("triage", "section"): "Say what a section covers (type, density, keywords, about) from its heading, text, claims "
+                           "and figures.",
+    ("compare", "proposals"): "Relate two claims from competing designs: equivalent, different, complementary, "
+                              "unrelated or uncertain.",
+    ("compare", "revisions"): "Relate two claims from two revisions of one document: equivalent, different, "
+                              "complementary, unrelated or uncertain.",
 }
 
 CLARITY = [
