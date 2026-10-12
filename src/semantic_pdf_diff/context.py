@@ -93,7 +93,8 @@ class Context:
             nearby = [self.marks(self.doc[n]) for n in range(max(0, page.number - NEIGHBOURS),
                                                             min(len(self.doc), page.number + NEIGHBOURS + 1))
                       if n != page.number and self.doc[n].rect == page.rect]
-            found = decoration(page, graphics, self.lines(page), nearby, self.marks(page))
+            drawn = [shown(page, f.bbox) for f in self.figures(page, page.number + 1)]
+            found = decoration(page, graphics, self.lines(page), nearby, self.marks(page), drawn)
             self.page_decoration[page.number] = [g for g, d in zip(graphics, found) if d]
         return self.page_decoration[page.number]
 

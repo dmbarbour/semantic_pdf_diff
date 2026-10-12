@@ -225,12 +225,13 @@ def marks(page, drawings=None):
         out.setdefault(_place(shown(page, image["bbox"])), set()).add(("image", image["digest"]))
     return out
 
-def decoration(page, graphics, lines, nearby=(), own=None):
+def decoration(page, graphics, lines, nearby=(), own=None, drawn=()):
     """Which of a page's graphics (Context.graphics) are decoration, [bool]: what a tile can hold and still be text
     only, as displayed.
 
     - **rules:** no thicker than RULE_POINTS and at least RULE_REACH of the page long (rules, margin bars, a frame
-      drawn as lines; a frame drawn as one path isn't a graphic at all)
+      drawn as lines; a frame drawn as one path isn't a graphic at all), unless its middle is in a detected figure
+      (drawn: their boxes, as displayed): there a long line is the drawing, a plan's gridline or a duct (2026-10-12)
     - **furniture:** drawn alike in the same place on REPEATED of the pages around it, or on all of them if there
       are fewer (nearby: marks(page) of those the same size; own: this page's, found if None)
     - **underlines:** no thicker than UNDERLINE_POINTS, within a text line's width and at most UNDERLINE_GAP below it
@@ -253,7 +254,7 @@ def decoration(page, graphics, lines, nearby=(), own=None):
     for g in graphics:
         holding.append(False)
         thin, long = min(g.width, g.height), max(g.width / page.rect.width, g.height / page.rect.height)
-        if thin <= RULE_POINTS and long >= RULE_REACH:
+        if thin <= RULE_POINTS and long >= RULE_REACH and not any((g.tl + g.br) / 2 in box for box in drawn):
             out.append(True)
             continue
         above = texts[bisect.bisect_left(bottoms, g.y0 - UNDERLINE_GAP):bisect.bisect_right(bottoms, g.y1 + 1)]

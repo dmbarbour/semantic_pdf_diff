@@ -123,6 +123,18 @@ class Candidates(unittest.TestCase):
                              render_mode=3)
         self.assertEqual(decoration(page, _graphics(page), lines(page)), [False])
 
+    def test_a_long_line_in_a_drawing_is_the_drawing_not_a_rule(self):  # a plan's gridlines, a schematic's duct
+        from semantic_pdf_diff.segmentation import decoration
+        _doc, page = text_page(width=612, height=792, count=5)
+        page.draw_line((100, 400), (100, 700), width=1)  # inside the drawing
+        page.draw_line((40, 380), (572, 380), width=1)  # a rule above it
+        drawing = pymupdf.Rect(80, 390, 560, 720)
+        graphics = _graphics(page)
+        self.assertEqual(decoration(page, graphics, lines(page)), [True, True])
+        self.assertEqual({tuple(round(v) for v in g): d
+                          for g, d in zip(graphics, decoration(page, graphics, lines(page), drawn=[drawing]))},
+                         {(100, 400, 100, 700): False, (40, 380, 572, 380): True})
+
     def test_decoration_underlines_text_masks_and_text_panels_but_not_a_figure_with_labels(self):
         from semantic_pdf_diff.segmentation import decoration
         doc = pymupdf.open()
