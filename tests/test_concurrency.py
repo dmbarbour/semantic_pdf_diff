@@ -12,6 +12,7 @@ import unittest
 from pathlib import Path
 import pymupdf
 from semantic_pdf_diff import cli
+import stubs
 from stubs import chat_answer, request_body, serving, situating_answer, slow, source_data
 
 @contextlib.contextmanager
@@ -90,14 +91,17 @@ def make_pdf(path, pages):
         page.insert_text((40, 40), text)
         page.draw_rect(pymupdf.Rect(60 + 20 * i, 120, 200, 260))
         page.draw_line(pymupdf.Point(200, 190), pymupdf.Point(340, 190 + 30 * i))
-    doc.save(path); doc.close()
+    doc.set_metadata({})  # the same bytes each time (no date, no fresh id), so the same content id: what's sampled
+    doc.save(path, no_new_id=True); doc.close()  # from a run by id (test_rounds' batches) is sampled alike
     return path
 
 @slow
 class Determinism(unittest.TestCase):
     def run_with(self, root, a, b, url, workers):
         config = root / f'config-{workers}.json'
-        config.write_text(json.dumps({'concurrency': workers, 'tile_points': 180, 'retries': 0}))
+        # small tiles of text, sent and halved as before milestone 8: many tasks, refinement and merging
+        # small tiles of text, sent and halved as before milestone 8: many tasks, refinement and merging
+        config.write_text(json.dumps({'concurrency': workers, 'tile_points': 180, 'retries': 0, **stubs.TILING_BEFORE}))
         out = root / f'out-{workers}'
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             cli.main([str(a), str(b), '--out', str(out), '--base-url', url, '--config', str(config)])

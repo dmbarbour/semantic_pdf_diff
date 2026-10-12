@@ -34,9 +34,17 @@ TOGGLES = {
     'sheet_details': True, 'skip_empty': False, 'table_filter': True, 'situate': False, 'verify_visuals': False,
     'top_k': 1, 'min_score': 0.9, 'max_pairs': 1, 'aliases': {'drawing': 'equipment', 'label': 'power'},
     'reconcile': False, 'quote_match': 'exact', 'skip_text_only': True, 'tile_cut': 'xycut', 'band_width': 6.0,
-    'render_area': True, 'tile_choice': 'measures', 'region_labels': 'model', 'another_tiling': 'asked',
+    'render_area': True, 'tile_choice': 'off', 'region_labels': 'model', 'another_tiling': 'asked',
     'least_half': 0.5,
 }
+# Settings measured under others, on both sides: the tilers' with tile_choice off (by default the rule picks the cut by
+# its measures, so another tiler or a tile's growth, say, may leave its choice and the queries as they were); the
+# least share of a half with the tiling as it was before milestone 8 (by default a partial tile is read under another
+# cut, not halved; under the new tiling alone, these documents' halves came out the same at either share).
+UNDER = {**dict.fromkeys(('grow_tiles', 'tiling', 'skip_empty', 'tile_cut', 'band_width', 'skip_text_only'),
+                         (('tile_choice', 'off'),)),
+         'least_half': (('tile_choice', 'off'), ('another_tiling', 'off'), ('decoration', False),
+                        ('skip_text_only', False), ('halve_parts', False))}
 # Settings that act only on the drawing sheet: grid tiles (report pages are cut into bands), its details,
 # and its frame (a false table); and refinement, which only grid tiles are large enough for (the stub answers
 # some tiles "incomplete"). A slower document: most of a run's time is its tiles.
@@ -128,7 +136,7 @@ class SettingsKeepToTheirClass(unittest.TestCase):
                     True: (document(cls.root / 'a-sheet.pdf', 10, True), document(cls.root / 'b-sheet.pdf', 12, True))}
         cls.stack = contextlib.ExitStack()
         cls.url, cls.state = cls.stack.enter_context(jittery_model())
-        cls.base = {False: cls.run_with('baseline', {})}
+        cls.base = {(False, ()): cls.run_with('baseline', {})}
 
     @classmethod
     def tearDownClass(cls):
@@ -154,14 +162,15 @@ class SettingsKeepToTheirClass(unittest.TestCase):
             self.assertNotEqual(getattr(defaults, name), Settings(**{name: value}).__getattribute__(name), name)
 
     def test_each_setting_keeps_to_its_class(self):
-        self.assertEqual({role for role, _ in self.base[False]}, {'extract', 'table-rules', 'triage', 'compare'})
+        self.assertEqual({role for role, _ in self.base[False, ()]}, {'extract', 'table-rules', 'triage', 'compare'})
         extraction = lambda queries: {q for q in queries if q[0] in ('extract', 'table-rules', 'table-review')}
         for name, value in TOGGLES.items():
             kind, sheet = SETTING_CLASSES[name], name in ON_SHEETS
+            under = UNDER.get(name, ())
             with self.subTest(setting=name, kind=kind):
-                if sheet not in self.base:
-                    self.base[sheet] = self.run_with('baseline-sheet', {}, sheet)
-                base, queries = self.base[sheet], self.run_with(name, {name: value}, sheet)
+                if (sheet, under) not in self.base:
+                    self.base[sheet, under] = self.run_with(f'baseline-{sheet}-{len(self.base)}', dict(under), sheet)
+                base, queries = self.base[sheet, under], self.run_with(name, {**dict(under), name: value}, sheet)
                 changed = f"{name} ({kind}): {len(queries - base)} queries new, {len(base - queries)} gone"
                 if kind == 'endpoint':
                     self.assertEqual(queries, base, changed)

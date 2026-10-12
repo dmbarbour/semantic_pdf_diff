@@ -95,12 +95,13 @@ class Lever(unittest.TestCase):
         self.addCleanup(doc.close)
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
-        s = Settings(region_labels=mode)
+        s = Settings(region_labels=mode, **stubs.TILING_BEFORE)
         reader = Context(doc, s, Path(folder.name), "stem")
         reader.ask = asker
         page = doc[number]
         tiles = [r for r in s.visual_regions(reader, page, number) if r[0].startswith("tile")]
-        return tiles, reader.page_labels.get(number), Settings().visual_regions(Context(doc, Settings()), page, number)
+        before = Settings(**stubs.TILING_BEFORE)
+        return tiles, reader.page_labels.get(number), before.visual_regions(Context(doc, before), page, number)
 
     def test_asked_once_a_page_about_the_tiles_it_sends(self):
         asker = Asker("chart")
@@ -149,7 +150,8 @@ class Job(unittest.TestCase):
             doc.select([SLIDE[1]])
             doc.save(path)
             doc.close()
-            _, coverage = extract_pdf(path, "sha256:" + "b" * 64 + ".pdf", Path(d), Client(region_labels="model"))
+            client = Client(region_labels="model", **stubs.TILING_BEFORE)
+            _, coverage = extract_pdf(path, "sha256:" + "b" * 64 + ".pdf", Path(d), client)
         (row,) = [r for r in coverage if r["task"] == "vision:p1:labels"]
         self.assertEqual(row["status"], "complete")
         self.assertTrue(row["issues"][0].startswith("Tiles labelled: 0 other, 1 text"))

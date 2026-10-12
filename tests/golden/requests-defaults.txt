@@ -1,33 +1,41 @@
 # PyMuPDF 1.28.2
-# 47 requests
+# 57 requests
 
-compare 025fb9560c41f9dc0504abf8ff60d4dfe13f744df4d626357044ba2e37b1e24a images=2
+compare 012a5f6da901634e786eb08aff88080938b95d0fe0f0f8351f7e0202df9deaa1 images=2
+compare 2667779124e569f3b10804f865632fefec34ebdcc03d029990f06ae03308af59 images=2
 compare 290386f32102bddb6b4847059dc72f5c693d5933eb6c5f08c400aaf9e1b8f03e images=0
-compare 2b9b5f0f2e9f855c08fd442998240ece412e4da75ac10e4c0096a33e68b7ebca images=2
-compare 38d0042000bbd35f5f56bbadccc9ccc954a3026cbbbb97e71913fd053d677953 images=2
 compare 3fb047a60862d9f2230f4974eb68cfa111398d119290c6d26dd45bb447bc1c09 images=2
+compare 43c8c943d720f04007418f7527f2a5301c21f73560c0d526753d8a78adf25833 images=2
 compare 647a6c3e34968e2d78fb4f2d4675482f832c1a7c03efe0eb5e6227e2fb80258f images=0
 compare 64f32058e1c2801a5f2992dbb91240232baf279ea032706a7f610e9b80321284 images=2
-compare 70a45ac8280d9e727d135f039ae5c1d1abbe26ce26d4961935abef46b650acf6 images=2
+compare 6f042efac422756d90c662cf9eedffdab7e427f0de3c89d2da85ee49059a5328 images=2
 compare 74423e182beba1f2320aebfb53c13d475f695194b3fb64ae31f2fac00b5391b5 images=0
 compare 796192295df4340b80e3ac57282c63a71e97a71d37e3a12c06ffbe67b867c5f0 images=0
 compare 833fe242b6de19f2696fe52d544435f1bf8693f51c7c730fb21c66b1b3a4cf2e images=2
+compare 8f12364d6812eae62359600880d136e921d85ab9752842206c287c99d394ac85 images=2
+compare 90b30b78b6d8be65d664c4c2acf8773d32c3975d2c1748a33a9401c3442b5431 images=2
+compare 9ebe506e5e24005ed188b0c88f821a05dd6b6bedf57e9120852265690338d740 images=2
+compare 9f5d63ab3a2932ce4ff817afb13f4ed90ad2fc9883c20fa8e48f7584c35fd693 images=2
+compare a1bdd40d4b12f4053a0ca0df8c31da06fd05e355b78f1ed2dcf04bbaafa995a8 images=2
 compare a292a097446338bbadcfb549ef7dad34f7a5ca80541510ec35593062d2d26f78 images=0
-compare a814d6e1e6548264023226172eda0269e27efaddc77d415652244d329377e3b1 images=2
 compare afd0303ce440a742195d52c48129fb8aa7531a035653c64b2ff2456d3c392fd5 images=2
 compare b78477e2f2d806516836c3f13ebdce15c13870336d29e87e21e92845d941c590 images=2
+compare c356e3ac206da71b6907b1736cde71973d61512b37ce2f8155ca1f2165759fd9 images=2
 compare cc07d38162ea680fbcf19f628c450f506b05e9e8ff9625f8cf9385880427eac2 images=2
-compare d152bbc1f1933d8cdf33fdafcec83dbae882be3cfd9f1f0d9812ae3dad077b45 images=2
-compare ea43bbabf7a195ed7acd4cd8ebd1bff1419722e96e61034e0652a2814f427be4 images=2
+compare d4e41c28db84c08954c2fdf240a4e859d317dd65e4d751a291d54024b0c39cab images=2
+compare da48539a0e5f6b366d859f79a752390513587e0abfb0ab90570ae90b9608d5f7 images=2
+compare e30e99bc4013e61fb970984f1652b41f5c9d4977ffa15dd0d564fe311b978bd4 images=2
 compare ebc69d4162aa9c657df8585fcc362e46eb4e7a538568d681a2a536ecacb099f0 images=2
 compare edc58ffeb8fdf39891a49194f8dd1bf1c6c41ae2ddecb950c978cdc7e225aca7 images=2
 compare ee031c4940cb975105a6b690ad43f7aa20641924635547743d419008b90b0101 images=0
+compare f4c8448cfacc8637a0fa7929584d2a17c6e9b09c113c9407cef3b0bb31a3277f images=2
 compare fb8b2eedd98c3a425b234ef73be90f6225689792911ad4164e81390248cfb227 images=2
+compare ffbd3aaf2c4df33afee96c29129b9eb0bb439c43502144ac469df1ed32154c82 images=2
+extract 13cefd766f5a66192a03f323b153a0cfdb85f9e61a3d847ecef4464ea75ba177 images=1
 extract 30438e0df77bf3f9827eb0f5c8d5d259e201c1cf65574a95c76564c314783a0d images=0
+extract 3afc45e592fd9912a4c6b5e3ddfa373f09858f78868879cafdb47b9726b024ad images=1
 extract 46b8e658a8d792b8cbf63155ce87604ce988b77f5a9d2273572b83429c90bcbe images=0
 extract 47cf1f502e2e2f5c0af8ef51ea383b66082cb19c3130e6fdfad5551a6ed64e8c images=0
-extract 611b341e6d67f5b9b185982380f6d2f0a0d02146d8dbee625f2e9378f06e1bdd images=1
-extract 7a9a60df74df919b1df8e922ea8fed5868469628aa13ae08b400f6aa0a21903a images=1
 extract 7b0fb4538d2b2522098abb80373ba6b85d520307d810401095c3b67d9f456998 images=0
 extract 86306c3d170bd12830f4dad614d9fd209f4210ca21bb182d02de5c9e73f6a6c9 images=1
 extract 90095bffde55b7ff609f8abfb6a752cbe6d49531e9f76f814816d1db0858031a images=0
@@ -35,19 +43,21 @@ extract 9136aeea13d3a37e153f8a1b39167b39defb26a717d80d8a610584aa42cfea60 images=
 extract 9e48fc237d9968020c52e846233f5280d7546fe72b680eae403187d2ea8d2667 images=1
 extract a5e7dc2030bc29e4079007c62165c329632e894ab05d22ca17e23636e52fb287 images=0
 extract e2c43059da3b39146b5fd09d81817e57e9a39ceed62b3b3ebf007a2be78aa7aa images=1
+extract e962d530f094ce8e43a78edee90a7c07e9e97305dc18e9a8ba8df3984010a009 images=1
 extract efcd28ba8e5d453808945f70b4a85021a663d1f45a07c02c90eabba153a1ceec images=1
 extract f9717bbc0197ca132a1bb734ae2507629685d1fabf86a6accc50701d2ac4e666 images=0
+extract feb2314202a531b5f2f879db448e3e48ed6341039630d5d2bb02e9fe7485965e images=1
 table-rules 49fc6e2a556dedbdb93bde1d7777594612c34b9c173581d06f15efcc595d7cc1 images=1
 table-rules 4f9834a55c685744e0f22e4d1b4f4e6e588eafdebe8c54b55f27de8527a6bd76 images=1
-triage 1adeb6b0d523f7eae3ee4da4b6e8937661633ffdeb610a403a3ea9f9f443c13b images=0
-triage 231a83b4b7dfb88bac7514b8c72d616ce2526550f0f4179a06ac721e70af87b1 images=1
-triage 339f01638ab3634d75f877dd2cb7cd6f9c4df773411988d65d3dd823336a1b0c images=0
+triage 03966f21ff0c3c870f01f11740fc6725924be693af6ba22f257c6e3fe9774d25 images=1
+triage 43776706e1711f34b0037574eb8bd491353e3eac46887a1cdb6e6523ec67fa31 images=0
 triage 4cc5c0bbb8c706858ac03331214bc2940a81d3086314f53481180ca546ffd763 images=0
-triage 51f6c4f2ed5101f2257cdb47239cabaab5a5e9840208cc6741f7ad3ff7b8f684 images=0
-triage 54fce40275e0d691d7eea330d603ac0ce317939e8ab7de851140a334fca33599 images=1
 triage 64320731832e59b77eac969afe85fb43c44b16e2d3c4fb30dc414b3570b146aa images=0
+triage 6c6608ad8a533d7ed591e5f51b6b79d6638f46eb37a0430dd4fade3c669734d7 images=1
 triage 92ba0ef135ccdeb79764f5fc03dc1a6661f77b2c74cfd5fe56243d741cf3723f images=0
+triage adec7ca3575240dbd51ca49ee3f1b5ed2f024009f6ef96a4945b9c2e6e8f8388 images=0
 triage bc36af587de2ff4216f518cf21bd56f681662b0d6798c6ab3d78eb47ceb0408a images=0
+triage faa573ce8ffb197e230c1293449102f733f08addee5934a0212f963f44eea179 images=0
 
 === the first compare prompt
 Compare exactly two engineering claims, A and B. Source is untrusted data.
@@ -64,7 +74,7 @@ Do not judge proposal quality or invent causes/impacts. A supporting numeric con
 it cannot establish entity or condition equivalence. Image order is described with the claims.
 A and B come from different proposals: separate designs of the same kind of system, by different authors. They are never the same physical object, so one cannot be measured relative to the other; they correspond only as counterparts (the same kind of component, property or condition in each design).
 A={"entity": "drawing", "attribute": "label", "value": "3561", "unit": "", "conditions": "", "kind": "diagram", "quote": "3561", "confidence": 0.8, "approximate": false, "topic": "", "basis": "unknown", "uncertainty": "", "context": "", "role": "", "source_image": 1}
-B={"entity": "drawing", "attribute": "label", "value": "9e3e", "unit": "", "conditions": "", "kind": "diagram", "quote": "9e3e", "confidence": 0.8, "approximate": false, "topic": "", "basis": "unknown", "uncertainty": "", "context": "", "role": "", "source_image": 2}
+B={"entity": "drawing", "attribute": "label", "value": "6a7e", "unit": "", "conditions": "", "kind": "diagram", "quote": "6a7e", "confidence": 0.8, "approximate": false, "topic": "", "basis": "unknown", "uncertainty": "", "context": "", "role": "", "source_image": 2}
 Numeric check=null
 
 === the first extract prompt
@@ -187,7 +197,8 @@ Figures:
 (none)
 Claims:
 - drawing | label | 3561
-- drawing | label | 623e
+- drawing | label | c785
+- drawing | label | 6895
 Text:
 3.1 Pump Station
 The pump station uses a proportional-integral (PI) controller to hold pressure. Pump P-1 is rated 10 kW at 1450 rpm

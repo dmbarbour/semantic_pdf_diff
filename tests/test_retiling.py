@@ -45,7 +45,7 @@ class Retiled(unittest.TestCase):
         stem, number = where
         doc = pymupdf.open(CORPUS / f"{stem}.pdf")
         self.addCleanup(doc.close)
-        s = Settings(another_tiling="said", **settings)
+        s = Settings(**{**stubs.TILING_BEFORE, "another_tiling": "said", **settings})
         reader = Context(doc, s)
         page = doc[number]
         return s, reader, page, [r for r in s.visual_regions(reader, page, number) if r[0].startswith("tile")]
@@ -99,7 +99,7 @@ class Job(unittest.TestCase):
             doc.select([WIDE[1]])
             doc.save(path)
             doc.close()
-            client = Client(another_tiling="asked", refinement_depth=1)
+            client = Client(**{**stubs.TILING_BEFORE, "another_tiling": "asked"}, refinement_depth=1)
             _, coverage = extract_pdf(path, "sha256:" + "c" * 64 + ".pdf", Path(d), client)
         tasks = [r["task"] for r in coverage if r["task"].startswith("tile")]
         self.assertIn("tile:p1:xycut0", tasks)

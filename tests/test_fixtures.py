@@ -99,7 +99,9 @@ class RecordAndReplay(unittest.TestCase):
 
     def run_cli(self, out, url, *extra, settings=None):
         config = self.root / f'{out}.json'
-        config.write_text(json.dumps({'concurrency': 4, 'tile_points': 180, 'retries': 0, **(settings or {})}))
+        # small tiles of text, sent as before milestone 8: many tasks, several queries a task
+        config.write_text(json.dumps({'concurrency': 4, 'tile_points': 180, 'retries': 0, **stubs.TILING_BEFORE,
+                                      **(settings or {})}))
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
             code = cli.main([str(self.a), str(self.b), '--out', str(self.root / out), '--base-url', url,
                              '--config', str(config), *extra])

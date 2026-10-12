@@ -52,7 +52,7 @@ def visual_regions(page, side, number=1, **settings):
     from semantic_pdf_diff.context import Context
     from semantic_pdf_diff.settings import Settings
     s = Settings(**{"tile_points": side, "tiling": "grid", "grow_tiles": False, "skip_empty": False,
-                    "figure_tasks": False, **settings})
+                    "figure_tasks": False, **stubs.TILING_BEFORE, **settings})
     return s.visual_regions(Context(page.parent, s), page, number)
 
 class Figures(unittest.TestCase):

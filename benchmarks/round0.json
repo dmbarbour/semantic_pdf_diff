@@ -48,5 +48,10 @@
   "grow_tiles": false,
   "skip_empty": false,
   "reconcile": false,
-  "quote_match": "exact"
+  "quote_match": "exact",
+  "decoration": false,
+  "tile_choice": "off",
+  "skip_text_only": false,
+  "another_tiling": "off",
+  "halve_parts": false
 }

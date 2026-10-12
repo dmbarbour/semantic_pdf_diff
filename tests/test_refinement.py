@@ -7,6 +7,7 @@ from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.pages import lines
 from semantic_pdf_diff.segmentation import halves
+from stubs import TILING_BEFORE
 from test_robustness import CID, Recorder, pdf
 
 WORDS = 'the pump delivers 10 kW at its rated point and the fan runs at 3 kW'
@@ -94,7 +95,7 @@ class Again(unittest.TestCase):  # figure_refinement: a partial tile mostly one 
             for mode, expected in (('again', [('tile:0-a', {'continued': (claim,),
                                                             'noted': ['legend partly unreadable']})]),
                                    ('halves', [('tile:0-r0', {}), ('tile:0-r1', {})])):
-                s = Settings(refine_figures=mode)
+                s = Settings(refine_figures=mode, **TILING_BEFORE)
                 reader = Context(doc, s)
                 tiles = [r for r in s.visual_regions(reader, page, 0) if r[0].startswith('tile')]
                 found = s.refined_tile(reader, page, *tiles[0][:2], done)
@@ -117,7 +118,7 @@ class Refined(unittest.TestCase):
             page.draw_rect(pymupdf.Rect(20, 60, 24, 240))  # a side bar, so the band is sent
         with tempfile.TemporaryDirectory() as d:
             client = Recorder(lambda source, prompt: Extraction(claims=[], complete=False), refinement_depth=1,
-                              visual_text_layer=20000)
+                              visual_text_layer=20000, **TILING_BEFORE)
             path = pdf(Path(d) / 't.pdf', build, width=500, height=500)
             _, coverage = extract_pdf(path, CID, Path(d), client)
             with pymupdf.open(path) as doc:

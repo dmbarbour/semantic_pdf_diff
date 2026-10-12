@@ -1,5 +1,5 @@
 import stubs  # noqa: F401 (a clean environment)
-from stubs import source_data
+from stubs import TILING_BEFORE, source_data
 import itertools
 import tempfile
 import unittest
@@ -76,7 +76,8 @@ class Extraction_(unittest.TestCase):
     def test_one_claim_across_passes_and_pages(self):
         with tempfile.TemporaryDirectory() as d:
             path, cid = self.pdf(Path(d))
-            evidence, coverage = extract_pdf(path, cid, Path(d), self.Model(tile_points=300))
+            # text alone in its tiles: sent as before milestone 8, so a tile sees the fact too
+            evidence, coverage = extract_pdf(path, cid, Path(d), self.Model(tile_points=300, **TILING_BEFORE))
             self.assertEqual(len(evidence), 1)
             e = evidence[0]
             regions = {o.locator.region for o in e.occurrences}

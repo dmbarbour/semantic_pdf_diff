@@ -251,7 +251,7 @@ class Decoration(Lever):
     lever_name, stage, off = "decoration", "segmentation", {"decoration": False}
     # set decoration aside when a tile's graphics are counted: rules, margin bars, a frame's sides, what repeats in
     # the same place on neighbouring pages, an image behind a page's visible text (segmentation.decoration)
-    decoration: Annotated[bool, _selecting(VISUAL)] = False
+    decoration: Annotated[bool, _selecting(VISUAL)] = True
 
     def content_graphics(self, reader, page):
         graphics = super().content_graphics(reader, page)
@@ -289,7 +289,7 @@ class TileChoice(Lever):
     # another beats it (measures), or the model's choice among those no other beats (model; calibrated first:
     # scripts/calibration.py), read with each of two it names as equally good. A drawing sheet keeps the tiler's cut:
     # XY-cut's larger tiles lost facts there (milestones 3 and 5), and the small-text measure doesn't see why
-    tile_choice: Annotated[Literal["off", "measures", "model"], _selecting(VISUAL)] = "off"
+    tile_choice: Annotated[Literal["off", "measures", "model"], _selecting(VISUAL)] = "measures"
 
     def tiling_of(self, reader, page):
         how = super().tiling_of(reader, page)
@@ -381,7 +381,7 @@ class AnotherTiling(Lever):
     # that cut holding what the measures find it cuts; one continued at the claim limit is halved, for more room.
     # Always (measures), or where it asks: its issues say it's cut
     # (said), or it names the edges cutting content when a rule asks (asked; calibrated first: scripts/asking.py)
-    another_tiling: Annotated[Literal["off", "measures", "said", "asked"], _shaping(VISUAL)] = "off"
+    another_tiling: Annotated[Literal["off", "measures", "said", "asked"], _shaping(VISUAL)] = "measures"
 
     def region_rules(self, region):
         from .retiling import RULE
@@ -414,7 +414,7 @@ class HalveParts(Lever):
     lever_name, stage, off = "halve_parts", "segmentation", {"halve_parts": False}
     # a refined tile's halves are cut around the detected figures it holds where they can be, as around a graphic: the
     # cut follows the parts (milestone 7; a figure of several graphics was cut through a gap inside it)
-    halve_parts: Annotated[bool, _selecting(VISUAL)] = False
+    halve_parts: Annotated[bool, _selecting(VISUAL)] = True
 
     def tile_parts(self, reader, page):
         parts = super().tile_parts(reader, page)
@@ -588,7 +588,9 @@ class DedupeRepeated(Lever):
 
 # The canonical order: the prompt's (instructions, then context lines as the providers write them), then the
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
-# (rounds 1-9; benchmarks/champion.json); round 0's settings are benchmarks/round0.json.
+# (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
+# tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8); round 0's settings
+# are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
                  RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,

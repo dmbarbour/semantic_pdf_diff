@@ -13,7 +13,7 @@ from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id
 import stubs
-from stubs import ROUND0, source_data
+from stubs import ROUND0, TILING_BEFORE, source_data
 
 def make_pdf(path, pages, toc=None, metadata=None, height=300):
     return stubs.text_pdf(path, pages, height=height, toc=toc, metadata=metadata)
@@ -304,7 +304,7 @@ class SectionContext(unittest.TestCase):
             page.insert_text((40, 60), 'Pump rated 12 kW', fontsize=9)
             path = Path(d) / 'big.pdf'
             doc.save(path); doc.close()
-            client = Recorder(vision=True, tile_locator=True)
+            client = Recorder(vision=True, tile_locator=True, **TILING_BEFORE)  # its text-only tile sent
             extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d) / 'on', client)
             tiles = [(p, i) for p, i in client.images if 'Source type: tile' in p]
             self.assertTrue(tiles)
