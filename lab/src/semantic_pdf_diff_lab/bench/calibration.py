@@ -22,6 +22,7 @@ import pymupdf
 
 from semantic_pdf_diff.pages import shown
 from semantic_pdf_diff.segmentation import grown, tiles as grid_tiles, xy_cut
+from semantic_pdf_diff.tilechoice import PROBLEMS
 from semantic_pdf_diff.tiling import measure, words
 
 SIDE = 420  # points: tile_points, today's
@@ -38,9 +39,20 @@ KINDS = {
     # fault, lines read twice
     "overlap": "repeats text",
 }
-# how the candidates are drawn (tilechoice.sketch), and their pictures' suffix: outlined; or with what no tile holds
-# greyed out, after the first run's misses (a tiling missing most of a page looked like the page untouched)
-ARMS = {"outlined": "", "dimmed": "-dimmed"}
+# near cases (milestone 5, before its lever is trusted): one known-good against one tiling a little off, or against a
+# heuristic cut where the measures find a fault in it; the fault expected is the measures' (fault_of)
+NEAR = {
+    "one cut": "one edge between two tiles moved into the line nearest it",
+    "one overlap": "one tile grown down into the tile below it by three lines, cutting none",
+    "today": "today's tiling (the default levers' cut, every tile kept)",
+    "snapped": "the snapped grid, every tile kept",
+}
+# how the candidates are drawn (tilechoice.sketch), their pictures' suffix, and which questions are asked: outlined;
+# or with what no tile holds greyed out, after the first run's misses (a tiling missing most of a page looked like the
+# page untouched); near, dimmed
+ARMS = {"outlined": {"suffix": "", "dimmed": False, "near": False},
+        "dimmed": {"suffix": "-dimmed", "dimmed": True, "near": False},
+        "near": {"suffix": "-dimmed", "dimmed": True, "near": True}}
 # a model passes, under an arm, at these shares or more (set by judgement, 2026-10-11: gemma-4 chose the known-good
 # 95% of the time, the same in both orders 91%, with the dimmed sketches; 90% and 87% with outlines alone)
 PASS = {"good_chosen": 0.9, "same_in_both_orders": 0.85}
@@ -55,7 +67,8 @@ class Page:
         from semantic_pdf_diff.context import Context
         from semantic_pdf_diff.settings import Settings
         self.file, self.number, self.page = file, number, doc[number]
-        reader = Context(doc, Settings())
+        self.settings = Settings()
+        self.reader = reader = Context(doc, self.settings)
         self.lines = reader.lines(self.page)
         self.graphics = reader.graphics(self.page)
         decoration = {tuple(d) for d in reader.decoration(self.page)}
@@ -193,16 +206,89 @@ def shows(kind, m):
             "missing": m["lines_missed"] > 0 or (m["graphics_missed"] or 0) > 0.05,
             "overlap": m["lines_read_twice"] > 0 and cuts == 0 and m["words_cut"] == 0}[kind]
 
-def tilings(p):
-    """{kind: [Rect]} for a page: "good" and each bad kind whose fault the measures find; {} without a good one."""
+def tilings(p, near=False):
+    """{kind: [Rect]} for a page: "good" and each bad kind whose fault the measures find (the near kinds, if near);
+    {} without a good one."""
     rects = good(p)
     if rects is None:
         return {}
     out = {"good": rects}
-    for kind, make in MAKERS.items():
+    for kind, make in (NEAR_MAKERS if near else MAKERS).items():
         bad = make(p, rects)
-        if bad and shows(kind, p.measured(bad)):
+        if bad and (fault_of(p.measured(bad)) in NEAR_FAULTS.get(kind, PROBLEMS) if near
+                    else shows(kind, p.measured(bad))):
             out[kind] = bad
+    return out
+
+def fault_of(m):
+    """The problem a tiling's measures show first (tilechoice.PROBLEMS), or None: cut text, then a split figure,
+    content missed, a tile of decoration or blank alone, lines read twice."""
+    if m["lines_cut_sideways"] + m["lines_cut_across"] + m["words_cut"]:
+        return "cuts text"
+    if m["figures_not_whole"]:
+        return "splits a figure"
+    if m["lines_missed"] or (m["graphics_missed"] or 0) > 0.05:
+        return "misses content"
+    if m["decoration_only"] + m["blank"]:
+        return "decoration or blank"
+    return "repeats text" if m["lines_read_twice"] else None
+
+def _stacked(p, rects):
+    """(i, j): the first tile and the one below it (within SHIFT_GAP, overlapping across), with a line in either."""
+    for i, a in enumerate(rects):
+        for j, b in enumerate(rects):
+            if i != j and 0 <= b.y0 - a.y1 < SHIFT_GAP and min(a.x1, b.x1) > max(a.x0, b.x0) and any(
+                    box.intersects(a) or box.intersects(b) for box, _ in p.lines):
+                return i, j
+    return None
+
+def _one_cut(p, rects):
+    pair = _stacked(p, rects)
+    if pair is None:
+        return None
+    i, j = pair
+    a, b = rects[i], rects[j]
+    gap = (a.y1 + b.y0) / 2
+    line = min((box for box, _ in p.lines if box.intersects(a) or box.intersects(b)),
+               key=lambda box: abs((box.y0 + box.y1) / 2 - gap))
+    out = [pymupdf.Rect(r) for r in rects]
+    out[i].y1 = out[j].y0 = (line.y0 + line.y1) / 2
+    return out
+
+def _one_overlap(p, rects):
+    pair = _stacked(p, rects)
+    if pair is None:
+        return None
+    i, j = pair
+    below = sorted((box for box, _ in p.lines if box.intersects(rects[j]) and box.y0 >= rects[j].y0 - 1),
+                   key=lambda box: box.y0)
+    if len(below) < 3:
+        return None
+    out = [pymupdf.Rect(r) for r in rects]
+    out[i].y1 = below[2].y1 + 1
+    out[i] = grown(p.page, out[i], lines=p.lines)
+    return out
+
+def _heuristic(how):
+    def make(p, rects):
+        s, reader = p.settings, p.reader
+        how_ = s.tiling_of(reader, p.page) if how is None else how
+        cut = s.cut_named(reader, p.page, how_)
+        return cut if how_ == "bands" else [s.grow(reader, p.page, r, p.page.rect) for r in cut]
+    return make
+
+NEAR_FAULTS = {"one cut": ("cuts text",), "one overlap": ("repeats text",)}  # the others: any fault the measures find
+NEAR_MAKERS = {"one cut": _one_cut, "one overlap": _one_overlap, "today": _heuristic(None),
+               "snapped": _heuristic("snapped")}
+
+def near_questions(p, found):
+    """[{"id", "kinds": [the good, one near kind], "orders"}]: each near kind against the known-good, in a seeded
+    order, then swapped."""
+    out = []
+    for kind in sorted(k for k in found if k != "good"):
+        kinds = ["good", kind]
+        first = random.Random(f"{p.seed}|{kind}").sample(kinds, 2)
+        out.append({"id": f"{p.id}-{kind.replace(' ', '-')}", "kinds": kinds, "orders": [first, first[::-1]]})
     return out
 
 def questions(p, found):
@@ -224,16 +310,17 @@ def questions(p, found):
         out.append({"id": f"{p.id}-q{n}", "kinds": kinds, "orders": [first, second]})
     return out
 
-def cases(folder, only=None):
-    """(Page, {kind: [Rect]}, questions) for every page of the folder's PDFs, sorted; only: page ids to keep."""
+def cases(folder, only=None, near=False):
+    """(Page, {kind: [Rect]}, questions) for every page of the folder's PDFs, sorted; only: page ids to keep; near: the
+    near cases' questions (near_questions), not the stark ones."""
     for path in sorted(Path(folder).glob("*.pdf")):
         with pymupdf.open(path) as doc:
             for number in range(len(doc)):
                 if only and f"{path.stem}-p{number + 1}" not in only:
                     continue
                 p = Page(path.name, doc, number)
-                found = tilings(p)
-                yield p, found, questions(p, found)
+                found = tilings(p, near)
+                yield p, found, (near_questions if near else questions)(p, found)
 
 def ask_all(folder, client, corpus, only=None, arm="outlined"):
     """{question id: {"page", "kinds", "orders", "answers": [per order: {"best", "problems", "error"}],
@@ -245,7 +332,7 @@ def ask_all(folder, client, corpus, only=None, arm="outlined"):
     target.mkdir(parents=True, exist_ok=True)
     out = {}
     with Dispatcher(client) as dispatch:
-        for p, found, asked in cases(corpus, only):
+        for p, found, asked in cases(corpus, only, ARMS[arm]["near"]):
             if not asked:
                 continue
             zoom = SKETCH_SIDE / max(p.page.rect.width, p.page.rect.height)
@@ -256,14 +343,15 @@ def ask_all(folder, client, corpus, only=None, arm="outlined"):
                 record = out[q["id"]] = {"page": p.id, "kinds": q["kinds"], "orders": q["orders"],
                                          "answers": [None, None],
                                          "measures": {k: p.measured(found[k]) for k in q["kinds"]}}
+                record["faults"] = {k: KINDS.get(k) or fault_of(record["measures"][k]) for k in q["kinds"][1:]}
                 for o, order in enumerate(q["orders"]):
                     letters = list(LETTERS[:len(order)])
                     images = [clean]
                     for letter, kind in zip(letters, order):
-                        image = target / f"{p.id}-{kind.replace(' ', '-')}-{letter}{ARMS[arm]}.png"
+                        image = target / f"{p.id}-{kind.replace(' ', '-')}-{letter}{ARMS[arm]['suffix']}.png"
                         if not image.exists():
                             image.write_bytes(sketch(p.page, found[kind], letter, pixmap=pixmap,
-                                                     dimmed=arm == "dimmed"))
+                                                     dimmed=ARMS[arm]["dimmed"]))
                         images.append(image)
                     key = ("tilechoice", f"{q['id']}|o{o}", arm)
 
@@ -272,7 +360,7 @@ def ask_all(folder, client, corpus, only=None, arm="outlined"):
                                                 if error is not None else
                                                 {"best": chosen(value, letters), "problems": problems(value, letters),
                                                  "error": None, "raw": value.best})
-                    dispatch.submit(prompt(letters, dimmed=arm == "dimmed"), Choice, images, key, finish)
+                    dispatch.submit(prompt(letters, dimmed=ARMS[arm]["dimmed"]), Choice, images, key, finish)
                     dispatch.make_room()
         dispatch.drain()
     return out
@@ -303,7 +391,7 @@ def score(asked):
             k["good_chosen"] += kind == "good"
             k["this_chosen"] += kind == bad
             letter = LETTERS[q["orders"][o].index(bad)]
-            k["fault_named"] += KINDS[bad] in q["answers"][o]["problems"].get(letter, [])
+            k["fault_named"] += q["faults"][bad] in q["answers"][o]["problems"].get(letter, [])
     out["by_kind"] = {bad: {"asked": k["asked"], "good_chosen": _share(k["good_chosen"], k["asked"]),
                             "this_chosen": _share(k["this_chosen"], k["asked"]),
                             "fault_named": _share(k["fault_named"], k["asked"])} for bad, k in sorted(by_kind.items())}
@@ -346,7 +434,7 @@ def page(folder, data, asked_by_arm):
             cells = [f"<figure><img src='images/{esc(q['page'])}.png' loading='lazy' alt=''><figcaption>the page"
                      "</figcaption></figure>"]
             for letter, kind in zip(LETTERS, q["orders"][0]):
-                name = f"{q['page']}-{kind.replace(' ', '-')}-{letter}{ARMS[arm]}.png"
+                name = f"{q['page']}-{kind.replace(' ', '-')}-{letter}{ARMS[arm]['suffix']}.png"
                 m = q["measures"][kind]
                 note = (f"cut {m['lines_cut_sideways'] + m['lines_cut_across']}, figures split {m['figures_not_whole']}"
                         f", missed {m['lines_missed']} lines")

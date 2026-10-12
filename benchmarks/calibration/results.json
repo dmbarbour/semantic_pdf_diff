@@ -166,6 +166,63 @@
       ]
      }
     }
+   },
+   "near": {
+    "questions": 239,
+    "answered": 239,
+    "asked": 478,
+    "invalid": 0,
+    "good_chosen": 0.946,
+    "same_in_both_orders": 0.9,
+    "good_in_both_orders": 0.895,
+    "by_kind": {
+     "one cut": {
+      "asked": 62,
+      "good_chosen": 0.984,
+      "this_chosen": 0.016,
+      "fault_named": 0.968
+     },
+     "one overlap": {
+      "asked": 50,
+      "good_chosen": 0.82,
+      "this_chosen": 0.18,
+      "fault_named": 0.22
+     },
+     "snapped": {
+      "asked": 252,
+      "good_chosen": 1.0,
+      "this_chosen": 0.0,
+      "fault_named": 0.897
+     },
+     "today": {
+      "asked": 114,
+      "good_chosen": 0.86,
+      "this_chosen": 0.14,
+      "fault_named": 0.307
+     }
+    },
+    "good_faulted": 0.096,
+    "good_faults": {
+     "cuts text": 5,
+     "decoration or blank": 38,
+     "misses content": 1,
+     "repeats text": 1,
+     "splits a figure": 1
+    },
+    "passes": true,
+    "positions": {
+     "2": {
+      "asked": 478,
+      "chosen": [
+       0.517,
+       0.483
+      ],
+      "good_at": [
+       0.5,
+       0.5
+      ]
+     }
+    }
    }
   }
  }

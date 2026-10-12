@@ -88,6 +88,20 @@ class Cases(unittest.TestCase):
             self.assertEqual(sorted(first), sorted(q["kinds"]))
             self.assertEqual(second, first[-1:] + first[:-1])  # each candidate moves one place on
 
+    def test_near_cases_show_one_fault_each_and_are_asked_both_ways(self):
+        doc, p = _page(DECORATED)
+        with doc:
+            found = calibration.tilings(p, near=True)
+            self.assertEqual(set(found) - {"good"}, {"one cut", "one overlap", "snapped"})
+            self.assertEqual(calibration.fault_of(p.measured(found["one cut"])), "cuts text")
+            self.assertEqual(calibration.fault_of(p.measured(found["one overlap"])), "repeats text")
+            self.assertIsNone(calibration.fault_of(p.measured(found["good"])))
+            asked = calibration.near_questions(p, found)
+        self.assertEqual(len(asked), 3)
+        for q in asked:
+            first, second = q["orders"]
+            self.assertEqual(second, first[::-1])
+
 class Judge:
     """A simulated model: chooses the candidate whose picture is named for `prefer` (the known-good, or always the
     first), and names each candidate's own fault, read from its picture's name."""
