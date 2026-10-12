@@ -33,6 +33,8 @@ class Asking(unittest.TestCase):
         self.assertFalse(retiling.asks(said("Cut at the image's right edge"), "said"))  # the edges' own note
         self.assertTrue(retiling.asks(said(cut=["right"]), "asked"))
         self.assertTrue(retiling.asks(said(), "measures"))
+        continued = {"row": {"task": "tile:p1:0-c3", "issues": ["text cut off"]}, "claims": (), "cut": ["right"]}
+        self.assertFalse(any(retiling.asks(continued, mode) for mode in ("measures", "said", "asked")))  # full
 
     def test_the_edges_a_tile_cuts_by(self):
         found, cut = cut_by((100, 100, 200, 200), [(90, 120, 150, 130), (150, 150, 160, 210), (120, 120, 130, 130)])

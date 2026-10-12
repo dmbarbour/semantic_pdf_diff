@@ -377,7 +377,8 @@ class RegionLabels(Lever):
 class AnotherTiling(Lever):
     lever_name, stage, off = "another_tiling", "segmentation", {"another_tiling": "off"}
     # a partial tile is read again under the page's next candidate cut, not in halves (retiling.py): the tiles of
-    # that cut holding what the measures find it cuts. Always (measures), or where it asks: its issues say it's cut
+    # that cut holding what the measures find it cuts; one continued at the claim limit is halved, for more room.
+    # Always (measures), or where it asks: its issues say it's cut
     # (said), or it names the edges cutting content when a rule asks (asked; calibrated first: scripts/asking.py)
     another_tiling: Annotated[Literal["off", "measures", "said", "asked"], _shaping(VISUAL)] = "off"
 

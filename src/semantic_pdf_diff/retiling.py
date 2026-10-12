@@ -15,7 +15,9 @@ The page tests' warning (2026-10-01): a model doesn't know what it can't read, s
 answer asks about tiles that cut content, and about those that don't (lab: bench/asking.py).
 
 Where nothing the tile cuts is held whole by the other cut, or the measures find nothing cut, the tile is halved as
-before.
+before; and so is a tile whose answer was continued at the claim limit (ContinueReading), whatever the mode: it's
+partial for holding more than an answer has room for, not for a cut, and its halves are more room (milestone 8:
+HabEx p403's dense table lost 43 of 454 values read under the other cut).
 """
 import re
 
@@ -34,7 +36,10 @@ def says_cut(issues):
     return any(CUT_SAID.search(i) for i in issues if not i.startswith(CUT_NOTE))
 
 def asks(done, mode):
-    """Whether a tile's answer asks for another tiling (see the module's note)."""
+    """Whether a tile's answer asks for another tiling (see the module's note): never one continued at the claim
+    limit."""
+    if re.search(r"-c\d+$", done["row"].get("task", "")):
+        return False
     if mode == "measures":
         return True
     said = says_cut(done["row"].get("issues", ()))
