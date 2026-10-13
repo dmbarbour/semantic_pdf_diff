@@ -156,14 +156,14 @@ def docx_locator(page, bbox, region, task):
 # Tasks fed between turns of fair share, on a page as long as a whole Word document or unpaginated text.
 TASKS_PER_TURN = 20
 
-def groups(blocks, text_bytes, section_of):
+def groups(blocks, text_bytes, section_of, split=split_utf8):
     """A page's text and code blocks grouped up to the byte budget (oversized blocks split), never across a section
     boundary: [(ids, [(box, text)])], ids like '3.0-5.0' naming the blocks, as text_groups names a PDF page's."""
     pieces = []
     for bi, block in enumerate(blocks):
         if block.kind == "table":
             continue
-        for ci, chunk in enumerate(split_utf8(block.text.strip("\n"), text_bytes)):
+        for ci, chunk in enumerate(split(block.text.strip("\n"), text_bytes)):
             if chunk.strip():
                 pieces.append((f"{bi}.{ci}", block.box, chunk))
     out, group, size = [], [], 0
@@ -247,7 +247,8 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     for page in range(1, doc.pages + 1):
         yield "page"
         blocks = [b for b in doc.blocks if b.page == page]
-        for k, (ids, segments) in enumerate(groups(blocks, s.text_bytes, lambda box, p=page: index.box(p, box).id)):
+        for k, (ids, segments) in enumerate(groups(blocks, s.text_bytes, lambda box, p=page: index.box(p, box).id,
+                                                         s.split_text)):
             if k and k % TASKS_PER_TURN == 0:
                 yield "page"  # a long page: other sources take their turn
             core.text_task(page, segments, f"text:p{page}:{ids}")

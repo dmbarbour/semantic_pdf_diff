@@ -554,7 +554,23 @@ class VisualTextLayer(Lever):
             layer = "".join(line + "\n" for line in layer.splitlines() if " ".join(line.split()) not in gone)
         if not self.visual_text_layer or not layer.strip():
             return text
-        return (text + "\n" if text else "") + LAYER_NOTE + "\n" + " ".join(layer.split())[:self.visual_text_layer]
+        return (text + "\n" if text else "") + LAYER_NOTE + "\n" + self.cut_layer(" ".join(layer.split()),
+                                                                                 self.visual_text_layer)
+
+class TextCuts(Lever):
+    lever_name, stage, off = "text_cuts", "inclusion", {"text_cuts": "bytes"}
+    # sentences: a text block too long for one task is cut after a sentence's end (else a word's), and an image task's
+    # text layer at a word's end, rather than where the bytes run out (query checks, 2026-09-28: "This focus is"
+    # ending a HabEx chunk; "defined in the W" ending an IEA-22 text layer)
+    text_cuts: Annotated[Literal["bytes", "sentences"], _shaping(frozenset({"text"}) | VISUAL)] = "bytes"
+
+    def split_text(self, text, limit):
+        from .tasks import split_at_ends, split_utf8
+        return split_at_ends(text, limit) if self.text_cuts == "sentences" else split_utf8(text, limit)
+
+    def cut_layer(self, layer, limit):
+        from .tasks import cut_at_word
+        return cut_at_word(layer, limit) if self.text_cuts == "sentences" else layer[:limit]
 
 class TableFilter(Lever):
     lever_name, stage, parked, off = "table_filter", "inclusion", True, {"table_filter": False}
@@ -658,8 +674,9 @@ class DedupeRepeated(Lever):
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, LeaveFurniture, TableContext, StemContext,
                  References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty,
                  SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks,
-                 TableRules, TableReview, TableStructure, VisualTextLayer, TableFilter, SkipSheetTables, LeaveText,
-                 QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
+                 TableRules, TableReview, TableStructure, VisualTextLayer, TextCuts, TableFilter, SkipSheetTables,
+                 LeaveText, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals,
+                 ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -857,6 +874,18 @@ class Platform(Composable):
         """Unrotated boxes whose text blocks a PDF page's text tasks leave out, to the readers of what they hold
         (tables: [(box, rows)] of the tables detected and read): the platform's, none."""
         return []
+
+    @chosen
+    def split_text(self, text, limit):
+        """A text block's chunks of at most limit bytes (a text task's, and a refined one's halves), no character
+        dropped: the platform's, cut where the bytes run out."""
+        from .tasks import split_utf8
+        return split_utf8(text, limit)
+
+    @chosen
+    def cut_layer(self, layer, limit):
+        """An image task's text layer, its whitespace folded, cut to limit characters: the platform's, anywhere."""
+        return layer[:limit]
 
     @chosen
     def context_left_out(self, reader, page_no):

@@ -117,6 +117,29 @@ def split_utf8(text, limit):
     if chunk:
         yield "".join(chunk)
 
+SENTENCE_END = re.compile(r"[.!?;:](?=\s)|\n")  # a sentence's (or a clause's, a line's) end, before the space after it
+WORD_END = re.compile(r"\S(?=\s)")
+
+def split_at_ends(text, limit):
+    """split_utf8's chunks, each cut after the last sentence end in its second half, else the last word end there,
+    else where the bytes run out; the space after a cut starts the next chunk, so no character is dropped."""
+    while len(text.encode()) > limit:
+        most = next(split_utf8(text, limit))
+        ends = [m.end() for m in SENTENCE_END.finditer(most) if m.end() > len(most) // 2]
+        words = [m.end() for m in WORD_END.finditer(most) if m.end() > len(most) // 2]
+        cut = ends[-1] if ends else words[-1] if words else len(most)
+        yield text[:cut]
+        text = text[cut:]
+    if text:
+        yield text
+
+def cut_at_word(text, limit):
+    """text's first limit characters, ending at a word's end in their second half if there is one."""
+    if len(text) <= limit:
+        return text
+    words = [m.end() for m in WORD_END.finditer(text[:limit + 1]) if m.end() > limit // 2]
+    return text[:words[-1]] if words else text[:limit]
+
 # An incomplete answer's issue saying the claim limit stopped it ("more steps (17-22) than the 20 claim limit
 # allowed"), as a request to continue; not clipping or illegibility, which another request wouldn't mend
 LIMIT_SAID = re.compile(r"claim limit|limit of \d+ claims|maximum (?:of )?\d+ claims|\d+[- ]claim (?:limit|maximum|cap)"
@@ -387,7 +410,7 @@ class TaskCore:
             parts = [segments[:middle], segments[middle:]]
         elif len(text.encode()) > MIN_REFINE_BYTES:
             bbox = segments[0][0]
-            parts = [[(bbox, p)] for p in split_utf8(text, max(200, len(text.encode()) // 2))]
+            parts = [[(bbox, p)] for p in self.s.split_text(text, max(200, len(text.encode()) // 2))]
         else:
             return
         for i, part in enumerate(parts):
