@@ -238,7 +238,6 @@ class Transport:
         if not request.admitted:  # a caller that didn't admit it as it asked
             self.admit(request)
         for attempt in range(self.s.retries + 1):
-            self._attempt()
             wait = min(2 ** attempt, 8)
             http = urllib.request.Request(self.s.base_url.rstrip("/") + "/chat/completions", data=request.raw,
                 headers={"Content-Type": "application/json",
@@ -247,6 +246,7 @@ class Transport:
             self.gate.acquire()
             started, throttled, generated = time.monotonic(), False, 0
             try:
+                self._attempt()  # after the waits: the cost cap may have been reached meanwhile
                 result = self._post(http)
                 usage = result.get("usage") or {}
                 generated = int(usage.get("completion_tokens") or 0) if isinstance(usage, dict) else 0
@@ -273,20 +273,27 @@ class Transport:
         with self.lock:
             if self.out_of_budget:
                 raise OutOfBudget(self.out_of_budget)
-            if self.s.max_cost is not None and self.cost >= self.s.max_cost:
-                self.out_of_budget = f"cost cap reached (${self.cost:.2f} of ${self.s.max_cost:.2f})"
-                raise OutOfBudget(self.out_of_budget)
+            self._capped()
             if self.admitted >= self.s.max_calls:
                 self.limited = f"call limit reached ({self.s.max_calls} requests)"
                 raise CallLimitReached("API call limit reached; rerun with cache and a higher --max-calls")
             self.admitted += 1
             request.admitted = True
 
+    def _capped(self):
+        """Raise OutOfBudget once the cost cap is reached (under the lock)."""
+        if self.s.max_cost is not None and self.cost >= self.s.max_cost:
+            self.out_of_budget = f"cost cap reached (${self.cost:.2f} of ${self.s.max_cost:.2f})"
+            raise OutOfBudget(self.out_of_budget)
+
     def _attempt(self):
-        """One more attempt counted, unless sending has stopped (the provider's balance ran out)."""
+        """One more attempt counted, unless sending has stopped (the provider's balance ran out) or the cost cap was
+        reached since the request was admitted: a request admitted as it was asked may wait behind others, and once
+        the cap is reached, only those already sent may overrun it."""
         with self.lock:
             if self.out_of_budget:
                 raise OutOfBudget(self.out_of_budget)
+            self._capped()
             self.calls += 1
 
     @property

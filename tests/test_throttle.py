@@ -8,6 +8,7 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from stubs import chat_answer, request_body, serving
+from semantic_pdf_diff.failures import OutOfBudget
 from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.settings import RateRule, Settings
@@ -128,6 +129,24 @@ class ConcurrentClient(unittest.TestCase):
         self.assertEqual(state['peak'], 4)
         self.assertLess(elapsed, 12 * 0.2)  # faster than sequential (wall time: the requests wait, they don't compute)
         self.assertEqual((client.calls, client.usage), (12, {'prompt_tokens': 120, 'completion_tokens': 60}))
+
+    def test_a_request_admitted_before_the_cost_cap_isnt_sent_after_it(self):
+        # Requests are admitted as they're asked (the determinism review, D6), so one may wait behind others while
+        # the cap is reached: it mustn't be sent then (test_fixtures' cost cap test overran 1 time in 5).
+        posted = []
+        def post(handler):
+            handler.rfile.read(int(handler.headers['Content-Length']))
+            posted.append(1)
+            chat_answer(handler, EMPTY, usage={'prompt_tokens': 10, 'completion_tokens': 5, 'estimated_cost': 0.01})
+        with serving(post) as url:
+            client = Client(Settings(base_url=url, retries=0, max_cost=0.01), None)
+            first, second = (client.prepare(f'prompt {i}', Extraction) for i in range(2))
+            client.admit(first)
+            client.admit(second)
+            client.send(first)  # its cost reaches the cap
+            with self.assertRaisesRegex(OutOfBudget, 'cost cap reached'):
+                client.send(second)
+        self.assertEqual((len(posted), client.calls), (1, 1))
 
     def test_long_answers_are_not_read_as_load(self):
         # Every fourth answer is ten times longer, and takes ten times as long: same speed per token.
