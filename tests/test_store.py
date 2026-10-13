@@ -403,7 +403,8 @@ class OneTaskTwice(unittest.TestCase):
         content = 'sha256:' + 'a' * 64 + '.pdf'
         at = PdfLocator(page=1, bbox=(0, 0, 10, 10), region='table', task='table:p1:0:0')
         first, second = (Evidence(id='ev-1', content=content, entity='pump', attribute='flow', value='5', unit='L/s',
-                                  kind='table', quote=q, confidence=c, locator=at) for q, c in (('5', .9), ('5 L/s', .6)))
+                                  kind='table', quote=q, confidence=c, locator=at)
+                         for q, c in (('5', .9), ('5 L/s', .6)))
         core = TaskCore.__new__(TaskCore)
         core.coverage, core.evidence = [], [first, second]
         fresh, _ = core.result(lambda r: r)
