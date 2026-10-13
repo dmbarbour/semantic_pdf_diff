@@ -36,7 +36,7 @@ TOGGLES = {
     'reconcile': False, 'quote_match': 'exact', 'skip_text_only': True, 'tile_cut': 'xycut', 'band_width': 6.0,
     'render_area': True, 'tile_choice': 'off', 'leave_text': 'none', 'region_labels': 'model',
     'another_tiling': 'asked',
-    'least_half': 0.5,
+    'least_half': 0.5, 'skip_sheet_tables': True,
 }
 # Settings measured under others, on both sides: the tilers' with tile_choice off (by default the rule picks the cut by
 # its measures, so another tiler or a tile's growth, say, may leave its choice and the queries as they were); the
@@ -52,7 +52,7 @@ UNDER = {**dict.fromkeys(('grow_tiles', 'tiling', 'skip_empty', 'tile_cut', 'ban
 # The budget settings' values bite under the model-neutral defaults (32,768 tokens of context): 8,192, or a
 # per-image or safety reserve that leaves little room, changes what situating sends and what's refused.
 ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refinement_depth', 'skip_text_only',
-             'tile_cut', 'band_width', 'least_half'}
+             'tile_cut', 'band_width', 'least_half', 'skip_sheet_tables'}
 # Settings these documents can't exercise, and why (each still needs its class checked elsewhere).
 NOT_EXERCISED = {
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',

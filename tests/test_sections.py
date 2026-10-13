@@ -484,6 +484,20 @@ class SectionContext(unittest.TestCase):
         self.assertIn((True, True), verdicts)    # the table is kept
         self.assertNotIn((False, True), verdicts)  # the grid, if detected at all, is dropped
 
+    def test_skip_sheet_tables_leaves_a_sheets_frame_unread_as_a_table(self):
+        from test_settings import document
+        def read(skip):
+            with tempfile.TemporaryDirectory() as d:
+                path = document(Path(d) / 'a.pdf', 10, sheet=True)
+                _, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d),
+                                          stubs.Recorder(vision=False, skip_sheet_tables=skip))
+            return {(row['page'], row['task'].split(':')[0]) for row in coverage}
+        detected, skipped = read(False), read(True)
+        self.assertIn((3, 'table'), detected)  # the sheet's frame, found as a table
+        self.assertNotIn((3, 'table'), skipped)
+        self.assertIn((3, 'text'), skipped)    # its text is still read
+        self.assertIn((1, 'table'), skipped)   # a report page's table is still found
+
     def test_split_headings_are_found_and_outline_order_is_kept(self):
         from semantic_pdf_diff.sections import heading_y
         doc = pymupdf.open()

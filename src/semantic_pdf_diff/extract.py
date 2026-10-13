@@ -174,6 +174,8 @@ class PdfReading:
         # table read as detected (code review 2026-10-08, A4: both dropped the page's tables as "detection").
         unrotated = lambda b: tuple(native(page, b)) if b else None
         found = []
+        if not s.detects_tables(self.context_of, page, number):
+            return found, None
         try:
             detected = [(table, table.extract()) for table in page.find_tables().tables]
         except Exception as e:  # noqa: BLE001 (PyMuPDF's)

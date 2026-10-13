@@ -109,6 +109,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `table_structure` | `true` | selecting | table_structure | extract | table |
 | `visual_text_layer` | `1500` | shaping | visual_text_layer | extract | figure, overview, tile, vision |
 | `table_filter` | `false` | selecting | table_filter | extract | table, table-detection |
+| `skip_sheet_tables` | `false` | selecting | skip_sheet_tables | extract | figure, table, table-detection |
 | `leave_text` | `"tables"` | shaping | leave_text | extract | table, text |
 | `quote_match` | `"fragments"` | post | quote_match | extract | table, text |
 | `reconcile` | `true` | post | reconcile | - | - |

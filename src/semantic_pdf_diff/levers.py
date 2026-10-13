@@ -548,6 +548,19 @@ class TableFilter(Lever):
         from .tables import real_table
         return not self.table_filter or real_table(page, table, rows)
 
+class SkipSheetTables(Lever):
+    lever_name, stage, off = "skip_sheet_tables", "inclusion", {"skip_sheet_tables": False}
+    # a page recognised as a drawing sheet isn't searched for tables: what's found there is mostly its frame, title
+    # block and keynote lists, which its text tasks and tiles read anyway (they keep a sheet's text), and detection
+    # costs 1.4 s a sheet (the 2026-10-08 code review, A20; the owner: "We can add skipping table detection as a
+    # lever, np.")
+    skip_sheet_tables: Annotated[bool, _selecting(frozenset({"table", "table-detection", "figure"}))] = False
+
+    def detects_tables(self, reader, page, number):
+        if not super().detects_tables(reader, page, number):
+            return False
+        return not self.skip_sheet_tables or not any(f.kind == "sheet" for f in reader.figures(page, number))
+
 class QuoteMatch(Lever):
     lever_name, stage, off = "quote_match", "matching", {"quote_match": "exact"}
     # fragments: quotes normalized (Unicode, line-end hyphens) and made of "a ... b" or "a | b" parts;
@@ -626,10 +639,8 @@ class DedupeRepeated(Lever):
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
                  RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,
-                 TableReview,
-                 TableStructure, VisualTextLayer, TableFilter, LeaveText, QuoteMatch, Reconcile, DedupeRepeated,
-                 ContinueReading,
-                 Align, VerifyVisuals, ExplainDifferences)
+                 TableReview, TableStructure, VisualTextLayer, TableFilter, SkipSheetTables, LeaveText, QuoteMatch,
+                 Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -836,6 +847,11 @@ class Platform(Composable):
     @chained
     def keep_table(self, reader, page, table, rows):
         """Whether a detected table is read as one."""
+        return True
+
+    @chained
+    def detects_tables(self, reader, page, number):
+        """Whether a PDF page is searched for tables (its number from 1)."""
         return True
 
     # --- segmentation: which image tasks a page becomes. visual_regions is the order of steps; the hooks are
