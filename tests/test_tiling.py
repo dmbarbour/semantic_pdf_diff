@@ -273,6 +273,16 @@ class LabRuns(unittest.TestCase):
         found = tiling.compare(default, grid)
         self.assertEqual([p["file"] for p in found["pages_changed"]], ["report.pdf"])
 
+    def test_the_refinement_benchs_claims_dont_depend_on_their_order(self):
+        """The judge and checker were shown the first of each alike claim, the first to finish (the determinism
+        review, D2)."""
+        from semantic_pdf_diff_lab.bench.refinement import _unique
+        claims = [{"entity": "Pump", "attribute": "flow", "value": "5", "unit": "L/s", "conditions": c, "quote": q}
+                  for c, q in (("June", "5 L/s"), ("", "5"), ("July", "flow 5"))]
+        claims.append({"entity": "Fan", "attribute": "power", "value": "3", "unit": "kW", "quote": "3 kW"})
+        self.assertEqual(_unique(claims), _unique(claims[::-1]))
+        self.assertEqual([(c["entity"], c["conditions"]) for c in _unique(claims)], [("Fan", ""), ("Pump", "")])
+
 class Gallery(unittest.TestCase):
     def test_the_worst_development_pages_are_picked_one_per_document(self):
         from semantic_pdf_diff_lab.bench import gallery

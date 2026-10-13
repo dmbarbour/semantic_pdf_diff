@@ -90,7 +90,7 @@ def collect(runs_dir, unit="family"):
                         claim["_id"] = identity = own.id + "~" + hashlib.sha256(o.quote.encode()).hexdigest()[:8]
                         claim["_claim"] = e.id
                         units[key]["claims"][identity] = claim
-    return dict(units)
+    return dict(sorted(units.items()))  # not in the order tasks finished (the determinism review, D2)
 
 MAX_BANDS = 4  # a unit is cut into at most this many bands
 BANDS = "as displayed"  # how a band's y0, y1 are measured (batches record it; before 2026-10-02, unrotated)

@@ -63,9 +63,10 @@ def halves(store):
     tile looked at again is its parent's one "half"; the tiles of a page's other cut are the halves of a parent of
     their own, "tile:p<n>:<cut>"."""
     with contextlib.closing(sqlite3.connect(f"file:{store}?mode=ro", uri=True)) as db:
-        tasks = [t for (t,) in db.execute("SELECT task FROM task WHERE task LIKE 'tile:%'")]
+        # by task and id, not as written: tasks finish in an order a replay doesn't share (the determinism review, D2)
+        tasks = [t for (t,) in db.execute("SELECT task FROM task WHERE task LIKE 'tile:%' ORDER BY task")]
         claims = {}
-        for task, data in db.execute("SELECT task, data FROM evidence WHERE task LIKE 'tile:%'"):
+        for task, data in db.execute("SELECT task, data FROM evidence WHERE task LIKE 'tile:%' ORDER BY task, id"):
             claims.setdefault(task, []).append(json.loads(data))
     out = {}
     for task in tasks:
@@ -115,9 +116,9 @@ def _parent(task):
 def _stored(store):
     """(task rows, claims by task, the document's path on disk) from a run's store."""
     with contextlib.closing(sqlite3.connect(f"file:{store}?mode=ro", uri=True)) as db:
-        rows = {t: json.loads(r) for t, r in db.execute("SELECT task, row FROM task")}
+        rows = {t: json.loads(r) for t, r in db.execute("SELECT task, row FROM task ORDER BY task")}
         claims = {}
-        for task, data in db.execute("SELECT task, data FROM evidence"):
+        for task, data in db.execute("SELECT task, data FROM evidence ORDER BY task, id"):  # not as written (D2)
             claims.setdefault(task, []).append(json.loads(data))
         disk = db.execute("SELECT disk FROM file LIMIT 1").fetchone()
     return rows, claims, (json.loads(disk[0])[0] if disk else None)
@@ -209,13 +210,12 @@ def _claim(c):
     return {k: c.get(k, "") for k in ("entity", "attribute", "value", "unit", "conditions", "quote")}
 
 def _unique(claims):
-    seen, out = set(), []
+    """One claim per entity, attribute and value, whatever order they come in: of those alike, the least by their
+    fields, in the order of their names (the determinism review, D2: the first kept was the first to finish)."""
+    alike = {}
     for c in claims:
-        ident = (_norm(c.get("entity")), _norm(c.get("attribute")), _value(c))
-        if ident not in seen:
-            seen.add(ident)
-            out.append(_claim(c))
-    return out
+        alike.setdefault((_norm(c.get("entity")), _norm(c.get("attribute")), _value(c)), []).append(_claim(c))
+    return [min(group, key=lambda c: tuple(str(v) for v in c.values())) for _, group in sorted(alike.items())]
 
 def pairs(before, after, folder, grown=False, image_side=None):
     """Write a pairwise batch (pairs.json and the tiles' images) into folder: a unit per tile both runs refined, its
