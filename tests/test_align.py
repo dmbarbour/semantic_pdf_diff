@@ -291,3 +291,21 @@ class Lever(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class HashSeed(unittest.TestCase):
+    def test_an_items_score_is_the_same_under_any_hash_seed(self):
+        """Its shared values were summed in the set's order, which follows PYTHONHASHSEED: 0.9 under one seed,
+        0.8999999999999999 under another, either side of a margin (the determinism review, D11)."""
+        import os
+        import subprocess
+        import sys
+        probe = ("from types import SimpleNamespace as N\n"
+                 "from semantic_pdf_diff.align import _score\n"
+                 "values = {f'v{i}' for i in range(12)}\n"
+                 "holders = {v: 1 + i % 7 for i, v in enumerate(sorted(values))}\n"
+                 "side = N(item_values={'k': values}, holders=holders, names={'k': {'pump'}},\n"
+                 "         item_attributes={'k': {'power'}})\n"
+                 "print(repr(_score(side, side, 'k', 'k')))\n")
+        found = {subprocess.run([sys.executable, '-c', probe], capture_output=True, text=True, check=True,
+                                env={**os.environ, 'PYTHONHASHSEED': str(seed)}).stdout for seed in range(8)}
+        self.assertEqual(len(found), 1, found)

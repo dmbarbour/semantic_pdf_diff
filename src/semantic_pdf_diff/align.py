@@ -23,6 +23,7 @@ The weights and thresholds were set by inspection on the controlled revision pai
 by eye); calibrated confidences come later.
 """
 from collections import Counter
+import math
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -192,7 +193,8 @@ def _name(a, b, ka, kb):
 def _score(a, b, ka, kb):
     va, vb = a.item_values[ka], b.item_values[kb]
     size = len(va) + len(vb)
-    shared = sum(1 / max(a.holders[v], b.holders[v]) for v in va & vb)
+    # fsum: exact, so the same whatever order the set gives (the hash seed's; the determinism review, D11)
+    shared = math.fsum(1 / max(a.holders[v], b.holders[v]) for v in va & vb)
     values = 2 * shared / size if size else 0.0
     return VALUES * values + NAME * _name(a, b, ka, kb) + ATTRIBUTES * jaccard(a.item_attributes[ka],
                                                                                 b.item_attributes[kb])

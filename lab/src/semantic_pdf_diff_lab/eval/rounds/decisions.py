@@ -140,8 +140,8 @@ def decide_scores(scores, family, document, units, criteria=None, gains=None):
     # Sampling is round-robin over kinds, so small kinds are over-represented; this weighs each kind's
     # mean by how many of its units changed, as an estimate over all changed units.
     by_kind = units.get("changed_by_kind") or {}
-    kinds = {f: strata[f][0] for f in set(family.values()) if f in strata and by_kind.get(f)}
-    weighted = (sum(by_kind[f] * m for f, m in kinds.items()) / sum(by_kind[f] for f in kinds)) if kinds else None
+    kinds = {f: strata[f][0] for f in sorted(set(family.values())) if f in strata and by_kind.get(f)}
+    weighted = (math.fsum(by_kind[f] * m for f, m in kinds.items()) / sum(by_kind[f] for f in kinds)) if kinds else None
     fmt = lambda t: None if t is None else {"mean": round(t[0], 3), "low": round(t[1], 3), "high": round(t[2], 3)}
     changed = units["units"] - units["unchanged"]
     # Win rates are over changed units only: coverage says how much of the output a lever touches.
