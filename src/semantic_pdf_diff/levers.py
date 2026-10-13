@@ -374,7 +374,7 @@ class LeaveText(Lever):
     # in tables and charts; docs/reviews/levers.md's ideas). A drawing sheet keeps its text (its frame is found as
     # tables), as does a page under a "table" covering most of it (a frame, a layout), and a table of words more than
     # numbers (a drawing's labels found as a table, a specification: the text tasks read facts there it missed)
-    leave_text: Annotated[Literal["none", "tables", "tables and figures"], _shaping(TEXTUAL)] = "none"
+    leave_text: Annotated[Literal["none", "tables", "tables and figures"], _shaping(TEXTUAL)] = "tables"
 
     def text_left_out(self, reader, page, number, tables):
         boxes = super().text_left_out(reader, page, number, tables)
@@ -619,8 +619,8 @@ class DedupeRepeated(Lever):
 # The canonical order: the prompt's (instructions, then context lines as the providers write them), then the
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
-# tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8); round 0's settings
-# are benchmarks/round0.json.
+# tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8) and leave_text's
+# tables (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
                  TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
                  RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,

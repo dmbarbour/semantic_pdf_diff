@@ -54,5 +54,6 @@
   "tile_choice": "off",
   "skip_text_only": false,
   "another_tiling": "off",
-  "halve_parts": false
+  "halve_parts": false,
+  "leave_text": "none"
 }
