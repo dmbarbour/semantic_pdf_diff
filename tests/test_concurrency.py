@@ -125,6 +125,37 @@ class Determinism(unittest.TestCase):
                 with self.subTest(part=part):
                     self.assertEqual(concurrent[part], sequential[part])
 
+    def test_answers_handled_in_any_order_agree(self):
+        """Recorded one at a time, then replayed with the answers handled in orders drawn from seeds, as a live run's
+        arrive: everything written but the run's own record agrees (the determinism review, 2026-10-12)."""
+        with jittery_model() as (url, state), tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            a = make_pdf(root / 'a.pdf', ['Pump 10 kW, fan 3 kW', 'Chiller 350 kW', 'Valve 1 kW'])
+            b = make_pdf(root / 'b.pdf', ['Pump 12 kW, fan 3 kW', 'Chiller 350 kW', 'Heater 9 kW'])
+            fixture = root / 'answers.sqlite'
+            runs = {}
+            for seed in (None, 1, 2, 3):
+                config = root / f'config-{seed}.json'
+                config.write_text(json.dumps({'concurrency': 1 if seed is None else 4, 'tile_points': 180,
+                                              'retries': 0, **stubs.TILING_BEFORE}))
+                out = root / f'out-{seed}'
+                mode = ['--fixture-mode', 'record-new'] if seed is None else ['--fixture-mode', 'replay',
+                                                                             '--responder', 'gemma-4']
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()), \
+                        (stubs.answers_shuffled(seed) if seed else contextlib.nullcontext()):
+                    cli.main([str(a), str(b), '--out', str(out), '--base-url', url, '--config', str(config),
+                              '--fixture', str(fixture), *mode])
+                report = json.loads((out / 'report.json').read_text())
+                for run_record in ('usage', 'settings', 'created_at'):
+                    report.pop(run_record, None)
+                runs[seed] = {'evidence': json.loads((out / 'evidence.json').read_text()), 'report': report}
+        recorded = runs.pop(None)
+        self.assertTrue(recorded['report']['findings'])
+        for seed, run in runs.items():
+            for part in run:
+                with self.subTest(seed=seed, part=part):
+                    self.assertEqual(run[part], recorded[part])
+
 class Merging(unittest.TestCase):
     def test_one_query_asked_for_two_samples_isnt_merged(self):
         # code review 2026-10-08: the merge key read a sample method long gone, so the A/A control's fresh regions

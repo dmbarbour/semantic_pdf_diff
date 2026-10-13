@@ -3,9 +3,19 @@
 Workers only send HTTP requests. Preparing requests (reading crops), cache lookups,
 saving responses and handling results (which may queue refinement requests) happen
 on the calling thread, which owns the PDF document and the store connection.
+
+A cached or replayed answer is handled at once, so a replay sees answers in the order they
+were asked, while a live run sees them as they arrive. With PDF_DIFF_ANSWER_ORDER set to a
+seed (tests only), cached and replayed answers are held and handled in an order drawn from
+it instead, as a live run's might be: what a run writes must not depend on that order (the
+determinism review, 2026-10-12).
 """
+import os
+import random
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from .failures import ModelFailure
+
+ANSWER_ORDER = "PDF_DIFF_ANSWER_ORDER"
 
 class Dispatcher:
     def __init__(self, client, workers=None):
@@ -19,6 +29,9 @@ class Dispatcher:
         # Queries asked again while the same query is in flight (the same page in two documents):
         # they wait for its answer rather than being sent (and paid for) twice.
         self.waiting = {}
+        seed = os.environ.get(ANSWER_ORDER)
+        self.shuffle = random.Random(seed) if seed and self.split else None
+        self.held = []  # with a shuffle: answers at hand, handled in its order
 
     def submit(self, prompt, schema, images, key, finish):
         """Ask for `schema`; finish(value, error) is called on this thread, now or later."""
@@ -36,7 +49,7 @@ class Dispatcher:
         except ModelFailure as e:
             finish(None, e)
             return
-        if value is not None:
+        if value is not None and self.shuffle is None:
             finish(value, None)
             return
         same = self._same(request)
@@ -45,7 +58,9 @@ class Dispatcher:
             return
         if same is not None:
             self.waiting[same] = []
-        if self.pool is None:
+        if self.shuffle is not None and (value is not None or getattr(request, "unrecorded", False)):
+            self.held.append((request, finish, value))
+        elif self.pool is None:
             self._complete(request, finish, self.client.send, request)
         else:
             self.inflight[self.pool.submit(self.client.send, request)] = (request, finish)
@@ -58,7 +73,7 @@ class Dispatcher:
         replay = getattr(self.client, "replay", None)
         return (query, replay.sample(request.key) if replay else 0) if query else None
 
-    def _complete(self, request, finish, call, *args):
+    def _complete(self, request, finish, call, *args, cached=False):
         waiting = self.waiting.pop(self._same(request), [])
         try:
             value = call(*args)
@@ -68,12 +83,13 @@ class Dispatcher:
             for done in [finish] + waiting:
                 done(None, e)
             return
-        self.client.save(request, value)
+        if not cached:
+            self.client.save(request, value)
         for done in [finish] + waiting:
             done(value, None)
 
     def pending(self):
-        return len(self.inflight)
+        return len(self.inflight) + len(self.held)
 
     def make_room(self):
         """Wait while as many requests are pending as the bound (twice the workers, at least 4), so prepared requests,
@@ -83,13 +99,20 @@ class Dispatcher:
 
     def wait_one(self):
         """Handle at least one finished request (results may queue more)."""
+        if self.held and (not self.inflight or self.shuffle.random() < 0.5):
+            request, finish, value = self.held.pop(self.shuffle.randrange(len(self.held)))
+            if value is not None:
+                self._complete(request, finish, lambda: value, cached=True)
+            else:  # unrecorded: sending fails as it would have
+                self._complete(request, finish, self.client.send, request)
+            return
         done, _ = wait(list(self.inflight), return_when=FIRST_COMPLETED)
         for future in done:
             request, finish = self.inflight.pop(future)
             self._complete(request, finish, future.result)
 
     def drain(self):
-        while self.inflight:
+        while self.inflight or self.held:
             self.wait_one()
 
     def close(self, cancel=False):

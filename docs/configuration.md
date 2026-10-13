@@ -22,6 +22,7 @@ Configuration precedence, highest first: **CLI flags > JSON config file > enviro
 | `PDF_DIFF_VISION` | Enable visual extraction (`true` or `false`) |
 | `PDF_DIFF_VERIFY_VISUALS` | Reinspect source images in comparisons |
 | `PDF_DIFF_ALIASES` | JSON object mapping domain aliases to canonical names |
+| `PDF_DIFF_ANSWER_ORDER` | Tests only: a seed; cached and replayed answers are handled in an order drawn from it, as a live run's might arrive, rather than as they were asked. What a run writes must not change (`dispatch.py`) |
 | `SOURCE_DATE_EPOCH` | Not a setting: the time reports and review batches say they were made, in seconds since 1970 (UTC). The reproducible-builds convention; with it, replays form byte-identical reports |
 
 Every other field in `Settings` follows `PDF_DIFF_<UPPERCASE_FIELD_NAME>` (for example `PDF_DIFF_TEXT_BYTES`, `PDF_DIFF_RETRIES`, `PDF_DIFF_RESPONSE_FORMAT`). Model and base URL use only the `OPENAI_*` names above. `OPENAI_MODEL` and the `PDF_DIFF_*` names are application conventions. Empty or whitespace-only setting variables are treated as unset; invalid active values fail validation. Explicit overrides take precedence even over invalid environment values. Export variables through your shell or process manager; `.env` files are not loaded automatically.

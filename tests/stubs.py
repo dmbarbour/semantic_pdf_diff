@@ -37,6 +37,15 @@ ROUND0 = json.loads((Path(__file__).resolve().parent.parent / 'benchmarks' / 'ro
 TILING_BEFORE = {"decoration": False, "tile_choice": "off", "skip_text_only": False, "another_tiling": "off",
                  "halve_parts": False}
 
+@contextlib.contextmanager
+def answers_shuffled(seed):
+    """Cached and replayed answers handled in an order drawn from `seed`, as a live run's might arrive
+    (dispatch.ANSWER_ORDER; the determinism review, 2026-10-12)."""
+    from unittest.mock import patch
+    from semantic_pdf_diff.dispatch import ANSWER_ORDER
+    with patch.dict(os.environ, {ANSWER_ORDER: str(seed)}):
+        yield
+
 def situating_answer(prompt):
     """A situating answer derived from the prompt, or None if it isn't a situating request."""
     if 'Situate one figure' in prompt:

@@ -1,7 +1,7 @@
 # Determinism review: only answers decide what a run writes
 
 - **Date:** 2026-10-12
-- **Status:** Open. Fixes to follow; three questions for the owner (below).
+- **Status:** Open. Fixes under way; the owner's answers to the three questions recorded below (2026-10-12).
 - **Asked by:** the owner. "We definitely need to fix things so race conditions aren't observed. Not just for replay, either. Only the content (or absence, e.g. for timeouts) of answers should impact reports or metrics (discounting the log). Do a review for this."
 - **Found by:** the controlled corpus re-recorded under `leave_text: tables` (commit c6f613a). lcc-enduse-s1-clean scored 3 claims more misbound replayed than recorded, from the same evidence.json.
 - **The requirement:**
@@ -84,6 +84,11 @@ Packing the corpus reported 3 explain requests without an answer. A reviewer tra
    - Record the fixture path as given, not where it was unpacked.
    - The report keeps the answer-determined content and `created_at` (SOURCE_DATE_EPOCH for byte-identical replays, as today).
 3. **Repeated table rows (D3).** Recommendation: hold rows with a repeat key until the document's pages are all fed and its table answers are in. The lead is then the first by (page, task), the second sighting is sent too, and the rest follow as today. This delays those rows to the document's end, a small cost in overlap. The alternative is to let identical prompts share one query through the cache and set `duplicate_of` afterwards. That changes more: the section heading is in the prompt, so pages' prompts differ.
+
+**The owner's answers (2026-10-12), each the recommended option:**
+1. "Paused, not a result."
+2. "Separate run.json."
+3. "Hold until the document is fed."
 
 ## Fix order (bugs; no behaviour change intended beyond determinism)
 
