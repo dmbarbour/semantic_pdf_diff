@@ -85,6 +85,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `visual_rules` | `[]` | shaping | visual_rules | extract | figure, overview, tile, vision |
 | `context_before` | `400` | shaping | neighbours | extract | table, text |
 | `context_after` | `400` | shaping | neighbours | extract | table, text |
+| `leave_furniture` | `false` | shaping | leave_furniture | extract | figure, overview, table, text, tile, vision |
 | `table_context` | `400` | shaping | table_context | extract | table |
 | `stem_context` | `true` | shaping | stem_context | extract | table, text |
 | `references` | `false` | shaping | references | extract | table, text |

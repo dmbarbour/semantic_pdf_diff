@@ -59,6 +59,7 @@ NOT_EXERCISED = {
     'decoration': 'changes which graphics count, so it shows only through bands, skip_text_only or tile_cut; these '
                   'documents hold no decoration (tests/test_tiling.py)',
     'dedupe_repeated': 'needs a table row repeated on three or more pages (tests/test_repeats.py)',
+    'leave_furniture': 'needs a running header, footer or page number on neighbouring pages (tests/test_furniture.py)',
     'table_review': "the stub reads every table's rows by themselves, so no rules are reviewed "
                     "(tests/test_xlsxdocs.py)",
     'table_structure': "no table in these documents has a suspect line (tests/test_tablestructure.py)",

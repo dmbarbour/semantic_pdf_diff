@@ -76,9 +76,12 @@ class TextReader:
                 return box
         return row_box
 
-    def text_above(self, page_no, bbox):
-        """The text of the blocks above a box on its page."""
-        return " ".join(t for b, t in self.page_blocks(page_no) if b[3] <= bbox[1])
+    def text_above(self, page_no, bbox, leave=()):
+        """The text of the blocks above a box on its page (blocks whose boxes are in leave left out)."""
+        return " ".join(t for b, t in self.page_blocks(page_no) if b[3] <= bbox[1] and b not in leave)
+
+    def furniture(self, page_no):
+        return {}  # a text file's running headers and footers are left out as it's read (textdocs.furniture)
 
     def stem_path(self, page_no, bbox):
         """The headings a box sits under, every level ("7. Flow Control > 7.2. Stream Concurrency")."""

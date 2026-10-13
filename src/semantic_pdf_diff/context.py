@@ -1,6 +1,8 @@
 """The document reader the context levers' hooks share (levers.py), the lines levers add found again in a prompt
 (their marks), and the locator thumbnail. Split from extract.py (milestone 7).
 """
+import re
+
 import pymupdf
 
 from .pages import display_y, lines as _lines, reading_blocks, shown
@@ -12,6 +14,7 @@ from .stems import glossary, references, stem_index
 CONTEXT_NOTE = "CONTEXT (for reference only: do not extract claims from it):"
 
 LOCATOR_SIDE = 384  # pixels: the page thumbnail that shows where a tile sits
+FURNITURE_BAND = 0.1  # a text block within this share of a page's height of its top or bottom may be page furniture
 
 class Recent:
     """What a page yields, kept for the last few pages asked about: a page's crops and passes ask for the same again
@@ -40,6 +43,7 @@ class Context:
         self.assets, self.stem = assets, stem  # where the locator's images go, and their names' stem
         self.blocks, self.stems, self.cited_by, self.page_lines, self.page_graphics = {}, {}, {}, {}, {}
         self.page_figures, self.page_decoration, self.page_marks = {}, {}, {}
+        self.page_margins, self.page_furniture = {}, {}
         self.tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
         # how the model is asked mid-reading (the client's ask), where a job can: the tiling question (tile_choice); and
         # each page's choice of cut, its record (tilechoice.choose); its tiles' labels (regionlabels); the cut a partial
@@ -133,13 +137,49 @@ class Context:
                 return box
         return row_box
 
-    def text_above(self, page_no, bbox):
-        """The text of the blocks just above a box (a table's lead-in sentence or caption), as displayed."""
+    def text_above(self, page_no, bbox, leave=()):
+        """The text of the blocks just above a box (a table's lead-in sentence or caption), as displayed; blocks
+        whose boxes are in leave left out."""
         page = self.doc[page_no - 1]
         table = shown(page, bbox)  # as displayed (rotated sheets)
         return " ".join(t for b, t in self.page_blocks(page_no)
                         if shown(page, b).y1 <= table.y0 + 2 and shown(page, b).x1 > table.x0
-                        and shown(page, b).x0 < table.x1)
+                        and shown(page, b).x0 < table.x1 and b not in leave)
+
+    def _margins(self, page_no):
+        """The page's text blocks near its top or bottom (FURNITURE_BAND), as displayed: {box: (band, what it says
+        with its numbers blanked, its lines)}; page_blocks' boxes."""
+        if page_no not in self.page_margins:
+            page, out = self.doc[page_no - 1], {}
+            band = FURNITURE_BAND * page.rect.height
+            for b in reading_blocks(page):
+                if b[6] != 0 or not b[4].strip():
+                    continue
+                r = shown(page, b[:4])
+                where = "top" if r.y1 <= page.rect.y0 + band else "bottom" if r.y0 >= page.rect.y1 - band else None
+                if where:
+                    lines = tuple(" ".join(line.split()) for line in b[4].splitlines() if line.strip())
+                    out[tuple(b[:4])] = (where, re.sub(r"\d+", "#", " ".join(lines)).casefold(), lines)
+            self.page_margins[page_no] = out
+        return self.page_margins[page_no]
+
+    def furniture(self, page_no):
+        """A page's furniture (running headers and footers, page numbers): {box: its lines} of the blocks near its
+        top or bottom saying the same, numbers aside, in the same band on REPEATED of the NEIGHBOURS pages either side
+        of the same size (all of them, if fewer); page_blocks' boxes. A one-page document has none."""
+        if page_no not in self.page_furniture:
+            from .segmentation import NEIGHBOURS, REPEATED
+            page = self.doc[page_no - 1]
+            size = (round(page.rect.width), round(page.rect.height))
+            nearby = [n for n in range(max(1, page_no - NEIGHBOURS), min(self.pages, page_no + NEIGHBOURS) + 1)
+                      if n != page_no and (round(self.doc[n - 1].rect.width),
+                                           round(self.doc[n - 1].rect.height)) == size]
+            seen = [{(where, said) for where, said, _ in self._margins(n).values()} for n in nearby]
+            needed = min(REPEATED, len(nearby))
+            self.page_furniture[page_no] = {
+                box: lines for box, (where, said, lines) in self._margins(page_no).items()
+                if needed and sum((where, said) in other for other in seen) >= needed}
+        return self.page_furniture[page_no]
 
     def stem_path(self, page_no, bbox):
         """The numbered items and headings a region sits under, e.g. ['9-2. Cooking', 'c. ...'] (also

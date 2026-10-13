@@ -173,17 +173,30 @@ class Neighbours(Lever):
         boxes = [b for b, _ in blocks]
         i0 = boxes.index(first) if first in boxes else 0
         i1 = len(boxes) - 1 - boxes[::-1].index(last) if last in boxes else len(boxes) - 1
-        head = " ".join(t for _, t in blocks[:i0])
-        tail = " ".join(t for _, t in blocks[i1 + 1:])
+        def text(blocks, number):
+            leave = self.context_left_out(reader, number)
+            return " ".join(t for b, t in blocks if b not in leave)
+        head = text(blocks[:i0], page_no)
+        tail = text(blocks[i1 + 1:], page_no)
         if before and len(head) < before and page_no > 1:
-            head = " ".join(t for _, t in reader.page_blocks(page_no - 1)) + " " + head
+            head = text(reader.page_blocks(page_no - 1), page_no - 1) + " " + head
         if after and len(tail) < after and page_no < reader.pages:
-            tail = tail + " " + " ".join(t for _, t in reader.page_blocks(page_no + 1))
+            tail = tail + " " + text(reader.page_blocks(page_no + 1), page_no + 1)
         if before and head.strip():
             lines.append("Before: ..." + head.strip()[-before:])
         if after and tail.strip():
             lines.append("After: " + tail.strip()[:after] + "...")
         return lines
+
+class LeaveFurniture(Lever):
+    lever_name, stage, off = "leave_furniture", "context", {"leave_furniture": False}
+    # a page's running headers and footers and its page number (Context.furniture) are left out of neighbouring text,
+    # a table's lead-in and image tasks' text layers (query checks, 2026-09-28: Gemini flagged them in 5 of 8
+    # sampled queries). A text task still reads them
+    leave_furniture: Annotated[bool, _shaping(TEXTUAL | VISUAL)] = False
+
+    def context_left_out(self, reader, page_no):
+        return reader.furniture(page_no) if self.leave_furniture else {}
 
 class TableContext(Lever):
     lever_name, stage = "table_context", "context"
@@ -195,7 +208,7 @@ class TableContext(Lever):
     def table_lines(self, reader, page_no, top, flat):
         """Text just above a table (its lead-in sentence or caption)."""
         lines = super().table_lines(reader, page_no, top, flat)
-        above = reader.text_above(page_no, top) if self.table_context else ""
+        above = reader.text_above(page_no, top, self.context_left_out(reader, page_no)) if self.table_context else ""
         return lines + (["Above the table: ..." + above.strip()[-self.table_context:]] if above.strip() else [])
 
 class StemContext(Lever):
@@ -533,6 +546,12 @@ class VisualTextLayer(Lever):
 
     def region_text(self, reader, page, rect, layer, text):
         text = super().region_text(reader, page, rect, layer, text)
+        left = self.context_left_out(reader, page.number + 1)
+        if left:  # what a block left out (its middle in the region) says, line by line
+            from .pages import shown
+            gone = {line for box, lines in left.items() for line in lines
+                    if (shown(page, box).tl + shown(page, box).br) / 2 in rect}
+            layer = "".join(line + "\n" for line in layer.splitlines() if " ".join(line.split()) not in gone)
         if not self.visual_text_layer or not layer.strip():
             return text
         return (text + "\n" if text else "") + LAYER_NOTE + "\n" + " ".join(layer.split())[:self.visual_text_layer]
@@ -636,11 +655,11 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8) and leave_text's
 # tables (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
-LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, TableContext, StemContext, References,
-                 TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
-                 RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,
-                 TableReview, TableStructure, VisualTextLayer, TableFilter, SkipSheetTables, LeaveText, QuoteMatch,
-                 Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
+LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, LeaveFurniture, TableContext, StemContext,
+                 References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty,
+                 SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks,
+                 TableRules, TableReview, TableStructure, VisualTextLayer, TableFilter, SkipSheetTables, LeaveText,
+                 QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -838,6 +857,12 @@ class Platform(Composable):
         """Unrotated boxes whose text blocks a PDF page's text tasks leave out, to the readers of what they hold
         (tables: [(box, rows)] of the tables detected and read): the platform's, none."""
         return []
+
+    @chosen
+    def context_left_out(self, reader, page_no):
+        """{box: its lines} of a page's text blocks that neighbouring text, a table's lead-in and image tasks' text
+        layers leave out (page_blocks' boxes): the platform's, none."""
+        return {}
 
     @chained
     def region_text(self, reader, page, rect, layer, text):

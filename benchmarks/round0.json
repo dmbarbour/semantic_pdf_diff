@@ -4,6 +4,7 @@
     "extract_rules",
     "visual_rules",
     "neighbours",
+    "leave_furniture",
     "table_context",
     "stem_context",
     "references",
