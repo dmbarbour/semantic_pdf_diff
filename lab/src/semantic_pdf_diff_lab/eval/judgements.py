@@ -60,14 +60,16 @@ def save(path, rater, verdicts, rubric=""):
 
 def rate(client, requests, progress=None):
     """Ask a model each request once, concurrently: requests are (ident, prompt, schema, images, key). Returns
-    ({ident: answer}, {ident: error}), each in the order requests finished. The loop the model raters share
-    (judges, the review panel, query checkers), once written three times."""
+    ({ident: answer}, {ident: error}), each in the order requests were given, not as they finished (the determinism
+    review, D14: verdict files followed it). The loop the model raters share (judges, the review panel, query
+    checkers), once written three times."""
     from semantic_pdf_diff.dispatch import Dispatcher
     from semantic_pdf_diff.progress import NoProgress
     progress = progress or NoProgress()
-    answers, errors = {}, {}
+    answers, errors, order = {}, {}, []
     with Dispatcher(client) as dispatch:
         for ident, prompt, schema, images, key in requests:
+            order.append(ident)
             def finish(value, error, ident=ident):
                 progress.finish("failed" if error else "complete")
                 if error is not None:
@@ -77,7 +79,7 @@ def rate(client, requests, progress=None):
             progress.add()
             dispatch.submit(prompt, schema, images, key, finish)
         dispatch.drain()
-    return answers, errors
+    return ({i: answers[i] for i in order if i in answers}, {i: errors[i] for i in order if i in errors})
 
 def failures_folder(verdicts_dir):
     """Where a verdicts folder's failed verdicts are counted: failures/ for verdicts/, failures-<x>/

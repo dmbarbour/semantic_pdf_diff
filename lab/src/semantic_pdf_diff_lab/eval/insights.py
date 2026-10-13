@@ -169,7 +169,7 @@ def page(round_folder):
             if issues[side]:
                 out.append(f"<h3>The model's issue notes only on the {side} side</h3><ul class='claims'>" + "".join(
                     f"<li>{esc(k)} <span class='muted'>×{n}</span></li>"
-                    for k, n in issues[side].most_common(12)) + "</ul>")
+                    for k, n in sorted(issues[side].items(), key=lambda kn: (-kn[1], kn[0]))[:12]) + "</ul>")
         remarks = [(u["run"], u["page"], r) for u in a["units"] for r in u["remarks"]]
         if remarks:
             out.append("<h3>Judges' remarks for us</h3><ul class='claims'>" + "".join(
