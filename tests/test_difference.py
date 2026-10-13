@@ -53,3 +53,37 @@ class SharedTargets(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class InputOrder(unittest.TestCase):
+    def test_a_comparison_doesnt_depend_on_its_claims_order(self):
+        """Explanations' siblings and echoes, item names, ties and lists followed the input's order, canonical only
+        because the store sorts (the determinism review, D10)."""
+        import json
+        import random
+        import tempfile
+        from semantic_pdf_diff.schema import PdfLocator
+
+        def side(letter, shift):
+            found = []
+            for f, content in enumerate('cd'):
+                for i in range(1, 7):
+                    for attribute, value in (('rated power', 10 + i + shift * (i % 2)), ('flow', 50)):
+                        found.append(ev(f'{letter}-{f}{i}{attribute[0]}', content=f'sha256:{content * 64}.pdf',
+                                        entity=f'pump P-{i}' if i < 5 else 'pump', attribute=attribute,
+                                        value=str(value), unit='kW' if attribute == 'rated power' else 'L/s',
+                                        locator=PdfLocator(page=i, bbox=(0, 0, 100, 100), region='text',
+                                                           task=f'text:{i}')))
+            return found
+        left, right = side('A', 0), side('B', 1)
+        results = []
+        for seed in (None, 1, 2, 3):
+            a, b = list(left), list(right)
+            if seed:
+                random.Random(seed).shuffle(a)
+                random.Random(seed + 10).shuffle(b)
+            with tempfile.TemporaryDirectory() as d:
+                found = compare(a, b, Path(d), Fake(kind='changed'), 'revisions')
+            results.append(json.dumps(found, sort_keys=True, default=str))
+        for seed, result in zip((1, 2, 3), results[1:]):
+            with self.subTest(seed=seed):
+                self.assertEqual(result, results[0])

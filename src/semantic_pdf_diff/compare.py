@@ -143,6 +143,10 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     """
     # Comparisons aren't bound to a store, so their cache keys carry their own settings.
     settings_key = label  # the comparison interpreter's hash, naming the requests' recipes (labels only)
+    # in one order however they're given: explanations' siblings, item names, ties and lists follow it (the
+    # determinism review, D10); within a content, the store's order already
+    canonical = lambda e: (e.content, e.locator.page, e.locator.task, e.id)
+    left, right = sorted(left, key=canonical), sorted(right, key=canonical)
     shared_ids = {e.id for e in left} & {e.id for e in right}
     shared = list({e.id: e for e in left if e.id in shared_ids}.values())
     findings, matched, attempted = [], set(), set()
