@@ -208,9 +208,9 @@ class Scale(unittest.TestCase):
         """Every "Room N" was scored against every other, by the name word they share: 2,000 rooms took 19 s."""
         import time
         rooms = lambda shift: [claim(f"Room {i}", "area", str(10 + (i + shift) % 997), "m2") for i in range(2000)]
-        started = time.monotonic()
+        started = time.process_time()  # this process's CPU time: other processes' load doesn't count
         found = align.align(rooms(0), rooms(1))
-        self.assertLess(time.monotonic() - started, 5)
+        self.assertLess(time.process_time() - started, 5)
         self.assertEqual(found.summary["items"], [2000, 2000])
 
     def test_a_large_item_pairs_its_claims_quickly(self):
@@ -218,9 +218,9 @@ class Scale(unittest.TestCase):
         import time
         claims = lambda shift: [claim("Building", f"attribute {k % 50} {chr(97 + k % 26)}", str(k + shift), "kW",
                                       f"zone {k % 30}") for k in range(1000)]
-        started = time.monotonic()
+        started = time.process_time()
         found = align.align(claims(0), claims(100000))
-        self.assertLess(time.monotonic() - started, 10)
+        self.assertLess(time.process_time() - started, 10)
         self.assertTrue(found.judge)
 
 class Report(unittest.TestCase):

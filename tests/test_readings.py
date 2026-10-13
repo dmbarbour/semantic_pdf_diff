@@ -108,9 +108,9 @@ class ReconcileScales(unittest.TestCase):
         from semantic_pdf_diff.readings import reconcile
         claims = [sighting(f'Pump P-{i % 900}', 'rated power', str(i % 1500), 'kW', page=1 + i % 20,
                            task=f'text:p{1 + i % 20}:{i % 7}', region='text') for i in range(4000)]
-        started = time.monotonic()
+        started = time.process_time()  # this process's CPU time: other processes' load doesn't count
         reconcile(claims)
-        self.assertLess(time.monotonic() - started, 5)
+        self.assertLess(time.process_time() - started, 5)
 
     def test_thousands_of_claims_of_one_value_reconcile_quickly(self):
         """Each claim was compared with every cluster of its value: 4,000 rooms of one area took 50 s (code review
@@ -118,6 +118,6 @@ class ReconcileScales(unittest.TestCase):
         import time
         claims = [sighting(f'Room {i}', 'area', '25', 'm2', page=1 + i % 20, task=f'text:p{1 + i % 20}:0',
                            region='text') for i in range(4000)]
-        started = time.monotonic()
+        started = time.process_time()
         self.assertEqual(len(reconcile(claims)), 4000)
-        self.assertLess(time.monotonic() - started, 5)
+        self.assertLess(time.process_time() - started, 5)
