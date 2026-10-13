@@ -267,17 +267,17 @@ def score(key_data, claims):
             if RELATIONS[f["relation"]].literal:
                 literal.setdefault(f["value"], set()).update(f.get("object_aliases") or ())
         things += [Thing(name, tuple(sorted(aliases)), True) for name, aliases in sorted(literal.items())]
-    seen, seen_triples = {}, set()
+    # Whatever order the claims come in (the order tasks finished: the determinism review, D1), each reading counts
+    # once per outcome: read twice alike, once; read right by one reader and misbound by another, once each
+    seen = set()
     for c in ranges(claims):
         ident = (str(c.get("entity", "")).casefold(), str(c.get("attribute", "")).casefold(), str(c.get("value", "")))
         if related and not NUMERIC_VALUE.match(str(c.get("value", ""))):  # a relation: one outcome per triple
-            if ident in seen:
-                continue
-            seen[ident] = None
             for outcome, fid, triple in classify_claim(c, things, index):
-                if triple is not None and triple in seen_triples:
+                reading = ("relation", triple if triple is not None else ident, outcome)
+                if reading in seen:
                     continue  # read twice, by other readers or in other words
-                seen_triples.add(triple)
+                seen.add(reading)
                 relation_outcomes[outcome] = relation_outcomes.get(outcome, 0) + 1
                 if outcome == "right":
                     found[fid] = "right"
@@ -285,9 +285,9 @@ def score(key_data, claims):
         # the same reading twice (overlapping tiles, other readers) counts once, but either may keep its conditions;
         # a value that repeats ("25 MWh" in June and in July) is two readings, told apart by the fact each names
         outcome, fid = classify(c, numeric, key_data["printed"])
-        reading = (ident, fid or outcome, outcome == "wrong unit")  # "63.3 mph" and "63.3 m/s" are two readings
+        reading = (ident, fid or outcome, outcome == "wrong unit", outcome)  # "63.3 mph" and "63.3 m/s": two readings
         if reading not in seen:
-            seen[reading] = True
+            seen.add(reading)
             outcomes[outcome] = outcomes.get(outcome, 0) + 1
         if outcome in ("right", "loose") and fid:
             found.setdefault(fid, outcome)

@@ -244,6 +244,20 @@ class Scoring(unittest.TestCase):
         self.assertEqual(s["outcomes"], {"right": 2, "hallucinated": 1})
         self.assertNotIn("hallc.tmax", s["missed"])
 
+    def test_the_score_doesnt_depend_on_the_claims_order(self):
+        """May's value read twice, once bound to June: whichever claim came first set the reading's outcome, and the
+        claims came in the order tasks finished (the determinism review, D1). Each outcome counts once now."""
+        project = controlled.energy_study(1)
+        project.knob = "clean"
+        _, log = controlled.render(project)
+        key = controlled.key(project, log)
+        may, june = project.fact("opt1.may"), project.fact("opt1.june")
+        right = {"entity": may.entity, "attribute": may.attribute, "value": may.value, "conditions": may.conditions}
+        misbound = dict(right, conditions=june.conditions)
+        for claims in ([right, misbound], [misbound, right]):
+            s = controlled.score(key, claims + claims)  # each read twice: counted once
+            self.assertEqual((s["outcomes"], s["found_right"]), ({"misbound": 1, "right": 1}, 1))
+
     def test_bars_read_against_an_axis_count_within_a_quarter_step(self):
         project = controlled.energy_study(1)
         project.knob = "axis"

@@ -1536,9 +1536,9 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 52,
+   "claims": 56,
    "outcomes": {
-    "misbound": 2,
+    "misbound": 6,
     "right": 50
    },
    "conditions_kept": "33/33",
@@ -1552,8 +1552,8 @@
    },
    "outcomes_by_reader": {
     "text": {
-     "misbound": 5,
-     "right": 4
+     "misbound": 6,
+     "right": 6
     },
     "visual": {
      "misbound": 2,
@@ -2403,11 +2403,12 @@
     "south.use.december",
     "south.use.november"
    ],
-   "claims": 91,
+   "claims": 92,
    "outcomes": {
     "hallucinated": 1,
     "inexact": 31,
     "loose": 19,
+    "misbound": 1,
     "misread": 1,
     "right": 39
    },
@@ -2428,6 +2429,7 @@
      "hallucinated": 1,
      "inexact": 31,
      "loose": 19,
+     "misbound": 1,
      "misread": 1,
      "right": 36
     }
@@ -4001,12 +4003,12 @@
    "missed": [
     "fail.duration"
    ],
-   "claims": 37,
+   "claims": 39,
    "outcomes": {
     "loose": 11,
     "misbound": 3,
     "misread": 1,
-    "right": 22
+    "right": 24
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -4526,11 +4528,11 @@
    "missed": [
     "fail.duration"
    ],
-   "claims": 48,
+   "claims": 49,
    "outcomes": {
     "loose": 13,
     "misread": 1,
-    "right": 32,
+    "right": 33,
     "text": 2
    },
    "conditions_kept": "4/4",
@@ -8947,10 +8949,10 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 52,
+   "claims": 56,
    "outcomes": {
-    "misbound": 5,
-    "right": 47
+    "misbound": 6,
+    "right": 50
    },
    "conditions_kept": "33/33",
    "recall_by_form": {
@@ -8963,8 +8965,8 @@
    },
    "outcomes_by_reader": {
     "text": {
-     "misbound": 5,
-     "right": 4
+     "misbound": 6,
+     "right": 6
     },
     "visual": {
      "misbound": 2,
@@ -9814,11 +9816,12 @@
     "south.use.december",
     "south.use.november"
    ],
-   "claims": 91,
+   "claims": 92,
    "outcomes": {
     "hallucinated": 1,
     "inexact": 31,
     "loose": 19,
+    "misbound": 1,
     "misread": 1,
     "right": 39
    },
@@ -9839,6 +9842,7 @@
      "hallucinated": 1,
      "inexact": 31,
      "loose": 19,
+     "misbound": 1,
      "misread": 1,
      "right": 36
     }
@@ -11412,12 +11416,12 @@
    "missed": [
     "fail.duration"
    ],
-   "claims": 37,
+   "claims": 39,
    "outcomes": {
     "loose": 11,
     "misbound": 3,
     "misread": 1,
-    "right": 22
+    "right": 24
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -11937,11 +11941,11 @@
    "missed": [
     "fail.duration"
    ],
-   "claims": 48,
+   "claims": 49,
    "outcomes": {
     "loose": 13,
     "misread": 1,
-    "right": 32,
+    "right": 33,
     "text": 2
    },
    "conditions_kept": "4/4",
@@ -16250,10 +16254,10 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 54,
+   "claims": 57,
    "outcomes": {
-    "misbound": 6,
-    "right": 48
+    "misbound": 7,
+    "right": 50
    },
    "conditions_kept": "33/33",
    "recall_by_form": {
@@ -16266,7 +16270,7 @@
    },
    "outcomes_by_reader": {
     "text": {
-     "misbound": 5,
+     "misbound": 6,
      "right": 4
     },
     "visual": {
@@ -16595,9 +16599,9 @@
    "recall": 1.0,
    "found_right": 21,
    "missed": [],
-   "claims": 35,
+   "claims": 36,
    "outcomes": {
-    "misbound": 7,
+    "misbound": 8,
     "misread": 1,
     "right": 26,
     "text": 1
@@ -16613,7 +16617,7 @@
    },
    "outcomes_by_reader": {
     "text": {
-     "misbound": 7,
+     "misbound": 8,
      "misread": 1,
      "right": 5
     },
@@ -16633,9 +16637,9 @@
    "recall": 1.0,
    "found_right": 21,
    "missed": [],
-   "claims": 40,
+   "claims": 41,
    "outcomes": {
-    "misbound": 9,
+    "misbound": 10,
     "misread": 3,
     "right": 26,
     "text": 2
@@ -16651,7 +16655,7 @@
    },
    "outcomes_by_reader": {
     "text": {
-     "misbound": 9,
+     "misbound": 10,
      "misread": 3,
      "right": 5
     },
@@ -17043,11 +17047,12 @@
     "south.use.december",
     "south.use.november"
    ],
-   "claims": 91,
+   "claims": 92,
    "outcomes": {
     "hallucinated": 1,
     "inexact": 31,
     "loose": 19,
+    "misbound": 1,
     "misread": 1,
     "right": 39
    },
@@ -17068,6 +17073,7 @@
      "hallucinated": 1,
      "inexact": 31,
      "loose": 19,
+     "misbound": 1,
      "misread": 1,
      "right": 36
     }
@@ -18525,12 +18531,12 @@
    "missed": [
     "fail.duration"
    ],
-   "claims": 34,
+   "claims": 36,
    "outcomes": {
     "loose": 9,
     "misbound": 3,
     "misread": 1,
-    "right": 21
+    "right": 23
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -18962,11 +18968,11 @@
    "missed": [
     "fail.duration"
    ],
-   "claims": 45,
+   "claims": 46,
    "outcomes": {
     "loose": 11,
     "misread": 1,
-    "right": 31,
+    "right": 32,
     "text": 2
    },
    "conditions_kept": "4/4",
@@ -22931,10 +22937,10 @@
    "recall": 1.0,
    "found_right": 33,
    "missed": [],
-   "claims": 54,
+   "claims": 57,
    "outcomes": {
-    "misbound": 6,
-    "right": 48
+    "misbound": 7,
+    "right": 50
    },
    "conditions_kept": "33/33",
    "recall_by_form": {
@@ -22947,7 +22953,7 @@
    },
    "outcomes_by_reader": {
     "text": {
-     "misbound": 5,
+     "misbound": 6,
      "right": 4
     },
     "visual": {
@@ -23276,9 +23282,9 @@
    "recall": 1.0,
    "found_right": 21,
    "missed": [],
-   "claims": 35,
+   "claims": 36,
    "outcomes": {
-    "misbound": 7,
+    "misbound": 8,
     "misread": 1,
     "right": 26,
     "text": 1
@@ -23294,7 +23300,7 @@
    },
    "outcomes_by_reader": {
     "text": {
-     "misbound": 7,
+     "misbound": 8,
      "misread": 1,
      "right": 5
     },
@@ -23314,9 +23320,9 @@
    "recall": 1.0,
    "found_right": 21,
    "missed": [],
-   "claims": 40,
+   "claims": 41,
    "outcomes": {
-    "misbound": 9,
+    "misbound": 10,
     "misread": 3,
     "right": 26,
     "text": 2
@@ -23332,7 +23338,7 @@
    },
    "outcomes_by_reader": {
     "text": {
-     "misbound": 9,
+     "misbound": 10,
      "misread": 3,
      "right": 5
     },
@@ -23724,11 +23730,12 @@
     "south.use.december",
     "south.use.november"
    ],
-   "claims": 91,
+   "claims": 92,
    "outcomes": {
     "hallucinated": 1,
     "inexact": 31,
     "loose": 19,
+    "misbound": 1,
     "misread": 1,
     "right": 39
    },
@@ -23749,6 +23756,7 @@
      "hallucinated": 1,
      "inexact": 31,
      "loose": 19,
+     "misbound": 1,
      "misread": 1,
      "right": 36
     }
@@ -24864,12 +24872,12 @@
    "missed": [
     "fail.duration"
    ],
-   "claims": 34,
+   "claims": 36,
    "outcomes": {
     "loose": 9,
     "misbound": 3,
     "misread": 1,
-    "right": 21
+    "right": 23
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -25301,11 +25309,11 @@
    "missed": [
     "fail.duration"
    ],
-   "claims": 45,
+   "claims": 46,
    "outcomes": {
     "loose": 11,
     "misread": 1,
-    "right": 31,
+    "right": 32,
     "text": 2
    },
    "conditions_kept": "4/4",
