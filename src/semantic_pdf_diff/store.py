@@ -402,8 +402,10 @@ class Store:
         return dropped
 
     def coverage(self, content):
-        return [json.loads(r)
-                for (r,) in self.db.execute("SELECT row FROM task WHERE content=? ORDER BY rowid", (content,))]
+        """A content's coverage rows by page and task, as the pipeline writes them: not in the order tasks finished,
+        which a live run and its replay don't share (the determinism review, D2)."""
+        rows = [json.loads(r) for (r,) in self.db.execute("SELECT row FROM task WHERE content=?", (content,))]
+        return sorted(rows, key=lambda r: (r.get("page") or 0, r["task"]))
 
     # --- response cache (by query and model) and the query log -----------------
     def cached(self, key):
@@ -452,7 +454,8 @@ class Store:
             raise StoreError(f"unknown view {name!r}; choose from {', '.join(self.VIEWS)}")
         cursor = self.db.execute(f"SELECT * FROM {name}")
         columns = [c[0] for c in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor]
+        # by their values, not as they were written (the determinism review, D14)
+        return [dict(zip(columns, row)) for row in sorted(cursor, key=lambda row: [str(v) for v in row])]
 
     def gc(self, dry_run=False, orphaned_sources=False):
         """Delete orphaned content with its derived data and crops. Returns what was (or would be) removed.

@@ -417,3 +417,20 @@ class OneTaskTwice(unittest.TestCase):
         self.assertEqual([e.model_dump() for e in loaded], [e.model_dump() for e in fresh])
         self.assertEqual((len(fresh), fresh[0].quote, fresh[0].confidence, len(fresh[0].occurrences)),
                          (1, '5', .9, 1))
+
+class Orders(unittest.TestCase):
+    def test_coverage_comes_back_by_page_and_task_not_as_written(self):
+        """Rows were read back in the order tasks finished, which a live run and its replay don't share; the lab's
+        units followed it (the determinism review, D2)."""
+        content = 'sha256:' + 'a' * 64 + '.pdf'
+        rows = [{'content': content, 'task': t, 'page': p, 'status': 'complete', 'issues': []}
+                for t, p in (('tile:p2:0', 2), ('text:p1:0', 1), ('overview:p1', 1), ('table:p1:0:0', 1))]
+        found = []
+        for order in (rows, rows[::-1]):
+            with tempfile.TemporaryDirectory() as d, Store(Path(d) / 'store') as store:
+                with store.db:
+                    store.db.execute("INSERT INTO content VALUES (?, 1, 0)", (content,))
+                for row in order:
+                    store.record_task(row, [])
+                found.append([r['task'] for r in store.coverage(content)])
+        self.assertEqual(found, [['overview:p1', 'table:p1:0:0', 'text:p1:0', 'tile:p2:0']] * 2)
