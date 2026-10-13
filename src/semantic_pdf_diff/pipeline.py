@@ -226,11 +226,15 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         file_difference=file_difference(files[names[0]], files[names[1]]),
         sections=document.sections, situation=document.situation, evidence=document.evidence, coverage=coverage,
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
-        usage={'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage, **fixture_usage(client)},
         limitations=LIMITATIONS).model_dump()
     data = traced(data)
     store.save_comparison(data['created_at'], data)
     write_report(data, out, assets=store.folder / 'assets')
+    # how the run went, apart from the report, which holds only what the answers decide (the determinism review, D9)
+    usage = {'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage,
+             **fixture_usage(client, options.fixture)}
+    (out / 'run.json').write_text(json.dumps({'created_at': data['created_at'], 'usage': usage}, indent=2) + '\n',
+                                  encoding='utf-8')
     incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
                   or data['retrieval']['omitted_by_pair_limit'] > 0
                   or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
@@ -260,14 +264,15 @@ def make_client(options, settings, store):
     return attach_ledger(Client(settings, store, fixture=fixture, mode=options.answers_mode,
                                 responder=options.responder, fresh_regions=fresh), options)
 
-def fixture_usage(client):
+def fixture_usage(client, given=None):
+    """The fixture's counts, under the path it was given (a .zip is read from a temporary copy)."""
     replay = getattr(client, 'replay', None)  # test doubles have none
     if replay is None:
         return {}
     if replay.missing:
         log.warning(f"Replay: {len(replay.missing)} request(s) have no answer from {replay.responder}; "
                     f"first: {replay.missing[0]}")
-    used = replay.usage()
+    used = {**replay.usage(), **({'path': str(given)} if given else {})}
     log.info(f"Fixture {replay.fixture.path.name}: {used['replayed']} answers replayed, {used['recorded']} recorded, "
              f"{used['missing']} missing")
     return {'fixture': used}

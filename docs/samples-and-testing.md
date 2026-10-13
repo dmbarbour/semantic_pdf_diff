@@ -91,7 +91,7 @@ python scripts/controlled.py run --replay        # the corpus, every report's co
 python scripts/controlled.py score               # results.json and comparisons.json: git shows no change
 ```
 
-- **Compare each report.json** before and after, leaving out what differs between any two runs: `created_at`, and the fixture's temporary path in `usage`. The fields that must match: evidence, coverage, findings, unmatched, sections, situation, groupings, shared, file_difference, retrieval.
+- **Compare each report.json** before and after, leaving out `created_at` (or set `SOURCE_DATE_EPOCH`). How each run went is in `run.json` beside it, not the report. The fields that must match: evidence, coverage, findings, unmatched, sections, situation, groupings, shared, file_difference, retrieval.
 - **A request that isn't recorded fails the replay.** That alone shows a change reached the model.
 - **What the replays don't cover, compare directly:**
   - a renderer's pages, from the same report documents

@@ -449,5 +449,4 @@ class Report(Strict):
     evidence: list[dict]
     coverage: list[dict]
     settings: dict
-    usage: dict
     limitations: list[str]

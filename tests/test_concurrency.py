@@ -146,8 +146,8 @@ class Determinism(unittest.TestCase):
                     cli.main([str(a), str(b), '--out', str(out), '--base-url', url, '--config', str(config),
                               '--fixture', str(fixture), *mode])
                 report = json.loads((out / 'report.json').read_text())
-                for run_record in ('usage', 'settings', 'created_at'):
-                    report.pop(run_record, None)
+                for run_record in ('settings', 'created_at'):  # how the run was set up and when
+                    report.pop(run_record)
                 runs[seed] = {'evidence': json.loads((out / 'evidence.json').read_text()), 'report': report}
         recorded = runs.pop(None)
         self.assertTrue(recorded['report']['findings'])

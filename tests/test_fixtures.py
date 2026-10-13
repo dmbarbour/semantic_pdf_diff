@@ -106,7 +106,11 @@ class RecordAndReplay(unittest.TestCase):
             code = cli.main([str(self.a), str(self.b), '--out', str(self.root / out), '--base-url', url,
                              '--config', str(config), *extra])
         path = self.root / out / 'report.json'
-        return code, json.loads(path.read_text()) if path.exists() else None, err.getvalue()
+        if not path.exists():
+            return code, None, err.getvalue()
+        # the run's usage is in its own record beside the report (run.json), read here with it
+        report = {**json.loads(path.read_text()), 'usage': json.loads((path.parent / 'run.json').read_text())['usage']}
+        return code, report, err.getvalue()
 
     def outcome(self, report):
         return {k: report[k] for k in ('evidence', 'coverage', 'findings', 'unmatched', 'sections', 'situation')}

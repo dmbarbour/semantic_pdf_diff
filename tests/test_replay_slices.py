@@ -70,7 +70,9 @@ class ReplaySlices(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             code = cli.main([str(a), str(b), '--out', str(out), '--base-url', UNREACHABLE, '--config', str(config),
                              '--fixture', str(FIXTURE), '--responder', responder])
-        return code, json.loads((out / 'report.json').read_text())
+        # the run's usage is in its own record beside the report (run.json), read here with it
+        return code, {**json.loads((out / 'report.json').read_text()),
+                      'usage': json.loads((out / 'run.json').read_text())['usage']}
 
     def test_every_responder_replays_every_run(self):
         responders = sorted({a['responder'] for a in self.summary['answers']})
