@@ -1,5 +1,6 @@
 import stubs  # noqa: F401 (a clean environment)
 from stubs import source_data
+import contextlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -155,6 +156,55 @@ class ConcurrentFollowers(unittest.TestCase):
                 results.append(([e.model_dump() for e in evidence], coverage))
         self.assertTrue(any(r.get('duplicate_of') for r in results[0][1]))
         self.assertEqual(results[0], results[1])
+
+    def test_followers_agree_however_the_answers_arrive(self):
+        """A ruled table's rows are read from its rules answer, so the lead was whichever page's answer arrived first
+        (the determinism review, D3). Recorded in page order, then replayed with the answers handled in other
+        orders."""
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent))
+        from test_concurrency import jittery_model
+        from semantic_pdf_diff import fixtures
+        from semantic_pdf_diff.llm import Client
+        results = []
+        with jittery_model() as (url, state), tempfile.TemporaryDirectory() as d:
+            path = ruled_title_blocks(Path(d) / 'r.pdf')
+            content = content_id(path.read_bytes(), path.name)
+            recorded = Path(d) / 'answers.sqlite'
+            for seed in (None, 1, 2, 3, 4):
+                with fixtures.open(recorded, 'record' if seed is None else 'read') as fixture, \
+                        (stubs.answers_shuffled(seed) if seed else contextlib.nullcontext()):
+                    client = Client(Settings(base_url=url, concurrency=1 if seed is None else 4, retries=0), None,
+                                    fixture=fixture, mode='record-new' if seed is None else 'replay', responder='stub')
+                    evidence, coverage = extract_pdf(path, content, Path(d), client)
+                results.append(([e.model_dump() for e in evidence], coverage))
+        tasks = [r['task'] for r in results[0][1]]
+        self.assertTrue(any(t.startswith('rules:') for t in tasks))  # rows read from the rules answers
+        self.assertTrue(any(r.get('duplicate_of') for r in results[0][1]))
+        for seed, result in enumerate(results[1:], 1):
+            with self.subTest(seed=seed):
+                self.assertEqual(result, results[0])
+
+def ruled_title_blocks(path):
+    """A ruled title block on four pages, the same but for its sheet number."""
+    doc = pymupdf.open()
+    rows = [('Field', 'Value'), ('Designer', 'ACME Engineering'), ('Checked', 'J. Smith'), ('Scale', '1:100')]
+    for i in range(1, 5):
+        page = doc.new_page(width=400, height=400)
+        page.insert_text((40, 40), f'Pump P-{i} rated power {10 + i} kW')
+        x0, y0, w, h = 200, 280, 90, 20
+        for r, (a, b) in enumerate(rows + [('Sheet', f'A-10{i}')]):
+            page.insert_text((x0 + 4, y0 + r * h + 14), a, fontsize=9)
+            page.insert_text((x0 + w + 4, y0 + r * h + 14), b, fontsize=9)
+        n = len(rows) + 1
+        for r in range(n + 1):
+            page.draw_line((x0, y0 + r * h), (x0 + 2 * w, y0 + r * h))
+        for c in range(3):
+            page.draw_line((x0 + c * w, y0), (x0 + c * w, y0 + n * h))
+    doc.set_metadata({})
+    doc.save(path, no_new_id=True)
+    doc.close()
+    return path
 
 if __name__ == '__main__':
     unittest.main()

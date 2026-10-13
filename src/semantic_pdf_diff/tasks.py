@@ -164,12 +164,27 @@ class TaskCore:
         self.s, self.output, self.dispatch, self.progress, self.name = client.s, output, dispatch, progress, name
         self.locator, self.derivation, self.oversized = locator, derivation, oversized
         self.evidence, self.coverage, self.repeats = [], [], {}
+        self.held, self.releasing = [], False  # rows that may repeat, until the content's pages are read
         self.sections = self.reader = None
 
     def record(self, row, items=()):
         self.coverage.append(row)
         if self.on_task:
             self.on_task(row, list(items))
+
+    def release(self):
+        """The rows held as possible repeats, read now in page and task order, so the first sighting leads and
+        which page's row is sent doesn't follow which table's answer came first (the determinism review, D3);
+        whether any were held. Called once the content's pages are read and its requests answered, again until it
+        holds none."""
+        held, self.held = sorted(self.held, key=lambda made: (made.page, made.tag)), []
+        self.releasing = True
+        try:
+            for made in held:
+                self.consume(made)
+        finally:
+            self.releasing = False
+        return bool(held)
 
     def result(self, sort):
         """(evidence with sightings merged, coverage sorted by sort). A claim one task gave twice (a rules answer's
@@ -236,6 +251,9 @@ class TaskCore:
         s, content, state = self.s, self.content, self.state
         region = region_of(task)
         entry = None
+        if repeat_key is not None and s.dedupes_repeated_rows() and not self.releasing:
+            self.held.append(made)  # read once the content's pages are (release)
+            return
         if repeat_key is not None and s.dedupes_repeated_rows():
             entry = self.repeats.setdefault(repeat_key, {"task": task, "page": page_no, "seen": 0, "done": False,
                                                          "ok": False, "found": [], "row": None, "followers": []})

@@ -294,7 +294,9 @@ class Extracted(unittest.TestCase):
         page2_read = threading.Event()
 
         class Client:  # answers on worker threads (the dispatcher's prepare/send split), so they can come late
-            s = Settings(vision=False, concurrency=4)
+            # rows read as they're made: a row that may repeat waits for the pages' answers (the determinism review,
+            # D3), page 2's with it
+            s = Settings(vision=False, concurrency=4, dedupe_repeated=False)
             calls, cache_hits, usage = 0, 0, {}
             asked = []
 

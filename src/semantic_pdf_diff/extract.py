@@ -429,6 +429,9 @@ def _pdf_job(path, job, output, client, dispatch, progress):
             reading.page(number, page)
         if on_sections:
             on_sections([x.model_copy(update={"signals": reading.signals.get(x.id, {})}) for x in sections])
-        while state["pending"]:  # refinement may still render crops from this document
-            yield "waiting"
+        while True:
+            while state["pending"]:  # refinement may still render crops from this document
+                yield "waiting"
+            if not core.release():  # rows that may repeat, read in page order now that every table's are in
+                break
     state["result"] = core.result(lambda r: (r["page"] or 0, r["task"]))
