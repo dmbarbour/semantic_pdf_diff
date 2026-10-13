@@ -172,9 +172,14 @@ class TaskCore:
             self.on_task(row, list(items))
 
     def result(self, sort):
-        """(evidence with sightings merged, coverage sorted by sort)."""
+        """(evidence with sightings merged, coverage sorted by sort). A claim one task gave twice (a rules answer's
+        rows, a leader's turns copied to a follower) is kept once, the first, as the store keeps it: a fresh run and
+        one read back from the store agree (the determinism review, D13)."""
         self.coverage.sort(key=sort)
-        return merge_occurrences(self.evidence), self.coverage
+        firsts = {}
+        for e in self.evidence:
+            firsts.setdefault((e.id, e.locator.task), e)
+        return merge_occurrences(firsts.values()), self.coverage
 
     def ask(self, role, name, prompt, schema, images, finish):
         """Ask a table query (the rules, structure and key-value queries, their reviews) for a schema object, its images

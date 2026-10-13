@@ -394,3 +394,25 @@ class SharedAnswers(unittest.TestCase):
             self.assertEqual(store.gc()['cached_responses'], 1)
             self.assertIsNotNone(store.cached('k-shared'))
             self.assertIsNone(store.cached('k-own'))
+
+class OneTaskTwice(unittest.TestCase):
+    def test_a_claim_one_task_gives_twice_is_kept_once_fresh_and_from_the_store(self):
+        """The store kept the last copy and a fresh run both, so the claim's sightings, representative and
+        confidence differed between a run and one read back (the determinism review, D13)."""
+        from semantic_pdf_diff.tasks import TaskCore
+        content = 'sha256:' + 'a' * 64 + '.pdf'
+        at = PdfLocator(page=1, bbox=(0, 0, 10, 10), region='table', task='table:p1:0:0')
+        first, second = (Evidence(id='ev-1', content=content, entity='pump', attribute='flow', value='5', unit='L/s',
+                                  kind='table', quote=q, confidence=c, locator=at) for q, c in (('5', .9), ('5 L/s', .6)))
+        core = TaskCore.__new__(TaskCore)
+        core.coverage, core.evidence = [], [first, second]
+        fresh, _ = core.result(lambda r: r)
+        with tempfile.TemporaryDirectory() as d, Store(Path(d) / 'store') as store:
+            with store.db:
+                store.db.execute("INSERT INTO content VALUES (?, 1, 0)", (content,))
+            row = {'content': content, 'task': 'table:p1:0:0', 'page': 1, 'status': 'complete', 'issues': []}
+            store.record_task(row, [first, second])
+            loaded = store.evidence(content, reconcile=False)
+        self.assertEqual([e.model_dump() for e in loaded], [e.model_dump() for e in fresh])
+        self.assertEqual((len(fresh), fresh[0].quote, fresh[0].confidence, len(fresh[0].occurrences)),
+                         (1, '5', .9, 1))

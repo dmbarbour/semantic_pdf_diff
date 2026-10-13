@@ -359,8 +359,8 @@ class Store:
             self.db.execute("DELETE FROM situation WHERE content=?", (row["content"],))  # it read the old evidence
             self.db.execute("INSERT OR REPLACE INTO task VALUES (?, ?, ?, ?)",
                             (row["content"], row["task"], region, json.dumps(row)))
-            for e in evidence:
-                self.db.execute("INSERT OR REPLACE INTO evidence VALUES (?, ?, ?, ?, ?)",
+            for e in evidence:  # a claim given twice by one task: the first kept, as TaskCore.result keeps it
+                self.db.execute("INSERT OR IGNORE INTO evidence VALUES (?, ?, ?, ?, ?)",
                                 (e.id, e.content, row["task"], region,
                                  e.model_copy(update={"occurrences": []}).model_dump_json()))
 
