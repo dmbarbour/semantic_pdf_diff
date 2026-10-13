@@ -6,8 +6,8 @@ on the calling thread, which owns the PDF document and the store connection.
 
 A cached or replayed answer is handled at once, so a replay sees answers in the order they
 were asked, while a live run sees them as they arrive. With PDF_DIFF_ANSWER_ORDER set to a
-seed (tests only), cached and replayed answers are held and handled in an order drawn from
-it instead, as a live run's might be: what a run writes must not depend on that order (the
+seed (tests only), cached and replayed answers (and replayed failures) are held and handled in
+an order drawn from it instead, as a live run's might be: what a run writes must not depend on that order (the
 determinism review, 2026-10-12).
 """
 import copy
@@ -50,8 +50,11 @@ class Dispatcher:
         try:
             request = self.client.prepare(prompt, schema, images, key)
             value = self.client.cached(request)
-        except ModelFailure as e:
-            finish(None, e)
+        except ModelFailure as e:  # a recorded failure, or one preparing
+            if self.shuffle is not None:
+                self.held.append((None, finish, None, e))
+            else:
+                finish(None, e)
             return
         if value is not None and self.shuffle is None:
             finish(value, None)
@@ -67,7 +70,7 @@ class Dispatcher:
         if same is not None:
             self.waiting[same] = []
         if self.shuffle is not None and (value is not None or getattr(request, "unrecorded", False)):
-            self.held.append((request, finish, value))
+            self.held.append((request, finish, value, None))
         elif self.pool is None:
             self._complete(request, finish, self.client.send, request)
         else:
@@ -120,8 +123,10 @@ class Dispatcher:
     def wait_one(self):
         """Handle at least one finished request (results may queue more)."""
         if self.held and (not self.inflight or self.shuffle.random() < 0.5):
-            request, finish, value = self.held.pop(self.shuffle.randrange(len(self.held)))
-            if value is not None:
+            request, finish, value, error = self.held.pop(self.shuffle.randrange(len(self.held)))
+            if error is not None:
+                finish(None, error)
+            elif value is not None:
                 self._complete(request, finish, lambda: value, cached=True)
             else:  # unrecorded: sending fails as it would have
                 self._complete(request, finish, self.client.send, request)

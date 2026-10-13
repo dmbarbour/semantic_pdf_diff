@@ -345,6 +345,10 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
         progress.add()
         dispatch.submit(prompt, SectionAbout, images, key("section", section.id, prompt), finish)
     dispatch.drain()
+    # by target, figures then sections, not as answers came in (the determinism review, D8); a target's own issues
+    # keep their order, each round drained before the next
+    place = {t: i for i, t in enumerate([f.id for f in figures] + [s.id for s in sections])}
+    issues.sort(key=lambda i: place.get(i["target"], len(place)))
     return figures, [updated.get(s.id, s) for s in sections], unresolved, issues
 
 # --- quality checks --------------------------------------------------------------------

@@ -333,6 +333,18 @@ class Requests(unittest.TestCase):
         self.assertEqual(sections[1].about, '')
         self.assertTrue(all(len(p.encode()) < 2048 for p, _, _ in client.asked))
 
+    def test_issues_dont_depend_on_the_order_answers_arrive_in(self):
+        """Failures were noted as answers came in (the determinism review, D8)."""
+        found = []
+        for seed in (None, 1, 2, 3):
+            client = Recorder(fail=('Heading path:', 'Situate one figure'), concurrency=4)
+            with (stubs.answers_shuffled(seed) if seed else contextlib.nullcontext()):
+                found.append(self.run_situate(stubs.AtHand(client))[3])
+        self.assertGreater(len(found[0]), 2)
+        for seed, issues in enumerate(found[1:], 1):
+            with self.subTest(seed=seed):
+                self.assertEqual(issues, found[0])
+
 class Storage(unittest.TestCase):
     def pdfs(self, root):
         a = build(root / 'a.pdf')

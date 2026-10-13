@@ -101,6 +101,30 @@ class Recorder:
         from semantic_pdf_diff.schema import Extraction
         return Extraction(claims=[], complete=True)
 
+class AtHand:
+    """A fake client's answers (and failures) as cached ones: the dispatcher's split client, so the order
+    answers_shuffled draws applies to them. Everything else is the fake's."""
+    def __init__(self, inner):
+        self.inner = inner
+
+    def __getattr__(self, name):
+        return getattr(self.inner, name)
+
+    def prepare(self, prompt, schema, images, key):
+        import hashlib
+        from types import SimpleNamespace
+        query = hashlib.sha256(json.dumps([prompt, [str(i) for i in images]]).encode()).hexdigest()
+        return SimpleNamespace(query=query, prompt=prompt, schema=schema, images=list(images), key=key)
+
+    def cached(self, request):
+        return self.inner.ask(request.prompt, request.schema, request.images, key=request.key)
+
+    def send(self, request):
+        raise AssertionError("every answer is at hand")
+
+    def save(self, request, value):
+        pass
+
 def text_pdf(path, pages, width=300, height=None, at=(40, 40), toc=None, metadata=None):
     """A PDF of pages (square unless a height is given), each with its text (none for an empty one) at one point;
     written to path, or returned as bytes when path is None."""
