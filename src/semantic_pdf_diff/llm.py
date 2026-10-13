@@ -452,6 +452,14 @@ class Client:
             self.cache_hits += 1
         return value
 
+    def noted(self, request):
+        """A request answered by the same query in flight for another (main thread): its recipe noted, as a cache
+        hit's."""
+        if self.replay is not None:
+            self.replay.note(request.query, request.key)
+        elif self.store is not None:
+            self.cache_hits += 1
+
     def save(self, request, value):
         """Cache a response (main thread); in record mode, also record it in the fixture."""
         self._save(request, value)

@@ -291,6 +291,13 @@ class Replayer:
             return "unrecorded", None
         return "ask", None
 
+    def note(self, query, key):
+        """A request answered by the same query in flight for another: counted and its recipe noted, as if
+        replayed."""
+        if key is not None:
+            self.fixture.note_recipe(query, key)
+        self.replayed += 1
+
     def record(self, query, key, answer, error, usage=None, description=None):
         """An answer, or the model's failure (error: its text), unless only replaying."""
         if self.mode == "replay":

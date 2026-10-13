@@ -30,6 +30,9 @@ class Dispatcher:
         # Queries asked again while the same query is in flight (the same page in two documents):
         # they wait for its answer rather than being sent (and paid for) twice.
         self.waiting = {}
+        # Each query's outcome, its answer or its failure: asked again later in the run, it gets the same as one
+        # asked while it was in flight (the determinism review, D5)
+        self.outcomes = {}
         seed = os.environ.get(ANSWER_ORDER)
         self.shuffle = random.Random(seed) if seed and self.split else None
         self.held = []  # with a shuffle: answers at hand, handled in its order
@@ -54,8 +57,12 @@ class Dispatcher:
             finish(value, None)
             return
         same = self._same(request)
+        if value is None and same in self.outcomes:  # its lookup counted it already
+            value, error = self.outcomes[same]
+            finish(None, error) if error is not None else finish(copy.deepcopy(value), None)
+            return
         if same is not None and same in self.waiting:
-            self.waiting[same].append(finish)
+            self.waiting[same].append((request, finish))
             return
         if same is not None:
             self.waiting[same] = []
@@ -74,20 +81,31 @@ class Dispatcher:
         replay = getattr(self.client, "replay", None)
         return (query, replay.sample(request.key) if replay else 0) if query else None
 
+    def _noted(self, request):
+        """A request answered by another's query: noted as a cache hit's is (its recipe, in a fixture)."""
+        if hasattr(self.client, "noted"):
+            self.client.noted(request)
+
     def _complete(self, request, finish, call, *args, cached=False):
-        waiting = self.waiting.pop(self._same(request), [])
+        same = self._same(request)
+        waiting = self.waiting.pop(same, [])
         try:
             value = call(*args)
         except ModelFailure as e:
             if hasattr(self.client, "failed"):
                 self.client.failed(request, e)
-            for done in [finish] + waiting:
+            if same is not None:
+                self.outcomes[same] = (None, e)
+            for done in [finish] + [done for _, done in waiting]:
                 done(None, e)
             return
         if not cached:
             self.client.save(request, value)
+        if same is not None:
+            self.outcomes[same] = (copy.deepcopy(value), None)
         finish(value, None)
-        for done in waiting:  # each its own copy: a callback may change what it's given (the determinism review, D4)
+        for other, done in waiting:  # each its own copy: a callback may change what it's given (the review, D4)
+            self._noted(other)
             done(copy.deepcopy(value), None)
 
     def pending(self):

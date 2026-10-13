@@ -172,5 +172,40 @@ class Merging(unittest.TestCase):
         self.assertNotEqual(dispatch._same(tile), dispatch._same(text))
         self.assertEqual(dispatch._same(text), dispatch._same(SimpleNamespace(query='q1', key=('extract', 'table'))))
 
+    def test_a_query_asked_again_gets_its_first_outcome(self):
+        """A query asked again while the first was in flight was given its outcome, failure included; asked a moment
+        later, it was sent again and could be answered (the determinism review, D5): now both get the first's."""
+        from types import SimpleNamespace
+        from semantic_pdf_diff.dispatch import Dispatcher
+        from semantic_pdf_diff.failures import ModelFailure
+
+        class Client:
+            def __init__(self):
+                self.s, self.sent = SimpleNamespace(concurrency=2), 0
+            def prepare(self, prompt, schema, images, key):
+                return SimpleNamespace(query=prompt, key=key)
+            def cached(self, request):
+                return None
+            def send(self, request):
+                self.sent += 1
+                if self.sent == 1:
+                    raise ModelFailure("timed out")
+                return SimpleNamespace(answer="yes")
+            def save(self, request, value):
+                pass
+        for during in (True, False):
+            outcomes = []
+            finish = lambda value, error, outcomes=outcomes: outcomes.append((value and value.answer,
+                                                                             str(error) if error else None))
+            client = Client()
+            with Dispatcher(client) as dispatch, self.subTest(during=during):
+                dispatch.submit('q', None, (), None, finish)
+                if not during:
+                    dispatch.drain()
+                dispatch.submit('q', None, (), None, finish)
+                dispatch.drain()
+                self.assertEqual(outcomes, [(None, 'timed out')] * 2)
+                self.assertEqual(client.sent, 1)
+
 if __name__ == '__main__':
     unittest.main()
