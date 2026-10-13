@@ -59,5 +59,6 @@
   "skip_text_only": false,
   "another_tiling": "off",
   "halve_parts": false,
-  "leave_text": "none"
+  "leave_text": "none",
+  "images_first": false
 }

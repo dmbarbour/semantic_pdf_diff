@@ -31,14 +31,14 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 32,
+    "no change": 31,
     "unscored": 2
    },
    "findings": {
     "different": 4,
-    "equivalent": 34
+    "equivalent": 33
    },
-   "unmatched": 5,
+   "unmatched": 4,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -455,14 +455,15 @@
     "removed": 1,
     "unchanged": 23
    },
-   "changes_found": "4/4",
+   "changes_found": "3/4",
    "additions_found": "3/3",
    "removals_found": "1/1",
    "unchanged_confirmed": "23/23",
    "false_changes": 0,
-   "difference_precision": 0.8,
+   "difference_precision": 1.0,
    "changed": {
-    "reported": 4
+    "reported": 3,
+    "unpaired": 1
    },
    "conditions": {},
    "added": {
@@ -475,30 +476,26 @@
     "confirmed": 23
    },
    "different": {
-    "change": 4,
-    "unscored": 1
+    "change": 3
    },
    "equivalent": {
-    "no change": 33,
+    "no change": 29,
     "unscored": 1
    },
    "findings": {
-    "different": 5,
-    "equivalent": 34
+    "different": 3,
+    "equivalent": 30
    },
-   "unmatched": 5,
-   "pairs": 15,
+   "unmatched": 10,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 4
-     },
-     "unscored": {
-      "changed": 1
+      "changed": 3
      }
     }
    },
@@ -518,7 +515,7 @@
     "el.Zero-g roll.height": "confirmed",
     "el.Zero-g roll.speed": "confirmed",
     "ride.angle": "confirmed",
-    "ride.capacity": "reported",
+    "ride.capacity": "unpaired",
     "ride.drop": "confirmed",
     "ride.duration": "confirmed",
     "ride.g_max": "confirmed",
@@ -1613,25 +1610,26 @@
     "confirmed": 18
    },
    "different": {
-    "change": 3
+    "change": 5
    },
    "equivalent": {
-    "no change": 20
+    "no change": 21,
+    "unscored": 3
    },
    "findings": {
-    "different": 3,
-    "equivalent": 20
+    "different": 5,
+    "equivalent": 24
    },
    "unmatched": 4,
-   "pairs": 5,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
-    "right": 3,
-    "scored": 3,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 3
+      "changed": 5
      }
     }
    },
@@ -2012,7 +2010,7 @@
     "different": 4,
     "equivalent": 17
    },
-   "unmatched": 2,
+   "unmatched": 1,
    "pairs": 13,
    "omitted": 0,
    "kinds": {
@@ -2342,26 +2340,26 @@
     "confirmed": 35
    },
    "different": {
-    "change": 7
+    "change": 5
    },
    "equivalent": {
-    "no change": 95,
-    "unscored": 16
+    "no change": 54,
+    "unscored": 22
    },
    "findings": {
-    "different": 7,
-    "equivalent": 111
+    "different": 5,
+    "equivalent": 76
    },
-   "unmatched": 18,
-   "pairs": 13,
+   "unmatched": 14,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
-    "right": 7,
-    "scored": 7,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 7
+      "changed": 5
      }
     }
    },
@@ -3615,12 +3613,12 @@
     "change": 1
    },
    "equivalent": {
-    "no change": 32,
+    "no change": 34,
     "unscored": 2
    },
    "findings": {
     "different": 1,
-    "equivalent": 34,
+    "equivalent": 36,
     "uncertain": 1
    },
    "unmatched": 2,
@@ -4802,13 +4800,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 34,
+    "no change": 36,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 36
+    "equivalent": 38
    },
-   "unmatched": 1,
+   "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
    "detail": {
@@ -5129,7 +5127,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 0.7143,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -5141,32 +5139,27 @@
     "unextracted": 2
    },
    "different": {
-    "across facts": 2,
-    "change": 5
+    "change": 4
    },
    "equivalent": {
-    "no change": 26,
+    "no change": 18,
     "unscored": 3
    },
    "findings": {
-    "different": 7,
-    "equivalent": 29,
-    "uncertain": 1,
-    "unrelated": 3
+    "different": 4,
+    "equivalent": 21,
+    "uncertain": 1
    },
-   "unmatched": 4,
-   "pairs": 20,
+   "unmatched": 2,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
-    "right": 7,
-    "scored": 7,
+    "right": 4,
+    "scored": 4,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "change": {
-      "changed": 5
+      "changed": 4
      },
      "unscored": {
       "restated": 1
@@ -5541,27 +5534,26 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 23,
+    "no change": 19,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 25,
-    "uncertain": 5,
-    "unrelated": 3
+    "equivalent": 21,
+    "uncertain": 2,
+    "unrelated": 1
    },
-   "unmatched": 14,
-   "pairs": 18,
+   "unmatched": 9,
+   "pairs": 10,
    "omitted": 0,
    "kinds": {
     "right": 0,
-    "scored": 2,
-    "value_change_precision": 0.0,
+    "scored": 1,
+    "value_change_precision": null,
     "by_claims": {
      "no change": {
-      "conditions": 2
+      "not_same_item": 1
      },
      "unscored": {
-      "misread": 2,
       "not_same_item": 1
      }
     }
@@ -5872,9 +5864,9 @@
    "changes_found": "0/0",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "18/21",
+   "unchanged_confirmed": "17/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
@@ -5882,40 +5874,32 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 18,
-    "uncertain": 1,
+    "confirmed": 17,
+    "uncertain": 2,
     "unextracted": 2
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
-    "no change": 31,
-    "unscored": 1
+    "no change": 21,
+    "unscored": 2
    },
    "findings": {
-    "different": 2,
-    "equivalent": 32,
-    "uncertain": 6,
-    "unrelated": 2
+    "equivalent": 23,
+    "uncertain": 3,
+    "unrelated": 1
    },
-   "unmatched": 15,
-   "pairs": 25,
+   "unmatched": 16,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 5,
-    "value_change_precision": 0.0,
+    "right": 0,
+    "scored": 2,
+    "value_change_precision": null,
     "by_claims": {
-     "across facts": {
+     "no change": {
       "not_same_item": 2
      },
-     "no change": {
-      "conditions": 2,
-      "not_same_item": 1
-     },
      "unscored": {
-      "misread": 2,
       "not_same_item": 1
      }
     }
@@ -5926,7 +5910,7 @@
     "fail.duration": "unextracted",
     "fail.fatal": "reported",
     "fail.retx": "confirmed",
-    "fail.snr": "confirmed",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
@@ -6268,7 +6252,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "18/19",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {
     "settled": 1,
@@ -6280,31 +6264,24 @@
     "confirmed": 18,
     "unextracted": 1
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
     "change": 1,
-    "no change": 30,
-    "unscored": 2
+    "no change": 23,
+    "unscored": 3
    },
    "findings": {
-    "different": 2,
-    "equivalent": 33,
-    "uncertain": 1,
-    "unrelated": 1
+    "equivalent": 27,
+    "uncertain": 1
    },
-   "unmatched": 4,
-   "pairs": 18,
+   "unmatched": 2,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 2,
+    "right": 0,
+    "scored": 0,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "unscored": {
       "restated": 1
      }
@@ -6641,15 +6618,14 @@
     "removed": 0,
     "unchanged": 24
    },
-   "changes_found": "1/2",
+   "changes_found": "2/2",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "23/24",
+   "unchanged_confirmed": "24/24",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
-    "reported": 1,
-    "uncertain": 1
+    "reported": 2
    },
    "conditions": {},
    "added": {
@@ -6657,21 +6633,20 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 23,
-    "unpaired": 1
+    "confirmed": 24
    },
    "different": {
-    "change": 1
+    "change": 2
    },
    "equivalent": {
-    "no change": 25
+    "no change": 27,
+    "unscored": 1
    },
    "findings": {
-    "different": 1,
-    "equivalent": 25,
-    "uncertain": 2
+    "different": 2,
+    "equivalent": 28
    },
-   "unmatched": 30,
+   "unmatched": 6,
    "pairs": 9,
    "omitted": 0,
    "kinds": {
@@ -6681,15 +6656,12 @@
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "unscored": {
-      "not_same_item": 1
      }
     }
    },
    "detail": {
     "attach.attempts": "confirmed",
-    "attach.deadline": "unpaired",
+    "attach.deadline": "confirmed",
     "challenge.timeout": "reported",
     "msg1.interval": "confirmed",
     "msg10.budget": "confirmed",
@@ -6698,7 +6670,7 @@
     "msg13.lifetime": "confirmed",
     "msg14.deadline": "confirmed",
     "msg15.window": "confirmed",
-    "msg16.timer": "uncertain",
+    "msg16.timer": "reported",
     "msg17.window": "confirmed",
     "msg18.interval": "confirmed",
     "msg19.lifetime": "confirmed",
@@ -6752,7 +6724,7 @@
     "different": 2,
     "equivalent": 24
    },
-   "unmatched": 16,
+   "unmatched": 1,
    "pairs": 2,
    "omitted": 0,
    "kinds": {
@@ -7073,14 +7045,14 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 32,
+    "no change": 31,
     "unscored": 2
    },
    "findings": {
     "different": 4,
-    "equivalent": 34
+    "equivalent": 33
    },
-   "unmatched": 5,
+   "unmatched": 4,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -7497,14 +7469,15 @@
     "removed": 1,
     "unchanged": 23
    },
-   "changes_found": "4/4",
+   "changes_found": "3/4",
    "additions_found": "3/3",
    "removals_found": "1/1",
    "unchanged_confirmed": "23/23",
    "false_changes": 0,
-   "difference_precision": 0.8,
+   "difference_precision": 1.0,
    "changed": {
-    "reported": 4
+    "reported": 3,
+    "unpaired": 1
    },
    "conditions": {},
    "added": {
@@ -7517,30 +7490,26 @@
     "confirmed": 23
    },
    "different": {
-    "change": 4,
-    "unscored": 1
+    "change": 3
    },
    "equivalent": {
-    "no change": 33,
+    "no change": 29,
     "unscored": 1
    },
    "findings": {
-    "different": 5,
-    "equivalent": 34
+    "different": 3,
+    "equivalent": 30
    },
-   "unmatched": 5,
-   "pairs": 15,
+   "unmatched": 10,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 4
-     },
-     "unscored": {
-      "changed": 1
+      "changed": 3
      }
     }
    },
@@ -7560,7 +7529,7 @@
     "el.Zero-g roll.height": "confirmed",
     "el.Zero-g roll.speed": "confirmed",
     "ride.angle": "confirmed",
-    "ride.capacity": "reported",
+    "ride.capacity": "unpaired",
     "ride.drop": "confirmed",
     "ride.duration": "confirmed",
     "ride.g_max": "confirmed",
@@ -8655,25 +8624,26 @@
     "confirmed": 18
    },
    "different": {
-    "change": 3
+    "change": 5
    },
    "equivalent": {
-    "no change": 20
+    "no change": 21,
+    "unscored": 3
    },
    "findings": {
-    "different": 3,
-    "equivalent": 20
+    "different": 5,
+    "equivalent": 24
    },
    "unmatched": 4,
-   "pairs": 5,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
-    "right": 3,
-    "scored": 3,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 3
+      "changed": 5
      }
     }
    },
@@ -9054,7 +9024,7 @@
     "different": 4,
     "equivalent": 17
    },
-   "unmatched": 2,
+   "unmatched": 1,
    "pairs": 13,
    "omitted": 0,
    "kinds": {
@@ -9384,26 +9354,26 @@
     "confirmed": 35
    },
    "different": {
-    "change": 7
+    "change": 5
    },
    "equivalent": {
-    "no change": 95,
-    "unscored": 16
+    "no change": 54,
+    "unscored": 22
    },
    "findings": {
-    "different": 7,
-    "equivalent": 111
+    "different": 5,
+    "equivalent": 76
    },
-   "unmatched": 18,
-   "pairs": 13,
+   "unmatched": 14,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
-    "right": 7,
-    "scored": 7,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 7
+      "changed": 5
      }
     }
    },
@@ -10657,12 +10627,12 @@
     "change": 1
    },
    "equivalent": {
-    "no change": 32,
+    "no change": 34,
     "unscored": 2
    },
    "findings": {
     "different": 1,
-    "equivalent": 34,
+    "equivalent": 36,
     "uncertain": 1
    },
    "unmatched": 2,
@@ -11844,13 +11814,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 34,
+    "no change": 36,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 36
+    "equivalent": 38
    },
-   "unmatched": 1,
+   "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
    "detail": {
@@ -12171,7 +12141,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 0.7143,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -12183,32 +12153,27 @@
     "unextracted": 2
    },
    "different": {
-    "across facts": 2,
-    "change": 5
+    "change": 4
    },
    "equivalent": {
-    "no change": 26,
+    "no change": 18,
     "unscored": 3
    },
    "findings": {
-    "different": 7,
-    "equivalent": 29,
-    "uncertain": 1,
-    "unrelated": 3
+    "different": 4,
+    "equivalent": 21,
+    "uncertain": 1
    },
-   "unmatched": 4,
-   "pairs": 20,
+   "unmatched": 2,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
-    "right": 7,
-    "scored": 7,
+    "right": 4,
+    "scored": 4,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "change": {
-      "changed": 5
+      "changed": 4
      },
      "unscored": {
       "restated": 1
@@ -12583,27 +12548,26 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 23,
+    "no change": 19,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 25,
-    "uncertain": 5,
-    "unrelated": 3
+    "equivalent": 21,
+    "uncertain": 2,
+    "unrelated": 1
    },
-   "unmatched": 14,
-   "pairs": 18,
+   "unmatched": 9,
+   "pairs": 10,
    "omitted": 0,
    "kinds": {
     "right": 0,
-    "scored": 2,
-    "value_change_precision": 0.0,
+    "scored": 1,
+    "value_change_precision": null,
     "by_claims": {
      "no change": {
-      "conditions": 2
+      "not_same_item": 1
      },
      "unscored": {
-      "misread": 2,
       "not_same_item": 1
      }
     }
@@ -12914,9 +12878,9 @@
    "changes_found": "0/0",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "18/21",
+   "unchanged_confirmed": "17/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
@@ -12924,40 +12888,32 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 18,
-    "uncertain": 1,
+    "confirmed": 17,
+    "uncertain": 2,
     "unextracted": 2
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
-    "no change": 31,
-    "unscored": 1
+    "no change": 21,
+    "unscored": 2
    },
    "findings": {
-    "different": 2,
-    "equivalent": 32,
-    "uncertain": 6,
-    "unrelated": 2
+    "equivalent": 23,
+    "uncertain": 3,
+    "unrelated": 1
    },
-   "unmatched": 15,
-   "pairs": 25,
+   "unmatched": 16,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 5,
-    "value_change_precision": 0.0,
+    "right": 0,
+    "scored": 2,
+    "value_change_precision": null,
     "by_claims": {
-     "across facts": {
+     "no change": {
       "not_same_item": 2
      },
-     "no change": {
-      "conditions": 2,
-      "not_same_item": 1
-     },
      "unscored": {
-      "misread": 2,
       "not_same_item": 1
      }
     }
@@ -12968,7 +12924,7 @@
     "fail.duration": "unextracted",
     "fail.fatal": "reported",
     "fail.retx": "confirmed",
-    "fail.snr": "confirmed",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
@@ -13310,7 +13266,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "18/19",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {
     "settled": 1,
@@ -13322,31 +13278,24 @@
     "confirmed": 18,
     "unextracted": 1
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
     "change": 1,
-    "no change": 30,
-    "unscored": 2
+    "no change": 23,
+    "unscored": 3
    },
    "findings": {
-    "different": 2,
-    "equivalent": 33,
-    "uncertain": 1,
-    "unrelated": 1
+    "equivalent": 27,
+    "uncertain": 1
    },
-   "unmatched": 4,
-   "pairs": 18,
+   "unmatched": 2,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 2,
+    "right": 0,
+    "scored": 0,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "unscored": {
       "restated": 1
      }
@@ -13683,15 +13632,14 @@
     "removed": 0,
     "unchanged": 24
    },
-   "changes_found": "1/2",
+   "changes_found": "2/2",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "23/24",
+   "unchanged_confirmed": "24/24",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
-    "reported": 1,
-    "uncertain": 1
+    "reported": 2
    },
    "conditions": {},
    "added": {
@@ -13699,21 +13647,20 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 23,
-    "unpaired": 1
+    "confirmed": 24
    },
    "different": {
-    "change": 1
+    "change": 2
    },
    "equivalent": {
-    "no change": 25
+    "no change": 27,
+    "unscored": 1
    },
    "findings": {
-    "different": 1,
-    "equivalent": 25,
-    "uncertain": 2
+    "different": 2,
+    "equivalent": 28
    },
-   "unmatched": 30,
+   "unmatched": 6,
    "pairs": 9,
    "omitted": 0,
    "kinds": {
@@ -13723,15 +13670,12 @@
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "unscored": {
-      "not_same_item": 1
      }
     }
    },
    "detail": {
     "attach.attempts": "confirmed",
-    "attach.deadline": "unpaired",
+    "attach.deadline": "confirmed",
     "challenge.timeout": "reported",
     "msg1.interval": "confirmed",
     "msg10.budget": "confirmed",
@@ -13740,7 +13684,7 @@
     "msg13.lifetime": "confirmed",
     "msg14.deadline": "confirmed",
     "msg15.window": "confirmed",
-    "msg16.timer": "uncertain",
+    "msg16.timer": "reported",
     "msg17.window": "confirmed",
     "msg18.interval": "confirmed",
     "msg19.lifetime": "confirmed",
@@ -13794,7 +13738,7 @@
     "different": 2,
     "equivalent": 24
    },
-   "unmatched": 16,
+   "unmatched": 1,
    "pairs": 2,
    "omitted": 0,
    "kinds": {
@@ -15729,14 +15673,14 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 32,
+    "no change": 31,
     "unscored": 2
    },
    "findings": {
     "different": 4,
-    "equivalent": 34
+    "equivalent": 33
    },
-   "unmatched": 5,
+   "unmatched": 4,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -16066,14 +16010,15 @@
     "removed": 1,
     "unchanged": 23
    },
-   "changes_found": "4/4",
+   "changes_found": "3/4",
    "additions_found": "3/3",
    "removals_found": "1/1",
    "unchanged_confirmed": "23/23",
    "false_changes": 0,
-   "difference_precision": 0.8,
+   "difference_precision": 1.0,
    "changed": {
-    "reported": 4
+    "reported": 3,
+    "unpaired": 1
    },
    "conditions": {},
    "added": {
@@ -16086,30 +16031,26 @@
     "confirmed": 23
    },
    "different": {
-    "change": 4,
-    "unscored": 1
+    "change": 3
    },
    "equivalent": {
-    "no change": 33,
+    "no change": 29,
     "unscored": 1
    },
    "findings": {
-    "different": 5,
-    "equivalent": 34
+    "different": 3,
+    "equivalent": 30
    },
-   "unmatched": 5,
-   "pairs": 15,
+   "unmatched": 10,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 4
-     },
-     "unscored": {
-      "changed": 1
+      "changed": 3
      }
     }
    },
@@ -16129,7 +16070,7 @@
     "el.Zero-g roll.height": "confirmed",
     "el.Zero-g roll.speed": "confirmed",
     "ride.angle": "confirmed",
-    "ride.capacity": "reported",
+    "ride.capacity": "unpaired",
     "ride.drop": "confirmed",
     "ride.duration": "confirmed",
     "ride.g_max": "confirmed",
@@ -16998,25 +16939,26 @@
     "confirmed": 18
    },
    "different": {
-    "change": 3
+    "change": 5
    },
    "equivalent": {
-    "no change": 20
+    "no change": 21,
+    "unscored": 3
    },
    "findings": {
-    "different": 3,
-    "equivalent": 20
+    "different": 5,
+    "equivalent": 24
    },
    "unmatched": 4,
-   "pairs": 5,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
-    "right": 3,
-    "scored": 3,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 3
+      "changed": 5
      }
     }
    },
@@ -17318,7 +17260,7 @@
     "different": 4,
     "equivalent": 17
    },
-   "unmatched": 2,
+   "unmatched": 1,
    "pairs": 13,
    "omitted": 0,
    "kinds": {
@@ -17594,26 +17536,26 @@
     "confirmed": 35
    },
    "different": {
-    "change": 7
+    "change": 6
    },
    "equivalent": {
-    "no change": 102,
-    "unscored": 16
+    "no change": 62,
+    "unscored": 22
    },
    "findings": {
-    "different": 7,
-    "equivalent": 118
+    "different": 6,
+    "equivalent": 84
    },
-   "unmatched": 19,
-   "pairs": 13,
+   "unmatched": 12,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
-    "right": 7,
-    "scored": 7,
+    "right": 6,
+    "scored": 6,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 7
+      "changed": 6
      }
     }
    },
@@ -18631,12 +18573,12 @@
     "change": 1
    },
    "equivalent": {
-    "no change": 32,
+    "no change": 34,
     "unscored": 2
    },
    "findings": {
     "different": 1,
-    "equivalent": 34,
+    "equivalent": 36,
     "uncertain": 1
    },
    "unmatched": 2,
@@ -19583,13 +19525,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 34,
+    "no change": 36,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 36
+    "equivalent": 38
    },
-   "unmatched": 1,
+   "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
    "detail": {
@@ -19857,28 +19799,28 @@
     "unextracted": 2
    },
    "different": {
-    "change": 5
+    "change": 4
    },
    "equivalent": {
-    "no change": 26,
+    "no change": 25,
     "unscored": 3
    },
    "findings": {
-    "different": 5,
-    "equivalent": 29,
+    "different": 4,
+    "equivalent": 28,
     "uncertain": 1,
-    "unrelated": 3
+    "unrelated": 2
    },
-   "unmatched": 4,
-   "pairs": 20,
+   "unmatched": 2,
+   "pairs": 18,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 4,
+    "scored": 4,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 5
+      "changed": 4
      },
      "unscored": {
       "restated": 1
@@ -20172,27 +20114,26 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 23,
+    "no change": 20,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 25,
-    "uncertain": 5,
+    "equivalent": 22,
+    "uncertain": 2,
     "unrelated": 2
    },
-   "unmatched": 13,
-   "pairs": 17,
+   "unmatched": 10,
+   "pairs": 14,
    "omitted": 0,
    "kinds": {
     "right": 0,
-    "scored": 2,
-    "value_change_precision": 0.0,
+    "scored": 1,
+    "value_change_precision": null,
     "by_claims": {
      "no change": {
-      "conditions": 2
+      "not_same_item": 1
      },
      "unscored": {
-      "misread": 2,
       "not_same_item": 1
      }
     }
@@ -20440,9 +20381,9 @@
    "changes_found": "0/0",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "18/21",
+   "unchanged_confirmed": "17/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
@@ -20450,40 +20391,32 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 18,
-    "uncertain": 1,
+    "confirmed": 17,
+    "uncertain": 2,
     "unextracted": 2
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
-    "no change": 30,
-    "unscored": 1
+    "no change": 27,
+    "unscored": 2
    },
    "findings": {
-    "different": 2,
-    "equivalent": 31,
-    "uncertain": 6,
-    "unrelated": 2
+    "equivalent": 29,
+    "uncertain": 3,
+    "unrelated": 1
    },
-   "unmatched": 15,
-   "pairs": 25,
+   "unmatched": 16,
+   "pairs": 15,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 5,
-    "value_change_precision": 0.0,
+    "right": 0,
+    "scored": 2,
+    "value_change_precision": null,
     "by_claims": {
-     "across facts": {
+     "no change": {
       "not_same_item": 2
      },
-     "no change": {
-      "conditions": 2,
-      "not_same_item": 1
-     },
      "unscored": {
-      "misread": 2,
       "not_same_item": 1
      }
     }
@@ -20494,7 +20427,7 @@
     "fail.duration": "unextracted",
     "fail.fatal": "reported",
     "fail.retx": "confirmed",
-    "fail.snr": "confirmed",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
@@ -20761,7 +20694,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "18/19",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {
     "settled": 1,
@@ -20773,31 +20706,24 @@
     "confirmed": 18,
     "unextracted": 1
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
     "change": 1,
     "no change": 29,
-    "unscored": 2
+    "unscored": 3
    },
    "findings": {
-    "different": 2,
-    "equivalent": 32,
-    "uncertain": 1,
-    "unrelated": 1
+    "equivalent": 33,
+    "uncertain": 1
    },
-   "unmatched": 4,
-   "pairs": 18,
+   "unmatched": 2,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 2,
+    "right": 0,
+    "scored": 0,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "unscored": {
       "restated": 1
      }
@@ -21054,15 +20980,14 @@
     "removed": 0,
     "unchanged": 24
    },
-   "changes_found": "1/2",
+   "changes_found": "2/2",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "23/24",
+   "unchanged_confirmed": "24/24",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
-    "reported": 1,
-    "uncertain": 1
+    "reported": 2
    },
    "conditions": {},
    "added": {
@@ -21070,21 +20995,20 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 23,
-    "unpaired": 1
+    "confirmed": 24
    },
    "different": {
-    "change": 1
+    "change": 2
    },
    "equivalent": {
-    "no change": 25
+    "no change": 27,
+    "unscored": 1
    },
    "findings": {
-    "different": 1,
-    "equivalent": 25,
-    "uncertain": 2
+    "different": 2,
+    "equivalent": 28
    },
-   "unmatched": 30,
+   "unmatched": 6,
    "pairs": 9,
    "omitted": 0,
    "kinds": {
@@ -21094,15 +21018,12 @@
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "unscored": {
-      "not_same_item": 1
      }
     }
    },
    "detail": {
     "attach.attempts": "confirmed",
-    "attach.deadline": "unpaired",
+    "attach.deadline": "confirmed",
     "challenge.timeout": "reported",
     "msg1.interval": "confirmed",
     "msg10.budget": "confirmed",
@@ -21111,7 +21032,7 @@
     "msg13.lifetime": "confirmed",
     "msg14.deadline": "confirmed",
     "msg15.window": "confirmed",
-    "msg16.timer": "uncertain",
+    "msg16.timer": "reported",
     "msg17.window": "confirmed",
     "msg18.interval": "confirmed",
     "msg19.lifetime": "confirmed",
@@ -21165,7 +21086,7 @@
     "different": 2,
     "equivalent": 24
    },
-   "unmatched": 16,
+   "unmatched": 1,
    "pairs": 2,
    "omitted": 0,
    "kinds": {
@@ -21487,14 +21408,14 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 32,
+    "no change": 31,
     "unscored": 2
    },
    "findings": {
     "different": 4,
-    "equivalent": 34
+    "equivalent": 33
    },
-   "unmatched": 5,
+   "unmatched": 4,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -21824,14 +21745,15 @@
     "removed": 1,
     "unchanged": 23
    },
-   "changes_found": "4/4",
+   "changes_found": "3/4",
    "additions_found": "3/3",
    "removals_found": "1/1",
    "unchanged_confirmed": "23/23",
    "false_changes": 0,
-   "difference_precision": 0.8,
+   "difference_precision": 1.0,
    "changed": {
-    "reported": 4
+    "reported": 3,
+    "unpaired": 1
    },
    "conditions": {},
    "added": {
@@ -21844,30 +21766,26 @@
     "confirmed": 23
    },
    "different": {
-    "change": 4,
-    "unscored": 1
+    "change": 3
    },
    "equivalent": {
-    "no change": 33,
+    "no change": 29,
     "unscored": 1
    },
    "findings": {
-    "different": 5,
-    "equivalent": 34
+    "different": 3,
+    "equivalent": 30
    },
-   "unmatched": 5,
-   "pairs": 15,
+   "unmatched": 10,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 4
-     },
-     "unscored": {
-      "changed": 1
+      "changed": 3
      }
     }
    },
@@ -21887,7 +21805,7 @@
     "el.Zero-g roll.height": "confirmed",
     "el.Zero-g roll.speed": "confirmed",
     "ride.angle": "confirmed",
-    "ride.capacity": "reported",
+    "ride.capacity": "unpaired",
     "ride.drop": "confirmed",
     "ride.duration": "confirmed",
     "ride.g_max": "confirmed",
@@ -22756,25 +22674,26 @@
     "confirmed": 18
    },
    "different": {
-    "change": 3
+    "change": 5
    },
    "equivalent": {
-    "no change": 20
+    "no change": 21,
+    "unscored": 3
    },
    "findings": {
-    "different": 3,
-    "equivalent": 20
+    "different": 5,
+    "equivalent": 24
    },
    "unmatched": 4,
-   "pairs": 5,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
-    "right": 3,
-    "scored": 3,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 3
+      "changed": 5
      }
     }
    },
@@ -23076,7 +22995,7 @@
     "different": 4,
     "equivalent": 17
    },
-   "unmatched": 2,
+   "unmatched": 1,
    "pairs": 13,
    "omitted": 0,
    "kinds": {
@@ -23352,26 +23271,26 @@
     "confirmed": 35
    },
    "different": {
-    "change": 7
+    "change": 6
    },
    "equivalent": {
-    "no change": 102,
-    "unscored": 16
+    "no change": 62,
+    "unscored": 22
    },
    "findings": {
-    "different": 7,
-    "equivalent": 118
+    "different": 6,
+    "equivalent": 84
    },
-   "unmatched": 19,
-   "pairs": 13,
+   "unmatched": 12,
+   "pairs": 9,
    "omitted": 0,
    "kinds": {
-    "right": 7,
-    "scored": 7,
+    "right": 6,
+    "scored": 6,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 7
+      "changed": 6
      }
     }
    },
@@ -24389,12 +24308,12 @@
     "change": 1
    },
    "equivalent": {
-    "no change": 32,
+    "no change": 34,
     "unscored": 2
    },
    "findings": {
     "different": 1,
-    "equivalent": 34,
+    "equivalent": 36,
     "uncertain": 1
    },
    "unmatched": 2,
@@ -25341,13 +25260,13 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 34,
+    "no change": 36,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 36
+    "equivalent": 38
    },
-   "unmatched": 1,
+   "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
    "detail": {
@@ -25615,28 +25534,28 @@
     "unextracted": 2
    },
    "different": {
-    "change": 5
+    "change": 4
    },
    "equivalent": {
-    "no change": 26,
+    "no change": 25,
     "unscored": 3
    },
    "findings": {
-    "different": 5,
-    "equivalent": 29,
+    "different": 4,
+    "equivalent": 28,
     "uncertain": 1,
-    "unrelated": 3
+    "unrelated": 2
    },
-   "unmatched": 4,
-   "pairs": 20,
+   "unmatched": 2,
+   "pairs": 18,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 4,
+    "scored": 4,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
-      "changed": 5
+      "changed": 4
      },
      "unscored": {
       "restated": 1
@@ -25930,27 +25849,26 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 23,
+    "no change": 20,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 25,
-    "uncertain": 5,
+    "equivalent": 22,
+    "uncertain": 2,
     "unrelated": 2
    },
-   "unmatched": 13,
-   "pairs": 17,
+   "unmatched": 10,
+   "pairs": 14,
    "omitted": 0,
    "kinds": {
     "right": 0,
-    "scored": 2,
-    "value_change_precision": 0.0,
+    "scored": 1,
+    "value_change_precision": null,
     "by_claims": {
      "no change": {
-      "conditions": 2
+      "not_same_item": 1
      },
      "unscored": {
-      "misread": 2,
       "not_same_item": 1
      }
     }
@@ -26198,9 +26116,9 @@
    "changes_found": "0/0",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "18/21",
+   "unchanged_confirmed": "17/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
@@ -26208,40 +26126,32 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 18,
-    "uncertain": 1,
+    "confirmed": 17,
+    "uncertain": 2,
     "unextracted": 2
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
-    "no change": 30,
-    "unscored": 1
+    "no change": 27,
+    "unscored": 2
    },
    "findings": {
-    "different": 2,
-    "equivalent": 31,
-    "uncertain": 6,
-    "unrelated": 2
+    "equivalent": 29,
+    "uncertain": 3,
+    "unrelated": 1
    },
-   "unmatched": 15,
-   "pairs": 25,
+   "unmatched": 16,
+   "pairs": 15,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 5,
-    "value_change_precision": 0.0,
+    "right": 0,
+    "scored": 2,
+    "value_change_precision": null,
     "by_claims": {
-     "across facts": {
+     "no change": {
       "not_same_item": 2
      },
-     "no change": {
-      "conditions": 2,
-      "not_same_item": 1
-     },
      "unscored": {
-      "misread": 2,
       "not_same_item": 1
      }
     }
@@ -26252,7 +26162,7 @@
     "fail.duration": "unextracted",
     "fail.fatal": "reported",
     "fail.retx": "confirmed",
-    "fail.snr": "confirmed",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
@@ -26519,7 +26429,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "18/19",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {
     "settled": 1,
@@ -26531,31 +26441,24 @@
     "confirmed": 18,
     "unextracted": 1
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
     "change": 1,
     "no change": 29,
-    "unscored": 2
+    "unscored": 3
    },
    "findings": {
-    "different": 2,
-    "equivalent": 32,
-    "uncertain": 1,
-    "unrelated": 1
+    "equivalent": 33,
+    "uncertain": 1
    },
-   "unmatched": 4,
-   "pairs": 18,
+   "unmatched": 2,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 2,
+    "right": 0,
+    "scored": 0,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "unscored": {
       "restated": 1
      }
@@ -26812,15 +26715,14 @@
     "removed": 0,
     "unchanged": 24
    },
-   "changes_found": "1/2",
+   "changes_found": "2/2",
    "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "23/24",
+   "unchanged_confirmed": "24/24",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
-    "reported": 1,
-    "uncertain": 1
+    "reported": 2
    },
    "conditions": {},
    "added": {
@@ -26828,21 +26730,20 @@
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 23,
-    "unpaired": 1
+    "confirmed": 24
    },
    "different": {
-    "change": 1
+    "change": 2
    },
    "equivalent": {
-    "no change": 25
+    "no change": 27,
+    "unscored": 1
    },
    "findings": {
-    "different": 1,
-    "equivalent": 25,
-    "uncertain": 2
+    "different": 2,
+    "equivalent": 28
    },
-   "unmatched": 30,
+   "unmatched": 6,
    "pairs": 9,
    "omitted": 0,
    "kinds": {
@@ -26852,15 +26753,12 @@
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "unscored": {
-      "not_same_item": 1
      }
     }
    },
    "detail": {
     "attach.attempts": "confirmed",
-    "attach.deadline": "unpaired",
+    "attach.deadline": "confirmed",
     "challenge.timeout": "reported",
     "msg1.interval": "confirmed",
     "msg10.budget": "confirmed",
@@ -26869,7 +26767,7 @@
     "msg13.lifetime": "confirmed",
     "msg14.deadline": "confirmed",
     "msg15.window": "confirmed",
-    "msg16.timer": "uncertain",
+    "msg16.timer": "reported",
     "msg17.window": "confirmed",
     "msg18.interval": "confirmed",
     "msg19.lifetime": "confirmed",
@@ -26923,7 +26821,7 @@
     "different": 2,
     "equivalent": 24
    },
-   "unmatched": 16,
+   "unmatched": 1,
    "pairs": 2,
    "omitted": 0,
    "kinds": {

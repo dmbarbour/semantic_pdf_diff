@@ -156,7 +156,7 @@ class VisualRules(Lever):
 class ImagesFirst(Lever):
     lever_name, stage, off = "images_first", "instructions", {"images_first": False}
     # a request's images before its text, as Google's guidance for gemma-4 has them (docs/reviews/levers.md's ideas)
-    images_first: Annotated[bool, _shaping(VISUAL, roles=EXTRACT + TRIAGE + COMPARE)] = False
+    images_first: Annotated[bool, _shaping(VISUAL, roles=EXTRACT + TRIAGE + COMPARE)] = True
 
     def puts_images_first(self):
         return self.images_first
@@ -677,8 +677,8 @@ class DedupeRepeated(Lever):
 # The canonical order: the prompt's (instructions, then context lines as the providers write them), then the
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
-# tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8) and leave_text's
-# tables (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
+# tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
+# tables and images_first (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, Neighbours, LeaveFurniture, TableContext,
                  StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails,
                  SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea,
