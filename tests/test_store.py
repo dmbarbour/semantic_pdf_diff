@@ -374,3 +374,23 @@ class ResumedRuns(unittest.TestCase):
         ran = {(r['content'], r['task']) for r in report['coverage']}
         self.assertFalse([r for r in report['coverage'] if r['status'] == 'not_reached'])
         self.assertEqual(stored, ran)
+
+class SharedAnswers(unittest.TestCase):
+    def test_collecting_content_keeps_an_answer_another_content_asked_for(self):
+        """A query two contents ask (the same page in two files) is cached under whichever asked first; collecting
+        that content dropped the answer the other still uses (the determinism review, D12)."""
+        with tempfile.TemporaryDirectory() as d, Store(Path(d) / 'store') as store:
+            kept, gone = 'sha256:' + 'a' * 64 + '.pdf', 'sha256:' + 'b' * 64 + '.pdf'
+            with store.db:
+                store.db.execute("INSERT INTO source VALUES ('s', '{}', NULL, '{}')")
+                for content in (kept, gone):
+                    store.db.execute("INSERT INTO content VALUES (?, 1, 0)", (content,))
+                store.db.execute("INSERT INTO file VALUES ('s', 'a.pdf', ?, 1, '', '', '', '{}')", (kept,))
+            for content in (kept, gone):
+                store.note_query('q-shared', ('extract', 'text', content, 'text:p1:0'), 'prompt', [])
+            store.note_query('q-own', ('extract', 'text', gone, 'text:p2:0'), 'prompt', [])
+            store.cache('k-shared', 'extract', 'text', 'q-shared', '{}', gone)  # the gone content asked first
+            store.cache('k-own', 'extract', 'text', 'q-own', '{}', gone)
+            self.assertEqual(store.gc()['cached_responses'], 1)
+            self.assertIsNotNone(store.cached('k-shared'))
+            self.assertIsNone(store.cached('k-own'))

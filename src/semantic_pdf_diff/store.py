@@ -477,11 +477,16 @@ class Store:
             marks = ",".join("?" * len(orphans))
             summary["evidence"] = self.db.execute(
                 f"SELECT COUNT(*) FROM evidence WHERE content IN ({marks})", orphans).fetchone()[0]
+            # a cached answer is labelled with the content that asked first; one another content also asked for is
+            # kept (the determinism review, D12)
+            unused = (f"content IN ({marks}) AND query NOT IN "
+                      f"(SELECT hash FROM query WHERE content NOT IN ({marks}))")
             summary["cached_responses"] = self.db.execute(
-                f"SELECT COUNT(*) FROM response_cache WHERE content IN ({marks})", orphans).fetchone()[0]
+                f"SELECT COUNT(*) FROM response_cache WHERE {unused}", orphans + orphans).fetchone()[0]
             if not dry_run:
                 with self._durable():
-                    for table in ("evidence", "task", "section", "situation", "response_cache", "query"):
+                    self.db.execute(f"DELETE FROM response_cache WHERE {unused}", orphans + orphans)
+                    for table in ("evidence", "task", "section", "situation", "query"):
                         self.db.execute(f"DELETE FROM {table} WHERE content IN ({marks})", orphans)
                     self.db.execute(f"DELETE FROM content WHERE id IN ({marks})", orphans)
                 for path in crops:
