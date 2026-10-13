@@ -207,5 +207,32 @@ class Merging(unittest.TestCase):
                 self.assertEqual(outcomes, [(None, 'timed out')] * 2)
                 self.assertEqual(client.sent, 1)
 
+    def test_the_last_call_goes_to_the_request_asked_first(self):
+        """Requests were counted under max_calls as worker threads took the lock, so which was refused followed
+        thread scheduling (the determinism review, D6): they're counted as they're asked."""
+        import threading
+        from semantic_pdf_diff.dispatch import Dispatcher
+        from semantic_pdf_diff.llm import Client
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
+        release = threading.Event()
+
+        def post(handler):
+            request_body(handler)
+            release.wait(5)
+            chat_answer(handler, {'claims': [], 'complete': True, 'issues': []})
+        with serving(post, threaded=True) as url:
+            client = Client(Settings(base_url=url, concurrency=4, max_calls=2, retries=0), None)
+            found = {}
+            with Dispatcher(client) as dispatch:
+                for name in ('first', 'second', 'third', 'fourth'):
+                    dispatch.submit(name, Extraction, (), None,
+                                    lambda value, error, name=name: found.__setitem__(name, type(error).__name__))
+                release.set()
+                dispatch.drain()
+        self.assertEqual(found, {'first': 'NoneType', 'second': 'NoneType', 'third': 'CallLimitReached',
+                                 'fourth': 'CallLimitReached'})
+        self.assertEqual(client.paused, 'call limit reached (2 requests)')
+
 if __name__ == '__main__':
     unittest.main()

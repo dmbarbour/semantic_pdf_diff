@@ -16,7 +16,7 @@ Configuration precedence, highest first: **CLI flags > JSON config file > enviro
 | `PDF_DIFF_CONTEXT_TOKENS` | Context budget |
 | `PDF_DIFF_OUTPUT_TOKENS` | Output reserve |
 | `PDF_DIFF_IMAGE_TOKENS` | Per-image budget estimate |
-| `PDF_DIFF_MAX_CALLS` | HTTP attempt limit |
+| `PDF_DIFF_MAX_CALLS` | Request limit (retries not counted) |
 | `PDF_DIFF_TIMEOUT` | HTTP timeout in seconds |
 | `PDF_DIFF_TOP_K` | Retrieval candidates per direction |
 | `PDF_DIFF_VISION` | Enable visual extraction (`true` or `false`) |
@@ -143,7 +143,7 @@ None of these affect output, so changing them never needs `--reset`.
 
 ## Calls, caching and exit codes
 
-A typical page needs multiple calls, so large PDFs can require hundreds or thousands. `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--max-calls` caps actual HTTP attempts for one invocation, including retries.
+A typical page needs multiple calls, so large PDFs can require hundreds or thousands. `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--max-calls` caps the requests sent in one invocation, counted as each is asked; retries don't count. A run a cap cuts (`--max-calls`, `--max-cost`, the provider's balance) says so in its report (`paused`): which work the cap cut followed the order answers came in, so the report isn't reproducible until the run is resumed.
 
 The `--out` folder is an evidence store: `store.sqlite` (sources, files, content, evidence, coverage, cached model responses, comparisons) plus `assets/` for rendered crops. Stores are created with owner-only permissions and are as sensitive as the documents they were built from.
 

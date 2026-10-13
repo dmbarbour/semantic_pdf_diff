@@ -164,6 +164,7 @@ class Request:
     unrecorded: bool = False   # replay found no answer: send fails without calling the model
     query: str = ""            # the query's hash (query_hash): the name answers are recorded and cached under
     description: dict | None = None  # facts about the query's content (describe)
+    admitted: bool = False     # counted under the caps (Transport.admit), on the thread that asked
 
     @cached_property
     def raw(self):
@@ -212,10 +213,12 @@ class Transport:
     def __init__(self, settings, api_key=None):
         self.s = settings
         self.api_key = api_key if api_key is not None else os.getenv("OPENAI_API_KEY", "")
-        self.calls = 0
+        self.calls = 0              # attempts posted, retries included (how the run went: run.json)
+        self.admitted = 0           # requests admitted under max_calls, retries not counted
         self.usage = {"prompt_tokens": 0, "completion_tokens": 0}
         self.cost = 0.0             # as the provider reports it (usage.estimated_cost)
         self.out_of_budget = None   # why sending stopped, once it has
+        self.limited = None         # the call limit, once a request was refused under it
         self.ledger = None          # a ledger.Ledger to record every paid attempt's cost
         self.warned_cost = False
         self.unpriced = 0           # responses without a reported cost (see Ledger.add)
@@ -230,8 +233,10 @@ class Transport:
         """Call the model, with retries (thread-safe): each attempt admitted under the caps, posted, its usage and cost
         accounted, its answer read; a refusal stops, fails or waits to retry."""
         last = "Unknown model failure"
+        if not request.admitted:  # a caller that didn't admit it as it asked
+            self.admit(request)
         for attempt in range(self.s.retries + 1):
-            self._admit()
+            self._attempt()
             wait = min(2 ** attempt, 8)
             http = urllib.request.Request(self.s.base_url.rstrip("/") + "/chat/completions", data=request.raw,
                 headers={"Content-Type": "application/json",
@@ -258,17 +263,34 @@ class Transport:
                 time.sleep(wait)
         raise ModelFailure(last)
 
-    def _admit(self):
-        """One more call counted, unless sending has stopped, the cost cap is reached or the call limit."""
+    def admit(self, request):
+        """One more request counted under the caps, unless sending has stopped, the cost cap is reached or the call
+        limit. The dispatcher admits each request as it's asked, on the calling thread, so which request the last
+        call goes to follows the order they're asked, not which worker thread gets the lock first (the determinism
+        review, D6). The cost cap still follows when answers' costs come in: a run it cuts is paused (paused)."""
         with self.lock:
             if self.out_of_budget:
                 raise OutOfBudget(self.out_of_budget)
             if self.s.max_cost is not None and self.cost >= self.s.max_cost:
                 self.out_of_budget = f"cost cap reached (${self.cost:.2f} of ${self.s.max_cost:.2f})"
                 raise OutOfBudget(self.out_of_budget)
-            if self.calls >= self.s.max_calls:
+            if self.admitted >= self.s.max_calls:
+                self.limited = f"call limit reached ({self.s.max_calls} requests)"
                 raise CallLimitReached("API call limit reached; rerun with cache and a higher --max-calls")
+            self.admitted += 1
+            request.admitted = True
+
+    def _attempt(self):
+        """One more attempt counted, unless sending has stopped (the provider's balance ran out)."""
+        with self.lock:
+            if self.out_of_budget:
+                raise OutOfBudget(self.out_of_budget)
             self.calls += 1
+
+    @property
+    def paused(self):
+        """Why a cap cut the run, if one did: which work it cut followed the order answers came in."""
+        return self.out_of_budget or self.limited
 
     def _post(self, http):
         """The endpoint's response, streamed or not, as a JSON object."""
@@ -402,6 +424,7 @@ class Client:
     cost = property(lambda self: self.transport.cost)
     unpriced = property(lambda self: self.transport.unpriced)
     out_of_budget = property(lambda self: self.transport.out_of_budget)
+    paused = property(lambda self: self.transport.paused)
     limiter = property(lambda self: self.transport.limiter)
     gate = property(lambda self: self.transport.gate)
     api_key = property(lambda self: self.transport.api_key)
@@ -474,6 +497,11 @@ class Client:
     def _record(self, request, answer, error):
         if self.replay is not None:
             self.replay.record(request.query, request.key, answer, error, request.usage, request.description)
+
+    def admit(self, request):
+        """Count a request under the caps as it's asked (main thread; Transport.admit)."""
+        if not request.admitted and not request.unrecorded:
+            self.transport.admit(request)
 
     def send(self, request):
         """Call the model through the transport (thread-safe; touches neither the cache nor the store)."""

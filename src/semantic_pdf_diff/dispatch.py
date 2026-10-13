@@ -67,6 +67,14 @@ class Dispatcher:
         if same is not None and same in self.waiting:
             self.waiting[same].append((request, finish))
             return
+        if hasattr(self.client, "admit"):  # counted under the caps as asked, here, not on a worker (review, D6)
+            try:
+                self.client.admit(request)
+            except ModelFailure as e:
+                if same is not None:
+                    self.outcomes[same] = (None, e)
+                finish(None, e)
+                return
         if same is not None:
             self.waiting[same] = []
         if self.shuffle is not None and (value is not None or getattr(request, "unrecorded", False)):

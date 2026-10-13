@@ -146,6 +146,9 @@ def header_html(data):
     issues = [r for r in data['coverage'] if r['status'] != 'complete']
     page = '<header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1>'
     page += f"<p>{' ↔ '.join(esc(x['name']) for x in data['sources'])}</p><p>Mode: {esc(data['mode'])}</p>"
+    if data.get('paused'):
+        page += (f"<p class='warning'>Paused: {esc(data['paused'])}. What the cap cut followed the order answers came "
+                 "in, so this report isn't reproducible: rerun the same command to resume.</p>")
     differently = sum(1 for f in data['findings'] if f.get('tables_read'))
     page += f"<p>{esc(dict(counts))}</p>" + kinds_html(data['findings'], esc) + (
         f"<p class='warning'>{differently} findings compare claims whose tables were read differently (by rules, a "

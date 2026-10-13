@@ -450,3 +450,6 @@ class Report(Strict):
     coverage: list[dict]
     settings: dict
     limitations: list[str]
+    # why a cap (max_cost, max_calls, the provider's balance) cut the run, if one did: which work it cut followed the
+    # order answers came in, so the report isn't reproducible until the run is resumed (the determinism review, D6)
+    paused: str = ""

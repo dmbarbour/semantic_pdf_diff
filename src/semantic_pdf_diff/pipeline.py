@@ -226,7 +226,7 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         file_difference=file_difference(files[names[0]], files[names[1]]),
         sections=document.sections, situation=document.situation, evidence=document.evidence, coverage=coverage,
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
-        limitations=LIMITATIONS).model_dump()
+        limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     data = traced(data)
     store.save_comparison(data['created_at'], data)
     write_report(data, out, assets=store.folder / 'assets')

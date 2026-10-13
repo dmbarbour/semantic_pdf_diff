@@ -299,11 +299,14 @@ class ResumeAndReuse(unittest.TestCase):
             statuses = {r['status'] for r in json.loads((root / 'out/evidence.json').read_text())['coverage']}
             self.assertIn('not_reached', statuses)  # cut off by the call limit, not failed
             self.assertNotIn('failed', statuses)
+            paused = json.loads((root / 'out/report.json').read_text())['paused']
+            self.assertEqual(paused, 'call limit reached (1 requests)')  # what it cut followed the answers' order
             with Store(root / 'out') as store:
                 self.assertFalse(store.is_extracted(content_id(a.read_bytes(), a.name), "pdf/1"))
             code, _ = self.run_cli(a, b, root / 'out', url)
             report = json.loads((root / 'out/report.json').read_text())
             self.assertFalse(any(r['status'] == 'failed' for r in report['coverage']))
+            self.assertEqual(report['paused'], '')  # resumed: nothing cut
 
     def test_changed_settings_need_reset(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
