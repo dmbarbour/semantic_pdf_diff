@@ -57,3 +57,40 @@ class Vetoes(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class SharedAnswers(unittest.TestCase):
+    def test_a_judgment_shared_by_two_pairs_is_vetoed_once_in_each(self):
+        """One note in two files of a source asks the same query twice; the second waited on the first and was given
+        its answer, which the first's veto had changed: its reason prepended twice (the determinism review, D4)."""
+        import tempfile
+        from pathlib import Path
+        from semantic_pdf_diff.compare import compare
+        from semantic_pdf_diff.llm import build_request
+        from semantic_pdf_diff.schema import Evidence, PdfLocator, claim_id
+        from semantic_pdf_diff.settings import Settings
+
+        def note(content):
+            e = Evidence(id="x", content=content, entity="Pump P-1", attribute="capacity", value="100", unit="gpm",
+                         kind="text", quote="Pump P-1 capacity 100 gpm", confidence=0.6,
+                         locator=PdfLocator(page=1, bbox=(0, 0, 100, 20), region="text", task="text:p1:0"))
+            return e.model_copy(update={"id": claim_id(content, e)})
+
+        class Cached:  # every answer at hand: the judge is unsure
+            def __init__(self):
+                self.s = Settings(concurrency=4)
+            def prepare(self, prompt, schema, images, key):
+                return build_request(self.s, prompt, schema, images, key)
+            def cached(self, request):
+                return Judgment(relation="equivalent", rationale="same value", confidence=0.95, same_conditions=True)
+            def send(self, request):
+                raise AssertionError("asked the model")
+            def save(self, request, value):
+                pass
+
+        left = [note("sha256:" + "a" * 64 + ".pdf"), note("sha256:" + "b" * 64 + ".pdf")]
+        right = [note("sha256:" + "c" * 64 + ".pdf")]
+        for seed in (1, 2, 3):
+            with stubs.answers_shuffled(seed), tempfile.TemporaryDirectory() as d, self.subTest(seed=seed):
+                found = compare(left, right, Path(d), Cached(), "proposals")["findings"]
+                self.assertEqual([f["rationale"] for f in found],
+                                 ["Low model confidence (uncalibrated). same value"] * 2)

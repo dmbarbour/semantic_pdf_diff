@@ -185,9 +185,9 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
                     "processing_error":True}
                 return
             reasons = vetoes(judgment, a, b, calc)
-            if reasons:
-                judgment.relation = "uncertain"
-                judgment.rationale = "; ".join(reasons) + ". " + judgment.rationale
+            if reasons:  # a copy: the answer itself stays as the model gave it
+                judgment = judgment.model_copy(update={"relation": "uncertain",
+                                                       "rationale": "; ".join(reasons) + ". " + judgment.rationale})
             if judgment.relation in ("equivalent","different","complementary"):
                 matched.update((a.id,b.id))
             results[index] = {"a":a.id, "b":b.id, "retrieval_score":round(score,4), **judgment.model_dump(),

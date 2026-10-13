@@ -10,6 +10,7 @@ seed (tests only), cached and replayed answers are held and handled in an order 
 it instead, as a live run's might be: what a run writes must not depend on that order (the
 determinism review, 2026-10-12).
 """
+import copy
 import os
 import random
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
@@ -85,8 +86,9 @@ class Dispatcher:
             return
         if not cached:
             self.client.save(request, value)
-        for done in [finish] + waiting:
-            done(value, None)
+        finish(value, None)
+        for done in waiting:  # each its own copy: a callback may change what it's given (the determinism review, D4)
+            done(copy.deepcopy(value), None)
 
     def pending(self):
         return len(self.inflight) + len(self.held)
