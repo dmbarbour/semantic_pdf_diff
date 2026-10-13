@@ -153,6 +153,14 @@ class VisualRules(Lever):
         return super().region_rules(region) + (_rules(self.visual_rules) if region in ("tile", "figure", "overview")
                                                else "")
 
+class ImagesFirst(Lever):
+    lever_name, stage, off = "images_first", "instructions", {"images_first": False}
+    # a request's images before its text, as Google's guidance for gemma-4 has them (docs/reviews/levers.md's ideas)
+    images_first: Annotated[bool, _shaping(VISUAL, roles=EXTRACT + TRIAGE + COMPARE)] = False
+
+    def puts_images_first(self):
+        return self.images_first
+
 class Neighbours(Lever):
     lever_name, stage = "neighbours", "context"
     off = {"context_before": 0, "context_after": 0}
@@ -671,12 +679,12 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8) and leave_text's
 # tables (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
-LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, Neighbours, LeaveFurniture, TableContext, StemContext,
-                 References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty,
-                 SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks,
-                 TableRules, TableReview, TableStructure, VisualTextLayer, TextCuts, TableFilter, SkipSheetTables,
-                 LeaveText, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals,
-                 ExplainDifferences)
+LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, Neighbours, LeaveFurniture, TableContext,
+                 StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails,
+                 SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea,
+                 FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TextCuts, TableFilter,
+                 SkipSheetTables, LeaveText, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align,
+                 VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -874,6 +882,11 @@ class Platform(Composable):
         """Unrotated boxes whose text blocks a PDF page's text tasks leave out, to the readers of what they hold
         (tables: [(box, rows)] of the tables detected and read): the platform's, none."""
         return []
+
+    @chosen
+    def puts_images_first(self):
+        """Whether a request's images come before its text: the platform's, after."""
+        return False
 
     @chosen
     def split_text(self, text, limit):

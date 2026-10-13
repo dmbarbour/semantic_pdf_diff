@@ -136,12 +136,13 @@ def read_stream(response):
 
 VALID_ESCAPE = re.compile(r'\\(["\\/bfnrt]|u[0-9a-fA-F]{4})?')
 
-def query_hash(prompt, image_hashes, params):
+def query_hash(prompt, image_hashes, params, images_first=False):
     """A query's name: the SHA-256 of what reaches the model (the system and user text, each image's
-    bytes by hash, the response format and generation settings as sent), leaving out the model (the
-    responder) and how the answer travels. A changed query has another name, so a recorded answer
-    never stands in for it (docs/plans/content-addressed-queries-2026-09-28.md)."""
-    canonical = {"system": SYSTEM, "user": prompt, "images": list(image_hashes), "params": params}
+    bytes by hash, the response format and generation settings as sent, and the images' place when they come
+    before the text), leaving out the model (the responder) and how the answer travels. A changed query has another
+    name, so a recorded answer never stands in for it (docs/plans/content-addressed-queries-2026-09-28.md)."""
+    canonical = {"system": SYSTEM, "user": prompt, "images": list(image_hashes), "params": params,
+                 **({"order": "images first"} if images_first and image_hashes else {})}
     return hashlib.sha256(json.dumps(canonical, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 def describe(prompt, image_sizes, params, key=None):
@@ -188,15 +189,16 @@ def build_request(s, prompt, schema, images=(), key=None):
     elif s.response_format == "json_schema":
         params["response_format"] = {"type": "json_schema", "json_schema": {
             "name": schema.__name__, "schema": schema.model_json_schema()}}
-    query = query_hash(prompt, hashes, params)
+    first = s.puts_images_first()
+    query = query_hash(prompt, hashes, params, first)
     model, stream = s.model, s.stream
     key = Recipe(key) if key is not None else None
 
     def body():  # built only when sent: a replayed answer never needs it (code review 2026-10-08, C19)
-        content = [{"type": "text", "text": prompt}]
-        for raw_image in raw_images:
-            data = base64.b64encode(raw_image).decode()
-            content.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + data}})
+        text = [{"type": "text", "text": prompt}]
+        pictures = [{"type": "image_url", "image_url": {"url": "data:image/png;base64," + base64.b64encode(r).decode()}}
+                    for r in raw_images]
+        content = pictures + text if first else text + pictures
         sent = {"model": model, "messages": [
             {"role": "system", "content": SYSTEM}, {"role": "user", "content": content}], **params}
         if stream:

@@ -36,7 +36,7 @@ TOGGLES = {
     'reconcile': False, 'quote_match': 'exact', 'skip_text_only': True, 'tile_cut': 'xycut', 'band_width': 6.0,
     'render_area': True, 'tile_choice': 'off', 'leave_text': 'none', 'region_labels': 'model',
     'another_tiling': 'asked',
-    'least_half': 0.5, 'skip_sheet_tables': True,
+    'least_half': 0.5, 'skip_sheet_tables': True, 'images_first': True,
 }
 # Settings measured under others, on both sides: the tilers' with tile_choice off (by default the rule picks the cut by
 # its measures, so another tiler or a tile's growth, say, may leave its choice and the queries as they were); the

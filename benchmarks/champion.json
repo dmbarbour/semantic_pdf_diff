@@ -3,6 +3,7 @@
     "extract_prompt",
     "extract_rules",
     "visual_rules",
+    "images_first",
     "neighbours",
     "leave_furniture",
     "table_context",
