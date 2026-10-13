@@ -196,7 +196,14 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
 def score():
     """results.json and comparisons.json from the runs' stores, with tables printed."""
     from semantic_pdf_diff_lab.bench import controlled
+    from semantic_pdf_diff_lab.bench.recording import cut
     from semantic_pdf_diff_lab.eval import rounds
+    unfinished = [(run, why) for base in (RUNS, PAIR_RUNS) if base.exists() for which in sorted(base.iterdir())
+                  for run in sorted(which.iterdir()) for why in [cut(run)] if why]
+    if unfinished:  # what a cap cut followed the order answers came in: resumed, not scored (determinism review, D6)
+        print(f"{len(unfinished)} runs unfinished, nothing scored; resume them (run):\n  "
+              + "\n  ".join(f"{run}: {why}" for run, why in unfinished[:20]))
+        return 1
     results = {}
     for which in ("recorded", "replay", "recorded-rows", "replay-rows"):
         runs = RUNS / which

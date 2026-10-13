@@ -183,7 +183,10 @@ def read(paths, configurations, out, base, fixture, max_cost, ledger=None, tags=
             spent += (ledgers.spent(ledger, **(tags or {})) - before) if ledger else 0.0
             key_path = path.with_name(path.stem + ".key.json")
             key = json.loads(key_path.read_text()) if key_path.exists() else None
-            found.setdefault(label, {})[path.stem] = {"exit": code, **answers(folder / "store.sqlite", key)}
+            from .recording import cut
+            unfinished = cut(folder)  # cut by the cap: resumed, not scored (the determinism review, D6)
+            found.setdefault(label, {})[path.stem] = ({"exit": code, "cut": unfinished} if unfinished else
+                                                      {"exit": code, **answers(folder / "store.sqlite", key)})
     return found, spent
 
 def save(rows, path):

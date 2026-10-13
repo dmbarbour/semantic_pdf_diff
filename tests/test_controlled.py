@@ -766,3 +766,24 @@ class Corpus(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class Unfinished(unittest.TestCase):
+    def test_a_run_a_cap_cut_isnt_scored(self):
+        """Which work a cap cut followed the order answers came in: such a run is resumed, not scored (the owner,
+        2026-10-12: "Paused, not a result."; the determinism review, D6)."""
+        import json
+        import sqlite3
+        import tempfile
+        from pathlib import Path
+        from semantic_pdf_diff_lab.bench.recording import cut
+        with tempfile.TemporaryDirectory() as d:
+            run = Path(d)
+            self.assertIsNone(cut(run))
+            (run / "report.json").write_text(json.dumps({"paused": "cost cap reached ($0.10 of $0.10)"}))
+            self.assertEqual(cut(run), "paused: cost cap reached ($0.10 of $0.10)")
+            (run / "report.json").write_text(json.dumps({"paused": ""}))
+            with sqlite3.connect(run / "store.sqlite") as db:
+                db.execute("CREATE TABLE task (content TEXT, task TEXT, region TEXT, row TEXT)")
+                db.executemany("INSERT INTO task VALUES ('c', ?, 'text', ?)",
+                               [(t, json.dumps({"status": s})) for t, s in (("a", "complete"), ("b", "not_reached"))])
+            self.assertEqual(cut(run), "1 tasks not reached")

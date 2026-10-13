@@ -56,6 +56,10 @@ def report(before, after):
     from semantic_pdf_diff_lab.bench import refinement
     keys = {p.name[:-len(".key.json")]: p for p in KEYS.glob("*.key.json")}
     found = refinement.compare(before, after, keys)
+    unfinished = {name: arms.pop("cut") for name, arms in found.items() if "cut" in arms}
+    if unfinished:  # cut by a cap: resumed, not scored
+        print("not scored, unfinished: " + json.dumps(unfinished))
+        found = {name: arms for name, arms in found.items() if name not in unfinished}
     for name, arms in found.items():
         stores = [Path(folder) / name / "store.sqlite" for folder in (before, after)]
         arms["before"]["checks"], arms["after"]["checks"] = (refinement.checks(s) for s in stores)

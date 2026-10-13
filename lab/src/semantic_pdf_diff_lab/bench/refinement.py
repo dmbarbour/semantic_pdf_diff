@@ -96,6 +96,11 @@ def compare(before, after, keys=None):
         name = store.parent.name
         other = Path(before) / name / "store.sqlite"
         if other.exists():
+            from .recording import cut
+            unfinished = cut(other.parent) or cut(store.parent)
+            if unfinished:  # cut by a cap: resumed, not scored (the determinism review, D6)
+                out[name] = {"cut": unfinished}
+                continue
             key = json.loads(keys[name].read_text(encoding="utf-8")) if name in keys else None
             out[name] = {"before": summary(other, key), "after": summary(store, key)}
     return out
