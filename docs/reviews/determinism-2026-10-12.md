@@ -112,3 +112,23 @@ Packing the corpus reported 3 explain requests without an answer. A reviewer tra
    - D2's lab reads ordered.
 5. **The owner's answers:** D3, D6, D9.
 6. **The corpus's `--rows` runs recorded again** (pennies), and the fixtures re-packed.
+
+## Fixes so far (2026-10-13)
+
+| Finding | Fix | Commit |
+|---|---|---|
+| D15 | `PDF_DIFF_ANSWER_ORDER`: cached and replayed answers (and replayed failures) handled in a seeded order; a whole run replayed under three seeds writes the same evidence and report | 372739e, 4f6ca5d |
+| D4 | each waiter gets its own copy; compare vetoes a copy | a69f3c6 |
+| D5 | a query's outcome kept for the run; a waiter noted as a replay is | 4fb3f60 |
+| D7 | a retiled tile read at depth 1 | 64cb2cf |
+| D8 | situating issues by target | 4f6ca5d |
+| D10 | compare sorts each side by content, page, task and id | c238dbf |
+| D11 | `math.fsum`; sorted kinds | 0272119 |
+| D12 | gc keeps an answer another content's query log names | 81c0e63 |
+| D13 | one task's duplicate claim: the first kept, fresh and stored | c523a5b, 72d52c1 |
+| D1 | each reading counted once per outcome; the corpus re-scored: recorded and replayed agree on all 210 runs (misbound 165 → 170, right 7,973 → 7,976, facts as before) | b582958 |
+| D2 | the store's coverage by page and task; the lab's reads ordered; refinement's unique claims chosen by content | 6ec634b, d21d7fa |
+| D14 | the store's views by value; raters' answers in the order asked; insights' ties by name. A failure's transport text (HTTP 503 against a timeout) is left: it says how the answer came to be absent | 6ec634b, edbae37 |
+| D3 | rows that may repeat held until the document's pages are read and its requests answered, then read in page order | f480081 |
+| D9 | `run.json` beside the report | c6242d4 |
+| D6 | requests admitted as asked, on the calling thread; `max_calls` counts requests, not attempts; a report a cap cut says `paused`; the lab refuses to score unfinished runs | d0c8598, 4784091 |
