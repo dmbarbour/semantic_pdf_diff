@@ -13,7 +13,7 @@ from pathlib import Path
 import pymupdf
 from semantic_pdf_diff import cli
 import stubs
-from stubs import chat_answer, request_body, serving, situating_answer, slow, source_data
+from stubs import chat_answer, prompt_of, request_body, serving, situating_answer, slow, source_data
 
 @contextlib.contextmanager
 def jittery_model():
@@ -35,7 +35,7 @@ def jittery_model():
             return
         time.sleep(random.uniform(0, 0.03))
         parts = body['messages'][1]['content']
-        prompt = parts[0]['text']
+        prompt = prompt_of(parts)
         digest = hashlib.sha256(json.dumps(parts).encode()).hexdigest()
         if prompt.startswith('This is one table'):  # a table's rules query: each row read by itself
             answer = {'reading': 'rows', 'why': 'stub'}
@@ -74,7 +74,7 @@ def jittery_model():
                                           if k not in ('model', 'stream', 'stream_options')},
                                          sort_keys=True).encode()).hexdigest()
         images = [hashlib.sha256(base64.b64decode(p['image_url']['url'].split(',', 1)[1])).hexdigest()
-                  for p in parts[1:] if p.get('type') == 'image_url']
+                  for p in parts if p.get('type') == 'image_url']
         params = {k: v for k, v in body.items() if k not in ('model', 'messages', 'stream', 'stream_options')}
         with state['lock']:
             state['active'] -= 1

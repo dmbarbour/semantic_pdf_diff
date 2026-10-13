@@ -150,6 +150,10 @@ def request_body(handler):
     """A stub server's request, parsed."""
     return json.loads(handler.rfile.read(int(handler.headers['Content-Length'])))
 
+def prompt_of(parts):
+    """A request's text part, before or after its images (images_first)."""
+    return next(part['text'] for part in parts if part['type'] == 'text')
+
 def chat_answer(handler, content, finish='stop', usage=None):
     """A chat completion's reply holding content (a string, or JSON-encoded), with usage if given."""
     handler.send_response(200)

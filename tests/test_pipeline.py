@@ -13,7 +13,7 @@ from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.tasks import split_utf8
 from semantic_pdf_diff.segmentation import tiles
 from semantic_pdf_diff.report import write_report
-from stubs import ROUND0, chat_answer, request_body, serving, situating_answer
+from stubs import ROUND0, chat_answer, prompt_of, request_body, serving, situating_answer
 
 
 def ev(id='A-1', **kw):
@@ -137,7 +137,7 @@ class Tests(unittest.TestCase):
                 if part['type']=='image_url':
                     state['images'] += 1
                     assert part['image_url']['url'].startswith('data:image/png;base64,')
-            prompt=parts[0]['text']
+            prompt=prompt_of(parts)
             if 'Compare exactly' in prompt:
                 answer=Judgment(relation='equivalent',rationale='Controlled same-value fixture',confidence=.95,
                                 same_conditions=True).model_dump()

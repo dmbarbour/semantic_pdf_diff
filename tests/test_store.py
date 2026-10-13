@@ -16,7 +16,7 @@ from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
 from semantic_pdf_diff.binding import InterpreterMismatch, bind
 from semantic_pdf_diff.store import Store, StoreError, StoreInUse
-from stubs import chat_answer, request_body, serving, situating_answer, source_data, text_pdf
+from stubs import chat_answer, prompt_of, request_body, serving, situating_answer, source_data, text_pdf
 
 EMPTY = {'claims': [], 'complete': True, 'issues': []}
 
@@ -27,7 +27,7 @@ def model_server():
     def post(handler):
         body = request_body(handler)
         state['requests'] += 1
-        prompt = body['messages'][1]['content'][0]['text']
+        prompt = prompt_of(body['messages'][1]['content'])
         if 'Compare exactly' in prompt:
             answer = {'relation': 'equivalent', 'rationale': 'stub', 'confidence': .9, 'same_conditions': True}
         elif situating_answer(prompt):
