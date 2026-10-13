@@ -68,6 +68,14 @@ class Retiled(unittest.TestCase):
                                  for x in retiling.retiled(s, reader, page, tag, r, said("cut off")) or ()))
         self.assertEqual(orders[0], orders[1])
 
+    def test_the_other_cuts_tiles_are_read_at_one_depth_whichever_tile_asks(self):
+        """Their depth was the asker's plus one, so with refinement_depth 2, a half asking first gave them a text layer
+        and a chance to be refined that a page's tile asking first didn't (the determinism review, D7)."""
+        s, reader, page, tiles = self.reader(refinement_depth=2)
+        found = s.refined_tile(reader, page, *tiles[0][:2], said("cut off"))
+        self.assertEqual([(t, again) for t, _, again in found], [("tile:xycut0", {"depth": 1}),
+                                                                 ("tile:xycut1", {"depth": 1})])
+
     def test_a_tile_cutting_nothing_is_halved(self):
         s, reader, page, tiles = self.reader(("ahu-schematic-s1-clean", 0))
         self.assertIsNone(retiling.retiled(s, reader, page, *tiles[0][:2], said("cut off")))

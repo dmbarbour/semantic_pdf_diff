@@ -73,4 +73,5 @@ class Visuals:
                 or depth >= s.refinement_depth or min(rect.width, rect.height) < MIN_REFINE_POINTS):
             return
         for child_tag, child, again in s.refined_tile(self.context_of, page, tag, rect, done):
-            self.task(page_no, page, child_tag, child, depth + 1, text, box, derivation, **again)
+            again = dict(again)
+            self.task(page_no, page, child_tag, child, again.pop("depth", depth + 1), text, box, derivation, **again)

@@ -423,7 +423,9 @@ class AnotherTiling(Lever):
             from .retiling import asks, retiled
             found = retiled(self, reader, page, tag, rect, done) if asks(done, self.another_tiling) else None
             if found is not None:  # [] where the tiles that hold what it cuts are read already
-                return [(t, r, {}) for t, r in found]
+                # read at depth 1 whichever tile asks first: its depth sets its text layer and whether it's refined
+                # again (the determinism review, D7)
+                return [(t, r, {"depth": 1}) for t, r in found]
         return super().refined_tile(reader, page, tag, rect, done)
 
 class FigureRefinement(Lever):
@@ -936,10 +938,10 @@ class Platform(Composable):
 
     @chained
     def refined_tile(self, reader, page, tag, rect, done):
-        """[(tag, Rect, {"continued": claims, "noted": issues} or {})] read next for a tile whose answer was partial or
-        failed (done: the answer's coverage row, claims and cut edges, tasks.TaskCore.consume): the platform's, its
-        halves, "<tag>-r0" and "-r1" (segmentation.halves, each holding least_half of what the tile holds), cut
-        around the parts tile_parts gives where they can be."""
+        """[(tag, Rect, {"continued": claims, "noted": issues, "depth": d} or {})] read next for a tile whose answer
+        was partial or failed (done: the answer's coverage row, claims and cut edges, tasks.TaskCore.consume; depth:
+        the asker's plus one unless given): the platform's, its halves, "<tag>-r0" and "-r1" (segmentation.halves,
+        each holding least_half of what the tile holds), cut around the parts tile_parts gives where they can be."""
         from .segmentation import halves
         found = halves(page, rect, reader.lines(page), reader.graphics(page), self.least_half,
                        parts=self.tile_parts(reader, page))
