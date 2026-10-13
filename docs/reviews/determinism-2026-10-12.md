@@ -1,7 +1,7 @@
 # Determinism review: only answers decide what a run writes
 
 - **Date:** 2026-10-12
-- **Status:** Open. Fixes under way; the owner's answers to the three questions recorded below (2026-10-12).
+- **Status:** Closed (2026-10-13; the owner: "Yes, close the review. Good job on finding the issue and fixing it."). Every finding fixed (the table at the end); the decisions in [0030](../decisions/0030-only-answers-decide-what-a-run-writes.md).
 - **Asked by:** the owner. "We definitely need to fix things so race conditions aren't observed. Not just for replay, either. Only the content (or absence, e.g. for timeouts) of answers should impact reports or metrics (discounting the log). Do a review for this."
 - **Found by:** the controlled corpus re-recorded under `leave_text: tables` (commit c6f613a). lcc-enduse-s1-clean scored 3 claims more misbound replayed than recorded, from the same evidence.json.
 - **The requirement:**
