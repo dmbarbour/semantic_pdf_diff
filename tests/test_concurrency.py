@@ -36,7 +36,8 @@ def jittery_model():
         time.sleep(random.uniform(0, 0.03))
         parts = body['messages'][1]['content']
         prompt = prompt_of(parts)
-        digest = hashlib.sha256(json.dumps(parts).encode()).hexdigest()
+        # the answer the same whichever comes first, the text or the images (images_first)
+        digest = hashlib.sha256(json.dumps(sorted(parts, key=lambda p: p['type'] != 'text')).encode()).hexdigest()
         if prompt.startswith('This is one table'):  # a table's rules query: each row read by itself
             answer = {'reading': 'rows', 'why': 'stub'}
         elif prompt.startswith('This is a block of two columns'):  # the key-value check: a table, as before it
@@ -79,7 +80,7 @@ def jittery_model():
         with state['lock']:
             state['active'] -= 1
             state.setdefault('queries', []).append((role, seen))
-            state.setdefault('transcript', []).append((role, prompt, images, params))
+            state.setdefault('transcript', []).append((role, prompt, images, params, parts[0]['type'] != 'text'))
         chat_answer(handler, answer, usage={'prompt_tokens': 100, 'completion_tokens': 20, 'estimated_cost': 0.001})
     with serving(post, threaded=True) as url:
         yield url, state

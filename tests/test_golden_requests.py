@@ -30,7 +30,8 @@ UPDATE = bool(os.environ.get("GOLDEN_UPDATE"))
 PROFILES = {"defaults": ({}, False), "round0": (ROUND0, False), "defaults-sheet": ({}, True)}
 
 def requests(settings, sheet, logged=False):
-    """One comparison's requests [(role, prompt, image hashes, params)], and (logged) its store's query log."""
+    """One comparison's requests [(role, prompt, image hashes, params, images first)], and (logged) its store's
+    query log."""
     from semantic_pdf_diff.store import Store
     with tempfile.TemporaryDirectory() as d, jittery_model() as (url, state):
         root = Path(d)
@@ -47,8 +48,9 @@ def requests(settings, sheet, logged=False):
 def transcript(settings, sheet):
     """The golden text of one comparison's requests."""
     lines, first = [], {}
-    for role, prompt, images, params in requests(settings, sheet):
-        digest = hashlib.sha256(json.dumps({"prompt": prompt, "images": images, "params": params},
+    for role, prompt, images, params, images_first in requests(settings, sheet):
+        order = {"order": "images first"} if images_first else {}  # named apart, as llm.query_hash names it
+        digest = hashlib.sha256(json.dumps({"prompt": prompt, "images": images, "params": params, **order},
                                            sort_keys=True).encode()).hexdigest()
         lines.append(f"{role} {digest} images={len(images)}")
         first[role] = min(first.get(role, prompt), prompt)  # the first in sorted order, whatever order they came
@@ -80,7 +82,7 @@ class Structure(unittest.TestCase):
         for name, (settings, sheet) in PROFILES.items():
             with self.subTest(profile=name):
                 sent, logged = requests(settings, sheet, logged=True)
-                prompts = [p for role, p, _, _ in sent if role == "extract"]
+                prompts = [p for role, p, *_ in sent if role == "extract"]
                 self.assertTrue(prompts)
                 for prompt in prompts:
                     asked = ExtractQuery.read(prompt)

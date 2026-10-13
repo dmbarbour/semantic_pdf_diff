@@ -14,7 +14,7 @@ class ImagesFirst(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             image = Path(d) / "tile.png"
             image.write_bytes(b"\x89PNG not really")
-            after = build_request(Settings(), "Read the tile.", Extraction, [image])
+            after = build_request(Settings(images_first=False), "Read the tile.", Extraction, [image])
             first = build_request(Settings(images_first=True), "Read the tile.", Extraction, [image])
             kinds = lambda r: [part["type"] for part in json.loads(r.body())["messages"][1]["content"]]
             self.assertEqual(kinds(after), ["text", "image_url"])
@@ -22,7 +22,7 @@ class ImagesFirst(unittest.TestCase):
             self.assertNotEqual(after.query, first.query)
 
     def test_a_request_without_images_is_unchanged(self):
-        after = build_request(Settings(), "Read the text.", Extraction)
+        after = build_request(Settings(images_first=False), "Read the text.", Extraction)
         first = build_request(Settings(images_first=True), "Read the text.", Extraction)
         self.assertEqual((after.query, after.body()), (first.query, first.body()))
 

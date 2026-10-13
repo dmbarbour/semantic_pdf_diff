@@ -917,8 +917,9 @@ def summarise(entries):
     out["prompt_tokens"] = {k: round(sum(v) / len(v)) for k, v in tokens.items()}
     return out
 
-# What every eye test query is asked with (a replay must ask the same queries).
-EYE_SETTINGS = {"context_tokens": 131072, "output_tokens": 4000, "image_tokens": 6000}
+# What every eye test query is asked with (a replay must ask the same queries), the image after the text as
+# recorded (eval/clients.py, RECORDED_ORDER).
+EYE_SETTINGS = {"context_tokens": 131072, "output_tokens": 4000, "image_tokens": 6000, "images_first": False}
 
 def responders(folder):
     """The models whose answers the folder's fixture holds."""

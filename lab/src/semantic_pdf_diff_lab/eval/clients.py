@@ -11,7 +11,10 @@ from semantic_pdf_diff.settings import SETTING_CLASSES, Settings
 # What every evaluating model (judges, query checkers, the post-mortem's analyst) is asked with.
 # Its answers are recorded by query, so these must be the same wherever a folder is judged; the
 # transport (concurrency, timeouts, retries, caps) varies by caller and never changes a query.
-EVALUATOR_SETTINGS = {"context_tokens": 262144, "output_tokens": 16000, "image_tokens": 3000}
+# What the product's defaults would otherwise change in every evaluator's queries: a request's images after its text,
+# as their answers were recorded (images_first is the product's, for gemma-4); a base may name it.
+RECORDED_ORDER = {"images_first": False}
+EVALUATOR_SETTINGS = {"context_tokens": 262144, "output_tokens": 16000, "image_tokens": 3000, **RECORDED_ORDER}
 
 def evaluator_settings(model, base=None, **runtime):
     """Settings for a judge, checker or analyst. What shapes its queries is fixed (`base`, by default
@@ -26,7 +29,8 @@ def evaluator_settings(model, base=None, **runtime):
     # only the endpoint's variables read: a profile's PDF_DIFF_CONTEXT_TOKENS made every judge's settings invalid
     env = Settings.from_env(only=endpoint_names, model=model)  # (code review 2026-10-08, C9)
     endpoint = {k: getattr(env, k) for k in endpoint_names}
-    return Settings(**{**endpoint, **(EVALUATOR_SETTINGS if base is None else base), **runtime, "model": model})
+    return Settings(**{**endpoint, **RECORDED_ORDER, **(EVALUATOR_SETTINGS if base is None else base), **runtime,
+                        "model": model})
 
 class Budget:
     """One cost cap for a whole command, shared by the clients it makes one after another (one per model): the
