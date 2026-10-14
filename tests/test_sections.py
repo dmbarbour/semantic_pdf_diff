@@ -19,7 +19,7 @@ def make_pdf(path, pages, toc=None, metadata=None, height=300):
     return stubs.text_pdf(path, pages, height=height, toc=toc, metadata=metadata)
 
 class Recorder(stubs.Recorder):
-    """Records prompts and keys; answers with a claim quoting any 'N kW' in the source."""
+    """Records prompts and keys; answers with a claim quoting each 'N kW' in the source."""
     def __init__(self, **settings):
         super().__init__(**settings)
         self.asked = []
@@ -27,12 +27,10 @@ class Recorder(stubs.Recorder):
         self.asked.append((prompt, key))
         self.images = getattr(self, 'images', []) + [(prompt, list(images))]
     def answer(self, prompt, schema, images, key):
-        data = source_data(prompt)
-        if ' kW' in data:
-            value = data.split(' kW')[0].split()[-1]
-            return Extraction(claims=[{'entity': 'pump', 'attribute': 'power', 'value': value, 'unit': 'kW',
-                                       'kind': 'text', 'quote': f'{value} kW', 'confidence': .9}], complete=True)
-        return Extraction(claims=[], complete=True)
+        values = [before.split()[-1] for before in source_data(prompt).split(' kW')[:-1]]
+        return Extraction(claims=[{'entity': 'pump', 'attribute': 'power', 'value': value, 'unit': 'kW',
+                                   'kind': 'text', 'quote': f'{value} kW', 'confidence': .9} for value in values],
+                          complete=True)
 
 TOC = [[1, 'Intro', 1], [1, 'Design', 2], [2, 'Pumps', 3], [2, 'Fans', 3], [3, 'Deep detail', 4], [1, 'Appendix', 5]]
 
@@ -104,12 +102,17 @@ class SectionContext(unittest.TestCase):
                 self.assertIs(index[2], fans)
                 self.assertIn('10 kW', section_text(doc, pumps)); self.assertNotIn('3 kW', section_text(doc, pumps))
                 self.assertIn('3 kW', section_text(doc, fans)); self.assertIn('5 kW', section_text(doc, fans))
-            client = Recorder(vision=False)
-            evidence, _ = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
-            headings = {k: p.split('\nSection: ', 1)[1].split('\n', 1)[0] for p, _ in client.asked
-                        for k in ('10 kW', '3 kW', '5 kW') if k in source_data(p)}
-            self.assertEqual(headings, {'10 kW': '1 Pumps', '3 kW': '2 Fans', '5 kW': '2 Fans'})
-            self.assertEqual({e.value: e.section for e in evidence}, {'10': 'sec1', '3': 'sec2', '5': 'sec2'})
+            # each text task one section's (text_spans section), or a page's across its sections (page, the
+            # default): its heading line names both; either way a claim takes the section its quote is in
+            for spans, first in (('section', '1 Pumps'), ('page', '1 Pumps | 2 Fans')):
+                client = Recorder(vision=False, text_spans=spans)
+                evidence, _ = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d) / spans, client)
+                headings = {k: p.split('\nSection: ', 1)[1].split('\n', 1)[0] for p, _ in client.asked
+                            for k in ('10 kW', '3 kW', '5 kW') if k in source_data(p)}
+                self.assertEqual(headings, {'10 kW': first, '3 kW': first if spans == 'page' else '2 Fans',
+                                            '5 kW': '2 Fans'}, spans)
+                self.assertEqual({e.value: e.section for e in evidence}, {'10': 'sec1', '3': 'sec2', '5': 'sec2'},
+                                 spans)
 
     def test_visual_claims_take_the_section_where_their_quote_is(self):
         class Seeing(Recorder):

@@ -620,7 +620,7 @@ class TextSpans(Lever):
     # section: a text task's blocks are one section's. Claims are placed by their quote's block either way. Word and
     # Markdown documents cut at every heading: the controlled spec's "4 Link Failure Detection" went alone, and its
     # conditions came back as "declaration condition 1 | no acknowledgement received within 856 ms" (2026-10-14)
-    text_spans: Annotated[Literal["section", "page"], _shaping(frozenset({"text"}))] = "section"
+    text_spans: Annotated[Literal["section", "page"], _shaping(frozenset({"text"}))] = "page"
 
     def text_section_of(self, section_of):
         return (lambda box: None) if self.text_spans == "page" else super().text_section_of(section_of)
@@ -745,8 +745,8 @@ class DedupeRepeated(Lever):
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
-# tables, images_first, repeated_text's first and lone_rows (docs/reviews/levers.md); round 0's settings are
-# benchmarks/round0.json.
+# tables, images_first, repeated_text's first, lone_rows and text_spans' page (docs/reviews/levers.md); round 0's
+# settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture,
                  TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles,
                  SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,

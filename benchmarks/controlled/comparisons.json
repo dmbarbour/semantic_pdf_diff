@@ -101,7 +101,7 @@
    "changes_found": "4/4",
    "additions_found": "3/3",
    "removals_found": "1/1",
-   "unchanged_confirmed": "28/28",
+   "unchanged_confirmed": "27/28",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -115,20 +115,21 @@
     "reported": 1
    },
    "unchanged": {
-    "confirmed": 28
+    "confirmed": 27,
+    "unextracted": 1
    },
    "different": {
     "change": 4
    },
    "equivalent": {
-    "no change": 28,
+    "no change": 27,
     "unscored": 1
    },
    "findings": {
     "different": 4,
-    "equivalent": 29
+    "equivalent": 28
    },
-   "unmatched": 5,
+   "unmatched": 6,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -161,7 +162,7 @@
     "filters.count": "confirmed",
     "filters.rate": "confirmed",
     "floc.detention": "confirmed",
-    "floc.stages": "confirmed",
+    "floc.stages": "unextracted",
     "mix.detention": "confirmed",
     "mix.g": "confirmed",
     "optA.cost": "reported",
@@ -217,8 +218,8 @@
     "different": 4,
     "equivalent": 28
    },
-   "unmatched": 5,
-   "pairs": 4,
+   "unmatched": 4,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -564,8 +565,8 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 24,
-    "unscored": 2
+    "no change": 25,
+    "unscored": 1
    },
    "findings": {
     "different": 4,
@@ -649,15 +650,15 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 24,
-    "unscored": 2
+    "no change": 25,
+    "unscored": 1
    },
    "findings": {
     "different": 4,
     "equivalent": 26
    },
    "unmatched": 4,
-   "pairs": 6,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -1692,12 +1693,11 @@
     "change": 3
    },
    "equivalent": {
-    "no change": 17,
-    "unscored": 3
+    "no change": 17
    },
    "findings": {
     "different": 3,
-    "equivalent": 20
+    "equivalent": 17
    },
    "unmatched": 4,
    "pairs": 3,
@@ -1778,7 +1778,7 @@
     "equivalent": 17
    },
    "unmatched": 4,
-   "pairs": 3,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 3,
@@ -2074,12 +2074,11 @@
     "change": 2
    },
    "equivalent": {
-    "no change": 2,
-    "unscored": 2
+    "no change": 2
    },
    "findings": {
     "different": 2,
-    "equivalent": 4
+    "equivalent": 2
    },
    "unmatched": 0,
    "pairs": 2,
@@ -2128,15 +2127,14 @@
     "change": 5
    },
    "equivalent": {
-    "no change": 16,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
     "different": 5,
-    "equivalent": 18
+    "equivalent": 16
    },
    "unmatched": 0,
-   "pairs": 5,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -3682,29 +3680,34 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "31/31",
+   "unchanged_confirmed": "30/31",
    "false_changes": 0,
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {},
    "conditions": {
-    "judged uncertain": 2
+    "judged different": 1,
+    "judged uncertain": 1
    },
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 31
+    "confirmed": 30,
+    "unextracted": 1
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
-    "no change": 31,
+    "no change": 30,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 33,
-    "uncertain": 2
+    "different": 1,
+    "equivalent": 32,
+    "uncertain": 1
    },
-   "unmatched": 4,
-   "pairs": 3,
+   "unmatched": 2,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -3733,7 +3736,7 @@
     "filters.count": "confirmed",
     "filters.rate": "judged uncertain",
     "floc.detention": "confirmed",
-    "floc.stages": "confirmed",
+    "floc.stages": "unextracted",
     "mix.detention": "confirmed",
     "mix.g": "confirmed",
     "optA.cost": "confirmed",
@@ -3744,7 +3747,7 @@
     "plant.finished_turbidity": "confirmed",
     "plant.peak_flow": "confirmed",
     "plant.population": "confirmed",
-    "plant.raw_turbidity": "judged uncertain",
+    "plant.raw_turbidity": "judged different",
     "sed.count": "confirmed",
     "sed.depth": "confirmed",
     "sed.length": "confirmed",
@@ -3765,34 +3768,39 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "31/31",
    "false_changes": 0,
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {},
    "conditions": {
-    "judged uncertain": 2
+    "judged different": 1,
+    "judged uncertain": 1
    },
    "added": {},
    "removed": {},
    "unchanged": {
     "confirmed": 31
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "no change": 31
    },
    "findings": {
+    "different": 1,
     "equivalent": 31,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 5,
-   "pairs": 3,
+   "unmatched": 2,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
-    "right": 2,
+    "right": 1,
     "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "conditions": {
-      "conditions": 2
+      "conditions": 1,
+      "not_same_item": 1
      }
     }
    },
@@ -3824,7 +3832,7 @@
     "plant.finished_turbidity": "confirmed",
     "plant.peak_flow": "confirmed",
     "plant.population": "confirmed",
-    "plant.raw_turbidity": "judged uncertain",
+    "plant.raw_turbidity": "judged different",
     "sed.count": "confirmed",
     "sed.depth": "confirmed",
     "sed.length": "confirmed",
@@ -4856,7 +4864,7 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "33/33",
+   "unchanged_confirmed": "32/33",
    "false_changes": 0,
    "difference_precision": null,
    "changed": {},
@@ -4864,18 +4872,19 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 33
+    "confirmed": 32,
+    "unextracted": 1
    },
    "different": {},
    "equivalent": {
-    "no change": 33,
+    "no change": 32,
     "unscored": 1
    },
    "findings": {
-    "equivalent": 34
+    "equivalent": 33
    },
    "unmatched": 1,
-   "pairs": 0,
+   "pairs": 2,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -4894,7 +4903,7 @@
     "filters.count": "confirmed",
     "filters.rate": "confirmed",
     "floc.detention": "confirmed",
-    "floc.stages": "confirmed",
+    "floc.stages": "unextracted",
     "mix.detention": "confirmed",
     "mix.g": "confirmed",
     "optA.cost": "confirmed",
@@ -4941,7 +4950,7 @@
    "findings": {
     "equivalent": 33
    },
-   "unmatched": 1,
+   "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
    "detail": {
@@ -5201,9 +5210,9 @@
    "changes_found": "3/3",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "13/18",
+   "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 0.75,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -5211,39 +5220,29 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 13,
-    "unextracted": 5
+    "confirmed": 16,
+    "unextracted": 2
    },
    "different": {
-    "across facts": 1,
     "change": 3
    },
    "equivalent": {
-    "no change": 13,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
-    "different": 4,
-    "equivalent": 15,
-    "uncertain": 1,
-    "unrelated": 1
+    "different": 3,
+    "equivalent": 16
    },
-   "unmatched": 4,
-   "pairs": 7,
+   "unmatched": 0,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 1
-     },
      "change": {
       "changed": 3
-     },
-     "unscored": {
-      "not_same_item": 1
      }
     }
    },
@@ -5252,14 +5251,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "reported",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "reported",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -5267,8 +5266,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1.docx": {
@@ -5282,9 +5281,9 @@
    "changes_found": "3/3",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "15/18",
+   "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 0.6,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -5292,34 +5291,27 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 3
+    "confirmed": 16,
+    "unextracted": 2
    },
    "different": {
-    "across facts": 2,
     "change": 3
    },
    "equivalent": {
-    "no change": 15,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
-    "complementary": 1,
-    "different": 5,
-    "equivalent": 17,
-    "unrelated": 2
+    "different": 3,
+    "equivalent": 16
    },
-   "unmatched": 2,
-   "pairs": 15,
+   "unmatched": 1,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "change": {
       "changed": 3
      }
@@ -5330,14 +5322,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "reported",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "reported",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -5595,7 +5587,7 @@
    "changes_found": "0/0",
    "additions_found": "2/2",
    "removals_found": "1/1",
-   "unchanged_confirmed": "15/20",
+   "unchanged_confirmed": "18/20",
    "false_changes": 0,
    "difference_precision": null,
    "changed": {},
@@ -5607,16 +5599,15 @@
     "reported": 1
    },
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 5
+    "confirmed": 18,
+    "unextracted": 2
    },
    "different": {},
    "equivalent": {
-    "no change": 15,
-    "unscored": 3
+    "no change": 19
    },
    "findings": {
-    "equivalent": 18
+    "equivalent": 19
    },
    "unmatched": 5,
    "pairs": 0,
@@ -5626,14 +5617,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.battery": "reported",
     "meas.beam": "reported",
     "meas.cell": "confirmed",
@@ -5643,8 +5634,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-members.docx": {
@@ -5675,28 +5666,27 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 18,
-    "unscored": 2
+    "no change": 18
    },
    "findings": {
-    "equivalent": 20
+    "equivalent": 18
    },
    "unmatched": 3,
-   "pairs": 0,
+   "pairs": 1,
    "omitted": 0,
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.battery": "reported",
     "meas.beam": "reported",
     "meas.cell": "confirmed",
@@ -5938,61 +5928,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "15/21",
+   "unchanged_confirmed": "17/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "unextracted": 1
+    "reported": 1
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 6
+    "confirmed": 17,
+    "uncertain": 2,
+    "unextracted": 2
    },
-   "different": {
-    "unscored": 2
-   },
+   "different": {},
    "equivalent": {
-    "no change": 15,
-    "unscored": 4
+    "no change": 20
    },
    "findings": {
-    "complementary": 6,
-    "different": 2,
-    "equivalent": 19,
-    "uncertain": 1
+    "equivalent": 20,
+    "uncertain": 3
    },
-   "unmatched": 2,
-   "pairs": 12,
+   "unmatched": 8,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 0,
-    "scored": 0,
+    "scored": 3,
     "value_change_precision": null,
     "by_claims": {
-     "unscored": {
+     "no change": {
       "not_same_item": 3
      }
     }
    },
    "detail": {
     "ext.field": "confirmed",
-    "fail.ack": "unextracted",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.fatal": "unextracted",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -6000,8 +5986,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-renumbered.docx": {
@@ -6013,65 +5999,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "17/21",
+   "unchanged_confirmed": "16/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "other": 1
+    "reported": 1
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 17,
-    "unextracted": 4
+    "confirmed": 16,
+    "uncertain": 3,
+    "unextracted": 2
    },
-   "different": {
-    "across facts": 3
-   },
+   "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 1
+    "no change": 16
    },
    "findings": {
-    "complementary": 2,
-    "different": 3,
-    "equivalent": 18,
-    "uncertain": 2,
-    "unrelated": 1
+    "equivalent": 16,
+    "uncertain": 3
    },
-   "unmatched": 4,
-   "pairs": 13,
+   "unmatched": 9,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 0,
+    "scored": 3,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 4
-     },
-     "unscored": {
-      "not_same_item": 1
+     "no change": {
+      "not_same_item": 3
      }
     }
    },
    "detail": {
     "ext.field": "confirmed",
-    "fail.ack": "confirmed",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.fatal": "other",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -6079,8 +6057,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-renumbered.pptx": {
@@ -6322,48 +6300,37 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "15/19",
+   "unchanged_confirmed": "17/19",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {
-    "judged uncertain": 1,
-    "unextracted": 1
+    "judged uncertain": 2
    },
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 4
+    "confirmed": 17,
+    "unextracted": 2
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
-    "no change": 15,
-    "unscored": 2
+    "no change": 17
    },
    "findings": {
-    "different": 2,
     "equivalent": 17,
     "uncertain": 2
    },
    "unmatched": 4,
-   "pairs": 6,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
-    "right": 3,
-    "scored": 3,
+    "right": 2,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "conditions": {
-      "conditions": 1
-     },
-     "unscored": {
-      "not_same_item": 1
+      "conditions": 2
      }
     }
    },
@@ -6372,14 +6339,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -6387,8 +6354,8 @@
     "short.field": "confirmed",
     "timer.congested": "judged uncertain",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "judged uncertain",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-context.docx": {
@@ -6417,11 +6384,10 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 2
+    "no change": 17
    },
    "findings": {
-    "equivalent": 19,
+    "equivalent": 17,
     "uncertain": 2
    },
    "unmatched": 4,
@@ -6442,14 +6408,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -6882,8 +6848,8 @@
     "different": 4,
     "equivalent": 28
    },
-   "unmatched": 5,
-   "pairs": 4,
+   "unmatched": 4,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -6943,64 +6909,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "17/21",
+   "unchanged_confirmed": "16/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "other": 1
+    "reported": 1
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 17,
-    "unextracted": 4
+    "confirmed": 16,
+    "uncertain": 3,
+    "unextracted": 2
    },
-   "different": {
-    "across facts": 1
-   },
+   "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
-    "complementary": 2,
-    "different": 1,
-    "equivalent": 19,
-    "uncertain": 2
+    "equivalent": 16,
+    "uncertain": 3
    },
-   "unmatched": 2,
-   "pairs": 8,
+   "unmatched": 9,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 2,
+    "right": 0,
+    "scored": 3,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
-     "unscored": {
-      "not_same_item": 1
+     "no change": {
+      "not_same_item": 3
      }
     }
    },
    "detail": {
     "ext.field": "confirmed",
-    "fail.ack": "confirmed",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.fatal": "other",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -7008,8 +6967,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   }
  },
@@ -7115,7 +7074,7 @@
    "changes_found": "4/4",
    "additions_found": "3/3",
    "removals_found": "1/1",
-   "unchanged_confirmed": "28/28",
+   "unchanged_confirmed": "27/28",
    "false_changes": 0,
    "difference_precision": 1.0,
    "changed": {
@@ -7129,20 +7088,21 @@
     "reported": 1
    },
    "unchanged": {
-    "confirmed": 28
+    "confirmed": 27,
+    "unextracted": 1
    },
    "different": {
     "change": 4
    },
    "equivalent": {
-    "no change": 28,
+    "no change": 27,
     "unscored": 1
    },
    "findings": {
     "different": 4,
-    "equivalent": 29
+    "equivalent": 28
    },
-   "unmatched": 5,
+   "unmatched": 6,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -7175,7 +7135,7 @@
     "filters.count": "confirmed",
     "filters.rate": "confirmed",
     "floc.detention": "confirmed",
-    "floc.stages": "confirmed",
+    "floc.stages": "unextracted",
     "mix.detention": "confirmed",
     "mix.g": "confirmed",
     "optA.cost": "reported",
@@ -7231,8 +7191,8 @@
     "different": 4,
     "equivalent": 28
    },
-   "unmatched": 5,
-   "pairs": 4,
+   "unmatched": 4,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -7578,8 +7538,8 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 24,
-    "unscored": 2
+    "no change": 25,
+    "unscored": 1
    },
    "findings": {
     "different": 4,
@@ -7663,15 +7623,15 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 24,
-    "unscored": 2
+    "no change": 25,
+    "unscored": 1
    },
    "findings": {
     "different": 4,
     "equivalent": 26
    },
    "unmatched": 4,
-   "pairs": 6,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -8706,12 +8666,11 @@
     "change": 3
    },
    "equivalent": {
-    "no change": 17,
-    "unscored": 3
+    "no change": 17
    },
    "findings": {
     "different": 3,
-    "equivalent": 20
+    "equivalent": 17
    },
    "unmatched": 4,
    "pairs": 3,
@@ -8792,7 +8751,7 @@
     "equivalent": 17
    },
    "unmatched": 4,
-   "pairs": 3,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 3,
@@ -9088,12 +9047,11 @@
     "change": 2
    },
    "equivalent": {
-    "no change": 2,
-    "unscored": 2
+    "no change": 2
    },
    "findings": {
     "different": 2,
-    "equivalent": 4
+    "equivalent": 2
    },
    "unmatched": 0,
    "pairs": 2,
@@ -9142,15 +9100,14 @@
     "change": 5
    },
    "equivalent": {
-    "no change": 16,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
     "different": 5,
-    "equivalent": 18
+    "equivalent": 16
    },
    "unmatched": 0,
-   "pairs": 5,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -10696,29 +10653,34 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "31/31",
+   "unchanged_confirmed": "30/31",
    "false_changes": 0,
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {},
    "conditions": {
-    "judged uncertain": 2
+    "judged different": 1,
+    "judged uncertain": 1
    },
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 31
+    "confirmed": 30,
+    "unextracted": 1
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
-    "no change": 31,
+    "no change": 30,
     "unscored": 2
    },
    "findings": {
-    "equivalent": 33,
-    "uncertain": 2
+    "different": 1,
+    "equivalent": 32,
+    "uncertain": 1
    },
-   "unmatched": 4,
-   "pairs": 3,
+   "unmatched": 2,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -10747,7 +10709,7 @@
     "filters.count": "confirmed",
     "filters.rate": "judged uncertain",
     "floc.detention": "confirmed",
-    "floc.stages": "confirmed",
+    "floc.stages": "unextracted",
     "mix.detention": "confirmed",
     "mix.g": "confirmed",
     "optA.cost": "confirmed",
@@ -10758,7 +10720,7 @@
     "plant.finished_turbidity": "confirmed",
     "plant.peak_flow": "confirmed",
     "plant.population": "confirmed",
-    "plant.raw_turbidity": "judged uncertain",
+    "plant.raw_turbidity": "judged different",
     "sed.count": "confirmed",
     "sed.depth": "confirmed",
     "sed.length": "confirmed",
@@ -10779,34 +10741,39 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "31/31",
    "false_changes": 0,
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {},
    "conditions": {
-    "judged uncertain": 2
+    "judged different": 1,
+    "judged uncertain": 1
    },
    "added": {},
    "removed": {},
    "unchanged": {
     "confirmed": 31
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "no change": 31
    },
    "findings": {
+    "different": 1,
     "equivalent": 31,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 5,
-   "pairs": 3,
+   "unmatched": 2,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
-    "right": 2,
+    "right": 1,
     "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "conditions": {
-      "conditions": 2
+      "conditions": 1,
+      "not_same_item": 1
      }
     }
    },
@@ -10838,7 +10805,7 @@
     "plant.finished_turbidity": "confirmed",
     "plant.peak_flow": "confirmed",
     "plant.population": "confirmed",
-    "plant.raw_turbidity": "judged uncertain",
+    "plant.raw_turbidity": "judged different",
     "sed.count": "confirmed",
     "sed.depth": "confirmed",
     "sed.length": "confirmed",
@@ -11870,7 +11837,7 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "33/33",
+   "unchanged_confirmed": "32/33",
    "false_changes": 0,
    "difference_precision": null,
    "changed": {},
@@ -11878,18 +11845,19 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 33
+    "confirmed": 32,
+    "unextracted": 1
    },
    "different": {},
    "equivalent": {
-    "no change": 33,
+    "no change": 32,
     "unscored": 1
    },
    "findings": {
-    "equivalent": 34
+    "equivalent": 33
    },
    "unmatched": 1,
-   "pairs": 0,
+   "pairs": 2,
    "omitted": 0,
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -11908,7 +11876,7 @@
     "filters.count": "confirmed",
     "filters.rate": "confirmed",
     "floc.detention": "confirmed",
-    "floc.stages": "confirmed",
+    "floc.stages": "unextracted",
     "mix.detention": "confirmed",
     "mix.g": "confirmed",
     "optA.cost": "confirmed",
@@ -11955,7 +11923,7 @@
    "findings": {
     "equivalent": 33
    },
-   "unmatched": 1,
+   "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
    "detail": {
@@ -12215,9 +12183,9 @@
    "changes_found": "3/3",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "13/18",
+   "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 0.75,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -12225,39 +12193,29 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 13,
-    "unextracted": 5
+    "confirmed": 16,
+    "unextracted": 2
    },
    "different": {
-    "across facts": 1,
     "change": 3
    },
    "equivalent": {
-    "no change": 13,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
-    "different": 4,
-    "equivalent": 15,
-    "uncertain": 1,
-    "unrelated": 1
+    "different": 3,
+    "equivalent": 16
    },
-   "unmatched": 4,
-   "pairs": 7,
+   "unmatched": 0,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 1
-     },
      "change": {
       "changed": 3
-     },
-     "unscored": {
-      "not_same_item": 1
      }
     }
    },
@@ -12266,14 +12224,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "reported",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "reported",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -12281,8 +12239,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1.docx": {
@@ -12296,9 +12254,9 @@
    "changes_found": "3/3",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "15/18",
+   "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 0.6,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -12306,34 +12264,27 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 3
+    "confirmed": 16,
+    "unextracted": 2
    },
    "different": {
-    "across facts": 2,
     "change": 3
    },
    "equivalent": {
-    "no change": 15,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
-    "complementary": 1,
-    "different": 5,
-    "equivalent": 17,
-    "unrelated": 2
+    "different": 3,
+    "equivalent": 16
    },
-   "unmatched": 2,
-   "pairs": 15,
+   "unmatched": 1,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "change": {
       "changed": 3
      }
@@ -12344,14 +12295,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "reported",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "reported",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -12609,7 +12560,7 @@
    "changes_found": "0/0",
    "additions_found": "2/2",
    "removals_found": "1/1",
-   "unchanged_confirmed": "15/20",
+   "unchanged_confirmed": "18/20",
    "false_changes": 0,
    "difference_precision": null,
    "changed": {},
@@ -12621,16 +12572,15 @@
     "reported": 1
    },
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 5
+    "confirmed": 18,
+    "unextracted": 2
    },
    "different": {},
    "equivalent": {
-    "no change": 15,
-    "unscored": 3
+    "no change": 19
    },
    "findings": {
-    "equivalent": 18
+    "equivalent": 19
    },
    "unmatched": 5,
    "pairs": 0,
@@ -12640,14 +12590,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.battery": "reported",
     "meas.beam": "reported",
     "meas.cell": "confirmed",
@@ -12657,8 +12607,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-members.docx": {
@@ -12689,28 +12639,27 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 18,
-    "unscored": 2
+    "no change": 18
    },
    "findings": {
-    "equivalent": 20
+    "equivalent": 18
    },
    "unmatched": 3,
-   "pairs": 0,
+   "pairs": 1,
    "omitted": 0,
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.battery": "reported",
     "meas.beam": "reported",
     "meas.cell": "confirmed",
@@ -12952,61 +12901,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "15/21",
+   "unchanged_confirmed": "17/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "unextracted": 1
+    "reported": 1
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 6
+    "confirmed": 17,
+    "uncertain": 2,
+    "unextracted": 2
    },
-   "different": {
-    "unscored": 2
-   },
+   "different": {},
    "equivalent": {
-    "no change": 15,
-    "unscored": 4
+    "no change": 20
    },
    "findings": {
-    "complementary": 6,
-    "different": 2,
-    "equivalent": 19,
-    "uncertain": 1
+    "equivalent": 20,
+    "uncertain": 3
    },
-   "unmatched": 2,
-   "pairs": 12,
+   "unmatched": 8,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 0,
-    "scored": 0,
+    "scored": 3,
     "value_change_precision": null,
     "by_claims": {
-     "unscored": {
+     "no change": {
       "not_same_item": 3
      }
     }
    },
    "detail": {
     "ext.field": "confirmed",
-    "fail.ack": "unextracted",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.fatal": "unextracted",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -13014,8 +12959,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-renumbered.docx": {
@@ -13027,65 +12972,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "17/21",
+   "unchanged_confirmed": "16/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "other": 1
+    "reported": 1
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 17,
-    "unextracted": 4
+    "confirmed": 16,
+    "uncertain": 3,
+    "unextracted": 2
    },
-   "different": {
-    "across facts": 3
-   },
+   "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 1
+    "no change": 16
    },
    "findings": {
-    "complementary": 2,
-    "different": 3,
-    "equivalent": 18,
-    "uncertain": 2,
-    "unrelated": 1
+    "equivalent": 16,
+    "uncertain": 3
    },
-   "unmatched": 4,
-   "pairs": 13,
+   "unmatched": 9,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 0,
+    "scored": 3,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 4
-     },
-     "unscored": {
-      "not_same_item": 1
+     "no change": {
+      "not_same_item": 3
      }
     }
    },
    "detail": {
     "ext.field": "confirmed",
-    "fail.ack": "confirmed",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.fatal": "other",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -13093,8 +13030,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-renumbered.pptx": {
@@ -13336,48 +13273,37 @@
    "changes_found": "0/0",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "15/19",
+   "unchanged_confirmed": "17/19",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {
-    "judged uncertain": 1,
-    "unextracted": 1
+    "judged uncertain": 2
    },
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 4
+    "confirmed": 17,
+    "unextracted": 2
    },
-   "different": {
-    "across facts": 2
-   },
+   "different": {},
    "equivalent": {
-    "no change": 15,
-    "unscored": 2
+    "no change": 17
    },
    "findings": {
-    "different": 2,
     "equivalent": 17,
     "uncertain": 2
    },
    "unmatched": 4,
-   "pairs": 6,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
-    "right": 3,
-    "scored": 3,
+    "right": 2,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "conditions": {
-      "conditions": 1
-     },
-     "unscored": {
-      "not_same_item": 1
+      "conditions": 2
      }
     }
    },
@@ -13386,14 +13312,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -13401,8 +13327,8 @@
     "short.field": "confirmed",
     "timer.congested": "judged uncertain",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "judged uncertain",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-context.docx": {
@@ -13431,11 +13357,10 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 2
+    "no change": 17
    },
    "findings": {
-    "equivalent": 19,
+    "equivalent": 17,
     "uncertain": 2
    },
    "unmatched": 4,
@@ -13456,14 +13381,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -13896,8 +13821,8 @@
     "different": 4,
     "equivalent": 28
    },
-   "unmatched": 5,
-   "pairs": 4,
+   "unmatched": 4,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -13957,1331 +13882,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "17/21",
+   "unchanged_confirmed": "16/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "other": 1
-   },
-   "removed": {},
-   "unchanged": {
-    "confirmed": 17,
-    "unextracted": 4
-   },
-   "different": {
-    "across facts": 1
-   },
-   "equivalent": {
-    "no change": 17,
-    "unscored": 2
-   },
-   "findings": {
-    "complementary": 2,
-    "different": 1,
-    "equivalent": 19,
-    "uncertain": 2
-   },
-   "unmatched": 2,
-   "pairs": 8,
-   "omitted": 0,
-   "kinds": {
-    "right": 2,
-    "scored": 2,
-    "value_change_precision": null,
-    "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
-     "unscored": {
-      "not_same_item": 1
-     }
-    }
-   },
-   "detail": {
-    "ext.field": "confirmed",
-    "fail.ack": "confirmed",
-    "fail.duration": "unextracted",
-    "fail.fatal": "other",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
-    "hdr.pn": "confirmed",
-    "hdr.pn_len": "confirmed",
-    "hdr.sid": "confirmed",
-    "hdr.sid_len": "confirmed",
-    "hdr.version": "confirmed",
-    "long.field": "confirmed",
-    "long.groups": "confirmed",
-    "meas.beam": "confirmed",
-    "meas.cell": "confirmed",
-    "meas.rssi": "confirmed",
-    "meas.ta": "confirmed",
-    "short.field": "confirmed",
-    "timer.congested": "confirmed",
-    "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
-   }
-  }
- },
- "recorded-unaligned": {
-  "wtp-s1": {
-   "facts": {
-    "changed": 4,
-    "conditions": 0,
-    "added": 3,
-    "removed": 1,
-    "unchanged": 28
-   },
-   "changes_found": "4/4",
-   "additions_found": "3/3",
-   "removals_found": "1/1",
-   "unchanged_confirmed": "28/28",
-   "false_changes": 0,
-   "difference_precision": 1.0,
-   "changed": {
-    "reported": 4
-   },
-   "conditions": {},
-   "added": {
-    "reported": 3
-   },
-   "removed": {
     "reported": 1
    },
-   "unchanged": {
-    "confirmed": 28
-   },
-   "different": {
-    "change": 5
-   },
-   "equivalent": {
-    "no change": 33,
-    "unscored": 2
-   },
-   "findings": {
-    "complementary": 47,
-    "different": 5,
-    "equivalent": 35,
-    "unrelated": 87
-   },
-   "unmatched": 4,
-   "pairs": 174,
-   "omitted": 0,
-   "kinds": {
-    "right": 5,
-    "scored": 5,
-    "value_change_precision": 1.0,
-    "by_claims": {
-     "change": {
-      "changed": 5
-     }
-    }
-   },
-   "detail": {
-    "P-101A.capacity": "confirmed",
-    "P-101A.head": "confirmed",
-    "P-101A.motor": "confirmed",
-    "P-101B.capacity": "reported",
-    "P-101B.head": "confirmed",
-    "P-101B.motor": "confirmed",
-    "P-101C.capacity": "confirmed",
-    "P-101C.head": "confirmed",
-    "P-101C.motor": "confirmed",
-    "P-101D.capacity": "reported",
-    "P-101D.head": "reported",
-    "P-101D.motor": "reported",
-    "chem.alum": "confirmed",
-    "chem.alum_max": "reported",
-    "chem.chlorine": "reported",
-    "filters.area": "confirmed",
-    "filters.count": "confirmed",
-    "filters.rate": "confirmed",
-    "floc.detention": "confirmed",
-    "floc.stages": "confirmed",
-    "mix.detention": "confirmed",
-    "mix.g": "confirmed",
-    "optA.cost": "reported",
-    "optA.energy": "confirmed",
-    "optB.contact": "confirmed",
-    "optB.cost": "confirmed",
-    "plant.design_flow": "reported",
-    "plant.finished_turbidity": "confirmed",
-    "plant.peak_flow": "confirmed",
-    "plant.population": "confirmed",
-    "plant.raw_turbidity": "confirmed",
-    "sed.count": "confirmed",
-    "sed.depth": "confirmed",
-    "sed.length": "confirmed",
-    "sed.loading": "confirmed",
-    "sed.width": "confirmed"
-   }
-  },
-  "coaster-s1": {
-   "facts": {
-    "changed": 4,
-    "conditions": 0,
-    "added": 3,
-    "removed": 1,
-    "unchanged": 23
-   },
-   "changes_found": "4/4",
-   "additions_found": "0/3",
-   "removals_found": "1/1",
-   "unchanged_confirmed": "23/23",
-   "false_changes": 0,
-   "difference_precision": 0.4667,
-   "changed": {
-    "reported": 4
-   },
-   "conditions": {},
-   "added": {
-    "as a change": 3
-   },
-   "removed": {
-    "reported": 1
-   },
-   "unchanged": {
-    "confirmed": 23
-   },
-   "different": {
-    "across facts": 7,
-    "change": 7,
-    "unscored": 1
-   },
-   "equivalent": {
-    "no change": 33,
-    "unscored": 1
-   },
-   "findings": {
-    "complementary": 23,
-    "different": 15,
-    "equivalent": 34,
-    "uncertain": 3,
-    "unrelated": 98
-   },
-   "unmatched": 1,
-   "pairs": 173,
-   "omitted": 0,
-   "kinds": {
-    "right": 17,
-    "scored": 17,
-    "value_change_precision": 1.0,
-    "by_claims": {
-     "across facts": {
-      "not_same_item": 9
-     },
-     "change": {
-      "changed": 7
-     },
-     "no change": {
-      "restated": 1
-     },
-     "unscored": {
-      "changed": 1
-     }
-    }
-   },
-   "detail": {
-    "el.Camelback.g": "confirmed",
-    "el.Camelback.height": "confirmed",
-    "el.Camelback.speed": "confirmed",
-    "el.First drop.g": "confirmed",
-    "el.First drop.speed": "confirmed",
-    "el.Helix.g": "as a change",
-    "el.Helix.height": "as a change",
-    "el.Helix.speed": "as a change",
-    "el.Vertical loop.g": "confirmed",
-    "el.Vertical loop.height": "confirmed",
-    "el.Vertical loop.speed": "reported",
-    "el.Zero-g roll.g": "confirmed",
-    "el.Zero-g roll.height": "confirmed",
-    "el.Zero-g roll.speed": "confirmed",
-    "ride.angle": "confirmed",
-    "ride.capacity": "reported",
-    "ride.drop": "confirmed",
-    "ride.duration": "confirmed",
-    "ride.g_max": "confirmed",
-    "ride.inversions": "confirmed",
-    "ride.length": "confirmed",
-    "ride.lift": "reported",
-    "ride.speed": "confirmed",
-    "station.length": "reported",
-    "struct.columns": "confirmed",
-    "struct.steel": "confirmed",
-    "struct.wind": "confirmed",
-    "trains.cars": "confirmed",
-    "trains.count": "confirmed",
-    "trains.mass": "reported",
-    "trains.riders": "confirmed"
-   }
-  },
-  "wtp-tables-s1-clean": {
-   "facts": {
-    "changed": 3,
-    "conditions": 0,
-    "added": 4,
-    "removed": 3,
-    "unchanged": 78
-   },
-   "changes_found": "3/3",
-   "additions_found": "4/4",
-   "removals_found": "3/3",
-   "unchanged_confirmed": "78/78",
-   "false_changes": 0,
-   "difference_precision": 1.0,
-   "changed": {
-    "reported": 3
-   },
-   "conditions": {},
-   "added": {
-    "reported": 4
-   },
-   "removed": {
-    "reported": 3
-   },
-   "unchanged": {
-    "confirmed": 78
-   },
-   "different": {
-    "change": 3
-   },
-   "equivalent": {
-    "no change": 78
-   },
-   "findings": {
-    "complementary": 49,
-    "different": 3,
-    "equivalent": 78,
-    "unrelated": 281
-   },
-   "unmatched": 7,
-   "pairs": 411,
-   "omitted": 0,
-   "kinds": {
-    "right": 3,
-    "scored": 3,
-    "value_change_precision": 1.0,
-    "by_claims": {
-     "change": {
-      "changed": 3
-     }
-    }
-   },
-   "detail": {
-    "B-401.airflow": "confirmed",
-    "B-401.discharge pressure": "confirmed",
-    "B-401.motor power": "confirmed",
-    "B-401.motor speed": "confirmed",
-    "B-402.airflow": "confirmed",
-    "B-402.discharge pressure": "reported",
-    "B-402.motor power": "confirmed",
-    "B-402.motor speed": "confirmed",
-    "B-403.airflow": "confirmed",
-    "B-403.discharge pressure": "confirmed",
-    "B-403.motor power": "confirmed",
-    "B-403.motor speed": "confirmed",
-    "P-101A.capacity": "confirmed",
-    "P-101A.motor power": "confirmed",
-    "P-101A.motor speed": "confirmed",
-    "P-101A.total dynamic head": "confirmed",
-    "P-101B.capacity": "confirmed",
-    "P-101B.motor power": "reported",
-    "P-101B.motor speed": "confirmed",
-    "P-101B.total dynamic head": "confirmed",
-    "P-101C.capacity": "confirmed",
-    "P-101C.motor power": "confirmed",
-    "P-101C.motor speed": "confirmed",
-    "P-101C.total dynamic head": "confirmed",
-    "P-101D.capacity": "reported",
-    "P-101D.motor power": "reported",
-    "P-101D.motor speed": "reported",
-    "P-101D.total dynamic head": "reported",
-    "V-301.flow coefficient": "confirmed",
-    "V-301.pressure rating": "confirmed",
-    "V-301.stroke time": "confirmed",
-    "V-302.flow coefficient": "confirmed",
-    "V-302.pressure rating": "confirmed",
-    "V-302.stroke time": "confirmed",
-    "V-303.flow coefficient": "confirmed",
-    "V-303.pressure rating": "confirmed",
-    "V-303.stroke time": "confirmed",
-    "V-304.flow coefficient": "confirmed",
-    "V-304.pressure rating": "confirmed",
-    "V-304.stroke time": "confirmed",
-    "V-305.flow coefficient": "confirmed",
-    "V-305.pressure rating": "confirmed",
-    "V-305.stroke time": "confirmed",
-    "V-306.flow coefficient": "reported",
-    "V-306.pressure rating": "confirmed",
-    "V-306.stroke time": "confirmed",
-    "V-307.flow coefficient": "confirmed",
-    "V-307.pressure rating": "confirmed",
-    "V-307.stroke time": "confirmed",
-    "V-308.flow coefficient": "confirmed",
-    "V-308.pressure rating": "confirmed",
-    "V-308.stroke time": "confirmed",
-    "V-309.flow coefficient": "confirmed",
-    "V-309.pressure rating": "confirmed",
-    "V-309.stroke time": "confirmed",
-    "V-310.flow coefficient": "confirmed",
-    "V-310.pressure rating": "confirmed",
-    "V-310.stroke time": "confirmed",
-    "V-311.flow coefficient": "confirmed",
-    "V-311.pressure rating": "confirmed",
-    "V-311.stroke time": "confirmed",
-    "V-312.flow coefficient": "confirmed",
-    "V-312.pressure rating": "confirmed",
-    "V-312.stroke time": "confirmed",
-    "V-313.flow coefficient": "confirmed",
-    "V-313.pressure rating": "confirmed",
-    "V-313.stroke time": "confirmed",
-    "V-314.flow coefficient": "reported",
-    "V-314.pressure rating": "reported",
-    "V-314.stroke time": "reported",
-    "V-315.flow coefficient": "confirmed",
-    "V-315.pressure rating": "confirmed",
-    "V-315.stroke time": "confirmed",
-    "V-316.flow coefficient": "confirmed",
-    "V-316.pressure rating": "confirmed",
-    "V-316.stroke time": "confirmed",
-    "V-317.flow coefficient": "confirmed",
-    "V-317.pressure rating": "confirmed",
-    "V-317.stroke time": "confirmed",
-    "V-318.flow coefficient": "confirmed",
-    "V-318.pressure rating": "confirmed",
-    "V-318.stroke time": "confirmed",
-    "V-319.flow coefficient": "confirmed",
-    "V-319.pressure rating": "confirmed",
-    "V-319.stroke time": "confirmed",
-    "V-320.flow coefficient": "confirmed",
-    "V-320.pressure rating": "confirmed",
-    "V-320.stroke time": "confirmed"
-   }
-  },
-  "lcc-s1-traps": {
-   "facts": {
-    "changed": 3,
-    "conditions": 0,
-    "added": 2,
-    "removed": 2,
-    "unchanged": 18
-   },
-   "changes_found": "3/3",
-   "additions_found": "2/2",
-   "removals_found": "2/2",
-   "unchanged_confirmed": "18/18",
-   "false_changes": 0,
-   "difference_precision": 0.5,
-   "changed": {
-    "reported": 3
-   },
-   "conditions": {},
-   "added": {
-    "reported": 2
-   },
-   "removed": {
-    "reported": 2
-   },
-   "unchanged": {
-    "confirmed": 18
-   },
-   "different": {
-    "across facts": 3,
-    "change": 3
-   },
-   "equivalent": {
-    "no change": 24
-   },
-   "findings": {
-    "complementary": 9,
-    "different": 6,
-    "equivalent": 24,
-    "uncertain": 1,
-    "unrelated": 74
-   },
-   "unmatched": 4,
-   "pairs": 114,
-   "omitted": 0,
-   "kinds": {
-    "right": 7,
-    "scored": 7,
-    "value_change_precision": 1.0,
-    "by_claims": {
-     "across facts": {
-      "not_same_item": 4
-     },
-     "change": {
-      "changed": 3
-     }
-    }
-   },
-   "detail": {
-    "ahu3.airflow": "confirmed",
-    "ahu3.fanmotor": "confirmed",
-    "hallc.area": "confirmed",
-    "hallc.height": "confirmed",
-    "hallc.liveload": "confirmed",
-    "hallc.noise": "reported",
-    "hallc.occupancy": "confirmed",
-    "hallc.tmax": "confirmed",
-    "hallc.tmin": "confirmed",
-    "halls.area": "confirmed",
-    "opt1.cost": "reported",
-    "opt1.load": "confirmed",
-    "opt2.cost": "confirmed",
-    "opt2.load": "confirmed",
-    "roof.snow": "reported",
-    "room101.area": "confirmed",
-    "room101.seats": "confirmed",
-    "room102.area": "confirmed",
-    "room102.seats": "confirmed",
-    "room103.area": "confirmed",
-    "room103.seats": "confirmed",
-    "room104.area": "reported",
-    "room104.seats": "reported",
-    "room105.area": "reported",
-    "room105.seats": "reported"
-   }
-  },
-  "lcc-energy-s1-clean": {
-   "facts": {
-    "changed": 5,
-    "conditions": 0,
-    "added": 0,
-    "removed": 0,
-    "unchanged": 16
-   },
-   "changes_found": "5/5",
-   "additions_found": "0/0",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "16/16",
-   "false_changes": 0,
-   "difference_precision": 0.4545,
-   "changed": {
-    "reported": 5
-   },
-   "conditions": {},
-   "added": {},
-   "removed": {},
-   "unchanged": {
-    "confirmed": 16
-   },
-   "different": {
-    "across facts": 1,
-    "change": 5,
-    "unscored": 5
-   },
-   "equivalent": {
-    "no change": 16,
-    "unscored": 1
-   },
-   "findings": {
-    "complementary": 13,
-    "different": 11,
-    "equivalent": 17,
-    "uncertain": 73,
-    "unrelated": 132
-   },
-   "unmatched": 32,
-   "pairs": 246,
-   "omitted": 0,
-   "kinds": {
-    "right": 28,
-    "scored": 35,
-    "value_change_precision": 1.0,
-    "by_claims": {
-     "across facts": {
-      "not_same_item": 21
-     },
-     "change": {
-      "changed": 5
-     },
-     "no change": {
-      "misread": 1,
-      "not_same_item": 5,
-      "restated": 2,
-      "unclear": 1
-     },
-     "unscored": {
-      "changed": 1,
-      "misread": 15,
-      "not_same_item": 27,
-      "restated": 6
-     }
-    }
-   },
-   "detail": {
-    "opt1.august": "confirmed",
-    "opt1.demand": "confirmed",
-    "opt1.july": "reported",
-    "opt1.june": "confirmed",
-    "opt1.may": "confirmed",
-    "opt1.october": "confirmed",
-    "opt1.season": "reported",
-    "opt1.september": "confirmed",
-    "opt2.august": "reported",
-    "opt2.demand": "confirmed",
-    "opt2.july": "confirmed",
-    "opt2.june": "confirmed",
-    "opt2.may": "confirmed",
-    "opt2.october": "confirmed",
-    "opt2.season": "reported",
-    "opt2.september": "confirmed",
-    "zone.concourse": "confirmed",
-    "zone.exhibit": "reported",
-    "zone.kitchens": "confirmed",
-    "zone.loading": "confirmed",
-    "zone.meeting": "confirmed"
-   }
-  },
-  "lcc-plan-s1-clean": {
-   "facts": {
-    "changed": 3,
-    "conditions": 0,
-    "added": 1,
-    "removed": 0,
-    "unchanged": 35
-   },
-   "changes_found": "2/3",
-   "additions_found": "0/1",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "35/35",
-   "false_changes": 0,
-   "difference_precision": 0.2055,
-   "changed": {
-    "reported": 2,
-    "uncertain": 1
-   },
-   "conditions": {},
-   "added": {
-    "as a change": 1
-   },
-   "removed": {},
-   "unchanged": {
-    "confirmed": 35
-   },
-   "different": {
-    "across facts": 41,
-    "change": 15,
-    "unscored": 17
-   },
-   "equivalent": {
-    "no change": 162,
-    "unscored": 17
-   },
-   "findings": {
-    "complementary": 122,
-    "different": 73,
-    "equivalent": 179,
-    "uncertain": 39,
-    "unrelated": 143
-   },
-   "unmatched": 7,
-   "pairs": 556,
-   "omitted": 0,
-   "kinds": {
-    "right": 75,
-    "scored": 84,
-    "value_change_precision": 0.8095,
-    "by_claims": {
-     "across facts": {
-      "changed": 4,
-      "not_same_item": 57
-     },
-     "change": {
-      "changed": 16,
-      "conditions": 1,
-      "not_same_item": 1
-     },
-     "no change": {
-      "not_same_item": 3,
-      "restated": 2
-     },
-     "unscored": {
-      "changed": 2,
-      "not_same_item": 26
-     }
-    }
-   },
-   "detail": {
-    "D101.height": "confirmed",
-    "D101.width": "confirmed",
-    "D102.height": "confirmed",
-    "D102.width": "confirmed",
-    "D103.height": "confirmed",
-    "D103.width": "reported",
-    "D104.height": "confirmed",
-    "D104.width": "confirmed",
-    "D110.height": "confirmed",
-    "D110.width": "confirmed",
-    "D111.height": "confirmed",
-    "D111.width": "confirmed",
-    "D112.height": "confirmed",
-    "D112.width": "confirmed",
-    "revA.date": "confirmed",
-    "revB.date": "confirmed",
-    "revC.date": "confirmed",
-    "revD.date": "as a change",
-    "room101.area": "confirmed",
-    "room101.depth": "confirmed",
-    "room101.width": "confirmed",
-    "room102.area": "uncertain",
-    "room102.depth": "confirmed",
-    "room102.width": "reported",
-    "room103.area": "confirmed",
-    "room103.depth": "confirmed",
-    "room103.width": "confirmed",
-    "room104.area": "confirmed",
-    "room104.depth": "confirmed",
-    "room104.width": "confirmed",
-    "room110.area": "confirmed",
-    "room110.depth": "confirmed",
-    "room110.width": "confirmed",
-    "room111.area": "confirmed",
-    "room111.depth": "confirmed",
-    "room111.width": "confirmed",
-    "room112.area": "confirmed",
-    "room112.depth": "confirmed",
-    "room112.width": "confirmed"
-   }
-  },
-  "wtp-tables-s1-clean-renamed": {
-   "facts": {
-    "changed": 0,
-    "conditions": 0,
-    "added": 0,
-    "removed": 0,
-    "unchanged": 84
-   },
-   "changes_found": "0/0",
-   "additions_found": "0/0",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "80/84",
-   "false_changes": 0,
-   "difference_precision": null,
-   "changed": {},
-   "conditions": {},
-   "added": {},
-   "removed": {},
-   "unchanged": {
-    "confirmed": 80,
-    "other": 4
-   },
-   "different": {},
-   "equivalent": {
-    "no change": 80
-   },
-   "findings": {
-    "complementary": 35,
-    "equivalent": 80,
-    "unrelated": 277
-   },
-   "unmatched": 8,
-   "pairs": 392,
-   "omitted": 0,
-   "detail": {
-    "B-401.airflow": "confirmed",
-    "B-401.discharge pressure": "confirmed",
-    "B-401.motor power": "confirmed",
-    "B-401.motor speed": "confirmed",
-    "B-402.airflow": "confirmed",
-    "B-402.discharge pressure": "confirmed",
-    "B-402.motor power": "confirmed",
-    "B-402.motor speed": "confirmed",
-    "B-403.airflow": "confirmed",
-    "B-403.discharge pressure": "confirmed",
-    "B-403.motor power": "confirmed",
-    "B-403.motor speed": "confirmed",
-    "P-101A.capacity": "confirmed",
-    "P-101A.motor power": "confirmed",
-    "P-101A.motor speed": "confirmed",
-    "P-101A.total dynamic head": "confirmed",
-    "P-101B.capacity": "other",
-    "P-101B.motor power": "other",
-    "P-101B.motor speed": "other",
-    "P-101B.total dynamic head": "other",
-    "P-101C.capacity": "confirmed",
-    "P-101C.motor power": "confirmed",
-    "P-101C.motor speed": "confirmed",
-    "P-101C.total dynamic head": "confirmed",
-    "V-301.flow coefficient": "confirmed",
-    "V-301.pressure rating": "confirmed",
-    "V-301.stroke time": "confirmed",
-    "V-302.flow coefficient": "confirmed",
-    "V-302.pressure rating": "confirmed",
-    "V-302.stroke time": "confirmed",
-    "V-303.flow coefficient": "confirmed",
-    "V-303.pressure rating": "confirmed",
-    "V-303.stroke time": "confirmed",
-    "V-304.flow coefficient": "confirmed",
-    "V-304.pressure rating": "confirmed",
-    "V-304.stroke time": "confirmed",
-    "V-305.flow coefficient": "confirmed",
-    "V-305.pressure rating": "confirmed",
-    "V-305.stroke time": "confirmed",
-    "V-306.flow coefficient": "confirmed",
-    "V-306.pressure rating": "confirmed",
-    "V-306.stroke time": "confirmed",
-    "V-307.flow coefficient": "confirmed",
-    "V-307.pressure rating": "confirmed",
-    "V-307.stroke time": "confirmed",
-    "V-308.flow coefficient": "confirmed",
-    "V-308.pressure rating": "confirmed",
-    "V-308.stroke time": "confirmed",
-    "V-309.flow coefficient": "confirmed",
-    "V-309.pressure rating": "confirmed",
-    "V-309.stroke time": "confirmed",
-    "V-310.flow coefficient": "confirmed",
-    "V-310.pressure rating": "confirmed",
-    "V-310.stroke time": "confirmed",
-    "V-311.flow coefficient": "confirmed",
-    "V-311.pressure rating": "confirmed",
-    "V-311.stroke time": "confirmed",
-    "V-312.flow coefficient": "confirmed",
-    "V-312.pressure rating": "confirmed",
-    "V-312.stroke time": "confirmed",
-    "V-313.flow coefficient": "confirmed",
-    "V-313.pressure rating": "confirmed",
-    "V-313.stroke time": "confirmed",
-    "V-314.flow coefficient": "confirmed",
-    "V-314.pressure rating": "confirmed",
-    "V-314.stroke time": "confirmed",
-    "V-315.flow coefficient": "confirmed",
-    "V-315.pressure rating": "confirmed",
-    "V-315.stroke time": "confirmed",
-    "V-316.flow coefficient": "confirmed",
-    "V-316.pressure rating": "confirmed",
-    "V-316.stroke time": "confirmed",
-    "V-317.flow coefficient": "confirmed",
-    "V-317.pressure rating": "confirmed",
-    "V-317.stroke time": "confirmed",
-    "V-318.flow coefficient": "confirmed",
-    "V-318.pressure rating": "confirmed",
-    "V-318.stroke time": "confirmed",
-    "V-319.flow coefficient": "confirmed",
-    "V-319.pressure rating": "confirmed",
-    "V-319.stroke time": "confirmed",
-    "V-320.flow coefficient": "confirmed",
-    "V-320.pressure rating": "confirmed",
-    "V-320.stroke time": "confirmed"
-   }
-  },
-  "wtp-tables-s1-clean-reordered": {
-   "facts": {
-    "changed": 0,
-    "conditions": 0,
-    "added": 0,
-    "removed": 0,
-    "unchanged": 84
-   },
-   "changes_found": "0/0",
-   "additions_found": "0/0",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "84/84",
-   "false_changes": 0,
-   "difference_precision": null,
-   "changed": {},
-   "conditions": {},
-   "added": {},
-   "removed": {},
-   "unchanged": {
-    "confirmed": 84
-   },
-   "different": {},
-   "equivalent": {
-    "no change": 84
-   },
-   "findings": {
-    "complementary": 39,
-    "equivalent": 84,
-    "unrelated": 266
-   },
-   "unmatched": 0,
-   "pairs": 389,
-   "omitted": 0,
-   "detail": {
-    "B-401.airflow": "confirmed",
-    "B-401.discharge pressure": "confirmed",
-    "B-401.motor power": "confirmed",
-    "B-401.motor speed": "confirmed",
-    "B-402.airflow": "confirmed",
-    "B-402.discharge pressure": "confirmed",
-    "B-402.motor power": "confirmed",
-    "B-402.motor speed": "confirmed",
-    "B-403.airflow": "confirmed",
-    "B-403.discharge pressure": "confirmed",
-    "B-403.motor power": "confirmed",
-    "B-403.motor speed": "confirmed",
-    "P-101A.capacity": "confirmed",
-    "P-101A.motor power": "confirmed",
-    "P-101A.motor speed": "confirmed",
-    "P-101A.total dynamic head": "confirmed",
-    "P-101B.capacity": "confirmed",
-    "P-101B.motor power": "confirmed",
-    "P-101B.motor speed": "confirmed",
-    "P-101B.total dynamic head": "confirmed",
-    "P-101C.capacity": "confirmed",
-    "P-101C.motor power": "confirmed",
-    "P-101C.motor speed": "confirmed",
-    "P-101C.total dynamic head": "confirmed",
-    "V-301.flow coefficient": "confirmed",
-    "V-301.pressure rating": "confirmed",
-    "V-301.stroke time": "confirmed",
-    "V-302.flow coefficient": "confirmed",
-    "V-302.pressure rating": "confirmed",
-    "V-302.stroke time": "confirmed",
-    "V-303.flow coefficient": "confirmed",
-    "V-303.pressure rating": "confirmed",
-    "V-303.stroke time": "confirmed",
-    "V-304.flow coefficient": "confirmed",
-    "V-304.pressure rating": "confirmed",
-    "V-304.stroke time": "confirmed",
-    "V-305.flow coefficient": "confirmed",
-    "V-305.pressure rating": "confirmed",
-    "V-305.stroke time": "confirmed",
-    "V-306.flow coefficient": "confirmed",
-    "V-306.pressure rating": "confirmed",
-    "V-306.stroke time": "confirmed",
-    "V-307.flow coefficient": "confirmed",
-    "V-307.pressure rating": "confirmed",
-    "V-307.stroke time": "confirmed",
-    "V-308.flow coefficient": "confirmed",
-    "V-308.pressure rating": "confirmed",
-    "V-308.stroke time": "confirmed",
-    "V-309.flow coefficient": "confirmed",
-    "V-309.pressure rating": "confirmed",
-    "V-309.stroke time": "confirmed",
-    "V-310.flow coefficient": "confirmed",
-    "V-310.pressure rating": "confirmed",
-    "V-310.stroke time": "confirmed",
-    "V-311.flow coefficient": "confirmed",
-    "V-311.pressure rating": "confirmed",
-    "V-311.stroke time": "confirmed",
-    "V-312.flow coefficient": "confirmed",
-    "V-312.pressure rating": "confirmed",
-    "V-312.stroke time": "confirmed",
-    "V-313.flow coefficient": "confirmed",
-    "V-313.pressure rating": "confirmed",
-    "V-313.stroke time": "confirmed",
-    "V-314.flow coefficient": "confirmed",
-    "V-314.pressure rating": "confirmed",
-    "V-314.stroke time": "confirmed",
-    "V-315.flow coefficient": "confirmed",
-    "V-315.pressure rating": "confirmed",
-    "V-315.stroke time": "confirmed",
-    "V-316.flow coefficient": "confirmed",
-    "V-316.pressure rating": "confirmed",
-    "V-316.stroke time": "confirmed",
-    "V-317.flow coefficient": "confirmed",
-    "V-317.pressure rating": "confirmed",
-    "V-317.stroke time": "confirmed",
-    "V-318.flow coefficient": "confirmed",
-    "V-318.pressure rating": "confirmed",
-    "V-318.stroke time": "confirmed",
-    "V-319.flow coefficient": "confirmed",
-    "V-319.pressure rating": "confirmed",
-    "V-319.stroke time": "confirmed",
-    "V-320.flow coefficient": "confirmed",
-    "V-320.pressure rating": "confirmed",
-    "V-320.stroke time": "confirmed"
-   }
-  },
-  "wtp-s1-conditions": {
-   "facts": {
-    "changed": 0,
-    "conditions": 2,
-    "added": 0,
-    "removed": 0,
-    "unchanged": 31
-   },
-   "changes_found": "0/0",
-   "additions_found": "0/0",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "31/31",
-   "false_changes": 0,
-   "difference_precision": 1.0,
-   "changed": {},
-   "conditions": {
-    "judged different": 1,
-    "judged uncertain": 1
-   },
-   "added": {},
-   "removed": {},
-   "unchanged": {
-    "confirmed": 31
-   },
-   "different": {
-    "change": 1
-   },
-   "equivalent": {
-    "no change": 31,
-    "unscored": 2
-   },
-   "findings": {
-    "complementary": 41,
-    "different": 1,
-    "equivalent": 33,
-    "uncertain": 1,
-    "unrelated": 76
-   },
-   "unmatched": 1,
-   "pairs": 152,
-   "omitted": 0,
-   "kinds": {
-    "right": 1,
-    "scored": 2,
-    "value_change_precision": 1.0,
-    "by_claims": {
-     "conditions": {
-      "conditions": 1,
-      "not_same_item": 1
-     }
-    }
-   },
-   "detail": {
-    "P-101A.capacity": "confirmed",
-    "P-101A.head": "confirmed",
-    "P-101A.motor": "confirmed",
-    "P-101B.capacity": "confirmed",
-    "P-101B.head": "confirmed",
-    "P-101B.motor": "confirmed",
-    "P-101C.capacity": "confirmed",
-    "P-101C.head": "confirmed",
-    "P-101C.motor": "confirmed",
-    "chem.alum": "confirmed",
-    "chem.alum_max": "confirmed",
-    "chem.chlorine": "confirmed",
-    "filters.area": "confirmed",
-    "filters.count": "confirmed",
-    "filters.rate": "judged uncertain",
-    "floc.detention": "confirmed",
-    "floc.stages": "confirmed",
-    "mix.detention": "confirmed",
-    "mix.g": "confirmed",
-    "optA.cost": "confirmed",
-    "optA.energy": "confirmed",
-    "optB.contact": "confirmed",
-    "optB.cost": "confirmed",
-    "plant.design_flow": "confirmed",
-    "plant.finished_turbidity": "confirmed",
-    "plant.peak_flow": "confirmed",
-    "plant.population": "confirmed",
-    "plant.raw_turbidity": "judged different",
-    "sed.count": "confirmed",
-    "sed.depth": "confirmed",
-    "sed.length": "confirmed",
-    "sed.loading": "confirmed",
-    "sed.width": "confirmed"
-   }
-  },
-  "wtp-tables-s1-clean-split": {
-   "facts": {
-    "changed": 0,
-    "conditions": 0,
-    "added": 8,
-    "removed": 4,
-    "unchanged": 80
-   },
-   "changes_found": "0/0",
-   "additions_found": "8/8",
-   "removals_found": "4/4",
-   "unchanged_confirmed": "80/80",
-   "false_changes": 0,
-   "difference_precision": null,
-   "changed": {},
-   "conditions": {},
-   "added": {
-    "reported": 8
-   },
-   "removed": {
-    "reported": 4
-   },
-   "unchanged": {
-    "confirmed": 80
-   },
-   "different": {},
-   "equivalent": {
-    "no change": 80
-   },
-   "findings": {
-    "complementary": 40,
-    "equivalent": 80,
-    "unrelated": 290
-   },
-   "unmatched": 12,
-   "pairs": 410,
-   "omitted": 0,
-   "splits": [
-    {
-     "from": [
-      "P-101C.capacity",
-      "P-101C.total dynamic head",
-      "P-101C.motor power",
-      "P-101C.motor speed"
-     ],
-     "to": [
-      "P-101E.capacity",
-      "P-101E.total dynamic head",
-      "P-101E.motor power",
-      "P-101E.motor speed",
-      "P-101F.capacity",
-      "P-101F.total dynamic head",
-      "P-101F.motor power",
-      "P-101F.motor speed"
-     ],
-     "viewed_as": [],
-     "compared": [
-      "unrelated"
-     ],
-     "old_claims": 4,
-     "new_claims": 8,
-     "old_claims_relations": [
-      "unrelated"
-     ]
-    }
-   ],
-   "detail": {
-    "B-401.airflow": "confirmed",
-    "B-401.discharge pressure": "confirmed",
-    "B-401.motor power": "confirmed",
-    "B-401.motor speed": "confirmed",
-    "B-402.airflow": "confirmed",
-    "B-402.discharge pressure": "confirmed",
-    "B-402.motor power": "confirmed",
-    "B-402.motor speed": "confirmed",
-    "B-403.airflow": "confirmed",
-    "B-403.discharge pressure": "confirmed",
-    "B-403.motor power": "confirmed",
-    "B-403.motor speed": "confirmed",
-    "P-101A.capacity": "confirmed",
-    "P-101A.motor power": "confirmed",
-    "P-101A.motor speed": "confirmed",
-    "P-101A.total dynamic head": "confirmed",
-    "P-101B.capacity": "confirmed",
-    "P-101B.motor power": "confirmed",
-    "P-101B.motor speed": "confirmed",
-    "P-101B.total dynamic head": "confirmed",
-    "P-101C.capacity": "reported",
-    "P-101C.motor power": "reported",
-    "P-101C.motor speed": "reported",
-    "P-101C.total dynamic head": "reported",
-    "P-101E.capacity": "reported",
-    "P-101E.motor power": "reported",
-    "P-101E.motor speed": "reported",
-    "P-101E.total dynamic head": "reported",
-    "P-101F.capacity": "reported",
-    "P-101F.motor power": "reported",
-    "P-101F.motor speed": "reported",
-    "P-101F.total dynamic head": "reported",
-    "V-301.flow coefficient": "confirmed",
-    "V-301.pressure rating": "confirmed",
-    "V-301.stroke time": "confirmed",
-    "V-302.flow coefficient": "confirmed",
-    "V-302.pressure rating": "confirmed",
-    "V-302.stroke time": "confirmed",
-    "V-303.flow coefficient": "confirmed",
-    "V-303.pressure rating": "confirmed",
-    "V-303.stroke time": "confirmed",
-    "V-304.flow coefficient": "confirmed",
-    "V-304.pressure rating": "confirmed",
-    "V-304.stroke time": "confirmed",
-    "V-305.flow coefficient": "confirmed",
-    "V-305.pressure rating": "confirmed",
-    "V-305.stroke time": "confirmed",
-    "V-306.flow coefficient": "confirmed",
-    "V-306.pressure rating": "confirmed",
-    "V-306.stroke time": "confirmed",
-    "V-307.flow coefficient": "confirmed",
-    "V-307.pressure rating": "confirmed",
-    "V-307.stroke time": "confirmed",
-    "V-308.flow coefficient": "confirmed",
-    "V-308.pressure rating": "confirmed",
-    "V-308.stroke time": "confirmed",
-    "V-309.flow coefficient": "confirmed",
-    "V-309.pressure rating": "confirmed",
-    "V-309.stroke time": "confirmed",
-    "V-310.flow coefficient": "confirmed",
-    "V-310.pressure rating": "confirmed",
-    "V-310.stroke time": "confirmed",
-    "V-311.flow coefficient": "confirmed",
-    "V-311.pressure rating": "confirmed",
-    "V-311.stroke time": "confirmed",
-    "V-312.flow coefficient": "confirmed",
-    "V-312.pressure rating": "confirmed",
-    "V-312.stroke time": "confirmed",
-    "V-313.flow coefficient": "confirmed",
-    "V-313.pressure rating": "confirmed",
-    "V-313.stroke time": "confirmed",
-    "V-314.flow coefficient": "confirmed",
-    "V-314.pressure rating": "confirmed",
-    "V-314.stroke time": "confirmed",
-    "V-315.flow coefficient": "confirmed",
-    "V-315.pressure rating": "confirmed",
-    "V-315.stroke time": "confirmed",
-    "V-316.flow coefficient": "confirmed",
-    "V-316.pressure rating": "confirmed",
-    "V-316.stroke time": "confirmed",
-    "V-317.flow coefficient": "confirmed",
-    "V-317.pressure rating": "confirmed",
-    "V-317.stroke time": "confirmed",
-    "V-318.flow coefficient": "confirmed",
-    "V-318.pressure rating": "confirmed",
-    "V-318.stroke time": "confirmed",
-    "V-319.flow coefficient": "confirmed",
-    "V-319.pressure rating": "confirmed",
-    "V-319.stroke time": "confirmed",
-    "V-320.flow coefficient": "confirmed",
-    "V-320.pressure rating": "confirmed",
-    "V-320.stroke time": "confirmed"
-   }
-  },
-  "wtp-s1-reworded": {
-   "facts": {
-    "changed": 0,
-    "conditions": 0,
-    "added": 0,
-    "removed": 0,
-    "unchanged": 33
-   },
-   "changes_found": "0/0",
-   "additions_found": "0/0",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "33/33",
-   "false_changes": 0,
-   "difference_precision": null,
-   "changed": {},
-   "conditions": {},
-   "added": {},
-   "removed": {},
-   "unchanged": {
-    "confirmed": 33
-   },
-   "different": {},
-   "equivalent": {
-    "no change": 35,
-    "unscored": 2
-   },
-   "findings": {
-    "complementary": 43,
-    "equivalent": 37,
-    "unrelated": 78
-   },
-   "unmatched": 0,
-   "pairs": 158,
-   "omitted": 0,
-   "detail": {
-    "P-101A.capacity": "confirmed",
-    "P-101A.head": "confirmed",
-    "P-101A.motor": "confirmed",
-    "P-101B.capacity": "confirmed",
-    "P-101B.head": "confirmed",
-    "P-101B.motor": "confirmed",
-    "P-101C.capacity": "confirmed",
-    "P-101C.head": "confirmed",
-    "P-101C.motor": "confirmed",
-    "chem.alum": "confirmed",
-    "chem.alum_max": "confirmed",
-    "chem.chlorine": "confirmed",
-    "filters.area": "confirmed",
-    "filters.count": "confirmed",
-    "filters.rate": "confirmed",
-    "floc.detention": "confirmed",
-    "floc.stages": "confirmed",
-    "mix.detention": "confirmed",
-    "mix.g": "confirmed",
-    "optA.cost": "confirmed",
-    "optA.energy": "confirmed",
-    "optB.contact": "confirmed",
-    "optB.cost": "confirmed",
-    "plant.design_flow": "confirmed",
-    "plant.finished_turbidity": "confirmed",
-    "plant.peak_flow": "confirmed",
-    "plant.population": "confirmed",
-    "plant.raw_turbidity": "confirmed",
-    "sed.count": "confirmed",
-    "sed.depth": "confirmed",
-    "sed.length": "confirmed",
-    "sed.loading": "confirmed",
-    "sed.width": "confirmed"
-   }
-  },
-  "spec-s1": {
-   "facts": {
-    "changed": 3,
-    "conditions": 0,
-    "added": 0,
-    "removed": 0,
-    "unchanged": 18
-   },
-   "changes_found": "3/3",
-   "additions_found": "0/0",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "16/18",
-   "false_changes": 0,
-   "difference_precision": 0.4545,
-   "changed": {
-    "reported": 3
-   },
-   "conditions": {},
-   "added": {},
    "removed": {},
    "unchanged": {
     "confirmed": 16,
+    "uncertain": 3,
     "unextracted": 2
    },
-   "different": {
-    "across facts": 4,
-    "change": 5,
-    "unscored": 2
-   },
+   "different": {},
    "equivalent": {
-    "no change": 28,
-    "unscored": 4
+    "no change": 16
    },
    "findings": {
-    "complementary": 10,
-    "different": 11,
-    "equivalent": 32,
-    "uncertain": 10,
-    "unrelated": 66
+    "equivalent": 16,
+    "uncertain": 3
    },
-   "unmatched": 1,
-   "pairs": 129,
+   "unmatched": 9,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 17,
-    "scored": 17,
-    "value_change_precision": 1.0,
+    "right": 0,
+    "scored": 3,
+    "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 11
-     },
-     "change": {
-      "changed": 6
-     },
-     "unscored": {
-      "not_same_item": 3,
-      "restated": 1
+     "no change": {
+      "not_same_item": 3
      }
     }
    },
    "detail": {
-    "ext.field": "reported",
-    "fail.ack": "confirmed",
+    "ext.field": "confirmed",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.retx": "reported",
-    "fail.snr": "confirmed",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
-    "hdr.sid": "reported",
+    "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -15289,355 +13940,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
+    "window.congested": "confirmed",
     "window.idle": "confirmed"
-   }
-  },
-  "spec-s1-members": {
-   "facts": {
-    "changed": 0,
-    "conditions": 0,
-    "added": 2,
-    "removed": 1,
-    "unchanged": 20
-   },
-   "changes_found": "0/0",
-   "additions_found": "2/2",
-   "removals_found": "1/1",
-   "unchanged_confirmed": "17/20",
-   "false_changes": 0,
-   "difference_precision": 0.0,
-   "changed": {},
-   "conditions": {},
-   "added": {
-    "reported": 2
-   },
-   "removed": {
-    "reported": 1
-   },
-   "unchanged": {
-    "confirmed": 17,
-    "uncertain": 1,
-    "unextracted": 2
-   },
-   "different": {
-    "across facts": 5,
-    "unscored": 4
-   },
-   "equivalent": {
-    "no change": 28,
-    "unscored": 5
-   },
-   "findings": {
-    "complementary": 9,
-    "different": 9,
-    "equivalent": 33,
-    "uncertain": 7,
-    "unrelated": 78
-   },
-   "unmatched": 6,
-   "pairs": 136,
-   "omitted": 0,
-   "kinds": {
-    "right": 7,
-    "scored": 9,
-    "value_change_precision": 0.0,
-    "by_claims": {
-     "across facts": {
-      "not_same_item": 7
-     },
-     "no change": {
-      "conditions": 2
-     },
-     "unscored": {
-      "misread": 2,
-      "not_same_item": 5
-     }
-    }
-   },
-   "detail": {
-    "ext.field": "confirmed",
-    "fail.ack": "confirmed",
-    "fail.duration": "unextracted",
-    "fail.retx": "confirmed",
-    "fail.snr": "confirmed",
-    "hdr.pn": "confirmed",
-    "hdr.pn_len": "confirmed",
-    "hdr.sid": "confirmed",
-    "hdr.sid_len": "confirmed",
-    "hdr.version": "confirmed",
-    "long.field": "confirmed",
-    "long.groups": "confirmed",
-    "meas.battery": "reported",
-    "meas.beam": "reported",
-    "meas.cell": "confirmed",
-    "meas.power": "reported",
-    "meas.rssi": "confirmed",
-    "meas.ta": "confirmed",
-    "short.field": "confirmed",
-    "timer.congested": "uncertain",
-    "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "confirmed"
-   }
-  },
-  "spec-s1-renumbered": {
-   "facts": {
-    "changed": 0,
-    "conditions": 0,
-    "added": 1,
-    "removed": 0,
-    "unchanged": 21
-   },
-   "changes_found": "0/0",
-   "additions_found": "1/1",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "18/21",
-   "false_changes": 0,
-   "difference_precision": 0.0,
-   "changed": {},
-   "conditions": {},
-   "added": {
-    "reported": 1
-   },
-   "removed": {},
-   "unchanged": {
-    "confirmed": 18,
-    "uncertain": 1,
-    "unextracted": 2
-   },
-   "different": {
-    "across facts": 14,
-    "unscored": 5
-   },
-   "equivalent": {
-    "no change": 41,
-    "unscored": 4
-   },
-   "findings": {
-    "complementary": 26,
-    "different": 19,
-    "equivalent": 45,
-    "uncertain": 7,
-    "unrelated": 63
-   },
-   "unmatched": 4,
-   "pairs": 160,
-   "omitted": 0,
-   "kinds": {
-    "right": 15,
-    "scored": 18,
-    "value_change_precision": 0.0,
-    "by_claims": {
-     "across facts": {
-      "not_same_item": 15
-     },
-     "no change": {
-      "conditions": 2,
-      "not_same_item": 1
-     },
-     "unscored": {
-      "changed": 1,
-      "misread": 2,
-      "not_same_item": 5
-     }
-    }
-   },
-   "detail": {
-    "ext.field": "confirmed",
-    "fail.ack": "confirmed",
-    "fail.duration": "unextracted",
-    "fail.fatal": "reported",
-    "fail.retx": "confirmed",
-    "fail.snr": "confirmed",
-    "hdr.pn": "confirmed",
-    "hdr.pn_len": "confirmed",
-    "hdr.sid": "confirmed",
-    "hdr.sid_len": "confirmed",
-    "hdr.version": "confirmed",
-    "long.field": "confirmed",
-    "long.groups": "confirmed",
-    "meas.beam": "confirmed",
-    "meas.cell": "confirmed",
-    "meas.rssi": "confirmed",
-    "meas.ta": "confirmed",
-    "short.field": "confirmed",
-    "timer.congested": "uncertain",
-    "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "confirmed"
-   }
-  },
-  "spec-s1-context": {
-   "facts": {
-    "changed": 0,
-    "conditions": 2,
-    "added": 0,
-    "removed": 0,
-    "unchanged": 19
-   },
-   "changes_found": "0/0",
-   "additions_found": "0/0",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "18/19",
-   "false_changes": 0,
-   "difference_precision": 0.0,
-   "changed": {},
-   "conditions": {
-    "judged equivalent": 1,
-    "unextracted": 1
-   },
-   "added": {},
-   "removed": {},
-   "unchanged": {
-    "confirmed": 18,
-    "unextracted": 1
-   },
-   "different": {
-    "across facts": 19,
-    "unscored": 2
-   },
-   "equivalent": {
-    "change": 1,
-    "no change": 40,
-    "unscored": 3
-   },
-   "findings": {
-    "complementary": 7,
-    "different": 21,
-    "equivalent": 44,
-    "uncertain": 6,
-    "unrelated": 55
-   },
-   "unmatched": 1,
-   "pairs": 133,
-   "omitted": 0,
-   "kinds": {
-    "right": 23,
-    "scored": 23,
-    "value_change_precision": null,
-    "by_claims": {
-     "across facts": {
-      "not_same_item": 23
-     },
-     "unscored": {
-      "not_same_item": 3,
-      "restated": 1
-     }
-    }
-   },
-   "detail": {
-    "ext.field": "confirmed",
-    "fail.ack": "confirmed",
-    "fail.duration": "unextracted",
-    "fail.retx": "confirmed",
-    "fail.snr": "confirmed",
-    "hdr.pn": "confirmed",
-    "hdr.pn_len": "confirmed",
-    "hdr.sid": "confirmed",
-    "hdr.sid_len": "confirmed",
-    "hdr.version": "confirmed",
-    "long.field": "confirmed",
-    "long.groups": "confirmed",
-    "meas.beam": "confirmed",
-    "meas.cell": "confirmed",
-    "meas.rssi": "confirmed",
-    "meas.ta": "confirmed",
-    "short.field": "confirmed",
-    "timer.congested": "judged equivalent",
-    "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "confirmed"
-   }
-  },
-  "attach-s1-clean": {
-   "facts": {
-    "changed": 2,
-    "conditions": 0,
-    "added": 1,
-    "removed": 0,
-    "unchanged": 24
-   },
-   "changes_found": "2/2",
-   "additions_found": "1/1",
-   "removals_found": "0/0",
-   "unchanged_confirmed": "23/24",
-   "false_changes": 0,
-   "difference_precision": 0.6667,
-   "changed": {
-    "reported": 2
-   },
-   "conditions": {},
-   "added": {
-    "reported": 1
-   },
-   "removed": {},
-   "unchanged": {
-    "confirmed": 23,
-    "uncertain": 1
-   },
-   "different": {
-    "change": 2,
-    "unscored": 1
-   },
-   "equivalent": {
-    "no change": 31,
-    "unscored": 13
-   },
-   "findings": {
-    "complementary": 7,
-    "different": 3,
-    "equivalent": 44,
-    "uncertain": 1,
-    "unrelated": 125
-   },
-   "unmatched": 3,
-   "pairs": 180,
-   "omitted": 0,
-   "kinds": {
-    "right": 2,
-    "scored": 3,
-    "value_change_precision": 0.6667,
-    "by_claims": {
-     "change": {
-      "changed": 2
-     },
-     "no change": {
-      "conditions": 1
-     },
-     "unscored": {
-      "changed": 1
-     }
-    }
-   },
-   "detail": {
-    "attach.attempts": "confirmed",
-    "attach.deadline": "confirmed",
-    "challenge.timeout": "reported",
-    "msg1.interval": "confirmed",
-    "msg10.budget": "confirmed",
-    "msg11.timeout": "confirmed",
-    "msg12.lifetime": "confirmed",
-    "msg13.lifetime": "uncertain",
-    "msg14.deadline": "confirmed",
-    "msg15.window": "confirmed",
-    "msg16.timer": "reported",
-    "msg17.window": "confirmed",
-    "msg18.interval": "confirmed",
-    "msg19.lifetime": "confirmed",
-    "msg2.period": "confirmed",
-    "msg20.interval": "confirmed",
-    "msg21.lifetime": "confirmed",
-    "msg22.interval": "confirmed",
-    "msg23.period": "confirmed",
-    "msg24.hysteresis": "confirmed",
-    "msg3.interval": "confirmed",
-    "msg4.depth": "confirmed",
-    "msg5.timeout": "reported",
-    "msg6.size": "confirmed",
-    "msg7.rate": "confirmed",
-    "msg8.period": "confirmed",
-    "msg9.length": "confirmed"
    }
   }
  },
@@ -15770,8 +14074,8 @@
     "different": 4,
     "equivalent": 30
    },
-   "unmatched": 5,
-   "pairs": 4,
+   "unmatched": 4,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -16119,15 +14423,15 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 24,
-    "unscored": 2
+    "no change": 25,
+    "unscored": 1
    },
    "findings": {
     "different": 4,
     "equivalent": 26
    },
    "unmatched": 4,
-   "pairs": 6,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -17028,7 +15332,7 @@
     "equivalent": 17
    },
    "unmatched": 4,
-   "pairs": 3,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 3,
@@ -17324,15 +15628,14 @@
     "change": 5
    },
    "equivalent": {
-    "no change": 16,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
     "different": 5,
-    "equivalent": 18
+    "equivalent": 16
    },
    "unmatched": 0,
-   "pairs": 5,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -18644,35 +16947,40 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "31/31",
    "false_changes": 0,
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {},
    "conditions": {
-    "judged uncertain": 2
+    "judged different": 1,
+    "judged uncertain": 1
    },
    "added": {},
    "removed": {},
    "unchanged": {
     "confirmed": 31
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "no change": 31,
     "unscored": 2
    },
    "findings": {
+    "different": 1,
     "equivalent": 33,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 5,
-   "pairs": 3,
+   "unmatched": 2,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
-    "right": 2,
+    "right": 1,
     "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "conditions": {
-      "conditions": 2
+      "conditions": 1,
+      "not_same_item": 1
      }
     }
    },
@@ -18704,7 +17012,7 @@
     "plant.finished_turbidity": "confirmed",
     "plant.peak_flow": "confirmed",
     "plant.population": "confirmed",
-    "plant.raw_turbidity": "judged uncertain",
+    "plant.raw_turbidity": "judged different",
     "sed.count": "confirmed",
     "sed.depth": "confirmed",
     "sed.length": "confirmed",
@@ -19599,7 +17907,7 @@
    "findings": {
     "equivalent": 35
    },
-   "unmatched": 1,
+   "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
    "detail": {
@@ -19862,9 +18170,9 @@
    "changes_found": "3/3",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "15/18",
+   "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 0.6,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -19872,34 +18180,27 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 3
+    "confirmed": 16,
+    "unextracted": 2
    },
    "different": {
-    "across facts": 2,
     "change": 3
    },
    "equivalent": {
-    "no change": 15,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
-    "complementary": 1,
-    "different": 5,
-    "equivalent": 17,
-    "unrelated": 2
+    "different": 3,
+    "equivalent": 16
    },
-   "unmatched": 2,
-   "pairs": 14,
+   "unmatched": 1,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "change": {
       "changed": 3
      }
@@ -19910,14 +18211,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "reported",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "reported",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -20192,28 +18493,27 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 18,
-    "unscored": 2
+    "no change": 18
    },
    "findings": {
-    "equivalent": 20
+    "equivalent": 18
    },
    "unmatched": 3,
-   "pairs": 0,
+   "pairs": 1,
    "omitted": 0,
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.battery": "reported",
     "meas.beam": "reported",
     "meas.cell": "confirmed",
@@ -20455,65 +18755,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "17/21",
+   "unchanged_confirmed": "16/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "other": 1
+    "reported": 1
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 17,
-    "unextracted": 4
+    "confirmed": 16,
+    "uncertain": 3,
+    "unextracted": 2
    },
-   "different": {
-    "across facts": 3
-   },
+   "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 1
+    "no change": 16
    },
    "findings": {
-    "complementary": 2,
-    "different": 3,
-    "equivalent": 18,
-    "uncertain": 2,
-    "unrelated": 1
+    "equivalent": 16,
+    "uncertain": 3
    },
-   "unmatched": 4,
-   "pairs": 13,
+   "unmatched": 9,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 0,
+    "scored": 3,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 4
-     },
-     "unscored": {
-      "not_same_item": 1
+     "no change": {
+      "not_same_item": 3
      }
     }
    },
    "detail": {
     "ext.field": "confirmed",
-    "fail.ack": "confirmed",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.fatal": "other",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -20521,8 +18813,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-renumbered.pptx": {
@@ -20779,11 +19071,10 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 2
+    "no change": 17
    },
    "findings": {
-    "equivalent": 19,
+    "equivalent": 17,
     "uncertain": 2
    },
    "unmatched": 4,
@@ -20804,14 +19095,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -21245,8 +19536,8 @@
     "different": 4,
     "equivalent": 30
    },
-   "unmatched": 5,
-   "pairs": 4,
+   "unmatched": 4,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -21306,64 +19597,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "17/21",
+   "unchanged_confirmed": "16/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "other": 1
+    "reported": 1
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 17,
-    "unextracted": 4
+    "confirmed": 16,
+    "uncertain": 3,
+    "unextracted": 2
    },
-   "different": {
-    "across facts": 1
-   },
+   "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
-    "complementary": 2,
-    "different": 1,
-    "equivalent": 19,
-    "uncertain": 2
+    "equivalent": 16,
+    "uncertain": 3
    },
-   "unmatched": 2,
-   "pairs": 8,
+   "unmatched": 9,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 2,
+    "right": 0,
+    "scored": 3,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
-     "unscored": {
-      "not_same_item": 1
+     "no change": {
+      "not_same_item": 3
      }
     }
    },
    "detail": {
     "ext.field": "confirmed",
-    "fail.ack": "confirmed",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.fatal": "other",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -21371,8 +19655,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   }
  },
@@ -21505,8 +19789,8 @@
     "different": 4,
     "equivalent": 30
    },
-   "unmatched": 5,
-   "pairs": 4,
+   "unmatched": 4,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -21854,15 +20138,15 @@
     "change": 4
    },
    "equivalent": {
-    "no change": 24,
-    "unscored": 2
+    "no change": 25,
+    "unscored": 1
    },
    "findings": {
     "different": 4,
     "equivalent": 26
    },
    "unmatched": 4,
-   "pairs": 6,
+   "pairs": 5,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -22763,7 +21047,7 @@
     "equivalent": 17
    },
    "unmatched": 4,
-   "pairs": 3,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 3,
@@ -23059,15 +21343,14 @@
     "change": 5
    },
    "equivalent": {
-    "no change": 16,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
     "different": 5,
-    "equivalent": 18
+    "equivalent": 16
    },
    "unmatched": 0,
-   "pairs": 5,
+   "pairs": 7,
    "omitted": 0,
    "kinds": {
     "right": 5,
@@ -24379,35 +22662,40 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "31/31",
    "false_changes": 0,
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {},
    "conditions": {
-    "judged uncertain": 2
+    "judged different": 1,
+    "judged uncertain": 1
    },
    "added": {},
    "removed": {},
    "unchanged": {
     "confirmed": 31
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "no change": 31,
     "unscored": 2
    },
    "findings": {
+    "different": 1,
     "equivalent": 33,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 5,
-   "pairs": 3,
+   "unmatched": 2,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
-    "right": 2,
+    "right": 1,
     "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "conditions": {
-      "conditions": 2
+      "conditions": 1,
+      "not_same_item": 1
      }
     }
    },
@@ -24439,7 +22727,7 @@
     "plant.finished_turbidity": "confirmed",
     "plant.peak_flow": "confirmed",
     "plant.population": "confirmed",
-    "plant.raw_turbidity": "judged uncertain",
+    "plant.raw_turbidity": "judged different",
     "sed.count": "confirmed",
     "sed.depth": "confirmed",
     "sed.length": "confirmed",
@@ -25334,7 +23622,7 @@
    "findings": {
     "equivalent": 35
    },
-   "unmatched": 1,
+   "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
    "detail": {
@@ -25597,9 +23885,9 @@
    "changes_found": "3/3",
    "additions_found": "0/0",
    "removals_found": "0/0",
-   "unchanged_confirmed": "15/18",
+   "unchanged_confirmed": "16/18",
    "false_changes": 0,
-   "difference_precision": 0.6,
+   "difference_precision": 1.0,
    "changed": {
     "reported": 3
    },
@@ -25607,34 +23895,27 @@
    "added": {},
    "removed": {},
    "unchanged": {
-    "confirmed": 15,
-    "unextracted": 3
+    "confirmed": 16,
+    "unextracted": 2
    },
    "different": {
-    "across facts": 2,
     "change": 3
    },
    "equivalent": {
-    "no change": 15,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
-    "complementary": 1,
-    "different": 5,
-    "equivalent": 17,
-    "unrelated": 2
+    "different": 3,
+    "equivalent": 16
    },
-   "unmatched": 2,
-   "pairs": 14,
+   "unmatched": 1,
+   "pairs": 6,
    "omitted": 0,
    "kinds": {
-    "right": 5,
-    "scored": 5,
+    "right": 3,
+    "scored": 3,
     "value_change_precision": 1.0,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
      "change": {
       "changed": 3
      }
@@ -25645,14 +23926,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "reported",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "reported",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
-    "long.field": "unextracted",
-    "long.groups": "confirmed",
+    "long.field": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -25927,28 +24208,27 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 18,
-    "unscored": 2
+    "no change": 18
    },
    "findings": {
-    "equivalent": 20
+    "equivalent": 18
    },
    "unmatched": 3,
-   "pairs": 0,
+   "pairs": 1,
    "omitted": 0,
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.battery": "reported",
     "meas.beam": "reported",
     "meas.cell": "confirmed",
@@ -26190,65 +24470,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "17/21",
+   "unchanged_confirmed": "16/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "other": 1
+    "reported": 1
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 17,
-    "unextracted": 4
+    "confirmed": 16,
+    "uncertain": 3,
+    "unextracted": 2
    },
-   "different": {
-    "across facts": 3
-   },
+   "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 1
+    "no change": 16
    },
    "findings": {
-    "complementary": 2,
-    "different": 3,
-    "equivalent": 18,
-    "uncertain": 2,
-    "unrelated": 1
+    "equivalent": 16,
+    "uncertain": 3
    },
-   "unmatched": 4,
-   "pairs": 13,
+   "unmatched": 9,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 0,
+    "scored": 3,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 4
-     },
-     "unscored": {
-      "not_same_item": 1
+     "no change": {
+      "not_same_item": 3
      }
     }
    },
    "detail": {
     "ext.field": "confirmed",
-    "fail.ack": "confirmed",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.fatal": "other",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -26256,8 +24528,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   },
   "spec-s1-renumbered.pptx": {
@@ -26514,11 +24786,10 @@
    },
    "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 2
+    "no change": 17
    },
    "findings": {
-    "equivalent": 19,
+    "equivalent": 17,
     "uncertain": 2
    },
    "unmatched": 4,
@@ -26539,14 +24810,14 @@
     "fail.ack": "confirmed",
     "fail.duration": "unextracted",
     "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.snr": "confirmed",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -26980,8 +25251,8 @@
     "different": 4,
     "equivalent": 30
    },
-   "unmatched": 5,
-   "pairs": 4,
+   "unmatched": 4,
+   "pairs": 8,
    "omitted": 0,
    "kinds": {
     "right": 4,
@@ -27041,64 +25312,57 @@
     "unchanged": 21
    },
    "changes_found": "0/0",
-   "additions_found": "0/1",
+   "additions_found": "1/1",
    "removals_found": "0/0",
-   "unchanged_confirmed": "17/21",
+   "unchanged_confirmed": "16/21",
    "false_changes": 0,
-   "difference_precision": 0.0,
+   "difference_precision": null,
    "changed": {},
    "conditions": {},
    "added": {
-    "other": 1
+    "reported": 1
    },
    "removed": {},
    "unchanged": {
-    "confirmed": 17,
-    "unextracted": 4
+    "confirmed": 16,
+    "uncertain": 3,
+    "unextracted": 2
    },
-   "different": {
-    "across facts": 1
-   },
+   "different": {},
    "equivalent": {
-    "no change": 17,
-    "unscored": 2
+    "no change": 16
    },
    "findings": {
-    "complementary": 2,
-    "different": 1,
-    "equivalent": 19,
-    "uncertain": 2
+    "equivalent": 16,
+    "uncertain": 3
    },
-   "unmatched": 2,
-   "pairs": 8,
+   "unmatched": 9,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 2,
+    "right": 0,
+    "scored": 3,
     "value_change_precision": null,
     "by_claims": {
-     "across facts": {
-      "not_same_item": 2
-     },
-     "unscored": {
-      "not_same_item": 1
+     "no change": {
+      "not_same_item": 3
      }
     }
    },
    "detail": {
     "ext.field": "confirmed",
-    "fail.ack": "confirmed",
+    "fail.ack": "uncertain",
     "fail.duration": "unextracted",
-    "fail.fatal": "other",
-    "fail.retx": "confirmed",
-    "fail.snr": "unextracted",
+    "fail.fatal": "reported",
+    "fail.retx": "uncertain",
+    "fail.snr": "uncertain",
     "hdr.pn": "confirmed",
     "hdr.pn_len": "confirmed",
     "hdr.sid": "confirmed",
     "hdr.sid_len": "confirmed",
     "hdr.version": "confirmed",
     "long.field": "confirmed",
-    "long.groups": "confirmed",
+    "long.groups": "unextracted",
     "meas.beam": "confirmed",
     "meas.cell": "confirmed",
     "meas.rssi": "confirmed",
@@ -27106,8 +25370,8 @@
     "short.field": "confirmed",
     "timer.congested": "confirmed",
     "timer.idle": "confirmed",
-    "window.congested": "unextracted",
-    "window.idle": "unextracted"
+    "window.congested": "confirmed",
+    "window.idle": "confirmed"
    }
   }
  }
