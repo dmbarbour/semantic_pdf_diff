@@ -161,6 +161,20 @@ class ImagesFirst(Lever):
     def puts_images_first(self):
         return self.images_first
 
+LAYER_RULE = ("This region's text layer is cut at its edges: its fragments are no reason to set complete=false. "
+              "Judge completeness by the image.")
+
+class CompleteByImage(Lever):
+    lever_name, stage, off = "complete_by_image", "instructions", {"complete_by_image": False}
+    # an image task's completeness is the image's: under images_first, the model called tiles incomplete for their text
+    # layer's cuts (the slices: image tasks not complete 43 -> 136, those blaming the text 8 -> 44)
+    complete_by_image: Annotated[bool, _shaping(VISUAL)] = False
+
+    def region_rules(self, region):
+        rules = super().region_rules(region)
+        return rules + (_rules([LAYER_RULE]) if self.complete_by_image and region in ("tile", "figure", "overview")
+                        else "")
+
 class Neighbours(Lever):
     lever_name, stage = "neighbours", "context"
     off = {"context_before": 0, "context_after": 0}
@@ -580,6 +594,28 @@ class TextCuts(Lever):
         from .tasks import cut_at_word
         return cut_at_word(layer, limit) if self.text_cuts == "sentences" else layer[:limit]
 
+class RepeatedText(Lever):
+    lever_name, stage, off = "repeated_text", "inclusion", {"repeated_text": "keep"}
+    # first: a PDF page's text tasks leave out a block saying exactly what blocks in the same place said on REPEATED
+    # earlier pages (Context.repeated: a watermark, a title block's stamp), read where it was first (query checks,
+    # 2026-09-28: a ken-cd text task holding only "PRODUCED BY AN AUTODESK STUDENT PRODUCT")
+    repeated_text: Annotated[Literal["keep", "first"], _shaping(TEXTUAL)] = "keep"
+
+    def text_left_out(self, reader, page, number, tables):
+        boxes = super().text_left_out(reader, page, number, tables)
+        return boxes if self.repeated_text == "keep" else boxes + reader.repeated(number)
+
+class LoneRows(Lever):
+    lever_name, stage, off = "lone_rows", "inclusion", {"lone_rows": False}
+    # a table row the same as its header (a one-row table: "AC Rating | 6.4 kW") sent once, not as its own header too
+    # (query checks, 2026-09-28: the Ken manual's "AC Rating ... 6.4 kW")
+    lone_rows: Annotated[bool, _shaping(frozenset({"table"}))] = False
+
+    def row_text(self, head, cells):
+        if self.lone_rows and head == cells:
+            return "Row: " + json.dumps(cells, ensure_ascii=False)
+        return super().row_text(head, cells)
+
 class TableFilter(Lever):
     lever_name, stage, parked, off = "table_filter", "inclusion", True, {"table_filter": False}
     # drop detected "tables" that are charts, frames or paragraphs
@@ -679,12 +715,12 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables and images_first (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
-LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, Neighbours, LeaveFurniture, TableContext,
-                 StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails,
-                 SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea,
-                 FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TextCuts, TableFilter,
-                 SkipSheetTables, LeaveText, QuoteMatch, Reconcile, DedupeRepeated, ContinueReading, Align,
-                 VerifyVisuals, ExplainDifferences)
+LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture,
+                 TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles,
+                 SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,
+                 RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TextCuts,
+                 RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Reconcile, DedupeRepeated,
+                 ContinueReading, Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -882,6 +918,11 @@ class Platform(Composable):
         """Unrotated boxes whose text blocks a PDF page's text tasks leave out, to the readers of what they hold
         (tables: [(box, rows)] of the tables detected and read): the platform's, none."""
         return []
+
+    @chosen
+    def row_text(self, head, cells):
+        """A table row's source data, with the header it's read under: the platform's, both."""
+        return "Header: " + json.dumps(head, ensure_ascii=False) + "\nRow: " + json.dumps(cells, ensure_ascii=False)
 
     @chosen
     def puts_images_first(self):

@@ -36,7 +36,7 @@ TOGGLES = {
     'reconcile': False, 'quote_match': 'exact', 'skip_text_only': True, 'tile_cut': 'xycut', 'band_width': 6.0,
     'render_area': True, 'tile_choice': 'off', 'leave_text': 'none', 'region_labels': 'model',
     'another_tiling': 'asked',
-    'least_half': 0.5, 'skip_sheet_tables': True, 'images_first': False,
+    'least_half': 0.5, 'skip_sheet_tables': True, 'images_first': False, 'complete_by_image': True,
 }
 # Settings measured under others, on both sides: the tilers' with tile_choice off (by default the rule picks the cut by
 # its measures, so another tiler or a tile's growth, say, may leave its choice and the queries as they were); the
@@ -62,6 +62,8 @@ NOT_EXERCISED = {
     'text_cuts': 'needs a text block longer than a task holds, or a text layer longer than an image task sends '
                  '(tests/test_text_cuts.py)',
     'leave_furniture': 'needs a running header, footer or page number on neighbouring pages (tests/test_furniture.py)',
+    'repeated_text': 'needs a text block said in the same place on three pages (tests/test_repeated_text.py)',
+    'lone_rows': 'needs a table row the same as its header, a one-row table (tests/test_lone_rows.py)',
     'table_review': "the stub reads every table's rows by themselves, so no rules are reviewed "
                     "(tests/test_xlsxdocs.py)",
     'table_structure': "no table in these documents has a suspect line (tests/test_tablestructure.py)",

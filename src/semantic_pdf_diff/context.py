@@ -43,7 +43,7 @@ class Context:
         self.assets, self.stem = assets, stem  # where the locator's images go, and their names' stem
         self.blocks, self.stems, self.cited_by, self.page_lines, self.page_graphics = {}, {}, {}, {}, {}
         self.page_figures, self.page_decoration, self.page_marks = {}, {}, {}
-        self.page_margins, self.page_furniture = {}, {}
+        self.page_margins, self.page_furniture, self.sightings = {}, {}, None
         self.tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
         # how the model is asked mid-reading (the client's ask), where a job can: the tiling question (tile_choice); and
         # each page's choice of cut, its record (tilechoice.choose); its tiles' labels (regionlabels); the cut a partial
@@ -145,6 +145,19 @@ class Context:
         return " ".join(t for b, t in self.page_blocks(page_no)
                         if shown(page, b).y1 <= table.y0 + 2 and shown(page, b).x1 > table.x0
                         and shown(page, b).x0 < table.x1 and b not in leave)
+
+    def repeated(self, page_no):
+        """The boxes of a page's text blocks saying exactly what blocks in the same place (within 2 points) said on
+        REPEATED earlier pages (whitespace and case folded); page_blocks' boxes."""
+        from .segmentation import REPEATED
+        place = lambda box, said: (" ".join(said.split()).casefold(), tuple(round(v / 2) for v in box))
+        if self.sightings is None:
+            self.sightings = {}
+            for n in range(1, self.pages + 1):
+                for box, said in self.page_blocks(n):
+                    self.sightings.setdefault(place(box, said), []).append(n)
+        return [box for box, said in self.page_blocks(page_no)
+                if sum(n < page_no for n in sorted(set(self.sightings[place(box, said)]))) >= REPEATED]
 
     def _margins(self, page_no):
         """The page's text blocks near its top or bottom (FURNITURE_BAND), as displayed: {box: (band, what it says
