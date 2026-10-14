@@ -2,8 +2,8 @@
 for each claim of a folder of runs, what its context holds, what's in the wrong field, and whether its context's
 words were in what its request showed the model.
 
-- **Inventory:** claims with conditions stated, with a list position (provenance), and the requests' context in
-  bytes: the heading and the levers' context lines (`Section:`, neighbouring text, a table's lead-in, stems) against
+- **Inventory:** claims with conditions stated, with a list position (provenance), context records kept (by kind)
+  and the claims referencing them, names as printed, and the requests' context in bytes: the heading and the levers' context lines (`Section:`, neighbouring text, a table's lead-in, stems) against
   the source data itself.
 - **Misplaced:** context in the wrong field, found by pattern: a list position or a reader's numbering ("Condition
   2", "dimension 1", "column 3") in conditions, attribute or entity; frame words ("face of finish", "net") in
@@ -105,7 +105,11 @@ def measure(runs_dir):
     for run, claims in sorted(by_run.items()):
         with Store.open(Path(runs_dir) / run) as store:
             shown_by = {content: requests(store, content) for content in {c for c, _, _ in claims}}
-            positioned = sum(1 for content in shown_by for e in store.evidence(content) if e.position)
+            evidence = [e for content in shown_by for e in store.evidence(content)]
+            positioned = sum(1 for e in evidence if e.position)
+            kept = Counter(r.kind for content in shown_by for r in store.records(content).values())
+            referenced = sum(1 for e in evidence if e.records)
+            printed = sum(1 for e in evidence if e.printed)
             sizes = Counter()
             for content in shown_by:
                 for q in store.queries(content=content, role="extract"):
@@ -134,6 +138,8 @@ def measure(runs_dir):
                 examples["unsupported"].append(f"{claim.get('entity')} | {claim.get('attribute')} | "
                                                f"{claim['conditions']}")
         out[run] = {**dict(sorted(tally.items())), "positioned": positioned, "misplaced": dict(sorted(tags.items())),
+                    **({"records": dict(sorted(kept.items())), "with records": referenced} if kept else {}),
+                    **({"printed": printed} if printed else {}), "evidence": len(evidence),
                     "context_bytes_per_request": round(sizes["context"] / sizes["requests"]) if sizes["requests"]
                     else 0,
                     "data_bytes_per_request": round(sizes["data"] / sizes["requests"]) if sizes["requests"] else 0,
@@ -150,6 +156,9 @@ def totals(measures):
             elif k == "misplaced":
                 for tag, n in v.items():
                     out[tag] += n
+            elif k == "records":
+                for kind, n in v.items():
+                    out[f"{kind} records"] += n
     return dict(sorted(out.items()))
 
 # --- against keys (Measurement, layers 2 and 3) ---------------------------------------------------------------------
