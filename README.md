@@ -72,7 +72,7 @@ pdf-semantic-diff gc --store work --dry-run
 
 A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. Files of the types listed under Status are read; others are listed as skipped (`source show` says which, and why).
 
-Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error.
+Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error, a mistyped command or option included.
 
 The `--store` folder (`diff-output` unless named) is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence and cached model responses, and an interrupted run resumes where it stopped. A store is bound to the model and extraction settings it was built with. A run with different ones is refused, saying what differs and at most how much would be asked again, unless you pass `--reset` (preview with `--reset --dry-run`) or use a new folder. Settings that only post-process answers are applied without asking, recomputed from cached answers.
 

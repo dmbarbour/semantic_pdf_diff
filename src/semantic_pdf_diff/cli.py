@@ -29,6 +29,13 @@ def lab_commands():
     from importlib.metadata import entry_points
     return {e.name: e.load() for e in entry_points(group=COMMANDS)}
 
+class Parser(argparse.ArgumentParser):
+    """A command's parser: a usage error exits 1, an input error as the exit codes say (argparse's own 2 would read
+    as a run with incomplete coverage). Subparsers are made of the same class."""
+    def error(self, message):
+        self.print_usage(sys.stderr)
+        self.exit(1, f'{self.prog}: error: {message}\n')
+
 def main(argv=None, client=None):
     """The command line. client: a model client the comparing commands use (a caller's: tests)."""
     return attempt(command, list(sys.argv[1:] if argv is None else argv), client)
@@ -100,7 +107,8 @@ A comparison's --store folder (diff-output unless named) holds what was read, an
 assets/ folder beside it), report.json and evidence.json. A comparison into it again reuses what was read, and
 resumes one interrupted.
 
-Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error.
+Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error
+(a mistyped command or option too).
 """
 
 def help_text(parser, epilog=None, description=None):
@@ -200,7 +208,7 @@ def overview_parser():
     """What `pdf-semantic-diff --help` prints: the commands, how to start, examples (each command parses its own)."""
     commands = COMMANDS_HELP + "".join(f"  {name:<11} the lab's (semantic-pdf-diff[lab])\n"
                                        for name in sorted(lab_commands()))
-    parser = argparse.ArgumentParser(prog='pdf-semantic-diff', usage='%(prog)s COMMAND [options]')
+    parser = Parser(prog='pdf-semantic-diff', usage='%(prog)s COMMAND [options]')
     help_text(parser, START_HELP.format(base_url=default('base_url'), model=default('model')), commands)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}',
                         help="show the program's version and exit")
@@ -225,7 +233,7 @@ Examples:
 """
 
 def compare_parser():
-    parser = help_text(argparse.ArgumentParser(prog='pdf-semantic-diff compare',
+    parser = help_text(Parser(prog='pdf-semantic-diff compare',
                                                usage='%(prog)s SOURCE SOURCE [--store DIR] [options]'),
                        COMPARE_EXAMPLES, COMPARE_HELP)
     parser.add_argument('sources', nargs='*', metavar='SOURCE',
@@ -280,7 +288,7 @@ def link_manifest(store, path):
     return source.name
 
 def fixtures_parser():
-    parser = argparse.ArgumentParser(prog='pdf-semantic-diff fixtures',
+    parser = Parser(prog='pdf-semantic-diff fixtures',
                                      description='Replay fixtures of recorded answers.')
     commands = parser.add_subparsers(dest='command', required=True, metavar='COMMAND')
     def sub_parser(name, help):
@@ -350,7 +358,7 @@ what differs, unless --reset is given.
 """
 
 def settings_parser():
-    parser = help_text(argparse.ArgumentParser(prog='pdf-semantic-diff settings'), description=SETTINGS_HELP)
+    parser = help_text(Parser(prog='pdf-semantic-diff settings'), description=SETTINGS_HELP)
     parser.add_argument('--config', type=Path, help='A settings JSON file, applied over the environment')
     parser.add_argument('--changed', action='store_true',
                         help='Only the settings that differ from the defaults (a starting --config file)')
@@ -399,7 +407,7 @@ Examples:
 """
 
 def source_parser():
-    parser = help_text(argparse.ArgumentParser(prog='pdf-semantic-diff source'), SOURCE_EXAMPLES,
+    parser = help_text(Parser(prog='pdf-semantic-diff source'), SOURCE_EXAMPLES,
                        'Declare sources in a store, and manage them.\n\n' + SOURCE_HELP)
     commands = parser.add_subparsers(dest='command', required=True, metavar='COMMAND')
     def command(name, help, description=None):
@@ -487,7 +495,7 @@ def source_command(argv):
     return 0
 
 def store_parser(command):
-    parser = argparse.ArgumentParser(prog=f'pdf-semantic-diff {command}')
+    parser = Parser(prog=f'pdf-semantic-diff {command}')
     parser.add_argument('--store', type=Path, required=True, help='The store folder')
     add_log_options(parser)
     if command == 'show':

@@ -78,6 +78,14 @@ class Help(unittest.TestCase):
         for option in ("--store", "--path", "--meta", "Examples:"):
             self.assertIn(option, text)
 
+class UsageErrors(unittest.TestCase):
+    def test_a_usage_error_exits_1_not_2_which_means_incomplete_coverage(self):
+        for argv in (["compare", "a", "b", "--mode", "nope"], ["source", "add", "x"], ["source", "nope"],
+                     ["show", "nope", "--store", "s"], ["settings", "--nope"], ["fixtures"]):
+            with self.subTest(argv=argv):
+                self.assertEqual(run(argv)[0], 1)
+        self.assertEqual(run(["nope"])[0], 1)
+
 class SettingsCommand(unittest.TestCase):
     def test_the_settings_a_run_would_use_and_the_changed_ones_alone(self):
         with tempfile.TemporaryDirectory() as d:
