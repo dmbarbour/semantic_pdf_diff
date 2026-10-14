@@ -26,6 +26,6 @@ from .model import Draw, Fact, Project, locate  # noqa: F401
 from .score import (  # noqa: F401
     BOUNDS, DATE, FIT_WEIGHTS, INEXACT_STEPS, NUMBER, NUMERIC_VALUE,
     RANGE, REFERENCE, SAME, SIGNS, STOP, UNIT_AFTER,
-    bounds, claimed_unit, classify, distinctive, fit, holds,
+    bounds, claimed_unit, classify, distinctive, facts_found, fit, holds,
     holds_as, parse_number, printed_value, ranges, rarity, same_number,
     score, tokens, unit_kind, vocabulary)

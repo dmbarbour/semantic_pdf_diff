@@ -269,6 +269,14 @@ def key_facts(key_data):
 def score(key_data, claims):
     """Each claim classed, facts found and missed, and conditions kept, from a key and extracted claims (dicts
     with entity, attribute, value, unit, conditions)."""
+    return _scored(key_data, claims)[0]
+
+def facts_found(key_data, claims):
+    """{fact id: "right" or "loose"} for the key's facts the claims find (missed facts left out)."""
+    return _scored(key_data, claims)[1]
+
+def _scored(key_data, claims):
+    """(score's result, how each fact was found)."""
     facts = key_facts(key_data)
     by_id = {f.id: f for f in facts}
     numeric = [f for f in facts if not f.relation]
@@ -320,15 +328,15 @@ def score(key_data, claims):
             got = by_form.setdefault(form, [0, 0])
             got[0] += f.id in found
             got[1] += 1
-    return {"facts": len(real), "found": sum(1 for f in real if f.id in found),
-            "recall": round(sum(1 for f in real if f.id in found) / len(real), 4),
-            "found_right": sum(1 for v in found.values() if v == "right"),
-            "missed": sorted(f.id for f in real if f.id not in found),
-            "claims": sum(outcomes.values()), "outcomes": dict(sorted(outcomes.items())),
-            "conditions_kept": f"{sum(conditions.values())}/{len(conditions)}",
-            "recall_by_form": {k: round(v[0] / v[1], 4) for k, v in sorted(by_form.items())},
-            **({"relations": dict(sorted(relation_outcomes.items())),
-                "recall_by_kind": {kind: round(sum(1 for f in mine if f.id in found) / len(mine), 4) if mine else None
-                                   for kind, mine in (("number", [f for f in real if not f.relation]),
-                                                      ("relation", [f for f in real if f.relation]))}}
-               if related else {})}
+    return ({"facts": len(real), "found": sum(1 for f in real if f.id in found),
+             "recall": round(sum(1 for f in real if f.id in found) / len(real), 4),
+             "found_right": sum(1 for v in found.values() if v == "right"),
+             "missed": sorted(f.id for f in real if f.id not in found),
+             "claims": sum(outcomes.values()), "outcomes": dict(sorted(outcomes.items())),
+             "conditions_kept": f"{sum(conditions.values())}/{len(conditions)}",
+             "recall_by_form": {k: round(v[0] / v[1], 4) for k, v in sorted(by_form.items())},
+             **({"relations": dict(sorted(relation_outcomes.items())),
+                 "recall_by_kind": {kind: round(sum(1 for f in mine if f.id in found) / len(mine), 4) if mine else None
+                                    for kind, mine in (("number", [f for f in real if not f.relation]),
+                                                       ("relation", [f for f in real if f.relation]))}}
+                if related else {})}, dict(sorted(found.items())))
