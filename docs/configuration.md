@@ -112,8 +112,8 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `table_structure` | `true` | selecting | table_structure | extract | table |
 | `visual_text_layer` | `1500` | shaping | visual_text_layer | extract | figure, overview, tile, vision |
 | `text_cuts` | `"bytes"` | shaping | text_cuts | extract | figure, overview, text, tile, vision |
-| `repeated_text` | `"keep"` | shaping | repeated_text | extract | table, text |
-| `lone_rows` | `false` | shaping | lone_rows | extract | table |
+| `repeated_text` | `"first"` | shaping | repeated_text | extract | table, text |
+| `lone_rows` | `true` | shaping | lone_rows | extract | table |
 | `table_filter` | `false` | selecting | table_filter | extract | table, table-detection |
 | `skip_sheet_tables` | `false` | selecting | skip_sheet_tables | extract | figure, table, table-detection |
 | `leave_text` | `"tables"` | shaping | leave_text | extract | table, text |

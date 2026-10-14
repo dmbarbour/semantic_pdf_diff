@@ -63,5 +63,7 @@
   "another_tiling": "off",
   "halve_parts": false,
   "leave_text": "none",
-  "images_first": false
+  "images_first": false,
+  "repeated_text": "keep",
+  "lone_rows": false
 }

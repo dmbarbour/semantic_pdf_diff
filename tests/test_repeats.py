@@ -69,8 +69,8 @@ class Repeats(unittest.TestCase):
     def sent_containing(self, client, text):
         return [task for task, data in client.sent if text in data]
 
-    def test_text_is_never_deduplicated(self):
-        client, _, coverage = self.run_extraction()
+    def test_text_is_never_deduplicated_when_kept(self):
+        client, _, coverage = self.run_extraction(repeated_text='keep')
         # The repeated header is sent with its page's text on every page: grouped text
         # costs no extra call, while isolating it would (see the triage review).
         self.assertEqual(sorted({t.split(':')[1] for t in self.sent_containing(client, HEADER)}),
@@ -78,6 +78,16 @@ class Repeats(unittest.TestCase):
         self.assertFalse([r for r in coverage if r['task'].startswith('text') and r.get('duplicate_of')])
         for i in range(1, 5):
             self.assertTrue(self.sent_containing(client, f'day {i}'))
+
+    def test_repeated_text_leaves_its_tasks_once_said_twice_in_the_same_place(self):
+        client, _, coverage = self.run_extraction()  # repeated_text: first
+        # The header leaves pages 3 and 4's text tasks, no task isolated for it; page 4's copy elsewhere is sent,
+        # as are the footnotes and page numbers, which differ on every page.
+        self.assertEqual(sorted({t.split(':')[1] for t in self.sent_containing(client, HEADER)}), ['p1', 'p2', 'p4'])
+        self.assertFalse([r for r in coverage if r['task'].startswith('text') and r.get('duplicate_of')])
+        for i in range(1, 5):
+            self.assertTrue(self.sent_containing(client, f'day {i}'))
+            self.assertTrue(self.sent_containing(client, f'Page {i} of 4'))
 
     def test_table_rows_need_proof_before_following(self):
         client, _, coverage = self.run_extraction()

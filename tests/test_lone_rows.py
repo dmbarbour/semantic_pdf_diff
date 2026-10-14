@@ -17,12 +17,12 @@ class LoneRows(unittest.TestCase):
     def test_a_row_that_is_its_own_header_is_sent_once(self):
         row = ["AC Rating", "6.4 kW"]
         self.assertEqual(Settings(lone_rows=True).row_text(row, list(row)), 'Row: ["AC Rating", "6.4 kW"]')
-        self.assertEqual(Settings().row_text(row, list(row)),
+        self.assertEqual(Settings(lone_rows=False).row_text(row, list(row)),
                          'Header: ["AC Rating", "6.4 kW"]\nRow: ["AC Rating", "6.4 kW"]')
 
     def test_a_row_under_another_header_keeps_it(self):
         head, row = ["Item", "Power"], ["Pump P-1", "10 kW"]
-        self.assertEqual(Settings(lone_rows=True).row_text(head, row), Settings().row_text(head, row))
+        self.assertEqual(Settings(lone_rows=True).row_text(head, row), Settings(lone_rows=False).row_text(head, row))
 
     def test_a_one_row_tables_request_holds_its_row_once(self):
         from test_concurrency import jittery_model

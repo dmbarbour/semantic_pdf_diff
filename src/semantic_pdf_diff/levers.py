@@ -599,7 +599,7 @@ class RepeatedText(Lever):
     # first: a PDF page's text tasks leave out a block saying exactly what blocks in the same place said on REPEATED
     # earlier pages (Context.repeated: a watermark, a title block's stamp), read where it was first (query checks,
     # 2026-09-28: a ken-cd text task holding only "PRODUCED BY AN AUTODESK STUDENT PRODUCT")
-    repeated_text: Annotated[Literal["keep", "first"], _shaping(TEXTUAL)] = "keep"
+    repeated_text: Annotated[Literal["keep", "first"], _shaping(TEXTUAL)] = "first"
 
     def text_left_out(self, reader, page, number, tables):
         boxes = super().text_left_out(reader, page, number, tables)
@@ -609,7 +609,7 @@ class LoneRows(Lever):
     lever_name, stage, off = "lone_rows", "inclusion", {"lone_rows": False}
     # a table row the same as its header (a one-row table: "AC Rating | 6.4 kW") sent once, not as its own header too
     # (query checks, 2026-09-28: the Ken manual's "AC Rating ... 6.4 kW")
-    lone_rows: Annotated[bool, _shaping(frozenset({"table"}))] = False
+    lone_rows: Annotated[bool, _shaping(frozenset({"table"}))] = True
 
     def row_text(self, head, cells):
         if self.lone_rows and head == cells:
@@ -714,7 +714,8 @@ class DedupeRepeated(Lever):
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
-# tables and images_first (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
+# tables, images_first, repeated_text's first and lone_rows (docs/reviews/levers.md); round 0's settings are
+# benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture,
                  TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles,
                  SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,
