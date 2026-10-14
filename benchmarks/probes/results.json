@@ -1,0 +1,342 @@
+{
+ "google/gemma-4-31B-it": {
+  "passed": "25/29",
+  "by_kind": {
+   "frame": "8/8",
+   "provenance": "2/2",
+   "scope": "12/12",
+   "stance": "3/5",
+   "subject": "0/2"
+  },
+  "by_property": {
+   "abstention": "2/4",
+   "control": "4/4",
+   "precedence": "2/2",
+   "sensitivity": "11/13",
+   "specificity": "6/6"
+  },
+  "judge_model_passed": "11/16",
+  "judge_consistent": "6/8",
+  "outcomes": [
+   {
+    "probe": "scope-lead-in",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "709: idle, from the lead-in",
+    "passed": true,
+    "read": [
+     "Retransmission timer | value | 709 | ms | link is idle"
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "scope-lead-in",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "1,250: idle, from the lead-in",
+    "passed": true,
+    "read": [
+     "Keep-alive interval | value | 1,250 | ms | link is idle"
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "scope-other-section",
+    "kind": "scope",
+    "property": "specificity",
+    "check": "856: not idle (another section's scope)",
+    "passed": true,
+    "read": [
+     "link | retransmission timer | 856 | ms | congested"
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "scope-other-section",
+    "kind": "scope",
+    "property": "specificity",
+    "check": "856: congested, from its heading",
+    "passed": true,
+    "read": [
+     "link | retransmission timer | 856 | ms | congested"
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "frame-units-note",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "340: unit mm, from the note",
+    "passed": true,
+    "read": [
+     "flange | outer diameter | 340 | millimetres | "
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "frame-units-note",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "290: unit mm, from the note",
+    "passed": true,
+    "read": [
+     "flange | bolt circle diameter | 290 | millimetres | "
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "frame-exception",
+    "kind": "frame",
+    "property": "precedence",
+    "check": "12'-6\": to face of finish (the general note)",
+    "passed": true,
+    "read": [
+     "Room 101 | width | 12'-6\" |  | to face of finish"
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "frame-exception",
+    "kind": "frame",
+    "property": "precedence",
+    "check": "6'-0\": to centreline, not face of finish (the exception)",
+    "passed": true,
+    "read": [
+     "corridor | width | 6'-0\" |  | measured to the centreline of its walls"
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "stance-holders",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "709: held by Company A",
+    "passed": true,
+    "read": [
+     "Company A proposal | retransmission timer | 709 | ms | "
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "stance-holders",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "856: held by Company B",
+    "passed": true,
+    "read": [
+     "Company B proposal | retransmission timer | 856 | ms | "
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "stance-negation",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "500: Company C's, as a limit it holds (not supported below; a minimum)",
+    "passed": true,
+    "read": [
+     "Company C | minimum supported retransmission timer | 500 | ms | "
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "name-abstention",
+    "kind": "subject",
+    "property": "abstention",
+    "check": "12'-6\": no conventional name the page doesn't give",
+    "passed": false,
+    "read": [
+     "Room 214 | length | 12'-6\" |  | on plan"
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "name-abstention",
+    "kind": "subject",
+    "property": "abstention",
+    "check": "14'-0\": no conventional name the page doesn't give",
+    "passed": false,
+    "read": [
+     "Room 214 | width | 14'-0\" |  | on plan"
+    ],
+    "model_passed": null
+   },
+   {
+    "probe": "frame-differs",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False) While the numeric values are identical, the operating conditions differ ('to face of finish' vs 'to centreline of walls'), meaning the physical dimension described is different."
+    ],
+    "model_passed": false
+   },
+   {
+    "probe": "frame-differs",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False) While the numeric values are identical, the operating conditions differ: Claim A measures to the centreline of walls, whereas Claim B measures to the face of finish. In engineering, these represent different physical dimensions."
+    ],
+    "model_passed": false
+   },
+   {
+    "probe": "holder-differs",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": false,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), and value (709 ms)."
+    ],
+    "model_passed": false
+   },
+   {
+    "probe": "holder-differs",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": false,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), and value (709 ms). While the proposing company differs, the engineering specification is identical."
+    ],
+    "model_passed": false
+   },
+   {
+    "probe": "position-renumbered",
+    "kind": "provenance",
+    "property": "specificity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link failure), attribute (acknowledgement timeout), and value (856 ms) under the same implied conditions."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "position-renumbered",
+    "kind": "provenance",
+    "property": "specificity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link failure), attribute (acknowledgement timeout), and value (856 ms) under the same implied conditions."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "scope-differs",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False) The retransmission timer value changed from 709 ms to 856 ms between revisions, although the specified conditions differ ('link idle' vs 'link congested')."
+    ],
+    "model_passed": false
+   },
+   {
+    "probe": "scope-differs",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "unrelated (asked: unrelated; same conditions: False) The claims describe the retransmission timer under different operating conditions ('link congested' vs 'link idle'), making them distinct parameters rather than a direct comparison of the same state."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "scope-unknown",
+    "kind": "scope",
+    "property": "abstention",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), and value (709 ms). The condition 'link idle' in A is consistent with the general specification in B."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "scope-unknown",
+    "kind": "scope",
+    "property": "abstention",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "uncertain (asked: uncertain; same conditions: False) Claim A provides no operating conditions, while Claim B specifies 'link idle'. It cannot be determined if the value in A applies generally or specifically to the same condition as B."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "irrelevant-context",
+    "kind": "scope",
+    "property": "specificity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), value (709 ms), and operating condition (link idle)."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "irrelevant-context",
+    "kind": "scope",
+    "property": "specificity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), value (709 ms), and operating condition (link idle)."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "value-changed",
+    "kind": "scope",
+    "property": "control",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "different (asked: different; same conditions: True) The retransmission timer value for the link under idle conditions changed from 709 ms in revision A to 720 ms in revision B."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "value-changed",
+    "kind": "scope",
+    "property": "control",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "different (asked: different; same conditions: True) The retransmission timer value for the link under idle conditions changed from 720 ms in revision A to 709 ms in revision B."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "units-converted",
+    "kind": "frame",
+    "property": "control",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the outer diameter of the flange as 340 mm and 34 cm respectively, which are numerically identical."
+    ],
+    "model_passed": true
+   },
+   {
+    "probe": "units-converted",
+    "kind": "frame",
+    "property": "control",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the outer diameter of the flange as 34 cm and 340 mm respectively, which are numerically identical values for the same attribute and entity."
+    ],
+    "model_passed": true
+   }
+  ]
+ }
+}
