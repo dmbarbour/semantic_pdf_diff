@@ -108,7 +108,7 @@ def load_settings(args):
 
 # --- shortcut: two paths ------------------------------------------------------------
 
-def shortcut_command(argv, client=None):
+def shortcut_parser():
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff',
         description='Evidence-first comparison of two sources (files, folders or zip archives) using a small '
                     'OpenAI-compatible VLM. See also: pdf-semantic-diff source --help, compare --help.')
@@ -117,7 +117,10 @@ def shortcut_command(argv, client=None):
     parser.add_argument('--out', type=Path, default=Path('diff-output'),
                         help='Store folder; also receives report.html, report.json and evidence.json')
     add_run_options(parser)
-    args = parser.parse_args(argv)
+    return parser
+
+def shortcut_command(argv, client=None):
+    args = shortcut_parser().parse_args(argv)
     start_logging(args)
     settings = load_settings(args)
     return compare_paths(args.a, args.b, args.out, settings, RunOptions.from_args(args), client)
@@ -125,7 +128,7 @@ def shortcut_command(argv, client=None):
 
 # --- compare declared sources ---------------------------------------------------------
 
-def compare_command(argv, client=None):
+def compare_parser():
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff compare',
                                      description='Compare two sources declared in a store.')
     parser.add_argument('sources', nargs='*', help='Names of declared sources')
@@ -134,7 +137,10 @@ def compare_command(argv, client=None):
     parser.add_argument('--store', type=Path, required=True)
     parser.add_argument('--report', type=Path, help='Report folder (default: the store folder)')
     add_run_options(parser)
-    args = parser.parse_args(argv)
+    return parser
+
+def compare_command(argv, client=None):
+    args = compare_parser().parse_args(argv)
     start_logging(args)
     settings = load_settings(args)
     with Store(args.store) as store:
@@ -159,7 +165,7 @@ def link_manifest(store, path):
         log.info(f"{'Updated' if existing else 'Linked'} source {source.name!r} from {path}")
     return source.name
 
-def fixtures_command(argv):
+def fixtures_parser():
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff fixtures',
                                      description='Replay fixtures of recorded answers.')
     sub = parser.add_subparsers(dest='command', required=True)
@@ -180,7 +186,10 @@ def fixtures_command(argv):
                                          "same queries, so the same answers: a variant's recording seeds another's)")
     merge.add_argument('fixture', type=Path, help='the .sqlite working fixture, created if missing')
     merge.add_argument('sources', type=Path, nargs='+', help='.zip or .sqlite fixtures')
-    args = parser.parse_args(argv)
+    return parser
+
+def fixtures_command(argv):
+    args = fixtures_parser().parse_args(argv)
     if args.command == 'merge':
         if args.fixture.suffix != '.sqlite':
             print(f'{args.fixture}: merge into a .sqlite working fixture (then pack it)', file=sys.stderr)
@@ -224,7 +233,7 @@ def parse_meta(pairs):
         metadata[key.strip()] = value
     return metadata
 
-def source_command(argv):
+def source_parser():
     parser = argparse.ArgumentParser(prog='pdf-semantic-diff source', description='Manage sources declared in a store.')
     commands = parser.add_subparsers(dest='command', required=True)
     def command(name, help):
@@ -257,7 +266,10 @@ def source_command(argv):
     importing = command('import', 'Declare a source from a manifest (a copy, not a live link)')
     importing.add_argument('manifest', type=Path)
     importing.add_argument('--name', help='Declare under another name')
-    args = parser.parse_args(argv)
+    return parser
+
+def source_command(argv):
+    args = source_parser().parse_args(argv)
     start_logging(args)
     settings = load_settings(args)
     with Store(args.store) as store:
@@ -303,7 +315,7 @@ def source_command(argv):
                 log.warning(f"Warning: {len(different)} file(s) differ from the manifest's hashes: {different[:5]}")
     return 0
 
-def store_command(command, argv):
+def store_parser(command):
     parser = argparse.ArgumentParser(prog=f'pdf-semantic-diff {command}')
     parser.add_argument('--store', type=Path, required=True)
     add_log_options(parser)
@@ -320,7 +332,10 @@ def store_command(command, argv):
         parser.description = 'Regenerate a report from a saved comparison, without model calls.'
         parser.add_argument('--comparison', type=int, help='Comparison id (see: show comparisons); default: latest')
         parser.add_argument('--out', type=Path, help='Report folder (default: the store folder)')
-    args = parser.parse_args(argv)
+    return parser
+
+def store_command(command, argv):
+    args = store_parser(command).parse_args(argv)
     start_logging(args)
     if not (args.store / 'store.sqlite').exists():
         raise StoreError(f'{args.store} is not a store')
