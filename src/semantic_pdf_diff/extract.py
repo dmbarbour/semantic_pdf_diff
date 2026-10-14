@@ -165,7 +165,8 @@ class PdfReading:
         left_out = self.s.text_left_out(self.context_of, page, number, [(f[0], f[1]) for f in found if f[1]])
         section_of = self.s.text_section_of(lambda b, n=number: self.owner.box(n, b).id)
         groups = text_groups(page, self.s.text_bytes, section_of, left_out, self.s.split_text)
-        self.core.find_positions(number, [seg for _, segments in groups for seg in segments])
+        self.core.find_positions(number, [seg for _, segments in groups for seg in segments],
+                                 lambda: any(f.kind == "sheet" for f in self.context_of.figures(page, number)))
         for ids, segments in groups:
             self.core.text_task(number, segments, f"text:p{number}:{ids}")
 

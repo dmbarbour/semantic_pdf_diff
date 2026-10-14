@@ -37,7 +37,7 @@ TOGGLES = {
     'render_area': True, 'tile_choice': 'off', 'leave_text': 'none', 'region_labels': 'model',
     'another_tiling': 'asked',
     'least_half': 0.5, 'skip_sheet_tables': True, 'images_first': False, 'complete_by_image': True,
-    'positions': 'conditions',
+    'positions': 'conditions', 'records': True,
 }
 # Settings measured under others, on both sides: the tilers' with tile_choice off (by default the rule picks the cut by
 # its measures, so another tiler or a tile's growth, say, may leave its choice and the queries as they were); the
@@ -213,11 +213,12 @@ class Declarations(unittest.TestCase):
         from semantic_pdf_diff import settings as settings_module
         self.assertFalse({k for k in binding.SETTING_REGIONS if SETTING_CLASSES[k] == "endpoint"})
         # a bound lever setting without a scope clears every region when changed: only the instructions should,
-        # and the row dedupe (it can drop rows from any task's text)
+        # the row dedupe (it can drop rows from any task's text), and context records (a sheet's notes reach every
+        # claim on it, the tiles' too)
         from semantic_pdf_diff.levers import declared
         unscoped = {n for n in levers.lever_settings() if "extract" in declared(Settings, n).roles
                     and n not in binding.SETTING_REGIONS}  # (regions are extraction's)
-        self.assertEqual(unscoped, {"extract_prompt", "extract_rules", "dedupe_repeated"})
+        self.assertEqual(unscoped, {"extract_prompt", "extract_rules", "dedupe_repeated", "records"})
         for name, _ in settings_module.LEVER_MARKS:  # each mark is its lever's own setting, or the headings
             self.assertTrue(name == "section" or any(name in c.model_fields and name in c.marks
                                                      for c in levers.LEVER_CLASSES), name)

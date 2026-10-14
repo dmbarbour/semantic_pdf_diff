@@ -189,13 +189,17 @@ class TaskCore:
         self.evidence, self.coverage, self.repeats = [], [], {}
         self.positions = {}  # page: {block box: Position}, as the positions hook finds them
         self.listed = {}  # page: [(an item's text, its Position)], for claims placed by their quotes
+        self.records = {}  # id: ContextRecord, as the page structure hook finds them (the records lever)
+        self.reach = {}  # page: the ids of records reaching every claim on it (a sheet's notes)
         self.held, self.releasing = [], False  # rows that may repeat, until the content's pages are read
         self.sections = self.reader = None
 
     def record(self, row, items=()):
         self.coverage.append(row)
         if self.on_task:
-            self.on_task(row, list(items))
+            used = sorted({r for e in items for r in getattr(e, "records", ())} & set(self.records))
+            # the records its claims reference, saved with them (a store keeps each once, by id)
+            self.on_task(row, list(items), *([[self.records[r] for r in used]] if used else []))
 
     def release(self):
         """The rows held as possible repeats, read now in page and task order, so the first sighting leads and
@@ -248,10 +252,13 @@ class TaskCore:
         self.evidence.extend(copies)
         self.record(row, copies)
 
-    def find_positions(self, page_no, blocks):
+    def find_positions(self, page_no, blocks, is_sheet=lambda: False):
         """A page's list items (the positions hook) among its text blocks [(box, text)] in reading order: by box,
-        for its text tasks' claims, and by text, for a claim another task read there (a picture's quote)."""
-        found = self.s.list_positions(blocks)
+        for its text tasks' claims, and by text, for a claim another task read there (a picture's quote); and the
+        context records the page structure hook finds there (a sheet's notes reach every claim on the page)."""
+        found, records = self.s.page_structure(page_no, blocks, is_sheet)
+        self.records.update((r.id, r) for r in records)
+        self.reach[page_no] = [r.id for r in records if r.kind in ("note", "legend")]
         self.positions[page_no] = found
         self.listed[page_no] = [(text, found[tuple(box)]) for box, text in blocks if tuple(box) in found]
 
@@ -394,10 +401,12 @@ class TaskCore:
                 where = tuple(locate(claim.quote) if locate else bbox)
                 spot = place(claim.quote) if place else where
                 home = self.sections.box(page_no, spot).id if spot is not None else section.id
+                records = [*self.reach.get(page_no, ()), *([position.list] if position and position.list else [])]
                 found.append(Evidence(**claim.model_dump(), id=eid, content=content, section=home,
                                       locator=self.locator(page_no, where, region, task),
                                       derivation=derivation or self.derivation[region], image=image,
-                                      quote_verified=verified, position=position))
+                                      quote_verified=verified, position=position, records=records,
+                                      printed=s.printed_name(claim) if verified else ""))
                 row["claims"] += 1
 
         self.progress.add()

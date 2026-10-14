@@ -703,6 +703,37 @@ class Positions(Lever):
         from .positions import without_label
         return claim.model_copy(update={"conditions": without_label(claim.conditions, position)}), position
 
+class Records(Lever):
+    lever_name, stage, off = "records", "matching", {"records": False}
+    # context records (docs/plans/claim-context-2026-10-14.md, milestone 3): a page's lists (their lead-ins and
+    # labels) and a drawing sheet's notes and legends kept once, as records its claims reference (Evidence.records);
+    # a list item's position names its list instead of copying its lead-in. Applied as answers are stored
+    records: Annotated[bool, Declared("post", EXTRACT)] = False
+
+    def page_structure(self, page_no, blocks, is_sheet):
+        positions, records = super().page_structure(page_no, blocks, is_sheet)
+        if not self.records:
+            return positions, records
+        from .records import list_records, note_records
+        lists, positions = list_records(page_no, blocks, positions)
+        notes = note_records(page_no, blocks) if is_sheet() else []
+        under = {n.label.casefold(): n.id for n in notes}  # a numbered list under a notes heading is that note's
+        lists = [r.model_copy(update={"parent": under[r.text.casefold()]}) if r.text.casefold() in under else r
+                 for r in lists]
+        return positions, records + lists + notes
+
+    def printed_name(self, claim):
+        if not self.records:
+            return super().printed_name(claim)
+        from .records import printed_before
+        return printed_before(claim.quote, claim.value)
+
+    def table_record(self, page_no, task, grid, context, box):
+        if not self.records:
+            return super().table_record(page_no, task, grid, context, box)
+        from .records import table_record
+        return table_record(page_no, task, grid, context, box)
+
 class Reconcile(Lever):
     lever_name, stage, off = "reconcile", "matching", {"reconcile": False}
     # merge readings of one fact by different tasks into one claim; applied when evidence is read, not stored
@@ -772,7 +803,7 @@ LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, Complete
                  SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,
                  RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts,
                  TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions,
-                 Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
+                 Records, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -937,6 +968,24 @@ class Platform(Composable):
         """{box: Position} for a page's text blocks [(box, text)] in reading order: where each sits in a sequence
         the source numbers. The platform's: none found."""
         return {}
+
+    @chained
+    def page_structure(self, page_no, blocks, is_sheet):
+        """(positions {box: Position}, context records [ContextRecord]) for a page's text blocks [(box, text)] in
+        reading order; is_sheet() says whether the page is a drawing sheet. The platform's: the list positions
+        hook's, and no records."""
+        return self.list_positions(blocks), []
+
+    @chosen
+    def printed_name(self, claim):
+        """A claim's name as printed in its verified quote (the words before its value), or "": the platform's."""
+        return ""
+
+    @chained
+    def table_record(self, page_no, task, grid, context, box):
+        """A table read by rules, as a context record its claims reference (its title, headers and the context its
+        rows are given), or None: the platform's."""
+        return None
 
     @chosen
     def positioned(self, claim, position):

@@ -39,6 +39,7 @@
     "leave_text",
     "quote_match",
     "positions",
+    "records",
     "reconcile",
     "dedupe_repeated",
     "continue_reading",

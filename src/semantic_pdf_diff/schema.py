@@ -323,6 +323,15 @@ class Position(Strict):
     item renumbers the rest."""
     label: str = Field(min_length=1, max_length=80)
     lead: str = Field(default="", max_length=300)
+    # its list's ContextRecord id, when records are kept (the lead-in is the record's, not copied here)
+    list: str = Field(default="", max_length=120)
+
+    @model_serializer(mode="wrap")
+    def _without_absent_list(self, handler):
+        out = handler(self)  # no list, no key: positions written before records stay as they were
+        if isinstance(out, dict) and not out.get("list"):
+            out.pop("list", None)
+        return out
 
 class Evidence(Claim):
     """A claim within one piece of content.

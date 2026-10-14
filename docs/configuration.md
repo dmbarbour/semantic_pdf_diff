@@ -123,6 +123,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `leave_text` | `"tables"` | shaping | leave_text | extract | table, text |
 | `quote_match` | `"fragments"` | post | quote_match | extract | table, text |
 | `positions` | `"provenance"` | post | positions | extract | table, text |
+| `records` | `false` | post | records | extract | all |
 | `reconcile` | `true` | post | reconcile | - | - |
 | `dedupe_repeated` | `true` | shaping | dedupe_repeated | extract | all |
 | `continuations` | `3` | selecting | continue_reading | extract | figure, overview, tile, vision |
