@@ -51,12 +51,12 @@ def label_of(text):
         return label, form, _ordinals(found.group("n"))
     return None
 
-def list_positions(blocks):
-    """{box: Position} for a page's text blocks [(box, text)] in reading order: a block opening with a label is a
-    list's item when another block opens with a label of the same form numbered next, before or after it (a lone
-    "Option B:" is a name). Blocks between items (an item's further paragraphs) are allowed. An item's position
-    gives the list's lead-in: the block before its first item, if that isn't an item itself. A block split in
-    pieces (one box) is placed by its first."""
+def found_lists(blocks):
+    """A page's lists among its text blocks [(box, text)] in reading order: [{"lead": the lead-in, "items":
+    [(box, label as printed)]}], each of two items or more. A block opening with a label is a list's item when
+    another block opens with a label of the same form numbered next, before or after it (a lone "Option B:" is a
+    name). Blocks between items (an item's further paragraphs) are allowed. The lead-in is the block before the first
+    item, if that isn't an item itself. A block split in pieces (one box) is placed by its first."""
     labelled, first_text = [], {}
     for box, text in blocks:
         box = tuple(box)
@@ -67,7 +67,7 @@ def list_positions(blocks):
         if found:
             labelled.append((box, *found))
     order = list(first_text)
-    lists = []  # each: {"form", "kind", "last", "items": [(box, label)]}
+    lists = []  # each: {"form", "last", "items": [(box, label)]}
     for box, label, form, ordinals in labelled:
         home = next((x for x in reversed(lists) if x["form"] == form and any(
             ordinals.get(kind) == x["last"].get(kind, -1) + 1 for kind in ordinals)), None)
@@ -76,16 +76,21 @@ def list_positions(blocks):
             continue
         home["last"] = {k: v for k, v in ordinals.items() if v == home["last"].get(k, -1) + 1}
         home["items"].append((box, label))
-    out = {}
+    out = []
     for found in lists:
         if len(found["items"]) < 2:
             continue
         start = order.index(found["items"][0][0])
         before = first_text[order[start - 1]] if start else ""
         lead = "" if not before or label_of(before) else " ".join(before.split())[:LEAD_CHARS]
-        for box, label in found["items"]:
-            out[box] = Position(label=label.rstrip("."), lead=lead)
+        out.append({"lead": lead, "items": found["items"]})
     return out
+
+def list_positions(blocks):
+    """{box: Position} for a page's text blocks [(box, text)] in reading order: each list item's label (found_lists)
+    and its list's lead-in."""
+    return {box: Position(label=label.rstrip("."), lead=found["lead"])
+            for found in found_lists(blocks) for box, label in found["items"]}
 
 GENERIC = r"(?:item|note|step|point|no\.?|number|#|condition|case|clause|requirement|criterion|rule)"
 
