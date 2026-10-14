@@ -9,6 +9,7 @@
     python scripts/controlled.py run --unaligned             # the PDF pairs only, alignment off (see below)
     python scripts/controlled.py run --rows                  # every document's tables read row by row (below)
     python scripts/controlled.py pack                        # replay.zip: the answers the standard runs replay
+    python scripts/controlled.py context                     # context.json: each claim's context, offline (below)
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
 is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
@@ -23,6 +24,10 @@ explanations (compare.explain) are measured where non-changes abound.
 With --rows every document and pair is read again with every table read row by row (table_rules none), into
 "<recorded or replay>-rows": the baseline the standard runs' tables, each read as a model says (tablerules.py), are
 scored against by the same keys. Packed with the standard runs.
+
+`context` measures the standard runs' claims' context (lab bench/context.py; docs/plans/claim-context-2026-10-14.md,
+milestone 2): misplaced context and conditions grounded in what each request showed, then, against the keys' context
+by kind, where each kind landed and, where it was lost, whether the request showed it. Into context.json.
 
 Recording adds to the working fixture (fixture.sqlite, git-ignored), which keeps every answer ever recorded. `pack`
 writes the committed replay.zip: the standard runs are replayed from fresh stores against a copy of the fixture, and
@@ -77,6 +82,7 @@ def main(argv=None):
     running.add_argument("--rows", action="store_true", help="every document, its tables read row by row")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     sub.add_parser("pack", help="pack the answers the standard runs replay into replay.zip (offline)")
+    sub.add_parser("context", help="measure the standard runs' claims' context against the keys (offline)")
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.bench import controlled
     if args.command == "generate":
@@ -102,6 +108,8 @@ def main(argv=None):
         return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rows=args.rows)
     if args.command == "pack":
         return pack()
+    if args.command == "context":
+        return context()
     return score()
 
 def pack():
@@ -192,6 +200,23 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
     if not replay:
         print(f"spent ${ledger.spent(LEDGER, round='controlled') - before:.3f}; run `pack` before committing")
     return worst
+
+def context():
+    """context.json: the standard runs' context measures (bench/context.py), per run and summed, with the sums
+    printed."""
+    from semantic_pdf_diff_lab.bench import context as measures
+    runs = RUNS / "recorded"
+    if not runs.exists():
+        print(f"no runs in {runs}: run first")
+        return 1
+    inventory = measures.measure(runs)
+    keyed = measures.measure_keys(runs, lambda run: json.loads(key_path(run).read_text(encoding="utf-8")))
+    out = {"totals": {"inventory": measures.totals(inventory), **measures.sum_keys(keyed)},
+           "runs": {run: {"inventory": inventory.get(run, {}), "keyed": keyed.get(run, {})}
+                    for run in sorted(set(inventory) | set(keyed))}}
+    (FOLDER / "context.json").write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(json.dumps(out["totals"], indent=1))
+    return 0
 
 def score():
     """results.json and comparisons.json from the runs' stores, with tables printed."""

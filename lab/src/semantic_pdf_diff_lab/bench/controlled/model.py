@@ -31,6 +31,7 @@ class Fact:
     relation: str = ""                # a relational fact (relations.RELATIONS): entity, relation, value (the object)
     object_aliases: tuple = ()        # the object's other names
     accepts: tuple = ()               # other relations that state it fairly
+    context: dict = field(default_factory=dict)  # its context by kind, sources and knowability (contexts.py)
 
     @property
     def number(self):

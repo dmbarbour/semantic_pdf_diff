@@ -1173,7 +1173,11 @@ def draw_schematics(project, doc, figures, spans):
 
 def key(project, log):
     """The answer key: facts with their forms, and the printed numbers with their roles."""
-    optional = ("tolerance", "relation", "object_aliases", "accepts")  # left out when unused
+    from .contexts import contexts
+    optional = ("tolerance", "relation", "object_aliases", "accepts", "context")  # left out when unused
+    found = contexts(project)
+    for f in project.facts:
+        f.context = found.get(f.id, {})
     fields = lambda f: {k: v for k, v in asdict(f).items() if k not in optional or v}
     out = {"project": project.id, "title": project.title, "facts": [fields(f) for f in project.facts], "printed": log}
     if project.things:

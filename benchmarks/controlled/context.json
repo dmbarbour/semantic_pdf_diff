@@ -1,0 +1,6009 @@
+{
+ "totals": {
+  "inventory": {
+   "claims": 11783,
+   "frame in conditions": 100,
+   "grounded": 3545,
+   "no content words": 18,
+   "numbered in attribute": 124,
+   "numbered in entity": 27,
+   "partly": 95,
+   "partly (image)": 19,
+   "positioned": 112,
+   "unsupported": 34,
+   "unsupported (image)": 484,
+   "with conditions": 4195
+  },
+  "placed": {
+   "bound": {
+    "attribute": 37,
+    "conditions": 23,
+    "nowhere": 21
+   },
+   "frame": {
+    "attribute": 18,
+    "conditions": 148,
+    "nowhere": 73
+   },
+   "provenance": {
+    "conditions": 5
+   },
+   "scope": {
+    "attribute": 29,
+    "conditions": 1775,
+    "nowhere": 6
+   },
+   "sibling": {
+    "conditions": 15,
+    "nowhere": 4
+   },
+   "subject": {
+    "conditions": 72,
+    "entity": 128,
+    "nowhere": 43
+   }
+  },
+  "audit": {
+   "bound": {
+    "shown, not used": 21
+   },
+   "frame": {
+    "image only": 37,
+    "not shown": 30,
+    "shown, not used": 24
+   },
+   "provenance": {
+    "in conditions": 5
+   },
+   "scope": {
+    "image only": 2,
+    "misapplied": 4,
+    "shown, not used": 29
+   },
+   "sibling": {
+    "in conditions": 15,
+    "kept out": 4
+   },
+   "subject": {
+    "image only": 1,
+    "not shown": 15,
+    "shown, not used": 27
+   }
+  },
+  "named": {
+   "by an unprinted convention": 71,
+   "otherwise": 11
+  }
+ },
+ "runs": {
+  "ahu-schematic-s1-all": {
+   "inventory": {
+    "claims": 40,
+    "partly (image)": 7,
+    "with conditions": 7,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 718,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "ahu-schematic-s1-clean": {
+   "inventory": {
+    "claims": 50,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 69,
+    "data_bytes_per_request": 580,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "ahu-schematic-s1-figure-only": {
+   "inventory": {
+    "claims": 33,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 141,
+    "data_bytes_per_request": 372,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "ahu-schematic-s1-folded": {
+   "inventory": {
+    "claims": 31,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 96,
+    "data_bytes_per_request": 399,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "ahu-schematic-s1-leaders": {
+   "inventory": {
+    "claims": 33,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 111,
+    "data_bytes_per_request": 436,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "ahu-schematic-s1-legend": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 15,
+    "with conditions": 15,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 54,
+    "data_bytes_per_request": 381,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "ahu-schematic-s1-prose": {
+   "inventory": {
+    "claims": 42,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 1189,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "ahu-schematic-s1-prose-hard": {
+   "inventory": {
+    "claims": 38,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 1084,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean": {
+   "inventory": {
+    "claims": 48,
+    "grounded": 11,
+    "partly (image)": 2,
+    "unsupported": 1,
+    "with conditions": 14,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 227,
+    "data_bytes_per_request": 773,
+    "examples": {
+     "unsupported": [
+      "terminal | attach procedure timeout | abandonment threshold"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean-revised": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 3,
+    "partly": 1,
+    "partly (image)": 1,
+    "unsupported (image)": 1,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 111,
+    "data_bytes_per_request": 920,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean-revised.docx": {
+   "inventory": {
+    "claims": 27,
+    "grounded": 1,
+    "unsupported": 1,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 17,
+    "data_bytes_per_request": 1148,
+    "examples": {
+     "unsupported": [
+      "terminal | attach procedure timeout | abandonment threshold"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean-revised.md": {
+   "inventory": {
+    "claims": 2,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 278,
+    "data_bytes_per_request": 654,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean-revised.pptx": {
+   "inventory": {
+    "claims": 27,
+    "grounded": 1,
+    "unsupported": 1,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 182,
+    "data_bytes_per_request": 709,
+    "examples": {
+     "unsupported": [
+      "terminal | attach procedure timeout | abandonment threshold"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean-revised.xlsx": {
+   "inventory": {
+    "claims": 3,
+    "grounded": 2,
+    "unsupported": 1,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 363,
+    "data_bytes_per_request": 160,
+    "examples": {
+     "unsupported": [
+      "terminal | attach procedure timeout | abandonment threshold"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean.docx": {
+   "inventory": {
+    "claims": 26,
+    "grounded": 1,
+    "unsupported": 1,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 17,
+    "data_bytes_per_request": 1113,
+    "examples": {
+     "unsupported": [
+      "terminal | attach procedure timeout | abandonment threshold"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean.md": {
+   "inventory": {
+    "claims": 2,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 278,
+    "data_bytes_per_request": 654,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean.pptx": {
+   "inventory": {
+    "claims": 26,
+    "grounded": 1,
+    "unsupported": 1,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 182,
+    "data_bytes_per_request": 687,
+    "examples": {
+     "unsupported": [
+      "terminal | attach procedure timeout | abandonment threshold"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-clean.xlsx": {
+   "inventory": {
+    "claims": 3,
+    "grounded": 2,
+    "unsupported": 1,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 363,
+    "data_bytes_per_request": 160,
+    "examples": {
+     "unsupported": [
+      "terminal | attach procedure timeout | abandonment threshold"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "attach-s1-raster": {
+   "inventory": {
+    "claims": 34,
+    "grounded": 3,
+    "partly (image)": 2,
+    "unsupported": 1,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 76,
+    "data_bytes_per_request": 287,
+    "examples": {
+     "unsupported": [
+      "terminal | attach procedure timeout | abandonment threshold"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1": {
+   "inventory": {
+    "claims": 65,
+    "grounded": 6,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 81,
+    "data_bytes_per_request": 556,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "conditions": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "in conditions": 1
+     }
+    },
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-earlier": {
+   "inventory": {
+    "claims": 61,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 81,
+    "data_bytes_per_request": 554,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-earlier.docx": {
+   "inventory": {
+    "claims": 30,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 59,
+    "data_bytes_per_request": 698,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-earlier.md": {
+   "inventory": {
+    "claims": 30,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 519,
+    "data_bytes_per_request": 229,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-earlier.pptx": {
+   "inventory": {
+    "claims": 30,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 451,
+    "data_bytes_per_request": 138,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-earlier.xlsx": {
+   "inventory": {
+    "claims": 30,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 446,
+    "data_bytes_per_request": 140,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1.docx": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 59,
+    "data_bytes_per_request": 695,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "conditions": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "in conditions": 1
+     }
+    },
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1.md": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 529,
+    "data_bytes_per_request": 208,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "conditions": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "in conditions": 1
+     }
+    },
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1.pptx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 3,
+    "partly": 1,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 472,
+    "data_bytes_per_request": 137,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "conditions": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "in conditions": 1
+     }
+    },
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1.xlsx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 3,
+    "partly": 1,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 467,
+    "data_bytes_per_request": 139,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "conditions": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "in conditions": 1
+     }
+    },
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-all": {
+   "inventory": {
+    "claims": 191,
+    "grounded": 30,
+    "with conditions": 30,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 155,
+    "data_bytes_per_request": 249,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean": {
+   "inventory": {
+    "claims": 184,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 179,
+    "data_bytes_per_request": 306,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean.docx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 20,
+    "with conditions": 20,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 492,
+    "data_bytes_per_request": 231,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean.md": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 583,
+    "data_bytes_per_request": 123,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean.pptx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 32,
+    "with conditions": 32,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 567,
+    "data_bytes_per_request": 114,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean.xlsx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 32,
+    "with conditions": 32,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 538,
+    "data_bytes_per_request": 119,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-continued": {
+   "inventory": {
+    "claims": 184,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 148,
+    "data_bytes_per_request": 303,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-dense": {
+   "inventory": {
+    "claims": 189,
+    "grounded": 25,
+    "with conditions": 25,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 129,
+    "data_bytes_per_request": 320,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-multilevel": {
+   "inventory": {
+    "claims": 184,
+    "grounded": 20,
+    "with conditions": 20,
+    "positioned": 0,
+    "misplaced": {
+     "numbered in entity": 15
+    },
+    "context_bytes_per_request": 187,
+    "data_bytes_per_request": 280,
+    "examples": {
+     "numbered in entity": [
+      "Support column C-02 | Base elev. | ",
+      "Support column C-03 | Base elev. | ",
+      "Support column C-05 | Base elev. | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-multivalue": {
+   "inventory": {
+    "claims": 190,
+    "grounded": 12,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 208,
+    "data_bytes_per_request": 253,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-stacked": {
+   "inventory": {
+    "claims": 189,
+    "grounded": 37,
+    "with conditions": 37,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 156,
+    "data_bytes_per_request": 309,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-all": {
+   "inventory": {
+    "claims": 47,
+    "unsupported (image)": 47,
+    "with conditions": 47,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 0,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 23
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-axis": {
+   "inventory": {
+    "claims": 65,
+    "grounded": 65,
+    "with conditions": 65,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 557,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 33
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-charts.docx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 33,
+    "with conditions": 33,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 463,
+    "data_bytes_per_request": 139,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 33
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-clean": {
+   "inventory": {
+    "claims": 50,
+    "grounded": 50,
+    "with conditions": 50,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 230,
+    "data_bytes_per_request": 382,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 33
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-clean.docx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 9,
+    "unsupported (image)": 24,
+    "with conditions": 33,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 19,
+    "data_bytes_per_request": 145,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 33
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-clean.md": {
+   "inventory": {
+    "claims": 3,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 252,
+    "data_bytes_per_request": 567,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 3
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-clean.pptx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 33,
+    "with conditions": 33,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 356,
+    "data_bytes_per_request": 111,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 33
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-clean.xlsx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 33,
+    "with conditions": 33,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 662,
+    "data_bytes_per_request": 126,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 33
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-legend-caption": {
+   "inventory": {
+    "claims": 42,
+    "grounded": 42,
+    "with conditions": 42,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 186,
+    "data_bytes_per_request": 396,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 33
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-raster": {
+   "inventory": {
+    "claims": 58,
+    "grounded": 21,
+    "unsupported (image)": 37,
+    "with conditions": 58,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 381,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 33
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-enduse-s1-scan": {
+   "inventory": {
+    "claims": 36,
+    "unsupported (image)": 36,
+    "with conditions": 36,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 0,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 31
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-all": {
+   "inventory": {
+    "claims": 48,
+    "unsupported (image)": 46,
+    "with conditions": 46,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 0,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-axis": {
+   "inventory": {
+    "claims": 45,
+    "grounded": 41,
+    "with conditions": 41,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 241,
+    "data_bytes_per_request": 533,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-charts.docx": {
+   "inventory": {
+    "claims": 21,
+    "grounded": 19,
+    "with conditions": 19,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 489,
+    "data_bytes_per_request": 193,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 17,
+      "attribute": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "misapplied": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: misapplied": [
+      "opt1.season: wanted 'cooling season'; read seasonal cooling energy | May to October",
+      "opt2.season: wanted 'cooling season'; read seasonal cooling energy | May to October"
+     ]
+    }
+   }
+  },
+  "lcc-energy-s1-clean": {
+   "inventory": {
+    "claims": 26,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 363,
+    "data_bytes_per_request": 393,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-clean-revised": {
+   "inventory": {
+    "claims": 26,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 243,
+    "data_bytes_per_request": 559,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-clean-revised.docx": {
+   "inventory": {
+    "claims": 21,
+    "grounded": 11,
+    "unsupported (image)": 8,
+    "with conditions": 19,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 28,
+    "data_bytes_per_request": 271,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-clean-revised.md": {
+   "inventory": {
+    "claims": 4,
+    "grounded": 4,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 379,
+    "data_bytes_per_request": 1216,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-clean-revised.pptx": {
+   "inventory": {
+    "claims": 23,
+    "grounded": 22,
+    "with conditions": 22,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 485,
+    "data_bytes_per_request": 137,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-clean-revised.xlsx": {
+   "inventory": {
+    "claims": 23,
+    "grounded": 22,
+    "with conditions": 22,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 589,
+    "data_bytes_per_request": 222,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-clean.docx": {
+   "inventory": {
+    "claims": 21,
+    "grounded": 13,
+    "unsupported (image)": 8,
+    "with conditions": 21,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 28,
+    "data_bytes_per_request": 271,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-clean.md": {
+   "inventory": {
+    "claims": 4,
+    "grounded": 4,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 379,
+    "data_bytes_per_request": 1216,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-clean.pptx": {
+   "inventory": {
+    "claims": 23,
+    "grounded": 22,
+    "with conditions": 22,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 485,
+    "data_bytes_per_request": 137,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-clean.xlsx": {
+   "inventory": {
+    "claims": 23,
+    "grounded": 22,
+    "with conditions": 22,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 589,
+    "data_bytes_per_request": 222,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-legend-caption": {
+   "inventory": {
+    "claims": 26,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 363,
+    "data_bytes_per_request": 397,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-raster": {
+   "inventory": {
+    "claims": 26,
+    "grounded": 16,
+    "unsupported (image)": 8,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 98,
+    "data_bytes_per_request": 455,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 19
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-energy-s1-scan": {
+   "inventory": {
+    "claims": 26,
+    "unsupported (image)": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 0,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 17,
+      "attribute": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "misapplied": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: misapplied": [
+      "opt1.season: wanted 'cooling season'; read seasonal cooling energy | May to October",
+      "opt2.season: wanted 'cooling season'; read seasonal cooling energy | May to October"
+     ]
+    }
+   }
+  },
+  "lcc-metered-s1-all": {
+   "inventory": {
+    "claims": 90,
+    "unsupported (image)": 90,
+    "with conditions": 90,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 0,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 41
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-axis": {
+   "inventory": {
+    "claims": 106,
+    "grounded": 106,
+    "with conditions": 106,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 148,
+    "data_bytes_per_request": 442,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 45
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-charts.docx": {
+   "inventory": {
+    "claims": 51,
+    "grounded": 50,
+    "with conditions": 50,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 458,
+    "data_bytes_per_request": 116,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 50
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-clean": {
+   "inventory": {
+    "claims": 100,
+    "grounded": 100,
+    "with conditions": 100,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 220,
+    "data_bytes_per_request": 495,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 50
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-clean.docx": {
+   "inventory": {
+    "claims": 51,
+    "grounded": 2,
+    "unsupported (image)": 48,
+    "with conditions": 50,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 17,
+    "data_bytes_per_request": 106,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 50
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-clean.md": {
+   "inventory": {
+    "claims": 3,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 303,
+    "data_bytes_per_request": 623,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-clean.pptx": {
+   "inventory": {
+    "claims": 51,
+    "grounded": 51,
+    "with conditions": 51,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 408,
+    "data_bytes_per_request": 108,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 50
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-clean.xlsx": {
+   "inventory": {
+    "claims": 51,
+    "grounded": 39,
+    "unsupported": 12,
+    "with conditions": 51,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 639,
+    "data_bytes_per_request": 176,
+    "examples": {
+     "unsupported": [
+      "South substation (MWh) | electricity use | in September",
+      "North substation (MWh) | electricity use | in June",
+      "South substation (MWh) | electricity use | in June"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 50
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-legend-caption": {
+   "inventory": {
+    "claims": 78,
+    "grounded": 77,
+    "with conditions": 77,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 247,
+    "data_bytes_per_request": 498,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 50
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-raster": {
+   "inventory": {
+    "claims": 54,
+    "grounded": 10,
+    "unsupported (image)": 44,
+    "with conditions": 54,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 43,
+    "data_bytes_per_request": 264,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 50
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-metered-s1-scan": {
+   "inventory": {
+    "claims": 52,
+    "unsupported (image)": 52,
+    "with conditions": 52,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 0,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 50
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "lcc-plan-s1-all": {
+   "inventory": {
+    "claims": 171,
+    "grounded": 91,
+    "partly": 1,
+    "with conditions": 92,
+    "positioned": 0,
+    "misplaced": {
+     "frame in conditions": 42,
+     "numbered in attribute": 26,
+     "numbered in entity": 2
+    },
+    "context_bytes_per_request": 18,
+    "data_bytes_per_request": 256,
+    "examples": {
+     "frame in conditions": [
+      "Meeting 103 | area | net, measured to face of finish",
+      "Meeting 102 | area | net, measured to face of finish",
+      "Meeting 101 | area | net, measured to face of finish"
+     ],
+     "numbered in attribute": [
+      "MEETING 101 564 SF D101 | dimension 2 | ",
+      "MEETING 101 564 SF D101 | dimension 1 | ",
+      "Meeting 104 | dimension 1 | face of finish"
+     ],
+     "numbered in entity": [
+      "dimension line 2 | length | ",
+      "dimension line 1 | length | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "sibling": {
+      "conditions": 3
+     },
+     "frame": {
+      "conditions": 21
+     }
+    },
+    "audit": {
+     "sibling": {
+      "in conditions": 3
+     }
+    },
+    "named": {
+     "by an unprinted convention": 9,
+     "otherwise": 5
+    },
+    "examples": {}
+   }
+  },
+  "lcc-plan-s1-clean": {
+   "inventory": {
+    "claims": 100,
+    "grounded": 31,
+    "with conditions": 31,
+    "positioned": 2,
+    "misplaced": {
+     "frame in conditions": 7,
+     "numbered in attribute": 13,
+     "numbered in entity": 2
+    },
+    "context_bytes_per_request": 27,
+    "data_bytes_per_request": 246,
+    "examples": {
+     "frame in conditions": [
+      "STORAGE 110 | area | net, measured to face of finish",
+      "MECHANICAL 112 | area | net, measured to face of finish",
+      "ELECTRICAL 111 | area | net, measured to face of finish"
+     ],
+     "numbered in attribute": [
+      "MEETING 103 | dimension 2 | ",
+      "MEETING 102 | dimension 1 | ",
+      "MEETING 104 | dimension 1 | "
+     ],
+     "numbered in entity": [
+      "dimension line 1 | length | ",
+      "dimension line 2 | length | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "sibling": {
+      "conditions": 3
+     },
+     "frame": {
+      "nowhere": 16,
+      "conditions": 5
+     }
+    },
+    "audit": {
+     "sibling": {
+      "in conditions": 3
+     },
+     "frame": {
+      "not shown": 9,
+      "image only": 7
+     }
+    },
+    "named": {
+     "by an unprinted convention": 14
+    },
+    "examples": {
+     "frame: not shown": [
+      "room101.area: wanted 'net, measured to face of finish'; read area |  / area | ",
+      "room101.depth: wanted 'to face of finish'; read dimension 2 |  / length | ",
+      "room101.width: wanted 'to face of finish'; read dimension 1 |  / width | "
+     ],
+     "frame: image only": [
+      "room104.depth: wanted 'to face of finish'; read length | ",
+      "room110.depth: wanted 'to face of finish'; read length | ",
+      "room110.width: wanted 'to face of finish'; read width | "
+     ]
+    }
+   }
+  },
+  "lcc-plan-s1-clean-revised": {
+   "inventory": {
+    "claims": 97,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 3,
+    "misplaced": {
+     "frame in conditions": 7,
+     "numbered in attribute": 5,
+     "numbered in entity": 2
+    },
+    "context_bytes_per_request": 27,
+    "data_bytes_per_request": 258,
+    "examples": {
+     "frame in conditions": [
+      "STORAGE 110 | area | net, measured to face of finish",
+      "MECHANICAL 112 | area | net, measured to face of finish",
+      "ELECTRICAL 111 | area | net, measured to face of finish"
+     ],
+     "numbered in attribute": [
+      "STORAGE 110 | dimension 2 | ",
+      "MEETING 103 | dimension 2 | ",
+      "MEETING 104 | dimension 2 | "
+     ],
+     "numbered in entity": [
+      "dimension line 2 | length | ",
+      "dimension line 1 | length | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "sibling": {
+      "nowhere": 4
+     },
+     "frame": {
+      "nowhere": 16,
+      "conditions": 5
+     }
+    },
+    "audit": {
+     "sibling": {
+      "kept out": 4
+     },
+     "frame": {
+      "not shown": 2,
+      "image only": 14
+     }
+    },
+    "named": {
+     "by an unprinted convention": 14
+    },
+    "examples": {
+     "frame: not shown": [
+      "room101.area: wanted 'net, measured to face of finish'; read area |  / area | ",
+      "room103.area: wanted 'net, measured to face of finish'; read area |  / area | "
+     ],
+     "frame: image only": [
+      "room101.depth: wanted 'to face of finish'; read length |  / depth | ",
+      "room101.width: wanted 'to face of finish'; read width |  / length | ",
+      "room102.depth: wanted 'to face of finish'; read depth | "
+     ]
+    }
+   }
+  },
+  "lcc-plan-s1-rotated": {
+   "inventory": {
+    "claims": 181,
+    "grounded": 62,
+    "with conditions": 62,
+    "positioned": 0,
+    "misplaced": {
+     "frame in conditions": 22,
+     "numbered in attribute": 16,
+     "numbered in entity": 3
+    },
+    "context_bytes_per_request": 18,
+    "data_bytes_per_request": 232,
+    "examples": {
+     "frame in conditions": [
+      "MEETING 104 | area | net, measured to face of finish",
+      "MEETING 103 | area | net, measured to face of finish",
+      "D102 | height | to face of finish"
+     ],
+     "numbered in attribute": [
+      "MEETING 101 | dimension 1 | ",
+      "MEETING 102 | dimension 1 | ",
+      "MEETING 102 | dimension 2 | "
+     ],
+     "numbered in entity": [
+      "dimension line 1 | length | ",
+      "dimension line 2 | length | ",
+      "dimension line 2 | length | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "sibling": {
+      "conditions": 3
+     },
+     "frame": {
+      "conditions": 6,
+      "nowhere": 15
+     }
+    },
+    "audit": {
+     "sibling": {
+      "in conditions": 3
+     },
+     "frame": {
+      "not shown": 6,
+      "shown, not used": 6,
+      "image only": 3
+     }
+    },
+    "named": {
+     "by an unprinted convention": 8,
+     "otherwise": 6
+    },
+    "examples": {
+     "frame: not shown": [
+      "room101.depth: wanted 'to face of finish'; read dimension 1 |  / dimension | ",
+      "room102.depth: wanted 'to face of finish'; read dimension 1 |  / dimension | ",
+      "room102.width: wanted 'to face of finish'; read dimension 2 |  / dimension | "
+     ],
+     "frame: shown, not used": [
+      "room101.width: wanted 'to face of finish'; read dimension 2 |  / dimension | ",
+      "room110.depth: wanted 'to face of finish'; read dimension |  / dimension | ",
+      "room110.width: wanted 'to face of finish'; read dimension |  / dimension | "
+     ],
+     "frame: image only": [
+      "room104.depth: wanted 'to face of finish'; read dimension | ",
+      "room111.depth: wanted 'to face of finish'; read dimension | ",
+      "room112.width: wanted 'to face of finish'; read length |  / dimension | "
+     ]
+    }
+   }
+  },
+  "lcc-plan-s1-small": {
+   "inventory": {
+    "claims": 133,
+    "grounded": 48,
+    "with conditions": 48,
+    "positioned": 2,
+    "misplaced": {
+     "frame in conditions": 10,
+     "numbered in attribute": 17,
+     "numbered in entity": 1
+    },
+    "context_bytes_per_request": 27,
+    "data_bytes_per_request": 245,
+    "examples": {
+     "frame in conditions": [
+      "MECHANICAL 112 | area | net, measured to face of finish",
+      "MEETING 101 | net area | measured to face of finish",
+      "MEETING 103 | net area | measured to face of finish"
+     ],
+     "numbered in attribute": [
+      "MECHANICAL 112 | dimension 2 | ",
+      "STORAGE 110 | dimension 1 | ",
+      "MECHANICAL 112 | dimension 1 | "
+     ],
+     "numbered in entity": [
+      "dimension line 2 | length | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "sibling": {
+      "conditions": 3
+     },
+     "frame": {
+      "conditions": 7,
+      "nowhere": 14
+     }
+    },
+    "audit": {
+     "sibling": {
+      "in conditions": 3
+     },
+     "frame": {
+      "not shown": 11,
+      "image only": 3
+     }
+    },
+    "named": {
+     "by an unprinted convention": 14
+    },
+    "examples": {
+     "frame: not shown": [
+      "room101.depth: wanted 'to face of finish'; read dimension 2 |  / length | ",
+      "room101.width: wanted 'to face of finish'; read dimension 1 |  / width | ",
+      "room102.depth: wanted 'to face of finish'; read dimension 2 |  / length | "
+     ],
+     "frame: image only": [
+      "room104.depth: wanted 'to face of finish'; read length | ",
+      "room110.width: wanted 'to face of finish'; read width | ",
+      "room111.width: wanted 'to face of finish'; read width | "
+     ]
+    }
+   }
+  },
+  "lcc-plan-s1-vertical": {
+   "inventory": {
+    "claims": 106,
+    "grounded": 43,
+    "with conditions": 43,
+    "positioned": 2,
+    "misplaced": {
+     "frame in conditions": 12,
+     "numbered in attribute": 7,
+     "numbered in entity": 2
+    },
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 220,
+    "examples": {
+     "frame in conditions": [
+      "MECHANICAL 112 | area | net, measured to face of finish",
+      "MEETING 103 | area | net, measured to face of finish",
+      "MEETING 104 | area | net, measured to face of finish"
+     ],
+     "numbered in attribute": [
+      "MEETING 102 | dimension 2 | ",
+      "MEETING 102 | dimension 1 | ",
+      "ELECTRICAL 111 | dimension 2 | "
+     ],
+     "numbered in entity": [
+      "dimension line 2 | length | ",
+      "dimension line 1 | length | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "sibling": {
+      "conditions": 3
+     },
+     "frame": {
+      "conditions": 7,
+      "nowhere": 12
+     }
+    },
+    "audit": {
+     "sibling": {
+      "in conditions": 3
+     },
+     "frame": {
+      "image only": 10,
+      "not shown": 2
+     }
+    },
+    "named": {
+     "by an unprinted convention": 12
+    },
+    "examples": {
+     "frame: image only": [
+      "room101.depth: wanted 'to face of finish'; read length | ",
+      "room101.width: wanted 'to face of finish'; read length |  / length | ",
+      "room103.depth: wanted 'to face of finish'; read length | "
+     ],
+     "frame: not shown": [
+      "room102.depth: wanted 'to face of finish'; read dimension 1 |  / depth | ",
+      "room102.width: wanted 'to face of finish'; read dimension 2 |  / length | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-all": {
+   "inventory": {
+    "claims": 55,
+    "grounded": 20,
+    "partly": 1,
+    "partly (image)": 1,
+    "with conditions": 22,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 250,
+    "data_bytes_per_request": 926,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "attribute": 3
+     },
+     "subject": {
+      "nowhere": 1,
+      "conditions": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read area |  / total exhibit area | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-background": {
+   "inventory": {
+    "claims": 42,
+    "grounded": 6,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 295,
+    "data_bytes_per_request": 781,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 2
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating |  / snow load rating | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | together"
+     ]
+    }
+   }
+  },
+  "lcc-s1-clean": {
+   "inventory": {
+    "claims": 41,
+    "grounded": 6,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 262,
+    "data_bytes_per_request": 699,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 2
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating |  / snow load rating | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | together"
+     ]
+    }
+   }
+  },
+  "lcc-s1-clean.docx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 548,
+    "data_bytes_per_request": 1592,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 2
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-clean.md": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 692,
+    "data_bytes_per_request": 595,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 2
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-clean.pptx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 5,
+    "unsupported": 1,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 756,
+    "data_bytes_per_request": 453,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-clean.xlsx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 5,
+    "unsupported": 1,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 744,
+    "data_bytes_per_request": 455,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-decorated": {
+   "inventory": {
+    "claims": 38,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 295,
+    "data_bytes_per_request": 781,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 2
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating |  / snow load rating | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-decorated+two-column": {
+   "inventory": {
+    "claims": 41,
+    "grounded": 8,
+    "partly": 3,
+    "unsupported": 1,
+    "unsupported (image)": 2,
+    "with conditions": 14,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 307,
+    "data_bytes_per_request": 980,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "conditions": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read exhibit space |  / total exhibit space | together"
+     ]
+    }
+   }
+  },
+  "lcc-s1-frame": {
+   "inventory": {
+    "claims": 41,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 262,
+    "data_bytes_per_request": 699,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 2
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating |  / snow load rating | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-frame-lines": {
+   "inventory": {
+    "claims": 41,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 262,
+    "data_bytes_per_request": 699,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 2
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating |  / snow load rating | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-furniture": {
+   "inventory": {
+    "claims": 41,
+    "grounded": 6,
+    "unsupported (image)": 1,
+    "with conditions": 7,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 313,
+    "data_bytes_per_request": 785,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-landscape": {
+   "inventory": {
+    "claims": 47,
+    "grounded": 2,
+    "partly (image)": 1,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 234,
+    "data_bytes_per_request": 824,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-scanned-frame": {
+   "inventory": {
+    "claims": 24,
+    "unsupported (image)": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 0,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "conditions": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "image only": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: image only": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-slide": {
+   "inventory": {
+    "claims": 46,
+    "grounded": 9,
+    "with conditions": 9,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 225,
+    "data_bytes_per_request": 772,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 2
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating |  / snow load rating | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps": {
+   "inventory": {
+    "claims": 47,
+    "grounded": 21,
+    "unsupported (image)": 1,
+    "with conditions": 22,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 264,
+    "data_bytes_per_request": 718,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "attribute": 3
+     },
+     "subject": {
+      "nowhere": 1,
+      "conditions": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read area |  / total exhibit area | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps-revised": {
+   "inventory": {
+    "claims": 47,
+    "grounded": 21,
+    "unsupported (image)": 1,
+    "with conditions": 22,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 264,
+    "data_bytes_per_request": 718,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "attribute": 3
+     },
+     "subject": {
+      "nowhere": 1,
+      "conditions": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read area |  / total exhibit area | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps-revised.docx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 548,
+    "data_bytes_per_request": 1586,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "attribute": 3
+     },
+     "subject": {
+      "nowhere": 1,
+      "conditions": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read area | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps-revised.md": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 1,
+    "with conditions": 1,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 692,
+    "data_bytes_per_request": 588,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "attribute": 3
+     },
+     "subject": {
+      "nowhere": 9
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 9
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read area | ",
+      "room101.area: wanted 'Hall C'; read area | ",
+      "room101.seats: wanted 'Hall C'; read seated capacity | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps-revised.pptx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 8,
+    "partly": 3,
+    "unsupported": 2,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 789,
+    "data_bytes_per_request": 374,
+    "examples": {
+     "unsupported": [
+      "Hall C floor | live load capacity | minimum",
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "conditions": 3
+     },
+     "subject": {
+      "nowhere": 1,
+      "conditions": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read total exhibit area | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps-revised.xlsx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 8,
+    "partly": 3,
+    "unsupported": 2,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 780,
+    "data_bytes_per_request": 375,
+    "examples": {
+     "unsupported": [
+      "Hall C floor | live load capacity | minimum",
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "conditions": 3
+     },
+     "subject": {
+      "nowhere": 1,
+      "conditions": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read total exhibit area | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps.docx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 548,
+    "data_bytes_per_request": 1586,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "attribute": 3
+     },
+     "subject": {
+      "nowhere": 1,
+      "conditions": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read area | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps.md": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 1,
+    "with conditions": 1,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 692,
+    "data_bytes_per_request": 588,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "attribute": 3
+     },
+     "subject": {
+      "nowhere": 9
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 9
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read area | ",
+      "room101.area: wanted 'Hall C'; read area | ",
+      "room101.seats: wanted 'Hall C'; read seated capacity | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps.pptx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 8,
+    "partly": 3,
+    "unsupported": 2,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 789,
+    "data_bytes_per_request": 374,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum",
+      "Hall C floor | live load capacity | minimum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "conditions": 3
+     },
+     "subject": {
+      "nowhere": 1,
+      "conditions": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read total exhibit area | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-traps.xlsx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 8,
+    "partly": 3,
+    "unsupported": 2,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 780,
+    "data_bytes_per_request": 375,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum",
+      "Hall C floor | live load capacity | minimum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "conditions": 3
+     },
+     "subject": {
+      "nowhere": 1,
+      "conditions": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: shown, not used": [
+      "halls.area: wanted 'across the four halls'; read total exhibit area | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-two-column": {
+   "inventory": {
+    "claims": 41,
+    "grounded": 7,
+    "partly": 3,
+    "unsupported": 1,
+    "unsupported (image)": 2,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 263,
+    "data_bytes_per_request": 843,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "conditions": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-wide-letter": {
+   "inventory": {
+    "claims": 45,
+    "grounded": 9,
+    "unsupported (image)": 1,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 170,
+    "data_bytes_per_request": 775,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "spec-s1": {
+   "inventory": {
+    "claims": 47,
+    "grounded": 15,
+    "partly": 4,
+    "partly (image)": 1,
+    "with conditions": 20,
+    "positioned": 4,
+    "misplaced": {},
+    "context_bytes_per_request": 288,
+    "data_bytes_per_request": 512,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "nowhere": 2,
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "image only": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: image only": [
+      "timer.congested: wanted 'link congested'; read value | ",
+      "window.congested: wanted 'link congested'; read size | "
+     ]
+    }
+   }
+  },
+  "spec-s1-context": {
+   "inventory": {
+    "claims": 49,
+    "grounded": 15,
+    "partly": 2,
+    "partly (image)": 1,
+    "with conditions": 18,
+    "positioned": 4,
+    "misplaced": {},
+    "context_bytes_per_request": 288,
+    "data_bytes_per_request": 513,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "nowhere": 2,
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "timer.congested: wanted 'link lightly loaded'; read value |  / value | ",
+      "window.congested: wanted 'link lightly loaded'; read size |  / size | "
+     ]
+    }
+   }
+  },
+  "spec-s1-context.docx": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 12,
+    "partly": 1,
+    "with conditions": 13,
+    "positioned": 3,
+    "misplaced": {},
+    "context_bytes_per_request": 116,
+    "data_bytes_per_request": 1377,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-context.md": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 7,
+    "partly": 1,
+    "with conditions": 8,
+    "positioned": 3,
+    "misplaced": {},
+    "context_bytes_per_request": 608,
+    "data_bytes_per_request": 288,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-context.pptx": {
+   "inventory": {
+    "claims": 21,
+    "grounded": 10,
+    "partly": 1,
+    "with conditions": 11,
+    "positioned": 3,
+    "misplaced": {
+     "numbered in attribute": 3
+    },
+    "context_bytes_per_request": 601,
+    "data_bytes_per_request": 228,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 2 | ",
+      "link failure | declaration condition 3 | duration = 60 s",
+      "link failure | declaration condition 1 | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-context.xlsx": {
+   "inventory": {
+    "claims": 21,
+    "grounded": 9,
+    "partly": 1,
+    "with conditions": 10,
+    "positioned": 3,
+    "misplaced": {
+     "numbered in attribute": 3
+    },
+    "context_bytes_per_request": 589,
+    "data_bytes_per_request": 229,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 3 | duration = 60 s",
+      "link failure | declaration condition 1 | ",
+      "link failure | declaration condition 2 | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-members": {
+   "inventory": {
+    "claims": 48,
+    "grounded": 12,
+    "partly": 2,
+    "partly (image)": 1,
+    "with conditions": 15,
+    "positioned": 4,
+    "misplaced": {},
+    "context_bytes_per_request": 163,
+    "data_bytes_per_request": 593,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-members.docx": {
+   "inventory": {
+    "claims": 20,
+    "grounded": 12,
+    "partly": 1,
+    "with conditions": 13,
+    "positioned": 3,
+    "misplaced": {},
+    "context_bytes_per_request": 116,
+    "data_bytes_per_request": 1409,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-members.md": {
+   "inventory": {
+    "claims": 23,
+    "grounded": 7,
+    "partly": 1,
+    "unsupported": 1,
+    "with conditions": 9,
+    "positioned": 3,
+    "misplaced": {},
+    "context_bytes_per_request": 654,
+    "data_bytes_per_request": 398,
+    "examples": {
+     "unsupported": [
+      "long status report | channel group capacity | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-members.pptx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 10,
+    "partly": 1,
+    "with conditions": 11,
+    "positioned": 3,
+    "misplaced": {
+     "numbered in attribute": 3
+    },
+    "context_bytes_per_request": 612,
+    "data_bytes_per_request": 233,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 3 | duration = 60 s",
+      "link failure | declaration condition 2 | ",
+      "link failure | declaration condition 1 | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-members.xlsx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 9,
+    "partly": 1,
+    "with conditions": 10,
+    "positioned": 3,
+    "misplaced": {
+     "numbered in attribute": 3
+    },
+    "context_bytes_per_request": 600,
+    "data_bytes_per_request": 235,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 1 | ",
+      "link failure | declaration condition 2 | ",
+      "link failure | declaration condition 3 | duration = 60 s"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-numbered.docx": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 12,
+    "partly": 1,
+    "with conditions": 13,
+    "positioned": 3,
+    "misplaced": {},
+    "context_bytes_per_request": 116,
+    "data_bytes_per_request": 1372,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-renumbered": {
+   "inventory": {
+    "claims": 54,
+    "grounded": 25,
+    "partly": 3,
+    "with conditions": 28,
+    "positioned": 12,
+    "misplaced": {
+     "numbered in attribute": 8
+    },
+    "context_bytes_per_request": 253,
+    "data_bytes_per_request": 615,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 4 | signal-to-noise ratio stays below for 60 s",
+      "link failure | declaration condition 1 | within 2,052 ms of setup",
+      "link failure | declaration condition 3 | fail"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-renumbered-numbered.docx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 13,
+    "partly": 2,
+    "with conditions": 15,
+    "positioned": 5,
+    "misplaced": {},
+    "context_bytes_per_request": 116,
+    "data_bytes_per_request": 1443,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-renumbered.docx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 13,
+    "partly": 2,
+    "with conditions": 15,
+    "positioned": 5,
+    "misplaced": {},
+    "context_bytes_per_request": 116,
+    "data_bytes_per_request": 1443,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-renumbered.md": {
+   "inventory": {
+    "claims": 26,
+    "grounded": 12,
+    "partly": 1,
+    "with conditions": 13,
+    "positioned": 6,
+    "misplaced": {},
+    "context_bytes_per_request": 654,
+    "data_bytes_per_request": 407,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-renumbered.pptx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 13,
+    "with conditions": 13,
+    "positioned": 4,
+    "misplaced": {
+     "numbered in attribute": 4
+    },
+    "context_bytes_per_request": 624,
+    "data_bytes_per_request": 239,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 4 | signal-to-noise ratio stays below for 60 s",
+      "link failure | declaration condition 1 | of setup",
+      "link failure | declaration condition 3 | fail"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-renumbered.xlsx": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 12,
+    "with conditions": 12,
+    "positioned": 4,
+    "misplaced": {
+     "numbered in attribute": 4
+    },
+    "context_bytes_per_request": 612,
+    "data_bytes_per_request": 240,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 4 | signal-to-noise ratio stays below for 60 s",
+      "link failure | declaration condition 1 | of setup",
+      "link failure | declaration condition 3 | fail"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-revised": {
+   "inventory": {
+    "claims": 47,
+    "grounded": 13,
+    "partly": 4,
+    "partly (image)": 1,
+    "unsupported": 1,
+    "with conditions": 19,
+    "positioned": 4,
+    "misplaced": {},
+    "context_bytes_per_request": 288,
+    "data_bytes_per_request": 512,
+    "examples": {
+     "unsupported": [
+      "long status report | channel group capacity | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "nowhere": 2,
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "timer.congested: wanted 'link congested'; read value |  / value | ",
+      "window.congested: wanted 'link congested'; read size |  / size | "
+     ]
+    }
+   }
+  },
+  "spec-s1-revised.docx": {
+   "inventory": {
+    "claims": 20,
+    "grounded": 12,
+    "partly": 1,
+    "with conditions": 13,
+    "positioned": 3,
+    "misplaced": {},
+    "context_bytes_per_request": 116,
+    "data_bytes_per_request": 1372,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-revised.md": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 7,
+    "partly": 1,
+    "with conditions": 8,
+    "positioned": 3,
+    "misplaced": {},
+    "context_bytes_per_request": 608,
+    "data_bytes_per_request": 287,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-revised.pptx": {
+   "inventory": {
+    "claims": 20,
+    "grounded": 12,
+    "partly": 1,
+    "with conditions": 13,
+    "positioned": 3,
+    "misplaced": {
+     "numbered in attribute": 3
+    },
+    "context_bytes_per_request": 600,
+    "data_bytes_per_request": 227,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 2 | ",
+      "link failure | declaration condition 1 | ",
+      "link failure | declaration condition 3 | duration = 60 s"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-revised.xlsx": {
+   "inventory": {
+    "claims": 21,
+    "grounded": 9,
+    "partly": 1,
+    "with conditions": 10,
+    "positioned": 3,
+    "misplaced": {
+     "numbered in attribute": 3
+    },
+    "context_bytes_per_request": 588,
+    "data_bytes_per_request": 228,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 3 | duration = 60 s",
+      "link failure | declaration condition 1 | ",
+      "link failure | declaration condition 2 | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1.docx": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 12,
+    "partly": 1,
+    "with conditions": 13,
+    "positioned": 3,
+    "misplaced": {},
+    "context_bytes_per_request": 116,
+    "data_bytes_per_request": 1372,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1.md": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 7,
+    "partly": 1,
+    "with conditions": 8,
+    "positioned": 3,
+    "misplaced": {},
+    "context_bytes_per_request": 608,
+    "data_bytes_per_request": 287,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1.pptx": {
+   "inventory": {
+    "claims": 21,
+    "grounded": 10,
+    "partly": 1,
+    "with conditions": 11,
+    "positioned": 3,
+    "misplaced": {
+     "numbered in attribute": 3
+    },
+    "context_bytes_per_request": 600,
+    "data_bytes_per_request": 227,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 2 | ",
+      "link failure | declaration condition 1 | ",
+      "link failure | declaration condition 3 | duration = 60 s"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1.xlsx": {
+   "inventory": {
+    "claims": 21,
+    "grounded": 9,
+    "partly": 1,
+    "with conditions": 10,
+    "positioned": 3,
+    "misplaced": {
+     "numbered in attribute": 3
+    },
+    "context_bytes_per_request": 588,
+    "data_bytes_per_request": 228,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 2 | ",
+      "link failure | declaration condition 3 | duration = 60 s",
+      "link failure | declaration condition 1 | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "uv-layout-s1-all": {
+   "inventory": {
+    "claims": 59,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 114,
+    "data_bytes_per_request": 671,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "uv-layout-s1-clean": {
+   "inventory": {
+    "claims": 61,
+    "grounded": 4,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 130,
+    "data_bytes_per_request": 840,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "uv-layout-s1-figure-only": {
+   "inventory": {
+    "claims": 27,
+    "grounded": 4,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 120,
+    "data_bytes_per_request": 477,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "uv-layout-s1-folded": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 106,
+    "data_bytes_per_request": 445,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "uv-layout-s1-leaders": {
+   "inventory": {
+    "claims": 41,
+    "grounded": 8,
+    "with conditions": 8,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 120,
+    "data_bytes_per_request": 478,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "uv-layout-s1-legend": {
+   "inventory": {
+    "claims": 31,
+    "grounded": 9,
+    "partly (image)": 1,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 107,
+    "data_bytes_per_request": 447,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "uv-layout-s1-prose": {
+   "inventory": {
+    "claims": 40,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 1323,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "uv-layout-s1-prose-hard": {
+   "inventory": {
+    "claims": 28,
+    "grounded": 6,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 1194,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-datasheets-s1": {
+   "inventory": {
+    "claims": 47,
+    "grounded": 12,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 138,
+    "data_bytes_per_request": 308,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-datasheets-s1.docx": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 398,
+    "data_bytes_per_request": 176,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-datasheets-s1.md": {
+   "inventory": {
+    "claims": 22,
+    "grounded": 4,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 544,
+    "data_bytes_per_request": 78,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-datasheets-s1.pptx": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 12,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 450,
+    "data_bytes_per_request": 125,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-datasheets-s1.xlsx": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 12,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 442,
+    "data_bytes_per_request": 126,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-s1": {
+   "inventory": {
+    "claims": 68,
+    "grounded": 23,
+    "no content words": 2,
+    "with conditions": 25,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 219,
+    "data_bytes_per_request": 637,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 9
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years / 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-comments.docx": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 15,
+    "with conditions": 15,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 307,
+    "data_bytes_per_request": 1403,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-conditions": {
+   "inventory": {
+    "claims": 68,
+    "grounded": 23,
+    "no content words": 1,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 219,
+    "data_bytes_per_request": 636,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 9
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '99th percentile'; read 99th percentile turbidity | measured over five years / 99th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-conditions.docx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 11,
+    "no content words": 1,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 307,
+    "data_bytes_per_request": 1181,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '99th percentile'; read 99th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-conditions.md": {
+   "inventory": {
+    "claims": 34,
+    "grounded": 11,
+    "no content words": 1,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 601,
+    "data_bytes_per_request": 260,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 7,
+      "attribute": 2
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
+      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '99th percentile'; read 99th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-conditions.pptx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 12,
+    "no content words": 1,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 610,
+    "data_bytes_per_request": 235,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '99th percentile'; read 99th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-conditions.xlsx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 12,
+    "no content words": 1,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 601,
+    "data_bytes_per_request": 236,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-footnotes.docx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 11,
+    "no content words": 1,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 307,
+    "data_bytes_per_request": 1232,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-notes.pptx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 12,
+    "no content words": 1,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 622,
+    "data_bytes_per_request": 242,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-revised": {
+   "inventory": {
+    "claims": 72,
+    "grounded": 21,
+    "with conditions": 21,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 215,
+    "data_bytes_per_request": 623,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 9
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years / 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-revised.docx": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 14,
+    "with conditions": 14,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 307,
+    "data_bytes_per_request": 1132,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-revised.md": {
+   "inventory": {
+    "claims": 36,
+    "grounded": 9,
+    "with conditions": 9,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 602,
+    "data_bytes_per_request": 234,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 7,
+      "attribute": 2
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
+      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-revised.pptx": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 595,
+    "data_bytes_per_request": 225,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-revised.xlsx": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 586,
+    "data_bytes_per_request": 227,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-reworded": {
+   "inventory": {
+    "claims": 69,
+    "grounded": 27,
+    "with conditions": 27,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 219,
+    "data_bytes_per_request": 638,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 9
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years / 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-reworded.docx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 11,
+    "no content words": 1,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 307,
+    "data_bytes_per_request": 1188,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-reworded.md": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 12,
+    "no content words": 1,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 601,
+    "data_bytes_per_request": 261,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 9
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-reworded.pptx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 12,
+    "no content words": 1,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 610,
+    "data_bytes_per_request": 236,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-reworded.xlsx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 12,
+    "no content words": 1,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 600,
+    "data_bytes_per_request": 238,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-textbox.docx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 11,
+    "no content words": 1,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 307,
+    "data_bytes_per_request": 1186,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-tracked.docx": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 14,
+    "with conditions": 14,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 307,
+    "data_bytes_per_request": 1132,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1.docx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 11,
+    "no content words": 1,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 307,
+    "data_bytes_per_request": 1184,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1.md": {
+   "inventory": {
+    "claims": 34,
+    "grounded": 11,
+    "no content words": 1,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 601,
+    "data_bytes_per_request": 261,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 7,
+      "attribute": 2
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
+      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1.pptx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 12,
+    "no content words": 1,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 610,
+    "data_bytes_per_request": 235,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1.xlsx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 12,
+    "no content words": 1,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 601,
+    "data_bytes_per_request": 237,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-tables-s1-all": {
+   "inventory": {
+    "claims": 168,
+    "grounded": 20,
+    "with conditions": 20,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 158,
+    "data_bytes_per_request": 296,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 10,
+      "attribute": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "P-101C.capacity: wanted 'rated point'; read Rated point Capacity |  / rated capacity | ",
+      "P-101C.total dynamic head: wanted 'rated point'; read Rated point TDH |  / rated TDH | "
+     ]
+    }
+   }
+  },
+  "wtp-tables-s1-clean": {
+   "inventory": {
+    "claims": 168,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 174,
+    "data_bytes_per_request": 277,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-renamed": {
+   "inventory": {
+    "claims": 168,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 174,
+    "data_bytes_per_request": 277,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-renamed.docx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 482,
+    "data_bytes_per_request": 220,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-renamed.md": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 567,
+    "data_bytes_per_request": 112,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-renamed.pptx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 552,
+    "data_bytes_per_request": 109,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-renamed.xlsx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 526,
+    "data_bytes_per_request": 114,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-reordered": {
+   "inventory": {
+    "claims": 168,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 154,
+    "data_bytes_per_request": 294,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-reordered.docx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 482,
+    "data_bytes_per_request": 220,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-reordered.md": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 567,
+    "data_bytes_per_request": 112,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-reordered.pptx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 552,
+    "data_bytes_per_request": 109,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-reordered.xlsx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 526,
+    "data_bytes_per_request": 114,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-revised": {
+   "inventory": {
+    "claims": 170,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 184,
+    "data_bytes_per_request": 274,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-revised.docx": {
+   "inventory": {
+    "claims": 85,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 482,
+    "data_bytes_per_request": 220,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-revised.md": {
+   "inventory": {
+    "claims": 85,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 559,
+    "data_bytes_per_request": 114,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-revised.pptx": {
+   "inventory": {
+    "claims": 85,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 552,
+    "data_bytes_per_request": 109,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-revised.xlsx": {
+   "inventory": {
+    "claims": 85,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 526,
+    "data_bytes_per_request": 114,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-split": {
+   "inventory": {
+    "claims": 176,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 185,
+    "data_bytes_per_request": 277,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 10
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-split.docx": {
+   "inventory": {
+    "claims": 88,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 482,
+    "data_bytes_per_request": 220,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 10
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-split.md": {
+   "inventory": {
+    "claims": 88,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 560,
+    "data_bytes_per_request": 113,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 10
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-split.pptx": {
+   "inventory": {
+    "claims": 88,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 552,
+    "data_bytes_per_request": 109,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 10
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean-split.xlsx": {
+   "inventory": {
+    "claims": 88,
+    "grounded": 28,
+    "with conditions": 28,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 526,
+    "data_bytes_per_request": 114,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 10
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean.docx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 482,
+    "data_bytes_per_request": 220,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean.md": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 567,
+    "data_bytes_per_request": 112,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean.pptx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 552,
+    "data_bytes_per_request": 109,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-clean.xlsx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 526,
+    "data_bytes_per_request": 114,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-continued": {
+   "inventory": {
+    "claims": 168,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 116,
+    "data_bytes_per_request": 343,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-dense": {
+   "inventory": {
+    "claims": 168,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 105,
+    "data_bytes_per_request": 336,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-layout.docx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 482,
+    "data_bytes_per_request": 220,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-merged.docx": {
+   "inventory": {
+    "claims": 111,
+    "grounded": 36,
+    "partly": 35,
+    "with conditions": 71,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 482,
+    "data_bytes_per_request": 220,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-multilevel": {
+   "inventory": {
+    "claims": 180,
+    "grounded": 36,
+    "with conditions": 36,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 193,
+    "data_bytes_per_request": 242,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-multivalue": {
+   "inventory": {
+    "claims": 168,
+    "grounded": 24,
+    "with conditions": 24,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 187,
+    "data_bytes_per_request": 248,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-nested.docx": {
+   "inventory": {
+    "claims": 84,
+    "grounded": 84,
+    "with conditions": 84,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 443,
+    "data_bytes_per_request": 145,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-tables-s1-stacked": {
+   "inventory": {
+    "claims": 188,
+    "grounded": 79,
+    "with conditions": 79,
+    "positioned": 0,
+    "misplaced": {},
+    "context_bytes_per_request": 162,
+    "data_bytes_per_request": 290,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 12
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  }
+ }
+}
