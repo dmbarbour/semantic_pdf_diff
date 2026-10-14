@@ -69,6 +69,29 @@ class OpenModes(unittest.TestCase):
             self.assertEqual(code, 1)
             self.assertIn('prune works on a .sqlite', err.getvalue())
 
+    def test_merging_copies_only_the_answers_a_fixture_lacks(self):
+        from semantic_pdf_diff import fixtures
+        with tempfile.TemporaryDirectory() as d:
+            working, other, packed = Path(d) / 'working.sqlite', Path(d) / 'other.sqlite', Path(d) / 'other.zip'
+            with fixtures.open(working, 'record') as f:
+                f.record('q1', 'm', outcome='ok', answer='"mine"')
+            with fixtures.open(other, 'record') as f:
+                f.record('q1', 'm', outcome='ok', answer='"theirs"')
+                f.record('q2', 'm', outcome='ok', answer='"new"', description={'text_chars': 3}, recipe=('extract',))
+            fixtures.pack(other, packed)
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                self.assertEqual(cli.fixtures_command(['merge', str(working), str(packed), str(other)]), 0)
+            self.assertEqual(json.loads(out.getvalue()), {'answers_added': {str(packed): 1, str(other): 0}})
+            with fixtures.open(working, 'read') as f:
+                self.assertEqual(f.answer('q1', 'm')[1], '"mine"')  # an answer held is kept
+                self.assertEqual(f.answer('q2', 'm')[1], '"new"')
+                self.assertEqual(f.summary()['answers'][-1]['role'], 'extract')  # with its side tables' rows
+                used = f.db.execute("SELECT used FROM response WHERE query = 'q2'").fetchone()[0]
+            self.assertIsNone(used)  # unused until a run replays it: prune drops it otherwise
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(cli.fixtures_command(['merge', str(packed), str(other)]), 1)
+            self.assertIn('merge into a .sqlite', err.getvalue())
+
     def test_the_replay_policy_counts_what_it_serves(self):
         from semantic_pdf_diff import fixtures
         with tempfile.TemporaryDirectory() as d, fixtures.open(Path(d) / 'f.sqlite', 'record') as f:

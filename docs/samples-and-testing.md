@@ -76,10 +76,11 @@ python scripts/record_runs.py --replay --fixture tests/fixtures/replay-slices.zi
 
 **After a prompt or lever change, top up, prune and pack:**
 
-1. **Start from a working copy.** A packed zip holds one SQLite file: `unzip tests/fixtures/replay-slices.zip -d tests/fixtures` gives `tests/fixtures/ci2.sqlite`. Keep its name, since the zip records it.
-2. **Note the time,** then record the runs it serves into the working copy: `python scripts/record_runs.py --fixture tests/fixtures/ci2.sqlite --set dev`. Only changed queries are asked.
-3. **Prune:** `pdf-semantic-diff fixtures prune tests/fixtures/ci2.sqlite --unused-since TIME` drops answers no run used since then (`--dry-run` previews). Unless `--force` is given, it refuses when no run used the fixture since then, when a run missed requests, or when more than half the answers would go.
-4. **Pack:** `pdf-semantic-diff fixtures pack tests/fixtures/ci2.sqlite tests/fixtures/replay-slices.zip`. Packing is reproducible: last-use times aren't packed, so the zip's bytes change only when answers do.
+1. **Start from a working copy.** A packed zip holds one SQLite file: `unzip tests/fixtures/replay-slices.zip -d tests/fixtures` gives `tests/fixtures/fixture.sqlite`. Keep its name, since the zip records it.
+2. **Seed it, if a recording already holds the new answers** (a lever's measured arm, say): `pdf-semantic-diff fixtures merge tests/fixtures/fixture.sqlite ARM.sqlite` copies in the answers the working copy lacks, `.zip` or `.sqlite`, keeping those it holds. A query is named by what reaches the model, so a copied answer is the same model's answer to the same query. Copied answers count as unused until a run replays them.
+3. **Note the time,** then record the runs it serves into the working copy: `python scripts/record_runs.py --fixture tests/fixtures/fixture.sqlite --set dev`. Only changed queries are asked.
+4. **Prune:** `pdf-semantic-diff fixtures prune tests/fixtures/fixture.sqlite --unused-since TIME` drops answers no run used since then (`--dry-run` previews). Unless `--force` is given, it refuses when no run used the fixture since then, when a run missed requests, or when more than half the answers would go.
+5. **Pack:** `pdf-semantic-diff fixtures pack tests/fixtures/fixture.sqlite tests/fixtures/replay-slices.zip`. Packing is reproducible: last-use times aren't packed, so the zip's bytes change only when answers do.
 
 ## Proving a refactor changes nothing
 

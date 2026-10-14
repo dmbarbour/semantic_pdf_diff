@@ -4,7 +4,7 @@
     pdf-semantic-diff compare --store DIR NAME NAME     # declared sources, or --manifest FILE
     pdf-semantic-diff source add|list|show|update|remove|export|import ...
     pdf-semantic-diff show|gc|report --store DIR ...
-    pdf-semantic-diff fixtures summary|pack|prune ...
+    pdf-semantic-diff fixtures summary|pack|prune|merge ...
     pdf-semantic-diff review|queries ...                # with the lab installed (semantic-pdf-diff[lab])
 """
 import argparse
@@ -176,7 +176,23 @@ def fixtures_command(argv):
     prune.add_argument('--force', action='store_true',
                        help='prune even if no run since then used the fixture, a run missed requests, '
                             'or most answers go')
+    merge = sub.add_parser('merge', help="Copy in the answers other fixtures hold that a working fixture lacks (the "
+                                         "same queries, so the same answers: a variant's recording seeds another's)")
+    merge.add_argument('fixture', type=Path, help='the .sqlite working fixture, created if missing')
+    merge.add_argument('sources', type=Path, nargs='+', help='.zip or .sqlite fixtures')
     args = parser.parse_args(argv)
+    if args.command == 'merge':
+        if args.fixture.suffix != '.sqlite':
+            print(f'{args.fixture}: merge into a .sqlite working fixture (then pack it)', file=sys.stderr)
+            return 1
+        with fixtures.open(args.fixture, 'record') as fixture:
+            try:
+                added = {str(source): fixture.merge(source) for source in args.sources}
+            except (fixtures.FixtureError, OSError) as e:
+                print(e, file=sys.stderr)
+                return 1
+        print(json.dumps({"answers_added": added}))
+        return 0
     if args.command == 'prune':
         if args.fixture.suffix != '.sqlite' or not args.fixture.exists():  # a .zip once crashed here
             print(f'{args.fixture}: prune works on a .sqlite working fixture (then pack it again)', file=sys.stderr)
