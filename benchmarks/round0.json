@@ -45,7 +45,8 @@
     "continue_reading",
     "align",
     "verify_visuals",
-    "explain_differences"
+    "explain_differences",
+    "editorial"
   ],
   "table_rules": null,
   "table_structure": false,

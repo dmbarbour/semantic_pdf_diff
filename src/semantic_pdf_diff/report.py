@@ -154,12 +154,13 @@ def finding_html(f, card):
         title += ': ' + KINDS[why['kind']][0].lower()
         why = (f"<p><b>{esc(KINDS[why['kind']][1])}.</b> {esc(why['rationale'])}"
                f" <small>(explanation confidence {why['confidence']})</small></p>")
+    editorial = "".join(f"<p>Editorial: {esc(note)}</p>" for note in f.get('editorial', ()))
     differ = (f"<p class='warning'>Their tables were read differently: A {esc(f['tables_read']['a'])}; B "
               f"{esc(f['tables_read']['b'])}. The difference may come from the "
               "reading.</p>") if f.get('tables_read') else ''
     return f'''<article data-relation="{esc(f['relation'])}" \
 data-kind="{esc(f.get('explanation', {}).get('kind', ''))}"><h2>{esc(title)}</h2>
-        {why or ''}<p>{esc(f['rationale'])}</p>{differ}<div class="pair">{card(f['a'])}{card(f['b'])}</div>
+        {why or ''}<p>{esc(f['rationale'])}</p>{editorial}{differ}<div class="pair">{card(f['a'])}{card(f['b'])}</div>
         <details><summary>Calculation and matching details</summary>{numeric}<p>Retrieval score \
 {f['retrieval_score']}; {'alignment' if f.get('settled') else 'model'} confidence {f['confidence']}</p></details>\
 </article>'''
@@ -248,17 +249,20 @@ KINDS = {"changed": ("Changed", "The same item and property under the same condi
          "moved": ("Moved", "The same statement in another section, table or row"),
          "restated": ("Restated", "The same meaning in other words, units, precision or format"),
          "split_or_merge": ("Split or merge", "One item became several, or several became one"),
+         "renumbered": ("Renumbered", "The same statement at another place in its list (the editorial lever)"),
          "misread": ("Misread", "A claim doesn't say what its source says"),
          "not_same_item": ("Not the same item", "Different items or properties, paired by the comparison"),
          "unclear": ("Unclear", "The evidence doesn't decide")}
 # The kinds as a reader weighs them: value changes, editorial changes, and differences that aren't changes.
 KIND_GROUPS = (("Value changes", ("changed", "conditions")),
-               ("Editorial changes", ("renamed", "moved", "restated", "split_or_merge")),
+               ("Editorial changes", ("renamed", "moved", "restated", "split_or_merge", "renumbered")),
                ("Not changes", ("misread", "not_same_item")), ("Unclear", ("unclear",)))
 
 def kinds_html(findings, esc):
-    """The explained differences counted by kind, in their groups (empty when none was explained)."""
+    """The explained differences, and the editorial notes on findings, counted by kind in their groups (empty when
+    there are none)."""
     found = Counter(f['explanation']['kind'] for f in findings if 'explanation' in f)
+    found.update(note.split(":", 1)[0] for f in findings for note in f.get('editorial', ()))
     if not found:
         return ''
     parts = []
@@ -266,7 +270,7 @@ def kinds_html(findings, esc):
         mine = [f"{KINDS[k][0].lower()} {found[k]}" for k in kinds if found[k]]
         if mine:
             parts.append(f"<b>{esc(group)}</b> ({sum(found[k] for k in kinds)}): {esc(', '.join(mine))}")
-    return "<p>Differences explained: " + "; ".join(parts) + "</p>"
+    return "<p>Differences explained or noted: " + "; ".join(parts) + "</p>"
 
 GROUPING_ORDER = ("split candidate", "merge candidate", "ambiguous", "renamed", "attached", "unaligned", "matched")
 

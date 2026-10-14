@@ -784,6 +784,20 @@ class ExplainDifferences(Lever):
     def explains(self, mode):
         return self.explain_differences and mode == "revisions"
 
+class Editorial(Lever):
+    lever_name, stage, off = "editorial", "comparison", {"editorial": False}
+    # a claim judged or settled equivalent at another place in its list ("Condition 2" then "Condition 3") reported
+    # as renumbered, an editorial change (a pair judged otherwise isn't one statement moved). The owner, 2026-10-14,
+    # on renumbering: "editorial changes, like a new page number if we added some text or section numbering if we
+    # inserted a section" (docs/plans/claim-context-2026-10-14.md, milestone 3)
+    editorial: Annotated[bool, Declared("post", COMPARE)] = False
+
+    def editorial_notes(self, a, b):
+        notes = super().editorial_notes(a, b)
+        if not self.editorial or a.position is None or b.position is None or a.position.label == b.position.label:
+            return notes
+        return notes + [f"renumbered: {a.position.label} → {b.position.label}"]
+
 class DedupeRepeated(Lever):
     lever_name, stage, off = "dedupe_repeated", "matching", {"dedupe_repeated": False}
     # extract exactly repeated table rows (same cells, same table position, 3+ pages) once
@@ -803,7 +817,8 @@ LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, Complete
                  SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,
                  RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts,
                  TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions,
-                 Records, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
+                 Records, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences,
+                 Editorial)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -948,6 +963,12 @@ class Platform(Composable):
     @chained
     def comparison_images(self, evidence, output):
         """Images sent with a claim being compared (paths)."""
+        return []
+
+    @chained
+    def editorial_notes(self, a, b):
+        """The editorial changes between two paired claims, as notes ("renumbered: Condition 2 → Condition 3"): the
+        platform's, none."""
         return []
 
     @chosen

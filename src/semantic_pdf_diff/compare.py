@@ -252,6 +252,11 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
                   "note": notes.get(status(e), "No confirmed counterpart in retrieved evidence; this does not "
                                                "establish absence.")}
                  for e in left + right if e.id not in matched]
+    by_id = {e.id: e for e in left + right + shared}
+    for f in findings:  # editorial changes to the same statement, judged or settled equivalent (the editorial lever)
+        notes = client.s.editorial_notes(by_id[f["a"]], by_id[f["b"]]) if f["relation"] == "equivalent" else []
+        if notes:
+            f["editorial"] = notes
     groupings = _combined(groupings, aligned, shared_ids)
     for g in groupings:  # what was done with each group's claims, as the findings say
         mine = set(g["earlier_claims"]), set(g["later_claims"])

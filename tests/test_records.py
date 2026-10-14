@@ -115,6 +115,22 @@ class Reported(unittest.TestCase):
                                     situation={}, scan_issues=[])
         self.assertNotIn("records", document.model_dump())
 
+class Editorial(unittest.TestCase):
+    def test_a_renumbered_claim_is_an_editorial_change(self):
+        from semantic_pdf_diff.report import finding_html, kinds_html
+        from test_pipeline import ev
+        a = ev("A-1", position=Position(label="Condition 2"))
+        b = ev("B-1", position=Position(label="Condition 3"))
+        self.assertEqual(Settings(editorial=True).editorial_notes(a, b), ["renumbered: Condition 2 → Condition 3"])
+        self.assertEqual(Settings().editorial_notes(a, b), [])
+        self.assertEqual(Settings(editorial=True).editorial_notes(a, ev("C-1", position=Position(label="Condition 2"))),
+                         [])
+        self.assertEqual(Settings(editorial=True).editorial_notes(a, ev("D-1")), [])  # no position: nothing to say
+        finding = {"a": "A-1", "b": "B-1", "relation": "equivalent", "rationale": "same", "confidence": 0.9,
+                   "retrieval_score": 1.0, "editorial": ["renumbered: Condition 2 → Condition 3"]}
+        self.assertIn("Editorial: renumbered: Condition 2 → Condition 3", finding_html(finding, lambda i: ""))
+        self.assertIn("<b>Editorial changes</b> (1): renumbered 1", kinds_html([finding], lambda x: x))
+
 class Stored(unittest.TestCase):
     def test_a_run_keeps_each_record_once_beside_the_claims_that_reference_it(self):
         import contextlib
