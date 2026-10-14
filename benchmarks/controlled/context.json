@@ -2,6 +2,7 @@
  "totals": {
   "inventory": {
    "claims": 11783,
+   "evidence": 9359,
    "frame in conditions": 100,
    "grounded": 3545,
    "no content words": 18,
@@ -143,6 +144,7 @@
     "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 32,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 718,
     "examples": {}
@@ -159,6 +161,7 @@
     "claims": 50,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 43,
     "context_bytes_per_request": 69,
     "data_bytes_per_request": 580,
     "examples": {}
@@ -175,6 +178,7 @@
     "claims": 33,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 141,
     "data_bytes_per_request": 372,
     "examples": {}
@@ -191,6 +195,7 @@
     "claims": 31,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 27,
     "context_bytes_per_request": 96,
     "data_bytes_per_request": 399,
     "examples": {}
@@ -207,6 +212,7 @@
     "claims": 33,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 31,
     "context_bytes_per_request": 111,
     "data_bytes_per_request": 436,
     "examples": {}
@@ -225,6 +231,7 @@
     "with conditions": 15,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 31,
     "context_bytes_per_request": 54,
     "data_bytes_per_request": 381,
     "examples": {}
@@ -241,6 +248,7 @@
     "claims": 42,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 29,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1189,
     "examples": {}
@@ -257,6 +265,7 @@
     "claims": 38,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 30,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1084,
     "examples": {}
@@ -277,6 +286,7 @@
     "with conditions": 14,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 32,
     "context_bytes_per_request": 227,
     "data_bytes_per_request": 773,
     "examples": {
@@ -302,6 +312,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 31,
     "context_bytes_per_request": 111,
     "data_bytes_per_request": 920,
     "examples": {}
@@ -321,6 +332,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 27,
     "context_bytes_per_request": 17,
     "data_bytes_per_request": 1148,
     "examples": {
@@ -343,6 +355,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 2,
     "context_bytes_per_request": 278,
     "data_bytes_per_request": 654,
     "examples": {}
@@ -362,6 +375,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 27,
     "context_bytes_per_request": 182,
     "data_bytes_per_request": 709,
     "examples": {
@@ -385,6 +399,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 3,
     "context_bytes_per_request": 363,
     "data_bytes_per_request": 160,
     "examples": {
@@ -408,6 +423,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 17,
     "data_bytes_per_request": 1113,
     "examples": {
@@ -430,6 +446,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 2,
     "context_bytes_per_request": 278,
     "data_bytes_per_request": 654,
     "examples": {}
@@ -449,6 +466,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 182,
     "data_bytes_per_request": 687,
     "examples": {
@@ -472,6 +490,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 3,
     "context_bytes_per_request": 363,
     "data_bytes_per_request": 160,
     "examples": {
@@ -496,6 +515,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 34,
     "context_bytes_per_request": 76,
     "data_bytes_per_request": 287,
     "examples": {
@@ -518,6 +538,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 35,
     "context_bytes_per_request": 81,
     "data_bytes_per_request": 556,
     "examples": {}
@@ -547,6 +568,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 35,
     "context_bytes_per_request": 81,
     "data_bytes_per_request": 554,
     "examples": {}
@@ -569,6 +591,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 30,
     "context_bytes_per_request": 59,
     "data_bytes_per_request": 698,
     "examples": {}
@@ -591,6 +614,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 30,
     "context_bytes_per_request": 519,
     "data_bytes_per_request": 229,
     "examples": {}
@@ -613,6 +637,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 30,
     "context_bytes_per_request": 451,
     "data_bytes_per_request": 138,
     "examples": {}
@@ -635,6 +660,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 30,
     "context_bytes_per_request": 446,
     "data_bytes_per_request": 140,
     "examples": {}
@@ -657,6 +683,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 32,
     "context_bytes_per_request": 59,
     "data_bytes_per_request": 695,
     "examples": {}
@@ -686,6 +713,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 32,
     "context_bytes_per_request": 529,
     "data_bytes_per_request": 208,
     "examples": {}
@@ -716,6 +744,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 472,
     "data_bytes_per_request": 137,
     "examples": {}
@@ -746,6 +775,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 467,
     "data_bytes_per_request": 139,
     "examples": {}
@@ -775,6 +805,7 @@
     "with conditions": 30,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 99,
     "context_bytes_per_request": 155,
     "data_bytes_per_request": 249,
     "examples": {}
@@ -797,6 +828,7 @@
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 92,
     "context_bytes_per_request": 179,
     "data_bytes_per_request": 306,
     "examples": {}
@@ -819,6 +851,7 @@
     "with conditions": 20,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 92,
     "context_bytes_per_request": 492,
     "data_bytes_per_request": 231,
     "examples": {}
@@ -841,6 +874,7 @@
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 92,
     "context_bytes_per_request": 583,
     "data_bytes_per_request": 123,
     "examples": {}
@@ -863,6 +897,7 @@
     "with conditions": 32,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 92,
     "context_bytes_per_request": 567,
     "data_bytes_per_request": 114,
     "examples": {}
@@ -885,6 +920,7 @@
     "with conditions": 32,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 92,
     "context_bytes_per_request": 538,
     "data_bytes_per_request": 119,
     "examples": {}
@@ -907,6 +943,7 @@
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 92,
     "context_bytes_per_request": 148,
     "data_bytes_per_request": 303,
     "examples": {}
@@ -929,6 +966,7 @@
     "with conditions": 25,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 97,
     "context_bytes_per_request": 129,
     "data_bytes_per_request": 320,
     "examples": {}
@@ -953,6 +991,7 @@
     "misplaced": {
      "numbered in entity": 15
     },
+    "evidence": 92,
     "context_bytes_per_request": 187,
     "data_bytes_per_request": 280,
     "examples": {
@@ -981,6 +1020,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 98,
     "context_bytes_per_request": 208,
     "data_bytes_per_request": 253,
     "examples": {}
@@ -1003,6 +1043,7 @@
     "with conditions": 37,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 107,
     "context_bytes_per_request": 156,
     "data_bytes_per_request": 309,
     "examples": {}
@@ -1025,6 +1066,7 @@
     "with conditions": 47,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 47,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -1047,6 +1089,7 @@
     "with conditions": 65,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 62,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 557,
     "examples": {}
@@ -1069,6 +1112,7 @@
     "with conditions": 33,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 463,
     "data_bytes_per_request": 139,
     "examples": {}
@@ -1091,6 +1135,7 @@
     "with conditions": 50,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 43,
     "context_bytes_per_request": 230,
     "data_bytes_per_request": 382,
     "examples": {}
@@ -1114,6 +1159,7 @@
     "with conditions": 33,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 19,
     "data_bytes_per_request": 145,
     "examples": {}
@@ -1136,6 +1182,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 3,
     "context_bytes_per_request": 252,
     "data_bytes_per_request": 567,
     "examples": {}
@@ -1158,6 +1205,7 @@
     "with conditions": 33,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 356,
     "data_bytes_per_request": 111,
     "examples": {}
@@ -1180,6 +1228,7 @@
     "with conditions": 33,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 662,
     "data_bytes_per_request": 126,
     "examples": {}
@@ -1202,6 +1251,7 @@
     "with conditions": 42,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 39,
     "context_bytes_per_request": 186,
     "data_bytes_per_request": 396,
     "examples": {}
@@ -1225,6 +1275,7 @@
     "with conditions": 58,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 55,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 381,
     "examples": {}
@@ -1247,6 +1298,7 @@
     "with conditions": 36,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 36,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -1269,6 +1321,7 @@
     "with conditions": 46,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 48,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -1291,6 +1344,7 @@
     "with conditions": 41,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 41,
     "context_bytes_per_request": 241,
     "data_bytes_per_request": 533,
     "examples": {}
@@ -1313,6 +1367,7 @@
     "with conditions": 19,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 21,
     "context_bytes_per_request": 489,
     "data_bytes_per_request": 193,
     "examples": {}
@@ -1345,6 +1400,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 363,
     "data_bytes_per_request": 393,
     "examples": {}
@@ -1367,6 +1423,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 243,
     "data_bytes_per_request": 559,
     "examples": {}
@@ -1390,6 +1447,7 @@
     "with conditions": 19,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 21,
     "context_bytes_per_request": 28,
     "data_bytes_per_request": 271,
     "examples": {}
@@ -1412,6 +1470,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 4,
     "context_bytes_per_request": 379,
     "data_bytes_per_request": 1216,
     "examples": {}
@@ -1434,6 +1493,7 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 23,
     "context_bytes_per_request": 485,
     "data_bytes_per_request": 137,
     "examples": {}
@@ -1456,6 +1516,7 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 23,
     "context_bytes_per_request": 589,
     "data_bytes_per_request": 222,
     "examples": {}
@@ -1479,6 +1540,7 @@
     "with conditions": 21,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 21,
     "context_bytes_per_request": 28,
     "data_bytes_per_request": 271,
     "examples": {}
@@ -1501,6 +1563,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 4,
     "context_bytes_per_request": 379,
     "data_bytes_per_request": 1216,
     "examples": {}
@@ -1523,6 +1586,7 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 23,
     "context_bytes_per_request": 485,
     "data_bytes_per_request": 137,
     "examples": {}
@@ -1545,6 +1609,7 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 23,
     "context_bytes_per_request": 589,
     "data_bytes_per_request": 222,
     "examples": {}
@@ -1567,6 +1632,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 363,
     "data_bytes_per_request": 397,
     "examples": {}
@@ -1590,6 +1656,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 98,
     "data_bytes_per_request": 455,
     "examples": {}
@@ -1612,6 +1679,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -1644,6 +1712,7 @@
     "with conditions": 90,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 90,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -1666,6 +1735,7 @@
     "with conditions": 106,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 103,
     "context_bytes_per_request": 148,
     "data_bytes_per_request": 442,
     "examples": {}
@@ -1688,6 +1758,7 @@
     "with conditions": 50,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 51,
     "context_bytes_per_request": 458,
     "data_bytes_per_request": 116,
     "examples": {}
@@ -1710,6 +1781,7 @@
     "with conditions": 100,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 97,
     "context_bytes_per_request": 220,
     "data_bytes_per_request": 495,
     "examples": {}
@@ -1733,6 +1805,7 @@
     "with conditions": 50,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 51,
     "context_bytes_per_request": 17,
     "data_bytes_per_request": 106,
     "examples": {}
@@ -1755,6 +1828,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 3,
     "context_bytes_per_request": 303,
     "data_bytes_per_request": 623,
     "examples": {}
@@ -1777,6 +1851,7 @@
     "with conditions": 51,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 51,
     "context_bytes_per_request": 408,
     "data_bytes_per_request": 108,
     "examples": {}
@@ -1800,6 +1875,7 @@
     "with conditions": 51,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 51,
     "context_bytes_per_request": 639,
     "data_bytes_per_request": 176,
     "examples": {
@@ -1828,6 +1904,7 @@
     "with conditions": 77,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 75,
     "context_bytes_per_request": 247,
     "data_bytes_per_request": 498,
     "examples": {}
@@ -1851,6 +1928,7 @@
     "with conditions": 54,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 51,
     "context_bytes_per_request": 43,
     "data_bytes_per_request": 264,
     "examples": {}
@@ -1873,6 +1951,7 @@
     "with conditions": 52,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 52,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -1900,6 +1979,7 @@
      "numbered in attribute": 26,
      "numbered in entity": 2
     },
+    "evidence": 129,
     "context_bytes_per_request": 18,
     "data_bytes_per_request": 256,
     "examples": {
@@ -1951,6 +2031,7 @@
      "numbered in attribute": 13,
      "numbered in entity": 2
     },
+    "evidence": 84,
     "context_bytes_per_request": 27,
     "data_bytes_per_request": 246,
     "examples": {
@@ -2017,6 +2098,7 @@
      "numbered in attribute": 5,
      "numbered in entity": 2
     },
+    "evidence": 81,
     "context_bytes_per_request": 27,
     "data_bytes_per_request": 258,
     "examples": {
@@ -2082,6 +2164,7 @@
      "numbered in attribute": 16,
      "numbered in entity": 3
     },
+    "evidence": 131,
     "context_bytes_per_request": 18,
     "data_bytes_per_request": 232,
     "examples": {
@@ -2156,6 +2239,7 @@
      "numbered in attribute": 17,
      "numbered in entity": 1
     },
+    "evidence": 106,
     "context_bytes_per_request": 27,
     "data_bytes_per_request": 245,
     "examples": {
@@ -2221,6 +2305,7 @@
      "numbered in attribute": 7,
      "numbered in entity": 2
     },
+    "evidence": 95,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 220,
     "examples": {
@@ -2284,6 +2369,7 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 250,
     "data_bytes_per_request": 926,
     "examples": {}
@@ -2318,6 +2404,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 295,
     "data_bytes_per_request": 781,
     "examples": {}
@@ -2360,6 +2447,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 25,
     "context_bytes_per_request": 262,
     "data_bytes_per_request": 699,
     "examples": {}
@@ -2402,6 +2490,7 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 548,
     "data_bytes_per_request": 1592,
     "examples": {}
@@ -2444,6 +2533,7 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 692,
     "data_bytes_per_request": 595,
     "examples": {}
@@ -2487,6 +2577,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 756,
     "data_bytes_per_request": 453,
     "examples": {
@@ -2534,6 +2625,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 744,
     "data_bytes_per_request": 455,
     "examples": {
@@ -2580,6 +2672,7 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 295,
     "data_bytes_per_request": 781,
     "examples": {}
@@ -2625,6 +2718,7 @@
     "with conditions": 14,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 980,
     "examples": {
@@ -2664,6 +2758,7 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 27,
     "context_bytes_per_request": 262,
     "data_bytes_per_request": 699,
     "examples": {}
@@ -2706,6 +2801,7 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 25,
     "context_bytes_per_request": 262,
     "data_bytes_per_request": 699,
     "examples": {}
@@ -2749,6 +2845,7 @@
     "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 27,
     "context_bytes_per_request": 313,
     "data_bytes_per_request": 785,
     "examples": {}
@@ -2792,6 +2889,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 25,
     "context_bytes_per_request": 234,
     "data_bytes_per_request": 824,
     "examples": {}
@@ -2834,6 +2932,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 24,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -2869,6 +2968,7 @@
     "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 24,
     "context_bytes_per_request": 225,
     "data_bytes_per_request": 772,
     "examples": {}
@@ -2912,6 +3012,7 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 31,
     "context_bytes_per_request": 264,
     "data_bytes_per_request": 718,
     "examples": {}
@@ -2947,6 +3048,7 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 31,
     "context_bytes_per_request": 264,
     "data_bytes_per_request": 718,
     "examples": {}
@@ -2981,6 +3083,7 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 548,
     "data_bytes_per_request": 1586,
     "examples": {}
@@ -3015,6 +3118,7 @@
     "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 692,
     "data_bytes_per_request": 588,
     "examples": {}
@@ -3052,6 +3156,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 789,
     "data_bytes_per_request": 374,
     "examples": {
@@ -3093,6 +3198,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 780,
     "data_bytes_per_request": 375,
     "examples": {
@@ -3132,6 +3238,7 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 548,
     "data_bytes_per_request": 1586,
     "examples": {}
@@ -3166,6 +3273,7 @@
     "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 692,
     "data_bytes_per_request": 588,
     "examples": {}
@@ -3203,6 +3311,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 789,
     "data_bytes_per_request": 374,
     "examples": {
@@ -3244,6 +3353,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 780,
     "data_bytes_per_request": 375,
     "examples": {
@@ -3286,6 +3396,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 263,
     "data_bytes_per_request": 843,
     "examples": {
@@ -3326,6 +3437,7 @@
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 25,
     "context_bytes_per_request": 170,
     "data_bytes_per_request": 775,
     "examples": {}
@@ -3370,6 +3482,7 @@
     "with conditions": 20,
     "positioned": 4,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 512,
     "examples": {}
@@ -3404,6 +3517,7 @@
     "with conditions": 18,
     "positioned": 4,
     "misplaced": {},
+    "evidence": 25,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 513,
     "examples": {}
@@ -3437,6 +3551,7 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "evidence": 19,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1377,
     "examples": {}
@@ -3460,6 +3575,7 @@
     "with conditions": 8,
     "positioned": 3,
     "misplaced": {},
+    "evidence": 19,
     "context_bytes_per_request": 608,
     "data_bytes_per_request": 288,
     "examples": {}
@@ -3485,6 +3601,7 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "evidence": 21,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 228,
     "examples": {
@@ -3516,6 +3633,7 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "evidence": 21,
     "context_bytes_per_request": 589,
     "data_bytes_per_request": 229,
     "examples": {
@@ -3546,6 +3664,7 @@
     "with conditions": 15,
     "positioned": 4,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 163,
     "data_bytes_per_request": 593,
     "examples": {}
@@ -3569,6 +3688,7 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "evidence": 20,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1409,
     "examples": {}
@@ -3593,6 +3713,7 @@
     "with conditions": 9,
     "positioned": 3,
     "misplaced": {},
+    "evidence": 23,
     "context_bytes_per_request": 654,
     "data_bytes_per_request": 398,
     "examples": {
@@ -3622,6 +3743,7 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "evidence": 22,
     "context_bytes_per_request": 612,
     "data_bytes_per_request": 233,
     "examples": {
@@ -3653,6 +3775,7 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "evidence": 22,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 235,
     "examples": {
@@ -3682,6 +3805,7 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "evidence": 19,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1372,
     "examples": {}
@@ -3707,6 +3831,7 @@
     "misplaced": {
      "numbered in attribute": 8
     },
+    "evidence": 35,
     "context_bytes_per_request": 253,
     "data_bytes_per_request": 615,
     "examples": {
@@ -3736,6 +3861,7 @@
     "with conditions": 15,
     "positioned": 5,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1443,
     "examples": {}
@@ -3759,6 +3885,7 @@
     "with conditions": 15,
     "positioned": 5,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1443,
     "examples": {}
@@ -3782,6 +3909,7 @@
     "with conditions": 13,
     "positioned": 6,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 654,
     "data_bytes_per_request": 407,
     "examples": {}
@@ -3806,6 +3934,7 @@
     "misplaced": {
      "numbered in attribute": 4
     },
+    "evidence": 22,
     "context_bytes_per_request": 624,
     "data_bytes_per_request": 239,
     "examples": {
@@ -3836,6 +3965,7 @@
     "misplaced": {
      "numbered in attribute": 4
     },
+    "evidence": 22,
     "context_bytes_per_request": 612,
     "data_bytes_per_request": 240,
     "examples": {
@@ -3867,6 +3997,7 @@
     "with conditions": 19,
     "positioned": 4,
     "misplaced": {},
+    "evidence": 25,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 512,
     "examples": {
@@ -3904,6 +4035,7 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "evidence": 20,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1372,
     "examples": {}
@@ -3927,6 +4059,7 @@
     "with conditions": 8,
     "positioned": 3,
     "misplaced": {},
+    "evidence": 19,
     "context_bytes_per_request": 608,
     "data_bytes_per_request": 287,
     "examples": {}
@@ -3952,6 +4085,7 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "evidence": 20,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 227,
     "examples": {
@@ -3983,6 +4117,7 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "evidence": 21,
     "context_bytes_per_request": 588,
     "data_bytes_per_request": 228,
     "examples": {
@@ -4012,6 +4147,7 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "evidence": 19,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1372,
     "examples": {}
@@ -4035,6 +4171,7 @@
     "with conditions": 8,
     "positioned": 3,
     "misplaced": {},
+    "evidence": 19,
     "context_bytes_per_request": 608,
     "data_bytes_per_request": 287,
     "examples": {}
@@ -4060,6 +4197,7 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "evidence": 21,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 227,
     "examples": {
@@ -4091,6 +4229,7 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "evidence": 21,
     "context_bytes_per_request": 588,
     "data_bytes_per_request": 228,
     "examples": {
@@ -4117,6 +4256,7 @@
     "claims": 59,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 53,
     "context_bytes_per_request": 114,
     "data_bytes_per_request": 671,
     "examples": {}
@@ -4135,6 +4275,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 46,
     "context_bytes_per_request": 130,
     "data_bytes_per_request": 840,
     "examples": {}
@@ -4153,6 +4294,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 120,
     "data_bytes_per_request": 477,
     "examples": {}
@@ -4171,6 +4313,7 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 35,
     "context_bytes_per_request": 106,
     "data_bytes_per_request": 445,
     "examples": {}
@@ -4189,6 +4332,7 @@
     "with conditions": 8,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 41,
     "context_bytes_per_request": 120,
     "data_bytes_per_request": 478,
     "examples": {}
@@ -4208,6 +4352,7 @@
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 31,
     "context_bytes_per_request": 107,
     "data_bytes_per_request": 447,
     "examples": {}
@@ -4226,6 +4371,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 35,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1323,
     "examples": {}
@@ -4244,6 +4390,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 18,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1194,
     "examples": {}
@@ -4262,6 +4409,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 26,
     "context_bytes_per_request": 138,
     "data_bytes_per_request": 308,
     "examples": {}
@@ -4280,6 +4428,7 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 19,
     "context_bytes_per_request": 398,
     "data_bytes_per_request": 176,
     "examples": {}
@@ -4298,6 +4447,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 22,
     "context_bytes_per_request": 544,
     "data_bytes_per_request": 78,
     "examples": {}
@@ -4316,6 +4466,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 19,
     "context_bytes_per_request": 450,
     "data_bytes_per_request": 125,
     "examples": {}
@@ -4334,6 +4485,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 19,
     "context_bytes_per_request": 442,
     "data_bytes_per_request": 126,
     "examples": {}
@@ -4353,6 +4505,7 @@
     "with conditions": 25,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 38,
     "context_bytes_per_request": 219,
     "data_bytes_per_request": 637,
     "examples": {}
@@ -4387,6 +4540,7 @@
     "with conditions": 15,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 32,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1403,
     "examples": {}
@@ -4422,6 +4576,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 37,
     "context_bytes_per_request": 219,
     "data_bytes_per_request": 636,
     "examples": {}
@@ -4457,6 +4612,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1181,
     "examples": {}
@@ -4499,6 +4655,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 34,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 260,
     "examples": {}
@@ -4542,6 +4699,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 610,
     "data_bytes_per_request": 235,
     "examples": {}
@@ -4584,6 +4742,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 236,
     "examples": {}
@@ -4619,6 +4778,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1232,
     "examples": {}
@@ -4661,6 +4821,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 622,
     "data_bytes_per_request": 242,
     "examples": {}
@@ -4702,6 +4863,7 @@
     "with conditions": 21,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 39,
     "context_bytes_per_request": 215,
     "data_bytes_per_request": 623,
     "examples": {}
@@ -4736,6 +4898,7 @@
     "with conditions": 14,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 35,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1132,
     "examples": {}
@@ -4777,6 +4940,7 @@
     "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 36,
     "context_bytes_per_request": 602,
     "data_bytes_per_request": 234,
     "examples": {}
@@ -4819,6 +4983,7 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 35,
     "context_bytes_per_request": 595,
     "data_bytes_per_request": 225,
     "examples": {}
@@ -4853,6 +5018,7 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 35,
     "context_bytes_per_request": 586,
     "data_bytes_per_request": 227,
     "examples": {}
@@ -4894,6 +5060,7 @@
     "with conditions": 27,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 38,
     "context_bytes_per_request": 219,
     "data_bytes_per_request": 638,
     "examples": {}
@@ -4929,6 +5096,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1188,
     "examples": {}
@@ -4971,6 +5139,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 261,
     "examples": {}
@@ -5006,6 +5175,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 610,
     "data_bytes_per_request": 236,
     "examples": {}
@@ -5041,6 +5211,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 238,
     "examples": {}
@@ -5076,6 +5247,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1186,
     "examples": {}
@@ -5117,6 +5289,7 @@
     "with conditions": 14,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 35,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1132,
     "examples": {}
@@ -5159,6 +5332,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1184,
     "examples": {}
@@ -5201,6 +5375,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 34,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 261,
     "examples": {}
@@ -5244,6 +5419,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 610,
     "data_bytes_per_request": 235,
     "examples": {}
@@ -5279,6 +5455,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 33,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 237,
     "examples": {}
@@ -5313,6 +5490,7 @@
     "with conditions": 20,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 158,
     "data_bytes_per_request": 296,
     "examples": {}
@@ -5345,6 +5523,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 174,
     "data_bytes_per_request": 277,
     "examples": {}
@@ -5367,6 +5546,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 174,
     "data_bytes_per_request": 277,
     "examples": {}
@@ -5389,6 +5569,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
     "examples": {}
@@ -5411,6 +5592,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 567,
     "data_bytes_per_request": 112,
     "examples": {}
@@ -5433,6 +5615,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
     "examples": {}
@@ -5455,6 +5638,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
     "examples": {}
@@ -5477,6 +5661,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 154,
     "data_bytes_per_request": 294,
     "examples": {}
@@ -5499,6 +5684,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
     "examples": {}
@@ -5521,6 +5707,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 567,
     "data_bytes_per_request": 112,
     "examples": {}
@@ -5543,6 +5730,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
     "examples": {}
@@ -5565,6 +5753,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
     "examples": {}
@@ -5587,6 +5776,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 85,
     "context_bytes_per_request": 184,
     "data_bytes_per_request": 274,
     "examples": {}
@@ -5609,6 +5799,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 85,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
     "examples": {}
@@ -5631,6 +5822,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 85,
     "context_bytes_per_request": 559,
     "data_bytes_per_request": 114,
     "examples": {}
@@ -5653,6 +5845,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 85,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
     "examples": {}
@@ -5675,6 +5868,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 85,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
     "examples": {}
@@ -5697,6 +5891,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 88,
     "context_bytes_per_request": 185,
     "data_bytes_per_request": 277,
     "examples": {}
@@ -5719,6 +5914,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 88,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
     "examples": {}
@@ -5741,6 +5937,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 88,
     "context_bytes_per_request": 560,
     "data_bytes_per_request": 113,
     "examples": {}
@@ -5763,6 +5960,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 88,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
     "examples": {}
@@ -5785,6 +5983,7 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 88,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
     "examples": {}
@@ -5807,6 +6006,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
     "examples": {}
@@ -5829,6 +6029,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 567,
     "data_bytes_per_request": 112,
     "examples": {}
@@ -5851,6 +6052,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
     "examples": {}
@@ -5873,6 +6075,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
     "examples": {}
@@ -5895,6 +6098,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 343,
     "examples": {}
@@ -5917,6 +6121,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 105,
     "data_bytes_per_request": 336,
     "examples": {}
@@ -5939,6 +6144,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
     "examples": {}
@@ -5962,6 +6168,7 @@
     "with conditions": 71,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 111,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
     "examples": {}
@@ -5984,6 +6191,7 @@
     "with conditions": 36,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 96,
     "context_bytes_per_request": 193,
     "data_bytes_per_request": 242,
     "examples": {}
@@ -6006,6 +6214,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 187,
     "data_bytes_per_request": 248,
     "examples": {}
@@ -6028,6 +6237,7 @@
     "with conditions": 84,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 84,
     "context_bytes_per_request": 443,
     "data_bytes_per_request": 145,
     "examples": {}
@@ -6050,6 +6260,7 @@
     "with conditions": 79,
     "positioned": 0,
     "misplaced": {},
+    "evidence": 104,
     "context_bytes_per_request": 162,
     "data_bytes_per_request": 290,
     "examples": {}
