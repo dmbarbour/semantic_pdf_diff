@@ -26,8 +26,9 @@ from semantic_pdf_diff.tasks import ExtractQuery
 from ..eval import rounds
 
 # A reader's numbering or a list's label, standing as a name: "Condition 2", "dimension 1", "column 3", "item (b)".
-NUMBERED = re.compile(r"\b(?:condition|step|item|note|point|requirement|criterion|rule|stage|dimension|column|row|"
-                      r"value|entry|line|field|case)\s*(?:no\.?\s*|#\s*)?\(?(?:\d{1,3}|[a-h]|[ivx]{1,4})\)?(?![\w.])",
+# A hyphen before the word makes a name of it ("BM-Case2", "Load-Case 3"), not a label.
+NUMBERED = re.compile(r"(?<![-\w])(?:condition|step|item|note|point|requirement|criterion|rule|stage|dimension|column|"
+                      r"row|value|entry|line|field|case)\s*(?:no\.?\s*|#\s*)?\(?(?:\d{1,3}|[a-h]|[ivx]{1,4})\)?(?![\w.])",
                       re.I)
 # Words that say how a value is read, not when it holds (Concepts: frame), as readers put them in conditions.
 FRAME = re.compile(r"\b(?:face of (?:finish|stud|wall|masonry|concrete)|finish(?:ed)? face|cent(?:er|re) ?lines?|"

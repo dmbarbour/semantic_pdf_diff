@@ -57,6 +57,7 @@ class Shown(unittest.TestCase):
                          ["numbered in conditions", "numbered in attribute", "frame in conditions"])
         self.assertEqual(context.misplaced({"entity": "Pump 2", "attribute": "capacity", "conditions": "at 2 bar"}),
                          [])
+        self.assertEqual(context.misplaced({"entity": "BM-Case2", "attribute": "report", "conditions": ""}), [])
 
 class AgainstKey(unittest.TestCase):
     def test_where_each_scope_landed_and_why_one_was_lost(self):
