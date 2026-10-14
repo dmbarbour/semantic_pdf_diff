@@ -1,9 +1,10 @@
 # Claim context: what a claim is about, how to read it, where it came from and who holds it
 
-- **Status:** Active (2026-10-14): written; milestone 1 built, its lever a default; Concepts rewritten (subject, scope, frame, provenance, stance); design questions answered.
+- **Status:** Active (2026-10-14): written; milestone 1 built, its lever a default; Concepts rewritten (subject, scope, frame, provenance, stance); design questions 1–5 answered; reviewed whole against the context model, with measurement rewritten and milestones reordered ([Review](#review-2026-10-14)); design questions 6–9 open.
 - **The owner, 2026-10-14:** "Ideally, we'd avoid list positions as conditions of a claim, treating them as provenance instead (where a claim was made, how it was named). I feel there's a lot to improve in this domain of tracking the context of a claim. For A, we should consider what the model has access to as part of its query, and what a comparison of claims would have access to - was there enough information in the query to call it the non-conventional 'depth' instead of 'length'? If not, what sort of structure would provide the context for that info? Perhaps we should be examining how we'd approach different naming conventions for dimensions between papers, too."
 - **Then:** "Write the plan, then start with list positions as provenance. Turn it into a full plan unless it proves very short; I expect there's a lot you can think up for how to handle provenance and contexts with a little brainstorming."
 - **On the kinds of context (2026-10-14),** after I proposed subject, scope, frame, provenance and stance: "The names work; rewrite the plan's Concepts section. We can keep 'context' as the umbrella term. I expect we'll spend a fair bit of time on this, trying to improve capture of context per claim." Further words on stance and on context's size are quoted in Concepts.
+- **The review (2026-10-14):** "Please give the plan a full review based on the adjusted context model (you did some of this, but it isn't clear to me that it was holistic), with some attention to how we'll measure outcomes and perhaps verify model quality at providing needed context or applying relevant context when provided."
 - **From:** the 2026-10-14 looks at the controlled corpus's drawing sheets and at the spec's revision pairs after `text_spans: page` became a default ([lever index](../reviews/levers.md)).
 
 ## Why
@@ -20,16 +21,17 @@ A claim today is five words the reader chose (entity, attribute, value, unit, co
   - The sheet prints "24'-6"" on a dimension line beside MEETING 101. It prints no word for either room dimension and has no north arrow. The key calls it "depth" ("north-south dimension"), a name the generator chose.
   - The tile's query held the image and a text layer ("MEETING 101 564 SF 23'-0" 24'-6" D101"), so which way each dimension runs was in the image only. The model called it "length"; "depth" couldn't be derived.
   - A comparison sees less still: entity, attribute, value, unit, conditions and quote, no geometry. Two proposals that call one dimension "depth" and "length", or draw the room turned 90°, have only the value to match on.
-- **Conventions that frame many claims are read once, if at all.** The same sheet's general notes say "ALL DIMENSIONS ARE TO FACE OF FINISH UNLESS NOTED OTHERWISE" and "ROOM AREAS ARE NET". Two proposals measuring to different faces would show equal rooms as different, or different rooms as equal, and nothing would say why.
+- **Conventions that frame many claims are read once, if at all.** The same sheet's general notes say "ALL DIMENSIONS ARE TO FACE OF FINISH UNLESS NOTED OTHERWISE" and "ROOM AREAS ARE NET". Two proposals measuring to different faces would show equal rooms as different, or different rooms as equal, and nothing would say why. A revision changing only such a note changes the meaning of every dimension on the sheet, and today nothing reports it.
 - **Who holds a claim is lost.** The RAN1 summaries tabulate companies' proposals; their claims named the subject but not the company, so Spreadtrum's "not needed" and ZTE's "support" were compared as one item changed ([comparing revisions](revision-comparison-2026-10-02.md)).
+- **No measure says where context is lost.** The scorer counts conditions kept, but not whether a missed scope or frame was ever in the reader's query, whether the model ignored it there, or whether the judge applied it once shown. Without that, a fix can't be aimed: at the parse, at what a query is given, or at the model.
 
 ## Scope
 
-- **In:** the context of a claim: where it was made (structure and position, not only page and box), how it was named (as printed, and as the reader named it), what scopes it (headings, lead-ins, notes, legends, captions), how its value is to be read (declared units and conventions: its frame), who holds it and through whom (stance), and for drawings what it spans. Captured mechanically where the source's structure gives it, by the reader where only reading can, and used by alignment, comparison, explanations, reports and the scorer.
+- **In:** the context of a claim, every kind (subject, scope, frame, provenance, stance), through every stage: captured mechanically where the source's structure gives it, by the reader where only reading can; stored once and referenced; selected into the reader's and the judge's queries; applied by code or by the model; reported; and keyed, so each stage is measured. For drawings, what a value spans.
 - **Shared with other plans:**
-  - [Comparing revisions](revision-comparison-2026-10-02.md), design item 4 (identity at extraction, an entity register): the register names *things*; this plan records *where and how* each claim named them. Its cheap partial steps (names by what a value measures, row labels and column headers kept) are built here or there, whichever comes first, not twice.
+  - [Comparing revisions](revision-comparison-2026-10-02.md), design item 4 (identity at extraction, an entity register): the register names *things*; this plan records where a claim's subject came from (a heading, a row label, a title block) and how it was named. Its cheap partial steps (names by what a value measures, row labels and column headers kept) are built here or there, whichever comes first, not twice.
   - *Subject, parties and provenance* (plans index): the parties around a project and the document's own provenance (title blocks, front matter, issue status), and claims about parties told from claims about the subject. That work stays there; the attribution chain on each claim (stance) is this plan's, and takes the document's link from it.
-  - [Scheduling and triage](scheduling-and-triage-2026-09-23.md), milestone 5 (epistemic status): asks readers for basis and uncertainty. Here those are the innermost link's attitude; the prompt work stays there.
+  - [Scheduling and triage](scheduling-and-triage-2026-09-23.md), milestone 5 (epistemic status): asks readers for basis and uncertainty. Here those are the innermost link's attitude; the prompt work stays there. Its situating stage's figure and section "abouts" become context records here (milestone 3).
   - [Units and normalization](units-and-normalization-2026-09-24.md): a document's declared units ("all dimensions in mm") are frame here, applied there.
   - *Evidence webs* (plans index): links between claims. A claim's context points at other claims (a lead-in, a note) but isn't a web.
 - **Out:** model-chosen names judged by a rater (the panel's business); a document's own revision marks (the revision comparison plan).
@@ -49,11 +51,13 @@ Suppose two claims differ only in X. What X is decides how a comparison treats i
 | the same proposition, held by someone else or held differently | **stance** | compares it as a finding of its own ("now B's proposal, was A's"; "now required, was targeted"), never as a changed value |
 | the same proposition, recorded in another place or another way | **provenance** | leaves it out of the verdict; may use it to pair claims and to explain |
 
+**So a claim's identity** (what makes two readings one claim, and what `claim_id` hashes) is its subject, attribute, value, unit, scope, frame and holder; never its provenance (design question 8).
+
 ### The kinds
 
 | Kind | The question | What it holds | Today |
 |---|---|---|---|
-| **Subject** | What is it about? | the entity, and what identifies it | `entity`, as the reader named it |
+| **Subject** | What is it about? | the entity, and what identifies it (a tag, a row label, the heading it sits under) | `entity`, as the reader named it |
 | **Scope** | Under what circumstances does it hold? | operating point, load case, mode; the time it's valid for; where it applies (level, zone); option or alternate; phase | `conditions` (with positions, tolerances and frame words mixed in) |
 | **Frame** | How is the value to be read? | units; datums; what a dimension is measured to (face of finish, centreline); orientation and north; sign conventions; defined terms and abbreviations; net or gross; a document's naming pairs (W × D) | not recorded; sometimes in `conditions` or `unit` |
 | **Provenance** | Where and how was it recorded? | the document, its revision and date; place (page, box, region, section path); position in a list; the quote; the name as printed; geometry as drawn; the derivation (which reader, which task) | locator, section, position, derivation, occurrences (`PROVENANCE_FIELDS`) |
@@ -66,9 +70,11 @@ Stance is a form of provenance: the provenance of the proposition, where the res
 - **Where it was said, and where it applies:** "page 4, Condition 2" is provenance; "level 3, zone B" is scope.
 - **Who wrote it, and whose view it reports:** the document's authors are its outer stance, usually implicit; "Company A proposes option 2" is a reported stance, and a different claim from B's proposal.
 - **The name as printed, and the name as read:** the printed label is provenance, something observed on the page; the reader's entity and attribute are the subject and property it assigned.
-- **A scope's source, and the scope:** a heading, a list's lead-in or a sheet's general notes is provenance (where the claim sits); the scope it implies is a reading of it. Both are kept, so a reading can be checked against its source, and a query can be asked whether it held enough to give it (the drawing sheets' "depth" didn't).
+- **A context source, and the context it gives:** a heading, a list's lead-in or a sheet's general notes is provenance (where the claim sits); the scope, frame or subject it implies is a reading of it. Both are kept, so a reading can be checked against its source, and a query can be asked whether it held enough to give it (the drawing sheets' "depth" didn't).
 
 **Identity cues:** a position, a name as printed and geometry as drawn are provenance that alignment may use as weak evidence for pairing claims. They never enter the verdict, and never block a match.
+
+**Stated, none, or unknown.** Each kind on a claim is one of three: stated (the source gives it, and the claim has it), none (the source gives none: the value holds unconditionally, the document declares no datum), or unknown (not captured, or not knowable from the page). Only stated against stated can differ; a scope stated on one side and unknown on the other is "not established", as the judge's veto says today, never a difference.
 
 ### Stance: attribution chains
 
@@ -77,7 +83,7 @@ Stance is a form of provenance: the provenance of the proposition, where the res
 - **A proposition reaches a report through a chain of holders,** from the outside in: our reader, the document's authors, any parties they report, and the party that holds the proposition. "gemma-4 is confident that Bob is uncertain that Alice believes the timeout is 856 ms" has three links.
 - **Each link has a holder and an attitude:** says, proposes, requires, targets, measures, calculates, estimates, believes, doubts, disputes, rejects. It may also have a strength: a hedge ("may", "likely") or a stated uncertainty.
 - **The pipeline's link is kept apart from the source's.** The reader's confidence, its quote's verification, agreement among readers (occurrences), the derivation and the judge's confidence are our stance on the record.
-  - They weight, order and filter findings.
+  - They weight, order and filter findings, once measured against keys (calibration, below).
   - They are never compared as a difference between documents, and never read as the source's uncertainty.
   - Today `confidence` is ours, and `basis` and `uncertainty` are meant to be the source's, but the schema doesn't say so.
 - **The document's link is usually implicit:** a spec states its requirements in its authors' voice. That link is recorded once per document or sheet (the *subject, parties and provenance* row's title blocks and front matter), not per claim.
@@ -94,13 +100,28 @@ Stance is a form of provenance: the provenance of the proposition, where the res
 
 - **Stored once, and referenced by claims.** Context records follow the document's structure: the document, a sheet, a section, a list, a table, a note, a legend, a figure.
   - A claim points to the records that hold it, and to those that reach it by reference: a general note's "unless noted otherwise", a footnote marker, a legend.
-  - A claim's context is that path and those references, not a copy. (Milestone 1's position copies its list's lead-in into each item's claims; milestone 2 makes it a reference.)
+  - A claim's context is that path and those references, not a copy. (Milestone 1's position copies its list's lead-in into each item's claims; milestone 3 makes it a reference.)
 - **A record's kinds are labels, not columns on claims.** One general note may be frame ("dimensions are to face of finish") and scope ("unless noted otherwise") at once; a heading may give both a subject and a scope.
+- **A record has a reach** (the claims it applies to) **and a precedence** (which wins when two disagree): a sheet's general notes reach its sheet; a table's notes its table; a footnote marker its cell; a heading its section; a lead-in its list. The nearer record wins, and an explicit exception ("unless noted otherwise", a local note) beats a general one. Finding a record's reach is capture too, and measured.
+- **Records are compared too.** A note, heading or lead-in that changes between revisions changes what every claim it reaches means, whatever their values. It is reported once, with the claims it reaches (design question 6), not as many claim findings or none.
 - **Selected for each use, within a budget:**
-  - the reader, what its span needs (today, the heading path);
+  - the reader, what its span needs (today: the heading path, neighbouring text, a table's lead-in, numbered-item stems: the `neighbours`, `table_context` and `stem_context` levers);
   - the judge, what bears on the pair, above all where the two sides' contexts differ;
   - the report, all of it, on demand.
-- **Measured:** the context each claim has (records and bytes), what each query and judgment was shown, and what it was not.
+
+### Context through the pipeline
+
+Each kind passes through the same stages. The table says where each is found and who applies it; every cell is a place a measure (below) can find a loss.
+
+| Kind | Captured from | Selected into | Applied by | Reported as |
+|---|---|---|---|---|
+| **Subject** | headings, row labels, tags, title blocks, situating's abouts; the reader | the reader (heading path, stems); the judge (both claims' subjects and their sources) | alignment (the register, names), then the judge | the claim's entity, with its printed source |
+| **Scope** | lead-ins, headings, captions, notes' reach, table columns (load case, month); the reader | the reader (the records reaching its span); the judge | the judge, ruling on scope apart | "conditions changed" (scope), or not established |
+| **Frame** | general notes, legends, declared units, north arrows and scales, schedule headers, abbreviation lists | the reader where it changes a reading (bare numbers under "all dimensions in mm"); the judge | code where the rule is mechanical (units, a datum offset, unordered pairs); the judge otherwise | "frame differs", once per record, with the claims it reaches |
+| **Provenance** | the parse: locator, section path, positions, printed names, geometry | the explainer; alignment's identity cues; never the judge's verdict | alignment (weak support), explanations | editorial changes: renumbered, moved, a new page |
+| **Stance** | title blocks (the document's link); "Company \| Proposals" tables, "according to", citations; the reader | the reader (who holds what it reads); the judge | alignment (different holders don't pair); the judge | "attribution changed", "now required, was targeted" |
+
+**Who applies context** is decided per kind by measurement (design question 7): where a rule is mechanical and the probes show the model applying it unreliably, code applies it; the model is asked only for what needs judgement. Our own link's figures (confidence, agreement) are applied only once calibrated.
 
 ### Rules for using context
 
@@ -108,6 +129,7 @@ Stance is a form of provenance: the provenance of the proposition, where the res
 - **A name as printed outranks a name as read.** Two readers naming one printed label differently aren't a rename.
 - **The judge rules on subject, scope and frame separately,** each shown apart from the others; a difference in frame is a finding about context ("dimensions to face of finish against centreline"), not a changed value (design question 4).
 - **Stance is compared as itself:** the source's chain against the source's chain; our own confidence never as a difference.
+- **Unknown is never different.** Only stated against stated can differ.
 - **What isn't knowable stays unnamed.** A dimension whose direction can't be tied to a convention is recorded by its geometry ("vertical as drawn, along MEETING 101's west wall"), never given a conventional name the page doesn't print.
 
 ### Where the code mixes them today
@@ -116,8 +138,10 @@ Stance is a form of provenance: the provenance of the proposition, where the res
 - **Readers' conditions** hold where a claim sits ("Door Schedule") and frame ("face of finish"), as `align.py` notes, and positions ("Condition 1"; milestone 1).
 - **Attributes** hold positions ("dimension 1") and names the page never prints ("depth").
 - **The judge** is asked whether "entity, attribute, scope and operating conditions correspond", and answers with one `same_conditions`. The report's "conditions" kind is "conditions or scope".
+- **`claim_id`** hashes conditions (scope and frame mixed, positions until milestone 1) and basis, but not a holder.
 - **Schema v2's unfilled fields** `context`, `topic` and `role` have no definitions; `context` names a field and the umbrella both.
 - **`basis`** is the innermost link's attitude with no holder: nothing says whose requirement or whose measurement it is.
+- **The controlled keys** hold conditions as one string; the scorer's "conditions kept" can't tell scope from frame, nor a misplaced context word from a missing one.
 
 ## Naming conventions across documents
 
@@ -131,24 +155,73 @@ Dimensions are the sharpest case, and the pattern carries over to other named qu
 
 ## Measurement
 
-- **Counts without the model, per document** (a new lab measure):
-  - claims holding a position in their conditions, attribute or entity
-  - claims named by position ("dimension 1")
-  - claims carrying a position, a printed name, scope, frame, geometry or a reported holder in their context
-- **The controlled corpus's keys gain context:** each listed fact's printed label; room dimensions by room and direction as drawn; the frame a document declares (units, what dimensions are measured to). Scoring then accepts a reading that names what's knowable ("Meeting 101, vertical dimension") and stops requiring a convention the page doesn't print. A scorer change is announced with before and after numbers, not folded into a lever's measure.
-- **New controlled scenarios,** each a knob on an existing family:
-  - a list item inserted (the spec has it), steps renumbered, nested lists, a list continued across a page
-  - a sheet with and without a north arrow; a room drawn turned 90° between proposals; a schedule headed W × D against one headed W × L; dimensions to centreline against face of finish
-  - a note's scope ("unless noted otherwise") with an exception, a footnote marker on a table value, a "typical" marker
-  - a proposal whose holder changes between revisions; a view reported ("Company A proposes") against the same words stated in the authors' voice; a hedge added or removed
-- **Comparisons:** the spec pairs' uncertain and false findings; renumbering named as such; the real pairs read by eye (3GPP revisions renumber clauses often).
-- **Judged** as levers are ([judging a lever](../samples-and-testing.md#judging-a-lever)): document by document, target and guard named first, null arms for anything that rewords a prompt.
+There's no ground truth to measure against ([decision 0018](../decisions/0018-several-raters-none-ground-truth.md)): quality is estimated from keys where documents are generated, mechanical checks everywhere, and raters on real documents. Context adds a question the extraction measures don't ask: when a claim's context is wrong, **where was it lost?** Each layer below answers part of that, and each milestone names its target and guard from them before it's built.
+
+### 1. Inventory (no model, every document)
+
+- **Per document:** context records by kind; claims per kind stated, none and unknown; context bytes per claim; what each query and judgment was shown.
+- **Misplacements:** context in the wrong field, found mechanically: positions in conditions, attributes or entities; scope words in attributes; frame words ("face of finish", "net") in conditions.
+- **Grounding:** each claim's context words (its scope and frame, its holder) found in what its query held: the page's text, the heading path, the records selected. Context the query didn't hold is **unsupported**: invented, or drawn from the image (counted apart for image tasks). This runs on real documents, with no key; it's the context counterpart of quote verification.
+
+### 2. Capture, against keys (controlled corpus)
+
+- **Keys gain context per kind:** each fact's subject source, scope, frame, holder and attitude, position and printed label, as the generator wrote them; and what the page makes knowable (a room dimension's direction as drawn; a conventional name only where a north arrow or a schedule's header gives it; design question 3).
+- **Per kind, stated right, missed, wrong, or invented** (given where the key says none or unknowable); "conditions kept" becomes its scope and frame parts.
+- **Placement:** for each keyed context item, the field it landed in (scope, frame, attribute, entity, nowhere): a confusion matrix of kinds. It measures separation, not just presence: a frame read into conditions is captured but misplaced.
+- **Knowability:** named where knowable; abstained (geometry, "named differently") where not. A conventional name the page doesn't give counts as invented.
+
+### 3. Sufficiency: was it in the query?
+
+The owner's question about "depth", asked of every miss. For each keyed context item a claim missed, misplaced or got wrong, the query that read it (stored, and dumped by the lab's `queries dump`) is searched for the item's source:
+
+- **not shown:** the source wasn't in the query (the parse missed it, or selection left it out, or the budget cut it): our pipeline's loss, fixed by capture or selection;
+- **shown, not used:** the source was there and the claim lacks it: the model's loss, fixed by instruction, by structure (a field for it), or by code applying it;
+- **shown, misapplied:** the source was there and the claim reads it wrongly (a note applied beyond its reach).
+
+The same split is made for the judge: was each claim's context in the pair's prompt? This is mechanical over stored queries, so it costs nothing, and its three counts say where a milestone should aim.
+
+### 4. Application: does the model use context it's given?
+
+Small, fixed **probe batteries**, recorded once per model and replayed thereafter, measure the model apart from the pipeline. Each probe varies one kind of context and nothing else, so its expected answer is known.
+
+- **Reader probes:** minimal pages or passages where only context decides the reading: bare numbers under a units note; list items under a scoping lead-in; a "Company | Proposal" table; a note that reaches one table and not the next.
+  - **Sensitivity:** with the context and without it, the reading changes as it should.
+  - **Specificity:** with context that doesn't reach the claim (another sheet's note, an irrelevant lead-in), the reading doesn't change.
+  - **Precedence:** with a general note and a local exception, the exception wins.
+  - **Abstention:** with the context a reading needs absent (no north arrow), the reader names geometry, not a convention.
+- **Judge probes:** claim pairs built from keyed facts, varied one kind at a time: the same values in different frames; the same proposition held by different parties; a renumbered position; a different scope; scope known on one side only. Expected rulings follow the table in Concepts. Each pair is asked in both orders; irrelevant context added mustn't change the verdict.
+- **Counterfactual pairs:** controlled revision pairs that change only a context record (the general note's datum, a lead-in, a table's holder column), with values unchanged. The comparison should report the context change once, with the claims it reaches, and no value change.
+- **Scored as accuracy per kind and per property** (sensitivity, specificity, precedence, abstention), with agreement across orders for the judge. Batteries are tens of queries: cents per model.
+- **They qualify a model:** the same batteries run against another model or backend before it's used, and after a prompt change to the context instructions, as a regression check beside the null arms.
+- **They decide who applies context** (design question 7): a kind the model applies reliably when shown stays the model's; one it doesn't is applied by code, or given a field of its own.
+
+### 5. Outcomes: comparisons and reports
+
+- **On the controlled pairs, per scenario family:** unchanged facts confirmed, false changes, kinds named right (the guard, as now), and the context findings' precision and recall: renumbered, moved, frame differs, attribution changed, named differently, agree as a pair.
+- **Reports:** a changed context record reported once, with the claims it reaches; editorial changes apart from value changes; no finding whose only difference is provenance.
+
+### 6. Real documents (no keys)
+
+- **Mechanical:** the inventory and grounding above, on the slices and the real pairs.
+- **Eye looks:** the real pairs (3GPP revisions renumber clauses and tabulate companies' views; drawing sets hold general notes), read by me at each milestone and recorded.
+- **Raters:** review batches gain a context rubric: is the claim's scope right, is any needed scope or frame missing, is its holder right, is anything invented. The pairwise rubric's "needed conditions kept" splits by kind. Rated by the panel of models, with people where the owner chooses (design question 9); agreement measured, as for any rubric.
+
+### 7. Our own link: calibration
+
+- The reader's confidence and the judge's confidence, against keyed correctness: a reliability curve per kind of claim. Until calibrated, they order findings but don't filter them.
+
+### Costs and guards
+
+- **Cost per query:** context bytes and tokens added, calls added, output tokens per claim (each new field in an answer costs output, and a small model's accuracy may fall as its schema grows).
+- **The guard for every lever:** facts read right on the corpus, paired by document; for prompt changes, against null arms ([judging a lever](../samples-and-testing.md#judging-a-lever)).
+- **A scorer change** (new keys, new splits) is announced with before and after numbers, never folded into a lever's measure.
 
 ## Rules against drift
 
+- **Measure before building:** each milestone names its target and guard from the measurement layers, and takes a baseline, before its first change.
 - **Every change in behaviour is a lever, off by default** until measured, and listed in the [lever index](../reviews/levers.md). Defaults change only on measured evidence and the owner's word.
-- **Refactors needed on the way are separate steps,** proven by replay ([0027](../decisions/0027-behaviour-changes-apart-from-refactors.md)). Likely: a context record on evidence, and the store's schema version.
-- **Mechanical before model:** context is taken from the source's structure wherever the parse has it. The reader is asked only for what reading alone can give, and each such prompt change is judged against null arms.
+- **Refactors needed on the way are separate steps,** proven by replay ([0027](../decisions/0027-behaviour-changes-apart-from-refactors.md)). Likely: context records on evidence, the store's schema version, and claim identity.
+- **Mechanical before model:** context is taken from the source's structure wherever the parse has it. The reader is asked only for what reading alone can give, and each such prompt change is judged against null arms and the probe batteries.
 - **New directions found on the way** become tentative rows in the plans index, not milestones here.
 - **Each milestone ends with a commit after the full suite passes,** and reports what it spent.
 
@@ -161,64 +234,70 @@ The first step, and the cheapest: no extraction query changes.
 **Built and measured (2026-10-14):** the `positions` lever (`positions.py`); the [lever index](../reviews/levers.md) has the numbers. A default since 2026-10-14 (the owner: "We can make `positions:provenance` the default, seems mostly positive and it's already committed.").
 - On the controlled corpus: conditions holding a position 81 → 0; 138 claims given a position; extraction unchanged; the spec's numbered and renumbered pairs' 9 uncertain facts confirmed, no false change. $0.002.
 - A picture's claim quoting a list item takes the item's position too: without that, the PDF spec's overview and text readings of one condition stopped merging.
-- **Not yet:** positions in attributes and entities ("condition 1" as an attribute), and alignment using a shared label as weak support.
-- **Seen on the slices as the default:** a lead-in taken from a stamp ("PUBLIC DOMAIN", ken-cd), and a figure's panel labels ("(b)", "(d)", turbines) counted as a list with axis ticks for a lead-in. Context records from the page's structure (milestone 2) should tell a list's lead-in, a figure's panels and furniture apart.
+- **Seen on the slices as the default:** a lead-in taken from a stamp ("PUBLIC DOMAIN", ken-cd), and a figure's panel labels ("(b)", "(d)", turbines) counted as a list with axis ticks for a lead-in. Context records from the page's structure (milestone 3) should tell a list's lead-in, a figure's panels and furniture apart.
+- **Left:**
+  - positions in attributes and entities ("condition 1" as an attribute, about 40 claims): the same label moved from those, or a prompt field for it (judged against null arms);
+  - alignment counting a shared label as weak support, never a conflict.
 
-- **Find positions mechanically.** A text block opening with a label is a list item when sibling blocks (the same page and section) open with labels of the same form in sequence:
-  - a word and a number ("Condition 1:", "Step 2.", "Item 3 -"); a number ("1.", "2)"); a letter or roman numeral ("(a)", "iv.")
-  - Word writes its numbering's labels into the text (`docxdocs.Numbering`), and Markdown's ordered lists keep theirs, so one rule covers PDF, Word and Markdown text.
-  - A lone "Option B:" or "Load Case 3" isn't a sequence and stays a name.
-- **A claim takes its block's position** (claims are placed by their quote's block). When its conditions are only that label, or the label and other words, the label leaves the conditions and goes to the claim's position, with the list's lead-in.
-- **The lever:** `positions: "conditions" | "provenance"`, off ("conditions") until measured.
-- **Comparison:** the position is provenance, so the judge doesn't see it. Alignment counts a shared label as weak support, never as a conflict.
-- **Measured:**
-  - the count of conditions holding a position, before and after (96 in the corpus's runs)
-  - the spec pairs: the 6 uncertain facts, kinds named right
-  - facts right on the corpus, paired by document (the guard)
-- **Cost:** extraction replays; comparisons re-asked where claims changed: cents.
-- **Then, if positions stay in attributes and entities** ("condition 1" as an attribute, 40 claims): the same label moved from those, or a prompt field for it (judged against null arms).
+### 2. Measuring context
 
-### 2. Context records
+Before records are built, so each later milestone has a baseline. Almost all of it without the model.
 
-- **Records once per document part** (document, sheet, section, list, table, note, legend, figure), each labelled with the kinds it gives (subject, scope, frame, stance); evidence points to the records that hold or reach it, beside its locator. The store's schema version bumped, with old stores read as having none.
-- **Milestone 1's position** refers to its list's record instead of copying the lead-in.
-- **Measured:** records and bytes of context per claim, and what each query and judgment was shown.
+- **The inventory and grounding** (layer 1) as a lab measure, per document, on the controlled corpus, the slices and the real pairs.
+- **Keys gain context per kind** (layer 2), from the generator: scope and frame apart, holders where a family has them, positions and printed labels, and what each page makes knowable. The scorer reports per kind, with the placement matrix. Announced as a scorer change, with before and after numbers.
+- **The sufficiency audit** (layer 3) over the corpus's stored queries: every context miss classed as not shown, shown not used, or misapplied, for the reader and the judge. The drawing sheets' "depth" is its first case.
+- **A first probe battery** (layer 4), reader and judge, a few probes per kind and property, recorded for gemma-4 as its baseline.
+- **Calibration** (layer 7) of the reader's confidence on the corpus, as a baseline.
+- **Then:** the order of milestones 3 to 8 revisited on what the audit and probes show, and reported.
+
+### 3. Context records
+
+- **Records once per document part** (document, sheet, section, list, table, note, legend, figure), each labelled with the kinds it gives (subject, scope, frame, stance) and its reach; evidence points to the records that hold or reach it, beside its locator. The store's schema version bumped, with old stores read as having none.
+- **Subject sources:** headings, row labels and title blocks as records; situating's figure and section abouts as subject and scope records.
+- **Milestone 1's position** refers to its list's record instead of copying the lead-in; the stamp and figure-panel cases told apart by the record's kind.
 - **Name as printed, mechanically:**
   - table claims: the parse's row label and column header (the [one table model](one-table-model-2026-09-30.md) has them)
   - text claims: the label before the value in its sentence ("timeout of 856 ms")
-- **Shown in the report:** "as printed: Condition 2 of 'A link failure is declared when…'"; a renumbering shown as such.
+- **Stated, none, unknown** recorded per kind on each claim.
+- **Claim identity** from the proposition, scope, frame and holder, not provenance (design question 8); a refactor where nothing yet fills the new parts, proven by replay.
+- **Shown in the report:** "as printed: Condition 2 of 'A link failure is declared when…'"; a renumbering among editorial changes.
 - **Explanations** get both claims' positions and printed names, so "renumbered" is named from evidence rather than inferred from numbers in the conditions.
+- **Measured:** the inventory per kind; misplacements; grounding; the spec pairs' renumberings named.
 
-### 3. Scope and frame
+### 4. Scope and frame
 
-- **Situating finds scope sources and frames** per document, sheet and section: general notes, legends, abbreviation lists, declared units, north arrows and scales, "unless noted otherwise", "typical".
-- **Claims take the frames and scope sources that reach them** (a sheet's notes apply to its sheet; a table's notes to its table; a footnote marker to its cell).
-- **The reader's `conditions` split into scope and frame** (a prompt change, judged against null arms); a tolerance goes with the value.
-- **The judge rules on subject, scope and frame separately,** and a difference in frame is reported as context, with the claims it covers.
-- **The scorer** checks a claim's frame where the key declares it.
+- **Situating finds scope sources and frames** per document, sheet and section: general notes, legends, abbreviation lists, declared units, north arrows and scales, "unless noted otherwise", "typical"; each with its reach and precedence.
+- **Claims take the frames and scope sources that reach them,** and the reader's query is given those its span needs (selection, measured by the sufficiency audit's "not shown").
+- **The reader's `conditions` split into scope and frame** (a prompt change, judged against null arms and the probes); a tolerance goes with the value.
+- **Who applies frame:** units and datums by code where the probes say the model doesn't apply them reliably; the rest by the judge.
+- **The judge rules on subject, scope and frame separately** (a lever; design question 4), and a difference in frame is reported as context, with the claims it covers.
+- **Changed records reported once:** a note, heading or lead-in that changes between revisions, with the claims it reaches (design question 6).
+- **The scorer** checks scope and frame per kind where the key declares them; the counterfactual pairs added (layer 4).
 
-### 4. Drawing geometry
+### 5. Drawing geometry
 
 - **First, a look without the model:** can dimension strings (a dimension line, extension lines, ticks or arrows, a label along the line) be found in the vector drawing of the corpus's sheets and the slices' real drawing sets? Real sets are stored turned 90° (25 of the slices' 103 pages), so directions are taken as displayed.
 - **If they can:** each dimension's direction, extent and what it bounds go into the tile's text layer ("24'-6" — vertical dimension, beside MEETING 101") and into the claim's context. Gridline references (A–F, 1–4) give places as a drawing's own coordinates.
-- **If they can't:** the reader is asked for direction as drawn, judged against null arms.
+- **If they can't:** the reader is asked for direction as drawn, judged against null arms and an abstention probe.
+- **Measured:** room dimensions by direction as drawn (layer 2's knowability), the sufficiency audit's "not shown" for direction before and after.
 
-### 5. Naming across documents
+### 6. Naming across documents
 
 - **Room dimensions as pairs** where direction isn't established; by direction where it is.
 - **A document's vocabulary** (schedule headers, defined terms) recorded and compared as frame.
-- **Keys and scorer:** room dimensions keyed by room and direction as drawn; "named differently" scored as a comparison outcome.
+- **Keys and scorer:** room dimensions keyed by room and direction as drawn; "named differently" and "agree as a pair" scored as comparison outcomes.
 - **Other paired quantities** (fore-aft and side-to-side, rated and design points) checked for the same pattern in the corpus and the samples.
 
-### 6. Stance
+### 7. Stance
 
 - **First, a look at the corpus and the real pairs without the model:** where are views reported (feature-lead summaries' company tables, minutes, reviews, cited standards), and what share of claims sit in them?
 - **The attribution chain on evidence:** links of holder, attitude and strength, outermost first; the document's link from its record (the *subject, parties and provenance* row), reported links from tables ("Company | Proposals"), "according to", quotations and citations, mechanically where the parse gives them.
-- **The pipeline's link named as such:** the reader's confidence, verification, agreement and derivation grouped as our stance, and the schema's `basis` and `uncertainty` documented as the source's.
-- **The reader asked for reported holders and attitudes** where the parse can't give them (a prompt change, judged against null arms; coordinated with the scheduling plan's epistemic status).
+- **The pipeline's link named as such:** the reader's confidence, verification, agreement and derivation grouped as our stance, and the schema's `basis` and `uncertainty` documented as the source's; confidence used to filter only once calibrated.
+- **The reader asked for reported holders and attitudes** where the parse can't give them (a prompt change, judged against null arms and stance probes; coordinated with the scheduling plan's epistemic status).
 - **Alignment and the judge:** claims held by different parties don't pair; the same proposition with a changed holder or attitude is its own finding (design question 5).
+- **Measured:** holders and attitudes against keys (new controlled families: a holder changed between revisions, a view reported against the same words in the authors' voice, a hedge added or removed); the RAN1 pair's companies' views told apart.
 
-### 7. Further contexts (to be ordered as earlier milestones report)
+### 8. Further contexts (to be ordered as earlier milestones report)
 
 - **Clause and section numbers as positions:** 3GPP revisions renumber clauses; a claim's clause is provenance, and a moved clause is "moved", not removed and added.
 - **Tables:** units rows, merged header spans, footnote markers, "typical" columns.
@@ -226,9 +305,23 @@ The first step, and the cheapest: no extraction query changes.
 - **Time and place in scope:** phase, year, level, zone, option or alternate ("base bid", "alternate 2"); options are names with identity, not positions.
 - **Repetition:** the same value stated in many places, its occurrences as context for confidence ([evidence webs](README.md)).
 
+## Review (2026-10-14)
+
+The plan read whole against the five kinds and the stages a context passes through. What changed, and why:
+
+- **Measurement was the weakest part:** counts, keys and new scenarios, but nothing to say where a lost context was lost, and nothing measuring the model apart from the pipeline. Now seven layers, of which three are new: the **sufficiency audit** (was it in the query?), the owner's "depth" question asked of every miss; **probe batteries** for the reader and the judge (sensitivity, specificity, precedence, abstention), which also qualify another model; and **counterfactual pairs** that change only a context record. Grounding (context the query didn't hold) gives a measure on real documents without keys.
+- **Measurement comes first** (new milestone 2), mostly without the model, so every later milestone has a baseline and the order of the rest can follow what the audit finds.
+- **The milestones followed mechanisms; now each kind has a home** and the stages are explicit (Context through the pipeline). Subject had none: its sources (headings, row labels, title blocks, situating's abouts) are now records in milestone 3, the register's identity work staying with the revision comparison plan.
+- **Context records have reach and precedence,** and changed records are findings of their own: a revision that changes only a general note was invisible to the plan as written (design question 6).
+- **Who applies context** (code or model) was implicit; now decided per kind from the probes (design question 7).
+- **Claim identity** was unstated: `claim_id` hashes conditions, positions until milestone 1, and no holder (design question 8).
+- **Unknown isn't different:** stated, none and unknown are told apart, so a scope one reader missed can't become a change.
+- **Our own link** is measured (calibration) before it filters anything.
+- **Kept:** the concepts, the naming conventions, milestone 1 and the answered design questions; milestones 3 to 8 are the old 2 to 7, extended as above.
+
 ## Design questions
 
-Answered by the owner on 2026-10-14.
+Questions 1–5 answered by the owner on 2026-10-14; 6–9 from the review, open.
 
 1. **Renumbering in reports:** shown as a finding of its own ("renumbered: Condition 2 → 3"), or only in the claim's detail? I'd show it among editorial changes.
    - **The owner:** "editorial changes, like a new page number if we added some text or section numbering if we inserted a section."
@@ -238,11 +331,15 @@ Answered by the owner on 2026-10-14.
    - **So:** compared by direction where the frame establishes it (a north arrow, a schedule's columns, both drawn the same way up); as an unordered pair otherwise.
 3. **The scorer's room dimensions:** keyed by direction as drawn, accepting any name, instead of the generator's width and depth?
    - **The owner:** "I waffle on this one: we can only score based on what's there, but we should also test under various conditions, and we should look into how data from context might augment framing of reads."
-   - **Proposed:** each scenario's key holds what its page makes knowable. A sheet with a north arrow or a schedule headed W × D is keyed by those names; a sheet without them by direction as drawn, accepting any name. The scenarios with and without (Measurement) test both, and the reads with context added (milestones 3 and 4) are scored on the same keys, so a gain from framing shows.
+   - **Proposed:** each scenario's key holds what its page makes knowable. A sheet with a north arrow or a schedule headed W × D is keyed by those names; a sheet without them by direction as drawn, accepting any name. The scenarios with and without (Measurement) test both, and the reads with context added (milestones 4 and 5) are scored on the same keys, so a gain from framing shows.
    - **The owner:** "Q3: your proposal looks reasonable as a starting point."
 4. **Frame to the judge:** shown as its own field, with its own ruling (my preference), or folded into conditions?
    - **The owner:** "this is clearly a lever, but you can start with your preference."
    - **So:** a lever, off until measured; its first setting shows the frame as its own field with its own ruling.
 5. **Stance changes in reports:** a finding kind of its own ("now B's proposal, was A's"; "now required, was targeted"), beside "changed" and "conditions changed"? I'd add it.
    - **The owner:** "I agree this is the sort of change readers would be interested in seeing called out."
-   - **So:** a finding kind of its own, in milestone 6.
+   - **So:** a finding kind of its own, in milestone 7.
+6. **Changed context records as findings:** a note, heading or lead-in that changes between revisions reported once, as its own finding, with the claims it reaches ("general note 3: dimensions now to centreline; 42 dimensions on A-101")? I'd add it, grouped with the value changes it may explain.
+7. **Who applies context:** code where a rule is mechanical (units, a datum, renumbering, unordered pairs) and the probes show the model unreliable; the model where judgement is needed. Decided per kind from the probes, each as a lever. Agreed?
+8. **Claim identity:** subject, attribute, value, unit, scope, frame and holder; never provenance. It changes claim ids (a store schema change, stores read again from cached answers), so I'd make it one refactor step in milestone 3, before anything fills scope, frame or holder apart.
+9. **Raters for context on real documents:** the context rubric rated by the panel of models first, and people only on samples where the panel disagrees? Or people from the start?
