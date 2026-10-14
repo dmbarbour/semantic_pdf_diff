@@ -146,6 +146,7 @@ class Aligned(unittest.TestCase):
         self.assertEqual([(i, j) for i, j, _ in align(earlier, later, printed=True).judge], [(0, 0)])
         self.assertEqual(printed_property("P-101A | Rated point > Capacity (gpm)").split(), ["Rated", "point",
                                                                                                "Capacity"])
+        self.assertEqual(printed_property("lift hill rises"), "")  # a text claim's: not a label
 
 class Stored(unittest.TestCase):
     def test_a_run_keeps_each_record_once_beside_the_claims_that_reference_it(self):

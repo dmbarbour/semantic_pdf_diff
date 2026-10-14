@@ -416,8 +416,12 @@ def align(left, right, printed=False):
     return Alignment(left, right).correspondence()
 
 def printed_property(printed):
-    """The property a name as printed names: a table's column header ("P-101A | Rated point > Capacity (gpm)":
-    "Rated point Capacity"), its unit left out; a text claim's whole name ("retransmission timer")."""
+    """The property a table claim's name as printed names: its column header ("P-101A | Rated point > Capacity
+    (gpm)": "Rated point Capacity"), its unit left out. A text claim's (the words before its value) isn't used: it
+    may hold its subject and a verb ("lift hill rises"), and outranking the reader's "height" with it lost the
+    coaster's lift hill change in every format (2026-10-14)."""
+    if " | " not in printed:
+        return ""
     last = printed.rsplit(" | ", 1)[-1]
     return re.sub(r"\([^)]*\)", " ", last.replace(">", " ")).strip()
 
