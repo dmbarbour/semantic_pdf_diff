@@ -67,6 +67,8 @@ def _named(claim, weights):
     out = []
     for part, weight in FIT_WEIGHTS.items():
         words = tokens(REFERENCE.sub(" ", str(claim.get(part, ""))))
+        if part == "attribute":  # a bound said with the value names the attribute's ("length", "up to 173")
+            words = words | bounds(claim.get("value", ""))  # a new set: tokens are cached
         out.append((weight, words, sum(weights.get(w, weights[None]) for w in words)))
     return out
 
@@ -126,8 +128,10 @@ def classify(claim, facts, printed):
     """(outcome, fact id or None) for one claim.
 
     A printed value names one fact (values are unique in a document), so the question is the binding: which fact
-    the claim's names describe best. Right: the value's own fact fits best, alone. Loose: it ties for best (a bare
-    "pump" among three pumps), or no name fits at all. Misbound: another fact fits better (the value filed under
+    the claim's names describe best (a bound said with the value, "up to 173", counting as the attribute's). Right:
+    the value's own fact fits best, alone, or ties with facts the claim names only within the fact's own longer name
+    ("Packet Number Length" holds "Packet Number"). Loose: it ties for best (a bare "pump" among three pumps), or no
+    name fits at all. Misbound: another fact fits better (the value filed under
     another entity or attribute). Distractor: a superseded or otherwise wrong value, bound to its own fact.
     Wrong unit: right or loose but for its unit, of another kind or size than the fact's (UNIT_KINDS).
     Misread: a printed number that isn't a fact (a page or section number). Hallucinated: printed nowhere.
@@ -181,6 +185,8 @@ def classify(claim, facts, printed):
         if holder.id in top and all((by_id[i].entity, by_id[i].attribute) == (holder.entity, holder.attribute)
                                     for i in top):
             top = [holder.id]  # facts named alike (a superseded value and its successor): the value decides
+        if best and holder.id in top and len(top) > 1 and named_within(claim, holder, [by_id[i] for i in top]):
+            top = [holder.id]  # "Packet Number Length" names its field, not the Packet Number field within it
         if best == 0 or (holder.id in top and len(top) > 1):
             return unit_checked("loose", holder.id)
         if top == [holder.id]:
@@ -201,6 +207,16 @@ def classify(claim, facts, printed):
     if any(same_number(parse_number(p["text"]), number) for p in printed):
         return "misread", None
     return "hallucinated", None
+
+def named_within(claim, holder, tied):
+    """Whether the claim's entity names the holder by a longer name holding every tied fact's name it says: the
+    rivals named only as part of the holder's name ("Packet Number" within "Packet Number Length")."""
+    said = tokens(claim.get("entity", ""))
+    def longest(fact):
+        return max((tokens(n) for n in (fact.entity,) + tuple(fact.aliases) if tokens(n) and tokens(n) <= said),
+                   key=len, default=set())
+    mine = longest(holder)
+    return bool(mine) and all(longest(f) and longest(f) < mine for f in tied if f.id != holder.id)
 
 # A limit, however it's put: a requirement ("shall not exceed"), a negation ("not rated above"), a bound.
 BOUNDS = {"maximum": ("maximum", "max", "not exceed", "not to exceed", "no more than", "at most", "up to", "limit",

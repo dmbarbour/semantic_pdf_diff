@@ -18,7 +18,7 @@ from .corpus import (  # noqa: F401
     RUNNING_HEADER, SERIES_FILL, Schedule, TABLE_KNOBS, TABLE_PROJECTS,
     _esc, _last, _phrase, _schedule_facts, charts, convention_center,
     draw_chart, draw_charts, draw_schematics, end_use_study, energy_study,
-    equipment_schedules, html, key, metered_study,
+    equipment_schedules, html, key, link_protocol, metered_study,
     raster, render, roller_coaster, scanned, schedule_html, track_schedules,
     water_treatment, write)
 from .catalog import corpus  # noqa: F401

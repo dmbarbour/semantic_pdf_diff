@@ -279,6 +279,22 @@ class Scoring(unittest.TestCase):
         self.assertEqual(s["outcomes"], {"right": 1})
         self.assertNotIn("zone.exhibit", s["missed"])
 
+    def test_a_field_named_whole_or_bounded_in_its_value_is_bound_right(self):
+        """The spec's header table: "Packet Number Length" names the length field, not the Packet Number field
+        within its name, and "up to 173" says the Session ID's maximum length; both were scored loose (2026-10-14)."""
+        project = controlled.link_protocol(1)
+        _, log = controlled.render(project)
+        key = controlled.key(project, log)
+        pn_len, sid = project.fact("hdr.pn_len"), project.fact("hdr.sid")
+        field = lambda entity, value: {"entity": entity, "attribute": "length", "value": value, "unit": "bits"}
+        self.assertEqual(controlled.score(key, [field("Packet Number Length", pn_len.value)])["outcomes"],
+                         {"right": 1})
+        self.assertEqual(controlled.score(key, [field("Session ID", f"up to {sid.value}")])["outcomes"], {"right": 1})
+        # said with neither, the Session ID's maximum ties with its length field's length: loose
+        self.assertEqual(controlled.score(key, [field("Session ID", sid.value)])["outcomes"], {"loose": 1})
+        # a name said whole, but no longer than a rival's: still loose
+        self.assertEqual(controlled.score(key, [field("Packet Number", pn_len.value)])["outcomes"], {"loose": 1})
+
     def test_relations_score_by_names_from_either_side(self):
         from semantic_pdf_diff_lab.bench.controlled import schematics
         project = schematics.ahu_drawing(1)

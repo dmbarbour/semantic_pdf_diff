@@ -3999,15 +3999,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 39,
    "outcomes": {
-    "loose": 11,
+    "loose": 1,
     "misbound": 4,
-    "right": 24
+    "right": 34
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -4021,18 +4021,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 3,
+     "loose": 1,
      "misbound": 3,
-     "right": 15
+     "right": 17
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -4045,15 +4044,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 30,
    "outcomes": {
-    "loose": 9,
+    "loose": 1,
     "misbound": 2,
-    "right": 19
+    "right": 27
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -4067,18 +4066,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 17
+     "right": 21
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -4091,17 +4089,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4114,8 +4112,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4133,7 +4130,7 @@
    "facts": 21,
    "found": 16,
    "recall": 0.7619,
-   "found_right": 9,
+   "found_right": 13,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -4143,10 +4140,10 @@
    ],
    "claims": 19,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 9
+    "right": 13
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -4159,8 +4156,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4178,17 +4174,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4201,8 +4197,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4220,7 +4215,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -4228,10 +4223,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4244,8 +4239,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4263,15 +4257,15 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 16,
+   "found_right": 20,
    "missed": [
     "fail.duration"
    ],
    "claims": 37,
    "outcomes": {
-    "loose": 13,
+    "loose": 1,
     "misbound": 1,
-    "right": 23
+    "right": 35
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4285,17 +4279,16 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 16
+     "right": 20
     },
     "visual": {
-     "loose": 5,
-     "right": 16
+     "loose": 1,
+     "right": 20
     }
    },
    "conditions_by_reader": {
@@ -4308,17 +4301,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4331,8 +4324,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4350,7 +4342,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -4358,10 +4350,10 @@
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4374,8 +4366,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4393,17 +4384,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4416,8 +4407,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4435,7 +4425,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -4443,10 +4433,10 @@
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4459,8 +4449,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4478,17 +4467,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4501,8 +4490,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4520,16 +4508,16 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 18,
+   "found_right": 20,
    "missed": [
     "fail.duration"
    ],
    "claims": 50,
    "outcomes": {
-    "loose": 13,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 33,
+    "right": 43,
     "text": 2
    },
    "conditions_kept": "4/4",
@@ -4544,19 +4532,18 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 4,
-     "right": 19,
+     "loose": 2,
+     "right": 21,
      "text": 2
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
      "misread": 1,
-     "right": 17
+     "right": 21
     }
    },
    "conditions_by_reader": {
@@ -4569,7 +4556,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 10,
+   "found_right": 14,
    "missed": [
     "fail.duration",
     "window.congested",
@@ -4577,9 +4564,9 @@
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 9,
+    "loose": 5,
     "misread": 1,
-    "right": 10
+    "right": 14
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -4592,8 +4579,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 5,
@@ -4610,7 +4596,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 10,
+   "found_right": 14,
    "missed": [
     "fail.duration",
     "window.congested",
@@ -4618,9 +4604,9 @@
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 9,
+    "loose": 5,
     "misread": 1,
-    "right": 10
+    "right": 14
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -4633,8 +4619,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 5,
@@ -4651,7 +4636,7 @@
    "facts": 22,
    "found": 18,
    "recall": 0.8182,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.ack",
     "fail.duration",
@@ -4660,10 +4645,10 @@
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 6,
+    "loose": 2,
     "misbound": 1,
     "misread": 1,
-    "right": 12,
+    "right": 16,
     "text": 2
    },
    "conditions_kept": "4/4",
@@ -4677,8 +4662,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 2,
@@ -4697,15 +4681,15 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 8,
+    "loose": 4,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4718,8 +4702,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 4,
@@ -4736,17 +4719,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "long.field"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 8,
+    "loose": 4,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4759,8 +4742,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 4,
@@ -4778,15 +4760,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 37,
    "outcomes": {
-    "loose": 11,
+    "loose": 1,
     "misbound": 2,
-    "right": 24
+    "right": 34
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -4800,18 +4782,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 3,
+     "loose": 1,
      "misbound": 1,
-     "right": 17
+     "right": 19
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -4824,7 +4805,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -4832,10 +4813,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4848,8 +4829,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4867,7 +4847,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -4875,10 +4855,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4891,8 +4871,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4910,16 +4889,16 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4932,8 +4911,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4950,7 +4928,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -4958,10 +4936,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -4974,8 +4952,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -4993,17 +4970,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -5016,8 +4993,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -5035,7 +5011,7 @@
    "facts": 21,
    "found": 16,
    "recall": 0.7619,
-   "found_right": 9,
+   "found_right": 13,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -5045,10 +5021,10 @@
    ],
    "claims": 19,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 9
+    "right": 13
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -5061,8 +5037,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -5080,17 +5055,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -5103,8 +5078,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -5122,7 +5096,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -5130,10 +5104,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -5146,8 +5120,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11408,15 +11381,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 39,
    "outcomes": {
-    "loose": 11,
+    "loose": 1,
     "misbound": 4,
-    "right": 24
+    "right": 34
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -11430,18 +11403,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 3,
+     "loose": 1,
      "misbound": 3,
-     "right": 15
+     "right": 17
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -11454,15 +11426,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 30,
    "outcomes": {
-    "loose": 9,
+    "loose": 1,
     "misbound": 2,
-    "right": 19
+    "right": 27
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -11476,18 +11448,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 17
+     "right": 21
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -11500,17 +11471,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -11523,8 +11494,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11542,7 +11512,7 @@
    "facts": 21,
    "found": 16,
    "recall": 0.7619,
-   "found_right": 9,
+   "found_right": 13,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -11552,10 +11522,10 @@
    ],
    "claims": 19,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 9
+    "right": 13
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -11568,8 +11538,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11587,17 +11556,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -11610,8 +11579,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11629,7 +11597,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -11637,10 +11605,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -11653,8 +11621,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11672,15 +11639,15 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 16,
+   "found_right": 20,
    "missed": [
     "fail.duration"
    ],
    "claims": 37,
    "outcomes": {
-    "loose": 13,
+    "loose": 1,
     "misbound": 1,
-    "right": 23
+    "right": 35
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -11694,17 +11661,16 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 16
+     "right": 20
     },
     "visual": {
-     "loose": 5,
-     "right": 16
+     "loose": 1,
+     "right": 20
     }
    },
    "conditions_by_reader": {
@@ -11717,17 +11683,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -11740,8 +11706,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11759,7 +11724,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -11767,10 +11732,10 @@
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -11783,8 +11748,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11802,17 +11766,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -11825,8 +11789,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11844,7 +11807,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -11852,10 +11815,10 @@
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -11868,8 +11831,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11887,17 +11849,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -11910,8 +11872,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -11929,16 +11890,16 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 18,
+   "found_right": 20,
    "missed": [
     "fail.duration"
    ],
    "claims": 50,
    "outcomes": {
-    "loose": 13,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 33,
+    "right": 43,
     "text": 2
    },
    "conditions_kept": "4/4",
@@ -11953,19 +11914,18 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 4,
-     "right": 19,
+     "loose": 2,
+     "right": 21,
      "text": 2
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
      "misread": 1,
-     "right": 17
+     "right": 21
     }
    },
    "conditions_by_reader": {
@@ -11978,7 +11938,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 10,
+   "found_right": 14,
    "missed": [
     "fail.duration",
     "window.congested",
@@ -11986,9 +11946,9 @@
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 9,
+    "loose": 5,
     "misread": 1,
-    "right": 10
+    "right": 14
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -12001,8 +11961,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 5,
@@ -12019,7 +11978,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 10,
+   "found_right": 14,
    "missed": [
     "fail.duration",
     "window.congested",
@@ -12027,9 +11986,9 @@
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 9,
+    "loose": 5,
     "misread": 1,
-    "right": 10
+    "right": 14
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -12042,8 +12001,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 5,
@@ -12060,7 +12018,7 @@
    "facts": 22,
    "found": 18,
    "recall": 0.8182,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.ack",
     "fail.duration",
@@ -12069,10 +12027,10 @@
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 6,
+    "loose": 2,
     "misbound": 1,
     "misread": 1,
-    "right": 12,
+    "right": 16,
     "text": 2
    },
    "conditions_kept": "4/4",
@@ -12086,8 +12044,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 2,
@@ -12106,15 +12063,15 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 8,
+    "loose": 4,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -12127,8 +12084,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 4,
@@ -12145,17 +12101,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "long.field"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 8,
+    "loose": 4,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -12168,8 +12124,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 4,
@@ -12187,15 +12142,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 37,
    "outcomes": {
-    "loose": 11,
+    "loose": 1,
     "misbound": 2,
-    "right": 24
+    "right": 34
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -12209,18 +12164,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 3,
+     "loose": 1,
      "misbound": 1,
-     "right": 17
+     "right": 19
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -12233,7 +12187,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -12241,10 +12195,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -12257,8 +12211,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -12276,7 +12229,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -12284,10 +12237,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -12300,8 +12253,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -12319,16 +12271,16 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -12341,8 +12293,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -12359,7 +12310,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -12367,10 +12318,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -12383,8 +12334,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -12402,17 +12352,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -12425,8 +12375,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -12444,7 +12393,7 @@
    "facts": 21,
    "found": 16,
    "recall": 0.7619,
-   "found_right": 9,
+   "found_right": 13,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -12454,10 +12403,10 @@
    ],
    "claims": 19,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 9
+    "right": 13
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -12470,8 +12419,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -12489,17 +12437,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -12512,8 +12460,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -12531,7 +12478,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -12539,10 +12486,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -12555,8 +12502,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -18452,15 +18398,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 39,
    "outcomes": {
-    "loose": 11,
+    "loose": 1,
     "misbound": 4,
-    "right": 24
+    "right": 34
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -18474,18 +18420,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 3,
+     "loose": 1,
      "misbound": 3,
-     "right": 15
+     "right": 17
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -18498,15 +18443,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 30,
    "outcomes": {
-    "loose": 9,
+    "loose": 1,
     "misbound": 2,
-    "right": 19
+    "right": 27
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -18520,18 +18465,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 17
+     "right": 21
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -18544,17 +18488,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -18567,8 +18511,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -18586,17 +18529,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -18609,8 +18552,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -18628,7 +18570,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -18636,10 +18578,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -18652,8 +18594,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -18671,15 +18612,15 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 16,
+   "found_right": 20,
    "missed": [
     "fail.duration"
    ],
    "claims": 37,
    "outcomes": {
-    "loose": 13,
+    "loose": 1,
     "misbound": 1,
-    "right": 23
+    "right": 35
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -18693,17 +18634,16 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 16
+     "right": 20
     },
     "visual": {
-     "loose": 5,
-     "right": 16
+     "loose": 1,
+     "right": 20
     }
    },
    "conditions_by_reader": {
@@ -18716,17 +18656,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -18739,8 +18679,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -18758,17 +18697,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -18781,8 +18720,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -18800,7 +18738,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -18808,10 +18746,10 @@
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -18824,8 +18762,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -18843,17 +18780,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -18866,8 +18803,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -18885,16 +18821,16 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 18,
+   "found_right": 20,
    "missed": [
     "fail.duration"
    ],
    "claims": 50,
    "outcomes": {
-    "loose": 13,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 33,
+    "right": 43,
     "text": 2
    },
    "conditions_kept": "4/4",
@@ -18909,19 +18845,18 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 4,
-     "right": 19,
+     "loose": 2,
+     "right": 21,
      "text": 2
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
      "misread": 1,
-     "right": 17
+     "right": 21
     }
    },
    "conditions_by_reader": {
@@ -18934,7 +18869,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 10,
+   "found_right": 14,
    "missed": [
     "fail.duration",
     "window.congested",
@@ -18942,9 +18877,9 @@
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 9,
+    "loose": 5,
     "misread": 1,
-    "right": 10
+    "right": 14
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -18957,8 +18892,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 5,
@@ -18975,7 +18909,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 10,
+   "found_right": 14,
    "missed": [
     "fail.duration",
     "window.congested",
@@ -18983,9 +18917,9 @@
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 9,
+    "loose": 5,
     "misread": 1,
-    "right": 10
+    "right": 14
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -18998,8 +18932,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 5,
@@ -19016,15 +18949,15 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 8,
+    "loose": 4,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -19037,8 +18970,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 4,
@@ -19055,17 +18987,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "long.field"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 8,
+    "loose": 4,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -19078,8 +19010,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 4,
@@ -19097,15 +19028,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 37,
    "outcomes": {
-    "loose": 11,
+    "loose": 1,
     "misbound": 2,
-    "right": 24
+    "right": 34
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -19119,18 +19050,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 3,
+     "loose": 1,
      "misbound": 1,
-     "right": 17
+     "right": 19
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -19143,7 +19073,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -19151,10 +19081,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -19167,8 +19097,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -19186,16 +19115,16 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -19208,8 +19137,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -19226,7 +19154,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -19234,10 +19162,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -19250,8 +19178,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -19269,17 +19196,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -19292,8 +19219,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -19311,17 +19237,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -19334,8 +19260,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -19353,7 +19278,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -19361,10 +19286,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -19377,8 +19302,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25007,15 +24931,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 39,
    "outcomes": {
-    "loose": 11,
+    "loose": 1,
     "misbound": 4,
-    "right": 24
+    "right": 34
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -25029,18 +24953,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 3,
+     "loose": 1,
      "misbound": 3,
-     "right": 15
+     "right": 17
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -25053,15 +24976,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 30,
    "outcomes": {
-    "loose": 9,
+    "loose": 1,
     "misbound": 2,
-    "right": 19
+    "right": 27
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -25075,18 +24998,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 17
+     "right": 21
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -25099,17 +25021,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25122,8 +25044,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25141,17 +25062,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25164,8 +25085,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25183,7 +25103,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -25191,10 +25111,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25207,8 +25127,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25226,15 +25145,15 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 16,
+   "found_right": 20,
    "missed": [
     "fail.duration"
    ],
    "claims": 37,
    "outcomes": {
-    "loose": 13,
+    "loose": 1,
     "misbound": 1,
-    "right": 23
+    "right": 35
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25248,17 +25167,16 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 16
+     "right": 20
     },
     "visual": {
-     "loose": 5,
-     "right": 16
+     "loose": 1,
+     "right": 20
     }
    },
    "conditions_by_reader": {
@@ -25271,17 +25189,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25294,8 +25212,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25313,17 +25230,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25336,8 +25253,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25355,7 +25271,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -25363,10 +25279,10 @@
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25379,8 +25295,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25398,17 +25313,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25421,8 +25336,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25440,16 +25354,16 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 18,
+   "found_right": 20,
    "missed": [
     "fail.duration"
    ],
    "claims": 50,
    "outcomes": {
-    "loose": 13,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 33,
+    "right": 43,
     "text": 2
    },
    "conditions_kept": "4/4",
@@ -25464,19 +25378,18 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 4,
-     "right": 19,
+     "loose": 2,
+     "right": 21,
      "text": 2
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
      "misread": 1,
-     "right": 17
+     "right": 21
     }
    },
    "conditions_by_reader": {
@@ -25489,7 +25402,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 10,
+   "found_right": 14,
    "missed": [
     "fail.duration",
     "window.congested",
@@ -25497,9 +25410,9 @@
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 9,
+    "loose": 5,
     "misread": 1,
-    "right": 10
+    "right": 14
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -25512,8 +25425,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 5,
@@ -25530,7 +25442,7 @@
    "facts": 22,
    "found": 19,
    "recall": 0.8636,
-   "found_right": 10,
+   "found_right": 14,
    "missed": [
     "fail.duration",
     "window.congested",
@@ -25538,9 +25450,9 @@
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 9,
+    "loose": 5,
     "misread": 1,
-    "right": 10
+    "right": 14
    },
    "conditions_kept": "2/2",
    "recall_by_form": {
@@ -25553,8 +25465,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 5,
@@ -25571,15 +25482,15 @@
    "facts": 22,
    "found": 21,
    "recall": 0.9545,
-   "found_right": 13,
+   "found_right": 17,
    "missed": [
     "fail.duration"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 8,
+    "loose": 4,
     "misread": 1,
-    "right": 13
+    "right": 17
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25592,8 +25503,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 4,
@@ -25610,17 +25520,17 @@
    "facts": 22,
    "found": 20,
    "recall": 0.9091,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "long.field"
    ],
    "claims": 22,
    "outcomes": {
-    "loose": 8,
+    "loose": 4,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25633,8 +25543,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 4,
@@ -25652,15 +25561,15 @@
    "facts": 21,
    "found": 20,
    "recall": 0.9524,
-   "found_right": 17,
+   "found_right": 19,
    "missed": [
     "fail.duration"
    ],
    "claims": 37,
    "outcomes": {
-    "loose": 11,
+    "loose": 1,
     "misbound": 2,
-    "right": 24
+    "right": 34
    },
    "conditions_kept": "2/4",
    "recall_by_form": {
@@ -25674,18 +25583,17 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
-     "loose": 3,
+     "loose": 1,
      "misbound": 1,
-     "right": 17
+     "right": 19
     },
     "visual": {
-     "loose": 5,
+     "loose": 1,
      "misbound": 1,
-     "right": 15
+     "right": 19
     }
    },
    "conditions_by_reader": {
@@ -25698,7 +25606,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -25706,10 +25614,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25722,8 +25630,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25741,16 +25648,16 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 20,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25763,8 +25670,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25781,7 +25687,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -25789,10 +25695,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25805,8 +25711,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25824,17 +25729,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25847,8 +25752,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25866,17 +25770,17 @@
    "facts": 21,
    "found": 19,
    "recall": 0.9048,
-   "found_right": 12,
+   "found_right": 16,
    "missed": [
     "fail.duration",
     "fail.snr"
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 1,
     "misread": 1,
-    "right": 12
+    "right": 16
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25889,8 +25793,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
@@ -25908,7 +25811,7 @@
    "facts": 21,
    "found": 18,
    "recall": 0.8571,
-   "found_right": 11,
+   "found_right": 15,
    "missed": [
     "fail.duration",
     "fail.snr",
@@ -25916,10 +25819,10 @@
    ],
    "claims": 21,
    "outcomes": {
-    "loose": 7,
+    "loose": 3,
     "misbound": 2,
     "misread": 1,
-    "right": 11
+    "right": 15
    },
    "conditions_kept": "4/4",
    "recall_by_form": {
@@ -25932,8 +25835,7 @@
    },
    "outcomes_by_reader": {
     "table": {
-     "loose": 4,
-     "right": 1
+     "right": 5
     },
     "text": {
      "loose": 3,
