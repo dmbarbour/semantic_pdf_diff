@@ -323,6 +323,8 @@ Before records are built, so each later milestone has a baseline. Almost all of 
 - **Calibration** (layer 7): table rules give 0.9 to every claim (99.8% right). Text and image readings' confidence rises with accuracy (below 0.9: 11% and 59% right; 0.95 and over: 90% and 92%), but 97% of readings are 0.95 or over: it ranks a few doubtful claims and doesn't separate the rest.
 - **The judge's sufficiency** (layer 3's second half): the judge is shown the two claims (and images, where `verify_visuals` sends them), so what it can know is what both readers captured: layer 2 on both sides, with the probes for its use of it. Measured pair by pair in milestone 4, when it rules on scope and frame apart.
 
+**Lever ideas** from these findings are rows in the [lever index](../reviews/levers.md)'s *Ideas not built yet* ("Claim context, …"): 13, for the reader's selection and fields, positions, the judge's rulings and order, alignment's gates and identifiers, explanations and confidence.
+
 **The order revisited:** scope capture is good; frame (not shown, then not used), names by unprinted convention, and the judge's stance are where context is lost. So:
 - **Context records stay first** (milestone 3): the sheet's notes' reach is a record and a selection, the cheapest cure for "not shown".
 - **Scope and frame next** (milestone 4), with frame's selection into tile requests first.
