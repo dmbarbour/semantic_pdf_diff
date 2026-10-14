@@ -188,6 +188,7 @@ class TaskCore:
         self.locator, self.derivation, self.oversized = locator, derivation, oversized
         self.evidence, self.coverage, self.repeats = [], [], {}
         self.positions = {}  # page: {block box: Position}, as the positions hook finds them
+        self.listed = {}  # page: [(an item's text, its Position)], for claims placed by their quotes
         self.held, self.releasing = [], False  # rows that may repeat, until the content's pages are read
         self.sections = self.reader = None
 
@@ -246,6 +247,21 @@ class TaskCore:
                            status=entry["row"]["status"], issues=[note], claims=len(copies), duplicate_of=entry["task"])
         self.evidence.extend(copies)
         self.record(row, copies)
+
+    def find_positions(self, page_no, blocks):
+        """A page's list items (the positions hook) among its text blocks [(box, text)] in reading order: by box,
+        for its text tasks' claims, and by text, for a claim another task read there (a picture's quote)."""
+        found = self.s.list_positions(blocks)
+        self.positions[page_no] = found
+        self.listed[page_no] = [(text, found[tuple(box)]) for box, text in blocks if tuple(box) in found]
+
+    def position_by_quote(self, page_no):
+        """position(quote) -> the Position of the list item on the page whose text holds the quote, or None if the
+        page has no list items."""
+        listed = self.listed.get(page_no)
+        if not listed:
+            return None
+        return lambda quote: next((p for text, p in listed if quoted(quote, text)), None)
 
     def consume(self, made):
         """Queue one extraction task (a Task); when it finishes, record it and call then(status, done): done, the last
@@ -370,7 +386,8 @@ class TaskCore:
                     row["status"] = "partial"
                     row["issues"].append("Rejected claim with unsupported literal quote")
                     continue
-                claim, position = s.positioned(claim, made.position(claim.quote) if made.position else None)
+                position_of = made.position or self.position_by_quote(page_no)
+                claim, position = s.positioned(claim, position_of(claim.quote) if position_of else None)
                 eid = claim_id(content, claim)
                 if any(e.id == eid for e in found):
                     continue  # the same claim twice in one response: keep the first

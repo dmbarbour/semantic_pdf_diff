@@ -63,6 +63,21 @@ class Removing(unittest.TestCase):
             with self.subTest(conditions=conditions):
                 self.assertEqual(without_label(conditions, Position(label=label)), kept)
 
+class ByQuote(unittest.TestCase):
+    def test_a_claim_any_task_read_takes_the_position_of_the_item_holding_its_quote(self):
+        # a picture's claim (the overview's) quoting a list item is placed as the text task's claims are, so the
+        # two readings keep the same conditions and merge
+        from types import SimpleNamespace
+        from semantic_pdf_diff.tasks import TaskCore
+        core = SimpleNamespace(s=Settings(positions="provenance"), positions={}, listed={})
+        TaskCore.find_positions(core, 1, blocks(LEAD, "Condition 1: no acknowledgement is received within 856 ms.",
+                                                "Condition 2: 21 retransmissions fail."))
+        position = TaskCore.position_by_quote(core, 1)
+        self.assertEqual(position("Condition 1: no acknowledgement is received within 856 ms."),
+                         Position(label="Condition 1", lead=LEAD))
+        self.assertIsNone(position("Pump 1: 10 kW"))
+        self.assertIsNone(TaskCore.position_by_quote(core, 2))  # a page without list items
+
 class Model:
     """Reads each 'N ms', 'N retransmissions' or 'N kW' in a text task, putting the item's label in conditions as
     readers did ("Condition 1"); records each query."""

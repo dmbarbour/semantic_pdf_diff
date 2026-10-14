@@ -249,7 +249,7 @@ def text_job(data, job, output, client, dispatch, progress, extension):
         blocks = [b for b in doc.blocks if b.page == page]
         section_of = s.text_section_of(lambda box, p=page: index.box(p, box).id)
         grouped = groups(blocks, s.text_bytes, section_of, s.split_text)
-        core.positions[page] = s.list_positions([seg for _, segments in grouped for seg in segments])
+        core.find_positions(page, [seg for _, segments in grouped for seg in segments])
         for k, (ids, segments) in enumerate(grouped):
             if k and k % TASKS_PER_TURN == 0:
                 yield "page"  # a long page: other sources take their turn
