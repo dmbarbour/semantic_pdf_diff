@@ -27,6 +27,8 @@ Configuration precedence, highest first: **CLI flags > JSON config file > enviro
 
 Every other field in `Settings` follows `PDF_DIFF_<UPPERCASE_FIELD_NAME>` (for example `PDF_DIFF_TEXT_BYTES`, `PDF_DIFF_RETRIES`, `PDF_DIFF_RESPONSE_FORMAT`). Model and base URL use only the `OPENAI_*` names above. `OPENAI_MODEL` and the `PDF_DIFF_*` names are application conventions. Empty or whitespace-only setting variables are treated as unset; invalid active values fail validation. Explicit overrides take precedence even over invalid environment values. Export variables through your shell or process manager; `.env` files are not loaded automatically.
 
+`pdf-semantic-diff settings [--config FILE]` prints every setting as a run would resolve them, the API key never; `--changed` prints only those differing from the defaults.
+
 For Python callers, use `Settings.from_env(...)` to get the same environment defaults with explicit keyword overrides. Plain `Settings(...)` remains deterministic and does not consult the environment. Output paths and comparison mode remain CLI options.
 
 ## Settings

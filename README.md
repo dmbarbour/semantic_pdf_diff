@@ -33,6 +33,8 @@ export OPENAI_MODEL='your-vision-model-id'
 pdf-semantic-diff team-a.pdf team-b.pdf --out result
 ```
 
+`pdf-semantic-diff --help` lists every command, the environment it needs and examples; `pdf-semantic-diff help COMMAND` gives a command's options, and `pdf-semantic-diff settings` prints every setting a run would use (with `--changed`, those differing from the defaults: a starting `--config` file).
+
 Open `result/report.html`, keeping its `assets/` folder alongside it. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
 
 Either argument can also be a folder or a zip archive. For revisions, supply the old version first:
@@ -68,7 +70,7 @@ pdf-semantic-diff report --store work --out reports/latest
 pdf-semantic-diff gc --store work --dry-run
 ```
 
-A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. PDF, `.txt`, `.md` and `.docx` files are extracted so far, a Word document's pictures (EMF, WMF and images) included; other files are listed as skipped.
+A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. Files of the types listed under Status are read; others are listed as skipped (`source show` says which, and why).
 
 Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error.
 
