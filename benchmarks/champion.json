@@ -31,6 +31,7 @@
     "visual_text_layer",
     "table_cuts",
     "text_cuts",
+    "text_spans",
     "repeated_text",
     "lone_rows",
     "table_filter",

@@ -614,6 +614,17 @@ class TextCuts(Lever):
         from .tasks import cut_at_word
         return cut_at_word(layer, limit) if self.text_cuts == "sentences" else layer[:limit]
 
+class TextSpans(Lever):
+    lever_name, stage, off = "text_spans", "inclusion", {"text_spans": "section"}
+    # page: a page's text blocks are grouped up to the byte budget across section boundaries, headings and all;
+    # section: a text task's blocks are one section's. Claims are placed by their quote's block either way. Word and
+    # Markdown documents cut at every heading: the controlled spec's "4 Link Failure Detection" went alone, and its
+    # conditions came back as "declaration condition 1 | no acknowledgement received within 856 ms" (2026-10-14)
+    text_spans: Annotated[Literal["section", "page"], _shaping(frozenset({"text"}))] = "section"
+
+    def text_section_of(self, section_of):
+        return (lambda box: None) if self.text_spans == "page" else super().text_section_of(section_of)
+
 class RepeatedText(Lever):
     lever_name, stage, off = "repeated_text", "inclusion", {"repeated_text": "keep"}
     # first: a PDF page's text tasks leave out a block saying exactly what blocks in the same place said on REPEATED
@@ -740,8 +751,8 @@ LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, Complete
                  TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles,
                  SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,
                  RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts,
-                 RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Reconcile, DedupeRepeated,
-                 ContinueReading, Align, VerifyVisuals, ExplainDifferences)
+                 TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Reconcile,
+                 DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -956,6 +967,12 @@ class Platform(Composable):
         dropped: the platform's, cut where the bytes run out."""
         from .tasks import split_utf8
         return split_utf8(text, limit)
+
+    @chosen
+    def text_section_of(self, section_of):
+        """What parts a page's text blocks into tasks (section_of(box) names a block's section): the platform's, its
+        sections."""
+        return section_of
 
     @chosen
     def cut_layer(self, layer, limit):

@@ -247,8 +247,8 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     for page in range(1, doc.pages + 1):
         yield "page"
         blocks = [b for b in doc.blocks if b.page == page]
-        for k, (ids, segments) in enumerate(groups(blocks, s.text_bytes, lambda box, p=page: index.box(p, box).id,
-                                                         s.split_text)):
+        section_of = s.text_section_of(lambda box, p=page: index.box(p, box).id)
+        for k, (ids, segments) in enumerate(groups(blocks, s.text_bytes, section_of, s.split_text)):
             if k and k % TASKS_PER_TURN == 0:
                 yield "page"  # a long page: other sources take their turn
             core.text_task(page, segments, f"text:p{page}:{ids}")
