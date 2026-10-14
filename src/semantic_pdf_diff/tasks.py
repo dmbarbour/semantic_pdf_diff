@@ -7,7 +7,6 @@ Split from extract.py; PDF requests are byte for byte what they were (tests/test
 """
 import hashlib
 import re
-import json
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
@@ -424,7 +423,7 @@ class TaskCore:
         s = self.s
         pick = lambda cells: [cells[c] if c < len(cells) else None for c in columns]
         head, cells = pick(header), pick(row)
-        text = "Header: " + json.dumps(head, ensure_ascii=False) + "\nRow: " + json.dumps(cells, ensure_ascii=False)
+        text = s.row_text(head, cells)
         flat = " ".join(str(c) for c in head + cells if c not in (None, ""))
         fits = len(text.encode()) <= s.text_bytes
         splittable = len(columns) > 2
