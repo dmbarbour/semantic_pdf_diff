@@ -41,8 +41,8 @@ python scripts/fetch_samples.py --all --make-zips
 The 3GPP files are kept as downloaded zips, since zips are meant to be read as folders. Sources and terms are in `scripts/samples.json`. For example:
 
 ```bash
-pdf-semantic-diff samples/wind-reference-turbines/nrel-5mw/NREL-5MW-reference-turbine.pdf \
-  samples/wind-reference-turbines/iea-15mw/IEA-15MW-reference-turbine.pdf --out wind-diff
+pdf-semantic-diff compare samples/wind-reference-turbines/nrel-5mw/NREL-5MW-reference-turbine.pdf \
+  samples/wind-reference-turbines/iea-15mw/IEA-15MW-reference-turbine.pdf --store wind-diff
 ```
 
 ## Recorded answers (replay fixtures)

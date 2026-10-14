@@ -105,7 +105,7 @@ class Determinism(unittest.TestCase):
         config.write_text(json.dumps({'concurrency': workers, 'tile_points': 180, 'retries': 0, **stubs.TILING_BEFORE}))
         out = root / f'out-{workers}'
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-            cli.main([str(a), str(b), '--out', str(out), '--base-url', url, '--config', str(config)])
+            cli.main(['compare', str(a), str(b), '--store', str(out), '--base-url', url, '--config', str(config)])
         evidence = json.loads((out / 'evidence.json').read_text())
         report = json.loads((out / 'report.json').read_text())
         return {'evidence': evidence['evidence'], 'coverage': evidence['coverage'], 'findings': report['findings'],
@@ -144,8 +144,8 @@ class Determinism(unittest.TestCase):
                                                                              '--responder', 'gemma-4']
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()), \
                         (stubs.answers_shuffled(seed) if seed else contextlib.nullcontext()):
-                    cli.main([str(a), str(b), '--out', str(out), '--base-url', url, '--config', str(config),
-                              '--fixture', str(fixture), *mode])
+                    cli.main(['compare', str(a), str(b), '--store', str(out), '--base-url', url, '--config',
+                              str(config), '--fixture', str(fixture), *mode])
                 report = json.loads((out / 'report.json').read_text())
                 for run_record in ('settings', 'created_at'):  # how the run was set up and when
                     report.pop(run_record)

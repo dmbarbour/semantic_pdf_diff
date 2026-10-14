@@ -159,7 +159,7 @@ class Tests(unittest.TestCase):
                     doc.save(root/(name+'.pdf'));doc.close()
                 config=root/'config.json'
                 config.write_text(json.dumps({'base_url':url,'retries':0}))
-                args=[str(root/'a.pdf'),str(root/'b.pdf'),'--out',str(root/'out'),'--config',str(config)]
+                args=['compare',str(root/'a.pdf'),str(root/'b.pdf'),'--store',str(root/'out'),'--config',str(config)]
                 self.assertEqual(main(args),0)
                 result=json.loads((root/'out/report.json').read_text())
                 self.assertGreater(state['images'],0)

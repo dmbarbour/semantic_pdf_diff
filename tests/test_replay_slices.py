@@ -68,8 +68,8 @@ class ReplaySlices(unittest.TestCase):
         # The settings the fixture was recorded with (they're part of each request's fingerprint).
         config.write_text(json.dumps(record_runs.BASE_SETTINGS))
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-            code = cli.main([str(a), str(b), '--out', str(out), '--base-url', UNREACHABLE, '--config', str(config),
-                             '--fixture', str(FIXTURE), '--responder', responder])
+            code = cli.main(['compare', str(a), str(b), '--store', str(out), '--base-url', UNREACHABLE, '--config',
+                             str(config), '--fixture', str(FIXTURE), '--responder', responder])
         # the run's usage is in its own record beside the report (run.json), read here with it
         return code, {**json.loads((out / 'report.json').read_text()),
                       'usage': json.loads((out / 'run.json').read_text())['usage']}

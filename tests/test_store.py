@@ -227,7 +227,7 @@ class ResumeAndReuse(unittest.TestCase):
 
     def run_cli(self, a, b, out, url, *extra):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
-            code = cli.main([str(a), str(b), '--out', str(out), '--base-url', url, '--no-vision', *extra])
+            code = cli.main(['compare', str(a), str(b), '--store', str(out), '--base-url', url, '--no-vision', *extra])
         return code, err.getvalue()
 
     def findings(self, out):
@@ -316,8 +316,8 @@ class ResumeAndReuse(unittest.TestCase):
             self.assertEqual(code, 1)
             self.assertIn('--reset', log)
             with contextlib.redirect_stdout(io.StringIO()) as out:
-                cli.main([str(a), str(b), '--out', str(root / 'out'), '--model', 'another-model', '--reset',
-                          '--dry-run'])
+                cli.main(['compare', str(a), str(b), '--store', str(root / 'out'), '--model', 'another-model',
+                          '--reset', '--dry-run'])
             self.assertGreater(json.loads(out.getvalue())['would_clear']['extract']['evidence'], 0)
             code, _ = self.run_cli(a, b, root / 'out', url, '--model', 'another-model', '--reset')
             self.assertEqual(code, 2)  # --no-vision is deliberately incomplete
@@ -363,7 +363,7 @@ class ResumedRuns(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, jittery_model() as (url, _):
             root = Path(d)
             a, b = document(root / 'a.pdf', 10, True), document(root / 'b.pdf', 12, True)
-            run = lambda limit: cli.main([str(a), str(b), '--out', str(root / 'out'), '--base-url', url,
+            run = lambda limit: cli.main(['compare', str(a), str(b), '--store', str(root / 'out'), '--base-url', url,
                                           '--no-situate'] + (['--config', str(limit)] if limit else []))
             limit = root / 'limit.json'
             limit.write_text(json.dumps({'max_calls': 12}))

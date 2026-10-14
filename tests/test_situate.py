@@ -355,7 +355,8 @@ class Storage(unittest.TestCase):
     def run_cli(self, root, a, b, *extra, client=None):
         client = client or Recorder(vision=False)
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
-            code = cli.main([str(a), str(b), '--out', str(root / 'out'), '--no-vision', *extra], client=client)
+            code = cli.main(['compare', str(a), str(b), '--store', str(root / 'out'), '--no-vision', *extra],
+                             client=client)
         return code, client, err.getvalue()
 
     def situating_calls(self, client):

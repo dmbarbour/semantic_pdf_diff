@@ -160,7 +160,8 @@ class SettingsKeepToTheirClass(unittest.TestCase):
         cls.state['queries'] = []
         a, b = cls.docs[sheet]
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-            cli.main([str(a), str(b), '--out', str(cls.root / name), '--base-url', cls.url, '--config', str(config)])
+            cli.main(['compare', str(a), str(b), '--store', str(cls.root / name), '--base-url', cls.url, '--config',
+                      str(config)])
         return set(cls.state['queries'])
 
     def test_every_setting_is_classified(self):
@@ -245,7 +246,7 @@ class DefaultsFitTheirBudget(unittest.TestCase):
             root = Path(d)
             a, b = document(root / "a.pdf", 10, True), document(root / "b.pdf", 12, True)
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                cli.main([str(a), str(b), "--out", str(root / "out"), "--base-url", url])
+                cli.main(["compare", str(a), str(b), "--store", str(root / "out"), "--base-url", url])
             report = json.loads((root / "out" / "report.json").read_text())
         refused = [f["rationale"] for f in report["findings"] if "budget" in str(f.get("rationale"))]
         issues = [i for row in report["coverage"] for i in row.get("issues", []) if "budget" in i]

@@ -64,15 +64,15 @@ class Verbosity(unittest.TestCase):
             for name, power in (('a.pdf', 10), ('b.pdf', 12)):
                 (root / name).write_bytes(pdf_bytes(f'Pump rated power {power} kW'))
             with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
-                cli.main([str(root / 'a.pdf'), str(root / 'b.pdf'), '--out', str(root / 'out'), '--base-url', url,
-                          '--no-vision', '-vv', '--log-file', str(root / 'run.log')])
+                cli.main(['compare', str(root / 'a.pdf'), str(root / 'b.pdf'), '--store', str(root / 'out'),
+                          '--base-url', url, '--no-vision', '-vv', '--log-file', str(root / 'run.log')])
             logged = (root / 'run.log').read_text()
             self.assertIn('Extraction', logged)
             self.assertIn('ok in', logged)
             self.assertIn('extract:', logged)
             with contextlib.redirect_stderr(io.StringIO()) as quiet, contextlib.redirect_stdout(io.StringIO()):
-                cli.main([str(root / 'a.pdf'), str(root / 'b.pdf'), '--out', str(root / 'out'), '--base-url', url,
-                          '--no-vision', '-q'])
+                cli.main(['compare', str(root / 'a.pdf'), str(root / 'b.pdf'), '--store', str(root / 'out'),
+                          '--base-url', url, '--no-vision', '-q'])
             self.assertEqual(quiet.getvalue(), '')
 
 if __name__ == '__main__':

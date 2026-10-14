@@ -76,8 +76,8 @@ class Requests(unittest.TestCase):
                 doc.save(pdf)
                 config.write_text(json.dumps({"table_cuts": on, "tiling": "grid", "tile_points": 300}))
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                    cli.main([str(pdf), str(pdf), "--out", str(Path(d) / "out"), "--base-url", url, "--no-situate",
-                              "--config", str(config)])
+                    cli.main(["compare", str(pdf), str(pdf), "--store", str(Path(d) / "out"), "--base-url", url,
+                              "--no-situate", "--config", str(config)])
             notes[on] = [p.split(TABLE_CUT_NOTE + "\n", 1)[1] for role, p, *_ in state["transcript"]
                          if role == "extract" and TABLE_CUT_NOTE in p]
         self.assertEqual(notes[False], [])

@@ -30,21 +30,21 @@ pip install -e .
 export OPENAI_API_KEY='your-serving-provider-key'
 export OPENAI_BASE_URL='https://your-provider.example/v1'
 export OPENAI_MODEL='your-vision-model-id'
-pdf-semantic-diff team-a.pdf team-b.pdf --out result
+pdf-semantic-diff compare team-a.pdf team-b.pdf --store result
 ```
 
-`pdf-semantic-diff --help` lists every command, the environment it needs and examples; `pdf-semantic-diff help COMMAND` gives a command's options, and `pdf-semantic-diff settings` prints every setting a run would use (with `--changed`, those differing from the defaults: a starting `--config` file).
+`pdf-semantic-diff --help` lists every command, the environment it needs and examples; `pdf-semantic-diff COMMAND --help` (or `pdf-semantic-diff help COMMAND`) gives a command's options, and `pdf-semantic-diff settings` prints every setting a run would use (with `--changed`, those differing from the defaults: a starting `--config` file).
 
 Open `result/report.html`, keeping its `assets/` folder alongside it. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
 
-Either argument can also be a folder or a zip archive. For revisions, supply the old version first:
+Either source can also be a folder or a zip archive. For revisions, supply the old version first:
 
 ```bash
-pdf-semantic-diff old.pdf new.pdf --mode revisions --out revision-diff
-pdf-semantic-diff team-a/ team-b.zip --out team-diff
+pdf-semantic-diff compare old.pdf new.pdf --mode revisions --store revision-diff
+pdf-semantic-diff compare team-a/ team-b.zip --store team-diff
 ```
 
-For repeated work, declare **sources** in a store, each with a name, provenance metadata and one or more roots, and compare them by name. Sources are rescanned on every run, so edited, added or deleted files are picked up:
+For repeated work, declare **sources** in a store, each with a name, provenance metadata and one or more roots, and compare them by name (`compare` takes names and paths alike, a declared name first). Sources are rescanned on every run, so edited, added or deleted files are picked up:
 
 ```bash
 pdf-semantic-diff source add team-a --store work --path team-a/ --path addendum.pdf --meta organization="Team A" --meta revision=C
@@ -74,7 +74,7 @@ A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifes
 
 Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error.
 
-The `--out` folder is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence and cached model responses, and an interrupted run resumes where it stopped. A store is bound to the model and extraction settings it was built with. A run with different ones is refused, saying what differs and at most how much would be asked again, unless you pass `--reset` (preview with `--reset --dry-run`) or use a new folder. Settings that only post-process answers are applied without asking, recomputed from cached answers.
+The `--store` folder (`diff-output` unless named) is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence and cached model responses, and an interrupted run resumes where it stopped. A store is bound to the model and extraction settings it was built with. A run with different ones is refused, saying what differs and at most how much would be asked again, unless you pass `--reset` (preview with `--reset --dry-run`) or use a new folder. Settings that only post-process answers are applied without asking, recomputed from cached answers.
 
 ## Documentation
 

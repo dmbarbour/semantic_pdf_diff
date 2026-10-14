@@ -143,7 +143,8 @@ class Pictures(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, jittery_model() as (url, state):
             root = Path(d)
             (root / "a.docx").write_bytes(raw.getvalue())
-            args = [str(root / "a.docx"), str(root / "a.docx"), "--out", str(root / "out"), "--base-url", url, "-q"]
+            args = ["compare", str(root / "a.docx"), str(root / "a.docx"), "--store", str(root / "out"), "--base-url",
+                    url, "-q"]
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 self.assertIn(cli.main(args), (0, 2))
             report = json.loads((root / "out" / "report.json").read_text())

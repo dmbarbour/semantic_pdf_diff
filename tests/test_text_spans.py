@@ -40,8 +40,8 @@ class TextSpans(unittest.TestCase):
                 doc.write_text(DOCUMENT)
                 config.write_text(json.dumps({"text_spans": spans}))
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                    cli.main([str(doc), str(doc), "--out", str(Path(d) / "out"), "--base-url", url, "--no-situate",
-                              "--config", str(config)])
+                    cli.main(["compare", str(doc), str(doc), "--store", str(Path(d) / "out"), "--base-url", url,
+                              "--no-situate", "--config", str(config)])
             sources[spans] = [p.split("SOURCE DATA:\n")[-1] for role, p, *_ in state["transcript"]
                               if role == "extract" and "SOURCE DATA:" in p]
         apart = [s for s in sources["section"] if "856 ms" in s or "709 ms" in s]

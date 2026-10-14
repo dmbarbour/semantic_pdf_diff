@@ -38,8 +38,8 @@ def requests(settings, sheet, logged=False):
         a, b = document(root / "a.pdf", 10, sheet), document(root / "b.pdf", 12, sheet)
         (root / "settings.json").write_text(json.dumps(settings))
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-            cli.main([str(a), str(b), "--out", str(root / "out"), "--base-url", url,
-                      "--config", str(root / "settings.json")])
+            cli.main(["compare", str(a), str(b), "--store", str(root / "out"), "--base-url", url, "--config",
+                      str(root / "settings.json")])
         if logged:
             with Store(root / "out") as store:
                 return state["transcript"], store.queries()

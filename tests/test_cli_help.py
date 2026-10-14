@@ -17,7 +17,7 @@ COMMANDS = ("compare", "source", "show", "report", "gc", "settings", "fixtures")
 
 def parsers():
     """Every parser and subparser the command line builds: [(prog, parser)]."""
-    tops = [cli.shortcut_parser(), cli.compare_parser(), cli.source_parser(), cli.fixtures_parser(),
+    tops = [cli.overview_parser(), cli.compare_parser(), cli.source_parser(), cli.fixtures_parser(),
             cli.settings_parser(), *(cli.store_parser(c) for c in ("show", "gc", "report"))]
     out = []
     def walk(parser):
@@ -59,7 +59,17 @@ class Help(unittest.TestCase):
             self.assertRegex(text, rf"\n  {name} +\S", name)
         for needed in ("OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_MODEL", "source add", "Exit codes"):
             self.assertIn(needed, text)
-        self.assertEqual(run([]), (1, text + "\n"))  # no arguments: the same, as an error
+        self.assertEqual(run([]), (1, text))  # no arguments: the same, as an error
+        self.assertEqual(run(["--version"])[0], 0)
+
+    def test_two_paths_alone_are_no_command_but_say_how(self):
+        with tempfile.TemporaryDirectory() as d:
+            a = Path(d) / "a.pdf"
+            a.write_bytes(b"%PDF")
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                self.assertEqual(cli.main([str(a), str(a)]), 1)
+            self.assertIn(f"pdf-semantic-diff compare {a} {a}", err.getvalue())
 
     def test_help_command_is_the_commands_own_help(self):
         self.assertEqual(run(["help", "source", "add"]), run(["source", "add", "--help"]))

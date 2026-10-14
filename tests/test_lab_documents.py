@@ -42,7 +42,8 @@ class EveryFormat(unittest.TestCase):
                 config = root / f'{name}.json'
                 config.write_text(json.dumps({'concurrency': 4, 'tile_points': 180, 'retries': 0, 'situate': False,
                                               **extra}))
-                cli.main([*files, '--out', str(root / name / 'run1'), '--base-url', url, '--config', str(config)])
+                cli.main(['compare', *files, '--store', str(root / name / 'run1'), '--base-url', url, '--config',
+                          str(config)])
         # The stub reads text the same way under either variant: the variant loses the heater, as a lever might.
         with Store(root / 'variant' / 'run1') as store, store.db:
             store.db.execute("DELETE FROM evidence WHERE content LIKE '%.md' AND data LIKE '%9 kW%'")

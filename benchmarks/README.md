@@ -127,7 +127,7 @@ For sensitive documents, everything stays local. Use `review judge` only with mo
 
 ```bash
 # Replay recorded answers into stores to sample from (offline; no model calls)
-pdf-semantic-diff samples/slices/A.pdf samples/slices/B.pdf --out benchmarks/runs/<responder>/<run> \
+pdf-semantic-diff compare samples/slices/A.pdf samples/slices/B.pdf --store benchmarks/runs/<responder>/<run> \
     --fixture tests/fixtures/replay-slices.zip --responder <responder> --config <recording settings>
 
 # Sample a batch (claims round-robin over kinds; abouts; pairs round-robin over relations)

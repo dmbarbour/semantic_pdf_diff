@@ -37,7 +37,7 @@ def run(setting):
         pdf = stamped(root / "a.pdf")
         (root / "settings.json").write_text(json.dumps({"repeated_text": setting, "vision": False}))
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-            cli.main([str(pdf), str(pdf), "--out", str(root / "out"), "--base-url", url, "--no-situate",
+            cli.main(["compare", str(pdf), str(pdf), "--store", str(root / "out"), "--base-url", url, "--no-situate",
                       "--config", str(root / "settings.json")])
         report = json.loads((root / "out" / "report.json").read_text())
     asked = [prompt for role, prompt, *_ in state["transcript"] if role == "extract"]

@@ -579,7 +579,7 @@ class Provenance(unittest.TestCase):
             for _ in range(2):
                 client = Recorder(vision=False)
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                    cli.main([str(a), str(b), '--out', str(root / 'out'), '--no-vision'], client=client)
+                    cli.main(['compare', str(a), str(b), '--store', str(root / 'out'), '--no-vision'], client=client)
                 report = json.loads((root / 'out/report.json').read_text())
                 self.assertEqual(len([x for x in report['sections'] if x['origin'] == 'outline']), 4)
                 self.assertIn('§ Design &gt; Fans', (root / 'out/report.html').read_text())

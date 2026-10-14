@@ -664,11 +664,10 @@ class Replay(unittest.TestCase):
                 pdf = controlled.write(project, d / "docs")
                 self.assertEqual(pdf.read_bytes(), (folder / "docs" / pdf.name).read_bytes())  # generated alike
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                    code = cli.main([str(pdf), str(pdf), "--config", str(folder / "settings.json"), "-q",
-                                     "--no-situate", "--out", str(d / "runs" / project.id),
-                                     "--fixture", str(folder / "replay.zip"),
-                                     "--fixture-mode", "replay", "--base-url", "http://127.0.0.1:9/v1",
-                                     "--responder", responder])
+                    code = cli.main(["compare", str(pdf), str(pdf), "--config", str(folder / "settings.json"), "-q",
+                                     "--no-situate", "--store", str(d / "runs" / project.id), "--fixture",
+                                     str(folder / "replay.zip"), "--fixture-mode", "replay", "--base-url",
+                                     "http://127.0.0.1:9/v1", "--responder", responder])
                 self.assertIn(code, (0, 2))
             claims = {}
             for (run, _, _, _), unit in rounds.collect(d / "runs").items():
@@ -701,10 +700,10 @@ class Replay(unittest.TestCase):
             for pdf in pdfs:
                 self.assertEqual(pdf.read_bytes(), (folder / "docs" / pdf.name).read_bytes())  # generated alike
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                code = cli.main([*map(str, pdfs), "--mode", "revisions", "--config", str(folder / "settings.json"),
-                                 "-q", "--no-situate", "--out", str(d / "run"), "--fixture", str(folder / "replay.zip"),
-                                 "--fixture-mode", "replay", "--base-url", "http://127.0.0.1:9/v1",
-                                 "--responder", responder])
+                code = cli.main(["compare", *map(str, pdfs), "--mode", "revisions", "--config",
+                                 str(folder / "settings.json"), "-q", "--no-situate", "--store", str(d / "run"),
+                                 "--fixture", str(folder / "replay.zip"), "--fixture-mode", "replay", "--base-url",
+                                 "http://127.0.0.1:9/v1", "--responder", responder])
             self.assertIn(code, (0, 2))
             keys = [json.loads((d / "docs" / f"{i}.key.json").read_text()) for i in (pair.earlier, pair.later)]
             result = comparison.score_comparison(*keys, json.loads((d / "run" / "report.json").read_text()))

@@ -115,7 +115,7 @@ class CliTests(unittest.TestCase):
     def run_cli(self, root, a, b):
         client = Recorder(vision=False)
         with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
-            code = main([str(a), str(b), '--out', str(root / 'out'), '--no-vision'], client=client)
+            code = main(['compare', str(a), str(b), '--store', str(root / 'out'), '--no-vision'], client=client)
         return code, client
 
     def test_the_saved_comparison_holds_what_the_report_marks(self):

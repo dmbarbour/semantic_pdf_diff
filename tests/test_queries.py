@@ -32,7 +32,7 @@ class Dumps(unittest.TestCase):
             for side, settings in (('base', {'context_before': 0}), ('variant', {})):  # the variant adds text before
                 config = root / f'{side}.json'
                 config.write_text(json.dumps({**settings, 'situate': False}))
-                cli.main([str(a), str(b), '--out', str(root / side / 'run1'), '--base-url', url,
+                cli.main(['compare', str(a), str(b), '--store', str(root / side / 'run1'), '--base-url', url,
                           '--config', str(config)])
 
     @classmethod
@@ -90,7 +90,7 @@ class LeverScope(unittest.TestCase):
             for side, settings in (('base', {}), ('variant', {'visual_text_layer': 0})):
                 config = root / f'{side}.json'
                 config.write_text(json.dumps({**settings, 'situate': False}))
-                cli.main([str(a), str(b), '--out', str(root / side / 'run1'), '--base-url', url,
+                cli.main(['compare', str(a), str(b), '--store', str(root / side / 'run1'), '--base-url', url,
                           '--config', str(config)])
 
     @classmethod

@@ -190,19 +190,27 @@ class CommandLine(unittest.TestCase):
             (self.root / 'team-b.source.json').unlink()
             self.assertIn('manifest missing: orphaned', self.source('list')[1])
 
-    def test_shortcut_takes_folders_and_guards_names(self):
+    def test_compare_takes_paths_and_names_and_guards_names(self):
         with model_server() as (url, state):
-            code, _, _ = self.cli(self.root / 'team-a', self.root / 'team-b', '--out', self.store, '--base-url', url,
-                                  '--no-vision')
+            code, _, _ = self.cli('compare', self.root / 'team-a', self.root / 'team-b', '--store', self.store,
+                                  '--base-url', url, '--no-vision')
             sources = json.loads((self.store / 'report.json').read_text())['sources']
             self.assertEqual([(s['name'], s['kind']) for s in sources],
                              [('team-a', 'shortcut'), ('team-b', 'shortcut')])
             self.source('add', 'declared', '--path', self.root / 'team-a')
+            code, _, _ = self.cli('compare', 'declared', self.root / 'team-b', '--store', self.store,
+                                  '--base-url', url, '--no-vision')  # a declared name and a path
+            sources = json.loads((self.store / 'report.json').read_text())['sources']
+            self.assertEqual([(s['name'], s['kind']) for s in sources], [('declared', 'declared'), ('team-b',
+            'shortcut')])
             (self.root / 'declared').mkdir()
-            code, _, err = self.cli(self.root / 'declared', self.root / 'team-b', '--out', self.store,
+            code, _, err = self.cli('compare', self.root / 'declared', self.root / 'team-b', '--store', self.store,
                                     '--base-url', url)
             self.assertEqual(code, 1)
             self.assertIn("already has a declared source named 'declared'", err)
+            code, _, err = self.cli('compare', 'nowhere', self.root / 'team-b', '--store', self.store)
+            self.assertEqual(code, 1)
+            self.assertIn("'nowhere' is neither a file, folder or zip archive nor a source declared in", err)
 
 class ReportLinks(unittest.TestCase):
     def test_crops_link_relative_to_the_report_folder(self):

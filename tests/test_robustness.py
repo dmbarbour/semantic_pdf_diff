@@ -377,7 +377,8 @@ class CliTests(unittest.TestCase):
             config = Path(d)/'c.json'; config.write_text('[1, 2]')
             path = pdf(Path(d)/'t.pdf', lambda p: None)
             with contextlib.redirect_stderr(io.StringIO()) as err:
-                self.assertEqual(main([str(path), str(path), '--out', str(Path(d)/'out'), '--config', str(config)]), 1)
+                self.assertEqual(main(['compare', str(path), str(path), '--store', str(Path(d)/'out'), '--config',
+                                       str(config)]), 1)
             self.assertIn('JSON object', err.getvalue())
 
     def test_even_tiles_on_a_blank_page(self):

@@ -164,7 +164,7 @@ class Pipeline(unittest.TestCase):
             root = Path(d)
             (root / "a.md").write_text(a)
             (root / "b.md").write_text(b)
-            args = [str(root / "a.md"), str(root / "b.md"), "--out", str(root / "out"), "--base-url", url,
+            args = ["compare", str(root / "a.md"), str(root / "b.md"), "--store", str(root / "out"), "--base-url", url,
                     "--mode", "revisions", "-q"]
             reports = []
             for _ in range(2):  # the second run reads both files' evidence from the store

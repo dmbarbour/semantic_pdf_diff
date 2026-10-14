@@ -1,7 +1,6 @@
 """Command line: compare two sources, and manage declared sources in a store.
 
-    pdf-semantic-diff A B --out DIR                     # shortcut: A and B are files, folders or zips
-    pdf-semantic-diff compare --store DIR NAME NAME     # declared sources, or --manifest FILE
+    pdf-semantic-diff compare A B [--store DIR]         # files, folders, zips or declared sources' names
     pdf-semantic-diff source add|list|show|update|remove|export|import ...
     pdf-semantic-diff show|gc|report --store DIR ...
     pdf-semantic-diff settings [--config FILE] [--changed]
@@ -14,7 +13,8 @@ import json
 import sys
 from pathlib import Path
 from . import __version__, fixtures, manifest
-from .pipeline import RunOptions, attempt, compare_paths, document_properties, limits, run, settings_from
+from .pipeline import (RunOptions, attempt, check_fixture, declare_paths, document_properties, limits, run,
+                       settings_from)
 from .schema import Source
 from .progress import log, setup_logging
 from .report import write_report
@@ -35,11 +35,16 @@ def main(argv=None, client=None):
 
 def command(argv, client):
     """The command argv names, run: its exit code."""
-    if not argv:
-        print(shortcut_parser().format_help())
-        return 1
+    if not argv or argv[0] in ('-h', '--help'):
+        print(overview_parser().format_help())
+        return 0 if argv else 1
+    if argv[0] == '--version':
+        print(f'pdf-semantic-diff {__version__}')
+        return 0
     if argv[0] == 'help':  # "help source add" is "source add --help"
         argv = [*argv[1:], '--help']
+        if argv == ['--help']:
+            return command(argv, client)
     if argv[0] == 'source':
         return source_command(argv[1:])
     if argv[0] == 'compare':
@@ -53,20 +58,20 @@ def command(argv, client):
     lab = lab_commands().get(argv[0])
     if lab:
         return lab(argv[1:])
-    return shortcut_command(argv, client)
+    hint = f": to compare files, pdf-semantic-diff compare {' '.join(argv[:2])}" if Path(argv[0]).exists() else ""
+    print(f"pdf-semantic-diff: no command {argv[0]!r}{hint} (pdf-semantic-diff --help lists them)", file=sys.stderr)
+    return 1
 
-# What `pdf-semantic-diff --help` says before and after the two-source options: someone installing the tool on
-# another machine has only this, not the docs (the owner, 2026-10-14: "it doesn't even mention the `source add`
-# options").
+# What `pdf-semantic-diff --help` says: someone installing the tool on another machine has only this, not the docs
+# (the owner, 2026-10-14: "it doesn't even mention the `source add` options").
 COMMANDS_HELP = """\
 Evidence-first comparison of engineering documents: competing proposals, or revisions of one design. A vision
 model behind an OpenAI-compatible endpoint reads claims from text, tables, charts and drawings; related claims are
 paired, and differences are reported with the page and region each claim came from. Nothing is ranked, and a claim
 with no counterpart isn't taken as proof of absence.
 
-Commands (pdf-semantic-diff help COMMAND, or COMMAND --help):
-  A B         compare two files, folders or zip archives (the options below)
-  compare     compare two sources declared in a store, by name
+Commands (pdf-semantic-diff COMMAND --help for each, or pdf-semantic-diff help COMMAND):
+  compare     compare two sources: files, folders or zip archives, or sources declared in a store
   source      declare sources in a store and manage them: add, list, show, update, remove, export, import
   show        print a view of a store: its sources, files, evidence, coverage or comparisons
   report      write a store's report again, without model calls
@@ -84,15 +89,16 @@ Any other setting goes in a --config JSON file, or the environment as PDF_DIFF_<
 `pdf-semantic-diff settings`.
 
 Examples:
-  pdf-semantic-diff team-a.pdf team-b.pdf --out result           two proposals; open result/report.html
-  pdf-semantic-diff old.pdf new.pdf --mode revisions --out diff   a revision: the earlier one first
-  pdf-semantic-diff team-a/ team-b.zip --out result --max-cost 2  stop asking once $2 is reported spent
+  pdf-semantic-diff compare team-a.pdf team-b.pdf --store result           two proposals; open result/report.html
+  pdf-semantic-diff compare old.pdf new.pdf --mode revisions --store diff  a revision: the earlier one first
+  pdf-semantic-diff compare team-a/ team-b.zip --max-cost 2                stop asking once $2 is reported spent
   pdf-semantic-diff source add team-a --store work --path team-a/ --meta organization="Team A"
   pdf-semantic-diff source add team-b --store work --path team-b.zip
-  pdf-semantic-diff compare --store work team-a team-b
+  pdf-semantic-diff compare team-a team-b --store work                     declared sources, by name
 
-The --out (or --store) folder is a store. It receives report.html (keep its assets/ folder beside it), report.json
-and evidence.json. A run into it again reuses what was read, and resumes one interrupted.
+A comparison's --store folder (diff-output unless named) holds what was read, and receives report.html (keep its
+assets/ folder beside it), report.json and evidence.json. A comparison into it again reuses what was read, and
+resumes one interrupted.
 
 Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error.
 """
@@ -123,7 +129,7 @@ def start_logging(args):
 def add_run_options(parser):
     reading = parser.add_argument_group('comparing and reading')
     reading.add_argument('--mode', choices=['proposals', 'revisions'], default='proposals',
-                         help='Proposals (the default): two competing designs, side by side. revisions: the first '
+                         help='Proposals (the default): two competing designs, side by side. Revisions: the first '
                               'source is the earlier revision of one design and the second the later; differences '
                               'are named as changes (a value or its conditions changed, renamed, restated, moved)')
     reading.add_argument('--config', type=Path,
@@ -190,43 +196,47 @@ def load_settings(args):
     return settings_from(getattr(args, 'config', None), **flags)
 
 
-# --- shortcut: two paths ------------------------------------------------------------
-
-def shortcut_parser():
+def overview_parser():
+    """What `pdf-semantic-diff --help` prints: the commands, how to start, examples (each command parses its own)."""
     commands = COMMANDS_HELP + "".join(f"  {name:<11} the lab's (semantic-pdf-diff[lab])\n"
                                        for name in sorted(lab_commands()))
-    parser = argparse.ArgumentParser(prog='pdf-semantic-diff', usage='%(prog)s A B [--out DIR] [options]\n'
-                                     '       %(prog)s COMMAND [options]   (COMMAND: see below)')
+    parser = argparse.ArgumentParser(prog='pdf-semantic-diff', usage='%(prog)s COMMAND [options]')
     help_text(parser, START_HELP.format(base_url=default('base_url'), model=default('model')), commands)
-    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
-    parser.add_argument('a', type=Path, help='The first source (a file, folder or zip archive): proposal A, or the '
-                                             'earlier revision')
-    parser.add_argument('b', type=Path, help='The second: proposal B, or the later revision')
-    parser.add_argument('--out', type=Path, default=Path('diff-output'),
-                        help='The store folder, created if missing (default: diff-output). It receives the reports '
-                             'too')
-    add_run_options(parser)
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}',
+                        help="show the program's version and exit")
     return parser
 
-def shortcut_command(argv, client=None):
-    args = shortcut_parser().parse_args(argv)
-    start_logging(args)
-    settings = load_settings(args)
-    return compare_paths(args.a, args.b, args.out, settings, RunOptions.from_args(args), client)
 
+# --- compare ---------------------------------------------------------------------------
 
-# --- compare declared sources ---------------------------------------------------------
+COMPARE_HELP = """\
+Compare two sources. Each is a file, folder or zip archive, or the name of a source declared in the store
+(`pdf-semantic-diff source add`); a declared name is taken before a path. Sources are rescanned first, so files
+edited, added or removed since are picked up.
+"""
+
+COMPARE_EXAMPLES = """\
+Examples:
+  pdf-semantic-diff compare team-a.pdf team-b.pdf --store result
+  pdf-semantic-diff compare old.pdf new.pdf --mode revisions --store diff --max-cost 2
+  pdf-semantic-diff compare team-a team-b --store work  sources declared in work
+  pdf-semantic-diff compare rev-b rev-c --store work --mode revisions --report reports/b-to-c
+  pdf-semantic-diff compare --store work --manifest team-a.source.json team-b
+"""
 
 def compare_parser():
-    parser = help_text(argparse.ArgumentParser(prog='pdf-semantic-diff compare'), COMPARE_EXAMPLES,
-                       'Compare two sources declared in a store (`pdf-semantic-diff source add`), by name. Each is '
-                       'rescanned first,\nso files edited, added or removed since are picked up.')
-    parser.add_argument('sources', nargs='*', help='The two sources\' names: proposal A then B, or the earlier '
-                                                   'revision then the later')
-    parser.add_argument('--manifest', action='append', type=Path, default=[],
-                        help='A manifest file as a source, linked live: re-imported when it changes')
-    parser.add_argument('--store', type=Path, required=True, help='The store folder holding the sources')
+    parser = help_text(argparse.ArgumentParser(prog='pdf-semantic-diff compare',
+                                               usage='%(prog)s SOURCE SOURCE [--store DIR] [options]'),
+                       COMPARE_EXAMPLES, COMPARE_HELP)
+    parser.add_argument('sources', nargs='*', metavar='SOURCE',
+                        help='Two sources (a file, folder or zip, or a declared source\'s name): proposal A then B, '
+                             'or the earlier revision then the later')
+    parser.add_argument('--store', type=Path, default=Path('diff-output'),
+                        help='The store folder, created if missing (default: diff-output). It keeps what was read, '
+                             'for the next comparison, and receives the reports unless --report names another')
     parser.add_argument('--report', type=Path, help='Report folder (default: the store folder)')
+    parser.add_argument('--manifest', action='append', type=Path, default=[],
+                        help='A manifest file (source export) as a source, linked live: re-imported when it changes')
     add_run_options(parser)
     return parser
 
@@ -234,16 +244,29 @@ def compare_command(argv, client=None):
     args = compare_parser().parse_args(argv)
     start_logging(args)
     settings = load_settings(args)
+    options = RunOptions.from_args(args)
+    check_fixture(options)  # before the store is changed
     with Store(args.store) as store:
-        names = list(args.sources)
-        for path in args.manifest:
-            names.append(link_manifest(store, path))
+        given = [named_or_path(store, args.store, s) for s in args.sources]
+        paths = [g for g in given if isinstance(g, Path)]
+        declared = iter(declare_paths(store, args.store, paths))
+        names = [next(declared) if isinstance(g, Path) else g for g in given]
+        names += [link_manifest(store, path) for path in args.manifest]
         if len(names) != 2:
             raise ValueError(f'compare needs exactly two sources, got {len(names)}')
-        missing = [n for n in names if store.source(n) is None]
-        if missing:
-            raise StoreError(f"no declared source named {', '.join(map(repr, missing))} in {args.store}")
-        return run(RunOptions.from_args(args), settings, store, names, args.report or args.store, client=client)
+        return run(options, settings, store, names, args.report or args.store, force_rescan=bool(paths),
+                   client=client)
+
+def named_or_path(store, folder, given):
+    """A declared source's name, or a path (a file, folder or zip) to declare as one."""
+    source = store.source(given)
+    if source is not None and source.kind != 'shortcut':
+        return given
+    if Path(given).exists():
+        return Path(given)
+    if source is not None:  # a path compared before, by the name it was given
+        return given
+    raise StoreError(f"{given!r} is neither a file, folder or zip archive nor a source declared in {folder}")
 
 def link_manifest(store, path):
     """Declare or refresh a source linked to a manifest file; returns its name."""
@@ -370,16 +393,9 @@ Examples:
   pdf-semantic-diff source add team-a --store work --path team-a/ --path addendum.pdf --meta organization="Team A"
   pdf-semantic-diff source add team-b --store work --path team-b.zip --meta revision=C
   pdf-semantic-diff source list --store work
-  pdf-semantic-diff source show team-a --store work          its files, and those skipped and why
-  pdf-semantic-diff compare --store work team-a team-b
+  pdf-semantic-diff source show team-a --store work  its files, and those skipped and why
+  pdf-semantic-diff compare team-a team-b --store work
   pdf-semantic-diff source export team-a --store work --output team-a.source.json --with-hashes
-"""
-
-COMPARE_EXAMPLES = """\
-Examples:
-  pdf-semantic-diff compare --store work team-a team-b
-  pdf-semantic-diff compare --store work rev-b rev-c --mode revisions --report reports/b-to-c
-  pdf-semantic-diff compare --store work --manifest team-a.source.json team-b
 """
 
 def source_parser():

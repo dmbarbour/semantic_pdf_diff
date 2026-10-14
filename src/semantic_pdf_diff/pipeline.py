@@ -87,8 +87,9 @@ class RunOptions:
         return self.fixture_mode or fixtures.default_mode(self.fixture)
 
 def compare_paths(a, b, out, settings, options=None, client=None):
-    """Compare two sources given as paths (files, folders or zips), each a shortcut source in the store at `out`:
-    the CLI's `pdf-semantic-diff A B --out DIR`. Returns its exit code (0, 2 incomplete, 3 paused for budget)."""
+    """Compare two sources given as paths (files, folders or zips), each a shortcut source in the store at `out`,
+    as `pdf-semantic-diff compare A B --store DIR` does. Returns its exit code (0, 2 incomplete, 3 paused for
+    budget)."""
     options = options or RunOptions()
     check_fixture(options)  # before the sources are declared in the store
     with Store(out) as store:
@@ -102,7 +103,7 @@ def declare_paths(store, out, paths):
     for name, path in zip(names, paths):
         existing = store.source(name)
         if existing and existing.kind != 'shortcut':
-            raise StoreError(f"{out} already has a declared source named {name!r}; use 'compare' instead")
+            raise StoreError(f"{out} already has a declared source named {name!r}: compare it by that name")
         store.save_source(Source(name=name, kind='shortcut', roots=[str(Path(path).resolve())]), replace=True)
     return names
 

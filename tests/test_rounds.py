@@ -40,7 +40,7 @@ class Rounds(unittest.TestCase):
                 config = root / f'{name}.json'
                 config.write_text(json.dumps({'concurrency': 4, 'tile_points': 180, 'retries': 0, 'situate': False,
                                               **extra}))
-                cli.main([str(a), str(b), '--out', str(root / name / 'run1'), '--base-url', url,
+                cli.main(['compare', str(a), str(b), '--store', str(root / name / 'run1'), '--base-url', url,
                           '--config', str(config)])
 
     @classmethod

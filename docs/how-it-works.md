@@ -14,7 +14,7 @@ Provenance (schema v2):
 - A piece of evidence is a **claim within one piece of content**. Its ID derives only from the content and the claim's identity (entity, attribute, value, unit, conditions, `approximate`, basis), so it is stable across renames and doesn't depend on the order in which tasks ran. Every sighting of the same claim (by text, table, tile or overview passes, on any page) is kept as an **occurrence**; displays use one representative occurrence (native before visual, tile before overview, then the smallest region), and reports say how many times and by which passes a claim was found. The same PDF supplied as both sources is extracted once; its evidence is listed as *shared* and never sent for comparison.
 - `evidence.json` and `report.json` record the **interpreters**: the model, a hash of the prompts, the settings that affect output, and library versions.
 - **What a run writes depends only on its inputs, its settings and the answers** (or their absence), not on the order answers arrive in: `run.json`, beside the report, records how the run went (calls, tokens, cost, cache hits, the fixture's counts). Tests replay with answers handled in seeded orders (`PDF_DIFF_ANSWER_ORDER`; the [determinism review](reviews/determinism-2026-10-12.md)).
-- Everything is kept in an evidence **store** (the `--out` folder); see [configuration](configuration.md) for reuse, resume and binding.
+- Everything is kept in an evidence **store** (the `--store` folder); see [configuration](configuration.md) for reuse, resume and binding.
 
 ## Pipeline
 

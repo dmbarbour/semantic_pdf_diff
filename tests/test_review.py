@@ -95,8 +95,8 @@ class Batches(unittest.TestCase):
         config.write_text(json.dumps({'concurrency': 4, 'tile_points': 180, 'retries': 0}))
         with jittery_model() as (url, _), contextlib.redirect_stdout(io.StringIO()), \
              contextlib.redirect_stderr(io.StringIO()):
-            cli.main([str(a), str(b), '--out', str(root / 'store'), '--base-url', url, '--config', str(config),
-                      '--fixture', str(root / 'f.sqlite'), '--fixture-mode', 'replay-or-record'])
+            cli.main(['compare', str(a), str(b), '--store', str(root / 'store'), '--base-url', url, '--config',
+                      str(config), '--fixture', str(root / 'f.sqlite'), '--fixture-mode', 'replay-or-record'])
         cls.store, cls.fixture = root / 'store', root / 'f.sqlite'
 
     @classmethod
