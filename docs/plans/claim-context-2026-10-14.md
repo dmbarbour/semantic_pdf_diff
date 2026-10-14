@@ -1,6 +1,6 @@
 # Claim context: what a claim is about, how to read it, where it came from and who holds it
 
-- **Status:** Active (2026-10-14): written; milestones 1 and 2 built (positions a default; context measured, order revisited); Concepts rewritten (subject, scope, frame, provenance, stance); reviewed whole against the context model, with measurement rewritten and milestones reordered ([Review](#review-2026-10-14)); design questions 1–9 answered, claim identity to be considered further ([Claim identity](#claim-identity)).
+- **Status:** Active (2026-10-14): written; milestones 1 to 3 built (positions a default; context measured, order revisited; context records kept, off); Concepts rewritten (subject, scope, frame, provenance, stance); reviewed whole against the context model, with measurement rewritten and milestones reordered ([Review](#review-2026-10-14)); design questions 1–9 answered, claim identity to be considered further ([Claim identity](#claim-identity)).
 - **The owner, 2026-10-14:** "Ideally, we'd avoid list positions as conditions of a claim, treating them as provenance instead (where a claim was made, how it was named). I feel there's a lot to improve in this domain of tracking the context of a claim. For A, we should consider what the model has access to as part of its query, and what a comparison of claims would have access to - was there enough information in the query to call it the non-conventional 'depth' instead of 'length'? If not, what sort of structure would provide the context for that info? Perhaps we should be examining how we'd approach different naming conventions for dimensions between papers, too."
 - **Then:** "Write the plan, then start with list positions as provenance. Turn it into a full plan unless it proves very short; I expect there's a lot you can think up for how to handle provenance and contexts with a little brainstorming."
 - **On the kinds of context (2026-10-14),** after I proposed subject, scope, frame, provenance and stance: "The names work; rewrite the plan's Concepts section. We can keep 'context' as the umbrella term. I expect we'll spend a fair bit of time on this, trying to improve capture of context per claim." Further words on stance and on context's size are quoted in Concepts.
@@ -345,10 +345,24 @@ Before records are built, so each later milestone has a baseline. Almost all of 
 - **Explanations** get both claims' positions and printed names, so "renumbered" is named from evidence rather than inferred from numbers in the conditions.
 - **Measured:** the inventory per kind; misplacements; grounding; the spec pairs' renumberings named.
 
+
+**Built and measured (2026-10-14)** (the owner: "Go ahead with milestone 3, context records."); the [lever index](../reviews/levers.md) has the rows. Spent: $0.20 (judge and explainer arms); the rest replays.
+- **The store's records** (schema 9: new stores): `ContextRecord` per content, saved with the tasks whose claims reference them; `Evidence.records` and `Evidence.printed`, provenance both (the judge never sees them). Reports and evidence.json carry a content's records once; a claim's card shows its name as printed, its position with its list's lead-in, and the table, notes and legends reaching it.
+- **`records`** (off): lists (lead-in and labels), a drawing sheet's notes and legends (reaching every claim on the sheet), tables read by rules (title, headers, the context their rows are given), and names as printed (a rule claim's row label and header; a text claim's words before its value). The controlled corpus: 256 table, 31 list and 6 note records; 4,800 of 9,359 claims reference one; 5,910 have a name as printed. Extraction and comparisons as before. $0.
+- **`editorial`** (off): a pair judged or settled equivalent at differently labelled places in its lists is noted "renumbered", an editorial change (design question 1). The controlled pairs: 19 notes, the renumbered spec's three conditions in every format; verdicts unchanged. $0.
+- **`align_printed`** (off; the first identity proxy): a table claim's column header stands for its attribute in alignment. No different on the corpus; text claims' names, tried too, lost the coaster's lift hill change in every format ("lift hill rises" for "height"), so only headers count.
+- **`explain_context`** (off): positions and names as printed shown to the explainer. No different against a null arm (kinds 150 and 148 of 155, records alone 151).
+- **Not done here, moved:**
+  - *Stated, none, unknown per kind* and `claim_id`'s parts named: with the scope and frame split (milestone 4) and holders (milestone 5), when there are parts to name.
+  - *Records from situating* (a sheet's title block, figures and their abouts, section abouts as subject and scope records) and *a document's glossary*: situating runs after extraction and only for PDFs; they come with milestone 4's selection, where records are given to requests.
+- **Defaults recommended** (the owner's call): `records` (a post setting, $0, extraction and verdicts unchanged; what reports and the next milestones read) and `editorial` (19 right notes, no verdict changed). `align_printed` and `explain_context` stay off until a corpus pair can move them.
+
 ### 4. Scope and frame
 
 - **Situating finds scope sources and frames** per document, sheet and section: general notes, legends, abbreviation lists, declared units, north arrows and scales, "unless noted otherwise", "typical"; each with its reach and precedence.
-- **Claims take the frames and scope sources that reach them,** and the reader's query is given those its span needs (selection, measured by the sufficiency audit's "not shown").
+- **Claims take the frames and scope sources that reach them,** and the reader's query is given those its span needs (selection, measured by the sufficiency audit's "not shown"): first a sheet's notes and legends (milestone 3's records) in its tiles' requests.
+- **Records from situating and the glossary** (moved from milestone 3): a sheet's title block, figures and their abouts, section abouts, and a document's defined abbreviations, as records requests and claims can be given.
+- **Stated, none, unknown per kind,** and `claim_id`'s parts named, once scope and frame are apart (moved from milestone 3).
 - **The reader's `conditions` split into scope and frame** (a prompt change, judged against null arms and the probes); a tolerance goes with the value.
 - **Who applies frame:** units and datums by code where the probes say the model doesn't apply them reliably; the rest by the judge.
 - **The judge rules on subject, scope and frame separately** (a lever; design question 4), and a difference in frame is reported as context, with the claims it covers.
