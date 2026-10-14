@@ -3,8 +3,8 @@ for each claim of a folder of runs, what its context holds, what's in the wrong 
 words were in what its request showed the model.
 
 - **Inventory:** claims with conditions stated, with a list position (provenance), context records kept (by kind)
-  and the claims referencing them, names as printed, and the requests' context in bytes: the heading and the levers' context lines (`Section:`, neighbouring text, a table's lead-in, stems) against
-  the source data itself.
+  and the claims referencing them, names as printed, and the requests' context in bytes: the heading and the
+  levers' context lines (`Section:`, neighbouring text, a table's lead-in, stems) against the source data itself.
 - **Misplaced:** context in the wrong field, found by pattern: a list position or a reader's numbering ("Condition
   2", "dimension 1", "column 3") in conditions, attribute or entity; frame words ("face of finish", "net") in
   conditions.
