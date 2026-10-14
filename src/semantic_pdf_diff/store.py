@@ -23,7 +23,7 @@ from pathlib import Path
 from .regions import crops_of, region_of
 from .schema import Evidence, Figure, FileRef, Section, Source, merge_occurrences
 
-SCHEMA_VERSION = 8  # 8: responses cached by query hash and model; the query log
+SCHEMA_VERSION = 9  # 8: responses cached by query hash and model; the query log; 9: context records
 
 SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -51,6 +51,10 @@ CREATE TABLE query (hash TEXT NOT NULL, recipe TEXT NOT NULL, role TEXT NOT NULL
                     content TEXT NOT NULL, task TEXT NOT NULL, prompt TEXT NOT NULL, images TEXT NOT NULL,
                     PRIMARY KEY (hash, recipe));
 CREATE INDEX query_task ON query(content, task);
+-- Context records per content (schema.ContextRecord): parts of a document that give claims context, referenced
+-- by evidence (its records), stored once.
+CREATE TABLE record (content TEXT NOT NULL REFERENCES content(id), id TEXT NOT NULL, data TEXT NOT NULL,
+                     PRIMARY KEY (content, id));
 -- Situating results per content: figures, unresolved references, issues, complete.
 CREATE TABLE situation (content TEXT PRIMARY KEY REFERENCES content(id), data TEXT NOT NULL);
 CREATE TABLE comparison (id INTEGER PRIMARY KEY AUTOINCREMENT, created TEXT NOT NULL, data TEXT NOT NULL);
@@ -199,6 +203,7 @@ class Store:
                 if not keep_comparisons:
                     self.db.execute("DELETE FROM comparison")
                 self.db.execute("UPDATE content SET extracted=0")
+                self.db.execute("DELETE FROM record")  # found again as the content is read again
                 self.db.execute("DELETE FROM situation")  # situating reads the evidence
                 if rebind is not None:
                     self.db.execute("UPDATE interpreter SET description=? WHERE role=?",
@@ -351,10 +356,26 @@ class Store:
                 [Reference.model_validate(r) for r in data["unresolved"]], data["issues"])
 
     # --- per-task results ------------------------------------------------------
-    def record_task(self, row, evidence):
-        """Write one task's coverage row and evidence in a single transaction."""
+    def record_records(self, content, records):
+        """Context records for one content, each kept by its id (a record found again replaces itself)."""
+        with self.db:
+            for r in records:
+                self.db.execute("INSERT OR REPLACE INTO record VALUES (?, ?, ?)", (content, r.id, r.model_dump_json()))
+
+    def records(self, content):
+        """{id: ContextRecord} for one content, in the order they were first recorded."""
+        from .schema import ContextRecord
+        return {r.id: r for r in (ContextRecord.model_validate_json(d) for (d,) in
+                                  self.db.execute("SELECT data FROM record WHERE content=? ORDER BY rowid",
+                                                  (content,)))}
+
+    def record_task(self, row, evidence, records=()):
+        """Write one task's coverage row, evidence and the context records it found in a single transaction."""
         region = region_of(row["task"])
         with self.db:
+            for r in records:
+                self.db.execute("INSERT OR REPLACE INTO record VALUES (?, ?, ?)", (row["content"], r.id,
+                                                                                   r.model_dump_json()))
             self.db.execute("DELETE FROM evidence WHERE content=? AND task=?", (row["content"], row["task"]))
             self.db.execute("DELETE FROM situation WHERE content=?", (row["content"],))  # it read the old evidence
             self.db.execute("INSERT OR REPLACE INTO task VALUES (?, ?, ?, ?)",
@@ -489,7 +510,7 @@ class Store:
             if not dry_run:
                 with self._durable():
                     self.db.execute(f"DELETE FROM response_cache WHERE {unused}", orphans + orphans)
-                    for table in ("evidence", "task", "section", "situation", "query"):
+                    for table in ("evidence", "task", "section", "record", "situation", "query"):
                         self.db.execute(f"DELETE FROM {table} WHERE content IN ({marks})", orphans)
                     self.db.execute(f"DELETE FROM content WHERE id IN ({marks})", orphans)
                 for path in crops:

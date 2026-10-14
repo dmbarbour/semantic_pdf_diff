@@ -299,6 +299,24 @@ class Occurrence(Strict):
     # it was merged with the claim as another reading of the same fact (see readings.reconcile).
     wording: str = ""
 
+# A document part's kinds, and the kinds of context it may give its claims (docs/plans/claim-context-2026-10-14.md)
+RECORD_KINDS = ("document", "sheet", "section", "list", "table", "note", "legend", "figure", "glossary")
+CONTEXT_KINDS = ("subject", "scope", "frame", "stance")
+
+class ContextRecord(Strict):
+    """A part of a document that gives claims context (docs/plans/claim-context-2026-10-14.md, milestone 3): stored
+    once per content and referenced by the claims it holds or reaches (Evidence.records), never copied into them.
+    Context outweighs claims by one or two orders of magnitude (the owner, 2026-10-14), so a claim carries ids."""
+    id: str = Field(min_length=1, max_length=120)  # deterministic, within its content: "list:p1:0", "table:p2:1"
+    kind: Literal["document", "sheet", "section", "list", "table", "note", "legend", "figure", "glossary"]
+    gives: list[Literal["subject", "scope", "frame", "stance"]] = Field(default_factory=list)
+    label: str = Field(default="", max_length=200)   # its name as printed: "GENERAL NOTES", "Table 2. Valves"
+    text: str = Field(default="", max_length=2000)   # what it says: a lead-in, a note, a table's headers
+    items: list[str] = Field(default_factory=list)  # its parts as printed: a list's labels, a table's columns
+    page: int | None = None                          # where it sits (None: the whole content)
+    bbox: tuple[float, float, float, float] | None = None
+    parent: str = ""                                 # the record it sits in, if any
+
 class Position(Strict):
     """Where a claim sits in a sequence the source numbers (docs/plans/claim-context-2026-10-14.md, milestone 1): the
     item's label as printed ("Condition 2", "(b)") and the list's lead-in. Provenance, not a condition: inserting an
@@ -325,12 +343,18 @@ class Evidence(Claim):
     quote_verified: bool | None = None
     occurrences: list[Occurrence] = Field(default_factory=list)
     position: Position | None = None  # where it sits in a numbered sequence (the positions lever), if found
+    # The context records that hold or reach it (ContextRecord ids within its content), and its name as printed:
+    # the label beside its value ("Rated point > Capacity (gpm)", "retransmission timer"). Provenance, both.
+    records: list[str] = Field(default_factory=list)
+    printed: str = Field(default="", max_length=200)
 
     @model_serializer(mode="wrap")
-    def _without_absent_position(self, handler):
-        out = handler(self)  # no position, no key: evidence written without the lever stays as it was
-        if isinstance(out, dict) and out.get("position") is None:
-            out.pop("position", None)
+    def _without_absent_context(self, handler):
+        out = handler(self)  # none, no key: evidence written without the levers that fill them stays as it was
+        if isinstance(out, dict):
+            for key, empty in (("position", None), ("records", []), ("printed", "")):
+                if out.get(key, empty) == empty:
+                    out.pop(key, None)
         return out
 
 def claim_id(content, claim):
