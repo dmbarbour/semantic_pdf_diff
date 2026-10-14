@@ -91,14 +91,20 @@ def compare_paths(a, b, out, settings, options=None, client=None):
     the CLI's `pdf-semantic-diff A B --out DIR`. Returns its exit code (0, 2 incomplete, 3 paused for budget)."""
     options = options or RunOptions()
     check_fixture(options)  # before the sources are declared in the store
-    names = shortcut_names([Path(a), Path(b)])
     with Store(out) as store:
-        for name, path in zip(names, [Path(a), Path(b)]):
-            existing = store.source(name)
-            if existing and existing.kind != 'shortcut':
-                raise StoreError(f"{out} already has a declared source named {name!r}; use 'compare' instead")
-            store.save_source(Source(name=name, kind='shortcut', roots=[str(Path(path).resolve())]), replace=True)
+        names = declare_paths(store, out, [Path(a), Path(b)])
         return run(options, settings, store, names, Path(out), force_rescan=True, client=client)
+
+def declare_paths(store, out, paths):
+    """Each path (a file, folder or zip) declared a shortcut source in the store at `out`, named by its final
+    component; returns their names."""
+    names = shortcut_names(paths)
+    for name, path in zip(names, paths):
+        existing = store.source(name)
+        if existing and existing.kind != 'shortcut':
+            raise StoreError(f"{out} already has a declared source named {name!r}; use 'compare' instead")
+        store.save_source(Source(name=name, kind='shortcut', roots=[str(Path(path).resolve())]), replace=True)
+    return names
 
 LIMITATIONS = ['Image-token budgeting must be calibrated to the serving backend.',
                'Confidence scores are uncalibrated model self-reports.',
