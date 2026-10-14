@@ -104,7 +104,8 @@ UNALIGNED = ("No corresponding item in the other revision (by shared values, nam
 REGROUPED = "Viewed as part of a split or merge candidate (see the groupings); not compared claim by claim."
 
 # Provenance stays out of the model's view; it sees the claims and any source crops.
-PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences"}
+PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences",
+                     "position"}
 
 def instructions(mode):
     """A comparison prompt's instructions (the rest is the two claims and the numeric check)."""

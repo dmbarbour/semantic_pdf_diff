@@ -171,6 +171,7 @@ class Task:
     noted: tuple = ()  # a region looked at again: what its earlier answer's issues said
     origin: str | None = None
     leading: dict | None = field(default=None, repr=False)
+    position: object = None  # position(quote) -> the Position of the block a text claim's quote is in
 
 class TaskCore:
     """One content item's extraction tasks: the evidence and coverage they make, as tasks finish.
@@ -186,6 +187,7 @@ class TaskCore:
         self.s, self.output, self.dispatch, self.progress, self.name = client.s, output, dispatch, progress, name
         self.locator, self.derivation, self.oversized = locator, derivation, oversized
         self.evidence, self.coverage, self.repeats = [], [], {}
+        self.positions = {}  # page: {block box: Position}, as the positions hook finds them
         self.held, self.releasing = [], False  # rows that may repeat, until the content's pages are read
         self.sections = self.reader = None
 
@@ -368,6 +370,7 @@ class TaskCore:
                     row["status"] = "partial"
                     row["issues"].append("Rejected claim with unsupported literal quote")
                     continue
+                claim, position = s.positioned(claim, made.position(claim.quote) if made.position else None)
                 eid = claim_id(content, claim)
                 if any(e.id == eid for e in found):
                     continue  # the same claim twice in one response: keep the first
@@ -377,7 +380,7 @@ class TaskCore:
                 found.append(Evidence(**claim.model_dump(), id=eid, content=content, section=home,
                                       locator=self.locator(page_no, where, region, task),
                                       derivation=derivation or self.derivation[region], image=image,
-                                      quote_verified=verified))
+                                      quote_verified=verified, position=position))
                 row["claims"] += 1
 
         self.progress.add()
@@ -396,8 +399,10 @@ class TaskCore:
         def locate(quote):
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
         match = lambda q: quoted(q, text) or s.loose_match(q, text)
+        positions = self.positions.get(page_no, {})
         self.consume(Task(page_no, union(b for b, _ in segments), task, text, check=match, locate=locate,
                           context=context, derivation=derivation,
+                          position=(lambda q: positions.get(tuple(locate(q)))) if positions else None,
                           then=lambda status, _: self.refine_text(page_no, segments, text, task, depth, status,
                                                                   derivation, given)))
 

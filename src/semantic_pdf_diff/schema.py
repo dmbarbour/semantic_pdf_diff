@@ -7,7 +7,7 @@ import hashlib
 import json
 import re
 from typing import Annotated, Literal
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_serializer, model_validator
 
 class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -299,6 +299,13 @@ class Occurrence(Strict):
     # it was merged with the claim as another reading of the same fact (see readings.reconcile).
     wording: str = ""
 
+class Position(Strict):
+    """Where a claim sits in a sequence the source numbers (docs/plans/claim-context-2026-10-14.md, milestone 1): the
+    item's label as printed ("Condition 2", "(b)") and the list's lead-in. Provenance, not a condition: inserting an
+    item renumbers the rest."""
+    label: str = Field(min_length=1, max_length=80)
+    lead: str = Field(default="", max_length=300)
+
 class Evidence(Claim):
     """A claim within one piece of content.
 
@@ -317,6 +324,14 @@ class Evidence(Claim):
     # the quote is absent (possible misread, or raster labels); None: not checkable.
     quote_verified: bool | None = None
     occurrences: list[Occurrence] = Field(default_factory=list)
+    position: Position | None = None  # where it sits in a numbered sequence (the positions lever), if found
+
+    @model_serializer(mode="wrap")
+    def _without_absent_position(self, handler):
+        out = handler(self)  # no position, no key: evidence written without the lever stays as it was
+        if isinstance(out, dict) and out.get("position") is None:
+            out.pop("position", None)
+        return out
 
 def claim_id(content, claim):
     """Evidence ID from content and claim identity: entity, attribute, value and conditions

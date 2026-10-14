@@ -120,6 +120,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `skip_sheet_tables` | `false` | selecting | skip_sheet_tables | extract | figure, table, table-detection |
 | `leave_text` | `"tables"` | shaping | leave_text | extract | table, text |
 | `quote_match` | `"fragments"` | post | quote_match | extract | table, text |
+| `positions` | `"conditions"` | post | positions | extract | table, text |
 | `reconcile` | `true` | post | reconcile | - | - |
 | `dedupe_repeated` | `true` | shaping | dedupe_repeated | extract | all |
 | `continuations` | `3` | selecting | continue_reading | extract | figure, overview, tile, vision |

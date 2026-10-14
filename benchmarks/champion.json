@@ -38,6 +38,7 @@
     "skip_sheet_tables",
     "leave_text",
     "quote_match",
+    "positions",
     "reconcile",
     "dedupe_repeated",
     "continue_reading",

@@ -164,7 +164,9 @@ class PdfReading:
         # other readers (text_left_out, given the tables detected) are left out.
         left_out = self.s.text_left_out(self.context_of, page, number, [(f[0], f[1]) for f in found if f[1]])
         section_of = self.s.text_section_of(lambda b, n=number: self.owner.box(n, b).id)
-        for ids, segments in text_groups(page, self.s.text_bytes, section_of, left_out, self.s.split_text):
+        groups = text_groups(page, self.s.text_bytes, section_of, left_out, self.s.split_text)
+        self.core.positions[number] = self.s.list_positions([seg for _, segments in groups for seg in segments])
+        for ids, segments in groups:
             self.core.text_task(number, segments, f"text:p{number}:{ids}")
 
     def detect(self, number, page):

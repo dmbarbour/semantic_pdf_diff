@@ -683,6 +683,26 @@ class QuoteMatch(Lever):
         from .quotes import excerpted
         return self.quote_match != "exact" and excerpted(quote, text, in_order=self.quote_match == "excerpts")
 
+class Positions(Lever):
+    lever_name, stage, off = "positions", "matching", {"positions": "conditions"}
+    # provenance: a text block opening with an item's label ("Condition 2:", "(b)") in a sequence the source numbers
+    # gives its claims a position (the label and the list's lead-in), and the label leaves their conditions:
+    # inserting an item renumbers the rest, so the spec's timeout read as "Condition 2" against "Condition 3" was
+    # judged uncertain (2026-10-14; docs/plans/claim-context-2026-10-14.md, milestone 1). Applied as answers are stored
+    positions: Annotated[Literal["conditions", "provenance"], Declared("post", EXTRACT, TEXTUAL)] = "conditions"
+
+    def list_positions(self, blocks):
+        if self.positions == "conditions":
+            return super().list_positions(blocks)
+        from .positions import list_positions
+        return list_positions(blocks)
+
+    def positioned(self, claim, position):
+        if self.positions == "conditions" or position is None:
+            return super().positioned(claim, position)
+        from .positions import without_label
+        return claim.model_copy(update={"conditions": without_label(claim.conditions, position)}), position
+
 class Reconcile(Lever):
     lever_name, stage, off = "reconcile", "matching", {"reconcile": False}
     # merge readings of one fact by different tasks into one claim; applied when evidence is read, not stored
@@ -751,8 +771,8 @@ LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, Complete
                  TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles,
                  SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,
                  RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts,
-                 TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Reconcile,
-                 DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
+                 TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions,
+                 Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -911,6 +931,18 @@ class Platform(Composable):
     def loose_match(self, quote, text):
         """Whether a quote that isn't in its source exactly (extract.quoted) is accepted all the same."""
         return False
+
+    @chosen
+    def list_positions(self, blocks):
+        """{box: Position} for a page's text blocks [(box, text)] in reading order: where each sits in a sequence
+        the source numbers. The platform's: none found."""
+        return {}
+
+    @chosen
+    def positioned(self, claim, position):
+        """(claim, position) as a claim read in a block at that position (or None) is kept: the platform's, the claim
+        as read and no position."""
+        return claim, None
 
     @chosen
     def reconciles(self):
