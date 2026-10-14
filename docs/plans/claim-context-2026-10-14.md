@@ -1,6 +1,6 @@
 # Claim context: what a claim is about, how to read it, where it came from and who holds it
 
-- **Status:** Active (2026-10-14): written; milestone 1 begun; Concepts rewritten (subject, scope, frame, provenance, stance).
+- **Status:** Active (2026-10-14): written; milestone 1 built, its lever a default; Concepts rewritten (subject, scope, frame, provenance, stance); design questions answered but the third.
 - **The owner, 2026-10-14:** "Ideally, we'd avoid list positions as conditions of a claim, treating them as provenance instead (where a claim was made, how it was named). I feel there's a lot to improve in this domain of tracking the context of a claim. For A, we should consider what the model has access to as part of its query, and what a comparison of claims would have access to - was there enough information in the query to call it the non-conventional 'depth' instead of 'length'? If not, what sort of structure would provide the context for that info? Perhaps we should be examining how we'd approach different naming conventions for dimensions between papers, too."
 - **Then:** "Write the plan, then start with list positions as provenance. Turn it into a full plan unless it proves very short; I expect there's a lot you can think up for how to handle provenance and contexts with a little brainstorming."
 - **On the kinds of context (2026-10-14),** after I proposed subject, scope, frame, provenance and stance: "The names work; rewrite the plan's Concepts section. We can keep 'context' as the umbrella term. I expect we'll spend a fair bit of time on this, trying to improve capture of context per claim." Further words on stance and on context's size are quoted in Concepts.
@@ -158,10 +158,11 @@ Dimensions are the sharpest case, and the pattern carries over to other named qu
 
 The first step, and the cheapest: no extraction query changes.
 
-**Built and measured (2026-10-14):** the `positions` lever (`positions.py`), off by default; the [lever index](../reviews/levers.md) has the numbers.
+**Built and measured (2026-10-14):** the `positions` lever (`positions.py`); the [lever index](../reviews/levers.md) has the numbers. A default since 2026-10-14 (the owner: "We can make `positions:provenance` the default, seems mostly positive and it's already committed.").
 - On the controlled corpus: conditions holding a position 81 → 0; 138 claims given a position; extraction unchanged; the spec's numbered and renumbered pairs' 9 uncertain facts confirmed, no false change. $0.002.
 - A picture's claim quoting a list item takes the item's position too: without that, the PDF spec's overview and text readings of one condition stopped merging.
 - **Not yet:** positions in attributes and entities ("condition 1" as an attribute), and alignment using a shared label as weak support.
+- **Seen on the slices as the default:** a lead-in taken from a stamp ("PUBLIC DOMAIN", ken-cd), and a figure's panel labels ("(b)", "(d)", turbines) counted as a list with axis ticks for a lead-in. Context records from the page's structure (milestone 2) should tell a list's lead-in, a figure's panels and furniture apart.
 
 - **Find positions mechanically.** A text block opening with a label is a list item when sibling blocks (the same page and section) open with labels of the same form in sequence:
   - a word and a number ("Condition 1:", "Step 2.", "Item 3 -"); a number ("1.", "2)"); a letter or roman numeral ("(a)", "iv.")
@@ -227,8 +228,20 @@ The first step, and the cheapest: no extraction query changes.
 
 ## Design questions
 
+Answered by the owner on 2026-10-14, except the third, which stays open.
+
 1. **Renumbering in reports:** shown as a finding of its own ("renumbered: Condition 2 → 3"), or only in the claim's detail? I'd show it among editorial changes.
+   - **The owner:** "editorial changes, like a new page number if we added some text or section numbering if we inserted a section."
+   - **So:** a changed position, page or clause number is reported among editorial changes, as a move is, never as a changed value.
 2. **Unordered pairs:** may room dimensions whose direction isn't established be compared as a pair and reported "agree as a pair", rather than left uncompared?
-3. **The scorer's room dimensions:** keyed by direction as drawn, accepting any name, instead of the generator's width and depth?
+   - **The owner:** "yes, agree as a pair if we don't have a clear idea on framing."
+   - **So:** compared by direction where the frame establishes it (a north arrow, a schedule's columns, both drawn the same way up); as an unordered pair otherwise.
+3. **The scorer's room dimensions:** keyed by direction as drawn, accepting any name, instead of the generator's width and depth? **Open.**
+   - **The owner:** "I waffle on this one: we can only score based on what's there, but we should also test under various conditions, and we should look into how data from context might augment framing of reads."
+   - **What I'd propose, for the owner's word:** each scenario's key holds what its page makes knowable. A sheet with a north arrow or a schedule headed W × D is keyed by those names; a sheet without them by direction as drawn, accepting any name. The scenarios with and without (Measurement) test both, and the reads with context added (milestones 3 and 4) are scored on the same keys, so a gain from framing shows.
 4. **Frame to the judge:** shown as its own field, with its own ruling (my preference), or folded into conditions?
+   - **The owner:** "this is clearly a lever, but you can start with your preference."
+   - **So:** a lever, off until measured; its first setting shows the frame as its own field with its own ruling.
 5. **Stance changes in reports:** a finding kind of its own ("now B's proposal, was A's"; "now required, was targeted"), beside "changed" and "conditions changed"? I'd add it.
+   - **The owner:** "I agree this is the sort of change readers would be interested in seeing called out."
+   - **So:** a finding kind of its own, in milestone 6.
