@@ -111,6 +111,23 @@ def instructions(mode):
     """A comparison prompt's instructions (the rest is the two claims and the numeric check)."""
     return COMPARE + MODE_CONTEXT[mode]
 
+def pair_request(s, mode, a, b, output=None):
+    """The judge's request for claims a and b: (prompt, images, the claims as shown, numeric check). The claims are
+    shown without their provenance (PROVENANCE_FIELDS), with source images where the settings send them."""
+    images, payload = [], []
+    for e in (a, b):
+        p = e.model_dump(exclude=PROVENANCE_FIELDS)
+        extra = s.comparison_images(e, output)
+        if extra:
+            p["source_image"] = len(images) + 1
+            images += extra
+        payload.append(p)
+    calc = numeric_check(a, b)
+    prompt = (instructions(mode) + "\nA=" + json.dumps(payload[0], ensure_ascii=False)
+              + "\nB=" + json.dumps(payload[1], ensure_ascii=False))
+    prompt += "\nNumeric check=" + json.dumps(calc)
+    return prompt, images, payload, calc
+
 def vetoes(judgment, a, b, calc):
     """Why a judgment of claims a and b is made uncertain, if it is: numeric arithmetic (calc, numeric_check's) and
     uncertain provenance can veto a confident judgment. Pure, so each rule is tested (code review 2026-10-08)."""
@@ -205,18 +222,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
         for index, (score, a, b) in enumerate(pairs[:client.s.max_pairs]):
             dispatch.make_room()
             attempted.update((a.id,b.id))
-            images, payload = [], []
-            for e in (a,b):
-                p = e.model_dump(exclude=PROVENANCE_FIELDS)
-                extra = client.s.comparison_images(e, output)
-                if extra:
-                    p["source_image"] = len(images) + 1
-                    images += extra
-                payload.append(p)
-            calc = numeric_check(a,b)
-            prompt = (instructions(mode) + "\nA=" + json.dumps(payload[0],ensure_ascii=False)
-                      + "\nB=" + json.dumps(payload[1],ensure_ascii=False))
-            prompt += "\nNumeric check=" + json.dumps(calc)
+            prompt, images, payload, calc = pair_request(client.s, mode, a, b, output)
             payloads[index] = (a, b, payload, images)
             progress.add()
             dispatch.submit(prompt, Judgment, images, ("compare", mode, settings_key, a.id, b.id),
