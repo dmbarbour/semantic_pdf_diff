@@ -315,3 +315,29 @@ def pdf_parts(header, body, boxes, styles=None):
         i += 1
     parts.append(current)
     return [(head, [r for r, _ in rows_], [b for _, b in rows_]) for head, rows_ in parts if rows_]
+
+def cut_by(region, tables, budget):
+    """What an image region cutting a detected table is told of it: the table's first row and the rows the region
+    touches, whole, their cells joined by " | ", up to budget characters; "" where the region cuts no table (holds it
+    whole, or misses it). region and the tables' boxes in the page's native coordinates; tables: [(box, rows, row
+    boxes)] as detected (Context.table_rows_on)."""
+    region = pymupdf.Rect(region)
+    lines = []
+    for box, rows, boxes in tables:
+        box = pymupdf.Rect(box)
+        if len(rows) < 2 or not box.intersects(region) or region.contains(box):
+            continue
+        held = [row for row, row_box in zip(rows[1:], boxes[1:])
+                if row_box and pymupdf.Rect(row_box).intersects(region)]
+        if held:
+            lines += ([""] if lines else []) + [_cells(row) for row in [rows[0], *held]]
+    out, size = [], 0
+    for line in lines:  # whole rows, as many as fit
+        if size + len(line) + 1 > budget:
+            break
+        out.append(line)
+        size += len(line) + 1
+    return "\n".join(out).strip("\n")
+
+def _cells(row):
+    return " | ".join(" ".join(str(c).split()) if c is not None else "" for c in row)

@@ -45,6 +45,7 @@ class Context:
         self.page_figures, self.page_decoration, self.page_marks = {}, {}, {}
         self.page_margins, self.page_furniture, self.sightings = {}, {}, None
         self.tables_on = {}  # page -> the boxes of its tables (a row's lead-in is above its whole table)
+        self.table_rows_on = {}  # page -> its tables as detected, [(box, rows, row boxes)] (table_cuts)
         # how the model is asked mid-reading (the client's ask), where a job can: the tiling question (tile_choice); and
         # each page's choice of cut, its record (tilechoice.choose); its tiles' labels (regionlabels); the cut a partial
         # tile is read again under (retiling.other_cut)

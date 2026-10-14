@@ -29,6 +29,7 @@
     "table_review",
     "table_structure",
     "visual_text_layer",
+    "table_cuts",
     "text_cuts",
     "repeated_text",
     "lone_rows",

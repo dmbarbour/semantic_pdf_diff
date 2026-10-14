@@ -118,6 +118,8 @@ class Lever(BaseModel):
 
 # Lines levers add to prompts (their text lives with the lever; extract.py writes them).
 LAYER_NOTE = "TEXT LAYER OF THIS REGION (from the PDF, may be partial; use it to read small labels):"
+TABLE_CUT_NOTE = "THIS REGION CUTS A TABLE: its first row, then the rows in the region, as the PDF's text has them:"
+TABLE_CUT_BYTES = 1500
 LOCATOR_NOTE = ("The last image is the whole page, small, with this region outlined in red: it shows where the "
                 "region sits, for orientation only.")
 
@@ -579,6 +581,24 @@ class VisualTextLayer(Lever):
         return (text + "\n" if text else "") + LAYER_NOTE + "\n" + self.cut_layer(" ".join(layer.split()),
                                                                                  self.visual_text_layer)
 
+class TableCuts(Lever):
+    lever_name, stage, off = "table_cuts", "inclusion", {"table_cuts": False}
+    marks = {"table_cuts": re.compile("^" + re.escape(TABLE_CUT_NOTE) + "\n", re.M)}
+    # an image region cutting a detected table is sent the table's first row and the rows it touches, whole, as the
+    # PDF's text has them (controlled documents, 2026-10-14: a tile holding a door schedule's lower rows, without its
+    # header or door column, filed the doors' sizes under the rooms as "dimension 1" and "dimension 2"; the lever
+    # index's "repeat a table's header block in every tile that cuts the table")
+    table_cuts: Annotated[bool, _shaping(VISUAL)] = False
+
+    def region_text(self, reader, page, rect, layer, text):
+        text = super().region_text(reader, page, rect, layer, text)
+        if not self.table_cuts:
+            return text
+        from .pages import native
+        from .tables import cut_by
+        note = cut_by(native(page, rect), reader.table_rows_on.get(page.number + 1, ()), TABLE_CUT_BYTES)
+        return (text + "\n" if text else "") + TABLE_CUT_NOTE + "\n" + note if note else text
+
 class TextCuts(Lever):
     lever_name, stage, off = "text_cuts", "inclusion", {"text_cuts": "bytes"}
     # sentences: a text block too long for one task is cut after a sentence's end (else a word's), and an image task's
@@ -719,7 +739,7 @@ class DedupeRepeated(Lever):
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture,
                  TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles,
                  SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,
-                 RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TextCuts,
+                 RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts,
                  RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Reconcile, DedupeRepeated,
                  ContinueReading, Align, VerifyVisuals, ExplainDifferences)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}

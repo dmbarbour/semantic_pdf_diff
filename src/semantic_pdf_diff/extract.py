@@ -209,6 +209,7 @@ class PdfReading:
         """Each table read (PdfTable); the last one ending near the page's bottom carried to the next page."""
         continuing, self.carried = self.carried, None
         self.context_of.tables_on[number] = [found_[0] for found_ in found]
+        self.context_of.table_rows_on[number] = [found_[:3] for found_ in found]
         for ti, (bbox, rows, boxes, styles, rules, edges) in enumerate(found):
             if not rows:
                 continue

@@ -64,6 +64,7 @@ NOT_EXERCISED = {
     'leave_furniture': 'needs a running header, footer or page number on neighbouring pages (tests/test_furniture.py)',
     'repeated_text': 'needs a text block said in the same place on three pages (tests/test_repeated_text.py)',
     'lone_rows': 'needs a table row the same as its header, a one-row table (tests/test_lone_rows.py)',
+    'table_cuts': 'needs an image region cutting a detected table (tests/test_table_cuts.py)',
     'table_review': "the stub reads every table's rows by themselves, so no rules are reviewed "
                     "(tests/test_xlsxdocs.py)",
     'table_structure': "no table in these documents has a suspect line (tests/test_tablestructure.py)",
