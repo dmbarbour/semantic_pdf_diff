@@ -188,6 +188,7 @@ class Read:
     coverage: list
     sections: dict
     situations: dict
+    records: dict = None  # {content: {id: ContextRecord}}, as the records lever keeps them
 
 def read_sources(store, client, settings, names, triage):
     """The sources' content extracted, and situated if the run situates."""
@@ -196,7 +197,8 @@ def read_sources(store, client, settings, names, triage):
     by_content, coverage, sections = extract_sources(store, client, names, files, progress)
     progress.close()
     situations = situate_sources(store, client, names, files, by_content, sections, coverage) if triage else {}
-    return Read(files, by_content, coverage, sections, situations)
+    records = {c: found for c in by_content for found in [store.records(c)] if found}
+    return Read(files, by_content, coverage, sections, situations, records)
 
 def write_evidence(store, names, read, interpreters, out):
     """evidence.json, what was read, written before comparing (so it stands if comparing fails); the document."""
@@ -211,7 +213,9 @@ def write_evidence(store, names, read, interpreters, out):
         evidence=[e.model_dump() for e in evidence], coverage=read.coverage,
         sections=[{'content': c, **x.model_dump()} for c, items in sorted(read.sections.items()) for x in items],
         situation=situation_data,
-        scan_issues=[{'source': n, 'path': p, 'reason': r} for n in names for p, r in store.issues(n)])
+        scan_issues=[{'source': n, 'path': p, 'reason': r} for n in names for p, r in store.issues(n)],
+        records=[{'content': c, **r.model_dump()} for c, found in sorted((read.records or {}).items())
+                 for r in found.values()])
     (out / 'evidence.json').write_text(json.dumps(document.model_dump(), indent=2, ensure_ascii=False),
                                        encoding='utf-8')
     return document
@@ -232,6 +236,7 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         sources=document.sources, files=document.files, interpreters=interpreters, scan_issues=document.scan_issues,
         file_difference=file_difference(files[names[0]], files[names[1]]),
         sections=document.sections, situation=document.situation, evidence=document.evidence, coverage=coverage,
+        records=document.records,
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
         limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     data = traced(data)

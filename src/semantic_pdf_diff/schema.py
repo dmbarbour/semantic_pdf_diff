@@ -474,6 +474,15 @@ class EvidenceDocument(Strict):
     sections: list[dict]
     situation: dict
     scan_issues: list[dict]
+    # context records by content, as the records lever keeps them ({"content", **ContextRecord}); none, no key
+    records: list[dict] = Field(default_factory=list)
+
+    @model_serializer(mode="wrap")
+    def _without_absent_records(self, handler):
+        out = handler(self)
+        if isinstance(out, dict) and not out.get("records"):
+            out.pop("records", None)
+        return out
 
 class Report(Strict):
     """report.json: the comparison (compare()'s result first) and everything it rests on; report.html is drawn
@@ -501,3 +510,11 @@ class Report(Strict):
     # why a cap (max_cost, max_calls, the provider's balance) cut the run, if one did: which work it cut followed the
     # order answers came in, so the report isn't reproducible until the run is resumed (the determinism review, D6)
     paused: str = ""
+    records: list[dict] = Field(default_factory=list)  # as EvidenceDocument's
+
+    @model_serializer(mode="wrap")
+    def _without_absent_records(self, handler):
+        out = handler(self)
+        if isinstance(out, dict) and not out.get("records"):
+            out.pop("records", None)
+        return out

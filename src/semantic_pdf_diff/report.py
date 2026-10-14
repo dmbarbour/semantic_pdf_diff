@@ -88,6 +88,25 @@ class Cards:
         for f in data["files"]:
             self.occurrences.setdefault(f["content"], []).append(f"{f['source']} / {f['path']}")
         self.headings = {(x["content"], x["id"]): " > ".join(x["heading_path"]) for x in data.get("sections", [])}
+        self.records = {(r["content"], r["id"]): r for r in data.get("records", [])}
+
+    def context(self, e):
+        """Where a claim sits and what reaches it, as its records and position say (the records lever): its name as
+        printed, its list item and the list's lead-in, the table, notes and legends it's under."""
+        lines = []
+        if e.get("printed"):
+            lines.append(f"As printed: {esc(e['printed'])}")
+        position = e.get("position")
+        if position:
+            listed = self.records.get((e["content"], position.get("list", "")), {})
+            lead = listed.get("text") or position.get("lead", "")
+            lines.append(f"Position: {esc(position['label'])}" + (f" of “{esc(clip(lead))}”" if lead else ""))
+        for rid in e.get("records", []):
+            r = self.records.get((e["content"], rid))
+            if r and r["kind"] != "list":
+                lines.append(f"{esc(r['kind'].capitalize())}: {esc(r['label'])}"
+                             + (f" — {esc(clip(r['text']))}" if r.get("text") else ""))
+        return "".join(f"<p>{line}</p>" for line in lines)
 
     def where(self, content):
         return "; ".join(self.occurrences.get(content, ["unregistered content"]))
@@ -115,10 +134,16 @@ class Cards:
         return f'''<section><h3>{esc(self.where(e['content']))}{heading} · \
 {PAGE_WORDS.get(loc.get('format'), 'page')} {loc['page']} · {esc(e['kind'])}</h3>
         <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
-        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}<blockquote>{esc(e['quote'])}</blockquote>\
-{verified}{read}{also}
+        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}{self.context(e)}\
+<blockquote>{esc(e['quote'])}</blockquote>{verified}{read}{also}
         <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>\
 {image}</section>'''
+
+CLIP = 160  # characters of a record's text shown beside a claim
+
+def clip(text):
+    text = " ".join(text.split())
+    return text if len(text) <= CLIP else text[:CLIP - 1].rstrip() + "…"
 
 def finding_html(f, card):
     """One finding: its relation (and kind, if explained), why, and its two claims' cards."""

@@ -93,6 +93,28 @@ class Lever(unittest.TestCase):
         self.assertTrue(found["856"].position.list.startswith("list:"))
         self.assertEqual(found["10"].records, [])  # "Pump 1: rated at 10 kW." is a name, not a list item
 
+class Reported(unittest.TestCase):
+    def test_a_claims_card_shows_its_name_as_printed_its_position_and_the_notes_reaching_it(self):
+        from semantic_pdf_diff.report import Cards
+        from test_pipeline import ev
+        e = ev("A-1", position=Position(label="Condition 2", list="list:p1:0"), records=["list:p1:0", "note:p1:0"],
+               printed="acknowledgement timeout")
+        records = [{"content": e.content, "id": "list:p1:0", "kind": "list", "label": "", "text": LEAD},
+                   {"content": e.content, "id": "note:p1:0", "kind": "note", "label": "GENERAL NOTES",
+                    "text": "1. ALL DIMENSIONS ARE TO FACE OF FINISH."}]
+        card = Cards({"evidence": [e.model_dump()], "files": [], "records": records}, lambda x: x)("A-1")
+        self.assertIn("As printed: acknowledgement timeout", card)
+        self.assertIn(f"Position: Condition 2 of “{LEAD}”", card)
+        self.assertIn("Note: GENERAL NOTES — 1. ALL DIMENSIONS ARE TO FACE OF FINISH.", card)
+        plain = Cards({"evidence": [ev("B-1").model_dump()], "files": []}, lambda x: x)("B-1")
+        self.assertNotIn("As printed", plain)
+
+    def test_reports_without_records_are_written_as_before(self):
+        from semantic_pdf_diff.schema import EvidenceDocument
+        document = EvidenceDocument(sources=[], files=[], interpreters={}, evidence=[], coverage=[], sections=[],
+                                    situation={}, scan_issues=[])
+        self.assertNotIn("records", document.model_dump())
+
 class Stored(unittest.TestCase):
     def test_a_run_keeps_each_record_once_beside_the_claims_that_reference_it(self):
         import contextlib
