@@ -73,6 +73,66 @@
   "named": {
    "by an unprinted convention": 71,
    "otherwise": 11
+  },
+  "reliability": {
+   "all": {
+    "<0.9": {
+     "readings": 418,
+     "right": 236,
+     "share": 0.565
+    },
+    "<0.95": {
+     "readings": 8628,
+     "right": 8474,
+     "share": 0.982
+    },
+    "<=1.0": {
+     "readings": 24104,
+     "right": 22040,
+     "share": 0.914
+    }
+   },
+   "image": {
+    "<0.9": {
+     "readings": 400,
+     "right": 234,
+     "share": 0.585
+    },
+    "<0.95": {
+     "readings": 406,
+     "right": 288,
+     "share": 0.709
+    },
+    "<=1.0": {
+     "readings": 17476,
+     "right": 16080,
+     "share": 0.92
+    }
+   },
+   "table rules": {
+    "<0.95": {
+     "readings": 8186,
+     "right": 8168,
+     "share": 0.998
+    }
+   },
+   "text": {
+    "<0.9": {
+     "readings": 18,
+     "right": 2,
+     "share": 0.111
+    },
+    "<0.95": {
+     "readings": 36,
+     "right": 18,
+     "share": 0.5
+    },
+    "<=1.0": {
+     "readings": 6628,
+     "right": 5960,
+     "share": 0.899
+    }
+   }
   }
  },
  "runs": {

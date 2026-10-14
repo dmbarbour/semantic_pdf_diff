@@ -257,3 +257,36 @@ def sum_keys(results):
     return {"placed": {k: dict(sorted(v.items())) for k, v in sorted(out["placed"].items())},
             "audit": {k: dict(sorted(v.items())) for k, v in sorted(out["audit"].items())},
             "named": dict(sorted(out["named"].items()))}
+
+# --- our own link: calibration (Measurement, layer 7) --------------------------------------------------------------
+
+BANDS = (0.5, 0.7, 0.8, 0.9, 0.95, 1.0)  # a band's upper edge (the last includes 1.0)
+
+def reliability(runs_dir, key_of):
+    """The reader's confidence against the keys: {reader: {band: {"readings", "right", "share"}}} (all readers, then
+    text, table rules and image tasks apart), each reading (a claim's
+    sighting by one task, with that task's confidence) counted by its claim's outcome (scored: numbers only; "text"
+    and distractors left out). Right counts; loose, misbound, misread and the rest don't."""
+    from semantic_pdf_diff.store import Store
+    from .controlled.score import classify, key_facts
+    tally = defaultdict(Counter)
+    for folder in sorted(p for p in Path(runs_dir).iterdir() if (p / "store.sqlite").exists()):
+        key_data = key_of(folder.name)
+        numeric = [f for f in key_facts(key_data) if not f.relation]
+        with Store.open(folder) as store:
+            for f in store.files():
+                for e in store.evidence(f.content):
+                    outcome, _ = classify(e.model_dump(), numeric, key_data["printed"])
+                    if outcome in ("text", "distractor"):
+                        continue
+                    for o in e.occurrences or [e]:
+                        band = next(b for b in BANDS if o.confidence < b or b == 1.0)
+                        reader = "table rules" if o.locator.task.startswith("rules:") else \
+                            "image" if o.locator.region in IMAGE_REGIONS else "text"
+                        for which in ("all", reader):
+                            tally[(which, band)]["readings"] += 1
+                            tally[(which, band)]["right"] += outcome == "right"
+    out = defaultdict(dict)
+    for (which, b), t in sorted(tally.items()):
+        out[which][f"<{b}" if b < 1.0 else "<=1.0"] = {**t, "share": round(t["right"] / t["readings"], 3)}
+    return dict(out)

@@ -27,7 +27,8 @@ scored against by the same keys. Packed with the standard runs.
 
 `context` measures the standard runs' claims' context (lab bench/context.py; docs/plans/claim-context-2026-10-14.md,
 milestone 2): misplaced context and conditions grounded in what each request showed, then, against the keys' context
-by kind, where each kind landed and, where it was lost, whether the request showed it. Into context.json.
+by kind, where each kind landed and, where it was lost, whether the request showed it; and the reader's confidence
+against the keys, band by band. Into context.json.
 
 Recording adds to the working fixture (fixture.sqlite, git-ignored), which keeps every answer ever recorded. `pack`
 writes the committed replay.zip: the standard runs are replayed from fresh stores against a copy of the fixture, and
@@ -210,8 +211,10 @@ def context():
         print(f"no runs in {runs}: run first")
         return 1
     inventory = measures.measure(runs)
-    keyed = measures.measure_keys(runs, lambda run: json.loads(key_path(run).read_text(encoding="utf-8")))
-    out = {"totals": {"inventory": measures.totals(inventory), **measures.sum_keys(keyed)},
+    key_of = lambda run: json.loads(key_path(run).read_text(encoding="utf-8"))  # noqa: E731
+    keyed = measures.measure_keys(runs, key_of)
+    out = {"totals": {"inventory": measures.totals(inventory), **measures.sum_keys(keyed),
+                      "reliability": measures.reliability(runs, key_of)},
            "runs": {run: {"inventory": inventory.get(run, {}), "keyed": keyed.get(run, {})}
                     for run in sorted(set(inventory) | set(keyed))}}
     (FOLDER / "context.json").write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
