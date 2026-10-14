@@ -131,6 +131,22 @@ class Editorial(unittest.TestCase):
         self.assertIn("Editorial: renumbered: Condition 2 → Condition 3", finding_html(finding, lambda i: ""))
         self.assertIn("<b>Editorial changes</b> (1): renumbered 1", kinds_html([finding], lambda x: x))
 
+class Aligned(unittest.TestCase):
+    def test_one_printed_label_is_one_property_however_readers_name_it(self):
+        from semantic_pdf_diff.align import align, printed_property
+        from test_pipeline import ev
+        def pump(eid, attribute, value, printed):
+            return ev(eid, entity="Pump P-101A", attribute=attribute, value=value, unit="gpm", conditions="",
+                      printed=printed)
+        earlier = [pump("A-1", "rated flow", "7,824", "P-101A | Capacity (gpm)"),
+                   pump("A-2", "head", "134.8", "P-101A | TDH (ft)")]
+        later = [pump("B-1", "duty point output", "7,900", "P-101A | Capacity (gpm)"),
+                 pump("B-2", "head", "134.8", "P-101A | TDH (ft)")]
+        self.assertEqual(align(earlier, later).judge, [])  # as read: no property in common, the change missed
+        self.assertEqual([(i, j) for i, j, _ in align(earlier, later, printed=True).judge], [(0, 0)])
+        self.assertEqual(printed_property("P-101A | Rated point > Capacity (gpm)").split(), ["Rated", "point",
+                                                                                               "Capacity"])
+
 class Stored(unittest.TestCase):
     def test_a_run_keeps_each_record_once_beside_the_claims_that_reference_it(self):
         import contextlib

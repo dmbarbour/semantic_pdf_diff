@@ -755,16 +755,19 @@ class ContinueReading(Lever):
         return self.continuations if region in VISUAL else 0
 
 class Align(Lever):
-    lever_name, stage, off = "align", "comparison", {"align": False}
+    lever_name, stage, off = "align", "comparison", {"align": False, "align_printed": False}
     # revisions: decide which items correspond across the two revisions before any value is judged, and settle equal
     # values without a model (align.py; docs/plans/revision-comparison-2026-10-02.md); proposals keep retrieval
     align: Annotated[bool, _selecting(roles=COMPARE)] = True
+    # a claim's name as printed (the records lever's) weighed beside its attribute as read: one printed label, one
+    # property, however readers name it (docs/plans/claim-context-2026-10-14.md, Claim identity)
+    align_printed: Annotated[bool, _selecting(roles=COMPARE)] = False
 
     def correspondence(self, left, right, mode):
         if not self.align or mode != "revisions":
             return super().correspondence(left, right, mode)
         from .align import align
-        return align(left, right)
+        return align(left, right, printed=self.align_printed)
 
 class VerifyVisuals(Lever):
     lever_name, stage, off = "verify_visuals", "comparison", {"verify_visuals": False}
@@ -776,10 +779,14 @@ class VerifyVisuals(Lever):
         return images + ([output / evidence.image] if self.verify_visuals and evidence.image else [])
 
 class ExplainDifferences(Lever):
-    lever_name, stage, off = "explain_differences", "comparison", {"explain_differences": False}
+    lever_name, stage, off = "explain_differences", "comparison", {"explain_differences": False,
+                                                                   "explain_context": False}
     # revisions: ask why each "different" or "uncertain" finding differs (a change, a renaming, not the same item...),
     # with the claims' items around them (explain.py; docs/plans/revision-comparison-2026-10-02.md, milestone 4)
     explain_differences: Annotated[bool, _selecting(roles=COMPARE)] = True
+    # each claim's list position and name as printed shown to the explainer (the records lever's; docs/plans/
+    # claim-context-2026-10-14.md, milestone 3), so "renumbered" or "renamed" rests on the source's own labels
+    explain_context: Annotated[bool, _shaping(roles=COMPARE)] = False
 
     def explains(self, mode):
         return self.explain_differences and mode == "revisions"

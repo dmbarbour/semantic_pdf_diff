@@ -72,6 +72,9 @@ NOT_EXERCISED = {
     'table_structure': "no table in these documents has a suspect line (tests/test_tablestructure.py)",
     'align': 'revisions mode only; these runs compare proposals (tests/test_align.py)',
     'explain_differences': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
+    'align_printed': 'revisions mode only, with names as printed (the records lever); these runs compare proposals '
+                     '(tests/test_records.py)',
+    'explain_context': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
     'continuations': "only an answer incomplete at the claim limit is continued; the stub's never are "
                      "(tests/test_continuation.py)",
     'refine_figures': "only a refined tile mostly one detected figure it holds is looked at again; the documents' "

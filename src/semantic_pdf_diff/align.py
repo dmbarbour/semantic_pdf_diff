@@ -407,9 +407,25 @@ def _regroup(a, b, lone_a, lone_b):
             out.append((kind, [key], parts, evidence) if kind == "split" else (kind, parts, [key], evidence))
     return out
 
-def align(left, right):
-    """The Correspondence of two revisions' claims (left the earlier, right the later)."""
+def align(left, right, printed=False):
+    """The Correspondence of two revisions' claims (left the earlier, right the later). printed: a claim's name as
+    printed (Evidence.printed) stands for its attribute as read, so two readers naming one printed label differently
+    still name one property: a name as printed outranks a name as read (docs/plans/claim-context-2026-10-14.md)."""
+    if printed:
+        left, right = [with_printed(c) for c in left], [with_printed(c) for c in right]
     return Alignment(left, right).correspondence()
+
+def printed_property(printed):
+    """The property a name as printed names: a table's column header ("P-101A | Rated point > Capacity (gpm)":
+    "Rated point Capacity"), its unit left out; a text claim's whole name ("retransmission timer")."""
+    last = printed.rsplit(" | ", 1)[-1]
+    return re.sub(r"\([^)]*\)", " ", last.replace(">", " ")).strip()
+
+def with_printed(claim):
+    """The claim as alignment weighs it: its printed name's property for its attribute, where it has one (indices,
+    not claims, come back out of an alignment, so the judge sees the claim as read)."""
+    printed = printed_property(getattr(claim, "printed", "") or "")
+    return claim.model_copy(update={"attribute": printed}) if words(printed) else claim
 
 class Alignment:
     """Two revisions' items aligned, step by step, each step's outcome kept for the next (code review 2026-10-08, D7:

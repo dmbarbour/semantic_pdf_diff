@@ -135,10 +135,16 @@ def explanation_prompt(a, b, finding, payload, revisions):
 
 EXPLAINED = ("different", "uncertain")
 
-def explain(results, payloads, earlier, later, headings, dispatch, progress, key):
+def context_fields(e):
+    """What a claim's context records add to it as the explainer sees it (the explain_context setting): its list
+    position as printed and its name as printed, where it has them."""
+    return {**({"position": e.position.label} if e.position else {}), **({"printed": e.printed} if e.printed else {})}
+
+def explain(results, payloads, earlier, later, headings, dispatch, progress, key, context=False):
     """Each "different" or "uncertain" finding in results ({index: finding}) explained in place: its
     "explanation" ({kind, rationale, confidence}), from a second call (EXPLAIN). payloads: {index: (A, B, the
-    claims as the judge saw them, the images sent)}; earlier and later: each revision's claims."""
+    claims as the judge saw them, the images sent)}; earlier and later: each revision's claims. context: each claim's
+    position and name as printed shown too (context_fields)."""
     chosen = [i for i in sorted(results)
               if results[i]["relation"] in EXPLAINED and not results[i].get("processing_error")]
     if not chosen:
@@ -155,8 +161,8 @@ def explain(results, payloads, earlier, later, headings, dispatch, progress, key
     for index in chosen:
         dispatch.make_room()
         a, b, payload, images = payloads[index]  # A is always the earlier revision's
-        shown = [{**p, **({"section": headings[e.content, e.section]} if (e.content, e.section) in headings else {})}
-                 for p, e in zip(payload, (a, b))]
+        shown = [{**p, **({"section": headings[e.content, e.section]} if (e.content, e.section) in headings else {}),
+                  **(context_fields(e) if context else {})} for p, e in zip(payload, (a, b))]
         prompt = explanation_prompt(a, b, results[index], shown, revisions)
         progress.add()
         dispatch.submit(prompt, Explanation, images, key + (a.id, b.id), explained(index))

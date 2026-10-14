@@ -59,6 +59,20 @@ class Explain(unittest.TestCase):
         self.assertEqual([f["explanation"]["kind"] for f in result["findings"] if f["relation"] == "uncertain"],
                          ["changed"])
 
+    def test_with_explain_context_each_claims_position_and_name_as_printed_are_shown(self):
+        from semantic_pdf_diff.schema import Position
+        left = [ev("A-1", entity="link", attribute="timeout", value="856", unit="ms", conditions="",
+                   position=Position(label="Condition 1"), printed="no acknowledgement is received")]
+        right = [ev("B-1", entity="link", attribute="timeout", value="900", unit="ms", conditions="",
+                    position=Position(label="Condition 2"), printed="no acknowledgement is received")]
+        for on in (False, True):
+            client = Recording(s=Settings(explain_context=on), kind="changed")
+            compare(left, right, Path("."), client, "revisions")
+            prompt = next(p for schema, p, _ in client.asked if schema is Explanation)
+            a = json.loads(next(line for line in prompt.splitlines() if line.startswith("A="))[2:])
+            self.assertEqual((a.get("position"), a.get("printed")),
+                             ("Condition 1", "no acknowledgement is received") if on else (None, None))
+
     def test_a_failed_explanation_is_unclear_and_marked(self):
         class Failing(Fake):
             def ask(self, prompt, schema, images=(), key=None):
