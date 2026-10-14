@@ -91,6 +91,11 @@ Dimensions are the sharpest case, and the pattern carries over to other named qu
 
 The first step, and the cheapest: no extraction query changes.
 
+**Built and measured (2026-10-14):** the `positions` lever (`positions.py`), off by default; the [lever index](../reviews/levers.md) has the numbers.
+- On the controlled corpus: conditions holding a position 81 → 0; 138 claims given a position; extraction unchanged; the spec's numbered and renumbered pairs' 9 uncertain facts confirmed, no false change. $0.002.
+- A picture's claim quoting a list item takes the item's position too: without that, the PDF spec's overview and text readings of one condition stopped merging.
+- **Not yet:** positions in attributes and entities ("condition 1" as an attribute), and alignment using a shared label as weak support.
+
 - **Find positions mechanically.** A text block opening with a label is a list item when sibling blocks (the same page and section) open with labels of the same form in sequence:
   - a word and a number ("Condition 1:", "Step 2.", "Item 3 -"); a number ("1.", "2)"); a letter or roman numeral ("(a)", "iv.")
   - Word writes its numbering's labels into the text (`docxdocs.Numbering`), and Markdown's ordered lists keep theirs, so one rule covers PDF, Word and Markdown text.
