@@ -60,6 +60,7 @@
   "skip_empty": false,
   "reconcile": false,
   "quote_match": "exact",
+  "positions": "conditions",
   "decoration": false,
   "tile_choice": "off",
   "skip_text_only": false,

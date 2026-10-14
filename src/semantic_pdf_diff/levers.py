@@ -689,7 +689,7 @@ class Positions(Lever):
     # gives its claims a position (the label and the list's lead-in), and the label leaves their conditions:
     # inserting an item renumbers the rest, so the spec's timeout read as "Condition 2" against "Condition 3" was
     # judged uncertain (2026-10-14; docs/plans/claim-context-2026-10-14.md, milestone 1). Applied as answers are stored
-    positions: Annotated[Literal["conditions", "provenance"], Declared("post", EXTRACT, TEXTUAL)] = "conditions"
+    positions: Annotated[Literal["conditions", "provenance"], Declared("post", EXTRACT, TEXTUAL)] = "provenance"
 
     def list_positions(self, blocks):
         if self.positions == "conditions":
@@ -765,8 +765,8 @@ class DedupeRepeated(Lever):
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
-# tables, images_first, repeated_text's first, lone_rows and text_spans' page (docs/reviews/levers.md); round 0's
-# settings are benchmarks/round0.json.
+# tables, images_first, repeated_text's first, lone_rows, text_spans' page and positions' provenance
+# (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture,
                  TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles,
                  SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,
