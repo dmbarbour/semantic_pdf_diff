@@ -102,6 +102,22 @@ python scripts/refactor_check.py --against main~2   # against another revision; 
 
 A changed output means a behaviour change. It goes in a fix of its own, with its test.
 
+## Judging a lever
+
+A lever changes some queries, and gemma-4 answers a changed query anew. A reworded image prompt moves facts both ways even at temperature 0: on 2026-10-14 a rule meant to do nothing ("Read the image carefully.") moved the corpus's relations read right 416 → 444, as far as the arrow rule it was a control for. Totals can't tell that churn from a gain. Arms on the controlled corpus are compared document by document instead:
+
+```bash
+python scripts/paired.py read/arrow --base read/base --null read/null --null read/null2 --target "relations reversed"
+python scripts/paired.py read/lone --base read/base --target "claims right" --all
+```
+
+- **Arms share answers.** Each reads from a copy of the base's fixture, so a query a lever leaves alone replays its answer and moves nothing. Every compared setting is named in each arm.
+- **Null arms for a lever that changes many queries.** A null arm changes the same queries to no purpose (a do-nothing rule of the same kind: `visual_rules` for an image rule, `extract_rules` for an instruction).
+- **Target and guards, named first.** The target is the error the lever is for (reversed relations for an arrow rule, not relations right); the guard is facts read right.
+- **The test:** each document's change, summed; a 90% interval from resampling documents; a two-sided sign-flip p-value (with no effect, either arm is as likely ahead on any document). Documents are the unit, since one query moves several of a document's facts.
+- **The verdict** (`bench/paired.judge`): better when the target improves on the base and on every null arm at p < 0.1 and no guard is worse; worse when the target or a guard is worse on the base and on every null; otherwise no different.
+- **What it can't see:** a change confined to one or two documents never reaches p < 0.1 (two documents can't go below 0.5), so a lever reaching few documents is judged by inspecting them.
+
 ## Synthetic samples
 
 Deliberately messy synthetic spreadsheets (several tables on one sheet, multi-row headers, value/uncertainty pairs, a formula without a cached value, a hidden superseded sheet, a long list that must not be sampled), each with an answer key describing its true layout:
