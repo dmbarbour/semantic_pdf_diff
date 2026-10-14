@@ -231,6 +231,25 @@ class Fixture:
             self.db.execute("VACUUM")
         return {"answers_removed": answers, "dry_run": dry_run, "refused": refused if not force else []}
 
+    def merge(self, source):
+        """Copy in the answers another fixture (a .zip or a .sqlite file) holds that this one lacks, with their side
+        tables' rows; an answer this one holds is kept. Copied answers are marked unused, so prune drops those no run
+        uses. Returns how many answers were added."""
+        import tempfile
+        with tempfile.TemporaryDirectory(prefix="fixture-merge-") as temp:
+            path = unpack(source, temp) if Path(source).suffix == ".zip" else Path(source)
+            Fixture(path, readonly=True).close()  # its schema checked
+            count = "SELECT COUNT(*) FROM main.response"
+            before = self.db.execute(count).fetchone()[0]
+            with self.db:
+                self.db.execute("ATTACH DATABASE ? AS other", (str(path),))
+                self.db.execute("INSERT OR IGNORE INTO main.response SELECT query, responder, sample, outcome, "
+                                "answer, error, usage, recorded, NULL FROM other.response")
+                for table in ("description", "recipe"):
+                    self.db.execute(f"INSERT OR IGNORE INTO main.{table} SELECT * FROM other.{table}")
+            self.db.execute("DETACH DATABASE other")
+            return self.db.execute(count).fetchone()[0] - before
+
     def summary(self):
         """Answers per responder, role and outcome, with token usage, and the documents recorded
         from (from the side tables: a query's role is its first recipe's)."""
@@ -387,18 +406,11 @@ def folder_fixture(folder):
     (pulled from elsewhere) are merged in; on closing, the zip is packed again when the working file
     holds anything the zip lacks (compared as packed bytes). Packing is reproducible: a run that only replays
     leaves the zip's bytes."""
-    import tempfile
     archive, working = Path(folder) / FOLDER_FIXTURE, Path(folder) / FOLDER_WORKING
     working.parent.mkdir(parents=True, exist_ok=True)
     fixture = Fixture(working, create=True)
     if archive.exists():
-        with tempfile.TemporaryDirectory(prefix="folder-fixture-") as temp:
-            path = unpack(archive, temp)
-            with fixture.db:
-                fixture.db.execute("ATTACH DATABASE ? AS packed", (str(path),))
-                for table in ("response", "description", "recipe"):
-                    fixture.db.execute(f"INSERT OR IGNORE INTO main.{table} SELECT * FROM packed.{table}")
-            fixture.db.execute("DETACH DATABASE packed")
+        fixture.merge(archive)
     fixture.packed_to = archive
     return fixture
 
