@@ -1,6 +1,6 @@
 # Claim context: what a claim is about, how to read it, where it came from and who holds it
 
-- **Status:** Active (2026-10-14): written; milestone 1 built, its lever a default; Concepts rewritten (subject, scope, frame, provenance, stance); design questions 1–5 answered; reviewed whole against the context model, with measurement rewritten and milestones reordered ([Review](#review-2026-10-14)); design questions 6–9 open.
+- **Status:** Active (2026-10-14): written; milestone 1 built, its lever a default; Concepts rewritten (subject, scope, frame, provenance, stance); reviewed whole against the context model, with measurement rewritten and milestones reordered ([Review](#review-2026-10-14)); design questions 1–9 answered, claim identity to be considered further ([Claim identity](#claim-identity)).
 - **The owner, 2026-10-14:** "Ideally, we'd avoid list positions as conditions of a claim, treating them as provenance instead (where a claim was made, how it was named). I feel there's a lot to improve in this domain of tracking the context of a claim. For A, we should consider what the model has access to as part of its query, and what a comparison of claims would have access to - was there enough information in the query to call it the non-conventional 'depth' instead of 'length'? If not, what sort of structure would provide the context for that info? Perhaps we should be examining how we'd approach different naming conventions for dimensions between papers, too."
 - **Then:** "Write the plan, then start with list positions as provenance. Turn it into a full plan unless it proves very short; I expect there's a lot you can think up for how to handle provenance and contexts with a little brainstorming."
 - **On the kinds of context (2026-10-14),** after I proposed subject, scope, frame, provenance and stance: "The names work; rewrite the plan's Concepts section. We can keep 'context' as the umbrella term. I expect we'll spend a fair bit of time on this, trying to improve capture of context per claim." Further words on stance and on context's size are quoted in Concepts.
@@ -51,7 +51,7 @@ Suppose two claims differ only in X. What X is decides how a comparison treats i
 | the same proposition, held by someone else or held differently | **stance** | compares it as a finding of its own ("now B's proposal, was A's"; "now required, was targeted"), never as a changed value |
 | the same proposition, recorded in another place or another way | **provenance** | leaves it out of the verdict; may use it to pair claims and to explain |
 
-**So a claim's identity** (what makes two readings one claim, and what `claim_id` hashes) is its subject, attribute, value, unit, scope, frame and holder; never its provenance (design question 8).
+**Identity follows only roughly:** the table says how a comparison treats a difference once claims are paired, not which claims to pair. Which claims are the same is a weighted estimate over proxies from every kind, provenance included ([Claim identity](#claim-identity)).
 
 ### The kinds
 
@@ -72,7 +72,7 @@ Stance is a form of provenance: the provenance of the proposition, where the res
 - **The name as printed, and the name as read:** the printed label is provenance, something observed on the page; the reader's entity and attribute are the subject and property it assigned.
 - **A context source, and the context it gives:** a heading, a list's lead-in or a sheet's general notes is provenance (where the claim sits); the scope, frame or subject it implies is a reading of it. Both are kept, so a reading can be checked against its source, and a query can be asked whether it held enough to give it (the drawing sheets' "depth" didn't).
 
-**Identity cues:** a position, a name as printed and geometry as drawn are provenance that alignment may use as weak evidence for pairing claims. They never enter the verdict, and never block a match.
+**Identity cues:** a printed identifier, a position, a name as printed and geometry as drawn are provenance that alignment weighs in pairing claims ([Claim identity](#claim-identity)): a requirement's "TFV-45" strongly between versions of one document, a list position weakly and never against a match. None enters the verdict on a value.
 
 **Stated, none, or unknown.** Each kind on a claim is one of three: stated (the source gives it, and the claim has it), none (the source gives none: the value holds unconditionally, the document declares no datum), or unknown (not captured, or not knowable from the page). Only stated against stated can differ; a scope stated on one side and unknown on the other is "not established", as the judge's veto says today, never a difference.
 
@@ -117,11 +117,15 @@ Each kind passes through the same stages. The table says where each is found and
 |---|---|---|---|---|
 | **Subject** | headings, row labels, tags, title blocks, situating's abouts; the reader | the reader (heading path, stems); the judge (both claims' subjects and their sources) | alignment (the register, names), then the judge | the claim's entity, with its printed source |
 | **Scope** | lead-ins, headings, captions, notes' reach, table columns (load case, month); the reader | the reader (the records reaching its span); the judge | the judge, ruling on scope apart | "conditions changed" (scope), or not established |
-| **Frame** | general notes, legends, declared units, north arrows and scales, schedule headers, abbreviation lists | the reader where it changes a reading (bare numbers under "all dimensions in mm"); the judge | code where the rule is mechanical (units, a datum offset, unordered pairs); the judge otherwise | "frame differs", once per record, with the claims it reaches |
+| **Frame** | general notes, legends, declared units, north arrows and scales, schedule headers, abbreviation lists | the reader where it changes a reading (bare numbers under "all dimensions in mm"); the judge | code (units, a datum offset, unordered pairs, a note's reach), the model checking it where unclear; the judge otherwise | "frame differs", once per record, with the claims it reaches |
 | **Provenance** | the parse: locator, section path, positions, printed names, geometry | the explainer; alignment's identity cues; never the judge's verdict | alignment (weak support), explanations | editorial changes: renumbered, moved, a new page |
 | **Stance** | title blocks (the document's link); "Company \| Proposals" tables, "according to", citations; the reader | the reader (who holds what it reads); the judge | alignment (different holders don't pair); the judge | "attribution changed", "now required, was targeted" |
 
-**Who applies context** is decided per kind by measurement (design question 7): where a rule is mechanical and the probes show the model applying it unreliably, code applies it; the model is asked only for what needs judgement. Our own link's figures (confidence, agreement) are applied only once calibrated.
+**Who applies context** (design question 7):
+- **Code, for mechanical and hierarchical context:** units and datums; unordered pairs; renumbering; a record's reach down the document's structure (sheet, section, table, list) and its precedence.
+- **The model checks code's heuristics where they're unclear:** signals flagged, the model asked, its answer applied mechanically and checked, as the table structure query does (a note whose reach the layout leaves open; a lead-in that may be a stamp).
+- **The model supplies context buried in images and prose:** a north arrow, a note's reach stated in words, a holder named in a sentence, a scope given only in a paragraph.
+- **The probes measure the model's part,** and say where a heuristic needs its check. Our own link's figures (confidence, agreement) are applied only once calibrated.
 
 ### Rules for using context
 
@@ -152,6 +156,41 @@ Dimensions are the sharpest case, and the pattern carries over to other named qu
 - **Where it isn't, compare a room's plan dimensions as an unordered pair:** {23'-0", 24'-6"} matches {24'-6", 23'-0"} whatever each is called, and the report says "the dimensions agree as a pair". A room drawn turned 90° in another proposal is the same room.
 - **A document's own vocabulary is recorded once:** a schedule headed "W × D", a glossary, defined terms. Claims named in it are tied to its terms, and two documents' vocabularies are compared as frame.
 - **Abstain rather than guess:** "length" in one document and "depth" in another is "named differently", not a match or a change, unless geometry or a convention ties them.
+
+## Claim identity
+
+*The owner, 2026-10-14:* "all of these things are heuristic proxies for claim identity; otoh, philosophically 'identity' itself is a difficult topic. Consider this closer to a weighted analysis. Some parts of provenance do make good claim identities, for example, e.g. in a requirements database a requirement named "TFV-45" is a pretty good identity for comparing versions of a model, less so for comparing across models. Let's consider identity more carefully, but prepare an initial heuristic proxy as a starting point."
+
+Identity is estimated, not defined: every part of a claim is a proxy for it, weighed by what is being compared.
+
+**Three questions, kept apart:**
+- **The same reading?** Two readings of one passage in one document (an overview and a text task, two tiles), merged as occurrences. Near exact: the proposition and its context's words, as `claim_id` hashes them; the same quote and place support it strongly.
+- **The same item in another version?** Alignment's question in revisions mode. Most of a revision is unchanged, so values and the document's own identifiers count most.
+- **The same item in another design?** Proposals mode, or another model of the same system. Each team numbers its own and values differ by design, so identifiers and values count little; what a thing is (its kind, its role, its subject as named) counts most.
+
+**The proxies, and their initial weight** (by eye, as alignment's were: decision 7):
+
+| Proxy | Kind | Between versions | Between designs |
+|---|---|---|---|
+| A printed identifier that names (requirement "TFV-45", tag "P-101B", room 104, sheet A-101) | provenance | strong | weak |
+| Values with their units, rare ones more | proposition | strong (alignment's 0.6 today) | weak |
+| The subject, as printed before as read | subject | moderate | strong |
+| The attribute: the kind of quantity and its role | proposition | moderate | strong |
+| Place: section path as printed, sheet | provenance | moderate | weak |
+| The quote's words | provenance | moderate (restated text less) | weak |
+| A list position, a clause number | provenance | weak, and only for a match | none |
+| Scope | scope | must agree where both stated; unknown never conflicts | the same |
+| Holder | stance | different holders are different claims | the same |
+| Frame | frame | not weighed: reconciled after pairing | the same |
+
+**The initial proxy:**
+- **Alignment's item score extended:** printed identifiers as a feature of their own, beside values, name and attributes; position and place as small positive terms; scope and holder as gates (where both are stated and differ, no pair). Weights per mode, as in the table.
+- **Shown with their evidence,** as alignment's groupings are now, so a pairing can be read and questioned.
+- **`claim_id` stays the same-reading key:** its conditions split into scope and frame, and the holder added, once they're filled apart. A refactor while nothing fills them, proven by replay.
+
+**Then, more carefully:**
+- **A research note on identity** across versions and designs: what a requirements database's IDs promise and don't (an ID reused, retired or split); things that split or merge; identity of items against identity of claims about them.
+- **Weights learned, not set:** record linkage weighs each proxy by how often it agrees among true counterparts against among non-counterparts (Fellegi and Sunter's method). The controlled pairs' keys give both rates, per mode and per family; the result is a calibrated score, not a threshold set by eye.
 
 ## Measurement
 
@@ -204,7 +243,8 @@ Small, fixed **probe batteries**, recorded once per model and replayed thereafte
 
 - **Mechanical:** the inventory and grounding above, on the slices and the real pairs.
 - **Eye looks:** the real pairs (3GPP revisions renumber clauses and tabulate companies' views; drawing sets hold general notes), read by me at each milestone and recorded.
-- **Raters:** review batches gain a context rubric: is the claim's scope right, is any needed scope or frame missing, is its holder right, is anything invented. The pairwise rubric's "needed conditions kept" splits by kind. Rated by the panel of models, with people where the owner chooses (design question 9); agreement measured, as for any rubric.
+- **Raters:** review batches gain a context rubric: is the claim's scope right, is any needed scope or frame missing, is its holder right, is anything invented. The pairwise rubric's "needed conditions kept" splits by kind. Rated by panels of models; agreement measured, as for any rubric (design question 9).
+- **People's feedback** comes from using the tool's results at work: generic, about the outcomes they needed. Recorded as it comes, and turned into probes, scenarios or rubric clauses where it points at a context; no rating batches asked of people.
 
 ### 7. Our own link: calibration
 
@@ -259,7 +299,7 @@ Before records are built, so each later milestone has a baseline. Almost all of 
   - table claims: the parse's row label and column header (the [one table model](one-table-model-2026-09-30.md) has them)
   - text claims: the label before the value in its sentence ("timeout of 856 ms")
 - **Stated, none, unknown** recorded per kind on each claim.
-- **Claim identity** from the proposition, scope, frame and holder, not provenance (design question 8); a refactor where nothing yet fills the new parts, proven by replay.
+- **Identity, a first proxy** ([Claim identity](#claim-identity)): printed identifiers as alignment's own feature, positions and place as small terms, weights per mode; `claim_id`'s parts named (a refactor, proven by replay).
 - **Shown in the report:** "as printed: Condition 2 of 'A link failure is declared when…'"; a renumbering among editorial changes.
 - **Explanations** get both claims' positions and printed names, so "renumbered" is named from evidence rather than inferred from numbers in the conditions.
 - **Measured:** the inventory per kind; misplacements; grounding; the spec pairs' renumberings named.
@@ -321,7 +361,7 @@ The plan read whole against the five kinds and the stages a context passes throu
 
 ## Design questions
 
-Questions 1–5 answered by the owner on 2026-10-14; 6–9 from the review, open.
+Answered by the owner on 2026-10-14; 6–9 came from the review.
 
 1. **Renumbering in reports:** shown as a finding of its own ("renumbered: Condition 2 → 3"), or only in the claim's detail? I'd show it among editorial changes.
    - **The owner:** "editorial changes, like a new page number if we added some text or section numbering if we inserted a section."
@@ -340,6 +380,14 @@ Questions 1–5 answered by the owner on 2026-10-14; 6–9 from the review, open
    - **The owner:** "I agree this is the sort of change readers would be interested in seeing called out."
    - **So:** a finding kind of its own, in milestone 7.
 6. **Changed context records as findings:** a note, heading or lead-in that changes between revisions reported once, as its own finding, with the claims it reaches ("general note 3: dimensions now to centreline; 42 dimensions on A-101")? I'd add it, grouped with the value changes it may explain.
+   - **The owner:** "add it."
+   - **So:** in milestone 4, grouped with the value changes it may explain.
 7. **Who applies context:** code where a rule is mechanical (units, a datum, renumbering, unordered pairs) and the probes show the model unreliable; the model where judgement is needed. Decided per kind from the probes, each as a lever. Agreed?
+   - **The owner:** "code is preferable for for mechanical or hierarchical contexts, we may need the rule of "model checks heuristics" here when things are unclear by our heuristics, and we certainly need some extra context from the model where it's buried in images and prose."
+   - **So:** code for mechanical and hierarchical context; the model checking heuristics where they're unclear; the model supplying context from images and prose ([Context through the pipeline](#context-through-the-pipeline)).
 8. **Claim identity:** subject, attribute, value, unit, scope, frame and holder; never provenance. It changes claim ids (a store schema change, stores read again from cached answers), so I'd make it one refactor step in milestone 3, before anything fills scope, frame or holder apart.
+   - **The owner:** "all of these things are heuristic proxies for claim identity; otoh, philosophically 'identity' itself is a difficult topic. Consider this closer to a weighted analysis. Some parts of provenance do make good claim identities, for example, e.g. in a requirements database a requirement named "TFV-45" is a pretty good identity for comparing versions of a model, less so for comparing across models. Let's consider identity more carefully, but prepare an initial heuristic proxy as a starting point."
+   - **So:** identity as a weighted estimate over proxies, weights by what's compared, provenance's identifiers among them; an initial proxy in milestone 3, a research note and learned weights after ([Claim identity](#claim-identity)).
 9. **Raters for context on real documents:** the context rubric rated by the panel of models first, and people only on samples where the panel disagrees? Or people from the start?
+   - **The owner:** "panels of models first; it turns out that I can only motivate myself to look at the final outcomes that are actually needed for work, and even more so my larger team, so it will mostly be generic feedback based on user experiences from me."
+   - **So:** panels of models rate; people's input is feedback from use, recorded and turned into probes, scenarios or rubric clauses (Measurement, layer 6).
