@@ -173,6 +173,31 @@ class Restated(unittest.TestCase):
         self.assertEqual(len(Settings(record_changes=True).changed_records({"a": {face.id: face}},
                                                                            {"b": {stud.id: stud}}, left, right)), 1)
 
+    def test_an_item_inserted_or_a_window_moved_is_no_restatement(self):
+        from semantic_pdf_diff.records import changed_records
+        from semantic_pdf_diff.schema import ContextRecord
+        from test_pipeline import ev
+        lead = "A link failure is declared when any of the following conditions holds."
+        three = ContextRecord(id="list:p1:0", kind="list", text=lead, items=["Condition 1", "Condition 2"])
+        four = three.model_copy(update={"items": ["Condition 1", "Condition 2", "Condition 3"]})
+        left, right = [ev("A-1", records=["list:p1:0"])], [ev("B-1", records=["list:p1:0"])]
+        found = lambda a, b: changed_records({left[0].content: {a.id: a}}, {right[0].content: {b.id: b}}, left, right)
+        self.assertEqual(found(three, four), [])  # labels are positions: an item inserted renumbers them
+        self.assertEqual(len(found(three, four.model_copy(update={"text": "When the link is idle:"}))), 1)
+        table = lambda text, rid="table:p1:0", label="page 1, table 1": ContextRecord(
+            id=rid, kind="table", label=label, text="Above the table: ..." + text, items=["Tag", "Capacity (gpm)"])
+        before = table("Creek WTP: Equipment. Table 1a. Raw water pumps P-101A 7,824 P-101B 8,837. Heights are above "
+                       "the station platform. Table 1b. Blowers")
+        moved = table("eek WTP: Equipment. Table 1a. Raw water pumps P-101A 7,824 P-101B 8,837 P-101C 7,650. Heights "
+                      "are above the station platform. Table 1b. Blowers")
+        self.assertEqual(found(before, moved), [])  # cut elsewhere, a row added above: the same lead-in
+        regraded = table("Creek WTP: Equipment. Table 1a. Raw water pumps P-101A 7,824 P-101B 8,837. Heights are "
+                         "above grade. Table 1b. Blowers")
+        self.assertEqual(len(found(before, regraded)), 1)
+        # an untitled table pairs by its headers, wherever it now sits
+        third = table("Heights are above grade.", "table:p1:2", "page 1, table 3")
+        self.assertEqual([c["later"]["id"] for c in found(before, third)], ["table:p1:2"])
+
     def test_the_report_lists_it_and_marks_the_findings_it_reaches(self):
         from semantic_pdf_diff.report import finding_html, record_changes_html
         change = {"kind": "note", "label": "GENERAL NOTES", "claims": ["A-1", "B-1"],

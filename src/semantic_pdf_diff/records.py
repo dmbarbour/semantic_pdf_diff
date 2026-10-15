@@ -130,28 +130,58 @@ def _wording(text):
     """A record's words, numbers aside: a value changed in a lead-in is a value change, reported as one."""
     return re.findall(r"[^\W\d_]+", text.casefold())
 
+WINDOW = "Above the table: ..."  # a table's text: the text above it, cut to a window (the table_context lever's)
+# a sentence's end, or a section number run into a heading's words ("Schedules 1 Track and Structure")
+SENTENCE_BREAK = re.compile(r"(?<=[.;:!?])\s+|(?:^|\s+)\d+(?:\.\d+)*\s+(?=[A-Z])")
+# a table's place, named for want of a printed title: a PDF's "page 1, table 3", a Word document's "table 2"
+UNTITLED = re.compile(r"^(?:page \d+, )?table \d+(?:, part \d+)?$")
+
+def _said(record):
+    """What a record says that can be restated: a list's lead-in (its labels are its items' positions: an item
+    inserted renumbers them); a note's words; a table's headers, and the sentences of the text above it that state no
+    value (a sentence with a number is a claim's: its change is a value's or a condition's), as (the first, which
+    a window may cut, the rest sorted, the headers)."""
+    if record.kind == "list":
+        return _wording(record.text)
+    if record.kind != "table":
+        return _wording(record.text) + [w for i in record.items for w in _wording(i)]
+    text = record.text[len(WINDOW):] if record.text.startswith(WINDOW) else record.text
+    parts = [p for p in SENTENCE_BREAK.split(text) if p is not None]
+    said = [tuple(_wording(p)) if p.strip() and not re.search(r"\d", p) else () for p in parts]
+    return " ".join(said[0] if said else ()), sorted(w for w in said[1:] if w), [_wording(i) for i in record.items]
+
+def _restated(a, b):
+    """Whether two paired records say different things (_said), numbers aside. A table's first sentence is the same
+    when one ends the other: a window cut elsewhere, perhaps within a word."""
+    x, y = _said(a), _said(b)
+    if a.kind != "table":
+        return x != y
+    (fa, ra, ha), (fb, rb, hb) = x, y
+    return ra != rb or ha != hb or not (fa.endswith(fb) or fb.endswith(fa))
+
 def _keyed(found):
-    """{(kind, label): [(content, record)]} in page order: a note or table by its heading or title, a list by none.
-    found: {content: {id: ContextRecord}}."""
+    """{(kind, name): [(content, record)]} in page order: a note by its heading, a table by its title (by its
+    headers when untitled: an untitled table's place moves when a table is inserted), a list by none. found:
+    {content: {id: ContextRecord}}."""
     out = {}
     pairs = sorted(((c, r) for c, records in found.items() for r in records.values()),
                    key=lambda x: (x[0], x[1].page or 0, x[1].id))
     for content, r in pairs:
-        out.setdefault((r.kind, " ".join(_wording(r.label))), []).append((content, r))
+        name = " | ".join(r.items) if r.kind == "table" and UNTITLED.match(r.label) else r.label
+        out.setdefault((r.kind, " ".join(_wording(name))), []).append((content, r))
     return out
 
 def changed_records(earlier, later, left, right):
     """The context records restated between two revisions, each once with the claims it reaches on either side:
     [{"kind", "label", "earlier": {content, id, text, items}, "later": {...}, "claims": [claim ids]}]. earlier,
     later: {content: {id: ContextRecord}} of each side's own content (shared content is the same on both); left,
-    right: each side's claims. Records pair by kind and heading or title, in order; a pair is restated when its
-    words differ, numbers aside (a table's headers too)."""
+    right: each side's claims. Records pair by kind and heading or title, in order; a pair is restated when what
+    it says differs (_restated), numbers aside."""
     a_side, b_side = _keyed(earlier), _keyed(later)
     out = []
     for key in sorted(a_side.keys() & b_side.keys()):
         for (ca, a), (cb, b) in zip(a_side[key], b_side[key]):
-            headers = [_wording(i) for i in a.items], [_wording(i) for i in b.items]
-            if _wording(a.text) == _wording(b.text) and headers[0] == headers[1]:
+            if not _restated(a, b):
                 continue
             claims = [e.id for e in left if e.content == ca and a.id in e.records] + \
                      [e.id for e in right if e.content == cb and b.id in e.records]
