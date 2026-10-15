@@ -1,24 +1,25 @@
 {
  "totals": {
   "inventory": {
-   "claims": 11783,
-   "evidence": 9359,
-   "frame in conditions": 100,
-   "grounded": 3545,
-   "list records": 31,
+   "claims": 12476,
+   "evidence": 9948,
+   "frame in conditions": 113,
+   "grounded": 3720,
+   "list records": 32,
    "no content words": 18,
-   "note records": 6,
-   "numbered in attribute": 124,
-   "numbered in entity": 27,
+   "note records": 7,
+   "numbered in attribute": 137,
+   "numbered in conditions": 1,
+   "numbered in entity": 29,
    "partly": 95,
    "partly (image)": 19,
-   "positioned": 112,
-   "printed": 5910,
-   "table records": 256,
+   "positioned": 117,
+   "printed": 6284,
+   "table records": 271,
    "unsupported": 34,
    "unsupported (image)": 484,
-   "with conditions": 4195,
-   "with records": 4800
+   "with conditions": 4370,
+   "with records": 5292
   },
   "placed": {
    "bound": {
@@ -28,8 +29,8 @@
    },
    "frame": {
     "attribute": 18,
-    "conditions": 148,
-    "records": 73
+    "conditions": 180,
+    "records": 87
    },
    "provenance": {
     "conditions": 5
@@ -40,7 +41,7 @@
     "nowhere": 6
    },
    "sibling": {
-    "conditions": 15,
+    "conditions": 18,
     "nowhere": 3,
     "records": 1
    },
@@ -66,7 +67,7 @@
     "shown, not used": 29
    },
    "sibling": {
-    "in conditions": 15,
+    "in conditions": 18,
     "in records": 1,
     "kept out": 3
    },
@@ -77,7 +78,7 @@
    }
   },
   "named": {
-   "by an unprinted convention": 71,
+   "by an unprinted convention": 85,
    "otherwise": 11
   },
   "reliability": {
@@ -88,14 +89,14 @@
      "share": 0.565
     },
     "<0.95": {
-     "readings": 8628,
-     "right": 8474,
-     "share": 0.982
+     "readings": 9364,
+     "right": 9210,
+     "share": 0.984
     },
     "<=1.0": {
-     "readings": 24104,
-     "right": 22040,
-     "share": 0.914
+     "readings": 25230,
+     "right": 23018,
+     "share": 0.912
     }
    },
    "image": {
@@ -110,15 +111,15 @@
      "share": 0.709
     },
     "<=1.0": {
-     "readings": 17476,
-     "right": 16080,
-     "share": 0.92
+     "readings": 18342,
+     "right": 16814,
+     "share": 0.917
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 8186,
-     "right": 8168,
+     "readings": 8922,
+     "right": 8904,
      "share": 0.998
     }
    },
@@ -134,9 +135,9 @@
      "share": 0.5
     },
     "<=1.0": {
-     "readings": 6628,
-     "right": 5960,
-     "share": 0.899
+     "readings": 6888,
+     "right": 6204,
+     "share": 0.901
     }
    }
   }
@@ -907,6 +908,141 @@
     "evidence": 92,
     "context_bytes_per_request": 179,
     "data_bytes_per_request": 306,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-datum": {
+   "inventory": {
+    "claims": 189,
+    "grounded": 25,
+    "with conditions": 25,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 92,
+    "printed": 92,
+    "evidence": 97,
+    "context_bytes_per_request": 176,
+    "data_bytes_per_request": 303,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-datum.docx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 32,
+    "with conditions": 32,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 92,
+    "printed": 92,
+    "evidence": 92,
+    "context_bytes_per_request": 492,
+    "data_bytes_per_request": 216,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-datum.md": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "evidence": 92,
+    "context_bytes_per_request": 580,
+    "data_bytes_per_request": 122,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-datum.pptx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 32,
+    "with conditions": 32,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 92,
+    "printed": 92,
+    "evidence": 92,
+    "context_bytes_per_request": 567,
+    "data_bytes_per_request": 107,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-datum.xlsx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 32,
+    "with conditions": 32,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 92,
+    "printed": 92,
+    "evidence": 92,
+    "context_bytes_per_request": 538,
+    "data_bytes_per_request": 112,
     "examples": {}
    },
    "keyed": {
@@ -2234,6 +2370,68 @@
      "frame": {
       "records": 16,
       "conditions": 5
+     }
+    },
+    "audit": {
+     "sibling": {
+      "in conditions": 3
+     }
+    },
+    "named": {
+     "by an unprinted convention": 14
+    },
+    "examples": {}
+   }
+  },
+  "lcc-plan-s1-clean-notes": {
+   "inventory": {
+    "claims": 136,
+    "grounded": 44,
+    "with conditions": 44,
+    "positioned": 5,
+    "misplaced": {
+     "frame in conditions": 13,
+     "numbered in attribute": 13,
+     "numbered in conditions": 1,
+     "numbered in entity": 2
+    },
+    "records": {
+     "list": 1,
+     "note": 1
+    },
+    "with records": 124,
+    "printed": 6,
+    "evidence": 124,
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 253,
+    "examples": {
+     "frame in conditions": [
+      "STORAGE 110 | area | net, measured to face of finish",
+      "MEETING 101 | area | net, measured to face of finish",
+      "MEETING 104 | area | net, measured to face of finish"
+     ],
+     "numbered in attribute": [
+      "MEETING 101 | dimension 1 | ",
+      "MEETING 103 | dimension 1 | ",
+      "MEETING 103 | dimension 2 | "
+     ],
+     "numbered in conditions": [
+      "Dimensions | reference | unless noted otherwise"
+     ],
+     "numbered in entity": [
+      "dimension line 1 | length | ",
+      "dimension line 2 | length | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "sibling": {
+      "conditions": 3
+     },
+     "frame": {
+      "conditions": 7,
+      "records": 14
      }
     },
     "audit": {

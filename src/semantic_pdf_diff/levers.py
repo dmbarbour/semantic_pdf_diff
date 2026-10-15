@@ -845,7 +845,7 @@ class RecordChanges(Lever):
     # a context record restated between revisions (a sheet's note, a list's lead-in, a table's lead-in or headers),
     # numbers aside, reported once with the claims it reaches (records.changed_records; the claim context plan's
     # milestone 4, design question 6: the owner, "add it"); the records lever keeps them
-    record_changes: Annotated[bool, Declared("post", COMPARE)] = False
+    record_changes: Annotated[bool, Declared("post", COMPARE)] = True
 
     def changed_records(self, earlier, later, left, right):
         if not self.record_changes:
@@ -887,8 +887,8 @@ class DedupeRepeated(Lever):
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
-# tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records and
-# editorial (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
+# tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
+# editorial and record_changes (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
                  LeaveFurniture, TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut,
                  TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling,

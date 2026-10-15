@@ -134,7 +134,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `explain_differences` | `true` | selecting | explain_differences | compare | - |
 | `explain_context` | `false` | shaping | explain_differences | compare | - |
 | `editorial` | `true` | post | editorial | compare | - |
-| `record_changes` | `false` | post | record_changes | compare | - |
+| `record_changes` | `true` | post | record_changes | compare | - |
 | `judge_context` | `false` | shaping | judge_context | compare | - |
 <!-- end of settings table -->
 

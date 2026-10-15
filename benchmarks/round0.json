@@ -68,6 +68,7 @@
   "positions": "conditions",
   "records": false,
   "editorial": false,
+  "record_changes": false,
   "decoration": false,
   "tile_choice": "off",
   "skip_text_only": false,

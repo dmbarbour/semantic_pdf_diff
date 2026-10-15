@@ -169,9 +169,10 @@ class Restated(unittest.TestCase):
         renumbered = self.note("2. ALL DIMENSIONS ARE TO FACE OF FINISH UNLESS NOTED OTHERWISE.")
         self.assertEqual(changed_records({left[0].content: {face.id: face}}, {"later": {face.id: renumbered}},
                                          left, right), [])
-        self.assertEqual(Settings().changed_records({"a": {face.id: face}}, {"b": {stud.id: stud}}, left, right), [])
-        self.assertEqual(len(Settings(record_changes=True).changed_records({"a": {face.id: face}},
-                                                                           {"b": {stud.id: stud}}, left, right)), 1)
+        off = Settings(record_changes=False)
+        self.assertEqual(off.changed_records({"a": {face.id: face}}, {"b": {stud.id: stud}}, left, right), [])
+        on = Settings()  # the default
+        self.assertEqual(len(on.changed_records({"a": {face.id: face}}, {"b": {stud.id: stud}}, left, right)), 1)
 
     def test_an_item_inserted_or_a_window_moved_is_no_restatement(self):
         from semantic_pdf_diff.records import changed_records

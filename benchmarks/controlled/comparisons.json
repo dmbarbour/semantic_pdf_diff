@@ -6801,7 +6801,8 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "24/24",
    "false_changes": 0,
-   "context_found": "0/14",
+   "context_found": "14/14",
+   "record_changes": 1,
    "difference_precision": null,
    "changed": {},
    "conditions": {},
@@ -6811,7 +6812,7 @@
     "confirmed": 24
    },
    "context": {
-    "settled": 14
+    "reported": 14
    },
    "different": {},
    "equivalent": {
@@ -6844,26 +6845,26 @@
     "revB.date": "confirmed",
     "revC.date": "confirmed",
     "room101.area": "confirmed",
-    "room101.depth": "settled",
-    "room101.width": "settled",
+    "room101.depth": "reported",
+    "room101.width": "reported",
     "room102.area": "confirmed",
-    "room102.depth": "settled",
-    "room102.width": "settled",
+    "room102.depth": "reported",
+    "room102.width": "reported",
     "room103.area": "confirmed",
-    "room103.depth": "settled",
-    "room103.width": "settled",
+    "room103.depth": "reported",
+    "room103.width": "reported",
     "room104.area": "confirmed",
-    "room104.depth": "settled",
-    "room104.width": "settled",
+    "room104.depth": "reported",
+    "room104.width": "reported",
     "room110.area": "confirmed",
-    "room110.depth": "settled",
-    "room110.width": "settled",
+    "room110.depth": "reported",
+    "room110.width": "reported",
     "room111.area": "confirmed",
-    "room111.depth": "settled",
-    "room111.width": "settled",
+    "room111.depth": "reported",
+    "room111.width": "reported",
     "room112.area": "confirmed",
-    "room112.depth": "settled",
-    "room112.width": "settled"
+    "room112.depth": "reported",
+    "room112.width": "reported"
    }
   },
   "coaster-tables-s1-clean-datum": {
@@ -6880,7 +6881,8 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "80/87",
    "false_changes": 0,
-   "context_found": "0/5",
+   "context_found": "5/5",
+   "record_changes": 2,
    "difference_precision": null,
    "changed": {},
    "conditions": {},
@@ -6891,8 +6893,7 @@
     "uncertain": 7
    },
    "context": {
-    "judged equivalent/uncertain": 3,
-    "judged uncertain": 2
+    "reported": 5
    },
    "different": {},
    "equivalent": {
@@ -6993,23 +6994,23 @@
     "C-20.design load": "confirmed",
     "C-20.footing width": "confirmed",
     "E1.entry speed": "confirmed",
-    "E1.height": "judged uncertain",
+    "E1.height": "reported",
     "E1.peak lateral g": "uncertain",
     "E1.peak vertical g": "uncertain",
     "E2.entry speed": "confirmed",
-    "E2.height": "judged equivalent/uncertain",
+    "E2.height": "reported",
     "E2.peak lateral g": "confirmed",
     "E2.peak vertical g": "uncertain",
     "E3.entry speed": "confirmed",
-    "E3.height": "judged uncertain",
+    "E3.height": "reported",
     "E3.peak lateral g": "uncertain",
     "E3.peak vertical g": "uncertain",
     "E4.entry speed": "confirmed",
-    "E4.height": "judged equivalent/uncertain",
+    "E4.height": "reported",
     "E4.peak lateral g": "uncertain",
     "E4.peak vertical g": "uncertain",
     "E5.entry speed": "confirmed",
-    "E5.height": "judged equivalent/uncertain",
+    "E5.height": "reported",
     "E5.peak lateral g": "confirmed",
     "E5.peak vertical g": "confirmed"
    }
@@ -7170,7 +7171,8 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "87/87",
    "false_changes": 0,
-   "context_found": "0/5",
+   "context_found": "5/5",
+   "record_changes": 2,
    "difference_precision": null,
    "changed": {},
    "conditions": {},
@@ -7180,7 +7182,7 @@
     "confirmed": 87
    },
    "context": {
-    "settled": 5
+    "reported": 5
    },
    "different": {},
    "equivalent": {
@@ -7267,23 +7269,23 @@
     "C-20.design load": "confirmed",
     "C-20.footing width": "confirmed",
     "E1.entry speed": "confirmed",
-    "E1.height": "settled",
+    "E1.height": "reported",
     "E1.peak lateral g": "confirmed",
     "E1.peak vertical g": "confirmed",
     "E2.entry speed": "confirmed",
-    "E2.height": "settled",
+    "E2.height": "reported",
     "E2.peak lateral g": "confirmed",
     "E2.peak vertical g": "confirmed",
     "E3.entry speed": "confirmed",
-    "E3.height": "settled",
+    "E3.height": "reported",
     "E3.peak lateral g": "confirmed",
     "E3.peak vertical g": "confirmed",
     "E4.entry speed": "confirmed",
-    "E4.height": "settled",
+    "E4.height": "reported",
     "E4.peak lateral g": "confirmed",
     "E4.peak vertical g": "confirmed",
     "E5.entry speed": "confirmed",
-    "E5.height": "settled",
+    "E5.height": "reported",
     "E5.peak lateral g": "confirmed",
     "E5.peak vertical g": "confirmed"
    }
@@ -7302,7 +7304,8 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "87/87",
    "false_changes": 0,
-   "context_found": "0/5",
+   "context_found": "5/5",
+   "record_changes": 2,
    "difference_precision": null,
    "changed": {},
    "conditions": {},
@@ -7312,7 +7315,7 @@
     "confirmed": 87
    },
    "context": {
-    "settled": 5
+    "reported": 5
    },
    "different": {},
    "equivalent": {
@@ -7399,23 +7402,23 @@
     "C-20.design load": "confirmed",
     "C-20.footing width": "confirmed",
     "E1.entry speed": "confirmed",
-    "E1.height": "settled",
+    "E1.height": "reported",
     "E1.peak lateral g": "confirmed",
     "E1.peak vertical g": "confirmed",
     "E2.entry speed": "confirmed",
-    "E2.height": "settled",
+    "E2.height": "reported",
     "E2.peak lateral g": "confirmed",
     "E2.peak vertical g": "confirmed",
     "E3.entry speed": "confirmed",
-    "E3.height": "settled",
+    "E3.height": "reported",
     "E3.peak lateral g": "confirmed",
     "E3.peak vertical g": "confirmed",
     "E4.entry speed": "confirmed",
-    "E4.height": "settled",
+    "E4.height": "reported",
     "E4.peak lateral g": "confirmed",
     "E4.peak vertical g": "confirmed",
     "E5.entry speed": "confirmed",
-    "E5.height": "settled",
+    "E5.height": "reported",
     "E5.peak lateral g": "confirmed",
     "E5.peak vertical g": "confirmed"
    }
@@ -7434,7 +7437,8 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "87/87",
    "false_changes": 0,
-   "context_found": "0/5",
+   "context_found": "5/5",
+   "record_changes": 2,
    "difference_precision": null,
    "changed": {},
    "conditions": {},
@@ -7444,7 +7448,7 @@
     "confirmed": 87
    },
    "context": {
-    "settled": 5
+    "reported": 5
    },
    "different": {},
    "equivalent": {
@@ -7531,23 +7535,23 @@
     "C-20.design load": "confirmed",
     "C-20.footing width": "confirmed",
     "E1.entry speed": "confirmed",
-    "E1.height": "settled",
+    "E1.height": "reported",
     "E1.peak lateral g": "confirmed",
     "E1.peak vertical g": "confirmed",
     "E2.entry speed": "confirmed",
-    "E2.height": "settled",
+    "E2.height": "reported",
     "E2.peak lateral g": "confirmed",
     "E2.peak vertical g": "confirmed",
     "E3.entry speed": "confirmed",
-    "E3.height": "settled",
+    "E3.height": "reported",
     "E3.peak lateral g": "confirmed",
     "E3.peak vertical g": "confirmed",
     "E4.entry speed": "confirmed",
-    "E4.height": "settled",
+    "E4.height": "reported",
     "E4.peak lateral g": "confirmed",
     "E4.peak vertical g": "confirmed",
     "E5.entry speed": "confirmed",
-    "E5.height": "settled",
+    "E5.height": "reported",
     "E5.peak lateral g": "confirmed",
     "E5.peak vertical g": "confirmed"
    }
