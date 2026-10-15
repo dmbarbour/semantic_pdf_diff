@@ -123,7 +123,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `leave_text` | `"tables"` | shaping | leave_text | extract | table, text |
 | `quote_match` | `"fragments"` | post | quote_match | extract | table, text |
 | `positions` | `"provenance"` | post | positions | extract | table, text |
-| `records` | `false` | post | records | extract | all |
+| `records` | `true` | post | records | extract | all |
 | `reconcile` | `true` | post | reconcile | - | - |
 | `dedupe_repeated` | `true` | shaping | dedupe_repeated | extract | all |
 | `continuations` | `3` | selecting | continue_reading | extract | figure, overview, tile, vision |
@@ -132,7 +132,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `verify_visuals` | `true` | selecting | verify_visuals | compare | - |
 | `explain_differences` | `true` | selecting | explain_differences | compare | - |
 | `explain_context` | `false` | shaping | explain_differences | compare | - |
-| `editorial` | `false` | post | editorial | compare | - |
+| `editorial` | `true` | post | editorial | compare | - |
 <!-- end of settings table -->
 
 - `response_format` is `none` by default because some compatible servers do not support it; `json_object` requests JSON mode and `json_schema` sends the response schema for guided decoding (vLLM, llama.cpp, and similar), which is strongly recommended for small models where supported. The 0.1 `json_mode: true` setting still maps to `json_object`.

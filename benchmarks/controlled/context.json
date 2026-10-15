@@ -5,15 +5,20 @@
    "evidence": 9359,
    "frame in conditions": 100,
    "grounded": 3545,
+   "list records": 31,
    "no content words": 18,
+   "note records": 6,
    "numbered in attribute": 124,
    "numbered in entity": 27,
    "partly": 95,
    "partly (image)": 19,
    "positioned": 112,
+   "printed": 5910,
+   "table records": 256,
    "unsupported": 34,
    "unsupported (image)": 484,
-   "with conditions": 4195
+   "with conditions": 4195,
+   "with records": 4800
   },
   "placed": {
    "bound": {
@@ -144,6 +149,7 @@
     "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
+    "printed": 23,
     "evidence": 32,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 718,
@@ -161,6 +167,7 @@
     "claims": 50,
     "positioned": 0,
     "misplaced": {},
+    "printed": 28,
     "evidence": 43,
     "context_bytes_per_request": 69,
     "data_bytes_per_request": 580,
@@ -178,6 +185,7 @@
     "claims": 33,
     "positioned": 0,
     "misplaced": {},
+    "printed": 10,
     "evidence": 33,
     "context_bytes_per_request": 141,
     "data_bytes_per_request": 372,
@@ -195,6 +203,7 @@
     "claims": 31,
     "positioned": 0,
     "misplaced": {},
+    "printed": 15,
     "evidence": 27,
     "context_bytes_per_request": 96,
     "data_bytes_per_request": 399,
@@ -212,6 +221,7 @@
     "claims": 33,
     "positioned": 0,
     "misplaced": {},
+    "printed": 19,
     "evidence": 31,
     "context_bytes_per_request": 111,
     "data_bytes_per_request": 436,
@@ -231,6 +241,7 @@
     "with conditions": 15,
     "positioned": 0,
     "misplaced": {},
+    "printed": 10,
     "evidence": 31,
     "context_bytes_per_request": 54,
     "data_bytes_per_request": 381,
@@ -248,6 +259,7 @@
     "claims": 42,
     "positioned": 0,
     "misplaced": {},
+    "printed": 28,
     "evidence": 29,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1189,
@@ -265,6 +277,7 @@
     "claims": 38,
     "positioned": 0,
     "misplaced": {},
+    "printed": 20,
     "evidence": 30,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1084,
@@ -286,6 +299,7 @@
     "with conditions": 14,
     "positioned": 0,
     "misplaced": {},
+    "printed": 31,
     "evidence": 32,
     "context_bytes_per_request": 227,
     "data_bytes_per_request": 773,
@@ -312,6 +326,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "printed": 31,
     "evidence": 31,
     "context_bytes_per_request": 111,
     "data_bytes_per_request": 920,
@@ -332,6 +347,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "printed": 27,
     "evidence": 27,
     "context_bytes_per_request": 17,
     "data_bytes_per_request": 1148,
@@ -355,6 +371,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "printed": 2,
     "evidence": 2,
     "context_bytes_per_request": 278,
     "data_bytes_per_request": 654,
@@ -375,6 +392,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "printed": 27,
     "evidence": 27,
     "context_bytes_per_request": 182,
     "data_bytes_per_request": 709,
@@ -399,6 +417,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 3,
     "context_bytes_per_request": 363,
     "data_bytes_per_request": 160,
@@ -423,6 +442,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "printed": 26,
     "evidence": 26,
     "context_bytes_per_request": 17,
     "data_bytes_per_request": 1113,
@@ -446,6 +466,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "printed": 2,
     "evidence": 2,
     "context_bytes_per_request": 278,
     "data_bytes_per_request": 654,
@@ -466,6 +487,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "printed": 26,
     "evidence": 26,
     "context_bytes_per_request": 182,
     "data_bytes_per_request": 687,
@@ -490,6 +512,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 3,
     "context_bytes_per_request": 363,
     "data_bytes_per_request": 160,
@@ -515,6 +538,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "printed": 6,
     "evidence": 34,
     "context_bytes_per_request": 76,
     "data_bytes_per_request": 287,
@@ -538,6 +562,11 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 15,
+    "printed": 32,
     "evidence": 35,
     "context_bytes_per_request": 81,
     "data_bytes_per_request": 556,
@@ -568,6 +597,11 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 12,
+    "printed": 32,
     "evidence": 35,
     "context_bytes_per_request": 81,
     "data_bytes_per_request": 554,
@@ -591,6 +625,11 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 12,
+    "printed": 28,
     "evidence": 30,
     "context_bytes_per_request": 59,
     "data_bytes_per_request": 698,
@@ -614,6 +653,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "printed": 16,
     "evidence": 30,
     "context_bytes_per_request": 519,
     "data_bytes_per_request": 229,
@@ -637,6 +677,11 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 12,
+    "printed": 28,
     "evidence": 30,
     "context_bytes_per_request": 451,
     "data_bytes_per_request": 138,
@@ -660,6 +705,11 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 12,
+    "printed": 28,
     "evidence": 30,
     "context_bytes_per_request": 446,
     "data_bytes_per_request": 140,
@@ -683,6 +733,11 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 15,
+    "printed": 29,
     "evidence": 32,
     "context_bytes_per_request": 59,
     "data_bytes_per_request": 695,
@@ -713,6 +768,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "printed": 14,
     "evidence": 32,
     "context_bytes_per_request": 529,
     "data_bytes_per_request": 208,
@@ -744,6 +800,11 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 15,
+    "printed": 30,
     "evidence": 33,
     "context_bytes_per_request": 472,
     "data_bytes_per_request": 137,
@@ -775,6 +836,11 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 15,
+    "printed": 30,
     "evidence": 33,
     "context_bytes_per_request": 467,
     "data_bytes_per_request": 139,
@@ -805,6 +871,11 @@
     "with conditions": 30,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 60,
+    "printed": 60,
     "evidence": 99,
     "context_bytes_per_request": 155,
     "data_bytes_per_request": 249,
@@ -828,6 +899,11 @@
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 92,
+    "printed": 92,
     "evidence": 92,
     "context_bytes_per_request": 179,
     "data_bytes_per_request": 306,
@@ -851,6 +927,11 @@
     "with conditions": 20,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 92,
+    "printed": 92,
     "evidence": 92,
     "context_bytes_per_request": 492,
     "data_bytes_per_request": 231,
@@ -897,6 +978,11 @@
     "with conditions": 32,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 92,
+    "printed": 92,
     "evidence": 92,
     "context_bytes_per_request": 567,
     "data_bytes_per_request": 114,
@@ -920,6 +1006,11 @@
     "with conditions": 32,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 92,
+    "printed": 92,
     "evidence": 92,
     "context_bytes_per_request": 538,
     "data_bytes_per_request": 119,
@@ -943,6 +1034,11 @@
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 4
+    },
+    "with records": 92,
+    "printed": 92,
     "evidence": 92,
     "context_bytes_per_request": 148,
     "data_bytes_per_request": 303,
@@ -966,6 +1062,11 @@
     "with conditions": 25,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 92,
+    "printed": 92,
     "evidence": 97,
     "context_bytes_per_request": 129,
     "data_bytes_per_request": 320,
@@ -991,6 +1092,11 @@
     "misplaced": {
      "numbered in entity": 15
     },
+    "records": {
+     "table": 6
+    },
+    "with records": 92,
+    "printed": 92,
     "evidence": 92,
     "context_bytes_per_request": 187,
     "data_bytes_per_request": 280,
@@ -1020,6 +1126,11 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 4
+    },
+    "with records": 60,
+    "printed": 60,
     "evidence": 98,
     "context_bytes_per_request": 208,
     "data_bytes_per_request": 253,
@@ -1043,6 +1154,11 @@
     "with conditions": 37,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 92,
+    "printed": 92,
     "evidence": 107,
     "context_bytes_per_request": 156,
     "data_bytes_per_request": 309,
@@ -1089,6 +1205,7 @@
     "with conditions": 65,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 62,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 557,
@@ -1112,6 +1229,7 @@
     "with conditions": 33,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 33,
     "context_bytes_per_request": 463,
     "data_bytes_per_request": 139,
@@ -1135,6 +1253,7 @@
     "with conditions": 50,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 43,
     "context_bytes_per_request": 230,
     "data_bytes_per_request": 382,
@@ -1159,6 +1278,7 @@
     "with conditions": 33,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 33,
     "context_bytes_per_request": 19,
     "data_bytes_per_request": 145,
@@ -1182,6 +1302,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 3,
     "context_bytes_per_request": 252,
     "data_bytes_per_request": 567,
@@ -1205,6 +1326,7 @@
     "with conditions": 33,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 33,
     "context_bytes_per_request": 356,
     "data_bytes_per_request": 111,
@@ -1228,6 +1350,11 @@
     "with conditions": 33,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 30,
+    "printed": 33,
     "evidence": 33,
     "context_bytes_per_request": 662,
     "data_bytes_per_request": 126,
@@ -1251,6 +1378,7 @@
     "with conditions": 42,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 39,
     "context_bytes_per_request": 186,
     "data_bytes_per_request": 396,
@@ -1275,6 +1403,7 @@
     "with conditions": 58,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 55,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 381,
@@ -1344,6 +1473,7 @@
     "with conditions": 41,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 41,
     "context_bytes_per_request": 241,
     "data_bytes_per_request": 533,
@@ -1367,6 +1497,7 @@
     "with conditions": 19,
     "positioned": 0,
     "misplaced": {},
+    "printed": 2,
     "evidence": 21,
     "context_bytes_per_request": 489,
     "data_bytes_per_request": 193,
@@ -1400,6 +1531,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "printed": 9,
     "evidence": 22,
     "context_bytes_per_request": 363,
     "data_bytes_per_request": 393,
@@ -1423,6 +1555,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "printed": 8,
     "evidence": 22,
     "context_bytes_per_request": 243,
     "data_bytes_per_request": 559,
@@ -1447,6 +1580,7 @@
     "with conditions": 19,
     "positioned": 0,
     "misplaced": {},
+    "printed": 2,
     "evidence": 21,
     "context_bytes_per_request": 28,
     "data_bytes_per_request": 271,
@@ -1470,6 +1604,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "printed": 2,
     "evidence": 4,
     "context_bytes_per_request": 379,
     "data_bytes_per_request": 1216,
@@ -1493,6 +1628,7 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "printed": 5,
     "evidence": 23,
     "context_bytes_per_request": 485,
     "data_bytes_per_request": 137,
@@ -1516,6 +1652,11 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 17,
+    "printed": 22,
     "evidence": 23,
     "context_bytes_per_request": 589,
     "data_bytes_per_request": 222,
@@ -1540,6 +1681,7 @@
     "with conditions": 21,
     "positioned": 0,
     "misplaced": {},
+    "printed": 2,
     "evidence": 21,
     "context_bytes_per_request": 28,
     "data_bytes_per_request": 271,
@@ -1563,6 +1705,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "printed": 2,
     "evidence": 4,
     "context_bytes_per_request": 379,
     "data_bytes_per_request": 1216,
@@ -1586,6 +1729,7 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "printed": 4,
     "evidence": 23,
     "context_bytes_per_request": 485,
     "data_bytes_per_request": 137,
@@ -1609,6 +1753,11 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 17,
+    "printed": 22,
     "evidence": 23,
     "context_bytes_per_request": 589,
     "data_bytes_per_request": 222,
@@ -1632,6 +1781,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "printed": 9,
     "evidence": 22,
     "context_bytes_per_request": 363,
     "data_bytes_per_request": 397,
@@ -1656,6 +1806,7 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 22,
     "context_bytes_per_request": 98,
     "data_bytes_per_request": 455,
@@ -1735,6 +1886,7 @@
     "with conditions": 106,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 103,
     "context_bytes_per_request": 148,
     "data_bytes_per_request": 442,
@@ -1758,6 +1910,7 @@
     "with conditions": 50,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 51,
     "context_bytes_per_request": 458,
     "data_bytes_per_request": 116,
@@ -1781,6 +1934,7 @@
     "with conditions": 100,
     "positioned": 0,
     "misplaced": {},
+    "printed": 27,
     "evidence": 97,
     "context_bytes_per_request": 220,
     "data_bytes_per_request": 495,
@@ -1805,6 +1959,7 @@
     "with conditions": 50,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 51,
     "context_bytes_per_request": 17,
     "data_bytes_per_request": 106,
@@ -1828,6 +1983,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 3,
     "context_bytes_per_request": 303,
     "data_bytes_per_request": 623,
@@ -1851,6 +2007,7 @@
     "with conditions": 51,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 51,
     "context_bytes_per_request": 408,
     "data_bytes_per_request": 108,
@@ -1875,6 +2032,11 @@
     "with conditions": 51,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 48,
+    "printed": 51,
     "evidence": 51,
     "context_bytes_per_request": 639,
     "data_bytes_per_request": 176,
@@ -1904,6 +2066,7 @@
     "with conditions": 77,
     "positioned": 0,
     "misplaced": {},
+    "printed": 25,
     "evidence": 75,
     "context_bytes_per_request": 247,
     "data_bytes_per_request": 498,
@@ -1928,6 +2091,7 @@
     "with conditions": 54,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 51,
     "context_bytes_per_request": 43,
     "data_bytes_per_request": 264,
@@ -1979,6 +2143,11 @@
      "numbered in attribute": 26,
      "numbered in entity": 2
     },
+    "records": {
+     "note": 1
+    },
+    "with records": 129,
+    "printed": 6,
     "evidence": 129,
     "context_bytes_per_request": 18,
     "data_bytes_per_request": 256,
@@ -2031,6 +2200,12 @@
      "numbered in attribute": 13,
      "numbered in entity": 2
     },
+    "records": {
+     "list": 1,
+     "note": 1
+    },
+    "with records": 84,
+    "printed": 6,
     "evidence": 84,
     "context_bytes_per_request": 27,
     "data_bytes_per_request": 246,
@@ -2098,6 +2273,12 @@
      "numbered in attribute": 5,
      "numbered in entity": 2
     },
+    "records": {
+     "list": 1,
+     "note": 1
+    },
+    "with records": 81,
+    "printed": 6,
     "evidence": 81,
     "context_bytes_per_request": 27,
     "data_bytes_per_request": 258,
@@ -2164,6 +2345,11 @@
      "numbered in attribute": 16,
      "numbered in entity": 3
     },
+    "records": {
+     "note": 1
+    },
+    "with records": 131,
+    "printed": 7,
     "evidence": 131,
     "context_bytes_per_request": 18,
     "data_bytes_per_request": 232,
@@ -2239,6 +2425,12 @@
      "numbered in attribute": 17,
      "numbered in entity": 1
     },
+    "records": {
+     "list": 1,
+     "note": 1
+    },
+    "with records": 106,
+    "printed": 6,
     "evidence": 106,
     "context_bytes_per_request": 27,
     "data_bytes_per_request": 245,
@@ -2305,6 +2497,12 @@
      "numbered in attribute": 7,
      "numbered in entity": 2
     },
+    "records": {
+     "list": 1,
+     "note": 1
+    },
+    "with records": 95,
+    "printed": 6,
     "evidence": 95,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 220,
@@ -2369,6 +2567,11 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 24,
     "evidence": 33,
     "context_bytes_per_request": 250,
     "data_bytes_per_request": 926,
@@ -2404,6 +2607,11 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 22,
     "evidence": 26,
     "context_bytes_per_request": 295,
     "data_bytes_per_request": 781,
@@ -2447,6 +2655,11 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 21,
     "evidence": 25,
     "context_bytes_per_request": 262,
     "data_bytes_per_request": 699,
@@ -2490,6 +2703,11 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 19,
     "evidence": 22,
     "context_bytes_per_request": 548,
     "data_bytes_per_request": 1592,
@@ -2533,6 +2751,7 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "printed": 11,
     "evidence": 22,
     "context_bytes_per_request": 692,
     "data_bytes_per_request": 595,
@@ -2577,6 +2796,11 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 20,
     "evidence": 22,
     "context_bytes_per_request": 756,
     "data_bytes_per_request": 453,
@@ -2625,6 +2849,11 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 20,
     "evidence": 22,
     "context_bytes_per_request": 744,
     "data_bytes_per_request": 455,
@@ -2672,6 +2901,11 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 19,
     "evidence": 22,
     "context_bytes_per_request": 295,
     "data_bytes_per_request": 781,
@@ -2718,6 +2952,11 @@
     "with conditions": 14,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 24,
     "evidence": 26,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 980,
@@ -2758,6 +2997,11 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 21,
     "evidence": 27,
     "context_bytes_per_request": 262,
     "data_bytes_per_request": 699,
@@ -2801,6 +3045,11 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 21,
     "evidence": 25,
     "context_bytes_per_request": 262,
     "data_bytes_per_request": 699,
@@ -2845,6 +3094,11 @@
     "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 23,
     "evidence": 27,
     "context_bytes_per_request": 313,
     "data_bytes_per_request": 785,
@@ -2889,6 +3143,11 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 21,
     "evidence": 25,
     "context_bytes_per_request": 234,
     "data_bytes_per_request": 824,
@@ -2968,6 +3227,11 @@
     "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 20,
     "evidence": 24,
     "context_bytes_per_request": 225,
     "data_bytes_per_request": 772,
@@ -3012,6 +3276,11 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 23,
     "evidence": 31,
     "context_bytes_per_request": 264,
     "data_bytes_per_request": 718,
@@ -3048,6 +3317,11 @@
     "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 23,
     "evidence": 31,
     "context_bytes_per_request": 264,
     "data_bytes_per_request": 718,
@@ -3083,6 +3357,11 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 18,
     "evidence": 22,
     "context_bytes_per_request": 548,
     "data_bytes_per_request": 1586,
@@ -3118,6 +3397,7 @@
     "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
+    "printed": 10,
     "evidence": 22,
     "context_bytes_per_request": 692,
     "data_bytes_per_request": 588,
@@ -3156,6 +3436,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 18,
     "evidence": 22,
     "context_bytes_per_request": 789,
     "data_bytes_per_request": 374,
@@ -3198,6 +3483,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 18,
     "evidence": 22,
     "context_bytes_per_request": 780,
     "data_bytes_per_request": 375,
@@ -3238,6 +3528,11 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 18,
     "evidence": 22,
     "context_bytes_per_request": 548,
     "data_bytes_per_request": 1586,
@@ -3273,6 +3568,7 @@
     "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
+    "printed": 10,
     "evidence": 22,
     "context_bytes_per_request": 692,
     "data_bytes_per_request": 588,
@@ -3311,6 +3607,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 18,
     "evidence": 22,
     "context_bytes_per_request": 789,
     "data_bytes_per_request": 374,
@@ -3353,6 +3654,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 18,
     "evidence": 22,
     "context_bytes_per_request": 780,
     "data_bytes_per_request": 375,
@@ -3396,6 +3702,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 24,
     "evidence": 26,
     "context_bytes_per_request": 263,
     "data_bytes_per_request": 843,
@@ -3437,6 +3748,11 @@
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 20,
     "evidence": 25,
     "context_bytes_per_request": 170,
     "data_bytes_per_request": 775,
@@ -3482,6 +3798,12 @@
     "with conditions": 20,
     "positioned": 4,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 6,
+    "printed": 20,
     "evidence": 26,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 512,
@@ -3517,6 +3839,12 @@
     "with conditions": 18,
     "positioned": 4,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 4,
+    "printed": 19,
     "evidence": 25,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 513,
@@ -3551,6 +3879,12 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 14,
     "evidence": 19,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1377,
@@ -3575,6 +3909,11 @@
     "with conditions": 8,
     "positioned": 3,
     "misplaced": {},
+    "records": {
+     "list": 1
+    },
+    "with records": 3,
+    "printed": 9,
     "evidence": 19,
     "context_bytes_per_request": 608,
     "data_bytes_per_request": 288,
@@ -3601,6 +3940,12 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
     "evidence": 21,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 228,
@@ -3633,6 +3978,12 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
     "evidence": 21,
     "context_bytes_per_request": 589,
     "data_bytes_per_request": 229,
@@ -3664,6 +4015,12 @@
     "with conditions": 15,
     "positioned": 4,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 4,
+    "printed": 15,
     "evidence": 22,
     "context_bytes_per_request": 163,
     "data_bytes_per_request": 593,
@@ -3688,6 +4045,12 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
     "evidence": 20,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1409,
@@ -3713,6 +4076,11 @@
     "with conditions": 9,
     "positioned": 3,
     "misplaced": {},
+    "records": {
+     "list": 1
+    },
+    "with records": 3,
+    "printed": 10,
     "evidence": 23,
     "context_bytes_per_request": 654,
     "data_bytes_per_request": 398,
@@ -3743,6 +4111,12 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
     "evidence": 22,
     "context_bytes_per_request": 612,
     "data_bytes_per_request": 233,
@@ -3775,6 +4149,12 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
     "evidence": 22,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 235,
@@ -3805,6 +4185,12 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 14,
     "evidence": 19,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1372,
@@ -3831,6 +4217,12 @@
     "misplaced": {
      "numbered in attribute": 8
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 14,
+    "printed": 24,
     "evidence": 35,
     "context_bytes_per_request": 253,
     "data_bytes_per_request": 615,
@@ -3861,6 +4253,12 @@
     "with conditions": 15,
     "positioned": 5,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 10,
+    "printed": 16,
     "evidence": 22,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1443,
@@ -3885,6 +4283,12 @@
     "with conditions": 15,
     "positioned": 5,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 10,
+    "printed": 16,
     "evidence": 22,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1443,
@@ -3909,6 +4313,11 @@
     "with conditions": 13,
     "positioned": 6,
     "misplaced": {},
+    "records": {
+     "list": 1
+    },
+    "with records": 6,
+    "printed": 14,
     "evidence": 26,
     "context_bytes_per_request": 654,
     "data_bytes_per_request": 407,
@@ -3934,6 +4343,12 @@
     "misplaced": {
      "numbered in attribute": 4
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 9,
+    "printed": 13,
     "evidence": 22,
     "context_bytes_per_request": 624,
     "data_bytes_per_request": 239,
@@ -3965,6 +4380,12 @@
     "misplaced": {
      "numbered in attribute": 4
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 9,
+    "printed": 13,
     "evidence": 22,
     "context_bytes_per_request": 612,
     "data_bytes_per_request": 240,
@@ -3997,6 +4418,12 @@
     "with conditions": 19,
     "positioned": 4,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 6,
+    "printed": 19,
     "evidence": 25,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 512,
@@ -4035,6 +4462,12 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 15,
     "evidence": 20,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1372,
@@ -4059,6 +4492,11 @@
     "with conditions": 8,
     "positioned": 3,
     "misplaced": {},
+    "records": {
+     "list": 1
+    },
+    "with records": 3,
+    "printed": 9,
     "evidence": 19,
     "context_bytes_per_request": 608,
     "data_bytes_per_request": 287,
@@ -4085,6 +4523,12 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
     "evidence": 20,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 227,
@@ -4117,6 +4561,12 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
     "evidence": 21,
     "context_bytes_per_request": 588,
     "data_bytes_per_request": 228,
@@ -4147,6 +4597,12 @@
     "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 14,
     "evidence": 19,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1372,
@@ -4171,6 +4627,11 @@
     "with conditions": 8,
     "positioned": 3,
     "misplaced": {},
+    "records": {
+     "list": 1
+    },
+    "with records": 3,
+    "printed": 9,
     "evidence": 19,
     "context_bytes_per_request": 608,
     "data_bytes_per_request": 287,
@@ -4197,6 +4658,12 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
     "evidence": 21,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 227,
@@ -4229,6 +4696,12 @@
     "misplaced": {
      "numbered in attribute": 3
     },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
     "evidence": 21,
     "context_bytes_per_request": 588,
     "data_bytes_per_request": 228,
@@ -4256,6 +4729,7 @@
     "claims": 59,
     "positioned": 0,
     "misplaced": {},
+    "printed": 10,
     "evidence": 53,
     "context_bytes_per_request": 114,
     "data_bytes_per_request": 671,
@@ -4275,6 +4749,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "printed": 34,
     "evidence": 46,
     "context_bytes_per_request": 130,
     "data_bytes_per_request": 840,
@@ -4294,6 +4769,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 26,
     "context_bytes_per_request": 120,
     "data_bytes_per_request": 477,
@@ -4313,6 +4789,7 @@
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 35,
     "context_bytes_per_request": 106,
     "data_bytes_per_request": 445,
@@ -4332,6 +4809,7 @@
     "with conditions": 8,
     "positioned": 0,
     "misplaced": {},
+    "printed": 6,
     "evidence": 41,
     "context_bytes_per_request": 120,
     "data_bytes_per_request": 478,
@@ -4352,6 +4830,7 @@
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
+    "printed": 5,
     "evidence": 31,
     "context_bytes_per_request": 107,
     "data_bytes_per_request": 447,
@@ -4371,6 +4850,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
+    "printed": 30,
     "evidence": 35,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1323,
@@ -4390,6 +4870,7 @@
     "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
+    "printed": 11,
     "evidence": 18,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1194,
@@ -4409,6 +4890,11 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 0,
+    "printed": 11,
     "evidence": 26,
     "context_bytes_per_request": 138,
     "data_bytes_per_request": 308,
@@ -4428,6 +4914,11 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 3,
+    "printed": 4,
     "evidence": 19,
     "context_bytes_per_request": 398,
     "data_bytes_per_request": 176,
@@ -4447,6 +4938,7 @@
     "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
+    "printed": 3,
     "evidence": 22,
     "context_bytes_per_request": 544,
     "data_bytes_per_request": 78,
@@ -4466,6 +4958,11 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 3,
+    "printed": 4,
     "evidence": 19,
     "context_bytes_per_request": 450,
     "data_bytes_per_request": 125,
@@ -4485,6 +4982,11 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 3,
+    "printed": 4,
     "evidence": 19,
     "context_bytes_per_request": 442,
     "data_bytes_per_request": 126,
@@ -4505,6 +5007,11 @@
     "with conditions": 25,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 32,
     "evidence": 38,
     "context_bytes_per_request": 219,
     "data_bytes_per_request": 637,
@@ -4540,6 +5047,11 @@
     "with conditions": 15,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 29,
     "evidence": 32,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1403,
@@ -4576,6 +5088,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 32,
     "evidence": 37,
     "context_bytes_per_request": 219,
     "data_bytes_per_request": 636,
@@ -4612,6 +5129,11 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 30,
     "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1181,
@@ -4655,6 +5177,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "printed": 16,
     "evidence": 34,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 260,
@@ -4699,6 +5222,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 30,
     "evidence": 33,
     "context_bytes_per_request": 610,
     "data_bytes_per_request": 235,
@@ -4742,6 +5270,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 29,
     "evidence": 33,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 236,
@@ -4778,6 +5311,11 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 30,
     "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1232,
@@ -4821,6 +5359,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 30,
     "evidence": 33,
     "context_bytes_per_request": 622,
     "data_bytes_per_request": 242,
@@ -4863,6 +5406,11 @@
     "with conditions": 21,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 16,
+    "printed": 34,
     "evidence": 39,
     "context_bytes_per_request": 215,
     "data_bytes_per_request": 623,
@@ -4898,6 +5446,11 @@
     "with conditions": 14,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 16,
+    "printed": 32,
     "evidence": 35,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1132,
@@ -4940,6 +5493,7 @@
     "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
+    "printed": 16,
     "evidence": 36,
     "context_bytes_per_request": 602,
     "data_bytes_per_request": 234,
@@ -4983,6 +5537,11 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 16,
+    "printed": 31,
     "evidence": 35,
     "context_bytes_per_request": 595,
     "data_bytes_per_request": 225,
@@ -5018,6 +5577,11 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 16,
+    "printed": 31,
     "evidence": 35,
     "context_bytes_per_request": 586,
     "data_bytes_per_request": 227,
@@ -5060,6 +5624,11 @@
     "with conditions": 27,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 33,
     "evidence": 38,
     "context_bytes_per_request": 219,
     "data_bytes_per_request": 638,
@@ -5096,6 +5665,11 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 30,
     "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1188,
@@ -5139,6 +5713,7 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "printed": 16,
     "evidence": 33,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 261,
@@ -5175,6 +5750,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 29,
     "evidence": 33,
     "context_bytes_per_request": 610,
     "data_bytes_per_request": 236,
@@ -5211,6 +5791,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 29,
     "evidence": 33,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 238,
@@ -5247,6 +5832,11 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 30,
     "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1186,
@@ -5289,6 +5879,11 @@
     "with conditions": 14,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 16,
+    "printed": 32,
     "evidence": 35,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1132,
@@ -5332,6 +5927,11 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 30,
     "evidence": 33,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1184,
@@ -5375,6 +5975,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
+    "printed": 16,
     "evidence": 34,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 261,
@@ -5419,6 +6020,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 29,
     "evidence": 33,
     "context_bytes_per_request": 610,
     "data_bytes_per_request": 235,
@@ -5455,6 +6061,11 @@
     "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 29,
     "evidence": 33,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 237,
@@ -5490,6 +6101,11 @@
     "with conditions": 20,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 60,
+    "printed": 60,
     "evidence": 84,
     "context_bytes_per_request": 158,
     "data_bytes_per_request": 296,
@@ -5523,6 +6139,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 174,
     "data_bytes_per_request": 277,
@@ -5546,6 +6167,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 174,
     "data_bytes_per_request": 277,
@@ -5569,6 +6195,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
@@ -5615,6 +6246,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
@@ -5638,6 +6274,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
@@ -5661,6 +6302,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 154,
     "data_bytes_per_request": 294,
@@ -5684,6 +6330,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
@@ -5730,6 +6381,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
@@ -5753,6 +6409,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
@@ -5776,6 +6437,11 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 85,
+    "printed": 85,
     "evidence": 85,
     "context_bytes_per_request": 184,
     "data_bytes_per_request": 274,
@@ -5799,6 +6465,11 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 85,
+    "printed": 85,
     "evidence": 85,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
@@ -5845,6 +6516,11 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 85,
+    "printed": 85,
     "evidence": 85,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
@@ -5868,6 +6544,11 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 85,
+    "printed": 85,
     "evidence": 85,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
@@ -5891,6 +6572,11 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 88,
+    "printed": 88,
     "evidence": 88,
     "context_bytes_per_request": 185,
     "data_bytes_per_request": 277,
@@ -5914,6 +6600,11 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 88,
+    "printed": 88,
     "evidence": 88,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
@@ -5960,6 +6651,11 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 88,
+    "printed": 88,
     "evidence": 88,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
@@ -5983,6 +6679,11 @@
     "with conditions": 28,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 88,
+    "printed": 88,
     "evidence": 88,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
@@ -6006,6 +6707,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
@@ -6052,6 +6758,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 552,
     "data_bytes_per_request": 109,
@@ -6075,6 +6786,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 526,
     "data_bytes_per_request": 114,
@@ -6098,6 +6814,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 4
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 343,
@@ -6121,6 +6842,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 105,
     "data_bytes_per_request": 336,
@@ -6144,6 +6870,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 84,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
@@ -6168,6 +6899,11 @@
     "with conditions": 71,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 111,
+    "printed": 111,
     "evidence": 111,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 220,
@@ -6191,6 +6927,11 @@
     "with conditions": 36,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 96,
     "context_bytes_per_request": 193,
     "data_bytes_per_request": 242,
@@ -6214,6 +6955,11 @@
     "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 4
+    },
+    "with records": 60,
+    "printed": 60,
     "evidence": 84,
     "context_bytes_per_request": 187,
     "data_bytes_per_request": 248,
@@ -6237,6 +6983,11 @@
     "with conditions": 84,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 72,
+    "printed": 72,
     "evidence": 84,
     "context_bytes_per_request": 443,
     "data_bytes_per_request": 145,
@@ -6260,6 +7011,11 @@
     "with conditions": 79,
     "positioned": 0,
     "misplaced": {},
+    "records": {
+     "table": 6
+    },
+    "with records": 84,
+    "printed": 84,
     "evidence": 104,
     "context_bytes_per_request": 162,
     "data_bytes_per_request": 290,

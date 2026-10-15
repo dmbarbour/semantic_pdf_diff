@@ -71,7 +71,7 @@ class Printed(unittest.TestCase):
 class Lever(unittest.TestCase):
     def test_off_nothing_is_kept_on_lists_and_notes(self):
         page = blocks("GENERAL NOTES", "1. ALL DIMENSIONS ARE TO FACE OF FINISH.", "2. AREAS ARE NET.")
-        off, on = Settings(), Settings(records=True)
+        off, on = Settings(records=False), Settings()
         self.assertEqual(off.page_structure(1, page, lambda: True)[1], [])
         self.assertEqual([r.kind for r in on.page_structure(1, page, lambda: True)[1]], ["list", "note"])
         self.assertEqual([r.kind for r in on.page_structure(1, page, lambda: False)[1]], ["list"])  # not a sheet
@@ -122,7 +122,7 @@ class Editorial(unittest.TestCase):
         a = ev("A-1", position=Position(label="Condition 2"))
         b = ev("B-1", position=Position(label="Condition 3"))
         self.assertEqual(Settings(editorial=True).editorial_notes(a, b), ["renumbered: Condition 2 → Condition 3"])
-        self.assertEqual(Settings().editorial_notes(a, b), [])
+        self.assertEqual(Settings(editorial=False).editorial_notes(a, b), [])
         self.assertEqual(Settings(editorial=True).editorial_notes(a, ev("C-1", position=Position(label="Condition 2"))),
                          [])
         self.assertEqual(Settings(editorial=True).editorial_notes(a, ev("D-1")), [])  # no position: nothing to say

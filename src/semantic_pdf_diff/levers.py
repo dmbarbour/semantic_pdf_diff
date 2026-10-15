@@ -708,7 +708,7 @@ class Records(Lever):
     # context records (docs/plans/claim-context-2026-10-14.md, milestone 3): a page's lists (their lead-ins and
     # labels) and a drawing sheet's notes and legends kept once, as records its claims reference (Evidence.records);
     # a list item's position names its list instead of copying its lead-in. Applied as answers are stored
-    records: Annotated[bool, Declared("post", EXTRACT)] = False
+    records: Annotated[bool, Declared("post", EXTRACT)] = True
 
     def page_structure(self, page_no, blocks, is_sheet):
         positions, records = super().page_structure(page_no, blocks, is_sheet)
@@ -797,7 +797,7 @@ class Editorial(Lever):
     # as renumbered, an editorial change (a pair judged otherwise isn't one statement moved). The owner, 2026-10-14,
     # on renumbering: "editorial changes, like a new page number if we added some text or section numbering if we
     # inserted a section" (docs/plans/claim-context-2026-10-14.md, milestone 3)
-    editorial: Annotated[bool, Declared("post", COMPARE)] = False
+    editorial: Annotated[bool, Declared("post", COMPARE)] = True
 
     def editorial_notes(self, a, b):
         notes = super().editorial_notes(a, b)
@@ -817,8 +817,8 @@ class DedupeRepeated(Lever):
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
-# tables, images_first, repeated_text's first, lone_rows, text_spans' page and positions' provenance
-# (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
+# tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records and
+# editorial (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture,
                  TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles,
                  SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,

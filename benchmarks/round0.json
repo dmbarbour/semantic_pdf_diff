@@ -63,6 +63,8 @@
   "reconcile": false,
   "quote_match": "exact",
   "positions": "conditions",
+  "records": false,
+  "editorial": false,
   "decoration": false,
   "tile_choice": "off",
   "skip_text_only": false,

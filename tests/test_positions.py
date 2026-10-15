@@ -69,7 +69,8 @@ class ByQuote(unittest.TestCase):
         # two readings keep the same conditions and merge
         from types import SimpleNamespace
         from semantic_pdf_diff.tasks import TaskCore
-        core = SimpleNamespace(s=Settings(positions="provenance"), positions={}, listed={}, records={}, reach={})
+        core = SimpleNamespace(s=Settings(positions="provenance", records=False), positions={}, listed={}, records={},
+                               reach={})
         TaskCore.find_positions(core, 1, blocks(LEAD, "Condition 1: no acknowledgement is received within 856 ms.",
                                                 "Condition 2: 21 retransmissions fail."))
         position = TaskCore.position_by_quote(core, 1)
@@ -103,7 +104,7 @@ class Pipeline(unittest.TestCase):
         import test_textdocs
         model_class, test_textdocs.Model = test_textdocs.Model, Model
         try:
-            evidence, _, _, model = extract("spec.md", SPEC, positions=positions)
+            evidence, _, _, model = extract("spec.md", SPEC, positions=positions, records=False)
         finally:
             test_textdocs.Model = model_class
         return {e.value: e for e in evidence}, model
