@@ -155,6 +155,12 @@ SPLIT_SPEC = ('"conditions":"scope: the load, scenario, operating point, time or
 CONDITIONS_RULE = 'put conditions (e.g. "at theta = 0", "at rated speed") in conditions.'
 SPLIT_RULE = (CONDITIONS_RULE + "\nPut what a value is measured to or from (to face of finish, to centreline, above "
               "a datum, net or gross) in frame, not conditions; a tolerance (± 0.5 mm) in uncertainty.")
+# The table rules' prompt likewise (tablerules.RULES): a frame bullet after the conditions', a frame in the templates
+TABLE_CONDITIONS = "  is the heading or slide title the table sits under (what it's about, not a circumstance)\n"
+TABLE_FRAME = ("- frame is how the values are read, where the table or the text above states it: what a height or "
+               "length is\n  measured from or to (a datum, face of finish), net or gross; it isn't a condition\n")
+TABLE_TEMPLATE = '"conditions":"...", "uncertainty":""'
+TABLE_SPLIT = '"conditions":"...", "frame":"", "uncertainty":""'
 
 class SplitConditions(Lever):
     lever_name, stage, off = "split_conditions", "instructions", {"split_conditions": False}
@@ -168,6 +174,12 @@ class SplitConditions(Lever):
         if not self.split_conditions:
             return text
         return text.replace(CONDITIONS_SPEC, SPLIT_SPEC).replace(CONDITIONS_RULE, SPLIT_RULE)
+
+    def table_rules_text(self, builtin):
+        text = super().table_rules_text(builtin)
+        if not self.split_conditions:
+            return text
+        return text.replace(TABLE_CONDITIONS, TABLE_CONDITIONS + TABLE_FRAME).replace(TABLE_TEMPLATE, TABLE_SPLIT)
 
 class VisualRules(Lever):
     lever_name, stage, off = "visual_rules", "instructions", {"visual_rules": []}
@@ -980,6 +992,11 @@ class Platform(Composable):
     @chained
     def instructions(self, builtin):
         return self.base_instructions(builtin)
+
+    @chained
+    def table_rules_text(self, builtin):
+        """The table rules' prompt (tablerules.RULES as builtin): the platform's, as it is."""
+        return builtin
 
     @chained
     def region_rules(self, region):

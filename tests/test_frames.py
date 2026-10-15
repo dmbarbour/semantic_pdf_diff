@@ -26,6 +26,26 @@ class Template(unittest.TestCase):
         self.assertEqual(extraction_template(Settings(extract_prompt=mine, split_conditions=True)),
                          extraction_template(Settings(extract_prompt=mine)))
 
+class Tables(unittest.TestCase):
+    def test_the_table_rules_are_asked_for_a_frame_only_when_on(self):
+        from semantic_pdf_diff.levers import TABLE_FRAME, TABLE_SPLIT
+        from semantic_pdf_diff.tablerules import RULES
+        self.assertEqual(Settings().table_rules_text(RULES), RULES)
+        on = Settings(split_conditions=True).table_rules_text(RULES)
+        self.assertIn(TABLE_FRAME, on)
+        self.assertIn(TABLE_SPLIT, on)
+
+    def test_a_rules_frame_fills_like_its_conditions(self):
+        from semantic_pdf_diff import tablerules as tr
+        from test_tablerules import Applying, pumps
+        rule = {**Applying.RULES["claims"][0], "frame": "at the pump's rated point"}
+        rules = tr.Rules.model_validate({**Applying.RULES, "claims": [rule]})
+        made = tr.row_claims(rules, pumps(), 0)
+        self.assertEqual([f["frame"] for f, _, _ in made], ["at the pump's rated point"] * 2)
+        self.assertIn("frame at the pump's rated point", tr.describe_rule(rules.claims[0]))
+        plain = tr.row_claims(tr.Rules.model_validate(Applying.RULES), pumps(), 0)
+        self.assertEqual([f["frame"] for f, _, _ in plain], ["", ""])
+
 class Field(unittest.TestCase):
     def test_an_answers_frame_and_tolerance_are_kept(self):
         answer = Extraction.model_validate({"claims": [{**WIDTH, "frame": "to face of finish",

@@ -272,7 +272,7 @@ def samples(g):
     odd = [i for i, row in enumerate(g.rows) if i not in picked and seen[pattern(row)] <= max(1, n // 50)]
     return sorted(i for i in picked | set(odd[:SAMPLE_ODD]) if 0 <= i < n)
 
-def question(g, cols=None, context=""):
+def question(g, cols=None, context="", rules=RULES):
     """The rules query's text; context: the context lines a row of the table is given (its lead-in, its headings)."""
     cols = cols or analyse(g)
     n, claims = len(g.rows), point_claims(g, cols)
@@ -306,7 +306,7 @@ def question(g, cols=None, context=""):
         lines.append(f"... (rows {g.names[last + 1]} to {g.names[-1]} not shown)")
     lines.append("OUR HEURISTIC OPINION (a guess from the size and the analysis above; decide yourself): "
                  + opinion(g, cols))
-    return RULES + "\n" + "\n".join(lines)
+    return rules + "\n" + "\n".join(lines)
 
 # --- the answer
 
@@ -317,6 +317,7 @@ class RuleClaim(Lenient):
     value: str = Field(default="", max_length=200)
     unit: str = Field(default="", max_length=80)
     conditions: str = Field(default="", max_length=300)
+    frame: str = Field(default="", max_length=200)  # how its values are read (the split_conditions lever's)
     uncertainty: str = Field(default="", max_length=120)  # "± {D} {C.unit}": a tolerance column, the value's
     number: bool = False
 
@@ -491,10 +492,11 @@ def row_claims(rules, g, i):
             if rule.number and number(value) is None:
                 raise Misfit(f"{column}{g.names[i]} isn't a number: {value[:40]!r}")
             fields = {"value": value}
-            for name in ("entity", "attribute", "unit", "conditions", "uncertainty"):
+            for name in ("entity", "attribute", "unit", "conditions", "frame", "uncertainty"):
                 fields[name], more = _fill(getattr(rule, name), g, i, star, rules.subject)
                 used += more
-                if name in ("unit", "conditions", "uncertainty") and PLACEHOLDER.search(getattr(rule, name)) and \
+                if name in ("unit", "conditions", "frame", "uncertainty") and PLACEHOLDER.search(getattr(rule, name)) \
+                        and \
                         all(not _fill("{" + ref + "}", g, i, star, rules.subject)[0]
                             for ref in PLACEHOLDER.findall(getattr(rule, name))):
                     fields[name] = ""  # its placeholders all empty: no stray words ("in" from "in {title}")
@@ -506,7 +508,7 @@ def row_claims(rules, g, i):
                              f"{'entity' if not fields['entity'] else 'attribute'}")
             out.append((fields, sorted(set(used)), rule))
     # two templates giving one claim, one of them without its unit (as an overview's rules wrote): the one with it
-    same = lambda f: (f["entity"], f["attribute"], f["value"], f["conditions"])
+    same = lambda f: (f["entity"], f["attribute"], f["value"], f["conditions"], f["frame"])
     united, kept, seen = {same(f) for f, _, _ in out if f["unit"]}, [], set()
     for c in out:
         if (c[0]["unit"] or same(c[0]) not in united) and (same(c[0]), c[0]["unit"]) not in seen:
@@ -718,7 +720,7 @@ def _quantity(rules, g, template, x, q, held, claim):
 def describe_rule(rule):
     """A rule's derivation detail: "value {C}; attribute {C.name}; entity {A}; unit {C.unit}"."""
     parts = [f"{name} {getattr(rule, name)}"
-             for name in ("columns", "entity", "attribute", "value", "unit", "conditions", "uncertainty")
+             for name in ("columns", "entity", "attribute", "value", "unit", "conditions", "frame", "uncertainty")
              if getattr(rule, name)]
     return "; ".join(parts)[:300]
 
@@ -739,7 +741,7 @@ def read(core, page, g, task, by_itself, source, image=None):
         row_box = lambda i: (0.0, float(g.lines[i]), 1.0, float(g.lines[i] + 1))
     images = [image] if image else []
     context = core.reader.for_table(page, span, " ".join(g.labels))
-    asked = question(g, cols, context) + ("\n" + IMAGED if image else "")
+    asked = question(g, cols, context, core.s.table_rules_text(RULES)) + ("\n" + IMAGED if image else "")
     table = core.s.table_record(page, task, g, context, span)  # its context record (the records lever), or None
     if table is not None:
         core.records[table.id] = table
@@ -888,8 +890,9 @@ def printed_name(g, i, used, value):
 def _evidence(core, page, box, task, fields, quote, verified, derivation, approximate=False, records=(), printed=""):
     from .schema import Claim
     claim = Claim(entity=fields["entity"][:160], attribute=fields["attribute"][:160], value=fields["value"][:300],
-                  unit=fields["unit"][:40], conditions=fields["conditions"][:300], kind="table", quote=quote[:400],
-                  confidence=CONFIDENCE, approximate=approximate, uncertainty=fields.get("uncertainty", "")[:200])
+                  unit=fields["unit"][:40], conditions=fields["conditions"][:300], frame=fields.get("frame", "")[:200],
+                  kind="table", quote=quote[:400], confidence=CONFIDENCE, approximate=approximate,
+                  uncertainty=fields.get("uncertainty", "")[:200])
     home = core.sections.box(page, box).id
     return Evidence(**claim.model_dump(), id=claim_id(core.content, claim), content=core.content, section=home,
                     locator=core.locator(page, box, "table", task), derivation=derivation, quote_verified=verified,
