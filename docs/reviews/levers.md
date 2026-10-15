@@ -320,6 +320,7 @@ Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so no
 
 | Idea | Raised by | Evidence |
 |---|---|---|
+| Text blocks from PyMuPDF's layout analysis (`pymupdf_layout`) in place of our reading order, for text tasks' blocks and spans | The owner, 2026-10-14 (the CLI's "Consider using the pymupdf_layout package" notice, and complaints about sliced text); [plans index](../plans/README.md#tentative) | Not measured; people still report text sliced |
 | Leave page furniture (running headers, footers, page numbers) out of neighbouring text and text layers (built 2026-10-13 as `leave_furniture`; see the table) | Query checks, 2026-09-28 | Gemini flagged it in 5 of 8 sampled queries (DC manual, NREL, HabEx) |
 | Cut text chunks at sentence ends, and text layers at word ends (built 2026-10-13 as `text_cuts: sentences`; see the table) | Query checks, 2026-09-28 | "This focus is" ending a HabEx chunk; "defined in the W" ending an IEA-22 text layer |
 | Send a one-row table's row without repeating it as its header (built 2026-10-14 as `lone_rows`; see the table) | Query checks, 2026-09-28 | Ken manual "AC Rating ... 6.4 kW", and an NREL "table" made of equation debris |
