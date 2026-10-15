@@ -21,6 +21,10 @@ on the link protocol's specification: a value changed beside its look-alikes (an
 short; a field beside its length field), a list's member replaced and another added, a numbered condition inserted
 (the rest renumbered), a lead-in's conditions changed with the sentences under it kept word for word, and a value's
 conditions reworded without changing their meaning.
+
+And counterfactual pairs (the claim context plan, milestone 4): only a record that gives facts their context restated,
+every value kept: the plan sheet's general note (dimensions to centerline of stud) and the track schedule's lead-in
+(heights above grade).
 """
 import re
 from dataclasses import dataclass, replace
@@ -444,6 +448,30 @@ def context_later(p, d):
         p.edits.append({"kind": "conditions", "fact": fid, "from": fact.conditions, "to": "link lightly loaded"})
         fact.conditions = "link lightly loaded"
 
+def restate_context(project, old, new, facts):
+    """A note or lead-in that gives facts their context restated, every value kept (a counterfactual pair: claim
+    context, milestone 4): the facts' keyed context follows the new text (contexts.DECLARED)."""
+    sheet = getattr(project, "sheet", None)
+    if sheet is not None and old in sheet.notes:
+        sheet.notes[sheet.notes.index(old)] = new
+    else:
+        rewrite(project, old, new)
+    project.edits.append({"kind": "context", "facts": list(facts), "from": old, "to": new})
+
+def notes_later(p, d):
+    """The plan's general note restated: its dimensions now to centerline of stud, not face of finish, the
+    dimensions as drawn kept (a frame changed by a sheet's note, reaching every dimension on it)."""
+    restate_context(p, "ALL DIMENSIONS ARE TO FACE OF FINISH UNLESS NOTED OTHERWISE.",
+                    "ALL DIMENSIONS ARE TO CENTERLINE OF STUD UNLESS NOTED OTHERWISE.",
+                    [f.id for f in p.facts if f.id.endswith((".width", ".depth")) and f.id.startswith("room")])
+
+def datum_later(p, d):
+    """The track schedule's lead-in restated: element heights now above grade, not the station platform, the
+    heights kept (a frame changed by a table's lead-in, reaching one column)."""
+    restate_context(p, "Element heights are above the station platform; speeds are design values at the element's "
+                       "entry.", "Element heights are above grade; speeds are design values at the element's entry.",
+                    [f.id for f in p.facts if re.match(r"^E\d\.height$", f.id)])
+
 def attach_later(p, d):
     """Revision B of the attach procedure: a Key Challenge inserted after the Key Request, the 15 steps after it
     renumbered; the lookup timeout (before the insertion) and the setup timer (after it, so renumbered too)
@@ -475,7 +503,10 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          (PROJECTS["spec"], None, renumbered_later, False, "renumbered"),
          (PROJECTS["spec"], None, context_later, False, "context"),
          # a claim-heavy diagram (the adapters plan, "Pictures in Word documents")
-         (PROCEDURE_PROJECTS["attach"], "clean", attach_later, False, "revised"))
+         (PROCEDURE_PROJECTS["attach"], "clean", attach_later, False, "revised"),
+         # counterfactual pairs: only a note or a lead-in restated, every value kept (claim context, milestone 4)
+         (SHEET_PROJECTS["lcc-plan"], "clean", notes_later, False, "notes"),
+         (TABLE_PROJECTS["coaster-tables"], "clean", datum_later, False, "datum"))
 
 def _base(make, knob, seed):
     p = make(seed)

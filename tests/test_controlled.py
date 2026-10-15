@@ -441,7 +441,12 @@ class Revisions(unittest.TestCase):
                     "wtp-s1-reworded": (0, 0, 0, 0), "spec-s1": (3, 0, 0, 0), "spec-s1-members": (0, 2, 1, 0),
                     "spec-s1-renumbered": (0, 1, 0, 0), "spec-s1-context": (0, 0, 0, 2),
                     # a diagram: a message inserted (the steps after it renumbered) and two parameters revised
-                    "attach-s1-clean": (2, 1, 0, 0)}
+                    "attach-s1-clean": (2, 1, 0, 0),
+                    # counterfactual pairs: only a note or a lead-in restated (claim context, milestone 4)
+                    "lcc-plan-s1-clean-notes": (0, 0, 0, 0), "coaster-tables-s1-clean-datum": (0, 0, 0, 0)}
+        # facts whose declared context was restated, value and conditions kept: the plan's 7 rooms' widths and
+        # depths, the coaster's 5 element heights
+        restated = {"lcc-plan-s1-clean-notes": 14, "coaster-tables-s1-clean-datum": 5}
         bases = {p.id: p for p in controlled.corpus(knobs=True)}
         made = revisions.revised()
         self.assertEqual([pair for pair, _ in made], revisions.pairs())
@@ -454,6 +459,7 @@ class Revisions(unittest.TestCase):
                 kinds = comparison.changes(keys[pair.earlier], keys[pair.later])
                 self.assertEqual(tuple(len(kinds[k]) for k in ("changed", "added", "removed", "conditions")),
                                  expected[pair.id])
+                self.assertEqual(len(kinds.get("context", ())), restated.get(pair.id, 0))
         # the narrated change: the later coaster prints the old lift height as superseded, the earlier as current
         coaster = dict((pair.id, project) for pair, project in made)["coaster-s1"]
         self.assertEqual(coaster.fact("ride.lift").value, bases["coaster-s1"].fact("ride.lift_old").value)

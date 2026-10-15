@@ -25,6 +25,9 @@ A revision's key logs its edits from its base (revisions.py), read in the direct
 - **renamed facts** (P-101B now P-201B, values kept) are the same facts, scored as unchanged or changed
 - **a conditions change with the value kept** is classed apart: settled (the comparison saw no change: missed),
   else the relations the judge gave
+- **a context change with value and conditions kept** (a note or lead-in restated: the counterfactual pairs) is
+  classed apart: reported when a record change the report lists (`record_changes`, the record_changes lever) reaches
+  one of its claims; else as a conditions change
 - **a split** (one item become two) is reported as its removed and added facts, how the report's groupings viewed
   it (a split candidate, or apart), and whether the old item's claims were compared with the new items' at all
 """
@@ -57,19 +60,24 @@ def edits(earlier, later):
 def changes(earlier, later):
     """The facts' changes between two revisions' keys, by fact id (distractors and relations aside; renamed facts
     under their earlier ids): changed (the value), conditions (the value kept, its conditions changed), added,
-    removed, unchanged."""
+    removed, unchanged; and context (value and conditions kept, the note or lead-in declaring its context restated),
+    in pairs that have it."""
     renames, _ = edits(earlier, later)
     facts = lambda key, rename: {rename.get(f["id"], f["id"]): f for f in key["facts"]
                                  if f["role"] == "fact" and not f.get("relation")}
     a, b = facts(earlier, {}), facts(later, renames)
     both = a.keys() & b.keys()
     same = lambda x, y: " ".join(x.casefold().split()) == " ".join(y.casefold().split())
+    kept = {i for i in both if a[i]["value"] == b[i]["value"]
+            and same(a[i].get("conditions", ""), b[i].get("conditions", ""))}
+    declared = lambda f: (f.get("context") or {}).get("declared", "")
+    restated = {i for i in kept if not same(declared(a[i]), declared(b[i]))}
     return {"changed": sorted(i for i in both if a[i]["value"] != b[i]["value"]),
             "conditions": sorted(i for i in both if a[i]["value"] == b[i]["value"]
                                  and not same(a[i].get("conditions", ""), b[i].get("conditions", ""))),
             "added": sorted(b.keys() - a.keys()), "removed": sorted(a.keys() - b.keys()),
-            "unchanged": sorted(i for i in both if a[i]["value"] == b[i]["value"]
-                                and same(a[i].get("conditions", ""), b[i].get("conditions", "")))}
+            "unchanged": sorted(kept - restated),
+            **({"context": sorted(restated)} if restated else {})}
 
 def sides(report):
     """{claim id: 0 (the earlier revision's) or 1 (the later's)}, by the source its file is in."""
@@ -104,6 +112,9 @@ def score_comparison(earlier, later, report):
             "removals_found": f"{count('removed', 'reported')}/{len(kinds['removed'])}",
             "unchanged_confirmed": f"{count('unchanged', 'confirmed')}/{len(kinds['unchanged'])}",
             "false_changes": count("unchanged", "false change"),
+            **({"context_found": f"{count('context', 'reported')}/{len(kinds['context'])}"}
+               if "context" in kinds else {}),
+            **({"record_changes": len(report["record_changes"])} if report.get("record_changes") else {}),
             "difference_precision": round(classes["different"]["change"] / differences, 4) if differences else None,
             **{kind: dict(sorted(Counter(detail[f] for f in kinds[kind]).items())) for kind in kinds},
             "different": dict(sorted(classes["different"].items())),
@@ -152,7 +163,7 @@ def _findings_read(report, side, bound, kinds, splits):
             out.between[fid].add(relation)
         what = ("unscored" if not fa or not fb else "across facts" if not common
                 else "misreading" if any(fa[f] in READ_WRONG or fb[f] in READ_WRONG for f in common)
-                else "change" if any(kind_of.get(f) in ("changed", "conditions") for f in common)
+                else "change" if any(kind_of.get(f) in ("changed", "conditions", "context") for f in common)
                 else "no change")
         if relation in out.classes:
             out.classes[relation][what] += 1
@@ -174,6 +185,15 @@ def _outcomes(report, kinds, claims_of, read):
         a, b = claims_of[fid]
         pairs = {(x, y) for x in a for y in b}
         detail[fid] = ("unextracted" if not a or not b
+                       else "settled" if pairs & settled and not between[fid] - {"equivalent"}
+                       else "judged " + "/".join(sorted(between[fid])) if between[fid] else "unpaired")
+    # value and conditions kept, the record giving their context restated: reported when a record change the report
+    # lists reaches a claim of it; else what the comparison made of its claims, as for conditions
+    reached = {c for change in report.get("record_changes", []) for c in change["claims"]}
+    for fid in kinds.get("context", ()):
+        a, b = claims_of[fid]
+        pairs = {(x, y) for x in a for y in b}
+        detail[fid] = ("unextracted" if not a or not b else "reported" if reached & set(a + b)
                        else "settled" if pairs & settled and not between[fid] - {"equivalent"}
                        else "judged " + "/".join(sorted(between[fid])) if between[fid] else "unpaired")
     for kind, (different, equivalent) in (("changed", ("reported", "called equivalent")),

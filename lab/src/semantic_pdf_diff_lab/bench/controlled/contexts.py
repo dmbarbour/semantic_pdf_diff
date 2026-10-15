@@ -39,17 +39,22 @@ def kind_of(conditions):
     return next((kind for pattern, kind in KINDS if re.search(pattern, conditions)), None)
 
 # Frames and scopes a document states once, for the facts they reach: {project family: [(the fact's id pattern, kind,
-# what it says, the text that says it)]}
+# what it says, the text that says it)]}. Each applies where its text is printed: a counterfactual revision states
+# another (revisions.py: the plan's dimensions to centreline, the coaster's heights above grade)
 DECLARED = {
     "lcc-plan": [
         (r"^room\d+\.(?:width|depth)$", "frame", "to face of finish",
          "ALL DIMENSIONS ARE TO FACE OF FINISH UNLESS NOTED OTHERWISE."),
+        (r"^room\d+\.(?:width|depth)$", "frame", "to centerline of stud",
+         "ALL DIMENSIONS ARE TO CENTERLINE OF STUD UNLESS NOTED OTHERWISE."),
         (r"^room\d+\.area$", "frame", "net, measured to face of finish",
          "ROOM AREAS ARE NET, MEASURED TO FACE OF FINISH."),
     ],
     "coaster-tables": [
         (r"^E\d\.height$", "frame", "above the station platform",
          "Element heights are above the station platform; speeds are design values at the element's entry."),
+        (r"^E\d\.height$", "frame", "above grade",
+         "Element heights are above grade; speeds are design values at the element's entry."),
     ],
     "wtp-tables": [
         (r"^(?:P|B)-\d+[A-C]?\.(?:capacity|total dynamic head|airflow|discharge pressure)$", "scope", "rated point",
@@ -117,18 +122,25 @@ def sources(project):
                                      label=f"{tag} | {header}", table=title)
     return out
 
+def declared_texts(project):
+    """The texts a project prints that may declare context: its paragraphs and a sheet's notes."""
+    texts = {block[1] for _, blocks in project.sections or () for block in blocks if block[0] == "p"}
+    sheet = getattr(project, "sheet", None)
+    return texts | set(sheet.notes if sheet else ())
+
 def contexts(project):
     """{fact id: context}: each fact's conditions by kind, what its document declares for it, its sources, and what
     its name rests on; facts with none are left out."""
     fam = family(project.id)
     found = sources(project)
+    printed = declared_texts(project)
     out = {}
     for f in project.facts:
         ctx = {}
         if f.conditions:
             ctx[kind_of(f.conditions) or "unclassed"] = f.conditions
         for pattern, kind, says, text in DECLARED.get(fam, ()):
-            if re.search(pattern, f.id):
+            if re.search(pattern, f.id) and text in printed:
                 ctx[kind] = f"{ctx[kind]}; {says}" if kind in ctx else says
                 ctx.setdefault("declared", text)
         for pattern, needs in CONVENTIONS.get(fam, ()):
