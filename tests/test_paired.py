@@ -107,6 +107,23 @@ class Scorer(unittest.TestCase):
         measures, facts = paired.measures(key, claims)
         self.assertEqual((measures["facts right"], measures["claims right"], facts), (2, 2, found))
 
+    def test_context_is_kept_in_its_place_or_by_a_record(self):
+        project = controlled.water_treatment(1)
+        _, log = controlled.render(project)
+        key = controlled.key(project, log)
+        a = next(f for f in project.facts if f.role == "fact")
+        entry = next(f for f in key["facts"] if f["id"] == a.id)
+        entry["context"] = {**(entry.get("context") or {}), "frame": "measured at the plant inlet",
+                            "scope": "during the winter season"}
+        claim = {"id": "e1", "entity": a.entity, "attribute": a.attribute, "value": f"{a.value}", "unit": a.unit,
+                 "conditions": "winter season"}
+        by_field, _ = paired.measures(key, [{**claim, "frame": "at the plant inlet"}])
+        by_record, _ = paired.measures(key, [claim], {"e1": "NOTES: all readings measured at the plant inlet."})
+        lost, _ = paired.measures(key, [claim])
+        self.assertEqual([(m["scope kept"], m["frame kept"], m["frame in its field"]) for m in (by_field, by_record,
+                                                                                                    lost)],
+                         [(1, 1, 1), (1, 1, 0), (1, 0, 0)])
+
     def test_an_arm_is_read_from_its_runs_stores(self):
         with tempfile.TemporaryDirectory() as d:
             self.assertEqual(paired.arm(Path(d), Path(d)), {})

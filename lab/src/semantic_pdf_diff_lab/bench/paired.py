@@ -30,22 +30,34 @@ from pathlib import Path
 CLAIM_OUTCOMES = ("right", "loose", "misbound", "inexact", "wrong unit", "misread", "hallucinated", "text",
                   "distractor")
 RELATION_OUTCOMES = ("right", "implied", "reversed", "wrong", "invented", "unscored")
+# "claims right" counts a fact's distinct wordings (entity, attribute, value), so readers wording alike lower it with
+# nothing lost (split_conditions, 2026-10-15). The kept measures count facts whose keyed context a reading holds in
+# its place (bench/context.py's HOME: its words, or a context record it references); "frame in its field", those in
+# the frame field itself.
+KEPT = ("scope", "frame", "subject")
 DIRECTION = {"facts right": 1, "facts found": 1, "claims right": 1, "relations right": 1, "relations unscored": 0,
              **{f"claims {o}": -1 for o in CLAIM_OUTCOMES if o != "right"},
-             **{f"relations {o}": -1 for o in RELATION_OUTCOMES if o not in ("right", "unscored")}}
+             **{f"relations {o}": -1 for o in RELATION_OUTCOMES if o not in ("right", "unscored")},
+             **{f"{k} kept": 1 for k in KEPT}, "frame in its field": 1}
 LEVEL = 0.1      # a change counts at p below this, two-sided
 DRAWS = 20_000   # sign-flip draws beyond exact enumeration
 EXACT = 16       # documents changed up to which every sign pattern is enumerated
 RESAMPLES = 2_000
 
-def measures(key, claims):
-    """({measure: count}, {fact id: "right" or "loose"}) for one document's claims against its key."""
+def measures(key, claims, records=None):
+    """({measure: count}, {fact id: "right" or "loose"}) for one document's claims against its key; records, {claim
+    id: the text of the context records it references}, counts context held by reference as kept."""
+    from .context import HOME, against_key
     from .controlled.score import _scored
     result, found = _scored(key, claims)
     out = {"facts right": result["found_right"], "facts found": len(found)}
     out.update({f"claims {o}": result["outcomes"].get(o, 0) for o in CLAIM_OUTCOMES})
     if "relations" in result:
         out.update({f"relations {o}": result["relations"].get(o, 0) for o in RELATION_OUTCOMES})
+    held = (records or {}).get
+    placed = against_key(key, [{**c, "records": held(c.get("id"), "")} for c in claims], {})["placed"]
+    out.update({f"{k} kept": sum(n for where, n in placed.get(k, {}).items() if where in HOME[k]) for k in KEPT})
+    out["frame in its field"] = placed.get("frame", {}).get("frame", 0)
     return out, found
 
 def claims_of(store):
@@ -71,8 +83,16 @@ def arm(folder, corpus):
     for run in sorted(Path(folder).iterdir()):
         if (run / "store.sqlite").exists() and not cut(run):
             key = json.loads(key_of(corpus, run.name).read_text(encoding="utf-8"))
-            out[run.name] = measures(key, claims_of(run / "store.sqlite"))
+            claims = claims_of(run / "store.sqlite")
+            out[run.name] = measures(key, claims, records_of(run, {c["content"] for c in claims}))
     return out
+
+def records_of(run, contents):
+    """{claim id: the text of the context records it references} for a run's contents (none before records)."""
+    from semantic_pdf_diff.store import Store
+    from .context import record_texts
+    with Store.open(run) as store:
+        return {cid: text for content in sorted(contents) for cid, text in record_texts(store, content).items()}
 
 def sign_flip(changes, seed=0):
     """Two-sided p-value of the changes' sum under random signs (exact up to EXACT nonzero changes)."""
