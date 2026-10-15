@@ -155,6 +155,8 @@ def finding_html(f, card):
         why = (f"<p><b>{esc(KINDS[why['kind']][1])}.</b> {esc(why['rationale'])}"
                f" <small>(explanation confidence {why['confidence']})</small></p>")
     editorial = "".join(f"<p>Editorial: {esc(note)}</p>" for note in f.get('editorial', ()))
+    editorial += "".join(f"<p class='warning'>Context changed: {esc(RECORD_KINDS.get(label, label))} (see Context "
+                         "changes)</p>" for label in f.get('context_changed', ()))
     differ = (f"<p class='warning'>Their tables were read differently: A {esc(f['tables_read']['a'])}; B "
               f"{esc(f['tables_read']['b'])}. The difference may come from the "
               "reading.</p>") if f.get('tables_read') else ''
@@ -181,6 +183,7 @@ def header_html(data):
         "summary or row by row): a difference there may come from the reading.</p>" if differently else '') + (
         f"<p class='warning'>{len(issues)} incomplete, failed or skipped source tasks. {len(data['unmatched'])} "
         "claims lack a confirmed counterpart.</p>")
+    page += record_changes_html(data.get('record_changes', ()), esc)
     diff = data.get('file_difference')
     if diff:
         render = lambda item: esc(' → '.join(item) if isinstance(item, list) else item)
@@ -198,6 +201,26 @@ def header_html(data):
                               indent=2))
              + '</pre></details></header>')
     return page
+
+RECORD_KINDS = {"note": "Note", "legend": "Legend", "list": "List lead-in", "table": "Table"}
+
+def record_changes_html(changes, esc):
+    """Context records restated between the revisions (the record_changes lever), each once with how many claims it
+    reaches: what every claim under it means may have changed, whatever its value."""
+    if not changes:
+        return ''
+    def said(side):
+        return ' '.join(x for x in (side['text'], ' | '.join(side['items'])) if x)
+    def around(a, b):  # both sides from a little before where they first differ
+        first = next((i for i, (x, y) in enumerate(zip(a, b)) if x != y), min(len(a), len(b)))
+        start = a.rfind(' ', 0, max(0, first - 40)) + 1 if first > 60 else 0
+        return [('…' if start else '') + clip(t[start:]) for t in (a, b)]
+    items = ''.join(f"<li><b>{esc(RECORD_KINDS.get(c['kind'], c['kind']))}"
+                    f"{(' ' + esc(c['label'])) if c['label'] else ''}</b>: “{esc(was)}” → “{esc(now)}”; reaches "
+                    f"{len(c['claims'])} claims</li>"
+                    for c in changes for was, now in [around(said(c['earlier']), said(c['later']))])
+    return (f"<section><h2>Context changes ({len(changes)})</h2><p>A note, lead-in or table heading restated: what "
+            f"the claims under it mean may have changed, whatever their values.</p><ul>{items}</ul></section>")
 
 def write_report(data, output, assets=None):
     """Write report.json and report.html; assets is the folder holding rendered crops

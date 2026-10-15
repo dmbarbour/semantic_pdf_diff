@@ -123,3 +123,39 @@ def printed_before(quote, value):
         words.pop(0)
     name = " ".join(words).rstrip(":")
     return "" if len(name) <= 3 else name[:200]
+
+# --- records compared between revisions (the record_changes lever; the plan's milestone 4, design question 6) -------
+
+def _wording(text):
+    """A record's words, numbers aside: a value changed in a lead-in is a value change, reported as one."""
+    return re.findall(r"[^\W\d_]+", text.casefold())
+
+def _keyed(found):
+    """{(kind, label): [(content, record)]} in page order: a note or table by its heading or title, a list by none.
+    found: {content: {id: ContextRecord}}."""
+    out = {}
+    pairs = sorted(((c, r) for c, records in found.items() for r in records.values()),
+                   key=lambda x: (x[0], x[1].page or 0, x[1].id))
+    for content, r in pairs:
+        out.setdefault((r.kind, " ".join(_wording(r.label))), []).append((content, r))
+    return out
+
+def changed_records(earlier, later, left, right):
+    """The context records restated between two revisions, each once with the claims it reaches on either side:
+    [{"kind", "label", "earlier": {content, id, text, items}, "later": {...}, "claims": [claim ids]}]. earlier,
+    later: {content: {id: ContextRecord}} of each side's own content (shared content is the same on both); left,
+    right: each side's claims. Records pair by kind and heading or title, in order; a pair is restated when its
+    words differ, numbers aside (a table's headers too)."""
+    a_side, b_side = _keyed(earlier), _keyed(later)
+    out = []
+    for key in sorted(a_side.keys() & b_side.keys()):
+        for (ca, a), (cb, b) in zip(a_side[key], b_side[key]):
+            headers = [_wording(i) for i in a.items], [_wording(i) for i in b.items]
+            if _wording(a.text) == _wording(b.text) and headers[0] == headers[1]:
+                continue
+            claims = [e.id for e in left if e.content == ca and a.id in e.records] + \
+                     [e.id for e in right if e.content == cb and b.id in e.records]
+            out.append({"kind": a.kind, "label": a.label or b.label,
+                        "earlier": {"content": ca, "id": a.id, "text": a.text, "items": a.items},
+                        "later": {"content": cb, "id": b.id, "text": b.text, "items": b.items}, "claims": claims})
+    return out

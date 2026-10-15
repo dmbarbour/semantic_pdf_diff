@@ -46,7 +46,8 @@
     "align",
     "verify_visuals",
     "explain_differences",
-    "editorial"
+    "editorial",
+    "record_changes"
   ],
   "table_rules": null,
   "table_structure": false,

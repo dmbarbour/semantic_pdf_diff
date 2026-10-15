@@ -231,6 +231,13 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
                    label=provenance.text_hash(comparing.model_dump_json()))
     progress.close()
+    if options.mode == 'revisions':
+        data['record_changes'] = restated(settings, files[names[0]], files[names[1]], read.records or {}, left, right)
+        for f in data['findings']:  # a finding whose claims a restated record reaches says so
+            labels = [c['label'] or c['kind'] for c in data['record_changes'] if f['a'] in c['claims']
+                      or f['b'] in c['claims']]
+            if labels:
+                f['context_changed'] = labels
     interpreters = {**document.interpreters, 'compare': comparing.model_dump()}
     data = Report(**data, created_at=provenance.now().isoformat(),
         sources=document.sources, files=document.files, interpreters=interpreters, scan_issues=document.scan_issues,
@@ -259,6 +266,19 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     # 2 makes automation aware of incomplete processing; uncertainty still appears
     # in the report even when all tasks completed successfully.
     return 2 if incomplete else 0
+
+def restated(settings, earlier, later, records, left, right):
+    """The context records restated between two revisions (the record_changes lever), content by content: a file's
+    content paired with the other side's at the same path, or the one content each side has."""
+    own = lambda files: {f.content for f in files} - ({f.content for f in earlier} & {f.content for f in later})
+    a, b = own(earlier), own(later)
+    by_path = lambda files, mine: {f.path: f.content for f in files if f.content in mine}
+    pairs = [(ca, by_path(later, b)[path]) for path, ca in sorted(by_path(earlier, a).items())
+             if path in by_path(later, b)]
+    if not pairs and len(a) == 1 and len(b) == 1:
+        pairs = [(next(iter(a)), next(iter(b)))]
+    return [change for ca, cb in pairs
+            for change in settings.changed_records({ca: records.get(ca, {})}, {cb: records.get(cb, {})}, left, right)]
 
 def make_client(options, settings, store):
     fixture = None

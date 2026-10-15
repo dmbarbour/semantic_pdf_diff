@@ -46,7 +46,8 @@
     "align",
     "verify_visuals",
     "explain_differences",
-    "editorial"
+    "editorial",
+    "record_changes"
   ],
   "context_before": 400,
   "context_after": 400,

@@ -511,10 +511,14 @@ class Report(Strict):
     # order answers came in, so the report isn't reproducible until the run is resumed (the determinism review, D6)
     paused: str = ""
     records: list[dict] = Field(default_factory=list)  # as EvidenceDocument's
+    # context records restated between the revisions, each with the claims it reaches (the record_changes lever;
+    # records.changed_records); none, no key
+    record_changes: list[dict] = Field(default_factory=list)
 
     @model_serializer(mode="wrap")
     def _without_absent_records(self, handler):
         out = handler(self)
-        if isinstance(out, dict) and not out.get("records"):
-            out.pop("records", None)
+        for key in ("records", "record_changes"):
+            if isinstance(out, dict) and not out.get(key):
+                out.pop(key, None)
         return out

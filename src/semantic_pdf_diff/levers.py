@@ -805,6 +805,19 @@ class Editorial(Lever):
             return notes
         return notes + [f"renumbered: {a.position.label} → {b.position.label}"]
 
+class RecordChanges(Lever):
+    lever_name, stage, off = "record_changes", "comparison", {"record_changes": False}
+    # a context record restated between revisions (a sheet's note, a list's lead-in, a table's lead-in or headers),
+    # numbers aside, reported once with the claims it reaches (records.changed_records; the claim context plan's
+    # milestone 4, design question 6: the owner, "add it"); the records lever keeps them
+    record_changes: Annotated[bool, Declared("post", COMPARE)] = False
+
+    def changed_records(self, earlier, later, left, right):
+        if not self.record_changes:
+            return super().changed_records(earlier, later, left, right)
+        from .records import changed_records
+        return changed_records(earlier, later, left, right)
+
 class DedupeRepeated(Lever):
     lever_name, stage, off = "dedupe_repeated", "matching", {"dedupe_repeated": False}
     # extract exactly repeated table rows (same cells, same table position, 3+ pages) once
@@ -825,7 +838,7 @@ LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, Complete
                  RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts,
                  TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions,
                  Records, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences,
-                 Editorial)
+                 Editorial, RecordChanges)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -976,6 +989,12 @@ class Platform(Composable):
     def editorial_notes(self, a, b):
         """The editorial changes between two paired claims, as notes ("renumbered: Condition 2 → Condition 3"): the
         platform's, none."""
+        return []
+
+    @chosen
+    def changed_records(self, earlier, later, left, right):
+        """The context records restated between two revisions' paired content, with the claims they reach
+        (records.changed_records): the platform's, none."""
         return []
 
     @chosen

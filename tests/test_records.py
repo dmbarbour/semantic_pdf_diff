@@ -148,6 +148,45 @@ class Aligned(unittest.TestCase):
                                                                                                "Capacity"])
         self.assertEqual(printed_property("lift hill rises"), "")  # a text claim's: not a label
 
+class Restated(unittest.TestCase):
+    def note(self, text, rid="note:p1:0"):
+        from semantic_pdf_diff.schema import ContextRecord
+        return ContextRecord(id=rid, kind="note", gives=["frame", "scope"], label="GENERAL NOTES", text=text, page=1)
+
+    def test_a_restated_note_is_reported_once_with_the_claims_it_reaches(self):
+        from semantic_pdf_diff.records import changed_records
+        from test_pipeline import ev
+        face = self.note("1. ALL DIMENSIONS ARE TO FACE OF FINISH UNLESS NOTED OTHERWISE.")
+        stud = self.note("1. ALL DIMENSIONS ARE TO CENTERLINE OF STUD UNLESS NOTED OTHERWISE.")
+        left = [ev("A-1", records=["note:p1:0"]), ev("A-2")]
+        right = [ev("B-1", records=["note:p1:0"]).model_copy(update={"content": "later"})]
+        found = changed_records({left[0].content: {face.id: face}}, {"later": {stud.id: stud}}, left, right)
+        self.assertEqual([(c["kind"], c["label"], c["claims"]) for c in found],
+                         [("note", "GENERAL NOTES", ["A-1", "B-1"])])
+        self.assertEqual(changed_records({left[0].content: {face.id: face}}, {"later": {face.id: face}}, left, right),
+                         [])
+        # numbers aside: a value changed in a note is a value change, reported as one
+        renumbered = self.note("2. ALL DIMENSIONS ARE TO FACE OF FINISH UNLESS NOTED OTHERWISE.")
+        self.assertEqual(changed_records({left[0].content: {face.id: face}}, {"later": {face.id: renumbered}},
+                                         left, right), [])
+        self.assertEqual(Settings().changed_records({"a": {face.id: face}}, {"b": {stud.id: stud}}, left, right), [])
+        self.assertEqual(len(Settings(record_changes=True).changed_records({"a": {face.id: face}},
+                                                                           {"b": {stud.id: stud}}, left, right)), 1)
+
+    def test_the_report_lists_it_and_marks_the_findings_it_reaches(self):
+        from semantic_pdf_diff.report import finding_html, record_changes_html
+        change = {"kind": "note", "label": "GENERAL NOTES", "claims": ["A-1", "B-1"],
+                  "earlier": {"text": "1. ALL DIMENSIONS ARE TO FACE OF FINISH.", "items": []},
+                  "later": {"text": "1. ALL DIMENSIONS ARE TO CENTERLINE OF STUD.", "items": []}}
+        html = record_changes_html([change], lambda x: x)
+        self.assertIn("Context changes (1)", html)
+        self.assertIn("“1. ALL DIMENSIONS ARE TO FACE OF FINISH.” → “1. ALL DIMENSIONS ARE TO CENTERLINE OF STUD.”; "
+                      "reaches 2 claims", html)
+        self.assertEqual(record_changes_html([], lambda x: x), "")
+        finding = {"a": "A-1", "b": "B-1", "relation": "equivalent", "rationale": "same", "confidence": 0.9,
+                   "retrieval_score": 1.0, "context_changed": ["GENERAL NOTES"]}
+        self.assertIn("Context changed: GENERAL NOTES", finding_html(finding, lambda i: ""))
+
 class Stored(unittest.TestCase):
     def test_a_run_keeps_each_record_once_beside_the_claims_that_reference_it(self):
         import contextlib
@@ -174,6 +213,34 @@ class Stored(unittest.TestCase):
         self.assertEqual([(r.kind, r.text) for r in records.values()],
                          [("list", "A link failure is declared when any of the following conditions holds.")])
         self.assertLessEqual(referenced, set(records))
+
+    def test_revisions_with_a_restated_lead_in(self):
+        import contextlib
+        import io
+        import json
+        import tempfile
+        from pathlib import Path
+        from semantic_pdf_diff import cli
+        from test_concurrency import jittery_model
+        items = "\n\nCondition 1: the heater draws 12 kW.\n\nCondition 2: the fan draws 3 kW.\n"
+        later = "A link failure is declared when all of the following conditions hold."
+        with tempfile.TemporaryDirectory() as d, jittery_model() as (url, _):
+            a, b, config = Path(d) / "a" / "spec.md", Path(d) / "b" / "spec.md", Path(d) / "settings.json"
+            for path, lead in ((a, LEAD), (b, later)):
+                path.parent.mkdir()
+                path.write_text(f"# Loads\n\n{lead}{items}")
+            config.write_text(json.dumps({"record_changes": True}))
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                cli.main(["compare", str(a.parent), str(b.parent), "--store", str(Path(d) / "out"), "--base-url",
+                          url, "--no-situate", "--config", str(config), "--mode", "revisions"])
+            report = json.loads((Path(d) / "out" / "report.json").read_text())
+            html = (Path(d) / "out" / "report.html").read_text()
+        (change,) = report["record_changes"]
+        self.assertEqual((change["kind"], change["earlier"]["text"], change["later"]["text"]), ("list", LEAD, later))
+        self.assertEqual(len(change["claims"]), 4)  # two conditions' claims on each side
+        self.assertTrue(all(f.get("context_changed") == ["list"] for f in report["findings"]
+                            if f["a"] in change["claims"]))
+        self.assertIn("Context changes (1)", html)
 
 if __name__ == "__main__":
     unittest.main()
