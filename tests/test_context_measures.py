@@ -83,5 +83,31 @@ class AgainstKey(unittest.TestCase):
         self.assertEqual(result["placed"]["scope"], {"records": 1})
         self.assertEqual(result["audit"], {})
 
+class Readings(unittest.TestCase):
+    def test_every_reading_counts_a_frame_only_a_later_sighting_gave(self):
+        # one fact read by two tasks, merged into one claim: the first sighting has no frame, the second does
+        import tempfile
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from semantic_pdf_diff.schema import Claim, Evidence, PdfLocator, claim_id
+        from semantic_pdf_diff.store import Store
+        content = 'sha256:' + 'c' * 64 + '.pdf'
+        with tempfile.TemporaryDirectory() as d, \
+                patch.object(Store, 'files', lambda self, source=None: [SimpleNamespace(content=content)]):
+            with Store(Path(d) / 'run1') as store:
+                store.db.execute("INSERT INTO content (id, size) VALUES (?, 1)", (content,))
+                for task, frame in (('figure:p1:0', ''), ('tile:p1:0', 'above the station platform')):
+                    c = Claim(entity='E1', attribute='height', value='120', unit='ft', kind='diagram', quote='E1 120',
+                              confidence=.9, frame=frame)
+                    store.record_task({'content': content, 'page': 1, 'task': task, 'status': 'complete',
+                                       'claims': 1},
+                                      [Evidence(**c.model_dump(), id=claim_id(content, c), content=content,
+                                                locator=PdfLocator(page=1, bbox=(0, 0, 9, 9),
+                                                                   region=task.split(':')[0], task=task))])
+                store.set_reconcile(True)
+            (readings,) = context.every_reading(Path(d)).values()
+        self.assertEqual(sorted((c['_task'], c.get('frame')) for _, _, c in readings),
+                         [('figure:p1:0', None), ('tile:p1:0', 'above the station platform')])
+
 if __name__ == "__main__":
     unittest.main()

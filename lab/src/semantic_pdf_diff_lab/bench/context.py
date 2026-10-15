@@ -13,8 +13,10 @@ words were in what its request showed the model.
   shows its text layer, not what the picture holds, so its unsupported conditions may still be read from the image:
   they're counted apart.
 
-Claims are each reading as its task gave it (rounds.collect), so a condition one reader gave and another didn't is
-measured where it was given.
+Claims are each reading as its task gave it (every_reading), so a condition one reader gave and another didn't is
+measured where it was given. Until 2026-10-15 they were rounds.collect's units, which show a merged claim once per
+unit, as its first sighting worded it: a frame only a later sighting gave (the coaster's tiles, after its figure
+task) went uncounted.
 """
 import re
 from collections import Counter, defaultdict
@@ -23,7 +25,6 @@ from pathlib import Path
 from semantic_pdf_diff.context import CONTEXT_NOTE
 from semantic_pdf_diff.tasks import ExtractQuery
 
-from ..eval import rounds
 
 # A reader's numbering or a list's label, standing as a name: "Condition 2", "dimension 1", "column 3", "item (b)".
 # A hyphen before the word makes a name of it ("BM-Case2", "Load-Case 3"), not a label.
@@ -93,16 +94,39 @@ def requests(store, content):
             out[q["task"]].append(shown(q["prompt"]))
     return out
 
+def every_reading(runs_dir):
+    """{run: [(content, family, claim)]} for every store under runs_dir: each task's reading of a claim in its own
+    words (once per task, quote and wording), from the readers whose regions have a family (as units' are); a claim
+    holds its entity, attribute, value, unit, conditions, frame (if any), quote, `_task`, and `_records` (the context
+    records it references)."""
+    from semantic_pdf_diff.readings import wording
+    from semantic_pdf_diff.regions import FAMILY
+    from semantic_pdf_diff.store import Store
+    from ..eval.documents import contents
+    out = defaultdict(list)
+    for folder in sorted(p for p in Path(runs_dir).iterdir() if (p / "store.sqlite").exists()):
+        with Store.open(folder) as store:
+            for content in contents(store):
+                seen = set()
+                for r in store.evidence(content, reconcile=False):
+                    for o in r.occurrences or [r]:
+                        family = FAMILY.get(o.locator.region)
+                        reading = (o.locator.task, o.quote, wording(r))
+                        if not family or reading in seen:
+                            continue
+                        seen.add(reading)
+                        claim = {k: getattr(r, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
+                        if r.frame:
+                            claim["frame"] = r.frame
+                        claim.update(quote=o.quote, _task=o.locator.task, _records=list(r.records))
+                        out[folder.name].append((content, family, claim))
+    return dict(out)
+
 def measure(runs_dir):
     """{run: its document's measures} for every store under runs_dir."""
     from semantic_pdf_diff.store import Store
-    units = rounds.collect(runs_dir)
-    by_run = defaultdict(list)
-    for (run, content, _, family), unit in units.items():
-        for claim in unit["claims"].values():
-            by_run[run].append((content, family, claim))
     out = {}
-    for run, claims in sorted(by_run.items()):
+    for run, claims in sorted(every_reading(runs_dir).items()):
         with Store.open(Path(runs_dir) / run) as store:
             shown_by = {content: requests(store, content) for content in {c for c, _, _ in claims}}
             evidence = [e for content in shown_by for e in store.evidence(content)]
@@ -247,22 +271,21 @@ def against_key(key_data, claims, shown_by_task):
 def measure_keys(runs_dir, key_of):
     """{run: against_key's result} for every store under runs_dir; key_of(run) is its key's data."""
     from semantic_pdf_diff.store import Store
-    units = rounds.collect(runs_dir)
-    by_run = defaultdict(list)
-    for (run, content, _, _), unit in units.items():
-        for claim in unit["claims"].values():
-            by_run[run].append((content, claim))
     out = {}
-    for run, claims in sorted(by_run.items()):
+    for run, claims in sorted(every_reading(runs_dir).items()):
         with Store.open(Path(runs_dir) / run) as store:
             shown_by, held = {}, {}
-            for content in {c for c, _ in claims}:
+            for content in {c for c, _, _ in claims}:
                 for task, texts in requests(store, content).items():
                     shown_by.setdefault(task, []).extend(texts)
-                held[content] = record_texts(store, content)
-        out[run] = against_key(key_of(run), [{**c, "records": held[content].get(c["_claim"], "")}
-                                             for content, c in claims], shown_by)
+                held[content] = store.records(content)
+        out[run] = against_key(key_of(run), [{**c, "records": _held_text(held[content], c["_records"])}
+                                             for content, _, c in claims], shown_by)
     return out
+
+def _held_text(records, ids):
+    """The text of the records named by ids: each record's label, text and items."""
+    return " ".join(" ".join([r.label, r.text, *r.items]) for r in map(records.get, ids) if r)
 
 def record_texts(store, content):
     """{claim id: the text of the context records it references} for one document: each record's label, text and
