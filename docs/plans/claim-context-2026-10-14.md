@@ -369,6 +369,13 @@ Before records are built, so each later milestone has a baseline. Almost all of 
 - **Changed records reported once:** a note, heading or lead-in that changes between revisions, with the claims it reaches (design question 6).
 - **The scorer** checks scope and frame per kind where the key declares them; the counterfactual pairs added (layer 4).
 
+**Progress (2026-10-14):**
+- **Context held by reference counted** (a scorer change): a keyed scope, frame or subject found in the text of a record the claim references (the `records` lever's lists, sheet notes and tables) is in its place, placed "records". The controlled corpus, before and after:
+  - frame: nowhere 73 → 0 (records 73: the plan sheet's general notes, which every claim on the sheet references); lost 91 → 18 (not shown 30 → 0, image only 37 → 0, shown and not used 24 → 18: frames in attributes, wtp's "95th percentile turbidity");
+  - scope, subject and bound unchanged: scope's 29 shown and not used are mostly scope in the attribute ("peak flow (maximum day)", "Rated point TDH"), two the spec's lead-in;
+  - a revision row's description held by its table's record (1), provenance kept out of the claim's words.
+- **So the reader's selection isn't where context is lost** on the corpus: a sheet's notes in its tiles' requests (the first item above) has no target left there, and waits for a document whose notes change a reading (a units note over bare numbers). What's lost is downstream: the judge is shown neither side's records, and a record that changes between revisions isn't reported.
+
 ### 5. Stance
 
 - **First, a look at the corpus and the real pairs without the model:** where are views reported (feature-lead summaries' company tables, minutes, reviews, cited standards), and what share of claims sit in them?
