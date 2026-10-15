@@ -2,6 +2,7 @@
   "levers": [
     "extract_prompt",
     "split_conditions",
+    "column_conditions",
     "extract_rules",
     "visual_rules",
     "images_first",

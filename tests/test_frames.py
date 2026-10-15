@@ -35,6 +35,15 @@ class Tables(unittest.TestCase):
         self.assertIn(TABLE_FRAME, on)
         self.assertIn(TABLE_SPLIT, on)
 
+    def test_a_condition_for_some_columns_is_kept_to_them_only_when_on(self):
+        # the column_conditions lever: the coaster's speeds' "at the element's entry" isn't its heights'
+        from semantic_pdf_diff.levers import TABLE_SHARED, TABLE_SOME
+        from semantic_pdf_diff.tablerules import RULES
+        self.assertEqual(Settings().table_rules_text(RULES), Settings(column_conditions=False).table_rules_text(RULES))
+        on = Settings(column_conditions=True).table_rules_text(RULES)
+        self.assertIn(TABLE_SHARED + TABLE_SOME, on)
+        self.assertIn(TABLE_SOME, Settings(column_conditions=True, split_conditions=False).table_rules_text(RULES))
+
     def test_a_rules_frame_fills_like_its_conditions(self):
         from semantic_pdf_diff import tablerules as tr
         from test_tablerules import Applying, pumps

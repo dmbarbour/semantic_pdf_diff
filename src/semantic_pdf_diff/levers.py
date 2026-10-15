@@ -182,6 +182,23 @@ class SplitConditions(Lever):
             return text
         return text.replace(TABLE_CONDITIONS, TABLE_CONDITIONS + TABLE_FRAME).replace(TABLE_TEMPLATE, TABLE_SPLIT)
 
+# The table rules' prompt: a condition the text above names for some columns only kept to those columns' templates
+# (the column_conditions lever; the coaster's "speeds are design values at the element's entry" written into its
+# heights' claims, docs/reviews/levers.md)
+TABLE_SHARED = "a state) belongs in the templates' conditions."
+TABLE_SOME = (" A condition it names for some columns only (\"speeds are at the element's entry\") belongs in those "
+              "columns' templates alone: write them apart from the other columns'.")
+
+class ColumnConditions(Lever):
+    lever_name, stage, off = "column_conditions", "instructions", {"column_conditions": False}
+    # the table rules told a condition the text gives some columns isn't every column's (the claim context plan's
+    # milestone 4: a sibling's scope misapplied)
+    column_conditions: Annotated[bool, _shaping(frozenset({"table"}))] = False
+
+    def table_rules_text(self, builtin):
+        text = super().table_rules_text(builtin)
+        return text.replace(TABLE_SHARED, TABLE_SHARED + TABLE_SOME) if self.column_conditions else text
+
 class VisualRules(Lever):
     lever_name, stage, off = "visual_rules", "instructions", {"visual_rules": []}
     # appended for image tasks only (tiles, figures, overview)
@@ -891,13 +908,13 @@ class DedupeRepeated(Lever):
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes and split_conditions (docs/reviews/levers.md); round 0's settings are
 # benchmarks/round0.json.
-LEVER_CLASSES = (ExtractPrompt, SplitConditions, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
-                 LeaveFurniture, TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut,
-                 TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling,
-                 FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules, TableReview, TableStructure,
-                 VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables,
-                 LeaveText, QuoteMatch, Positions, Records, Reconcile, DedupeRepeated, ContinueReading, Align,
-                 VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
+LEVER_CLASSES = (ExtractPrompt, SplitConditions, ColumnConditions, ExtractRules, VisualRules, ImagesFirst,
+                 CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext, References, TileLocator,
+                 Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
+                 RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,
+                 TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText, LoneRows,
+                 TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, Reconcile, DedupeRepeated,
+                 ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
