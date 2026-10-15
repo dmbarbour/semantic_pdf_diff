@@ -378,7 +378,12 @@ Before records are built, so each later milestone has a baseline. Almost all of 
 - **The judge shown records, ruling on subject, scope and frame apart** (`judge_context`, off; design question 4): each claim's records as a `context` field, and `same_subject`, `same_scope`, `same_frame` ruled yes, no or unknown; a part ruled "no" makes an equivalent or different relation uncertain.
   - The judge probes gain five that give context in records only, and are asked under the battery's settings and under each judge lever (`JUDGE_ARMS`).
   - Off: the three sensitivity probes (frame in notes, scope in a lead-in, units in headers) all called equivalent (0/6). On: 26/26 of the judge probes, 13/13 alike in both orders (off: 18/26, 11/13).
-  - The model itself answers "different" for a frame or scope apart; its rulings make it uncertain. The corpus arms, with a null arm, are next.
+  - The model itself answers "different" for a frame or scope apart; its rulings make it uncertain.
+  - The controlled pairs (against `record_changes` alone, and a null arm asking the same rulings with an empty context): no different from the null, both worse than without. Kinds named right 170 → 161 (null 162); the spec's scope pairs went from uncertain to complementary or unrelated, ruled the same subject in another scope. The datum pair's heights were ruled a different frame, naming the datum. Off; $0.19 the two arms.
+  - Tweak direction (the lever index): in revisions mode, the same subject in another scope or frame is a conditions change where the claims' records were restated; the rulings alone also fit siblings (a chart's months).
+- **Restated records reported once** (`record_changes`, off; design question 6): each side's records paired by kind and heading or title (an untitled table by its headers), one whose words differ, numbers aside, listed once with the claims it reaches.
+  - The counterfactual pairs: restated-context facts reported 0/39 → 34/39 (the plan's notes 14/14; the datum lead-in 5/5 in every format but Markdown, whose tables have no records); verdicts unchanged; replayed, $0.
+  - First built on a record's whole text and labels: 48 changes listed, 39 false (an item inserted renumbered a list's labels; a table's text window moved; untitled tables paired by place). Fixed: a list by its lead-in, a table by its headers and the value-free sentences above it; 9 listed, all restatements.
 
 ### 5. Stance
 
