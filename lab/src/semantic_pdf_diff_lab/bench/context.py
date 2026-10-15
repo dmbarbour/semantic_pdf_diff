@@ -165,11 +165,15 @@ def totals(measures):
 
 KINDS = ("scope", "frame", "subject", "bound", "provenance", "sibling")
 OUTSIDE = ("provenance", "sibling")  # kinds that belong in none of a claim's words
-FIELDS = ("conditions", "entity", "attribute")
+# A claim's words, then the context records it references (the records lever: a sheet's notes, a list's lead-in, a
+# table's title, headers and lead-in), whose text a claim holds by reference rather than in its words
+FIELDS = ("conditions", "entity", "attribute", "records")
 # Where a kind belongs in today's claim (its five words): scope and frame in conditions (no frame field yet), a
-# subject in the entity, a bound in the attribute or conditions; provenance in none of them
-HOME = {"scope": {"conditions"}, "frame": {"conditions"}, "subject": {"entity", "conditions"},
-        "bound": {"attribute", "conditions"}, "provenance": set(), "sibling": set()}
+# subject in the entity, a bound in the attribute or conditions; provenance in none of them. Scope, frame and subject
+# may also be held by a record reaching the claim (the plan's Concepts: stored once and referenced)
+HOME = {"scope": {"conditions", "records"}, "frame": {"conditions", "records"},
+        "subject": {"entity", "conditions", "records"}, "bound": {"attribute", "conditions"}, "provenance": set(),
+        "sibling": set()}
 CONVENTION_WORDS = {"width", "depth", "length", "east", "west", "north", "south"}
 GEOMETRY_WORDS = {"horizontal", "vertical", "drawn", "x", "y"}
 
@@ -181,7 +185,8 @@ def _wanted(fact, text):
 def against_key(key_data, claims, shown_by_task):
     """One document's context per kind against its key: {kind: {where it landed: facts}}, the audit of each lost
     item {kind: {not shown|shown, not used|misapplied|image only: facts}}, and names resting on unprinted conventions.
-    claims: dicts with entity, attribute, value, unit, conditions and _task; shown_by_task: {task: [texts shown]}."""
+    claims: dicts with entity, attribute, value, unit, conditions and _task, and records (the text of the records the
+    claim references, if any); shown_by_task: {task: [texts shown]}."""
     from .controlled.score import bounds, classify, key_facts
     facts = key_facts(key_data)
     numeric = [f for f in facts if not f.relation]
@@ -249,12 +254,23 @@ def measure_keys(runs_dir, key_of):
     out = {}
     for run, claims in sorted(by_run.items()):
         with Store.open(Path(runs_dir) / run) as store:
-            shown_by = {}
+            shown_by, held = {}, {}
             for content in {c for c, _ in claims}:
                 for task, texts in requests(store, content).items():
                     shown_by.setdefault(task, []).extend(texts)
-        out[run] = against_key(key_of(run), [c for _, c in claims], shown_by)
+                held[content] = record_texts(store, content)
+        out[run] = against_key(key_of(run), [{**c, "records": held[content].get(c["_claim"], "")}
+                                             for content, c in claims], shown_by)
     return out
+
+def record_texts(store, content):
+    """{claim id: the text of the context records it references} for one document: each record's label, text and
+    items."""
+    records = store.records(content)
+    def text(r):
+        return " ".join([r.label, r.text, *r.items])
+    return {e.id: " ".join(text(records[r]) for r in e.records if r in records)
+            for e in store.evidence(content) if e.records}
 
 def sum_keys(results):
     """against_key's results summed over runs (examples left out)."""

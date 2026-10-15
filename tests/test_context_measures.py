@@ -76,5 +76,12 @@ class AgainstKey(unittest.TestCase):
         result = context.against_key(KEY, claims, {"text:p2": ["The timer is 856 ms."], "tile:p1:0": [""]})
         self.assertEqual(result["audit"]["scope"], {"not shown": 1, "image only": 1})
 
+    def test_a_scope_a_record_holds_is_held_by_reference(self):
+        # the lead-in as the claim's list record's text: in place by reference, not lost
+        held = {**claim("retransmission timer", "709", ""), "records": LEAD}
+        result = context.against_key(KEY, [held], {"text:p1": [LEAD]})
+        self.assertEqual(result["placed"]["scope"], {"records": 1})
+        self.assertEqual(result["audit"], {})
+
 if __name__ == "__main__":
     unittest.main()

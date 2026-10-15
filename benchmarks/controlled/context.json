@@ -29,7 +29,7 @@
    "frame": {
     "attribute": 18,
     "conditions": 148,
-    "nowhere": 73
+    "records": 73
    },
    "provenance": {
     "conditions": 5
@@ -41,7 +41,8 @@
    },
    "sibling": {
     "conditions": 15,
-    "nowhere": 4
+    "nowhere": 3,
+    "records": 1
    },
    "subject": {
     "conditions": 72,
@@ -54,9 +55,7 @@
     "shown, not used": 21
    },
    "frame": {
-    "image only": 37,
-    "not shown": 30,
-    "shown, not used": 24
+    "shown, not used": 18
    },
    "provenance": {
     "in conditions": 5
@@ -68,7 +67,8 @@
    },
    "sibling": {
     "in conditions": 15,
-    "kept out": 4
+    "in records": 1,
+    "kept out": 3
    },
    "subject": {
     "image only": 1,
@@ -2232,34 +2232,19 @@
       "conditions": 3
      },
      "frame": {
-      "nowhere": 16,
+      "records": 16,
       "conditions": 5
      }
     },
     "audit": {
      "sibling": {
       "in conditions": 3
-     },
-     "frame": {
-      "not shown": 9,
-      "image only": 7
      }
     },
     "named": {
      "by an unprinted convention": 14
     },
-    "examples": {
-     "frame: not shown": [
-      "room101.area: wanted 'net, measured to face of finish'; read area |  / area | ",
-      "room101.depth: wanted 'to face of finish'; read dimension 2 |  / length | ",
-      "room101.width: wanted 'to face of finish'; read dimension 1 |  / width | "
-     ],
-     "frame: image only": [
-      "room104.depth: wanted 'to face of finish'; read length | ",
-      "room110.depth: wanted 'to face of finish'; read length | ",
-      "room110.width: wanted 'to face of finish'; read width | "
-     ]
-    }
+    "examples": {}
    }
   },
   "lcc-plan-s1-clean-revised": {
@@ -2302,36 +2287,24 @@
    "keyed": {
     "placed": {
      "sibling": {
-      "nowhere": 4
+      "nowhere": 3,
+      "records": 1
      },
      "frame": {
-      "nowhere": 16,
+      "records": 16,
       "conditions": 5
      }
     },
     "audit": {
      "sibling": {
-      "kept out": 4
-     },
-     "frame": {
-      "not shown": 2,
-      "image only": 14
+      "kept out": 3,
+      "in records": 1
      }
     },
     "named": {
      "by an unprinted convention": 14
     },
-    "examples": {
-     "frame: not shown": [
-      "room101.area: wanted 'net, measured to face of finish'; read area |  / area | ",
-      "room103.area: wanted 'net, measured to face of finish'; read area |  / area | "
-     ],
-     "frame: image only": [
-      "room101.depth: wanted 'to face of finish'; read length |  / depth | ",
-      "room101.width: wanted 'to face of finish'; read width |  / length | ",
-      "room102.depth: wanted 'to face of finish'; read depth | "
-     ]
-    }
+    "examples": {}
    }
   },
   "lcc-plan-s1-rotated": {
@@ -2378,40 +2351,19 @@
      },
      "frame": {
       "conditions": 6,
-      "nowhere": 15
+      "records": 15
      }
     },
     "audit": {
      "sibling": {
       "in conditions": 3
-     },
-     "frame": {
-      "not shown": 6,
-      "shown, not used": 6,
-      "image only": 3
      }
     },
     "named": {
      "by an unprinted convention": 8,
      "otherwise": 6
     },
-    "examples": {
-     "frame: not shown": [
-      "room101.depth: wanted 'to face of finish'; read dimension 1 |  / dimension | ",
-      "room102.depth: wanted 'to face of finish'; read dimension 1 |  / dimension | ",
-      "room102.width: wanted 'to face of finish'; read dimension 2 |  / dimension | "
-     ],
-     "frame: shown, not used": [
-      "room101.width: wanted 'to face of finish'; read dimension 2 |  / dimension | ",
-      "room110.depth: wanted 'to face of finish'; read dimension |  / dimension | ",
-      "room110.width: wanted 'to face of finish'; read dimension |  / dimension | "
-     ],
-     "frame: image only": [
-      "room104.depth: wanted 'to face of finish'; read dimension | ",
-      "room111.depth: wanted 'to face of finish'; read dimension | ",
-      "room112.width: wanted 'to face of finish'; read length |  / dimension | "
-     ]
-    }
+    "examples": {}
    }
   },
   "lcc-plan-s1-small": {
@@ -2457,33 +2409,18 @@
      },
      "frame": {
       "conditions": 7,
-      "nowhere": 14
+      "records": 14
      }
     },
     "audit": {
      "sibling": {
       "in conditions": 3
-     },
-     "frame": {
-      "not shown": 11,
-      "image only": 3
      }
     },
     "named": {
      "by an unprinted convention": 14
     },
-    "examples": {
-     "frame: not shown": [
-      "room101.depth: wanted 'to face of finish'; read dimension 2 |  / length | ",
-      "room101.width: wanted 'to face of finish'; read dimension 1 |  / width | ",
-      "room102.depth: wanted 'to face of finish'; read dimension 2 |  / length | "
-     ],
-     "frame: image only": [
-      "room104.depth: wanted 'to face of finish'; read length | ",
-      "room110.width: wanted 'to face of finish'; read width | ",
-      "room111.width: wanted 'to face of finish'; read width | "
-     ]
-    }
+    "examples": {}
    }
   },
   "lcc-plan-s1-vertical": {
@@ -2530,32 +2467,18 @@
      },
      "frame": {
       "conditions": 7,
-      "nowhere": 12
+      "records": 12
      }
     },
     "audit": {
      "sibling": {
       "in conditions": 3
-     },
-     "frame": {
-      "image only": 10,
-      "not shown": 2
      }
     },
     "named": {
      "by an unprinted convention": 12
     },
-    "examples": {
-     "frame: image only": [
-      "room101.depth: wanted 'to face of finish'; read length | ",
-      "room101.width: wanted 'to face of finish'; read length |  / length | ",
-      "room103.depth: wanted 'to face of finish'; read length | "
-     ],
-     "frame: not shown": [
-      "room102.depth: wanted 'to face of finish'; read dimension 1 |  / depth | ",
-      "room102.width: wanted 'to face of finish'; read dimension 2 |  / length | "
-     ]
-    }
+    "examples": {}
    }
   },
   "lcc-s1-all": {
