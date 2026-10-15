@@ -20,6 +20,9 @@ class Claim(Strict):
     value: str = Field(min_length=1, max_length=300)
     unit: str = Field(default="", max_length=40)
     conditions: str = Field(default="", max_length=300)
+    # how the value is to be read, where the source states it: what a dimension is measured to, a datum, net or gross
+    # (the split_conditions lever's; docs/plans/claim-context-2026-10-14.md, milestone 4). Conditions are then scope
+    frame: str = Field(default="", max_length=200)
     kind: Literal["text", "table", "chart", "diagram"]
     quote: str = Field(min_length=1, max_length=400)
     confidence: float = Field(ge=0, le=1)
@@ -32,7 +35,8 @@ class Claim(Strict):
     context: str = Field(default="", max_length=300)
     role: str = Field(default="", max_length=200)
 
-OPTIONAL_CLAIM_FIELDS = ("unit", "conditions", "approximate", "topic", "basis", "uncertainty", "context", "role")
+OPTIONAL_CLAIM_FIELDS = ("unit", "conditions", "frame", "approximate", "topic", "basis", "uncertainty", "context",
+                         "role")
 
 # Sanity bounds on one answer; the requested maximum is Settings.claims_per_request.
 MAX_CLAIMS, MAX_ISSUES = 200, 10
@@ -361,17 +365,18 @@ class Evidence(Claim):
     def _without_absent_context(self, handler):
         out = handler(self)  # none, no key: evidence written without the levers that fill them stays as it was
         if isinstance(out, dict):
-            for key, empty in (("position", None), ("records", []), ("printed", "")):
+            for key, empty in (("frame", ""), ("position", None), ("records", []), ("printed", "")):
                 if out.get(key, empty) == empty:
                     out.pop(key, None)
         return out
 
 def claim_id(content, claim):
-    """Evidence ID from content and claim identity: entity, attribute, value and conditions
-    (whitespace-normalized, case-folded), unit (exact: mW is not MW), approximate and basis."""
+    """Evidence ID from content and claim identity: entity, attribute, value, conditions and frame
+    (whitespace-normalized, case-folded), unit (exact: mW is not MW), approximate and basis. A claim with no frame
+    is named as before frames were read."""
     fold = lambda text: " ".join(str(text).split()).casefold()
     identity = [content, fold(claim.entity), fold(claim.attribute), fold(claim.value), claim.unit.strip(),
-                fold(claim.conditions), claim.approximate, claim.basis]
+                fold(claim.conditions), claim.approximate, claim.basis] + ([fold(claim.frame)] if claim.frame else [])
     return "ev-" + hashlib.sha256(json.dumps(identity).encode()).hexdigest()[:16]
 
 # Representative occurrence: native before visual, tile before overview, then the

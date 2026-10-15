@@ -122,6 +122,7 @@ class Cards:
                     }.get(e.get('quote_verified'), '')
         loc = e['locator']
         basis = f"<p>Basis: {esc(e['basis'])}</p>" if e.get('basis', 'unknown') != 'unknown' else ''
+        frame = f"<p>Frame: {esc(e['frame'])}</p>" if e.get('frame') else ''
         others = e.get('occurrences', [])[1:] if len(e.get('occurrences', [])) > 1 else []
         seen_by = sorted({o['locator']['region'] for o in e.get('occurrences', [])})
         also = (f"<p>Found {len(e['occurrences'])} times ({esc(', '.join(seen_by))}): "
@@ -134,7 +135,7 @@ class Cards:
         return f'''<section><h3>{esc(self.where(e['content']))}{heading} · \
 {PAGE_WORDS.get(loc.get('format'), 'page')} {loc['page']} · {esc(e['kind'])}</h3>
         <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
-        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{basis}{self.context(e)}\
+        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{frame}{basis}{self.context(e)}\
 <blockquote>{esc(e['quote'])}</blockquote>{verified}{read}{also}
         <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>\
 {image}</section>'''

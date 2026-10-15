@@ -17,7 +17,22 @@
   },
   "judge_model_passed": "15/26",
   "judge_consistent": "11/13",
-  "judge_arms": {
+  "arms": {
+   "split_conditions": {
+    "passed": "11/13",
+    "by_kind": {
+     "frame": "4/4",
+     "scope": "4/4",
+     "stance": "3/3",
+     "subject": "0/2"
+    },
+    "by_property": {
+     "abstention": "0/2",
+     "precedence": "2/2",
+     "sensitivity": "7/7",
+     "specificity": "2/2"
+    }
+   },
    "judge_context": {
     "passed": "26/26",
     "by_kind": {
@@ -192,6 +207,162 @@
     ],
     "model_passed": null,
     "arm": ""
+   },
+   {
+    "probe": "scope-lead-in",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "709: idle, from the lead-in",
+    "passed": true,
+    "read": [
+     "Retransmission timer | value | 709 | ms | link is idle"
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "scope-lead-in",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "1,250: idle, from the lead-in",
+    "passed": true,
+    "read": [
+     "Keep-alive interval | value | 1,250 | ms | link is idle"
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "scope-other-section",
+    "kind": "scope",
+    "property": "specificity",
+    "check": "856: not idle (another section's scope)",
+    "passed": true,
+    "read": [
+     "link | retransmission timer | 856 | ms | congested"
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "scope-other-section",
+    "kind": "scope",
+    "property": "specificity",
+    "check": "856: congested, from its heading",
+    "passed": true,
+    "read": [
+     "link | retransmission timer | 856 | ms | congested"
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "frame-units-note",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "340: unit mm, from the note",
+    "passed": true,
+    "read": [
+     "flange | outer diameter | 340 | millimetres | "
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "frame-units-note",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "290: unit mm, from the note",
+    "passed": true,
+    "read": [
+     "flange | bolt circle diameter | 290 | millimetres | "
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "frame-exception",
+    "kind": "frame",
+    "property": "precedence",
+    "check": "12'-6\": to face of finish (the general note)",
+    "passed": true,
+    "read": [
+     "Room 101 | width | 12'-6\" |  |  | frame: face of finish"
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "frame-exception",
+    "kind": "frame",
+    "property": "precedence",
+    "check": "6'-0\": to centreline, not face of finish (the exception)",
+    "passed": true,
+    "read": [
+     "corridor | width | 6'-0\" |  |  | frame: centreline of its walls"
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "stance-holders",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "709: held by Company A",
+    "passed": true,
+    "read": [
+     "Company A proposal | retransmission timer | 709 | ms | "
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "stance-holders",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "856: held by Company B",
+    "passed": true,
+    "read": [
+     "Company B proposal | retransmission timer | 856 | ms | "
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "stance-negation",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "500: Company C's, as a limit it holds (not supported below; a minimum)",
+    "passed": true,
+    "read": [
+     "Company C | minimum supported retransmission timer | 500 | ms | "
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "name-abstention",
+    "kind": "subject",
+    "property": "abstention",
+    "check": "12'-6\": no conventional name the page doesn't give",
+    "passed": false,
+    "read": [
+     "Room 214 | width | 12'-6\" |  | on plan"
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
+   },
+   {
+    "probe": "name-abstention",
+    "kind": "subject",
+    "property": "abstention",
+    "check": "14'-0\": no conventional name the page doesn't give",
+    "passed": false,
+    "read": [
+     "Room 214 | length | 14'-0\" |  | on plan"
+    ],
+    "model_passed": null,
+    "arm": "split_conditions"
    },
    {
     "probe": "frame-differs",

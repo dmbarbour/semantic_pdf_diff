@@ -55,12 +55,14 @@ def run(replay, responder, max_cost, fixture=None, out=None, keep=True):
         return 0
     results = json.loads((FOLDER / "results.json").read_text()) if (FOLDER / "results.json").exists() else {}
     judge = [o for o in outcomes if o.check in ("A, B", "B, A")]
-    # the battery's own settings, then each judge arm's (its judge probes alone)
+    # the battery's own settings, then each arm's (a reader arm's reader probes, a judge arm's judge probes)
     mine = [o for o in outcomes if not o.arm]
+    arms = [arm for arm in {**probes.READER_ARMS, **probes.JUDGE_ARMS} if arm]
     results[name] = {**probes.summary(mine), "judge_consistent": probes.consistency([o for o in judge if not o.arm]),
-                     "judge_arms": {arm: {**probes.summary(asked), "judge_consistent": probes.consistency(asked)}
-                                    for arm in probes.JUDGE_ARMS if arm
-                                    for asked in [[o for o in judge if o.arm == arm]]},
+                     "arms": {arm: {**probes.summary(asked),
+                                    **({"judge_consistent": probes.consistency(asked)} if arm in probes.JUDGE_ARMS
+                                       else {})}
+                              for arm in arms for asked in [[o for o in outcomes if o.arm == arm]]},
                      "outcomes": [asdict(o) for o in outcomes]}
     (FOLDER / "results.json").write_text(json.dumps(results, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps({k: v for k, v in results[name].items() if k != "outcomes"}, indent=1))

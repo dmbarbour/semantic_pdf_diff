@@ -12,7 +12,7 @@ it isn't given a conventional name).
   (compare.pair_request, then compare.vetoes), each in both orders. A probe passes when the relation is one it allows.
   Some give their context only in records (a sheet's note, a list's lead-in, a table's headers: what the records
   lever keeps), which the judge sees only with the judge_context lever: the battery asks them under each of
-  JUDGE_ARMS, so a judge setting's probes are told apart.
+  JUDGE_ARMS, so a judge setting's probes are told apart. Reader probes are read under each of READER_ARMS likewise.
 
 A battery is tens of requests: cents per model. Answers are recorded into a fixture and replayed after, so a battery
 qualifies a model or backend, and checks a prompt change, at no further cost.
@@ -53,7 +53,7 @@ def _silent(claims, fields, *patterns):
     return bool(claims) and not any(re.search(p, str(c.get(f, "")), re.I) for c in claims for f in fields
                                     for p in patterns)
 
-WHERE = ("entity", "attribute", "conditions")
+WHERE = ("entity", "attribute", "conditions", "frame")
 CONVENTION = r"\b(?:width|wide|depth|deep|length|long)\b"
 
 READER = [
@@ -164,18 +164,21 @@ JUDGE = [
                b_records=_note(FACE, "2. REFER TO SHEET A-502 FOR DOOR DETAILS.")),
 ]
 
-# The judge settings each judge probe is asked under: the battery's own (""), and each judge lever's, by its name
-# (its settings; the lever added where the battery's settings don't list it).
+# The settings each judge probe is asked, and each reader probe read, under: the battery's own (""), and each
+# lever's, by its name (its settings; the lever added where the battery's settings don't list it, in the default
+# order).
 JUDGE_ARMS = {"": {}, "judge_context": {"judge_context": True}}
+READER_ARMS = {"": {}, "split_conditions": {"split_conditions": True}}
 
-def armed(settings, arm):
-    """The battery's settings under one of JUDGE_ARMS."""
+def armed(settings, arm, arms):
+    """The battery's settings under one of arms (JUDGE_ARMS or READER_ARMS)."""
+    from semantic_pdf_diff.levers import DEFAULT_LEVERS
     from semantic_pdf_diff.settings import settings_class
     if not arm:
         return settings
     names = tuple(lever.lever_name for lever in type(settings).lever_classes)
-    cls = type(settings) if arm in names else settings_class(names + (arm,))
-    return cls(**{**settings.model_dump(), **JUDGE_ARMS[arm]})
+    cls = type(settings) if arm in names else settings_class(tuple(n for n in DEFAULT_LEVERS if n in names or n == arm))
+    return cls(**{**settings.model_dump(), **arms[arm]})
 
 @dataclass
 class Outcome:
@@ -201,7 +204,8 @@ def read_probe(probe, claims):
         mine = matching(claims, value)
         out.append(Outcome(probe.id, probe.kind, probe.property, f"{value}: {says}", bool(check(mine)),
                            [" | ".join(str(c.get(k, "")) for k in ("entity", "attribute", "value", "unit",
-                                                                    "conditions")) for c in mine]))
+                                                                    "conditions"))
+                            + (f" | frame: {c['frame']}" if c.get("frame") else "") for c in mine]))
     return out
 
 def evidence(fields, side, records=()):
@@ -212,19 +216,23 @@ def evidence(fields, side, records=()):
                     records=[r["id"] for r in records], **fields)
 
 def run_reader(folder, settings, options):
-    """Every reader probe read: [Outcome]. Each document is written into folder/docs, its run into folder/runs."""
+    """Every reader probe read under each of READER_ARMS: [Outcome]. Each document is written into folder/docs, its
+    run into folder/runs (an arm's into folder/runs-<arm>)."""
+    from dataclasses import replace
     from semantic_pdf_diff.pipeline import attempt, compare_paths
     from semantic_pdf_diff.store import Store
     out = []
-    for probe in READER:
-        doc = Path(folder) / "docs" / f"{probe.id}.md"
-        doc.parent.mkdir(parents=True, exist_ok=True)
-        doc.write_text(probe.text, encoding="utf-8")
-        run = Path(folder) / "runs" / probe.id
-        attempt(compare_paths, doc, doc, run, settings, options)
-        with Store.open(run) as store:
-            claims = list({e.id: e.model_dump() for f in store.files() for e in store.evidence(f.content)}.values())
-        out += read_probe(probe, claims)
+    for arm in READER_ARMS:
+        reading = armed(settings, arm, READER_ARMS)
+        for probe in READER:
+            doc = Path(folder) / "docs" / f"{probe.id}.md"
+            doc.parent.mkdir(parents=True, exist_ok=True)
+            doc.write_text(probe.text, encoding="utf-8")
+            run = Path(folder) / ("runs-" + arm if arm else "runs") / probe.id
+            attempt(compare_paths, doc, doc, run, reading, options)
+            with Store.open(run) as store:
+                claims = list({e.id: e.model_dump() for f in store.files() for e in store.evidence(f.content)}.values())
+            out += [replace(o, arm=arm) for o in read_probe(probe, claims)]
     return out
 
 def run_judge(folder, settings, options):
@@ -233,7 +241,7 @@ def run_judge(folder, settings, options):
     from semantic_pdf_diff.store import Store
     out = []
     for arm in JUDGE_ARMS:
-        judging = armed(settings, arm)
+        judging = armed(settings, arm, JUDGE_ARMS)
         with Store(Path(folder) / ("judge-" + arm if arm else "judge")) as store:
             client = make_client(options, judging, store)
             try:

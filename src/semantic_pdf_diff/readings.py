@@ -54,8 +54,11 @@ def _words(text):
     return frozenset(words)
 
 def _conditions_agree(a, b):
-    x, y = _words(a.conditions), _words(b.conditions)
-    return not x or not y or x <= y or y <= x
+    """Conditions, and frames, agree: one unstated, or one's words within the other's."""
+    for x, y in ((_words(a.conditions), _words(b.conditions)), (_words(a.frame), _words(b.frame))):
+        if x and y and not (x <= y or y <= x):
+            return False
+    return True
 
 def _near(a, b):
     """Some sighting of each on one page, in overlapping regions."""
@@ -81,7 +84,7 @@ def same_fact(a, b):
     return _named_alike(a, b) and _near(a, b)
 
 def wording(e):
-    return " | ".join(x for x in [e.entity, e.attribute, f"{e.value} {e.unit}".strip(), e.conditions] if x)
+    return " | ".join(x for x in [e.entity, e.attribute, f"{e.value} {e.unit}".strip(), e.conditions, e.frame] if x)
 
 def sightings(e):
     """A claim's occurrences; a single sighting keeps none, so make it one."""

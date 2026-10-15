@@ -251,6 +251,11 @@ def _conflict(x, y):
     ib = identifiers(words(y.attribute) | words(y.conditions))
     return bool(ia and ib and ia != ib)
 
+def _frames_differ(x, y):
+    """Both readings state a frame, and not the same one (to face of finish, to centreline): never settled."""
+    fa, fb = words(x.frame), words(y.frame)
+    return bool(fa and fb and fa != fb)
+
 def _one_property(side, claims):
     """Whether a value's readings in an item all name one property (each pair fits): then the value identifies it."""
     return all(fits(side.claims[i], side.claims[j]) for i in claims for j in claims if i < j)
@@ -279,7 +284,8 @@ def _within(a, b, ia, ib, settle):
             continue
         ranked = sorted(pairs, key=lambda p: (-_conditions(a.claims[p[0]], b.claims[p[1]]), p))
         best = (a.claims[ranked[0][0]], b.claims[ranked[0][1]])
-        agreed = settle and _conditions(*best) >= 0.5 and not any(_conflict(a.claims[i], b.claims[j]) for i, j in pairs)
+        agreed = settle and _conditions(*best) >= 0.5 and not any(
+            _conflict(a.claims[i], b.claims[j]) or _frames_differ(a.claims[i], b.claims[j]) for i, j in pairs)
         covered_a, covered_b = set(), set()
         for i, j in ranked:  # one pair per claim, best conditions first
             if i in covered_a and j in covered_b:

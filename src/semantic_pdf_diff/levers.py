@@ -146,6 +146,29 @@ class ExtractRules(Lever):
     def instructions(self, builtin):
         return super().instructions(builtin) + _rules(self.extract_rules)
 
+# The extraction template's conditions, split (the split_conditions lever): scope stays in conditions, frame has a
+# field of its own, and a tolerance goes with the value, in uncertainty.
+CONDITIONS_SPEC = '"conditions":"load, scenario, time, tolerances, scope",'
+SPLIT_SPEC = ('"conditions":"scope: the load, scenario, operating point, time or place it holds for", '
+              '"frame":"how its value is read, if stated: what it is measured to or from, a datum, net or gross", '
+              '"uncertainty":"a stated tolerance or uncertainty, if any",')
+CONDITIONS_RULE = 'put conditions (e.g. "at theta = 0", "at rated speed") in conditions.'
+SPLIT_RULE = (CONDITIONS_RULE + "\nPut what a value is measured to or from (to face of finish, to centreline, above "
+              "a datum, net or gross) in frame, not conditions; a tolerance (± 0.5 mm) in uncertainty.")
+
+class SplitConditions(Lever):
+    lever_name, stage, off = "split_conditions", "instructions", {"split_conditions": False}
+    # the reader's conditions split into scope (conditions) and frame (its own field), a tolerance with the value
+    # (the claim context plan's milestone 4: readers' conditions held frame, "face of finish", and positions); the
+    # template's lines replaced where a prompt keeps them
+    split_conditions: Annotated[bool, _shaping()] = False
+
+    def instructions(self, builtin):
+        text = super().instructions(builtin)
+        if not self.split_conditions:
+            return text
+        return text.replace(CONDITIONS_SPEC, SPLIT_SPEC).replace(CONDITIONS_RULE, SPLIT_RULE)
+
 class VisualRules(Lever):
     lever_name, stage, off = "visual_rules", "instructions", {"visual_rules": []}
     # appended for image tasks only (tiles, figures, overview)
@@ -854,13 +877,13 @@ class DedupeRepeated(Lever):
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records and
 # editorial (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
-LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture,
-                 TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles,
-                 SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts,
-                 RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts,
-                 TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions,
-                 Records, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences,
-                 Editorial, RecordChanges, JudgeContext)
+LEVER_CLASSES = (ExtractPrompt, SplitConditions, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
+                 LeaveFurniture, TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut,
+                 TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling,
+                 FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules, TableReview, TableStructure,
+                 VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables,
+                 LeaveText, QuoteMatch, Positions, Records, Reconcile, DedupeRepeated, ContinueReading, Align,
+                 VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 

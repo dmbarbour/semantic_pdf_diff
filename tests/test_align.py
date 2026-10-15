@@ -6,9 +6,9 @@ from types import SimpleNamespace
 
 from semantic_pdf_diff import align
 
-def claim(entity, attribute, value, unit="", conditions=""):
+def claim(entity, attribute, value, unit="", conditions="", frame=""):
     return SimpleNamespace(entity=entity, attribute=attribute, value=value, unit=unit, conditions=conditions,
-                           approximate=False)
+                           frame=frame, approximate=False)
 
 def pairs(found, left, right, which="judge"):
     """A correspondence's pairs as readable (entity, attribute, value) couples."""

@@ -1,6 +1,7 @@
 {
   "levers": [
     "extract_prompt",
+    "split_conditions",
     "extract_rules",
     "visual_rules",
     "images_first",

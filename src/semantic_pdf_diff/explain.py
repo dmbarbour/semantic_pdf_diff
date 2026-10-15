@@ -58,7 +58,7 @@ SIBLINGS = 8   # an item's other claims shown with a claim being explained
 ECHOES = 4     # claims of the other revision holding a claim's value
 
 def _brief(e):
-    return {k: getattr(e, k) for k in ("entity", "attribute", "value", "unit", "conditions") if getattr(e, k)}
+    return {k: getattr(e, k) for k in ("entity", "attribute", "value", "unit", "conditions", "frame") if getattr(e, k)}
 
 class Revisions:
     """Both revisions' claims as alignment groups them into items (align.Side), for what an explanation is shown

@@ -167,11 +167,12 @@ KINDS = ("scope", "frame", "subject", "bound", "provenance", "sibling")
 OUTSIDE = ("provenance", "sibling")  # kinds that belong in none of a claim's words
 # A claim's words, then the context records it references (the records lever: a sheet's notes, a list's lead-in, a
 # table's title, headers and lead-in), whose text a claim holds by reference rather than in its words
-FIELDS = ("conditions", "entity", "attribute", "records")
-# Where a kind belongs in today's claim (its five words): scope and frame in conditions (no frame field yet), a
-# subject in the entity, a bound in the attribute or conditions; provenance in none of them. Scope, frame and subject
-# may also be held by a record reaching the claim (the plan's Concepts: stored once and referenced)
-HOME = {"scope": {"conditions", "records"}, "frame": {"conditions", "records"},
+FIELDS = ("frame", "conditions", "entity", "attribute", "records")
+# Where a kind belongs in a claim: scope in conditions, frame in its own field (the split_conditions lever's) or in
+# conditions (readers without it), a subject in the entity, a bound in the attribute or conditions; provenance in none
+# of them. Scope, frame and subject may also be held by a record reaching the claim (the plan's Concepts: stored once
+# and referenced)
+HOME = {"scope": {"conditions", "records"}, "frame": {"frame", "conditions", "records"},
         "subject": {"entity", "conditions", "records"}, "bound": {"attribute", "conditions"}, "provenance": set(),
         "sibling": set()}
 CONVENTION_WORDS = {"width", "depth", "length", "east", "west", "north", "south"}
@@ -221,7 +222,7 @@ def against_key(key_data, claims, shown_by_task):
             # lost or misplaced: was it in what the requests showed? A neighbour's scope said instead: misapplied
             others = set().union(*(_wanted(f, f.context.get(kind, "")) for f in facts
                                    if f.entity == fact.entity and f.id != fid and (f.context or {}).get(kind)))
-            said = set().union(*(words(c.get("conditions", "")) for c in mine))
+            said = set().union(*(words(c.get("conditions", "") + " " + c.get("frame", "")) for c in mine))
             texts = [t for c in mine for t in shown_by_task.get(c.get("_task"), [])]
             image = all(c.get("_task", "").split(":")[0] in IMAGE_REGIONS for c in mine)
             if said & (others - want):
