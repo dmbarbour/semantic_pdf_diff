@@ -168,7 +168,7 @@ class SplitConditions(Lever):
     # the reader's conditions split into scope (conditions) and frame (its own field), a tolerance with the value
     # (the claim context plan's milestone 4: readers' conditions held frame, "face of finish", and positions); the
     # template's lines replaced where a prompt keeps them
-    split_conditions: Annotated[bool, _shaping()] = False
+    split_conditions: Annotated[bool, _shaping()] = True
 
     def instructions(self, builtin):
         text = super().instructions(builtin)
@@ -889,7 +889,8 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
-# editorial and record_changes (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
+# editorial, record_changes and split_conditions (docs/reviews/levers.md); round 0's settings are
+# benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
                  LeaveFurniture, TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut,
                  TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly, RegionLabels, AnotherTiling,

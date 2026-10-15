@@ -69,6 +69,7 @@
   "records": false,
   "editorial": false,
   "record_changes": false,
+  "split_conditions": false,
   "decoration": false,
   "tile_choice": "off",
   "skip_text_only": false,

@@ -13,7 +13,7 @@ WIDTH = dict(entity="Room 101", attribute="width", value="12'-6\"", kind="text",
 
 class Template(unittest.TestCase):
     def test_the_reader_is_asked_for_a_frame_only_when_on(self):
-        off, on = extraction_template(Settings()), extraction_template(Settings(split_conditions=True))
+        off, on = extraction_template(Settings(split_conditions=False)), extraction_template(Settings())
         self.assertIn(CONDITIONS_SPEC, off)
         self.assertNotIn('"frame"', off)
         self.assertIn(SPLIT_SPEC, on)
@@ -30,7 +30,7 @@ class Tables(unittest.TestCase):
     def test_the_table_rules_are_asked_for_a_frame_only_when_on(self):
         from semantic_pdf_diff.levers import TABLE_FRAME, TABLE_SPLIT
         from semantic_pdf_diff.tablerules import RULES
-        self.assertEqual(Settings().table_rules_text(RULES), RULES)
+        self.assertEqual(Settings(split_conditions=False).table_rules_text(RULES), RULES)
         on = Settings(split_conditions=True).table_rules_text(RULES)
         self.assertIn(TABLE_FRAME, on)
         self.assertIn(TABLE_SPLIT, on)
