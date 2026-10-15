@@ -42,7 +42,9 @@
     "nowhere": 2
    },
    "sibling": {
-    "conditions": 22
+    "conditions": 186,
+    "nowhere": 828,
+    "records": 1108
    },
    "subject": {
     "conditions": 72,
@@ -65,7 +67,9 @@
     "shown, not used": 21
    },
    "sibling": {
-    "in conditions": 22
+    "in conditions": 186,
+    "in records": 1108,
+    "kept out": 828
    },
    "subject": {
     "image only": 1,
@@ -848,11 +852,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "nowhere": 68,
+      "conditions": 10
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "kept out": 68,
+      "in conditions": 10
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -876,11 +889,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 51,
+      "nowhere": 30
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 51,
+      "kept out": 30
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -904,11 +926,22 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 36,
+      "nowhere": 30,
+      "conditions": 15
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 36,
+      "kept out": 30,
+      "in conditions": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -932,11 +965,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 66,
+      "conditions": 15
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 66,
+      "in conditions": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -955,11 +997,18 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "nowhere": 81
+     },
      "frame": {
       "conditions": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "kept out": 81
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -983,11 +1032,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 66,
+      "nowhere": 15
+     },
      "frame": {
       "conditions": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 66,
+      "kept out": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1011,11 +1069,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 66,
+      "conditions": 15
+     },
      "frame": {
       "records": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 66,
+      "in conditions": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1047,11 +1114,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 51,
+      "nowhere": 30
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 51,
+      "kept out": 30
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1075,12 +1151,21 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 66,
+      "nowhere": 15
+     },
      "frame": {
       "conditions": 3,
       "frame": 2
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 66,
+      "kept out": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1099,11 +1184,18 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "nowhere": 81
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "kept out": 81
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1127,12 +1219,23 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 66,
+      "nowhere": 11,
+      "conditions": 4
+     },
      "frame": {
       "conditions": 4,
       "frame": 1
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 66,
+      "kept out": 11,
+      "in conditions": 4
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1156,12 +1259,23 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "nowhere": 17,
+      "records": 60,
+      "conditions": 4
+     },
      "frame": {
       "conditions": 4,
       "frame": 1
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "kept out": 17,
+      "in records": 60,
+      "in conditions": 4
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1193,11 +1307,22 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 41,
+      "nowhere": 30,
+      "conditions": 10
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 41,
+      "kept out": 30,
+      "in conditions": 10
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1221,11 +1346,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "conditions": 21,
+      "records": 60
+     },
      "frame": {
       "records": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in conditions": 21,
+      "in records": 60
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1244,12 +1378,19 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "nowhere": 81
+     },
      "frame": {
       "conditions": 4,
       "frame": 1
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "kept out": 81
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1273,11 +1414,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 66,
+      "nowhere": 15
+     },
      "frame": {
       "conditions": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 66,
+      "kept out": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1301,11 +1451,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 71,
+      "conditions": 10
+     },
      "frame": {
       "conditions": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 71,
+      "in conditions": 10
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1329,11 +1488,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 66,
+      "conditions": 15
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 66,
+      "in conditions": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1352,11 +1520,18 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "nowhere": 81
+     },
      "frame": {
       "conditions": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "kept out": 81
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1380,11 +1555,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 66,
+      "conditions": 15
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 66,
+      "in conditions": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1408,11 +1592,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 66,
+      "conditions": 15
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 66,
+      "in conditions": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1436,11 +1629,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 51,
+      "nowhere": 30
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 51,
+      "kept out": 30
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1464,11 +1666,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 6,
+      "nowhere": 75
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 6,
+      "kept out": 75
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1492,11 +1703,22 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 21,
+      "nowhere": 45,
+      "conditions": 15
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 21,
+      "kept out": 45,
+      "in conditions": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1520,11 +1742,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "nowhere": 63,
+      "records": 15
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "kept out": 63,
+      "in records": 15
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -1556,11 +1787,20 @@
    },
    "keyed": {
     "placed": {
+     "sibling": {
+      "records": 51,
+      "nowhere": 30
+     },
      "frame": {
       "frame": 5
      }
     },
-    "audit": {},
+    "audit": {
+     "sibling": {
+      "in records": 51,
+      "kept out": 30
+     }
+    },
     "named": {},
     "examples": {}
    }

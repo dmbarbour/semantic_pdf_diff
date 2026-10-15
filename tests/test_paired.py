@@ -123,6 +123,11 @@ class Scorer(unittest.TestCase):
         self.assertEqual([(m["scope kept"], m["frame kept"], m["frame in its field"]) for m in (by_field, by_record,
                                                                                                     lost)],
                          [(1, 1, 1), (1, 1, 0), (1, 0, 0)])
+        # another fact's context: misapplied in the claim's own words, not when a record it references holds it
+        entry["context"] = {"sibling": "at the plant outlet"}
+        given, _ = paired.measures(key, [{**claim, "conditions": "at the plant outlet"}])
+        held, _ = paired.measures(key, [claim], {"e1": "Flows are measured at the plant outlet."})
+        self.assertEqual((given["sibling misapplied"], held["sibling misapplied"]), (1, 0))
 
     def test_an_arm_is_read_from_its_runs_stores(self):
         with tempfile.TemporaryDirectory() as d:

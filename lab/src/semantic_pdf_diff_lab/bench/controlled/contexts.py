@@ -55,6 +55,9 @@ DECLARED = {
          "Element heights are above the station platform; speeds are design values at the element's entry."),
         (r"^E\d\.height$", "frame", "above grade",
          "Element heights are above grade; speeds are design values at the element's entry."),
+        # the speeds' scope, said in the same lead-in: another column's context, kept out of every other value's
+        (r"^(?:E\d|BR\d|C-\d+)\.(?!.*speed)", "sibling", "at the element's entry",
+         "speeds are design values at the element's entry."),
     ],
     "wtp-tables": [
         (r"^(?:P|B)-\d+[A-C]?\.(?:capacity|total dynamic head|airflow|discharge pressure)$", "scope", "rated point",
@@ -142,7 +145,8 @@ def contexts(project):
         for pattern, kind, says, text in DECLARED.get(fam, ()):
             if re.search(pattern, f.id) and any(text in t for t in printed):  # a paragraph may say more
                 ctx[kind] = f"{ctx[kind]}; {says}" if kind in ctx else says
-                ctx.setdefault("declared", text)
+                if kind != "sibling":  # another fact's context, not declared for this one
+                    ctx.setdefault("declared", text)
         for pattern, needs in CONVENTIONS.get(fam, ()):
             if re.search(pattern, f.id):
                 ctx["named_by"] = needs

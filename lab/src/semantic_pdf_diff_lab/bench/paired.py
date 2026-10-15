@@ -33,12 +33,14 @@ RELATION_OUTCOMES = ("right", "implied", "reversed", "wrong", "invented", "unsco
 # "claims right" counts a fact's distinct wordings (entity, attribute, value), so readers wording alike lower it with
 # nothing lost (split_conditions, 2026-10-15). The kept measures count facts whose keyed context a reading holds in
 # its place (bench/context.py's HOME: its words, or a context record it references); "frame in its field", those in
-# the frame field itself.
+# the frame field itself; "sibling misapplied", facts given another's context in their own words (a speed's "at
+# the element's entry" on a height), not merely by a record they reference.
 KEPT = ("scope", "frame", "subject")
+MISAPPLIED = ("frame", "conditions", "entity", "attribute")
 DIRECTION = {"facts right": 1, "facts found": 1, "claims right": 1, "relations right": 1, "relations unscored": 0,
              **{f"claims {o}": -1 for o in CLAIM_OUTCOMES if o != "right"},
              **{f"relations {o}": -1 for o in RELATION_OUTCOMES if o not in ("right", "unscored")},
-             **{f"{k} kept": 1 for k in KEPT}, "frame in its field": 1}
+             **{f"{k} kept": 1 for k in KEPT}, "frame in its field": 1, "sibling misapplied": -1}
 LEVEL = 0.1      # a change counts at p below this, two-sided
 DRAWS = 20_000   # sign-flip draws beyond exact enumeration
 EXACT = 16       # documents changed up to which every sign pattern is enumerated
@@ -58,6 +60,7 @@ def measures(key, claims, records=None):
     placed = against_key(key, [{**c, "records": held(c.get("id"), "")} for c in claims], {})["placed"]
     out.update({f"{k} kept": sum(n for where, n in placed.get(k, {}).items() if where in HOME[k]) for k in KEPT})
     out["frame in its field"] = placed.get("frame", {}).get("frame", 0)
+    out["sibling misapplied"] = sum(n for where, n in placed.get("sibling", {}).items() if where in MISAPPLIED)
     return out, found
 
 def claims_of(store):
