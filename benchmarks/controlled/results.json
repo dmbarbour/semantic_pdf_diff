@@ -1140,6 +1140,141 @@
     "visual": "0/0"
    }
   },
+  "coaster-tables-s1-clean-datum": {
+   "facts": 92,
+   "found": 92,
+   "recall": 1.0,
+   "found_right": 92,
+   "missed": [],
+   "claims": 112,
+   "outcomes": {
+    "right": 112
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 92
+    },
+    "visual": {
+     "right": 97
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "coaster-tables-s1-clean-datum.docx": {
+   "facts": 92,
+   "found": 92,
+   "recall": 1.0,
+   "found_right": 92,
+   "missed": [],
+   "claims": 92,
+   "outcomes": {
+    "right": 92
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 92
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "coaster-tables-s1-clean-datum.md": {
+   "facts": 92,
+   "found": 92,
+   "recall": 1.0,
+   "found_right": 92,
+   "missed": [],
+   "claims": 92,
+   "outcomes": {
+    "right": 92
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-table": 1.0
+   },
+   "by_reader": {
+    "table": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 92
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "coaster-tables-s1-clean-datum.pptx": {
+   "facts": 92,
+   "found": 92,
+   "recall": 1.0,
+   "found_right": 92,
+   "missed": [],
+   "claims": 92,
+   "outcomes": {
+    "right": 92
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 92
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "coaster-tables-s1-clean-datum.xlsx": {
+   "facts": 92,
+   "found": 92,
+   "recall": 1.0,
+   "found_right": 92,
+   "missed": [],
+   "claims": 92,
+   "outcomes": {
+    "right": 92
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 92
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
   "coaster-tables-s1-clean.docx": {
    "facts": 92,
    "found": 92,
@@ -2785,6 +2920,59 @@
      "misbound": 5,
      "misread": 3,
      "right": 34
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "3/3"
+   }
+  },
+  "lcc-plan-s1-clean-notes": {
+   "facts": 45,
+   "found": 45,
+   "recall": 1.0,
+   "found_right": 38,
+   "missed": [],
+   "claims": 91,
+   "outcomes": {
+    "loose": 30,
+    "misbound": 10,
+    "misread": 3,
+    "right": 48
+   },
+   "conditions_kept": "3/3",
+   "recall_by_form": {
+    "drawing": 1.0,
+    "table": 1.0
+   },
+   "relations": {
+    "right": 7,
+    "unscored": 11
+   },
+   "recall_by_kind": {
+    "number": 1.0,
+    "relation": 1.0
+   },
+   "by_reader": {
+    "table": 0.2889,
+    "text": 0.4444,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 7,
+     "misbound": 1,
+     "right": 6
+    },
+    "text": {
+     "right": 20
+    },
+    "visual": {
+     "loose": 23,
+     "misbound": 9,
+     "misread": 3,
+     "right": 43
     }
    },
    "conditions_by_reader": {
@@ -15616,6 +15804,115 @@
     "visual": "0/0"
    }
   },
+  "coaster-tables-s1-clean-datum": {
+   "facts": 92,
+   "found": 92,
+   "recall": 1.0,
+   "found_right": 92,
+   "missed": [],
+   "claims": 124,
+   "outcomes": {
+    "right": 124
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 92
+    },
+    "visual": {
+     "right": 92
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "coaster-tables-s1-clean-datum.docx": {
+   "facts": 92,
+   "found": 92,
+   "recall": 1.0,
+   "found_right": 92,
+   "missed": [],
+   "claims": 92,
+   "outcomes": {
+    "right": 92
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 92
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "coaster-tables-s1-clean-datum.pptx": {
+   "facts": 92,
+   "found": 92,
+   "recall": 1.0,
+   "found_right": 92,
+   "missed": [],
+   "claims": 92,
+   "outcomes": {
+    "right": 92
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 92
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "coaster-tables-s1-clean-datum.xlsx": {
+   "facts": 92,
+   "found": 92,
+   "recall": 1.0,
+   "found_right": 92,
+   "missed": [],
+   "claims": 92,
+   "outcomes": {
+    "right": 92
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 92
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
   "coaster-tables-s1-clean.docx": {
    "facts": 92,
    "found": 92,
@@ -17131,6 +17428,59 @@
      "misbound": 5,
      "misread": 3,
      "right": 34
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "3/3"
+   }
+  },
+  "lcc-plan-s1-clean-notes": {
+   "facts": 45,
+   "found": 45,
+   "recall": 1.0,
+   "found_right": 38,
+   "missed": [],
+   "claims": 91,
+   "outcomes": {
+    "loose": 30,
+    "misbound": 10,
+    "misread": 3,
+    "right": 48
+   },
+   "conditions_kept": "3/3",
+   "recall_by_form": {
+    "drawing": 1.0,
+    "table": 1.0
+   },
+   "relations": {
+    "right": 7,
+    "unscored": 11
+   },
+   "recall_by_kind": {
+    "number": 1.0,
+    "relation": 1.0
+   },
+   "by_reader": {
+    "table": 0.2889,
+    "text": 0.4444,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 7,
+     "misbound": 1,
+     "right": 6
+    },
+    "text": {
+     "right": 20
+    },
+    "visual": {
+     "loose": 23,
+     "misbound": 9,
+     "misread": 3,
+     "right": 43
     }
    },
    "conditions_by_reader": {
