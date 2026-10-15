@@ -84,6 +84,8 @@ def collect(runs_dir, unit="family"):
                         seen.add(key)
                         own = readings.get((o.locator.task, o.quote, o.wording or wording(e)), e)
                         claim = {k: getattr(own, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
+                        if own.frame:  # the split_conditions lever's; absent otherwise, units without it as before
+                            claim["frame"] = own.frame
                         claim["quote"] = o.quote
                         claim["_box"] = list(o.locator.bbox)  # where it was read (splitting units)
                         claim["_task"] = o.locator.task       # which request read it (its input, for reviewers)

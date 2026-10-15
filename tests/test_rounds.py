@@ -450,6 +450,29 @@ class Rounds(unittest.TestCase):
             quoted = rounds.collect(Path(d) / 'quoted')
             self.assertNotEqual(set(base[visual]['claims']), set(quoted[visual]['claims']))  # only the quote differs
 
+    def test_units_keep_a_frame_only_where_one_was_read(self):
+        from types import SimpleNamespace
+        from semantic_pdf_diff.schema import Claim, Evidence, PdfLocator, claim_id
+        from semantic_pdf_diff.store import Store
+        content = 'sha256:' + 'b' * 64 + '.pdf'
+        with tempfile.TemporaryDirectory() as d, \
+                patch.object(Store, 'files', lambda self, source=None: [SimpleNamespace(content=content)]):
+            with Store(Path(d) / 'arm' / 'run1') as store:
+                store.db.execute("INSERT INTO content (id, size) VALUES (?, 1)", (content,))
+                for i, frame in enumerate(('above grade', '')):
+                    claim = Claim(entity=f'Column C-{i}', attribute='height', value='12', unit='ft', kind='text',
+                                  quote=f'C-{i} 12 ft', confidence=.9, frame=frame)
+                    task = f'text:p1:{i}'
+                    store.record_task({'content': content, 'page': 1, 'task': task, 'status': 'complete',
+                                       'claims': 1},
+                                      [Evidence(**claim.model_dump(), id=claim_id(content, claim), content=content,
+                                                locator=PdfLocator(page=1, bbox=(0, 0, 300, 300), region='text',
+                                                                   task=task))])
+                store.set_reconcile(True)
+            claims = rounds.collect(Path(d) / 'arm')[('run1', content, 1, 'text')]['claims'].values()
+            self.assertEqual({c['entity']: c.get('frame') for c in claims},
+                             {'Column C-0': 'above grade', 'Column C-1': None})
+
     def test_every_lever_gets_a_post_mortem(self):
         from semantic_pdf_diff_lab.eval import postmortem
         from semantic_pdf_diff.settings import Settings
