@@ -154,7 +154,8 @@ SPLIT_SPEC = ('"conditions":"scope: the load, scenario, operating point, time or
               '"uncertainty":"a stated tolerance or uncertainty, if any",')
 CONDITIONS_RULE = 'put conditions (e.g. "at theta = 0", "at rated speed") in conditions.'
 SPLIT_RULE = (CONDITIONS_RULE + "\nPut what a value is measured to or from (to face of finish, to centreline, above "
-              "a datum, net or gross) in frame, not conditions; a tolerance (± 0.5 mm) in uncertainty.")
+              "a datum, net or gross) in frame, not conditions; a tolerance (± 0.5 mm) in uncertainty. A limit "
+              "(maximum, at least, up to, below) isn't a frame: keep it with the value or the attribute.")
 # The table rules' prompt likewise (tablerules.RULES): a frame bullet after the conditions', a frame in the templates
 TABLE_CONDITIONS = "  is the heading or slide title the table sits under (what it's about, not a circumstance)\n"
 TABLE_FRAME = ("- frame is how the values are read, where the table or the text above states it: what a height or "
