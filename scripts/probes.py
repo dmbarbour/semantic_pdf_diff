@@ -55,12 +55,18 @@ def run(replay, responder, max_cost, fixture=None, out=None, keep=True):
         return 0
     results = json.loads((FOLDER / "results.json").read_text()) if (FOLDER / "results.json").exists() else {}
     judge = [o for o in outcomes if o.check in ("A, B", "B, A")]
-    results[name] = {**probes.summary(outcomes), "judge_consistent": probes.consistency(judge),
+    # the battery's own settings, then each judge arm's (its judge probes alone)
+    mine = [o for o in outcomes if not o.arm]
+    results[name] = {**probes.summary(mine), "judge_consistent": probes.consistency([o for o in judge if not o.arm]),
+                     "judge_arms": {arm: {**probes.summary(asked), "judge_consistent": probes.consistency(asked)}
+                                    for arm in probes.JUDGE_ARMS if arm
+                                    for asked in [[o for o in judge if o.arm == arm]]},
                      "outcomes": [asdict(o) for o in outcomes]}
     (FOLDER / "results.json").write_text(json.dumps(results, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps({k: v for k, v in results[name].items() if k != "outcomes"}, indent=1))
     for o in outcomes:
-        print(f"{'pass' if o.passed else 'FAIL'}  {o.kind:10s} {o.property:11s} {o.probe}: {o.check}  {o.read[:2]}")
+        print(f"{'pass' if o.passed else 'FAIL'}  {o.arm or '-':13s} {o.kind:10s} {o.property:11s} {o.probe}: "
+              f"{o.check}  {o.read[:2]}")
     return 0
 
 def pack():

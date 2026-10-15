@@ -77,6 +77,8 @@ NOT_EXERCISED = {
     'explain_context': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
     'record_changes': 'revisions mode only, with context records restated; these runs compare proposals '
                       '(tests/test_records.py)',
+    'judge_context': "the stub's judge answers whatever it's shown, so showing context changes no outcome "
+                     '(tests/test_records.py)',
     'continuations': "only an answer incomplete at the claim limit is continued; the stub's never are "
                      "(tests/test_continuation.py)",
     'refine_figures': "only a refined tile mostly one detected figure it holds is looked at again; the documents' "

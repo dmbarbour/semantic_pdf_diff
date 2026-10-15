@@ -10,6 +10,9 @@ it isn't given a conventional name).
   compared with itself, so nothing is judged). A check reads the claims for its values.
 - **Judge probes** are pairs of claims put to the product's judge as a revisions comparison puts them
   (compare.pair_request, then compare.vetoes), each in both orders. A probe passes when the relation is one it allows.
+  Some give their context only in records (a sheet's note, a list's lead-in, a table's headers: what the records
+  lever keeps), which the judge sees only with the judge_context lever: the battery asks them under each of
+  JUDGE_ARMS, so a judge setting's probes are told apart.
 
 A battery is tens of requests: cents per model. Answers are recorded into a fixture and replayed after, so a battery
 qualifies a model or backend, and checks a prompt change, at no further cost.
@@ -37,6 +40,8 @@ class JudgeProbe:
     b: dict
     allowed: tuple     # relations that pass
     mode: str = "revisions"
+    a_records: list = field(default_factory=list)  # ContextRecord fields the claim references (its context)
+    b_records: list = field(default_factory=list)
 
 def _said(claims, fields, *patterns):
     """Whether every claim says one of the patterns in one of its fields (any claim at all: none read fails)."""
@@ -97,6 +102,20 @@ def _claim(entity, attribute, value, unit="", conditions="", quote=None):
     return {"entity": entity, "attribute": attribute, "value": value, "unit": unit, "conditions": conditions,
             "quote": quote or f"{attribute} {value} {unit}".strip()}
 
+def _note(*notes):
+    return [{"id": "note:p1:0", "kind": "note", "label": "GENERAL NOTES", "text": " ".join(notes), "page": 1}]
+
+def _lead(text):
+    return [{"id": "list:p1:0", "kind": "list", "text": text, "items": ["(a)", "(b)"], "page": 1}]
+
+def _table(title, *headers):
+    return [{"id": "table:p1:0", "kind": "table", "label": title, "items": list(headers), "page": 1}]
+
+FACE, STUD = "1. ALL DIMENSIONS ARE TO FACE OF FINISH.", "1. ALL DIMENSIONS ARE TO CENTERLINE OF STUD."
+ROOM = _claim("Room 101", "width", "12'-6\"", "ft-in")
+TIMER = _claim("link", "retransmission timer", "709", "ms")
+FLANGE = _claim("flange", "outer diameter", "340")
+
 NOT_SAME = ("complementary", "uncertain", "unrelated")
 JUDGE = [
     JudgeProbe("frame-differs", "frame", "sensitivity",
@@ -129,7 +148,34 @@ JUDGE = [
     JudgeProbe("units-converted", "frame", "control",
                _claim("flange", "outer diameter", "340", "mm"), _claim("flange", "outer diameter", "34", "cm"),
                ("equivalent",)),
+    # context in records only (the judge_context lever's): the claims' own fields the same on both sides
+    JudgeProbe("frame-in-notes", "frame", "sensitivity", ROOM, ROOM, ("complementary", "uncertain"),
+               a_records=_note(FACE), b_records=_note(STUD)),
+    JudgeProbe("scope-in-lead-in", "scope", "sensitivity", TIMER, TIMER, NOT_SAME,
+               a_records=_lead("When the link is idle, the following values apply."),
+               b_records=_lead("When the link is congested, the following values apply.")),
+    JudgeProbe("units-in-headers", "frame", "sensitivity", FLANGE, FLANGE, ("different", "complementary", "uncertain"),
+               a_records=_table("Flange dimensions", "Size", "Outer diameter (mm)"),
+               b_records=_table("Flange dimensions", "Size", "Outer diameter (in)")),
+    JudgeProbe("same-notes", "frame", "specificity", ROOM, ROOM, ("equivalent",),
+               a_records=_note(FACE), b_records=_note(FACE)),
+    JudgeProbe("other-note-changed", "frame", "specificity", ROOM, ROOM, ("equivalent",),
+               a_records=_note(FACE, "2. REFER TO SHEET A-501 FOR DOOR DETAILS."),
+               b_records=_note(FACE, "2. REFER TO SHEET A-502 FOR DOOR DETAILS.")),
 ]
+
+# The judge settings each judge probe is asked under: the battery's own (""), and each judge lever's, by its name
+# (its settings; the lever added where the battery's settings don't list it).
+JUDGE_ARMS = {"": {}, "judge_context": {"judge_context": True}}
+
+def armed(settings, arm):
+    """The battery's settings under one of JUDGE_ARMS."""
+    from semantic_pdf_diff.settings import settings_class
+    if not arm:
+        return settings
+    names = tuple(lever.lever_name for lever in type(settings).lever_classes)
+    cls = type(settings) if arm in names else settings_class(names + (arm,))
+    return cls(**{**settings.model_dump(), **JUDGE_ARMS[arm]})
 
 @dataclass
 class Outcome:
@@ -140,6 +186,7 @@ class Outcome:
     passed: bool
     read: list = field(default_factory=list)  # what was read (reader) or answered (judge)
     model_passed: bool | None = None  # a judge probe: the model's own answer passes, before the product's vetoes
+    arm: str = ""  # a judge probe: the JUDGE_ARMS entry it was asked under ("": the battery's settings)
 
 def matching(claims, value):
     """The claims whose value is this one, as printed or as a number."""
@@ -157,11 +204,12 @@ def read_probe(probe, claims):
                                                                     "conditions")) for c in mine]))
     return out
 
-def evidence(fields, side):
-    """A claim as the judge's evidence (provenance made up: the judge never sees it)."""
+def evidence(fields, side, records=()):
+    """A claim as the judge's evidence (provenance made up: the judge never sees it), referencing its records."""
     from semantic_pdf_diff.schema import Evidence, TextLocator
     return Evidence(id=f"probe-{side}", content=f"sha256:{side * 64}.md", kind="text", confidence=0.95,
-                    locator=TextLocator(page=1, lines=(1, 1), region="text", task="probe"), **fields)
+                    locator=TextLocator(page=1, lines=(1, 1), region="text", task="probe"),
+                    records=[r["id"] for r in records], **fields)
 
 def run_reader(folder, settings, options):
     """Every reader probe read: [Outcome]. Each document is written into folder/docs, its run into folder/runs."""
@@ -180,28 +228,35 @@ def run_reader(folder, settings, options):
     return out
 
 def run_judge(folder, settings, options):
-    """Every judge probe asked in both orders: [Outcome] (check: "A, B" or "B, A")."""
+    """Every judge probe asked in both orders under each of JUDGE_ARMS: [Outcome] (check: "A, B" or "B, A")."""
     from semantic_pdf_diff.pipeline import make_client
     from semantic_pdf_diff.store import Store
-    with Store(Path(folder) / "judge") as store:
-        client = make_client(options, settings, store)
-        try:
-            return [judge(client, settings, probe, order) for probe in JUDGE for order in ("A, B", "B, A")]
-        finally:
-            client.close()  # the fixture notes which answers were used (pack keeps those)
+    out = []
+    for arm in JUDGE_ARMS:
+        judging = armed(settings, arm)
+        with Store(Path(folder) / ("judge-" + arm if arm else "judge")) as store:
+            client = make_client(options, judging, store)
+            try:
+                out += [judge(client, judging, probe, order, arm) for probe in JUDGE for order in ("A, B", "B, A")]
+            finally:
+                client.close()  # the fixture notes which answers were used (pack keeps those)
+    return out
 
-def judge(client, settings, probe, order):
+def judge(client, settings, probe, order, arm=""):
     """One judge probe asked in one order, judged as compare() judges a pair: the model's relation, then vetoes."""
     from semantic_pdf_diff.compare import pair_request, vetoes
-    from semantic_pdf_diff.schema import Judgment
-    x, y = (probe.a, probe.b) if order == "A, B" else (probe.b, probe.a)
-    a, b = evidence(x, "a"), evidence(y, "b")
-    prompt, images, _, calc = pair_request(settings, probe.mode, a, b)
-    judgment = client.ask(prompt, Judgment, images, ("compare", probe.mode, "probe", probe.id, order))
+    from semantic_pdf_diff.schema import ContextRecord
+    (x, xr), (y, yr) = ((probe.a, probe.a_records), (probe.b, probe.b_records))[::1 if order == "A, B" else -1]
+    a, b = evidence(x, "a", xr), evidence(y, "b", yr)
+    records = {e.content: {r["id"]: ContextRecord(**r) for r in found} for e, found in ((a, xr), (b, yr))}
+    prompt, images, _, calc = pair_request(settings, probe.mode, a, b, records=records)
+    judgment = client.ask(prompt, settings.judging()[1], images, ("compare", probe.mode, "probe", probe.id, order))
     relation = "uncertain" if vetoes(judgment, a, b, calc) else judgment.relation
+    ruled = "".join(f"; same {part}: {getattr(judgment, 'same_' + part)}" for part in ("subject", "scope", "frame")
+                    if hasattr(judgment, "same_" + part))
     return Outcome(probe.id, probe.kind, probe.property, order, relation in probe.allowed,
-                   [f"{relation} (asked: {judgment.relation}; same conditions: {judgment.same_conditions}) "
-                    f"{judgment.rationale}"], judgment.relation in probe.allowed)
+                   [f"{relation} (asked: {judgment.relation}; same conditions: {judgment.same_conditions}{ruled}) "
+                    f"{judgment.rationale}"], judgment.relation in probe.allowed, arm)
 
 def summary(outcomes):
     """Passed of asked, by kind and by property; and, for judge probes, the probes answered alike in both orders."""
@@ -218,9 +273,9 @@ def summary(outcomes):
             **({"judge_model_passed": f"{sum(o.model_passed for o in judged)}/{len(judged)}"} if judged else {})}
 
 def consistency(outcomes):
-    """Judge probes whose relation was the same in both orders, of those asked in both."""
+    """Judge probes whose relation was the same in both orders, of those asked in both (under one arm)."""
     by = {}
     for o in outcomes:
-        by.setdefault(o.probe, []).append(o.read[0].split(" ")[0])
+        by.setdefault((o.arm, o.probe), []).append(o.read[0].split(" ")[0])
     both = [v for v in by.values() if len(v) == 2]
     return f"{sum(1 for v in both if v[0] == v[1])}/{len(both)}"

@@ -159,3 +159,22 @@ def changed_records(earlier, later, left, right):
                         "earlier": {"content": ca, "id": a.id, "text": a.text, "items": a.items},
                         "later": {"content": cb, "id": b.id, "text": b.text, "items": b.items}, "claims": claims})
     return out
+
+def context_shown(evidence, records):
+    """The context a claim's records give it, as the judge is shown it (the judge_context lever): {"context": [one
+    line per record: its kind, its label and its text, a table's headers too]}, each record's parents before it, each
+    once; {} when it references none. records: its content's {id: ContextRecord}."""
+    chain = []
+    for rid in evidence.records:
+        line = []
+        while rid in records and rid not in chain and rid not in line:
+            line.insert(0, rid)
+            rid = records[rid].parent
+        chain += [r for r in line if r not in chain]
+    lines = []
+    for rid in chain:
+        r = records[rid]
+        said = " ".join(x for x in (r.label + ":" if r.label else "", r.text) if x)
+        headers = f" (columns: {' | '.join(r.items)})" if r.kind == "table" and r.items else ""
+        lines.append(f"{r.kind}: {said}{headers}".strip())
+    return {"context": lines} if lines else {}

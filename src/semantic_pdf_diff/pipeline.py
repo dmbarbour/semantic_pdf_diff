@@ -229,7 +229,7 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     headings = {(c, x.id): " > ".join(x.heading_path) for c, items in sections.items() for x in items}
     comparing = comparison_interpreter(settings)
     data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
-                   label=provenance.text_hash(comparing.model_dump_json()))
+                   label=provenance.text_hash(comparing.model_dump_json()), records=read.records)
     progress.close()
     if options.mode == 'revisions':
         data['record_changes'] = restated(settings, files[names[0]], files[names[1]], read.records or {}, left, right)

@@ -818,6 +818,28 @@ class RecordChanges(Lever):
         from .records import changed_records
         return changed_records(earlier, later, left, right)
 
+class JudgeContext(Lever):
+    lever_name, stage, off = "judge_context", "comparison", {"judge_context": False}
+    # each claim's context records (the records lever's: its list's lead-in, its sheet's notes, its table's title and
+    # headers) shown to the judge, which rules on subject, scope and frame apart; one ruled different makes a
+    # confident relation uncertain (compare.vetoes). The claim context plan's milestone 4, design question 4 (the
+    # owner: "this is clearly a lever, but you can start with your preference")
+    judge_context: Annotated[bool, _shaping(roles=COMPARE)] = False
+
+    def judged_context(self, evidence, records):
+        shown = super().judged_context(evidence, records)
+        if not self.judge_context:
+            return shown
+        from .records import context_shown
+        return {**shown, **context_shown(evidence, records)}
+
+    def judging(self):
+        if not self.judge_context:
+            return super().judging()
+        from .compare import RULINGS
+        from .schema import RuledJudgment
+        return RULINGS, RuledJudgment
+
 class DedupeRepeated(Lever):
     lever_name, stage, off = "dedupe_repeated", "matching", {"dedupe_repeated": False}
     # extract exactly repeated table rows (same cells, same table position, 3+ pages) once
@@ -838,7 +860,7 @@ LEVER_CLASSES = (ExtractPrompt, ExtractRules, VisualRules, ImagesFirst, Complete
                  RenderArea, FigureTasks, TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts,
                  TextSpans, RepeatedText, LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions,
                  Records, Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences,
-                 Editorial, RecordChanges)
+                 Editorial, RecordChanges, JudgeContext)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -996,6 +1018,18 @@ class Platform(Composable):
         """The context records restated between two revisions' paired content, with the claims they reach
         (records.changed_records): the platform's, none."""
         return []
+
+    @chained
+    def judged_context(self, evidence, records):
+        """What a claim being judged shows besides its own fields ({field: value}); records: its content's {id:
+        ContextRecord}: the platform's, nothing."""
+        return {}
+
+    @chosen
+    def judging(self):
+        """The judge's further instructions and the schema of its answer: the platform's, none and Judgment."""
+        from .schema import Judgment
+        return "", Judgment
 
     @chosen
     def explains(self, mode):

@@ -375,6 +375,10 @@ Before records are built, so each later milestone has a baseline. Almost all of 
   - scope, subject and bound unchanged: scope's 29 shown and not used are mostly scope in the attribute ("peak flow (maximum day)", "Rated point TDH"), two the spec's lead-in;
   - a revision row's description held by its table's record (1), provenance kept out of the claim's words.
 - **So the reader's selection isn't where context is lost** on the corpus: a sheet's notes in its tiles' requests (the first item above) has no target left there, and waits for a document whose notes change a reading (a units note over bare numbers). What's lost is downstream: the judge is shown neither side's records, and a record that changes between revisions isn't reported.
+- **The judge shown records, ruling on subject, scope and frame apart** (`judge_context`, off; design question 4): each claim's records as a `context` field, and `same_subject`, `same_scope`, `same_frame` ruled yes, no or unknown; a part ruled "no" makes an equivalent or different relation uncertain.
+  - The judge probes gain five that give context in records only, and are asked under the battery's settings and under each judge lever (`JUDGE_ARMS`).
+  - Off: the three sensitivity probes (frame in notes, scope in a lead-in, units in headers) all called equivalent (0/6). On: 26/26 of the judge probes, 13/13 alike in both orders (off: 18/26, 11/13).
+  - The model itself answers "different" for a frame or scope apart; its rulings make it uncertain. The corpus arms, with a null arm, are next.
 
 ### 5. Stance
 

@@ -423,6 +423,16 @@ class Judgment(DropsUnknown):
     confidence: float = Field(ge=0, le=1)
     same_conditions: bool
 
+RULING = Literal["yes", "no", "unknown"]
+
+class RuledJudgment(Judgment):
+    """A judgment with subject, scope and frame ruled on apart (the judge_context lever): whether the two claims are
+    about the same thing, apply in the same circumstances, and are stated in the same frame (units, datum, reference
+    point, convention), as their fields and context say."""
+    same_subject: RULING
+    same_scope: RULING
+    same_frame: RULING
+
 # Why two claims of a revisions finding differ (explain.py): value changes, editorial changes, not changes.
 DIFFERENCE_KINDS = ("changed", "conditions", "renamed", "moved", "restated", "split_or_merge", "misread",
                     "not_same_item", "unclear")

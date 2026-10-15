@@ -1,10 +1,10 @@
 {
  "google/gemma-4-31B-it": {
-  "passed": "25/29",
+  "passed": "29/39",
   "by_kind": {
-   "frame": "8/8",
+   "frame": "12/16",
    "provenance": "2/2",
-   "scope": "12/12",
+   "scope": "12/14",
    "stance": "3/5",
    "subject": "0/2"
   },
@@ -12,11 +12,30 @@
    "abstention": "2/4",
    "control": "4/4",
    "precedence": "2/2",
-   "sensitivity": "11/13",
-   "specificity": "6/6"
+   "sensitivity": "11/19",
+   "specificity": "10/10"
   },
-  "judge_model_passed": "11/16",
-  "judge_consistent": "6/8",
+  "judge_model_passed": "15/26",
+  "judge_consistent": "11/13",
+  "judge_arms": {
+   "judge_context": {
+    "passed": "26/26",
+    "by_kind": {
+     "frame": "12/12",
+     "provenance": "2/2",
+     "scope": "10/10",
+     "stance": "2/2"
+    },
+    "by_property": {
+     "abstention": "2/2",
+     "control": "4/4",
+     "sensitivity": "12/12",
+     "specificity": "8/8"
+    },
+    "judge_model_passed": "16/26",
+    "judge_consistent": "13/13"
+   }
+  },
   "outcomes": [
    {
     "probe": "scope-lead-in",
@@ -27,7 +46,8 @@
     "read": [
      "Retransmission timer | value | 709 | ms | link is idle"
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "scope-lead-in",
@@ -38,7 +58,8 @@
     "read": [
      "Keep-alive interval | value | 1,250 | ms | link is idle"
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "scope-other-section",
@@ -49,7 +70,8 @@
     "read": [
      "link | retransmission timer | 856 | ms | congested"
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "scope-other-section",
@@ -60,7 +82,8 @@
     "read": [
      "link | retransmission timer | 856 | ms | congested"
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "frame-units-note",
@@ -71,7 +94,8 @@
     "read": [
      "flange | outer diameter | 340 | millimetres | "
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "frame-units-note",
@@ -82,7 +106,8 @@
     "read": [
      "flange | bolt circle diameter | 290 | millimetres | "
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "frame-exception",
@@ -93,7 +118,8 @@
     "read": [
      "Room 101 | width | 12'-6\" |  | to face of finish"
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "frame-exception",
@@ -104,7 +130,8 @@
     "read": [
      "corridor | width | 6'-0\" |  | measured to the centreline of its walls"
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "stance-holders",
@@ -115,7 +142,8 @@
     "read": [
      "Company A proposal | retransmission timer | 709 | ms | "
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "stance-holders",
@@ -126,7 +154,8 @@
     "read": [
      "Company B proposal | retransmission timer | 856 | ms | "
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "stance-negation",
@@ -137,7 +166,8 @@
     "read": [
      "Company C | minimum supported retransmission timer | 500 | ms | "
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "name-abstention",
@@ -148,7 +178,8 @@
     "read": [
      "Room 214 | length | 12'-6\" |  | on plan"
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "name-abstention",
@@ -159,7 +190,8 @@
     "read": [
      "Room 214 | width | 14'-0\" |  | on plan"
     ],
-    "model_passed": null
+    "model_passed": null,
+    "arm": ""
    },
    {
     "probe": "frame-differs",
@@ -170,7 +202,8 @@
     "read": [
      "uncertain (asked: different; same conditions: False) While the numeric values are identical, the operating conditions differ ('to face of finish' vs 'to centreline of walls'), meaning the physical dimension described is different."
     ],
-    "model_passed": false
+    "model_passed": false,
+    "arm": ""
    },
    {
     "probe": "frame-differs",
@@ -181,7 +214,8 @@
     "read": [
      "uncertain (asked: different; same conditions: False) While the numeric values are identical, the operating conditions differ: Claim A measures to the centreline of walls, whereas Claim B measures to the face of finish. In engineering, these represent different physical dimensions."
     ],
-    "model_passed": false
+    "model_passed": false,
+    "arm": ""
    },
    {
     "probe": "holder-differs",
@@ -192,7 +226,8 @@
     "read": [
      "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), and value (709 ms)."
     ],
-    "model_passed": false
+    "model_passed": false,
+    "arm": ""
    },
    {
     "probe": "holder-differs",
@@ -203,7 +238,8 @@
     "read": [
      "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), and value (709 ms). While the proposing company differs, the engineering specification is identical."
     ],
-    "model_passed": false
+    "model_passed": false,
+    "arm": ""
    },
    {
     "probe": "position-renumbered",
@@ -214,7 +250,8 @@
     "read": [
      "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link failure), attribute (acknowledgement timeout), and value (856 ms) under the same implied conditions."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "position-renumbered",
@@ -225,7 +262,8 @@
     "read": [
      "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link failure), attribute (acknowledgement timeout), and value (856 ms) under the same implied conditions."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "scope-differs",
@@ -236,7 +274,8 @@
     "read": [
      "uncertain (asked: different; same conditions: False) The retransmission timer value changed from 709 ms to 856 ms between revisions, although the specified conditions differ ('link idle' vs 'link congested')."
     ],
-    "model_passed": false
+    "model_passed": false,
+    "arm": ""
    },
    {
     "probe": "scope-differs",
@@ -247,7 +286,8 @@
     "read": [
      "unrelated (asked: unrelated; same conditions: False) The claims describe the retransmission timer under different operating conditions ('link congested' vs 'link idle'), making them distinct parameters rather than a direct comparison of the same state."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "scope-unknown",
@@ -258,7 +298,8 @@
     "read": [
      "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), and value (709 ms). The condition 'link idle' in A is consistent with the general specification in B."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "scope-unknown",
@@ -269,7 +310,8 @@
     "read": [
      "uncertain (asked: uncertain; same conditions: False) Claim A provides no operating conditions, while Claim B specifies 'link idle'. It cannot be determined if the value in A applies generally or specifically to the same condition as B."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "irrelevant-context",
@@ -280,7 +322,8 @@
     "read": [
      "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), value (709 ms), and operating condition (link idle)."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "irrelevant-context",
@@ -291,7 +334,8 @@
     "read": [
      "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), value (709 ms), and operating condition (link idle)."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "value-changed",
@@ -302,7 +346,8 @@
     "read": [
      "different (asked: different; same conditions: True) The retransmission timer value for the link under idle conditions changed from 709 ms in revision A to 720 ms in revision B."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "value-changed",
@@ -313,7 +358,8 @@
     "read": [
      "different (asked: different; same conditions: True) The retransmission timer value for the link under idle conditions changed from 720 ms in revision A to 709 ms in revision B."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "units-converted",
@@ -324,7 +370,8 @@
     "read": [
      "equivalent (asked: equivalent; same conditions: True) Both claims specify the outer diameter of the flange as 340 mm and 34 cm respectively, which are numerically identical."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
    },
    {
     "probe": "units-converted",
@@ -335,7 +382,440 @@
     "read": [
      "equivalent (asked: equivalent; same conditions: True) Both claims specify the outer diameter of the flange as 34 cm and 340 mm respectively, which are numerically identical values for the same attribute and entity."
     ],
-    "model_passed": true
+    "model_passed": true,
+    "arm": ""
+   },
+   {
+    "probe": "frame-in-notes",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": false,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (Room 101), attribute (width), and value (12'-6\") with identical units."
+    ],
+    "model_passed": false,
+    "arm": ""
+   },
+   {
+    "probe": "frame-in-notes",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": false,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (Room 101), attribute (width), and value (12'-6\") with identical units."
+    ],
+    "model_passed": false,
+    "arm": ""
+   },
+   {
+    "probe": "scope-in-lead-in",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": false,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), and value (709 ms) under identical conditions."
+    ],
+    "model_passed": false,
+    "arm": ""
+   },
+   {
+    "probe": "scope-in-lead-in",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": false,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (link), attribute (retransmission timer), and value (709 ms) under identical conditions."
+    ],
+    "model_passed": false,
+    "arm": ""
+   },
+   {
+    "probe": "units-in-headers",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": false,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (flange), attribute (outer diameter), and value (340)."
+    ],
+    "model_passed": false,
+    "arm": ""
+   },
+   {
+    "probe": "units-in-headers",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": false,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (flange), attribute (outer diameter), and value (340)."
+    ],
+    "model_passed": false,
+    "arm": ""
+   },
+   {
+    "probe": "same-notes",
+    "kind": "frame",
+    "property": "specificity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (Room 101), attribute (width), and value (12'-6\") with identical units."
+    ],
+    "model_passed": true,
+    "arm": ""
+   },
+   {
+    "probe": "same-notes",
+    "kind": "frame",
+    "property": "specificity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (Room 101), attribute (width), and value (12'-6\") with identical units."
+    ],
+    "model_passed": true,
+    "arm": ""
+   },
+   {
+    "probe": "other-note-changed",
+    "kind": "frame",
+    "property": "specificity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (Room 101), attribute (width), and value (12'-6\") with identical units."
+    ],
+    "model_passed": true,
+    "arm": ""
+   },
+   {
+    "probe": "other-note-changed",
+    "kind": "frame",
+    "property": "specificity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True) Both claims specify the same entity (Room 101), attribute (width), and value (12'-6\") with identical units."
+    ],
+    "model_passed": true,
+    "arm": ""
+   },
+   {
+    "probe": "frame-differs",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False; same subject: yes; same scope: yes; same frame: no) While the numeric values are identical, the measurement conditions differ: Claim A is 'to face of finish' and Claim B is 'to centreline of walls', which represent different physical dimensions."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "frame-differs",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False; same subject: yes; same scope: yes; same frame: no) While the numeric values are identical, the measurement conditions differ: Claim A is measured to the centerline of walls, whereas Claim B is measured to the face of finish."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "holder-differs",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "uncertain (asked: equivalent; same conditions: False; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same value (709 ms) for the same attribute (retransmission timer) of the same entity (link)."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "holder-differs",
+    "kind": "stance",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "uncertain (asked: equivalent; same conditions: False; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same value (709 ms) for the same attribute (retransmission timer) of the same entity (link)."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "position-renumbered",
+    "kind": "provenance",
+    "property": "specificity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same timeout value of 856 ms for link failure due to missing acknowledgement."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "position-renumbered",
+    "kind": "provenance",
+    "property": "specificity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same timeout value of 856 ms for link failure due to missing acknowledgement."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "scope-differs",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False; same subject: yes; same scope: no; same frame: yes) The retransmission timer values differ (709 ms vs 856 ms) under different operating conditions (link idle vs link congested). Since A and B describe the same design across revisions, these represent different specified values for the same attribute."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "scope-differs",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False; same subject: yes; same scope: no; same frame: yes) The retransmission timer values differ (856 ms vs 709 ms) under different operating conditions (link congested vs link idle). Since A and B describe the same design across revisions, these are incompatible values for the attribute under their respective specified conditions."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "scope-unknown",
+    "kind": "scope",
+    "property": "abstention",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "uncertain (asked: uncertain; same conditions: False; same subject: yes; same scope: unknown; same frame: yes) Claim A specifies the timer value under the condition 'link idle', whereas Claim B provides no conditions. It cannot be determined if Claim B applies generally or under the same specific condition as Claim A."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "scope-unknown",
+    "kind": "scope",
+    "property": "abstention",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "uncertain (asked: uncertain; same conditions: False; same subject: yes; same scope: unknown; same frame: yes) Claim B specifies a condition ('link idle') that is not present in Claim A; it cannot be determined if Claim A applies generally or under the same specific condition."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "irrelevant-context",
+    "kind": "scope",
+    "property": "specificity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same value (709 ms) for the retransmission timer of the link under the same condition (link idle)."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "irrelevant-context",
+    "kind": "scope",
+    "property": "specificity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same value (709 ms) for the retransmission timer of the link under the same condition (link idle)."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "value-changed",
+    "kind": "scope",
+    "property": "control",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "different (asked: different; same conditions: True; same subject: yes; same scope: yes; same frame: yes) The retransmission timer value changed from 709 ms in revision A to 720 ms in revision B under the same conditions."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "value-changed",
+    "kind": "scope",
+    "property": "control",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "different (asked: different; same conditions: True; same subject: yes; same scope: yes; same frame: yes) The retransmission timer value changed from 720 ms in revision A to 709 ms in revision B under the same conditions."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "units-converted",
+    "kind": "frame",
+    "property": "control",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the outer diameter of the flange as 340 mm and 34 cm respectively, which are numerically equal."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "units-converted",
+    "kind": "frame",
+    "property": "control",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the outer diameter of the flange as 34 cm and 340 mm respectively, which are numerically identical values for the same attribute."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "frame-in-notes",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False; same subject: yes; same scope: yes; same frame: no) While the numeric values are identical, the frames of reference differ: Claim A is measured to the face of finish, whereas Claim B is measured to the centerline of the stud."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "frame-in-notes",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False; same subject: yes; same scope: yes; same frame: no) While the numeric values are identical, the frames of reference differ: Claim A is measured to the centerline of the stud, whereas Claim B is measured to the face of finish."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "scope-in-lead-in",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False; same subject: yes; same scope: no; same frame: yes) While the values are identical, the claims apply to different operating conditions: Claim A applies when the link is idle, and Claim B applies when the link is congested."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "scope-in-lead-in",
+    "kind": "scope",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False; same subject: yes; same scope: no; same frame: yes) While the values are identical, the claims apply to different operating conditions: Claim A applies when the link is congested, and Claim B applies when the link is idle."
+    ],
+    "model_passed": false,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "units-in-headers",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: False; same subject: yes; same scope: yes; same frame: no) While the numeric values are identical, the units specified in the table headers differ: Claim A is in millimeters (mm) and Claim B is in inches (in)."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "units-in-headers",
+    "kind": "frame",
+    "property": "sensitivity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "uncertain (asked: different; same conditions: True; same subject: yes; same scope: yes; same frame: no) Claim A specifies the outer diameter as 340 inches, while Claim B specifies it as 340 mm. These are incompatible values for the same attribute under the same conditions."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "same-notes",
+    "kind": "frame",
+    "property": "specificity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same entity (Room 101), attribute (width), value (12'-6\"), and share the same frame (face of finish)."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "same-notes",
+    "kind": "frame",
+    "property": "specificity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same entity (Room 101), attribute (width), value (12'-6\"), and share the same frame (face of finish)."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "other-note-changed",
+    "kind": "frame",
+    "property": "specificity",
+    "check": "A, B",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same width (12'-6\") for Room 101 under the same dimensioning convention (face of finish)."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
+   },
+   {
+    "probe": "other-note-changed",
+    "kind": "frame",
+    "property": "specificity",
+    "check": "B, A",
+    "passed": true,
+    "read": [
+     "equivalent (asked: equivalent; same conditions: True; same subject: yes; same scope: yes; same frame: yes) Both claims specify the same width (12'-6\") for Room 101 under the same dimensioning convention (face of finish)."
+    ],
+    "model_passed": true,
+    "arm": "judge_context"
    }
   ]
  }

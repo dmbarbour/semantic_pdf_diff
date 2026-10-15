@@ -47,7 +47,8 @@
     "verify_visuals",
     "explain_differences",
     "editorial",
-    "record_changes"
+    "record_changes",
+    "judge_context"
   ],
   "table_rules": null,
   "table_structure": false,

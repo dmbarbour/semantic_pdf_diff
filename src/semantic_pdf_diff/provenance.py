@@ -82,5 +82,6 @@ def triage_interpreter(settings):
 def comparison_interpreter(settings):
     from .compare import COMPARE, PROMPT_VERSION
     from .llm import SYSTEM
-    return interpreter("compare", settings, (SYSTEM, COMPARE, f"v{PROMPT_VERSION}"),
+    rulings = settings.judging()[0]  # the judge_context lever's
+    return interpreter("compare", settings, (SYSTEM, COMPARE, f"v{PROMPT_VERSION}") + ((rulings,) if rulings else ()),
                        role_settings(type(settings), "compare"))

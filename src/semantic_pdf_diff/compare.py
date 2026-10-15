@@ -7,7 +7,6 @@ import re
 from collections import Counter
 from decimal import Decimal, InvalidOperation
 from .explain import explain
-from .schema import Judgment
 from .dispatch import Dispatcher
 from .progress import NoProgress
 from .values import unit
@@ -107,14 +106,25 @@ REGROUPED = "Viewed as part of a split or merge candidate (see the groupings); n
 PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences",
                      "position", "records", "printed"}
 
+# With the judge_context lever: each claim's context records shown, and subject, scope and frame ruled on apart
+# (schema.RuledJudgment; docs/plans/claim-context-2026-10-14.md, milestone 4, design question 4).
+RULINGS = ('\nEach claim\'s "context", where given, is what its document says around it: the notes, list lead-in or '
+           "table title and headers that hold or reach it. Read each claim under its context: a note can set its "
+           "units, datum, reference point or convention (its frame), or limit where or when it applies (its scope). "
+           'Also return "same_subject", "same_scope" and "same_frame", each "yes", "no" or "unknown": whether A and B '
+           "are about the same thing, apply in the same circumstances, and are stated in the same frame, from their "
+           "fields and context. Equal values in different frames or scopes are not equivalent.")
+
 def instructions(mode):
     """A comparison prompt's instructions (the rest is the two claims and the numeric check)."""
     return COMPARE + MODE_CONTEXT[mode]
 
-def pair_request(s, mode, a, b, output=None):
-    """The judge's request for claims a and b: (prompt, images, the claims as shown, numeric check). The claims are
-    shown without their provenance (PROVENANCE_FIELDS), with source images where the settings send them."""
-    images, payload = [], []
+def pair_request(s, mode, a, b, output=None, records=None):
+    """The judge's request for claims a and b: (prompt, images, the claims' fields as shown, numeric check). The
+    claims are shown without their provenance (PROVENANCE_FIELDS), with source images where the settings send them,
+    and with what their context records say where the settings show it (records: {content: {id: ContextRecord}};
+    the judge_context lever's, not among the fields returned: the explainer is shown context by its own lever)."""
+    images, payload, shown = [], [], []
     for e in (a, b):
         p = e.model_dump(exclude=PROVENANCE_FIELDS)
         extra = s.comparison_images(e, output)
@@ -122,9 +132,10 @@ def pair_request(s, mode, a, b, output=None):
             p["source_image"] = len(images) + 1
             images += extra
         payload.append(p)
+        shown.append({**p, **s.judged_context(e, (records or {}).get(e.content, {}))})
     calc = numeric_check(a, b)
-    prompt = (instructions(mode) + "\nA=" + json.dumps(payload[0], ensure_ascii=False)
-              + "\nB=" + json.dumps(payload[1], ensure_ascii=False))
+    prompt = (instructions(mode) + s.judging()[0] + "\nA=" + json.dumps(shown[0], ensure_ascii=False)
+              + "\nB=" + json.dumps(shown[1], ensure_ascii=False))
     prompt += "\nNumeric check=" + json.dumps(calc)
     return prompt, images, payload, calc
 
@@ -134,6 +145,9 @@ def vetoes(judgment, a, b, calc):
     reasons = []
     if judgment.relation in ("different", "equivalent") and not judgment.same_conditions:
         reasons.append("Matching conditions were not established")
+    differ = [part for part in ("subject", "scope", "frame") if getattr(judgment, f"same_{part}", None) == "no"]
+    if judgment.relation in ("different", "equivalent") and differ:  # ruled apart (the judge_context lever)
+        reasons.append(f"The claims' {' and '.join(differ)} differ" + ("s" if len(differ) == 1 else ""))
     if calc and judgment.relation == "equivalent" and not calc["equal"]:
         reasons.append("Numeric conversion disagrees with equivalence")
     if calc and judgment.relation == "different" and calc["equal"]:
@@ -144,7 +158,7 @@ def vetoes(judgment, a, b, calc):
         reasons.append("Approximate visual value requires review")
     return reasons
 
-def compare(left, right, output, client, mode, dispatcher=None, progress=None, headings=None, label=""):
+def compare(left, right, output, client, mode, dispatcher=None, progress=None, headings=None, label="", records=None):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
 
     Evidence belongs to content, so content present on both sides yields identical
@@ -158,6 +172,9 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
 
     label: the comparison interpreter's hash (provenance.comparison_interpreter), naming the requests in their
     recipes; the pipeline gives it (code review 2026-10-08, D6: compare imported provenance for it).
+
+    records: {content: {id: ContextRecord}}, the context records the claims reference (the records lever's), shown
+    to the judge where the settings say (the judge_context lever).
     """
     # Comparisons aren't bound to a store, so their cache keys carry their own settings.
     settings_key = label  # the comparison interpreter's hash, naming the requests' recipes (labels only)
@@ -218,14 +235,15 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
 
     own = dispatcher is None
     dispatch = dispatcher or Dispatcher(client)
+    schema = client.s.judging()[1]
     with (dispatch if own else contextlib.nullcontext()):
         for index, (score, a, b) in enumerate(pairs[:client.s.max_pairs]):
             dispatch.make_room()
             attempted.update((a.id,b.id))
-            prompt, images, payload, calc = pair_request(client.s, mode, a, b, output)
+            prompt, images, payload, calc = pair_request(client.s, mode, a, b, output, records)
             payloads[index] = (a, b, payload, images)
             progress.add()
-            dispatch.submit(prompt, Judgment, images, ("compare", mode, settings_key, a.id, b.id),
+            dispatch.submit(prompt, schema, images, ("compare", mode, settings_key, a.id, b.id),
                             judged(index, score, a, b, calc))
         dispatch.drain()
         if client.s.explains(mode):

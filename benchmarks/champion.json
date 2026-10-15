@@ -47,7 +47,8 @@
     "verify_visuals",
     "explain_differences",
     "editorial",
-    "record_changes"
+    "record_changes",
+    "judge_context"
   ],
   "context_before": 400,
   "context_after": 400,

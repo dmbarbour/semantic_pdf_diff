@@ -187,6 +187,59 @@ class Restated(unittest.TestCase):
                    "retrieval_score": 1.0, "context_changed": ["GENERAL NOTES"]}
         self.assertIn("Context changed: GENERAL NOTES", finding_html(finding, lambda i: ""))
 
+class Judged(unittest.TestCase):
+    """The judge_context lever: each claim's context records shown to the judge, subject, scope and frame ruled on
+    apart (the claim context plan's milestone 4)."""
+    def records(self):
+        from semantic_pdf_diff.schema import ContextRecord
+        return {"note:p1:0": ContextRecord(id="note:p1:0", kind="note", label="GENERAL NOTES", page=1,
+                                           text="1. ALL DIMENSIONS ARE TO FACE OF FINISH."),
+                "list:p1:0": ContextRecord(id="list:p1:0", kind="list", text="Clear widths:", parent="note:p1:0"),
+                "table:p1:0": ContextRecord(id="table:p1:0", kind="table", label="Room schedule",
+                                            items=["Room", "Width"])}
+
+    def test_a_claims_records_as_the_judge_sees_them(self):
+        from semantic_pdf_diff.records import context_shown
+        from test_pipeline import ev
+        shown = context_shown(ev("A-1", records=["list:p1:0", "table:p1:0", "note:p1:0"]), self.records())
+        self.assertEqual(shown, {"context": ["note: GENERAL NOTES: 1. ALL DIMENSIONS ARE TO FACE OF FINISH.",
+                                             "list: Clear widths:", "table: Room schedule: (columns: Room | Width)"]})
+        self.assertEqual(context_shown(ev("A-2"), self.records()), {})
+        self.assertEqual(context_shown(ev("A-3", records=["gone"]), self.records()), {})
+
+    def test_the_judges_request_shows_context_and_asks_for_rulings_only_when_on(self):
+        from semantic_pdf_diff.compare import RULINGS, pair_request
+        from semantic_pdf_diff.schema import Judgment, RuledJudgment
+        from test_pipeline import ev
+        a, b = ev("A-1", records=["note:p1:0"]), ev("B-1", records=["note:p1:0"])
+        records = {a.content: self.records(), b.content: self.records()}
+        off, on = Settings(), Settings(judge_context=True)
+        prompt, _, payload, _ = pair_request(off, "revisions", a, b, records=records)
+        self.assertNotIn("FACE OF FINISH", prompt)
+        self.assertNotIn(RULINGS, prompt)
+        self.assertEqual(off.judging(), ("", Judgment))
+        prompt, _, shown, _ = pair_request(on, "revisions", a, b, records=records)
+        self.assertEqual(prompt.count("note: GENERAL NOTES: 1. ALL DIMENSIONS ARE TO FACE OF FINISH."), 2)
+        self.assertIn(RULINGS, prompt)
+        self.assertEqual(shown, payload)  # the fields returned (the explainer's) are the claims' own
+        self.assertEqual(on.judging(), (RULINGS, RuledJudgment))
+
+    def test_a_part_ruled_different_makes_a_confident_relation_uncertain(self):
+        from semantic_pdf_diff.compare import vetoes
+        from semantic_pdf_diff.schema import RuledJudgment
+        from test_pipeline import ev
+        a, b = ev("A-1"), ev("B-1")
+        ruled = dict(rationale="r", confidence=0.9, same_conditions=True, same_subject="yes", same_scope="yes")
+        self.assertEqual(vetoes(RuledJudgment(relation="equivalent", same_frame="no", **ruled), a, b, None),
+                         ["The claims' frame differs"])
+        self.assertEqual(vetoes(RuledJudgment(relation="equivalent", same_frame="unknown", **ruled), a, b, None), [])
+        self.assertEqual(vetoes(RuledJudgment(relation="complementary", same_frame="no", **ruled), a, b, None), [])
+
+    def test_the_comparison_interpreter_names_it(self):
+        from semantic_pdf_diff.provenance import comparison_interpreter
+        self.assertNotEqual(comparison_interpreter(Settings()).prompt_hash,
+                            comparison_interpreter(Settings(judge_context=True)).prompt_hash)
+
 class Stored(unittest.TestCase):
     def test_a_run_keeps_each_record_once_beside_the_claims_that_reference_it(self):
         import contextlib
