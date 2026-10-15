@@ -140,7 +140,7 @@ def contexts(project):
         if f.conditions:
             ctx[kind_of(f.conditions) or "unclassed"] = f.conditions
         for pattern, kind, says, text in DECLARED.get(fam, ()):
-            if re.search(pattern, f.id) and text in printed:
+            if re.search(pattern, f.id) and any(text in t for t in printed):  # a paragraph may say more
                 ctx[kind] = f"{ctx[kind]}; {says}" if kind in ctx else says
                 ctx.setdefault("declared", text)
         for pattern, needs in CONVENTIONS.get(fam, ()):

@@ -68,12 +68,13 @@ def changes(earlier, later):
     a, b = facts(earlier, {}), facts(later, renames)
     both = a.keys() & b.keys()
     same = lambda x, y: " ".join(x.casefold().split()) == " ".join(y.casefold().split())
-    kept = {i for i in both if a[i]["value"] == b[i]["value"]
+    value = lambda f: (f["value"], f.get("unit", ""))  # a unit restated, the number kept, is a changed value
+    kept = {i for i in both if value(a[i]) == value(b[i])
             and same(a[i].get("conditions", ""), b[i].get("conditions", ""))}
     declared = lambda f: (f.get("context") or {}).get("declared", "")
     restated = {i for i in kept if not same(declared(a[i]), declared(b[i]))}
-    return {"changed": sorted(i for i in both if a[i]["value"] != b[i]["value"]),
-            "conditions": sorted(i for i in both if a[i]["value"] == b[i]["value"]
+    return {"changed": sorted(i for i in both if value(a[i]) != value(b[i])),
+            "conditions": sorted(i for i in both if value(a[i]) == value(b[i])
                                  and not same(a[i].get("conditions", ""), b[i].get("conditions", ""))),
             "added": sorted(b.keys() - a.keys()), "removed": sorted(a.keys() - b.keys()),
             "unchanged": sorted(kept - restated),

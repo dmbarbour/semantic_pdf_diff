@@ -443,7 +443,11 @@ class Revisions(unittest.TestCase):
                     # a diagram: a message inserted (the steps after it renumbered) and two parameters revised
                     "attach-s1-clean": (2, 1, 0, 0),
                     # counterfactual pairs: only a note or a lead-in restated (claim context, milestone 4)
-                    "lcc-plan-s1-clean-notes": (0, 0, 0, 0), "coaster-tables-s1-clean-datum": (0, 0, 0, 0)}
+                    "lcc-plan-s1-clean-notes": (0, 0, 0, 0), "coaster-tables-s1-clean-datum": (0, 0, 0, 0),
+                    # units moved from the headers to a note (nothing changed), and restated there: the 5 element
+                    # heights now metres, their numbers kept (a changed unit is a changed value)
+                    "coaster-tables-s1-clean-units-note": (0, 0, 0, 0),
+                    "coaster-tables-s1-clean-units-changed": (5, 0, 0, 0)}
         # facts whose declared context was restated, value and conditions kept: the plan's 7 rooms' widths and
         # depths, the coaster's 5 element heights
         restated = {"lcc-plan-s1-clean-notes": 14, "coaster-tables-s1-clean-datum": 5}

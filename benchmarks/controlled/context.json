@@ -1,25 +1,25 @@
 {
  "totals": {
   "inventory": {
-   "claims": 18102,
-   "evidence": 9830,
+   "claims": 19526,
+   "evidence": 10850,
    "frame in conditions": 55,
-   "grounded": 5181,
+   "grounded": 5400,
    "list records": 32,
    "no content words": 3,
    "note records": 7,
    "numbered in attribute": 152,
    "numbered in conditions": 3,
-   "numbered in entity": 48,
+   "numbered in entity": 204,
    "partly": 63,
    "partly (image)": 16,
    "positioned": 109,
-   "printed": 6276,
-   "table records": 269,
+   "printed": 6920,
+   "table records": 294,
    "unsupported": 25,
    "unsupported (image)": 806,
-   "with conditions": 6094,
-   "with records": 5160
+   "with conditions": 6313,
+   "with records": 5804
   },
   "placed": {
    "bound": {
@@ -29,9 +29,9 @@
    },
    "frame": {
     "attribute": 23,
-    "conditions": 70,
-    "frame": 96,
-    "records": 98
+    "conditions": 95,
+    "frame": 116,
+    "records": 103
    },
    "provenance": {
     "conditions": 5
@@ -85,14 +85,14 @@
      "share": 0.59
     },
     "<0.95": {
-     "readings": 9256,
-     "right": 9108,
-     "share": 0.984
+     "readings": 10544,
+     "right": 10396,
+     "share": 0.986
     },
     "<=1.0": {
-     "readings": 25044,
-     "right": 23002,
-     "share": 0.918
+     "readings": 26604,
+     "right": 24562,
+     "share": 0.923
     }
    },
    "image": {
@@ -107,15 +107,15 @@
      "share": 0.778
     },
     "<=1.0": {
-     "readings": 18236,
-     "right": 16786,
-     "share": 0.92
+     "readings": 19244,
+     "right": 17794,
+     "share": 0.925
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 8824,
-     "right": 8796,
+     "readings": 10112,
+     "right": 10084,
      "share": 0.997
     }
    },
@@ -131,9 +131,9 @@
      "share": 0.111
     },
     "<=1.0": {
-     "readings": 6808,
-     "right": 6216,
-     "share": 0.913
+     "readings": 7360,
+     "right": 6768,
+     "share": 0.92
     }
    }
   }
@@ -1013,6 +1013,296 @@
     "placed": {
      "frame": {
       "records": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-changed": {
+   "inventory": {
+    "claims": 368,
+    "grounded": 44,
+    "with conditions": 44,
+    "positioned": 0,
+    "misplaced": {
+     "numbered in entity": 90
+    },
+    "records": {
+     "table": 6
+    },
+    "with records": 92,
+    "printed": 92,
+    "evidence": 156,
+    "context_bytes_per_request": 154,
+    "data_bytes_per_request": 341,
+    "examples": {
+     "numbered in entity": [
+      "Support column C-06 | Footing | ",
+      "Support column C-02 | Load | ",
+      "Support column C-10 | Load | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "frame": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-changed.docx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 14,
+    "with conditions": 14,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 72,
+    "printed": 72,
+    "evidence": 92,
+    "context_bytes_per_request": 495,
+    "data_bytes_per_request": 162,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 3,
+      "frame": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-changed.md": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "evidence": 92,
+    "context_bytes_per_request": 603,
+    "data_bytes_per_request": 111,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "frame": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-changed.pptx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 19,
+    "with conditions": 19,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 72,
+    "printed": 72,
+    "evidence": 92,
+    "context_bytes_per_request": 442,
+    "data_bytes_per_request": 136,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 4,
+      "frame": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-changed.xlsx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 13,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 60,
+    "printed": 60,
+    "evidence": 92,
+    "context_bytes_per_request": 463,
+    "data_bytes_per_request": 128,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 4,
+      "frame": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-note": {
+   "inventory": {
+    "claims": 320,
+    "grounded": 38,
+    "with conditions": 38,
+    "positioned": 0,
+    "misplaced": {
+     "numbered in entity": 66
+    },
+    "records": {
+     "table": 6
+    },
+    "with records": 92,
+    "printed": 92,
+    "evidence": 128,
+    "context_bytes_per_request": 169,
+    "data_bytes_per_request": 266,
+    "examples": {
+     "numbered in entity": [
+      "Support column C-01 | Base elev. | ",
+      "Support column C-01 | Load | ",
+      "Support column C-06 | Base elev. | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "frame": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-note.docx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 32,
+    "with conditions": 32,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 92,
+    "printed": 92,
+    "evidence": 92,
+    "context_bytes_per_request": 592,
+    "data_bytes_per_request": 219,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "records": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-note.md": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 9,
+    "with conditions": 9,
+    "positioned": 0,
+    "misplaced": {},
+    "evidence": 92,
+    "context_bytes_per_request": 600,
+    "data_bytes_per_request": 111,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 4,
+      "frame": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-note.pptx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 13,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 72,
+    "printed": 72,
+    "evidence": 92,
+    "context_bytes_per_request": 429,
+    "data_bytes_per_request": 133,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-tables-s1-clean-units-note.xlsx": {
+   "inventory": {
+    "claims": 92,
+    "grounded": 32,
+    "with conditions": 32,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 92,
+    "printed": 92,
+    "evidence": 92,
+    "context_bytes_per_request": 538,
+    "data_bytes_per_request": 168,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "frame": {
+      "conditions": 5
      }
     },
     "audit": {},

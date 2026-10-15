@@ -472,6 +472,37 @@ def datum_later(p, d):
                        "entry.", "Element heights are above grade; speeds are design values at the element's entry.",
                     [f.id for f in p.facts if re.match(r"^E\d\.height$", f.id)])
 
+HEADER_UNIT = re.compile(r"\s*\([^)]*\)$")  # "Height (ft)": the unit a column's header gives
+COASTER_LEAD = "Element heights are above the station platform; speeds are design values at the element's entry."
+
+def units_to_note(project, lead, note):
+    """Every schedule's units taken from its column headers ("Height (ft)" now "Height") and given by a note after
+    the section's lead-in instead, the values kept: the cells' numbers bare, their units only in the note."""
+    for _, blocks in project.sections:
+        for block in blocks:
+            if block[0] == "schedule":
+                for _, _, columns, _ in block[1].sections:
+                    for column in columns:
+                        column.label = HEADER_UNIT.sub("", column.label)
+    rewrite(project, lead, f"{lead} {note}")
+
+def units_note_later(p, d):
+    """The track schedules' units moved from their headers to a note under the lead-in, every value and unit kept (a
+    counterfactual pair: nothing changed, the units now only in a note the cells' readers may not be shown)."""
+    units_to_note(p, COASTER_LEAD, "Heights, lengths, footings and elevations are in feet, speeds in miles per hour "
+                                   "and loads in kips.")
+    p.edits.append({"kind": "units moved", "to": "note"})
+
+def units_changed_later(p, d):
+    """As units_note_later, but the note gives element heights in metres: the heights' numbers kept, their unit
+    changed by the note alone (a change only a reader shown the note can see)."""
+    units_to_note(p, COASTER_LEAD, "Element heights are in metres; lengths, footings and elevations in feet, speeds "
+                                   "in miles per hour and loads in kips.")
+    heights = [f for f in p.facts if re.match(r"^E\d\.height$", f.id)]
+    for f in heights:
+        f.unit = "m"
+    p.edits.append({"kind": "unit", "facts": [f.id for f in heights], "from": "ft", "to": "m"})
+
 def attach_later(p, d):
     """Revision B of the attach procedure: a Key Challenge inserted after the Key Request, the 15 steps after it
     renumbered; the lookup timeout (before the insertion) and the setup timer (after it, so renumbered too)
@@ -506,7 +537,10 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          (PROCEDURE_PROJECTS["attach"], "clean", attach_later, False, "revised"),
          # counterfactual pairs: only a note or a lead-in restated, every value kept (claim context, milestone 4)
          (SHEET_PROJECTS["lcc-plan"], "clean", notes_later, False, "notes"),
-         (TABLE_PROJECTS["coaster-tables"], "clean", datum_later, False, "datum"))
+         (TABLE_PROJECTS["coaster-tables"], "clean", datum_later, False, "datum"),
+         # units only in a note over bare cells: moved (nothing changed), and restated (heights now metres)
+         (TABLE_PROJECTS["coaster-tables"], "clean", units_note_later, False, "units-note"),
+         (TABLE_PROJECTS["coaster-tables"], "clean", units_changed_later, False, "units-changed"))
 
 def _base(make, knob, seed):
     p = make(seed)
