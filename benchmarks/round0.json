@@ -3,6 +3,7 @@
     "extract_prompt",
     "split_conditions",
     "column_conditions",
+    "conditions_by_column",
     "extract_rules",
     "visual_rules",
     "images_first",

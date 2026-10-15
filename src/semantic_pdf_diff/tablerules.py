@@ -310,6 +310,13 @@ def question(g, cols=None, context="", rules=RULES):
 
 # --- the answer
 
+def _by_column(value):
+    """A by-column map as a model gives it, tidied: text by column, at most 20, anything else dropped."""
+    if not isinstance(value, dict):
+        return {}
+    return {str(k)[:60]: str(v)[:300] for k, v in list(value.items())[:20]
+            if isinstance(v, (str, int, float)) and not isinstance(v, bool)}
+
 class RuleClaim(Lenient):
     columns: str = Field(default="", max_length=60)
     entity: str = Field(default="", max_length=200)
@@ -320,6 +327,13 @@ class RuleClaim(Lenient):
     frame: str = Field(default="", max_length=200)  # how its values are read (the split_conditions lever's)
     uncertainty: str = Field(default="", max_length=120)  # "± {D} {C.unit}": a tolerance column, the value's
     number: bool = False
+    # what the text names for some of its columns only, by column ({"C": "at the element's entry"}), added to those
+    # columns' claims alone (the conditions_by_column lever's)
+    column_conditions: dict[str, str] = Field(default_factory=dict)
+    column_frame: dict[str, str] = Field(default_factory=dict)
+
+    _tidy_by_column = field_validator("column_conditions", "column_frame", mode="before")(
+        lambda cls, v: _by_column(v))
 
 class Written(Lenient):
     entity: str = Field(default="", max_length=200)
@@ -479,6 +493,22 @@ def _fill(template, g, i, star=None, subject=""):
 
     return " ".join(PLACEHOLDER.sub(one, template).split()), used
 
+def _named_columns(g, key):
+    """Column indices a by-column key names: letters as a template's columns ("C", "C:D"), or a header's name."""
+    try:
+        return _columns(g, key)
+    except Broken:
+        named = [k for k, label in enumerate(g.labels)
+                 if key.strip().casefold() in (label.strip().casefold(), header_name(label).strip().casefold())]
+        if not named:
+            raise Broken(f"no column {key!r} in the table, for a template's column_conditions or column_frame")
+        return named
+
+def _for_column(rule, name, g, i, k, subject):
+    """[the text a rule's column_conditions or column_frame gives column k, filled for row i]."""
+    return [_fill(text, g, i, k, subject)[0] for key, text in getattr(rule, "column_" + name).items()
+            if k is not None and k in _named_columns(g, key)]
+
 def row_claims(rules, g, i):
     """[(claim fields, the columns its cells came from, its rule)] that the rules give row i; raises Misfit or
     Broken."""
@@ -500,6 +530,9 @@ def row_claims(rules, g, i):
                         all(not _fill("{" + ref + "}", g, i, star, rules.subject)[0]
                             for ref in PLACEHOLDER.findall(getattr(rule, name))):
                     fields[name] = ""  # its placeholders all empty: no stray words ("in" from "in {title}")
+            for name in ("conditions", "frame"):  # what the text gives the value's column alone
+                fields[name] = "; ".join(t for t in [fields[name], *_for_column(
+                    rule, name, g, i, star if star is not None else (used[0] if used else None), rules.subject)] if t)
             if any(ch.isdigit() for ch in fields["uncertainty"]) is False or \
                     fields["uncertainty"].strip(" ±+-").casefold() in NOT_APPLICABLE:
                 fields["uncertainty"] = ""  # "±" alone, or "± n/a": no uncertainty stated
@@ -722,6 +755,8 @@ def describe_rule(rule):
     parts = [f"{name} {getattr(rule, name)}"
              for name in ("columns", "entity", "attribute", "value", "unit", "conditions", "frame", "uncertainty")
              if getattr(rule, name)]
+    parts += [f"{name} {key}: {text}" for name in ("column_conditions", "column_frame")
+              for key, text in getattr(rule, name).items()]
     return "; ".join(parts)[:300]
 
 def read(core, page, g, task, by_itself, source, image=None):

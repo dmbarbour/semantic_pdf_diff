@@ -44,6 +44,36 @@ class Tables(unittest.TestCase):
         self.assertIn(TABLE_SHARED + TABLE_SOME, on)
         self.assertIn(TABLE_SOME, Settings(column_conditions=True, split_conditions=False).table_rules_text(RULES))
 
+    def test_conditions_and_frames_are_asked_by_column_only_when_on(self):
+        # the conditions_by_column lever: what the text gives some columns only, by column, added by code
+        from semantic_pdf_diff.levers import TABLE_BY_COLUMN, TABLE_BY_COLUMN_FRAME, TABLE_KEYED, TABLE_KEYED_FRAME
+        from semantic_pdf_diff.tablerules import RULES
+        self.assertEqual(Settings().table_rules_text(RULES),
+                         Settings(conditions_by_column=False).table_rules_text(RULES))
+        on = Settings(conditions_by_column=True).table_rules_text(RULES)
+        self.assertIn(TABLE_KEYED + TABLE_KEYED_FRAME, on)
+        self.assertIn(TABLE_BY_COLUMN_FRAME, on)
+        unsplit = Settings(conditions_by_column=True, split_conditions=False).table_rules_text(RULES)
+        self.assertIn(TABLE_KEYED, unsplit)
+        self.assertNotIn(TABLE_KEYED_FRAME, unsplit)
+        self.assertIn(TABLE_BY_COLUMN, unsplit)
+
+    def test_a_rules_conditions_and_frame_by_column_reach_their_columns_alone(self):
+        from semantic_pdf_diff import tablerules as tr
+        from test_tablerules import Applying, pumps
+        rule = {**Applying.RULES["claims"][0], "column_conditions": {"D": "at the impeller eye"},
+                "column_frame": {"Flow": "at the discharge", "C:D": ""}}  # a column by its header's name
+        rules = tr.Rules.model_validate({**Applying.RULES, "claims": [rule]})
+        made = tr.row_claims(rules, pumps(), 0)
+        self.assertEqual([(f["attribute"], f["conditions"], f["frame"]) for f, _, _ in made],
+                         [("Flow", "Duty pumps", "at the discharge"), ("Head", "Duty pumps; at the impeller eye", "")])
+        self.assertIn("column_conditions D: at the impeller eye", tr.describe_rule(rules.claims[0]))
+        astray = {**rule, "column_conditions": {"Power": "at the motor"}}
+        self.assertEqual(tr.problems(tr.Rules.model_validate({**Applying.RULES, "claims": [astray]}), pumps()),
+                         ["no column 'Power' in the table, for a template's column_conditions or column_frame"])
+        loose = tr.RuleClaim.model_validate({"column_conditions": "at the inlet", "column_frame": {"B": ["x"], "C": 2}})
+        self.assertEqual((loose.column_conditions, loose.column_frame), ({}, {"C": "2"}))
+
     def test_a_rules_frame_fills_like_its_conditions(self):
         from semantic_pdf_diff import tablerules as tr
         from test_tablerules import Applying, pumps

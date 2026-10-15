@@ -199,6 +199,32 @@ class ColumnConditions(Lever):
         text = super().table_rules_text(builtin)
         return text.replace(TABLE_SHARED, TABLE_SHARED + TABLE_SOME) if self.column_conditions else text
 
+# The table rules' templates: what the text names for some columns only, given by column and added by code to those
+# columns' claims alone (the conditions_by_column lever: column_conditions' answers still wrote one template over
+# every column, the speeds' scope with it, docs/reviews/levers.md)
+TABLE_KEYED = (" One it names for some columns only (\"pressures are at the inlet\") goes in the template's "
+               "\"column_conditions\" instead, by column ({\"D\": \"at the inlet\"}): it's added to those columns' "
+               "claims alone.")
+TABLE_KEYED_FRAME = (" A frame it gives some columns only (\"depths are below ground surface\") goes in "
+                     "\"column_frame\" likewise ({\"B\": \"below ground surface\"}).")
+TABLE_NUMBER = '"number":true}],'
+TABLE_BY_COLUMN = '"number":true, "column_conditions":{}}],'
+TABLE_BY_COLUMN_FRAME = '"number":true, "column_conditions":{}, "column_frame":{}}],'
+
+class ConditionsByColumn(Lever):
+    lever_name, stage, off = "conditions_by_column", "instructions", {"conditions_by_column": False}
+    # the table rules' templates given conditions (and frames, with split_conditions) by column (the claim context
+    # plan's milestone 4: a sibling's scope misapplied)
+    conditions_by_column: Annotated[bool, _shaping(frozenset({"table"}))] = False
+
+    def table_rules_text(self, builtin):
+        text = super().table_rules_text(builtin)
+        if not self.conditions_by_column:
+            return text
+        frame = getattr(self, "split_conditions", False)
+        return text.replace(TABLE_SHARED, TABLE_SHARED + TABLE_KEYED + (TABLE_KEYED_FRAME if frame else "")) \
+            .replace(TABLE_NUMBER, TABLE_BY_COLUMN_FRAME if frame else TABLE_BY_COLUMN)
+
 class VisualRules(Lever):
     lever_name, stage, off = "visual_rules", "instructions", {"visual_rules": []}
     # appended for image tasks only (tiles, figures, overview)
@@ -908,9 +934,9 @@ class DedupeRepeated(Lever):
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes and split_conditions (docs/reviews/levers.md); round 0's settings are
 # benchmarks/round0.json.
-LEVER_CLASSES = (ExtractPrompt, SplitConditions, ColumnConditions, ExtractRules, VisualRules, ImagesFirst,
-                 CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext, References, TileLocator,
-                 Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
+LEVER_CLASSES = (ExtractPrompt, SplitConditions, ColumnConditions, ConditionsByColumn, ExtractRules, VisualRules,
+                 ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext, References,
+                 TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
                  RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,
                  TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText, LoneRows,
                  TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, Reconcile, DedupeRepeated,
