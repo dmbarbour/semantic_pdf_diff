@@ -48,8 +48,8 @@ class Alignment(unittest.TestCase):
     def test_a_holders_name_counts_among_a_claims_words(self):
         # milestone 5: holders read into the stance, not the entity ("Avelin Proposal 1"), a generic attribute, and
         # "Proposal 1" in the conditions on one side only: the same company's changed timeout still pairs
-        timeout = lambda v, who, conditions="": claim("acknowledgement timeout", "value", v, "ms", conditions,  # noqa: E731
-                                                      held=who)
+        def timeout(v, who, conditions=""):
+            return claim("acknowledgement timeout", "value", v, "ms", conditions, held=who)
         left = [timeout("251", "Avelin"), timeout("483", "Borealis", "Proposal 1"), timeout("742", "", "Proposal 3.1")]
         right = [timeout("928", "Avelin", "Proposal 1"), timeout("483", "Borealis", "Proposal 1"),
                  timeout("840", "", "Proposal 3.1")]
@@ -324,8 +324,8 @@ class Report(unittest.TestCase):
         from test_pipeline import Fake, ev
         from semantic_pdf_diff.compare import compare
         from semantic_pdf_diff.settings import Settings
-        row = lambda eid, attribute, value, conditions: ev(eid, entity="failure detection", attribute=attribute,  # noqa: E731
-                                                         value=value, unit="", conditions=conditions)
+        def row(eid, attribute, value, conditions):
+            return ev(eid, entity="failure detection", attribute=attribute, value=value, unit="", conditions=conditions)
         left = [row("A-1", "low signal duration", "79", "Working assumption"), row("A-2", "failed retransmissions",
                                                                                    "180", "Agreed"),
                 row("A-3", "signal-to-noise threshold", "3.5", "Agreed"), row("A-4", "timer", "804", "link idle")]
