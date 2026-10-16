@@ -9741,15 +9741,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -9761,16 +9761,19 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 6,
     "no change": 8
    },
    "findings": {
+    "different": 1,
     "equivalent": 14,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 4,
+   "unmatched": 2,
    "pairs": 5,
    "omitted": 0,
    "kinds": {
@@ -9785,7 +9788,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -9804,15 +9807,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -9824,16 +9827,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -9848,7 +9853,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -9867,15 +9872,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -9887,16 +9892,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -9911,7 +9918,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -9930,15 +9937,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -9951,16 +9958,19 @@
     "judged uncertain": 1,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 3,
     "no change": 4
    },
    "findings": {
+    "different": 1,
     "equivalent": 7,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 4,
+   "unmatched": 2,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -9978,7 +9988,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -9997,15 +10007,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -10017,16 +10027,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -10041,7 +10053,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -19943,15 +19955,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -19963,16 +19975,19 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 6,
     "no change": 8
    },
    "findings": {
+    "different": 1,
     "equivalent": 14,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 4,
+   "unmatched": 2,
    "pairs": 5,
    "omitted": 0,
    "kinds": {
@@ -19987,7 +20002,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -20006,15 +20021,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -20026,16 +20041,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -20050,7 +20067,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -20069,15 +20086,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -20089,16 +20106,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -20113,7 +20132,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -20132,15 +20151,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -20153,16 +20172,19 @@
     "judged uncertain": 1,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 3,
     "no change": 4
    },
    "findings": {
+    "different": 1,
     "equivalent": 7,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 4,
+   "unmatched": 2,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -20180,7 +20202,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -20199,15 +20221,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -20219,16 +20241,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -20243,7 +20267,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -28322,15 +28346,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -28342,16 +28366,19 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 6,
     "no change": 8
    },
    "findings": {
+    "different": 1,
     "equivalent": 14,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 4,
+   "unmatched": 2,
    "pairs": 5,
    "omitted": 0,
    "kinds": {
@@ -28366,7 +28393,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -28385,15 +28412,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -28405,16 +28432,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -28429,7 +28458,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -28448,15 +28477,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -28468,16 +28497,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -28492,7 +28523,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -28511,15 +28542,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -28531,16 +28562,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -28555,7 +28588,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -36635,15 +36668,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -36655,16 +36688,19 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 6,
     "no change": 8
    },
    "findings": {
+    "different": 1,
     "equivalent": 14,
-    "uncertain": 2
+    "uncertain": 1
    },
-   "unmatched": 4,
+   "unmatched": 2,
    "pairs": 5,
    "omitted": 0,
    "kinds": {
@@ -36679,7 +36715,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -36698,15 +36734,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -36718,16 +36754,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -36742,7 +36780,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -36761,15 +36799,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -36781,16 +36819,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
    "kinds": {
@@ -36805,7 +36845,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",
@@ -36824,15 +36864,15 @@
     "unchanged": 4,
     "hedge": 4
    },
-   "changes_found": "0/1",
+   "changes_found": "1/1",
    "additions_found": "0/0",
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
    "hedges_reported": "0/4",
-   "difference_precision": null,
+   "difference_precision": 1.0,
    "changed": {
-    "uncertain": 1
+    "reported": 1
    },
    "conditions": {},
    "added": {},
@@ -36844,16 +36884,18 @@
     "judged equivalent": 2,
     "settled": 2
    },
-   "different": {},
+   "different": {
+    "change": 1
+   },
    "equivalent": {
     "change": 4,
     "no change": 4
    },
    "findings": {
-    "equivalent": 8,
-    "uncertain": 1
+    "different": 1,
+    "equivalent": 8
    },
-   "unmatched": 2,
+   "unmatched": 0,
    "pairs": 4,
    "omitted": 0,
    "kinds": {
@@ -36868,7 +36910,7 @@
    },
    "detail": {
     "ack": "settled",
-    "beams": "uncertain",
+    "beams": "reported",
     "duration": "judged equivalent",
     "heartbeat": "confirmed",
     "period": "confirmed",

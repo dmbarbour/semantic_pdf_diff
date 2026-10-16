@@ -8,8 +8,8 @@ from types import SimpleNamespace
 from semantic_pdf_diff.compare import vetoes
 from semantic_pdf_diff.schema import Judgment
 
-def claim(confidence=0.9, approximate=False):
-    return SimpleNamespace(confidence=confidence, approximate=approximate)
+def claim(confidence=0.9, approximate=False, kind="chart"):
+    return SimpleNamespace(confidence=confidence, approximate=approximate, kind=kind, image=None)
 
 def judged(relation, confidence=0.9, same_conditions=True):
     return Judgment(relation=relation, rationale="stub", confidence=confidence, same_conditions=same_conditions)
@@ -47,6 +47,14 @@ class Vetoes(unittest.TestCase):
         self.assertEqual(vetoes(judged("complementary", same_conditions=False), claim(), claim(approximate=True), None),
                          [])
         self.assertEqual(vetoes(judged("unrelated", confidence=0.1), claim(confidence=0.1), claim(), None), [])
+
+    def test_only_a_value_read_off_a_picture_is_approximate_enough_to_veto(self):
+        # "Preliminary estimates put the number of beams at 23", then 19: stated, not read off a chart
+        stated = claim(approximate=True, kind="text")
+        self.assertEqual(vetoes(judged("different"), stated, claim(kind="text"), UNEQUAL), [])
+        cropped = SimpleNamespace(confidence=0.9, approximate=True, kind="table", image="crop.png")  # a tile's reading
+        self.assertEqual(vetoes(judged("different"), cropped, claim(), UNEQUAL),
+                         ["Approximate visual value requires review"])
 
     def test_reasons_add_up_in_order(self):
         reasons = vetoes(judged("equivalent", confidence=0.5, same_conditions=False), claim(approximate=True), claim(),

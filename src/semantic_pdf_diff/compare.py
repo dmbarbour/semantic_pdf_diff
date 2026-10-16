@@ -159,9 +159,16 @@ def vetoes(judgment, a, b, calc):
         reasons.append("Numeric values are equal after conversion; review semantic difference")
     if min(a.confidence,b.confidence,judgment.confidence) < .7 and judgment.relation != "unrelated":
         reasons.append("Low model confidence (uncalibrated)")
-    if (a.approximate or b.approximate) and judgment.relation in ("equivalent","different"):
+    if any(_read_off(c) for c in (a, b)) and judgment.relation in ("equivalent", "different"):
         reasons.append("Approximate visual value requires review")
     return reasons
+
+def _read_off(claim):
+    """A value read approximately off a picture (a bar against its axis): approximate, and a visual reading. A value the
+    text states as an estimate ("about 23", "preliminary estimates put it at 23") is stated, not read off: 23 against
+    19 is a change (the hedged design notes, 2026-10-16: vetoed in every format)."""
+    return bool(claim.approximate) and (getattr(claim, "kind", "") in ("chart", "diagram")
+                                        or bool(getattr(claim, "image", None)))
 
 def compare(left, right, output, client, mode, dispatcher=None, progress=None, headings=None, label="", records=None):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
