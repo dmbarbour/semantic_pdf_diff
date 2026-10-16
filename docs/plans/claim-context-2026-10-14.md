@@ -418,6 +418,10 @@ Before records are built, so each later milestone has a baseline. Almost all of 
   - So the holder is in the table's first column for every claim of its row, and the reader mostly drops it ("UE-side model report | reported beam count | > 4 | BM-Case 1 and BM-Case 2", Spreadtrum's); where it keeps it, a view is bound as a value of the company (entity CMCC, attribute "support for Proposal 3.2.4", value "Y") rather than as CMCC's stance on the proposal.
   - TS 38.300 and QUIC report almost no one's views: a dozen claims in 13,309 and 4,558 name a company, mostly false matches ("New Cell").
   - Counted by company names from the meeting's TDoc list and the tables' own row labels; tasks' row numbers don't count rows as python-docx does, so a claim's own row's company isn't checked, only whether it names one.
+- **A controlled family with holders** (`views`): a feature lead's summary, each company's proposals in a "Company | Proposals" table (two companies proposing different values for one parameter) and the moderator's own in the summary's voice; keys give a proposal's holder and attitude ("proposes"), the moderator's none (the document's implicit voice). Its pair credits Estrella's report period to Borealis, words and value kept, and revises Avelin's and the moderator's timeouts; the comparison scorer counts a fact whose holder alone changed (`holders_noticed`: not settled as unchanged). Recorded, $0.023:
+  - Readers keep the holder for all 60 keyed facts (40 in conditions, "proposed by Avelin"; 20 as the entity), every fact found in every format: on a clean table, one proposal a row, the reader names whose it is.
+  - The comparison finds both changes and confirms the 5 unchanged facts, but settles the credited proposal as unchanged in PDF, Word and Markdown, and leaves it uncertain in PowerPoint and Excel: never reported as another's.
+  - So the holder is read but isn't part of the claim: alignment and the judge treat "proposed by Estrella" and "proposed by Borealis" as conditions worded differently.
 
 ### 6. Drawing geometry
 

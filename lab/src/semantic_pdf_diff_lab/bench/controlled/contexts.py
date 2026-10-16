@@ -152,6 +152,8 @@ def contexts(project):
         ctx = {}
         if f.conditions:
             ctx[kind_of(f.conditions) or "unclassed"] = f.conditions
+        if f.holder:  # a reported view: whose, and its attitude (milestone 5)
+            ctx["holder"], ctx["attitude"] = f.holder, f.attitude
         for pattern, kind, says, text in DECLARED.get(fam, ()):
             if re.search(pattern, f.id) and any(text in t for t in printed):  # a paragraph may say more
                 ctx[kind] = f"{ctx[kind]}; {says}" if kind in ctx else says

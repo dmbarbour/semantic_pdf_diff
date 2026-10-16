@@ -450,10 +450,14 @@ class Revisions(unittest.TestCase):
                     "coaster-tables-s1-clean-units-changed": (5, 0, 0, 0),
                     # two sheets alike but for their halls: Hall D's room 102 widened (its area follows), Hall C's
                     # room 102 unchanged
-                    "lcc-plans-s1-clean": (2, 1, 0, 0)}
+                    "lcc-plans-s1-clean": (2, 1, 0, 0),
+                    # companies' proposals: Avelin's and the moderator's acknowledgement timeouts revised; Estrella's
+                    # report period credited to Borealis, its value kept (a holder changed, not a value)
+                    "views-s1": (2, 0, 0, 0)}
         # facts whose declared context was restated, value and conditions kept: the plan's 7 rooms' widths and
-        # depths, the coaster's 5 element heights
+        # depths, the coaster's 5 element heights; and a proposal credited to another company, its value kept
         restated = {"lcc-plan-s1-clean-notes": 14, "coaster-tables-s1-clean-datum": 5}
+        credited = {"views-s1": ["period.2"]}
         bases = {p.id: p for p in controlled.corpus(knobs=True)}
         made = revisions.revised()
         self.assertEqual([pair for pair, _ in made], revisions.pairs())
@@ -467,6 +471,7 @@ class Revisions(unittest.TestCase):
                 self.assertEqual(tuple(len(kinds[k]) for k in ("changed", "added", "removed", "conditions")),
                                  expected[pair.id])
                 self.assertEqual(len(kinds.get("context", ())), restated.get(pair.id, 0))
+                self.assertEqual(kinds.get("holder", []), credited.get(pair.id, []))
         # the narrated change: the later coaster prints the old lift height as superseded, the earlier as current
         coaster = dict((pair.id, project) for pair, project in made)["coaster-s1"]
         self.assertEqual(coaster.fact("ride.lift").value, bases["coaster-s1"].fact("ride.lift_old").value)

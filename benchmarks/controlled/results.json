@@ -5920,6 +5920,360 @@
     "visual": "0/0"
    }
   },
+  "views-s1": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 8,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "loose": 5,
+    "right": 21
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 8
+    },
+    "visual": {
+     "loose": 3,
+     "right": 11
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "views-s1-revised": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 8,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "loose": 4,
+    "right": 22
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 8
+    },
+    "visual": {
+     "loose": 2,
+     "right": 12
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "views-s1-revised.docx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.md": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-prose": 1.0,
+    "md-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.pptx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 5,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 3,
+    "right": 5
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "loose": 1,
+     "right": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.xlsx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 5,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 3,
+    "right": 5
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "loose": 1,
+     "right": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.docx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.md": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-prose": 1.0,
+    "md-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.pptx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 6,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 2,
+    "right": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.xlsx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 6,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 2,
+    "right": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
   "wtp-datasheets-s1": {
    "facts": 19,
    "found": 19,
@@ -13796,6 +14150,360 @@
     "visual": "0/0"
    }
   },
+  "views-s1": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 8,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "loose": 5,
+    "right": 21
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 8
+    },
+    "visual": {
+     "loose": 3,
+     "right": 11
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "views-s1-revised": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 8,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "loose": 4,
+    "right": 22
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 8
+    },
+    "visual": {
+     "loose": 2,
+     "right": 12
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "views-s1-revised.docx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.md": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-prose": 1.0,
+    "md-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.pptx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 5,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 3,
+    "right": 5
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "loose": 1,
+     "right": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.xlsx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 5,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 3,
+    "right": 5
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "loose": 1,
+     "right": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.docx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.md": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-prose": 1.0,
+    "md-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.pptx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 6,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 2,
+    "right": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.xlsx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 6,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 2,
+    "right": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
   "wtp-datasheets-s1": {
    "facts": 19,
    "found": 19,
@@ -21058,6 +21766,292 @@
     "visual": "0/0"
    }
   },
+  "views-s1": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 8,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "loose": 5,
+    "right": 21
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 8
+    },
+    "visual": {
+     "loose": 3,
+     "right": 11
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "views-s1-revised": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 8,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "loose": 4,
+    "right": 22
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 8
+    },
+    "visual": {
+     "loose": 2,
+     "right": 12
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "views-s1-revised.docx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.pptx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 5,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 3,
+    "right": 5
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "loose": 1,
+     "right": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.xlsx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 5,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 3,
+    "right": 5
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "loose": 1,
+     "right": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.docx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.pptx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 6,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 2,
+    "right": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.xlsx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 6,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 2,
+    "right": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
   "wtp-datasheets-s1": {
    "facts": 19,
    "found": 19,
@@ -28053,6 +29047,292 @@
    "conditions_by_reader": {
     "text": "0/0",
     "visual": "0/0"
+   }
+  },
+  "views-s1": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 8,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "loose": 5,
+    "right": 21
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 8
+    },
+    "visual": {
+     "loose": 3,
+     "right": 11
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "views-s1-revised": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 8,
+   "missed": [],
+   "claims": 26,
+   "outcomes": {
+    "loose": 4,
+    "right": 22
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 1.0,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 8
+    },
+    "visual": {
+     "loose": 2,
+     "right": 12
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "views-s1-revised.docx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.pptx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 5,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 3,
+    "right": 5
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "loose": 1,
+     "right": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1-revised.xlsx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 5,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 3,
+    "right": 5
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "loose": 1,
+     "right": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.docx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 7,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 1,
+    "right": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-prose": 1.0,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 1,
+     "right": 5
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.pptx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 6,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 2,
+    "right": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
+   }
+  },
+  "views-s1.xlsx": {
+   "facts": 8,
+   "found": 8,
+   "recall": 1.0,
+   "found_right": 6,
+   "missed": [],
+   "claims": 8,
+   "outcomes": {
+    "loose": 2,
+    "right": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.75,
+    "text": 0.25
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "loose": 2,
+     "right": 4
+    },
+    "text": {
+     "right": 2
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0"
    }
   },
   "wtp-datasheets-s1": {

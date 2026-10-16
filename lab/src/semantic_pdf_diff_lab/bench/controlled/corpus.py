@@ -286,6 +286,56 @@ def link_protocol(seed=1):
     ]
     return Project(f"spec-s{seed}", "Lakeshore Telemetry Link: Protocol Specification", F, sections)
 
+COMPANIES = ("Avelin", "Borealis", "Corvane", "Delmar", "Estrella")
+
+def proposals_summary(seed=1):
+    """A feature lead's summary of companies' proposals (the claim context plan, milestone 5: stance), as RAN1's
+    are: each company's proposals in a "Company | Proposals" table, two companies proposing different values for one
+    parameter, and the moderator's own proposals in the summary's voice. A proposal is its company's view, not the
+    document's: its holder is the row's company, its attitude "proposes"; the moderator's are the authors' own, the
+    document's implicit voice, with no holder keyed."""
+    d = Draw(f"views-{seed}")
+    F = []
+    add = lambda *a, **k: F.append(Fact(*a, **k)) or F[-1]
+    ack = ("Link failure detection", ("link failure", "failure detection"), "acknowledgement timeout",
+           ("ack timeout", "timeout", "acknowledgement window"))
+    period = ("Beam report", ("beam reporting", "the beam report", "report"), "report period",
+              ("reporting period", "period", "periodicity"))
+    beams = ("Beam report", ("beam reporting", "the beam report", "report"), "strongest beams reported",
+             ("beams", "number of beams", "beam count", "reported beams"))
+    ms = lambda: d.number(150, 950)
+    count = lambda: d.number(6, 32)
+    proposed = lambda fid, what, value, unit, holder="": add(fid, *what, value, unit, basis="proposed", holder=holder,
+                                                             attitude="proposes" if holder else "")
+    ack1, ack2 = proposed("ack.1", ack, ms(), "ms", "Avelin"), proposed("ack.2", ack, ms(), "ms", "Borealis")
+    per1 = proposed("period.1", period, ms(), "ms", "Avelin")
+    per2 = proposed("period.2", period, ms(), "ms", "Estrella")
+    beams1 = proposed("beams.1", beams, count(), "", "Corvane")
+    beams2 = proposed("beams.2", beams, count(), "", "Delmar")
+    ack_mod, beams_mod = proposed("ack.mod", ack, ms(), "ms"), proposed("beams.mod", beams, count(), "")
+    timeout = lambda f: f"The acknowledgement timeout is {f.value} ms."
+    reported = lambda f: f"The beam report carries the {f.value} strongest beams."
+    every = lambda f: f"The beam report period is {f.value} ms."
+    sections = [
+        ("1 Introduction", [
+            ("p", "This summary collects the companies' proposals on link failure detection and beam reporting "
+                  "submitted to this meeting, and gives the moderator's proposals for agreement."),
+        ]),
+        ("2 Companies' Proposals", [
+            ("p", "The companies' proposals, as submitted:"),
+            ("table", "Table 1. Companies' proposals", ["Company", "Proposals"],
+             [[ack1.holder, f"Proposal 1: {timeout(ack1)}"], [per1.holder, f"Proposal 2: {every(per1)}"],
+              [ack2.holder, f"Proposal 1: {timeout(ack2)}"], [beams1.holder, f"Proposal 1: {reported(beams1)}"],
+              [beams2.holder, f"Proposal 1: {reported(beams2)}"], [per2.holder, f"Proposal 1: {every(per2)}"]]),
+        ]),
+        ("3 Moderator's Proposals", [
+            ("p", f"Proposal 3.1: {timeout(ack_mod)}"),
+            ("p", f"Proposal 3.2: {reported(beams_mod)}"),
+        ]),
+    ]
+    return Project(f"views-s{seed}", "Feature Lead Summary: Link Failure Detection and Beam Reporting", F,
+                   sections, things=[(c, ()) for c in COMPANIES])
+
 def equipment_datasheets(seed=1):
     """Equipment data sheets (code review 2026-10-08, B5): each pump's and the clearwell's data as a key-value list,
     a block of two columns standing alone with no header, its first row a key and its value ("Pump | P-201A"; the
@@ -334,7 +384,7 @@ def equipment_datasheets(seed=1):
     return Project(f"wtp-datasheets-s{seed}", "Harrow Creek WTP: Equipment Data Sheets", F, sections)
 
 PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster, "spec": link_protocol,
-            "wtp-datasheets": equipment_datasheets}
+            "wtp-datasheets": equipment_datasheets, "views": proposals_summary}
 
 # --- table knobs (milestone 2) -------------------------------------------------------------------
 # Schedules rendered clean or with one knob, the same facts either way, so a knob's effect is the difference.
@@ -1174,7 +1224,7 @@ def draw_schematics(project, doc, figures, spans):
 def key(project, log):
     """The answer key: facts with their forms, and the printed numbers with their roles."""
     from .contexts import contexts
-    optional = ("tolerance", "relation", "object_aliases", "accepts", "context")  # left out when unused
+    optional = ("tolerance", "relation", "object_aliases", "accepts", "context", "holder", "attitude")  # when used
     found = contexts(project)
     for f in project.facts:
         f.context = found.get(f.id, {})

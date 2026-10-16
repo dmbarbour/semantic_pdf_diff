@@ -60,8 +60,9 @@ def edits(earlier, later):
 def changes(earlier, later):
     """The facts' changes between two revisions' keys, by fact id (distractors and relations aside; renamed facts
     under their earlier ids): changed (the value), conditions (the value kept, its conditions changed), added,
-    removed, unchanged; and context (value and conditions kept, the note or lead-in declaring its context restated),
-    in pairs that have it."""
+    removed, unchanged; and context (value and conditions kept, the note or lead-in declaring its context restated)
+    and holder (value and conditions kept, the proposition credited to another: milestone 5), in pairs that have
+    them."""
     renames, _ = edits(earlier, later)
     facts = lambda key, rename: {rename.get(f["id"], f["id"]): f for f in key["facts"]
                                  if f["role"] == "fact" and not f.get("relation")}
@@ -72,13 +73,17 @@ def changes(earlier, later):
     kept = {i for i in both if value(a[i]) == value(b[i])
             and same(a[i].get("conditions", ""), b[i].get("conditions", ""))}
     declared = lambda f: (f.get("context") or {}).get("declared", "")
+    holder = lambda f: f.get("holder", "")
+    credited = {i for i in kept if not same(holder(a[i]), holder(b[i]))}  # the same proposition, another's
+    kept -= credited
     restated = {i for i in kept if not same(declared(a[i]), declared(b[i]))}
     return {"changed": sorted(i for i in both if value(a[i]) != value(b[i])),
             "conditions": sorted(i for i in both if value(a[i]) == value(b[i])
                                  and not same(a[i].get("conditions", ""), b[i].get("conditions", ""))),
             "added": sorted(b.keys() - a.keys()), "removed": sorted(a.keys() - b.keys()),
             "unchanged": sorted(kept - restated),
-            **({"context": sorted(restated)} if restated else {})}
+            **({"context": sorted(restated)} if restated else {}),
+            **({"holder": sorted(credited)} if credited else {})}
 
 def sides(report):
     """{claim id: 0 (the earlier revision's) or 1 (the later's)}, by the source its file is in."""
@@ -115,6 +120,8 @@ def score_comparison(earlier, later, report):
             "false_changes": count("unchanged", "false change"),
             **({"context_found": f"{count('context', 'reported')}/{len(kinds['context'])}"}
                if "context" in kinds else {}),
+            **({"holders_noticed": f"{len(kinds['holder']) - count('holder', 'settled')}/{len(kinds['holder'])}"}
+               if "holder" in kinds else {}),
             **({"record_changes": len(report["record_changes"])} if report.get("record_changes") else {}),
             "difference_precision": round(classes["different"]["change"] / differences, 4) if differences else None,
             **{kind: dict(sorted(Counter(detail[f] for f in kinds[kind]).items())) for kind in kinds},
@@ -164,7 +171,7 @@ def _findings_read(report, side, bound, kinds, splits):
             out.between[fid].add(relation)
         what = ("unscored" if not fa or not fb else "across facts" if not common
                 else "misreading" if any(fa[f] in READ_WRONG or fb[f] in READ_WRONG for f in common)
-                else "change" if any(kind_of.get(f) in ("changed", "conditions", "context") for f in common)
+                else "change" if any(kind_of.get(f) in ("changed", "conditions", "context", "holder") for f in common)
                 else "no change")
         if relation in out.classes:
             out.classes[relation][what] += 1
@@ -182,7 +189,7 @@ def _outcomes(report, kinds, claims_of, read):
     unmatched = {u["id"] for u in report["unmatched"]}
     settled = {(f["a"], f["b"]) for f in report["findings"] if f.get("settled")}
     detail = {}
-    for fid in kinds["conditions"]:  # the value kept: settled means the comparison saw no change
+    for fid in kinds["conditions"] + kinds.get("holder", []):  # the value kept: settled means it saw no change
         a, b = claims_of[fid]
         pairs = {(x, y) for x in a for y in b}
         detail[fid] = ("unextracted" if not a or not b

@@ -392,6 +392,26 @@ def set_later(p, d):
                 for f in p.facts if f.id in before and before[f.id] != f.value]
     p.edits.append({"kind": "added", "facts": [f.id for f in p.facts if f.id not in before]})
 
+def credit(project, fact_id, holder):
+    """A proposal credited to another company (its row's company cell), its words and value kept: the same
+    proposition, now another's (a holder changed: the claim context plan, milestone 5)."""
+    fact = project.fact(fact_id)
+    for rows, name, cells in _rows(project):
+        for k, row in enumerate(rows):
+            if not isinstance(row, tuple) and name(row) == fact.holder and fact.value in " ".join(cells(row)):
+                rows[k] = [holder] + list(cells(row))
+                project.edits.append({"kind": "holder", "fact": fact_id, "from": fact.holder, "to": holder})
+                fact.holder = holder
+                return
+    raise ValueError(f"{project.id}: no row of {fact.holder}'s holds {fact_id}")
+
+def views_later(p, d):
+    """The summary revised: Estrella's beam report period credited to Borealis (a correction: its words and value
+    kept), Avelin's acknowledgement timeout revised, and the moderator's revised."""
+    credit(p, "period.2", "Borealis")
+    for fid in ("ack.1", "ack.mod"):
+        change(p, fid, d.number(150, 950))
+
 def renamed_later(p, d):
     """Pump P-101B renamed P-201B, its values kept: the same pump under a new tag (alignment by its values)."""
     rename_row(p, "P-101B", "P-201B")
@@ -559,7 +579,9 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          (TABLE_PROJECTS["coaster-tables"], "clean", units_note_later, False, "units-note"),
          (TABLE_PROJECTS["coaster-tables"], "clean", units_changed_later, False, "units-changed"),
          # two sheets alike but for the hall their title blocks name, one hall's room changed
-         (SET_PROJECTS["lcc-plans"], "clean", set_later, False, "revised"))
+         (SET_PROJECTS["lcc-plans"], "clean", set_later, False, "revised"),
+         # companies' proposals: one credited to another company, words and value kept; two values revised
+         (PROJECTS["views"], None, views_later, False, "revised"))
 
 def _base(make, knob, seed):
     p = make(seed)

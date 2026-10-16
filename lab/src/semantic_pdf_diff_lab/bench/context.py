@@ -187,18 +187,18 @@ def totals(measures):
 
 # --- against keys (Measurement, layers 2 and 3) ---------------------------------------------------------------------
 
-KINDS = ("scope", "frame", "subject", "bound", "provenance", "sibling")
+KINDS = ("scope", "frame", "subject", "bound", "provenance", "sibling", "holder")
 OUTSIDE = ("provenance", "sibling")  # kinds that belong in none of a claim's words
 # A claim's words, then the context records it references (the records lever: a sheet's notes, a list's lead-in, a
 # table's title, headers and lead-in), whose text a claim holds by reference rather than in its words
 FIELDS = ("frame", "conditions", "entity", "attribute", "records")
 # Where a kind belongs in a claim: scope in conditions, frame in its own field (the split_conditions lever's) or in
 # conditions (readers without it), a subject in the entity, a bound in the attribute or conditions; provenance in none
-# of them. Scope, frame and subject may also be held by a record reaching the claim (the plan's Concepts: stored once
-# and referenced)
+# of them; a holder (a reported view's: milestone 5) wherever the claim's words name it, for now. Scope, frame and
+# subject may also be held by a record reaching the claim (the plan's Concepts: stored once and referenced)
 HOME = {"scope": {"conditions", "records"}, "frame": {"frame", "conditions", "records"},
         "subject": {"entity", "conditions", "records"}, "bound": {"attribute", "conditions"}, "provenance": set(),
-        "sibling": set()}
+        "sibling": set(), "holder": {"entity", "conditions", "attribute", "records"}}
 CONVENTION_WORDS = {"width", "depth", "length", "east", "west", "north", "south"}
 GEOMETRY_WORDS = {"horizontal", "vertical", "drawn", "x", "y"}
 

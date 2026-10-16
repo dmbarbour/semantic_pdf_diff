@@ -9044,6 +9044,327 @@
     "revD.date": "reported"
    }
   },
+  "views-s1": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 4
+   },
+   "equivalent": {
+    "change": 3,
+    "no change": 16
+   },
+   "findings": {
+    "different": 4,
+    "equivalent": 19
+   },
+   "unmatched": 9,
+   "pairs": 8,
+   "omitted": 0,
+   "kinds": {
+    "right": 4,
+    "scored": 4,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 4
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.md": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "change": 1,
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 6
+   },
+   "unmatched": 0,
+   "pairs": 2,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "change": 1,
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 6
+   },
+   "unmatched": 0,
+   "pairs": 2,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.pptx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "1/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "judged uncertain": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 5,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 3,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "conditions": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "judged uncertain"
+   }
+  },
+  "views-s1.xlsx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "1/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "judged uncertain": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 5,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 3,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "conditions": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "judged uncertain"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -18239,6 +18560,327 @@
     "revD.date": "reported"
    }
   },
+  "views-s1": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 4
+   },
+   "equivalent": {
+    "change": 3,
+    "no change": 16
+   },
+   "findings": {
+    "different": 4,
+    "equivalent": 19
+   },
+   "unmatched": 9,
+   "pairs": 8,
+   "omitted": 0,
+   "kinds": {
+    "right": 4,
+    "scored": 4,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 4
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.md": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "change": 1,
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 6
+   },
+   "unmatched": 0,
+   "pairs": 2,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "change": 1,
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 6
+   },
+   "unmatched": 0,
+   "pairs": 2,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.pptx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "1/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "judged uncertain": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 5,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 3,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "conditions": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "judged uncertain"
+   }
+  },
+  "views-s1.xlsx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "1/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "judged uncertain": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 5,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 3,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "conditions": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "judged uncertain"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -25746,6 +26388,264 @@
     "revB.date": "confirmed",
     "revC.date": "confirmed",
     "revD.date": "reported"
+   }
+  },
+  "views-s1": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 4
+   },
+   "equivalent": {
+    "change": 3,
+    "no change": 16
+   },
+   "findings": {
+    "different": 4,
+    "equivalent": 19
+   },
+   "unmatched": 9,
+   "pairs": 8,
+   "omitted": 0,
+   "kinds": {
+    "right": 4,
+    "scored": 4,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 4
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "change": 1,
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 6
+   },
+   "unmatched": 0,
+   "pairs": 2,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.pptx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "1/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "judged uncertain": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 5,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 3,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "conditions": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "judged uncertain"
+   }
+  },
+  "views-s1.xlsx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "1/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "judged uncertain": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 5,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 3,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "conditions": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "judged uncertain"
    }
   },
   "wtp-s1-tracked.docx": {
@@ -33256,6 +34156,264 @@
     "revB.date": "confirmed",
     "revC.date": "confirmed",
     "revD.date": "reported"
+   }
+  },
+  "views-s1": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 4
+   },
+   "equivalent": {
+    "change": 3,
+    "no change": 16
+   },
+   "findings": {
+    "different": 4,
+    "equivalent": 19
+   },
+   "unmatched": 9,
+   "pairs": 8,
+   "omitted": 0,
+   "kinds": {
+    "right": 4,
+    "scored": 4,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 4
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "0/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "settled": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "change": 1,
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 6
+   },
+   "unmatched": 0,
+   "pairs": 2,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "settled"
+   }
+  },
+  "views-s1.pptx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "1/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "judged uncertain": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 5,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 3,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "conditions": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "judged uncertain"
+   }
+  },
+  "views-s1.xlsx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 5,
+    "holder": 1
+   },
+   "changes_found": "2/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "holders_noticed": "1/1",
+   "difference_precision": 1.0,
+   "changed": {
+    "reported": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 5
+   },
+   "holder": {
+    "judged uncertain": 1
+   },
+   "different": {
+    "change": 2
+   },
+   "equivalent": {
+    "no change": 5
+   },
+   "findings": {
+    "different": 2,
+    "equivalent": 5,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 3,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     },
+     "conditions": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.1": "reported",
+    "ack.2": "confirmed",
+    "ack.mod": "reported",
+    "beams.1": "confirmed",
+    "beams.2": "confirmed",
+    "beams.mod": "confirmed",
+    "period.1": "confirmed",
+    "period.2": "judged uncertain"
    }
   },
   "wtp-s1-tracked.docx": {

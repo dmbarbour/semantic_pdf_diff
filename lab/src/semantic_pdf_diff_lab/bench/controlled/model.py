@@ -32,6 +32,8 @@ class Fact:
     object_aliases: tuple = ()        # the object's other names
     accepts: tuple = ()               # other relations that state it fairly
     context: dict = field(default_factory=dict)  # its context by kind, sources and knowability (contexts.py)
+    holder: str = ""                  # whose view it is, where the document reports one (a company's proposal)
+    attitude: str = ""                # the holder's attitude to it: proposes, supports, opposes
 
     @property
     def number(self):

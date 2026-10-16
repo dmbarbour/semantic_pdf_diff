@@ -35,7 +35,7 @@ RELATION_OUTCOMES = ("right", "implied", "reversed", "wrong", "invented", "unsco
 # its place (bench/context.py's HOME: its words, or a context record it references); "frame in its field", those in
 # the frame field itself; "sibling misapplied", facts given another's context in their own words (a speed's "at
 # the element's entry" on a height), not merely by a record they reference.
-KEPT = ("scope", "frame", "subject")
+KEPT = ("scope", "frame", "subject", "holder")
 MISAPPLIED = ("frame", "conditions", "entity", "attribute")
 DIRECTION = {"facts right": 1, "facts found": 1, "claims right": 1, "relations right": 1, "relations unscored": 0,
              **{f"claims {o}": -1 for o in CLAIM_OUTCOMES if o != "right"},

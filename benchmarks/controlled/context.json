@@ -1,10 +1,10 @@
 {
  "totals": {
   "inventory": {
-   "claims": 20392,
-   "evidence": 11227,
+   "claims": 20524,
+   "evidence": 11340,
    "frame in conditions": 76,
-   "grounded": 5588,
+   "grounded": 5700,
    "list records": 36,
    "no content words": 3,
    "note records": 11,
@@ -14,12 +14,12 @@
    "partly": 63,
    "partly (image)": 16,
    "positioned": 123,
-   "printed": 6940,
+   "printed": 7053,
    "sheet records": 11,
    "table records": 294,
    "unsupported": 25,
    "unsupported (image)": 806,
-   "with conditions": 6501,
+   "with conditions": 6613,
    "with records": 6181
   },
   "placed": {
@@ -33,6 +33,10 @@
     "conditions": 95,
     "frame": 156,
     "records": 143
+   },
+   "holder": {
+    "conditions": 40,
+    "entity": 20
    },
    "provenance": {
     "conditions": 5
@@ -96,9 +100,9 @@
      "share": 0.985
     },
     "<=1.0": {
-     "readings": 28174,
-     "right": 25536,
-     "share": 0.906
+     "readings": 28438,
+     "right": 25746,
+     "share": 0.905
     }
    },
    "image": {
@@ -113,9 +117,9 @@
      "share": 0.77
     },
     "<=1.0": {
-     "readings": 20418,
-     "right": 18518,
-     "share": 0.907
+     "readings": 20498,
+     "right": 18580,
+     "share": 0.906
     }
    },
    "table rules": {
@@ -137,9 +141,9 @@
      "share": 0.105
     },
     "<=1.0": {
-     "readings": 7756,
-     "right": 7018,
-     "share": 0.905
+     "readings": 7940,
+     "right": 7166,
+     "share": 0.903
     }
    }
   }
@@ -5617,6 +5621,250 @@
    },
    "keyed": {
     "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1": {
+   "inventory": {
+    "claims": 34,
+    "grounded": 34,
+    "with conditions": 34,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 25,
+    "evidence": 25,
+    "context_bytes_per_request": 253,
+    "data_bytes_per_request": 384,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 6
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1-revised": {
+   "inventory": {
+    "claims": 34,
+    "grounded": 34,
+    "with conditions": 34,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 24,
+    "evidence": 24,
+    "context_bytes_per_request": 253,
+    "data_bytes_per_request": 384,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 6
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1-revised.docx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 8,
+    "with conditions": 8,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 8,
+    "context_bytes_per_request": 416,
+    "data_bytes_per_request": 159,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 6
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1-revised.md": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 8,
+    "with conditions": 8,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 8,
+    "context_bytes_per_request": 596,
+    "data_bytes_per_request": 161,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 6
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1-revised.pptx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 8,
+    "context_bytes_per_request": 358,
+    "data_bytes_per_request": 110,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "entity": 5,
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1-revised.xlsx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 8,
+    "context_bytes_per_request": 347,
+    "data_bytes_per_request": 111,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "entity": 5,
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1.docx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 8,
+    "with conditions": 8,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 8,
+    "context_bytes_per_request": 416,
+    "data_bytes_per_request": 159,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 6
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1.md": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 8,
+    "with conditions": 8,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 8,
+    "context_bytes_per_request": 596,
+    "data_bytes_per_request": 161,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 6
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1.pptx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 8,
+    "context_bytes_per_request": 358,
+    "data_bytes_per_request": 110,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "entity": 5,
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "views-s1.xlsx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 8,
+    "context_bytes_per_request": 347,
+    "data_bytes_per_request": 111,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "entity": 5,
+      "conditions": 1
+     }
+    },
     "audit": {},
     "named": {},
     "examples": {}
