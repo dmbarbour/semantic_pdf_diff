@@ -827,9 +827,8 @@ class Records(Lever):
 
 class SheetRecords(Lever):
     lever_name, stage, off = "sheet_records", "matching", {"sheet_records": False}
-    # a drawing sheet's title block kept as a record every claim on the sheet references, and alignment keeping
-    # apart claims of two sheets both revisions have (docs/plans/claim-context-2026-10-14.md, milestone 4: two halls'
-    # sheets alike but for their title blocks). Applied as answers are stored
+    # a drawing sheet's title block kept as a record every claim on the sheet references (docs/plans/claim-context-
+    # 2026-10-14.md, milestone 4: two halls' sheets alike but for their title blocks). Applied as answers are stored
     sheet_records: Annotated[bool, Declared("post", EXTRACT)] = False
 
     def page_structure(self, page_no, blocks, is_sheet):

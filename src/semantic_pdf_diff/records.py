@@ -13,7 +13,7 @@ ContextRecord, Evidence.records).
   often a table's or a section's, whose reach the layout doesn't settle: not taken there.
 - **A sheet's title block** (the sheet_records lever): its number and the titles beside it ("sheet A-202", "HALL D
   FLOOR PLAN - MEETING ROOMS"), as figures.title_block reads them; every claim on the sheet takes it. Its id names
-  the sheet ("sheet:p2:sheet A-202"), so alignment can keep two sheets' claims apart (align.sheet_of).
+  the sheet ("sheet:p2:sheet A-202").
 - **Names as printed** (Evidence.printed): a table claim's row label and value's header; a text claim's words before
   its value in its verified quote (printed_before).
 """
