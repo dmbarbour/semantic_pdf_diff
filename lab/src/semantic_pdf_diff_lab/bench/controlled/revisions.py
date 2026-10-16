@@ -437,6 +437,30 @@ def views_poll_later(p, d):
     flip_view(p, next(v["id"] for v in p.views if v["proposition"] == "Proposal 2.2" and v["value"] == "N"),
               "Can accept the proposal.")
 
+def hedge(project, fact_id, old, new, strength):
+    """A fact's hedge added or taken away (old printed once, rewritten as new; a table's status cell, or a passage of
+    a paragraph), its value kept: the authors' link firmer or weaker (the claim context plan, milestone 5)."""
+    fact = project.fact(fact_id)
+    rows = [row for rows, _, _ in _rows(project) for row in rows if not isinstance(row, tuple) and old in row
+            and any(fact.value in cell for cell in row)]
+    if rows:
+        rows[0][rows[0].index(old)] = new
+    else:
+        rewrite(project, old, new)
+    project.edits.append({"kind": "hedge", "fact": fact_id, "from": fact.strength, "to": strength})
+    fact.strength = strength
+
+def hedges_later(p, d):
+    """The design notes revised: the acknowledgement timeout and the low signal duration firmed up (their hedges
+    taken away), the retransmission timer and the failed retransmissions hedged, every value kept; the preliminary
+    beam count revised (a value changed, its hedge kept)."""
+    ack, rto, low, retx = (p.fact(f) for f in ("ack", "rto", "duration", "retx"))
+    hedge(p, "ack", f"is expected to be {ack.value}", f"is {ack.value}", "")
+    hedge(p, "rto", f"timer is {rto.value}", f"timer will likely be {rto.value}", "likely")
+    hedge(p, "duration", "Working assumption", "Agreed", "")
+    hedge(p, "retx", "Agreed", "Working assumption", "working assumption")
+    change(p, "beams", d.number(6, 32))
+
 def renamed_later(p, d):
     """Pump P-101B renamed P-201B, its values kept: the same pump under a new tag (alignment by its values)."""
     rename_row(p, "P-101B", "P-201B")
@@ -608,7 +632,9 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          # companies' proposals: one credited to another company, words and value kept; two values revised
          (PROJECTS["views"], None, views_later, False, "revised"),
          # companies' yes-or-no views on the moderator's proposals: two turned round
-         (PROJECTS["views-poll"], None, views_poll_later, False, "revised"))
+         (PROJECTS["views-poll"], None, views_poll_later, False, "revised"),
+         # design notes: two values firmed up, two hedged, every value kept; one value revised
+         (PROJECTS["hedges"], None, hedges_later, False, "revised"))
 
 def _base(make, knob, seed):
     p = make(seed)

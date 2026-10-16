@@ -456,6 +456,55 @@ def proposals_polled(seed=1):
     return Project(f"views-poll-s{seed}", "Feature Lead Summary: Companies' Views on the Proposals", F, sections,
                    things=[(c, ()) for c in COMPANIES], views=views)
 
+# How a sentence states a value with a hedge, or without one (hedged_notes); {v} the value
+HEDGED = {"expected": "is expected to be {v}", "likely": "will likely be {v}", "": "is {v}"}
+
+def hedged_notes(seed=1):
+    """A link's design notes stating some values with a hedge (the claim context plan, milestone 5: a hedge is the
+    strength of the authors' link, not part of the value): in sentences ("is expected to be", "Tentatively,",
+    "Preliminary estimates put") and in a table's Status column ("Working assumption" against "Agreed", as 3GPP's
+    agreements print them). A fact's strength keys its hedge; its revision firms two up and hedges two others, every
+    value kept, beside one value changed."""
+    d = Draw(f"hedges-{seed}")
+    F = []
+    add = lambda *a, **k: F.append(Fact(*a, **k)) or F[-1]  # noqa: E731
+    timer = ("Retransmission timer", ("retransmission timer", "RTO", "retransmit timer"), "duration",
+             ("value", "timeout", "timer value"))
+    window = ("Send window", ("send window", "window", "transmit window"), "size", ("window size", "packets"))
+    failure = ("Link failure detection", ("link failure", "failure detection", "link failure declaration"))
+    ack = add("ack", *ACK, d.number(200, 450), "ms", basis="targeted", strength="expected")
+    rto = add("rto", *timer, d.number(500, 900), "ms", basis="targeted")
+    win = add("window", *window, d.number(91, 150), "packets", basis="targeted", strength="tentative")
+    period = add("period", *PERIOD, d.number(1000, 1900), "ms", basis="targeted")
+    beams = add("beams", *BEAMS, d.number(6, 32), "", basis="projected", strength="preliminary")
+    snr = add("snr", *failure, "signal-to-noise threshold", ("SNR threshold", "signal-to-noise ratio"),
+              d.number(1.5, 4.5, 1), "dB", basis="required")
+    low = add("duration", *failure, "low signal duration", ("duration", "time below threshold"), d.number(33, 90), "s",
+              basis="required", strength="working assumption")
+    retx = add("retx", *failure, "consecutive failed retransmissions", ("failed retransmissions", "retransmissions"),
+               d.number(151, 250), "", basis="required")
+    beat = add("heartbeat", "Heartbeat", ("heartbeat", "keep-alive"), "interval", ("heartbeat interval", "period"),
+               d.number(2000, 5000), "ms", basis="required", strength="working assumption")
+    status = lambda f: "Working assumption" if f.strength else "Agreed"  # noqa: E731
+    sections = [
+        ("1 Timers", [
+            ("p", f"The acknowledgement timeout {HEDGED[ack.strength].format(v=ack.value)} ms. The retransmission "
+                  f"timer {HEDGED[rto.strength].format(v=rto.value)} ms."),
+            ("p", f"Tentatively, the send window is {win.value} packets. The beam report period is {period.value} "
+                  f"ms."),
+            ("p", f"Preliminary estimates put the number of strongest beams reported at {beams.value}."),
+        ]),
+        ("2 Failure Detection", [
+            ("p", "The failure detection parameters, as agreed so far:"),
+            ("table", "Table 1. Failure detection parameters", ["Parameter", "Value", "Status"],
+             [["Signal-to-noise threshold", f"{snr.value} dB", status(snr)],
+              ["Low signal duration", f"{low.value} s", status(low)],
+              ["Consecutive failed retransmissions", retx.value, status(retx)],
+              ["Heartbeat interval", f"{beat.value} ms", status(beat)]]),
+        ]),
+    ]
+    return Project(f"hedges-s{seed}", "Lakeshore Telemetry Link: Design Notes (Draft)", F, sections)
+
 def equipment_datasheets(seed=1):
     """Equipment data sheets (code review 2026-10-08, B5): each pump's and the clearwell's data as a key-value list,
     a block of two columns standing alone with no header, its first row a key and its value ("Pump | P-201A"; the
@@ -505,7 +554,7 @@ def equipment_datasheets(seed=1):
 
 PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster, "spec": link_protocol,
             "wtp-datasheets": equipment_datasheets, "views": proposals_summary, "views-grouped": proposals_grouped,
-            "views-prose": proposals_reported, "views-poll": proposals_polled}
+            "views-prose": proposals_reported, "views-poll": proposals_polled, "hedges": hedged_notes}
 
 # --- table knobs (milestone 2) -------------------------------------------------------------------
 # Schedules rendered clean or with one knob, the same facts either way, so a knob's effect is the difference.
@@ -1345,7 +1394,8 @@ def draw_schematics(project, doc, figures, spans):
 def key(project, log):
     """The answer key: facts with their forms, and the printed numbers with their roles."""
     from .contexts import contexts
-    optional = ("tolerance", "relation", "object_aliases", "accepts", "context", "holder", "attitude")  # when used
+    optional = ("tolerance", "relation", "object_aliases", "accepts", "context", "holder", "attitude",
+                "strength")  # when used
     found = contexts(project)
     for f in project.facts:
         f.context = found.get(f.id, {})

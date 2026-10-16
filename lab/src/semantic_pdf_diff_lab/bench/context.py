@@ -120,6 +120,8 @@ def every_reading(runs_dir):
                             claim["frame"] = r.frame
                         if r.stance:  # who holds it (milestone 5): its links, holder and attitude
                             claim["stance"] = [link.model_dump() for link in r.stance]
+                        if r.uncertainty:  # where a hedge may land (milestone 5)
+                            claim["uncertainty"] = r.uncertainty
                         claim.update(quote=o.quote, _task=o.locator.task, _records=list(r.records))
                         out[folder.name].append((content, family, claim))
     return dict(out)
@@ -225,6 +227,23 @@ def _attitudes(stance):
         return set()
     return {_attitude(x.get("attitude", "")) for x in stance if isinstance(x, dict)}
 
+# A keyed hedge's words, as a claim may say them ("expected" as "expect", "tentative" as "tentatively")
+HEDGE_WORDS = {"expected": ("expect",), "likely": ("likely", "probabl"), "tentative": ("tentativ",),
+               "preliminary": ("preliminar",), "working assumption": ("working assumption", "assum")}
+# Where a hedge may land, in order: its link's strength (the stance), then the claim's words
+HEDGE_FIELDS = ("stance", "uncertainty", "conditions", "attribute", "value", "entity")
+
+def _hedged(claim, hedge):
+    """The field a claim says a keyed hedge in first (HEDGE_FIELDS), or None."""
+    roots = HEDGE_WORDS.get(hedge, (hedge,))
+    for field in HEDGE_FIELDS:
+        value = claim.get(field) or ""
+        text = " ".join(str(x.get("strength", "")) for x in value if isinstance(x, dict)) \
+            if isinstance(value, list) else str(value)
+        if any(root in text.casefold() for root in roots):
+            return field
+    return None
+
 def _wanted(fact, text):
     """The words of a context item that a claim would have to say: its own, less the fact's names'."""
     names = words(" ".join((fact.entity, fact.attribute, *fact.synonyms, *fact.aliases)))
@@ -233,7 +252,8 @@ def _wanted(fact, text):
 def against_key(key_data, claims, shown_by_task):
     """One document's context per kind against its key: {kind: {where it landed: facts}}, the audit of each lost
     item {kind: {not shown|shown, not used|misapplied|image only: facts}}, names resting on unprinted conventions, and
-    a reported view's attitude (milestone 5) in a reading's stance, another attitude there, or none.
+    a reported view's attitude (milestone 5) in a reading's stance, another attitude there, or none; and where a
+    keyed hedge landed (HEDGE_FIELDS' first, or nowhere).
     claims: dicts with entity, attribute, value, unit, conditions and _task, and records (the text of the records the
     claim references, if any); shown_by_task: {task: [texts shown]}."""
     from .controlled.score import bounds, classify, key_facts
@@ -248,6 +268,7 @@ def against_key(key_data, claims, shown_by_task):
         if fid and outcome in ("right", "loose"):
             readings[fid].append(c)
     placed, audit, named, attitudes = defaultdict(Counter), defaultdict(Counter), Counter(), Counter()
+    hedges = Counter()
     examples = defaultdict(list)
     for fid, mine in sorted(readings.items()):
         fact = by_id[fid]
@@ -288,12 +309,16 @@ def against_key(key_data, claims, shown_by_task):
         if ctx.get("attitude"):
             held = set().union(*(_attitudes(c.get("stance")) for c in mine)) - {""}
             attitudes["in its stance" if _attitude(ctx["attitude"]) in held else "another" if held else "none"] += 1
+        if ctx.get("hedge"):  # where a reading says it, the first field by HEDGE_FIELDS' order
+            landed = {_hedged(c, ctx["hedge"]) for c in mine} - {None}
+            hedges[next((f for f in HEDGE_FIELDS if f in landed), "nowhere")] += 1
         if ctx.get("named_by"):
             said = set().union(*(words(f"{c.get('attribute', '')} {c.get('conditions', '')}") for c in mine))
             named["by an unprinted convention" if said & CONVENTION_WORDS else
                   "by geometry as drawn" if said & GEOMETRY_WORDS else "otherwise"] += 1
     return {"placed": {k: dict(v) for k, v in placed.items()}, "audit": {k: dict(v) for k, v in audit.items()},
             "named": dict(named), **({"attitudes": dict(attitudes)} if attitudes else {}),
+            **({"hedges": dict(hedges)} if hedges else {}),
             "examples": dict(examples)}
 
 def measure_keys(runs_dir, key_of):
@@ -326,9 +351,11 @@ def record_texts(store, content):
 
 def sum_keys(results):
     """against_key's results summed over runs (examples left out)."""
-    out = {"placed": defaultdict(Counter), "audit": defaultdict(Counter), "named": Counter(), "attitudes": Counter()}
+    out = {"placed": defaultdict(Counter), "audit": defaultdict(Counter), "named": Counter(), "attitudes": Counter(),
+           "hedges": Counter()}
     for r in results.values():
         out["attitudes"].update(r.get("attitudes", {}))
+        out["hedges"].update(r.get("hedges", {}))
         for part in ("placed", "audit"):
             for kind, where in r[part].items():
                 out[part][kind].update(where)
@@ -336,7 +363,8 @@ def sum_keys(results):
     return {"placed": {k: dict(sorted(v.items())) for k, v in sorted(out["placed"].items())},
             "audit": {k: dict(sorted(v.items())) for k, v in sorted(out["audit"].items())},
             "named": dict(sorted(out["named"].items())),
-            **({"attitudes": dict(sorted(out["attitudes"].items()))} if out["attitudes"] else {})}
+            **({"attitudes": dict(sorted(out["attitudes"].items()))} if out["attitudes"] else {}),
+            **({"hedges": dict(sorted(out["hedges"].items()))} if out["hedges"] else {})}
 
 # --- our own link: calibration (Measurement, layer 7) --------------------------------------------------------------
 

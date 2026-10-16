@@ -34,6 +34,7 @@ class Fact:
     context: dict = field(default_factory=dict)  # its context by kind, sources and knowability (contexts.py)
     holder: str = ""                  # whose view it is, where the document reports one (a company's proposal)
     attitude: str = ""                # the holder's attitude to it: proposes, supports, opposes
+    strength: str = ""                # a hedge the document states it with: expected, tentative, working assumption
 
     @property
     def number(self):

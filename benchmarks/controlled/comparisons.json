@@ -9732,6 +9732,325 @@
     "period.mod": "confirmed"
    }
   },
+  "hedges-s1": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 6,
+    "no change": 8
+   },
+   "findings": {
+    "equivalent": 14,
+    "uncertain": 2
+   },
+   "unmatched": 4,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.md": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.docx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.pptx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 1,
+    "judged uncertain": 1,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 3,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 7,
+    "uncertain": 2
+   },
+   "unmatched": 4,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     },
+     "conditions": {
+      "conditions": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged uncertain",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.xlsx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 4,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -19615,6 +19934,325 @@
     "period.mod": "confirmed"
    }
   },
+  "hedges-s1": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 6,
+    "no change": 8
+   },
+   "findings": {
+    "equivalent": 14,
+    "uncertain": 2
+   },
+   "unmatched": 4,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.md": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.docx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.pptx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 1,
+    "judged uncertain": 1,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 3,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 7,
+    "uncertain": 2
+   },
+   "unmatched": 4,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     },
+     "conditions": {
+      "conditions": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged uncertain",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.xlsx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 4,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -27673,6 +28311,258 @@
     "period.delmar": "reported",
     "period.estrella": "confirmed",
     "period.mod": "confirmed"
+   }
+  },
+  "hedges-s1": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 6,
+    "no change": 8
+   },
+   "findings": {
+    "equivalent": 14,
+    "uncertain": 2
+   },
+   "unmatched": 4,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.docx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.pptx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.xlsx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 4,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
    }
   },
   "wtp-s1-tracked.docx": {
@@ -35734,6 +36624,258 @@
     "period.delmar": "reported",
     "period.estrella": "confirmed",
     "period.mod": "confirmed"
+   }
+  },
+  "hedges-s1": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 6,
+    "no change": 8
+   },
+   "findings": {
+    "equivalent": 14,
+    "uncertain": 2
+   },
+   "unmatched": 4,
+   "pairs": 5,
+   "omitted": 0,
+   "kinds": {
+    "right": 2,
+    "scored": 2,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 2
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.docx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.pptx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 3,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
+   }
+  },
+  "hedges-s1.xlsx": {
+   "facts": {
+    "changed": 1,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 4,
+    "hedge": 4
+   },
+   "changes_found": "0/1",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "4/4",
+   "false_changes": 0,
+   "hedges_noticed": "2/4",
+   "difference_precision": null,
+   "changed": {
+    "uncertain": 1
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 4
+   },
+   "hedge": {
+    "judged equivalent": 2,
+    "settled": 2
+   },
+   "different": {},
+   "equivalent": {
+    "change": 4,
+    "no change": 4
+   },
+   "findings": {
+    "equivalent": 8,
+    "uncertain": 1
+   },
+   "unmatched": 2,
+   "pairs": 4,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": 1.0,
+    "by_claims": {
+     "change": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack": "settled",
+    "beams": "uncertain",
+    "duration": "judged equivalent",
+    "heartbeat": "confirmed",
+    "period": "confirmed",
+    "retx": "judged equivalent",
+    "rto": "settled",
+    "snr": "confirmed",
+    "window": "confirmed"
    }
   },
   "wtp-s1-tracked.docx": {

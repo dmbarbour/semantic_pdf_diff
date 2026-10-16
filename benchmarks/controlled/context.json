@@ -1,10 +1,10 @@
 {
  "totals": {
   "inventory": {
-   "claims": 20878,
-   "evidence": 11645,
+   "claims": 21020,
+   "evidence": 11748,
    "frame in conditions": 76,
-   "grounded": 5917,
+   "grounded": 5989,
    "list records": 36,
    "no content words": 3,
    "note records": 11,
@@ -14,13 +14,13 @@
    "partly": 88,
    "partly (image)": 16,
    "positioned": 123,
-   "printed": 7307,
+   "printed": 7386,
    "sheet records": 11,
-   "table records": 301,
-   "unsupported": 25,
+   "table records": 303,
+   "unsupported": 34,
    "unsupported (image)": 806,
-   "with conditions": 6855,
-   "with records": 6237
+   "with conditions": 6936,
+   "with records": 6245
   },
   "placed": {
    "bound": {
@@ -91,22 +91,26 @@
    "in its stance": 110,
    "none": 59
   },
+  "hedges": {
+   "conditions": 40,
+   "nowhere": 10
+  },
   "reliability": {
    "all": {
     "<0.9": {
-     "readings": 386,
-     "right": 222,
-     "share": 0.575
+     "readings": 394,
+     "right": 230,
+     "share": 0.584
     },
     "<0.95": {
-     "readings": 10574,
-     "right": 10420,
+     "readings": 10594,
+     "right": 10440,
      "share": 0.985
     },
     "<=1.0": {
-     "readings": 28856,
-     "right": 26100,
-     "share": 0.904
+     "readings": 29112,
+     "right": 26356,
+     "share": 0.905
     }
    },
    "image": {
@@ -121,33 +125,33 @@
      "share": 0.77
     },
     "<=1.0": {
-     "readings": 20630,
-     "right": 18676,
-     "share": 0.905
+     "readings": 20718,
+     "right": 18764,
+     "share": 0.906
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 10136,
-     "right": 10108,
+     "readings": 10152,
+     "right": 10124,
      "share": 0.997
     }
    },
    "text": {
     "<0.9": {
-     "readings": 16,
-     "right": 2,
-     "share": 0.125
+     "readings": 24,
+     "right": 10,
+     "share": 0.417
     },
     "<0.95": {
-     "readings": 38,
-     "right": 4,
-     "share": 0.105
+     "readings": 42,
+     "right": 8,
+     "share": 0.19
     },
     "<=1.0": {
-     "readings": 8226,
-     "right": 7424,
-     "share": 0.903
+     "readings": 8394,
+     "right": 7592,
+     "share": 0.904
     }
    }
   }
@@ -1812,6 +1816,299 @@
      }
     },
     "named": {},
+    "examples": {}
+   }
+  },
+  "hedges-s1": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 22,
+    "unsupported": 1,
+    "with conditions": 23,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 14,
+    "evidence": 16,
+    "context_bytes_per_request": 240,
+    "data_bytes_per_request": 350,
+    "examples": {
+     "unsupported": [
+      "send window | size | tentative"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "nowhere": 1,
+     "conditions": 4
+    },
+    "examples": {}
+   }
+  },
+  "hedges-s1-revised": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 21,
+    "unsupported": 1,
+    "with conditions": 22,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 14,
+    "evidence": 15,
+    "context_bytes_per_request": 240,
+    "data_bytes_per_request": 349,
+    "examples": {
+     "unsupported": [
+      "send window | size | tentative"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "conditions": 4,
+     "nowhere": 1
+    },
+    "examples": {}
+   }
+  },
+  "hedges-s1-revised.docx": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 3,
+    "unsupported": 1,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 5,
+    "evidence": 9,
+    "context_bytes_per_request": 486,
+    "data_bytes_per_request": 162,
+    "examples": {
+     "unsupported": [
+      "send window | size | tentative"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "conditions": 4,
+     "nowhere": 1
+    },
+    "examples": {}
+   }
+  },
+  "hedges-s1-revised.md": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 3,
+    "unsupported": 1,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 6,
+    "evidence": 9,
+    "context_bytes_per_request": 613,
+    "data_bytes_per_request": 164,
+    "examples": {
+     "unsupported": [
+      "send window | size | tentative"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "conditions": 4,
+     "nowhere": 1
+    },
+    "examples": {}
+   }
+  },
+  "hedges-s1-revised.pptx": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 5,
+    "unsupported": 1,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 4,
+    "printed": 9,
+    "evidence": 9,
+    "context_bytes_per_request": 500,
+    "data_bytes_per_request": 136,
+    "examples": {
+     "unsupported": [
+      "send window | size | tentative"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "conditions": 4,
+     "nowhere": 1
+    },
+    "examples": {}
+   }
+  },
+  "hedges-s1-revised.xlsx": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 4,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 6,
+    "evidence": 9,
+    "context_bytes_per_request": 340,
+    "data_bytes_per_request": 116,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "conditions": 4,
+     "nowhere": 1
+    },
+    "examples": {}
+   }
+  },
+  "hedges-s1.docx": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 3,
+    "unsupported": 1,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 5,
+    "evidence": 9,
+    "context_bytes_per_request": 486,
+    "data_bytes_per_request": 162,
+    "examples": {
+     "unsupported": [
+      "send window | size | tentative"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "nowhere": 1,
+     "conditions": 4
+    },
+    "examples": {}
+   }
+  },
+  "hedges-s1.md": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 3,
+    "unsupported": 1,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 6,
+    "evidence": 9,
+    "context_bytes_per_request": 613,
+    "data_bytes_per_request": 165,
+    "examples": {
+     "unsupported": [
+      "send window | size | tentative"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "nowhere": 1,
+     "conditions": 4
+    },
+    "examples": {}
+   }
+  },
+  "hedges-s1.pptx": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 5,
+    "unsupported": 1,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 4,
+    "printed": 9,
+    "evidence": 9,
+    "context_bytes_per_request": 502,
+    "data_bytes_per_request": 137,
+    "examples": {
+     "unsupported": [
+      "send window | size | tentative"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "nowhere": 1,
+     "conditions": 4
+    },
+    "examples": {}
+   }
+  },
+  "hedges-s1.xlsx": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 3,
+    "unsupported": 1,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 5,
+    "evidence": 9,
+    "context_bytes_per_request": 341,
+    "data_bytes_per_request": 117,
+    "examples": {
+     "unsupported": [
+      "send window | size | tentative"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "hedges": {
+     "nowhere": 1,
+     "conditions": 4
+    },
     "examples": {}
    }
   },

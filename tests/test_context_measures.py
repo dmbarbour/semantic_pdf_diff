@@ -100,6 +100,19 @@ class AgainstKey(unittest.TestCase):
                          ({"in its stance": 1}, {"another": 1}, {"none": 1}))
         self.assertNotIn("attitudes", context.against_key(KEY, [unheld], {"text:p1": [""]}))  # no view keyed
 
+    def test_a_hedge_is_found_in_the_stance_or_the_claims_words(self):
+        # milestone 5: "is expected to be 709 ms", as its link's strength, the claim's words, or nowhere
+        key = {**KEY, "facts": [fact("timer.idle", "retransmission timer", "709", ctx={"hedge": "expected"})]
+               + KEY["facts"][1:]}
+        hedge = lambda c: context.against_key(key, [c], {"text:p1": [""]}).get("hedges")  # noqa: E731
+        plain = claim("retransmission timer", "709", "")
+        self.assertEqual([hedge(c) for c in (
+            {**plain, "stance": [{"holder": "the authors", "strength": "expected"}]},
+            {**plain, "uncertainty": "expected value"}, claim("retransmission timer", "709", "expected"),
+            claim("expected retransmission timer", "709", ""), plain)],
+            [{"stance": 1}, {"uncertainty": 1}, {"conditions": 1}, {"attribute": 1}, {"nowhere": 1}])
+        self.assertNotIn("hedges", context.against_key(KEY, [plain], {"text:p1": [""]}))  # no hedge keyed
+
 class Readings(unittest.TestCase):
     def test_every_reading_counts_a_frame_only_a_later_sighting_gave(self):
         # one fact read by two tasks, merged into one claim: the first sighting has no frame, the second does
