@@ -205,8 +205,10 @@ class RecordAndReplay(unittest.TestCase):
     def test_unrecorded_requests_fail_visibly(self):
         self.record()
         with sqlite3.connect(self.fixture) as db:
+            # two text tasks' answers, the same ones every run: the first two recorded were whichever answered
+            # first, and under load others went missing with them (30 requests missing, 4 tasks unreached)
             db.execute("DELETE FROM response WHERE rowid IN (SELECT r.rowid FROM response r JOIN recipe q "
-                       "ON q.query = r.query WHERE q.role = 'extract' LIMIT 2)")
+                       "ON q.query = r.query WHERE q.role = 'extract' AND q.region = 'text' ORDER BY q.task LIMIT 2)")
         code, report, log = self.run_cli('replay', UNREACHABLE, '--fixture', str(self.fixture),
                                          '--fixture-mode', 'replay')
         self.assertEqual(code, 2)
