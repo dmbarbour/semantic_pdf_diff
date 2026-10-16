@@ -11,10 +11,11 @@ def corpus(seeds=(1,), knobs=False, revisions=False):
     if knobs:
         from .procedures import PROCEDURE_KNOBS, PROCEDURE_PROJECTS
         from .schematics import SCHEMATIC_KNOBS, SCHEMATIC_PROJECTS
-        from .sheets import SHEET_KNOBS, SHEET_PROJECTS
+        from .sheets import SET_KNOBS, SET_PROJECTS, SHEET_KNOBS, SHEET_PROJECTS
         for makers, all_knobs in ((TABLE_PROJECTS, TABLE_KNOBS), (PROSE_PROJECTS, PROSE_KNOBS),
                                   (CHART_PROJECTS, CHART_KNOBS), (SCHEMATIC_PROJECTS, SCHEMATIC_KNOBS),
-                                  (SHEET_PROJECTS, SHEET_KNOBS), (PROCEDURE_PROJECTS, PROCEDURE_KNOBS)):
+                                  (SHEET_PROJECTS, SHEET_KNOBS), (SET_PROJECTS, SET_KNOBS),
+                                  (PROCEDURE_PROJECTS, PROCEDURE_KNOBS)):
             for make in makers.values():
                 for seed in seeds:
                     for knob in all_knobs:

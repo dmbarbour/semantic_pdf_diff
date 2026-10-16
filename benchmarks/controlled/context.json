@@ -1,25 +1,25 @@
 {
  "totals": {
   "inventory": {
-   "claims": 19526,
-   "evidence": 10850,
-   "frame in conditions": 55,
-   "grounded": 5400,
-   "list records": 32,
+   "claims": 20392,
+   "evidence": 11227,
+   "frame in conditions": 76,
+   "grounded": 5588,
+   "list records": 36,
    "no content words": 3,
-   "note records": 7,
-   "numbered in attribute": 152,
+   "note records": 11,
+   "numbered in attribute": 238,
    "numbered in conditions": 3,
    "numbered in entity": 204,
    "partly": 63,
    "partly (image)": 16,
-   "positioned": 109,
-   "printed": 6920,
+   "positioned": 123,
+   "printed": 6940,
    "table records": 294,
    "unsupported": 25,
    "unsupported (image)": 806,
-   "with conditions": 6313,
-   "with records": 5804
+   "with conditions": 6501,
+   "with records": 6181
   },
   "placed": {
    "bound": {
@@ -30,8 +30,8 @@
    "frame": {
     "attribute": 23,
     "conditions": 95,
-    "frame": 116,
-    "records": 103
+    "frame": 156,
+    "records": 143
    },
    "provenance": {
     "conditions": 5
@@ -42,14 +42,14 @@
     "nowhere": 2
    },
    "sibling": {
-    "conditions": 186,
+    "conditions": 193,
     "nowhere": 828,
     "records": 1108
    },
    "subject": {
     "conditions": 72,
-    "entity": 128,
-    "nowhere": 43
+    "entity": 132,
+    "nowhere": 165
    }
   },
   "audit": {
@@ -67,36 +67,36 @@
     "shown, not used": 21
    },
    "sibling": {
-    "in conditions": 186,
+    "in conditions": 193,
     "in records": 1108,
     "kept out": 828
    },
    "subject": {
-    "image only": 1,
-    "not shown": 15,
-    "shown, not used": 27
+    "image only": 10,
+    "not shown": 44,
+    "shown, not used": 111
    }
   },
   "named": {
-   "by an unprinted convention": 84,
+   "by an unprinted convention": 136,
    "otherwise": 14
   },
   "reliability": {
    "all": {
     "<0.9": {
-     "readings": 376,
+     "readings": 386,
      "right": 222,
-     "share": 0.59
+     "share": 0.575
     },
     "<0.95": {
-     "readings": 10544,
+     "readings": 10550,
      "right": 10396,
-     "share": 0.986
+     "share": 0.985
     },
     "<=1.0": {
-     "readings": 26604,
-     "right": 24562,
-     "share": 0.923
+     "readings": 28174,
+     "right": 25536,
+     "share": 0.906
     }
    },
    "image": {
@@ -106,14 +106,14 @@
      "share": 0.595
     },
     "<0.95": {
-     "readings": 396,
+     "readings": 400,
      "right": 308,
-     "share": 0.778
+     "share": 0.77
     },
     "<=1.0": {
-     "readings": 19244,
-     "right": 17794,
-     "share": 0.925
+     "readings": 20418,
+     "right": 18518,
+     "share": 0.907
     }
    },
    "table rules": {
@@ -125,19 +125,19 @@
    },
    "text": {
     "<0.9": {
-     "readings": 6,
+     "readings": 16,
      "right": 2,
-     "share": 0.333
+     "share": 0.125
     },
     "<0.95": {
-     "readings": 36,
+     "readings": 38,
      "right": 4,
-     "share": 0.111
+     "share": 0.105
     },
     "<=1.0": {
-     "readings": 7360,
-     "right": 6768,
-     "share": 0.92
+     "readings": 7756,
+     "right": 7018,
+     "share": 0.905
     }
    }
   }
@@ -3143,6 +3143,162 @@
      "by an unprinted convention": 14
     },
     "examples": {}
+   }
+  },
+  "lcc-plans-s1-clean": {
+   "inventory": {
+    "claims": 429,
+    "grounded": 102,
+    "with conditions": 102,
+    "positioned": 7,
+    "misplaced": {
+     "frame in conditions": 14,
+     "numbered in attribute": 43
+    },
+    "records": {
+     "list": 2,
+     "note": 2
+    },
+    "with records": 188,
+    "printed": 11,
+    "evidence": 188,
+    "context_bytes_per_request": 51,
+    "data_bytes_per_request": 255,
+    "examples": {
+     "frame in conditions": [
+      "ELECTRICAL 111 | area | net",
+      "MECHANICAL 112 | area | net",
+      "STORAGE 110 | area | net"
+     ],
+     "numbered in attribute": [
+      "MEETING 102 | dimension 1 | ",
+      "MEETING 104 | dimension 2 | ",
+      "MEETING 101 | dimension 2 | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "subject": {
+      "nowhere": 61,
+      "entity": 2
+     },
+     "frame": {
+      "frame": 14,
+      "records": 26
+     },
+     "sibling": {
+      "conditions": 3
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 36,
+      "not shown": 19,
+      "image only": 6
+     },
+     "sibling": {
+      "in conditions": 3
+     }
+    },
+    "named": {
+     "by an unprinted convention": 26
+    },
+    "examples": {
+     "subject: shown, not used": [
+      "hallc.D101.height: wanted 'Hall C'; read height |  / height | Room: MEETING 101",
+      "hallc.D101.width: wanted 'Hall C'; read width |  / width | ",
+      "hallc.D102.height: wanted 'Hall C'; read height |  / height | Room: MEETING 102"
+     ],
+     "subject: not shown": [
+      "hallc.room101.width: wanted 'Hall C'; read width |  / width | ",
+      "hallc.room102.depth: wanted 'Hall C'; read dimension 2 |  / dimension 2 | ",
+      "hallc.room102.width: wanted 'Hall C'; read dimension 1 |  / width | "
+     ],
+     "subject: image only": [
+      "hallc.room110.width: wanted 'Hall C'; read width |  / width | ",
+      "hallc.room112.width: wanted 'Hall C'; read width |  / width | ",
+      "halld.room104.depth: wanted 'Hall D'; read length | "
+     ]
+    }
+   }
+  },
+  "lcc-plans-s1-clean-revised": {
+   "inventory": {
+    "claims": 437,
+    "grounded": 86,
+    "with conditions": 86,
+    "positioned": 7,
+    "misplaced": {
+     "frame in conditions": 7,
+     "numbered in attribute": 43
+    },
+    "records": {
+     "list": 2,
+     "note": 2
+    },
+    "with records": 189,
+    "printed": 9,
+    "evidence": 189,
+    "context_bytes_per_request": 33,
+    "data_bytes_per_request": 255,
+    "examples": {
+     "frame in conditions": [
+      "MEETING 102 | area | net",
+      "MEETING 103 | area | net",
+      "ELECTRICAL 111 | area | net"
+     ],
+     "numbered in attribute": [
+      "MEETING 102 | dimension 1 | ",
+      "MEETING 103 | dimension 1 | ",
+      "MEETING 102 | dimension 2 | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "subject": {
+      "nowhere": 61,
+      "entity": 2
+     },
+     "frame": {
+      "frame": 26,
+      "records": 14
+     },
+     "sibling": {
+      "conditions": 4
+     }
+    },
+    "audit": {
+     "subject": {
+      "shown, not used": 48,
+      "not shown": 10,
+      "image only": 3
+     },
+     "sibling": {
+      "in conditions": 4
+     }
+    },
+    "named": {
+     "by an unprinted convention": 26
+    },
+    "examples": {
+     "subject: shown, not used": [
+      "hallc.D101.height: wanted 'Hall C'; read height | Meeting 101 / height | ",
+      "hallc.D101.width: wanted 'Hall C'; read width | Meeting 101 / width | ",
+      "hallc.D102.height: wanted 'Hall C'; read height | Meeting 102 / height | "
+     ],
+     "subject: not shown": [
+      "hallc.room101.width: wanted 'Hall C'; read width |  / width | ",
+      "hallc.room102.width: wanted 'Hall C'; read dimension 1 |  / width | ",
+      "hallc.room103.depth: wanted 'Hall C'; read length |  / dimension 2 | "
+     ],
+     "subject: image only": [
+      "hallc.room110.width: wanted 'Hall C'; read width |  / width | ",
+      "hallc.room112.width: wanted 'Hall C'; read width |  / width | ",
+      "halld.room112.depth: wanted 'Hall D'; read length | "
+     ]
+    }
    }
   },
   "lcc-s1-all": {

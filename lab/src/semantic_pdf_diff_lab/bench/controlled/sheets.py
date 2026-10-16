@@ -76,6 +76,19 @@ def plan_sheet(seed=1):
     from .model import Draw
     return sheet_project(floor_plan(Draw(f"lcc-plan-{seed}")), f"lcc-plan-s{seed}")
 
+def plan_set(seed=1):
+    """A controlled project of two sheets, Hall C's meeting rooms and Hall D's: the same room and door numbers on
+    each, only the title block saying which hall a sheet is (a subject given by the sheet alone)."""
+    from .model import Draw
+    halls = [floor_plan(Draw(f"lcc-plans-{seed}-c"))]
+    for k in range(20):  # Hall D's sizes none of Hall C's, so a value names its hall
+        other = floor_plan(Draw(f"lcc-plans-{seed}-d{k}" if k else f"lcc-plans-{seed}-d"))
+        sizes = lambda plan: {v for r in plan.rooms for v in (r.width, r.depth, round(r.width * r.depth / 144))}
+        if not sizes(other) & sizes(halls[0]):
+            break
+    other.hall, other.number = "D", "A-202"
+    return sheet_project(halls + [other], f"lcc-plans-s{seed}")
+
 def _room_facts(plan, prefix=""):
     """A plan's rooms' and doors' facts, their ids prefixed (a set's "hallc.")."""
     from .model import Fact
@@ -114,7 +127,7 @@ def sheet_project(plan, ident):
                           ("issue date", "revision date", "issued", "date issued"), date, "", what, drawn="table"))
     title = ("Lakeshore Hall C: Meeting Rooms Floor Plan" if len(plans) == 1
              else f"Lakeshore Halls {' and '.join(p.hall for p in plans)}: Meeting Rooms Floor Plans")
-    project = Project(ident, title, facts, [], kinds=SHEET_KNOBS,
+    project = Project(ident, title, facts, [], kinds=SHEET_KNOBS if len(plans) == 1 else SET_KNOBS,
                       things=[(f"{r.name.title()} {r.number}", (f"Room {r.number}", f"{r.name.title()} Room {r.number}",
                                                                  r.number, f"{r.name} {r.number}"))
                               for r in plan.rooms] +
@@ -125,6 +138,8 @@ def sheet_project(plan, ident):
     return project
 
 SHEET_PROJECTS = {"lcc-plan": plan_sheet}
+SET_KNOBS = ("clean",)
+SET_PROJECTS = {"lcc-plans": plan_set}
 REVISIONS = (("A", "2026-01-10", "ISSUED FOR REVIEW"), ("B", "2026-02-20", "REVISED PER COMMENTS"),
              ("C", "2026-03-14", "ISSUED FOR PERMIT"))
 

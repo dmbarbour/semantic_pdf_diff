@@ -34,7 +34,7 @@ from semantic_pdf_diff.values import parse_number
 from .corpus import CHART_PROJECTS, PROJECTS, PROSE_PROJECTS, TABLE_PROJECTS, render
 from .model import Draw, Fact
 from .procedures import PROCEDURE_PROJECTS
-from .sheets import SHEET_PROJECTS, sheet_project
+from .sheets import SET_PROJECTS, SHEET_PROJECTS, sheet_project
 
 @dataclass
 class Pair:
@@ -379,6 +379,19 @@ def _widen(plan, number, taken=()):
             r.x += grow / 12
     room.width += grow
 
+def set_later(p, d):
+    """Revision D of the two halls' plans: Hall D's meeting room 102 widened (its area follows), Hall C's unchanged
+    though its rooms bear the same numbers; both sheets' revision tables gain revision D."""
+    hall_c, hall_d = p.sheets
+    _widen(hall_d, "102", {s for r in hall_c.rooms for s in (r.width, r.depth)})
+    for plan in p.sheets:
+        plan.revisions = plan.revisions + (("D", "2026-04-02", "HALL D ROOM 102 ENLARGED"),)
+    before = {f.id: f.value for f in p.facts}
+    p.facts[:] = sheet_project(p.sheets, p.id).facts
+    p.edits += [{"kind": "changed", "fact": f.id, "from": before[f.id], "to": f.value}
+                for f in p.facts if f.id in before and before[f.id] != f.value]
+    p.edits.append({"kind": "added", "facts": [f.id for f in p.facts if f.id not in before]})
+
 def renamed_later(p, d):
     """Pump P-101B renamed P-201B, its values kept: the same pump under a new tag (alignment by its values)."""
     rename_row(p, "P-101B", "P-201B")
@@ -544,7 +557,9 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          (TABLE_PROJECTS["coaster-tables"], "clean", datum_later, False, "datum"),
          # units only in a note over bare cells: moved (nothing changed), and restated (heights now metres)
          (TABLE_PROJECTS["coaster-tables"], "clean", units_note_later, False, "units-note"),
-         (TABLE_PROJECTS["coaster-tables"], "clean", units_changed_later, False, "units-changed"))
+         (TABLE_PROJECTS["coaster-tables"], "clean", units_changed_later, False, "units-changed"),
+         # two sheets alike but for the hall their title blocks name, one hall's room changed
+         (SET_PROJECTS["lcc-plans"], "clean", set_later, False, "revised"))
 
 def _base(make, knob, seed):
     p = make(seed)

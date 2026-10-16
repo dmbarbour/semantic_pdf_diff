@@ -50,6 +50,14 @@ DECLARED = {
         (r"^room\d+\.area$", "frame", "net, measured to face of finish",
          "ROOM AREAS ARE NET, MEASURED TO FACE OF FINISH."),
     ],
+    "lcc-plans": [  # the plan sheet's notes on each of the set's sheets; each sheet's hall, from its title block
+        (r"^hall[cd]\.room\d+\.(?:width|depth)$", "frame", "to face of finish",
+         "ALL DIMENSIONS ARE TO FACE OF FINISH UNLESS NOTED OTHERWISE."),
+        (r"^hall[cd]\.room\d+\.area$", "frame", "net, measured to face of finish",
+         "ROOM AREAS ARE NET, MEASURED TO FACE OF FINISH."),
+        (r"^hallc\.", "subject", "Hall C", "HALL C"),
+        (r"^halld\.", "subject", "Hall D", "HALL D"),
+    ],
     "coaster-tables": [
         (r"^E\d\.height$", "frame", "above the station platform",
          "Element heights are above the station platform; speeds are design values at the element's entry."),
@@ -65,7 +73,8 @@ DECLARED = {
     ],
 }
 # Names resting on a convention the page doesn't print: {family: [(the fact's id pattern, what it would take)]}
-CONVENTIONS = {"lcc-plan": [(r"^room\d+\.(?:width|depth)$", "orientation: no north arrow")]}
+CONVENTIONS = {"lcc-plan": [(r"^room\d+\.(?:width|depth)$", "orientation: no north arrow")],
+               "lcc-plans": [(r"^hall[cd]\.room\d+\.(?:width|depth)$", "orientation: no north arrow")]}
 
 def family(project_id):
     """A project's family: its id before the seed ("lcc-plan-s1-rotated": "lcc-plan")."""
@@ -126,10 +135,11 @@ def sources(project):
     return out
 
 def declared_texts(project):
-    """The texts a project prints that may declare context: its paragraphs and a sheet's notes."""
+    """The texts a project prints that may declare context: its paragraphs, and its sheets' notes and the halls
+    their title blocks name."""
     texts = {block[1] for _, blocks in project.sections or () for block in blocks if block[0] == "p"}
-    sheet = getattr(project, "sheet", None)
-    return texts | set(sheet.notes if sheet else ())
+    return texts | {text for sheet in getattr(project, "sheets", None) or () for text in (*sheet.notes,
+                                                                                            f"HALL {sheet.hall}")}
 
 def contexts(project):
     """{fact id: context}: each fact's conditions by kind, what its document declares for it, its sources, and what
