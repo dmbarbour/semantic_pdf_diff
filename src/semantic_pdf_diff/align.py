@@ -13,6 +13,8 @@ over the whole of both before any value is judged, from cheap signals, so the ju
   added or removed, and its claims aren't compared.
 - **Holders** (a claim's stance: the table_holders lever's): two claims both naming whose they are, and not the
   same party's, never pair; the same value held by another is an attribution changed, found without a model.
+  A claim naming no one pairs with a party's only when its own revision has no claim of the party's of that value:
+  else it's another voice repeating the value (a moderator adopting a company's proposal).
 - **Claims within an aligned item:** equal values under agreeing conditions are settled as equivalent, without a
   model; the rest are paired by attribute and conditions, best first, for the judge (a changed value among them).
 - **A hedge changed** (with hedges, the align_hedges setting): two readings of one value whose conditions differ
@@ -303,6 +305,13 @@ def _hedges_differ(x, y):
     differ = said(x) ^ said(y)
     return bool(differ & HEDGE_WORDS) and differ <= HEDGE_WORDS | FIRM_WORDS
 
+def _echoed(x, y, named_x, named_y):
+    """One claim names no holder, the other a party, and the unnamed one's own revision holds the party's claim of
+    the value too: the unnamed one is another voice repeating the party's value (a moderator adopting a company's
+    proposal word for word), not the party's claim read without its holder. Never paired."""
+    hx, hy = holders(x), holders(y)
+    return bool(not hx and hy and hy in named_x or not hy and hx and hx in named_y)
+
 def _one_property(side, claims):
     """Whether a value's readings in an item all name one property (each pair fits): then the value identifies it."""
     return all(fits(side.claims[i], side.claims[j]) for i in claims for j in claims if i < j)
@@ -330,13 +339,14 @@ def _within(a, b, ia, ib, settle, hedges=False):
         pairs = [(i, j) for i in ga for j in gb if value[0] == "id" or fits(a.claims[i], b.claims[j])]
         if not pairs and _one_property(a, ga) and _one_property(b, gb):
             pairs = [(i, j) for i in ga for j in gb]
-        if not pairs:
-            continue
         # claims naming the same holder pair first; claims naming different holders never pair, but for the same
         # proposition credited to another (an attribution changed), and then nothing of the value settles through
         # readings naming no one (unknown is never different, but a known holder has changed)
         named_a = {holders(a.claims[i]) for i in ga} - {frozenset()}
         named_b = {holders(b.claims[j]) for j in gb} - {frozenset()}
+        pairs = [(i, j) for i, j in pairs if not _echoed(a.claims[i], b.claims[j], named_a, named_b)]
+        if not pairs:
+            continue
         held = lambda p: (0 if holders(a.claims[p[0]]) and holders(b.claims[p[1]]) else 1)  # noqa: E731
         credited = {(i, j) for i, j in pairs if _attributable(a.claims[i], b.claims[j], named_a, named_b)}
         ranked = sorted(pairs, key=lambda p: (p not in credited, _holders_differ(a.claims[p[0]], b.claims[p[1]]),

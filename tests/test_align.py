@@ -56,6 +56,23 @@ class Alignment(unittest.TestCase):
         self.assertEqual({(left[i].value, right[j].value) for i, j, _ in align.align(left, right).judge},
                          {("251", "928"), ("742", "840")})
 
+    def test_the_document_repeating_a_partys_value_is_not_the_partys_claim(self):
+        # milestone 5: the moderator adopts Avelin's 158 ms, then Borealis's 341 ms; the companies' proposals kept.
+        # The moderator's claims (no holder) pair with each other, not with the companies' of the same value
+        def timeout(v, who, conditions):
+            return claim("acknowledgement timeout", "value", v, "ms", conditions, held=who)
+        left = [timeout("158", "Avelin", "Avelin Proposal 1"), timeout("341", "Borealis", "Borealis Proposal 1"),
+                timeout("158", "", "Proposal 3.1")]
+        right = [timeout("158", "Avelin", "Avelin Proposal 1"), timeout("341", "Borealis", "Borealis Proposal 1"),
+                 timeout("341", "", "Proposal 3.1")]
+        found = align.align(left, right)
+        paired = {(left[i].value, left[i].conditions, right[j].conditions) for i, j, _ in found.judge + found.settled}
+        self.assertIn(("158", "Proposal 3.1", "Proposal 3.1"), paired)
+        self.assertFalse({p for p in paired if (p[1] == "Proposal 3.1") != (p[2] == "Proposal 3.1")})
+        # a company's claim read without its holder (a text reading of its row) still pairs with its holder's
+        lone = [timeout("158", "", "Avelin Proposal 1")]
+        self.assertEqual(len(align.align(lone, right[:1]).settled + align.align(lone, right[:1]).judge), 1)
+
     def test_a_name_by_position_follows_its_values(self):
         # The image reader names rows by position; a pump inserted above moves every blower down a row, so
         # "blower 5" is B-402 in the earlier revision and B-401 in the later.
