@@ -286,15 +286,20 @@ def _attributable(x, y, named_x, named_y):
     return min(len(wa), len(wb)) >= ATTRIBUTION_WORDS and jaccard(wa, wb) >= ATTRIBUTING
 
 # The words a hedge or a status is said in (as words() folds them): a value stated tentatively, as a working
-# assumption, preliminary or expected, against one agreed or confirmed
+# assumption, preliminary or expected, against one agreed or confirmed. Not "proposed": a holder's attitude
 HEDGE_WORDS = {"tentative", "tentatively", "preliminary", "provisional", "provisionally", "working", "assumption",
-               "expected", "likely", "estimate", "estimated", "tbd", "tbc", "ffs", "draft", "proposed"}
+               "expected", "likely", "estimate", "estimated", "tbd", "tbc", "ffs", "draft"}
 FIRM_WORDS = {"agreed", "agreement", "confirmed", "final", "firm", "approved", "status"}
+
+# A hedge word's other forms, as one ("Tentatively" is "tentative": no hedge changed)
+HEDGE_FORMS = {"tentatively": "tentative", "provisionally": "provisional", "estimated": "estimate",
+               "agreement": "agreed"}
 
 def _hedges_differ(x, y):
     """The two readings' conditions (and stated uncertainty) differ, and only by hedge or status words, a hedge among
     them: the value firmed up or hedged."""
-    said = lambda c: words(f"{c.conditions} {getattr(c, 'uncertainty', '')}")  # noqa: E731
+    def said(c):
+        return {HEDGE_FORMS.get(w, w) for w in words(f"{c.conditions} {getattr(c, 'uncertainty', '')}")}
     differ = said(x) ^ said(y)
     return bool(differ & HEDGE_WORDS) and differ <= HEDGE_WORDS | FIRM_WORDS
 

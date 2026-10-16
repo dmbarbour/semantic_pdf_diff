@@ -341,6 +341,12 @@ class Report(unittest.TestCase):
                 self.assertEqual(hedged, {("A-1", "B-1"), ("A-2", "B-2")} if on else set())
                 self.assertTrue(found["A-3", "B-3"].get("settled"))
                 self.assertFalse(found["A-4", "B-4"].get("hedged"))  # a scope changed is no hedge: judged
+        # a hedge said in another form is the same hedge: settled, not changed
+        from semantic_pdf_diff.align import _hedges_differ
+        self.assertFalse(_hedges_differ(row("A", "size", "121", "tentative"), row("B", "size", "121", "Tentatively")))
+        # a proposal is its holder's attitude (the stance's), not a hedge: RAN1's reader once added it to conditions
+        self.assertFalse(_hedges_differ(row("A", "stage", "P1", "proposed; relying on overhead"),
+                                        row("B", "stage", "P1", "relying on overhead")))
         found = compared(True)["A-1", "B-1"]
         self.assertEqual(found["relation"], "different")
         self.assertIn('stated "Working assumption" in one revision and "Agreed" in the other', found["rationale"])
