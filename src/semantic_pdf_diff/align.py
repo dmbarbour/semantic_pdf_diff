@@ -11,6 +11,8 @@ over the whole of both before any value is judged, from cheap signals, so the ju
 - **Assignment:** best first, one counterpart each, and only with a margin over the next candidate. Near-ties
   are ambiguous and go to the judge (the plan's decision 10). Below a floor an item has no counterpart: it was
   added or removed, and its claims aren't compared.
+- **Holders** (a claim's stance: the table_holders lever's): two claims both naming whose they are, and not the
+  same party's, never pair; the same value held by another is an attribution changed, found without a model.
 - **Claims within an aligned item:** equal values under agreeing conditions are settled as equivalent, without a
   model; the rest are paired by attribute and conditions, best first, for the judge (a changed value among them).
 
@@ -54,6 +56,7 @@ class Correspondence:
     summary: dict = field(default_factory=dict)
     groups: list = field(default_factory=list)
     regrouped: tuple = ((), ())
+    attributed: list = field(default_factory=list)  # the same value, another holder: [(i, j, score)]
 
 # "number of inversions", "inversion count"
 SAME = {"number": "count", "quantity": "count", "qty": "count", "no": "count"}
@@ -256,6 +259,15 @@ def _frames_differ(x, y):
     fa, fb = words(x.frame), words(y.frame)
     return bool(fa and fb and fa != fb)
 
+def holders(claim):
+    """The parties a claim names as holding it (its stance's holders' words), or an empty set."""
+    return frozenset(w for link in getattr(claim, "stance", None) or () for w in words(link.holder))
+
+def _holders_differ(x, y):
+    """Both claims name whose they are, and not the same party's: never the same claim."""
+    ha, hb = holders(x), holders(y)
+    return bool(ha and hb and ha != hb)
+
 def _one_property(side, claims):
     """Whether a value's readings in an item all name one property (each pair fits): then the value identifies it."""
     return all(fits(side.claims[i], side.claims[j]) for i in claims for j in claims if i < j)
@@ -265,8 +277,10 @@ def _within(a, b, ia, ib, settle):
     are a group: readers phrase conditions differently ("Door Schedule", "face of finish"), so a group is unchanged
     when any of its readings agree on conditions across the revisions, and is settled (if settle) with one pair per
     claim; a group with none agreeing goes to the judge (its conditions may have changed). The rest pair by
-    attribute and conditions, best first, for the judge. Returns (to judge, settled)."""
-    judge, settled, done_a, done_b, unsure_a, unsure_b = [], [], set(), set(), set(), set()
+    attribute and conditions, best first, for the judge. Claims both naming their holders pair with the same
+    holder's first; a value's pair held by different parties is an attribution changed. Returns (to judge, settled,
+    attributed)."""
+    judge, settled, attributed, done_a, done_b, unsure_a, unsure_b = [], [], [], set(), set(), set(), set()
     groups = defaultdict(lambda: ([], []))
     for i in ia:
         if a.values[i] is not None:
@@ -282,15 +296,18 @@ def _within(a, b, ia, ib, settle):
             pairs = [(i, j) for i in ga for j in gb]
         if not pairs:
             continue
-        ranked = sorted(pairs, key=lambda p: (-_conditions(a.claims[p[0]], b.claims[p[1]]), p))
+        ranked = sorted(pairs, key=lambda p: (_holders_differ(a.claims[p[0]], b.claims[p[1]]),
+                                              -_conditions(a.claims[p[0]], b.claims[p[1]]), p))
         best = (a.claims[ranked[0][0]], b.claims[ranked[0][1]])
         agreed = settle and _conditions(*best) >= 0.5 and not any(
-            _conflict(a.claims[i], b.claims[j]) or _frames_differ(a.claims[i], b.claims[j]) for i, j in pairs)
+            _conflict(a.claims[i], b.claims[j]) or _frames_differ(a.claims[i], b.claims[j]) for i, j in pairs
+            if not _holders_differ(a.claims[i], b.claims[j]))
         covered_a, covered_b = set(), set()
-        for i, j in ranked:  # one pair per claim, best conditions first
+        for i, j in ranked:  # one pair per claim, the same holder's and best conditions first
             if i in covered_a and j in covered_b:
                 continue
-            (settled if agreed else judge).append((i, j, 1.0))
+            (attributed if _holders_differ(a.claims[i], b.claims[j]) else settled if agreed else judge).append(
+                (i, j, 1.0))
             covered_a.add(i)
             covered_b.add(j)
         done_a |= covered_a
@@ -320,6 +337,7 @@ def _within(a, b, ia, ib, settle):
                   for i in ia if free_a(i) for j in {j for w in attr_a[i] for j in by_word[w]}
                   if (i not in done_a or j not in done_b) and free_b(j)
                   and (a.values[i] is None or a.values[i] != b.values[j])
+                  and not _holders_differ(a.claims[i], b.claims[j])
                   and ((i not in done_a and j not in done_b) or same(i, j))]
     for s, i, j in sorted(candidates, key=lambda x: (-x[0], x[1], x[2])):
         if s < PAIRING:
@@ -336,15 +354,15 @@ def _within(a, b, ia, ib, settle):
     whole = lambda c: words(f"{c.entity} {c.attribute} {c.value} {c.unit} {c.conditions}")
     whole_a, whole_b = {i: whole(a.claims[i]) for i in left_a}, {j: whole(b.claims[j]) for j in left_b}
     open_a, open_b = set(left_a), set(left_b)
-    for s, i, j in sorted(((jaccard(whole_a[i], whole_b[j]), i, j) for i in left_a for j in left_b),
-                          key=lambda x: (-x[0], x[1], x[2])):
+    for s, i, j in sorted(((jaccard(whole_a[i], whole_b[j]), i, j) for i in left_a for j in left_b
+                           if not _holders_differ(a.claims[i], b.claims[j])), key=lambda x: (-x[0], x[1], x[2])):
         if s < WORDING:
             break
         if i in open_a and j in open_b:
             judge.append((i, j, round(s, 4)))
             open_a.remove(i)
             open_b.remove(j)
-    return judge, settled
+    return judge, settled, attributed
 
 def _homes(src, dst, key):
     """The other revision's items a leftover item belongs to, if clear (one counterpart is favoured, not assumed: a
@@ -446,7 +464,7 @@ class Alignment:
 
     def __init__(self, left, right):
         self.a, self.b = Side(left), Side(right)
-        self.judge, self.settled = [], []
+        self.judge, self.settled, self.attributed = [], [], []
         self.match()
         self.compare_matched()
         self.compare_ambiguous()
@@ -463,8 +481,9 @@ class Alignment:
         self.aligned, self.ambiguous = _assign(self.candidates, self.of_a, self.of_b)
 
     def compare(self, ka, kb, settle):
-        j, s = _within(self.a, self.b, self.a.items[ka], self.b.items[kb], settle=settle)
+        j, s, held = _within(self.a, self.b, self.a.items[ka], self.b.items[kb], settle=settle)
         self.judge += j
+        self.attributed += held
         if settle:
             self.settled += s
 
@@ -501,7 +520,7 @@ class Alignment:
         homed_a, homed_b = {ka for ka, _ in self.attached}, {kb for _, kb in self.attached}
         lone_a = [k for k in a.items if k not in self.aligned and k not in self.open_a and k not in homed_a]
         lone_b = [k for k in b.items if k not in self.taken_b and k not in self.open_b and k not in homed_b]
-        self.judge += _strays(a, b, self.judge + self.settled, lone_a, lone_b)
+        self.judge += _strays(a, b, self.judge + self.settled + self.attributed, lone_a, lone_b)
         self.regroupings = _regroup(a, b, lone_a, lone_b)
         self.regrouped_a = {k for _, ka, _, _ in self.regroupings for k in ka}
         self.regrouped_b = {k for _, _, kb, _ in self.regroupings for k in kb}
@@ -519,7 +538,8 @@ class Alignment:
                 "renamed_items": sorted([ka, kb] for ka, kb in list(aligned.items()) + sorted(self.attached)
                                         if ka != kb and TAG.fullmatch(ka) and TAG.fullmatch(kb)),
                 "regrouped_items": [len(self.regrouped_a), len(self.regrouped_b)],
-                "settled_pairs": len(self.settled)}
+                "settled_pairs": len(self.settled),
+                **({"attributed_pairs": len(set(self.attributed))} if self.attributed else {})}
 
     def correspondence(self):
         a, b = self.a, self.b
@@ -529,7 +549,7 @@ class Alignment:
         regrouped = (sorted(i for k in self.regrouped_a for i in a.items[k]),
                      sorted(i for k in self.regrouped_b for i in b.items[k]))
         return Correspondence(judge, sorted(self.settled), (unaligned_a, unaligned_b), self.summary(), _groups(self),
-                              regrouped)
+                              regrouped, sorted(set(self.attributed)))
 
 def _strays(a, b, pairs, lone_a, lone_b):
     """Claims left without a partner in items that have counterparts, paired with the one such claim on the other side
@@ -547,7 +567,8 @@ def _strays(a, b, pairs, lone_a, lone_b):
             stray_b[b.values[j]].append(j)
     out = []
     for i in stray_a:
-        matches = [j for j in stray_b.get(a.values[i], []) if fits(a.claims[i], b.claims[j])]
+        matches = [j for j in stray_b.get(a.values[i], []) if fits(a.claims[i], b.claims[j])
+                   and not _holders_differ(a.claims[i], b.claims[j])]
         if len(matches) == 1 and sum(a.values[k] == a.values[i] for k in stray_a) == 1:
             out.append((i, matches[0], 0.5))
     return out

@@ -6,9 +6,9 @@ from types import SimpleNamespace
 
 from semantic_pdf_diff import align
 
-def claim(entity, attribute, value, unit="", conditions="", frame=""):
+def claim(entity, attribute, value, unit="", conditions="", frame="", held=""):
     return SimpleNamespace(entity=entity, attribute=attribute, value=value, unit=unit, conditions=conditions,
-                           frame=frame, approximate=False)
+                           frame=frame, approximate=False, stance=[SimpleNamespace(holder=held)] if held else [])
 
 def pairs(found, left, right, which="judge"):
     """A correspondence's pairs as readable (entity, attribute, value) couples."""
@@ -16,6 +16,21 @@ def pairs(found, left, right, which="judge"):
     return {(show(left[i]), show(right[j])) for i, j, _ in getattr(found, which)}
 
 class Alignment(unittest.TestCase):
+    def test_claims_held_by_different_parties_never_pair_and_a_value_credited_to_another_is_attributed(self):
+        # milestone 5: two companies proposing one timeout each, and a report period credited to another company
+        timeout = lambda v, who: claim("Link failure detection", "acknowledgement timeout", v, "ms", held=who)
+        period = lambda v, who: claim("Beam report", "report period", v, "ms", held=who)
+        left = [timeout("251", "Avelin"), timeout("483", "Borealis"), period("627", "Estrella")]
+        right = [timeout("928", "Avelin"), timeout("483", "Borealis"), period("627", "Borealis")]
+        found = align.align(left, right)
+        self.assertEqual(pairs(found, left, right), {(("Link failure detection", "acknowledgement timeout", "251"),
+                                                      ("Link failure detection", "acknowledgement timeout", "928"))})
+        self.assertEqual({(i, j) for i, j, _ in found.settled}, {(1, 1)})
+        self.assertEqual({(i, j) for i, j, _ in found.attributed}, {(2, 2)})
+        self.assertEqual(found.summary["attributed_pairs"], 1)
+        unheld = [claim(c.entity, c.attribute, c.value, c.unit) for c in right]  # holders unknown: as before
+        self.assertEqual(align.align(left, unheld).attributed, [])
+
     def test_a_name_by_position_follows_its_values(self):
         # The image reader names rows by position; a pump inserted above moves every blower down a row, so
         # "blower 5" is B-402 in the earlier revision and B-401 in the later.
@@ -274,6 +289,28 @@ class Report(unittest.TestCase):
         self.assertEqual(matched["outcome"]["settled"], 1)
         self.assertIn("split candidate", groupings_html(result["groupings"], str))
         self.assertEqual(compare(left, right, Path("."), Fake(relation="different"), "proposals")["groupings"], [])
+
+    def test_a_value_credited_to_another_is_reported_as_its_attribution_changed(self):
+        # milestone 5: Estrella's report period, now Borealis's; Avelin's timeout revised; Borealis's kept
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent))
+        from test_pipeline import Fake, ev
+        from semantic_pdf_diff.compare import compare
+        from semantic_pdf_diff.schema import Link
+        held = lambda eid, who, **k: ev(eid, stance=[Link(holder=who, attitude="proposes")], **k)  # noqa: E731
+        timeout, period = dict(entity="Link failure detection", attribute="acknowledgement timeout", unit="ms"), \
+            dict(entity="Beam report", attribute="report period", unit="ms")
+        left = [held("A-1", "Avelin", value="251", **timeout), held("A-2", "Borealis", value="483", **timeout),
+                held("A-3", "Estrella", value="627", **period)]
+        right = [held("B-1", "Avelin", value="928", **timeout), held("B-2", "Borealis", value="483", **timeout),
+                 held("B-3", "Borealis", value="627", **period)]
+        result = compare(left, right, Path("."), Fake(relation="different"), "revisions")
+        found = {(f["a"], f["b"]): f for f in result["findings"]}
+        self.assertEqual(set(found), {("A-1", "B-1"), ("A-2", "B-2"), ("A-3", "B-3")})
+        self.assertTrue(found["A-2", "B-2"].get("settled"))
+        self.assertEqual((found["A-3", "B-3"]["relation"], found["A-3", "B-3"].get("attributed")), ("different", True))
+        self.assertIn("held by Estrella in one revision and by Borealis", found["A-3", "B-3"]["rationale"])
 
 class Lever(unittest.TestCase):
     def test_revisions_align_and_proposals_keep_retrieval(self):
