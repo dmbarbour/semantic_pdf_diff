@@ -3,7 +3,7 @@ ahead can cost a model call, what it would clear and ask again, and the refusal 
 operations (Store.interpreter, save_interpreter, clear_extraction, clear_situating, logged_queries): split from
 store.py (code review 2026-10-08, C5).
 """
-from .levers import ALL_REGIONS, declared, setting_regions
+from .levers import ALL_REGIONS, REGISTRY, declared, setting_regions
 from .schema import Interpreter
 from .settings import Settings
 from .store import StoreError
@@ -74,6 +74,21 @@ def interpreter_differences(old, new):
             diff[key] = (a, b)
     return diff
 
+# Each lever setting's off value: what asks exactly what leaving its lever out asks (Lever.off)
+OFF = {name: value for lever in REGISTRY.values() for name, value in lever.off.items()}
+
+def _asks_alike(key, a, b, old, new):
+    """Whether a difference asks nothing new: a setting one side doesn't have, at its lever's off value on the
+    other, or levers added or dropped with every setting of theirs off (a lever built, off, after a store was made
+    asks what the store's run asked)."""
+    name = key.split(".", 1)[1] if key.startswith("settings.") else None
+    if name == "levers" and isinstance(a, list) and isinstance(b, list):
+        moved = [(lever, new) for lever in b if lever not in a] + [(lever, old) for lever in a if lever not in b]
+        return all(lever in REGISTRY and REGISTRY[lever].off and
+                   all(side.get("settings", {}).get(s, OFF[s]) == OFF[s] for s in REGISTRY[lever].off)
+                   for lever, side in moved) and [x for x in a if x in b] == [x for x in b if x in a]
+    return name in OFF and (a is None or b is None) and (b if a is None else a) == OFF[name]
+
 def affected_regions(differences):
     regions = set()
     for key in differences:
@@ -89,8 +104,11 @@ def bind(store, interpreter: Interpreter, reset=False, dry_run=False):
         if not dry_run:
             store.save_interpreter(interpreter.role, new)
         return {}
-    differences = interpreter_differences(old, new)
+    differences = {k: (a, b) for k, (a, b) in interpreter_differences(old, new).items()
+                   if not _asks_alike(k, a, b, old, new)}
     if not differences:
+        if old != new and not dry_run:
+            store.save_interpreter(interpreter.role, new)  # only levers off that the store didn't know
         return {}
     automatic = free(differences) and not reset  # can't cost a model call: applied without asking
     if interpreter.role == "triage":

@@ -132,6 +132,23 @@ class Binding(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
             self.assertEqual(bind(store, extraction_interpreter(Settings())), {})
 
+    def test_a_lever_built_off_since_binds_quietly(self):
+        # a store made before a lever existed: the lever, off, asks what the store's run asked
+        import json
+        with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
+            before = store.interpreter('extract')
+            before['settings'].pop('column_conditions')
+            before['settings']['levers'].remove('column_conditions')
+            store.save_interpreter('extract', before)
+            self.assertEqual(bind(store, extraction_interpreter(Settings())), {})
+            self.assertEqual(store.interpreter('extract'), json.loads(json.dumps(
+                extraction_interpreter(Settings()).model_dump())))  # rebound, as it is now
+            store.save_interpreter('extract', before)
+            with self.assertRaises(InterpreterMismatch) as caught:  # on, it asks something new
+                bind(store, extraction_interpreter(Settings(column_conditions=True)))
+            self.assertIn('settings.column_conditions', caught.exception.differences)
+            self.assertIn('settings.levers', caught.exception.differences)
+
     def test_changed_interpreter_is_rejected_with_explanation(self):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
             with self.assertRaises(InterpreterMismatch) as caught:
