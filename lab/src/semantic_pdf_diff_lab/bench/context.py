@@ -97,8 +97,8 @@ def requests(store, content):
 def every_reading(runs_dir):
     """{run: [(content, family, claim)]} for every store under runs_dir: each task's reading of a claim in its own
     words (once per task, quote and wording), from the readers whose regions have a family (as units' are); a claim
-    holds its entity, attribute, value, unit, conditions, frame (if any), quote, `_task`, and `_records` (the context
-    records it references)."""
+    holds its entity, attribute, value, unit, conditions, frame and stance (if any), quote, `_task`, and `_records`
+    (the context records it references)."""
     from semantic_pdf_diff.readings import wording
     from semantic_pdf_diff.regions import FAMILY
     from semantic_pdf_diff.store import Store
@@ -118,6 +118,8 @@ def every_reading(runs_dir):
                         claim = {k: getattr(r, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
                         if r.frame:
                             claim["frame"] = r.frame
+                        if r.stance:  # who holds it (milestone 5): its links' holders
+                            claim["stance"] = "; ".join(link.holder for link in r.stance)
                         claim.update(quote=o.quote, _task=o.locator.task, _records=list(r.records))
                         out[folder.name].append((content, family, claim))
     return dict(out)
@@ -189,18 +191,26 @@ def totals(measures):
 
 KINDS = ("scope", "frame", "subject", "bound", "provenance", "sibling", "holder")
 OUTSIDE = ("provenance", "sibling")  # kinds that belong in none of a claim's words
-# A claim's words, then the context records it references (the records lever: a sheet's notes, a list's lead-in, a
-# table's title, headers and lead-in), whose text a claim holds by reference rather than in its words
-FIELDS = ("frame", "conditions", "entity", "attribute", "records")
+# A claim's stance (who holds it), its words, then the context records it references (the records lever: a sheet's
+# notes, a list's lead-in, a table's title, headers and lead-in), whose text a claim holds by reference rather than in
+# its words
+FIELDS = ("stance", "frame", "conditions", "entity", "attribute", "records")
 # Where a kind belongs in a claim: scope in conditions, frame in its own field (the split_conditions lever's) or in
 # conditions (readers without it), a subject in the entity, a bound in the attribute or conditions; provenance in none
-# of them; a holder (a reported view's: milestone 5) wherever the claim's words name it, for now. Scope, frame and
-# subject may also be held by a record reaching the claim (the plan's Concepts: stored once and referenced)
+# of them; a holder (a reported view's: milestone 5) in the claim's stance, or wherever its words name it. Scope,
+# frame and subject may also be held by a record reaching the claim (the plan's Concepts: stored once and
+# referenced)
 HOME = {"scope": {"conditions", "records"}, "frame": {"frame", "conditions", "records"},
         "subject": {"entity", "conditions", "records"}, "bound": {"attribute", "conditions"}, "provenance": set(),
-        "sibling": set(), "holder": {"entity", "conditions", "attribute", "records"}}
+        "sibling": set(), "holder": {"stance", "entity", "conditions", "attribute", "records"}}
 CONVENTION_WORDS = {"width", "depth", "length", "east", "west", "north", "south"}
 GEOMETRY_WORDS = {"horizontal", "vertical", "drawn", "x", "y"}
+
+def _text(value):
+    """A claim's field as words: a stance stored as links (a run's evidence) gives its holders."""
+    if isinstance(value, list):
+        return "; ".join(str(x.get("holder", "")) if isinstance(x, dict) else str(x) for x in value)
+    return value or ""
 
 def _wanted(fact, text):
     """The words of a context item that a claim would have to say: its own, less the fact's names'."""
@@ -234,7 +244,7 @@ def against_key(key_data, claims, shown_by_task):
             # a bound is said in many ways ("shall not exceed", "at least"): the scorer's reading of bounds decides
             said_in = (lambda text, limit=bounds(ctx[kind]): bounds(text) & limit) if kind == "bound" else \
                 (lambda text, want=_wanted(fact, ctx[kind]): want & words(text))
-            landed = {field for c in mine for field in FIELDS if said_in(c.get(field, ""))}
+            landed = {field for c in mine for field in FIELDS if said_in(_text(c.get(field, "")))}
             where = next((f for f in FIELDS if f in landed), "nowhere")
             placed[kind][where] += 1
             if kind in OUTSIDE:

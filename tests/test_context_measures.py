@@ -83,6 +83,17 @@ class AgainstKey(unittest.TestCase):
         self.assertEqual(result["placed"]["scope"], {"records": 1})
         self.assertEqual(result["audit"], {})
 
+    def test_a_holder_is_kept_in_the_claims_stance_or_its_words(self):
+        # milestone 5: a proposal's company, as the claim's stance (stored as links) or in its conditions
+        key = {**KEY, "facts": [fact("timer.idle", "retransmission timer", "709",
+                                     ctx={"holder": "Avelin", "attitude": "proposes"})] + KEY["facts"][1:]}
+        stanced = {**claim("retransmission timer", "709", ""), "stance": [{"holder": "Avelin", "attitude": "proposes"}]}
+        said = claim("retransmission timer", "709", "proposed by Avelin")
+        unheld = claim("retransmission timer", "709", "")
+        place = lambda c: context.against_key(key, [c], {"text:p1": [""]})["placed"].get("holder")  # noqa: E731
+        self.assertEqual((place(stanced), place(said), place(unheld)),
+                         ({"stance": 1}, {"conditions": 1}, {"nowhere": 1}))
+
 class Readings(unittest.TestCase):
     def test_every_reading_counts_a_frame_only_a_later_sighting_gave(self):
         # one fact read by two tasks, merged into one claim: the first sighting has no frame, the second does
