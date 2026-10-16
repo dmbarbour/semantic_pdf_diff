@@ -825,6 +825,21 @@ class Records(Lever):
         from .records import table_record
         return table_record(page_no, task, grid, context, box)
 
+class SheetRecords(Lever):
+    lever_name, stage, off = "sheet_records", "matching", {"sheet_records": False}
+    # a drawing sheet's title block kept as a record every claim on the sheet references, and alignment keeping
+    # apart claims of two sheets both revisions have (docs/plans/claim-context-2026-10-14.md, milestone 4: two halls'
+    # sheets alike but for their title blocks). Applied as answers are stored
+    sheet_records: Annotated[bool, Declared("post", EXTRACT)] = False
+
+    def page_structure(self, page_no, blocks, is_sheet):
+        positions, records = super().page_structure(page_no, blocks, is_sheet)
+        if not self.sheet_records:
+            return positions, records
+        from .records import sheet_record
+        sheet = sheet_record(page_no, is_sheet())
+        return positions, records + ([sheet] if sheet else [])
+
 class Reconcile(Lever):
     lever_name, stage, off = "reconcile", "matching", {"reconcile": False}
     # merge readings of one fact by different tasks into one claim; applied when evidence is read, not stored
@@ -951,8 +966,9 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ColumnConditions, ConditionsByC
                  TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
                  RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,
                  TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText, LoneRows,
-                 TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, Reconcile, DedupeRepeated,
-                 ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
+                 TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords, Reconcile,
+                 DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
+                 JudgeContext)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 

@@ -11,6 +11,9 @@ ContextRecord, Evidence.records).
   ABBREVIATIONS, with the numbered notes under it. A sheet's notes reach the whole sheet ("ALL DIMENSIONS ARE TO FACE
   OF FINISH UNLESS NOTED OTHERWISE"), so every claim on the page takes them. On other pages a "Notes" heading is
   often a table's or a section's, whose reach the layout doesn't settle: not taken there.
+- **A sheet's title block** (the sheet_records lever): its number and the titles beside it ("sheet A-202", "HALL D
+  FLOOR PLAN - MEETING ROOMS"), as figures.title_block reads them; every claim on the sheet takes it. Its id names
+  the sheet ("sheet:p2:sheet A-202"), so alignment can keep two sheets' claims apart (align.sheet_of).
 - **Names as printed** (Evidence.printed): a table claim's row label and value's header; a text claim's words before
   its value in its verified quote (printed_before).
 """
@@ -79,6 +82,14 @@ def note_records(page_no, blocks):
                                      gives=["frame"] if kind == "legend" else ["frame", "scope"], label=label,
                                      text=text_of, page=page_no, bbox=_union(boxes)))
     return records
+
+def sheet_record(page_no, figure):
+    """A drawing sheet's title block as a record, or None when the sheet has no number: its id names the sheet."""
+    if not figure or not figure.label:
+        return None
+    return ContextRecord(id=f"sheet:p{page_no}:{figure.label}"[:120], kind="sheet", gives=["subject", "scope"],
+                         label=figure.label[:200], text=figure.title[:TEXT_CHARS], page=page_no,
+                         bbox=tuple(figure.bbox))
 
 def table_record(page_no, task, grid, context, box):
     """A table read by rules, as a record: its title as its label, its headers as its items, the context its rows

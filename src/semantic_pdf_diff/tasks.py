@@ -255,10 +255,11 @@ class TaskCore:
     def find_positions(self, page_no, blocks, is_sheet=lambda: False):
         """A page's list items (the positions hook) among its text blocks [(box, text)] in reading order: by box,
         for its text tasks' claims, and by text, for a claim another task read there (a picture's quote); and the
-        context records the page structure hook finds there (a sheet's notes reach every claim on the page)."""
+        context records the page structure hook finds there (a sheet's notes, and its title block, reach every claim on
+        the page). is_sheet() gives the page's sheet figure, or None."""
         found, records = self.s.page_structure(page_no, blocks, is_sheet)
         self.records.update((r.id, r) for r in records)
-        self.reach[page_no] = [r.id for r in records if r.kind in ("note", "legend")]
+        self.reach[page_no] = [r.id for r in records if r.kind in ("note", "legend", "sheet")]
         self.positions[page_no] = found
         self.listed[page_no] = [(text, found[tuple(box)]) for box, text in blocks if tuple(box) in found]
 

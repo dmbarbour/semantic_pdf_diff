@@ -38,7 +38,7 @@ TOGGLES = {
     'another_tiling': 'asked',
     'least_half': 0.5, 'skip_sheet_tables': True, 'images_first': False, 'complete_by_image': True,
     'positions': 'conditions', 'records': False, 'editorial': False, 'split_conditions': False,
-    'column_conditions': True, 'conditions_by_column': True,
+    'column_conditions': True, 'conditions_by_column': True, 'sheet_records': True,
 }
 # Settings measured under others, on both sides: the tilers' with tile_choice off (by default the rule picks the cut by
 # its measures, so another tiler or a tile's growth, say, may leave its choice and the queries as they were); the
@@ -54,7 +54,7 @@ UNDER = {**dict.fromkeys(('grow_tiles', 'tiling', 'skip_empty', 'tile_cut', 'ban
 # The budget settings' values bite under the model-neutral defaults (32,768 tokens of context): 8,192, or a
 # per-image or safety reserve that leaves little room, changes what situating sends and what's refused.
 ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refinement_depth', 'skip_text_only',
-             'tile_cut', 'band_width', 'least_half', 'skip_sheet_tables'}
+             'tile_cut', 'band_width', 'least_half', 'skip_sheet_tables', 'sheet_records'}
 # Settings these documents can't exercise, and why (each still needs its class checked elsewhere).
 NOT_EXERCISED = {
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
@@ -221,13 +221,13 @@ class Declarations(unittest.TestCase):
         from semantic_pdf_diff import settings as settings_module
         self.assertFalse({k for k in binding.SETTING_REGIONS if SETTING_CLASSES[k] == "endpoint"})
         # a bound lever setting without a scope clears every region when changed: only the instructions should,
-        # the row dedupe (it can drop rows from any task's text), and context records (a sheet's notes reach every
-        # claim on it, the tiles' too)
+        # the row dedupe (it can drop rows from any task's text), and context records (a sheet's notes, and its title
+        # block, reach every claim on it, the tiles' too)
         from semantic_pdf_diff.levers import declared
         unscoped = {n for n in levers.lever_settings() if "extract" in declared(Settings, n).roles
                     and n not in binding.SETTING_REGIONS}  # (regions are extraction's)
         self.assertEqual(unscoped, {"extract_prompt", "split_conditions", "extract_rules", "dedupe_repeated",
-                                    "records"})
+                                    "records", "sheet_records"})
         for name, _ in settings_module.LEVER_MARKS:  # each mark is its lever's own setting, or the headings
             self.assertTrue(name == "section" or any(name in c.model_fields and name in c.marks
                                                      for c in levers.LEVER_CLASSES), name)

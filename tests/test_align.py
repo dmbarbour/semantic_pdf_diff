@@ -6,9 +6,9 @@ from types import SimpleNamespace
 
 from semantic_pdf_diff import align
 
-def claim(entity, attribute, value, unit="", conditions="", frame=""):
+def claim(entity, attribute, value, unit="", conditions="", frame="", records=()):
     return SimpleNamespace(entity=entity, attribute=attribute, value=value, unit=unit, conditions=conditions,
-                           frame=frame, approximate=False)
+                           frame=frame, approximate=False, records=list(records))
 
 def pairs(found, left, right, which="judge"):
     """A correspondence's pairs as readable (entity, attribute, value) couples."""
@@ -16,6 +16,23 @@ def pairs(found, left, right, which="judge"):
     return {(show(left[i]), show(right[j])) for i, j, _ in getattr(found, which)}
 
 class Alignment(unittest.TestCase):
+    def test_two_sheets_alike_but_for_their_title_blocks_keep_their_rooms_apart(self):
+        # the sheet_records lever: Hall C's and Hall D's Meeting 101, on sheets A-201 and A-202; Hall D's widened
+        c, d = ["sheet:p1:sheet A-201"], ["sheet:p2:sheet A-202"]
+        def halls(d_width):
+            return [claim("Meeting 101", "width", "30'-0\"", records=c),
+                    claim("Meeting 101", "depth", "24'-0\"", records=c),
+                    claim("Meeting 101", "width", d_width, records=d),
+                    claim("Meeting 101", "depth", "26'-0\"", records=d)]
+        left, right = halls("32'-0\""), halls("34'-0\"")
+        found = align.align(left, right)
+        compared = {(i, j) for i, j, _ in found.judge + found.settled}
+        self.assertEqual(compared, {(0, 0), (1, 1), (2, 2), (3, 3)})  # every claim with its own hall's
+        self.assertEqual({(i, j) for i, j, _ in found.judge}, {(2, 2)})  # only Hall D's width judged
+        one = [claim(x.entity, x.attribute, x.value, records=c) for x in right]  # a sheet the other lacks
+        self.assertEqual(align.Side(one, {"sheet A-201"}).items.keys(), {"sheet A-201 | 101 meeting"})
+        self.assertEqual(align.Side(one, set()).items.keys(), {"101 meeting"})
+
     def test_a_name_by_position_follows_its_values(self):
         # The image reader names rows by position; a pump inserted above moves every blower down a row, so
         # "blower 5" is B-402 in the earlier revision and B-401 in the later.

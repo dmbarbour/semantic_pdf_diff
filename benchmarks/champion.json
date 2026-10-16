@@ -43,6 +43,7 @@
     "quote_match",
     "positions",
     "records",
+    "sheet_records",
     "reconcile",
     "dedupe_repeated",
     "continue_reading",

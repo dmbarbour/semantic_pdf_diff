@@ -40,6 +40,29 @@ class Notes(unittest.TestCase):
         self.assertNotIn("MEETING 102", notes[0].text)  # an unnumbered block ends the notes
         self.assertEqual(notes[1].text, "DF DRINKING FOUNTAIN")
 
+class Sheets(unittest.TestCase):
+    def test_a_sheets_title_block_is_a_record_naming_the_sheet(self):
+        # the sheet_records lever: two halls' sheets alike but for their title blocks
+        from semantic_pdf_diff.records import sheet_record
+        from semantic_pdf_diff.schema import Figure
+        sheet = Figure(id="fig:p2:0", page=2, bbox=(0, 0, 2592, 1728), kind="sheet", label="sheet A-202",
+                       title="HALL D FLOOR PLAN - MEETING ROOMS", label_source="title block")
+        record = sheet_record(2, sheet)
+        self.assertEqual((record.id, record.kind, record.label, record.text, record.gives),
+                         ("sheet:p2:sheet A-202", "sheet", "sheet A-202", "HALL D FLOOR PLAN - MEETING ROOMS",
+                          ["subject", "scope"]))
+        self.assertIsNone(sheet_record(2, sheet.model_copy(update={"label": None})))
+        self.assertIsNone(sheet_record(2, None))
+
+    def test_the_sheet_record_is_kept_only_when_on(self):
+        from semantic_pdf_diff.schema import Figure
+        sheet = Figure(id="fig:p1:0", page=1, bbox=(0, 0, 10, 10), kind="sheet", label="sheet A-201", title="HALL C")
+        page = blocks("GENERAL NOTES", "1. ALL DIMENSIONS ARE TO FACE OF FINISH.")
+        kinds = lambda s: [r.kind for r in s.page_structure(1, page, lambda: sheet)[1]]
+        self.assertEqual(kinds(Settings()), ["note"])
+        self.assertEqual(kinds(Settings(sheet_records=True)), ["note", "sheet"])
+        self.assertEqual(Settings(sheet_records=True).page_structure(1, page, lambda: None)[1], [])  # no sheet
+
 class Tables(unittest.TestCase):
     def test_a_table_record_is_named_by_its_rules_task(self):
         grid = SimpleNamespace(title="Table 1. Pumps", place="page 2, table 1", labels=["Tag", "Capacity (gpm)"])

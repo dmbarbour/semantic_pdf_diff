@@ -11,6 +11,9 @@ over the whole of both before any value is judged, from cheap signals, so the ju
 - **Assignment:** best first, one counterpart each, and only with a margin over the next candidate. Near-ties
   are ambiguous and go to the judge (the plan's decision 10). Below a floor an item has no counterpart: it was
   added or removed, and its claims aren't compared.
+- **Sheets:** a claim on a drawing sheet whose number both revisions have (its sheet record, the sheet_records
+  lever's) is an item with that sheet's claims only: two halls' sheets alike but for their title blocks keep their
+  Room 101s apart. A sheet one revision lacks leaves its claims to be matched as any others.
 - **Claims within an aligned item:** equal values under agreeing conditions are settled as equivalent, without a
   model; the rest are paired by attribute and conditions, best first, for the judge (a changed value among them).
 
@@ -136,9 +139,14 @@ def qualifier(text):
     bound, tolerance, money = PREFIX.match(text).groups()
     return BOUNDS.get(bound, bound or "") + ("±" if tolerance else "") + ("$" if money else "")
 
+def sheet_of(claim):
+    """The drawing sheet a claim is on, by its sheet record ("sheet:p2:sheet A-202" gives "sheet A-202"), or ""."""
+    return next((r.split(":", 2)[2] for r in getattr(claim, "records", None) or () if r.startswith("sheet:")), "")
+
 class Side:
-    """One revision's items: {key: [claim indices]}, each item's values, attributes and name words."""
-    def __init__(self, claims):
+    """One revision's items: {key: [claim indices]}, each item's values, attributes and name words. sheets: the
+    drawing sheets both revisions have, whose claims make items of their own."""
+    def __init__(self, claims, sheets=frozenset()):
         self.claims = claims
         self.values = [value_key(c) for c in claims]
         items = defaultdict(list)
@@ -147,6 +155,8 @@ class Side:
             items[tags[0] if tags else " ".join(sorted(words(c.entity))) or "(unnamed)"].append(i)
         self.items = dict(items)
         self._join_positional()
+        if sheets:
+            self._by_sheet(sheets)
         self.item_values = {k: {self.values[i] for i in idx} - {None} for k, idx in self.items.items()}
         self.item_attributes = {k: frozenset().union(*(attribute(claims[i]) for i in idx))
                                 for k, idx in self.items.items()}
@@ -180,6 +190,15 @@ class Side:
             shares = sorted(((len(vals[k] & vals[t]) / len(vals[k]), t) for t in tagged), reverse=True)
             if shares and shares[0][0] >= JOINING and (len(shares) == 1 or shares[0][0] - shares[1][0] >= MARGIN):
                 self.items[shares[0][1]] += self.items.pop(k)
+
+    def _by_sheet(self, sheets):
+        """Each item's claims on a sheet both revisions have made an item of that sheet's ("sheet A-202 | D101")."""
+        items = defaultdict(list)
+        for key, idx in self.items.items():
+            for i in idx:
+                sheet = sheet_of(self.claims[i])
+                items[f"{sheet} | {key}" if sheet in sheets else key].append(i)
+        self.items = dict(items)
 
 def _name(a, b, ka, kb):
     if ka == kb:
@@ -445,7 +464,8 @@ class Alignment:
     still alone."""
 
     def __init__(self, left, right):
-        self.a, self.b = Side(left), Side(right)
+        sheets = ({sheet_of(c) for c in left} & {sheet_of(c) for c in right}) - {""}
+        self.a, self.b = Side(left, sheets), Side(right, sheets)
         self.judge, self.settled = [], []
         self.match()
         self.compare_matched()
