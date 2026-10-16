@@ -130,8 +130,8 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `records` | `true` | post | records | extract | all |
 | `sheet_records` | `true` | post | sheet_records | extract | all |
 | `table_holders` | `true` | post | table_holders | extract | table |
-| `carried_holders` | `false` | post | carried_holders | extract | table |
-| `view_attitudes` | `false` | post | view_attitudes | extract | all |
+| `carried_holders` | `true` | post | carried_holders | extract | table |
+| `view_attitudes` | `true` | post | view_attitudes | extract | all |
 | `reconcile` | `true` | post | reconcile | - | - |
 | `dedupe_repeated` | `true` | shaping | dedupe_repeated | extract | all |
 | `continuations` | `3` | selecting | continue_reading | extract | figure, overview, tile, vision |

@@ -36,8 +36,7 @@
    },
    "holder": {
     "conditions": 25,
-    "nowhere": 24,
-    "stance": 86
+    "stance": 110
    },
    "provenance": {
     "conditions": 5
@@ -67,9 +66,6 @@
    "frame": {
     "shown, not used": 23
    },
-   "holder": {
-    "not shown": 24
-   },
    "provenance": {
     "in conditions": 5
    },
@@ -92,8 +88,8 @@
    "otherwise": 14
   },
   "attitudes": {
-   "in its stance": 86,
-   "none": 49
+   "in its stance": 110,
+   "none": 25
   },
   "reliability": {
    "all": {
@@ -5677,27 +5673,15 @@
    "keyed": {
     "placed": {
      "holder": {
-      "stance": 4,
-      "nowhere": 6
+      "stance": 10
      }
     },
-    "audit": {
-     "holder": {
-      "not shown": 6
-     }
-    },
+    "audit": {},
     "named": {},
     "attitudes": {
-     "in its stance": 4,
-     "none": 6
+     "in its stance": 10
     },
-    "examples": {
-     "holder: not shown": [
-      "avelin.2: wanted 'Avelin'; read value | Proposal 2",
-      "avelin.3: wanted 'Avelin'; read beam report capacity | ",
-      "borealis.2: wanted 'Borealis'; read value | Proposal 2"
-     ]
-    }
+    "examples": {}
    }
   },
   "views-grouped-s1.md": {
@@ -5716,27 +5700,15 @@
    "keyed": {
     "placed": {
      "holder": {
-      "stance": 4,
-      "nowhere": 6
+      "stance": 10
      }
     },
-    "audit": {
-     "holder": {
-      "not shown": 6
-     }
-    },
+    "audit": {},
     "named": {},
     "attitudes": {
-     "in its stance": 4,
-     "none": 6
+     "in its stance": 10
     },
-    "examples": {
-     "holder: not shown": [
-      "avelin.2: wanted 'Avelin'; read value | Proposal 2",
-      "avelin.3: wanted 'Avelin'; read beam report capacity | ",
-      "borealis.2: wanted 'Borealis'; read value | Proposal 2"
-     ]
-    }
+    "examples": {}
    }
   },
   "views-grouped-s1.pptx": {
@@ -5753,27 +5725,15 @@
    "keyed": {
     "placed": {
      "holder": {
-      "stance": 4,
-      "nowhere": 6
+      "stance": 10
      }
     },
-    "audit": {
-     "holder": {
-      "not shown": 6
-     }
-    },
+    "audit": {},
     "named": {},
     "attitudes": {
-     "in its stance": 4,
-     "none": 6
+     "in its stance": 10
     },
-    "examples": {
-     "holder: not shown": [
-      "avelin.2: wanted 'Avelin'; read beam report period | ",
-      "avelin.3: wanted 'Avelin'; read beam report content | ",
-      "borealis.2: wanted 'Borealis'; read beam report period | "
-     ]
-    }
+    "examples": {}
    }
   },
   "views-grouped-s1.xlsx": {
@@ -5790,27 +5750,15 @@
    "keyed": {
     "placed": {
      "holder": {
-      "stance": 4,
-      "nowhere": 6
+      "stance": 10
      }
     },
-    "audit": {
-     "holder": {
-      "not shown": 6
-     }
-    },
+    "audit": {},
     "named": {},
     "attitudes": {
-     "in its stance": 4,
-     "none": 6
+     "in its stance": 10
     },
-    "examples": {
-     "holder: not shown": [
-      "avelin.2: wanted 'Avelin'; read beam report period | ",
-      "avelin.3: wanted 'Avelin'; read beam report content | ",
-      "borealis.2: wanted 'Borealis'; read beam report period | "
-     ]
-    }
+    "examples": {}
    }
   },
   "views-prose-s1": {

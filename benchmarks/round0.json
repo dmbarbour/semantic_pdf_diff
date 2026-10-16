@@ -79,6 +79,8 @@
   "split_conditions": false,
   "sheet_records": false,
   "table_holders": false,
+  "carried_holders": false,
+  "view_attitudes": false,
   "decoration": false,
   "tile_choice": "off",
   "skip_text_only": false,

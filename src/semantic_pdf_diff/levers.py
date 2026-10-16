@@ -865,7 +865,7 @@ class CarriedHolders(Lever):
     lever_name, stage, off = "carried_holders", "matching", {"carried_holders": False}
     # with table_holders: a holder column's blank cell takes the nearest name above it (a company named on its first
     # row only, as merged cells print; stance.py). Applied as answers are stored
-    carried_holders: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = False
+    carried_holders: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = True
 
     def table_holder(self, header, row, above=()):
         found = super().table_holder(header, row, above)
@@ -879,7 +879,7 @@ class ViewAttitudes(Lever):
     # a held claim whose value is a yes or a no is its holder's view of the proposition ("CMCC | support for Proposal
     # 3.2.4 | Y": Proposal 3.2.4, support, CMCC supports), not a value of the holder (stance.py). Applied as answers
     # are stored
-    view_attitudes: Annotated[bool, Declared("post", EXTRACT)] = False
+    view_attitudes: Annotated[bool, Declared("post", EXTRACT)] = True
 
     def held(self, claim):
         claim = super().held(claim)
@@ -1020,8 +1020,8 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
-# editorial, record_changes, split_conditions, sheet_records and table_holders (docs/reviews/levers.md); round 0's
-# settings are benchmarks/round0.json.
+# editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders and view_attitudes
+# (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, ColumnConditions, ConditionsByColumn, ExtractRules,
                  VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext,
                  References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty,

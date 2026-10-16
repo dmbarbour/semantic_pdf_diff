@@ -67,10 +67,10 @@ class HolderColumn(unittest.TestCase):
         header = ["Company", "Proposals"]
         above = [["Avelin [1]", "Proposal 1: ..."], [None, "Proposal 2: ..."]]
         holder = lambda s: [x.holder for x in s.table_holder(header, ["", "Proposal 3: ..."], above)]  # noqa: E731
-        self.assertEqual(holder(Settings()), [])
-        self.assertEqual(holder(Settings(carried_holders=True)), ["Avelin"])
-        self.assertEqual(holder(Settings(carried_holders=True, table_holders=False)), [])
-        self.assertEqual(Settings(carried_holders=True).table_holder(header, ["", "x"], [[None, "y"]]), ())
+        self.assertEqual(holder(Settings(carried_holders=False)), [])
+        self.assertEqual(holder(Settings()), ["Avelin"])
+        self.assertEqual(holder(Settings(table_holders=False)), [])
+        self.assertEqual(Settings().table_holder(header, ["", "x"], [[None, "y"]]), ())
 
 class Views(unittest.TestCase):
     def test_a_yes_or_no_held_is_the_holders_view_of_the_proposition(self):
@@ -93,10 +93,10 @@ class Views(unittest.TestCase):
         from semantic_pdf_diff.settings import Settings
         claims = [Claim(entity=h, attribute=f"support for Proposal {p}", value="Y", kind="table", quote="Y",
                         confidence=0.9, stance=[Link(holder=h)]) for h in ("CMCC", "vivo") for p in ("3.1", "3.2")]
-        on = [Settings(view_attitudes=True).held(c) for c in claims]
+        on = [Settings().held(c) for c in claims]
         self.assertEqual(sorted({c.entity for c in on}), ["Proposal 3.1", "Proposal 3.2"])
         self.assertEqual(len({claim_id("c", c) for c in on}), 4)
-        self.assertEqual([Settings().held(c) for c in claims], claims)
+        self.assertEqual([Settings(view_attitudes=False).held(c) for c in claims], claims)
 
 class Asked(unittest.TestCase):
     def test_a_rows_holder_is_kept_and_the_readers_attitude_added(self):
@@ -190,9 +190,10 @@ class Read(unittest.TestCase):
         self.assertEqual(sorted(x for x in on if x[0] != "Y" and x[0] != "N"),
                          [("251", [("Avelin", "proposes")]), ("251", [("Borealis", "proposes")]),
                           ("754", [("Corvane", "proposes")])])
-        # by rules: the views table's rows, each its company's (the attitude is in the value)
-        self.assertIn(("Y", [("CMCC", "")]), on)
-        self.assertIn(("N", [("Delmar", "")]), on)
+        # by rules: the views table's rows, each its company's view (view_attitudes: the attitude from the value)
+        self.assertIn(("Y", [("CMCC", "supports")]), on)
+        self.assertIn(("N", [("Delmar", "opposes")]), on)
+        self.assertIn(("Y", [("CMCC", "")]), self.read(view_attitudes=False))
         off = self.read(table_holders=False)
         self.assertTrue(all(stance == [] for _, stance in off))
         self.assertEqual(sorted(v for v, _ in off if v not in ("Y", "N")), ["251", "754"])  # one 251: one claim
