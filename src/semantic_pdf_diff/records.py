@@ -84,8 +84,9 @@ def note_records(page_no, blocks):
     return records
 
 def sheet_record(page_no, figure):
-    """A drawing sheet's title block as a record, or None when the sheet has no number: its id names the sheet."""
-    if not figure or not figure.label:
+    """A drawing sheet's title block as a record, or None when the sheet has no number (or the sheet check says only
+    whether the page is one): its id names the sheet."""
+    if not getattr(figure, "label", None):
         return None
     return ContextRecord(id=f"sheet:p{page_no}:{figure.label}"[:120], kind="sheet", gives=["subject", "scope"],
                          label=figure.label[:200], text=figure.title[:TEXT_CHARS], page=page_no,
