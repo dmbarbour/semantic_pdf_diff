@@ -36,7 +36,9 @@ class Claim(Strict):
     confidence: float = Field(ge=0, le=1)
     approximate: bool = False
     # Claim context (schema v2). Prompts don't ask for these yet, so they default to
-    # "not stated"; the epistemic-status work fills them.
+    # "not stated"; the epistemic-status work fills them. basis and uncertainty are the source's (how it says it knows
+    # the value, the uncertainty it states), never ours: our stance on a reading is confidence, quote_verified, its
+    # occurrences and derivation (docs/how-it-works.md, "Whose a claim is")
     topic: str = Field(default="", max_length=200)
     basis: Basis = "unknown"
     uncertainty: str = Field(default="", max_length=200)

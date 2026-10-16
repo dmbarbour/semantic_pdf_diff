@@ -434,6 +434,7 @@ Before records are built, so each later milestone has a baseline. Almost all of 
   - **The reader asked for holders** (`read_holders`, off): the sentences' companies move from conditions into the stance (25 of 25), attitudes right for 19; facts right no different from the null arm, nor the comparisons. But it invents holders the null never does (61: the moderator's and the authors' own voice, "Company 1" for a blank cell, proposal labels), and on RAN1 first named rows' companies as printed, reference marks and all, mixing companies (fixed: a holder column's name wins, the reader adds only an attitude). RAN1's text reports no company's view, so the lever has nothing to find there. Tweak directions are in the lever index.
   - **An alignment fix** it led to: a claim's holders count among its words when it pairs by wording (no default comparison changed).
   - $2.2 in all, mostly the prompt arms re-reading every PDF.
+- **The pipeline's link named as such** (2026-10-16, the owner: "Continue."): [how it works](../how-it-works.md) says whose each field is: `stance`, `basis` and `uncertainty` the source's; the reader's confidence, quote verification, occurrences, derivation and the judge's and explainer's confidence ours, ordering and weighting a report, filtering nothing (none does today) until calibrated (Measurement, 7).
 
 ### 6. Drawing geometry
 
