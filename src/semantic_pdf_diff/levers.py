@@ -188,9 +188,14 @@ KIND_SPEC = '"kind":"text|table|chart|diagram",'
 STANCE_SPEC = ('"stance":[{"holder":"who the source says holds it, if not the source itself",'
                '"attitude":"proposes, supports, opposes or reports"}],\n')
 NEGATION_RULE = "Preserve negation, requirements versus proposed capabilities, ranges and inequality signs."
-STANCE_RULE = ("\nWhere the source reports a claim as someone else's (\"Company A proposes\", \"according to B\", a "
-               "quotation), put who holds it in stance with their attitude, not in entity or conditions; leave stance "
-               "empty for what the source states in its own voice.")
+# Tweaked 2026-10-16 from its first measure (docs/reviews/levers.md): the document's own voice (its authors', a
+# moderator's) is no holder; nor a placeholder for a blank cell, nor a proposal's label; "according to" reports
+STANCE_RULE = ("\nWhere the source reports a claim as a named party's (\"Company A proposes\", \"according to B\", a "
+               "quotation), put that party in stance with their attitude: proposes (proposes, argues, suggests), "
+               "supports, opposes, or reports (according to, states); not in entity or conditions. Leave stance empty "
+               "for what the document states in its own voice, its authors', editors' or moderator's own proposals "
+               "among them. A holder is a party the source names: never a placeholder for a blank cell "
+               "(\"Company 1\"), nor a proposal's or an item's label (\"Proposal 2\").")
 
 class ReadHolders(Lever):
     lever_name, stage, off = "read_holders", "instructions", {"read_holders": False}
