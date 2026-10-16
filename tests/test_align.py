@@ -6,9 +6,10 @@ from types import SimpleNamespace
 
 from semantic_pdf_diff import align
 
-def claim(entity, attribute, value, unit="", conditions="", frame="", held=""):
+def claim(entity, attribute, value, unit="", conditions="", frame="", held="", quote=""):
     return SimpleNamespace(entity=entity, attribute=attribute, value=value, unit=unit, conditions=conditions,
-                           frame=frame, approximate=False, stance=[SimpleNamespace(holder=held)] if held else [])
+                           frame=frame, approximate=False, stance=[SimpleNamespace(holder=held)] if held else [],
+                           quote=quote)
 
 def pairs(found, left, right, which="judge"):
     """A correspondence's pairs as readable (entity, attribute, value) couples."""
@@ -18,8 +19,10 @@ def pairs(found, left, right, which="judge"):
 class Alignment(unittest.TestCase):
     def test_claims_held_by_different_parties_never_pair_and_a_value_credited_to_another_is_attributed(self):
         # milestone 5: two companies proposing one timeout each, and a report period credited to another company
-        timeout = lambda v, who: claim("Link failure detection", "acknowledgement timeout", v, "ms", held=who)
-        period = lambda v, who: claim("Beam report", "report period", v, "ms", held=who)
+        timeout = lambda v, who: claim("Link failure detection", "acknowledgement timeout", v, "ms", held=who,
+                                       quote=f"{who} | Proposal 1: The acknowledgement timeout is {v} ms.")
+        period = lambda v, who: claim("Beam report", "report period", v, "ms", held=who,
+                                      quote=f"{who} | Proposal 1: The beam report period is {v} ms.")
         left = [timeout("251", "Avelin"), timeout("483", "Borealis"), period("627", "Estrella")]
         right = [timeout("928", "Avelin"), timeout("483", "Borealis"), period("627", "Borealis")]
         found = align.align(left, right)
@@ -37,6 +40,10 @@ class Alignment(unittest.TestCase):
         self.assertEqual({(i, j) for i, j, _ in found.attributed}, {(2, 2)})
         self.assertEqual({(i, j) for i, j, _ in found.settled}, {(1, 1)})
         self.assertTrue({3} & {i for i, _, _ in found.judge} and {3} & {j for _, j, _ in found.judge})  # judged
+        # two companies saying "Y" (or proposing one value in their own words) are two views, not one credited
+        support = lambda who: claim("Proposal 3.1", "support", "Y", held=who, quote=f"{who} | Y")  # noqa: E731
+        found = align.align([support("New H3C"), support("CMCC")], [support("Spreadtrum"), support("CMCC")])
+        self.assertEqual((found.attributed, {(i, j) for i, j, _ in found.settled}), ([], {(1, 1)}))
 
     def test_a_name_by_position_follows_its_values(self):
         # The image reader names rows by position; a pump inserted above moves every blower down a row, so
@@ -305,7 +312,8 @@ class Report(unittest.TestCase):
         from test_pipeline import Fake, ev
         from semantic_pdf_diff.compare import compare
         from semantic_pdf_diff.schema import Link
-        held = lambda eid, who, **k: ev(eid, stance=[Link(holder=who, attitude="proposes")], **k)  # noqa: E731
+        held = lambda eid, who, **k: ev(eid, stance=[Link(holder=who, attitude="proposes")],  # noqa: E731
+                                        quote=f"{who} | Proposal 1: The {k['attribute']} is {k['value']} ms.", **k)
         timeout, period = dict(entity="Link failure detection", attribute="acknowledgement timeout", unit="ms"), \
             dict(entity="Beam report", attribute="report period", unit="ms")
         left = [held("A-1", "Avelin", value="251", **timeout), held("A-2", "Borealis", value="483", **timeout),

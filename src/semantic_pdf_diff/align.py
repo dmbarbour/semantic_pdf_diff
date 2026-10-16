@@ -268,6 +268,19 @@ def _holders_differ(x, y):
     ha, hb = holders(x), holders(y)
     return bool(ha and hb and ha != hb)
 
+ATTRIBUTING = 0.8  # an attribution changed: the two claims' words, holders aside, this alike
+ATTRIBUTION_WORDS = 3  # and at least this many of them: two companies' "Y" or "8" is no proposition re-credited
+
+def _attributable(x, y, named_x, named_y):
+    """A value's claim held by one party in one revision and by another in the other, as the same proposition: each
+    holder without a claim of the value on the other side (named_x, named_y: the holders the value's claims name on
+    each side), and the same words said, holders aside (a proposal's sentence credited to another company)."""
+    if not _holders_differ(x, y) or holders(x) in named_y or holders(y) in named_x:
+        return False
+    names = holders(x) | holders(y)
+    wa, wb = words(getattr(x, "quote", "")) - names, words(getattr(y, "quote", "")) - names
+    return min(len(wa), len(wb)) >= ATTRIBUTION_WORDS and jaccard(wa, wb) >= ATTRIBUTING
+
 def _one_property(side, claims):
     """Whether a value's readings in an item all name one property (each pair fits): then the value identifies it."""
     return all(fits(side.claims[i], side.claims[j]) for i in claims for j in claims if i < j)
@@ -296,15 +309,15 @@ def _within(a, b, ia, ib, settle):
             pairs = [(i, j) for i in ga for j in gb]
         if not pairs:
             continue
-        # the value's holders as its claims name them: changed between the revisions, nothing of it settles, and
-        # its claims naming holders pair first (unknown is never different, but a known holder has changed)
+        # claims naming the same holder pair first; claims naming different holders never pair, but for the same
+        # proposition credited to another (an attribution changed), and then nothing of the value settles through
+        # readings naming no one (unknown is never different, but a known holder has changed)
         named_a = {holders(a.claims[i]) for i in ga} - {frozenset()}
         named_b = {holders(b.claims[j]) for j in gb} - {frozenset()}
-        credited = bool(named_a and named_b and named_a != named_b)
-        both_named = lambda p: bool(holders(a.claims[p[0]]) and holders(b.claims[p[1]]))  # noqa: E731
-        ranked = sorted(pairs, key=lambda p: (0 if both_named(p) and not _holders_differ(a.claims[p[0]], b.claims[p[1]])
-                                              else 1 if both_named(p) else 2,
-                                              -_conditions(a.claims[p[0]], b.claims[p[1]]), p))
+        held = lambda p: (0 if holders(a.claims[p[0]]) and holders(b.claims[p[1]]) else 1)  # noqa: E731
+        credited = {(i, j) for i, j in pairs if _attributable(a.claims[i], b.claims[j], named_a, named_b)}
+        ranked = sorted(pairs, key=lambda p: (p not in credited, _holders_differ(a.claims[p[0]], b.claims[p[1]]),
+                                              held(p), -_conditions(a.claims[p[0]], b.claims[p[1]]), p))
         best = (a.claims[ranked[0][0]], b.claims[ranked[0][1]])
         agreed = settle and not credited and _conditions(*best) >= 0.5 and not any(
             _conflict(a.claims[i], b.claims[j]) or _frames_differ(a.claims[i], b.claims[j]) for i, j in pairs
@@ -313,8 +326,12 @@ def _within(a, b, ia, ib, settle):
         for i, j in ranked:  # one pair per claim, the same holder's and best conditions first
             if i in covered_a and j in covered_b:
                 continue
-            (attributed if _holders_differ(a.claims[i], b.claims[j]) else settled if agreed else judge).append(
-                (i, j, 1.0))
+            if _holders_differ(a.claims[i], b.claims[j]):  # another's: only an attribution changed, one to one
+                if (i, j) not in credited or i in covered_a or j in covered_b:
+                    continue
+                attributed.append((i, j, 1.0))
+            else:
+                (settled if agreed else judge).append((i, j, 1.0))
             covered_a.add(i)
             covered_b.add(j)
         done_a |= covered_a
