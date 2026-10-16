@@ -159,6 +159,12 @@ class Binding(unittest.TestCase):
             cleared = bind(store, extraction_interpreter(Settings(sheet_records=True)))
             self.assertTrue(cleared.get('automatic'))
             self.assertEqual(bind(store, extraction_interpreter(Settings(sheet_records=True))), {})
+            for lever in ('column_conditions', 'sheet_records'):  # and with another lever built, off, since
+                before['settings'].pop(lever, None)
+                if lever in before['settings']['levers']:
+                    before['settings']['levers'].remove(lever)
+            store.save_interpreter('extract', before)
+            self.assertTrue(bind(store, extraction_interpreter(Settings(sheet_records=True))).get('automatic'))
 
     def test_changed_interpreter_is_rejected_with_explanation(self):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:

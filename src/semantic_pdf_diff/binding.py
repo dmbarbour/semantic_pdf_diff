@@ -25,13 +25,21 @@ def _post_only(lever):
     return lever in REGISTRY and all(declared(Settings, name).kind == "post" for name in REGISTRY[lever].model_fields
                                      if name in Settings.model_fields)
 
-def free(differences):
+def _levers_moved(a, b, old, new, post=False):
+    """Whether the levers added (b's, not a's) or dropped (a's, not b's), the rest in order, are each off on the side
+    that has them, or (post) a lever that only post-processes answers."""
+    moved = [(lever, new) for lever in b if lever not in a] + [(lever, old) for lever in a if lever not in b]
+    off = lambda lever, side: bool(REGISTRY[lever].off) and all(  # noqa: E731
+        (side or {}).get("settings", {}).get(s, OFF[s]) == OFF[s] for s in REGISTRY[lever].off)
+    return [x for x in a if x in b] == [x for x in b if x in a] and all(
+        lever in REGISTRY and (off(lever, side) or post and _post_only(lever)) for lever, side in moved)
+
+def free(differences, old=None, new=None):
     """Whether no difference can cost a model call: each a setting that only post-processes answers, or levers
-    added or dropped whose settings all do."""
+    added or dropped each off or only post-processing."""
     def one(key, a, b):
         if key == "settings.levers" and isinstance(a, list) and isinstance(b, list):
-            return all(_post_only(x) for x in set(a) ^ set(b)) and \
-                [x for x in a if x in b] == [x for x in b if x in a]
+            return _levers_moved(a, b, old, new, post=True)
         return _kind(key) == "post"
     return all(one(key, a, b) for key, (a, b) in differences.items())
 
@@ -94,10 +102,7 @@ def _asks_alike(key, a, b, old, new):
     asks what the store's run asked)."""
     name = key.split(".", 1)[1] if key.startswith("settings.") else None
     if name == "levers" and isinstance(a, list) and isinstance(b, list):
-        moved = [(lever, new) for lever in b if lever not in a] + [(lever, old) for lever in a if lever not in b]
-        return all(lever in REGISTRY and REGISTRY[lever].off and
-                   all(side.get("settings", {}).get(s, OFF[s]) == OFF[s] for s in REGISTRY[lever].off)
-                   for lever, side in moved) and [x for x in a if x in b] == [x for x in b if x in a]
+        return _levers_moved(a, b, old, new)
     return name in OFF and (a is None or b is None) and (b if a is None else a) == OFF[name]
 
 def affected_regions(differences):
@@ -121,7 +126,7 @@ def bind(store, interpreter: Interpreter, reset=False, dry_run=False):
         if old != new and not dry_run:
             store.save_interpreter(interpreter.role, new)  # only levers off that the store didn't know
         return {}
-    automatic = free(differences) and not reset  # can't cost a model call: applied without asking
+    automatic = free(differences, old, new) and not reset  # can't cost a model call: applied without asking
     if interpreter.role == "triage":
         if not (reset or automatic):
             raise InterpreterMismatch("triage", differences, {"situating"},
