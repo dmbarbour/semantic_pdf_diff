@@ -272,7 +272,8 @@ def text_job(data, job, output, client, dispatch, progress, extension):
                 steps = None if checked is None else [core.derivation["table"][0], checked, core.derivation["table"][1]]
                 core.table_task(page, (0.0, float(line), 1.0, float(line + 1)), f"table:p{page}:{ti}:{ri}", labels,
                                 row, list(range(len(labels) if table.row_headers else width)),
-                                derivation=chart_derivation(extension) if table.source == "chart" else steps)
+                                derivation=chart_derivation(extension) if table.source == "chart" else steps,
+                                above=body[:ri])
 
             def as_table(checked=None, page=page, table=table, ti=ti, body=body, by_itself=by_itself, limit=limit):
                 """The table read as one (checked: the key-value check's step, when it was asked)."""

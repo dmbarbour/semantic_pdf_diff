@@ -846,9 +846,9 @@ class TableHolders(Lever):
     # stored
     table_holders: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = True
 
-    def table_holder(self, header, row):
+    def table_holder(self, header, row, above=()):
         if not self.table_holders:
-            return super().table_holder(header, row)
+            return super().table_holder(header, row, above)
         from .stance import table_holder
         return table_holder(header, row)
 
@@ -1188,10 +1188,15 @@ class Platform(Composable):
         return ""
 
     @chained
-    def table_holder(self, header, row):
-        """(the Links holding the claims read from a table row,) given its table's headers and the row's cells: the
-        platform's, none."""
+    def table_holder(self, header, row, above=()):
+        """(the Links holding the claims read from a table row,) given its table's headers, the row's cells and the
+        rows over it in its table (nearest last): the platform's, none."""
         return ()
+
+    @chained
+    def held(self, claim):
+        """A claim read with its holders (a stance), as stored: the platform's, as it is."""
+        return claim
 
     @chained
     def table_record(self, page_no, task, grid, context, box):

@@ -326,7 +326,7 @@ class PdfTable:
             header_, body_, boxes_ = original
             row_box = boxes_[i] if i < len(boxes_) and boxes_[i] else tuple(self.bbox)
             r.core.table_task(number, tuple(row_box), f"table:p{number}:{base}:x{i}", header_, body_[i],
-                              list(range(self.width)), derivation=steps)
+                              list(range(self.width)), derivation=steps, above=body_[:i])
 
     def read_part(self, pi, part, count, base, label, step, steps, limit):
         """One part read as a table, or perhaps as a key-value list (two columns), asked with the table's crop."""
@@ -369,7 +369,7 @@ class PdfTable:
                tuple(round(v / 2) * 2 for v in self.bbox))
         self.reading.core.table_task(number, tuple(row_box), f"table:p{number}:{tag}:{ri}", header, row,
                                      list(range(max(self.width, len(header), len(row)))), derivation=steps,
-                                     repeat_key=key)
+                                     repeat_key=key, above=body[:ri])
 
     def as_table(self, checked=None, *, tag, part_body, ruled, by_itself, steps, step, limit):
         """A part read as a table (checked: the key-value check's step, when it was asked)."""

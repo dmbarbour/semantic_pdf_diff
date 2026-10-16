@@ -894,7 +894,7 @@ def read(core, page, g, task, by_itself, source, image=None):
                 misfits.append(i)
                 issues.append(f"Row {g.names[i]} read by itself: {error}")
                 continue
-            stance = core.s.table_holder(g.labels, g.rows[i])  # its holder column's cell (table_holders)
+            stance = core.s.table_holder(g.labels, g.rows[i], g.rows[:i])  # its holder column's cell (table_holders)
             for fields, used, rule in made:
                 quote = " | ".join(g.rows[i][k] for k in used if g.rows[i][k]) or " | ".join(t for t in g.rows[i] if t)
                 found.append(_evidence(core, page, row_box(i), name, fields, quote, True, [
@@ -930,6 +930,8 @@ def _evidence(core, page, box, task, fields, quote, verified, derivation, approx
                   unit=fields["unit"][:40], conditions=fields["conditions"][:300], frame=fields.get("frame", "")[:200],
                   kind="table", quote=quote[:400], confidence=CONFIDENCE, approximate=approximate,
                   uncertainty=fields.get("uncertainty", "")[:200], stance=list(stance))
+    if claim.stance:
+        claim = core.s.held(claim)
     home = core.sections.box(page, box).id
     return Evidence(**claim.model_dump(), id=claim_id(core.content, claim), content=core.content, section=home,
                     locator=core.locator(page, box, "table", task), derivation=derivation, quote_verified=verified,

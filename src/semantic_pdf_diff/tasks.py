@@ -399,6 +399,8 @@ class TaskCore:
                 claim, position = s.positioned(claim, position_of(claim.quote) if position_of else None)
                 if made.stance and not claim.stance:  # its row's holder, unless the reader named one
                     claim = claim.model_copy(update={"stance": list(made.stance)})
+                if claim.stance:
+                    claim = s.held(claim)
                 eid = claim_id(content, claim)
                 if any(e.id == eid for e in found):
                     continue  # the same claim twice in one response: keep the first
@@ -450,10 +452,12 @@ class TaskCore:
         for i, part in enumerate(parts):
             self.text_task(page_no, part, f"{task}:r{i}", depth + 1, derivation, context)
 
-    def table_task(self, page_no, bbox, task, header, row, columns, depth=0, derivation=None, repeat_key=None):
+    def table_task(self, page_no, bbox, task, header, row, columns, depth=0, derivation=None, repeat_key=None,
+                   above=()):
         """Send one table row with its header; split wide or partial rows by column.
 
-        Column 0 is kept in every split as the provisional row label.
+        Column 0 is kept in every split as the provisional row label; above, the rows over it in its table (nearest
+        last), for its holder.
         """
         s = self.s
         pick = lambda cells: [cells[c] if c < len(cells) else None for c in columns]
@@ -471,20 +475,21 @@ class TaskCore:
                 # as text and pictures: only a partial or failed answer is refined; "not reached" (the call limit, an
                 # answer a replay lacks) learnt nothing (code review 2026-10-08, A3: it tripled the unreached rows)
                 if status in ("partial", "failed") and depth < s.refinement_depth and splittable:
-                    self.split_columns(page_no, bbox, task, header, row, columns, depth + 1, derivation)
+                    self.split_columns(page_no, bbox, task, header, row, columns, depth + 1, derivation, above)
             context = self.reader.for_table(page_no, bbox, flat)
             if repeat_key is not None and context:  # the same row under another lead-in or stem isn't a repeat
                 repeat_key += (hashlib.sha256(context.encode()).hexdigest(),)
             self.consume(Task(page_no, bbox, task, text, derivation=derivation,
                               check=lambda q: quoted(q, text) or covered(q, flat) or s.loose_match(q, text),
                               then=then, repeat_key=repeat_key, repeat_after=2, context=context,
-                              stance=s.table_holder(header, row)))
+                              stance=s.table_holder(header, row, above)))
         else:
-            self.split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
+            self.split_columns(page_no, bbox, task, header, row, columns, depth, derivation, above)
 
-    def split_columns(self, page_no, bbox, task, header, row, columns, depth, derivation):
+    def split_columns(self, page_no, bbox, task, header, row, columns, depth, derivation, above=()):
         rest = columns[1:]
         middle = (len(rest) + 1) // 2
         for i, part in enumerate([rest[:middle], rest[middle:]]):
             # Budget-driven splits are mandatory; only quality-driven ones use depth.
-            self.table_task(page_no, bbox, f"{task}:c{i}", header, row, [columns[0], *part], depth, derivation)
+            self.table_task(page_no, bbox, f"{task}:c{i}", header, row, [columns[0], *part], depth, derivation,
+                            above=above)
