@@ -15,6 +15,8 @@ Conservative by design. Two claims are one fact when they
   normalization ("railing posts" and "Railing Post", "W2" and "Window W2", "material" and
   "material/size"; not "West Module" and "East Module", nor "fore-aft stiffness" and
   "side-to-side stiffness").
+- are held by the same holders (a claim's stance: two companies' views of one proposal, "Y" in adjacent rows, are
+  two claims, as their IDs are).
 Every reading in a cluster must agree on conditions with every other.
 Clustering is greedy against each cluster's representative (the most local reading), so
 chains of near-matches don't merge distinct facts.
@@ -78,10 +80,14 @@ def _named_alike(a, b):
             return False
     return True
 
+def _holders(e):
+    """Who holds a claim, as its ID names them (case and spacing aside)."""
+    return tuple(" ".join(link.holder.split()).casefold() for link in e.stance)
+
 def same_fact(a, b):
     if a.approximate != b.approximate or _stated(a) != _stated(b) or not _conditions_agree(a, b):
         return False
-    return _named_alike(a, b) and _near(a, b)
+    return _holders(a) == _holders(b) and _named_alike(a, b) and _near(a, b)
 
 def wording(e):
     return " | ".join(x for x in [e.entity, e.attribute, f"{e.value} {e.unit}".strip(), e.conditions, e.frame] if x)
@@ -105,10 +111,11 @@ def reconcile(evidence):
     # only with the clusters stating its value whose representative was seen on a page of the claim's: the same
     # clusters, in the same order, as comparing with all of them, without the quadratic cost (code review
     # 2026-10-08, D5: 4,000 claims of one value took 33 s).
-    by_value = {}  # (approximate, stated value): {page: [the indices of clusters whose representative was seen there]}
+    # (approximate, stated value, holders): {page: [the indices of clusters whose representative was seen there]}
+    by_value = {}
     for e in claims:
         pages = {o.locator.page for o in e.occurrences or [e]}
-        group = by_value.setdefault((e.approximate, _stated(e)), {})
+        group = by_value.setdefault((e.approximate, _stated(e), _holders(e)), {})
         for n in sorted({n for page in pages for n in group.get(page, ())}):
             cluster = clusters[n]
             # Every reading must agree with every other, not only with the representative: a generic

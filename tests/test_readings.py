@@ -43,6 +43,18 @@ class Readings(unittest.TestCase):
             with self.subTest(pair[0].entity):
                 self.assertEqual(len(reconcile(pair)), 2)
 
+    def test_two_holders_views_of_one_proposal_stay_apart(self):
+        # adjacent rows of a "Company | Y/N" table, each its company's view: two claims (their IDs differ), never one
+        from semantic_pdf_diff.schema import Link
+        def held(e, h):
+            claim = Claim(**{**e.model_dump(include=set(Claim.model_fields)), "stance": [Link(holder=h)]})
+            return e.model_copy(update={"stance": [Link(holder=h, attitude="supports")], "id": claim_id(CID, claim)})
+        rows = [held(sighting('Proposal 2.2', 'support', 'Y', bbox=(0, 10 * k, 400, 10 * k + 10),
+                              task=f'table:p1:1:{k}', region='table'), h) for k, h in enumerate(('Avelin', 'Borealis'))]
+        self.assertEqual(sorted(e.stance[0].holder for e in reconcile(rows)), ['Avelin', 'Borealis'])
+        again = held(sighting('Proposal 2.2', 'support', 'Y', task='tile:p1:0'), 'avelin')  # one holder, read twice
+        self.assertEqual(len(reconcile([rows[0], again])), 1)
+
     def test_conditions_must_agree_among_all_readings(self):
         found = reconcile([
             sighting('rotor', 'speed', '12.1', 'rpm'),

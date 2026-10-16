@@ -2,7 +2,7 @@
  "totals": {
   "inventory": {
    "claims": 20858,
-   "evidence": 11605,
+   "evidence": 11633,
    "frame in conditions": 76,
    "grounded": 5917,
    "list records": 36,
@@ -14,13 +14,13 @@
    "partly": 88,
    "partly (image)": 16,
    "positioned": 123,
-   "printed": 7285,
+   "printed": 7307,
    "sheet records": 11,
    "table records": 301,
    "unsupported": 25,
    "unsupported (image)": 806,
    "with conditions": 6855,
-   "with records": 6228
+   "with records": 6237
   },
   "placed": {
    "bound": {
@@ -105,8 +105,8 @@
     },
     "<=1.0": {
      "readings": 28856,
-     "right": 26110,
-     "share": 0.905
+     "right": 26100,
+     "share": 0.904
     }
    },
    "image": {
@@ -122,8 +122,8 @@
     },
     "<=1.0": {
      "readings": 20630,
-     "right": 18686,
-     "share": 0.906
+     "right": 18676,
+     "share": 0.905
     }
    },
    "table rules": {
@@ -5637,8 +5637,8 @@
     "with conditions": 38,
     "positioned": 0,
     "misplaced": {},
-    "printed": 21,
-    "evidence": 21,
+    "printed": 23,
+    "evidence": 23,
     "context_bytes_per_request": 164,
     "data_bytes_per_request": 416,
     "examples": {}
@@ -5768,8 +5768,8 @@
     "with conditions": 20,
     "positioned": 0,
     "misplaced": {},
-    "printed": 16,
-    "evidence": 21,
+    "printed": 20,
+    "evidence": 27,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 238,
     "examples": {}
@@ -5795,8 +5795,8 @@
     "with conditions": 17,
     "positioned": 0,
     "misplaced": {},
-    "printed": 17,
-    "evidence": 23,
+    "printed": 20,
+    "evidence": 28,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 241,
     "examples": {}
@@ -5822,8 +5822,8 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
-    "printed": 9,
-    "evidence": 14,
+    "printed": 10,
+    "evidence": 16,
     "context_bytes_per_request": 488,
     "data_bytes_per_request": 88,
     "examples": {}
@@ -5849,8 +5849,8 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
-    "printed": 10,
-    "evidence": 15,
+    "printed": 11,
+    "evidence": 17,
     "context_bytes_per_request": 622,
     "data_bytes_per_request": 93,
     "examples": {}
@@ -5879,9 +5879,9 @@
     "records": {
      "table": 2
     },
-    "with records": 13,
-    "printed": 15,
-    "evidence": 15,
+    "with records": 16,
+    "printed": 18,
+    "evidence": 18,
     "context_bytes_per_request": 475,
     "data_bytes_per_request": 150,
     "examples": {}
@@ -5910,9 +5910,9 @@
     "records": {
      "table": 2
     },
-    "with records": 13,
-    "printed": 15,
-    "evidence": 15,
+    "with records": 16,
+    "printed": 18,
+    "evidence": 18,
     "context_bytes_per_request": 445,
     "data_bytes_per_request": 153,
     "examples": {}
@@ -5965,8 +5965,8 @@
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
-    "printed": 9,
-    "evidence": 15,
+    "printed": 10,
+    "evidence": 16,
     "context_bytes_per_request": 620,
     "data_bytes_per_request": 88,
     "examples": {}
@@ -5996,8 +5996,8 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 14,
-    "evidence": 14,
+    "printed": 15,
+    "evidence": 15,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 103,
     "examples": {}
@@ -6026,9 +6026,9 @@
     "records": {
      "table": 2
     },
-    "with records": 13,
-    "printed": 15,
-    "evidence": 15,
+    "with records": 16,
+    "printed": 18,
+    "evidence": 18,
     "context_bytes_per_request": 442,
     "data_bytes_per_request": 153,
     "examples": {}
