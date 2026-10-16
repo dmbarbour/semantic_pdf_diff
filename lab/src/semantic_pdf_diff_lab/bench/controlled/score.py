@@ -268,8 +268,12 @@ def key_facts(key_data):
 
 def score(key_data, claims):
     """Each claim classed, facts found and missed, and conditions kept, from a key and extracted claims (dicts
-    with entity, attribute, value, unit, conditions)."""
-    return _scored(key_data, claims)[0]
+    with entity, attribute, value, unit, conditions; and stance, where views are keyed)."""
+    result = _scored(key_data, claims)[0]
+    if key_data.get("views"):  # holders' yes-or-no views, scored by names (views.py)
+        from .views import score_views
+        result["views"] = score_views(key_data["views"], claims)
+    return result
 
 def facts_found(key_data, claims):
     """{fact id: "right" or "loose"} for the key's facts the claims find (missed facts left out)."""

@@ -412,6 +412,31 @@ def views_later(p, d):
     for fid in ("ack.1", "ack.mod"):
         change(p, fid, d.number(150, 950))
 
+def flip_view(project, view_id, comment=""):
+    """A company's yes or no on a proposal turned round (its row's Y/N cell), its comment rewritten: a counter-
+    proposal it held is dropped with it (the claim context plan, milestone 5: a view changed)."""
+    view = next(v for v in project.views if v["id"] == view_id)
+    for _, blocks in project.sections:
+        for block in blocks:
+            if block[0] == "table" and block[1].endswith(view["proposition"]):
+                row = next(r for r in block[3] if r[0] == view["holder"])
+                gone = [f for f in project.facts if f.value in row[2]]
+                row[1:] = ["N" if view["value"] == "Y" else "Y", comment]
+                project.edits.append({"kind": "view", "view": view_id, "from": view["value"], "to": row[1]})
+                if gone:
+                    project.edits.append({"kind": "removed", "facts": [f.id for f in gone]})
+                    project.facts[:] = [f for f in project.facts if f not in gone]
+                view["value"], view["attitude"] = row[1], "supports" if row[1] == "Y" else "opposes"
+                return
+    raise ValueError(f"{project.id}: no table of {view['proposition']}'s views")
+
+def views_poll_later(p, d):
+    """The companies' views revised: one supporter of Proposal 2.1 now opposes it, one opponent of Proposal 2.2 now
+    accepts it (its counter-proposal withdrawn)."""
+    flip_view(p, next(v["id"] for v in p.views if v["proposition"] == "Proposal 2.1" and v["value"] == "Y"))
+    flip_view(p, next(v["id"] for v in p.views if v["proposition"] == "Proposal 2.2" and v["value"] == "N"),
+              "Can accept the proposal.")
+
 def renamed_later(p, d):
     """Pump P-101B renamed P-201B, its values kept: the same pump under a new tag (alignment by its values)."""
     rename_row(p, "P-101B", "P-201B")
@@ -581,7 +606,9 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          # two sheets alike but for the hall their title blocks name, one hall's room changed
          (SET_PROJECTS["lcc-plans"], "clean", set_later, False, "revised"),
          # companies' proposals: one credited to another company, words and value kept; two values revised
-         (PROJECTS["views"], None, views_later, False, "revised"))
+         (PROJECTS["views"], None, views_later, False, "revised"),
+         # companies' yes-or-no views on the moderator's proposals: two turned round
+         (PROJECTS["views-poll"], None, views_poll_later, False, "revised"))
 
 def _base(make, knob, seed):
     p = make(seed)

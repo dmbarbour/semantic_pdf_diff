@@ -1,10 +1,10 @@
 {
  "totals": {
   "inventory": {
-   "claims": 20646,
-   "evidence": 11442,
+   "claims": 20858,
+   "evidence": 11605,
    "frame in conditions": 76,
-   "grounded": 5765,
+   "grounded": 5917,
    "list records": 36,
    "no content words": 3,
    "note records": 11,
@@ -14,13 +14,13 @@
    "partly": 88,
    "partly (image)": 16,
    "positioned": 123,
-   "printed": 7155,
+   "printed": 7285,
    "sheet records": 11,
-   "table records": 294,
+   "table records": 301,
    "unsupported": 25,
    "unsupported (image)": 806,
-   "with conditions": 6703,
-   "with records": 6181
+   "with conditions": 6855,
+   "with records": 6228
   },
   "placed": {
    "bound": {
@@ -36,7 +36,7 @@
    },
    "holder": {
     "conditions": 25,
-    "stance": 110
+    "stance": 144
    },
    "provenance": {
     "conditions": 5
@@ -89,7 +89,7 @@
   },
   "attitudes": {
    "in its stance": 110,
-   "none": 25
+   "none": 59
   },
   "reliability": {
    "all": {
@@ -99,13 +99,13 @@
      "share": 0.575
     },
     "<0.95": {
-     "readings": 10550,
-     "right": 10396,
+     "readings": 10574,
+     "right": 10420,
      "share": 0.985
     },
     "<=1.0": {
-     "readings": 28682,
-     "right": 25950,
+     "readings": 28856,
+     "right": 26110,
      "share": 0.905
     }
    },
@@ -121,15 +121,15 @@
      "share": 0.77
     },
     "<=1.0": {
-     "readings": 20572,
-     "right": 18640,
+     "readings": 20630,
+     "right": 18686,
      "share": 0.906
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 10112,
-     "right": 10084,
+     "readings": 10136,
+     "right": 10108,
      "share": 0.997
     }
    },
@@ -145,9 +145,9 @@
      "share": 0.105
     },
     "<=1.0": {
-     "readings": 8110,
-     "right": 7310,
-     "share": 0.901
+     "readings": 8226,
+     "right": 7424,
+     "share": 0.903
     }
    }
   }
@@ -5757,6 +5757,292 @@
     "named": {},
     "attitudes": {
      "in its stance": 10
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 20,
+    "with conditions": 20,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 16,
+    "evidence": 21,
+    "context_bytes_per_request": 288,
+    "data_bytes_per_request": 238,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 4
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1-revised": {
+   "inventory": {
+    "claims": 34,
+    "grounded": 17,
+    "with conditions": 17,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 17,
+    "evidence": 23,
+    "context_bytes_per_request": 288,
+    "data_bytes_per_request": 241,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 3
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 3
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1-revised.docx": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 12,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 9,
+    "evidence": 14,
+    "context_bytes_per_request": 488,
+    "data_bytes_per_request": 88,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 3
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 3
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1-revised.md": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 12,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 10,
+    "evidence": 15,
+    "context_bytes_per_request": 622,
+    "data_bytes_per_request": 93,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 3
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 3
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1-revised.pptx": {
+   "inventory": {
+    "claims": 18,
+    "grounded": 18,
+    "with conditions": 18,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 15,
+    "evidence": 15,
+    "context_bytes_per_request": 475,
+    "data_bytes_per_request": 150,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 3
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 3
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1-revised.xlsx": {
+   "inventory": {
+    "claims": 18,
+    "grounded": 18,
+    "with conditions": 18,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 15,
+    "evidence": 15,
+    "context_bytes_per_request": 445,
+    "data_bytes_per_request": 153,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 3
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 3
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1.docx": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 12,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 10,
+    "evidence": 16,
+    "context_bytes_per_request": 488,
+    "data_bytes_per_request": 87,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 4
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1.md": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 9,
+    "evidence": 15,
+    "context_bytes_per_request": 620,
+    "data_bytes_per_request": 88,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 3
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 3
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1.pptx": {
+   "inventory": {
+    "claims": 15,
+    "grounded": 14,
+    "with conditions": 14,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 14,
+    "evidence": 14,
+    "context_bytes_per_request": 482,
+    "data_bytes_per_request": 103,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 4
+    },
+    "examples": {}
+   }
+  },
+  "views-poll-s1.xlsx": {
+   "inventory": {
+    "claims": 18,
+    "grounded": 18,
+    "with conditions": 18,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 15,
+    "evidence": 15,
+    "context_bytes_per_request": 442,
+    "data_bytes_per_request": 153,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 4
     },
     "examples": {}
    }

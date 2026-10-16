@@ -86,6 +86,8 @@ def collect(runs_dir, unit="family"):
                         claim = {k: getattr(own, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
                         if own.frame:  # the split_conditions lever's; absent otherwise, units without it as before
                             claim["frame"] = own.frame
+                        if own.stance:  # who holds it (milestone 5's levers); absent otherwise
+                            claim["stance"] = [link.model_dump() for link in own.stance]
                         claim["quote"] = o.quote
                         claim["_box"] = list(o.locator.bbox)  # where it was read (splitting units)
                         claim["_task"] = o.locator.task       # which request read it (its input, for reviewers)

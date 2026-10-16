@@ -9359,6 +9359,362 @@
     "period.2": "judged different"
    }
   },
+  "views-poll-s1": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 11,
+    "unscored": 4
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 15,
+    "uncertain": 1
+   },
+   "unmatched": 12,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "unextracted",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "confirmed",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "confirmed"
+    }
+   },
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     },
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.md": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "0/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "unextracted": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 6,
+    "unscored": 6
+   },
+   "findings": {
+    "equivalent": 12
+   },
+   "unmatched": 6,
+   "pairs": 1,
+   "omitted": 0,
+   "views": {
+    "changes_found": "0/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "unpaired",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "confirmed",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "unextracted",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 6,
+    "unscored": 5
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 11
+   },
+   "unmatched": 6,
+   "pairs": 1,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "3/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "0/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "as a change": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 5,
+    "unscored": 6
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 11
+   },
+   "unmatched": 5,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "0/2",
+    "unchanged_confirmed": "5/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "unextracted",
+     "view.2.1.borealis": "confirmed",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "confirmed",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "as a change",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "0/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "as a change": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 5,
+    "unscored": 7
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 12
+   },
+   "unmatched": 4,
+   "pairs": 1,
+   "omitted": 0,
+   "views": {
+    "changes_found": "0/2",
+    "unchanged_confirmed": "5/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "unextracted",
+     "view.2.1.borealis": "confirmed",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "confirmed"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "as a change",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -18869,6 +19225,362 @@
     "period.2": "judged different"
    }
   },
+  "views-poll-s1": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 11,
+    "unscored": 4
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 15,
+    "uncertain": 1
+   },
+   "unmatched": 12,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "unextracted",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "confirmed",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "confirmed"
+    }
+   },
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     },
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.md": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "0/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "unextracted": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 6,
+    "unscored": 6
+   },
+   "findings": {
+    "equivalent": 12
+   },
+   "unmatched": 6,
+   "pairs": 1,
+   "omitted": 0,
+   "views": {
+    "changes_found": "0/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "unpaired",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "confirmed",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "unextracted",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 6,
+    "unscored": 5
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 11
+   },
+   "unmatched": 6,
+   "pairs": 1,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "3/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "0/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "as a change": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 5,
+    "unscored": 6
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 11
+   },
+   "unmatched": 5,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "0/2",
+    "unchanged_confirmed": "5/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "unextracted",
+     "view.2.1.borealis": "confirmed",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "confirmed",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "as a change",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "0/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "as a change": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 5,
+    "unscored": 7
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 12
+   },
+   "unmatched": 4,
+   "pairs": 1,
+   "omitted": 0,
+   "views": {
+    "changes_found": "0/2",
+    "unchanged_confirmed": "5/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "unextracted",
+     "view.2.1.borealis": "confirmed",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "confirmed"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "changed": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "as a change",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -26629,6 +27341,302 @@
     "beams.mod": "confirmed",
     "period.1": "confirmed",
     "period.2": "judged different"
+   }
+  },
+  "views-poll-s1": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 11,
+    "unscored": 4
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 15,
+    "uncertain": 1
+   },
+   "unmatched": 12,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "unextracted",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "confirmed",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "confirmed"
+    }
+   },
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     },
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 6,
+    "unscored": 5
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 11
+   },
+   "unmatched": 6,
+   "pairs": 1,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "3/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 5,
+    "unscored": 4
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 9
+   },
+   "unmatched": 5,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "confirmed",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 5,
+    "unscored": 4
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 9
+   },
+   "unmatched": 5,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "confirmed",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
    }
   },
   "wtp-s1-tracked.docx": {
@@ -34392,6 +35400,302 @@
     "beams.mod": "confirmed",
     "period.1": "confirmed",
     "period.2": "judged different"
+   }
+  },
+  "views-poll-s1": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 11,
+    "unscored": 4
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 15,
+    "uncertain": 1
+   },
+   "unmatched": 12,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "unextracted",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "confirmed",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "confirmed"
+    }
+   },
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     },
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 6,
+    "unscored": 5
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 11
+   },
+   "unmatched": 6,
+   "pairs": 1,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "3/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "unextracted",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 5,
+    "unscored": 4
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 9
+   },
+   "unmatched": 5,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "confirmed",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
+   }
+  },
+  "views-poll-s1.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 1,
+    "unchanged": 5
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "1/1",
+   "unchanged_confirmed": "5/5",
+   "false_changes": 0,
+   "difference_precision": 0.0,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 1
+   },
+   "unchanged": {
+    "confirmed": 5
+   },
+   "different": {
+    "unscored": 1
+   },
+   "equivalent": {
+    "no change": 5,
+    "unscored": 4
+   },
+   "findings": {
+    "different": 1,
+    "equivalent": 9
+   },
+   "unmatched": 5,
+   "pairs": 2,
+   "omitted": 0,
+   "views": {
+    "changes_found": "1/2",
+    "unchanged_confirmed": "4/8",
+    "false_changes": 0,
+    "detail": {
+     "view.2.1.avelin": "reported",
+     "view.2.1.borealis": "unextracted",
+     "view.2.1.corvane": "confirmed",
+     "view.2.1.delmar": "confirmed",
+     "view.2.1.estrella": "confirmed",
+     "view.2.2.avelin": "confirmed",
+     "view.2.2.borealis": "unextracted",
+     "view.2.2.corvane": "unextracted",
+     "view.2.2.delmar": "unextracted",
+     "view.2.2.estrella": "unextracted"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
+    }
+   },
+   "detail": {
+    "ack.borealis": "confirmed",
+    "ack.delmar": "confirmed",
+    "ack.mod": "confirmed",
+    "period.delmar": "reported",
+    "period.estrella": "confirmed",
+    "period.mod": "confirmed"
    }
   },
   "wtp-s1-tracked.docx": {

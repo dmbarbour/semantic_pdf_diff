@@ -300,6 +300,10 @@ def score():
             print(f"{which} {run}: recall {r['recall']} ({r['found']}/{r['facts']}, {r['found_right']} right) "
                   f"by form {r['recall_by_form']} by reader {r['by_reader']}; claims {r['claims']} {r['outcomes']}; "
                   f"conditions kept {r['conditions_kept']}")
+            if "views" in r:
+                v = r["views"]
+                print(f"    views {v['found']}/{v['views']} ({v['holder_in_stance']} held in a stance, "
+                      f"{v['attitude_in_stance']} with the attitude); readings {v['outcomes']}")
     for which, runs in results.items():  # each Markdown and Word document beside its PDF
         for suffix, name in ((".md", "Markdown"), (".docx", "Word"), (".pptx", "Slides"), (".xlsx", "Excel")):
             other = {run[:-len(suffix)]: r for run, r in runs.items() if run.endswith(suffix)}
@@ -325,6 +329,10 @@ def score():
                 print(f"      {kind}: {r[kind]}")
             print(f"      different: {r['different']}; equivalent: {r['equivalent']}; unmatched {r['unmatched']}; "
                   f"pairs {r['pairs']} (omitted {r['omitted']})")
+            if "views" in r:  # holders' yes-or-no views (views.py)
+                v = r["views"]
+                print(f"      views turned round {v['changes_found']}, kept {v['unchanged_confirmed']}, "
+                      f"false changes {v['false_changes']}")
             if "kinds" in r:
                 k = r["kinds"]
                 print(f"      kinds named right {k['right']}/{k['scored']}, value changes named precisely "

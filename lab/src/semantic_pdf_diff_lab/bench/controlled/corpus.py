@@ -412,6 +412,50 @@ def proposals_reported(seed=1):
     return Project(f"views-prose-s{seed}", "Feature Lead Summary: Companies' Views", F, sections,
                    things=[(c, ()) for c in COMPANIES])
 
+def proposals_polled(seed=1):
+    """A feature lead's summary polling the companies on the moderator's proposals, as RAN1's are: each proposal
+    stated in the summary's voice, then a "Company | Y/N | Comments" table of the companies' views on it (the claim
+    context plan, milestone 5: the view_attitudes lever). A view is keyed apart from the facts (Project.views: holder,
+    proposition, yes or no, attitude), scored by names (score.score_views); a comment's counter-proposal is a fact,
+    its company's, attitude "proposes"."""
+    d = Draw(f"views-poll-{seed}")
+    F = []
+    ms = lambda: d.number(150, 950)  # noqa: E731
+    ack, per = (Fact(fid, *what, ms(), "ms", basis="proposed") for fid, what in (("ack.mod", ACK),
+                                                                                 ("period.mod", PERIOD)))
+    F += [ack, per]
+    views, blocks = [], []
+    for number, (proposal, fact, what) in enumerate((("Proposal 2.1", ack, ACK), ("Proposal 2.2", per, PERIOD)), 1):
+        said = [d.pick("YN") for _ in COMPANIES]
+        while said.count("Y") < 2 or said.count("N") < 2:  # each proposal has supporters and opponents
+            said[d.rng.randrange(len(said))] = d.pick("YN")
+        rows = []
+        for company, yes_no in zip(COMPANIES, said):
+            views.append({"id": f"view.{proposal.split()[-1]}.{company.lower()}", "holder": company,
+                          "proposition": proposal, "value": yes_no,
+                          "attitude": "supports" if yes_no == "Y" else "opposes"})
+            comment = ""
+            if yes_no == "N":  # an opponent's counter-proposal
+                counter = Fact(f"{fact.id.split('.')[0]}.{company.lower()}", *what, ms(), "ms", basis="proposed",
+                               holder=company, attitude="proposes")
+                F.append(counter)
+                comment = f"Prefers {counter.value} ms."
+            elif d.rng.random() < 0.4:
+                comment = "Fine with the proposal."
+            rows.append([company, yes_no, comment])
+        blocks.append(("p", f"{proposal}: {STATED[what](fact.value)}"))
+        blocks.append(("table", f"Table {number}. Companies' views on {proposal}", ["Company", "Y/N", "Comments"],
+                       rows))
+    sections = [
+        ("1 Introduction", [
+            ("p", "This summary gives the moderator's proposals on link failure detection and beam reporting, and "
+                  "the companies' views on each, collected in the first round of discussion."),
+        ]),
+        ("2 Proposals and Views", blocks),
+    ]
+    return Project(f"views-poll-s{seed}", "Feature Lead Summary: Companies' Views on the Proposals", F, sections,
+                   things=[(c, ()) for c in COMPANIES], views=views)
+
 def equipment_datasheets(seed=1):
     """Equipment data sheets (code review 2026-10-08, B5): each pump's and the clearwell's data as a key-value list,
     a block of two columns standing alone with no header, its first row a key and its value ("Pump | P-201A"; the
@@ -461,7 +505,7 @@ def equipment_datasheets(seed=1):
 
 PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster, "spec": link_protocol,
             "wtp-datasheets": equipment_datasheets, "views": proposals_summary, "views-grouped": proposals_grouped,
-            "views-prose": proposals_reported}
+            "views-prose": proposals_reported, "views-poll": proposals_polled}
 
 # --- table knobs (milestone 2) -------------------------------------------------------------------
 # Schedules rendered clean or with one knob, the same facts either way, so a knob's effect is the difference.
@@ -1309,6 +1353,8 @@ def key(project, log):
     out = {"project": project.id, "title": project.title, "facts": [fields(f) for f in project.facts], "printed": log}
     if project.things:
         out["parts"] = [{"name": n, "aliases": list(a)} for n, a in project.things]
+    if project.views:  # views, keyed apart: a yes or a no names no fact by its value
+        out["views"] = project.views
     if project.revision_of:
         out["revision_of"], out["edits"] = project.revision_of, project.edits
     return out

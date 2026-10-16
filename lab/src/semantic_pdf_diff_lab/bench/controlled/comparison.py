@@ -20,6 +20,7 @@ a new one's of a split), a misreading "misread". The kinds named as value change
 explanations saying "changed" or "conditions", the share whose claims are a change.
 
 Relations (a door's room) aren't compared yet: they're left out of the changes.
+Holders' yes-or-no views, keyed apart (a poll's), are scored by names (views.py).
 
 A revision's key logs its edits from its base (revisions.py), read in the direction of the comparison:
 - **renamed facts** (P-101B now P-201B, values kept) are the same facts, scored as unchanged or changed
@@ -35,6 +36,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
 from .score import classify, key_facts, ranges
+from .views import score_compared
 
 BOUND = ("right", "loose")              # a claim of its fact, read right
 READ_WRONG = ("wrong unit", "inexact")  # a claim of its fact, read wrong
@@ -131,6 +133,7 @@ def score_comparison(earlier, later, report):
             "unmatched": len(report["unmatched"]),
             "pairs": report["retrieval"]["attempted_pairs"], "omitted": report["retrieval"]["omitted_by_pair_limit"],
             **({"splits": split_detail} if splits else {}),
+            **({"views": score_compared(earlier, later, report, side)} if earlier.get("views") else {}),
             **({"kinds": _explained(read.kinds_found)} if read.kinds_found else {}),
             "detail": dict(sorted(detail.items()))}
 

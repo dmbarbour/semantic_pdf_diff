@@ -91,6 +91,8 @@ class Project:
     things: list = None  # the named parts a schematic shows: [(name, aliases)]
     edits: list = field(default_factory=list)  # a revision's edits from its base (revisions.py), in the key
     revision_of: str = ""                      # the base document's id, for a revision
+    views: list = field(default_factory=list)  # holders' yes-or-no views: [{id, holder, proposition, value,
+                                               # attitude}] (corpus.proposals_polled; score.score_views)
 
     def has(self, knob):
         """Whether a prose, layout or chart knob applies: "all" applies every knob of the project's kind but those

@@ -453,7 +453,10 @@ class Revisions(unittest.TestCase):
                     "lcc-plans-s1-clean": (2, 1, 0, 0),
                     # companies' proposals: Avelin's and the moderator's acknowledgement timeouts revised; Estrella's
                     # report period credited to Borealis, its value kept (a holder changed, not a value)
-                    "views-s1": (2, 0, 0, 0)}
+                    "views-s1": (2, 0, 0, 0),
+                    # companies' views: two turned round (keyed apart: no fact changed), an opponent's counter-
+                    # proposal withdrawn with its no
+                    "views-poll-s1": (0, 0, 1, 0)}
         # facts whose declared context was restated, value and conditions kept: the plan's 7 rooms' widths and
         # depths, the coaster's 5 element heights; and a proposal credited to another company, its value kept
         restated = {"lcc-plan-s1-clean-notes": 14, "coaster-tables-s1-clean-datum": 5}
@@ -559,6 +562,61 @@ class Representations(unittest.TestCase):
                 self.assertEqual({x["form"] for f in key["facts"] for x in f["forms"]}, {"docx-table"})
         # laid out, the schedules read as the plain document does (but for the layout cells' empty paragraphs)
         self.assertEqual([t for _, t in read_docx(made["wtp-tables-s1-layout"][1]).lines if t], clean)
+
+class Views(unittest.TestCase):
+    """Holders' yes-or-no views, scored by names (views.py), on the polled summary and its revision."""
+    @classmethod
+    def setUpClass(cls):
+        from semantic_pdf_diff_lab.bench.controlled import revisions
+        from semantic_pdf_diff_lab.bench.controlled.corpus import proposals_polled
+        (_, revised), = [x for x in revisions.revised() if x[0].id == "views-poll-s1"]
+        cls.keys = [controlled.key(p, controlled.render(p)[1]) for p in (proposals_polled(1), revised)]
+
+    def test_a_view_is_bound_by_its_names_wherever_the_claim_gives_them(self):
+        from semantic_pdf_diff_lab.bench.controlled.views import score_views
+        views = self.keys[0]["views"]
+        yes = next(v for v in views if v["value"] == "Y")
+        h, p = yes["holder"], yes["proposition"]
+        other = next(v["holder"] for v in views if v["proposition"] == p and v["holder"] != h)
+        unkeyed = "Proposal 9.9"
+        claims = [{"entity": h, "attribute": f"support for {p}", "value": "Y"},  # the holder as the entity
+                  {"entity": p, "attribute": "support", "value": "Yes",  # as view_attitudes binds it
+                   "stance": [{"holder": f"{h} [3]", "attitude": "supports"}]},
+                  {"entity": p, "attribute": "support", "value": "N", "stance": [{"holder": h}]},
+                  {"entity": p, "attribute": "support", "value": "Y"},
+                  {"entity": h, "attribute": "support", "value": "Y"},
+                  {"entity": h, "attribute": f"support for {unkeyed}", "value": "Y"},
+                  {"entity": p, "attribute": "acknowledgement timeout", "value": "251 ms",
+                   "stance": [{"holder": other}]}]
+        s = score_views(views, claims)
+        self.assertEqual(s["outcomes"], {"right": 2, "flipped": 1, "no holder": 1, "no proposition": 1,
+                                         "misbound": 1})
+        self.assertEqual((s["found"], s["holder_in_stance"], s["attitude_in_stance"]), (1, 1, 1))
+        self.assertEqual(s["views"], 10)
+
+    def test_a_view_turned_round_is_reported_when_its_claims_differ(self):
+        from semantic_pdf_diff_lab.bench.controlled import comparison
+        views = [{v["id"]: v for v in k["views"]} for k in self.keys]
+        turned = sorted(i for i in views[0] if views[0][i]["value"] != views[1][i]["value"])
+        self.assertEqual(len(turned), 2)
+        evidence, findings = [], []
+        for vid in views[0]:
+            ids = []
+            for s in (0, 1):
+                v = views[s][vid]
+                ids.append(f"{'ab'[s]}:{vid}")
+                evidence.append({"id": ids[-1], "content": f"{'ab'[s]}.pdf", "entity": v["proposition"],
+                                 "attribute": "support", "value": v["value"], "unit": "", "conditions": "",
+                                 "stance": [{"holder": v["holder"], "attitude": v["attitude"]}]})
+            findings.append({"a": ids[0], "b": ids[1],
+                             "relation": "different" if vid in turned[:1] else "equivalent"})
+        report = {"sources": [{"name": "a"}, {"name": "b"}],
+                  "files": [{"source": "a", "content": "a.pdf"}, {"source": "b", "content": "b.pdf"}],
+                  "evidence": evidence, "findings": findings, "unmatched": [],
+                  "retrieval": {"attempted_pairs": len(findings), "omitted_by_pair_limit": 0}}
+        s = comparison.score_comparison(*self.keys, report)["views"]
+        self.assertEqual((s["changes_found"], s["unchanged_confirmed"], s["false_changes"]), ("1/2", "8/8", 0))
+        self.assertEqual(s["detail"][turned[1]], "called equivalent")
 
 class ComparisonScoring(unittest.TestCase):
     """A report's findings against the key's changes, on the treatment plant's pair."""
