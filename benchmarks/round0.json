@@ -75,6 +75,7 @@
   "record_changes": false,
   "split_conditions": false,
   "sheet_records": false,
+  "table_holders": false,
   "decoration": false,
   "tile_choice": "off",
   "skip_text_only": false,

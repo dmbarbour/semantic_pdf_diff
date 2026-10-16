@@ -9058,7 +9058,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -9070,29 +9070,33 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different/equivalent/uncertain": 1
    },
    "different": {
-    "change": 4
+    "change": 5
    },
    "equivalent": {
-    "change": 3,
-    "no change": 16
+    "change": 1,
+    "no change": 19
    },
    "findings": {
-    "different": 4,
-    "equivalent": 19
+    "different": 5,
+    "equivalent": 20,
+    "uncertain": 1
    },
-   "unmatched": 9,
-   "pairs": 8,
+   "unmatched": 10,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 4
+     },
+     "conditions": {
+      "conditions": 1
      }
     }
    },
@@ -9104,7 +9108,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different/equivalent/uncertain"
    }
   },
   "views-s1.md": {
@@ -9121,7 +9125,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -9133,18 +9137,17 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
-    "change": 1,
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 6
+    "different": 3,
+    "equivalent": 5
    },
    "unmatched": 0,
    "pairs": 2,
@@ -9167,7 +9170,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different"
    }
   },
   "views-s1.docx": {
@@ -9184,7 +9187,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -9196,18 +9199,17 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
-    "change": 1,
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 6
+    "different": 3,
+    "equivalent": 5
    },
    "unmatched": 0,
    "pairs": 2,
@@ -9230,7 +9232,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different"
    }
   },
   "views-s1.pptx": {
@@ -9259,32 +9261,28 @@
     "confirmed": 5
    },
    "holder": {
-    "judged uncertain": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 5,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 5
    },
-   "unmatched": 2,
-   "pairs": 5,
+   "unmatched": 0,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "conditions": {
-      "not_same_item": 1
      }
     }
    },
@@ -9296,7 +9294,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "judged uncertain"
+    "period.2": "judged different"
    }
   },
   "views-s1.xlsx": {
@@ -9325,32 +9323,28 @@
     "confirmed": 5
    },
    "holder": {
-    "judged uncertain": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 5,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 5
    },
-   "unmatched": 2,
-   "pairs": 5,
+   "unmatched": 0,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "conditions": {
-      "not_same_item": 1
      }
     }
    },
@@ -9362,7 +9356,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "judged uncertain"
+    "period.2": "judged different"
    }
   },
   "wtp-s1-tracked.docx": {
@@ -18574,7 +18568,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -18586,29 +18580,33 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different/equivalent/uncertain": 1
    },
    "different": {
-    "change": 4
+    "change": 5
    },
    "equivalent": {
-    "change": 3,
-    "no change": 16
+    "change": 1,
+    "no change": 19
    },
    "findings": {
-    "different": 4,
-    "equivalent": 19
+    "different": 5,
+    "equivalent": 20,
+    "uncertain": 1
    },
-   "unmatched": 9,
-   "pairs": 8,
+   "unmatched": 10,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 4
+     },
+     "conditions": {
+      "conditions": 1
      }
     }
    },
@@ -18620,7 +18618,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different/equivalent/uncertain"
    }
   },
   "views-s1.md": {
@@ -18637,7 +18635,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -18649,18 +18647,17 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
-    "change": 1,
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 6
+    "different": 3,
+    "equivalent": 5
    },
    "unmatched": 0,
    "pairs": 2,
@@ -18683,7 +18680,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different"
    }
   },
   "views-s1.docx": {
@@ -18700,7 +18697,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -18712,18 +18709,17 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
-    "change": 1,
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 6
+    "different": 3,
+    "equivalent": 5
    },
    "unmatched": 0,
    "pairs": 2,
@@ -18746,7 +18742,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different"
    }
   },
   "views-s1.pptx": {
@@ -18775,32 +18771,28 @@
     "confirmed": 5
    },
    "holder": {
-    "judged uncertain": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 5,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 5
    },
-   "unmatched": 2,
-   "pairs": 5,
+   "unmatched": 0,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "conditions": {
-      "not_same_item": 1
      }
     }
    },
@@ -18812,7 +18804,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "judged uncertain"
+    "period.2": "judged different"
    }
   },
   "views-s1.xlsx": {
@@ -18841,32 +18833,28 @@
     "confirmed": 5
    },
    "holder": {
-    "judged uncertain": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 5,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 5
    },
-   "unmatched": 2,
-   "pairs": 5,
+   "unmatched": 0,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "conditions": {
-      "not_same_item": 1
      }
     }
    },
@@ -18878,7 +18866,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "judged uncertain"
+    "period.2": "judged different"
    }
   },
   "wtp-s1-tracked.docx": {
@@ -26404,7 +26392,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -26416,29 +26404,33 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different/equivalent/uncertain": 1
    },
    "different": {
-    "change": 4
+    "change": 5
    },
    "equivalent": {
-    "change": 3,
-    "no change": 16
+    "change": 1,
+    "no change": 19
    },
    "findings": {
-    "different": 4,
-    "equivalent": 19
+    "different": 5,
+    "equivalent": 20,
+    "uncertain": 1
    },
-   "unmatched": 9,
-   "pairs": 8,
+   "unmatched": 10,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 4
+     },
+     "conditions": {
+      "conditions": 1
      }
     }
    },
@@ -26450,7 +26442,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different/equivalent/uncertain"
    }
   },
   "views-s1.docx": {
@@ -26467,7 +26459,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -26479,18 +26471,17 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
-    "change": 1,
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 6
+    "different": 3,
+    "equivalent": 5
    },
    "unmatched": 0,
    "pairs": 2,
@@ -26513,7 +26504,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different"
    }
   },
   "views-s1.pptx": {
@@ -26542,32 +26533,28 @@
     "confirmed": 5
    },
    "holder": {
-    "judged uncertain": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 5,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 5
    },
-   "unmatched": 2,
-   "pairs": 5,
+   "unmatched": 0,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "conditions": {
-      "not_same_item": 1
      }
     }
    },
@@ -26579,7 +26566,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "judged uncertain"
+    "period.2": "judged different"
    }
   },
   "views-s1.xlsx": {
@@ -26608,32 +26595,28 @@
     "confirmed": 5
    },
    "holder": {
-    "judged uncertain": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 5,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 5
    },
-   "unmatched": 2,
-   "pairs": 5,
+   "unmatched": 0,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "conditions": {
-      "not_same_item": 1
      }
     }
    },
@@ -26645,7 +26628,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "judged uncertain"
+    "period.2": "judged different"
    }
   },
   "wtp-s1-tracked.docx": {
@@ -34172,7 +34155,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -34184,29 +34167,33 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different/equivalent/uncertain": 1
    },
    "different": {
-    "change": 4
+    "change": 5
    },
    "equivalent": {
-    "change": 3,
-    "no change": 16
+    "change": 1,
+    "no change": 19
    },
    "findings": {
-    "different": 4,
-    "equivalent": 19
+    "different": 5,
+    "equivalent": 20,
+    "uncertain": 1
    },
-   "unmatched": 9,
-   "pairs": 8,
+   "unmatched": 10,
+   "pairs": 13,
    "omitted": 0,
    "kinds": {
-    "right": 4,
-    "scored": 4,
+    "right": 5,
+    "scored": 5,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 4
+     },
+     "conditions": {
+      "conditions": 1
      }
     }
    },
@@ -34218,7 +34205,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different/equivalent/uncertain"
    }
   },
   "views-s1.docx": {
@@ -34235,7 +34222,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "holders_noticed": "0/1",
+   "holders_noticed": "1/1",
    "difference_precision": 1.0,
    "changed": {
     "reported": 2
@@ -34247,18 +34234,17 @@
     "confirmed": 5
    },
    "holder": {
-    "settled": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
-    "change": 1,
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 6
+    "different": 3,
+    "equivalent": 5
    },
    "unmatched": 0,
    "pairs": 2,
@@ -34281,7 +34267,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "settled"
+    "period.2": "judged different"
    }
   },
   "views-s1.pptx": {
@@ -34310,32 +34296,28 @@
     "confirmed": 5
    },
    "holder": {
-    "judged uncertain": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 5,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 5
    },
-   "unmatched": 2,
-   "pairs": 5,
+   "unmatched": 0,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "conditions": {
-      "not_same_item": 1
      }
     }
    },
@@ -34347,7 +34329,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "judged uncertain"
+    "period.2": "judged different"
    }
   },
   "views-s1.xlsx": {
@@ -34376,32 +34358,28 @@
     "confirmed": 5
    },
    "holder": {
-    "judged uncertain": 1
+    "judged different": 1
    },
    "different": {
-    "change": 2
+    "change": 3
    },
    "equivalent": {
     "no change": 5
    },
    "findings": {
-    "different": 2,
-    "equivalent": 5,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 5
    },
-   "unmatched": 2,
-   "pairs": 5,
+   "unmatched": 0,
+   "pairs": 4,
    "omitted": 0,
    "kinds": {
     "right": 2,
-    "scored": 3,
+    "scored": 2,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 2
-     },
-     "conditions": {
-      "not_same_item": 1
      }
     }
    },
@@ -34413,7 +34391,7 @@
     "beams.2": "confirmed",
     "beams.mod": "confirmed",
     "period.1": "confirmed",
-    "period.2": "judged uncertain"
+    "period.2": "judged different"
    }
   },
   "wtp-s1-tracked.docx": {

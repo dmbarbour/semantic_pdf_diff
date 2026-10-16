@@ -844,7 +844,7 @@ class TableHolders(Lever):
     # a table's holder column (Company, Source, Proponent...) holds every claim read from its row: the row's cell as
     # the claims' stance (docs/plans/claim-context-2026-10-14.md, milestone 5; stance.py). Applied as answers are
     # stored
-    table_holders: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = False
+    table_holders: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = True
 
     def table_holder(self, header, row):
         if not self.table_holders:
@@ -971,8 +971,8 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
-# editorial, record_changes, split_conditions and sheet_records (docs/reviews/levers.md); round 0's settings are
-# benchmarks/round0.json.
+# editorial, record_changes, split_conditions, sheet_records and table_holders (docs/reviews/levers.md); round 0's
+# settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ColumnConditions, ConditionsByColumn, ExtractRules, VisualRules,
                  ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext, References,
                  TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,

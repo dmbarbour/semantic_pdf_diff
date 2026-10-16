@@ -58,8 +58,8 @@ class HolderColumn(unittest.TestCase):
     def test_a_rows_claims_take_its_holder_only_when_on(self):
         from semantic_pdf_diff.settings import Settings
         header, row = ["Company", "Proposals"], ["Avelin", "Proposal 1: The acknowledgement timeout is 251 ms."]
-        self.assertEqual(Settings().table_holder(header, row), ())
-        self.assertEqual([x.holder for x in Settings(table_holders=True).table_holder(header, row)], ["Avelin"])
+        self.assertEqual(Settings(table_holders=False).table_holder(header, row), ())
+        self.assertEqual([x.holder for x in Settings().table_holder(header, row)], ["Avelin"])
 
 PROPOSALS = [["Company", "Proposals"], ["Avelin", "Proposal 1: The acknowledgement timeout is 251 ms."],
              ["Borealis", "Proposal 1: The acknowledgement timeout is 251 ms."],
@@ -122,7 +122,7 @@ class Read(unittest.TestCase):
         return [(e.value, [(x.holder, x.attitude) for x in e.stance]) for e in evidence if e.kind == "table"]
 
     def test_a_tables_rows_claims_are_held_by_its_companies_only_when_on(self):
-        on = self.read(table_holders=True)
+        on = self.read()
         # row by row: two companies' proposals of one value are two claims; a reference mark left out
         self.assertEqual(sorted(x for x in on if x[0] != "Y" and x[0] != "N"),
                          [("251", [("Avelin", "proposes")]), ("251", [("Borealis", "proposes")]),
@@ -130,7 +130,7 @@ class Read(unittest.TestCase):
         # by rules: the views table's rows, each its company's (the attitude is in the value)
         self.assertIn(("Y", [("CMCC", "")]), on)
         self.assertIn(("N", [("Delmar", "")]), on)
-        off = self.read()
+        off = self.read(table_holders=False)
         self.assertTrue(all(stance == [] for _, stance in off))
         self.assertEqual(sorted(v for v, _ in off if v not in ("Y", "N")), ["251", "754"])  # one 251: one claim
 

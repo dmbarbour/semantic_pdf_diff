@@ -2,7 +2,7 @@
  "totals": {
   "inventory": {
    "claims": 20524,
-   "evidence": 11340,
+   "evidence": 11342,
    "frame in conditions": 76,
    "grounded": 5700,
    "list records": 36,
@@ -14,7 +14,7 @@
    "partly": 63,
    "partly (image)": 16,
    "positioned": 123,
-   "printed": 7053,
+   "printed": 7055,
    "sheet records": 11,
    "table records": 294,
    "unsupported": 25,
@@ -35,8 +35,7 @@
     "records": 143
    },
    "holder": {
-    "conditions": 40,
-    "entity": 20
+    "stance": 60
    },
    "provenance": {
     "conditions": 5
@@ -5633,8 +5632,8 @@
     "with conditions": 34,
     "positioned": 0,
     "misplaced": {},
-    "printed": 25,
-    "evidence": 25,
+    "printed": 26,
+    "evidence": 26,
     "context_bytes_per_request": 253,
     "data_bytes_per_request": 384,
     "examples": {}
@@ -5642,7 +5641,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 6
+      "stance": 6
      }
     },
     "audit": {},
@@ -5657,8 +5656,8 @@
     "with conditions": 34,
     "positioned": 0,
     "misplaced": {},
-    "printed": 24,
-    "evidence": 24,
+    "printed": 25,
+    "evidence": 25,
     "context_bytes_per_request": 253,
     "data_bytes_per_request": 384,
     "examples": {}
@@ -5666,7 +5665,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 6
+      "stance": 6
      }
     },
     "audit": {},
@@ -5690,7 +5689,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 6
+      "stance": 6
      }
     },
     "audit": {},
@@ -5714,7 +5713,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 6
+      "stance": 6
      }
     },
     "audit": {},
@@ -5738,8 +5737,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "entity": 5,
-      "conditions": 1
+      "stance": 6
      }
     },
     "audit": {},
@@ -5763,8 +5761,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "entity": 5,
-      "conditions": 1
+      "stance": 6
      }
     },
     "audit": {},
@@ -5788,7 +5785,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 6
+      "stance": 6
      }
     },
     "audit": {},
@@ -5812,7 +5809,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 6
+      "stance": 6
      }
     },
     "audit": {},
@@ -5836,8 +5833,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "entity": 5,
-      "conditions": 1
+      "stance": 6
      }
     },
     "audit": {},
@@ -5861,8 +5857,7 @@
    "keyed": {
     "placed": {
      "holder": {
-      "entity": 5,
-      "conditions": 1
+      "stance": 6
      }
     },
     "audit": {},

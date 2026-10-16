@@ -39,7 +39,7 @@ TOGGLES = {
     'least_half': 0.5, 'skip_sheet_tables': True, 'images_first': False, 'complete_by_image': True,
     'positions': 'conditions', 'records': False, 'editorial': False, 'split_conditions': False,
     'column_conditions': True, 'conditions_by_column': True, 'sheet_records': False,
-    'table_holders': True,
+    'table_holders': False,
 }
 # Settings measured under others, on both sides: the tilers' with tile_choice off (by default the rule picks the cut by
 # its measures, so another tiler or a tile's growth, say, may leave its choice and the queries as they were); the
