@@ -30,6 +30,13 @@ class Alignment(unittest.TestCase):
         self.assertEqual(found.summary["attributed_pairs"], 1)
         unheld = [claim(c.entity, c.attribute, c.value, c.unit) for c in right]  # holders unknown: as before
         self.assertEqual(align.align(left, unheld).attributed, [])
+        # other readings of the credited value naming no holder (a page's text, its tiles): the named pair is the
+        # attribution, and nothing of the value settles
+        left, right = left + [period("627", "")], right + [period("627", "")]
+        found = align.align(left, right)
+        self.assertEqual({(i, j) for i, j, _ in found.attributed}, {(2, 2)})
+        self.assertEqual({(i, j) for i, j, _ in found.settled}, {(1, 1)})
+        self.assertTrue({3} & {i for i, _, _ in found.judge} and {3} & {j for _, j, _ in found.judge})  # judged
 
     def test_a_name_by_position_follows_its_values(self):
         # The image reader names rows by position; a pump inserted above moves every blower down a row, so

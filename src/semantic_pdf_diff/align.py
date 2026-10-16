@@ -296,10 +296,17 @@ def _within(a, b, ia, ib, settle):
             pairs = [(i, j) for i in ga for j in gb]
         if not pairs:
             continue
-        ranked = sorted(pairs, key=lambda p: (_holders_differ(a.claims[p[0]], b.claims[p[1]]),
+        # the value's holders as its claims name them: changed between the revisions, nothing of it settles, and
+        # its claims naming holders pair first (unknown is never different, but a known holder has changed)
+        named_a = {holders(a.claims[i]) for i in ga} - {frozenset()}
+        named_b = {holders(b.claims[j]) for j in gb} - {frozenset()}
+        credited = bool(named_a and named_b and named_a != named_b)
+        both_named = lambda p: bool(holders(a.claims[p[0]]) and holders(b.claims[p[1]]))  # noqa: E731
+        ranked = sorted(pairs, key=lambda p: (0 if both_named(p) and not _holders_differ(a.claims[p[0]], b.claims[p[1]])
+                                              else 1 if both_named(p) else 2,
                                               -_conditions(a.claims[p[0]], b.claims[p[1]]), p))
         best = (a.claims[ranked[0][0]], b.claims[ranked[0][1]])
-        agreed = settle and _conditions(*best) >= 0.5 and not any(
+        agreed = settle and not credited and _conditions(*best) >= 0.5 and not any(
             _conflict(a.claims[i], b.claims[j]) or _frames_differ(a.claims[i], b.claims[j]) for i, j in pairs
             if not _holders_differ(a.claims[i], b.claims[j]))
         covered_a, covered_b = set(), set()
