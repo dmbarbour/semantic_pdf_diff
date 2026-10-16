@@ -461,6 +461,21 @@ def hedges_later(p, d):
     hedge(p, "retx", "Agreed", "Working assumption", "working assumption")
     change(p, "beams", d.number(6, 32))
 
+def adopt(project, echo_id, fact_id, sentence):
+    """The document's own proposal (a moderator's) made to adopt another holder's value, its words kept: sentence(value)
+    is how it's stated (a value changed in the authors' voice, every holder's kept)."""
+    echo, fact = next(e for e in project.echoes if e["id"] == echo_id), project.fact(fact_id)
+    label = echo["proposition"]
+    rewrite(project, f"{label}: {sentence(echo['value'])}", f"{label}: {sentence(fact.value)}")
+    project.edits.append({"kind": "echo", "echo": echo_id, "from": echo["value"], "to": fact.value})
+    echo["value"], echo["echoes"] = fact.value, fact_id
+
+def views_echo_later(p, d):
+    """The moderator's acknowledgement timeout now Borealis's proposal instead of Avelin's (the same sentence, the
+    other company's value); its report period still Corvane's; every company's proposal kept."""
+    from .corpus import ACK, STATED
+    adopt(p, "mod.3.1", "ack.2", STATED[ACK])
+
 def renamed_later(p, d):
     """Pump P-101B renamed P-201B, its values kept: the same pump under a new tag (alignment by its values)."""
     rename_row(p, "P-101B", "P-201B")
@@ -634,7 +649,9 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          # companies' yes-or-no views on the moderator's proposals: two turned round
          (PROJECTS["views-poll"], None, views_poll_later, False, "revised"),
          # design notes: two values firmed up, two hedged, every value kept; one value revised
-         (PROJECTS["hedges"], None, hedges_later, False, "revised"))
+         (PROJECTS["hedges"], None, hedges_later, False, "revised"),
+         # the moderator's proposal, a company's words and value, now the other company's
+         (PROJECTS["views-echo"], None, views_echo_later, False, "revised"))
 
 def _base(make, knob, seed):
     p = make(seed)

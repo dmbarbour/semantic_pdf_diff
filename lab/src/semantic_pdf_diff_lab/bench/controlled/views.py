@@ -13,10 +13,14 @@ proposition anywhere ("Proposal 2.1"), the yes or no in its value. Each reading 
 Of the views found right, how many hold their holder in the claim's stance (not only in its entity or conditions),
 and with the keyed attitude (supports, opposes).
 
-On a revision pair, each claim of a view (right or flipped) is bound to it, and each view classed by what the
-report's findings say of its claims, as comparison.py classes facts: a view turned round reported (a "different"
-finding), called equivalent, uncertain, other, unpaired, unextracted; a view kept confirmed (equivalent), a false
-change (different), and so on.
+Echoes (corpus.proposals_echoed: Project.echoes): the document's own proposals (a moderator's) in a holder's words
+and value, keyed apart since the value names the holder's fact too; a claim reads one when it names its label
+("Proposal 3.1", in its quote or words) and gives its value.
+
+On a revision pair, each claim of a view (right or flipped) is bound to it, and each claim of an echo to it, and
+each classed by what the report's findings say of its claims, as comparison.py classes facts: a view turned round
+(an echo's value changed) reported (a "different" finding), called equivalent, uncertain, other, unpaired,
+unextracted; one kept confirmed (equivalent), a false change (different), and so on.
 """
 import re
 from collections import Counter, defaultdict
@@ -97,6 +101,33 @@ def score_views(views, claims):
             "outcomes": dict(sorted(outcomes.items())), "holder_in_stance": len(in_stance),
             "attitude_in_stance": len(attitude)}
 
+def _echo_of(claim, echoes):
+    """The echo (the document's own proposal repeating a holder's value) a claim reads, by its label in the claim's
+    quote or words and its value, or None."""
+    from semantic_pdf_diff.values import parse_number
+    said = " ".join(str(claim.get(k, "") or "") for k in ("quote", "entity", "attribute", "conditions"))
+    number = parse_number(str(claim.get("value", "")))
+    for e in echoes:
+        if re.search(rf"(?<![\w.]){re.escape(e['proposition'])}(?![\w.]|\.\d)", said, re.I) \
+                and number is not None and number == parse_number(e["value"]):
+            return e["id"]
+    return None
+
+def score_echoes(echoes, claims):
+    """The echoes a run's claims read (bound by label and value), of the key's."""
+    found = {_echo_of(c, echoes) for c in claims} - {None}
+    return {"echoes": len(echoes), "found": len(found), "missed": sorted({e["id"] for e in echoes} - found)}
+
+def score_echoes_compared(earlier, later, report, side):
+    """A revision pair's echoes against the report's findings, as score_compared classes views: an echo whose value
+    changed reported (a "different" finding between its claims), called equivalent, ...; one kept confirmed."""
+    keys = (earlier, later)
+    echoes = [{e["id"]: e for e in k.get("echoes", [])} for k in keys]
+    changed = sorted(i for i in echoes[0].keys() & echoes[1].keys() if echoes[0][i]["value"] != echoes[1][i]["value"])
+    kept = sorted(i for i in echoes[0].keys() & echoes[1].keys() if i not in changed)
+    bound = {e["id"]: _echo_of(e, list(echoes[side[e["id"]]].values())) for e in report["evidence"]}
+    return _classed(report, side, bound, changed, kept)
+
 def score_compared(earlier, later, report, side):
     """A revision pair's views (both keys' "views") against the report's findings (see the module's note); side:
     {claim id: 0 or 1}, as comparison.sides gives it."""
@@ -108,6 +139,10 @@ def score_compared(earlier, later, report, side):
     for e in report["evidence"]:
         classed = classify(e, list(views[side[e["id"]]].values()))
         bound[e["id"]] = classed[1] if classed and classed[0] in ("right", "flipped") else None
+    return _classed(report, side, bound, changed, kept)
+
+def _classed(report, side, bound, changed, kept):
+    """Each keyed item (a view, an echo) classed by the findings between its claims ({claim id: item id or None})."""
     claims_of = defaultdict(lambda: ([], []))
     for claim, vid in bound.items():
         if vid:

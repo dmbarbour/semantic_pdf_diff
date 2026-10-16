@@ -273,6 +273,9 @@ def score(key_data, claims):
     if key_data.get("views"):  # holders' yes-or-no views, scored by names (views.py)
         from .views import score_views
         result["views"] = score_views(key_data["views"], claims)
+    if key_data.get("echoes"):  # the document's own proposals repeating a holder's value (views.py)
+        from .views import score_echoes
+        result["echoes"] = score_echoes(key_data["echoes"], claims)
     return result
 
 def facts_found(key_data, claims):

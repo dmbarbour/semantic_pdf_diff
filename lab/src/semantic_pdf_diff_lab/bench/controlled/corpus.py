@@ -505,6 +505,43 @@ def hedged_notes(seed=1):
     ]
     return Project(f"hedges-s{seed}", "Lakeshore Telemetry Link: Design Notes (Draft)", F, sections)
 
+def proposals_echoed(seed=1):
+    """A feature lead's summary whose moderator adopts a company's proposal word for word (the claim context plan,
+    milestone 5: a view reported against the same words in the authors' voice): the companies' proposals in a
+    "Company | Proposals" table, then the moderator's own, each the same sentence and value as one company's. The
+    moderator's are the document's voice, no holder keyed; its revision has the moderator adopt the other company's
+    proposal instead (the moderator's value changed, every company's kept), so a change is found only if the
+    moderator's claims aren't paired with the companies' equal values."""
+    d = Draw(f"views-echo-{seed}")
+    F = []
+    ms, count = (lambda: d.number(150, 950)), (lambda: d.number(6, 32))  # noqa: E731
+    held = lambda fid, what, value, unit, holder: F.append(Fact(  # noqa: E731
+        fid, *what, value, unit, basis="proposed", holder=holder, attitude="proposes")) or F[-1]
+    ack1, ack2 = held("ack.1", ACK, ms(), "ms", "Avelin"), held("ack.2", ACK, ms(), "ms", "Borealis")
+    per1, per2 = held("period.1", PERIOD, ms(), "ms", "Corvane"), held("period.2", PERIOD, ms(), "ms", "Delmar")
+    beams1 = held("beams.1", BEAMS, count(), "", "Estrella")
+    # the moderator's: the same words as a company's proposal; its values printed twice, so keyed by the company's
+    # facts (a value names one fact), and the moderator's by the sentence it's in (its proposal number)
+    rows = [[f.holder, f"Proposal 1: {STATED[what](f.value)}"]
+            for f, what in ((ack1, ACK), (ack2, ACK), (per1, PERIOD), (per2, PERIOD), (beams1, BEAMS))]
+    sections = [
+        ("1 Introduction", [
+            ("p", "This summary collects the companies' proposals on link failure detection and beam reporting, and "
+                  "gives the moderator's proposals for agreement, each adopting one company's."),
+        ]),
+        ("2 Companies' Proposals", [
+            ("table", "Table 1. Companies' proposals", ["Company", "Proposals"], rows),
+        ]),
+        ("3 Moderator's Proposals", [
+            ("p", f"Proposal 3.1: {STATED[ACK](ack1.value)}"),
+            ("p", f"Proposal 3.2: {STATED[PERIOD](per1.value)}"),
+        ]),
+    ]
+    echoes = [{"id": "mod.3.1", "proposition": "Proposal 3.1", "value": ack1.value, "echoes": ack1.id},
+              {"id": "mod.3.2", "proposition": "Proposal 3.2", "value": per1.value, "echoes": per1.id}]
+    return Project(f"views-echo-s{seed}", "Feature Lead Summary: Moderator's Proposals", F, sections,
+                   things=[(c, ()) for c in COMPANIES], echoes=echoes)
+
 def equipment_datasheets(seed=1):
     """Equipment data sheets (code review 2026-10-08, B5): each pump's and the clearwell's data as a key-value list,
     a block of two columns standing alone with no header, its first row a key and its value ("Pump | P-201A"; the
@@ -554,7 +591,8 @@ def equipment_datasheets(seed=1):
 
 PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster, "spec": link_protocol,
             "wtp-datasheets": equipment_datasheets, "views": proposals_summary, "views-grouped": proposals_grouped,
-            "views-prose": proposals_reported, "views-poll": proposals_polled, "hedges": hedged_notes}
+            "views-prose": proposals_reported, "views-poll": proposals_polled, "hedges": hedged_notes,
+            "views-echo": proposals_echoed}
 
 # --- table knobs (milestone 2) -------------------------------------------------------------------
 # Schedules rendered clean or with one knob, the same facts either way, so a knob's effect is the difference.
@@ -1405,6 +1443,8 @@ def key(project, log):
         out["parts"] = [{"name": n, "aliases": list(a)} for n, a in project.things]
     if project.views:  # views, keyed apart: a yes or a no names no fact by its value
         out["views"] = project.views
+    if project.echoes:  # the document's own proposals repeating a holder's value, keyed apart (by their label)
+        out["echoes"] = project.echoes
     if project.revision_of:
         out["revision_of"], out["edits"] = project.revision_of, project.edits
     return out

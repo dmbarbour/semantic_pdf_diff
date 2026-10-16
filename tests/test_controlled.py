@@ -458,7 +458,9 @@ class Revisions(unittest.TestCase):
                     # proposal withdrawn with its no
                     "views-poll-s1": (0, 0, 1, 0),
                     # design notes: two values firmed up and two hedged (a hedge, not a value, changed); one revised
-                    "hedges-s1": (1, 0, 0, 0)}
+                    "hedges-s1": (1, 0, 0, 0),
+                    # the moderator's proposal now the other company's (keyed apart: no fact changed)
+                    "views-echo-s1": (0, 0, 0, 0)}
         # facts whose declared context was restated, value and conditions kept: the plan's 7 rooms' widths and
         # depths, the coaster's 5 element heights; and a proposal credited to another company, its value kept
         restated = {"lcc-plan-s1-clean-notes": 14, "coaster-tables-s1-clean-datum": 5}
@@ -621,6 +623,32 @@ class Views(unittest.TestCase):
         s = comparison.score_comparison(*self.keys, report)["views"]
         self.assertEqual((s["changes_found"], s["unchanged_confirmed"], s["false_changes"]), ("1/2", "8/8", 0))
         self.assertEqual(s["detail"][turned[1]], "called equivalent")
+
+class Echoes(unittest.TestCase):
+    def test_the_moderators_proposal_is_told_from_the_company_whose_words_it_repeats(self):
+        from semantic_pdf_diff_lab.bench.controlled import comparison, revisions
+        from semantic_pdf_diff_lab.bench.controlled.corpus import proposals_echoed
+        (_, revised), = [x for x in revisions.revised() if x[0].id == "views-echo-s1"]
+        keys = [controlled.key(p, controlled.render(p)[1]) for p in (proposals_echoed(1), revised)]
+        (old, new), (kept, _) = ([{e["id"]: e for e in k["echoes"]}[i] for k in keys] for i in ("mod.3.1", "mod.3.2"))
+        company = next(f for f in keys[0]["facts"] if f["id"] == "ack.1")
+        self.assertEqual((old["value"], new["value"] != old["value"]), (company["value"], True))
+        def said(eid, s, quote, value):
+            return {"id": eid, "content": f"{'ab'[s]}.pdf", "entity": "acknowledgement timeout", "attribute": "value",
+                    "value": value, "unit": "ms", "conditions": "", "quote": quote}
+        evidence = [said("a1", 0, f"Proposal 3.1: The acknowledgement timeout is {old['value']} ms.", old["value"]),
+                    said("b1", 1, f"Proposal 3.1: The acknowledgement timeout is {new['value']} ms.", new["value"]),
+                    said("a0", 0, f"Avelin Proposal 1: The acknowledgement timeout is {old['value']} ms.",
+                         old["value"])]
+        report = {"sources": [{"name": "a"}, {"name": "b"}],
+                  "files": [{"source": "a", "content": "a.pdf"}, {"source": "b", "content": "b.pdf"}],
+                  "evidence": evidence, "unmatched": [],
+                  "retrieval": {"attempted_pairs": 1, "omitted_by_pair_limit": 0}}
+        score = lambda relation: comparison.score_comparison(*keys, {**report, "findings": [  # noqa: E731
+            {"a": "a1", "b": "b1", "relation": relation}]})["echoes"]
+        self.assertEqual(score("different")["changes_found"], "1/1")
+        self.assertEqual(score("equivalent")["detail"]["mod.3.1"], "called equivalent")
+        self.assertEqual(score("different")["detail"]["mod.3.2"], "unextracted")  # its claims: none here
 
 class ComparisonScoring(unittest.TestCase):
     """A report's findings against the key's changes, on the treatment plant's pair."""

@@ -94,6 +94,8 @@ class Project:
     revision_of: str = ""                      # the base document's id, for a revision
     views: list = field(default_factory=list)  # holders' yes-or-no views: [{id, holder, proposition, value,
                                                # attitude}] (corpus.proposals_polled; score.score_views)
+    echoes: list = field(default_factory=list)  # the document's own proposals repeating a holder's value: [{id,
+                                                # proposition, value, echoes}] (corpus.proposals_echoed; views.py)
 
     def has(self, knob):
         """Whether a prose, layout or chart knob applies: "all" applies every knob of the project's kind but those

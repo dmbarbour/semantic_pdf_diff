@@ -1,10 +1,10 @@
 {
  "totals": {
   "inventory": {
-   "claims": 21020,
-   "evidence": 11748,
+   "claims": 21134,
+   "evidence": 11828,
    "frame in conditions": 76,
-   "grounded": 5989,
+   "grounded": 6047,
    "list records": 36,
    "no content words": 3,
    "note records": 11,
@@ -14,12 +14,12 @@
    "partly": 88,
    "partly (image)": 16,
    "positioned": 123,
-   "printed": 7386,
+   "printed": 7466,
    "sheet records": 11,
    "table records": 303,
    "unsupported": 34,
    "unsupported (image)": 806,
-   "with conditions": 6936,
+   "with conditions": 6994,
    "with records": 6245
   },
   "placed": {
@@ -36,7 +36,7 @@
    },
    "holder": {
     "conditions": 25,
-    "stance": 144
+    "stance": 194
    },
    "provenance": {
     "conditions": 5
@@ -88,7 +88,7 @@
    "otherwise": 14
   },
   "attitudes": {
-   "in its stance": 110,
+   "in its stance": 160,
    "none": 59
   },
   "hedges": {
@@ -108,8 +108,8 @@
      "share": 0.985
     },
     "<=1.0": {
-     "readings": 29112,
-     "right": 26356,
+     "readings": 29340,
+     "right": 26548,
      "share": 0.905
     }
    },
@@ -125,9 +125,9 @@
      "share": 0.77
     },
     "<=1.0": {
-     "readings": 20718,
-     "right": 18764,
-     "share": 0.906
+     "readings": 20786,
+     "right": 18820,
+     "share": 0.905
     }
    },
    "table rules": {
@@ -149,9 +149,9 @@
      "share": 0.19
     },
     "<=1.0": {
-     "readings": 8394,
-     "right": 7592,
-     "share": 0.904
+     "readings": 8554,
+     "right": 7728,
+     "share": 0.903
     }
    }
   }
@@ -5924,6 +5924,276 @@
     "placed": {},
     "audit": {},
     "named": {},
+    "examples": {}
+   }
+  },
+  "views-echo-s1": {
+   "inventory": {
+    "claims": 29,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 12,
+    "evidence": 12,
+    "context_bytes_per_request": 203,
+    "data_bytes_per_request": 364,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-echo-s1-revised": {
+   "inventory": {
+    "claims": 29,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 12,
+    "evidence": 12,
+    "context_bytes_per_request": 203,
+    "data_bytes_per_request": 364,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-echo-s1-revised.docx": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 6,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 359,
+    "data_bytes_per_request": 155,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-echo-s1-revised.md": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 7,
+    "with conditions": 7,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 495,
+    "data_bytes_per_request": 158,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-echo-s1-revised.pptx": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 339,
+    "data_bytes_per_request": 103,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-echo-s1-revised.xlsx": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 332,
+    "data_bytes_per_request": 104,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-echo-s1.docx": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 6,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 359,
+    "data_bytes_per_request": 155,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-echo-s1.md": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 7,
+    "with conditions": 7,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 495,
+    "data_bytes_per_request": 158,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-echo-s1.pptx": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 339,
+    "data_bytes_per_request": 103,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-echo-s1.xlsx": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 3,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 332,
+    "data_bytes_per_request": 104,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 5
+    },
     "examples": {}
    }
   },

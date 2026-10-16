@@ -36,7 +36,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
 from .score import classify, key_facts, ranges
-from .views import score_compared
+from .views import score_compared, score_echoes_compared
 
 BOUND = ("right", "loose")              # a claim of its fact, read right
 READ_WRONG = ("wrong unit", "inexact")  # a claim of its fact, read wrong
@@ -139,6 +139,7 @@ def score_comparison(earlier, later, report):
             "pairs": report["retrieval"]["attempted_pairs"], "omitted": report["retrieval"]["omitted_by_pair_limit"],
             **({"splits": split_detail} if splits else {}),
             **({"views": score_compared(earlier, later, report, side)} if earlier.get("views") else {}),
+            **({"echoes": score_echoes_compared(earlier, later, report, side)} if earlier.get("echoes") else {}),
             **({"kinds": _explained(read.kinds_found)} if read.kinds_found else {}),
             "detail": dict(sorted(detail.items()))}
 
