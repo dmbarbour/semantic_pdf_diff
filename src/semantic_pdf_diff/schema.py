@@ -14,6 +14,14 @@ class Strict(BaseModel):
 
 Basis = Literal["measured", "calculated", "simulated", "projected", "required", "targeted", "asserted", "unknown"]
 
+class Link(Strict):
+    """One link of a claim's attribution chain (docs/plans/claim-context-2026-10-14.md, Stance): who holds the
+    proposition and how ("Avelin", "proposes"), with a hedge if stated ("may", "likely"). The source's, never the
+    pipeline's: our confidence in a reading is Claim.confidence."""
+    holder: str = Field(min_length=1, max_length=120)
+    attitude: str = Field(default="", max_length=60)   # says, proposes, requires, supports, opposes, ...
+    strength: str = Field(default="", max_length=60)
+
 class Claim(Strict):
     entity: str = Field(min_length=1, max_length=160)
     attribute: str = Field(min_length=1, max_length=160)
@@ -34,6 +42,9 @@ class Claim(Strict):
     uncertainty: str = Field(default="", max_length=200)
     context: str = Field(default="", max_length=300)
     role: str = Field(default="", max_length=200)
+    # who holds it, where the document reports another's view: the reported links, outermost first (milestone 5);
+    # empty, the document's own voice or not known. The document's authors and the pipeline aren't links here
+    stance: list[Link] = Field(default_factory=list, max_length=4)
 
 OPTIONAL_CLAIM_FIELDS = ("unit", "conditions", "frame", "approximate", "topic", "basis", "uncertainty", "context",
                          "role")
@@ -78,6 +89,9 @@ class Extraction(Strict):
                     item.pop(k, None)
             if item.get("basis") not in Basis.__args__:
                 item.pop("basis", None)  # an unrecognized basis is "unknown", not a broken claim
+            if "stance" in item:  # links as asked, or none: a malformed stance loses the stance, not the claim
+                links = item["stance"] if isinstance(item["stance"], list) else []
+                item["stance"] = [x for x in links if isinstance(x, dict) and str(x.get("holder") or "").strip()]
             try:
                 claims.append(Claim.model_validate(item).model_dump())
             except ValidationError:
@@ -365,18 +379,21 @@ class Evidence(Claim):
     def _without_absent_context(self, handler):
         out = handler(self)  # none, no key: evidence written without the levers that fill them stays as it was
         if isinstance(out, dict):
-            for key, empty in (("frame", ""), ("position", None), ("records", []), ("printed", "")):
+            for key, empty in (("frame", ""), ("position", None), ("records", []), ("printed", ""), ("stance", [])):
                 if out.get(key, empty) == empty:
                     out.pop(key, None)
         return out
 
 def claim_id(content, claim):
     """Evidence ID from content and claim identity: entity, attribute, value, conditions and frame
-    (whitespace-normalized, case-folded), unit (exact: mW is not MW), approximate and basis. A claim with no frame
-    is named as before frames were read."""
+    (whitespace-normalized, case-folded), unit (exact: mW is not MW), approximate and basis, and its holders (two
+    companies' proposals of one value are two claims). A claim with no frame or holder is named as before they were
+    read."""
     fold = lambda text: " ".join(str(text).split()).casefold()
     identity = [content, fold(claim.entity), fold(claim.attribute), fold(claim.value), claim.unit.strip(),
                 fold(claim.conditions), claim.approximate, claim.basis] + ([fold(claim.frame)] if claim.frame else [])
+    if claim.stance:
+        identity.append([fold(link.holder) for link in claim.stance])
     return "ev-" + hashlib.sha256(json.dumps(identity).encode()).hexdigest()[:16]
 
 # Representative occurrence: native before visual, tile before overview, then the
