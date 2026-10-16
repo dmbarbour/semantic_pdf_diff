@@ -32,6 +32,8 @@ class Plan:
     doors: dict                 # tag: (width in, height in)
     notes: list = field(default_factory=list)
     revisions: tuple = ()       # the revision table's rows: (revision, date, description)
+    hall: str = "C"             # the hall its title block names
+    number: str = "A-201"       # its sheet number
 
 def floor_plan(d):
     """Hall C's meeting rooms: a row of rooms north of a corridor, a row south, each its own size."""
@@ -74,39 +76,52 @@ def plan_sheet(seed=1):
     from .model import Draw
     return sheet_project(floor_plan(Draw(f"lcc-plan-{seed}")), f"lcc-plan-s{seed}")
 
-def sheet_project(plan, ident):
-    """The project a plan draws: its facts read from the plan (so a revised plan gives the revision's facts)."""
-    from .model import Fact, Project
+def _room_facts(plan, prefix=""):
+    """A plan's rooms' and doors' facts, their ids prefixed (a set's "hallc.")."""
+    from .model import Fact
     facts = []
     for r in plan.rooms:
         room = f"{r.name.title()} {r.number}"
         aliases = (f"Room {r.number}", f"{r.name.title()} Room {r.number}", r.number, f"{r.name} {r.number}")
-        facts.append(Fact(f"room{r.number}.width", room, aliases, "width", ("east-west dimension", "room width"),
-                          ft_in(r.width), "ft-in", drawn="drawing"))
-        facts.append(Fact(f"room{r.number}.depth", room, aliases, "depth", ("north-south dimension", "room depth"),
-                          ft_in(r.depth), "ft-in", drawn="drawing"))
+        facts.append(Fact(f"{prefix}room{r.number}.width", room, aliases, "width",
+                          ("east-west dimension", "room width"), ft_in(r.width), "ft-in", drawn="drawing"))
+        facts.append(Fact(f"{prefix}room{r.number}.depth", room, aliases, "depth",
+                          ("north-south dimension", "room depth"), ft_in(r.depth), "ft-in", drawn="drawing"))
         area = round(r.width * r.depth / 144)
-        facts.append(Fact(f"room{r.number}.area", room, aliases, "floor area", ("area", "net area", "room area"),
-                          f"{area:,}", "ft²", drawn="drawing"))
+        facts.append(Fact(f"{prefix}room{r.number}.area", room, aliases, "floor area",
+                          ("area", "net area", "room area"), f"{area:,}", "ft²", drawn="drawing"))
         w, h = plan.doors[r.door]
         door = f"Door {r.door}"
-        facts.append(Fact(f"{r.door}.width", door, (r.door,), "width", ("door width", "opening width"), ft_in(w),
-                          "ft-in", drawn="table"))
-        facts.append(Fact(f"{r.door}.height", door, (r.door,), "height", ("door height", "opening height"), ft_in(h),
-                          "ft-in", drawn="table"))
-        facts.append(Fact(f"{r.door}.part-of.room{r.number}", door, (r.door,), "part of", (), room, "",
+        facts.append(Fact(f"{prefix}{r.door}.width", door, (r.door,), "width", ("door width", "opening width"),
+                          ft_in(w), "ft-in", drawn="table"))
+        facts.append(Fact(f"{prefix}{r.door}.height", door, (r.door,), "height", ("door height", "opening height"),
+                          ft_in(h), "ft-in", drawn="table"))
+        facts.append(Fact(f"{prefix}{r.door}.part-of.room{r.number}", door, (r.door,), "part of", (), room, "",
                           relation="part of", object_aliases=aliases,
                           accepts=("within", "linked", "serves", "leads to"), drawn="table"))
+    return facts
+
+def sheet_project(plan, ident):
+    """The project a plan draws (or a list of plans, a sheet each): its facts read from the plan (so a revised plan
+    gives the revision's facts)."""
+    from .model import Fact, Project
+    plans = plan if isinstance(plan, list) else [plan]
+    prefix = (lambda p: f"hall{p.hall.lower()}.") if len(plans) > 1 else (lambda p: "")
+    facts = [f for p in plans for f in _room_facts(p, prefix(p))]
+    plan = plans[0]  # the sheets share a revision table
     for rev, date, what in plan.revisions:  # the revision table's dates: fair claims, so facts
         facts.append(Fact(f"rev{rev}.date", f"Revision {rev}", (f"Rev {rev}", f"Rev. {rev}"), "date",
                           ("issue date", "revision date", "issued", "date issued"), date, "", what, drawn="table"))
-    project = Project(ident, "Lakeshore Hall C: Meeting Rooms Floor Plan", facts, [], kinds=SHEET_KNOBS,
+    title = ("Lakeshore Hall C: Meeting Rooms Floor Plan" if len(plans) == 1
+             else f"Lakeshore Halls {' and '.join(p.hall for p in plans)}: Meeting Rooms Floor Plans")
+    project = Project(ident, title, facts, [], kinds=SHEET_KNOBS,
                       things=[(f"{r.name.title()} {r.number}", (f"Room {r.number}", f"{r.name.title()} Room {r.number}",
                                                                  r.number, f"{r.name} {r.number}"))
                               for r in plan.rooms] +
                              [(f"Door {r.door}", (r.door,)) for r in plan.rooms] +
                              [("Corridor C-100", ("C-100", "corridor"))])  # named on the sheet, though in no fact
-    project.sheet = plan
+    project.sheet = plans[0] if len(plans) == 1 else None
+    project.sheets = plans
     return project
 
 SHEET_PROJECTS = {"lcc-plan": plan_sheet}
@@ -116,15 +131,28 @@ REVISIONS = (("A", "2026-01-10", "ISSUED FOR REVIEW"), ("B", "2026-02-20", "REVI
 # --- drawing --------------------------------------------------------------------------------------------
 
 def render(project):
-    """(pdf bytes, the printed numbers' log), like controlled.render, for a sheet drawn directly."""
+    """(pdf bytes, the printed numbers' log), like controlled.render, for a sheet (or a set of them) drawn
+    directly."""
     import pymupdf
     from .model import locate
-    plan = project.sheet
+    doc, tables, drawn = pymupdf.open(), {}, {}
+    plans = project.sheets
+    for n, plan in enumerate(plans, 1):
+        prefix = f"hall{plan.hall.lower()}." if len(plans) > 1 else ""
+        door_of = {f.entity.split()[-1]: f for f in project.facts if f.relation and f.id.startswith(prefix)}
+        table_box, in_table, on_plan = _draw(project, doc, plan, door_of)
+        tables[n], drawn[n] = [tuple(table_box)], [(None, in_table, [], "table"), (None, on_plan, [], "drawing")]
+    doc.set_metadata({})
+    data = doc.tobytes(garbage=3, deflate=True, no_new_id=True)
+    return data, locate(project, pymupdf.open("pdf", data), tables, drawn)
+
+def _draw(project, doc, plan, door_of):
+    """A plan's sheet, on a new page: (its door schedule's box, where its doors' rooms are shown in the schedule,
+    and on the plan). door_of: each door's room, as a fact."""
+    import pymupdf
     small, vertical, rotated = (project.has(k) for k in ("small", "vertical", "rotated"))
     tag_size, dim_size = (6.0, 4.5) if small else (10.0, 8.0)
-    door_of = {f.entity.split()[-1]: f for f in project.facts if f.relation}  # each door's room, as a fact
     in_table, on_plan = [], []  # where those facts are shown
-    doc = pymupdf.open()
     page = doc.new_page(width=ARCH_D[0], height=ARCH_D[1])
     ox, oy = 260.0, 330.0  # where grid lines A and 1 cross
     X = lambda ft: ox + ft * SCALE
@@ -144,8 +172,9 @@ def render(project):
     lines([border.tl, border.tr, border.br, border.bl, border.tl], 2.0)
     tb = pymupdf.Rect(ARCH_D[0] - 520, 36, ARCH_D[0] - 36, ARCH_D[1] - 36)
     lines([tb.tl, tb.bl], 1.5)
-    rows = [("PROJECT", 9), ("LAKESHORE CONVENTION CENTER EXPANSION", 14), ("HALL C", 14), ("SHEET TITLE", 9),
-            ("FLOOR PLAN - MEETING ROOMS", 14), ("SCALE", 9), ('1/8" = 1\'-0"', 12), ("SHEET", 9), ("A-201", 28)]
+    rows = [("PROJECT", 9), ("LAKESHORE CONVENTION CENTER EXPANSION", 14), (f"HALL {plan.hall}", 14),
+            ("SHEET TITLE", 9), ("FLOOR PLAN - MEETING ROOMS", 14), ("SCALE", 9), ('1/8" = 1\'-0"', 12), ("SHEET", 9),
+            (plan.number, 28)]
     y = ARCH_D[1] - 520
     for t, s in rows:
         y += s * 1.9
@@ -222,11 +251,7 @@ def render(project):
     text(X(0), Y(plan.grid_y[-1]) + 100, 'SCALE: 1/8" = 1\'-0"', 9)
     if rotated:
         page.set_rotation(90)  # stored turned, as many sheets are
-    doc.set_metadata({})
-    data = doc.tobytes(garbage=3, deflate=True, no_new_id=True)
-    log = locate(project, pymupdf.open("pdf", data), {1: [tuple(table_box)]},
-                 {1: [(None, in_table, [], "table"), (None, on_plan, [], "drawing")]})
-    return data, log
+    return table_box, in_table, on_plan
 
 def _bubble(page, x, y, label, r=14):
     import pymupdf

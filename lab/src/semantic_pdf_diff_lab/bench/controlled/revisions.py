@@ -359,13 +359,7 @@ def plan_later(p, d):
     """Revision D of the floor plan: meeting room 102 widened (its area follows, and the rooms east of it move),
     door D103 widened, and the revision table gains revision D."""
     plan = p.sheet
-    room = next(r for r in plan.rooms if r.number == "102")
-    sizes = {s for r in plan.rooms for s in (r.width, r.depth)}
-    grow = next(g for g in (24, 30, 18, 36) if room.width + g not in sizes)
-    for r in plan.rooms:
-        if r.door_side == room.door_side and r.x > room.x:
-            r.x += grow / 12
-    room.width += grow
+    _widen(plan, "102")
     width, height = plan.doors["D103"]
     plan.doors["D103"] = (next((w for w in (36, 42, 48, 72) if w > width), 48), height)
     plan.revisions = plan.revisions + (("D", "2026-04-02", "ROOM 102 ENLARGED, DOOR D103 WIDENED"),)
@@ -374,6 +368,16 @@ def plan_later(p, d):
     p.edits += [{"kind": "changed", "fact": f.id, "from": before[f.id], "to": f.value}
                 for f in p.facts if f.id in before and before[f.id] != f.value]
     p.edits.append({"kind": "added", "facts": [f.id for f in p.facts if f.id not in before]})
+
+def _widen(plan, number, taken=()):
+    """A plan's room widened by a size no room of it (nor taken) has, the rooms east of it on its side moved."""
+    room = next(r for r in plan.rooms if r.number == number)
+    sizes = {s for r in plan.rooms for s in (r.width, r.depth)} | set(taken)
+    grow = next(g for g in (24, 30, 18, 36) if room.width + g not in sizes)
+    for r in plan.rooms:
+        if r.door_side == room.door_side and r.x > room.x:
+            r.x += grow / 12
+    room.width += grow
 
 def renamed_later(p, d):
     """Pump P-101B renamed P-201B, its values kept: the same pump under a new tag (alignment by its values)."""
@@ -565,7 +569,7 @@ def check(base, project):
     _, before = render(base)
     _, after = render(project)
     values = [f.value for f in project.facts if not f.relation]
-    if not getattr(project, "sheet", None) and len(values) != len(set(values)):
+    if not getattr(project, "sheets", None) and len(values) != len(set(values)):
         raise ValueError(f"{project.id}: a value names two facts")
     structure = lambda log: {p["text"] for p in log if p["role"] == "structure"}
     old = {f.id for f in base.facts}

@@ -30,7 +30,7 @@ def _table(caption, header, rows):
 
 def markdown(project):
     """A project as Markdown lines, or None for one Markdown can't carry (a sheet, a schematic)."""
-    if getattr(project, "sheet", None) or getattr(project, "schematic", None):
+    if getattr(project, "sheets", None) or getattr(project, "schematic", None):
         return None
     out = [f"# {project.title}", ""]
     for heading, blocks in project.sections:

@@ -1024,7 +1024,7 @@ def html(project, breaks=()):
 def render(project, page_size="letter"):
     """(pdf bytes, the printed numbers' log): the same project gives the same bytes."""
     import pymupdf
-    if getattr(project, "sheet", None):  # a drawing sheet, drawn directly (sheets.py)
+    if getattr(project, "sheets", None):  # drawing sheets, drawn directly (sheets.py)
         from .sheets import render as render_sheet
         return render_sheet(project)
     rect = (pymupdf.paper_rect("letter-l") if project.has("landscape")
