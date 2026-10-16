@@ -59,9 +59,9 @@ class Sheets(unittest.TestCase):
         sheet = Figure(id="fig:p1:0", page=1, bbox=(0, 0, 10, 10), kind="sheet", label="sheet A-201", title="HALL C")
         page = blocks("GENERAL NOTES", "1. ALL DIMENSIONS ARE TO FACE OF FINISH.")
         kinds = lambda s: [r.kind for r in s.page_structure(1, page, lambda: sheet)[1]]
-        self.assertEqual(kinds(Settings()), ["note"])
-        self.assertEqual(kinds(Settings(sheet_records=True)), ["note", "sheet"])
-        self.assertEqual(Settings(sheet_records=True).page_structure(1, page, lambda: None)[1], [])  # no sheet
+        self.assertEqual(kinds(Settings(sheet_records=False)), ["note"])
+        self.assertEqual(kinds(Settings()), ["note", "sheet"])
+        self.assertEqual(Settings().page_structure(1, page, lambda: None)[1], [])  # no sheet
 
 class Tables(unittest.TestCase):
     def test_a_table_record_is_named_by_its_rules_task(self):

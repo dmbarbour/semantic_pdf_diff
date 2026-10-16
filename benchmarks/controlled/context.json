@@ -15,6 +15,7 @@
    "partly (image)": 16,
    "positioned": 123,
    "printed": 6940,
+   "sheet records": 11,
    "table records": 294,
    "unsupported": 25,
    "unsupported (image)": 806,
@@ -49,7 +50,8 @@
    "subject": {
     "conditions": 72,
     "entity": 132,
-    "nowhere": 165
+    "nowhere": 43,
+    "records": 122
    }
   },
   "audit": {
@@ -72,9 +74,9 @@
     "kept out": 828
    },
    "subject": {
-    "image only": 10,
-    "not shown": 44,
-    "shown, not used": 111
+    "image only": 1,
+    "not shown": 15,
+    "shown, not used": 27
    }
   },
   "named": {
@@ -2756,7 +2758,8 @@
      "numbered in entity": 4
     },
     "records": {
-     "note": 1
+     "note": 1,
+     "sheet": 1
     },
     "with records": 103,
     "printed": 9,
@@ -2811,7 +2814,8 @@
     },
     "records": {
      "list": 1,
-     "note": 1
+     "note": 1,
+     "sheet": 1
     },
     "with records": 99,
     "printed": 6,
@@ -2872,7 +2876,8 @@
     },
     "records": {
      "list": 1,
-     "note": 1
+     "note": 1,
+     "sheet": 1
     },
     "with records": 100,
     "printed": 6,
@@ -2935,7 +2940,8 @@
     },
     "records": {
      "list": 1,
-     "note": 1
+     "note": 1,
+     "sheet": 1
     },
     "with records": 88,
     "printed": 9,
@@ -2986,7 +2992,8 @@
      "numbered in entity": 4
     },
     "records": {
-     "note": 1
+     "note": 1,
+     "sheet": 1
     },
     "with records": 97,
     "printed": 7,
@@ -3041,7 +3048,8 @@
     },
     "records": {
      "list": 1,
-     "note": 1
+     "note": 1,
+     "sheet": 1
     },
     "with records": 104,
     "printed": 6,
@@ -3099,7 +3107,8 @@
     },
     "records": {
      "list": 1,
-     "note": 1
+     "note": 1,
+     "sheet": 1
     },
     "with records": 94,
     "printed": 6,
@@ -3157,7 +3166,8 @@
     },
     "records": {
      "list": 2,
-     "note": 2
+     "note": 2,
+     "sheet": 2
     },
     "with records": 188,
     "printed": 11,
@@ -3180,7 +3190,7 @@
    "keyed": {
     "placed": {
      "subject": {
-      "nowhere": 61,
+      "records": 61,
       "entity": 2
      },
      "frame": {
@@ -3192,11 +3202,6 @@
      }
     },
     "audit": {
-     "subject": {
-      "shown, not used": 36,
-      "not shown": 19,
-      "image only": 6
-     },
      "sibling": {
       "in conditions": 3
      }
@@ -3204,23 +3209,7 @@
     "named": {
      "by an unprinted convention": 26
     },
-    "examples": {
-     "subject: shown, not used": [
-      "hallc.D101.height: wanted 'Hall C'; read height |  / height | Room: MEETING 101",
-      "hallc.D101.width: wanted 'Hall C'; read width |  / width | ",
-      "hallc.D102.height: wanted 'Hall C'; read height |  / height | Room: MEETING 102"
-     ],
-     "subject: not shown": [
-      "hallc.room101.width: wanted 'Hall C'; read width |  / width | ",
-      "hallc.room102.depth: wanted 'Hall C'; read dimension 2 |  / dimension 2 | ",
-      "hallc.room102.width: wanted 'Hall C'; read dimension 1 |  / width | "
-     ],
-     "subject: image only": [
-      "hallc.room110.width: wanted 'Hall C'; read width |  / width | ",
-      "hallc.room112.width: wanted 'Hall C'; read width |  / width | ",
-      "halld.room104.depth: wanted 'Hall D'; read length | "
-     ]
-    }
+    "examples": {}
    }
   },
   "lcc-plans-s1-clean-revised": {
@@ -3235,7 +3224,8 @@
     },
     "records": {
      "list": 2,
-     "note": 2
+     "note": 2,
+     "sheet": 2
     },
     "with records": 189,
     "printed": 9,
@@ -3258,7 +3248,7 @@
    "keyed": {
     "placed": {
      "subject": {
-      "nowhere": 61,
+      "records": 61,
       "entity": 2
      },
      "frame": {
@@ -3270,11 +3260,6 @@
      }
     },
     "audit": {
-     "subject": {
-      "shown, not used": 48,
-      "not shown": 10,
-      "image only": 3
-     },
      "sibling": {
       "in conditions": 4
      }
@@ -3282,23 +3267,7 @@
     "named": {
      "by an unprinted convention": 26
     },
-    "examples": {
-     "subject: shown, not used": [
-      "hallc.D101.height: wanted 'Hall C'; read height | Meeting 101 / height | ",
-      "hallc.D101.width: wanted 'Hall C'; read width | Meeting 101 / width | ",
-      "hallc.D102.height: wanted 'Hall C'; read height | Meeting 102 / height | "
-     ],
-     "subject: not shown": [
-      "hallc.room101.width: wanted 'Hall C'; read width |  / width | ",
-      "hallc.room102.width: wanted 'Hall C'; read dimension 1 |  / width | ",
-      "hallc.room103.depth: wanted 'Hall C'; read length |  / dimension 2 | "
-     ],
-     "subject: image only": [
-      "hallc.room110.width: wanted 'Hall C'; read width |  / width | ",
-      "hallc.room112.width: wanted 'Hall C'; read width |  / width | ",
-      "halld.room112.depth: wanted 'Hall D'; read length | "
-     ]
-    }
+    "examples": {}
    }
   },
   "lcc-s1-all": {

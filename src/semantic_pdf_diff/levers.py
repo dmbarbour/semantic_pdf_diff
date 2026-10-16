@@ -829,7 +829,7 @@ class SheetRecords(Lever):
     lever_name, stage, off = "sheet_records", "matching", {"sheet_records": False}
     # a drawing sheet's title block kept as a record every claim on the sheet references (docs/plans/claim-context-
     # 2026-10-14.md, milestone 4: two halls' sheets alike but for their title blocks). Applied as answers are stored
-    sheet_records: Annotated[bool, Declared("post", EXTRACT)] = False
+    sheet_records: Annotated[bool, Declared("post", EXTRACT)] = True
 
     def page_structure(self, page_no, blocks, is_sheet):
         positions, records = super().page_structure(page_no, blocks, is_sheet)
@@ -958,7 +958,7 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
-# editorial, record_changes and split_conditions (docs/reviews/levers.md); round 0's settings are
+# editorial, record_changes, split_conditions and sheet_records (docs/reviews/levers.md); round 0's settings are
 # benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ColumnConditions, ConditionsByColumn, ExtractRules, VisualRules,
                  ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext, References,
