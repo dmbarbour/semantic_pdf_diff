@@ -936,19 +936,22 @@ class ContinueReading(Lever):
         return self.continuations if region in VISUAL else 0
 
 class Align(Lever):
-    lever_name, stage, off = "align", "comparison", {"align": False, "align_printed": False}
+    lever_name, stage, off = "align", "comparison", {"align": False, "align_printed": False, "align_hedges": False}
     # revisions: decide which items correspond across the two revisions before any value is judged, and settle equal
     # values without a model (align.py; docs/plans/revision-comparison-2026-10-02.md); proposals keep retrieval
     align: Annotated[bool, _selecting(roles=COMPARE)] = True
     # a claim's name as printed (the records lever's) weighed beside its attribute as read: one printed label, one
     # property, however readers name it (docs/plans/claim-context-2026-10-14.md, Claim identity)
     align_printed: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # a value's two readings differing only by a hedge or a status ("working assumption" against "agreed"): the value
+    # firmed up or hedged, reported without a model (docs/plans/claim-context-2026-10-14.md, milestone 5)
+    align_hedges: Annotated[bool, _selecting(roles=COMPARE)] = False
 
     def correspondence(self, left, right, mode):
         if not self.align or mode != "revisions":
             return super().correspondence(left, right, mode)
         from .align import align
-        return align(left, right, printed=self.align_printed)
+        return align(left, right, printed=self.align_printed, hedges=self.align_hedges)
 
 class VerifyVisuals(Lever):
     lever_name, stage, off = "verify_visuals", "comparison", {"verify_visuals": False}

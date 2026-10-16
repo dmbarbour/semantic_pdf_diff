@@ -315,6 +315,36 @@ class Report(unittest.TestCase):
         self.assertIn("split candidate", groupings_html(result["groupings"], str))
         self.assertEqual(compare(left, right, Path("."), Fake(relation="different"), "proposals")["groupings"], [])
 
+    def test_a_hedge_changed_is_reported_without_a_model_only_with_align_hedges(self):
+        # milestone 5: the low signal duration firmed up (a working assumption, then agreed), the failed
+        # retransmissions hedged, the threshold agreed in both, the timer's conditions really changed
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent))
+        from test_pipeline import Fake, ev
+        from semantic_pdf_diff.compare import compare
+        from semantic_pdf_diff.settings import Settings
+        row = lambda eid, attribute, value, conditions: ev(eid, entity="failure detection", attribute=attribute,  # noqa: E731
+                                                         value=value, unit="", conditions=conditions)
+        left = [row("A-1", "low signal duration", "79", "Working assumption"), row("A-2", "failed retransmissions",
+                                                                                   "180", "Agreed"),
+                row("A-3", "signal-to-noise threshold", "3.5", "Agreed"), row("A-4", "timer", "804", "link idle")]
+        right = [row("B-1", "low signal duration", "79", "Agreed"), row("B-2", "failed retransmissions", "180",
+                                                                         "working assumption"),
+                 row("B-3", "signal-to-noise threshold", "3.5", "Agreed"), row("B-4", "timer", "804", "link congested")]
+        compared = lambda on: {(f["a"], f["b"]): f for f in compare(  # noqa: E731
+            left, right, Path("."), Fake(Settings(align_hedges=on), relation="equivalent"), "revisions")["findings"]}
+        for on in (True, False):
+            with self.subTest(align_hedges=on):
+                found = compared(on)
+                hedged = {k for k, f in found.items() if f.get("hedged")}
+                self.assertEqual(hedged, {("A-1", "B-1"), ("A-2", "B-2")} if on else set())
+                self.assertTrue(found["A-3", "B-3"].get("settled"))
+                self.assertFalse(found["A-4", "B-4"].get("hedged"))  # a scope changed is no hedge: judged
+        found = compared(True)["A-1", "B-1"]
+        self.assertEqual(found["relation"], "different")
+        self.assertIn('stated "Working assumption" in one revision and "Agreed" in the other', found["rationale"])
+
     def test_a_value_credited_to_another_is_reported_as_its_attribution_changed(self):
         # milestone 5: Estrella's report period, now Borealis's; Avelin's timeout revised; Borealis's kept
         import sys

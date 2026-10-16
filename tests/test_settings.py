@@ -77,6 +77,8 @@ NOT_EXERCISED = {
     'align_printed': 'revisions mode only, with names as printed (the records lever); these runs compare proposals '
                      '(tests/test_records.py)',
     'explain_context': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
+    'align_hedges': 'revisions mode only, with hedges in conditions; these runs compare proposals '
+                    '(tests/test_align.py)',
     'record_changes': 'revisions mode only, with context records restated; these runs compare proposals '
                       '(tests/test_records.py)',
     'judge_context': "the stub's judge answers whatever it's shown, so showing context changes no outcome "

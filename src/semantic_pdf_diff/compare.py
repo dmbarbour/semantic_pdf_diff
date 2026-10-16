@@ -104,6 +104,8 @@ REGROUPED = "Viewed as part of a split or merge candidate (see the groupings); n
 # The same value in corresponding items, held by different parties (the claims' stance: milestone 5)
 ATTRIBUTED = ("Attribution changed, found without a model: the same value, held by {a} in one revision and by {b} in "
               "the other.")
+HEDGED = ("Hedge changed, found without a model: the same value, stated \"{a}\" in one revision and \"{b}\" in the "
+          "other.")
 
 # Provenance stays out of the model's view; it sees the claims and any source crops.
 PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences",
@@ -195,7 +197,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     # was in (code review 2026-10-08, D2: unioned, a claim one pass aligned was "possibly added or removed" when the
     # other found no counterpart among the shared).
     scored, settled, unaligned, regrouped, aligned, alignment, groupings = {}, {}, set(), set(), set(), [], []
-    attributed = {}
+    attributed, hedged = {}, {}
     for label, a_side, b_side in (("earlier own against later own and shared", left, right + shared),
                                   ("shared against later own", shared, right)):
         if not a_side or not b_side:
@@ -208,6 +210,8 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
             settled.setdefault((a_side[i].id, b_side[j].id), (score, a_side[i], b_side[j]))
         for i, j, score in found.attributed:
             attributed.setdefault((a_side[i].id, b_side[j].id), (score, a_side[i], b_side[j]))
+        for i, j, score in found.hedged:
+            hedged.setdefault((a_side[i].id, b_side[j].id), (score, a_side[i], b_side[j]))
         lone = {a_side[i].id for i in found.unaligned[0]} | {b_side[j].id for j in found.unaligned[1]}
         apart = {a_side[i].id for i in found.regrouped[0]} | {b_side[j].id for j in found.regrouped[1]}
         unaligned |= lone
@@ -272,6 +276,14 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
         findings.append({"a": aid, "b": bid, "retrieval_score": round(score, 4), "relation": "different",
                          "rationale": ATTRIBUTED.format(a=held(a), b=held(b)), "confidence": round(score, 4),
                          "same_conditions": True, "numeric": numeric_check(a, b), "attributed": True})
+        matched.update((aid, bid))
+    said = lambda e: " ".join(x for x in (e.conditions, e.uncertainty) if x) or "with no hedge"  # noqa: E731
+    for (aid, bid), (score, a, b) in sorted(hedged.items()):
+        if (aid, bid) in scored or (aid, bid) in settled or (aid, bid) in attributed:
+            continue
+        findings.append({"a": aid, "b": bid, "retrieval_score": round(score, 4), "relation": "different",
+                         "rationale": HEDGED.format(a=said(a), b=said(b)), "confidence": round(score, 4),
+                         "same_conditions": False, "numeric": numeric_check(a, b), "hedged": True})
         matched.update((aid, bid))
     def status(e):
         if e.id in attempted:

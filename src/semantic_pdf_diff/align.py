@@ -15,6 +15,9 @@ over the whole of both before any value is judged, from cheap signals, so the ju
   same party's, never pair; the same value held by another is an attribution changed, found without a model.
 - **Claims within an aligned item:** equal values under agreeing conditions are settled as equivalent, without a
   model; the rest are paired by attribute and conditions, best first, for the judge (a changed value among them).
+- **A hedge changed** (with hedges, the align_hedges setting): two readings of one value whose conditions differ
+  only by a hedge or a status ("working assumption" against "agreed", "tentative", "preliminary", "expected") are
+  the value firmed up or hedged, found without a model.
 
 - **Groupings, as alignment sees them** (decision 12): every group it formed, matched, renamed, attached, ambiguous,
   unaligned, and split or merge candidates (leftover items whose names share a stem, one on one side and two or
@@ -57,6 +60,7 @@ class Correspondence:
     groups: list = field(default_factory=list)
     regrouped: tuple = ((), ())
     attributed: list = field(default_factory=list)  # the same value, another holder: [(i, j, score)]
+    hedged: list = field(default_factory=list)  # the same value, its hedge added or taken away: [(i, j, score)]
 
 # "number of inversions", "inversion count"
 SAME = {"number": "count", "quantity": "count", "qty": "count", "no": "count"}
@@ -281,19 +285,33 @@ def _attributable(x, y, named_x, named_y):
     wa, wb = words(getattr(x, "quote", "")) - names, words(getattr(y, "quote", "")) - names
     return min(len(wa), len(wb)) >= ATTRIBUTION_WORDS and jaccard(wa, wb) >= ATTRIBUTING
 
+# The words a hedge or a status is said in (as words() folds them): a value stated tentatively, as a working
+# assumption, preliminary or expected, against one agreed or confirmed
+HEDGE_WORDS = {"tentative", "tentatively", "preliminary", "provisional", "provisionally", "working", "assumption",
+               "expected", "likely", "estimate", "estimated", "tbd", "tbc", "ffs", "draft", "proposed"}
+FIRM_WORDS = {"agreed", "agreement", "confirmed", "final", "firm", "approved", "status"}
+
+def _hedges_differ(x, y):
+    """The two readings' conditions (and stated uncertainty) differ, and only by hedge or status words, a hedge among
+    them: the value firmed up or hedged."""
+    said = lambda c: words(f"{c.conditions} {getattr(c, 'uncertainty', '')}")  # noqa: E731
+    differ = said(x) ^ said(y)
+    return bool(differ & HEDGE_WORDS) and differ <= HEDGE_WORDS | FIRM_WORDS
+
 def _one_property(side, claims):
     """Whether a value's readings in an item all name one property (each pair fits): then the value identifies it."""
     return all(fits(side.claims[i], side.claims[j]) for i in claims for j in claims if i < j)
 
-def _within(a, b, ia, ib, settle):
+def _within(a, b, ia, ib, settle, hedges=False):
     """Claim pairs within two corresponding items. Claims of one value (the same value under a fitting attribute)
     are a group: readers phrase conditions differently ("Door Schedule", "face of finish"), so a group is unchanged
     when any of its readings agree on conditions across the revisions, and is settled (if settle) with one pair per
     claim; a group with none agreeing goes to the judge (its conditions may have changed). The rest pair by
     attribute and conditions, best first, for the judge. Claims both naming their holders pair with the same
-    holder's first; a value's pair held by different parties is an attribution changed. Returns (to judge, settled,
-    attributed)."""
+    holder's first; a value's pair held by different parties is an attribution changed; with hedges, a value's pair
+    differing only by a hedge is a hedge changed. Returns (to judge, settled, attributed, hedged)."""
     judge, settled, attributed, done_a, done_b, unsure_a, unsure_b = [], [], [], set(), set(), set(), set()
+    hedged = []
     groups = defaultdict(lambda: ([], []))
     for i in ia:
         if a.values[i] is not None:
@@ -330,6 +348,8 @@ def _within(a, b, ia, ib, settle):
                 if (i, j) not in credited or i in covered_a or j in covered_b:
                     continue
                 attributed.append((i, j, 1.0))
+            elif hedges and _hedges_differ(a.claims[i], b.claims[j]):
+                hedged.append((i, j, 1.0))
             else:
                 (settled if agreed else judge).append((i, j, 1.0))
             covered_a.add(i)
@@ -387,7 +407,7 @@ def _within(a, b, ia, ib, settle):
             judge.append((i, j, round(s, 4)))
             open_a.remove(i)
             open_b.remove(j)
-    return judge, settled, attributed
+    return judge, settled, attributed, hedged
 
 def _homes(src, dst, key):
     """The other revision's items a leftover item belongs to, if clear (one counterpart is favoured, not assumed: a
@@ -456,13 +476,14 @@ def _regroup(a, b, lone_a, lone_b):
             out.append((kind, [key], parts, evidence) if kind == "split" else (kind, parts, [key], evidence))
     return out
 
-def align(left, right, printed=False):
+def align(left, right, printed=False, hedges=False):
     """The Correspondence of two revisions' claims (left the earlier, right the later). printed: a claim's name as
     printed (Evidence.printed) stands for its attribute as read, so two readers naming one printed label differently
-    still name one property: a name as printed outranks a name as read (docs/plans/claim-context-2026-10-14.md)."""
+    still name one property: a name as printed outranks a name as read (docs/plans/claim-context-2026-10-14.md).
+    hedges: a value's two readings differing only by a hedge are a hedge changed, found without a model."""
     if printed:
         left, right = [with_printed(c) for c in left], [with_printed(c) for c in right]
-    return Alignment(left, right).correspondence()
+    return Alignment(left, right, hedges).correspondence()
 
 def printed_property(printed):
     """The property a table claim's name as printed names: its column header ("P-101A | Rated point > Capacity
@@ -487,9 +508,9 @@ class Alignment:
     attached to a clear home; the claims left over paired across items; split and merge candidates among the items
     still alone."""
 
-    def __init__(self, left, right):
-        self.a, self.b = Side(left), Side(right)
-        self.judge, self.settled, self.attributed = [], [], []
+    def __init__(self, left, right, hedges=False):
+        self.a, self.b, self.hedges = Side(left), Side(right), hedges
+        self.judge, self.settled, self.attributed, self.hedged = [], [], [], []
         self.match()
         self.compare_matched()
         self.compare_ambiguous()
@@ -506,9 +527,11 @@ class Alignment:
         self.aligned, self.ambiguous = _assign(self.candidates, self.of_a, self.of_b)
 
     def compare(self, ka, kb, settle):
-        j, s, held = _within(self.a, self.b, self.a.items[ka], self.b.items[kb], settle=settle)
+        j, s, held, hedged = _within(self.a, self.b, self.a.items[ka], self.b.items[kb], settle=settle,
+                                     hedges=self.hedges)
         self.judge += j
         self.attributed += held
+        self.hedged += hedged
         if settle:
             self.settled += s
 
@@ -545,7 +568,7 @@ class Alignment:
         homed_a, homed_b = {ka for ka, _ in self.attached}, {kb for _, kb in self.attached}
         lone_a = [k for k in a.items if k not in self.aligned and k not in self.open_a and k not in homed_a]
         lone_b = [k for k in b.items if k not in self.taken_b and k not in self.open_b and k not in homed_b]
-        self.judge += _strays(a, b, self.judge + self.settled + self.attributed, lone_a, lone_b)
+        self.judge += _strays(a, b, self.judge + self.settled + self.attributed + self.hedged, lone_a, lone_b)
         self.regroupings = _regroup(a, b, lone_a, lone_b)
         self.regrouped_a = {k for _, ka, _, _ in self.regroupings for k in ka}
         self.regrouped_b = {k for _, _, kb, _ in self.regroupings for k in kb}
@@ -574,7 +597,7 @@ class Alignment:
         regrouped = (sorted(i for k in self.regrouped_a for i in a.items[k]),
                      sorted(i for k in self.regrouped_b for i in b.items[k]))
         return Correspondence(judge, sorted(self.settled), (unaligned_a, unaligned_b), self.summary(), _groups(self),
-                              regrouped, sorted(set(self.attributed)))
+                              regrouped, sorted(set(self.attributed)), sorted(set(self.hedged)))
 
 def _strays(a, b, pairs, lone_a, lone_b):
     """Claims left without a partner in items that have counterparts, paired with the one such claim on the other side
