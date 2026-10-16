@@ -45,6 +45,17 @@ class Alignment(unittest.TestCase):
         found = align.align([support("New H3C"), support("CMCC")], [support("Spreadtrum"), support("CMCC")])
         self.assertEqual((found.attributed, {(i, j) for i, j, _ in found.settled}), ([], {(1, 1)}))
 
+    def test_a_holders_name_counts_among_a_claims_words(self):
+        # milestone 5: holders read into the stance, not the entity ("Avelin Proposal 1"), a generic attribute, and
+        # "Proposal 1" in the conditions on one side only: the same company's changed timeout still pairs
+        timeout = lambda v, who, conditions="": claim("acknowledgement timeout", "value", v, "ms", conditions,  # noqa: E731
+                                                      held=who)
+        left = [timeout("251", "Avelin"), timeout("483", "Borealis", "Proposal 1"), timeout("742", "", "Proposal 3.1")]
+        right = [timeout("928", "Avelin", "Proposal 1"), timeout("483", "Borealis", "Proposal 1"),
+                 timeout("840", "", "Proposal 3.1")]
+        self.assertEqual({(left[i].value, right[j].value) for i, j, _ in align.align(left, right).judge},
+                         {("251", "928"), ("742", "840")})
+
     def test_a_name_by_position_follows_its_values(self):
         # The image reader names rows by position; a pump inserted above moves every blower down a row, so
         # "blower 5" is B-402 in the earlier revision and B-401 in the later.

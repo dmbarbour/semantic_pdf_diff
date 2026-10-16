@@ -375,7 +375,8 @@ def _within(a, b, ia, ib, settle):
     # otherwise by another reading)
     left_a = [i for i in ia if i not in done_a and i not in best_a]
     left_b = [j for j in ib if j not in done_b and j not in best_b]
-    whole = lambda c: words(f"{c.entity} {c.attribute} {c.value} {c.unit} {c.conditions}")
+    # a claim's holders are its words too: the companies' names readers once put in the entity ("Avelin Proposal 1")
+    whole = lambda c: words(f"{c.entity} {c.attribute} {c.value} {c.unit} {c.conditions}") | holders(c)
     whole_a, whole_b = {i: whole(a.claims[i]) for i in left_a}, {j: whole(b.claims[j]) for j in left_b}
     open_a, open_b = set(left_a), set(left_b)
     for s, i, j in sorted(((jaccard(whole_a[i], whole_b[j]), i, j) for i in left_a for j in left_b
