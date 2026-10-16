@@ -1,25 +1,25 @@
 {
  "totals": {
   "inventory": {
-   "claims": 20524,
-   "evidence": 11342,
+   "claims": 20646,
+   "evidence": 11442,
    "frame in conditions": 76,
-   "grounded": 5700,
+   "grounded": 5765,
    "list records": 36,
    "no content words": 3,
    "note records": 11,
    "numbered in attribute": 238,
    "numbered in conditions": 3,
    "numbered in entity": 204,
-   "partly": 63,
+   "partly": 88,
    "partly (image)": 16,
    "positioned": 123,
-   "printed": 7055,
+   "printed": 7155,
    "sheet records": 11,
    "table records": 294,
    "unsupported": 25,
    "unsupported (image)": 806,
-   "with conditions": 6613,
+   "with conditions": 6703,
    "with records": 6181
   },
   "placed": {
@@ -35,7 +35,9 @@
     "records": 143
    },
    "holder": {
-    "stance": 60
+    "conditions": 25,
+    "nowhere": 24,
+    "stance": 86
    },
    "provenance": {
     "conditions": 5
@@ -65,6 +67,9 @@
    "frame": {
     "shown, not used": 23
    },
+   "holder": {
+    "not shown": 24
+   },
    "provenance": {
     "in conditions": 5
    },
@@ -87,7 +92,8 @@
    "otherwise": 14
   },
   "attitudes": {
-   "in its stance": 60
+   "in its stance": 86,
+   "none": 49
   },
   "reliability": {
    "all": {
@@ -102,8 +108,8 @@
      "share": 0.985
     },
     "<=1.0": {
-     "readings": 28438,
-     "right": 25746,
+     "readings": 28682,
+     "right": 25950,
      "share": 0.905
     }
    },
@@ -119,8 +125,8 @@
      "share": 0.77
     },
     "<=1.0": {
-     "readings": 20498,
-     "right": 18580,
+     "readings": 20572,
+     "right": 18640,
      "share": 0.906
     }
    },
@@ -143,9 +149,9 @@
      "share": 0.105
     },
     "<=1.0": {
-     "readings": 7940,
-     "right": 7166,
-     "share": 0.903
+     "readings": 8110,
+     "right": 7310,
+     "share": 0.901
     }
    }
   }
@@ -5625,6 +5631,325 @@
     "placed": {},
     "audit": {},
     "named": {},
+    "examples": {}
+   }
+  },
+  "views-grouped-s1": {
+   "inventory": {
+    "claims": 40,
+    "grounded": 38,
+    "with conditions": 38,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 21,
+    "evidence": 21,
+    "context_bytes_per_request": 164,
+    "data_bytes_per_request": 416,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 10
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "in its stance": 10
+    },
+    "examples": {}
+   }
+  },
+  "views-grouped-s1.docx": {
+   "inventory": {
+    "claims": 10,
+    "grounded": 6,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 10,
+    "evidence": 10,
+    "context_bytes_per_request": 431,
+    "data_bytes_per_request": 117,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 4,
+      "nowhere": 6
+     }
+    },
+    "audit": {
+     "holder": {
+      "not shown": 6
+     }
+    },
+    "named": {},
+    "attitudes": {
+     "in its stance": 4,
+     "none": 6
+    },
+    "examples": {
+     "holder: not shown": [
+      "avelin.2: wanted 'Avelin'; read value | Proposal 2",
+      "avelin.3: wanted 'Avelin'; read beam report capacity | ",
+      "borealis.2: wanted 'Borealis'; read value | Proposal 2"
+     ]
+    }
+   }
+  },
+  "views-grouped-s1.md": {
+   "inventory": {
+    "claims": 10,
+    "grounded": 9,
+    "with conditions": 9,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 10,
+    "evidence": 10,
+    "context_bytes_per_request": 541,
+    "data_bytes_per_request": 118,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 4,
+      "nowhere": 6
+     }
+    },
+    "audit": {
+     "holder": {
+      "not shown": 6
+     }
+    },
+    "named": {},
+    "attitudes": {
+     "in its stance": 4,
+     "none": 6
+    },
+    "examples": {
+     "holder: not shown": [
+      "avelin.2: wanted 'Avelin'; read value | Proposal 2",
+      "avelin.3: wanted 'Avelin'; read beam report capacity | ",
+      "borealis.2: wanted 'Borealis'; read value | Proposal 2"
+     ]
+    }
+   }
+  },
+  "views-grouped-s1.pptx": {
+   "inventory": {
+    "claims": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 10,
+    "evidence": 10,
+    "context_bytes_per_request": 294,
+    "data_bytes_per_request": 99,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 4,
+      "nowhere": 6
+     }
+    },
+    "audit": {
+     "holder": {
+      "not shown": 6
+     }
+    },
+    "named": {},
+    "attitudes": {
+     "in its stance": 4,
+     "none": 6
+    },
+    "examples": {
+     "holder: not shown": [
+      "avelin.2: wanted 'Avelin'; read beam report period | ",
+      "avelin.3: wanted 'Avelin'; read beam report content | ",
+      "borealis.2: wanted 'Borealis'; read beam report period | "
+     ]
+    }
+   }
+  },
+  "views-grouped-s1.xlsx": {
+   "inventory": {
+    "claims": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 10,
+    "evidence": 10,
+    "context_bytes_per_request": 290,
+    "data_bytes_per_request": 99,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "stance": 4,
+      "nowhere": 6
+     }
+    },
+    "audit": {
+     "holder": {
+      "not shown": 6
+     }
+    },
+    "named": {},
+    "attitudes": {
+     "in its stance": 4,
+     "none": 6
+    },
+    "examples": {
+     "holder: not shown": [
+      "avelin.2: wanted 'Avelin'; read beam report period | ",
+      "avelin.3: wanted 'Avelin'; read beam report content | ",
+      "borealis.2: wanted 'Borealis'; read beam report period | "
+     ]
+    }
+   }
+  },
+  "views-prose-s1": {
+   "inventory": {
+    "claims": 14,
+    "grounded": 4,
+    "partly": 5,
+    "with conditions": 9,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 11,
+    "evidence": 11,
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 818,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-prose-s1.docx": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 2,
+    "partly": 5,
+    "with conditions": 7,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 61,
+    "data_bytes_per_request": 767,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-prose-s1.md": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 2,
+    "partly": 5,
+    "with conditions": 7,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 332,
+    "data_bytes_per_request": 778,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-prose-s1.pptx": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 2,
+    "partly": 5,
+    "with conditions": 7,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 463,
+    "data_bytes_per_request": 190,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 5
+    },
+    "examples": {}
+   }
+  },
+  "views-prose-s1.xlsx": {
+   "inventory": {
+    "claims": 7,
+    "grounded": 2,
+    "partly": 5,
+    "with conditions": 7,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 7,
+    "context_bytes_per_request": 449,
+    "data_bytes_per_request": 192,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "conditions": 5
+     }
+    },
+    "audit": {},
+    "named": {},
+    "attitudes": {
+     "none": 5
+    },
     "examples": {}
    }
   },

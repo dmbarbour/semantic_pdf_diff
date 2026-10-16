@@ -336,6 +336,82 @@ def proposals_summary(seed=1):
     return Project(f"views-s{seed}", "Feature Lead Summary: Link Failure Detection and Beam Reporting", F,
                    sections, things=[(c, ()) for c in COMPANIES])
 
+# The views families' parameters: (entity, its aliases, attribute, its synonyms) and how a sentence states each
+ACK = ("Link failure detection", ("link failure", "failure detection"), "acknowledgement timeout",
+       ("ack timeout", "timeout", "acknowledgement window"))
+PERIOD = ("Beam report", ("beam reporting", "the beam report", "report"), "report period",
+          ("reporting period", "period", "periodicity"))
+BEAMS = ("Beam report", ("beam reporting", "the beam report", "report"), "strongest beams reported",
+         ("beams", "number of beams", "beam count", "reported beams"))
+STATED = {ACK: lambda v: f"The acknowledgement timeout is {v} ms.",
+          PERIOD: lambda v: f"The beam report period is {v} ms.",
+          BEAMS: lambda v: f"The beam report carries the {v} strongest beams."}
+
+def proposals_grouped(seed=1):
+    """A feature lead's summary with each company's proposals grouped, the company named on its first row only, the
+    rows under it blank, as a merged cell prints (the claim context plan, milestone 5: the carried_holders lever).
+    Every proposal is its company's, attitude "proposes"."""
+    d = Draw(f"views-grouped-{seed}")
+    F = []
+    ms, count = (lambda: d.number(150, 950)), (lambda: d.number(6, 32))
+    groups = [("Avelin", [(ACK, "ms"), (PERIOD, "ms"), (BEAMS, "")]), ("Borealis", [(ACK, "ms"), (PERIOD, "ms")]),
+              ("Corvane", [(BEAMS, ""), (ACK, "ms"), (PERIOD, "ms")]), ("Delmar", [(PERIOD, "ms"), (BEAMS, "")])]
+    rows = []
+    for company, wanted in groups:
+        for k, (what, unit) in enumerate(wanted):
+            f = Fact(f"{company.lower()}.{k + 1}", *what, ms() if unit else count(), unit, basis="proposed",
+                     holder=company, attitude="proposes")
+            F.append(f)
+            rows.append([company if k == 0 else "", f"Proposal {k + 1}: {STATED[what](f.value)}"])
+    sections = [
+        ("1 Introduction", [
+            ("p", "This summary collects the companies' proposals on link failure detection and beam reporting "
+                  "submitted to this meeting, grouped by company."),
+        ]),
+        ("2 Companies' Proposals", [
+            ("p", "The companies' proposals, as submitted:"),
+            ("table", "Table 1. Companies' proposals", ["Company", "Proposals"], rows),
+        ]),
+    ]
+    return Project(f"views-grouped-s{seed}", "Feature Lead Summary: Proposals by Company", F, sections,
+                   things=[(c, ()) for c in COMPANIES])
+
+def proposals_reported(seed=1):
+    """A feature lead's summary reporting the companies' views in sentences, no table (the claim context plan,
+    milestone 5: the read_holders lever): a company proposes, a source says, a company supports or opposes a value;
+    and the moderator's own proposals in the summary's voice, no holder keyed."""
+    d = Draw(f"views-prose-{seed}")
+    F = []
+    ms, count = (lambda: d.number(150, 950)), (lambda: d.number(6, 32))
+    held = lambda fid, what, value, unit, holder="", attitude="": F.append(Fact(  # noqa: E731
+        fid, *what, value, unit, basis="proposed", holder=holder, attitude=attitude)) or F[-1]
+    ack1 = held("ack.1", ACK, ms(), "ms", "Avelin", "proposes")
+    ack2 = held("ack.2", ACK, ms(), "ms", "Borealis", "proposes")
+    per1 = held("period.1", PERIOD, ms(), "ms", "Delmar", "supports")
+    per2 = held("period.2", PERIOD, ms(), "ms", "Estrella", "opposes")
+    beams1 = held("beams.1", BEAMS, count(), "", "Corvane", "proposes")
+    ack_mod, per_mod = held("ack.mod", ACK, ms(), "ms"), held("period.mod", PERIOD, ms(), "ms")
+    sections = [
+        ("1 Introduction", [
+            ("p", "This summary reports the companies' views on link failure detection and beam reporting submitted "
+                  "to this meeting, and gives the moderator's proposals for agreement."),
+        ]),
+        ("2 Companies' Views", [
+            ("p", f"Avelin [1] proposes an acknowledgement timeout of {ack1.value} ms, to detect a failed link "
+                  f"within one report period."),
+            ("p", f"According to Borealis [2], the acknowledgement timeout should be {ack2.value} ms."),
+            ("p", f"Corvane [3] argues that the beam report should carry the {beams1.value} strongest beams."),
+            ("p", f"Delmar [4] supports a beam report period of {per1.value} ms."),
+            ("p", f"Estrella [5] opposes a beam report period of {per2.value} ms, citing the reporting overhead."),
+        ]),
+        ("3 Moderator's Proposals", [
+            ("p", f"Proposal 3.1: {STATED[ACK](ack_mod.value)}"),
+            ("p", f"Proposal 3.2: {STATED[PERIOD](per_mod.value)}"),
+        ]),
+    ]
+    return Project(f"views-prose-s{seed}", "Feature Lead Summary: Companies' Views", F, sections,
+                   things=[(c, ()) for c in COMPANIES])
+
 def equipment_datasheets(seed=1):
     """Equipment data sheets (code review 2026-10-08, B5): each pump's and the clearwell's data as a key-value list,
     a block of two columns standing alone with no header, its first row a key and its value ("Pump | P-201A"; the
@@ -384,7 +460,8 @@ def equipment_datasheets(seed=1):
     return Project(f"wtp-datasheets-s{seed}", "Harrow Creek WTP: Equipment Data Sheets", F, sections)
 
 PROJECTS = {"wtp": water_treatment, "coaster": roller_coaster, "spec": link_protocol,
-            "wtp-datasheets": equipment_datasheets, "views": proposals_summary}
+            "wtp-datasheets": equipment_datasheets, "views": proposals_summary, "views-grouped": proposals_grouped,
+            "views-prose": proposals_reported}
 
 # --- table knobs (milestone 2) -------------------------------------------------------------------
 # Schedules rendered clean or with one knob, the same facts either way, so a knob's effect is the difference.
