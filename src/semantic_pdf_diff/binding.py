@@ -20,9 +20,20 @@ def _kind(key):
     name = key.split(".", 1)[1] if key.startswith("settings.") else None
     return declared(Settings, name).kind if name in Settings.model_fields else ""
 
+def _post_only(lever):
+    """Whether a lever's settings all only post-process answers."""
+    return lever in REGISTRY and all(declared(Settings, name).kind == "post" for name in REGISTRY[lever].model_fields
+                                     if name in Settings.model_fields)
+
 def free(differences):
-    """Whether no difference can cost a model call: each a setting that only post-processes answers."""
-    return all(_kind(key) == "post" for key in differences)
+    """Whether no difference can cost a model call: each a setting that only post-processes answers, or levers
+    added or dropped whose settings all do."""
+    def one(key, a, b):
+        if key == "settings.levers" and isinstance(a, list) and isinstance(b, list):
+            return all(_post_only(x) for x in set(a) ^ set(b)) and \
+                [x for x in a if x in b] == [x for x in b if x in a]
+        return _kind(key) == "post"
+    return all(one(key, a, b) for key, (a, b) in differences.items())
 
 def describe(key, old, new):
     """One difference, plainly: "claims_per_request: 20 -> 25 (shapes what's asked)"; lists by what came and went."""

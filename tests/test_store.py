@@ -149,6 +149,17 @@ class Binding(unittest.TestCase):
             self.assertIn('settings.column_conditions', caught.exception.differences)
             self.assertIn('settings.levers', caught.exception.differences)
 
+    def test_a_post_processing_lever_built_on_since_rebinds_by_itself(self):
+        # a store made before sheet_records existed, the lever now on: it only post-processes answers
+        with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
+            before = store.interpreter('extract')
+            before['settings'].pop('sheet_records')
+            before['settings']['levers'].remove('sheet_records')
+            store.save_interpreter('extract', before)
+            cleared = bind(store, extraction_interpreter(Settings(sheet_records=True)))
+            self.assertTrue(cleared.get('automatic'))
+            self.assertEqual(bind(store, extraction_interpreter(Settings(sheet_records=True))), {})
+
     def test_changed_interpreter_is_rejected_with_explanation(self):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
             with self.assertRaises(InterpreterMismatch) as caught:
