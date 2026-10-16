@@ -9746,7 +9746,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -9809,7 +9809,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -9872,7 +9872,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -9935,7 +9935,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -10002,7 +10002,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -19948,7 +19948,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -20011,7 +20011,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -20074,7 +20074,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -20137,7 +20137,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -20204,7 +20204,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -28327,7 +28327,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -28390,7 +28390,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -28453,7 +28453,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -28516,7 +28516,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -36640,7 +36640,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -36703,7 +36703,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -36766,7 +36766,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1
@@ -36829,7 +36829,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_noticed": "2/4",
+   "hedges_reported": "0/4",
    "difference_precision": null,
    "changed": {
     "uncertain": 1

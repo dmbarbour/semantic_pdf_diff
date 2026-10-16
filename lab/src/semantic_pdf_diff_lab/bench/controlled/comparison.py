@@ -127,8 +127,8 @@ def score_comparison(earlier, later, report):
                if "context" in kinds else {}),
             **({"holders_noticed": f"{len(kinds['holder']) - count('holder', 'settled')}/{len(kinds['holder'])}"}
                if "holder" in kinds else {}),
-            **({"hedges_noticed": f"{len(kinds['hedge']) - count('hedge', 'settled')}/{len(kinds['hedge'])}"}
-               if "hedge" in kinds else {}),
+            **({"hedges_reported": f"{sum(1 for f in kinds['hedge'] if 'different' in detail[f])}/"
+                                   f"{len(kinds['hedge'])}"} if "hedge" in kinds else {}),
             **({"record_changes": len(report["record_changes"])} if report.get("record_changes") else {}),
             "difference_precision": round(classes["different"]["change"] / differences, 4) if differences else None,
             **{kind: dict(sorted(Counter(detail[f] for f in kinds[kind]).items())) for kind in kinds},
