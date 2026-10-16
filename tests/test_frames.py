@@ -46,17 +46,20 @@ class Tables(unittest.TestCase):
 
     def test_conditions_and_frames_are_asked_by_column_only_when_on(self):
         # the conditions_by_column lever: what the text gives some columns only, by column, added by code
-        from semantic_pdf_diff.levers import TABLE_BY_COLUMN, TABLE_BY_COLUMN_FRAME, TABLE_KEYED, TABLE_KEYED_FRAME
+        from semantic_pdf_diff.levers import (TABLE_BY_COLUMN, TABLE_BY_COLUMN_FRAME, TABLE_KEYED, TABLE_KEYED_EXAMPLE,
+                                              TABLE_KEYED_EXAMPLE_FRAME, TABLE_KEYED_FRAME, TABLE_LAST_EXAMPLE)
         from semantic_pdf_diff.tablerules import RULES
         self.assertEqual(Settings().table_rules_text(RULES),
                          Settings(conditions_by_column=False).table_rules_text(RULES))
         on = Settings(conditions_by_column=True).table_rules_text(RULES)
         self.assertIn(TABLE_KEYED + TABLE_KEYED_FRAME, on)
         self.assertIn(TABLE_BY_COLUMN_FRAME, on)
+        self.assertIn(TABLE_LAST_EXAMPLE + TABLE_KEYED_EXAMPLE_FRAME, on)
         unsplit = Settings(conditions_by_column=True, split_conditions=False).table_rules_text(RULES)
         self.assertIn(TABLE_KEYED, unsplit)
         self.assertNotIn(TABLE_KEYED_FRAME, unsplit)
         self.assertIn(TABLE_BY_COLUMN, unsplit)
+        self.assertIn(TABLE_LAST_EXAMPLE + TABLE_KEYED_EXAMPLE, unsplit)
 
     def test_a_rules_conditions_and_frame_by_column_reach_their_columns_alone(self):
         from semantic_pdf_diff import tablerules as tr

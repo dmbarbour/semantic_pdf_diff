@@ -207,6 +207,16 @@ TABLE_KEYED = (" One it names for some columns only (\"pressures are at the inle
                "claims alone.")
 TABLE_KEYED_FRAME = (" A frame it gives some columns only (\"depths are below ground surface\") goes in "
                      "\"column_frame\" likewise ({\"B\": \"below ground surface\"}).")
+TABLE_LAST_EXAMPLE = "  over columns B:C, entity {*.header}, attribute {A.cell_name}, value {*}, unit {A.cell_unit}\n"
+TABLE_KEYED_EXAMPLE = ("- a table \"Bridge spans\" with columns Span | Length (m) | Clearance (m) | Load rating (t), "
+                       "under \"load ratings are\n  for a single vehicle\": one template over columns B:D, entity {A}, "
+                       "attribute {*.name}, value {*}, unit {*.unit},\n  column_conditions {\"D\": \"for a single "
+                       "vehicle\"}\n")
+TABLE_KEYED_EXAMPLE_FRAME = ("- a table \"Bridge spans\" with columns Span | Length (m) | Clearance (m) | Load "
+                             "rating (t), under \"clearances\n  are above mean high water; load ratings are for a "
+                             "single vehicle\": one template over columns B:D, entity {A},\n  attribute {*.name}, "
+                             "value {*}, unit {*.unit}, column_conditions {\"D\": \"for a single vehicle\"},\n  "
+                             "column_frame {\"C\": \"above mean high water\"}\n")
 TABLE_NUMBER = '"number":true}],'
 TABLE_BY_COLUMN = '"number":true, "column_conditions":{}}],'
 TABLE_BY_COLUMN_FRAME = '"number":true, "column_conditions":{}, "column_frame":{}}],'
@@ -223,7 +233,9 @@ class ConditionsByColumn(Lever):
             return text
         frame = getattr(self, "split_conditions", False)
         return text.replace(TABLE_SHARED, TABLE_SHARED + TABLE_KEYED + (TABLE_KEYED_FRAME if frame else "")) \
-            .replace(TABLE_NUMBER, TABLE_BY_COLUMN_FRAME if frame else TABLE_BY_COLUMN)
+            .replace(TABLE_NUMBER, TABLE_BY_COLUMN_FRAME if frame else TABLE_BY_COLUMN) \
+            .replace(TABLE_LAST_EXAMPLE,
+                     TABLE_LAST_EXAMPLE + (TABLE_KEYED_EXAMPLE_FRAME if frame else TABLE_KEYED_EXAMPLE))
 
 class VisualRules(Lever):
     lever_name, stage, off = "visual_rules", "instructions", {"visual_rules": []}
