@@ -422,6 +422,12 @@ Before records are built, so each later milestone has a baseline. Almost all of 
   - Readers keep the holder for all 60 keyed facts (40 in conditions, "proposed by Avelin"; 20 as the entity), every fact found in every format: on a clean table, one proposal a row, the reader names whose it is.
   - The comparison finds both changes and confirms the 5 unchanged facts, but settles the credited proposal as unchanged in PDF, Word and Markdown, and leaves it uncertain in PowerPoint and Excel: never reported as another's.
   - So the holder is read but isn't part of the claim: alignment and the judge treat "proposed by Estrella" and "proposed by Borealis" as conditions worded differently.
+- **Stance on claims** (`Claim.stance`, the reported links outermost first: holder, attitude, a hedge): a holder is part of a claim's identity; a claim without one keeps its id. Proven by replay (238 documents' and 98 pairs' scores as before).
+- **A table's holder column** (`table_holders`, off; `stance.py`): a column headed Company, Source, Proponent, Organization (and the like) holds every claim of its row. Alignment never pairs claims naming different holders, but for an attribution changed (the same words, holders aside, each holder without the value on the other side), a finding of its own without a model (design question 5).
+  - The controlled corpus: holders in the stance for all 60 keyed facts; the credited proposal reported in every format (before: settled in three, uncertain in two); every other document and pair unchanged.
+  - The RAN1 pair: all 1,930 table claims name their company; findings pairing two companies' claims 14 → 0 (5 had settled as one claim), none falsely attributed.
+  - Built in steps: every equal value under other holders was first an attribution (RAN1's 9 were two companies' views sharing "Y" or "8"); and readings naming no holder (the PDF's text and tiles) settled the credited value before a value with an attribution stopped settling.
+  - Left as lever ideas: the reader asked for holders where no column gives them; a view bound as the holder's stance on the proposition (RAN1's "CMCC | support for Proposal 3.2.4 | Y"); a holder named on a company's first row only.
 
 ### 6. Drawing geometry
 
