@@ -182,6 +182,28 @@ class SplitConditions(Lever):
             return text
         return text.replace(TABLE_CONDITIONS, TABLE_CONDITIONS + TABLE_FRAME).replace(TABLE_TEMPLATE, TABLE_SPLIT)
 
+# The extraction template's stance (the read_holders lever): who the source reports holds a claim, and their attitude,
+# asked of the reader where no holder column gives it (the claim context plan's milestone 5)
+KIND_SPEC = '"kind":"text|table|chart|diagram",'
+STANCE_SPEC = ('"stance":[{"holder":"who the source says holds it, if not the source itself",'
+               '"attitude":"proposes, supports, opposes or reports"}],\n')
+NEGATION_RULE = "Preserve negation, requirements versus proposed capabilities, ranges and inequality signs."
+STANCE_RULE = ("\nWhere the source reports a claim as someone else's (\"Company A proposes\", \"according to B\", a "
+               "quotation), put who holds it in stance with their attitude, not in entity or conditions; leave stance "
+               "empty for what the source states in its own voice.")
+
+class ReadHolders(Lever):
+    lever_name, stage, off = "read_holders", "instructions", {"read_holders": False}
+    # the reader asked who holds a claim the source reports as another's, and their attitude (the claim context
+    # plan's milestone 5: RAN1's text and overview claims name no company); a row's holder column still gives its own
+    read_holders: Annotated[bool, _shaping()] = False
+
+    def instructions(self, builtin):
+        text = super().instructions(builtin)
+        if not self.read_holders:
+            return text
+        return text.replace(KIND_SPEC, STANCE_SPEC + KIND_SPEC).replace(NEGATION_RULE, NEGATION_RULE + STANCE_RULE)
+
 # The table rules' prompt: a condition the text above names for some columns only kept to those columns' templates
 # (the column_conditions lever; the coaster's "speeds are design values at the element's entry" written into its
 # heights' claims, docs/reviews/levers.md)
@@ -839,6 +861,33 @@ class SheetRecords(Lever):
         sheet = sheet_record(page_no, is_sheet())
         return positions, records + ([sheet] if sheet else [])
 
+class CarriedHolders(Lever):
+    lever_name, stage, off = "carried_holders", "matching", {"carried_holders": False}
+    # with table_holders: a holder column's blank cell takes the nearest name above it (a company named on its first
+    # row only, as merged cells print; stance.py). Applied as answers are stored
+    carried_holders: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = False
+
+    def table_holder(self, header, row, above=()):
+        found = super().table_holder(header, row, above)
+        if found or not (self.carried_holders and self.table_holders):
+            return found
+        from .stance import table_holder
+        return table_holder(header, row, above, carried=True)
+
+class ViewAttitudes(Lever):
+    lever_name, stage, off = "view_attitudes", "matching", {"view_attitudes": False}
+    # a held claim whose value is a yes or a no is its holder's view of the proposition ("CMCC | support for Proposal
+    # 3.2.4 | Y": Proposal 3.2.4, support, CMCC supports), not a value of the holder (stance.py). Applied as answers
+    # are stored
+    view_attitudes: Annotated[bool, Declared("post", EXTRACT)] = False
+
+    def held(self, claim):
+        claim = super().held(claim)
+        if not self.view_attitudes:
+            return claim
+        from .stance import as_view
+        return as_view(claim)
+
 class TableHolders(Lever):
     lever_name, stage, off = "table_holders", "matching", {"table_holders": False}
     # a table's holder column (Company, Source, Proponent...) holds every claim read from its row: the row's cell as
@@ -973,14 +1022,14 @@ class DedupeRepeated(Lever):
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes, split_conditions, sheet_records and table_holders (docs/reviews/levers.md); round 0's
 # settings are benchmarks/round0.json.
-LEVER_CLASSES = (ExtractPrompt, SplitConditions, ColumnConditions, ConditionsByColumn, ExtractRules, VisualRules,
-                 ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext, References,
-                 TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
-                 RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,
-                 TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText, LoneRows,
-                 TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords, TableHolders,
-                 Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial,
-                 RecordChanges, JudgeContext)
+LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, ColumnConditions, ConditionsByColumn, ExtractRules,
+                 VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext,
+                 References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty,
+                 SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks,
+                 TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText,
+                 LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
+                 TableHolders, CarriedHolders, ViewAttitudes, Reconcile, DedupeRepeated, ContinueReading, Align,
+                 VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 

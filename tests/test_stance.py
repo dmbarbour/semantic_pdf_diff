@@ -61,6 +61,57 @@ class HolderColumn(unittest.TestCase):
         self.assertEqual(Settings(table_holders=False).table_holder(header, row), ())
         self.assertEqual([x.holder for x in Settings().table_holder(header, row)], ["Avelin"])
 
+    def test_a_holder_given_once_is_carried_down_only_when_on(self):
+        # the carried_holders lever: a company named on its first row only, as merged cells print
+        from semantic_pdf_diff.settings import Settings
+        header = ["Company", "Proposals"]
+        above = [["Avelin [1]", "Proposal 1: ..."], [None, "Proposal 2: ..."]]
+        holder = lambda s: [x.holder for x in s.table_holder(header, ["", "Proposal 3: ..."], above)]  # noqa: E731
+        self.assertEqual(holder(Settings()), [])
+        self.assertEqual(holder(Settings(carried_holders=True)), ["Avelin"])
+        self.assertEqual(holder(Settings(carried_holders=True, table_holders=False)), [])
+        self.assertEqual(Settings(carried_holders=True).table_holder(header, ["", "x"], [[None, "y"]]), ())
+
+class Views(unittest.TestCase):
+    def test_a_yes_or_no_held_is_the_holders_view_of_the_proposition(self):
+        from semantic_pdf_diff.stance import as_view
+        view = lambda e, a, v, h: as_view(Claim(entity=e, attribute=a, value=v, kind="table", quote=v,  # noqa: E731
+                                                confidence=0.9, stance=[Link(holder=h)]))
+        said = lambda c: (c.entity, c.attribute, c.value, [(x.holder, x.attitude) for x in c.stance])  # noqa: E731
+        self.assertEqual(said(view("CMCC", "support for Proposal 3.2.4", "Y", "CMCC")),
+                         ("Proposal 3.2.4", "support", "Y", [("CMCC", "supports")]))
+        self.assertEqual(said(view("Proposal 4.1.2 (Report)", "KDDI support status", "Yes", "KDDI")),
+                         ("Proposal 4.1.2 (Report)", "support", "Yes", [("KDDI", "supports")]))
+        self.assertEqual(said(view("HW/HiSi", "Proposal 3.1.1a (contents) support", "N", "HW/HiSi")),
+                         ("Proposal 3.1.1a (contents)", "support", "N", [("HW/HiSi", "opposes")]))
+        self.assertEqual(said(view("CMCC", "agreement", "Y", "CMCC")), ("CMCC", "support", "Y", [("CMCC", "supports")]))
+        kept = Claim(**TIMEOUT, stance=[Link(holder="Avelin", attitude="proposes")])  # not a yes or a no
+        self.assertEqual(as_view(kept), kept)
+        self.assertEqual(as_view(Claim(**{**TIMEOUT, "value": "Y"})).stance, [])  # held by no one
+
+    def test_two_companies_views_of_two_proposals_are_four_claims_only_when_on(self):
+        from semantic_pdf_diff.settings import Settings
+        claims = [Claim(entity=h, attribute=f"support for Proposal {p}", value="Y", kind="table", quote="Y",
+                        confidence=0.9, stance=[Link(holder=h)]) for h in ("CMCC", "vivo") for p in ("3.1", "3.2")]
+        on = [Settings(view_attitudes=True).held(c) for c in claims]
+        self.assertEqual(sorted({c.entity for c in on}), ["Proposal 3.1", "Proposal 3.2"])
+        self.assertEqual(len({claim_id("c", c) for c in on}), 4)
+        self.assertEqual([Settings().held(c) for c in claims], claims)
+
+class Asked(unittest.TestCase):
+    def test_the_reader_is_asked_for_a_stance_only_when_on(self):
+        from semantic_pdf_diff.levers import STANCE_RULE, STANCE_SPEC
+        from semantic_pdf_diff.settings import Settings
+        from semantic_pdf_diff.tasks import extraction_template
+        off, on = extraction_template(Settings()), extraction_template(Settings(read_holders=True))
+        self.assertNotIn('"stance"', off)
+        self.assertIn(STANCE_SPEC, on)
+        self.assertIn(STANCE_RULE, on)
+        self.assertIn(STANCE_SPEC, extraction_template(Settings(read_holders=True, split_conditions=False)))
+        mine = 'List claims as JSON: {"claims": [], "complete": true, "issues": []}'
+        self.assertEqual(extraction_template(Settings(extract_prompt=mine, read_holders=True)),
+                         extraction_template(Settings(extract_prompt=mine)))
+
 PROPOSALS = [["Company", "Proposals"], ["Avelin", "Proposal 1: The acknowledgement timeout is 251 ms."],
              ["Borealis", "Proposal 1: The acknowledgement timeout is 251 ms."],
              ["Corvane [3]", "Proposal 2: The report period is 754 ms."]]

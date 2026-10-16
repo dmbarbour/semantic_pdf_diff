@@ -2,6 +2,7 @@
   "levers": [
     "extract_prompt",
     "split_conditions",
+    "read_holders",
     "column_conditions",
     "conditions_by_column",
     "extract_rules",
@@ -45,6 +46,8 @@
     "records",
     "sheet_records",
     "table_holders",
+    "carried_holders",
+    "view_attitudes",
     "reconcile",
     "dedupe_repeated",
     "continue_reading",
