@@ -6072,11 +6072,11 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 19,
+   "claims": 20,
    "outcomes": {
     "loose": 4,
     "right": 12,
-    "text": 3
+    "text": 4
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -6085,17 +6085,13 @@
    },
    "views": {
     "views": 10,
-    "found": 7,
-    "missed": [
-     "view.2.1.borealis",
-     "view.2.1.delmar",
-     "view.2.2.delmar"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 7
+     "right": 10
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -6105,7 +6101,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 3
+     "text": 4
     },
     "text": {
      "right": 6
@@ -6140,16 +6136,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.1.borealis",
-     "view.2.1.delmar"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 12
+     "right": 14
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.6,
@@ -6182,10 +6175,10 @@
    "recall": 1.0,
    "found_right": 5,
    "missed": [],
-   "claims": 10,
+   "claims": 12,
    "outcomes": {
     "right": 6,
-    "text": 4
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -6194,16 +6187,15 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
+    "found": 9,
     "missed": [
-     "view.2.2.corvane",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 8
+     "right": 9
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.6,
@@ -6212,7 +6204,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 4
+     "text": 6
     },
     "text": {
      "right": 2
@@ -6229,10 +6221,10 @@
    "recall": 1.0,
    "found_right": 5,
    "missed": [],
-   "claims": 12,
+   "claims": 13,
    "outcomes": {
     "right": 6,
-    "text": 6
+    "text": 7
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -6258,7 +6250,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 6
+     "text": 7
     },
     "text": {
      "right": 2
@@ -6363,10 +6355,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 12,
+   "claims": 13,
    "outcomes": {
     "right": 7,
-    "text": 5
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -6375,18 +6367,16 @@
    },
    "views": {
     "views": 10,
-    "found": 6,
+    "found": 8,
     "missed": [
      "view.2.2.avelin",
-     "view.2.2.corvane",
-     "view.2.2.delmar",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 7
+     "right": 9
     },
-    "holder_in_stance": 6,
-    "attitude_in_stance": 6
+    "holder_in_stance": 8,
+    "attitude_in_stance": 8
    },
    "by_reader": {
     "table": 0.6667,
@@ -6395,7 +6385,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 5,
-     "text": 5
+     "text": 6
     },
     "text": {
      "right": 2
@@ -6414,11 +6404,11 @@
    "missed": [
     "period.delmar"
    ],
-   "claims": 12,
+   "claims": 13,
    "outcomes": {
     "misbound": 1,
     "right": 6,
-    "text": 5
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -6427,17 +6417,15 @@
    },
    "views": {
     "views": 10,
-    "found": 7,
+    "found": 9,
     "missed": [
-     "view.2.2.corvane",
-     "view.2.2.delmar",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 8
+     "right": 10
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.5,
@@ -6447,7 +6435,7 @@
     "table": {
      "misbound": 1,
      "right": 4,
-     "text": 5
+     "text": 6
     },
     "text": {
      "right": 2
@@ -6464,10 +6452,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "right": 6,
-    "text": 4
+    "text": 5
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -6476,16 +6464,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.2.delmar",
-     "view.2.2.estrella"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 8
+     "right": 10
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -6494,7 +6479,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 4
+     "text": 5
     },
     "text": {
      "right": 2
@@ -15068,11 +15053,11 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 19,
+   "claims": 20,
    "outcomes": {
     "loose": 4,
     "right": 12,
-    "text": 3
+    "text": 4
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -15081,17 +15066,13 @@
    },
    "views": {
     "views": 10,
-    "found": 7,
-    "missed": [
-     "view.2.1.borealis",
-     "view.2.1.delmar",
-     "view.2.2.delmar"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 7
+     "right": 10
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -15101,7 +15082,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 3
+     "text": 4
     },
     "text": {
      "right": 6
@@ -15136,16 +15117,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.1.borealis",
-     "view.2.1.delmar"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 12
+     "right": 14
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.6,
@@ -15178,10 +15156,10 @@
    "recall": 1.0,
    "found_right": 5,
    "missed": [],
-   "claims": 10,
+   "claims": 12,
    "outcomes": {
     "right": 6,
-    "text": 4
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -15190,16 +15168,15 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
+    "found": 9,
     "missed": [
-     "view.2.2.corvane",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 8
+     "right": 9
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.6,
@@ -15208,7 +15185,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 4
+     "text": 6
     },
     "text": {
      "right": 2
@@ -15225,10 +15202,10 @@
    "recall": 1.0,
    "found_right": 5,
    "missed": [],
-   "claims": 12,
+   "claims": 13,
    "outcomes": {
     "right": 6,
-    "text": 6
+    "text": 7
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -15254,7 +15231,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 6
+     "text": 7
     },
     "text": {
      "right": 2
@@ -15359,10 +15336,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 12,
+   "claims": 13,
    "outcomes": {
     "right": 7,
-    "text": 5
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -15371,18 +15348,16 @@
    },
    "views": {
     "views": 10,
-    "found": 6,
+    "found": 8,
     "missed": [
      "view.2.2.avelin",
-     "view.2.2.corvane",
-     "view.2.2.delmar",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 7
+     "right": 9
     },
-    "holder_in_stance": 6,
-    "attitude_in_stance": 6
+    "holder_in_stance": 8,
+    "attitude_in_stance": 8
    },
    "by_reader": {
     "table": 0.6667,
@@ -15391,7 +15366,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 5,
-     "text": 5
+     "text": 6
     },
     "text": {
      "right": 2
@@ -15410,11 +15385,11 @@
    "missed": [
     "period.delmar"
    ],
-   "claims": 12,
+   "claims": 13,
    "outcomes": {
     "misbound": 1,
     "right": 6,
-    "text": 5
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -15423,17 +15398,15 @@
    },
    "views": {
     "views": 10,
-    "found": 7,
+    "found": 9,
     "missed": [
-     "view.2.2.corvane",
-     "view.2.2.delmar",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 8
+     "right": 10
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.5,
@@ -15443,7 +15416,7 @@
     "table": {
      "misbound": 1,
      "right": 4,
-     "text": 5
+     "text": 6
     },
     "text": {
      "right": 2
@@ -15460,10 +15433,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "right": 6,
-    "text": 4
+    "text": 5
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -15472,16 +15445,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.2.delmar",
-     "view.2.2.estrella"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 8
+     "right": 10
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -15490,7 +15460,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 4
+     "text": 5
     },
     "text": {
      "right": 2
@@ -23422,11 +23392,11 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 19,
+   "claims": 20,
    "outcomes": {
     "loose": 4,
     "right": 12,
-    "text": 3
+    "text": 4
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -23435,17 +23405,13 @@
    },
    "views": {
     "views": 10,
-    "found": 7,
-    "missed": [
-     "view.2.1.borealis",
-     "view.2.1.delmar",
-     "view.2.2.delmar"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 7
+     "right": 10
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -23455,7 +23421,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 3
+     "text": 4
     },
     "text": {
      "right": 6
@@ -23490,16 +23456,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.1.borealis",
-     "view.2.1.delmar"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 12
+     "right": 14
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.6,
@@ -23532,10 +23495,10 @@
    "recall": 1.0,
    "found_right": 5,
    "missed": [],
-   "claims": 10,
+   "claims": 12,
    "outcomes": {
     "right": 6,
-    "text": 4
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -23544,16 +23507,15 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
+    "found": 9,
     "missed": [
-     "view.2.2.corvane",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 8
+     "right": 9
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.6,
@@ -23562,7 +23524,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 4
+     "text": 6
     },
     "text": {
      "right": 2
@@ -23671,10 +23633,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 12,
+   "claims": 13,
    "outcomes": {
     "right": 7,
-    "text": 5
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -23683,18 +23645,16 @@
    },
    "views": {
     "views": 10,
-    "found": 6,
+    "found": 8,
     "missed": [
      "view.2.2.avelin",
-     "view.2.2.corvane",
-     "view.2.2.delmar",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 7
+     "right": 9
     },
-    "holder_in_stance": 6,
-    "attitude_in_stance": 6
+    "holder_in_stance": 8,
+    "attitude_in_stance": 8
    },
    "by_reader": {
     "table": 0.6667,
@@ -23703,7 +23663,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 5,
-     "text": 5
+     "text": 6
     },
     "text": {
      "right": 2
@@ -23720,10 +23680,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 9,
+   "claims": 10,
    "outcomes": {
     "right": 6,
-    "text": 3
+    "text": 4
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -23732,16 +23692,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.2.delmar",
-     "view.2.2.estrella"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 8
+     "right": 10
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -23750,7 +23707,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 3
+     "text": 4
     },
     "text": {
      "right": 2
@@ -23767,10 +23724,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 9,
+   "claims": 10,
    "outcomes": {
     "right": 6,
-    "text": 3
+    "text": 4
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -23779,16 +23736,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.2.delmar",
-     "view.2.2.estrella"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 8
+     "right": 10
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -23797,7 +23751,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 3
+     "text": 4
     },
     "text": {
      "right": 2
@@ -31326,11 +31280,11 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 19,
+   "claims": 20,
    "outcomes": {
     "loose": 4,
     "right": 12,
-    "text": 3
+    "text": 4
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -31339,17 +31293,13 @@
    },
    "views": {
     "views": 10,
-    "found": 7,
-    "missed": [
-     "view.2.1.borealis",
-     "view.2.1.delmar",
-     "view.2.2.delmar"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 7
+     "right": 10
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -31359,7 +31309,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 3
+     "text": 4
     },
     "text": {
      "right": 6
@@ -31394,16 +31344,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.1.borealis",
-     "view.2.1.delmar"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 12
+     "right": 14
     },
-    "holder_in_stance": 7,
-    "attitude_in_stance": 7
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.6,
@@ -31436,10 +31383,10 @@
    "recall": 1.0,
    "found_right": 5,
    "missed": [],
-   "claims": 10,
+   "claims": 12,
    "outcomes": {
     "right": 6,
-    "text": 4
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -31448,16 +31395,15 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
+    "found": 9,
     "missed": [
-     "view.2.2.corvane",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 8
+     "right": 9
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 9,
+    "attitude_in_stance": 9
    },
    "by_reader": {
     "table": 0.6,
@@ -31466,7 +31412,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 4
+     "text": 6
     },
     "text": {
      "right": 2
@@ -31575,10 +31521,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 12,
+   "claims": 13,
    "outcomes": {
     "right": 7,
-    "text": 5
+    "text": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -31587,18 +31533,16 @@
    },
    "views": {
     "views": 10,
-    "found": 6,
+    "found": 8,
     "missed": [
      "view.2.2.avelin",
-     "view.2.2.corvane",
-     "view.2.2.delmar",
-     "view.2.2.estrella"
+     "view.2.2.corvane"
     ],
     "outcomes": {
-     "right": 7
+     "right": 9
     },
-    "holder_in_stance": 6,
-    "attitude_in_stance": 6
+    "holder_in_stance": 8,
+    "attitude_in_stance": 8
    },
    "by_reader": {
     "table": 0.6667,
@@ -31607,7 +31551,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 5,
-     "text": 5
+     "text": 6
     },
     "text": {
      "right": 2
@@ -31624,10 +31568,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 9,
+   "claims": 10,
    "outcomes": {
     "right": 6,
-    "text": 3
+    "text": 4
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -31636,16 +31580,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.2.delmar",
-     "view.2.2.estrella"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 8
+     "right": 10
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -31654,7 +31595,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 3
+     "text": 4
     },
     "text": {
      "right": 2
@@ -31671,10 +31612,10 @@
    "recall": 1.0,
    "found_right": 6,
    "missed": [],
-   "claims": 9,
+   "claims": 10,
    "outcomes": {
     "right": 6,
-    "text": 3
+    "text": 4
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -31683,16 +31624,13 @@
    },
    "views": {
     "views": 10,
-    "found": 8,
-    "missed": [
-     "view.2.2.delmar",
-     "view.2.2.estrella"
-    ],
+    "found": 10,
+    "missed": [],
     "outcomes": {
-     "right": 8
+     "right": 10
     },
-    "holder_in_stance": 8,
-    "attitude_in_stance": 8
+    "holder_in_stance": 10,
+    "attitude_in_stance": 10
    },
    "by_reader": {
     "table": 0.6667,
@@ -31701,7 +31639,7 @@
    "outcomes_by_reader": {
     "table": {
      "right": 4,
-     "text": 3
+     "text": 4
     },
     "text": {
      "right": 2

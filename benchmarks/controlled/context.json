@@ -1,8 +1,8 @@
 {
  "totals": {
   "inventory": {
-   "claims": 20858,
-   "evidence": 11633,
+   "claims": 20878,
+   "evidence": 11645,
    "frame in conditions": 76,
    "grounded": 5917,
    "list records": 36,
@@ -5763,13 +5763,13 @@
   },
   "views-poll-s1": {
    "inventory": {
-    "claims": 33,
+    "claims": 36,
     "grounded": 20,
     "with conditions": 20,
     "positioned": 0,
     "misplaced": {},
     "printed": 20,
-    "evidence": 27,
+    "evidence": 30,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 238,
     "examples": {}
@@ -5790,13 +5790,13 @@
   },
   "views-poll-s1-revised": {
    "inventory": {
-    "claims": 34,
+    "claims": 36,
     "grounded": 17,
     "with conditions": 17,
     "positioned": 0,
     "misplaced": {},
     "printed": 20,
-    "evidence": 28,
+    "evidence": 30,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 241,
     "examples": {}
@@ -5817,13 +5817,13 @@
   },
   "views-poll-s1-revised.docx": {
    "inventory": {
-    "claims": 19,
+    "claims": 22,
     "grounded": 12,
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
     "printed": 10,
-    "evidence": 16,
+    "evidence": 17,
     "context_bytes_per_request": 488,
     "data_bytes_per_request": 88,
     "examples": {}
@@ -5844,7 +5844,7 @@
   },
   "views-poll-s1-revised.md": {
    "inventory": {
-    "claims": 19,
+    "claims": 21,
     "grounded": 12,
     "with conditions": 12,
     "positioned": 0,
@@ -5933,13 +5933,13 @@
   },
   "views-poll-s1.docx": {
    "inventory": {
-    "claims": 19,
+    "claims": 23,
     "grounded": 12,
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
     "printed": 10,
-    "evidence": 16,
+    "evidence": 18,
     "context_bytes_per_request": 488,
     "data_bytes_per_request": 87,
     "examples": {}
@@ -5960,13 +5960,13 @@
   },
   "views-poll-s1.md": {
    "inventory": {
-    "claims": 19,
+    "claims": 23,
     "grounded": 11,
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
     "printed": 10,
-    "evidence": 16,
+    "evidence": 18,
     "context_bytes_per_request": 620,
     "data_bytes_per_request": 88,
     "examples": {}
@@ -5987,7 +5987,7 @@
   },
   "views-poll-s1.pptx": {
    "inventory": {
-    "claims": 15,
+    "claims": 17,
     "grounded": 14,
     "with conditions": 14,
     "positioned": 0,
@@ -5997,7 +5997,7 @@
     },
     "with records": 8,
     "printed": 15,
-    "evidence": 15,
+    "evidence": 17,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 103,
     "examples": {}

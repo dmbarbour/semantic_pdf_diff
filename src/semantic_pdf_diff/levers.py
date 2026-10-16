@@ -893,7 +893,7 @@ class ViewRows(Lever):
     # with table_holders: a holder's yes or no in a "Company | Y/N | Comments" table is read without the model, as
     # its view of the item the text above the table names, where the reader gives no yes or no of the row (stance.py).
     # Applied as answers are stored
-    view_rows: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = False
+    view_rows: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = True
 
     def table_view(self, header, row, context):
         found = super().table_view(header, row, context)
@@ -1034,8 +1034,8 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
-# editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders and view_attitudes
-# (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
+# editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes and
+# view_rows (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, ColumnConditions, ConditionsByColumn, ExtractRules,
                  VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext,
                  References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty,

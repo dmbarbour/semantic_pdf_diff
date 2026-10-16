@@ -222,11 +222,11 @@ class Read(unittest.TestCase):
         views = [("N", [("Delmar", "opposes")]), ("Y", [("CMCC", "supports")])]
         for model in (RowsModel, CommentRules):
             with self.subTest(model=model.__name__):
-                on = self.read(model, view_rows=True)
+                on = self.read(model)
                 self.assertEqual(sorted(x for x in on if x[0] in ("Y", "N")), views)
-                self.assertEqual([x for x in self.read(model) if x[0] in ("Y", "N")], [])
+                self.assertEqual([x for x in self.read(model, view_rows=False) if x[0] in ("Y", "N")], [])
         # where the reader gives the yes or no itself (the rule reads it as "agreement"), nothing is added
-        self.assertEqual(sorted(x for x in self.read(view_rows=True) if x[0] in ("Y", "N")), views)
+        self.assertEqual(sorted(x for x in self.read() if x[0] in ("Y", "N")), views)
 
     def test_a_view_needs_a_holder_a_yes_or_no_and_an_item_named_above(self):
         from semantic_pdf_diff.stance import view_of

@@ -9383,34 +9383,34 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 17,
-    "unscored": 6
+    "unscored": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 23,
+    "different": 2,
+    "equivalent": 25,
     "uncertain": 1
    },
-   "unmatched": 13,
-   "pairs": 4,
+   "unmatched": 12,
+   "pairs": 5,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "5/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
-     "view.2.1.borealis": "unextracted",
+     "view.2.1.borealis": "confirmed",
      "view.2.1.corvane": "confirmed",
-     "view.2.1.delmar": "unextracted",
+     "view.2.1.delmar": "confirmed",
      "view.2.1.estrella": "confirmed",
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unpaired",
-     "view.2.2.delmar": "unextracted",
+     "view.2.2.delmar": "reported",
      "view.2.2.estrella": "confirmed"
     }
    },
@@ -9423,7 +9423,7 @@
       "restated": 1
      },
      "unscored": {
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
@@ -9449,7 +9449,7 @@
    "removals_found": "0/1",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "difference_precision": null,
+   "difference_precision": 0.0,
    "changed": {},
    "conditions": {},
    "added": {},
@@ -9459,20 +9459,23 @@
    "unchanged": {
     "confirmed": 5
    },
-   "different": {},
+   "different": {
+    "unscored": 1
+   },
    "equivalent": {
     "no change": 6,
-    "unscored": 8
+    "unscored": 9
    },
    "findings": {
-    "equivalent": 14
+    "different": 1,
+    "equivalent": 15
    },
-   "unmatched": 5,
-   "pairs": 1,
+   "unmatched": 3,
+   "pairs": 3,
    "omitted": 0,
    "views": {
-    "changes_found": "0/2",
-    "unchanged_confirmed": "6/8",
+    "changes_found": "1/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "unpaired",
@@ -9483,8 +9486,18 @@
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
     }
    },
    "detail": {
@@ -9520,23 +9533,23 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 6,
-    "unscored": 7
+    "unscored": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 13,
+    "different": 2,
+    "equivalent": 14,
     "unrelated": 1
    },
-   "unmatched": 4,
-   "pairs": 2,
+   "unmatched": 3,
+   "pairs": 3,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "5/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "6/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -9547,8 +9560,8 @@
      "view.2.2.avelin": "unextracted",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -9557,6 +9570,7 @@
     "value_change_precision": null,
     "by_claims": {
      "unscored": {
+      "changed": 1,
       "not_same_item": 1
      }
     }
@@ -9594,22 +9608,22 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 2
+    "unscored": 3
    },
    "equivalent": {
     "no change": 5,
-    "unscored": 8
+    "unscored": 9
    },
    "findings": {
-    "different": 2,
-    "equivalent": 13
+    "different": 3,
+    "equivalent": 14
    },
-   "unmatched": 3,
-   "pairs": 3,
+   "unmatched": 1,
+   "pairs": 5,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "7/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "8/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -9620,8 +9634,8 @@
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "confirmed",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -9631,7 +9645,7 @@
     "by_claims": {
      "unscored": {
       "changed": 1,
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
@@ -19252,34 +19266,34 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 17,
-    "unscored": 6
+    "unscored": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 23,
+    "different": 2,
+    "equivalent": 25,
     "uncertain": 1
    },
-   "unmatched": 13,
-   "pairs": 4,
+   "unmatched": 12,
+   "pairs": 5,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "5/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
-     "view.2.1.borealis": "unextracted",
+     "view.2.1.borealis": "confirmed",
      "view.2.1.corvane": "confirmed",
-     "view.2.1.delmar": "unextracted",
+     "view.2.1.delmar": "confirmed",
      "view.2.1.estrella": "confirmed",
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unpaired",
-     "view.2.2.delmar": "unextracted",
+     "view.2.2.delmar": "reported",
      "view.2.2.estrella": "confirmed"
     }
    },
@@ -19292,7 +19306,7 @@
       "restated": 1
      },
      "unscored": {
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
@@ -19318,7 +19332,7 @@
    "removals_found": "0/1",
    "unchanged_confirmed": "5/5",
    "false_changes": 0,
-   "difference_precision": null,
+   "difference_precision": 0.0,
    "changed": {},
    "conditions": {},
    "added": {},
@@ -19328,20 +19342,23 @@
    "unchanged": {
     "confirmed": 5
    },
-   "different": {},
+   "different": {
+    "unscored": 1
+   },
    "equivalent": {
     "no change": 6,
-    "unscored": 8
+    "unscored": 9
    },
    "findings": {
-    "equivalent": 14
+    "different": 1,
+    "equivalent": 15
    },
-   "unmatched": 5,
-   "pairs": 1,
+   "unmatched": 3,
+   "pairs": 3,
    "omitted": 0,
    "views": {
-    "changes_found": "0/2",
-    "unchanged_confirmed": "6/8",
+    "changes_found": "1/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "unpaired",
@@ -19352,8 +19369,18 @@
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
+    }
+   },
+   "kinds": {
+    "right": 0,
+    "scored": 0,
+    "value_change_precision": null,
+    "by_claims": {
+     "unscored": {
+      "not_same_item": 1
+     }
     }
    },
    "detail": {
@@ -19389,23 +19416,23 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 6,
-    "unscored": 7
+    "unscored": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 13,
+    "different": 2,
+    "equivalent": 14,
     "unrelated": 1
    },
-   "unmatched": 4,
-   "pairs": 2,
+   "unmatched": 3,
+   "pairs": 3,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "5/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "6/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -19416,8 +19443,8 @@
      "view.2.2.avelin": "unextracted",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -19426,6 +19453,7 @@
     "value_change_precision": null,
     "by_claims": {
      "unscored": {
+      "changed": 1,
       "not_same_item": 1
      }
     }
@@ -19463,22 +19491,22 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 2
+    "unscored": 3
    },
    "equivalent": {
     "no change": 5,
-    "unscored": 8
+    "unscored": 9
    },
    "findings": {
-    "different": 2,
-    "equivalent": 13
+    "different": 3,
+    "equivalent": 14
    },
-   "unmatched": 3,
-   "pairs": 3,
+   "unmatched": 1,
+   "pairs": 5,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "7/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "8/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -19489,8 +19517,8 @@
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "confirmed",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -19500,7 +19528,7 @@
     "by_claims": {
      "unscored": {
       "changed": 1,
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
@@ -27373,34 +27401,34 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 17,
-    "unscored": 6
+    "unscored": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 23,
+    "different": 2,
+    "equivalent": 25,
     "uncertain": 1
    },
-   "unmatched": 13,
-   "pairs": 4,
+   "unmatched": 12,
+   "pairs": 5,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "5/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
-     "view.2.1.borealis": "unextracted",
+     "view.2.1.borealis": "confirmed",
      "view.2.1.corvane": "confirmed",
-     "view.2.1.delmar": "unextracted",
+     "view.2.1.delmar": "confirmed",
      "view.2.1.estrella": "confirmed",
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unpaired",
-     "view.2.2.delmar": "unextracted",
+     "view.2.2.delmar": "reported",
      "view.2.2.estrella": "confirmed"
     }
    },
@@ -27413,7 +27441,7 @@
       "restated": 1
      },
      "unscored": {
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
@@ -27450,23 +27478,23 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 6,
-    "unscored": 7
+    "unscored": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 13,
+    "different": 2,
+    "equivalent": 14,
     "unrelated": 1
    },
-   "unmatched": 4,
-   "pairs": 2,
+   "unmatched": 3,
+   "pairs": 3,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "5/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "6/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -27477,8 +27505,8 @@
      "view.2.2.avelin": "unextracted",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -27487,6 +27515,7 @@
     "value_change_precision": null,
     "by_claims": {
      "unscored": {
+      "changed": 1,
       "not_same_item": 1
      }
     }
@@ -27524,22 +27553,22 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 5,
-    "unscored": 6
+    "unscored": 7
    },
    "findings": {
-    "different": 1,
-    "equivalent": 11
+    "different": 2,
+    "equivalent": 12
    },
-   "unmatched": 4,
-   "pairs": 2,
+   "unmatched": 2,
+   "pairs": 4,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "6/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -27550,8 +27579,8 @@
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -27560,7 +27589,7 @@
     "value_change_precision": null,
     "by_claims": {
      "unscored": {
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
@@ -27597,22 +27626,22 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 5,
-    "unscored": 6
+    "unscored": 7
    },
    "findings": {
-    "different": 1,
-    "equivalent": 11
+    "different": 2,
+    "equivalent": 12
    },
-   "unmatched": 4,
-   "pairs": 2,
+   "unmatched": 2,
+   "pairs": 4,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "6/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -27623,8 +27652,8 @@
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -27633,7 +27662,7 @@
     "value_change_precision": null,
     "by_claims": {
      "unscored": {
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
@@ -35433,34 +35462,34 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 17,
-    "unscored": 6
+    "unscored": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 23,
+    "different": 2,
+    "equivalent": 25,
     "uncertain": 1
    },
-   "unmatched": 13,
-   "pairs": 4,
+   "unmatched": 12,
+   "pairs": 5,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "5/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
-     "view.2.1.borealis": "unextracted",
+     "view.2.1.borealis": "confirmed",
      "view.2.1.corvane": "confirmed",
-     "view.2.1.delmar": "unextracted",
+     "view.2.1.delmar": "confirmed",
      "view.2.1.estrella": "confirmed",
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unpaired",
-     "view.2.2.delmar": "unextracted",
+     "view.2.2.delmar": "reported",
      "view.2.2.estrella": "confirmed"
     }
    },
@@ -35473,7 +35502,7 @@
       "restated": 1
      },
      "unscored": {
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
@@ -35510,23 +35539,23 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 6,
-    "unscored": 7
+    "unscored": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 13,
+    "different": 2,
+    "equivalent": 14,
     "unrelated": 1
    },
-   "unmatched": 4,
-   "pairs": 2,
+   "unmatched": 3,
+   "pairs": 3,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "5/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "6/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -35537,8 +35566,8 @@
      "view.2.2.avelin": "unextracted",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -35547,6 +35576,7 @@
     "value_change_precision": null,
     "by_claims": {
      "unscored": {
+      "changed": 1,
       "not_same_item": 1
      }
     }
@@ -35584,22 +35614,22 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 5,
-    "unscored": 6
+    "unscored": 7
    },
    "findings": {
-    "different": 1,
-    "equivalent": 11
+    "different": 2,
+    "equivalent": 12
    },
-   "unmatched": 4,
-   "pairs": 2,
+   "unmatched": 2,
+   "pairs": 4,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "6/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -35610,8 +35640,8 @@
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -35620,7 +35650,7 @@
     "value_change_precision": null,
     "by_claims": {
      "unscored": {
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
@@ -35657,22 +35687,22 @@
     "confirmed": 5
    },
    "different": {
-    "unscored": 1
+    "unscored": 2
    },
    "equivalent": {
     "no change": 5,
-    "unscored": 6
+    "unscored": 7
    },
    "findings": {
-    "different": 1,
-    "equivalent": 11
+    "different": 2,
+    "equivalent": 12
    },
-   "unmatched": 4,
-   "pairs": 2,
+   "unmatched": 2,
+   "pairs": 4,
    "omitted": 0,
    "views": {
-    "changes_found": "1/2",
-    "unchanged_confirmed": "6/8",
+    "changes_found": "2/2",
+    "unchanged_confirmed": "7/8",
     "false_changes": 0,
     "detail": {
      "view.2.1.avelin": "reported",
@@ -35683,8 +35713,8 @@
      "view.2.2.avelin": "confirmed",
      "view.2.2.borealis": "confirmed",
      "view.2.2.corvane": "unextracted",
-     "view.2.2.delmar": "unextracted",
-     "view.2.2.estrella": "unextracted"
+     "view.2.2.delmar": "reported",
+     "view.2.2.estrella": "confirmed"
     }
    },
    "kinds": {
@@ -35693,7 +35723,7 @@
     "value_change_precision": null,
     "by_claims": {
      "unscored": {
-      "not_same_item": 1
+      "not_same_item": 2
      }
     }
    },
