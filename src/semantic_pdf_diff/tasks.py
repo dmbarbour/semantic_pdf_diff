@@ -172,6 +172,7 @@ class Task:
     origin: str | None = None
     leading: dict | None = field(default=None, repr=False)
     position: object = None  # position(quote) -> the Position of the block a text claim's quote is in
+    stance: tuple = ()  # the Links holding every claim it reads (a table row's holder: the table_holders lever)
 
 class TaskCore:
     """One content item's extraction tasks: the evidence and coverage they make, as tasks finish.
@@ -396,6 +397,8 @@ class TaskCore:
                     continue
                 position_of = made.position or self.position_by_quote(page_no)
                 claim, position = s.positioned(claim, position_of(claim.quote) if position_of else None)
+                if made.stance and not claim.stance:  # its row's holder, unless the reader named one
+                    claim = claim.model_copy(update={"stance": list(made.stance)})
                 eid = claim_id(content, claim)
                 if any(e.id == eid for e in found):
                     continue  # the same claim twice in one response: keep the first
@@ -474,7 +477,8 @@ class TaskCore:
                 repeat_key += (hashlib.sha256(context.encode()).hexdigest(),)
             self.consume(Task(page_no, bbox, task, text, derivation=derivation,
                               check=lambda q: quoted(q, text) or covered(q, flat) or s.loose_match(q, text),
-                              then=then, repeat_key=repeat_key, repeat_after=2, context=context))
+                              then=then, repeat_key=repeat_key, repeat_after=2, context=context,
+                              stance=s.table_holder(header, row)))
         else:
             self.split_columns(page_no, bbox, task, header, row, columns, depth, derivation)
 

@@ -44,6 +44,7 @@
     "positions",
     "records",
     "sheet_records",
+    "table_holders",
     "reconcile",
     "dedupe_repeated",
     "continue_reading",

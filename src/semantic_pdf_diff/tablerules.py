@@ -894,12 +894,13 @@ def read(core, page, g, task, by_itself, source, image=None):
                 misfits.append(i)
                 issues.append(f"Row {g.names[i]} read by itself: {error}")
                 continue
+            stance = core.s.table_holder(g.labels, g.rows[i])  # its holder column's cell (table_holders)
             for fields, used, rule in made:
                 quote = " | ".join(g.rows[i][k] for k in used if g.rows[i][k]) or " | ".join(t for t in g.rows[i] if t)
                 found.append(_evidence(core, page, row_box(i), name, fields, quote, True, [
                     *source_, DerivationStep(step="table-rules", detail=describe_rule(rule))],
                     records=[table.id] if table else (),
-                    printed=printed_name(g, i, used, fields["value"]) if table else ""))
+                    printed=printed_name(g, i, used, fields["value"]) if table else "", stance=stance))
         for i in misfits:
             by_itself(g.keys[i])
         summary = (f"Read by rules: {len(g.rows) - len(misfits)} of {len(g.rows)} rows, {len(found)} claims"
@@ -922,12 +923,13 @@ def printed_name(g, i, used, value):
     section = g.sections[i] if i < len(g.sections) else ""
     return " | ".join(x for x in (section, label, g.labels[col].strip()) if x)[:200]
 
-def _evidence(core, page, box, task, fields, quote, verified, derivation, approximate=False, records=(), printed=""):
+def _evidence(core, page, box, task, fields, quote, verified, derivation, approximate=False, records=(), printed="",
+              stance=()):
     from .schema import Claim
     claim = Claim(entity=fields["entity"][:160], attribute=fields["attribute"][:160], value=fields["value"][:300],
                   unit=fields["unit"][:40], conditions=fields["conditions"][:300], frame=fields.get("frame", "")[:200],
                   kind="table", quote=quote[:400], confidence=CONFIDENCE, approximate=approximate,
-                  uncertainty=fields.get("uncertainty", "")[:200])
+                  uncertainty=fields.get("uncertainty", "")[:200], stance=list(stance))
     home = core.sections.box(page, box).id
     return Evidence(**claim.model_dump(), id=claim_id(core.content, claim), content=core.content, section=home,
                     locator=core.locator(page, box, "table", task), derivation=derivation, quote_verified=verified,

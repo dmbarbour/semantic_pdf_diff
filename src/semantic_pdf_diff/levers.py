@@ -839,6 +839,19 @@ class SheetRecords(Lever):
         sheet = sheet_record(page_no, is_sheet())
         return positions, records + ([sheet] if sheet else [])
 
+class TableHolders(Lever):
+    lever_name, stage, off = "table_holders", "matching", {"table_holders": False}
+    # a table's holder column (Company, Source, Proponent...) holds every claim read from its row: the row's cell as
+    # the claims' stance (docs/plans/claim-context-2026-10-14.md, milestone 5; stance.py). Applied as answers are
+    # stored
+    table_holders: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = False
+
+    def table_holder(self, header, row):
+        if not self.table_holders:
+            return super().table_holder(header, row)
+        from .stance import table_holder
+        return table_holder(header, row)
+
 class Reconcile(Lever):
     lever_name, stage, off = "reconcile", "matching", {"reconcile": False}
     # merge readings of one fact by different tasks into one claim; applied when evidence is read, not stored
@@ -965,9 +978,9 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ColumnConditions, ConditionsByC
                  TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty, SkipTextOnly,
                  RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks, TableRules,
                  TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText, LoneRows,
-                 TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords, Reconcile,
-                 DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext)
+                 TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords, TableHolders,
+                 Reconcile, DedupeRepeated, ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial,
+                 RecordChanges, JudgeContext)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1173,6 +1186,12 @@ class Platform(Composable):
     def printed_name(self, claim):
         """A claim's name as printed in its verified quote (the words before its value), or "": the platform's."""
         return ""
+
+    @chained
+    def table_holder(self, header, row):
+        """(the Links holding the claims read from a table row,) given its table's headers and the row's cells: the
+        platform's, none."""
+        return ()
 
     @chained
     def table_record(self, page_no, task, grid, context, box):

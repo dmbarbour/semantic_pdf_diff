@@ -128,6 +128,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `positions` | `"provenance"` | post | positions | extract | table, text |
 | `records` | `true` | post | records | extract | all |
 | `sheet_records` | `true` | post | sheet_records | extract | all |
+| `table_holders` | `false` | post | table_holders | extract | table |
 | `reconcile` | `true` | post | reconcile | - | - |
 | `dedupe_repeated` | `true` | shaping | dedupe_repeated | extract | all |
 | `continuations` | `3` | selecting | continue_reading | extract | figure, overview, tile, vision |

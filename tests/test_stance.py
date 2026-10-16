@@ -5,6 +5,12 @@ import unittest
 
 from semantic_pdf_diff.schema import Claim, Extraction, Link, claim_id
 
+try:
+    import docx  # noqa: F401 (the office extra)
+    needs_docx = lambda cls: cls  # noqa: E731
+except ImportError:
+    needs_docx = unittest.skip("the office extra isn't installed")
+
 TIMEOUT = dict(entity="Link failure detection", attribute="acknowledgement timeout", value="251", unit="ms",
                kind="table", quote="Proposal 1: The acknowledgement timeout is 251 ms.", confidence=0.9)
 
@@ -37,6 +43,96 @@ class Schema(unittest.TestCase):
         self.assertNotIn("stance", made().model_dump())
         self.assertEqual(made(stance=[Link(holder="Avelin")]).model_dump()["stance"],
                          [{"holder": "Avelin", "attitude": "", "strength": ""}])
+
+class HolderColumn(unittest.TestCase):
+    def test_a_tables_holder_column_names_its_rows_holder(self):
+        from semantic_pdf_diff.stance import table_holder
+        holder = lambda header, row: [(x.holder, x.attitude) for x in table_holder(header, row)]  # noqa: E731
+        self.assertEqual(holder(["Company", "Proposals"], ["Spreadtrum [1]", "Proposal 1: ..."]),
+                         [("Spreadtrum", "proposes")])
+        self.assertEqual(holder(["Company", "Y/N", "Comments"], ["CMCC", "Y", ""]), [("CMCC", "")])
+        self.assertEqual(holder(["Tag", "Flow (L/s)"], ["P-1", "118"]), [])  # no holder column
+        self.assertEqual(holder(["Company", "Proposals"], [None, "Proposal 2: ..."]), [])  # an empty cell
+        self.assertEqual(holder(["Item", "Source"], ["Timer", "ASHRAE [3, 5]"]), [("ASHRAE", "")])
+
+    def test_a_rows_claims_take_its_holder_only_when_on(self):
+        from semantic_pdf_diff.settings import Settings
+        header, row = ["Company", "Proposals"], ["Avelin", "Proposal 1: The acknowledgement timeout is 251 ms."]
+        self.assertEqual(Settings().table_holder(header, row), ())
+        self.assertEqual([x.holder for x in Settings(table_holders=True).table_holder(header, row)], ["Avelin"])
+
+PROPOSALS = [["Company", "Proposals"], ["Avelin", "Proposal 1: The acknowledgement timeout is 251 ms."],
+             ["Borealis", "Proposal 1: The acknowledgement timeout is 251 ms."],
+             ["Corvane [3]", "Proposal 2: The report period is 754 ms."]]
+VIEWS = [["Company", "Y/N", "Comments"], ["CMCC", "Y", "fine"], ["Delmar", "N", "prefer 600 ms"]]
+
+def summary():
+    """A feature lead's summary as a Word document: the companies' proposals, and their views on a proposal."""
+    import io
+    import docx
+    d = docx.Document()
+    d.add_heading("Feature lead summary", level=0)
+    for heading, rows in (("Companies' proposals", PROPOSALS), ("Views on the moderator's proposal", VIEWS)):
+        d.add_heading(heading, level=1)
+        table = d.add_table(rows=len(rows), cols=len(rows[0]))
+        for r, cells in enumerate(rows):
+            for c, text in enumerate(cells):
+                table.cell(r, c).text = text
+    out = io.BytesIO()
+    d.save(out)
+    return out.getvalue()
+
+class Model:
+    """Reads a proposals table row by row (each 'N ms'), and a views table by rules (the company's Y or N)."""
+    def __init__(self, **settings):
+        from semantic_pdf_diff.settings import Settings
+        self.s = Settings(**settings)
+        self.calls, self.cache_hits, self.usage, self.queries = 0, 0, {}, []
+
+    def ask(self, prompt, schema, images=(), key=None):
+        import re
+        from semantic_pdf_diff.keyvalue import Check
+        from semantic_pdf_diff.tablerules import Review, Rules
+        from semantic_pdf_diff.tasks import ExtractQuery
+        if schema is Check:  # two columns: a table, not a key-value list
+            return Check(reading="table")
+        if schema is Review:  # the rules shown again with what they gave: kept
+            return Review.model_validate({"verdict": "keep"})
+        if schema is Rules:
+            if "Y/N" not in prompt:
+                return Rules(reading="rows")
+            return Rules.model_validate({
+                "reading": "rules", "claims": [{"columns": "", "entity": "{A}", "attribute": "agreement",
+                                                "value": "{B}"}],
+                "examples": [{"row": "1", "claims": [{"entity": "CMCC", "attribute": "agreement", "value": "Y"}]}]})
+        query = ExtractQuery.read(prompt)
+        claims = [{"entity": "Link failure detection", "attribute": "timeout", "value": v, "unit": "ms",
+                   "kind": "table", "quote": v, "confidence": 0.9} for v in re.findall(r"(\d+) ms", query.data)]
+        return Extraction(claims=claims, complete=True)
+
+@needs_docx
+class Read(unittest.TestCase):
+    def read(self, **settings):
+        import test_textdocs
+        model_class, test_textdocs.Model = test_textdocs.Model, Model
+        try:
+            evidence, _, _, _ = test_textdocs.extract("summary.docx", summary(), **settings)
+        finally:
+            test_textdocs.Model = model_class
+        return [(e.value, [(x.holder, x.attitude) for x in e.stance]) for e in evidence if e.kind == "table"]
+
+    def test_a_tables_rows_claims_are_held_by_its_companies_only_when_on(self):
+        on = self.read(table_holders=True)
+        # row by row: two companies' proposals of one value are two claims; a reference mark left out
+        self.assertEqual(sorted(x for x in on if x[0] != "Y" and x[0] != "N"),
+                         [("251", [("Avelin", "proposes")]), ("251", [("Borealis", "proposes")]),
+                          ("754", [("Corvane", "proposes")])])
+        # by rules: the views table's rows, each its company's (the attitude is in the value)
+        self.assertIn(("Y", [("CMCC", "")]), on)
+        self.assertIn(("N", [("Delmar", "")]), on)
+        off = self.read()
+        self.assertTrue(all(stance == [] for _, stance in off))
+        self.assertEqual(sorted(v for v, _ in off if v not in ("Y", "N")), ["251", "754"])  # one 251: one claim
 
 if __name__ == "__main__":
     unittest.main()
