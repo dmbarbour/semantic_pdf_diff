@@ -93,6 +93,12 @@ class AgainstKey(unittest.TestCase):
         place = lambda c: context.against_key(key, [c], {"text:p1": [""]})["placed"].get("holder")  # noqa: E731
         self.assertEqual((place(stanced), place(said), place(unheld)),
                          ({"stance": 1}, {"conditions": 1}, {"nowhere": 1}))
+        # and its attitude: in the stance, another there ("supports" for "proposes"), or none
+        attitude = lambda c: context.against_key(key, [c], {"text:p1": [""]}).get("attitudes")  # noqa: E731
+        other = {**stanced, "stance": [{"holder": "Avelin", "attitude": "supports"}]}
+        self.assertEqual((attitude(stanced), attitude(other), attitude(said)),
+                         ({"in its stance": 1}, {"another": 1}, {"none": 1}))
+        self.assertNotIn("attitudes", context.against_key(KEY, [unheld], {"text:p1": [""]}))  # no view keyed
 
 class Readings(unittest.TestCase):
     def test_every_reading_counts_a_frame_only_a_later_sighting_gave(self):

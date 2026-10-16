@@ -118,8 +118,8 @@ def every_reading(runs_dir):
                         claim = {k: getattr(r, k) for k in ("entity", "attribute", "value", "unit", "conditions")}
                         if r.frame:
                             claim["frame"] = r.frame
-                        if r.stance:  # who holds it (milestone 5): its links' holders
-                            claim["stance"] = "; ".join(link.holder for link in r.stance)
+                        if r.stance:  # who holds it (milestone 5): its links, holder and attitude
+                            claim["stance"] = [link.model_dump() for link in r.stance]
                         claim.update(quote=o.quote, _task=o.locator.task, _records=list(r.records))
                         out[folder.name].append((content, family, claim))
     return dict(out)
@@ -212,6 +212,19 @@ def _text(value):
         return "; ".join(str(x.get("holder", "")) if isinstance(x, dict) else str(x) for x in value)
     return value or ""
 
+ATTITUDES = ("propos", "support", "oppos", "report", "agree", "object")
+
+def _attitude(text):
+    """An attitude's root ("proposes", "proposed": "propos"), or the text folded when it names none."""
+    text = str(text or "").casefold()
+    return next((root for root in ATTITUDES if root in text), text.strip())
+
+def _attitudes(stance):
+    """The attitudes a claim's stance holds: its links' (a run's evidence stores them as dicts)."""
+    if not isinstance(stance, list):
+        return set()
+    return {_attitude(x.get("attitude", "")) for x in stance if isinstance(x, dict)}
+
 def _wanted(fact, text):
     """The words of a context item that a claim would have to say: its own, less the fact's names'."""
     names = words(" ".join((fact.entity, fact.attribute, *fact.synonyms, *fact.aliases)))
@@ -219,7 +232,8 @@ def _wanted(fact, text):
 
 def against_key(key_data, claims, shown_by_task):
     """One document's context per kind against its key: {kind: {where it landed: facts}}, the audit of each lost
-    item {kind: {not shown|shown, not used|misapplied|image only: facts}}, and names resting on unprinted conventions.
+    item {kind: {not shown|shown, not used|misapplied|image only: facts}}, names resting on unprinted conventions, and
+    a reported view's attitude (milestone 5) in a reading's stance, another attitude there, or none.
     claims: dicts with entity, attribute, value, unit, conditions and _task, and records (the text of the records the
     claim references, if any); shown_by_task: {task: [texts shown]}."""
     from .controlled.score import bounds, classify, key_facts
@@ -233,7 +247,7 @@ def against_key(key_data, claims, shown_by_task):
         outcome, fid = classify(c, numeric, key_data["printed"])
         if fid and outcome in ("right", "loose"):
             readings[fid].append(c)
-    placed, audit, named = defaultdict(Counter), defaultdict(Counter), Counter()
+    placed, audit, named, attitudes = defaultdict(Counter), defaultdict(Counter), Counter(), Counter()
     examples = defaultdict(list)
     for fid, mine in sorted(readings.items()):
         fact = by_id[fid]
@@ -271,12 +285,16 @@ def against_key(key_data, claims, shown_by_task):
                 examples[f"{kind}: {verdict}"].append(f"{fid}: wanted {ctx[kind]!r}; read "
                                                       + " / ".join(f"{c.get('attribute')} | {c.get('conditions')}"
                                                                    for c in mine[:2]))
+        if ctx.get("attitude"):
+            held = set().union(*(_attitudes(c.get("stance")) for c in mine)) - {""}
+            attitudes["in its stance" if _attitude(ctx["attitude"]) in held else "another" if held else "none"] += 1
         if ctx.get("named_by"):
             said = set().union(*(words(f"{c.get('attribute', '')} {c.get('conditions', '')}") for c in mine))
             named["by an unprinted convention" if said & CONVENTION_WORDS else
                   "by geometry as drawn" if said & GEOMETRY_WORDS else "otherwise"] += 1
     return {"placed": {k: dict(v) for k, v in placed.items()}, "audit": {k: dict(v) for k, v in audit.items()},
-            "named": dict(named), "examples": dict(examples)}
+            "named": dict(named), **({"attitudes": dict(attitudes)} if attitudes else {}),
+            "examples": dict(examples)}
 
 def measure_keys(runs_dir, key_of):
     """{run: against_key's result} for every store under runs_dir; key_of(run) is its key's data."""
@@ -308,15 +326,17 @@ def record_texts(store, content):
 
 def sum_keys(results):
     """against_key's results summed over runs (examples left out)."""
-    out = {"placed": defaultdict(Counter), "audit": defaultdict(Counter), "named": Counter()}
+    out = {"placed": defaultdict(Counter), "audit": defaultdict(Counter), "named": Counter(), "attitudes": Counter()}
     for r in results.values():
+        out["attitudes"].update(r.get("attitudes", {}))
         for part in ("placed", "audit"):
             for kind, where in r[part].items():
                 out[part][kind].update(where)
         out["named"].update(r["named"])
     return {"placed": {k: dict(sorted(v.items())) for k, v in sorted(out["placed"].items())},
             "audit": {k: dict(sorted(v.items())) for k, v in sorted(out["audit"].items())},
-            "named": dict(sorted(out["named"].items()))}
+            "named": dict(sorted(out["named"].items())),
+            **({"attitudes": dict(sorted(out["attitudes"].items()))} if out["attitudes"] else {})}
 
 # --- our own link: calibration (Measurement, layer 7) --------------------------------------------------------------
 
