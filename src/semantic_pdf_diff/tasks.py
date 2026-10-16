@@ -397,8 +397,9 @@ class TaskCore:
                     continue
                 position_of = made.position or self.position_by_quote(page_no)
                 claim, position = s.positioned(claim, position_of(claim.quote) if position_of else None)
-                if made.stance and not claim.stance:  # its row's holder, unless the reader named one
-                    claim = claim.model_copy(update={"stance": list(made.stance)})
+                if made.stance or claim.stance:  # its row's holder, with the reader's attitude where it has none
+                    from .stance import merged
+                    claim = claim.model_copy(update={"stance": merged(made.stance, claim.stance)})
                 if claim.stance:
                     claim = s.held(claim)
                 eid = claim_id(content, claim)

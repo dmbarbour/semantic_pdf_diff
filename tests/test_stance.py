@@ -99,6 +99,18 @@ class Views(unittest.TestCase):
         self.assertEqual([Settings().held(c) for c in claims], claims)
 
 class Asked(unittest.TestCase):
+    def test_a_rows_holder_is_kept_and_the_readers_attitude_added(self):
+        from semantic_pdf_diff.stance import merged
+        links = lambda xs: [(x.holder, x.attitude) for x in xs]  # noqa: E731
+        row, proposal = [Link(holder="Xiaomi")], [Link(holder="Xiaomi", attitude="proposes")]
+        self.assertEqual(links(merged(row, [Link(holder="Xiaomi [12]", attitude="supports")])),
+                         [("Xiaomi", "supports")])
+        self.assertEqual(links(merged(proposal, [Link(holder="Xiaomi [12]", attitude="reports")])),
+                         [("Xiaomi", "proposes")])
+        self.assertEqual(links(merged(row, [])), [("Xiaomi", "")])
+        self.assertEqual(links(merged((), [Link(holder="Borealis [2]", attitude="proposes")])),
+                         [("Borealis", "proposes")])
+
     def test_the_reader_is_asked_for_a_stance_only_when_on(self):
         from semantic_pdf_diff.levers import STANCE_RULE, STANCE_SPEC
         from semantic_pdf_diff.settings import Settings

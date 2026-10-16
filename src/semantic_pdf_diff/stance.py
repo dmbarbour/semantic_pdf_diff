@@ -11,6 +11,8 @@ document's structure says so.
 - **A view as the holder's stance** (the view_attitudes lever): a held claim whose value is a yes or a no ("CMCC |
   support for Proposal 3.2.4 | Y") is the holder's view of a proposition, not a value of the holder: the attitude
   supports or opposes, the proposition the entity, the attribute "support", the holder out of both names.
+- **The reader's links** (the read_holders lever asks for them): a row's holder column still names the holder, the
+  reader adding an attitude the row doesn't give; elsewhere the reader's holders, their reference marks left out.
 """
 import re
 
@@ -39,6 +41,15 @@ def table_holder(header, row, above=(), carried=False):
         return ()
     attitude = "proposes" if any(PROPOSALS.search(h) for k, h in enumerate(names) if k != col) else ""
     return (Link(holder=holder[:120], attitude=attitude),)
+
+def merged(row, read):
+    """A claim's stance from its row's holder column (row) and the reader's answer (read): the row's holders, each
+    given the reader's first attitude where it has none (the reader names a holder as printed, "Xiaomi [12]", and a
+    summary renumbers its references); without a row's, the reader's, reference marks left out."""
+    if row:
+        attitude = next((x.attitude for x in read if x.attitude), "")
+        return [x.model_copy(update={"attitude": attitude}) if attitude and not x.attitude else x for x in row]
+    return [x.model_copy(update={"holder": " ".join(REFERENCE.sub("", x.holder).split()) or x.holder}) for x in read]
 
 YES = {"y", "yes", "support", "supported", "supports", "agree", "agreed", "ok"}
 NO = {"n", "no", "not supported", "not support", "object", "objects", "disagree", "oppose", "opposed"}
