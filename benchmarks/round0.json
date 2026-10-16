@@ -48,6 +48,7 @@
     "table_holders",
     "carried_holders",
     "view_attitudes",
+    "view_rows",
     "reconcile",
     "dedupe_repeated",
     "continue_reading",

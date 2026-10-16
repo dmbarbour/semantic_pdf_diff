@@ -17,6 +17,7 @@ from .progress import log
 from .quotes import covered, quoted
 from .regions import region_of
 from .retiling import CUT_NOTE
+from .stance import VIEW_COLUMN, is_yes_no
 
 # Text shorter than this is not split further during refinement.
 # Bump when prompt assembly or task construction changes, not only the template text;
@@ -173,6 +174,7 @@ class Task:
     leading: dict | None = field(default=None, repr=False)
     position: object = None  # position(quote) -> the Position of the block a text claim's quote is in
     stance: tuple = ()  # the Links holding every claim it reads (a table row's holder: the table_holders lever)
+    view: object = None  # a Claim: the view its row's yes-or-no cell states, kept if the reader gives none (view_rows)
 
 class TaskCore:
     """One content item's extraction tasks: the evidence and coverage they make, as tasks finish.
@@ -389,13 +391,17 @@ class TaskCore:
                 more.extend(result.claims)
                 asked.append(True)
                 row["issues"].append(f"Continued: the claim limit reached, the rest asked for ({origin}-c{turn + 1})")
-            for claim in result.claims:
+            claims = list(result.claims)
+            if made.view is not None and not any(is_yes_no(c.value) for c in claims):
+                claims.append(made.view)  # its row's yes or no, which the reader didn't give (the view_rows lever)
+            for claim in claims:
                 verified = check(claim.quote) if check else None
                 if not image and not verified:
                     row["status"] = "partial"
                     row["issues"].append("Rejected claim with unsupported literal quote")
                     continue
                 position_of = made.position or self.position_by_quote(page_no)
+                claim_read = claim
                 claim, position = s.positioned(claim, position_of(claim.quote) if position_of else None)
                 if made.stance or claim.stance:  # its row's holder, with the reader's attitude where it has none
                     from .stance import merged
@@ -411,7 +417,8 @@ class TaskCore:
                 records = [*self.reach.get(page_no, ()), *([position.list] if position and position.list else [])]
                 found.append(Evidence(**claim.model_dump(), id=eid, content=content, section=home,
                                       locator=self.locator(page_no, where, region, task),
-                                      derivation=derivation or self.derivation[region], image=image,
+                                      derivation=(derivation or self.derivation[region]) + (
+                                          [VIEW_COLUMN] if claim_read is made.view else []), image=image,
                                       quote_verified=verified, position=position, records=records,
                                       printed=s.printed_name(claim) if verified else ""))
                 row["claims"] += 1
@@ -483,7 +490,7 @@ class TaskCore:
             self.consume(Task(page_no, bbox, task, text, derivation=derivation,
                               check=lambda q: quoted(q, text) or covered(q, flat) or s.loose_match(q, text),
                               then=then, repeat_key=repeat_key, repeat_after=2, context=context,
-                              stance=s.table_holder(header, row, above)))
+                              stance=s.table_holder(header, row, above), view=s.table_view(head, cells, context)))
         else:
             self.split_columns(page_no, bbox, task, header, row, columns, depth, derivation, above)
 

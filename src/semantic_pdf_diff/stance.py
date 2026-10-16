@@ -11,12 +11,16 @@ document's structure says so.
 - **A view as the holder's stance** (the view_attitudes lever): a held claim whose value is a yes or a no ("CMCC |
   support for Proposal 3.2.4 | Y") is the holder's view of a proposition, not a value of the holder: the attitude
   supports or opposes, the proposition the entity, the attribute "support", the holder out of both names.
+- **A yes-or-no column read without the model** (the view_rows lever): in a table with a holder column and a column
+  of yes and no ("Company | Y/N | Comments"), a row's yes or no is its holder's view of the item the text above the
+  table last names ("Proposal 2.2", "Question 4"), read even where the reader gives no claim of it (a bare "Y"
+  row, or a "N" row whose comment holds a counter-proposal).
 - **The reader's links** (the read_holders lever asks for them): a row's holder column still names the holder, the
   reader adding an attitude the row doesn't give; elsewhere the reader's holders, their reference marks left out.
 """
 import re
 
-from .schema import Link
+from .schema import DerivationStep, Link
 
 HOLDER_HEADER = re.compile(r"^\s*(?:compan(?:y|ies)|sources?|proponents?|organi[sz]ations?|part(?:y|ies)|vendors?|"
                            r"submitted by|contributors?|authors?)\s*:?\s*$", re.I)
@@ -88,3 +92,34 @@ def as_view(claim):
     stance = [link.model_copy(update={"attitude": attitude}), *claim.stance[1:]]
     return claim.model_copy(update={"entity": entity[:160], "attribute": attribute[:160] or "support",
                                     "stance": stance})
+
+VIEW_HEADER = re.compile(r"^\s*(?:y\s*/\s*n|yes\s*/\s*no|support(?:ed)?|agree(?:d|ment)?|accept(?:ed|ance)?)\s*\??\s*$",
+                         re.I)
+YES_NO = {"y": "Y", "yes": "Y", "n": "N", "no": "N"}
+# A claim's derivation step where its table row's yes or no was read without the model (the view_rows lever)
+VIEW_COLUMN = DerivationStep(step="view-column", detail="the row's yes or no as its holder's view of the item named "
+                                                        "above the table, read without the model")
+# An item a table of views is about: a label and its number, the last the text above the table names ("Proposal
+# 3.1.1", "Question 4", "Observation 2"); a table's or a figure's own number isn't one.
+ITEM = re.compile(r"\b(?P<item>(?:Proposal|Question|Item|Issue|Observation|Recommendation|Option|Agreement|"
+                  r"Conclusion|Topic)\s+\d+(?:\.\d+)*[a-z]?)\b")
+
+def is_yes_no(value):
+    """Whether a value is a bare yes or no ("Y", "No")."""
+    return _fold(value) in YES_NO
+
+def view_of(header, row, context):
+    """The view a table row's yes-or-no cell states, as a claim (entity: the item the text above names; attribute
+    "support"; value: the cell), or None: no holder column, no yes-or-no column, a cell that's neither, or no item
+    named above (context: the row's context lines, "Above the table: ..." among them)."""
+    from .schema import Claim
+    if not table_holder(header, row):
+        return None
+    names = [" ".join(str(h or "").rsplit(" > ", 1)[-1].split()) for h in header]
+    col = next((k for k, h in enumerate(names) if VIEW_HEADER.match(h)), None)
+    cell = str(row[col] or "").strip() if col is not None and col < len(row) else ""
+    above = next((line for line in str(context or "").splitlines() if line.startswith("Above the table:")), "")
+    items = ITEM.findall(above)
+    if not is_yes_no(cell) or not items:
+        return None
+    return Claim(entity=items[-1][:160], attribute="support", value=cell, kind="table", quote=cell, confidence=0.9)

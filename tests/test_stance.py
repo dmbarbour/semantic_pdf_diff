@@ -135,7 +135,7 @@ def summary():
     import docx
     d = docx.Document()
     d.add_heading("Feature lead summary", level=0)
-    for heading, rows in (("Companies' proposals", PROPOSALS), ("Views on the moderator's proposal", VIEWS)):
+    for heading, rows in (("Companies' proposals", PROPOSALS), ("Views on the moderator's Proposal 3.1", VIEWS)):
         d.add_heading(heading, level=1)
         table = d.add_table(rows=len(rows), cols=len(rows[0]))
         for r, cells in enumerate(rows):
@@ -173,11 +173,28 @@ class Model:
                    "kind": "table", "quote": v, "confidence": 0.9} for v in re.findall(r"(\d+) ms", query.data)]
         return Extraction(claims=claims, complete=True)
 
+class RowsModel(Model):
+    """Reads every table row by row: a views row gives only its comment's number, never its Y or N."""
+    def ask(self, prompt, schema, images=(), key=None):
+        from semantic_pdf_diff.tablerules import Rules
+        return Rules(reading="rows") if schema is Rules else super().ask(prompt, schema, images, key)
+
+class CommentRules(Model):
+    """Reads the views table by a rule that takes the comment only, never the Y or N."""
+    def ask(self, prompt, schema, images=(), key=None):
+        from semantic_pdf_diff.tablerules import Rules
+        if schema is Rules and "Y/N" in prompt:
+            return Rules.model_validate({
+                "reading": "rules", "claims": [{"columns": "", "entity": "{A}", "attribute": "comment",
+                                                "value": "{C}"}],
+                "examples": [{"row": "1", "claims": [{"entity": "CMCC", "attribute": "comment", "value": "fine"}]}]})
+        return super().ask(prompt, schema, images, key)
+
 @needs_docx
 class Read(unittest.TestCase):
-    def read(self, **settings):
+    def read(self, model=Model, **settings):
         import test_textdocs
-        model_class, test_textdocs.Model = test_textdocs.Model, Model
+        model_class, test_textdocs.Model = test_textdocs.Model, model
         try:
             evidence, _, _, _ = test_textdocs.extract("summary.docx", summary(), **settings)
         finally:
@@ -197,6 +214,27 @@ class Read(unittest.TestCase):
         off = self.read(table_holders=False)
         self.assertTrue(all(stance == [] for _, stance in off))
         self.assertEqual(sorted(v for v, _ in off if v not in ("Y", "N")), ["251", "754"])  # one 251: one claim
+
+
+    def test_a_rows_yes_or_no_is_its_holders_view_where_the_reader_gives_none_only_when_on(self):
+        # the view_rows lever: read row by row, the reader gives the comment's number only; read by rules, the
+        # comment only. Either way the row's Y or N is its company's view of the item named above the table
+        views = [("N", [("Delmar", "opposes")]), ("Y", [("CMCC", "supports")])]
+        for model in (RowsModel, CommentRules):
+            with self.subTest(model=model.__name__):
+                on = self.read(model, view_rows=True)
+                self.assertEqual(sorted(x for x in on if x[0] in ("Y", "N")), views)
+                self.assertEqual([x for x in self.read(model) if x[0] in ("Y", "N")], [])
+        # where the reader gives the yes or no itself (the rule reads it as "agreement"), nothing is added
+        self.assertEqual(sorted(x for x in self.read(view_rows=True) if x[0] in ("Y", "N")), views)
+
+    def test_a_view_needs_a_holder_a_yes_or_no_and_an_item_named_above(self):
+        from semantic_pdf_diff.stance import view_of
+        header, above = ["Company", "Y/\nN", "Comments"], "Above the table: ...Proposal 2.2: x. Table 2. Views"
+        self.assertEqual(view_of(header, ["vivo", "Yes", ""], above).entity, "Proposal 2.2")
+        self.assertIsNone(view_of(header, ["vivo", "Fine", ""], above))  # not a yes or a no
+        self.assertIsNone(view_of(header, ["vivo", "Y", ""], "Above the table: ...Table 2. Views"))  # no item
+        self.assertIsNone(view_of(["Option", "Y/N"], ["A", "Y"], above))  # no holder column
 
 if __name__ == "__main__":
     unittest.main()

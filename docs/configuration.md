@@ -132,6 +132,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `table_holders` | `true` | post | table_holders | extract | table |
 | `carried_holders` | `true` | post | carried_holders | extract | table |
 | `view_attitudes` | `true` | post | view_attitudes | extract | all |
+| `view_rows` | `false` | post | view_rows | extract | table |
 | `reconcile` | `true` | post | reconcile | - | - |
 | `dedupe_repeated` | `true` | shaping | dedupe_repeated | extract | all |
 | `continuations` | `3` | selecting | continue_reading | extract | figure, overview, tile, vision |

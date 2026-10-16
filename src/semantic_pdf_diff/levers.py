@@ -888,6 +888,20 @@ class ViewAttitudes(Lever):
         from .stance import as_view
         return as_view(claim)
 
+class ViewRows(Lever):
+    lever_name, stage, off = "view_rows", "matching", {"view_rows": False}
+    # with table_holders: a holder's yes or no in a "Company | Y/N | Comments" table is read without the model, as
+    # its view of the item the text above the table names, where the reader gives no yes or no of the row (stance.py).
+    # Applied as answers are stored
+    view_rows: Annotated[bool, Declared("post", EXTRACT, frozenset({"table"}))] = False
+
+    def table_view(self, header, row, context):
+        found = super().table_view(header, row, context)
+        if found is not None or not (self.view_rows and self.table_holders):
+            return found
+        from .stance import view_of
+        return view_of(header, row, context)
+
 class TableHolders(Lever):
     lever_name, stage, off = "table_holders", "matching", {"table_holders": False}
     # a table's holder column (Company, Source, Proponent...) holds every claim read from its row: the row's cell as
@@ -1028,8 +1042,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, ColumnConditions, 
                  SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks,
                  TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText,
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
-                 TableHolders, CarriedHolders, ViewAttitudes, Reconcile, DedupeRepeated, ContinueReading, Align,
-                 VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
+                 TableHolders, CarriedHolders, ViewAttitudes, ViewRows, Reconcile, DedupeRepeated, ContinueReading,
+                 Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1246,6 +1260,13 @@ class Platform(Composable):
     def held(self, claim):
         """A claim read with its holders (a stance), as stored: the platform's, as it is."""
         return claim
+
+    @chained
+    def table_view(self, header, row, context):
+        """The view a table row's yes-or-no cell states, as a claim its row's holder holds (or None), read even where
+        the reader gives none; header, row: its table's headers and the row's cells; context: the row's context
+        lines. The platform's, None."""
+        return None
 
     @chained
     def table_record(self, page_no, task, grid, context, box):
