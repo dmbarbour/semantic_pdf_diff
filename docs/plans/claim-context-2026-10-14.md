@@ -412,6 +412,13 @@ Before records are built, so each later milestone has a baseline. Almost all of 
 - **Alignment and the judge:** claims held by different parties don't pair; the same proposition with a changed holder or attitude is its own finding (design question 5).
 - **Measured:** holders and attitudes against keys (new controlled families: a holder changed between revisions, a view reported against the same words in the authors' voice, a hedge added or removed); the RAN1 pair's companies' views told apart.
 
+**Progress (2026-10-15; the owner: "Please proceed with milestone 5."):**
+- **Where views are reported, without the model** (the real pairs' recorded runs, before `records` was a default):
+  - The RAN1 feature-lead summaries are almost all reported views: 1,862 of the pair's 2,182 claims sit in companies' tables. "Company | Proposals" (16 tables, 246 rows: each company's proposals, quoted from its contribution) gives 1,151 claims, 110 of them naming a company (10%); "Company | Y/N | Comments" (12 tables and 278 rows, 29 and 387 by summary #3: each company's view on the moderator's proposals) gives 711, 221 naming one (31%, mostly as the entity: "CMCC | support for Proposal 3.2.4 | Y").
+  - So the holder is in the table's first column for every claim of its row, and the reader mostly drops it ("UE-side model report | reported beam count | > 4 | BM-Case 1 and BM-Case 2", Spreadtrum's); where it keeps it, a view is bound as a value of the company (entity CMCC, attribute "support for Proposal 3.2.4", value "Y") rather than as CMCC's stance on the proposal.
+  - TS 38.300 and QUIC report almost no one's views: a dozen claims in 13,309 and 4,558 name a company, mostly false matches ("New Cell").
+  - Counted by company names from the meeting's TDoc list and the tables' own row labels; tasks' row numbers don't count rows as python-docx does, so a claim's own row's company isn't checked, only whether it names one.
+
 ### 6. Drawing geometry
 
 - **First, a look without the model:** can dimension strings (a dimension line, extension lines, ticks or arrows, a label along the line) be found in the vector drawing of the corpus's sheets and the slices' real drawing sets? Real sets are stored turned 90° (25 of the slices' 103 pages), so directions are taken as displayed.
