@@ -252,5 +252,16 @@ class Hedges(unittest.TestCase):
         both = hedges_apart(Claim(**{**TIMEOUT, "conditions": "Preliminary estimates", "uncertainty": "± 5 ms"}))
         self.assertEqual((both.conditions, both.uncertainty), ("", "± 5 ms; Preliminary estimates"))
 
+
+class Voice(unittest.TestCase):
+    def test_the_documents_own_voice_is_no_holder(self):
+        from semantic_pdf_diff.stance import merged
+        read = lambda h: [Link(holder=h, attitude="proposes")]  # noqa: E731
+        for voice in ("moderator", "The Moderator", "Moderator (Samsung)", "design team", "the authors", "FL", "we"):
+            with self.subTest(voice):
+                self.assertEqual(merged((), read(voice)), [])
+        self.assertEqual([x.holder for x in merged((), read("Avelin [1]"))], ["Avelin"])
+        self.assertEqual([x.holder for x in merged((), read("Moderna"))], ["Moderna"])  # a company, not a moderator
+
 if __name__ == "__main__":
     unittest.main()

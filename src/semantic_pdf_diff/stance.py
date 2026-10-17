@@ -49,14 +49,22 @@ def table_holder(header, row, above=(), carried=False):
     attitude = "proposes" if any(PROPOSALS.search(h) for k, h in enumerate(names) if k != col) else ""
     return (Link(holder=holder[:120], attitude=attitude),)
 
+# The document's own voice, which the reader may name as a holder though it holds no reported view: its authors, its
+# editor, a moderator or feature lead summarising, a design team writing ("The design team proposes")
+VOICE = re.compile(r"^\s*(?:the\s+)?(?:moderator|feature\s+lead|fl|rapporteur|chair(?:man|person)?|editors?|authors?|"
+                   r"design\s+team|project\s+team|writers?|we|us|this\s+(?:document|summary|report|paper))(?:'s)?"
+                   r"(?:\s*\([^)]*\))?\s*$", re.I)
+
 def merged(row, read):
     """A claim's stance from its row's holder column (row) and the reader's answer (read): the row's holders, each
     given the reader's first attitude where it has none (the reader names a holder as printed, "Xiaomi [12]", and a
-    summary renumbers its references); without a row's, the reader's, reference marks left out."""
+    summary renumbers its references); without a row's, the reader's, reference marks left out, and none that is the
+    document's own voice (VOICE: a moderator, the authors, a design team)."""
     if row:
         attitude = next((x.attitude for x in read if x.attitude), "")
         return [x.model_copy(update={"attitude": attitude}) if attitude and not x.attitude else x for x in row]
-    return [x.model_copy(update={"holder": " ".join(REFERENCE.sub("", x.holder).split()) or x.holder}) for x in read]
+    named = [x.model_copy(update={"holder": " ".join(REFERENCE.sub("", x.holder).split()) or x.holder}) for x in read]
+    return [x for x in named if not VOICE.match(x.holder)]
 
 YES = {"y", "yes", "support", "supported", "supports", "agree", "agreed", "ok"}
 NO = {"n", "no", "not supported", "not support", "object", "objects", "disagree", "oppose", "opposed"}
