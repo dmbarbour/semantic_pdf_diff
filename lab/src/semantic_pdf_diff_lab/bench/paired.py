@@ -41,7 +41,7 @@ DIRECTION = {"facts right": 1, "facts found": 1, "claims right": 1, "relations r
              **{f"claims {o}": -1 for o in CLAIM_OUTCOMES if o != "right"},
              **{f"relations {o}": -1 for o in RELATION_OUTCOMES if o not in ("right", "unscored")},
              **{f"{k} kept": 1 for k in KEPT}, "frame in its field": 1, "holder in its stance": 1,
-             "attitude in its stance": 1,
+             "attitude in its stance": 1, "hedge said": 1, "hedge in uncertainty": 1,
              "sibling misapplied": -1}
 LEVEL = 0.1      # a change counts at p below this, two-sided
 DRAWS = 20_000   # sign-flip draws beyond exact enumeration
@@ -65,6 +65,9 @@ def measures(key, claims, records=None):
     out["frame in its field"] = placed.get("frame", {}).get("frame", 0)
     out["holder in its stance"] = placed.get("holder", {}).get("stance", 0)
     out["attitude in its stance"] = keyed.get("attitudes", {}).get("in its stance", 0)
+    hedges = keyed.get("hedges", {})  # a keyed hedge (milestone 5): said anywhere, and where it lives (uncertainty)
+    out["hedge said"] = sum(n for where, n in hedges.items() if where != "nowhere")
+    out["hedge in uncertainty"] = hedges.get("uncertainty", 0)
     out["sibling misapplied"] = sum(n for where, n in placed.get("sibling", {}).items() if where in MISAPPLIED)
     return out, found
 
