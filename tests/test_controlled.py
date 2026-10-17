@@ -649,6 +649,13 @@ class Echoes(unittest.TestCase):
         self.assertEqual(score("different")["changes_found"], "1/1")
         self.assertEqual(score("equivalent")["detail"]["mod.3.1"], "called equivalent")
         self.assertEqual(score("different")["detail"]["mod.3.2"], "unextracted")  # its claims: none here
+        # unlabeled (the reader told a label is no holder may leave it out): the document's voice, held by no one
+        unlabeled = [{**e, "quote": e["quote"].removeprefix("Proposal 3.1: ")} for e in evidence]
+        held = {**unlabeled[1], "id": "b0", "stance": [{"holder": "Avelin", "attitude": "proposes"}]}
+        report = {**report, "evidence": unlabeled[:1] + [held] + unlabeled[1:]}
+        self.assertEqual(score("different")["changes_found"], "1/1")
+        report["findings"] = [{"a": "a1", "b": "b0", "relation": "different"}]
+        self.assertEqual(comparison.score_comparison(*keys, report)["echoes"]["detail"]["mod.3.1"], "unpaired")
 
 class ComparisonScoring(unittest.TestCase):
     """A report's findings against the key's changes, on the treatment plant's pair."""

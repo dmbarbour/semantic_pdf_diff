@@ -275,7 +275,7 @@ def score(key_data, claims):
         result["views"] = score_views(key_data["views"], claims)
     if key_data.get("echoes"):  # the document's own proposals repeating a holder's value (views.py)
         from .views import score_echoes
-        result["echoes"] = score_echoes(key_data["echoes"], claims)
+        result["echoes"] = score_echoes(key_data["echoes"], claims, key_data["facts"])
     return result
 
 def facts_found(key_data, claims):

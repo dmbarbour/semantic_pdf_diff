@@ -14,8 +14,9 @@ Of the views found right, how many hold their holder in the claim's stance (not 
 and with the keyed attitude (supports, opposes).
 
 Echoes (corpus.proposals_echoed: Project.echoes): the document's own proposals (a moderator's) in a holder's words
-and value, keyed apart since the value names the holder's fact too; a claim reads one when it names its label
-("Proposal 3.1", in its quote or words) and gives its value.
+and value, keyed apart since the value names the holder's fact too; a claim reads one when it gives its value and
+names its label ("Proposal 3.1", in its quote or words), or, unlabeled, is held by no one, names no holder, and names
+the echoed fact's attribute.
 
 On a revision pair, each claim of a view (right or flipped) is bound to it, and each claim of an echo to it, and
 each classed by what the report's findings say of its claims, as comparison.py classes facts: a view turned round
@@ -101,21 +102,33 @@ def score_views(views, claims):
             "outcomes": dict(sorted(outcomes.items())), "holder_in_stance": len(in_stance),
             "attitude_in_stance": len(attitude)}
 
-def _echo_of(claim, echoes):
-    """The echo (the document's own proposal repeating a holder's value) a claim reads, by its label in the claim's
-    quote or words and its value, or None."""
+def _echo_of(claim, echoes, facts=()):
+    """The echo (the document's own proposal repeating a holder's value) a claim reads, by its value and its label in
+    the claim's quote or words, or None. Without the label, a claim held by no one and naming none of the key's
+    holders, of the echo's value, reads it where it names the echoed fact's attribute (the reader told a proposal's
+    label is no holder may leave it out: the document's own voice still says it)."""
     from semantic_pdf_diff.values import parse_number
     said = " ".join(str(claim.get(k, "") or "") for k in ("quote", "entity", "attribute", "conditions"))
     number = parse_number(str(claim.get("value", "")))
+    if number is None:
+        return None
+    by_id = {f["id"]: f for f in facts}
+    holders = {f["holder"] for f in facts if f.get("holder")}
+    unheld = not claim.get("stance") and not any(f" {_fold(h)} " in f" {_fold(said)} " for h in holders)
+    named = f" {_fold(claim.get('entity'))} {_fold(claim.get('attribute'))} "
     for e in echoes:
-        if re.search(rf"(?<![\w.]){re.escape(e['proposition'])}(?![\w.]|\.\d)", said, re.I) \
-                and number is not None and number == parse_number(e["value"]):
+        if number != parse_number(e["value"]):
+            continue
+        if re.search(rf"(?<![\w.]){re.escape(e['proposition'])}(?![\w.]|\.\d)", said, re.I):
+            return e["id"]
+        fact = by_id.get(e.get("echoes"))
+        if unheld and fact and any(f" {_fold(n)} " in named for n in [fact["attribute"], *fact.get("synonyms", ())]):
             return e["id"]
     return None
 
-def score_echoes(echoes, claims):
-    """The echoes a run's claims read (bound by label and value), of the key's."""
-    found = {_echo_of(c, echoes) for c in claims} - {None}
+def score_echoes(echoes, claims, facts=()):
+    """The echoes a run's claims read (bound as _echo_of binds them), of the key's."""
+    found = {_echo_of(c, echoes, facts) for c in claims} - {None}
     return {"echoes": len(echoes), "found": len(found), "missed": sorted({e["id"] for e in echoes} - found)}
 
 def score_echoes_compared(earlier, later, report, side):
@@ -125,7 +138,8 @@ def score_echoes_compared(earlier, later, report, side):
     echoes = [{e["id"]: e for e in k.get("echoes", [])} for k in keys]
     changed = sorted(i for i in echoes[0].keys() & echoes[1].keys() if echoes[0][i]["value"] != echoes[1][i]["value"])
     kept = sorted(i for i in echoes[0].keys() & echoes[1].keys() if i not in changed)
-    bound = {e["id"]: _echo_of(e, list(echoes[side[e["id"]]].values())) for e in report["evidence"]}
+    bound = {e["id"]: _echo_of(e, list(echoes[side[e["id"]]].values()), keys[side[e["id"]]].get("facts", ()))
+             for e in report["evidence"]}
     return _classed(report, side, bound, changed, kept)
 
 def score_compared(earlier, later, report, side):
