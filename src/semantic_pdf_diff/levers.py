@@ -912,7 +912,7 @@ class HedgesApart(Lever):
     # a hedge a reader put in a claim's conditions ("tentative", "working assumption", "preliminary estimates") moved
     # to its uncertainty, the source's stated uncertainty: conditions keep scope
     # (docs/plans/claim-context-2026-10-14.md, Stance: where a hedge lives, for now). Applied as answers are stored
-    hedges_apart: Annotated[bool, Declared("post", EXTRACT)] = False
+    hedges_apart: Annotated[bool, Declared("post", EXTRACT)] = True
 
     def stated(self, claim):
         claim = super().stated(claim)
@@ -1057,7 +1057,7 @@ class DedupeRepeated(Lever):
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes,
-# view_rows and align_hedges (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
+# view_rows, align_hedges and hedges_apart (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, ColumnConditions, ConditionsByColumn, ExtractRules,
                  VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext,
                  References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty,

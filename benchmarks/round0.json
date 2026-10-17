@@ -85,6 +85,7 @@
   "view_attitudes": false,
   "view_rows": false,
   "align_hedges": false,
+  "hedges_apart": false,
   "decoration": false,
   "tile_choice": "off",
   "skip_text_only": false,

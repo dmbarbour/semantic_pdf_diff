@@ -4,7 +4,7 @@
    "claims": 21134,
    "evidence": 11828,
    "frame in conditions": 76,
-   "grounded": 6047,
+   "grounded": 5992,
    "list records": 36,
    "no content words": 3,
    "note records": 11,
@@ -17,9 +17,9 @@
    "printed": 7466,
    "sheet records": 11,
    "table records": 303,
-   "unsupported": 34,
+   "unsupported": 25,
    "unsupported (image)": 806,
-   "with conditions": 6994,
+   "with conditions": 6930,
    "with records": 6245
   },
   "placed": {
@@ -92,8 +92,8 @@
    "none": 59
   },
   "hedges": {
-   "conditions": 40,
-   "nowhere": 10
+   "nowhere": 10,
+   "uncertainty": 40
   },
   "reliability": {
    "all": {
@@ -1822,20 +1822,15 @@
   "hedges-s1": {
    "inventory": {
     "claims": 35,
-    "grounded": 22,
-    "unsupported": 1,
-    "with conditions": 23,
+    "grounded": 7,
+    "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
     "printed": 14,
     "evidence": 16,
     "context_bytes_per_request": 240,
     "data_bytes_per_request": 350,
-    "examples": {
-     "unsupported": [
-      "send window | size | tentative"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
@@ -1843,7 +1838,7 @@
     "named": {},
     "hedges": {
      "nowhere": 1,
-     "conditions": 4
+     "uncertainty": 4
     },
     "examples": {}
    }
@@ -1851,27 +1846,22 @@
   "hedges-s1-revised": {
    "inventory": {
     "claims": 35,
-    "grounded": 21,
-    "unsupported": 1,
-    "with conditions": 22,
+    "grounded": 6,
+    "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
     "printed": 14,
     "evidence": 15,
     "context_bytes_per_request": 240,
     "data_bytes_per_request": 349,
-    "examples": {
-     "unsupported": [
-      "send window | size | tentative"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
     "audit": {},
     "named": {},
     "hedges": {
-     "conditions": 4,
+     "uncertainty": 4,
      "nowhere": 1
     },
     "examples": {}
@@ -1880,27 +1870,20 @@
   "hedges-s1-revised.docx": {
    "inventory": {
     "claims": 9,
-    "grounded": 3,
-    "unsupported": 1,
-    "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
     "printed": 5,
     "evidence": 9,
     "context_bytes_per_request": 486,
     "data_bytes_per_request": 162,
-    "examples": {
-     "unsupported": [
-      "send window | size | tentative"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
     "audit": {},
     "named": {},
     "hedges": {
-     "conditions": 4,
+     "uncertainty": 4,
      "nowhere": 1
     },
     "examples": {}
@@ -1909,27 +1892,20 @@
   "hedges-s1-revised.md": {
    "inventory": {
     "claims": 9,
-    "grounded": 3,
-    "unsupported": 1,
-    "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
     "printed": 6,
     "evidence": 9,
     "context_bytes_per_request": 613,
     "data_bytes_per_request": 164,
-    "examples": {
-     "unsupported": [
-      "send window | size | tentative"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
     "audit": {},
     "named": {},
     "hedges": {
-     "conditions": 4,
+     "uncertainty": 4,
      "nowhere": 1
     },
     "examples": {}
@@ -1938,9 +1914,8 @@
   "hedges-s1-revised.pptx": {
    "inventory": {
     "claims": 9,
-    "grounded": 5,
-    "unsupported": 1,
-    "with conditions": 6,
+    "grounded": 2,
+    "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -1951,18 +1926,14 @@
     "evidence": 9,
     "context_bytes_per_request": 500,
     "data_bytes_per_request": 136,
-    "examples": {
-     "unsupported": [
-      "send window | size | tentative"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
     "audit": {},
     "named": {},
     "hedges": {
-     "conditions": 4,
+     "uncertainty": 4,
      "nowhere": 1
     },
     "examples": {}
@@ -1971,8 +1942,6 @@
   "hedges-s1-revised.xlsx": {
    "inventory": {
     "claims": 9,
-    "grounded": 4,
-    "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
     "printed": 6,
@@ -1986,7 +1955,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "conditions": 4,
+     "uncertainty": 4,
      "nowhere": 1
     },
     "examples": {}
@@ -1995,20 +1964,13 @@
   "hedges-s1.docx": {
    "inventory": {
     "claims": 9,
-    "grounded": 3,
-    "unsupported": 1,
-    "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
     "printed": 5,
     "evidence": 9,
     "context_bytes_per_request": 486,
     "data_bytes_per_request": 162,
-    "examples": {
-     "unsupported": [
-      "send window | size | tentative"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
@@ -2016,7 +1978,7 @@
     "named": {},
     "hedges": {
      "nowhere": 1,
-     "conditions": 4
+     "uncertainty": 4
     },
     "examples": {}
    }
@@ -2024,20 +1986,13 @@
   "hedges-s1.md": {
    "inventory": {
     "claims": 9,
-    "grounded": 3,
-    "unsupported": 1,
-    "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
     "printed": 6,
     "evidence": 9,
     "context_bytes_per_request": 613,
     "data_bytes_per_request": 165,
-    "examples": {
-     "unsupported": [
-      "send window | size | tentative"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
@@ -2045,7 +2000,7 @@
     "named": {},
     "hedges": {
      "nowhere": 1,
-     "conditions": 4
+     "uncertainty": 4
     },
     "examples": {}
    }
@@ -2053,9 +2008,8 @@
   "hedges-s1.pptx": {
    "inventory": {
     "claims": 9,
-    "grounded": 5,
-    "unsupported": 1,
-    "with conditions": 6,
+    "grounded": 2,
+    "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -2066,11 +2020,7 @@
     "evidence": 9,
     "context_bytes_per_request": 502,
     "data_bytes_per_request": 137,
-    "examples": {
-     "unsupported": [
-      "send window | size | tentative"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
@@ -2078,7 +2028,7 @@
     "named": {},
     "hedges": {
      "nowhere": 1,
-     "conditions": 4
+     "uncertainty": 4
     },
     "examples": {}
    }
@@ -2086,20 +2036,13 @@
   "hedges-s1.xlsx": {
    "inventory": {
     "claims": 9,
-    "grounded": 3,
-    "unsupported": 1,
-    "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
     "printed": 5,
     "evidence": 9,
     "context_bytes_per_request": 341,
     "data_bytes_per_request": 117,
-    "examples": {
-     "unsupported": [
-      "send window | size | tentative"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
@@ -2107,7 +2050,7 @@
     "named": {},
     "hedges": {
      "nowhere": 1,
-     "conditions": 4
+     "uncertainty": 4
     },
     "examples": {}
    }
