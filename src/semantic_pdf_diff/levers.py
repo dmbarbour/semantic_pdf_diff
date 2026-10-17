@@ -229,8 +229,15 @@ class HedgeRule(Lever):
 # afford it."): sources unlike the corpus's, each with the claims read from it, showing scope, frame, a tolerance, a
 # hedge and a limit apart; with read_holders, a reported view and the document's own voice. Static, after the fixed
 # instructions: a provider caching a prompt's prefix caches them too.
-def _example(region, data, claims):
-    return f"Source type: {region}\nSOURCE DATA:\n{data}\nClaims: {json.dumps(claims, ensure_ascii=False)}\n"
+def _example(n, source, claims):
+    return f"Example {n}, {source}\nClaims read from it: {json.dumps({'claims': claims}, ensure_ascii=False)}\n"
+
+# How the examples are fenced off from the request: in their first form they repeated its "Source type: ... SOURCE
+# DATA:" markers and ended in claims, so a row request that followed read as one more example still unanswered, and
+# 580 of 662 table rows were answered "No source data provided" (b63, 2026-10-17)
+EXAMPLES_HEAD = ("\nWORKED EXAMPLES: other sources, not the one to read, each with the claims read from it, to show "
+                 "how the fields are filled.\n")
+EXAMPLES_END = "End of the worked examples. The source to read follows: read only that one."
 
 def worked_examples(frame=True, holders=False):
     """The worked examples' text for the fields in force: frame (split_conditions), stance (read_holders)."""
@@ -244,32 +251,35 @@ def worked_examples(frame=True, holders=False):
         if holders:
             out["stance"] = stance or []
         return {**out, "kind": kind, "quote": quote, "confidence": 0.95, "approximate": False}
-    text = "At design flow the cooling tower fan is expected to draw 42 kW. The basin heater is rated 6 kW."
     examples = [
-        _example("text", text, [
+        ("a text source: \"At design flow the cooling tower fan is expected to draw 42 kW. The basin heater is rated "
+         "6 kW.\"", [
             claim("cooling tower fan", "power draw", "42", "kW", "text",
                   "At design flow the cooling tower fan is expected to draw 42 kW.", conditions="at design flow",
                   uncertainty="expected"),
             claim("basin heater", "rated power", "6", "kW", "text", "The basin heater is rated 6 kW.")]),
-        _example("table", 'Header: ["Parameter", "Value", "Status"]\nRow: ["Relief valve set pressure", "150 psig", '
-                          '"Working assumption"]', [
+        ("a table row: header [\"Parameter\", \"Value\", \"Status\"], row [\"Relief valve set pressure\", "
+         "\"150 psig\", \"Working assumption\"]", [
             claim("relief valve", "set pressure", "150", "psig", "table", "Relief valve set pressure | 150 psig",
                   uncertainty="working assumption")]),
-        _example("text", "On level 2 the east corridor is 2.4 m wide, measured to face of finish. The booster pump "
-                         "shall deliver at least 300 gpm ± 5 gpm.", [
+        ("a text source: \"On level 2 the east corridor is 2.4 m wide, measured to face of finish. The booster pump "
+         "shall deliver at least 300 gpm ± 5 gpm.\"", [
             claim("east corridor", "width", "2.4", "m", "text", "the east corridor is 2.4 m wide",
                   conditions="on level 2", frame_="to face of finish"),
             claim("booster pump", "minimum flow", "at least 300", "gpm", "text",
                   "shall deliver at least 300 gpm ± 5 gpm", uncertainty="± 5 gpm")]),
     ]
     if holders:
-        examples.append(_example("text", "Halvern [3] proposes a relief pressure of 165 psig. The working group "
-                                         "recommends 160 psig.", [
-            claim("relief valve", "set pressure", "165", "psig", "text",
-                  "Halvern [3] proposes a relief pressure of 165 psig.",
-                  stance=[{"holder": "Halvern", "attitude": "proposes"}]),
-            claim("relief valve", "set pressure", "160", "psig", "text", "The working group recommends 160 psig.")]))
-    return "\nWORKED EXAMPLES (other sources, each with the claims read from it):\n" + "\n".join(examples)
+        examples.append((
+            "a text source: \"Halvern [3] proposes a relief pressure of 165 psig. The working group recommends 160 "
+            "psig.\"", [
+                claim("relief valve", "set pressure", "165", "psig", "text",
+                      "Halvern [3] proposes a relief pressure of 165 psig.",
+                      stance=[{"holder": "Halvern", "attitude": "proposes"}]),
+                claim("relief valve", "set pressure", "160", "psig", "text",
+                      "The working group recommends 160 psig.")]))
+    return EXAMPLES_HEAD + "".join(_example(n, source, claims) for n, (source, claims) in enumerate(examples, 1)) \
+        + EXAMPLES_END
 
 class WorkedExamples(Lever):
     lever_name, stage, off = "worked_examples", "instructions", {"worked_examples": False}
