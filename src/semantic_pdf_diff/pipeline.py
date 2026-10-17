@@ -69,6 +69,8 @@ class RunOptions:
     fresh_regions: tuple = ()         # the A/A control's regions, answered afresh
     ledger: Path | None = None        # every response's reported cost appended here
     ledger_tags: dict = field(default_factory=dict)
+    export: Path | None = None        # a .sqlite fixture every answer served or recorded is copied into (in fresh
+                                      # stores: a store holding a region's claims asks nothing for it)
 
     @classmethod
     def from_args(cls, args):
@@ -76,7 +78,7 @@ class RunOptions:
         return cls(mode=get("mode", "proposals"), reset=bool(get("reset", False)), dry_run=bool(get("dry_run", False)),
                    fixture=get("fixture"), fixture_mode=get("fixture_mode"), responder=get("responder"),
                    fresh_regions=tuple(r for r in (get("fresh_regions", "") or "").split(",") if r),
-                   ledger=get("ledger"),
+                   ledger=get("ledger"), export=get("fixture_export"),
                    ledger_tags=dict(t.split("=", 1) for t in (get("ledger_tag", []) or []) if "=" in t))
 
     @property
@@ -284,7 +286,10 @@ def make_client(options, settings, store):
     fixture = None
     if options.fixture:
         try:
-            fixture = fixtures.open(options.fixture, 'replay' if options.answers_mode == 'replay' else 'record')
+            # an export's source, replayed, is only read: what it served is in the export, not in use marks
+            mode = 'record' if options.answers_mode != 'replay' else 'read' if options.export else 'replay'
+            fixture = fixtures.open(options.fixture, mode)
+            export = fixtures.open(options.export, 'record') if options.export else None
         except fixtures.FixtureError as e:
             raise ValueError(str(e)) from e
         if options.answers_mode != 'replay':  # text and rendering depend on it: replay tests compare versions
@@ -294,7 +299,7 @@ def make_client(options, settings, store):
         return attach_ledger(Client(settings, store), options)
     fresh = list(options.fresh_regions)
     return attach_ledger(Client(settings, store, fixture=fixture, mode=options.answers_mode,
-                                responder=options.responder, fresh_regions=fresh), options)
+                                responder=options.responder, fresh_regions=fresh, export=export), options)
 
 def fixture_usage(client, given=None):
     """The fixture's counts, under the path it was given (a .zip is read from a temporary copy)."""

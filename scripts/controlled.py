@@ -30,9 +30,10 @@ milestone 2): misplaced context and conditions grounded in what each request sho
 by kind, where each kind landed and, where it was lost, whether the request showed it; and the reader's confidence
 against the keys, band by band. Into context.json.
 
-Recording adds to the working fixture (fixture.sqlite, git-ignored), which keeps every answer ever recorded. `pack`
-writes the committed replay.zip: the standard runs are replayed from fresh stores against a copy of the fixture, and
-only the answers they use are packed (the --unaligned runs' answers and superseded ones stay local).
+Recording adds to the working fixture (fixture.sqlite, git-ignored), an archive keeping every answer ever recorded,
+every variant's. `pack` exports the committed replay.zip from it: the standard runs replay from fresh stores, reading
+the archive, and every answer they're served is copied into a new fixture, which is packed (the --unaligned runs'
+answers, other variants' and superseded ones stay in the archive). Nothing is pruned.
 """
 import argparse
 import contextlib
@@ -82,7 +83,7 @@ def main(argv=None):
     running.add_argument("--unaligned", action="store_true", help="only the PDF pairs, compared with alignment off")
     running.add_argument("--rows", action="store_true", help="every document, its tables read row by row")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
-    sub.add_parser("pack", help="pack the answers the standard runs replay into replay.zip (offline)")
+    sub.add_parser("pack", help="export the answers the standard runs replay into replay.zip (offline)")
     sub.add_parser("context", help="measure the standard runs' claims' context against the keys (offline)")
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.bench import controlled
@@ -114,43 +115,43 @@ def main(argv=None):
     return score()
 
 def pack():
-    """replay.zip from the working fixture: the standard runs replayed from fresh stores against a copy, which marks
-    the answers they use, and only those packed."""
-    import shutil
+    """replay.zip exported from the archive: the standard runs replayed from fresh stores, reading the archive, and
+    the answers they're served copied into a new fixture, packed."""
     import tempfile
-    from datetime import datetime, timezone
     from semantic_pdf_diff import fixtures
     with tempfile.TemporaryDirectory() as d:
         d = Path(d)
-        copy = d / "fixture.sqlite"
-        shutil.copy(WORKING, copy)
-        start = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        export = d / "export" / "fixture.sqlite"  # the packed member's name
+        export.parent.mkdir()
         said = io.StringIO()
         with contextlib.redirect_stdout(said):
-            code = run(True, None, 0, False, fixture=copy, runs=d / "runs", pair_runs=d / "pairs")
+            code = run(True, None, 0, False, fixture=WORKING, runs=d / "runs", pair_runs=d / "pairs", export=export)
             if code in (0, 2):
-                code = max(code, run(True, None, 0, False, fixture=copy, runs=d / "runs", pair_runs=d / "pairs",
-                                     rows=True))
+                code = max(code, run(True, None, 0, False, fixture=WORKING, runs=d / "runs", pair_runs=d / "pairs",
+                                     rows=True, export=export))
         if code not in (0, 2):
             failed = [line for line in said.getvalue().splitlines() if "exit 1" in line or "fixture holds" in line]
             print(f"the replay failed (exit {code}): nothing packed\n  " + "\n  ".join(failed[:20]))
             return code
-        with fixtures.open(copy, "record") as f:
-            dropped = f.prune(start, force=True)["answers_removed"]
-        fixtures.pack(copy, PACKED)
-    print(f"packed {PACKED}: {dropped} answers the standard runs don't use left out")
+        fixtures.pack(export, PACKED)
+        with fixtures.open(export, "read") as f, fixtures.open(WORKING, "read") as archive:
+            count = lambda x: x.db.execute("SELECT COUNT(*) FROM response").fetchone()[0]  # noqa: E731
+            kept, held = count(f), count(archive)
+    print(f"packed {PACKED}: {kept} answers exported of the archive's {held}")
     return 0
 
-def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=RUNS, pair_runs=PAIR_RUNS, rows=False):
+def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=RUNS, pair_runs=PAIR_RUNS, rows=False,
+        export=None):
     """Every document read alone, then every revision pair compared: recorded into the working fixture, or replayed
-    (from replay.zip, or `fixture`) into fresh or existing stores under runs and pair_runs."""
+    (from replay.zip, or `fixture`) into fresh or existing stores under runs and pair_runs; with `export`, every
+    answer served or recorded also copied into that fixture."""
     from semantic_pdf_diff import fixtures, ledger, pipeline
     from semantic_pdf_diff.progress import setup_logging
     fixture = fixture or (PACKED if replay else WORKING)
     out = runs / ("replay" if replay else "recorded")
     if replay and not responder:  # the responder the fixture holds, whatever the environment says
         with fixtures.open(fixture, "read") as f:
-            held = f.responders()
+            held = f.responders(answered=True)
         if len(held) != 1:
             (error or print)(f"the fixture holds {held}: name one with --responder")
             return 1
@@ -183,7 +184,7 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
                 for a, b, folder, name, mode in jobs if a.suffix in (".xlsx", ".docx", ".pptx", ".pdf")]
         overrides = {"table_rules": None}
     for a, b, folder, name, mode in jobs:
-        options = pipeline.RunOptions(mode=mode, fixture=fixture,
+        options = pipeline.RunOptions(mode=mode, fixture=fixture, export=export,
                                       fixture_mode="replay" if replay else "record-new", responder=responder)
         if replay:  # the model named as recorded, whatever the environment says (its name is in the stores' binding)
             settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL, model=responder,

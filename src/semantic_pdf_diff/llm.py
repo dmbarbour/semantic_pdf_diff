@@ -390,14 +390,16 @@ class Client:
     2026-10-02).
     """
     def __init__(self, settings: "Settings", store, api_key: str | None = None, fixture=None, mode="replay",
-                 responder=None, fresh_regions=None):
+                 responder=None, fresh_regions=None, export=None):
         """fixture: an open fixtures.Fixture, replayed under its policy (fixtures.Replayer: mode, responder,
         fresh_regions). In `replay` mode answers come only from it and unrecorded requests fail; in
         `replay-or-record` mode unrecorded requests (and recorded failures) go to the model and are recorded under
         `responder` (default: the model name); `record-new` is the same but replays the model's failures as
-        failures (transient ones are asked again)."""
+        failures (transient ones are asked again). export: an open fixture every answer served or recorded is
+        copied into (fixtures.Replayer)."""
         self.s = settings
-        self.replay = None if fixture is None else Replayer(fixture, mode, responder or settings.model, fresh_regions)
+        self.replay = None if fixture is None else Replayer(fixture, mode, responder or settings.model, fresh_regions,
+                                                            export=export)
         if isinstance(store, (str, Path)):
             raise TypeError("a client caches in a store (store.Store) or not at all: the folder cache is gone")
         self.store = store

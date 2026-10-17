@@ -179,6 +179,10 @@ def add_run_options(parser):
                                ".sqlite file's default): ask the model and record, recorded failures asked again; "
                                'record-new: record only requests never asked')
     recorded.add_argument('--responder', help='Whose recorded answers to use or record (default: the model name)')
+    recorded.add_argument('--fixture-export', type=Path, metavar='FILE',
+                          help='Copy every answer this run is served or records into this .sqlite fixture (created '
+                               'if missing), to pack instead of pruning the source; with a new --store, since a '
+                               'store already holding a region asks nothing for it')
     recorded.add_argument('--fresh-regions', default='', metavar='REGIONS',
                           help='A/A control: answer extraction for these regions (e.g. tile,figure,overview) afresh, '
                                'as a second sample of each query')
@@ -310,6 +314,9 @@ def fixtures_parser():
                                          "same queries, so the same answers: a variant's recording seeds another's)")
     merge.add_argument('fixture', type=Path, help='the .sqlite working fixture, created if missing')
     merge.add_argument('sources', type=Path, nargs='+', help='.zip or .sqlite fixtures')
+    merge.add_argument('--prefer', action='store_true',
+                       help="the sources' answers replace the fixture's own to the same queries (a committed zip "
+                            'merged into its archive)')
     return parser
 
 def fixtures_command(argv):
@@ -320,7 +327,7 @@ def fixtures_command(argv):
             return 1
         with fixtures.open(args.fixture, 'record') as fixture:
             try:
-                added = {str(source): fixture.merge(source) for source in args.sources}
+                added = {str(source): fixture.merge(source, prefer=args.prefer) for source in args.sources}
             except (fixtures.FixtureError, OSError) as e:
                 print(e, file=sys.stderr)
                 return 1

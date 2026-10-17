@@ -83,7 +83,7 @@ class OpenModes(unittest.TestCase):
                 self.assertEqual(cli.fixtures_command(['merge', str(working), str(packed), str(other)]), 0)
             self.assertEqual(json.loads(out.getvalue()), {'answers_added': {str(packed): 1, str(other): 0}})
             with fixtures.open(working, 'read') as f:
-                self.assertEqual(f.answer('q1', 'm')[1], '"mine"')  # an answer held is kept
+                self.assertEqual(f.answer('q1', 'm')[1], '"mine"')  # an answer held is kept (recorded the same day)
                 self.assertEqual(f.answer('q2', 'm')[1], '"new"')
                 self.assertEqual(f.summary()['answers'][-1]['role'], 'extract')  # with its side tables' rows
                 used = f.db.execute("SELECT used FROM response WHERE query = 'q2'").fetchone()[0]
@@ -91,6 +91,11 @@ class OpenModes(unittest.TestCase):
             with contextlib.redirect_stderr(io.StringIO()) as err:
                 self.assertEqual(cli.fixtures_command(['merge', str(packed), str(other)]), 1)
             self.assertIn('merge into a .sqlite', err.getvalue())
+            # preferred: a committed zip merged into its archive replaces a variant's later answer to the same query
+            # (an archive kept its arms' answers over the committed ones, and replayed 28 of them differently)
+            with fixtures.open(working, 'record') as f:
+                self.assertEqual(f.merge(packed, prefer=True), 0)
+                self.assertEqual(f.answer('q1', 'm')[1], '"theirs"')
 
     def test_the_replay_policy_counts_what_it_serves(self):
         from semantic_pdf_diff import fixtures
@@ -380,6 +385,70 @@ class RecordAndReplay(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn('pack it', log)
 
+
+    def test_an_export_holds_exactly_what_a_replay_served_and_leaves_the_archive_alone(self):
+        # recording tooling (2026-10-17): a committed zip exported from an archive, instead of pruned in place
+        _, live, _ = self.record()
+        with sqlite3.connect(self.fixture) as db:  # an answer to another variant's query, kept in the archive
+            db.execute("INSERT INTO response SELECT 'other variant', responder, sample, outcome, answer, error, usage, "
+                       "recorded, NULL FROM response LIMIT 1")
+            before = db.execute("SELECT * FROM response ORDER BY query").fetchall()
+        export = self.root / 'export' / 'f.sqlite'
+        export.parent.mkdir()
+        code, replayed, _ = self.run_cli('exported', UNREACHABLE, '--fixture', str(self.fixture),
+                                         '--fixture-mode', 'replay', '--fixture-export', str(export))
+        self.assertEqual(self.outcome(replayed), self.outcome(live))
+        with sqlite3.connect(self.fixture) as db:
+            self.assertEqual(db.execute("SELECT * FROM response ORDER BY query").fetchall(), before)  # not marked
+        with sqlite3.connect(export) as db:
+            exported = {q for (q,) in db.execute("SELECT query FROM response")}
+            self.assertEqual(dict(db.execute("SELECT key, value FROM meta"))['pymupdf'],
+                             dict(sqlite3.connect(self.fixture).execute("SELECT key, value FROM meta"))['pymupdf'])
+        self.assertEqual(exported, {row[0] for row in before} - {'other variant'})
+        packed = self.root / 'exported.zip'
+        with contextlib.redirect_stdout(io.StringIO()):
+            cli.main(['fixtures', 'pack', str(export), str(packed)])
+        _, again, _ = self.run_cli('from-export', UNREACHABLE, '--fixture', str(packed))
+        self.assertEqual(self.outcome(again), self.outcome(live))
+        self.assertEqual(again['usage']['fixture']['missing'], 0)
+
+    def test_a_recording_exports_what_it_records_and_what_it_replays(self):
+        self.record()  # the archive: one variant's answers
+        export = self.root / 'variant.sqlite'
+        with jittery_model() as (url, state):  # another variant: more tiles, some queries new
+            code, report, _ = self.run_cli('variant', url, '--fixture', str(self.fixture), '--fixture-mode',
+                                           'record-new', '--fixture-export', str(export),
+                                           settings={'tile_points': 120})
+        self.assertGreater(state['requests'], 0)
+        _, again, _ = self.run_cli('variant-again', UNREACHABLE, '--fixture', str(export), '--fixture-mode', 'replay',
+                                   settings={'tile_points': 120})
+        self.assertEqual(self.outcome(again), self.outcome(report))
+        with sqlite3.connect(self.fixture) as archive, sqlite3.connect(export) as exported:
+            count = lambda db: db.execute('SELECT COUNT(*) FROM response').fetchone()[0]  # noqa: E731
+            self.assertLess(count(exported), count(archive))  # the archive keeps both variants'
+
+    def test_processes_record_into_one_fixture_at_once(self):
+        import multiprocessing
+        path = self.root / 'shared.sqlite'
+        from semantic_pdf_diff.fixtures import Fixture
+        Fixture(path, create=True).close()
+        context = multiprocessing.get_context('spawn')
+        workers = [context.Process(target=_record_many, args=(str(path), n)) for n in range(3)]
+        for w in workers:
+            w.start()
+        for w in workers:
+            w.join(60)
+        self.assertEqual([w.exitcode for w in workers], [0, 0, 0])
+        with sqlite3.connect(path) as db:
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM response').fetchone()[0], 300)
+
+
+def _record_many(path, worker):
+    """A process recording 100 answers into a shared fixture, one transaction each (test_processes_record...)."""
+    from semantic_pdf_diff.fixtures import Fixture
+    with Fixture(path) as f:
+        for i in range(100):
+            f.record(f'q{worker}-{i}', 'm', outcome='ok', answer='{}')
 
 class FolderFixtures(unittest.TestCase):
     def test_answers_survive_a_crash_and_are_packed_later(self):

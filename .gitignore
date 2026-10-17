@@ -38,3 +38,6 @@ benchmarks/real-pairs/replay.zip
 benchmarks/metafiles/
 # tile selection's measures and gallery (scripts/tiling.py): working data
 benchmarks/tiling/
+# SQLite write-ahead logs of working fixtures recorded by several processes at once
+*.sqlite-wal
+*.sqlite-shm

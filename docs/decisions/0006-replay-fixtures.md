@@ -33,4 +33,5 @@ Integration tests against a real model are slow, cost money and vary from run to
   - more than half the answers would go
 
   An unguarded prune once emptied the fixture.
-- How to record, top up, prune and pack: [samples and testing](../samples-and-testing.md#recorded-answers-replay-fixtures).
+- **Amended 2026-10-17 ([recording tooling](../plans/recording-tooling-2026-10-17.md)): committed zips are exported, not pruned.** Each corpus's working fixture is an archive keeping every variant's answers; a zip is the answers its runs are served, copied into a new fixture as they replay from fresh stores (`--fixture-export`, `record_runs.py --pack`, `controlled.py pack`). Pruning by last use stays, unneeded. Several processes may record into one archive at once (SQLite's write-ahead log).
+- How to record and export: [samples and testing](../samples-and-testing.md#recorded-answers-replay-fixtures).

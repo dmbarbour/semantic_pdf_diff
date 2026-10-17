@@ -70,23 +70,23 @@ The replay test skips without the slices, when the fixture was recorded from oth
 **Recording** calls the model configured through `OPENAI_*` and costs money. `scripts/record_runs.py` runs the slice runs live with a fixture attached:
 
 ```bash
-python scripts/record_runs.py --fixture tests/fixtures/slices.sqlite --set dev \
-    --ledger benchmarks/ledger.jsonl --tag step=record --max-cost 1
+python scripts/record_runs.py --fixture tests/fixtures/slices.sqlite --set dev --max-cost 1 \
+    --pack tests/fixtures/replay-slices.zip
 python scripts/record_runs.py --replay --fixture tests/fixtures/replay-slices.zip --out benchmarks/runs/baseline
 ```
 
-- **Into a working `.sqlite`** (git-ignored under `tests/fixtures/`). A `.zip` is for replay only.
-- **Modes:** by default `record-new`, which asks only what was never asked: the model's failures replay as failures, and transient ones (timeouts, server errors) are asked again. `--retry-failures` uses `replay-or-record`, which asks recorded failures again too. `--replay` asks nothing and fails on anything unrecorded.
-- **Resumable:** a rerun replays what's recorded. At `--max-cost` it stops with exit code 3.
+- **Into an archive:** each corpus's working `.sqlite` (git-ignored: `tests/fixtures/slices.sqlite`, the controlled corpus's `benchmarks/controlled/fixture.sqlite`, the real pairs' and the probes') keeps every answer ever recorded, every variant's. A query is named by what reaches the model, so variants' answers sit side by side. Several processes may record into one archive at once. A `.zip` is for replay only.
+- **Modes:** by default `record-new`, which asks only what was never asked: the model's failures replay as failures, and transient ones (timeouts, server errors) are asked again. `--retry-failures` uses `replay-or-record`, which asks recorded failures again too. `--replay` asks nothing and fails on anything unrecorded, as the fixture's own responder whatever the environment says.
+- **Resumable:** a rerun replays what's recorded. At `--max-cost` it stops with exit code 3. The spend goes to the repository's ledger (`--ledger` names another).
 - **Variants:** `--variant FILE` merges a settings JSON over the base settings. Every setting that can change a query is saved, resolved, in `<out>/settings.json`.
 
-**After a prompt or lever change, top up, prune and pack:**
+**The committed zip is exported, not pruned** (recording tooling, 2026-10-17):
 
-1. **Start from a working copy.** A packed zip holds one SQLite file: `unzip tests/fixtures/replay-slices.zip -d tests/fixtures` gives `tests/fixtures/fixture.sqlite`. Keep its name, since the zip records it.
-2. **Seed it, if a recording already holds the new answers** (a lever's measured arm, say): `pdf-semantic-diff fixtures merge tests/fixtures/fixture.sqlite ARM.sqlite` copies in the answers the working copy lacks, `.zip` or `.sqlite`, keeping those it holds. A query is named by what reaches the model, so a copied answer is the same model's answer to the same query. Copied answers count as unused until a run replays them.
-3. **Note the time,** then record the runs it serves into the working copy: `python scripts/record_runs.py --fixture tests/fixtures/fixture.sqlite --set dev`. Only changed queries are asked.
-4. **Prune:** `pdf-semantic-diff fixtures prune tests/fixtures/fixture.sqlite --unused-since TIME` drops answers no run used since then (`--dry-run` previews). Unless `--force` is given, it refuses when no run used the fixture since then, when a run missed requests, or when more than half the answers would go.
-5. **Pack:** `pdf-semantic-diff fixtures pack tests/fixtures/fixture.sqlite tests/fixtures/replay-slices.zip`. Packing is reproducible: last-use times aren't packed, so the zip's bytes change only when answers do.
+- **`--pack ZIP`** runs into fresh stores in a temporary folder and copies every answer the runs are served or record into a new fixture, which is packed. Recording and exporting is one command; with `--replay`, it exports again from the archive, asking nothing. The runs need fresh stores, since a store already holding a region's claims asks nothing for it.
+- **The controlled corpus:** `scripts/controlled.py pack` exports `replay.zip` from its archive the same way.
+- **The same runs export the same zip,** whatever else the archive holds: the answers they're served, their queries' descriptions and the recipes they noted. Packing is reproducible, so the zip's bytes change only when the runs' answers do.
+- **Merging:** `pdf-semantic-diff fixtures merge ARCHIVE SOURCE...` copies in the answers an archive lacks (an arm's copy, a colleague's recording), keeping the archive's own. `--prefer` lets the sources' answers win instead, for a committed zip merged into its archive: an archive holding a variant's later answer to a query would otherwise replay it in place of the committed one.
+- **Pruning** (`fixtures prune ARCHIVE --unused-since TIME`) still drops answers no run used since a time, with its guards, but nothing needs it.
 
 ## Proving a refactor changes nothing
 

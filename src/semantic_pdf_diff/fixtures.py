@@ -13,6 +13,11 @@ query's own content (`description`) and how the pipeline built it (`recipe`: rol
 task; possibly several per query). Each run's use of a working file is logged (`session`, not
 packed) for prune's guard.
 
+Exports (recording tooling, 2026-10-17): a working fixture is an archive, every answer any variant recorded kept; a
+committed zip is exported from it, the runs it serves replayed with every answer they're served (or record) copied
+into a new fixture (Replayer's `export`), which is packed. Nothing is pruned in place. Several processes may record
+into one working fixture at once (write-ahead log, waiting on each other's locks).
+
 Modes (see Client): `replay` serves recorded answers and fails on anything unrecorded;
 `replay-or-record` serves recorded answers and records live answers for the rest, asking
 recorded failures again; `record-new` records only what was never asked, replaying the model's
@@ -37,6 +42,7 @@ SCHEMA_VERSION = 4  # 2: failures recorded; 3: response.used; 4: keyed by the qu
 FOLDER_FIXTURE = "replay.zip"
 FOLDER_WORKING = "replay.sqlite"  # the working copy beside it (git-ignored)
 MODES = ("replay", "replay-or-record", "record-new")
+BUSY_MS = 120_000  # how long a process waits on another's write lock
 
 def default_mode(path):
     """The mode a fixture named without one is used in (trials 2026-10-08, finding 1: a new file named alone failed,
@@ -100,6 +106,9 @@ class Fixture:
             with self.db:
                 self.db.executescript(SCHEMA)
                 self.db.execute("INSERT INTO meta VALUES ('schema_version', ?)", (str(SCHEMA_VERSION),))
+        self.db.execute(f"PRAGMA busy_timeout = {BUSY_MS}")  # other processes recording into it wait their turn
+        if not readonly:
+            self.db.execute("PRAGMA journal_mode = WAL")  # readers and one writer at a time, across processes
         version = self.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
         if not version or int(version[0]) != SCHEMA_VERSION:
             self.db.close()
@@ -147,9 +156,12 @@ class Fixture:
     def meta(self):
         return dict(self.db.execute("SELECT key, value FROM meta"))
 
-    def responders(self):
-        """Whose answers the fixture holds (as SQLite lists them: sort for an order)."""
-        return [r for (r,) in self.db.execute("SELECT DISTINCT responder FROM response")]
+    def responders(self, answered=False):
+        """Whose answers the fixture holds (as SQLite lists them: sort for an order); answered: only those with an
+        answer, not only failures (a run without its credentials once recorded thousands of failures under the
+        model's short name, and archives keep what was merged into them)."""
+        where = " WHERE outcome = 'ok'" if answered else ""
+        return [r for (r,) in self.db.execute(f"SELECT DISTINCT responder FROM response{where}")]
 
     def usage(self, query):
         """The usage a query's first answer (sample 0) was recorded with, or None."""
@@ -185,6 +197,27 @@ class Fixture:
             if description is not None:
                 self.db.execute("INSERT OR IGNORE INTO description VALUES (?, ?)",
                                 (query, json.dumps(description, sort_keys=True)))
+        if recipe is not None:
+            self.note_recipe(query, recipe)
+
+    def adopt_meta(self, source):
+        """Another open fixture's meta (its PyMuPDF version, say) copied in, for an export; this one's own kept."""
+        with self.db:
+            self.db.executemany("INSERT OR IGNORE INTO meta VALUES (?, ?)", source.meta().items())
+
+    def adopt(self, source, query, responder, sample, recipe=None):
+        """Copy an answer another open fixture holds into this one (an export), with its query's description and the
+        recipe it was served for: an export's recipes are its runs', whatever else the archive noted, so the same
+        runs export the same fixture. An answer this one holds is kept."""
+        row = source.db.execute("SELECT query, responder, sample, outcome, answer, error, usage, recorded "
+                                "FROM response WHERE query=? AND responder=? AND sample=?",
+                                (query, responder, sample)).fetchone()
+        if row is None:
+            return
+        with self.db:
+            self.db.execute("INSERT OR IGNORE INTO response VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)", row)
+            self.db.executemany("INSERT OR IGNORE INTO description VALUES (?, ?)",
+                                source.db.execute("SELECT * FROM description WHERE query=?", (query,)).fetchall())
         if recipe is not None:
             self.note_recipe(query, recipe)
 
@@ -231,10 +264,12 @@ class Fixture:
             self.db.execute("VACUUM")
         return {"answers_removed": answers, "dry_run": dry_run, "refused": refused if not force else []}
 
-    def merge(self, source):
+    def merge(self, source, prefer=False):
         """Copy in the answers another fixture (a .zip or a .sqlite file) holds that this one lacks, with their side
-        tables' rows; an answer this one holds is kept. Copied answers are marked unused, so prune drops those no run
-        uses. Returns how many answers were added."""
+        tables' rows. Where both answer a query this one's is kept, unless `prefer`: then the source's replaces it
+        (a committed zip merged into its archive, so the archive replays what was committed, not a variant's later
+        answer to the same query). Copied answers are marked unused, so prune drops those no run uses. Returns how
+        many answers were added."""
         import tempfile
         with tempfile.TemporaryDirectory(prefix="fixture-merge-") as temp:
             path = unpack(source, temp) if Path(source).suffix == ".zip" else Path(source)
@@ -243,8 +278,8 @@ class Fixture:
             before = self.db.execute(count).fetchone()[0]
             with self.db:
                 self.db.execute("ATTACH DATABASE ? AS other", (str(path),))
-                self.db.execute("INSERT OR IGNORE INTO main.response SELECT query, responder, sample, outcome, "
-                                "answer, error, usage, recorded, NULL FROM other.response")
+                self.db.execute(f"INSERT OR {'REPLACE' if prefer else 'IGNORE'} INTO main.response SELECT query, "
+                                "responder, sample, outcome, answer, error, usage, recorded, NULL FROM other.response")
                 for table in ("description", "recipe"):
                     self.db.execute(f"INSERT OR IGNORE INTO main.{table} SELECT * FROM other.{table}")
             self.db.execute("DETACH DATABASE other")
@@ -277,12 +312,15 @@ class Replayer:
     Modes: `replay` serves recorded answers and recorded failures, and marks anything unrecorded;
     `replay-or-record` serves recorded answers and asks again for the rest, recorded failures included;
     `record-new` replays the model's failures as failures too, asking only transient ones again.
-    fresh_regions: the A/A control's extraction regions, answered afresh as another sample of the same query."""
+    fresh_regions: the A/A control's extraction regions, answered afresh as another sample of the same query.
+    export: an open Fixture every answer served or recorded is copied into (see the module's note on exports)."""
 
-    def __init__(self, fixture, mode="replay", responder="", fresh_regions=()):
+    def __init__(self, fixture, mode="replay", responder="", fresh_regions=(), export=None):
         if mode not in MODES:
             raise ValueError(f"mode {mode!r} is not one of {MODES}")
-        self.fixture, self.mode, self.responder = fixture, mode, responder
+        self.fixture, self.mode, self.responder, self.export = fixture, mode, responder, export
+        if export is not None:
+            export.adopt_meta(fixture)
         self.fresh_regions = frozenset(fresh_regions or ())
         self.replayed, self.recorded, self.missing = 0, 0, []
 
@@ -297,6 +335,10 @@ class Replayer:
         row = self.fixture.answer(query, self.responder, self.sample(key))
         if row is not None and key is not None:
             self.fixture.note_recipe(query, key)
+        served = row is not None and (row[0] == "ok" or self.mode == "replay"
+                                      or self.mode == "record-new" and row[0] == "invalid")
+        if served and self.export is not None:
+            self.export.adopt(self.fixture, query, self.responder, self.sample(key), key)
         if row is not None and row[0] != "ok" and (self.mode == "replay"
                                                     or self.mode == "record-new" and row[0] == "invalid"):
             self.replayed += 1
@@ -315,6 +357,8 @@ class Replayer:
         replayed."""
         if key is not None:
             self.fixture.note_recipe(query, key)
+            if self.export is not None:
+                self.export.note_recipe(query, key)
         self.replayed += 1
 
     def record(self, query, key, answer, error, usage=None, description=None):
@@ -322,8 +366,10 @@ class Replayer:
         if self.mode == "replay":
             return
         outcome = "ok" if error is None else "transient" if transient(error) else "invalid"
-        self.fixture.record(query, self.responder, self.sample(key), outcome=outcome, answer=answer, error=error,
-                            usage=usage, description=description, recipe=key)
+        for target in (self.fixture, self.export):
+            if target is not None:
+                target.record(query, self.responder, self.sample(key), outcome=outcome, answer=answer, error=error,
+                              usage=usage, description=description, recipe=key)
         self.recorded += 1
 
     def usage(self):
@@ -333,6 +379,8 @@ class Replayer:
     def close(self):
         self.fixture.log_session({self.responder}, self.replayed, self.recorded, len(self.missing))
         self.fixture.close()
+        if self.export is not None:
+            self.export.close()
 
 def open(path, mode="read"):  # noqa: A001 (fixtures.open, as the module's reader)
     """A fixture, open for one use (code review 2026-10-01, A1: five ways to open one, three working-file
