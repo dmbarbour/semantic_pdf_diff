@@ -24,11 +24,19 @@ SLOW_FIRST = ["test_controlled", "test_fixtures", "test_settings", "test_replay_
               "test_concurrency", "test_golden_requests"]
 
 
-def run(name):
+TIMEOUT = 900  # seconds a module may take (the slowest takes about 2 minutes): a hang fails, it doesn't stall
+
+
+def run(name, timeout=TIMEOUT):
     started = time.monotonic()
     # as `unittest discover -s tests` runs them: the tests folder on the path (for `stubs`), the root as cwd
     env = {**os.environ, "PYTHONPATH": os.pathsep.join(filter(None, [str(TESTS), os.environ.get("PYTHONPATH")]))}
-    done = subprocess.run([sys.executable, "-m", "unittest", name], cwd=ROOT, env=env, capture_output=True, text=True)
+    try:
+        done = subprocess.run([sys.executable, "-m", "unittest", name], cwd=ROOT, env=env, capture_output=True,
+                              text=True, timeout=timeout)
+    except subprocess.TimeoutExpired as e:
+        said = (e.stdout or b"").decode(errors="replace") + (e.stderr or b"").decode(errors="replace")
+        return name, 1, f"{said}\ntimed out after {timeout}s", time.monotonic() - started
     return name, done.returncode, done.stdout + done.stderr, time.monotonic() - started
 
 
@@ -37,6 +45,7 @@ def main(argv=None):
     parser.add_argument("modules", nargs="*", help="test modules (default: every tests/test_*.py)")
     parser.add_argument("-j", "--jobs", type=int, default=os.cpu_count() or 4)
     parser.add_argument("--no-record", action="store_true", help="record no pass for the commit gate")
+    parser.add_argument("--timeout", type=int, default=TIMEOUT, help="seconds a module may take before it fails")
     args = parser.parse_args(argv)
     import gate
     record = not (args.modules or args.no_record or os.environ.get("GATE_NO_RECORD"))
@@ -45,7 +54,7 @@ def main(argv=None):
     names.sort(key=lambda n: SLOW_FIRST.index(n) if n in SLOW_FIRST else len(SLOW_FIRST))
     started, failed, ran = time.monotonic(), [], 0
     with ThreadPoolExecutor(args.jobs) as pool:
-        for name, code, output, seconds in pool.map(run, names):
+        for name, code, output, seconds in pool.map(lambda name: run(name, args.timeout), names):
             summary = [line for line in output.splitlines() if line.startswith(("Ran ", "OK", "FAILED"))]
             ran += sum(int(line.split()[1]) for line in summary if line.startswith("Ran "))
             print(f"{name:32} {seconds:6.1f}s  {' '.join(summary[-1:]) or f'exit {code}'}", flush=True)
