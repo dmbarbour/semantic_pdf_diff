@@ -907,6 +907,20 @@ class ViewRows(Lever):
         from .stance import view_of
         return view_of(header, row, context)
 
+class HedgesApart(Lever):
+    lever_name, stage, off = "hedges_apart", "matching", {"hedges_apart": False}
+    # a hedge a reader put in a claim's conditions ("tentative", "working assumption", "preliminary estimates") moved
+    # to its uncertainty, the source's stated uncertainty: conditions keep scope
+    # (docs/plans/claim-context-2026-10-14.md, Stance: where a hedge lives, for now). Applied as answers are stored
+    hedges_apart: Annotated[bool, Declared("post", EXTRACT)] = False
+
+    def stated(self, claim):
+        claim = super().stated(claim)
+        if not self.hedges_apart:
+            return claim
+        from .stance import hedges_apart
+        return hedges_apart(claim)
+
 class TableHolders(Lever):
     lever_name, stage, off = "table_holders", "matching", {"table_holders": False}
     # a table's holder column (Company, Source, Proponent...) holds every claim read from its row: the row's cell as
@@ -1050,8 +1064,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, ColumnConditions, 
                  SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks,
                  TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText,
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
-                 TableHolders, CarriedHolders, ViewAttitudes, ViewRows, Reconcile, DedupeRepeated, ContinueReading,
-                 Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
+                 TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
+                 ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1267,6 +1281,11 @@ class Platform(Composable):
     @chained
     def held(self, claim):
         """A claim read with its holders (a stance), as stored: the platform's, as it is."""
+        return claim
+
+    @chained
+    def stated(self, claim):
+        """A claim as stored, its fields sorted by kind (a hedge out of its conditions): the platform's, as read."""
         return claim
 
     @chained

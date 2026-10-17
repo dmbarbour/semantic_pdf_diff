@@ -937,6 +937,7 @@ def _evidence(core, page, box, task, fields, quote, verified, derivation, approx
                   uncertainty=fields.get("uncertainty", "")[:200], stance=list(stance))
     if claim.stance:
         claim = core.s.held(claim)
+    claim = core.s.stated(claim)
     home = core.sections.box(page, box).id
     return Evidence(**claim.model_dump(), id=claim_id(core.content, claim), content=core.content, section=home,
                     locator=core.locator(page, box, "table", task), derivation=derivation, quote_verified=verified,

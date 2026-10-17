@@ -236,5 +236,21 @@ class Read(unittest.TestCase):
         self.assertIsNone(view_of(header, ["vivo", "Y", ""], "Above the table: ...Table 2. Views"))  # no item
         self.assertIsNone(view_of(["Option", "Y/N"], ["A", "Y"], above))  # no holder column
 
+
+class Hedges(unittest.TestCase):
+    def test_a_hedge_in_conditions_is_moved_to_uncertainty_only_when_on(self):
+        from semantic_pdf_diff.settings import Settings
+        from semantic_pdf_diff.stance import hedges_apart
+        hedged = Claim(**{**TIMEOUT, "conditions": "link idle; status: Working assumption"})
+        moved = hedges_apart(hedged)
+        self.assertEqual((moved.conditions, moved.uncertainty), ("link idle", "Working assumption"))
+        self.assertEqual(Settings(hedges_apart=True).stated(hedged), moved)
+        self.assertEqual(Settings().stated(hedged), hedged)
+        self.assertEqual(claim_id("c", moved), claim_id("c", Claim(**{**TIMEOUT, "conditions": "link idle"})))
+        plain = Claim(**{**TIMEOUT, "conditions": "at peak flow"})
+        self.assertEqual(hedges_apart(plain), plain)
+        both = hedges_apart(Claim(**{**TIMEOUT, "conditions": "Preliminary estimates", "uncertainty": "± 5 ms"}))
+        self.assertEqual((both.conditions, both.uncertainty), ("", "± 5 ms; Preliminary estimates"))
+
 if __name__ == "__main__":
     unittest.main()

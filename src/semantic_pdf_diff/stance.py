@@ -15,6 +15,9 @@ document's structure says so.
   of yes and no ("Company | Y/N | Comments"), a row's yes or no is its holder's view of the item the text above the
   table last names ("Proposal 2.2", "Question 4"), read even where the reader gives no claim of it (a bare "Y"
   row, or a "N" row whose comment holds a counter-proposal).
+- **A hedge apart from scope** (the hedges_apart lever): a hedge a reader put in a claim's conditions ("tentative",
+  "working assumption", "preliminary estimates", "expected") is the source's stated uncertainty, not the claim's
+  scope: moved to its uncertainty, where a hedge on the document's own claim lives for now (the owner, 2026-10-16).
 - **The reader's links** (the read_holders lever asks for them): a row's holder column still names the holder, the
   reader adding an attitude the row doesn't give; elsewhere the reader's holders, their reference marks left out.
 """
@@ -123,3 +126,20 @@ def view_of(header, row, context):
     if not is_yes_no(cell) or not items:
         return None
     return Claim(entity=items[-1][:160], attribute="support", value=cell, kind="table", quote=cell, confidence=0.9)
+
+# A hedge as readers put it in conditions: the phrase, with a "status" or "per" before it ("status: Working
+# assumption", "per preliminary estimates")
+HEDGE = re.compile(r"(?:\bstatus\s*(?:is|:)?\s*)?\b(working assumption|tentative(?:ly)?|preliminary(?: estimates?)?|"
+                   r"provisional(?:ly)?|expected|likely|TBD|TBC|FFS)\b", re.I)
+
+def hedges_apart(claim):
+    """The claim with the hedges its conditions hold moved to its uncertainty (after any it states), the
+    conditions' leftover separators tidied; a claim with none as it is."""
+    found = [m.group(1) for m in HEDGE.finditer(claim.conditions)]
+    if not found:
+        return claim
+    rest = HEDGE.sub(" ", claim.conditions)
+    rest = re.sub(r"\s*([,;:])\s*(?=[,;:]|$)", "", rest)  # a separator left with nothing after it
+    rest = re.sub(r"^\s*[,;:]\s*", "", " ".join(rest.split()))
+    said = "; ".join(x for x in [claim.uncertainty, *found] if x)
+    return claim.model_copy(update={"conditions": rest.strip(), "uncertainty": said[:200]})

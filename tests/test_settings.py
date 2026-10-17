@@ -39,7 +39,8 @@ TOGGLES = {
     'least_half': 0.5, 'skip_sheet_tables': True, 'images_first': False, 'complete_by_image': True,
     'positions': 'conditions', 'records': False, 'editorial': False, 'split_conditions': False,
     'column_conditions': True, 'conditions_by_column': True, 'sheet_records': False,
-    'table_holders': False, 'carried_holders': False, 'view_attitudes': False, 'view_rows': False, 'read_holders': True,
+    'table_holders': False, 'carried_holders': False, 'view_attitudes': False, 'view_rows': False,
+    'hedges_apart': True, 'read_holders': True,
 }
 # Settings measured under others, on both sides: the tilers' with tile_choice off (by default the rule picks the cut by
 # its measures, so another tiler or a tile's growth, say, may leave its choice and the queries as they were); the
@@ -230,7 +231,7 @@ class Declarations(unittest.TestCase):
         unscoped = {n for n in levers.lever_settings() if "extract" in declared(Settings, n).roles
                     and n not in binding.SETTING_REGIONS}  # (regions are extraction's)
         self.assertEqual(unscoped, {"extract_prompt", "split_conditions", "extract_rules", "dedupe_repeated",
-                                    "records", "sheet_records", "read_holders", "view_attitudes"})
+                                    "records", "sheet_records", "read_holders", "view_attitudes", "hedges_apart"})
         for name, _ in settings_module.LEVER_MARKS:  # each mark is its lever's own setting, or the headings
             self.assertTrue(name == "section" or any(name in c.model_fields and name in c.marks
                                                      for c in levers.LEVER_CLASSES), name)

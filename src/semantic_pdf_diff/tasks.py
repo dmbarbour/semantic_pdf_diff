@@ -408,6 +408,7 @@ class TaskCore:
                     claim = claim.model_copy(update={"stance": merged(made.stance, claim.stance)})
                 if claim.stance:
                     claim = s.held(claim)
+                claim = s.stated(claim)
                 eid = claim_id(content, claim)
                 if any(e.id == eid for e in found):
                     continue  # the same claim twice in one response: keep the first
