@@ -83,6 +83,7 @@
   "carried_holders": false,
   "view_attitudes": false,
   "view_rows": false,
+  "align_hedges": false,
   "decoration": false,
   "tile_choice": "off",
   "skip_text_only": false,

@@ -950,7 +950,7 @@ class Align(Lever):
     align_printed: Annotated[bool, _selecting(roles=COMPARE)] = False
     # a value's two readings differing only by a hedge or a status ("working assumption" against "agreed"): the value
     # firmed up or hedged, reported without a model (docs/plans/claim-context-2026-10-14.md, milestone 5)
-    align_hedges: Annotated[bool, _selecting(roles=COMPARE)] = False
+    align_hedges: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def correspondence(self, left, right, mode):
         if not self.align or mode != "revisions":
@@ -1042,8 +1042,8 @@ class DedupeRepeated(Lever):
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
-# editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes and
-# view_rows (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
+# editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes,
+# view_rows and align_hedges (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, ColumnConditions, ConditionsByColumn, ExtractRules,
                  VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext,
                  References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty,

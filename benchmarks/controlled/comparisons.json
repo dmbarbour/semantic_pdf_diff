@@ -9746,7 +9746,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -9758,23 +9758,23 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 6,
+    "change": 4,
     "no change": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 14,
+    "different": 3,
+    "equivalent": 12,
     "uncertain": 1
    },
    "unmatched": 2,
-   "pairs": 5,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -9789,10 +9789,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -9812,7 +9812,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -9824,22 +9824,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 3,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -9854,10 +9854,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -9877,7 +9877,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -9889,22 +9889,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 3,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -9919,10 +9919,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -9942,7 +9942,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -9954,45 +9954,40 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 1,
-    "judged uncertain": 1,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 3,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 7,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 6
    },
-   "unmatched": 2,
-   "pairs": 3,
+   "unmatched": 0,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 2,
+    "right": 1,
+    "scored": 1,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 1
-     },
-     "conditions": {
-      "conditions": 1
      }
     }
    },
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged uncertain",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -10012,7 +10007,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -10024,22 +10019,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 4,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -10054,10 +10049,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -20265,7 +20260,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -20277,23 +20272,23 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 6,
+    "change": 4,
     "no change": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 14,
+    "different": 3,
+    "equivalent": 12,
     "uncertain": 1
    },
    "unmatched": 2,
-   "pairs": 5,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -20308,10 +20303,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -20331,7 +20326,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -20343,22 +20338,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 3,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -20373,10 +20368,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -20396,7 +20391,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -20408,22 +20403,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 3,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -20438,10 +20433,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -20461,7 +20456,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -20473,45 +20468,40 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 1,
-    "judged uncertain": 1,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 3,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 7,
-    "uncertain": 1
+    "different": 3,
+    "equivalent": 6
    },
-   "unmatched": 2,
-   "pairs": 3,
+   "unmatched": 0,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
-    "right": 2,
-    "scored": 2,
+    "right": 1,
+    "scored": 1,
     "value_change_precision": 1.0,
     "by_claims": {
      "change": {
       "changed": 1
-     },
-     "conditions": {
-      "conditions": 1
      }
     }
    },
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged uncertain",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -20531,7 +20521,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -20543,22 +20533,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 4,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -20573,10 +20563,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -28961,7 +28951,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -28973,23 +28963,23 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 6,
+    "change": 4,
     "no change": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 14,
+    "different": 3,
+    "equivalent": 12,
     "uncertain": 1
    },
    "unmatched": 2,
-   "pairs": 5,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -29004,10 +28994,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -29027,7 +29017,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -29039,22 +29029,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 3,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -29069,10 +29059,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -29092,7 +29082,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -29104,22 +29094,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 3,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -29134,10 +29124,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -29157,7 +29147,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -29169,22 +29159,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 4,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -29199,10 +29189,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -37527,7 +37517,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -37539,23 +37529,23 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 6,
+    "change": 4,
     "no change": 8
    },
    "findings": {
-    "different": 1,
-    "equivalent": 14,
+    "different": 3,
+    "equivalent": 12,
     "uncertain": 1
    },
    "unmatched": 2,
-   "pairs": 5,
+   "pairs": 3,
    "omitted": 0,
    "kinds": {
     "right": 2,
@@ -37570,10 +37560,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -37593,7 +37583,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -37605,22 +37595,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 3,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -37635,10 +37625,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -37658,7 +37648,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -37670,22 +37660,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 3,
+   "pairs": 1,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -37700,10 +37690,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
@@ -37723,7 +37713,7 @@
    "removals_found": "0/0",
    "unchanged_confirmed": "4/4",
    "false_changes": 0,
-   "hedges_reported": "0/4",
+   "hedges_reported": "2/4",
    "difference_precision": 1.0,
    "changed": {
     "reported": 1
@@ -37735,22 +37725,22 @@
     "confirmed": 4
    },
    "hedge": {
-    "judged equivalent": 2,
+    "judged different": 2,
     "settled": 2
    },
    "different": {
-    "change": 1
+    "change": 3
    },
    "equivalent": {
-    "change": 4,
+    "change": 2,
     "no change": 4
    },
    "findings": {
-    "different": 1,
-    "equivalent": 8
+    "different": 3,
+    "equivalent": 6
    },
    "unmatched": 0,
-   "pairs": 4,
+   "pairs": 2,
    "omitted": 0,
    "kinds": {
     "right": 1,
@@ -37765,10 +37755,10 @@
    "detail": {
     "ack": "settled",
     "beams": "reported",
-    "duration": "judged equivalent",
+    "duration": "judged different",
     "heartbeat": "confirmed",
     "period": "confirmed",
-    "retx": "judged equivalent",
+    "retx": "judged different",
     "rto": "settled",
     "snr": "confirmed",
     "window": "confirmed"
