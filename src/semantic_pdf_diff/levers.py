@@ -209,6 +209,79 @@ class ReadHolders(Lever):
             return text
         return text.replace(KIND_SPEC, STANCE_SPEC + KIND_SPEC).replace(NEGATION_RULE, NEGATION_RULE + STANCE_RULE)
 
+# A hedge on a value read as its uncertainty (the hedge_rule lever): the hedged design notes' sentence hedges ("is
+# expected to be", "will likely be") were dropped by every reader (the claim context plan, milestone 5); where a hedge
+# on the document's own claim lives, for now (the owner, 2026-10-16)
+HEDGE_RULE = ("\nA hedge the source puts on a value (is expected to be, will likely be, tentatively, preliminary, a "
+              "working assumption, TBD) goes in uncertainty, the value as stated; it isn't a condition.")
+
+class HedgeRule(Lever):
+    lever_name, stage, off = "hedge_rule", "instructions", {"hedge_rule": False}
+    # the reader told a hedge on a value is its uncertainty (the claim context plan, milestone 5)
+    hedge_rule: Annotated[bool, _shaping()] = False
+
+    def instructions(self, builtin):
+        text = super().instructions(builtin)
+        return text.replace(NEGATION_RULE, NEGATION_RULE + HEDGE_RULE) if self.hedge_rule else text
+
+# Worked examples after the instructions (the worked_examples lever; the owner, 2026-10-16: "Worked examples plus
+# instructions are often more useful than instructions alone, whether for humans or LLMs. And our contexts can
+# afford it."): sources unlike the corpus's, each with the claims read from it, showing scope, frame, a tolerance, a
+# hedge and a limit apart; with read_holders, a reported view and the document's own voice. Static, after the fixed
+# instructions: a provider caching a prompt's prefix caches them too.
+def _example(region, data, claims):
+    return f"Source type: {region}\nSOURCE DATA:\n{data}\nClaims: {json.dumps(claims, ensure_ascii=False)}\n"
+
+def worked_examples(frame=True, holders=False):
+    """The worked examples' text for the fields in force: frame (split_conditions), stance (read_holders)."""
+    def claim(entity, attribute, value, unit, kind, quote, conditions="", frame_="", uncertainty="", stance=None):
+        out = {"entity": entity, "attribute": attribute, "value": value, "unit": unit, "conditions": conditions}
+        if frame:
+            out["frame"] = frame_
+        elif frame_:
+            out["conditions"] = "; ".join(x for x in (conditions, frame_) if x)
+        out["uncertainty"] = uncertainty
+        if holders:
+            out["stance"] = stance or []
+        return {**out, "kind": kind, "quote": quote, "confidence": 0.95, "approximate": False}
+    text = "At design flow the cooling tower fan is expected to draw 42 kW. The basin heater is rated 6 kW."
+    examples = [
+        _example("text", text, [
+            claim("cooling tower fan", "power draw", "42", "kW", "text",
+                  "At design flow the cooling tower fan is expected to draw 42 kW.", conditions="at design flow",
+                  uncertainty="expected"),
+            claim("basin heater", "rated power", "6", "kW", "text", "The basin heater is rated 6 kW.")]),
+        _example("table", 'Header: ["Parameter", "Value", "Status"]\nRow: ["Relief valve set pressure", "150 psig", '
+                          '"Working assumption"]', [
+            claim("relief valve", "set pressure", "150", "psig", "table", "Relief valve set pressure | 150 psig",
+                  uncertainty="working assumption")]),
+        _example("text", "On level 2 the east corridor is 2.4 m wide, measured to face of finish. The booster pump "
+                         "shall deliver at least 300 gpm ± 5 gpm.", [
+            claim("east corridor", "width", "2.4", "m", "text", "the east corridor is 2.4 m wide",
+                  conditions="on level 2", frame_="to face of finish"),
+            claim("booster pump", "minimum flow", "at least 300", "gpm", "text",
+                  "shall deliver at least 300 gpm ± 5 gpm", uncertainty="± 5 gpm")]),
+    ]
+    if holders:
+        examples.append(_example("text", "Halvern [3] proposes a relief pressure of 165 psig. The working group "
+                                         "recommends 160 psig.", [
+            claim("relief valve", "set pressure", "165", "psig", "text",
+                  "Halvern [3] proposes a relief pressure of 165 psig.",
+                  stance=[{"holder": "Halvern", "attitude": "proposes"}]),
+            claim("relief valve", "set pressure", "160", "psig", "text", "The working group recommends 160 psig.")]))
+    return "\nWORKED EXAMPLES (other sources, each with the claims read from it):\n" + "\n".join(examples)
+
+class WorkedExamples(Lever):
+    lever_name, stage, off = "worked_examples", "instructions", {"worked_examples": False}
+    # worked examples after the extraction instructions, for the fields in force (worked_examples above)
+    worked_examples: Annotated[bool, _shaping()] = False
+
+    def instructions(self, builtin):
+        text = super().instructions(builtin)
+        if not self.worked_examples:
+            return text
+        return text + worked_examples(frame=self.split_conditions, holders=self.read_holders)
+
 # The table rules' prompt: a condition the text above names for some columns only kept to those columns' templates
 # (the column_conditions lever; the coaster's "speeds are design values at the element's entry" written into its
 # heights' claims, docs/reviews/levers.md)
@@ -1058,9 +1131,10 @@ class DedupeRepeated(Lever):
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes,
 # view_rows, align_hedges and hedges_apart (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
-LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, ColumnConditions, ConditionsByColumn, ExtractRules,
-                 VisualRules, ImagesFirst, CompleteByImage, Neighbours, LeaveFurniture, TableContext, StemContext,
-                 References, TileLocator, Decoration, Tiling, TileCut, TileChoice, GrowTiles, SheetDetails, SkipEmpty,
+LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedExamples, ColumnConditions,
+                 ConditionsByColumn, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
+                 LeaveFurniture, TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut,
+                 TileChoice, GrowTiles, SheetDetails, SkipEmpty,
                  SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks,
                  TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText,
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,

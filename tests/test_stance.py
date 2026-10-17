@@ -263,5 +263,24 @@ class Voice(unittest.TestCase):
         self.assertEqual([x.holder for x in merged((), read("Avelin [1]"))], ["Avelin"])
         self.assertEqual([x.holder for x in merged((), read("Moderna"))], ["Moderna"])  # a company, not a moderator
 
+
+class Examples(unittest.TestCase):
+    def test_the_hedge_rule_and_the_worked_examples_only_when_on(self):
+        from semantic_pdf_diff.levers import HEDGE_RULE, worked_examples
+        from semantic_pdf_diff.settings import Settings
+        from semantic_pdf_diff.tasks import extraction_template
+        plain = extraction_template(Settings())
+        self.assertNotIn(HEDGE_RULE, plain)
+        self.assertNotIn("WORKED EXAMPLES", plain)
+        self.assertIn(HEDGE_RULE, extraction_template(Settings(hedge_rule=True)))
+        both = extraction_template(Settings(hedge_rule=True, worked_examples=True))
+        self.assertTrue(both.startswith(extraction_template(Settings(hedge_rule=True))))  # after: a shared prefix
+        self.assertTrue(both.endswith(worked_examples()))
+        # the examples' fields are the template's in force: no frame without split_conditions; a stance with holders
+        self.assertNotIn('"frame"', worked_examples(frame=False))
+        self.assertIn('"conditions": "on level 2; to face of finish"', worked_examples(frame=False))
+        self.assertIn('"holder": "Halvern"', worked_examples(holders=True))
+        self.assertNotIn("Halvern", worked_examples())
+
 if __name__ == "__main__":
     unittest.main()

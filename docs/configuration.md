@@ -85,6 +85,8 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `extract_prompt` | `null` | shaping | extract_prompt | extract | all |
 | `split_conditions` | `true` | shaping | split_conditions | extract | all |
 | `read_holders` | `false` | shaping | read_holders | extract | all |
+| `hedge_rule` | `false` | shaping | hedge_rule | extract | all |
+| `worked_examples` | `false` | shaping | worked_examples | extract | all |
 | `column_conditions` | `false` | shaping | column_conditions | extract | table |
 | `conditions_by_column` | `false` | shaping | conditions_by_column | extract | table |
 | `extract_rules` | `[]` | shaping | extract_rules | extract | all |
