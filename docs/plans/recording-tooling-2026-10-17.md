@@ -1,6 +1,6 @@
 # Recording tooling: a commit gate, answer archives, parallel re-records and variants
 
-- **Status:** Active (2026-10-17)
+- **Status:** Completed (2026-10-17)
 - **The owner (2026-10-17):** "Let's do some tooling work. Faster re-records. Working with a few variants without losing information. Perhaps extraction and export of a refined replay cache instead of relying on in-place pruning. Perhaps adding a little CI for the fast tests to force a pass or a record of passing before commit. I think a little work here will improve things moving forward."
 - **Takes over** *Testing and recording infrastructure*'s continuous integration item (plans index, Tentative), as a local gate: nothing is pushed.
 
@@ -37,3 +37,14 @@ The owner's answers (2026-10-17, choosing among the options offered): the gate "
 2. **Archives and exports:** the write-ahead log and lock waits; export on replay; `pack` and the slices exporting; scratch answers merged into the archives; [samples and testing](../samples-and-testing.md) and [decision 0006](../decisions/0006-replay-fixtures.md) amended.
 3. **Parallel re-records:** `--jobs`, `--reset`, the refresh command, the slices' recorder; proved by exporting the committed zips again unchanged.
 4. **Variants:** overlays, filters, folders, worktree defaults, `paired.py`; proved by re-running a measured arm's comparison (b62's `hedge_rule` against its null) from the archive at no cost.
+
+## Results (2026-10-17)
+
+- **The commit gate** (7b6308a; [decision 0031](../decisions/0031-commits-need-a-recorded-pass.md)): every commit since went through it. Its first run blocked a commit, rightly: the staged tree's own suite predated the gate's flag.
+- **Archives and exports** (3dab76b; [decision 0006](../decisions/0006-replay-fixtures.md), amended): the scratch copies' answers merged into the archives (controlled 25,395 → 58,424 answers, slices 12,187 → 38,567, real pairs 7,488 → 11,749). Both committed zips are exported again with every answer as before and fewer recipe rows; an export matches the committed zip's bytes once exported.
+  - Merging an archive with its arms' copies first let 28 arm answers replace committed ones: a committed zip now merges into its archive with `--prefer`.
+  - 6,170 transient failures recorded under "gemma-4" (a run without its credentials) stay in the controlled archive. Deleting them was refused by the session's safety check, so it's left to the owner. A replay's responder guard counts only responders with answers, so nothing reads them.
+- **Parallel re-records** (7cf7cc7): `--jobs` in `controlled.py` and `record_runs.py`, `--reset`, and `controlled.py refresh`. An open transaction for recipe notes held each fixture's write lock for a whole run, so six processes were no faster than one. Now the corpus exports in 1m54s with six processes (4m43s alone; 1m28s after the pool's fix below), and the slices in 41s with eight (2m15s). `refresh --jobs 6` over the current corpus took 8 minutes at $0 and changed nothing.
+- **Found by the gate after the milestones:** the fork pool lost a result now and then (a queue's background thread across forks), and the gate's quick suite waited forever on it. Workers now send results down pipes of their own (5eec0be; the corpus's export 1m28s with six processes), and a test module that takes over 15 minutes fails instead of stalling (run_tests.py's `--timeout`).
+- **Variants** (779d34a): b62's comparison replayed as three variants at $0, its verdict and numbers as recorded. The null arm is one document short of 145: 21 answers its arm recorded weren't kept.
+- **Left for later** (the *Testing and recording infrastructure* row): collection rounds, the in-house recording kit, fixture summaries beside each zip, and a test replaying with the side tables dropped.
