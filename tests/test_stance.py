@@ -282,5 +282,14 @@ class Examples(unittest.TestCase):
         self.assertIn('"holder": "Halvern"', worked_examples(holders=True))
         self.assertNotIn("Halvern", worked_examples())
 
+    def test_the_hedge_rule_and_the_stance_rule_alike_in_either_lever_order(self):
+        from semantic_pdf_diff import levers as L
+        from semantic_pdf_diff.settings import settings_class
+        from semantic_pdf_diff.tasks import extraction_template
+        on = {"read_holders": True, "hedge_rule": True}
+        forwards = extraction_template(settings_class(L.DEFAULT_LEVERS)(**on))
+        self.assertEqual(extraction_template(settings_class(tuple(reversed(L.DEFAULT_LEVERS)))(**on)), forwards)
+        self.assertIn(L.NEGATION_RULE + L.HEDGE_RULE + L.STANCE_RULE, forwards)
+
 if __name__ == "__main__":
     unittest.main()

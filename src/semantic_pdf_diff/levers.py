@@ -207,7 +207,9 @@ class ReadHolders(Lever):
         text = super().instructions(builtin)
         if not self.read_holders:
             return text
-        return text.replace(KIND_SPEC, STANCE_SPEC + KIND_SPEC).replace(NEGATION_RULE, NEGATION_RULE + STANCE_RULE)
+        # after the hedge rule where it's in force, as it comes after the negation rule: either order, one prompt
+        after = NEGATION_RULE + HEDGE_RULE if NEGATION_RULE + HEDGE_RULE in text else NEGATION_RULE
+        return text.replace(KIND_SPEC, STANCE_SPEC + KIND_SPEC).replace(after, after + STANCE_RULE)
 
 # A hedge on a value read as its uncertainty (the hedge_rule lever): the hedged design notes' sentence hedges ("is
 # expected to be", "will likely be") were dropped by every reader (the claim context plan, milestone 5); where a hedge
