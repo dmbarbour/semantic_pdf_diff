@@ -13,15 +13,16 @@ class Forked(unittest.TestCase):
         from semantic_pdf_diff_lab.bench.recording import forked
         self.forked = forked
 
-    def test_every_item_once_whatever_the_order_and_in_processes_of_its_own(self):
+    def test_every_item_once_whatever_the_order_in_other_processes(self):
         here = os.getpid()
         def work(item):  # a closure: nothing but indices and results crosses processes
             return item, item * item, os.getpid()
-        results = list(self.forked(work, range(12), 4))
-        self.assertEqual(sorted((i, sq) for i, sq, _ in results), [(i, i * i) for i in range(12)])
-        pids = {pid for *_, pid in results}
-        self.assertEqual(len(pids), 12)  # a process per item: no run's state outlives it
-        self.assertNotIn(here, pids)
+        for _ in range(20):  # the first version lost results now and then (a queue's thread across forks)
+            results = list(self.forked(work, range(12), 4))
+            self.assertEqual(sorted((i, sq) for i, sq, _ in results), [(i, i * i) for i in range(12)])
+            pids = {pid for *_, pid in results}
+            self.assertLessEqual(len(pids), 4)
+            self.assertNotIn(here, pids)
 
     def test_one_job_runs_here_in_order(self):
         self.assertEqual(list(self.forked(lambda i: (i, os.getpid()), [3, 1, 2], 1)),
@@ -35,6 +36,17 @@ class Forked(unittest.TestCase):
         with self.assertRaises(RuntimeError) as caught:
             list(self.forked(work, range(4), 2))
         self.assertIn("died on 2", str(caught.exception))
+
+    def test_workers_end_when_the_caller_stops_reading(self):
+        import multiprocessing
+        import time
+        def work(item):
+            time.sleep(0.05)
+            return item
+        results = self.forked(work, range(40), 3)
+        next(results)
+        results.close()
+        self.assertEqual(multiprocessing.active_children(), [])
 
 
 if __name__ == "__main__":

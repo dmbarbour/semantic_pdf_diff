@@ -48,33 +48,56 @@ def cut(folder):
 def forked(work, items, jobs):
     """work(item) for each item, yielded as each finishes: in this process when jobs <= 1, else in `jobs` forked
     processes taking items by their index (nothing pickled but indices and results, so `work` may be a script's own
-    function, loaded under any name). Each item runs in a process of its own (a run's state, its caches and open
-    files, doesn't outlive it)."""
+    function, loaded under any name). Each worker sends its results down a pipe of its own, which blocks until read:
+    no queue's background thread (the first version forked a process per item from workers holding a queue's thread,
+    and lost results). A worker that dies is reported with the item it was on; workers left when the caller stops
+    reading are ended."""
     items = list(items)
     if jobs <= 1 or len(items) <= 1:
         yield from map(work, items)
         return
     import multiprocessing
+    from multiprocessing.connection import wait
     context = multiprocessing.get_context("fork")
-    taken, done = context.Value("i", 0), context.Queue()  # the next item's index; results
-    def worker():
+    taken = context.Value("i", 0)  # the next item's index
+
+    def worker(conn):
         while True:
             with taken.get_lock():
                 i, taken.value = taken.value, taken.value + 1
             if i >= len(items):
+                conn.close()
                 return
-            child = context.Process(target=lambda i=i: done.put((i, work(items[i]))))
-            child.start()
-            child.join()
-            if child.exitcode:
-                done.put((i, None))  # it died before answering
-    workers = [context.Process(target=worker) for _ in range(min(jobs, len(items)))]
-    for w in workers:
-        w.start()
-    for _ in items:
-        i, result = done.get()
-        if result is None:
-            raise RuntimeError(f"a worker process died on {items[i]!r}")
-        yield result
-    for w in workers:
-        w.join()
+            conn.send(("start", i))
+            conn.send(("done", i, work(items[i])))
+
+    workers, conns = [], []
+    for _ in range(min(jobs, len(items))):
+        receive, send = context.Pipe(duplex=False)
+        process = context.Process(target=worker, args=(send,), daemon=True)
+        process.start()
+        send.close()  # the worker's end: its exit closes the pipe
+        workers.append(process)
+        conns.append(receive)
+    on, remaining = {}, len(items)
+    try:
+        while remaining:
+            for conn in wait(conns):
+                try:
+                    message = conn.recv()
+                except EOFError:
+                    conns.remove(conn)
+                    if conn in on:
+                        raise RuntimeError(f"a worker process died on {items[on[conn]]!r}") from None
+                    continue
+                if message[0] == "start":
+                    on[conn] = message[1]
+                else:
+                    del on[conn]
+                    remaining -= 1
+                    yield message[2]
+    finally:
+        for process in workers:
+            if process.is_alive():
+                process.terminate()
+            process.join()
