@@ -201,7 +201,7 @@ class ReadHolders(Lever):
     lever_name, stage, off = "read_holders", "instructions", {"read_holders": False}
     # the reader asked who holds a claim the source reports as another's, and their attitude (the claim context
     # plan's milestone 5: RAN1's text and overview claims name no company); a row's holder column still gives its own
-    read_holders: Annotated[bool, _shaping()] = False
+    read_holders: Annotated[bool, _shaping()] = True
 
     def instructions(self, builtin):
         text = super().instructions(builtin)
@@ -220,7 +220,7 @@ HEDGE_RULE = ("\nA hedge the source puts on a value (is expected to be, will lik
 class HedgeRule(Lever):
     lever_name, stage, off = "hedge_rule", "instructions", {"hedge_rule": False}
     # the reader told a hedge on a value is its uncertainty (the claim context plan, milestone 5)
-    hedge_rule: Annotated[bool, _shaping()] = False
+    hedge_rule: Annotated[bool, _shaping()] = True
 
     def instructions(self, builtin):
         text = super().instructions(builtin)
@@ -1142,7 +1142,8 @@ class DedupeRepeated(Lever):
 # tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes,
-# view_rows, align_hedges and hedges_apart (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
+# view_rows, align_hedges, hedges_apart, read_holders and hedge_rule (docs/reviews/levers.md); round 0's settings
+# are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedExamples, ColumnConditions,
                  ConditionsByColumn, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
                  LeaveFurniture, TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut,

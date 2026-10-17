@@ -115,14 +115,14 @@ class Asked(unittest.TestCase):
         from semantic_pdf_diff.levers import STANCE_RULE, STANCE_SPEC
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.tasks import extraction_template
-        off, on = extraction_template(Settings()), extraction_template(Settings(read_holders=True))
+        off, on = extraction_template(Settings(read_holders=False)), extraction_template(Settings())
         self.assertNotIn('"stance"', off)
         self.assertIn(STANCE_SPEC, on)
         self.assertIn(STANCE_RULE, on)
-        self.assertIn(STANCE_SPEC, extraction_template(Settings(read_holders=True, split_conditions=False)))
+        self.assertIn(STANCE_SPEC, extraction_template(Settings(split_conditions=False)))
         mine = 'List claims as JSON: {"claims": [], "complete": true, "issues": []}'
-        self.assertEqual(extraction_template(Settings(extract_prompt=mine, read_holders=True)),
-                         extraction_template(Settings(extract_prompt=mine)))
+        self.assertEqual(extraction_template(Settings(extract_prompt=mine)),
+                         extraction_template(Settings(extract_prompt=mine, read_holders=False)))
 
 PROPOSALS = [["Company", "Proposals"], ["Avelin", "Proposal 1: The acknowledgement timeout is 251 ms."],
              ["Borealis", "Proposal 1: The acknowledgement timeout is 251 ms."],
@@ -269,13 +269,13 @@ class Examples(unittest.TestCase):
         from semantic_pdf_diff.levers import HEDGE_RULE, worked_examples
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.tasks import extraction_template
-        plain = extraction_template(Settings())
+        plain = extraction_template(Settings(hedge_rule=False))
         self.assertNotIn(HEDGE_RULE, plain)
         self.assertNotIn("WORKED EXAMPLES", plain)
-        self.assertIn(HEDGE_RULE, extraction_template(Settings(hedge_rule=True)))
-        both = extraction_template(Settings(hedge_rule=True, worked_examples=True))
-        self.assertTrue(both.startswith(extraction_template(Settings(hedge_rule=True))))  # after: a shared prefix
-        self.assertTrue(both.endswith(worked_examples()))
+        self.assertIn(HEDGE_RULE, extraction_template(Settings()))
+        both = extraction_template(Settings(worked_examples=True))
+        self.assertTrue(both.startswith(extraction_template(Settings())))  # after: a shared prefix
+        self.assertTrue(both.endswith(worked_examples(holders=True)))
         # the examples' fields are the template's in force: no frame without split_conditions; a stance with holders
         self.assertNotIn('"frame"', worked_examples(frame=False))
         self.assertIn('"conditions": "on level 2; to face of finish"', worked_examples(frame=False))

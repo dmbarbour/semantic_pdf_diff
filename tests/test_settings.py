@@ -40,7 +40,7 @@ TOGGLES = {
     'positions': 'conditions', 'records': False, 'editorial': False, 'split_conditions': False,
     'column_conditions': True, 'conditions_by_column': True, 'sheet_records': False,
     'table_holders': False, 'carried_holders': False, 'view_attitudes': False, 'view_rows': False,
-    'hedges_apart': False, 'read_holders': True, 'hedge_rule': True,
+    'hedges_apart': False, 'read_holders': False, 'hedge_rule': False,
     'worked_examples': True,
 }
 # Settings measured under others, on both sides: the tilers' with tile_choice off (by default the rule picks the cut by

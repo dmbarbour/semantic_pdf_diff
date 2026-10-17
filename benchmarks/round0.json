@@ -88,6 +88,8 @@
   "view_rows": false,
   "align_hedges": false,
   "hedges_apart": false,
+  "read_holders": false,
+  "hedge_rule": false,
   "decoration": false,
   "tile_choice": "off",
   "skip_text_only": false,

@@ -1,81 +1,80 @@
 {
  "totals": {
   "inventory": {
-   "claims": 21134,
-   "evidence": 11828,
-   "frame in conditions": 76,
-   "grounded": 5992,
+   "claims": 21166,
+   "evidence": 11822,
+   "frame in conditions": 36,
+   "grounded": 5588,
    "list records": 36,
-   "no content words": 3,
    "note records": 11,
-   "numbered in attribute": 238,
-   "numbered in conditions": 3,
-   "numbered in entity": 204,
-   "partly": 88,
-   "partly (image)": 16,
-   "positioned": 123,
-   "printed": 7466,
+   "numbered in attribute": 164,
+   "numbered in conditions": 2,
+   "numbered in entity": 378,
+   "partly": 64,
+   "partly (image)": 34,
+   "positioned": 124,
+   "printed": 7410,
    "sheet records": 11,
    "table records": 303,
-   "unsupported": 25,
-   "unsupported (image)": 806,
-   "with conditions": 6930,
-   "with records": 6245
+   "unsupported": 23,
+   "unsupported (image)": 795,
+   "with conditions": 6504,
+   "with records": 6185
   },
   "placed": {
    "bound": {
-    "attribute": 37,
-    "conditions": 16,
-    "nowhere": 28
+    "attribute": 28,
+    "conditions": 12,
+    "nowhere": 41
    },
    "frame": {
-    "attribute": 23,
-    "conditions": 95,
-    "frame": 156,
-    "records": 143
+    "attribute": 9,
+    "conditions": 104,
+    "frame": 195,
+    "records": 109
    },
    "holder": {
-    "conditions": 25,
-    "stance": 194
+    "stance": 219
    },
    "provenance": {
     "conditions": 5
    },
    "scope": {
     "attribute": 19,
-    "conditions": 1769,
-    "nowhere": 2
+    "conditions": 1774,
+    "nowhere": 6
    },
    "sibling": {
-    "conditions": 193,
-    "nowhere": 828,
+    "conditions": 145,
+    "nowhere": 876,
     "records": 1108
    },
    "subject": {
     "conditions": 72,
-    "entity": 132,
+    "entity": 130,
     "nowhere": 43,
-    "records": 122
+    "records": 124
    }
   },
   "audit": {
    "bound": {
-    "image only": 1,
-    "shown, not used": 27
+    "image only": 2,
+    "shown, not used": 39
    },
    "frame": {
-    "shown, not used": 23
+    "shown, not used": 9
    },
    "provenance": {
     "in conditions": 5
    },
    "scope": {
+    "image only": 4,
     "shown, not used": 21
    },
    "sibling": {
-    "in conditions": 193,
+    "in conditions": 145,
     "in records": 1108,
-    "kept out": 828
+    "kept out": 876
    },
    "subject": {
     "image only": 1,
@@ -88,45 +87,50 @@
    "otherwise": 14
   },
   "attitudes": {
-   "in its stance": 160,
-   "none": 59
+   "another": 5,
+   "in its stance": 202,
+   "none": 12
   },
   "hedges": {
-   "nowhere": 10,
-   "uncertainty": 40
+   "uncertainty": 50
   },
   "reliability": {
    "all": {
+    "<0.8": {
+     "readings": 2,
+     "right": 0,
+     "share": 0.0
+    },
     "<0.9": {
-     "readings": 394,
-     "right": 230,
-     "share": 0.584
+     "readings": 542,
+     "right": 320,
+     "share": 0.59
     },
     "<0.95": {
-     "readings": 10594,
-     "right": 10440,
-     "share": 0.985
+     "readings": 10492,
+     "right": 10344,
+     "share": 0.986
     },
     "<=1.0": {
-     "readings": 29340,
-     "right": 26548,
-     "share": 0.905
+     "readings": 29166,
+     "right": 26450,
+     "share": 0.907
     }
    },
    "image": {
     "<0.9": {
-     "readings": 370,
-     "right": 220,
-     "share": 0.595
+     "readings": 518,
+     "right": 312,
+     "share": 0.602
     },
     "<0.95": {
-     "readings": 400,
-     "right": 308,
-     "share": 0.77
+     "readings": 264,
+     "right": 208,
+     "share": 0.788
     },
     "<=1.0": {
-     "readings": 20786,
-     "right": 18820,
+     "readings": 20738,
+     "right": 18774,
      "share": 0.905
     }
    },
@@ -138,20 +142,25 @@
     }
    },
    "text": {
+    "<0.8": {
+     "readings": 2,
+     "right": 0,
+     "share": 0.0
+    },
     "<0.9": {
      "readings": 24,
-     "right": 10,
-     "share": 0.417
+     "right": 8,
+     "share": 0.333
     },
     "<0.95": {
-     "readings": 42,
-     "right": 8,
-     "share": 0.19
+     "readings": 76,
+     "right": 12,
+     "share": 0.158
     },
     "<=1.0": {
-     "readings": 8554,
-     "right": 7728,
-     "share": 0.903
+     "readings": 8428,
+     "right": 7676,
+     "share": 0.911
     }
    }
   }
@@ -159,15 +168,13 @@
  "runs": {
   "ahu-schematic-s1-all": {
    "inventory": {
-    "claims": 61,
-    "partly (image)": 7,
-    "with conditions": 7,
+    "claims": 66,
     "positioned": 0,
     "misplaced": {},
-    "printed": 25,
-    "evidence": 34,
-    "context_bytes_per_request": 0,
-    "data_bytes_per_request": 718,
+    "printed": 23,
+    "evidence": 35,
+    "context_bytes_per_request": 104,
+    "data_bytes_per_request": 654,
     "examples": {}
    },
    "keyed": {
@@ -183,7 +190,7 @@
     "positioned": 0,
     "misplaced": {},
     "printed": 29,
-    "evidence": 42,
+    "evidence": 43,
     "context_bytes_per_request": 69,
     "data_bytes_per_request": 580,
     "examples": {}
@@ -197,13 +204,13 @@
   },
   "ahu-schematic-s1-figure-only": {
    "inventory": {
-    "claims": 58,
+    "claims": 51,
     "positioned": 0,
     "misplaced": {},
-    "printed": 12,
-    "evidence": 28,
-    "context_bytes_per_request": 141,
-    "data_bytes_per_request": 372,
+    "printed": 11,
+    "evidence": 29,
+    "context_bytes_per_request": 64,
+    "data_bytes_per_request": 419,
     "examples": {}
    },
    "keyed": {
@@ -215,11 +222,11 @@
   },
   "ahu-schematic-s1-folded": {
    "inventory": {
-    "claims": 64,
+    "claims": 62,
     "positioned": 0,
     "misplaced": {},
-    "printed": 25,
-    "evidence": 32,
+    "printed": 24,
+    "evidence": 33,
     "context_bytes_per_request": 96,
     "data_bytes_per_request": 399,
     "examples": {}
@@ -233,11 +240,11 @@
   },
   "ahu-schematic-s1-leaders": {
    "inventory": {
-    "claims": 52,
+    "claims": 60,
     "positioned": 0,
     "misplaced": {},
-    "printed": 19,
-    "evidence": 27,
+    "printed": 15,
+    "evidence": 31,
     "context_bytes_per_request": 111,
     "data_bytes_per_request": 436,
     "examples": {}
@@ -251,15 +258,13 @@
   },
   "ahu-schematic-s1-legend": {
    "inventory": {
-    "claims": 65,
-    "grounded": 12,
-    "with conditions": 12,
+    "claims": 60,
     "positioned": 0,
     "misplaced": {},
-    "printed": 12,
-    "evidence": 33,
-    "context_bytes_per_request": 125,
-    "data_bytes_per_request": 352,
+    "printed": 13,
+    "evidence": 32,
+    "context_bytes_per_request": 54,
+    "data_bytes_per_request": 381,
     "examples": {}
    },
    "keyed": {
@@ -271,11 +276,11 @@
   },
   "ahu-schematic-s1-prose": {
    "inventory": {
-    "claims": 42,
+    "claims": 40,
     "positioned": 0,
     "misplaced": {},
-    "printed": 24,
-    "evidence": 25,
+    "printed": 31,
+    "evidence": 32,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1189,
     "examples": {}
@@ -289,13 +294,13 @@
   },
   "ahu-schematic-s1-prose-hard": {
    "inventory": {
-    "claims": 36,
+    "claims": 31,
     "partly": 1,
     "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
-    "printed": 17,
-    "evidence": 21,
+    "printed": 20,
+    "evidence": 24,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 1084,
     "examples": {}
@@ -309,16 +314,16 @@
   },
   "attach-s1-clean": {
    "inventory": {
-    "claims": 101,
-    "grounded": 11,
+    "claims": 106,
+    "grounded": 8,
     "partly (image)": 1,
-    "with conditions": 12,
+    "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
-    "printed": 30,
-    "evidence": 32,
-    "context_bytes_per_request": 227,
-    "data_bytes_per_request": 773,
+    "printed": 34,
+    "evidence": 37,
+    "context_bytes_per_request": 249,
+    "data_bytes_per_request": 726,
     "examples": {}
    },
    "keyed": {
@@ -330,22 +335,18 @@
   },
   "attach-s1-clean-revised": {
    "inventory": {
-    "claims": 83,
-    "grounded": 4,
-    "unsupported": 1,
-    "unsupported (image)": 1,
-    "with conditions": 6,
+    "claims": 82,
+    "grounded": 3,
+    "partly": 1,
+    "partly (image)": 1,
+    "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
-    "printed": 30,
-    "evidence": 31,
+    "printed": 32,
+    "evidence": 32,
     "context_bytes_per_request": 111,
     "data_bytes_per_request": 920,
-    "examples": {
-     "unsupported": [
-      "terminal | attach procedure timeout | abandonment threshold"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {},
@@ -523,7 +524,7 @@
     "positioned": 0,
     "misplaced": {},
     "printed": 5,
-    "evidence": 34,
+    "evidence": 35,
     "context_bytes_per_request": 76,
     "data_bytes_per_request": 287,
     "examples": {}
@@ -538,8 +539,8 @@
   "coaster-s1": {
    "inventory": {
     "claims": 97,
-    "grounded": 7,
-    "with conditions": 7,
+    "grounded": 10,
+    "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -547,7 +548,7 @@
     },
     "with records": 15,
     "printed": 34,
-    "evidence": 38,
+    "evidence": 37,
     "context_bytes_per_request": 81,
     "data_bytes_per_request": 556,
     "examples": {}
@@ -581,8 +582,8 @@
      "table": 1
     },
     "with records": 12,
-    "printed": 31,
-    "evidence": 33,
+    "printed": 30,
+    "evidence": 32,
     "context_bytes_per_request": 81,
     "data_bytes_per_request": 554,
     "examples": {}
@@ -630,14 +631,19 @@
    "inventory": {
     "claims": 30,
     "grounded": 2,
-    "with conditions": 2,
+    "unsupported": 1,
+    "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
     "printed": 16,
     "evidence": 30,
     "context_bytes_per_request": 519,
     "data_bytes_per_request": 229,
-    "examples": {}
+    "examples": {
+     "unsupported": [
+      "ride | train count | operating"
+     ]
+    }
    },
    "keyed": {
     "placed": {
@@ -850,8 +856,8 @@
   "coaster-tables-s1-all": {
    "inventory": {
     "claims": 368,
-    "grounded": 48,
-    "with conditions": 48,
+    "grounded": 32,
+    "with conditions": 32,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -867,8 +873,7 @@
    "keyed": {
     "placed": {
      "sibling": {
-      "nowhere": 68,
-      "conditions": 10
+      "nowhere": 78
      },
      "frame": {
       "frame": 5
@@ -876,8 +881,7 @@
     },
     "audit": {
      "sibling": {
-      "kept out": 68,
-      "in conditions": 10
+      "kept out": 78
      }
     },
     "named": {},
@@ -890,16 +894,24 @@
     "grounded": 31,
     "with conditions": 31,
     "positioned": 0,
-    "misplaced": {},
+    "misplaced": {
+     "numbered in entity": 46
+    },
     "records": {
      "table": 6
     },
     "with records": 92,
     "printed": 92,
-    "evidence": 96,
+    "evidence": 92,
     "context_bytes_per_request": 179,
     "data_bytes_per_request": 306,
-    "examples": {}
+    "examples": {
+     "numbered in entity": [
+      "Support column C-06 | Footing | ",
+      "Support column C-06 | Footing | ",
+      "Support column C-08 | Base elev. | "
+     ]
+    }
    },
    "keyed": {
     "placed": {
@@ -924,19 +936,27 @@
   "coaster-tables-s1-clean-datum": {
    "inventory": {
     "claims": 368,
-    "grounded": 34,
-    "with conditions": 34,
+    "grounded": 31,
+    "with conditions": 31,
     "positioned": 0,
-    "misplaced": {},
+    "misplaced": {
+     "numbered in entity": 45
+    },
     "records": {
      "table": 6
     },
     "with records": 92,
     "printed": 92,
-    "evidence": 94,
+    "evidence": 96,
     "context_bytes_per_request": 176,
     "data_bytes_per_request": 303,
-    "examples": {}
+    "examples": {
+     "numbered in entity": [
+      "Support column C-10 | Footing | ",
+      "Support column C-10 | Footing | ",
+      "Support column C-06 | Load | "
+     ]
+    }
    },
    "keyed": {
     "placed": {
@@ -1000,8 +1020,8 @@
   "coaster-tables-s1-clean-datum.md": {
    "inventory": {
     "claims": 92,
-    "grounded": 10,
-    "with conditions": 10,
+    "grounded": 11,
+    "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
     "evidence": 92,
@@ -1104,18 +1124,18 @@
   "coaster-tables-s1-clean-units-changed": {
    "inventory": {
     "claims": 368,
-    "grounded": 44,
-    "with conditions": 44,
+    "grounded": 43,
+    "with conditions": 43,
     "positioned": 0,
     "misplaced": {
-     "numbered in entity": 90
+     "numbered in entity": 75
     },
     "records": {
      "table": 6
     },
     "with records": 92,
     "printed": 92,
-    "evidence": 156,
+    "evidence": 162,
     "context_bytes_per_request": 154,
     "data_bytes_per_request": 341,
     "examples": {
@@ -1149,8 +1169,8 @@
   "coaster-tables-s1-clean-units-changed.docx": {
    "inventory": {
     "claims": 92,
-    "grounded": 14,
-    "with conditions": 14,
+    "grounded": 16,
+    "with conditions": 16,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -1159,8 +1179,8 @@
     "with records": 72,
     "printed": 72,
     "evidence": 92,
-    "context_bytes_per_request": 495,
-    "data_bytes_per_request": 162,
+    "context_bytes_per_request": 443,
+    "data_bytes_per_request": 159,
     "examples": {}
    },
    "keyed": {
@@ -1170,8 +1190,7 @@
       "nowhere": 15
      },
      "frame": {
-      "conditions": 3,
-      "frame": 2
+      "conditions": 5
      }
     },
     "audit": {
@@ -1187,8 +1206,8 @@
   "coaster-tables-s1-clean-units-changed.md": {
    "inventory": {
     "claims": 92,
-    "grounded": 5,
-    "with conditions": 5,
+    "grounded": 9,
+    "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
     "evidence": 92,
@@ -1202,7 +1221,8 @@
       "nowhere": 81
      },
      "frame": {
-      "frame": 5
+      "conditions": 4,
+      "frame": 1
      }
     },
     "audit": {
@@ -1217,8 +1237,8 @@
   "coaster-tables-s1-clean-units-changed.pptx": {
    "inventory": {
     "claims": 92,
-    "grounded": 19,
-    "with conditions": 19,
+    "grounded": 16,
+    "with conditions": 16,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -1235,19 +1255,16 @@
     "placed": {
      "sibling": {
       "records": 66,
-      "nowhere": 11,
-      "conditions": 4
+      "nowhere": 15
      },
      "frame": {
-      "conditions": 4,
-      "frame": 1
+      "conditions": 5
      }
     },
     "audit": {
      "sibling": {
       "in records": 66,
-      "kept out": 11,
-      "in conditions": 4
+      "kept out": 15
      }
     },
     "named": {},
@@ -1257,8 +1274,8 @@
   "coaster-tables-s1-clean-units-changed.xlsx": {
    "inventory": {
     "claims": 92,
-    "grounded": 13,
-    "with conditions": 13,
+    "grounded": 10,
+    "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -1274,20 +1291,17 @@
    "keyed": {
     "placed": {
      "sibling": {
-      "nowhere": 17,
-      "records": 60,
-      "conditions": 4
+      "nowhere": 21,
+      "records": 60
      },
      "frame": {
-      "conditions": 4,
-      "frame": 1
+      "conditions": 5
      }
     },
     "audit": {
      "sibling": {
-      "kept out": 17,
-      "in records": 60,
-      "in conditions": 4
+      "kept out": 21,
+      "in records": 60
      }
     },
     "named": {},
@@ -1296,26 +1310,26 @@
   },
   "coaster-tables-s1-clean-units-note": {
    "inventory": {
-    "claims": 320,
-    "grounded": 38,
-    "with conditions": 38,
+    "claims": 369,
+    "grounded": 43,
+    "with conditions": 43,
     "positioned": 0,
     "misplaced": {
-     "numbered in entity": 66
+     "numbered in entity": 76
     },
     "records": {
      "table": 6
     },
     "with records": 92,
     "printed": 92,
-    "evidence": 128,
-    "context_bytes_per_request": 169,
-    "data_bytes_per_request": 266,
+    "evidence": 147,
+    "context_bytes_per_request": 153,
+    "data_bytes_per_request": 337,
     "examples": {
      "numbered in entity": [
       "Support column C-01 | Base elev. | ",
-      "Support column C-01 | Load | ",
-      "Support column C-06 | Base elev. | "
+      "Support column C-10 | Base elev. | ",
+      "Support column C-10 | Footing | "
      ]
     }
    },
@@ -1354,8 +1368,8 @@
     "with records": 92,
     "printed": 92,
     "evidence": 92,
-    "context_bytes_per_request": 592,
-    "data_bytes_per_request": 219,
+    "context_bytes_per_request": 492,
+    "data_bytes_per_request": 330,
     "examples": {}
    },
    "keyed": {
@@ -1381,8 +1395,8 @@
   "coaster-tables-s1-clean-units-note.md": {
    "inventory": {
     "claims": 92,
-    "grounded": 9,
-    "with conditions": 9,
+    "grounded": 10,
+    "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
     "evidence": 92,
@@ -1396,8 +1410,7 @@
       "nowhere": 81
      },
      "frame": {
-      "conditions": 4,
-      "frame": 1
+      "conditions": 5
      }
     },
     "audit": {
@@ -1627,19 +1640,27 @@
   "coaster-tables-s1-continued": {
    "inventory": {
     "claims": 368,
-    "grounded": 30,
-    "with conditions": 30,
+    "grounded": 31,
+    "with conditions": 31,
     "positioned": 0,
-    "misplaced": {},
+    "misplaced": {
+     "numbered in entity": 30
+    },
     "records": {
      "table": 4
     },
     "with records": 92,
     "printed": 92,
-    "evidence": 92,
-    "context_bytes_per_request": 148,
-    "data_bytes_per_request": 303,
-    "examples": {}
+    "evidence": 96,
+    "context_bytes_per_request": 142,
+    "data_bytes_per_request": 322,
+    "examples": {
+     "numbered in entity": [
+      "Support column C-01 | Footing | ",
+      "Support column C-04 | Load | ",
+      "Support column C-03 | Base elev. | "
+     ]
+    }
    },
    "keyed": {
     "placed": {
@@ -1664,8 +1685,8 @@
   "coaster-tables-s1-dense": {
    "inventory": {
     "claims": 368,
-    "grounded": 26,
-    "with conditions": 26,
+    "grounded": 23,
+    "with conditions": 23,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -1673,7 +1694,7 @@
     },
     "with records": 72,
     "printed": 72,
-    "evidence": 94,
+    "evidence": 93,
     "context_bytes_per_request": 152,
     "data_bytes_per_request": 289,
     "examples": {}
@@ -1701,26 +1722,33 @@
   "coaster-tables-s1-multilevel": {
    "inventory": {
     "claims": 368,
-    "grounded": 41,
-    "with conditions": 41,
+    "grounded": 19,
+    "with conditions": 19,
     "positioned": 0,
-    "misplaced": {},
+    "misplaced": {
+     "numbered in entity": 30
+    },
     "records": {
      "table": 5
     },
     "with records": 72,
     "printed": 72,
-    "evidence": 97,
+    "evidence": 92,
     "context_bytes_per_request": 192,
     "data_bytes_per_request": 279,
-    "examples": {}
+    "examples": {
+     "numbered in entity": [
+      "Support column C-01 | Load | ",
+      "Support column C-01 | Load | ",
+      "Support column C-01 | Footing | "
+     ]
+    }
    },
    "keyed": {
     "placed": {
      "sibling": {
       "records": 21,
-      "nowhere": 45,
-      "conditions": 15
+      "nowhere": 60
      },
      "frame": {
       "frame": 5
@@ -1729,8 +1757,7 @@
     "audit": {
      "sibling": {
       "in records": 21,
-      "kept out": 45,
-      "in conditions": 15
+      "kept out": 60
      }
     },
     "named": {},
@@ -1740,19 +1767,27 @@
   "coaster-tables-s1-multivalue": {
    "inventory": {
     "claims": 368,
-    "grounded": 23,
-    "with conditions": 23,
+    "grounded": 20,
+    "with conditions": 20,
     "positioned": 0,
-    "misplaced": {},
+    "misplaced": {
+     "numbered in entity": 15
+    },
     "records": {
      "table": 4
     },
     "with records": 60,
     "printed": 60,
-    "evidence": 113,
+    "evidence": 111,
     "context_bytes_per_request": 218,
     "data_bytes_per_request": 251,
-    "examples": {}
+    "examples": {
+     "numbered in entity": [
+      "Support column C-01 | Load | ",
+      "Support column C-02 | Footing | ",
+      "Support column C-02 | Base elev. | "
+     ]
+    }
    },
    "keyed": {
     "placed": {
@@ -1777,25 +1812,25 @@
   "coaster-tables-s1-stacked": {
    "inventory": {
     "claims": 368,
-    "grounded": 42,
-    "with conditions": 42,
+    "grounded": 44,
+    "with conditions": 44,
     "positioned": 0,
     "misplaced": {
-     "numbered in entity": 30
+     "numbered in entity": 45
     },
     "records": {
      "table": 6
     },
     "with records": 92,
     "printed": 92,
-    "evidence": 96,
+    "evidence": 97,
     "context_bytes_per_request": 156,
     "data_bytes_per_request": 309,
     "examples": {
      "numbered in entity": [
-      "Support column C-02 | Load | ",
       "Support column C-06 | Footing | ",
-      "Support column C-06 | Base elev. | "
+      "Support column C-06 | Base elev. | ",
+      "Support column C-06 | Load | "
      ]
     }
    },
@@ -1822,12 +1857,12 @@
   "hedges-s1": {
    "inventory": {
     "claims": 35,
-    "grounded": 7,
-    "with conditions": 7,
+    "grounded": 2,
+    "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
-    "printed": 14,
-    "evidence": 16,
+    "printed": 21,
+    "evidence": 24,
     "context_bytes_per_request": 240,
     "data_bytes_per_request": 350,
     "examples": {}
@@ -1837,8 +1872,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "nowhere": 1,
-     "uncertainty": 4
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -1846,12 +1880,12 @@
   "hedges-s1-revised": {
    "inventory": {
     "claims": 35,
-    "grounded": 6,
-    "with conditions": 6,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
-    "printed": 14,
-    "evidence": 15,
+    "printed": 21,
+    "evidence": 23,
     "context_bytes_per_request": 240,
     "data_bytes_per_request": 349,
     "examples": {}
@@ -1861,8 +1895,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "uncertainty": 4,
-     "nowhere": 1
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -1883,8 +1916,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "uncertainty": 4,
-     "nowhere": 1
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -1905,8 +1937,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "uncertainty": 4,
-     "nowhere": 1
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -1933,8 +1964,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "uncertainty": 4,
-     "nowhere": 1
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -1944,7 +1974,7 @@
     "claims": 9,
     "positioned": 0,
     "misplaced": {},
-    "printed": 6,
+    "printed": 5,
     "evidence": 9,
     "context_bytes_per_request": 340,
     "data_bytes_per_request": 116,
@@ -1955,8 +1985,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "uncertainty": 4,
-     "nowhere": 1
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -1977,8 +2006,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "nowhere": 1,
-     "uncertainty": 4
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -1999,8 +2027,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "nowhere": 1,
-     "uncertainty": 4
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -2027,8 +2054,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "nowhere": 1,
-     "uncertainty": 4
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -2049,8 +2075,7 @@
     "audit": {},
     "named": {},
     "hedges": {
-     "nowhere": 1,
-     "uncertainty": 4
+     "uncertainty": 5
     },
     "examples": {}
    }
@@ -2062,7 +2087,7 @@
     "with conditions": 52,
     "positioned": 0,
     "misplaced": {},
-    "evidence": 44,
+    "evidence": 48,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -2070,7 +2095,7 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 26
+      "conditions": 25
      }
     },
     "audit": {},
@@ -2080,13 +2105,13 @@
   },
   "lcc-enduse-s1-axis": {
    "inventory": {
-    "claims": 77,
-    "grounded": 77,
-    "with conditions": 77,
+    "claims": 71,
+    "grounded": 71,
+    "with conditions": 71,
     "positioned": 0,
     "misplaced": {},
     "printed": 3,
-    "evidence": 64,
+    "evidence": 58,
     "context_bytes_per_request": 123,
     "data_bytes_per_request": 506,
     "examples": {}
@@ -2128,9 +2153,9 @@
   },
   "lcc-enduse-s1-clean": {
    "inventory": {
-    "claims": 111,
-    "grounded": 102,
-    "with conditions": 102,
+    "claims": 112,
+    "grounded": 103,
+    "with conditions": 103,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -2138,7 +2163,7 @@
     },
     "with records": 11,
     "printed": 3,
-    "evidence": 75,
+    "evidence": 76,
     "context_bytes_per_request": 112,
     "data_bytes_per_request": 608,
     "examples": {}
@@ -2158,7 +2183,8 @@
    "inventory": {
     "claims": 63,
     "grounded": 15,
-    "unsupported (image)": 48,
+    "partly (image)": 24,
+    "unsupported (image)": 24,
     "with conditions": 63,
     "positioned": 0,
     "misplaced": {},
@@ -2240,8 +2266,8 @@
     "with records": 30,
     "printed": 33,
     "evidence": 33,
-    "context_bytes_per_request": 662,
-    "data_bytes_per_request": 126,
+    "context_bytes_per_request": 589,
+    "data_bytes_per_request": 157,
     "examples": {}
    },
    "keyed": {
@@ -2281,16 +2307,16 @@
   },
   "lcc-enduse-s1-raster": {
    "inventory": {
-    "claims": 97,
-    "grounded": 33,
-    "unsupported (image)": 64,
-    "with conditions": 97,
+    "claims": 85,
+    "grounded": 29,
+    "unsupported (image)": 56,
+    "with conditions": 85,
     "positioned": 0,
     "misplaced": {},
     "printed": 3,
-    "evidence": 65,
+    "evidence": 54,
     "context_bytes_per_request": 0,
-    "data_bytes_per_request": 381,
+    "data_bytes_per_request": 351,
     "examples": {}
    },
    "keyed": {
@@ -2306,12 +2332,12 @@
   },
   "lcc-enduse-s1-scan": {
    "inventory": {
-    "claims": 65,
-    "unsupported (image)": 65,
-    "with conditions": 65,
+    "claims": 64,
+    "unsupported (image)": 64,
+    "with conditions": 64,
     "positioned": 0,
     "misplaced": {},
-    "evidence": 35,
+    "evidence": 33,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -2319,7 +2345,7 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 33
+      "conditions": 30
      }
     },
     "audit": {},
@@ -2329,12 +2355,12 @@
   },
   "lcc-energy-s1-all": {
    "inventory": {
-    "claims": 46,
-    "unsupported (image)": 42,
-    "with conditions": 42,
+    "claims": 57,
+    "unsupported (image)": 53,
+    "with conditions": 53,
     "positioned": 0,
     "misplaced": {},
-    "evidence": 39,
+    "evidence": 49,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -2342,7 +2368,7 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 14
+      "conditions": 19
      }
     },
     "audit": {},
@@ -2352,13 +2378,13 @@
   },
   "lcc-energy-s1-axis": {
    "inventory": {
-    "claims": 59,
+    "claims": 60,
     "grounded": 55,
     "with conditions": 55,
     "positioned": 0,
     "misplaced": {},
-    "printed": 5,
-    "evidence": 42,
+    "printed": 6,
+    "evidence": 43,
     "context_bytes_per_request": 241,
     "data_bytes_per_request": 533,
     "examples": {}
@@ -2424,13 +2450,13 @@
   },
   "lcc-energy-s1-clean-revised": {
    "inventory": {
-    "claims": 59,
+    "claims": 60,
     "grounded": 55,
     "with conditions": 55,
     "positioned": 0,
     "misplaced": {},
-    "printed": 10,
-    "evidence": 24,
+    "printed": 11,
+    "evidence": 25,
     "context_bytes_per_request": 243,
     "data_bytes_per_request": 559,
     "examples": {}
@@ -2497,15 +2523,15 @@
   },
   "lcc-energy-s1-clean-revised.pptx": {
    "inventory": {
-    "claims": 25,
-    "grounded": 24,
-    "with conditions": 24,
+    "claims": 23,
+    "grounded": 22,
+    "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
     "printed": 5,
     "evidence": 23,
-    "context_bytes_per_request": 485,
-    "data_bytes_per_request": 137,
+    "context_bytes_per_request": 445,
+    "data_bytes_per_request": 136,
     "examples": {}
    },
    "keyed": {
@@ -2579,7 +2605,7 @@
     "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
-    "printed": 2,
+    "printed": 3,
     "evidence": 4,
     "context_bytes_per_request": 379,
     "data_bytes_per_request": 1216,
@@ -2598,15 +2624,15 @@
   },
   "lcc-energy-s1-clean.pptx": {
    "inventory": {
-    "claims": 25,
-    "grounded": 24,
-    "with conditions": 24,
+    "claims": 23,
+    "grounded": 22,
+    "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
     "printed": 5,
     "evidence": 23,
-    "context_bytes_per_request": 485,
-    "data_bytes_per_request": 137,
+    "context_bytes_per_request": 445,
+    "data_bytes_per_request": 136,
     "examples": {}
    },
    "keyed": {
@@ -2631,7 +2657,7 @@
      "table": 2
     },
     "with records": 17,
-    "printed": 22,
+    "printed": 21,
     "evidence": 23,
     "context_bytes_per_request": 589,
     "data_bytes_per_request": 222,
@@ -2650,12 +2676,12 @@
   },
   "lcc-energy-s1-legend-caption": {
    "inventory": {
-    "claims": 58,
-    "grounded": 53,
-    "with conditions": 53,
+    "claims": 59,
+    "grounded": 54,
+    "with conditions": 54,
     "positioned": 0,
     "misplaced": {},
-    "printed": 9,
+    "printed": 19,
     "evidence": 23,
     "context_bytes_per_request": 363,
     "data_bytes_per_request": 397,
@@ -2674,14 +2700,14 @@
   },
   "lcc-energy-s1-raster": {
    "inventory": {
-    "claims": 62,
+    "claims": 63,
     "grounded": 34,
     "unsupported (image)": 24,
     "with conditions": 58,
     "positioned": 0,
     "misplaced": {},
-    "printed": 3,
-    "evidence": 22,
+    "printed": 4,
+    "evidence": 23,
     "context_bytes_per_request": 98,
     "data_bytes_per_request": 455,
     "examples": {}
@@ -2699,12 +2725,12 @@
   },
   "lcc-energy-s1-scan": {
    "inventory": {
-    "claims": 48,
+    "claims": 49,
     "unsupported (image)": 44,
     "with conditions": 44,
     "positioned": 0,
     "misplaced": {},
-    "evidence": 26,
+    "evidence": 27,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -2722,12 +2748,12 @@
   },
   "lcc-metered-s1-all": {
    "inventory": {
-    "claims": 87,
-    "unsupported (image)": 87,
-    "with conditions": 87,
+    "claims": 98,
+    "unsupported (image)": 97,
+    "with conditions": 97,
     "positioned": 0,
     "misplaced": {},
-    "evidence": 80,
+    "evidence": 93,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -2735,7 +2761,7 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 37
+      "conditions": 39
      }
     },
     "audit": {},
@@ -2745,21 +2771,21 @@
   },
   "lcc-metered-s1-axis": {
    "inventory": {
-    "claims": 117,
-    "grounded": 117,
-    "with conditions": 117,
+    "claims": 111,
+    "grounded": 111,
+    "with conditions": 111,
     "positioned": 0,
     "misplaced": {},
     "printed": 3,
-    "evidence": 103,
-    "context_bytes_per_request": 161,
-    "data_bytes_per_request": 433,
+    "evidence": 101,
+    "context_bytes_per_request": 175,
+    "data_bytes_per_request": 402,
     "examples": {}
    },
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 45
+      "conditions": 43
      }
     },
     "audit": {},
@@ -2930,8 +2956,8 @@
     "with conditions": 128,
     "positioned": 0,
     "misplaced": {},
-    "printed": 27,
-    "evidence": 77,
+    "printed": 25,
+    "evidence": 75,
     "context_bytes_per_request": 209,
     "data_bytes_per_request": 509,
     "examples": {}
@@ -2949,14 +2975,14 @@
   },
   "lcc-metered-s1-raster": {
    "inventory": {
-    "claims": 152,
+    "claims": 153,
     "grounded": 20,
-    "unsupported (image)": 132,
-    "with conditions": 152,
+    "unsupported (image)": 133,
+    "with conditions": 153,
     "positioned": 0,
     "misplaced": {},
-    "printed": 6,
-    "evidence": 54,
+    "printed": 5,
+    "evidence": 55,
     "context_bytes_per_request": 43,
     "data_bytes_per_request": 264,
     "examples": {}
@@ -2974,12 +3000,12 @@
   },
   "lcc-metered-s1-scan": {
    "inventory": {
-    "claims": 94,
-    "unsupported (image)": 94,
-    "with conditions": 94,
+    "claims": 102,
+    "unsupported (image)": 100,
+    "with conditions": 100,
     "positioned": 0,
     "misplaced": {},
-    "evidence": 50,
+    "evidence": 52,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -2987,7 +3013,7 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 46
+      "conditions": 50
      }
     },
     "audit": {},
@@ -2997,32 +3023,31 @@
   },
   "lcc-plan-s1-all": {
    "inventory": {
-    "claims": 219,
-    "grounded": 61,
-    "with conditions": 61,
+    "claims": 223,
+    "grounded": 45,
+    "with conditions": 45,
     "positioned": 0,
     "misplaced": {
-     "numbered in attribute": 12,
-     "numbered in entity": 4
+     "numbered in attribute": 10,
+     "numbered in entity": 2
     },
     "records": {
      "note": 1,
      "sheet": 1
     },
-    "with records": 103,
-    "printed": 9,
-    "evidence": 103,
-    "context_bytes_per_request": 19,
-    "data_bytes_per_request": 247,
+    "with records": 109,
+    "printed": 6,
+    "evidence": 109,
+    "context_bytes_per_request": 18,
+    "data_bytes_per_request": 236,
     "examples": {
      "numbered in attribute": [
-      "MEETING 101 564 SF D101 | dimension 2 | ",
-      "MEETING 101 564 SF D101 | dimension 1 | ",
-      "MECHANICAL 112 | dimension 2 | "
+      "MECHANICAL 112 | dimension 2 | ",
+      "MEETING 104 | dimension 1 | ",
+      "MECHANICAL 112 | dimension 1 | "
      ],
      "numbered in entity": [
       "dimension line 2 | length | ",
-      "dimension line 1 | length | ",
       "dimension line 1 | length | "
      ]
     }
@@ -3043,21 +3068,21 @@
      }
     },
     "named": {
-     "otherwise": 6,
-     "by an unprinted convention": 8
+     "by an unprinted convention": 9,
+     "otherwise": 5
     },
     "examples": {}
    }
   },
   "lcc-plan-s1-clean": {
    "inventory": {
-    "claims": 190,
-    "grounded": 51,
-    "with conditions": 51,
+    "claims": 192,
+    "grounded": 48,
+    "with conditions": 48,
     "positioned": 3,
     "misplaced": {
      "frame in conditions": 6,
-     "numbered in attribute": 18,
+     "numbered in attribute": 10,
      "numbered in entity": 2
     },
     "records": {
@@ -3065,21 +3090,21 @@
      "note": 1,
      "sheet": 1
     },
-    "with records": 99,
+    "with records": 93,
     "printed": 6,
-    "evidence": 99,
+    "evidence": 93,
     "context_bytes_per_request": 29,
     "data_bytes_per_request": 260,
     "examples": {
      "frame in conditions": [
-      "MEETING 104 | area | net, measured to face of finish",
-      "MEETING 101 | area | net, measured to face of finish",
-      "STORAGE 110 | area | net, measured to face of finish"
+      "MEETING 103 | area | net",
+      "STORAGE 110 | area | net",
+      "ELECTRICAL 111 | area | net"
      ],
      "numbered in attribute": [
-      "MEETING 103 | dimension 2 | ",
-      "MEETING 102 | dimension 1 | ",
-      "MEETING 104 | dimension 1 | "
+      "STORAGE 110 | dimension 2 | ",
+      "ELECTRICAL 111 | dimension 1 | ",
+      "STORAGE 110 | dimension 1 | "
      ],
      "numbered in entity": [
       "dimension line 1 | length | ",
@@ -3090,17 +3115,16 @@
    "keyed": {
     "placed": {
      "sibling": {
-      "conditions": 3
+      "nowhere": 3
      },
      "frame": {
-      "conditions": 4,
-      "records": 14,
-      "frame": 3
+      "frame": 7,
+      "records": 14
      }
     },
     "audit": {
      "sibling": {
-      "in conditions": 3
+      "kept out": 3
      }
     },
     "named": {
@@ -3111,15 +3135,15 @@
   },
   "lcc-plan-s1-clean-notes": {
    "inventory": {
-    "claims": 217,
-    "grounded": 67,
+    "claims": 194,
+    "grounded": 49,
     "partly (image)": 1,
-    "with conditions": 68,
+    "with conditions": 50,
     "positioned": 4,
     "misplaced": {
-     "frame in conditions": 23,
-     "numbered in attribute": 18,
-     "numbered in conditions": 3,
+     "frame in conditions": 8,
+     "numbered in attribute": 10,
+     "numbered in conditions": 2,
      "numbered in entity": 2
     },
     "records": {
@@ -3127,26 +3151,25 @@
      "note": 1,
      "sheet": 1
     },
-    "with records": 100,
+    "with records": 94,
     "printed": 6,
-    "evidence": 100,
-    "context_bytes_per_request": 28,
-    "data_bytes_per_request": 285,
+    "evidence": 94,
+    "context_bytes_per_request": 29,
+    "data_bytes_per_request": 260,
     "examples": {
      "frame in conditions": [
-      "MEETING 104 | length | to centerline of stud",
-      "STORAGE 110 | length | to centerline of stud",
-      "MEETING 102 | area | net, measured to face of finish"
+      "MEETING 102 | area | net, measured to face of finish",
+      "ELECTRICAL 111 | area | net, measured to face of finish",
+      "MEETING 104 | area | net, measured to face of finish"
      ],
      "numbered in attribute": [
-      "MEETING 101 | dimension 1 | ",
-      "MEETING 103 | dimension 1 | ",
-      "MEETING 103 | dimension 2 | "
+      "MECHANICAL 112 | dimension 2 | ",
+      "MEETING 104 | dimension 2 | ",
+      "STORAGE 110 | dimension 1 | "
      ],
      "numbered in conditions": [
       "all dimensions | reference | unless noted otherwise",
-      "all dimensions | reference | unless noted otherwise",
-      "all dimensions | reference point | unless noted otherwise"
+      "dimensions | reference point | unless noted otherwise"
      ],
      "numbered in entity": [
       "dimension line 1 | length | ",
@@ -3157,17 +3180,17 @@
    "keyed": {
     "placed": {
      "sibling": {
-      "conditions": 3
+      "nowhere": 3
      },
      "frame": {
-      "conditions": 10,
-      "records": 8,
+      "conditions": 4,
+      "records": 14,
       "frame": 3
      }
     },
     "audit": {
      "sibling": {
-      "in conditions": 3
+      "kept out": 3
      }
     },
     "named": {
@@ -3178,10 +3201,11 @@
   },
   "lcc-plan-s1-clean-revised": {
    "inventory": {
-    "claims": 194,
+    "claims": 210,
     "grounded": 50,
-    "with conditions": 50,
-    "positioned": 5,
+    "partly (image)": 2,
+    "with conditions": 52,
+    "positioned": 3,
     "misplaced": {
      "numbered in attribute": 10,
      "numbered in entity": 2
@@ -3191,11 +3215,11 @@
      "note": 1,
      "sheet": 1
     },
-    "with records": 88,
-    "printed": 9,
-    "evidence": 88,
-    "context_bytes_per_request": 29,
-    "data_bytes_per_request": 273,
+    "with records": 92,
+    "printed": 7,
+    "evidence": 92,
+    "context_bytes_per_request": 26,
+    "data_bytes_per_request": 283,
     "examples": {
      "numbered in attribute": [
       "STORAGE 110 | dimension 2 | ",
@@ -3203,8 +3227,8 @@
       "MEETING 103 | dimension 2 | "
      ],
      "numbered in entity": [
-      "dimension line 1 | length | ",
-      "dimension line 2 | length | "
+      "dimension line 2 | length | ",
+      "dimension line 1 | length | "
      ]
     }
    },
@@ -3214,8 +3238,7 @@
       "conditions": 4
      },
      "frame": {
-      "frame": 7,
-      "records": 14
+      "frame": 21
      }
     },
     "audit": {
@@ -3231,11 +3254,12 @@
   },
   "lcc-plan-s1-rotated": {
    "inventory": {
-    "claims": 226,
-    "grounded": 62,
-    "with conditions": 62,
+    "claims": 225,
+    "grounded": 59,
+    "with conditions": 59,
     "positioned": 0,
     "misplaced": {
+     "frame in conditions": 7,
      "numbered in attribute": 16,
      "numbered in entity": 4
     },
@@ -3243,21 +3267,26 @@
      "note": 1,
      "sheet": 1
     },
-    "with records": 97,
-    "printed": 7,
-    "evidence": 97,
-    "context_bytes_per_request": 19,
-    "data_bytes_per_request": 242,
+    "with records": 94,
+    "printed": 6,
+    "evidence": 94,
+    "context_bytes_per_request": 18,
+    "data_bytes_per_request": 232,
     "examples": {
+     "frame in conditions": [
+      "STORAGE 110 | area | net",
+      "MECHANICAL 112 | area | net",
+      "ELECTRICAL 111 | area | net"
+     ],
      "numbered in attribute": [
       "MEETING 101 | dimension 1 | ",
       "MEETING 101 | dimension 2 | ",
-      "MEETING 102 | dimension 1 | "
+      "MEETING 102 732 D102 | dimension 1 | "
      ],
      "numbered in entity": [
       "dimension line 1 | length | ",
       "dimension line 2 | length | ",
-      "dimension line 1 | length | "
+      "dimension line 2 | length | "
      ]
     }
    },
@@ -3277,21 +3306,21 @@
      }
     },
     "named": {
-     "by an unprinted convention": 6,
-     "otherwise": 8
+     "otherwise": 9,
+     "by an unprinted convention": 5
     },
     "examples": {}
    }
   },
   "lcc-plan-s1-small": {
    "inventory": {
-    "claims": 200,
-    "grounded": 51,
-    "with conditions": 51,
+    "claims": 195,
+    "grounded": 48,
+    "with conditions": 48,
     "positioned": 3,
     "misplaced": {
      "frame in conditions": 6,
-     "numbered in attribute": 30,
+     "numbered in attribute": 22,
      "numbered in entity": 2
     },
     "records": {
@@ -3299,9 +3328,9 @@
      "note": 1,
      "sheet": 1
     },
-    "with records": 104,
+    "with records": 101,
     "printed": 6,
-    "evidence": 104,
+    "evidence": 101,
     "context_bytes_per_request": 29,
     "data_bytes_per_request": 259,
     "examples": {
@@ -3311,9 +3340,9 @@
       "MEETING 102 | area | net"
      ],
      "numbered in attribute": [
-      "MECHANICAL 112 | dimension 2 | ",
-      "STORAGE 110 | dimension 1 | ",
-      "MECHANICAL 112 | dimension 1 | "
+      "MEETING 102 | dimension 2 | ",
+      "MEETING 104 | dimension 1 | ",
+      "MECHANICAL 112 | dimension 2 | "
      ],
      "numbered in entity": [
       "dimension line 2 | length | ",
@@ -3324,7 +3353,7 @@
    "keyed": {
     "placed": {
      "sibling": {
-      "conditions": 3
+      "nowhere": 3
      },
      "frame": {
       "frame": 7,
@@ -3333,7 +3362,7 @@
     },
     "audit": {
      "sibling": {
-      "in conditions": 3
+      "kept out": 3
      }
     },
     "named": {
@@ -3344,13 +3373,12 @@
   },
   "lcc-plan-s1-vertical": {
    "inventory": {
-    "claims": 179,
-    "grounded": 51,
-    "with conditions": 51,
+    "claims": 181,
+    "grounded": 42,
+    "with conditions": 42,
     "positioned": 3,
     "misplaced": {
-     "frame in conditions": 20,
-     "numbered in attribute": 12,
+     "numbered in attribute": 10,
      "numbered in entity": 2
     },
     "records": {
@@ -3358,21 +3386,16 @@
      "note": 1,
      "sheet": 1
     },
-    "with records": 94,
+    "with records": 73,
     "printed": 6,
-    "evidence": 94,
+    "evidence": 73,
     "context_bytes_per_request": 28,
     "data_bytes_per_request": 252,
     "examples": {
-     "frame in conditions": [
-      "MEETING 104 | area | net, measured to face of finish",
-      "MECHANICAL 112 | area | net, measured to face of finish",
-      "D111 | width | face of finish"
-     ],
      "numbered in attribute": [
-      "MEETING 102 | dimension 1 | ",
-      "MEETING 102 | dimension 2 | ",
-      "ELECTRICAL 111 | dimension 2 | "
+      "ELECTRICAL 111 | dimension 2 | ",
+      "MEETING 104 | dimension 2 | ",
+      "MECHANICAL 112 | dimension 2 | "
      ],
      "numbered in entity": [
       "dimension line 2 | length | ",
@@ -3383,17 +3406,16 @@
    "keyed": {
     "placed": {
      "sibling": {
-      "conditions": 3
+      "nowhere": 3
      },
      "frame": {
-      "conditions": 4,
-      "records": 14,
-      "frame": 3
+      "frame": 7,
+      "records": 14
      }
     },
     "audit": {
      "sibling": {
-      "in conditions": 3
+      "kept out": 3
      }
     },
     "named": {
@@ -3404,54 +3426,54 @@
   },
   "lcc-plans-s1-clean": {
    "inventory": {
-    "claims": 429,
-    "grounded": 102,
-    "with conditions": 102,
-    "positioned": 7,
+    "claims": 428,
+    "grounded": 78,
+    "with conditions": 78,
+    "positioned": 6,
     "misplaced": {
-     "frame in conditions": 14,
-     "numbered in attribute": 43
+     "frame in conditions": 8,
+     "numbered in attribute": 20
     },
     "records": {
      "list": 2,
      "note": 2,
      "sheet": 2
     },
-    "with records": 188,
+    "with records": 166,
     "printed": 11,
-    "evidence": 188,
-    "context_bytes_per_request": 51,
-    "data_bytes_per_request": 255,
+    "evidence": 166,
+    "context_bytes_per_request": 50,
+    "data_bytes_per_request": 268,
     "examples": {
      "frame in conditions": [
-      "ELECTRICAL 111 | area | net",
-      "MECHANICAL 112 | area | net",
-      "STORAGE 110 | area | net"
+      "Mechanical 112 | area | net",
+      "Meeting 101 | area | net",
+      "Meeting 102 | area | net"
      ],
      "numbered in attribute": [
-      "MEETING 102 | dimension 1 | ",
-      "MEETING 104 | dimension 2 | ",
-      "MEETING 101 | dimension 2 | "
+      "MECHANICAL 112 | dimension 2 | ",
+      "ELECTRICAL 111 | dimension 1 | ",
+      "MEETING 104 | dimension 2 | "
      ]
     }
    },
    "keyed": {
     "placed": {
      "subject": {
-      "records": 61,
-      "entity": 2
+      "records": 62,
+      "entity": 1
      },
      "frame": {
-      "frame": 14,
-      "records": 26
+      "frame": 39,
+      "records": 1
      },
      "sibling": {
-      "conditions": 3
+      "nowhere": 3
      }
     },
     "audit": {
      "sibling": {
-      "in conditions": 3
+      "kept out": 3
      }
     },
     "named": {
@@ -3462,46 +3484,44 @@
   },
   "lcc-plans-s1-clean-revised": {
    "inventory": {
-    "claims": 437,
-    "grounded": 86,
-    "with conditions": 86,
-    "positioned": 7,
+    "claims": 440,
+    "grounded": 95,
+    "with conditions": 95,
+    "positioned": 6,
     "misplaced": {
-     "frame in conditions": 7,
-     "numbered in attribute": 43
+     "frame in conditions": 1,
+     "numbered in attribute": 20
     },
     "records": {
      "list": 2,
      "note": 2,
      "sheet": 2
     },
-    "with records": 189,
-    "printed": 9,
-    "evidence": 189,
-    "context_bytes_per_request": 33,
-    "data_bytes_per_request": 255,
+    "with records": 175,
+    "printed": 10,
+    "evidence": 175,
+    "context_bytes_per_request": 49,
+    "data_bytes_per_request": 274,
     "examples": {
      "frame in conditions": [
-      "MEETING 102 | area | net",
-      "MEETING 103 | area | net",
-      "ELECTRICAL 111 | area | net"
+      "MECHANICAL 112 | area | net"
      ],
      "numbered in attribute": [
-      "MEETING 102 | dimension 1 | ",
       "MEETING 103 | dimension 1 | ",
-      "MEETING 102 | dimension 2 | "
+      "MEETING 103 | dimension 2 | ",
+      "MEETING 103 | dimension 2 | "
      ]
     }
    },
    "keyed": {
     "placed": {
      "subject": {
-      "records": 61,
-      "entity": 2
+      "records": 62,
+      "entity": 1
      },
      "frame": {
-      "frame": 26,
-      "records": 14
+      "frame": 27,
+      "records": 13
      },
      "sibling": {
       "conditions": 4
@@ -3520,20 +3540,20 @@
   },
   "lcc-s1-all": {
    "inventory": {
-    "claims": 69,
-    "grounded": 29,
-    "partly (image)": 1,
-    "with conditions": 30,
+    "claims": 61,
+    "grounded": 20,
+    "unsupported (image)": 1,
+    "with conditions": 21,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 25,
-    "evidence": 31,
-    "context_bytes_per_request": 250,
-    "data_bytes_per_request": 926,
+    "printed": 27,
+    "evidence": 37,
+    "context_bytes_per_request": 305,
+    "data_bytes_per_request": 787,
     "examples": {}
    },
    "keyed": {
@@ -3554,7 +3574,7 @@
     "named": {},
     "examples": {
      "subject: shown, not used": [
-      "halls.area: wanted 'across the four halls'; read area |  / total exhibit area | "
+      "halls.area: wanted 'across the four halls'; read total exhibit area |  / area | "
      ]
     }
    }
@@ -3562,9 +3582,8 @@
   "lcc-s1-background": {
    "inventory": {
     "claims": 46,
-    "grounded": 5,
+    "grounded": 6,
     "unsupported": 1,
-    "unsupported (image)": 1,
     "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
@@ -3572,8 +3591,8 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 21,
-    "evidence": 22,
+    "printed": 22,
+    "evidence": 23,
     "context_bytes_per_request": 295,
     "data_bytes_per_request": 781,
     "examples": {
@@ -3671,8 +3690,7 @@
    "inventory": {
     "claims": 22,
     "grounded": 5,
-    "unsupported": 1,
-    "with conditions": 6,
+    "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -3683,18 +3701,13 @@
     "evidence": 22,
     "context_bytes_per_request": 548,
     "data_bytes_per_request": 1592,
-    "examples": {
-     "unsupported": [
-      "existing roof | snow load rating | maximum"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {
      "bound": {
-      "nowhere": 1,
-      "attribute": 1,
-      "conditions": 1
+      "nowhere": 2,
+      "attribute": 1
      },
      "subject": {
       "nowhere": 1,
@@ -3703,7 +3716,7 @@
     },
     "audit": {
      "bound": {
-      "shown, not used": 1
+      "shown, not used": 2
      },
      "subject": {
       "not shown": 1
@@ -3712,7 +3725,8 @@
     "named": {},
     "examples": {
      "bound: shown, not used": [
-      "hallc.liveload: wanted 'minimum'; read floor live load | "
+      "hallc.liveload: wanted 'minimum'; read floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating | "
      ],
      "subject: not shown": [
       "halls.area: wanted 'across the four halls'; read total exhibit space | "
@@ -3772,8 +3786,8 @@
   "lcc-s1-clean.pptx": {
    "inventory": {
     "claims": 22,
-    "grounded": 6,
-    "with conditions": 6,
+    "grounded": 5,
+    "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -3789,9 +3803,8 @@
    "keyed": {
     "placed": {
      "bound": {
-      "nowhere": 1,
-      "attribute": 1,
-      "conditions": 1
+      "nowhere": 2,
+      "attribute": 1
      },
      "subject": {
       "nowhere": 1,
@@ -3800,7 +3813,7 @@
     },
     "audit": {
      "bound": {
-      "shown, not used": 1
+      "shown, not used": 2
      },
      "subject": {
       "not shown": 1
@@ -3809,7 +3822,8 @@
     "named": {},
     "examples": {
      "bound: shown, not used": [
-      "hallc.liveload: wanted 'minimum'; read floor live load | "
+      "hallc.liveload: wanted 'minimum'; read floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating | "
      ],
      "subject: not shown": [
       "halls.area: wanted 'across the four halls'; read total exhibit space | "
@@ -3820,8 +3834,8 @@
   "lcc-s1-clean.xlsx": {
    "inventory": {
     "claims": 22,
-    "grounded": 6,
-    "with conditions": 6,
+    "grounded": 5,
+    "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -3837,9 +3851,8 @@
    "keyed": {
     "placed": {
      "bound": {
-      "nowhere": 1,
-      "attribute": 1,
-      "conditions": 1
+      "nowhere": 2,
+      "attribute": 1
      },
      "subject": {
       "nowhere": 1,
@@ -3848,7 +3861,7 @@
     },
     "audit": {
      "bound": {
-      "shown, not used": 1
+      "shown, not used": 2
      },
      "subject": {
       "not shown": 1
@@ -3857,7 +3870,8 @@
     "named": {},
     "examples": {
      "bound: shown, not used": [
-      "hallc.liveload: wanted 'minimum'; read floor live load | "
+      "hallc.liveload: wanted 'minimum'; read floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating | "
      ],
      "subject: not shown": [
       "halls.area: wanted 'across the four halls'; read total exhibit space | "
@@ -3921,18 +3935,19 @@
   },
   "lcc-s1-decorated+two-column": {
    "inventory": {
-    "claims": 46,
-    "grounded": 2,
+    "claims": 51,
+    "grounded": 6,
+    "partly": 2,
     "unsupported (image)": 1,
-    "with conditions": 3,
+    "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 22,
-    "evidence": 23,
+    "printed": 25,
+    "evidence": 28,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 980,
     "examples": {}
@@ -3971,9 +3986,8 @@
   "lcc-s1-frame": {
    "inventory": {
     "claims": 54,
-    "grounded": 5,
+    "grounded": 6,
     "unsupported": 1,
-    "unsupported (image)": 1,
     "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
@@ -3981,8 +3995,8 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 21,
-    "evidence": 22,
+    "printed": 22,
+    "evidence": 23,
     "context_bytes_per_request": 262,
     "data_bytes_per_request": 699,
     "examples": {
@@ -4025,9 +4039,8 @@
   "lcc-s1-frame-lines": {
    "inventory": {
     "claims": 54,
-    "grounded": 5,
+    "grounded": 6,
     "unsupported": 1,
-    "unsupported (image)": 1,
     "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
@@ -4035,8 +4048,8 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 21,
-    "evidence": 22,
+    "printed": 22,
+    "evidence": 23,
     "context_bytes_per_request": 262,
     "data_bytes_per_request": 699,
     "examples": {
@@ -4078,10 +4091,9 @@
   },
   "lcc-s1-furniture": {
    "inventory": {
-    "claims": 46,
-    "grounded": 5,
+    "claims": 48,
+    "grounded": 6,
     "unsupported": 1,
-    "unsupported (image)": 1,
     "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
@@ -4089,8 +4101,8 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 21,
-    "evidence": 22,
+    "printed": 24,
+    "evidence": 25,
     "context_bytes_per_request": 313,
     "data_bytes_per_request": 785,
     "examples": {
@@ -4132,20 +4144,19 @@
   },
   "lcc-s1-landscape": {
    "inventory": {
-    "claims": 73,
-    "grounded": 3,
-    "partly (image)": 1,
+    "claims": 75,
+    "grounded": 5,
     "unsupported": 1,
     "unsupported (image)": 1,
-    "with conditions": 6,
+    "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 23,
-    "evidence": 24,
+    "printed": 24,
+    "evidence": 26,
     "context_bytes_per_request": 234,
     "data_bytes_per_request": 824,
     "examples": {
@@ -4187,12 +4198,12 @@
   },
   "lcc-s1-scanned-frame": {
    "inventory": {
-    "claims": 44,
+    "claims": 45,
     "unsupported (image)": 10,
     "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
-    "evidence": 23,
+    "evidence": 25,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 0,
     "examples": {}
@@ -4200,9 +4211,8 @@
    "keyed": {
     "placed": {
      "bound": {
-      "nowhere": 1,
-      "attribute": 1,
-      "conditions": 1
+      "nowhere": 2,
+      "attribute": 1
      },
      "subject": {
       "nowhere": 1,
@@ -4211,7 +4221,7 @@
     },
     "audit": {
      "bound": {
-      "image only": 1
+      "image only": 2
      },
      "subject": {
       "image only": 1
@@ -4220,7 +4230,8 @@
     "named": {},
     "examples": {
      "bound: image only": [
-      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating |  / snow load rating | "
      ],
      "subject: image only": [
       "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
@@ -4230,19 +4241,19 @@
   },
   "lcc-s1-slide": {
    "inventory": {
-    "claims": 75,
-    "grounded": 13,
+    "claims": 78,
+    "grounded": 16,
     "unsupported": 1,
-    "unsupported (image)": 2,
-    "with conditions": 16,
+    "unsupported (image)": 1,
+    "with conditions": 18,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 22,
-    "evidence": 23,
+    "printed": 23,
+    "evidence": 25,
     "context_bytes_per_request": 225,
     "data_bytes_per_request": 772,
     "examples": {
@@ -4285,17 +4296,17 @@
   "lcc-s1-traps": {
    "inventory": {
     "claims": 60,
-    "grounded": 36,
+    "grounded": 34,
     "unsupported (image)": 1,
-    "with conditions": 37,
+    "with conditions": 35,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 24,
-    "evidence": 30,
+    "printed": 22,
+    "evidence": 28,
     "context_bytes_per_request": 264,
     "data_bytes_per_request": 718,
     "examples": {}
@@ -4325,18 +4336,17 @@
   },
   "lcc-s1-traps-revised": {
    "inventory": {
-    "claims": 60,
+    "claims": 57,
     "grounded": 36,
-    "unsupported (image)": 1,
-    "with conditions": 37,
+    "with conditions": 36,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 22,
-    "evidence": 27,
+    "printed": 21,
+    "evidence": 26,
     "context_bytes_per_request": 264,
     "data_bytes_per_request": 718,
     "examples": {}
@@ -4367,8 +4377,8 @@
   "lcc-s1-traps-revised.docx": {
    "inventory": {
     "claims": 22,
-    "grounded": 9,
-    "with conditions": 9,
+    "grounded": 11,
+    "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -4420,19 +4430,27 @@
    "keyed": {
     "placed": {
      "bound": {
-      "attribute": 3
+      "nowhere": 3
      },
      "subject": {
       "nowhere": 9
      }
     },
     "audit": {
+     "bound": {
+      "shown, not used": 3
+     },
      "subject": {
       "shown, not used": 9
      }
     },
     "named": {},
     "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load | ",
+      "hallc.noise: wanted 'maximum'; read background noise | hall empty and all building systems running",
+      "roof.snow: wanted 'maximum'; read snow load rating | "
+     ],
      "subject: shown, not used": [
       "halls.area: wanted 'across the four halls'; read total exhibit area | ",
       "room101.area: wanted 'Hall C'; read area | ",
@@ -4443,18 +4461,18 @@
   },
   "lcc-s1-traps-revised.pptx": {
    "inventory": {
-    "claims": 22,
-    "grounded": 9,
+    "claims": 24,
+    "grounded": 11,
     "partly": 2,
-    "with conditions": 11,
+    "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 19,
-    "evidence": 22,
+    "printed": 16,
+    "evidence": 24,
     "context_bytes_per_request": 789,
     "data_bytes_per_request": 374,
     "examples": {}
@@ -4480,7 +4498,7 @@
     "named": {},
     "examples": {
      "bound: shown, not used": [
-      "hallc.liveload: wanted 'minimum'; read live load | ",
+      "hallc.liveload: wanted 'minimum'; read live load capacity | ",
       "hallc.noise: wanted 'maximum'; read background noise | hall empty and all building systems running",
       "roof.snow: wanted 'maximum'; read snow load rating | "
      ],
@@ -4492,18 +4510,18 @@
   },
   "lcc-s1-traps-revised.xlsx": {
    "inventory": {
-    "claims": 22,
-    "grounded": 9,
+    "claims": 24,
+    "grounded": 11,
     "partly": 2,
-    "with conditions": 11,
+    "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 19,
-    "evidence": 22,
+    "printed": 16,
+    "evidence": 24,
     "context_bytes_per_request": 780,
     "data_bytes_per_request": 375,
     "examples": {}
@@ -4529,7 +4547,7 @@
     "named": {},
     "examples": {
      "bound: shown, not used": [
-      "hallc.liveload: wanted 'minimum'; read live load | ",
+      "hallc.liveload: wanted 'minimum'; read live load capacity | ",
       "hallc.noise: wanted 'maximum'; read background noise | hall empty and all building systems running",
       "roof.snow: wanted 'maximum'; read snow load rating | "
      ],
@@ -4541,17 +4559,17 @@
   },
   "lcc-s1-traps.docx": {
    "inventory": {
-    "claims": 22,
-    "grounded": 9,
-    "with conditions": 9,
+    "claims": 24,
+    "grounded": 13,
+    "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 18,
-    "evidence": 22,
+    "printed": 16,
+    "evidence": 24,
     "context_bytes_per_request": 548,
     "data_bytes_per_request": 1586,
     "examples": {}
@@ -4559,7 +4577,7 @@
    "keyed": {
     "placed": {
      "bound": {
-      "attribute": 3
+      "nowhere": 3
      },
      "subject": {
       "nowhere": 1,
@@ -4567,12 +4585,20 @@
      }
     },
     "audit": {
+     "bound": {
+      "shown, not used": 3
+     },
      "subject": {
       "shown, not used": 1
      }
     },
     "named": {},
     "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read live load capacity | ",
+      "hallc.noise: wanted 'maximum'; read background noise | hall empty and all building systems running",
+      "roof.snow: wanted 'maximum'; read snow load rating | "
+     ],
      "subject: shown, not used": [
       "halls.area: wanted 'across the four halls'; read total exhibit area | "
      ]
@@ -4586,7 +4612,7 @@
     "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
-    "printed": 10,
+    "printed": 7,
     "evidence": 22,
     "context_bytes_per_request": 692,
     "data_bytes_per_request": 588,
@@ -4595,19 +4621,27 @@
    "keyed": {
     "placed": {
      "bound": {
-      "attribute": 3
+      "nowhere": 3
      },
      "subject": {
       "nowhere": 9
      }
     },
     "audit": {
+     "bound": {
+      "shown, not used": 3
+     },
      "subject": {
       "shown, not used": 9
      }
     },
     "named": {},
     "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read live load capacity | ",
+      "hallc.noise: wanted 'maximum'; read background noise | hall empty and all building systems running",
+      "roof.snow: wanted 'maximum'; read snow load rating | "
+     ],
      "subject: shown, not used": [
       "halls.area: wanted 'across the four halls'; read total exhibit area | ",
       "room101.area: wanted 'Hall C'; read area | ",
@@ -4618,18 +4652,17 @@
   },
   "lcc-s1-traps.pptx": {
    "inventory": {
-    "claims": 22,
-    "grounded": 9,
-    "partly": 2,
-    "with conditions": 11,
+    "claims": 24,
+    "grounded": 15,
+    "with conditions": 15,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 18,
-    "evidence": 22,
+    "printed": 20,
+    "evidence": 24,
     "context_bytes_per_request": 789,
     "data_bytes_per_request": 374,
     "examples": {}
@@ -4667,18 +4700,17 @@
   },
   "lcc-s1-traps.xlsx": {
    "inventory": {
-    "claims": 22,
-    "grounded": 9,
-    "partly": 2,
-    "with conditions": 11,
+    "claims": 24,
+    "grounded": 15,
+    "with conditions": 15,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 18,
-    "evidence": 22,
+    "printed": 20,
+    "evidence": 24,
     "context_bytes_per_request": 780,
     "data_bytes_per_request": 375,
     "examples": {}
@@ -4716,10 +4748,11 @@
   },
   "lcc-s1-two-column": {
    "inventory": {
-    "claims": 60,
-    "grounded": 2,
+    "claims": 59,
+    "grounded": 6,
+    "partly": 2,
     "unsupported (image)": 1,
-    "with conditions": 3,
+    "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -4727,7 +4760,7 @@
     },
     "with records": 8,
     "printed": 25,
-    "evidence": 26,
+    "evidence": 28,
     "context_bytes_per_request": 263,
     "data_bytes_per_request": 843,
     "examples": {}
@@ -4765,26 +4798,21 @@
   },
   "lcc-s1-wide-letter": {
    "inventory": {
-    "claims": 74,
-    "grounded": 9,
-    "unsupported": 1,
+    "claims": 70,
+    "grounded": 11,
     "unsupported (image)": 2,
-    "with conditions": 12,
+    "with conditions": 13,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 23,
+    "printed": 22,
     "evidence": 24,
     "context_bytes_per_request": 170,
     "data_bytes_per_request": 775,
-    "examples": {
-     "unsupported": [
-      "existing roof | snow load rating | maximum"
-     ]
-    }
+    "examples": {}
    },
    "keyed": {
     "placed": {
@@ -4819,22 +4847,63 @@
   },
   "spec-s1": {
    "inventory": {
-    "claims": 80,
-    "grounded": 17,
+    "claims": 78,
+    "grounded": 21,
     "partly": 2,
     "partly (image)": 1,
-    "with conditions": 20,
-    "positioned": 3,
+    "with conditions": 24,
+    "positioned": 4,
     "misplaced": {},
     "records": {
      "list": 1,
      "table": 1
     },
-    "with records": 3,
-    "printed": 15,
-    "evidence": 20,
+    "with records": 4,
+    "printed": 17,
+    "evidence": 22,
     "context_bytes_per_request": 288,
     "data_bytes_per_request": 512,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "nowhere": 2,
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "image only": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: image only": [
+      "timer.congested: wanted 'link congested'; read value |  / value | ",
+      "window.congested: wanted 'link congested'; read size |  / size | "
+     ]
+    }
+   }
+  },
+  "spec-s1-context": {
+   "inventory": {
+    "claims": 63,
+    "grounded": 13,
+    "partly": 1,
+    "partly (image)": 1,
+    "with conditions": 15,
+    "positioned": 4,
+    "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 4,
+    "printed": 20,
+    "evidence": 25,
+    "context_bytes_per_request": 228,
+    "data_bytes_per_request": 482,
     "examples": {}
    },
    "keyed": {
@@ -4852,46 +4921,15 @@
     "named": {},
     "examples": {
      "scope: shown, not used": [
-      "timer.congested: wanted 'link congested'; read value |  / value | ",
-      "window.congested: wanted 'link congested'; read size |  / size | "
+      "timer.congested: wanted 'link lightly loaded'; read value |  / value | ",
+      "window.congested: wanted 'link lightly loaded'; read size |  / size | "
      ]
     }
    }
   },
-  "spec-s1-context": {
-   "inventory": {
-    "claims": 80,
-    "grounded": 15,
-    "partly": 2,
-    "partly (image)": 1,
-    "with conditions": 18,
-    "positioned": 3,
-    "misplaced": {},
-    "records": {
-     "list": 1,
-     "table": 1
-    },
-    "with records": 3,
-    "printed": 19,
-    "evidence": 24,
-    "context_bytes_per_request": 288,
-    "data_bytes_per_request": 513,
-    "examples": {}
-   },
-   "keyed": {
-    "placed": {
-     "scope": {
-      "conditions": 4
-     }
-    },
-    "audit": {},
-    "named": {},
-    "examples": {}
-   }
-  },
   "spec-s1-context.docx": {
    "inventory": {
-    "claims": 20,
+    "claims": 19,
     "grounded": 12,
     "partly": 1,
     "with conditions": 13,
@@ -4902,8 +4940,8 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 15,
-    "evidence": 20,
+    "printed": 14,
+    "evidence": 19,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1377,
     "examples": {}
@@ -4921,20 +4959,20 @@
   },
   "spec-s1-context.md": {
    "inventory": {
-    "claims": 20,
-    "grounded": 9,
-    "partly": 1,
-    "with conditions": 10,
-    "positioned": 3,
+    "claims": 32,
+    "grounded": 13,
+    "partly": 2,
+    "with conditions": 15,
+    "positioned": 4,
     "misplaced": {},
     "records": {
      "list": 1
     },
-    "with records": 3,
+    "with records": 4,
     "printed": 10,
-    "evidence": 20,
-    "context_bytes_per_request": 608,
-    "data_bytes_per_request": 288,
+    "evidence": 22,
+    "context_bytes_per_request": 654,
+    "data_bytes_per_request": 390,
     "examples": {}
    },
    "keyed": {
@@ -4950,9 +4988,9 @@
   },
   "spec-s1-context.pptx": {
    "inventory": {
-    "claims": 20,
-    "grounded": 12,
-    "with conditions": 12,
+    "claims": 19,
+    "grounded": 11,
+    "with conditions": 11,
     "positioned": 3,
     "misplaced": {
      "numbered in attribute": 3
@@ -4962,22 +5000,22 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 13,
-    "evidence": 20,
-    "context_bytes_per_request": 601,
-    "data_bytes_per_request": 228,
+    "printed": 11,
+    "evidence": 18,
+    "context_bytes_per_request": 586,
+    "data_bytes_per_request": 205,
     "examples": {
      "numbered in attribute": [
       "link failure | declaration condition 1 | ",
-      "link failure | declaration condition 3 | ",
-      "link failure | declaration condition 2 | "
+      "link failure | declaration condition 2 | ",
+      "link failure | declaration condition 3 | "
      ]
     }
    },
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 4
+      "conditions": 2
      }
     },
     "audit": {},
@@ -4987,9 +5025,9 @@
   },
   "spec-s1-context.xlsx": {
    "inventory": {
-    "claims": 20,
-    "grounded": 12,
-    "with conditions": 12,
+    "claims": 19,
+    "grounded": 11,
+    "with conditions": 11,
     "positioned": 3,
     "misplaced": {
      "numbered in attribute": 3
@@ -4999,10 +5037,10 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 13,
-    "evidence": 20,
-    "context_bytes_per_request": 589,
-    "data_bytes_per_request": 229,
+    "printed": 11,
+    "evidence": 18,
+    "context_bytes_per_request": 576,
+    "data_bytes_per_request": 206,
     "examples": {
      "numbered in attribute": [
       "link failure | declaration condition 1 | ",
@@ -5014,7 +5052,7 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 4
+      "conditions": 2
      }
     },
     "audit": {},
@@ -5024,20 +5062,20 @@
   },
   "spec-s1-members": {
    "inventory": {
-    "claims": 65,
-    "grounded": 18,
+    "claims": 64,
+    "grounded": 21,
     "partly": 1,
     "partly (image)": 1,
-    "with conditions": 20,
-    "positioned": 3,
+    "with conditions": 23,
+    "positioned": 4,
     "misplaced": {},
     "records": {
      "list": 1,
      "table": 1
     },
-    "with records": 3,
-    "printed": 19,
-    "evidence": 25,
+    "with records": 4,
+    "printed": 18,
+    "evidence": 24,
     "context_bytes_per_request": 163,
     "data_bytes_per_request": 593,
     "examples": {}
@@ -5055,7 +5093,7 @@
   },
   "spec-s1-members.docx": {
    "inventory": {
-    "claims": 21,
+    "claims": 20,
     "grounded": 12,
     "partly": 1,
     "with conditions": 13,
@@ -5066,8 +5104,8 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 15,
-    "evidence": 21,
+    "printed": 14,
+    "evidence": 20,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1409,
     "examples": {}
@@ -5085,18 +5123,18 @@
   },
   "spec-s1-members.md": {
    "inventory": {
-    "claims": 21,
-    "grounded": 9,
+    "claims": 20,
+    "grounded": 8,
     "partly": 1,
-    "with conditions": 10,
+    "with conditions": 9,
     "positioned": 3,
     "misplaced": {},
     "records": {
      "list": 1
     },
     "with records": 3,
-    "printed": 10,
-    "evidence": 21,
+    "printed": 9,
+    "evidence": 20,
     "context_bytes_per_request": 608,
     "data_bytes_per_request": 293,
     "examples": {}
@@ -5114,9 +5152,9 @@
   },
   "spec-s1-members.pptx": {
    "inventory": {
-    "claims": 20,
-    "grounded": 11,
-    "with conditions": 11,
+    "claims": 21,
+    "grounded": 12,
+    "with conditions": 12,
     "positioned": 3,
     "misplaced": {
      "numbered in attribute": 3
@@ -5126,14 +5164,14 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 11,
-    "evidence": 19,
-    "context_bytes_per_request": 593,
-    "data_bytes_per_request": 208,
+    "printed": 13,
+    "evidence": 21,
+    "context_bytes_per_request": 612,
+    "data_bytes_per_request": 233,
     "examples": {
      "numbered in attribute": [
-      "link failure | declaration condition 2 | ",
       "link failure | declaration condition 3 | ",
+      "link failure | declaration condition 2 | ",
       "link failure | declaration condition 1 | "
      ]
     }
@@ -5141,7 +5179,7 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 2
+      "conditions": 4
      }
     },
     "audit": {},
@@ -5151,9 +5189,9 @@
   },
   "spec-s1-members.xlsx": {
    "inventory": {
-    "claims": 20,
-    "grounded": 11,
-    "with conditions": 11,
+    "claims": 21,
+    "grounded": 12,
+    "with conditions": 12,
     "positioned": 3,
     "misplaced": {
      "numbered in attribute": 3
@@ -5163,10 +5201,10 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 11,
-    "evidence": 19,
-    "context_bytes_per_request": 584,
-    "data_bytes_per_request": 210,
+    "printed": 13,
+    "evidence": 21,
+    "context_bytes_per_request": 600,
+    "data_bytes_per_request": 235,
     "examples": {
      "numbered in attribute": [
       "link failure | declaration condition 1 | ",
@@ -5178,7 +5216,7 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 2
+      "conditions": 4
      }
     },
     "audit": {},
@@ -5230,15 +5268,15 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 22,
-    "evidence": 29,
+    "printed": 19,
+    "evidence": 27,
     "context_bytes_per_request": 162,
     "data_bytes_per_request": 601,
     "examples": {
      "numbered in attribute": [
-      "link failure | declaration condition 1 | from setup",
-      "link failure | declaration condition 2 | ",
-      "link failure | declaration condition 4 | signal-to-noise ratio stays for 60 s"
+      "Link failure | declaration condition 3 | ",
+      "Link failure | declaration condition 4 | signal-to-noise ratio stays for 60 s",
+      "Link failure | declaration condition 1 | within 2,052 ms of setup"
      ]
     }
    },
@@ -5256,9 +5294,8 @@
   "spec-s1-renumbered-numbered.docx": {
    "inventory": {
     "claims": 21,
-    "grounded": 12,
-    "partly": 1,
-    "with conditions": 13,
+    "grounded": 14,
+    "with conditions": 14,
     "positioned": 4,
     "misplaced": {},
     "records": {
@@ -5266,7 +5303,7 @@
      "table": 1
     },
     "with records": 9,
-    "printed": 15,
+    "printed": 16,
     "evidence": 21,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1443,
@@ -5286,9 +5323,8 @@
   "spec-s1-renumbered.docx": {
    "inventory": {
     "claims": 21,
-    "grounded": 12,
-    "partly": 1,
-    "with conditions": 13,
+    "grounded": 14,
+    "with conditions": 14,
     "positioned": 4,
     "misplaced": {},
     "records": {
@@ -5296,7 +5332,7 @@
      "table": 1
     },
     "with records": 9,
-    "printed": 15,
+    "printed": 16,
     "evidence": 21,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1443,
@@ -5315,17 +5351,17 @@
   },
   "spec-s1-renumbered.md": {
    "inventory": {
-    "claims": 21,
-    "grounded": 10,
-    "with conditions": 10,
+    "claims": 20,
+    "grounded": 9,
+    "with conditions": 9,
     "positioned": 4,
     "misplaced": {},
     "records": {
      "list": 1
     },
     "with records": 4,
-    "printed": 11,
-    "evidence": 21,
+    "printed": 10,
+    "evidence": 20,
     "context_bytes_per_request": 608,
     "data_bytes_per_request": 299,
     "examples": {}
@@ -5343,9 +5379,9 @@
   },
   "spec-s1-renumbered.pptx": {
    "inventory": {
-    "claims": 20,
-    "grounded": 13,
-    "with conditions": 13,
+    "claims": 21,
+    "grounded": 14,
+    "with conditions": 14,
     "positioned": 4,
     "misplaced": {
      "numbered in attribute": 4
@@ -5355,85 +5391,17 @@
      "table": 1
     },
     "with records": 9,
-    "printed": 11,
-    "evidence": 19,
-    "context_bytes_per_request": 617,
-    "data_bytes_per_request": 213,
+    "printed": 13,
+    "evidence": 21,
+    "context_bytes_per_request": 624,
+    "data_bytes_per_request": 239,
     "examples": {
      "numbered in attribute": [
       "link failure | declaration condition 2 | ",
-      "link failure | declaration condition 1 | of setup",
-      "link failure | declaration condition 3 | "
-     ]
-    }
-   },
-   "keyed": {
-    "placed": {
-     "scope": {
-      "conditions": 2
-     }
-    },
-    "audit": {},
-    "named": {},
-    "examples": {}
-   }
-  },
-  "spec-s1-renumbered.xlsx": {
-   "inventory": {
-    "claims": 20,
-    "grounded": 13,
-    "with conditions": 13,
-    "positioned": 4,
-    "misplaced": {
-     "numbered in attribute": 4
-    },
-    "records": {
-     "list": 1,
-     "table": 1
-    },
-    "with records": 9,
-    "printed": 11,
-    "evidence": 19,
-    "context_bytes_per_request": 608,
-    "data_bytes_per_request": 214,
-    "examples": {
-     "numbered in attribute": [
       "link failure | declaration condition 3 | ",
-      "link failure | declaration condition 4 | for 60 s",
       "link failure | declaration condition 1 | of setup"
      ]
     }
-   },
-   "keyed": {
-    "placed": {
-     "scope": {
-      "conditions": 2
-     }
-    },
-    "audit": {},
-    "named": {},
-    "examples": {}
-   }
-  },
-  "spec-s1-revised": {
-   "inventory": {
-    "claims": 79,
-    "grounded": 18,
-    "partly": 2,
-    "partly (image)": 1,
-    "with conditions": 21,
-    "positioned": 3,
-    "misplaced": {},
-    "records": {
-     "list": 1,
-     "table": 1
-    },
-    "with records": 3,
-    "printed": 17,
-    "evidence": 22,
-    "context_bytes_per_request": 288,
-    "data_bytes_per_request": 512,
-    "examples": {}
    },
    "keyed": {
     "placed": {
@@ -5446,9 +5414,87 @@
     "examples": {}
    }
   },
+  "spec-s1-renumbered.xlsx": {
+   "inventory": {
+    "claims": 21,
+    "grounded": 14,
+    "with conditions": 14,
+    "positioned": 4,
+    "misplaced": {
+     "numbered in attribute": 4
+    },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 9,
+    "printed": 13,
+    "evidence": 21,
+    "context_bytes_per_request": 612,
+    "data_bytes_per_request": 240,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 3 | ",
+      "link failure | declaration condition 4 | for 60 s",
+      "link failure | declaration condition 2 | "
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 4
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1-revised": {
+   "inventory": {
+    "claims": 63,
+    "grounded": 17,
+    "partly": 1,
+    "partly (image)": 1,
+    "with conditions": 19,
+    "positioned": 4,
+    "misplaced": {},
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 4,
+    "printed": 18,
+    "evidence": 23,
+    "context_bytes_per_request": 228,
+    "data_bytes_per_request": 481,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "nowhere": 2,
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "image only": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: image only": [
+      "timer.congested: wanted 'link congested'; read value |  / value | ",
+      "window.congested: wanted 'link congested'; read size |  / size | "
+     ]
+    }
+   }
+  },
   "spec-s1-revised.docx": {
    "inventory": {
-    "claims": 19,
+    "claims": 20,
     "grounded": 12,
     "partly": 1,
     "with conditions": 13,
@@ -5459,8 +5505,8 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 14,
-    "evidence": 19,
+    "printed": 15,
+    "evidence": 20,
     "context_bytes_per_request": 116,
     "data_bytes_per_request": 1372,
     "examples": {}
@@ -5478,26 +5524,26 @@
   },
   "spec-s1-revised.md": {
    "inventory": {
-    "claims": 19,
-    "grounded": 8,
-    "partly": 1,
-    "with conditions": 9,
+    "claims": 30,
+    "grounded": 11,
+    "partly": 2,
+    "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
     "records": {
      "list": 1
     },
     "with records": 3,
-    "printed": 9,
+    "printed": 8,
     "evidence": 19,
-    "context_bytes_per_request": 608,
-    "data_bytes_per_request": 287,
+    "context_bytes_per_request": 654,
+    "data_bytes_per_request": 389,
     "examples": {}
    },
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 4
+      "conditions": 2
      }
     },
     "audit": {},
@@ -5509,7 +5555,8 @@
    "inventory": {
     "claims": 20,
     "grounded": 12,
-    "with conditions": 12,
+    "partly": 1,
+    "with conditions": 13,
     "positioned": 3,
     "misplaced": {
      "numbered in attribute": 3
@@ -5525,8 +5572,8 @@
     "data_bytes_per_request": 227,
     "examples": {
      "numbered in attribute": [
-      "link failure | declaration condition 3 | ",
       "link failure | declaration condition 1 | ",
+      "link failure | declaration condition 3 | duration: 60 s",
       "link failure | declaration condition 2 | "
      ]
     }
@@ -5544,9 +5591,10 @@
   },
   "spec-s1-revised.xlsx": {
    "inventory": {
-    "claims": 22,
-    "grounded": 9,
-    "with conditions": 9,
+    "claims": 20,
+    "grounded": 11,
+    "partly": 1,
+    "with conditions": 12,
     "positioned": 3,
     "misplaced": {
      "numbered in attribute": 3
@@ -5557,12 +5605,12 @@
     },
     "with records": 8,
     "printed": 13,
-    "evidence": 21,
+    "evidence": 20,
     "context_bytes_per_request": 588,
     "data_bytes_per_request": 228,
     "examples": {
      "numbered in attribute": [
-      "link failure | declaration condition 3 | ",
+      "link failure | declaration condition 3 | duration: 60 s",
       "link failure | declaration condition 2 | ",
       "link failure | declaration condition 1 | "
      ]
@@ -5611,21 +5659,58 @@
   },
   "spec-s1.md": {
    "inventory": {
-    "claims": 33,
-    "grounded": 14,
+    "claims": 30,
+    "grounded": 11,
     "partly": 2,
-    "with conditions": 16,
+    "with conditions": 13,
     "positioned": 3,
     "misplaced": {},
     "records": {
      "list": 1
     },
     "with records": 3,
-    "printed": 12,
-    "evidence": 23,
+    "printed": 8,
+    "evidence": 19,
     "context_bytes_per_request": 654,
     "data_bytes_per_request": 389,
     "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "spec-s1.pptx": {
+   "inventory": {
+    "claims": 20,
+    "grounded": 12,
+    "with conditions": 12,
+    "positioned": 3,
+    "misplaced": {
+     "numbered in attribute": 3
+    },
+    "records": {
+     "list": 1,
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 13,
+    "evidence": 20,
+    "context_bytes_per_request": 600,
+    "data_bytes_per_request": 227,
+    "examples": {
+     "numbered in attribute": [
+      "link failure | declaration condition 1 | ",
+      "link failure | declaration condition 3 | ",
+      "link failure | declaration condition 2 | "
+     ]
+    }
    },
    "keyed": {
     "placed": {
@@ -5638,48 +5723,11 @@
     "examples": {}
    }
   },
-  "spec-s1.pptx": {
-   "inventory": {
-    "claims": 19,
-    "grounded": 11,
-    "with conditions": 11,
-    "positioned": 3,
-    "misplaced": {
-     "numbered in attribute": 3
-    },
-    "records": {
-     "list": 1,
-     "table": 1
-    },
-    "with records": 8,
-    "printed": 11,
-    "evidence": 18,
-    "context_bytes_per_request": 584,
-    "data_bytes_per_request": 204,
-    "examples": {
-     "numbered in attribute": [
-      "link failure | declaration condition 3 | ",
-      "link failure | declaration condition 1 | ",
-      "link failure | declaration condition 2 | "
-     ]
-    }
-   },
-   "keyed": {
-    "placed": {
-     "scope": {
-      "conditions": 2
-     }
-    },
-    "audit": {},
-    "named": {},
-    "examples": {}
-   }
-  },
   "spec-s1.xlsx": {
    "inventory": {
-    "claims": 19,
-    "grounded": 11,
-    "with conditions": 11,
+    "claims": 20,
+    "grounded": 12,
+    "with conditions": 12,
     "positioned": 3,
     "misplaced": {
      "numbered in attribute": 3
@@ -5689,10 +5737,10 @@
      "table": 1
     },
     "with records": 8,
-    "printed": 11,
-    "evidence": 18,
-    "context_bytes_per_request": 575,
-    "data_bytes_per_request": 205,
+    "printed": 13,
+    "evidence": 20,
+    "context_bytes_per_request": 588,
+    "data_bytes_per_request": 228,
     "examples": {
      "numbered in attribute": [
       "link failure | declaration condition 3 | ",
@@ -5704,7 +5752,7 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 2
+      "conditions": 4
      }
     },
     "audit": {},
@@ -5714,11 +5762,13 @@
   },
   "uv-layout-s1-all": {
    "inventory": {
-    "claims": 70,
+    "claims": 73,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
-    "printed": 12,
-    "evidence": 55,
+    "printed": 9,
+    "evidence": 46,
     "context_bytes_per_request": 114,
     "data_bytes_per_request": 671,
     "examples": {}
@@ -5732,15 +5782,15 @@
   },
   "uv-layout-s1-clean": {
    "inventory": {
-    "claims": 71,
-    "grounded": 10,
-    "with conditions": 10,
+    "claims": 83,
+    "grounded": 23,
+    "with conditions": 23,
     "positioned": 0,
     "misplaced": {},
-    "printed": 27,
+    "printed": 26,
     "evidence": 37,
-    "context_bytes_per_request": 0,
-    "data_bytes_per_request": 922,
+    "context_bytes_per_request": 130,
+    "data_bytes_per_request": 840,
     "examples": {}
    },
    "keyed": {
@@ -5752,13 +5802,13 @@
   },
   "uv-layout-s1-figure-only": {
    "inventory": {
-    "claims": 58,
-    "grounded": 10,
-    "with conditions": 10,
+    "claims": 60,
+    "grounded": 5,
+    "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
-    "printed": 5,
-    "evidence": 29,
+    "printed": 4,
+    "evidence": 30,
     "context_bytes_per_request": 120,
     "data_bytes_per_request": 477,
     "examples": {}
@@ -5772,13 +5822,13 @@
   },
   "uv-layout-s1-folded": {
    "inventory": {
-    "claims": 61,
-    "grounded": 24,
-    "with conditions": 24,
+    "claims": 55,
+    "grounded": 22,
+    "with conditions": 22,
     "positioned": 0,
     "misplaced": {},
-    "printed": 7,
-    "evidence": 33,
+    "printed": 4,
+    "evidence": 34,
     "context_bytes_per_request": 106,
     "data_bytes_per_request": 445,
     "examples": {}
@@ -5793,12 +5843,12 @@
   "uv-layout-s1-leaders": {
    "inventory": {
     "claims": 58,
-    "grounded": 7,
-    "with conditions": 7,
+    "grounded": 11,
+    "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
-    "printed": 3,
-    "evidence": 38,
+    "printed": 6,
+    "evidence": 36,
     "context_bytes_per_request": 120,
     "data_bytes_per_request": 478,
     "examples": {}
@@ -5812,13 +5862,13 @@
   },
   "uv-layout-s1-legend": {
    "inventory": {
-    "claims": 57,
-    "grounded": 29,
-    "with conditions": 29,
+    "claims": 52,
+    "grounded": 24,
+    "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
     "printed": 5,
-    "evidence": 32,
+    "evidence": 31,
     "context_bytes_per_request": 107,
     "data_bytes_per_request": 447,
     "examples": {}
@@ -5837,7 +5887,7 @@
     "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
-    "printed": 38,
+    "printed": 30,
     "evidence": 43,
     "context_bytes_per_request": 195,
     "data_bytes_per_request": 982,
@@ -5873,12 +5923,12 @@
   "views-echo-s1": {
    "inventory": {
     "claims": 29,
-    "grounded": 10,
-    "with conditions": 10,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
-    "printed": 12,
-    "evidence": 12,
+    "printed": 9,
+    "evidence": 9,
     "context_bytes_per_request": 203,
     "data_bytes_per_request": 364,
     "examples": {}
@@ -5900,12 +5950,12 @@
   "views-echo-s1-revised": {
    "inventory": {
     "claims": 29,
-    "grounded": 10,
-    "with conditions": 10,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
-    "printed": 12,
-    "evidence": 12,
+    "printed": 9,
+    "evidence": 9,
     "context_bytes_per_request": 203,
     "data_bytes_per_request": 364,
     "examples": {}
@@ -5927,8 +5977,8 @@
   "views-echo-s1-revised.docx": {
    "inventory": {
     "claims": 7,
-    "grounded": 6,
-    "with conditions": 6,
+    "grounded": 3,
+    "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
     "printed": 7,
@@ -5954,8 +6004,8 @@
   "views-echo-s1-revised.md": {
    "inventory": {
     "claims": 7,
-    "grounded": 7,
-    "with conditions": 7,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
     "printed": 7,
@@ -6035,8 +6085,8 @@
   "views-echo-s1.docx": {
    "inventory": {
     "claims": 7,
-    "grounded": 6,
-    "with conditions": 6,
+    "grounded": 3,
+    "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
     "printed": 7,
@@ -6062,8 +6112,8 @@
   "views-echo-s1.md": {
    "inventory": {
     "claims": 7,
-    "grounded": 7,
-    "with conditions": 7,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
     "printed": 7,
@@ -6143,12 +6193,10 @@
   "views-grouped-s1": {
    "inventory": {
     "claims": 40,
-    "grounded": 38,
-    "with conditions": 38,
     "positioned": 0,
     "misplaced": {},
-    "printed": 23,
-    "evidence": 23,
+    "printed": 18,
+    "evidence": 18,
     "context_bytes_per_request": 164,
     "data_bytes_per_request": 416,
     "examples": {}
@@ -6170,8 +6218,6 @@
   "views-grouped-s1.docx": {
    "inventory": {
     "claims": 10,
-    "grounded": 6,
-    "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
     "printed": 10,
@@ -6197,8 +6243,6 @@
   "views-grouped-s1.md": {
    "inventory": {
     "claims": 10,
-    "grounded": 9,
-    "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
     "printed": 10,
@@ -6224,6 +6268,8 @@
   "views-grouped-s1.pptx": {
    "inventory": {
     "claims": 10,
+    "grounded": 6,
+    "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
     "printed": 10,
@@ -6249,6 +6295,8 @@
   "views-grouped-s1.xlsx": {
    "inventory": {
     "claims": 10,
+    "grounded": 6,
+    "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
     "printed": 10,
@@ -6273,15 +6321,15 @@
   },
   "views-poll-s1": {
    "inventory": {
-    "claims": 36,
-    "grounded": 20,
-    "with conditions": 20,
+    "claims": 56,
+    "grounded": 6,
+    "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
-    "printed": 20,
-    "evidence": 30,
-    "context_bytes_per_request": 288,
-    "data_bytes_per_request": 238,
+    "printed": 15,
+    "evidence": 27,
+    "context_bytes_per_request": 338,
+    "data_bytes_per_request": 177,
     "examples": {}
    },
    "keyed": {
@@ -6293,22 +6341,22 @@
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 4
+     "in its stance": 4
     },
     "examples": {}
    }
   },
   "views-poll-s1-revised": {
    "inventory": {
-    "claims": 36,
-    "grounded": 17,
-    "with conditions": 17,
+    "claims": 54,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
-    "printed": 20,
-    "evidence": 30,
-    "context_bytes_per_request": 288,
-    "data_bytes_per_request": 241,
+    "printed": 10,
+    "evidence": 22,
+    "context_bytes_per_request": 349,
+    "data_bytes_per_request": 169,
     "examples": {}
    },
    "keyed": {
@@ -6320,22 +6368,22 @@
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 3
+     "in its stance": 3
     },
     "examples": {}
    }
   },
   "views-poll-s1-revised.docx": {
    "inventory": {
-    "claims": 22,
-    "grounded": 12,
-    "with conditions": 12,
+    "claims": 26,
+    "grounded": 2,
+    "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
-    "printed": 10,
-    "evidence": 17,
-    "context_bytes_per_request": 488,
-    "data_bytes_per_request": 88,
+    "printed": 6,
+    "evidence": 18,
+    "context_bytes_per_request": 495,
+    "data_bytes_per_request": 79,
     "examples": {}
    },
    "keyed": {
@@ -6347,22 +6395,22 @@
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 3
+     "in its stance": 3
     },
     "examples": {}
    }
   },
   "views-poll-s1-revised.md": {
    "inventory": {
-    "claims": 21,
-    "grounded": 12,
-    "with conditions": 12,
+    "claims": 25,
+    "grounded": 4,
+    "with conditions": 4,
     "positioned": 0,
     "misplaced": {},
-    "printed": 11,
-    "evidence": 17,
-    "context_bytes_per_request": 622,
-    "data_bytes_per_request": 93,
+    "printed": 8,
+    "evidence": 18,
+    "context_bytes_per_request": 623,
+    "data_bytes_per_request": 83,
     "examples": {}
    },
    "keyed": {
@@ -6374,7 +6422,7 @@
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 3
+     "in its stance": 3
     },
     "examples": {}
    }
@@ -6382,8 +6430,8 @@
   "views-poll-s1-revised.pptx": {
    "inventory": {
     "claims": 18,
-    "grounded": 18,
-    "with conditions": 18,
+    "grounded": 16,
+    "with conditions": 16,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -6413,8 +6461,8 @@
   "views-poll-s1-revised.xlsx": {
    "inventory": {
     "claims": 18,
-    "grounded": 18,
-    "with conditions": 18,
+    "grounded": 16,
+    "with conditions": 16,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -6443,15 +6491,15 @@
   },
   "views-poll-s1.docx": {
    "inventory": {
-    "claims": 23,
-    "grounded": 12,
-    "with conditions": 12,
+    "claims": 25,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
-    "printed": 10,
-    "evidence": 18,
+    "printed": 8,
+    "evidence": 19,
     "context_bytes_per_request": 488,
-    "data_bytes_per_request": 87,
+    "data_bytes_per_request": 83,
     "examples": {}
    },
    "keyed": {
@@ -6463,22 +6511,22 @@
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 4
+     "in its stance": 4
     },
     "examples": {}
    }
   },
   "views-poll-s1.md": {
    "inventory": {
-    "claims": 23,
-    "grounded": 11,
-    "with conditions": 11,
+    "claims": 25,
+    "grounded": 6,
+    "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
-    "printed": 10,
-    "evidence": 18,
+    "printed": 8,
+    "evidence": 19,
     "context_bytes_per_request": 620,
-    "data_bytes_per_request": 88,
+    "data_bytes_per_request": 84,
     "examples": {}
    },
    "keyed": {
@@ -6490,24 +6538,24 @@
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 3
+     "in its stance": 3
     },
     "examples": {}
    }
   },
   "views-poll-s1.pptx": {
    "inventory": {
-    "claims": 17,
-    "grounded": 14,
-    "with conditions": 14,
+    "claims": 19,
+    "grounded": 12,
+    "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 15,
-    "evidence": 17,
+    "printed": 13,
+    "evidence": 19,
     "context_bytes_per_request": 482,
     "data_bytes_per_request": 103,
     "examples": {}
@@ -6521,7 +6569,8 @@
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 4
+     "none": 2,
+     "in its stance": 2
     },
     "examples": {}
    }
@@ -6529,8 +6578,8 @@
   "views-poll-s1.xlsx": {
    "inventory": {
     "claims": 18,
-    "grounded": 18,
-    "with conditions": 18,
+    "grounded": 16,
+    "with conditions": 16,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -6560,13 +6609,12 @@
   "views-prose-s1": {
    "inventory": {
     "claims": 14,
-    "grounded": 4,
-    "partly": 5,
-    "with conditions": 9,
+    "grounded": 3,
+    "with conditions": 3,
     "positioned": 0,
     "misplaced": {},
-    "printed": 11,
-    "evidence": 11,
+    "printed": 8,
+    "evidence": 8,
     "context_bytes_per_request": 0,
     "data_bytes_per_request": 818,
     "examples": {}
@@ -6574,13 +6622,14 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 5
+      "stance": 5
      }
     },
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 5
+     "in its stance": 4,
+     "another": 1
     },
     "examples": {}
    }
@@ -6588,9 +6637,8 @@
   "views-prose-s1.docx": {
    "inventory": {
     "claims": 7,
-    "grounded": 2,
-    "partly": 5,
-    "with conditions": 7,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
     "printed": 7,
@@ -6602,13 +6650,14 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 5
+      "stance": 5
      }
     },
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 5
+     "in its stance": 4,
+     "another": 1
     },
     "examples": {}
    }
@@ -6616,9 +6665,8 @@
   "views-prose-s1.md": {
    "inventory": {
     "claims": 7,
-    "grounded": 2,
-    "partly": 5,
-    "with conditions": 7,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
     "printed": 7,
@@ -6630,13 +6678,14 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 5
+      "stance": 5
      }
     },
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 5
+     "in its stance": 4,
+     "another": 1
     },
     "examples": {}
    }
@@ -6644,9 +6693,8 @@
   "views-prose-s1.pptx": {
    "inventory": {
     "claims": 7,
-    "grounded": 2,
-    "partly": 5,
-    "with conditions": 7,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
     "printed": 7,
@@ -6658,13 +6706,14 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 5
+      "stance": 5
      }
     },
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 5
+     "in its stance": 4,
+     "another": 1
     },
     "examples": {}
    }
@@ -6672,9 +6721,8 @@
   "views-prose-s1.xlsx": {
    "inventory": {
     "claims": 7,
-    "grounded": 2,
-    "partly": 5,
-    "with conditions": 7,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
     "printed": 7,
@@ -6686,13 +6734,14 @@
    "keyed": {
     "placed": {
      "holder": {
-      "conditions": 5
+      "stance": 5
      }
     },
     "audit": {},
     "named": {},
     "attitudes": {
-     "none": 5
+     "in its stance": 4,
+     "another": 1
     },
     "examples": {}
    }
@@ -6700,12 +6749,10 @@
   "views-s1": {
    "inventory": {
     "claims": 34,
-    "grounded": 34,
-    "with conditions": 34,
     "positioned": 0,
     "misplaced": {},
-    "printed": 26,
-    "evidence": 26,
+    "printed": 15,
+    "evidence": 15,
     "context_bytes_per_request": 253,
     "data_bytes_per_request": 384,
     "examples": {}
@@ -6727,12 +6774,10 @@
   "views-s1-revised": {
    "inventory": {
     "claims": 34,
-    "grounded": 34,
-    "with conditions": 34,
     "positioned": 0,
     "misplaced": {},
-    "printed": 25,
-    "evidence": 25,
+    "printed": 17,
+    "evidence": 17,
     "context_bytes_per_request": 253,
     "data_bytes_per_request": 384,
     "examples": {}
@@ -6754,8 +6799,6 @@
   "views-s1-revised.docx": {
    "inventory": {
     "claims": 8,
-    "grounded": 8,
-    "with conditions": 8,
     "positioned": 0,
     "misplaced": {},
     "printed": 8,
@@ -6781,8 +6824,6 @@
   "views-s1-revised.md": {
    "inventory": {
     "claims": 8,
-    "grounded": 8,
-    "with conditions": 8,
     "positioned": 0,
     "misplaced": {},
     "printed": 8,
@@ -6808,8 +6849,8 @@
   "views-s1-revised.pptx": {
    "inventory": {
     "claims": 8,
-    "grounded": 3,
-    "with conditions": 3,
+    "grounded": 2,
+    "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
     "printed": 8,
@@ -6835,8 +6876,8 @@
   "views-s1-revised.xlsx": {
    "inventory": {
     "claims": 8,
-    "grounded": 3,
-    "with conditions": 3,
+    "grounded": 2,
+    "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
     "printed": 8,
@@ -6862,8 +6903,6 @@
   "views-s1.docx": {
    "inventory": {
     "claims": 8,
-    "grounded": 8,
-    "with conditions": 8,
     "positioned": 0,
     "misplaced": {},
     "printed": 8,
@@ -6889,8 +6928,8 @@
   "views-s1.md": {
    "inventory": {
     "claims": 8,
-    "grounded": 8,
-    "with conditions": 8,
+    "grounded": 1,
+    "with conditions": 1,
     "positioned": 0,
     "misplaced": {},
     "printed": 8,
@@ -6916,8 +6955,8 @@
   "views-s1.pptx": {
    "inventory": {
     "claims": 8,
-    "grounded": 3,
-    "with conditions": 3,
+    "grounded": 2,
+    "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
     "printed": 8,
@@ -6943,8 +6982,8 @@
   "views-s1.xlsx": {
    "inventory": {
     "claims": 8,
-    "grounded": 3,
-    "with conditions": 3,
+    "grounded": 2,
+    "with conditions": 2,
     "positioned": 0,
     "misplaced": {},
     "printed": 8,
@@ -6969,7 +7008,7 @@
   },
   "wtp-datasheets-s1": {
    "inventory": {
-    "claims": 106,
+    "claims": 105,
     "grounded": 36,
     "with conditions": 36,
     "positioned": 0,
@@ -6979,9 +7018,9 @@
     },
     "with records": 0,
     "printed": 8,
-    "evidence": 23,
-    "context_bytes_per_request": 138,
-    "data_bytes_per_request": 308,
+    "evidence": 24,
+    "context_bytes_per_request": 178,
+    "data_bytes_per_request": 285,
     "examples": {}
    },
    "keyed": {
@@ -7018,11 +7057,11 @@
   "wtp-datasheets-s1.md": {
    "inventory": {
     "claims": 24,
-    "grounded": 5,
-    "with conditions": 5,
+    "grounded": 8,
+    "with conditions": 8,
     "positioned": 0,
     "misplaced": {},
-    "printed": 1,
+    "printed": 3,
     "evidence": 22,
     "context_bytes_per_request": 544,
     "data_bytes_per_request": 78,
@@ -7085,19 +7124,19 @@
   },
   "wtp-s1": {
    "inventory": {
-    "claims": 100,
-    "grounded": 37,
-    "with conditions": 37,
+    "claims": 111,
+    "grounded": 36,
+    "with conditions": 36,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 2
     },
     "with records": 13,
-    "printed": 34,
+    "printed": 33,
     "evidence": 40,
-    "context_bytes_per_request": 241,
-    "data_bytes_per_request": 548,
+    "context_bytes_per_request": 219,
+    "data_bytes_per_request": 637,
     "examples": {}
    },
    "keyed": {
@@ -7106,21 +7145,12 @@
       "conditions": 9
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
-    "audit": {
-     "frame": {
-      "shown, not used": 1
-     }
-    },
+    "audit": {},
     "named": {},
-    "examples": {
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years / 95th percentile turbidity | measured over five years"
-     ]
-    }
+    "examples": {}
    }
   },
   "wtp-s1-comments.docx": {
@@ -7165,10 +7195,9 @@
   },
   "wtp-s1-conditions": {
    "inventory": {
-    "claims": 116,
-    "grounded": 38,
-    "no content words": 1,
-    "with conditions": 39,
+    "claims": 99,
+    "grounded": 35,
+    "with conditions": 35,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -7176,9 +7205,9 @@
     },
     "with records": 13,
     "printed": 35,
-    "evidence": 41,
-    "context_bytes_per_request": 219,
-    "data_bytes_per_request": 636,
+    "evidence": 39,
+    "context_bytes_per_request": 241,
+    "data_bytes_per_request": 547,
     "examples": {}
    },
    "keyed": {
@@ -7187,26 +7216,17 @@
       "conditions": 9
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
-    "audit": {
-     "frame": {
-      "shown, not used": 1
-     }
-    },
+    "audit": {},
     "named": {},
-    "examples": {
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '99th percentile'; read 99th percentile turbidity | measured over five years / 99th percentile turbidity | measured over five years"
-     ]
-    }
+    "examples": {}
    }
   },
   "wtp-s1-conditions.docx": {
    "inventory": {
-    "claims": 33,
+    "claims": 32,
     "grounded": 11,
     "with conditions": 11,
     "positioned": 0,
@@ -7215,8 +7235,8 @@
      "table": 2
     },
     "with records": 13,
-    "printed": 30,
-    "evidence": 33,
+    "printed": 29,
+    "evidence": 32,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1181,
     "examples": {}
@@ -7253,13 +7273,13 @@
   },
   "wtp-s1-conditions.md": {
    "inventory": {
-    "claims": 35,
-    "grounded": 13,
-    "with conditions": 13,
+    "claims": 33,
+    "grounded": 12,
+    "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
-    "printed": 17,
-    "evidence": 35,
+    "printed": 15,
+    "evidence": 33,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 260,
     "examples": {}
@@ -7270,26 +7290,17 @@
       "conditions": 9
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
-    "audit": {
-     "frame": {
-      "shown, not used": 1
-     }
-    },
+    "audit": {},
     "named": {},
-    "examples": {
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '99th percentile'; read 99th percentile turbidity | measured over five years"
-     ]
-    }
+    "examples": {}
    }
   },
   "wtp-s1-conditions.pptx": {
    "inventory": {
-    "claims": 33,
+    "claims": 32,
     "grounded": 11,
     "with conditions": 11,
     "positioned": 0,
@@ -7298,8 +7309,8 @@
      "table": 2
     },
     "with records": 13,
-    "printed": 30,
-    "evidence": 33,
+    "printed": 29,
+    "evidence": 32,
     "context_bytes_per_request": 610,
     "data_bytes_per_request": 235,
     "examples": {}
@@ -7336,7 +7347,7 @@
   },
   "wtp-s1-conditions.xlsx": {
    "inventory": {
-    "claims": 33,
+    "claims": 32,
     "grounded": 20,
     "with conditions": 20,
     "positioned": 0,
@@ -7345,8 +7356,8 @@
      "table": 2
     },
     "with records": 13,
-    "printed": 30,
-    "evidence": 33,
+    "printed": 28,
+    "evidence": 32,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 236,
     "examples": {}
@@ -7358,15 +7369,11 @@
       "attribute": 1
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
     "audit": {
      "scope": {
-      "shown, not used": 1
-     },
-     "frame": {
       "shown, not used": 1
      }
     },
@@ -7374,18 +7381,15 @@
     "examples": {
      "scope: shown, not used": [
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
-     ],
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '99th percentile'; read 99th percentile turbidity | measured over five years"
      ]
     }
    }
   },
   "wtp-s1-footnotes.docx": {
    "inventory": {
-    "claims": 33,
-    "grounded": 11,
-    "with conditions": 11,
+    "claims": 32,
+    "grounded": 9,
+    "with conditions": 9,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -7393,7 +7397,7 @@
     },
     "with records": 13,
     "printed": 29,
-    "evidence": 33,
+    "evidence": 32,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1232,
     "examples": {}
@@ -7401,8 +7405,8 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 8,
-      "attribute": 1
+      "conditions": 6,
+      "attribute": 3
      },
      "frame": {
       "conditions": 1,
@@ -7411,7 +7415,7 @@
     },
     "audit": {
      "scope": {
-      "shown, not used": 1
+      "shown, not used": 3
      },
      "frame": {
       "shown, not used": 1
@@ -7420,7 +7424,9 @@
     "named": {},
     "examples": {
      "scope: shown, not used": [
-      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | ",
+      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
+      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
      ],
      "frame: shown, not used": [
       "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
@@ -7452,15 +7458,11 @@
       "attribute": 1
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
     "audit": {
      "scope": {
-      "shown, not used": 1
-     },
-     "frame": {
       "shown, not used": 1
      }
     },
@@ -7468,26 +7470,22 @@
     "examples": {
      "scope: shown, not used": [
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
-     ],
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
      ]
     }
    }
   },
   "wtp-s1-revised": {
    "inventory": {
-    "claims": 123,
-    "grounded": 33,
-    "no content words": 2,
-    "with conditions": 35,
+    "claims": 117,
+    "grounded": 34,
+    "with conditions": 34,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 2
     },
     "with records": 16,
-    "printed": 34,
+    "printed": 35,
     "evidence": 42,
     "context_bytes_per_request": 215,
     "data_bytes_per_request": 623,
@@ -7556,13 +7554,13 @@
   },
   "wtp-s1-revised.md": {
    "inventory": {
-    "claims": 36,
+    "claims": 35,
     "grounded": 11,
     "with conditions": 11,
     "positioned": 0,
     "misplaced": {},
-    "printed": 16,
-    "evidence": 36,
+    "printed": 15,
+    "evidence": 35,
     "context_bytes_per_request": 602,
     "data_bytes_per_request": 234,
     "examples": {}
@@ -7614,15 +7612,11 @@
       "attribute": 1
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
     "audit": {
      "scope": {
-      "shown, not used": 1
-     },
-     "frame": {
       "shown, not used": 1
      }
     },
@@ -7630,9 +7624,6 @@
     "examples": {
      "scope: shown, not used": [
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
-     ],
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
      ]
     }
    }
@@ -7686,19 +7677,19 @@
   },
   "wtp-s1-reworded": {
    "inventory": {
-    "claims": 95,
-    "grounded": 27,
-    "with conditions": 27,
+    "claims": 115,
+    "grounded": 38,
+    "with conditions": 38,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 2
     },
     "with records": 13,
-    "printed": 33,
-    "evidence": 37,
-    "context_bytes_per_request": 162,
-    "data_bytes_per_request": 629,
+    "printed": 31,
+    "evidence": 38,
+    "context_bytes_per_request": 219,
+    "data_bytes_per_request": 638,
     "examples": {}
    },
    "keyed": {
@@ -7707,21 +7698,12 @@
       "conditions": 9
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
-    "audit": {
-     "frame": {
-      "shown, not used": 1
-     }
-    },
+    "audit": {},
     "named": {},
-    "examples": {
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years / 95th percentile turbidity | measured over five years"
-     ]
-    }
+    "examples": {}
    }
   },
   "wtp-s1-reworded.docx": {
@@ -7748,15 +7730,11 @@
       "attribute": 1
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
     "audit": {
      "scope": {
-      "shown, not used": 1
-     },
-     "frame": {
       "shown, not used": 1
      }
     },
@@ -7764,9 +7742,6 @@
     "examples": {
      "scope: shown, not used": [
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
-     ],
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
      ]
     }
    }
@@ -7778,7 +7753,7 @@
     "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
-    "printed": 17,
+    "printed": 16,
     "evidence": 34,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 261,
@@ -7790,21 +7765,12 @@
       "conditions": 9
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
-    "audit": {
-     "frame": {
-      "shown, not used": 1
-     }
-    },
+    "audit": {},
     "named": {},
-    "examples": {
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
-     ]
-    }
+    "examples": {}
    }
   },
   "wtp-s1-reworded.pptx": {
@@ -7818,7 +7784,7 @@
      "table": 2
     },
     "with records": 13,
-    "printed": 30,
+    "printed": 29,
     "evidence": 33,
     "context_bytes_per_request": 610,
     "data_bytes_per_request": 236,
@@ -7831,15 +7797,11 @@
       "attribute": 1
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
     "audit": {
      "scope": {
-      "shown, not used": 1
-     },
-     "frame": {
       "shown, not used": 1
      }
     },
@@ -7847,9 +7809,6 @@
     "examples": {
      "scope: shown, not used": [
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
-     ],
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
      ]
     }
    }
@@ -7865,7 +7824,7 @@
      "table": 2
     },
     "with records": 13,
-    "printed": 30,
+    "printed": 29,
     "evidence": 33,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 238,
@@ -7878,15 +7837,11 @@
       "attribute": 1
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
     "audit": {
      "scope": {
-      "shown, not used": 1
-     },
-     "frame": {
       "shown, not used": 1
      }
     },
@@ -7894,9 +7849,6 @@
     "examples": {
      "scope: shown, not used": [
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
-     ],
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
      ]
     }
    }
@@ -7912,7 +7864,7 @@
      "table": 2
     },
     "with records": 13,
-    "printed": 28,
+    "printed": 29,
     "evidence": 32,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1186,
@@ -7997,7 +7949,7 @@
   },
   "wtp-s1.docx": {
    "inventory": {
-    "claims": 33,
+    "claims": 32,
     "grounded": 11,
     "with conditions": 11,
     "positioned": 0,
@@ -8006,8 +7958,8 @@
      "table": 2
     },
     "with records": 13,
-    "printed": 30,
-    "evidence": 33,
+    "printed": 29,
+    "evidence": 32,
     "context_bytes_per_request": 307,
     "data_bytes_per_request": 1184,
     "examples": {}
@@ -8045,8 +7997,8 @@
   "wtp-s1.md": {
    "inventory": {
     "claims": 34,
-    "grounded": 11,
-    "with conditions": 11,
+    "grounded": 12,
+    "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
     "printed": 16,
@@ -8058,32 +8010,15 @@
    "keyed": {
     "placed": {
      "scope": {
-      "conditions": 7,
-      "attribute": 2
+      "conditions": 9
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
-    "audit": {
-     "scope": {
-      "shown, not used": 2
-     },
-     "frame": {
-      "shown, not used": 1
-     }
-    },
+    "audit": {},
     "named": {},
-    "examples": {
-     "scope: shown, not used": [
-      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
-      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
-     ],
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
-     ]
-    }
+    "examples": {}
    }
   },
   "wtp-s1.pptx": {
@@ -8097,7 +8032,7 @@
      "table": 2
     },
     "with records": 13,
-    "printed": 30,
+    "printed": 29,
     "evidence": 33,
     "context_bytes_per_request": 610,
     "data_bytes_per_request": 235,
@@ -8110,15 +8045,11 @@
       "attribute": 1
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
     "audit": {
      "scope": {
-      "shown, not used": 1
-     },
-     "frame": {
       "shown, not used": 1
      }
     },
@@ -8126,9 +8057,6 @@
     "examples": {
      "scope: shown, not used": [
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
-     ],
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
      ]
     }
    }
@@ -8144,7 +8072,7 @@
      "table": 2
     },
     "with records": 13,
-    "printed": 30,
+    "printed": 29,
     "evidence": 33,
     "context_bytes_per_request": 601,
     "data_bytes_per_request": 237,
@@ -8157,15 +8085,11 @@
       "attribute": 1
      },
      "frame": {
-      "conditions": 1,
-      "attribute": 1
+      "conditions": 2
      }
     },
     "audit": {
      "scope": {
-      "shown, not used": 1
-     },
-     "frame": {
       "shown, not used": 1
      }
     },
@@ -8173,9 +8097,6 @@
     "examples": {
      "scope: shown, not used": [
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
-     ],
-     "frame: shown, not used": [
-      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
      ]
     }
    }
@@ -8183,8 +8104,8 @@
   "wtp-tables-s1-all": {
    "inventory": {
     "claims": 336,
-    "grounded": 74,
-    "with conditions": 74,
+    "grounded": 84,
+    "with conditions": 84,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -8192,7 +8113,7 @@
     },
     "with records": 60,
     "printed": 60,
-    "evidence": 86,
+    "evidence": 96,
     "context_bytes_per_request": 158,
     "data_bytes_per_request": 296,
     "examples": {}
@@ -8373,9 +8294,9 @@
   },
   "wtp-tables-s1-clean-reordered": {
    "inventory": {
-    "claims": 321,
-    "grounded": 72,
-    "with conditions": 72,
+    "claims": 336,
+    "grounded": 86,
+    "with conditions": 86,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -8384,8 +8305,8 @@
     "with records": 84,
     "printed": 84,
     "evidence": 84,
-    "context_bytes_per_request": 159,
-    "data_bytes_per_request": 272,
+    "context_bytes_per_request": 154,
+    "data_bytes_per_request": 294,
     "examples": {}
    },
    "keyed": {
@@ -8508,9 +8429,9 @@
   },
   "wtp-tables-s1-clean-revised": {
    "inventory": {
-    "claims": 340,
-    "grounded": 120,
-    "with conditions": 120,
+    "claims": 300,
+    "grounded": 86,
+    "with conditions": 86,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -8519,8 +8440,8 @@
     "with records": 85,
     "printed": 85,
     "evidence": 85,
-    "context_bytes_per_request": 152,
-    "data_bytes_per_request": 337,
+    "context_bytes_per_request": 163,
+    "data_bytes_per_request": 292,
     "examples": {}
    },
    "keyed": {
@@ -8643,9 +8564,9 @@
   },
   "wtp-tables-s1-clean-split": {
    "inventory": {
-    "claims": 352,
-    "grounded": 120,
-    "with conditions": 120,
+    "claims": 312,
+    "grounded": 86,
+    "with conditions": 86,
     "positioned": 0,
     "misplaced": {},
     "records": {
@@ -8654,8 +8575,8 @@
     "with records": 88,
     "printed": 88,
     "evidence": 88,
-    "context_bytes_per_request": 153,
-    "data_bytes_per_request": 340,
+    "context_bytes_per_request": 164,
+    "data_bytes_per_request": 295,
     "examples": {}
    },
    "keyed": {
@@ -8896,8 +8817,8 @@
     "with records": 84,
     "printed": 84,
     "evidence": 84,
-    "context_bytes_per_request": 116,
-    "data_bytes_per_request": 343,
+    "context_bytes_per_request": 142,
+    "data_bytes_per_request": 321,
     "examples": {}
    },
    "keyed": {
@@ -9083,8 +9004,8 @@
   "wtp-tables-s1-stacked": {
    "inventory": {
     "claims": 336,
-    "grounded": 117,
-    "with conditions": 117,
+    "grounded": 101,
+    "with conditions": 101,
     "positioned": 0,
     "misplaced": {},
     "records": {
