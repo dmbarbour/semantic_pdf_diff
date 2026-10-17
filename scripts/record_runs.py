@@ -22,7 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = Path(__file__).with_name("slices.json")
 # The settings every recording shares (they shape the queries, so they decide which answers replay).
-from semantic_pdf_diff_lab.bench.recording import BASE_SETTINGS, LEDGER  # noqa: E402 (every recording's)
+from semantic_pdf_diff_lab.bench.recording import BASE_SETTINGS  # noqa: E402 (every recording's)
+from semantic_pdf_diff_lab.bench.recording import ledger as ledger_path  # noqa: E402
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
@@ -40,7 +41,8 @@ def main(argv=None):
     parser.add_argument("--retry-failures", action="store_true",
                         help="ask recorded failures again "
                              "(default: replay them, so variants differ only where they change requests)")
-    parser.add_argument("--ledger", type=Path, default=ROOT / LEDGER, help="default: the repository's ledger")
+    parser.add_argument("--ledger", type=Path, default=ledger_path(ROOT),
+                        help="default: the repository's (its main checkout's, from a worktree)")
     parser.add_argument("--pack", type=Path, metavar="ZIP",
                         help="export what the runs are served or record into this zip (fresh stores in a "
                              "temporary folder: not with --out)")

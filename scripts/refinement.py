@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SETTINGS = ROOT / "benchmarks/controlled/settings.json"  # the corpus's settings; refinement_depth is 1
 KEYS = ROOT / "benchmarks/controlled/docs"
 from semantic_pdf_diff_lab.bench import recording  # noqa: E402
-LEDGER = ROOT / recording.LEDGER
+LEDGER = recording.ledger(ROOT)
 
 def run(src, out, fixture, max_cost, documents, tag, fresh=False, given=None):
     sys.path.insert(0, str(Path(src).resolve()))

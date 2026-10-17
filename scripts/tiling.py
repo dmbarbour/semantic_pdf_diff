@@ -69,7 +69,7 @@ def main(argv=None):
     if args.command == "read":
         from semantic_pdf_diff_lab.bench import recording
         found, spent = tiling.read(args.documents, configurations, args.out, args.base, Path(args.fixture),
-                                   args.max_cost, ROOT / recording.LEDGER, {"round": "tiling"})
+                                   args.max_cost, recording.ledger(ROOT), {"round": "tiling"})
         Path(args.out).mkdir(parents=True, exist_ok=True)
         (Path(args.out) / "results.json").write_text(json.dumps(found, indent=1))
         for label, documents in found.items():

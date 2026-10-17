@@ -11,6 +11,7 @@
     python scripts/controlled.py pack                        # replay.zip: the answers the standard runs replay
     python scripts/controlled.py context                     # context.json: each claim's context, offline (below)
     python scripts/controlled.py refresh --jobs 6 --max-cost 2   # all of it after a change, six runs at once
+    python scripts/controlled.py run --variant b62.json --jobs 6     # a named variant, into the archive (below)
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
 is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
@@ -30,6 +31,11 @@ scored against by the same keys. Packed with the standard runs.
 milestone 2): misplaced context and conditions grounded in what each request showed, then, against the keys' context
 by kind, where each kind landed and, where it was lost, whether the request showed it; and the reader's confidence
 against the keys, band by band. Into context.json.
+
+A variant (--variant FILE) is a lever's arm: its settings over the corpus's, on the documents it names, its runs under
+benchmarks/runs/controlled/variants/<name> (scripts/paired.py names it), its answers recorded into the archive and
+replayed from it. From a frozen worktree (to pin the code), the archive, the ledger and the variants are the main
+checkout's.
 
 Recording adds to the working fixture (fixture.sqlite, git-ignored), an archive keeping every answer ever recorded,
 every variant's. `pack` exports the committed replay.zip from it: the standard runs replay from fresh stores, reading
@@ -53,12 +59,15 @@ DOCS_PPTX = FOLDER / "docs-pptx"  # and as slide decks
 DOCS_XLSX = FOLDER / "docs-xlsx"  # and as workbooks
 # The representations' documents by suffix, in the order they're read and compared (code review 2026-10-08, E4).
 REPRESENTATIONS = {".md": DOCS_MD, ".docx": DOCS_DOCX, ".pptx": DOCS_PPTX, ".xlsx": DOCS_XLSX}
-WORKING = FOLDER / "fixture.sqlite"   # recorded answers (git-ignored); packed into replay.zip
+from semantic_pdf_diff_lab.bench import recording  # noqa: E402
+MAIN = recording.main_checkout(ROOT)  # from a frozen worktree, the main checkout: its archive, ledger and variants
+WORKING = MAIN / "benchmarks/controlled/fixture.sqlite"  # the archive of recorded answers (git-ignored)
 PACKED = FOLDER / "replay.zip"
 RUNS = ROOT / "benchmarks/runs/controlled"
 PAIR_RUNS = ROOT / "benchmarks/runs/controlled-pairs"
-from semantic_pdf_diff_lab.bench import recording  # noqa: E402
-LEDGER = ROOT / recording.LEDGER
+VARIANTS = MAIN / "benchmarks/runs/controlled/variants"  # a named variant's runs, then its pairs'
+VARIANT_PAIRS = MAIN / "benchmarks/runs/controlled-pairs/variants"
+LEDGER = recording.ledger(ROOT)
 BASE_SETTINGS = recording.BASE_SETTINGS  # the settings recordings share: they shape the queries
 
 SETTINGS = FOLDER / "settings.json"  # every setting that shapes a query, resolved when first recorded (committed)
@@ -83,6 +92,11 @@ def main(argv=None):
     running.add_argument("--max-cost", type=float, default=0.2)
     running.add_argument("--unaligned", action="store_true", help="only the PDF pairs, compared with alignment off")
     running.add_argument("--rows", action="store_true", help="every document, its tables read row by row")
+    running.add_argument("--variant", type=Path, metavar="FILE",
+                         help='a named variant (JSON: {"settings": {...}, "only": ["*.pdf", "views*"], "name": ...}): '
+                              "its settings over the corpus's, only the documents named, its runs under "
+                              "benchmarks/runs/controlled/variants/<name>, its answers in the archive (replayed from "
+                              "the archive too)")
     refreshing = sub.add_parser("refresh", help="the corpus after a change: record the standard and row-by-row runs, "
                                              "export replay.zip, replay both, score, measure context")
     refreshing.add_argument("--max-cost", type=float, default=0.2, help="for each of the two recordings")
@@ -116,6 +130,11 @@ def main(argv=None):
     if args.command == "run":
         if args.unaligned and args.rows:
             parser.error("--unaligned and --rows are separate runs")
+        if args.variant:
+            name, config, only = variant(args.variant)
+            return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rows=args.rows,
+                       jobs=args.jobs, reset=args.reset, fixture=WORKING, runs=VARIANTS / name,
+                       pair_runs=VARIANT_PAIRS / name, config=config, only=only)
         return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rows=args.rows,
                    jobs=args.jobs, reset=args.reset)
     if args.command == "pack":
@@ -125,6 +144,23 @@ def main(argv=None):
     if args.command == "context":
         return context()
     return score()
+
+def variant(path):
+    """(name, settings file, document patterns) of a variant defined in a JSON file: {"settings": an overlay on the
+    corpus's settings, "only": shell patterns of the documents' file names (default: every document; a pair by its
+    earlier document), "name": its folder's (default: the file's stem)}. Its resolved settings and its definition are
+    written beside its runs, so a later run of the same name with other settings is refused by the stores (or reset)."""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    unknown = set(data) - {"settings", "only", "name", "note"}
+    if unknown:
+        raise SystemExit(f"{path}: unknown keys {sorted(unknown)} (settings, only, name, note)")
+    name = data.get("name") or Path(path).stem
+    folder = VARIANTS / name
+    folder.mkdir(parents=True, exist_ok=True)
+    settings = {**json.loads(settings_file().read_text(encoding="utf-8")), **data.get("settings", {})}
+    (folder / "settings.json").write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
+    (folder / "variant.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return name, folder / "settings.json", tuple(data.get("only") or ())
 
 def refresh(max_cost, jobs=1):
     """Every step after a change, in order, stores reset where settings moved: the standard and row-by-row runs
@@ -171,13 +207,15 @@ def pack(jobs=1):
     return 0
 
 def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=RUNS, pair_runs=PAIR_RUNS, rows=False,
-        export=None, jobs=1, reset=False):
+        export=None, jobs=1, reset=False, config=None, only=()):
     """Every document read alone, then every revision pair compared: recorded into the working fixture, or replayed
     (from replay.zip, or `fixture`) into fresh or existing stores under runs and pair_runs; with `export`, every
     answer served or recorded also copied into that fixture. jobs: runs at once, in processes sharing the fixture
     (the documents first, then the pairs, which replay their extraction). reset: a store bound to other settings
     clears what changed and reads it again, instead of refusing. The cost cap is checked as each run starts, so runs
-    started together may overshoot it together."""
+    started together may overshoot it together. config: a settings file other than the corpus's (a variant's); only:
+    shell patterns of the documents' file names to read (a pair by its earlier document's)."""
+    import fnmatch
     from semantic_pdf_diff import fixtures, ledger
     from semantic_pdf_diff.progress import setup_logging
     fixture = fixture or (PACKED if replay else WORKING)
@@ -204,6 +242,8 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
                    pair_runs / out.name / f"{p.id}{suffix}", f"pair {p.id}{suffix}", "revisions") for p in listed
                   if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
     batch = [job for job in batch if job[4] != "revisions" or not same_document(job[0], job[1])]
+    if only:
+        batch = [job for job in batch if any(fnmatch.fnmatch(job[0].name, pattern) for pattern in only)]
     overrides = {}
     if unaligned:
         batch = [(a, b, pair_runs / f"{out.name}-unaligned" / folder.name, name + " unaligned", mode)
@@ -214,7 +254,7 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
                  for a, b, folder, name, mode in batch if a.suffix in (".xlsx", ".docx", ".pptx", ".pdf")]
         overrides = {"table_rules": None}
     before = ledger.spent(LEDGER, round="controlled")
-    _BATCH.update(replay=replay, responder=responder, fixture=fixture, export=export, config=settings_file(),
+    _BATCH.update(replay=replay, responder=responder, fixture=fixture, export=export, config=config or settings_file(),
                   overrides=overrides, max_cost=max_cost, before=before, reset=reset)
     worst, capped = 0, 0
     for mode in ("proposals", "revisions"):

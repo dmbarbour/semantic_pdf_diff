@@ -13,6 +13,19 @@ BASE_SETTINGS = {"claims_per_request": 20, "output_tokens": 4000, "context_token
 # the spending ledger, relative to the repository's root (ledger.spent: 0 without one)
 LEDGER = "benchmarks/ledger.jsonl"
 
+def main_checkout(root):
+    """The repository's main working folder, from any of its worktrees (root itself outside git, or in the main
+    one): a frozen worktree's runs spend into, and read answers from, the main checkout's ledger and archives, so
+    nothing needs folding back before the worktree goes (recording tooling, 2026-10-17)."""
+    import subprocess
+    done = subprocess.run(["git", "-C", str(root), "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                          capture_output=True, text=True)
+    return Path(done.stdout.strip()).parent if done.returncode == 0 else Path(root)
+
+def ledger(root):
+    """The spending ledger every run writes: the main checkout's."""
+    return main_checkout(root) / LEDGER
+
 def cut(folder):
     """Why a run's results can't be scored, or None: a cap cut it (its report says it paused), or tasks weren't
     reached (a cap, or a replay without their answers). Which work was cut followed the order answers came in, so the

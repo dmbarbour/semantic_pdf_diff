@@ -22,7 +22,7 @@ PACKED = FOLDER / "replay.zip"
 SETTINGS = FOLDER / "settings.json"   # every setting that shapes a query, resolved when first recorded (committed)
 RUNS = ROOT / "benchmarks/runs/real-pairs"
 from semantic_pdf_diff_lab.bench import recording  # noqa: E402
-LEDGER = ROOT / recording.LEDGER
+LEDGER = recording.ledger(ROOT)
 SAMPLES = ROOT / "samples"
 # The settings recordings share (scripts/record_runs.py, scripts/controlled.py).
 BASE_SETTINGS = recording.BASE_SETTINGS  # the settings recordings share: they shape the queries

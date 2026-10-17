@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 FOLDER = ROOT / "benchmarks/calibration"
 CORPUS = ROOT / "benchmarks/controlled/docs"
 from semantic_pdf_diff_lab.bench import recording  # noqa: E402
-LEDGER = ROOT / recording.LEDGER
+LEDGER = recording.ledger(ROOT)
 
 def main(argv=None):
     from semantic_pdf_diff_lab.bench import calibration

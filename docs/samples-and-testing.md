@@ -114,11 +114,15 @@ A changed output means a behaviour change. It goes in a fix of its own, with its
 A lever changes some queries, and gemma-4 answers a changed query anew. A reworded image prompt moves facts both ways even at temperature 0: on 2026-10-14 a rule meant to do nothing ("Read the image carefully.") moved the corpus's relations read right 416 → 444, as far as the arrow rule it was a control for. Totals can't tell that churn from a gain. Arms on the controlled corpus are compared document by document instead:
 
 ```bash
+python scripts/controlled.py run --variant b62.json --jobs 6    # each arm a named variant, recorded into the archive
+python scripts/paired.py b62 --base base --null b64 --target "hedge said"
 python scripts/paired.py read/arrow --base read/base --null read/null --null read/null2 --target "relations reversed"
 python scripts/paired.py read/lone --base read/base --target "claims right" --all
 ```
 
-- **Arms share answers.** Each reads from a copy of the base's fixture, so a query a lever leaves alone replays its answer and moves nothing. Every compared setting is named in each arm.
+- **Arms are named variants** (`controlled.py run --variant FILE`): a JSON file with `settings` (an overlay on the corpus's: name every compared setting), `only` (the documents' file names as shell patterns, such as `["*.pdf", "views*"]`) and optionally `name`. Its runs go under `benchmarks/runs/controlled/variants/<name>/`, its answers into the archive; `--replay` replays it from the archive at no cost. `paired.py` takes a variant's name or a folder.
+- **Arms share answers.** Every arm reads the one archive, so a query a lever leaves alone replays its answer and moves nothing.
+- **Frozen code:** run an arm from a git worktree to pin the code while main moves; from a worktree, the archive, the ledger and the variants' runs are the main checkout's, so nothing needs folding back before the worktree goes. On 2026-10-17, b62's comparison (`hedge_rule` against its base and null) replayed as three variants from the archive at no cost, its verdict and numbers as recorded (the null short one document of 145: answers its arm recorded weren't kept).
 - **Null arms for a lever that changes many queries.** A null arm changes the same queries to no purpose (a do-nothing rule of the same kind: `visual_rules` for an image rule, `extract_rules` for an instruction).
 - **Target and guards, named first.** The target is the error the lever is for (reversed relations for an arrow rule, not relations right); the guard is facts read right.
 - **The test:** each document's change, summed; a 90% interval from resampling documents; a two-sided sign-flip p-value (with no effect, either arm is as likely ahead on any document). Documents are the unit, since one query moves several of a document's facts.

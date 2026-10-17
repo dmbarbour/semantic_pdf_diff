@@ -40,7 +40,7 @@ FIXTURE = ROOT / "tests/fixtures/slices.sqlite"
 # Each slice's document family (reports, drawings, manuals, rules): strata alongside the kinds of region.
 DOCUMENTS = {s["name"]: s.get("family") for s in json.loads((ROOT / "scripts/slices.json").read_text())["slices"]}
 from semantic_pdf_diff_lab.bench import recording  # noqa: E402
-LEDGER = ROOT / recording.LEDGER
+LEDGER = recording.ledger(ROOT)
 HISTORY = ROOT / "benchmarks/history.jsonl"
 # Checkers of each round's queries (query_checks in round.json): two families, both reading images,
 # with Claude reading the dump. Gemini shares Google with the extractor (gemma), which matters little

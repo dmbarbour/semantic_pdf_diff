@@ -20,7 +20,7 @@ FOLDER = ROOT / "benchmarks/asking"
 CORPUS = ROOT / "benchmarks/controlled/docs"
 SETTINGS = ROOT / "benchmarks/controlled/settings.json"  # the corpus's settings, as a tile is read there
 from semantic_pdf_diff_lab.bench import recording  # noqa: E402
-LEDGER = ROOT / recording.LEDGER
+LEDGER = recording.ledger(ROOT)
 
 def main(argv=None):
     from semantic_pdf_diff_lab.bench import asking
