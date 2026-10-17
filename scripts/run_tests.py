@@ -5,7 +5,9 @@ module at a time, four modules taking 61%). The slowest modules start first, so 
     python scripts/run_tests.py -j 4 test_align test_store
     QUICK=1 python scripts/run_tests.py         # skips the tests marked @slow, as with unittest
 
-Each module's output is shown only when it fails. Exit status 1 if any module fails.
+Each module's output is shown only when it fails. Exit status 1 if any module fails. A run over every module that
+passes records a pass for the tree it tested, for the commit gate (scripts/gate.py), unless --no-record
+(or GATE_NO_RECORD, set by the gate's own runs).
 """
 import argparse
 import os
@@ -34,7 +36,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("modules", nargs="*", help="test modules (default: every tests/test_*.py)")
     parser.add_argument("-j", "--jobs", type=int, default=os.cpu_count() or 4)
+    parser.add_argument("--no-record", action="store_true", help="record no pass for the commit gate")
     args = parser.parse_args(argv)
+    import gate
+    record = not (args.modules or args.no_record or os.environ.get("GATE_NO_RECORD"))
+    tree = gate.working_tree() if record and gate.in_repository() else None
     names = [m.removesuffix(".py") for m in args.modules] or sorted(p.stem for p in TESTS.glob("test_*.py"))
     names.sort(key=lambda n: SLOW_FIRST.index(n) if n in SLOW_FIRST else len(SLOW_FIRST))
     started, failed, ran = time.monotonic(), [], 0
@@ -49,6 +55,12 @@ def main(argv=None):
         print(f"\n===== {name} =====\n{output}")
     print(f"\n{ran} tests in {len(names)} modules, {time.monotonic() - started:.0f}s: "
           + (f"{len(failed)} module(s) failed: {', '.join(n for n, _ in failed)}" if failed else "OK"))
+    if tree and not failed:
+        if gate.working_tree() == tree:
+            gate.record(tree, "quick" if os.environ.get("QUICK") else "full", ran)
+            print(f"pass recorded for tree {tree[:12]} (the commit gate)")
+        else:
+            print("the tree changed during the run: no pass recorded")
     return 1 if failed else 0
 
 

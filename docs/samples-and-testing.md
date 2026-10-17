@@ -7,10 +7,16 @@ The product is `src/semantic_pdf_diff`. The lab, how it's measured and improved 
 ```bash
 pip install -e '.[dev]' -e lab
 python -m unittest discover -s tests -v
-QUICK=1 python -m unittest discover -s tests    # skips the slowest tests (marked @slow): for iterating, not for commits
-python scripts/run_tests.py                     # the same suite, one module per process on every CPU: about 2.5 minutes
+QUICK=1 python -m unittest discover -s tests    # skips the slowest tests (marked @slow): for iterating
+python scripts/run_tests.py                     # the same suite, one module per process on every CPU: about 4.5 minutes
 python examples/demo.py
 ```
+
+**The commit gate** (`scripts/gate.py`; enabled in a checkout by `git config core.hooksPath scripts/hooks`):
+
+- `scripts/run_tests.py` run over every module records a pass for the tree it tested: the working folder as git would commit it, untracked files included. A tree edited during the run gets no pass.
+- A pre-commit hook lets a commit through when its staged tree has a recorded pass. Otherwise it checks the staged tree out into a temporary folder (with `samples/` linked in), runs the quick suite there (about 3 minutes), records the pass, and blocks the commit on a failure. A partial commit is tested as committed.
+- `python scripts/gate.py status` says whether the working tree and the staged tree have passes.
 
 Tests use a local HTTP stub, temporary PDFs and controlled evidence. They exercise cross-format and many-to-one retrieval, case-sensitive unit conversion, uncertainty gates, UTF-8 chunking, text grouping and refinement, table column splitting, tile spacing and coverage, rotated pages, visual quote checks, malformed/truncated/null API output, `Retry-After`, claim salvage, caching, budgets, quote validation and HTML escaping. Synthetic spreadsheet tests check that the generated messy samples match their answer keys; they need the `dev` extra and are skipped without it. None of this establishes real-model extraction accuracy; see [VALIDATION.md](VALIDATION.md) and the [evaluation plan](plans/evaluation-benchmarks-2026-09-23.md).
 
