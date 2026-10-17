@@ -10,6 +10,7 @@
     python scripts/controlled.py run --rows                  # every document's tables read row by row (below)
     python scripts/controlled.py pack                        # replay.zip: the answers the standard runs replay
     python scripts/controlled.py context                     # context.json: each claim's context, offline (below)
+    python scripts/controlled.py refresh --jobs 6 --max-cost 2   # all of it after a change, six runs at once
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
 is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
@@ -82,8 +83,16 @@ def main(argv=None):
     running.add_argument("--max-cost", type=float, default=0.2)
     running.add_argument("--unaligned", action="store_true", help="only the PDF pairs, compared with alignment off")
     running.add_argument("--rows", action="store_true", help="every document, its tables read row by row")
+    refreshing = sub.add_parser("refresh", help="the corpus after a change: record the standard and row-by-row runs, "
+                                             "export replay.zip, replay both, score, measure context")
+    refreshing.add_argument("--max-cost", type=float, default=0.2, help="for each of the two recordings")
+    packing = sub.add_parser("pack", help="export the answers the standard runs replay into replay.zip (offline)")
+    for each in (running, refreshing, packing):
+        each.add_argument("--jobs", type=int, default=1, help="runs at once, in processes sharing the fixture")
+    running.add_argument("--reset", action="store_true",
+                         help="a store bound to other settings clears what changed and reads it again (refresh "
+                              "always does)")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
-    sub.add_parser("pack", help="export the answers the standard runs replay into replay.zip (offline)")
     sub.add_parser("context", help="measure the standard runs' claims' context against the keys (offline)")
     args = parser.parse_args(argv)
     from semantic_pdf_diff_lab.bench import controlled
@@ -107,14 +116,34 @@ def main(argv=None):
     if args.command == "run":
         if args.unaligned and args.rows:
             parser.error("--unaligned and --rows are separate runs")
-        return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rows=args.rows)
+        return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rows=args.rows,
+                   jobs=args.jobs, reset=args.reset)
     if args.command == "pack":
-        return pack()
+        return pack(args.jobs)
+    if args.command == "refresh":
+        return refresh(args.max_cost, args.jobs)
     if args.command == "context":
         return context()
     return score()
 
-def pack():
+def refresh(max_cost, jobs=1):
+    """Every step after a change, in order, stores reset where settings moved: the standard and row-by-row runs
+    recorded, replay.zip exported, both replayed from it, scored, context measured. Exit status 1 when a run failed
+    or a step did, 3 when a recording reached its cap (rerun to resume); incomplete coverage (2) isn't a failure."""
+    steps = [("record", lambda: run(False, None, max_cost, False, jobs=jobs, reset=True)),
+             ("record rows", lambda: run(False, None, max_cost, False, rows=True, jobs=jobs, reset=True)),
+             ("pack", lambda: pack(jobs)),
+             ("replay", lambda: run(True, None, 0, False, jobs=jobs, reset=True)),
+             ("replay rows", lambda: run(True, None, 0, False, rows=True, jobs=jobs, reset=True)),
+             ("score", score), ("context", context)]
+    for name, step in steps:
+        code = step()
+        print(f"== {name}: exit {code}", flush=True)
+        if code not in (0, 2):
+            return 3 if code == 3 else 1
+    return 0
+
+def pack(jobs=1):
     """replay.zip exported from the archive: the standard runs replayed from fresh stores, reading the archive, and
     the answers they're served copied into a new fixture, packed."""
     import tempfile
@@ -125,10 +154,11 @@ def pack():
         export.parent.mkdir()
         said = io.StringIO()
         with contextlib.redirect_stdout(said):
-            code = run(True, None, 0, False, fixture=WORKING, runs=d / "runs", pair_runs=d / "pairs", export=export)
+            code = run(True, None, 0, False, fixture=WORKING, runs=d / "runs", pair_runs=d / "pairs", export=export,
+                       jobs=jobs)
             if code in (0, 2):
                 code = max(code, run(True, None, 0, False, fixture=WORKING, runs=d / "runs", pair_runs=d / "pairs",
-                                     rows=True, export=export))
+                                     rows=True, export=export, jobs=jobs))
         if code not in (0, 2):
             failed = [line for line in said.getvalue().splitlines() if "exit 1" in line or "fixture holds" in line]
             print(f"the replay failed (exit {code}): nothing packed\n  " + "\n  ".join(failed[:20]))
@@ -141,11 +171,14 @@ def pack():
     return 0
 
 def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=RUNS, pair_runs=PAIR_RUNS, rows=False,
-        export=None):
+        export=None, jobs=1, reset=False):
     """Every document read alone, then every revision pair compared: recorded into the working fixture, or replayed
     (from replay.zip, or `fixture`) into fresh or existing stores under runs and pair_runs; with `export`, every
-    answer served or recorded also copied into that fixture."""
-    from semantic_pdf_diff import fixtures, ledger, pipeline
+    answer served or recorded also copied into that fixture. jobs: runs at once, in processes sharing the fixture
+    (the documents first, then the pairs, which replay their extraction). reset: a store bound to other settings
+    clears what changed and reads it again, instead of refusing. The cost cap is checked as each run starts, so runs
+    started together may overshoot it together."""
+    from semantic_pdf_diff import fixtures, ledger
     from semantic_pdf_diff.progress import setup_logging
     fixture = fixture or (PACKED if replay else WORKING)
     out = runs / ("replay" if replay else "recorded")
@@ -157,51 +190,72 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
             return 1
         responder = held[0]
     from semantic_pdf_diff_lab.bench.controlled import revisions
-    config = settings_file()
-    before = ledger.spent(LEDGER, round="controlled")
-    worst = 0
     setup_logging(quiet=True)
     # each document alone (the same PDF on both sides: extraction only), then each pair in revisions mode
-    jobs = [(pdf, pdf, out / pdf.stem, pdf.stem, "proposals") for pdf in sorted(DOCS.glob("*.pdf"))]
+    batch = [(pdf, pdf, out / pdf.stem, pdf.stem, "proposals") for pdf in sorted(DOCS.glob("*.pdf"))]
     for suffix, folder in REPRESENTATIONS.items():
-        jobs += [(d, d, out / d.name, d.name, "proposals") for d in sorted(folder.glob(f"*{suffix}"))]
-    jobs += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", pair_runs / out.name / p.id, f"pair {p.id}",
-              "revisions") for p in revisions.pairs()]
+        batch += [(d, d, out / d.name, d.name, "proposals") for d in sorted(folder.glob(f"*{suffix}"))]
+    batch += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", pair_runs / out.name / p.id, f"pair {p.id}",
+               "revisions") for p in revisions.pairs()]
     from semantic_pdf_diff_lab.bench.controlled import word
     for suffix, folder in REPRESENTATIONS.items():
         listed = revisions.pairs() + (word.pairs() if suffix == ".docx" else [])  # Word's own: word.py
-        jobs += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}",
-                  pair_runs / out.name / f"{p.id}{suffix}", f"pair {p.id}{suffix}", "revisions") for p in listed
-                 if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
-    jobs = [job for job in jobs if job[4] != "revisions" or not same_document(job[0], job[1])]
+        batch += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}",
+                   pair_runs / out.name / f"{p.id}{suffix}", f"pair {p.id}{suffix}", "revisions") for p in listed
+                  if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
+    batch = [job for job in batch if job[4] != "revisions" or not same_document(job[0], job[1])]
     overrides = {}
     if unaligned:
-        jobs = [(a, b, pair_runs / f"{out.name}-unaligned" / folder.name, name + " unaligned", mode)
-                for a, b, folder, name, mode in jobs if mode == "revisions" and a.suffix == ".pdf"]
+        batch = [(a, b, pair_runs / f"{out.name}-unaligned" / folder.name, name + " unaligned", mode)
+                 for a, b, folder, name, mode in batch if mode == "revisions" and a.suffix == ".pdf"]
         overrides = {"align": False}
     if rows:
-        jobs = [(a, b, folder.parent.parent / f"{folder.parent.name}-rows" / folder.name, name + " rows", mode)
-                for a, b, folder, name, mode in jobs if a.suffix in (".xlsx", ".docx", ".pptx", ".pdf")]
+        batch = [(a, b, folder.parent.parent / f"{folder.parent.name}-rows" / folder.name, name + " rows", mode)
+                 for a, b, folder, name, mode in batch if a.suffix in (".xlsx", ".docx", ".pptx", ".pdf")]
         overrides = {"table_rules": None}
-    for a, b, folder, name, mode in jobs:
-        options = pipeline.RunOptions(mode=mode, fixture=fixture, export=export,
-                                      fixture_mode="replay" if replay else "record-new", responder=responder)
-        if replay:  # the model named as recorded, whatever the environment says (its name is in the stores' binding)
-            settings = pipeline.settings_from(config, situate=False, base_url=pipeline.NO_MODEL, model=responder,
-                                              **overrides)
-        else:
-            left = max_cost - (ledger.spent(LEDGER, round="controlled") - before)
-            if left <= 0:
-                print(f"cap of ${max_cost} reached")
-                return 3
-            settings = pipeline.settings_from(config, situate=False, max_cost=round(left, 4), **overrides)
-            options.ledger, options.ledger_tags = LEDGER, {"round": "controlled", "run": name.replace(" ", "-")}
-        code = pipeline.attempt(pipeline.compare_paths, a, b, folder, settings, options)
-        print(f"{name}: exit {code}", flush=True)
-        worst = max(worst, code)
+    before = ledger.spent(LEDGER, round="controlled")
+    _BATCH.update(replay=replay, responder=responder, fixture=fixture, export=export, config=settings_file(),
+                  overrides=overrides, max_cost=max_cost, before=before, reset=reset)
+    worst, capped = 0, 0
+    for mode in ("proposals", "revisions"):
+        for name, code in _each([job for job in batch if job[4] == mode], jobs):
+            if code == CAPPED:
+                capped += 1
+                continue
+            print(f"{name}: exit {code}", flush=True)
+            worst = max(worst, code)
+    if capped:
+        print(f"cap of ${max_cost} reached: {capped} runs not started (run again to resume)")
+        worst = max(worst, 3)
     if not replay:
         print(f"spent ${ledger.spent(LEDGER, round='controlled') - before:.3f}; run `pack` before committing")
     return worst
+
+CAPPED = -3  # a run not started: the cap was reached (exit 3)
+_BATCH = {}  # what every run of a batch shares, set before the worker processes fork
+
+def _each(batch, jobs):
+    """(name, exit code) of each run, in processes when jobs > 1 (see recording.forked)."""
+    from semantic_pdf_diff_lab.bench.recording import forked
+    yield from forked(_one, batch, jobs)
+
+def _one(job):
+    """One run of the batch (_BATCH): (its name, its exit code, or CAPPED)."""
+    from semantic_pdf_diff import ledger, pipeline
+    a, b, folder, name, mode = job
+    c = _BATCH
+    options = pipeline.RunOptions(mode=mode, fixture=c["fixture"], export=c["export"], reset=c["reset"],
+                                  fixture_mode="replay" if c["replay"] else "record-new", responder=c["responder"])
+    if c["replay"]:  # the model named as recorded, whatever the environment says (its name is in the stores' binding)
+        settings = pipeline.settings_from(c["config"], situate=False, base_url=pipeline.NO_MODEL, model=c["responder"],
+                                          **c["overrides"])
+    else:
+        left = c["max_cost"] - (ledger.spent(LEDGER, round="controlled") - c["before"])
+        if left <= 0:
+            return name, CAPPED
+        settings = pipeline.settings_from(c["config"], situate=False, max_cost=round(left, 4), **c["overrides"])
+        options.ledger, options.ledger_tags = LEDGER, {"round": "controlled", "run": name.replace(" ", "-")}
+    return name, pipeline.attempt(pipeline.compare_paths, a, b, folder, settings, options)
 
 def context():
     """context.json: the standard runs' context measures (bench/context.py), per run and summed, with the sums

@@ -117,6 +117,10 @@ class Fixture:
             with self.db:
                 self.db.execute(SESSIONS)
         self.used = set()
+        # rows written with the next answer recorded, or on close, in one short transaction: recipes noted and an
+        # export's adopted answers (an open transaction holds the file's write lock, and processes recording or
+        # exporting into one fixture at once waited out each other's whole runs)
+        self.pending = {"response": [], "description": [], "recipe": []}
         self.packed_to = None    # the zip an unpacked fixture came from (see folder_fixture)
 
     def log_session(self, responders, replayed, recorded, missing):
@@ -128,7 +132,8 @@ class Fixture:
 
     def close(self):
         if not self.readonly:
-            with self.db:  # the last recipes noted (note_recipe), and which answers were used
+            with self.db:  # the rows pending (recipes noted, answers adopted), and which answers were used
+                self._write_pending()
                 if self.used:
                     now = _now()
                     self.db.executemany("UPDATE response SET used=? WHERE query=? AND responder=? AND sample=?",
@@ -191,6 +196,7 @@ class Fixture:
         if outcome not in OUTCOMES:
             raise ValueError(f"outcome {outcome!r} is not one of {OUTCOMES}")
         with self.db:
+            self._write_pending()
             self.db.execute("INSERT OR REPLACE INTO response VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             (query, responder, sample, outcome, answer, error, json.dumps(usage or {}, sort_keys=True),
                              recorded or datetime.now(timezone.utc).strftime("%Y-%m-%d"), _now()))
@@ -214,10 +220,9 @@ class Fixture:
                                 (query, responder, sample)).fetchone()
         if row is None:
             return
-        with self.db:
-            self.db.execute("INSERT OR IGNORE INTO response VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)", row)
-            self.db.executemany("INSERT OR IGNORE INTO description VALUES (?, ?)",
-                                source.db.execute("SELECT * FROM description WHERE query=?", (query,)).fetchall())
+        self.pending["response"].append((*row, None))
+        self.pending["description"] += source.db.execute("SELECT * FROM description WHERE query=?",
+                                                         (query,)).fetchall()
         if recipe is not None:
             self.note_recipe(query, recipe)
 
@@ -227,8 +232,16 @@ class Fixture:
         for every answer replayed needn't be (code review 2026-10-08, C2)."""
         if self.readonly:
             return
-        self.db.execute("INSERT OR IGNORE INTO recipe VALUES (?, ?, ?, ?, ?, ?, ?)",
-                        (query, *recipe_labels(recipe), json.dumps(list(recipe), default=str)))
+        self.pending["recipe"].append((query, *recipe_labels(recipe), json.dumps(list(recipe), default=str)))
+
+    def _write_pending(self):
+        """The pending rows written, in the caller's transaction; an answer recorded afterwards replaces an adopted
+        one."""
+        for table, rows in self.pending.items():
+            if rows:
+                marks = ",".join("?" * len(rows[0]))
+                self.db.executemany(f"INSERT OR IGNORE INTO {table} VALUES ({marks})", rows)
+                rows.clear()
 
     def prune(self, before, responder=None, dry_run=False, force=False):
         """Drop answers not used (replayed or recorded) since `before` (ISO time), and side-table

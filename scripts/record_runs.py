@@ -46,6 +46,8 @@ def main(argv=None):
                              "temporary folder: not with --out)")
     parser.add_argument("--tag", action="append", default=[], metavar="KEY=VALUE")
     parser.add_argument("--max-cost", type=float)
+    parser.add_argument("--jobs", type=int, default=1,
+                        help="runs at once, in processes sharing the fixture (the cap is checked as each starts)")
     parser.add_argument("--extract-only", action="store_true",
                         help="extraction only: each slice on its own, without situating or comparisons")
     args = parser.parse_args(argv)
@@ -111,11 +113,13 @@ def record(args, out, export=None):
                 if name not in seen:
                     seen.append(name)
         runs = [{"name": name, "slices": [name, name]} for name in seen]
-    worst = 0
     from semantic_pdf_diff import ledger
+    from semantic_pdf_diff_lab.bench.recording import forked
     tags = dict(t.split("=", 1) for t in args.tag) or {"round": "slices"}
     spent_before = ledger.spent(args.ledger, **tags) if args.ledger else 0.0
-    for run in runs:
+
+    def one(run):
+        """(the run's name, its exit code, or None when the cap was reached before it started)."""
         a, b = (ROOT / "samples/slices" / f"{name}.pdf" for name in run["slices"])
         overrides = {"situate": False} if args.extract_only else {}
         if args.replay:
@@ -124,8 +128,7 @@ def record(args, out, export=None):
             spent = (ledger.spent(args.ledger, **tags) - spent_before) if args.ledger else 0.0
             left = args.max_cost - spent
             if left <= 0:
-                print(f"{run['name']}: cap of ${args.max_cost} reached", flush=True)
-                return 3
+                return run["name"], None
             overrides["max_cost"] = round(left, 4)
         options = pipeline.RunOptions(
             fixture=args.fixture, responder=args.responder,
@@ -133,12 +136,13 @@ def record(args, out, export=None):
             fresh_regions=tuple(r for r in (args.fresh_regions or "").split(",") if r),
             ledger=None if args.replay else args.ledger, export=export,
             ledger_tags={**tags, "run": run["name"]} if args.ledger and not args.replay else {})
-        code = pipeline.attempt(pipeline.compare_paths, a, b, args.out / run["name"],
-                                pipeline.settings_from(config, **overrides), options)
-        print(f"{run['name']}: exit {code}", flush=True)
-        if code == 3:  # out of budget: stop; rerunning resumes
-            return 3
-        worst = max(worst, code)
+        return run["name"], pipeline.attempt(pipeline.compare_paths, a, b, args.out / run["name"],
+                                             pipeline.settings_from(config, **overrides), options)
+
+    worst = 0
+    for name, code in forked(one, runs, args.jobs):
+        print(f"{name}: " + (f"cap of ${args.max_cost} reached" if code is None else f"exit {code}"), flush=True)
+        worst = max(worst, 3 if code is None else code)  # 3: out of budget; rerunning resumes
     return worst
 
 if __name__ == "__main__":
