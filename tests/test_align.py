@@ -361,6 +361,11 @@ class Report(unittest.TestCase):
         # a hedge said in another form is the same hedge: settled, not changed
         from semantic_pdf_diff.align import _hedges_differ
         self.assertFalse(_hedges_differ(row("A", "size", "121", "tentative"), row("B", "size", "121", "Tentatively")))
+        # a status said on one side only ("status is Agreed" against a hedge moved to uncertainty): words() folds
+        # "status" to "statu", found among the status words all the same
+        moved = ev("A", entity="failure detection", attribute="duration", value="79", unit="s", conditions="",
+                   uncertainty="Working assumption")
+        self.assertTrue(_hedges_differ(moved, row("B", "duration", "79", "status is Agreed")))
         # a proposal is its holder's attitude (the stance's), not a hedge: RAN1's reader once added it to conditions
         self.assertFalse(_hedges_differ(row("A", "stage", "P1", "proposed; relying on overhead"),
                                         row("B", "stage", "P1", "relying on overhead")))

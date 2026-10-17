@@ -292,6 +292,8 @@ def _attributable(x, y, named_x, named_y):
 HEDGE_WORDS = {"tentative", "tentatively", "preliminary", "provisional", "provisionally", "working", "assumption",
                "expected", "likely", "estimate", "estimated", "tbd", "tbc", "ffs", "draft"}
 FIRM_WORDS = {"agreed", "agreement", "confirmed", "final", "firm", "approved", "status"}
+# as words() folds them ("status" is "statu"), so they're found among a claim's words
+HEDGE_WORDS, FIRM_WORDS = (frozenset().union(*map(words, group)) for group in (HEDGE_WORDS, FIRM_WORDS))
 
 # A hedge word's other forms, as one ("Tentatively" is "tentative": no hedge changed)
 HEDGE_FORMS = {"tentatively": "tentative", "provisionally": "provisional", "estimated": "estimate",
