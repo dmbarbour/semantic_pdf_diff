@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 import pymupdf
+from semantic_pdf_diff.report import unpacked
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.sections import pdf_sections
@@ -582,7 +583,7 @@ class Provenance(unittest.TestCase):
                     cli.main(['compare', str(a), str(b), '--store', str(root / 'out'), '--no-vision'], client=client)
                 report = json.loads((root / 'out/report.json').read_text())
                 self.assertEqual(len([x for x in report['sections'] if x['origin'] == 'outline']), 4)
-                self.assertIn('§ Design &gt; Fans', (root / 'out/report.html').read_text())
+                self.assertIn('§ Design &gt; Fans', unpacked((root / 'out/report.html').read_text()))
 
 if __name__ == '__main__':
     unittest.main()

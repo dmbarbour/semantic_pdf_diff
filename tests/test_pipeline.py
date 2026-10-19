@@ -12,7 +12,7 @@ from semantic_pdf_diff.compare import numeric_check, compare
 from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.tasks import split_utf8
 from semantic_pdf_diff.segmentation import tiles
-from semantic_pdf_diff.report import write_report
+from semantic_pdf_diff.report import unpacked, write_report
 from stubs import ROUND0, chat_answer, prompt_of, request_body, serving, situating_answer
 
 
@@ -192,10 +192,12 @@ class Tests(unittest.TestCase):
                    FileRef(source='B',path='B.pdf',content=b.content).model_dump()])
         with tempfile.TemporaryDirectory() as d:
             write_report(data,Path(d))
-            html=(Path(d)/'report.html').read_text()
+            page=(Path(d)/'report.html').read_text()
+            html=unpacked(page)  # as the page's script shows it
+            self.assertNotIn('<script>alert(1)</script>',page)
             self.assertNotIn('<script>alert(1)</script>',html)
             self.assertIn('&lt;script&gt;',html)
-            self.assertIn('prefers-color-scheme:dark',html)  # the shared palette (html_pages), dark mode included
+            self.assertIn('prefers-color-scheme:dark',page)  # the shared palette (html_pages), dark mode included
 
     def test_pages_share_escaping_and_embedded_data(self):
         from semantic_pdf_diff.html_pages import embed_json, fill, page

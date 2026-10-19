@@ -5,6 +5,7 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from semantic_pdf_diff.report import unpacked
 from semantic_pdf_diff.cli import main
 from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.pipeline import shortcut_names
@@ -147,7 +148,8 @@ class CliTests(unittest.TestCase):
             self.assertEqual(report['findings'], [])
             self.assertEqual(len(report['shared']), 1)
             self.assertEqual(len({f['content'] for f in report['files']}), 1)
-            self.assertIn('team-a.pdf / team-a.pdf; team-b.pdf / team-b.pdf', (root / 'out/report.html').read_text())
+            self.assertIn('team-a.pdf / team-a.pdf; team-b.pdf / team-b.pdf',
+                          unpacked((root / 'out/report.html').read_text()))
 
     def test_v2_outputs(self):
         with tempfile.TemporaryDirectory() as d:

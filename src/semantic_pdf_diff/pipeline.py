@@ -7,7 +7,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import fixtures, provenance
+from . import crops, fixtures, provenance
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
 from .jobs import Job, reader_for, reader_version, run_jobs
@@ -71,6 +71,7 @@ class RunOptions:
     ledger_tags: dict = field(default_factory=dict)
     export: Path | None = None        # a .sqlite fixture every answer served or recorded is copied into (in fresh
                                       # stores: a store holding a region's claims asks nothing for it)
+    report_budget: int = crops.DEFAULT_BUDGET  # report.html's bytes, its crops included as they fit (crops.py)
 
     @classmethod
     def from_args(cls, args):
@@ -79,6 +80,7 @@ class RunOptions:
                    fixture=get("fixture"), fixture_mode=get("fixture_mode"), responder=get("responder"),
                    fresh_regions=tuple(r for r in (get("fresh_regions", "") or "").split(",") if r),
                    ledger=get("ledger"), export=get("fixture_export"),
+                   report_budget=get("report_budget", crops.DEFAULT_BUDGET),
                    ledger_tags=dict(t.split("=", 1) for t in (get("ledger_tag", []) or []) if "=" in t))
 
     @property
@@ -250,7 +252,7 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     data = traced(data)
     store.save_comparison(data['created_at'], data)
-    write_report(data, out, assets=store.folder / 'assets')
+    account = write_report(data, out, assets=store.folder / 'assets', budget=options.report_budget)
     # how the run went, apart from the report, which holds only what the answers decide (the determinism review, D9)
     usage = {'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage,
              **fixture_usage(client, options.fixture)}
@@ -261,6 +263,8 @@ def compare_and_report(options, settings, store, client, names, read, document, 
                   or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
                          for f in data['findings']))
     print(f"Report: {out / 'report.html'}" + (' (incomplete source coverage)' if incomplete else ''))
+    if account.cut:
+        print(crops.summary(account, store.folder))
     note = budget_note(client)
     if note:
         log.warning(note)

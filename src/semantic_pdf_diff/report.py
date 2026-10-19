@@ -1,6 +1,13 @@
-from .html_pages import esc, page as html_page
+"""A comparison's report: report.json, and report.html as one file that travels alone, its parts written here once
+each, gzipped inside the page and put together by its script (report.js), its crops embedded as a byte budget allows
+(crops.py; docs/plans/portable-reports-2026-10-19.md)."""
+from . import crops
+from .html_pages import embed_json, esc, page as html_page
+import base64
+import gzip
 import json
-import os
+import re
+from importlib import resources
 from pathlib import Path
 from collections import Counter
 
@@ -71,19 +78,21 @@ td,th{text-align:left;border-bottom:1px solid var(--line);padding:8px}
 select,input{padding:10px;border:1px solid var(--field);border-radius:6px;margin:8px;\
 background:var(--card);color:var(--fg)}
 pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{color:var(--accent)}
+img.crop{cursor:zoom-in}img.crop.full{max-height:none;cursor:zoom-out}.cut{color:var(--muted);font-size:13px}
+button.more{padding:10px 16px;margin:8px 0;border:1px solid var(--field);border-radius:6px;background:var(--card);\
+color:var(--fg);cursor:pointer}
 @media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
 '''
-SCRIPT = ("<script>function filter(){const r=document.querySelector('#filter').value,"
-          "k=document.querySelector('#kind')?.value||'all',q=document.querySelector('#query').value.toLowerCase();"
-          "document.querySelectorAll('main article').forEach(a=>a.hidden=(r!=='all'&&a.dataset.relation!==r)"
-          "||(k!=='all'&&a.dataset.kind!==k)||!a.textContent.toLowerCase().includes(q))}"
-          "document.querySelector('#filter').onchange=filter;const kind=document.querySelector('#kind');"
-          "if(kind)kind.onchange=filter;document.querySelector('#query').oninput=filter;</script>")
+# The page's script: it inflates the report's parts and shows them (a file beside this one, so it reads as code).
+SCRIPT = resources.files(__package__).joinpath("report.js").read_text(encoding="utf-8")
 
 class Cards:
-    """A report's claims as cards: each with where it is, what it says, its quote and how it was read."""
-    def __init__(self, data, link):
-        self.evidence, self.link = {e["id"]: e for e in data["evidence"]}, link
+    """A report's claims as cards: each with where it is, what it says, its quote and how it was read. Called with a
+    claim's id, it gives the card's place in a finding or list; each card is written once (html), and the page's
+    script puts it in each place. crop(claim) gives a card's crop: an embedded image, or why there's none."""
+    def __init__(self, data, crop=lambda e: ''):
+        self.evidence, self.crop = {e["id"]: e for e in data["evidence"]}, crop
+        self.html = {}
         self.occurrences = {}
         for f in data["files"]:
             self.occurrences.setdefault(f["content"], []).append(f"{f['source']} / {f['path']}")
@@ -112,9 +121,13 @@ class Cards:
         return "; ".join(self.occurrences.get(content, ["unregistered content"]))
 
     def __call__(self, eid):
-        e, link = self.evidence[eid], self.link
-        image = ('<a href="'+esc(link(e['image']))+'"><img loading="lazy" src="'+esc(link(e['image']))
-                 +'" alt="Source crop"></a>') if e.get('image') else ''
+        if eid not in self.html:
+            self.html[eid] = self.card(eid)
+        return f'<div data-card="{esc(eid)}"></div>'
+
+    def card(self, eid):
+        e = self.evidence[eid]
+        image = self.crop(e)
         verified = {True: '<p>Quote found in the file\'s text.</p>' if e['locator'].get('format') in PLACES
                     else '<p>Quote found in PDF text layer.</p>',
                     False: '<p class="warning">Quote not found in the PDF text layer for this region; possible misread '
@@ -223,25 +236,59 @@ def record_changes_html(changes, esc):
     return (f"<section><h2>Context changes ({len(changes)})</h2><p>A note, lead-in or table heading restated: what "
             f"the claims under it mean may have changed, whatever their values.</p><ul>{items}</ul></section>")
 
-def write_report(data, output, assets=None):
-    """Write report.json and report.html; assets is the folder holding rendered crops
-    (default: output/assets), linked relative to the report."""
+def write_report(data, output, assets=None, budget=crops.DEFAULT_BUDGET, write=True):
+    """Write report.json and report.html, one file holding its crops (rendered into `assets`, default output/assets)
+    as far as the byte budget allows, in crops.py's order of value. Returns the budget's account (crops.Account);
+    with write=False, only the account (`report --dry-run`)."""
     output = Path(output)
-    output.mkdir(exist_ok=True, parents=True)
-    prefix = os.path.relpath(Path(assets), output).replace(os.sep, "/") + "/" if assets else "assets/"
-    card = Cards(data, lambda image: prefix + image.split("/", 1)[1] if image.startswith("assets/") else image)
-    (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    assets = Path(assets) if assets else output / "assets"
+    stored = lambda image: assets / image.split("/", 1)[1] if image.startswith("assets/") else output / image
     # explained differences first, value changes leading (KINDS' order); the rest as found
     order = {k: i for i, k in enumerate(KINDS)}
     shown = sorted(data['findings'], key=lambda f: order.get(f.get('explanation', {}).get('kind'), len(KINDS)))
-    unmatched = ''.join('<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched'])
-    shared = ''.join(card(eid) for eid in data.get('shared', []))
-    issues_found = ''.join('<tr><td>'+esc(i['source'])+'</td><td>'+esc(i['path'])+'</td><td>'+esc(i['reason'])
-                           +'</td></tr>' for i in data.get('scan_issues', []))
-    coverage = ''.join('<tr><td>'+esc(card.where(r['content']))+'</td><td>'
-                       +esc(r['page'] if r['page'] is not None else '')+'</td><td>'+esc(r['task'])+'</td><td>'
-                       +esc(r['status'])+'</td><td>'+esc('; '.join(r['issues']))+'</td></tr>' for r in data['coverage'])
-    page = header_html(data)
+    where = Cards(data).where
+    def label(e):
+        loc = e['locator']
+        return (f"{where(e['content'])}, {PAGE_WORDS.get(loc.get('format'), 'page')} {loc['page']}, "
+                f"{loc.get('task', loc.get('region', ''))}: {e['entity']} — {e['attribute']}")
+    account = crops.Account(budget)
+    account.wanted = crops.wanted({e["id"]: e for e in data["evidence"]}, shown, data['unmatched'],
+                                  data.get('shared', []), label, lambda image: stored(image).exists())
+    mime, encode = crops.encoder()
+    crops.encode(account.wanted, stored, encode)
+    account.page = len(page_html(data, shown, stored, [], account, mime).encode())  # every crop left out
+    chosen = crops.choose(account.wanted, budget - account.page)
+    while True:  # the page's text changes a little with what's embedded: never over budget for it
+        account.chosen = {c.image for c in chosen}
+        page = page_html(data, shown, stored, chosen, account, mime)
+        account.size = len(page.encode())
+        if account.size <= budget or not chosen:
+            break
+        chosen.pop()
+    if write:
+        output.mkdir(exist_ok=True, parents=True)
+        (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        (output/'report.html').write_text(page, encoding='utf-8')
+    return account
+
+def crop_html(e, embedded, stored):
+    """A card's crop: its embedded image (enlarged by a click), or why it has none."""
+    image = e.get('image')
+    if not image:
+        return ''
+    if image in embedded:
+        return (f'<img class="crop" data-crop="{embedded[image]}" alt="The image the model read" '
+                'title="Click to enlarge">')
+    if not stored(image).exists():
+        return f"<p class='cut'>Crop not found in the store ({esc(image)}).</p>"
+    return (f"<p class='cut'>Crop left out for the report's size budget ({esc(e['locator'].get('task', ''))}): "
+            "see Crops left out.</p>")
+
+def page_html(data, shown, stored, chosen, account, mime="image/webp"):
+    """report.html: its parts gzipped inside it (each card once), the chosen crops, and the script showing them."""
+    embedded = {c.image: i for i, c in enumerate(chosen)}
+    card = Cards(data, lambda e: crop_html(e, embedded, stored))
+    page = header_html(data) + crops_note(account)
     page += ('<label>Show <select id="filter"><option value="all">All relations</option>'
              +''.join('<option>'+r+'</option>'
                       for r in ['different','equivalent','complementary','uncertain','unrelated'])
@@ -249,21 +296,79 @@ def write_report(data, output, assets=None):
     if any('explanation' in f for f in data['findings']):
         page += ('<label>Kind <select id="kind"><option value="all">All kinds</option>'
                  +''.join(f'<option value="{k}">{esc(v[0])}</option>' for k, v in KINDS.items())+'</select></label>')
-    page += '<input id="query" placeholder="Search findings" aria-label="Search findings">'
-    page += ('<main>'+''.join(finding_html(f, card) for f in shown)+'</main><details><summary>Unmatched evidence ('
-             +str(len(data['unmatched']))+')</summary>'+unmatched+'</details>')
+    page += ('<input id="query" placeholder="Search findings" aria-label="Search findings"> '
+             '<span id="count" class="meta"></span>')
+    page += ('<main></main><details data-list="unmatched"><summary>Unmatched evidence ('
+             +str(len(data['unmatched']))+')</summary></details>')
     page += groupings_html(data.get('groupings', []), esc)
-    page += ('<details><summary>Shared evidence ('+str(len(data.get('shared', [])))
-             +'): identical content in both sources, not compared</summary>'+shared+'</details>')
+    page += ('<details data-list="shared"><summary>Shared evidence ('+str(len(data.get('shared', [])))
+             +'): identical content in both sources, not compared</summary></details>')
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
+    issues_found = ''.join('<tr><td>'+esc(i['source'])+'</td><td>'+esc(i['path'])+'</td><td>'+esc(i['reason'])
+                           +'</td></tr>' for i in data.get('scan_issues', []))
     page += ('<details class="coverage"><summary>Files not scanned ('+str(len(data.get('scan_issues', [])))
              +'): hidden, unsafe or over limits</summary><table><thead><tr><th>Source</th><th>Path</th><th>Reason</th>'
              '</tr></thead><tbody>'+issues_found+'</tbody></table></details>')
+    coverage = ''.join('<tr><td>'+esc(card.where(r['content']))+'</td><td>'
+                       +esc(r['page'] if r['page'] is not None else '')+'</td><td>'+esc(r['task'])+'</td><td>'
+                       +esc(r['status'])+'</td><td>'+esc('; '.join(r['issues']))+'</td></tr>' for r in data['coverage'])
     page += ('<details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>File</th>'
              '<th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody>'+coverage
              +'</tbody></table></details>')
-    page = html_page('Semantic PDF comparison', page + SCRIPT, STYLE)
-    (output/'report.html').write_text(page,encoding='utf-8')
+    page += crops_left_out_html(account)
+    parts = {"page": page,
+             "findings": [{"relation": f['relation'], "kind": f.get('explanation', {}).get('kind', ''),
+                           "cards": [f['a'], f['b']], "html": finding_html(f, card)} for f in shown],
+             "lists": {"unmatched": ['<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched']],
+                       "shared": [card(eid) for eid in data.get('shared', [])]},
+             "cards": card.html}
+    packed = json.dumps(parts, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    packed = base64.b64encode(gzip.compress(packed, 9, mtime=0)).decode("ascii")  # mtime=0: the same bytes each time
+    images = embed_json({"type": mime, "data": [c.data for c in chosen]})
+    body = ('<div id="report"><p class="meta">Opening the report…</p></div><noscript><p class="warning">This report '
+            'is shown by its script: open it in a browser with JavaScript on.</p></noscript>'
+            f'<script type="application/gzip" id="report-data">{packed}</script>'
+            f'<script type="application/json" id="report-crops">{images}</script><script>{SCRIPT}</script>')
+    return html_page('Semantic PDF comparison', body, STYLE)
+
+def crops_note(account):
+    """The header's word on crops the budget left out (none: nothing to say)."""
+    cut = account.cut
+    if not cut:
+        return ''
+    return (f"<p class='warning'>{len(cut)} of {len(account.wanted)} crops left out for the report's size budget of "
+            f"{crops.sized(account.budget)}, the findings to check and pictured claims first: see Crops left out."
+            "</p>")
+
+def crops_left_out_html(account):
+    """The crops the budget left out, in the order they'd have been embedded."""
+    cut = account.cut
+    if not cut:
+        return ''
+    rows = ''.join(f"<tr><td>{esc(crops.GROUPS[c.group])}</td><td>{esc(c.label)}</td><td>{crops.sized(c.size)}"
+                   "</td></tr>" for c in cut)
+    return (f'<details class="coverage"><summary>Crops left out ({len(cut)})</summary><p>The report is one file; its '
+            f"crops fill the size budget ({crops.sized(account.budget)}) in order of value: claims in different "
+            "or uncertain findings, then complementary ones and claims possibly added or removed, then the rest; "
+            "within each, claims read from a chart, diagram or table, or whose quote isn't in the page's text, first. "
+            "<code>pdf-semantic-diff report --report-budget SIZE</code> writes it again with another budget, and "
+            "<code>--dry-run</code> says what that would leave out.</p><table><thead><tr><th>Shown in</th>"
+            f"<th>Crop</th><th>Size</th></tr></thead><tbody>{rows}</tbody></table></details>")
+
+def unpacked(page):
+    """A report page's HTML as its script shows it, with every finding and list open (for tests and tools)."""
+    import html
+    found = re.search(r'<script type="application/gzip" id="report-data">([^<]*)</script>', page)
+    parts = json.loads(gzip.decompress(base64.b64decode(found.group(1))))
+    fill = lambda text: re.sub(r'<div data-card="([^"]*)"></div>', lambda m: parts["cards"][html.unescape(m.group(1))],
+                               text)
+    out = parts["page"].replace("<main></main>", "<main>" + "".join(fill(f["html"]) for f in parts["findings"])
+                                + "</main>")
+    for name, items in parts["lists"].items():
+        listed = fill("".join(items))
+        out = re.sub(f'(<details data-list="{name}"><summary>.*?</summary>)', lambda m: m.group(1) + listed,  # noqa: B023
+                     out, count=1, flags=re.S)  # (used at once)
+    return out
 
 # A difference's kind (explain.py): its name, and what it means, in the order the report lists them.
 KINDS = {"changed": ("Changed", "The same item and property under the same conditions; its value was revised"),

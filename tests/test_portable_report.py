@@ -1,0 +1,185 @@
+"""Portable reports (docs/plans/portable-reports-2026-10-19.md): report.html is one file that travels alone, its parts
+gzipped inside it and its crops embedded under a byte budget in order of value (crops.py). The owner, 2026-10-19: "I
+need a report that is easily migrated"; then "consider providing a command-line option and a mode that provides some
+feedback about some items that will be cut under that budget"."""
+import stubs  # noqa: F401 (a clean environment)
+import base64
+import json
+import random
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from unittest import mock
+from semantic_pdf_diff import crops
+from semantic_pdf_diff.report import unpacked, write_report
+from semantic_pdf_diff.schema import FileRef, Source
+from test_pipeline import ev
+
+def noise(path, side, seed=0):
+    """A PNG of noise, side pixels square: incompressible, so its crop's size grows with its area."""
+    import pymupdf
+    samples = random.Random(seed).randbytes(side * side * 3)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    pymupdf.Pixmap(pymupdf.csRGB, side, side, samples, False).save(str(path))
+    return f"assets/{path.name}"
+
+def finding(a, b, relation):
+    return {"a": a.id, "b": b.id, "relation": relation, "rationale": "as judged", "confidence": 0.9,
+            "retrieval_score": 0.5}
+
+def report(claims, findings, unmatched=()):
+    """A report document: two sources, the claims, their findings and unmatched claims."""
+    return {"mode": "proposals", "findings": findings, "unmatched": list(unmatched), "shared": [],
+            "evidence": [c.model_dump() for c in claims], "coverage": [], "retrieval": {},
+            "sources": [Source(name="A").model_dump(), Source(name="B").model_dump()],
+            "files": [FileRef(source="A", path="a.pdf", content=ev("A-1").content).model_dump(),
+                      FileRef(source="B", path="b.pdf", content=ev("B-1").content).model_dump()]}
+
+class OneFile(unittest.TestCase):
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name)
+        self.assets = self.root / "store" / "assets"
+
+    def test_a_report_written_elsewhere_holds_its_crops_and_links_nothing(self):
+        a = ev("A-1", kind="chart", image=noise(self.assets / "a-tile-p1-0.png", 60))
+        data = report([a, ev("B-1")], [finding(a, ev("B-1"), "different")])
+        write_report(data, self.root / "reports" / "r1", assets=self.assets)
+        page = (self.root / "reports" / "r1" / "report.html").read_text()
+        self.assertNotIn("assets/", page.replace("store/assets", ""))  # nothing linked
+        held = json.loads(page.split('id="report-crops">', 1)[1].split("</script>", 1)[0])
+        self.assertEqual(held["type"], "image/webp")
+        self.assertEqual(base64.b64decode(held["data"][0])[8:12], b"WEBP")
+        shown = unpacked(page)
+        self.assertIn('<img class="crop" data-crop="0"', shown)
+        self.assertIn("primary pump", shown)
+        self.assertEqual(json.loads((self.root / "reports" / "r1" / "report.json").read_text()),
+                         json.loads(json.dumps(data)))
+
+    def test_the_same_report_is_written_byte_for_byte(self):
+        a = ev("A-1", kind="chart", image=noise(self.assets / "a.png", 40))
+        data = report([a, ev("B-1")], [finding(a, ev("B-1"), "uncertain")])
+        for name in ("one", "two"):
+            write_report(data, self.root / name, assets=self.assets)
+        self.assertEqual((self.root / "one" / "report.html").read_bytes(),
+                         (self.root / "two" / "report.html").read_bytes())
+
+    def claims(self):
+        """Four crops: two in a different finding (one of a chart), one complementary, one equivalent."""
+        text = ev("A-1", image=noise(self.assets / "text.png", 150, 1), quote_verified=True)  # group 0, second
+        chart = ev("A-2", kind="chart", image=noise(self.assets / "chart.png", 60, 2))      # group 0, first
+        compl = ev("A-3", kind="table", image=noise(self.assets / "table.png", 60, 3))      # group 1
+        equal = ev("A-4", kind="diagram", image=noise(self.assets / "diagram.png", 40, 4))  # group 2
+        b = [ev(f"B-{i}") for i in range(1, 5)]
+        findings = [finding(equal, b[3], "equivalent"), finding(compl, b[2], "complementary"),
+                    finding(text, b[0], "different"), finding(chart, b[1], "different")]
+        return report([text, chart, compl, equal, *b], findings)
+
+    def test_crops_fill_the_budget_in_order_of_value(self):
+        data = self.claims()
+        every = write_report(data, self.root / "out", assets=self.assets, write=False)
+        self.assertEqual([c.image for c in every.wanted],
+                         ["assets/chart.png", "assets/text.png", "assets/table.png", "assets/diagram.png"])
+        self.assertEqual([c.group for c in every.wanted], [0, 0, 1, 2])
+        size = {c.image: c.size for c in every.wanted}
+        self.assertGreater(size["assets/text.png"], size["assets/table.png"] + size["assets/diagram.png"])
+        # room for all but the big one: it's left out, and the smaller ones after it still go in
+        budget = every.page + size["assets/chart.png"] + size["assets/table.png"] + size["assets/diagram.png"] + 200
+        account = write_report(data, self.root / "out", assets=self.assets, budget=budget)
+        self.assertEqual([c.image for c in account.cut], ["assets/text.png"])
+        self.assertLessEqual(account.size, budget)
+        self.assertEqual(account.size, (self.root / "out" / "report.html").stat().st_size)
+        shown = unpacked((self.root / "out" / "report.html").read_text())
+        self.assertIn("Crop left out for the report's size budget (text:0)", shown)
+        self.assertIn("1 of 4 crops left out", shown)
+        self.assertIn("Crops left out (1)", shown)
+
+    def test_a_crop_two_claims_show_is_paid_for_once_at_the_better_place(self):
+        image = noise(self.assets / "shared.png", 40)
+        a, c = ev("A-1", image=image), ev("A-2", attribute="flow", image=image)
+        b, d = ev("B-1"), ev("B-2")
+        account = write_report(report([a, b, c, d], [finding(a, b, "equivalent"), finding(c, d, "uncertain")]),
+                               self.root / "out", assets=self.assets, write=False)
+        self.assertEqual([(x.image, x.group) for x in account.wanted], [(image, 0)])
+
+    def test_a_budget_of_nothing_embeds_no_crop(self):
+        account = write_report(self.claims(), self.root / "out", assets=self.assets, budget=0)
+        self.assertEqual((account.chosen, len(account.cut)), (set(), 4))
+        self.assertGreater(account.size, 0)  # the page is written all the same
+        self.assertNotIn("data-crop=", unpacked((self.root / "out" / "report.html").read_text()))
+
+    def test_feedback_says_what_each_group_costs_in_full(self):
+        data = self.claims()
+        every = write_report(data, self.root / "out", assets=self.assets, write=False)
+        account = write_report(data, self.root / "out", assets=self.assets, budget=every.page, write=False)
+        lines = crops.feedback(account)
+        self.assertFalse((self.root / "out").exists())  # a dry run writes nothing
+        self.assertIn("4 wanted", lines[1])
+        in_full = account.page + sum(c.size for c in account.wanted if c.group == 0)
+        self.assertRegex(lines[2], r"^  different or uncertain +2 crops, +\d+ KB: all left out; in full with "
+                                   r"--report-budget \d+KB$")
+        needed = crops.as_budget(in_full)
+        self.assertTrue(lines[2].endswith(needed))
+        from semantic_pdf_diff.cli import report_size
+        self.assertGreaterEqual(report_size(needed), in_full)  # rounded up: that budget does include them
+        self.assertIn("left out, the first 4 of 4 by priority:", lines)
+        self.assertIn("a.pdf, page 1, text:0: primary pump — rated power", lines[-4])
+
+    def test_a_crop_the_store_lost_is_shown_missing(self):
+        a = ev("A-1", kind="chart", image="assets/gone.png")
+        account = write_report(report([a, ev("B-1")], [finding(a, ev("B-1"), "different")]), self.root / "out",
+                               assets=self.assets)
+        self.assertEqual(account.wanted, [])
+        self.assertIn("Crop not found in the store (assets/gone.png)",
+                      unpacked((self.root / "out" / "report.html").read_text()))
+
+    def test_without_pillow_crops_are_jpeg(self):
+        path = self.root / "x.png"
+        noise(path, 20)
+        with mock.patch.dict(sys.modules, {"PIL": None}):
+            mime, encode = crops.encoder()
+            self.assertEqual(mime, "image/jpeg")
+            self.assertEqual(encode(path)[:2], b"\xff\xd8")
+
+    def test_budgets_on_the_command_line(self):
+        import argparse
+        from semantic_pdf_diff.cli import report_size
+        self.assertEqual([report_size(x) for x in ("20MB", "500kb", "1.5GB", "7", "0", "12B", "3 M")],
+                         [20_000_000, 500_000, 1_500_000_000, 7_000_000, 0, 12, 3_000_000])
+        with self.assertRaises(argparse.ArgumentTypeError):
+            report_size("lots")
+
+BROWSERS = ("chromium", "chromium-browser", "google-chrome", "chrome")
+
+class InABrowser(unittest.TestCase):
+    """The page's script, run by a headless browser where one is installed (it inflates the parts, puts cards and
+    crops in place, and shows findings a page at a time)."""
+    def test_the_page_opens_with_its_first_findings_cards_and_crops(self):
+        browser = next((b for b in map(shutil.which, BROWSERS) if b), None)
+        if browser is None:
+            self.skipTest("no headless browser installed (chromium)")
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            chart = ev("A-0", kind="chart", image=noise(root / "assets" / "chart.png", 40))
+            claims = [chart] + [ev(f"A-{i}", attribute=f"flow {i}") for i in range(1, 150)]
+            others = [ev(f"B-{i}", attribute=f"flow {i}") for i in range(150)]
+            data = report(claims + others, [finding(a, b, "different") for a, b in zip(claims, others)])
+            write_report(data, root / "out", assets=root / "assets")
+            page = (root / "out" / "report.html").as_uri()
+            flags = ["--headless", "--no-sandbox", "--disable-gpu", "--virtual-time-budget=10000", "--dump-dom"]
+            done = subprocess.run([browser, *flags, page], capture_output=True, text=True, timeout=120)
+        dom = done.stdout
+        self.assertNotIn("Opening the report", dom)
+        self.assertIn("150 of 150 findings", dom)
+        self.assertEqual(dom.count("<article"), 100)
+        self.assertIn("Show 50 more (50 left)", dom)
+        self.assertEqual(dom.count("<section><h3>"), 200)
+        self.assertNotIn("data-card=", dom)
+        self.assertIn('src="data:image/webp;base64,', dom)
+
+if __name__ == "__main__":
+    unittest.main()

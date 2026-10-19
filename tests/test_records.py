@@ -4,6 +4,7 @@ import stubs  # noqa: F401 (a clean environment)
 import unittest
 from types import SimpleNamespace
 
+from semantic_pdf_diff.report import unpacked
 from semantic_pdf_diff.records import list_records, note_records, printed_before, table_record
 from semantic_pdf_diff.schema import Position
 from semantic_pdf_diff.settings import Settings
@@ -125,11 +126,11 @@ class Reported(unittest.TestCase):
         records = [{"content": e.content, "id": "list:p1:0", "kind": "list", "label": "", "text": LEAD},
                    {"content": e.content, "id": "note:p1:0", "kind": "note", "label": "GENERAL NOTES",
                     "text": "1. ALL DIMENSIONS ARE TO FACE OF FINISH."}]
-        card = Cards({"evidence": [e.model_dump()], "files": [], "records": records}, lambda x: x)("A-1")
+        card = Cards({"evidence": [e.model_dump()], "files": [], "records": records}).card("A-1")
         self.assertIn("As printed: acknowledgement timeout", card)
         self.assertIn(f"Position: Condition 2 of “{LEAD}”", card)
         self.assertIn("Note: GENERAL NOTES — 1. ALL DIMENSIONS ARE TO FACE OF FINISH.", card)
-        plain = Cards({"evidence": [ev("B-1").model_dump()], "files": []}, lambda x: x)("B-1")
+        plain = Cards({"evidence": [ev("B-1").model_dump()], "files": []}).card("B-1")
         self.assertNotIn("As printed", plain)
 
     def test_reports_without_records_are_written_as_before(self):
@@ -336,7 +337,7 @@ class Stored(unittest.TestCase):
                 cli.main(["compare", str(a.parent), str(b.parent), "--store", str(Path(d) / "out"), "--base-url",
                           url, "--no-situate", "--config", str(config), "--mode", "revisions"])
             report = json.loads((Path(d) / "out" / "report.json").read_text())
-            html = (Path(d) / "out" / "report.html").read_text()
+            html = unpacked((Path(d) / "out" / "report.html").read_text())
         (change,) = report["record_changes"]
         self.assertEqual((change["kind"], change["earlier"]["text"], change["later"]["text"]), ("list", LEAD, later))
         self.assertEqual(len(change["claims"]), 4)  # two conditions' claims on each side

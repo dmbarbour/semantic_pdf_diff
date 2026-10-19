@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 import pymupdf
+from semantic_pdf_diff.report import unpacked
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.dispatch import Dispatcher
 from semantic_pdf_diff.failures import ModelFailure
@@ -379,7 +380,7 @@ class Storage(unittest.TestCase):
             # checks rerun on loaded results
             self.assertEqual({c: x['quality'] for c, x in again['situation'].items()},
                              {c: x['quality'] for c, x in report['situation'].items()})
-            page = (root / 'out/report.html').read_text()
+            page = unpacked((root / 'out/report.html').read_text())
             self.assertIn('Situating: figures and sections', page)
             self.assertIn('stub figure: Figure 1: Pump arrangement', page)
 

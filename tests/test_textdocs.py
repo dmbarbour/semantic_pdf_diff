@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from semantic_pdf_diff.report import unpacked
 from semantic_pdf_diff import textdocs, textjob
 from semantic_pdf_diff.tasks import ExtractQuery
 from semantic_pdf_diff.jobs import Job, reader_for, run_jobs
@@ -171,7 +172,7 @@ class Pipeline(unittest.TestCase):
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                     self.assertEqual(cli.main(args), 0)
                 reports.append(json.loads((root / "out" / "report.json").read_text()))
-            html = (root / "out" / "report.html").read_text()
+            html = unpacked((root / "out" / "report.html").read_text())
         first, second = reports
         self.assertEqual(first["evidence"], second["evidence"])
         self.assertEqual({e["locator"]["format"] for e in first["evidence"]}, {"text"})

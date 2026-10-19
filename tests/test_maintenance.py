@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from semantic_pdf_diff.report import unpacked
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.store import Store
 
@@ -100,7 +101,12 @@ class Maintenance(unittest.TestCase):
         before = self.state['requests']
         code, out, _ = self.cli('report', '--store', self.store)
         self.assertEqual((code, self.state['requests']), (0, before))
-        self.assertIn('team-a ↔ team-b', (self.store / 'report.html').read_text())
+        self.assertIn('team-a ↔ team-b', unpacked((self.store / 'report.html').read_text()))
+        (self.store / 'report.html').unlink()  # a dry run says what a budget would leave out, and writes nothing
+        code, out, _ = self.cli('report', '--store', self.store, '--dry-run', '--report-budget', '1KB')
+        self.assertEqual(code, 0)
+        self.assertIn('report.html with a budget of 1 KB', out)
+        self.assertFalse((self.store / 'report.html').exists())
         code, _, err = self.cli('report', '--store', self.store, '--comparison', 99)
         self.assertEqual(code, 1)
         self.assertIn('no comparison 99', err)

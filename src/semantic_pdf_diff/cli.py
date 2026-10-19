@@ -10,9 +10,10 @@
 import argparse
 import csv
 import json
+import re
 import sys
 from pathlib import Path
-from . import __version__, fixtures, manifest
+from . import __version__, crops, fixtures, manifest
 from .pipeline import (RunOptions, attempt, check_fixture, declare_paths, document_properties, limits, run,
                        settings_from)
 from .schema import Source
@@ -103,9 +104,9 @@ Examples:
   pdf-semantic-diff source add team-b --store work --path team-b.zip
   pdf-semantic-diff compare team-a team-b --store work                     declared sources, by name
 
-A comparison's --store folder (diff-output unless named) holds what was read, and receives report.html (keep its
-assets/ folder beside it), report.json and evidence.json. A comparison into it again reuses what was read, and
-resumes one interrupted.
+A comparison's --store folder (diff-output unless named) holds what was read, and receives report.html (one file
+to keep or send, its crops inside as --report-budget allows), report.json and evidence.json. A comparison into it
+again reuses what was read, and resumes one interrupted.
 
 Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error
 (a mistyped command or option too).
@@ -169,7 +170,9 @@ def add_run_options(parser):
                             'others, saying what differs: --reset clears what they change, then runs')
     store.add_argument('--dry-run', action='store_true',
                        help='With --reset: say what would be cleared, and change nothing')
-    add_log_options(parser.add_argument_group('output'))
+    output = parser.add_argument_group('output')
+    add_log_options(output)
+    add_report_options(output)
     recorded = parser.add_argument_group('recorded answers (testing, and runs without the model)')
     recorded.add_argument('--fixture', type=Path,
                           help='Answers fixture: answers recorded in it are replayed, not asked again. A .sqlite '
@@ -186,6 +189,21 @@ def add_run_options(parser):
     recorded.add_argument('--fresh-regions', default='', metavar='REGIONS',
                           help='A/A control: answer extraction for these regions (e.g. tile,figure,overview) afresh, '
                                'as a second sample of each query')
+
+def report_size(text):
+    """A report's budget in bytes, from "20MB", "500KB", "1.5GB" or a bare number of megabytes."""
+    found = re.fullmatch(r"\s*(\d+(?:\.\d*)?)\s*([kmg]?b?)\s*", text, re.IGNORECASE)
+    if not found:
+        raise argparse.ArgumentTypeError(f"{text!r} isn't a size (e.g. 20MB, 500KB)")
+    unit = found.group(2).lower().rstrip("b") if found.group(2).lower() != "b" else "b"
+    return int(float(found.group(1)) * {"": 1e6, "b": 1, "k": 1e3, "m": 1e6, "g": 1e9}[unit])
+
+def add_report_options(parser):
+    parser.add_argument('--report-budget', type=report_size, default=crops.DEFAULT_BUDGET, metavar='SIZE',
+                        help='report.html is one file holding its crops, in order of value (the findings to check, '
+                             'and claims read from charts, diagrams and tables, first) until it reaches this size '
+                             f'(default: {crops.DEFAULT_BUDGET // 1_000_000}MB; a bare number is megabytes; 0 embeds '
+                             'none). `report --dry-run` says what a budget leaves out')
 
 def add_budget_options(parser):
     parser.add_argument('--max-cost', type=float,
@@ -524,6 +542,10 @@ def store_parser(command):
         parser.description = 'Regenerate a report from a saved comparison, without model calls.'
         parser.add_argument('--comparison', type=int, help='Comparison id (see: show comparisons); default: latest')
         parser.add_argument('--out', type=Path, help='Report folder (default: the store folder)')
+        add_report_options(parser)
+        parser.add_argument('--dry-run', action='store_true',
+                            help='Write nothing: say what the budget embeds and leaves out, group by group, and the '
+                                 'budget each group needs in full')
     return parser
 
 def store_command(command, argv):
@@ -539,8 +561,14 @@ def store_command(command, argv):
             print(json.dumps(store.gc(dry_run=args.dry_run, orphaned_sources=args.orphaned_sources), indent=2))
         else:
             out = args.out or args.store
-            write_report(store.comparison(args.comparison), out, assets=store.folder / 'assets')
-            print(f"Report: {out / 'report.html'}")
+            account = write_report(store.comparison(args.comparison), out, assets=store.folder / 'assets',
+                                   budget=args.report_budget, write=not args.dry_run)
+            if args.dry_run:
+                print("\n".join(crops.feedback(account)))
+            else:
+                print(f"Report: {out / 'report.html'} ({crops.sized(account.size)})")
+                if account.cut:
+                    print(crops.summary(account, args.store))
     return 0
 
 def print_rows(rows, style):

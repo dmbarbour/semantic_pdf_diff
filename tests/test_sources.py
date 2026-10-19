@@ -10,7 +10,6 @@ import zipfile
 from pathlib import Path
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.schema import Source
-from semantic_pdf_diff.report import write_report
 from semantic_pdf_diff.store import Store, StoreError
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -211,18 +210,6 @@ class CommandLine(unittest.TestCase):
             code, _, err = self.cli('compare', 'nowhere', self.root / 'team-b', '--store', self.store)
             self.assertEqual(code, 1)
             self.assertIn("'nowhere' is neither a file, folder or zip archive nor a source declared in", err)
-
-class ReportLinks(unittest.TestCase):
-    def test_crops_link_relative_to_the_report_folder(self):
-        from test_pipeline import ev
-        a = ev(image='assets/abc-tile-p1-0.png'); b = ev('B-1')
-        data = {'mode': 'proposals', 'findings': [], 'unmatched': [{'id': a.id, 'note': 'n'}], 'shared': [],
-                'evidence': [a.model_dump(), b.model_dump()], 'coverage': [], 'retrieval': {},
-                'sources': [Source(name='A').model_dump()], 'files': []}
-        with tempfile.TemporaryDirectory() as d:
-            write_report(data, Path(d) / 'reports' / 'r1', assets=Path(d) / 'store' / 'assets')
-            html = (Path(d) / 'reports' / 'r1' / 'report.html').read_text()
-            self.assertIn('src="../../store/assets/abc-tile-p1-0.png"', html)
 
 if __name__ == '__main__':
     unittest.main()
