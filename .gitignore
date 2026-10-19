@@ -41,3 +41,4 @@ benchmarks/tiling/
 # SQLite write-ahead logs of working fixtures recorded by several processes at once
 *.sqlite-wal
 *.sqlite-shm
+.devcontainer
