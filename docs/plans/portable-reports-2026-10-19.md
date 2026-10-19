@@ -40,15 +40,48 @@
 
 ## Milestones
 
-1. **One file under a budget:** the payload, the script, crops by priority, `--report-budget`, `report --dry-run`, the report's own list of cut crops; tests, and a headless browser's check that a report opens, filters and shows its crops.
-2. **At scale:** the largest local reports opened and timed; a report of many files when comparisons take more than two (the owner: "I'm hoping to compare a lot more than two files"); the owner's 32 MB, 561-page and 18 MB, 99-page pair estimated from the measures.
-3. **More value per byte:** crops for tables read by rules (rendered already, not attached to their claims; the owner: "small tables"); tighter crops where an image claim's quote is found in the page's text layer, its box marked on the tile.
+1. **One file under a budget** (done 2026-10-19, 3e0f457): the payload, the script, crops by priority, `--report-budget`, `report --dry-run`, the report's own list of cut crops; tests, and a headless browser's check that a report opens and shows its findings, cards and crops.
+   - The largest local report (TS 38.300, 6,808 findings): a 14.2 MB page beside 16.3 MB of assets became one 10.1 MB file with every crop (2.1 MB without them).
+2. **Many files on each side.** Two sources, each a folder or zip of many documents, which the pipeline compares today. The owner, on more than two sources: "I agree that comparisons of more than two sources is premature."
+   - **How far one file goes** (2026-10-19): the TS 38.300 report's data copied 4 and 10 times, timed in headless Chromium on a real clock (DevTools protocol):
+
+     | Copies | Claims | Findings | Data without crops | Written in | Opened in | Heap | First search |
+     |---|---|---|---|---|---|---|---|
+     | 1× | 13,309 | 6,808 | 2.1 MB | 7 s | 1.1 s | 66 MB | 0.2 s |
+     | 4× | 53,236 | 27,232 | 6.9 MB | 26 s | 2.0 s | 165 MB | — |
+     | 10× | 133,090 | 68,080 | 16.4 MB | 48 s | 2.8 s | 369 MB (535 MB after a search) | 1.5 s |
+
+     The budget runs out first: at 10×, the data alone leaves the crops 3.6 MB of 20. The heap comes next. The owner's 660-page pair is about 1.5× by its page's size.
+   - **Browse by file:** the files' difference (unchanged, modified, moved, added, removed) becomes a table of file pairs, with findings counted by relation and crops embedded or left out; a file filter beside the relation filter.
+   - **Crops shared fairly between files:** within each group, crops taken from each file in turn, so one large drawing set can't take the budget; the dry run's figures per file too.
+   - **Less of what grows with files:** the run's metadata dump repeats sections and situating already shown (0.24 MB gzipped at 1×), and the coverage ledger has a row a task. Each would be measured, and the details kept in `report.json`.
+   - **Shared structure for identical claims** (the owner: "For version comparisons, or the 4x one file, I expect you could squeeze things down further via shared structure for subsets of identical claims. Might be a lever worth exploring.").
+     - What a claim says (its entity, attribute, value, unit, conditions, quote and kind) would be stored once, and each card would hold its place and a reference.
+     - In revisions, findings whose claims say the same would collapse into "unchanged" lines by item or section, opened on request.
+     - In the TS 38.300 pair, 5,689 of 6,808 findings pair claims that say the same. Stored once, they make the gzipped cards only 14% smaller (0.97 → 0.83 MB), since gzip already finds twins written side by side. The gain would be in what a reader wades through, the heap, and repeats farther apart than gzip's 32 KB window (many versions, many files); the browsers' `DecompressionStream` has no Brotli and its larger window.
+     - Measured on the controlled revision pairs and the real pairs.
+   - **Split when one file can't hold it:** one report file per file pair, and an index, in a folder or zip (the owner's first message: "or distribution with a zip folder").
+   - **Parts inflated on demand:** the data in parts by file, inflated when a file is opened or searched, if reports beyond about 10× turn up.
+   - **Not the report, but limiting it:** proposals mode judges at most 1,000 pairs (`max_pairs`). With many files, most candidates go unjudged; the IEA report against its workbook already left out 9,899. A larger cap costs judge calls; the reranker below is the cheaper way.
+3. **Topic browsing** (the owner, 2026-10-19: "the idea is to let users swiftly filter when the Search box is blank page syndrome").
+   - **The owner's approach,** from cameo_ingest: "find candidate cliques of unique words that split the datasets (requirements, in that case, claim cards in this one) roughly evenly. After finding these, there was a step to let an LLM model select heuristically between candidates based on what would better fit the human intuition, and name the divisions. [...] If LLMs timed out, we'd just use a heuristic choice."
+   - **What cameo_ingest's code does** (`subjects.py`, `topics.py`, its `docs/design/subjects.md`):
+     - The model proposes about three ways to split, each on a principle, and places items 30 to a request. The first way placing 95% is shown first.
+     - Without the model, a split comes from Louvain communities of shared words and elements, merged down to about √(n/2) groups (2 to 15) and labelled by distinctive words.
+     - Its lesson: topics are joined across models, never within one, or they come out as the models again.
+   - **Here,** the cards of both sources:
+     - **Candidates, mechanical:** sets of words found on both sides, in claims' entities, attributes and conditions, that split the cards about evenly into about √(n/2) groups. Also each side's sections, and alignment's items in revisions.
+     - **The model** chooses among the candidates and names the groups, in a request or two a comparison: recorded and replayed like any query. Placing 13,000 cards 30 to a request would take about 450 requests, so cards are placed by their words.
+     - **Without the model, or when it fails:** the most even candidate, labelled by its words.
+     - **Shown when the search box is empty,** as topics with counts, each a filter.
+   - **Measured** by the share of cards in a topic, how even the topics are, whether each holds both sources, and a model panel's judgement of the names and groups (as cameo_ingest's three judges did).
+4. **More value per byte:** crops for tables read by rules (rendered already, not attached to their claims; the owner: "small tables"); tighter crops where an image claim's quote is found in the page's text layer, its box marked on the tile.
 
 ## Proposed, awaiting the owner
 
-Raised by the owner on 2026-10-19 (the first quote above). Each was offered with a recommendation, and none is answered yet:
+Raised by the owner on 2026-10-19 (the first quote above). Each was offered with a recommendation:
 
 - **Unrelated pairs out of the findings:** counted in the header, and listed on a claim that has no counterpart with what it was compared with.
-- **Topic browsing:** by each document's sections, by the items claims are about, or by shared topics a model writes over both sources.
 - **Search** across claims and findings beyond today's text filter.
 - **A reranker before the judge:** a lever, measured on proposals runs (the [lever index](../reviews/levers.md) row; [retrieval recall](retrieval-recall-2026-09-23.md) lists rerankers already).
+- **More than two sources:** premature (the owner, 2026-10-19). It would belong to [criteria-first comparison](n-way-comparison-2026-09-23.md) and claim clustering: claims of every source grouped into topics, shown as a matrix of topics by sources.
