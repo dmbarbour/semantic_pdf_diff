@@ -9,12 +9,16 @@ were asked, while a live run sees them as they arrive. With SEMANTIC_PDF_DIFF_AN
 seed (tests only), cached and replayed answers (and replayed failures) are held and handled in
 an order drawn from it instead, as a live run's might be: what a run writes must not depend on that order (the
 determinism review, 2026-10-12).
+
+Each answer's handler runs within the progress item it was asked for (progress.carried): what it asks next is its
+page's, so a page counts as read once its follow-ups are answered too.
 """
 import copy
 import os
 import random
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from .failures import ModelFailure
+from .progress import carried
 
 ANSWER_ORDER = "SEMANTIC_PDF_DIFF_ANSWER_ORDER"
 
@@ -39,6 +43,7 @@ class Dispatcher:
 
     def submit(self, prompt, schema, images, key, finish):
         """Ask for `schema`; finish(value, error) is called on this thread, now or later."""
+        finish = carried(finish)
         if not self.split:
             try:
                 value = self.client.ask(prompt, schema, images, key=key)
@@ -52,7 +57,7 @@ class Dispatcher:
         except ModelFailure as e:  # one preparing
             self._failed_early(finish, e)
             return
-        self.submit_request(request, finish)
+        self._submit(request, finish)
 
     def _failed_early(self, finish, error):
         if self.shuffle is not None:
@@ -63,6 +68,9 @@ class Dispatcher:
     def submit_request(self, request, finish):
         """A prepared request (another endpoint's too: a reranker's, rerank.request) looked up, then sent if it must
         be; finish(value, error) is called on this thread, now or later."""
+        self._submit(request, carried(finish))
+
+    def _submit(self, request, finish):
         try:
             value = self.client.cached(request)
         except ModelFailure as e:  # a recorded failure

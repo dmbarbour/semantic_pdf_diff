@@ -3,6 +3,7 @@
 - **Status:** Active (2026-10-20)
 - **The owner (2026-10-20):** "Progress bars: it's very awkward to have say 97/100 items followed by 98/115. I spend 90% of my time at 90% done, like a metaphor for software development. I'd prefer to have multiple stacked progress bars that are each stable size."
 - **On testing (2026-10-20):** "How are you testing progress bar rendering in any case? Seems difficult, though IIUC libghostty has some support for headless terminal testing."
+- **Earlier (2026-10-08, the [trials review](../reviews/trials-2026-10-08.md), findings 3 and 4, until now a tentative row):** "What we need is something closer to pinned progress bars at the bottom with a rolling log above or similar." And: "It would be better to develop some clear concept of what needs processing and base it on that, and use multiple progress bars for hierarchical subtasks that open into more tasks."
 
 ## Why
 
@@ -33,6 +34,7 @@
   - Lines are cut to the terminal's width, so none wraps.
   - Without a terminal, heartbeat lines give the same numbers.
 - **Drawn by the product itself,** in about a hundred lines, replacing tqdm, its only use. Bars come and go in any order, and log lines from worker threads print above them.
+  - The trials review proposed rich's live display and log handler (finding 3). Stacked lines need little of it, and the product keeps two dependencies. If the tentative *Interactive views* row brings Textual, rich comes with it, and the bars can move onto it.
 - **Tested in an emulated terminal:**
   - pyte, a terminal emulator written in Python and installed for tests only, reads what was written and gives the screen as rows of text.
   - Tests assert what a user would see: bars after log lines, after bars finish out of order, and at 40 columns.
@@ -41,7 +43,8 @@
 
 ## Milestones
 
-1. **The renderer and its tests:** a block of bars and a status line, log lines above it, tested in pyte. tqdm is dropped.
+1. **The renderer and its tests** (done 2026-10-20): a block of bars and a status line, log lines above it, tested in pyte. tqdm is dropped.
+   - **Found by the pseudo-terminal test:** PyMuPDF prints a notice to standard output ("Consider using the pymupdf_layout package…") while the bars are drawn, so their copy was left on the screen. Its messages now go to the log at `-v`. Anything else written to standard output or error while bars are drawn is printed above them too.
 2. **Extraction's bars:** pages per file, files per source, with requests attributed to pages.
 3. **Situating's and comparing's bars.**
-4. **Heartbeat lines** from the same numbers, for runs without a terminal.
+4. **Heartbeat lines** from the same numbers, for runs without a terminal (done 2026-10-20, with milestone 1).
