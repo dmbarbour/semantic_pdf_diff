@@ -118,7 +118,8 @@
         index.named(card).forEach((name, i) => {
           if (!name.trim() || !Search.touches(groups, own[i]) || Search.covers(groups, name)) return;
           const key = Search.words(name).join(' ');
-          names.set(key, {name, n: (names.has(key) ? names.get(key).n : 0) + 1});
+          const seen = names.get(key);  // the first spelling found, as search.py keeps it
+          names.set(key, {name: seen ? seen.name : name, n: (seen ? seen.n : 0) + 1});
         });
       }
     }

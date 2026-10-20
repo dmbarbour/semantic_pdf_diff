@@ -552,7 +552,7 @@ class SearchInABrowser(unittest.TestCase):
             raise unittest.SkipTest("no headless browser installed (chromium)")
         cases = [("claims", q) for q in ("pump feed", '"feed pump"', "pump -gearbox", "gearbox OR motor",
                                          "power of the pump", "entity:pump", "75", "1,000", "1000", "15", "cafe",
-                                         "page:4-5", "pump", "section:feed", "-valve", "output")]
+                                         "page:4-5", "pump", "section:feed", "-valve", "output", "pdf", "file:b")]
         cases += [("findings", "pump"), ("claims", "output", True)]
         with tempfile.TemporaryDirectory() as d:
             write_report(search_report(), Path(d))
@@ -587,6 +587,8 @@ class SearchInABrowser(unittest.TestCase):
         self.assertEqual(set(self.ids("entity:pump")), {"A-pump", "A-motor", "B-pump", "B-gearbox"})
         self.assertEqual(set(self.ids("page:4-5")), {"A-valve", "B-valve", "A-motor"})
         self.assertEqual(self.ids("section:feed"), ["A-pump"])
+        self.assertEqual(self.ids("pdf"), [])  # a file's name only when asked for: "a.pdf", "b.pdf"
+        self.assertEqual(set(self.ids("file:b")), {"B-pump", "B-valve", "B-gearbox", "B-heater"})
 
     def test_numbers_match_whole_however_written(self):
         self.assertEqual(self.ids("75"), ["A-pump"])  # not the tank's 750

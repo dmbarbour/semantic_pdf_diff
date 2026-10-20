@@ -70,6 +70,7 @@ semantic-pdf-diff show evidence_occurrences --store work --format csv
 semantic-pdf-diff report --store work --out reports/latest
 semantic-pdf-diff gc --store work --dry-run
 semantic-pdf-diff cache copy ~/.cache/semantic-pdf-diff --store work   # this project's answers, from another cache
+semantic-pdf-diff search 'hub height -tower' --store work               # the store's claims, as the report's search
 ```
 
 A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. Files of the types listed under Status are read; others are listed as skipped (`source show` says which, and why).

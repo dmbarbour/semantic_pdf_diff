@@ -124,14 +124,15 @@ const Search = (() => {
       for (let i = lo; i < sorted.length && sorted[i].startsWith(w); i++) out.push(vocab.get(sorted[i]));
       return out;
     };
-    // how much a term's words, in a row, weigh in a document (0: not found)
+    // how much a term's words, in a row, weigh in a document (0: not found); a file's name only when asked for
+    // (file:), or "mw" would find every claim of "nrel-5mw.pdf"
     const weight = (sets, field, doc) => {
       const {terms, fields} = docs[doc];
       let n = 0;
       for (let i = 0; i + sets.length <= terms.length; i++) {
         let j = 0;
         while (j < sets.length && sets[j].has(terms[i + j])) j++;
-        if (j === sets.length && (field === null || fields[i] === field)) n += WEIGHTS[fields[i]];
+        if (j === sets.length && (field === null ? fields[i] !== FILE : fields[i] === field)) n += WEIGHTS[fields[i]];
       }
       return n;
     };

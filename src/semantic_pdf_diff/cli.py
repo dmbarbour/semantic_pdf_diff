@@ -6,6 +6,7 @@
     semantic-pdf-diff settings [--config FILE] [--changed]
     semantic-pdf-diff fixtures summary|pack|prune|merge ...
     semantic-pdf-diff cache show|copy|remove|prune ...   # the answers cache
+    semantic-pdf-diff search WORDS... [--store DIR ...]  # stores' claims, as a report's search finds them
     semantic-pdf-diff review|queries ...                # with the lab installed (semantic-pdf-diff[lab])
 """
 import argparse
@@ -68,6 +69,8 @@ def command(argv, client):
         return fixtures_command(argv[1:])
     if argv[0] == 'cache':
         return cache_command(argv[1:])
+    if argv[0] == 'search':
+        return search_command(argv[1:])
     lab = lab_commands().get(argv[0])
     if lab:
         return lab(argv[1:])
@@ -88,6 +91,7 @@ Commands (semantic-pdf-diff COMMAND --help for each, or semantic-pdf-diff help C
   source      declare sources in a store and manage them: add, list, show, update, remove, export, import
   show        print a view of a store: its sources, files, evidence, coverage or comparisons
   report      write a store's report again, without model calls
+  search      search a store's claims, or several stores', as a report's search box does
   gc          delete content no declared source uses any more
   config      the user's and a store's settings: show, find, help, set, unset, export, import
   settings    print the settings a run would use, as JSON
@@ -403,6 +407,145 @@ def fixtures_command(argv):
         print(f'Packed {args.target}')
     return 0
 
+
+# --- search ------------------------------------------------------------------------
+
+SEARCH_HELP = """\
+Search the claims of one store or several as a report's search box does, with or without a report written: each
+store's latest comparison (--comparison picks another, for one store).
+  feed pump            both words, in any order, as the start of words; case and accents ignored
+  75  1,000  75kW      numbers whole, however written (75 isn't 750; 1,000 is 1000; 75kW is 75 kW)
+  "feed pump"          the words in a row;  -gearbox  without it;  blade OR rotor  either
+  entity:pump          one part of a claim: entity, attribute, value (with its unit), conditions, quote, section,
+                       file (a file's name is searched only so); page:12 or page:10-20
+  like:ID              the claims sharing enough of what a claim is about, most alike first
+The most relevant first. After the claims found come their counterparts (the claims the comparison paired with
+them; --alone leaves them out), and where a counterpart names what was searched otherwise, its name is offered.
+
+Quote a query holding a word to leave out, or anything else the shell reads: semantic-pdf-diff search 'pump -gearbox'.
+
+Examples:
+  semantic-pdf-diff search rated power --store work
+  semantic-pdf-diff search 'entity:pump -gearbox' --store bid-a --store bid-b --limit 50
+  semantic-pdf-diff search like:ev-00ce8e6f78324812 --store work
+  semantic-pdf-diff search hub height --findings --json
+"""
+
+def search_parser():
+    parser = Parser(prog='semantic-pdf-diff search', usage='%(prog)s WORDS... [--store DIR ...] [options]',
+                    add_help=False)  # no -h: "-heater" leaves heaters out
+    help_text(parser, SEARCH_HELP, "Search stores' claims, as a report's search box does.")
+    parser.add_argument('--help', action='help', help='show this help and exit')
+    parser.add_argument('words', nargs='*', help='the query')
+    parser.add_argument('--store', type=Path, action='append', default=[],
+                        help='a store (repeat for several; default: $SEMANTIC_PDF_DIFF_STORE, else ./diff-output)')
+    parser.add_argument('--comparison', type=int, help='the comparison searched, with one store (default: the latest)')
+    parser.add_argument('--findings', action='store_true', help='the findings found, not the claims')
+    parser.add_argument('--side', help="only this source's claims (its name, or a part of it)")
+    parser.add_argument('--alone', action='store_true', help='the claims found, without their counterparts')
+    parser.add_argument('--limit', type=int, default=20, help='at most this many (default 20; 0: every one)')
+    parser.add_argument('--json', action='store_true', help='everything found as one JSON document, for tools')
+    return parser
+
+def brief(claim):
+    """A claim as the command prints it: what it says, then where it is."""
+    e = claim['evidence']
+    said = f"{e['entity']} — {e['attribute']} = {e['value']} {e['unit']}".strip()
+    if e.get('conditions'):
+        said += f" ({e['conditions']})"
+    loc = e['locator']
+    where = f"{claim['where']}, page {loc['page']}" + (f", § {claim['section']}" if claim['section'] else '')
+    return said, where
+
+def claim_json(claim):
+    e = claim['evidence']
+    return {'store': str(claim['store']), 'source': claim['source'], 'id': e['id'], 'file': claim['where'],
+            'page': e['locator']['page'], 'section': claim['section'], 'entity': e['entity'],
+            'attribute': e['attribute'], 'value': e['value'], 'unit': e['unit'], 'conditions': e['conditions'],
+            'quote': e['quote'], 'fared': claim['status']}
+
+def search_command(argv):
+    from . import search as finder
+    from .store import Store, StoreError
+    parser = search_parser()
+    args, rest = parser.parse_known_args(argv)
+    unknown = [r for r in rest if r.startswith('--')]
+    if unknown:
+        parser.error(f"unrecognized arguments: {' '.join(unknown)}")
+    query = ' '.join(args.words + rest)  # a word to leave out ("-gearbox") isn't an option
+    groups = finder.parse(query)
+    if not groups:
+        parser.error('nothing to search for: give words (--help says how)')
+    stores = args.store or [default_store()]
+    if args.comparison and len(stores) > 1:
+        parser.error('--comparison picks one store\'s comparison: name one store')
+    index, claims, findings = finder.Index(), [], []
+    for n, folder in enumerate(stores):
+        try:
+            with Store.open(folder) as store:
+                data = store.comparison(args.comparison)
+        except StoreError as e:
+            print(f'{folder}: {e}', file=sys.stderr)
+            return 1
+        found_claims, found_findings = finder.report_items(data, index, f'{n}:' if len(stores) > 1 else '')
+        for x in found_claims + found_findings:
+            x['store'] = folder
+        claims += found_claims
+        findings += found_findings
+    for group in groups:  # like:ID names a claim by its id, in whichever store holds it
+        for term in group['terms']:
+            if 'like' in term and term['like'] not in index.card_doc:
+                term['like'] = next((k for k in index.card_doc if k.endswith(':' + term['like'])), term['like'])
+    view = 'findings' if args.findings else 'claims'
+    hits, names = finder.search(index, groups, claims, findings, view, paired=not args.alone)
+    if view == 'claims' and args.side:
+        names_of = sorted({c['source'] for c in claims if c['source']})
+        side = [n for n in names_of if n == args.side] or [n for n in names_of if args.side.lower() in n.lower()]
+        if len(side) != 1:
+            parser.error(f"--side {args.side}: {'no source' if not side else 'several sources'} by that name; the "
+                         f"sources: {', '.join(side or names_of)}")
+        hits = [h for h in hits if claims[h[0]]['source'] == side[0]]
+    shown = hits if not args.limit else hits[:args.limit]
+    if args.json:
+        items = ([{'score': round(s, 3), 'counterpart': via, **claim_json(claims[i])} for i, s, via in shown]
+                 if view == 'claims' else
+                 [{'score': round(s, 3), 'store': str(findings[i]['store']), 'relation': findings[i]['relation'],
+                   'rationale': findings[i]['finding'].get('rationale', ''),
+                   'claims': [claim_json(claims[at[c]]) for c in findings[i]['cards'] if c in at]}
+                  for at in [{c['card']: k for k, c in enumerate(claims)}] for i, s, _ in shown])
+        print(json.dumps({'query': query, 'view': view, 'found': len(hits),
+                          'counterparts': sum(1 for h in hits if h[2]), 'names': [n for n, _ in names],
+                          'items': items}, indent=1, ensure_ascii=False))
+        return 0
+    via = sum(1 for h in hits if h[2])
+    line = f"{len(hits)} {view} found" + (f' ({via} as counterparts)' if via else '')
+    if view == 'claims':
+        counts = {}
+        for i, _, _ in hits:
+            counts[claims[i]['source']] = counts.get(claims[i]['source'], 0) + 1
+        line += ': ' + '; '.join(f'{n} in {name}' for name, n in counts.items()) if counts else ''
+    print(line)
+    if names:
+        print("The other source's names for it: " + ', '.join(f'"{name}" ({n})' for name, n in names))
+    at = {c['card']: k for k, c in enumerate(claims)}
+    for rank, (i, score, counterpart) in enumerate(shown, 1):
+        if view == 'claims':
+            said, where = brief(claims[i])
+            print(f"{rank:>3}. {said}" + ('  [counterpart]' if counterpart else ''))
+            print(f"     {where} · {claims[i]['evidence']['id']}")
+            quote = ' '.join(claims[i]['evidence']['quote'].split())
+            if quote:
+                print(f"     “{quote[:157] + '…' if len(quote) > 158 else quote}”")
+        else:
+            f = findings[i]
+            print(f"{rank:>3}. {f['relation']}")
+            for card in f['cards']:
+                if card in at:
+                    said, where = brief(claims[at[card]])
+                    print(f"     {claims[at[card]]['source']}: {said}  ({where})")
+    if len(hits) > len(shown):
+        print(f"… {len(hits) - len(shown)} more (--limit 0 shows every one)")
+    return 0
 
 # --- the answers cache ---------------------------------------------------------------
 
