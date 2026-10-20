@@ -87,10 +87,32 @@ button.more,.topics button,.views button{padding:10px 16px;margin:8px 0;border:1
 border-radius:6px;background:var(--card);color:var(--fg);cursor:pointer}.topics button{padding:6px 10px;margin:4px 2px}\
 .topics button.on,.views button.on{background:var(--accent);color:var(--card)}.views{margin:18px 0 4px}\
 .views button{font-size:15px;margin-right:6px}.topics button small{color:inherit;opacity:.7}
+#query{width:min(28em,90%)}#order-box{white-space:nowrap}mark{background:var(--mark);color:inherit;border-radius:2px}\
+.search-help{font-size:13px;margin:0 8px}.search-help ul{margin:6px 0}\
+button.like{padding:0 6px;border:1px solid var(--field);border-radius:4px;background:var(--card);color:var(--accent);\
+cursor:pointer;font-size:12px}
 @media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
 '''
-# The page's script: it inflates the report's parts and shows them (a file beside this one, so it reads as code).
-SCRIPT = resources.files(__package__).joinpath("report.js").read_text(encoding="utf-8")
+# The page's script: it inflates the report's parts and shows them, and finds what's searched (files beside this one,
+# so they read as code).
+SCRIPT = "\n".join(resources.files(__package__).joinpath(name).read_text(encoding="utf-8")
+                   for name in ("search.js", "report.js"))
+# What the search box takes (search.js), beside it.
+SEARCH_HELP = ('<details class="search-help"><summary>How to search</summary><ul>'
+               '<li><code>feed pump</code>: both words, in any order, as the start of a word (<i>pump</i> finds '
+               '<i>pumps</i>); case and accents ignored. Numbers match whole: <code>75</code> doesn\'t find 750, '
+               '<code>1,000</code> finds 1000, <code>75kW</code> finds 75 kW.</li>'
+               '<li><code>"feed pump"</code>: the words in a row. <code>-gearbox</code>: without it. '
+               '<code>blade OR rotor</code>: either.</li>'
+               '<li>In one part of a claim: <code>entity:</code>, <code>attribute:</code>, <code>value:</code> (with '
+               'its unit), <code>conditions:</code>, <code>quote:</code>, <code>section:</code>, <code>file:</code>; '
+               '<code>page:12</code> or <code>page:10-20</code>.</li>'
+               '<li><code>like:</code> and a claim\'s id, as each card\'s <i>Claims like this</i> searches: the claims '
+               'sharing enough of the words of what it\'s about (its entity, attribute, conditions, and its value\'s '
+               'words), most alike first.</li>'
+               '<li>Found items come most relevant first: words in what a claim is about count most, then its value, '
+               'conditions and section, then its quote. The page\'s address keeps the search, to bookmark or send.'
+               '</li></ul></details>')
 
 class Cards:
     """A report's claims as cards: each with where it is, what it says, its quote and how it was read. Called with a
@@ -463,8 +485,10 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
         page += ('<label>File <select id="file"><option value="all">All files</option>'
                  + ''.join(f'<option value="{pair_key(a, b, files)}">{esc(pair_name(kind, a, b))}</option>'
                            for kind, a, b in pairs) + '</select></label>')
-    page += ('<input id="query" placeholder="Search" aria-label="Search the findings or claims shown"> '
-             '<span id="count" class="meta"></span>')
+    page += ('<input id="query" type="search" placeholder="Search: words, &quot;a phrase&quot;, -without, entity:…" '
+             'aria-label="Search the findings or claims shown"> <label id="order-box" hidden>Order <select id="order">'
+             '<option value="relevance">Most relevant first</option><option value="listed">As listed</option></select>'
+             '</label><span id="count" class="meta"></span>' + SEARCH_HELP)
     if way:
         named = 'named by the model; ' if data.get('topics', {}).get('names') else ''
         page += ('<div class="topics"><span class="meta" title="Claims split by the words of what they are about, '

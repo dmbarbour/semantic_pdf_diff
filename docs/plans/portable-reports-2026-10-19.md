@@ -120,10 +120,58 @@
 
      No related finding was lost at any threshold; turbines, which the cap had cut, gained three. Offline, 0.1 lost related pairs in two runs (19% of an older turbines run's; the IEA pair's complementary ones); the default is the owner's 3 (0.03).
 
+6. **Search** (done 2026-10-20; the owner, 2026-10-20: "Broader search is good.").
+   - **Today:** the box keeps the items whose text holds what's typed as one string.
+     - "feed pump" misses "pump, feed" and "the feed water pumps"; "75 kW" misses "75kW".
+     - Items stay in their listed order however weakly they match.
+     - A claim is also found by the words of the claims it was compared with (its "compared with" list).
+   - **Words, not strings:**
+     - Each word must appear, in any order, as the start of a word ("pump" finds "pumps"). Case and accents are ignored.
+     - Numbers match whole: "75" doesn't find "750"; "1,000" is "1000", "15.00" is "15", "75kW" is "75 kW".
+     - `"feed pump"` is a phrase, `-gearbox` excludes, `blade OR rotor` takes either.
+   - **Fields:** a card's parts searched alone: `entity:`, `attribute:`, `value:` (with its unit), `conditions:`, `quote:`, `section:`, `file:`, `page:` (`page:12`, `page:10-20`). They're read off the card's markup, which report.py writes; nothing is added to the data.
+   - **Most relevant first:**
+     - With words, items are ordered by BM25 over the fields, weighted by what a claim is about: entity and attribute 3, value 2, conditions and section 1.5, quote and context 1, the rest 0.5.
+     - A finding is scored by its two claims and its own text.
+     - "As listed" is one click away.
+   - **Claims like this one:** each card's button searches `like:ID`, the other source's claims by default. It's the reader's own retrieval, for a claim the comparison found no counterpart for.
+     - Its words are what the claim is about (entity, attribute, conditions) and its value's words, numbers left out. Each weighs as its field does.
+     - A claim is found when it scores at least 30% of the claim's own score: "UE — performs = resuming from RRC_INACTIVE" finds 189 claims, not the 1,021 that share "UE" or "performs".
+   - **What each source says:** while searching, the count says how many of each source's claims match, and each view's button how many of its items do (topic coverage, for any words).
+   - **Shown:** the matched words are marked in the cards.
+   - **An address:** the view and the search are kept in the page's address (`#claims&q=feed%20pump`), so a search can be bookmarked, or sent with the file, and opens as it was.
+   - **Built in the page:**
+     - An index of the cards' words is built just after the page opens, in slices that keep it responsive; no library, and nothing added to the file.
+     - A search then intersects a few lists.
+   - **Measured** (2026-10-20) in headless Chromium on a real clock (DevTools protocol), on the largest local report and 10× it. Times are after the box's 0.2 s pause:
+
+     | Report | Claims | Building the index | A search at once | Later searches | Heap |
+     |---|---|---|---|---|---|
+     | TS 38.300 | 13,309 | about 0.4 s of work, after opening | 0.44 s | 0.05–0.16 s | 28 MB opened, 41–59 MB searched |
+     | 10× it | 133,090 | about 5 s of work | 5.0 s (the index finished first) | 0.13–0.37 s | 322 MB indexed (285 MB before) |
+
+   - **Found, against the old search** (TS 38.300, claims; the old search's findings in brackets):
+
+     | Search | Old | New |
+     |---|---|---|
+     | harq timer | 0 (0) | 24, 12 in each revision (13 findings) |
+     | timer harq | 0 (0) | 24 |
+     | rrc inactive | 6 (3): the documents write "RRC_INACTIVE" | 546 |
+     | pdcch monitoring | 71 (39) | 78 |
+     | monitoring pdcch | 8 (4) | 78 |
+     | capability ue | 0 (0) | 365 |
+
+     Ordered by relevance, the first claims found are those about the words: "harq timer" opens on SL HARQ RTT and retransmission timers.
+
 ## Proposed, awaiting the owner
 
 Raised by the owner on 2026-10-19 (the first quote above). Each was offered with a recommendation:
 
-- **Search** across claims and findings beyond today's text filter.
-- **A reranker before the judge:** a lever, measured on proposals runs (the [lever index](../reviews/levers.md) row; [retrieval recall](retrieval-recall-2026-09-23.md) lists rerankers already).
+- **More search** (2026-10-20, beyond milestone 6):
+  - **From the command line:** `semantic-pdf-diff search`, over every claim of one store or several, without a report: the database of claims the owner asked for, kept where the stores are.
+  - **Words the documents name differently:** "rated output" in one, "nominal power" in the other.
+    - The comparison itself pairs such names: findings' claims, equivalent or different.
+    - A search could also show the counterparts of the claims it finds; or the model could name synonyms in the topics' request.
+  - **Numbers across units** (`power > 50 kW` finding "0.075 MW"): this needs the claims' values normalized, which the [units plan](units-and-normalization-2026-09-24.md) covers.
+  - **By meaning** (embeddings): the query has to be embedded by a model, which a file opened offline can't do. The claims' own embeddings could still find claims like a claim, as `like:` does by words.
 - **More than two sources:** premature (the owner, 2026-10-19). It would belong to [criteria-first comparison](n-way-comparison-2026-09-23.md) and claim clustering: claims of every source grouped into topics, shown as a matrix of topics by sources.

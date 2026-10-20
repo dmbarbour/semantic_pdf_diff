@@ -27,8 +27,8 @@ where = ["src"]
 [tool.setuptools.package-data]
 # vendored code ships with its license (src/semantic_pdf_diff/vendor/README.md)
 "semantic_pdf_diff.vendor.metafile_render" = ["LICENSE", "py.typed"]
-# the report page's script (report.py)
-"semantic_pdf_diff" = ["report.js"]
+# the report page's scripts (report.py)
+"semantic_pdf_diff" = ["report.js", "search.js"]
 
 [tool.ruff]
 line-length = 120

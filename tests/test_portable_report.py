@@ -453,5 +453,163 @@ class InABrowser(unittest.TestCase):
         counts = re.findall(r'<button data-topic="(-?\d+)"[^>]*>[^<]*<small>(\d+)</small>', dom)
         self.assertEqual(sorted(int(n) for t, n in counts if t != "-1"), [12, 12, 12])
 
+def search_report():
+    """Claims to search (milestone 6): pumps named in either order, a pump only quoted, numbers written two ways."""
+    at = lambda page: PdfLocator(page=page, bbox=(0, 0, 100, 100), region="text", task="text:0")
+    a = [ev("A-pump", entity="feed water pump", attribute="rated power", value="75", unit="kW", locator=at(3),
+            quote="rated power 75 kW", section="s1"),
+         ev("A-valve", entity="isolation valve", attribute="nominal diameter", value="1,000", unit="mm", locator=at(4),
+            conditions="", quote="DN 1000"),
+         ev("A-motor", entity="pump motor", attribute="speed", value="1500", unit="rpm", locator=at(5),
+            quote="motor speed 1500 rpm"),
+         ev("A-tank", entity="storage tank", attribute="volume", value="750", unit="m3", locator=at(6),
+            quote="the tank feeding the feed pumps holds 750 m3"),
+         ev("A-heater", entity="Café heater", attribute="power", value="15.00", unit="kW", locator=at(7),
+            quote="heater 15 kW")]
+    b = [ev("B-pump", entity="pump, feed water", attribute="rated output", value="80", unit="kW", locator=at(3),
+            quote="output 80 kW"),
+         ev("B-valve", entity="isolation valve", attribute="nominal diameter", value="1000", unit="mm", locator=at(4),
+            quote="DN1000"),
+         ev("B-gearbox", entity="pump gearbox", attribute="ratio", value="3.5", unit="", locator=at(9), quote="3.5:1"),
+         ev("B-heater", entity="cafe heater", attribute="power", value="15", unit="kW", locator=at(7),
+            quote="15 kW heater")]
+    data = report(a + b, [finding(a[0], b[0], "different"), finding(a[1], b[1], "equivalent"),
+                          finding(a[4], b[3], "equivalent")])
+    data["sections"] = [{"content": a[0].content, "id": "s1", "heading_path": ["Plant", "Feed system"]}]
+    return data
+
+class SearchMarkup(unittest.TestCase):
+    """What search.js reads off a card, as report.py writes it: if this fails, so does the page's search."""
+    def test_cards_and_statements_have_the_parts_the_search_reads(self):
+        import re
+        with tempfile.TemporaryDirectory() as d:
+            write_report(search_report(), Path(d))
+            parts = parts_of((Path(d) / "report.html").read_text())
+        card = re.compile(r'<h3>([\s\S]*?)</h3>\s*<div data-said="(\d+)"></div>([\s\S]*?)<small>')
+        statement = re.compile(r'^<b>([\s\S]*?) — ([\s\S]*?)</b><p>([\s\S]*?)</p><p>Conditions: ([\s\S]*?)</p>'
+                               r'([\s\S]*?)<blockquote>([\s\S]*?)</blockquote>$')
+        for html in parts["cards"].values():
+            found = card.search(html)
+            self.assertIsNotNone(found, html)
+            head = re.sub(r"<[^>]*>", "", found.group(1)).split(" · ")
+            self.assertRegex(head[-2], r"(page|sheet|slide|file) \d+$")
+            self.assertIsNotNone(statement.match(parts["said"][int(found.group(2))]))
+        self.assertIn("§ Plant &gt; Feed system", parts["cards"]["A-pump"])
+
+    def test_the_page_offers_an_order_and_says_how_to_search(self):
+        with tempfile.TemporaryDirectory() as d:
+            write_report(search_report(), Path(d))
+            page = (Path(d) / "report.html").read_text()
+        shown = parts_of(page)["page"]
+        self.assertIn('<label id="order-box" hidden>', shown)
+        self.assertIn("How to search", shown)
+        self.assertIn("const Search", page)
+
+# What the harness asks of a report page, after it opens: a view, a search, then what's drawn.
+HARNESS = """<script>(async () => {
+  const wait = () => new Promise((r) => setTimeout(r, 10));
+  while (!document.getElementById('count') || !document.getElementById('count').textContent) await wait();
+  const $ = (id) => document.getElementById(id), out = [];
+  const drawn = (q, view) => ({q, view, count: $('count').textContent, hash: location.hash,
+    items: [...document.querySelectorAll('main article')].map((a) => [...a.querySelectorAll('section small')]
+      .map((s) => s.textContent.split(' · ')[0])),
+    marks: [...new Set([...document.querySelectorAll('main mark')].map((m) => m.textContent))].sort()});
+  out.push(drawn($('query').value, 'opened'));
+  for (const [view, q] of CASES) {
+    document.querySelector(`.views button[data-view="${view}"]`).click();
+    $('side').value = 'all';
+    $('query').value = q;
+    $('order').dispatchEvent(new Event('change'));
+    out.push(drawn(q, view));
+  }
+  document.querySelector('.views button[data-view="findings"]').click();
+  $('query').value = '';
+  $('order').dispatchEvent(new Event('change'));
+  [...document.querySelectorAll('button.like')].find((b) => b.dataset.like === 'A-pump').click();
+  out.push({...drawn($('query').value, 'claims'), side: $('side').value});
+  const pre = document.createElement('pre');
+  pre.id = 'results';
+  pre.textContent = JSON.stringify(out);
+  document.body.append(pre);
+})();</script>"""
+
+class SearchInABrowser(unittest.TestCase):
+    """The page's search (milestone 6; the owner, 2026-10-20: "Broader search is good."), run by a headless browser
+    where one is installed: words in any order and as beginnings, phrases, exclusions, either, fields, pages, numbers
+    whole, the most relevant first, what each source says, marks, the address, and claims like a claim."""
+    @classmethod
+    def setUpClass(cls):
+        import html
+        import re
+        browser = next((b for b in map(shutil.which, BROWSERS) if b), None)
+        if browser is None:
+            raise unittest.SkipTest("no headless browser installed (chromium)")
+        cases = [("claims", q) for q in ("pump feed", '"feed pump"', "pump -gearbox", "gearbox OR motor",
+                                         "power of the pump", "entity:pump", "75", "1,000", "1000", "15", "cafe",
+                                         "page:4-5", "pump", "section:feed", "-valve")]
+        cases.append(("findings", "pump"))
+        with tempfile.TemporaryDirectory() as d:
+            write_report(search_report(), Path(d))
+            page = Path(d) / "report.html"
+            page.write_text(page.read_text().replace("</body>", HARNESS.replace("CASES", json.dumps(cases))
+                                                     + "</body>"))
+            flags = ["--headless", "--no-sandbox", "--disable-gpu", "--virtual-time-budget=10000", "--dump-dom"]
+            dom = subprocess.run([browser, *flags, page.as_uri() + "#claims&q=feed%20pump"], capture_output=True,
+                                 text=True, timeout=120).stdout
+        found = re.search(r'<pre id="results">(.*?)</pre>', dom, re.S)
+        cls.results = {(r["view"], r["q"]): r for r in json.loads(html.unescape(found.group(1)))} if found else {}
+
+    def got(self, q, view="claims"):
+        return self.results[(view, q)]
+
+    def ids(self, q, view="claims"):
+        return [card for item in self.got(q, view)["items"] for card in item]
+
+    def test_words_in_any_order_as_the_start_of_words(self):
+        self.assertEqual(self.got("pump feed")["count"], "3 of 9 claims: 2 in A; 1 in B")
+        self.assertEqual(set(self.ids("pump feed")), {"A-pump", "B-pump", "A-tank"})
+        self.assertEqual(self.ids("pump feed")[-1], "A-tank")  # only its quote says so: last
+
+    def test_a_phrase_an_exclusion_and_either(self):
+        self.assertEqual(self.ids('"feed pump"'), ["A-tank"])  # "the feed pumps"
+        self.assertEqual(set(self.ids("pump -gearbox")), {"A-pump", "A-motor", "A-tank", "B-pump"})
+        self.assertEqual(set(self.ids("gearbox OR motor")), {"A-motor", "B-gearbox"})
+        self.assertEqual(len(self.ids("-valve")), 7)
+        self.assertEqual(self.ids("power of the pump"), ["A-pump"])  # "of" and "the" not asked for
+
+    def test_fields_and_pages(self):
+        self.assertEqual(set(self.ids("entity:pump")), {"A-pump", "A-motor", "B-pump", "B-gearbox"})
+        self.assertEqual(set(self.ids("page:4-5")), {"A-valve", "B-valve", "A-motor"})
+        self.assertEqual(self.ids("section:feed"), ["A-pump"])
+
+    def test_numbers_match_whole_however_written(self):
+        self.assertEqual(self.ids("75"), ["A-pump"])  # not the tank's 750
+        for q in ("1,000", "1000"):
+            self.assertEqual(set(self.ids(q)), {"A-valve", "B-valve"})
+        self.assertEqual(set(self.ids("15")), {"A-heater", "B-heater"})  # 15.00 too
+        self.assertEqual(set(self.ids("cafe")), {"A-heater", "B-heater"})  # accents folded
+
+    def test_the_most_relevant_first_and_the_words_marked(self):
+        ranked = self.ids("pump")
+        self.assertEqual(ranked[-1], "A-tank")
+        self.assertEqual(set(ranked[:4]), {"A-pump", "A-motor", "B-pump", "B-gearbox"})
+        self.assertEqual(self.got("pump")["marks"], ["pump", "pumps"])
+
+    def test_findings_are_found_by_either_claim(self):
+        self.assertTrue(self.got("pump", "findings")["count"].startswith("1 of 3 findings"))
+        self.assertEqual(self.ids("pump", "findings"), ["A-pump", "B-pump"])
+
+    def test_the_address_keeps_the_view_and_the_search(self):
+        # the page opened on the view and the search its address held (#claims&q=feed%20pump)
+        self.assertEqual(self.got("feed pump", "opened")["count"], "3 of 9 claims: 2 in A; 1 in B")
+        self.assertEqual(self.got("pump feed")["hash"], "#claims&q=pump%20feed")
+        self.assertEqual(self.got("pump", "findings")["hash"], "#q=pump")
+
+    def test_claims_like_a_claim_are_the_other_sources_most_alike_first(self):
+        like = self.results[("claims", "like:A-pump")]
+        self.assertEqual(like["side"], "1")
+        self.assertEqual(self.ids("like:A-pump")[0], "B-pump")
+        self.assertNotIn("A-pump", self.ids("like:A-pump"))
+
 if __name__ == "__main__":
     unittest.main()

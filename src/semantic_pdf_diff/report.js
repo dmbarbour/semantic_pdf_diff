@@ -1,7 +1,7 @@
-// The report page's script (report.py writes the page): inflate the report's parts, gzipped inside the page, and show
-// them in two views, a page at a time: the findings (filtered by relation, kind, file, topic and words) and every
-// claim (by side, how it fared, kind, file, topic and words), each card put in place with its crop. #claims opens on
-// the claims.
+// The report page's script (report.py writes the page; search.js finds what's searched): inflate the report's parts,
+// gzipped inside the page, and show them in two views, a page at a time: the findings (filtered by relation, kind,
+// file, topic and a search) and every claim (by side, how it fared, kind, file, topic and a search), each card put in
+// place with its crop. The view and the search are kept in the page's address: #claims&q=feed%20pump.
 (async () => {
   const root = document.getElementById('report');
   let R;
@@ -19,12 +19,21 @@
   const crops = JSON.parse(document.getElementById('report-crops').textContent);
   const PAGE = 100;
 
-  // cards in their places, then what their claims say (written once however many say it), then their crops
+  // cards in their places, each with a search for the claims like it, then what their claims say (written once
+  // however many say it), then their crops
   const fill = (part) => {
     for (const name of ['card', 'said']) {
       const table = name === 'card' ? R.cards : R.said;
       for (const place of part.querySelectorAll(`[data-${name}]`)) {
         place.insertAdjacentHTML('afterend', table[place.dataset[name]] || '');
+        const small = name === 'card' && place.nextElementSibling && place.nextElementSibling.querySelector('small');
+        if (small) {
+          const like = document.createElement('button');
+          like.className = 'like';
+          like.dataset.like = place.dataset.card;
+          like.textContent = 'Claims like this';
+          small.append(' · ', like);
+        }
         place.remove();
       }
     }
@@ -34,8 +43,8 @@
     }
   };
 
-  // items' HTML shown in box a page at a time, a button showing the next
-  const paged = (box, items) => {
+  // items' HTML shown in box a page at a time, a button showing the next; mark(part) marks what was searched
+  const paged = (box, items, mark) => {
     box.textContent = '';
     const more = document.createElement('button');
     more.className = 'more';
@@ -45,6 +54,7 @@
       const part = document.createElement('template');
       part.innerHTML = items.slice(shown, shown + PAGE).join('');
       fill(part.content);
+      if (mark) mark(part.content);
       box.insertBefore(part.content, more);
       shown = Math.min(items.length, shown + PAGE);
       more.hidden = shown >= items.length;
@@ -54,35 +64,55 @@
     next();
   };
 
-  // an item's words, its cards' included, for the search (worked out once, when first searched)
-  const entities = {amp: '&', lt: '<', gt: '>', quot: '"', '#x27': "'"};
-  const plain = (html) => html.replace(/<[^>]*>/g, ' ').replace(/&(amp|lt|gt|quot|#x27);/g, (m, e) => entities[e]);
-  const said = (html) => html.replace(/<div data-said="(\d+)"><\/div>/g, (m, n) => R.said[Number(n)]);
-  const words = new Map();
-  const wordsOf = (x) => {
-    if (!words.has(x)) {
-      const cards = (x.cards || [x.card]).map((id) => said(R.cards[id] || '')).join(' ');
-      words.set(x, plain(x.html + ' ' + cards).toLowerCase());
-    }
-    return words.get(x);
-  };
-
   root.innerHTML = R.page;
   const main = root.querySelector('main');
   const $ = (id) => root.querySelector('#' + id);
   const relation = $('filter'), kind = $('kind'), same = $('same'), query = $('query');
   const side = $('side'), status = $('status'), claimKind = $('claimkind');
+  const order = $('order'), orderBox = $('order-box');
   const file = $('file');  // with more than one pair of files: their indexes, "3,4"
-  let view = location.hash === '#claims' ? 'claims' : 'findings';
+  const sides = [...side.options].filter((o) => o.value !== 'all').map((o) => o.textContent);
+  const tabs = [...root.querySelectorAll('.views button')];
+  const labels = new Map(tabs.map((tab) => [tab, tab.textContent]));
+
+  // the index of the cards' words, built a slice at a time once the page is shown (a search finishes it)
+  const index = Search.index(R);
+  const build = () => {
+    if (!index.step(12)) setTimeout(build, 0);
+  };
+  setTimeout(build, 0);
+
+  const address = () => new URLSearchParams(location.hash.slice(1));
+  let view = address().has('claims') ? 'claims' : 'findings';
+  query.value = address().get('q') || '';
+  const remember = () => {  // the view and the search, in the address
+    const q = query.value.trim();
+    const hash = [view === 'claims' ? 'claims' : '', q ? 'q=' + encodeURIComponent(q) : ''].filter(Boolean).join('&');
+    if (location.hash.slice(1) === hash) return;
+    try {
+      history.replaceState(null, '', hash ? '#' + hash : location.pathname + location.search);
+    } catch (e) {  // a browser keeping a file's address as it is: the page still works
+    }
+  };
+
   let topic = null;  // a topic's index (-1: claims in no topic), or every one
   const inTopic = (x, t) => (t === -1 ? x.topics.every((y) => y === -1) : x.topics.includes(t));
   const chips = [...root.querySelectorAll('.topics button')];
   const show = () => {
-    for (const tab of root.querySelectorAll('.views button')) tab.classList.toggle('on', tab.dataset.view === view);
+    for (const tab of tabs) tab.classList.toggle('on', tab.dataset.view === view);
     for (const part of root.querySelectorAll('[data-for]')) part.hidden = part.dataset.for !== view;
-    const q = query.value.toLowerCase().trim();
+    const groups = Search.parse(query.value);
+    const among = groups.length ? index.find(groups) : null;
+    const searched = among && {findings: among(R.findings), claims: among(R.claims)};
+    const found = searched && searched[view];
+    for (const tab of tabs) {
+      const all = tab.dataset.view === 'findings' ? R.findings : R.claims;
+      tab.textContent = searched ? `${labels.get(tab)} (${searched[tab.dataset.view].size} found)` : labels.get(tab);
+      if (searched) tab.title = `${searched[tab.dataset.view].size} of ${all.length} found by the search`;
+      else tab.removeAttribute('title');
+    }
     const files = !file || file.value === 'all' ? null : new Set(file.value.split(',').map(Number));
-    const common = (x) => (!files || x.files.some((f) => files.has(f))) && (!q || wordsOf(x).includes(q));
+    const common = (x) => (!files || x.files.some((f) => files.has(f))) && (!found || found.has(x));
     let matching, folded = 0;
     if (view === 'findings') {
       const r = relation.value, k = kind ? kind.value : 'all';
@@ -100,15 +130,32 @@
       chip.querySelector('small').textContent = matching.filter((x) => inTopic(x, t)).length;
       chip.classList.toggle('on', t === topic);
     }
-    const chosen = topic === null ? matching : matching.filter((x) => inTopic(x, topic));
+    let chosen = topic === null ? matching : matching.filter((x) => inTopic(x, topic));
+    orderBox.hidden = !found;
+    if (found && order.value === 'relevance') chosen = [...chosen].sort((a, b) => found.get(b) - found.get(a));
     const total = view === 'findings' ? R.findings.length : R.claims.length;
-    $('count').textContent = `${chosen.length} of ${total} ${view}`
+    let count = `${chosen.length} of ${total} ${view}`
       + (folded ? ` (${folded} that say the same in both folded)` : '');
-    paged(main, chosen.map((x) => x.html));
+    if (found && view === 'claims') {  // what each source says, as searched
+      count += ': ' + sides.map((name, i) => `${chosen.filter((c) => c.side === i).length} in ${name}`).join('; ');
+    }
+    $('count').textContent = count;
+    paged(main, chosen.map((x) => x.html), found ? Search.marker(groups, index) : null);
+    remember();
   };
   let typing;
-  for (const control of [relation, kind, same, side, status, claimKind, file]) if (control) control.onchange = show;
-  query.oninput = () => { clearTimeout(typing); typing = setTimeout(show, 200); };
+  for (const control of [relation, kind, same, side, status, claimKind, file, order]) {
+    if (control) control.onchange = show;
+  }
+  query.oninput = () => {
+    clearTimeout(typing);
+    typing = setTimeout(show, 200);
+  };
+  window.addEventListener('hashchange', () => {  // an address edited, or another search's
+    view = address().has('claims') ? 'claims' : 'findings';
+    query.value = address().get('q') || '';
+    show();
+  });
   root.addEventListener('click', (e) => {
     if (e.target.matches('img.crop')) e.target.classList.toggle('full');
     const tab = e.target.closest('.views button');
@@ -131,6 +178,16 @@
       file.value = e.target.dataset.files;
       show();
       relation.scrollIntoView();
+    }
+    if (e.target.matches('button.like')) {  // the claims like a claim: the other source's, most alike first
+      const claim = R.claims.find((c) => c.card === e.target.dataset.like);
+      query.value = 'like:' + e.target.dataset.like;
+      view = 'claims';
+      topic = null;
+      if (claim && claim.side >= 0 && sides.length === 2) side.value = String(1 - claim.side);
+      order.value = 'relevance';
+      show();
+      query.scrollIntoView();
     }
   });
   show();
