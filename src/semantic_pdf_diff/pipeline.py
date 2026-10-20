@@ -263,6 +263,10 @@ def compare_and_report(options, settings, store, client, names, read, document, 
                   or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
                          for f in data['findings']))
     print(f"Report: {out / 'report.html'}" + (' (incomplete source coverage)' if incomplete else ''))
+    omitted = data['retrieval']['omitted_by_pair_limit']
+    if omitted:
+        print(f"{omitted} of {data['retrieval']['candidate_pairs']} candidate pairs weren't judged: --max-pairs sets "
+              f"how many are (now {settings.max_pairs})")
     if account.cut:
         print(crops.summary(account, store.folder))
     note = budget_note(client)

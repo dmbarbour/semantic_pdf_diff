@@ -152,6 +152,9 @@ def add_run_options(parser):
                          help='Skip the figure and section summaries ("about" statements) that place claims')
     reading.add_argument('--top-k', type=int,
                          help=f'Claims of the other source each claim is compared with (default: {default("top_k")})')
+    reading.add_argument('--max-pairs', type=int,
+                         help=f'The most candidate pairs the model judges, best first; the report says how many were '
+                              f'left unjudged (default: {default("max_pairs")})')
     model = parser.add_argument_group('the model')
     model.add_argument('--model', help=f'The model identifier the provider uses (default: $OPENAI_MODEL, else '
                                        f'{default("model")})')
@@ -217,7 +220,7 @@ def add_budget_options(parser):
 def load_settings(args):
     """The environment, then --config, then the flags."""
     flags = {name: getattr(args, name)
-             for name in ['model', 'base_url', 'context_tokens', 'max_calls', 'top_k', 'max_cost']
+             for name in ['model', 'base_url', 'context_tokens', 'max_calls', 'top_k', 'max_pairs', 'max_cost']
              if getattr(args, name, None) is not None}
     if getattr(args, 'no_vision', False):
         flags['vision'] = False

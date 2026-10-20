@@ -192,6 +192,11 @@ def header_html(data):
         page += (f"<p class='warning'>Paused: {esc(data['paused'])}. What the cap cut followed the order answers came "
                  "in, so this report isn't reproducible: rerun the same command to resume.</p>")
     differently = sum(1 for f in data['findings'] if f.get('tables_read'))
+    retrieval = data.get('retrieval', {})
+    if retrieval.get('omitted_by_pair_limit'):
+        page += (f"<p class='warning'>{retrieval['omitted_by_pair_limit']} of {retrieval['candidate_pairs']} candidate "
+                 f"pairs weren't judged: a comparison judges at most {retrieval['attempted_pairs']}, best first "
+                 "(<code>--max-pairs</code>, or <code>max_pairs</code> in a <code>--config</code> file).</p>")
     page += f"<p>{esc(dict(counts))}</p>" + kinds_html(data['findings'], esc) + (
         f"<p class='warning'>{differently} findings compare claims whose tables were read differently (by rules, a "
         "summary or row by row): a difference there may come from the reading.</p>" if differently else '') + (

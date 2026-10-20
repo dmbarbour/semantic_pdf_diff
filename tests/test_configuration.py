@@ -58,4 +58,11 @@ class ConfigurationTests(unittest.TestCase):
                 parser=argparse.ArgumentParser();add_run_options(parser)
                 self.assertEqual(load_settings(parser.parse_args(extra)).max_calls,expected)
 
+    def test_the_pairs_judged_are_capped_by_a_flag(self):
+        # the owner, 2026-10-19: "That 1000 item cap seems arbitrary, it should be configurable at least."
+        parser=argparse.ArgumentParser();add_run_options(parser)
+        with patch.dict(os.environ,{},clear=True):
+            self.assertEqual(load_settings(parser.parse_args([])).max_pairs,1000)
+            self.assertEqual(load_settings(parser.parse_args(['--max-pairs','5000'])).max_pairs,5000)
+
 if __name__=='__main__': unittest.main()

@@ -145,6 +145,14 @@ class OneFile(unittest.TestCase):
             self.assertEqual(mime, "image/jpeg")
             self.assertEqual(encode(path)[:2], b"\xff\xd8")
 
+    def test_the_header_says_how_many_candidate_pairs_went_unjudged(self):
+        a, b = ev("A-1"), ev("B-1")
+        data = report([a, b], [finding(a, b, "different")])
+        data["retrieval"] = {"candidate_pairs": 1500, "attempted_pairs": 1000, "omitted_by_pair_limit": 500}
+        write_report(data, self.root / "out")
+        self.assertIn("500 of 1500 candidate pairs weren't judged: a comparison judges at most 1000, best first "
+                      "(<code>--max-pairs</code>", unpacked((self.root / "out" / "report.html").read_text()))
+
     def test_budgets_on_the_command_line(self):
         import argparse
         from semantic_pdf_diff.cli import report_size
