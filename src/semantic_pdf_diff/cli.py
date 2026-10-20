@@ -155,7 +155,10 @@ def add_run_options(parser):
     reading.add_argument('--rerank', dest='rerank_model', metavar='MODEL',
                          help='Proposals mode: score each claim\'s candidates with this reranker before the judge '
                               '(e.g. Qwen/Qwen3-Reranker-8B on DeepInfra; elsewhere set rerank_url and rerank_api in '
-                              'a --config file); pairs below rerank_threshold are not judged, the rest best first')
+                              'a --config file); pairs below --rerank-threshold are not judged, the rest best first')
+    reading.add_argument('--rerank-threshold', type=int, choices=range(1, 11), metavar='1-10',
+                         help=f'With --rerank: the least score a pair is judged with, in hundredths (1-10 for '
+                              f'0.01-0.10; default: {default("rerank_threshold")})')
     reading.add_argument('--max-pairs', type=int,
                          help=f'The most candidate pairs the model judges, best first; the report says how many were '
                               f'left unjudged (default: {default("max_pairs")})')
@@ -229,7 +232,7 @@ def load_settings(args):
     """The environment, then --config, then the flags."""
     flags = {name: getattr(args, name)
              for name in ['model', 'base_url', 'context_tokens', 'max_calls', 'top_k', 'max_pairs', 'max_cost',
-                          'rerank_model']
+                          'rerank_model', 'rerank_threshold']
              if getattr(args, name, None) is not None}
     if getattr(args, 'no_vision', False):
         flags['vision'] = False

@@ -55,6 +55,26 @@ class Requests(unittest.TestCase):
         self.assertEqual(rerank.endpoint(Settings(rerank_model="m", rerank_url="https://x/{model}/rank")),
                          "https://x/m/rank")
 
+    def test_the_threshold_is_hundredths_from_1_to_10_and_a_setting_like_any(self):
+        # the owner, 2026-10-20: "perhaps 1-10 corresponding to 0.01-0.10 ... Default 3?"
+        import argparse
+        import os
+        from unittest.mock import patch
+        from pydantic import ValidationError
+        from semantic_pdf_diff.cli import add_run_options, load_settings
+        self.assertEqual(Settings().rerank_threshold, 3)
+        for wrong in (0, 11):
+            with self.assertRaises(ValidationError):
+                Settings(rerank_threshold=wrong)
+        parser = argparse.ArgumentParser()
+        add_run_options(parser)
+        with patch.dict(os.environ, {"PDF_DIFF_RERANK_MODEL": "m", "PDF_DIFF_RERANK_THRESHOLD": "5"}, clear=True):
+            kept = load_settings(parser.parse_args([]))  # a persistent setting: the environment's
+            flagged = load_settings(parser.parse_args(["--rerank-threshold", "2"]))  # a flag overrides it
+        self.assertEqual((kept.rerank_model, kept.rerank_threshold, flagged.rerank_threshold), ("m", 5, 2))
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
+            parser.parse_args(["--rerank-threshold", "20"])
+
     def test_the_lever_acts_in_proposals_mode_with_a_reranker_named(self):
         self.assertFalse(Settings().reranks("proposals"))
         self.assertTrue(Settings(rerank_model="m").reranks("proposals"))
@@ -112,7 +132,7 @@ class Compared(unittest.TestCase):
         self.assertEqual(sorted(pairs), [('fan', 'fan'), ('pump', 'pump')])  # pump-fan, valve-pump... ranked out
         self.assertTrue(all(f['rerank_score'] == 0.9 for f in report['findings']))
         reranked = report['retrieval']['reranked']
-        self.assertEqual((reranked['model'], reranked['failed']), ('stub-reranker', 0))
+        self.assertEqual((reranked['model'], reranked['threshold'], reranked['failed']), ('stub-reranker', 0.03, 0))
         self.assertGreater(reranked['below_threshold'], 0)
         valve = next(e['id'] for e in report['evidence'] if e['entity'] == 'valve')
         self.assertEqual(next(u['status'] for u in report['unmatched'] if u['id'] == valve), 'ranked_out')

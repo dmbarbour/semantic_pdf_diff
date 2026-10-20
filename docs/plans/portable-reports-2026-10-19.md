@@ -104,7 +104,7 @@
      - **As a search engine's reranker** (claims as "entity — attribute [conditions]", no instruction), no model separated related from unrelated pairs better than TF-IDF's own score; the 4B and 8B were no better than the 0.6B, and the IEA report against its workbook was at chance.
      - **Told the task** (the instruction "Given a claim from one engineering design document, retrieve claims from another design that state the same property of the same kind of component, so that their values can be compared", claims as sentences: "The rated power of the rotor, for 10 m/s."), the 8B separated them far better on the turbines runs (0.92–0.94 against TF-IDF's 0.64–0.82, the chance a related pair outscores an unrelated one), as well on the drawings (0.89–0.95 against 0.93), and no better on the IEA pair (0.71 against 0.70).
      - **One threshold, 0.02:** every equivalent and different pair kept in all six runs; 26–64% of the unrelated pairs left unjudged in five (4% in the IEA pair, which loses 57 of its 86 complementary pairs: the same item's other property, which the instruction asks to leave out). About 39% of the 4,482 unrelated pairs, for some $0.006 a thousand pairs against the judge's $0.19.
-   - **Built** (74c0dd2; the owner: "Yes, please."): the `rerank` lever, off by default (`--rerank MODEL`, `rerank_threshold` 0.02), on DeepInfra's inference API or text-embeddings-inference's `/rerank`; its requests recorded and replayed like the judge's.
+   - **Built** (74c0dd2; the owner: "Yes, please."): the `rerank` lever, on DeepInfra's inference API or text-embeddings-inference's `/rerank`; its requests recorded and replayed like the judge's. On only where a reranker is configured, its threshold in hundredths (the owner, 2026-10-20: "Let's enable the reranker if the user configures it, no default. We should make the threshold configurable, too, perhaps 1-10 corresponding to 0.01-0.10. It can be disabled by default in the configuration. Default 3?"): `rerank_threshold` 1–10, 3 by default, `--rerank-threshold` overriding the environment or a `--config` file.
    - **End to end** (2026-10-20, the slices' two proposals runs from their archive, $0.12; 0.05 and 0.1 replayed for $0.0007):
 
      | Run | Arm | Pairs judged | Related (lost, gained) | Uncertain | Unrelated |
@@ -118,7 +118,7 @@
      | drawings | reranker, 0.05 | 876 | 132 (0, 0) | 197 | 547 |
      | drawings | reranker, 0.1 | 783 | 132 (0, 0) | 195 | 456 |
 
-     No related finding was lost at any threshold; turbines, which the cap had cut, gained three. 0.02 stays the default: offline, 0.1 lost related pairs in two runs (19% of an older turbines run's; the IEA pair's complementary ones).
+     No related finding was lost at any threshold; turbines, which the cap had cut, gained three. Offline, 0.1 lost related pairs in two runs (19% of an older turbines run's; the IEA pair's complementary ones); the default is the owner's 3 (0.03).
 
 ## Proposed, awaiting the owner
 

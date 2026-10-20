@@ -1120,15 +1120,18 @@ class NameTopics(Lever):
 
 class Rerank(Lever):
     lever_name, stage, off = "rerank", "comparison", {"rerank_model": None, "rerank_api": "deepinfra",
-                                                       "rerank_url": None, "rerank_threshold": 0.02}
+                                                       "rerank_url": None, "rerank_threshold": 3}
     # proposals mode: each claim's candidates scored by a cross-encoder told the task (rerank.py) before the judge;
     # pairs below rerank_threshold not judged, the rest judged best first (the owner, 2026-10-20, on the measured
-    # proposal: "Yes, please."; docs/plans/portable-reports-2026-10-19.md, milestone 5). Off until measured end to end
+    # proposal: "Yes, please."; docs/plans/portable-reports-2026-10-19.md, milestone 5). On only where a reranker is
+    # named (the owner: "Let's enable the reranker if the user configures it, no default.")
     rerank_model: Annotated[str | None, _selecting(roles=COMPARE)] = None  # e.g. Qwen/Qwen3-Reranker-8B
     rerank_api: Annotated[Literal["deepinfra", "tei"], _selecting(roles=COMPARE)] = "deepinfra"
     # where it's asked ({model} filled in); none: DeepInfra's inference API where the chat endpoint is DeepInfra's
     rerank_url: Annotated[str | None, Declared("endpoint")] = None
-    rerank_threshold: Annotated[float, _selecting(roles=COMPARE)] = Field(default=0.02, ge=0, le=1)
+    # the least score a pair is judged with, in hundredths: 1-10 for 0.01-0.10 (the owner: "perhaps 1-10
+    # corresponding to 0.01-0.10 ... Default 3?"); measured end to end at 2, 5 and 10, no related finding lost
+    rerank_threshold: Annotated[int, _selecting(roles=COMPARE)] = Field(default=3, ge=1, le=10)
 
     def reranks(self, mode):
         return bool(self.rerank_model) and mode == "proposals"

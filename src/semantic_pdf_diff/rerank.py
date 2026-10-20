@@ -1,11 +1,13 @@
 """Reranking a comparison's candidate pairs before the judge (the rerank lever; portable reports, milestone 5).
 Retrieval's candidates share words; in proposals mode most are judged unrelated (the same property of another item, the
 same item's other property), and the pair cap leaves the rest unjudged. A cross-encoder told the task scores each
-claim's candidates; pairs below a threshold aren't judged, and the judge takes the rest best first.
+claim's candidates; pairs below a threshold (rerank_threshold, in hundredths) aren't judged, and the judge takes
+the rest best first.
 
 Measured offline on six recorded proposals runs (2026-10-20): Qwen3-Reranker-8B, told the task and given claims as
 sentences, kept every pair the judge called equivalent or different at a threshold of 0.02, and left 26-64% of the
-unrelated unjudged in five of them. As a search engine's reranker (no instruction) it was no better than TF-IDF.
+unrelated unjudged in five of them; end to end, none was lost at 0.02, 0.05 or 0.1. As a search engine's reranker (no
+instruction) it was no better than TF-IDF.
 
 A reranker's request is a query like any other (llm.Request): named by what reaches the reranker, recorded, replayed and
 cached as the judge's are, and counted under the caps. Two endpoints:
@@ -102,9 +104,9 @@ def ranked(pairs, dispatch, client, mode, label):
         dispatch.submit_request(request(s, sentence(a), [sentence(b) for b in bs], ("rerank", mode, label, a.id)),
                                 finish(a, bs))
     dispatch.drain()
-    score = lambda p: scores.get((p[1].id, p[2].id), s.rerank_threshold)
-    kept = sorted((p for p in pairs if score(p) >= s.rerank_threshold), key=lambda p: (-score(p), -p[0], p[1].id,
-                                                                                        p[2].id))
-    summary = {"model": s.rerank_model, "threshold": s.rerank_threshold, "requests": len(candidates),
-               "failed": failed, "below_threshold": len(pairs) - len(kept)}
+    least = s.rerank_threshold / 100  # the setting's 1-10 are hundredths
+    score = lambda p: scores.get((p[1].id, p[2].id), least)
+    kept = sorted((p for p in pairs if score(p) >= least), key=lambda p: (-score(p), -p[0], p[1].id, p[2].id))
+    summary = {"model": s.rerank_model, "threshold": least, "requests": len(candidates), "failed": failed,
+               "below_threshold": len(pairs) - len(kept)}
     return kept, scores, summary
