@@ -243,12 +243,12 @@ def figure_prompt(part, scale):
             lines.append(f"{title}: {text}")
     return "\n".join(lines) + "\n"
 
-def situate(doc, content, evidence, sections, output, client, dispatch, progress, image_side=None):
+def situate(doc, content, evidence, sections, output, client, dispatch, progress, image_side=None, label=""):
     """Figures, then sections (bottom-up): returns (figures, sections, unresolved, issues).
 
     Every figure gets a request. Figures that gain citations from labels the model read
     get one more, with the citing paragraphs. Model requests run on the dispatcher;
-    everything else on this thread.
+    everything else on this thread. Each round is a bar of progress (label: the document's name).
     """
     import hashlib
     import pymupdf
@@ -277,7 +277,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
     from .sections import SectionIndex, section_text
     index = SectionIndex(sections, doc)
 
-    def ask_figure(figure):
+    def ask_figure(figure, bar):
         images = [render(figure.page, figure.bbox, crop_name(stem, figure.id))] if figure.region else []
         part = figure_material(doc, figure, index, by_id, text_by_page)
         prompt, trimmed = fit(lambda scale: figure_prompt(part, scale), client, images)
@@ -286,6 +286,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
 
         def finish(result, error):
             progress.finish("failed" if error else "complete")
+            bar.tick()
             if error is not None:
                 issues.append({"target": figure.id, "issue": str(error), "failed": True})
                 return
@@ -299,19 +300,22 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
         dispatch.submit(prompt, FigureAbout, images, key("figure", figure.id, prompt), finish)
 
     # 1. Every figure; then those that gained citations from labels read by the model.
+    bar = progress.bar(label, len(figures), "figures", keep=False) if figures else None
     for figure in figures:
-        ask_figure(figure)
+        ask_figure(figure, bar)
     dispatch.drain()
     gained, unresolved = resolve(figures, unresolved)
     if gained:
         attach_claims(gained, evidence)  # claims from the newly citing text
+        bar = progress.bar(label, len(gained), "figures cited", keep=False)
         for figure in gained:
-            ask_figure(figure)
+            ask_figure(figure, bar)
         dispatch.drain()
 
     # 2. Sections, from their text, claims and figures.
     sheets = {f.page for f in figures if f.kind == "sheet" and position(doc[f.page - 1], f) == "the whole page"}
     updated = {}
+    of_sections = progress.bar(label, len(sections), "sections", keep=False) if sections else None
     for section in sections:
         pages = range(section.first_page, section.last_page + 1)
         text = section_text(doc, section).strip()
@@ -335,6 +339,7 @@ def situate(doc, content, evidence, sections, output, client, dispatch, progress
 
         def finish(result, error, section=section):
             progress.finish("failed" if error else "complete")
+            of_sections.tick()
             if error is not None:
                 issues.append({"target": section.id, "issue": str(error), "failed": True})
                 updated[section.id] = section

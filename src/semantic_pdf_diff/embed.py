@@ -75,10 +75,13 @@ def request(s, texts, key=None, query=False):
                                 "params": {"embed": s.embed_model, "dimensions": s.embed_dimensions}},
                    url=endpoint(s), model=s.embed_model, read=read)
 
-def embedded(evidence, dispatch, s, label):
+def embedded(evidence, dispatch, s, label, progress=None):
     """The claims' vectors, as a report keeps them: {"model", "dimensions", "vectors": [kept vectors], "of": {claim's
-    id: its vector's index}, "requests", "failed"}; a claim whose request failed has none."""
+    id: its vector's index}, "requests", "failed"}; a claim whose request failed has none. progress: its requests
+    counted, and a bar of the claims' sentences embedded."""
+    from .progress import NoProgress
     from .recipes import Recipe
+    progress = progress or NoProgress()
     of_sentence = {}
     for e in evidence:
         of_sentence.setdefault(sentence_of(e), []).append(e["id"])
@@ -88,6 +91,8 @@ def embedded(evidence, dispatch, s, label):
     def finish(start, count):
         def done(value, error):
             nonlocal failed
+            progress.finish("failed" if error is not None else "complete")
+            bar.tick(count)
             if error is not None:
                 failed += 1
                 errors.append(error)
@@ -96,9 +101,11 @@ def embedded(evidence, dispatch, s, label):
         return done
 
     batches = range(0, len(sentences), EMBED_A_REQUEST)
+    bar = progress.bar('embed', len(sentences), 'sentences')
     for start in batches:
         texts = sentences[start:start + EMBED_A_REQUEST]
         dispatch.make_room()
+        progress.add()
         dispatch.submit_request(request(s, texts, Recipe(("embed", label, str(start // EMBED_A_REQUEST)))),
                                 finish(start, len(texts)))
     dispatch.drain()

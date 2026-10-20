@@ -26,6 +26,7 @@ import json
 import logging
 
 from .llm import Request
+from .progress import NoProgress
 from .recipes import Recipe
 from .schema import Ranking
 
@@ -99,10 +100,12 @@ def request(s, query, documents, key=None):
                                 "params": {"rerank": s.rerank_model}},
                    url=endpoint(s), model=s.rerank_model, read=read)
 
-def ranked(pairs, dispatch, client, mode, label):
+def ranked(pairs, dispatch, client, mode, label, progress=None):
     """The candidate pairs ((retrieval score, a, b), best first) the judge takes, reranked: each claim's candidates
     scored in one request; pairs below the threshold left out, the rest best first by the reranker (a pair whose
-    request failed keeps the threshold's score). Returns (the pairs kept, {(a id, b id): score}, a summary)."""
+    request failed keeps the threshold's score). Returns (the pairs kept, {(a id, b id): score}, a summary).
+    progress: its requests counted, and a bar of the claims reranked."""
+    progress = progress or NoProgress()
     s = client.s
     candidates = {}
     for retrieved, a, b in pairs:
@@ -112,6 +115,8 @@ def ranked(pairs, dispatch, client, mode, label):
     def finish(a, bs):
         def done(value, error):
             nonlocal failed
+            progress.finish("failed" if error is not None else "complete")
+            bar.tick()
             if error is not None:
                 failed += 1
                 errors.append(error)
@@ -120,10 +125,12 @@ def ranked(pairs, dispatch, client, mode, label):
                 scores[a.id, b.id] = round(score, 4)
         return done
 
+    bar = progress.bar('rerank', len(candidates), 'claims')
     for aid in sorted(candidates):
         a, bs = candidates[aid]
         bs = sorted(bs, key=lambda b: b.id)
         dispatch.make_room()
+        progress.add()
         dispatch.submit_request(request(s, sentence(a), [sentence(b) for b in bs], ("rerank", mode, label, a.id)),
                                 finish(a, bs))
     dispatch.drain()

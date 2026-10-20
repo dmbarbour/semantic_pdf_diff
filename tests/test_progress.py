@@ -239,6 +239,29 @@ class Extraction(unittest.TestCase):
             ('extract', 'two.pdf', 1, 'pages')])
         self.assertEqual(sorted(filled), [('b.pdf', 2, 2), ('one.pdf', 3, 3), ('two.pdf', 1, 1)])
 
+    def test_situating_and_comparing_have_bars_full_when_they_close(self):
+        from unittest.mock import patch
+        closed, real_close = [], Progress.close
+
+        def close(self):
+            closed.extend((self.stage, b.label, b.unit, b.done, b.total) for b in self.bars)
+            real_close(self)
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d, patch.object(Progress, 'close', close):
+            root = Path(d)
+            for name, power in (('a.pdf', 10), ('b.pdf', 12)):
+                stubs.text_pdf(root / name, [f'Pump rated power {power} kW', 'Fan rated power 2 kW'],
+                               toc=[[1, 'Pumps', 1], [1, 'Fans', 2]])
+            with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
+                cli.main(['compare', str(root / 'a.pdf'), str(root / 'b.pdf'), '--store', str(root / 'out'),
+                          '--base-url', url, '--no-vision'])
+        situated = {(stage, label, unit) for stage, label, unit, done, total in closed if stage == 'situate'}
+        self.assertEqual(situated, {('situate', 'PDFs', 'PDFs'), ('situate', 'a.pdf', 'sections'),
+                                    ('situate', 'b.pdf', 'sections')})
+        judged = [c for c in closed if c[0] == 'compare' and c[1] == 'judge']
+        self.assertEqual(len(judged), 1)
+        self.assertGreater(judged[0][4], 0)
+        self.assertEqual([c for c in closed if c[3] != c[4]], [])  # every bar full at its stage's end
+
 class Pages(unittest.TestCase):
     """A page is done once every request asked for it is answered, follow-ups included."""
 

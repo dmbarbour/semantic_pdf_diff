@@ -239,6 +239,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     def judged(index, score, a, b, calc):
         def finish(judgment, error):
             progress.finish("failed" if error is not None else "complete")
+            judging.tick()
             if error is not None:
                 results[index] = {"a":a.id,"b":b.id,"retrieval_score":round(score,4),"relation":"uncertain",
                     "rationale":str(error),"confidence":0,"same_conditions":False,"numeric":calc,
@@ -261,8 +262,9 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     with (dispatch if own else contextlib.nullcontext()):
         if client.s.reranks(mode) and pairs and dispatch.split:  # the reranker's order, its threshold (rerank.py)
             judged_before = {x.id for _, a, b in pairs for x in (a, b)}
-            pairs, rerank_scores, reranked = ranked(pairs, dispatch, client, mode, settings_key)
+            pairs, rerank_scores, reranked = ranked(pairs, dispatch, client, mode, settings_key, progress)
             ranked_out = judged_before - {x.id for _, a, b in pairs for x in (a, b)}
+        judging = progress.bar('judge', len(pairs[:client.s.max_pairs]), 'pairs')
         for index, (score, a, b) in enumerate(pairs[:client.s.max_pairs]):
             dispatch.make_room()
             attempted.update((a.id,b.id))

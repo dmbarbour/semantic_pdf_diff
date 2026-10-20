@@ -150,10 +150,12 @@ def explain(results, payloads, earlier, later, headings, dispatch, progress, key
     if not chosen:
         return
     revisions = Revisions(earlier, later)
+    bar = progress.bar('explain', len(chosen), 'findings')
 
     def explained(index):
         def finish(answer, error):
             progress.finish("failed" if error is not None else "complete")
+            bar.tick()
             results[index]["explanation"] = ({"kind": "unclear", "rationale": str(error), "confidence": 0,
                                               "processing_error": True} if error is not None else answer.model_dump())
         return finish

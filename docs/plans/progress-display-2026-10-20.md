@@ -44,8 +44,9 @@
 ## Milestones
 
 1. **The renderer and its tests** (done 2026-10-20): a block of bars and a status line, log lines above it, tested in pyte. tqdm is dropped.
-   - **Found by the pseudo-terminal test:** PyMuPDF prints a notice to standard output ("Consider using the pymupdf_layout package…") while the bars are drawn, so their copy was left on the screen. Its messages now go to the log at `-v`. Anything else written to standard output or error while bars are drawn is printed above them too.
+   - **Found by the pseudo-terminal test:** PyMuPDF prints a notice to standard output ("Consider using the pymupdf_layout package…") while the bars are drawn, so their copy was left on the screen. Anything written to standard output or error while bars are drawn is now printed above them, the notice too (it's a `print`). PyMuPDF's own messages, which go to the standard output it found when imported, go to the log instead, at the same level.
 2. **Extraction's bars** (done 2026-10-20): pages per file, files per source, with requests attributed to pages.
    - **On the recorded slices** (turbines, drawings, rules), every page was counted by its own answers before its file's job ended: none was left for the job's end to fill, and each stage's requests asked and answered matched. With answers handled in a shuffled order, as a live run's are (`SEMANTIC_PDF_DIFF_ANSWER_ORDER`), the turbines' 12-page files rose a page or so each tenth of the 149 requests.
-3. **Situating's and comparing's bars.**
+3. **Situating's and comparing's bars** (done 2026-10-20): each PDF's figures, figures cited and sections, and the PDFs when there are several; the claims reranked, the pairs judged, the findings explained, the sentences embedded. The other names' requests are counted in the status line; the topics' one request isn't.
+   - **Replayed on a pseudo-terminal** (the turbines slices, answers in a shuffled order): both files' page bars rose together, 1, 4 and then 8 of 12 pages, with "about 36 s left" falling to 6 s. The screen kept every log line whole, and no bar was left once a stage closed.
 4. **Heartbeat lines** from the same numbers, for runs without a terminal (done 2026-10-20, with milestone 1).

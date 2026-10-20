@@ -262,10 +262,13 @@ def write_evidence(store, names, read, interpreters, out):
                                        encoding='utf-8')
     return document
 
-def other_names(data, client, mode, label):
-    """The documents' other names for one thing, asked of the model a request a topic (synonyms.named)."""
+def other_names(data, client, mode, label, progress=None):
+    """The documents' other names for one thing, asked of the model a request a topic (synonyms.named), counted as
+    the stage's requests (progress)."""
     from . import synonyms
+    from .progress import NoProgress
     from .schema import OtherNames
+    progress = progress or NoProgress()
     found, placed = report_topics(data)  # the most even way's topics split a large comparison's names
     topic_of = {c['id']: t for c, t in zip(placed, found[0].placed)} if found else {}
     side = {}
@@ -275,8 +278,12 @@ def other_names(data, client, mode, label):
     sides = [s['name'] for s in data['sources']]
     with Dispatcher(client) as dispatch:
         def submit(prompt, i, finish):
+            def done(answer, error):
+                progress.finish("failed" if error is not None else "complete")
+                finish(answer, error)
             dispatch.make_room()
-            dispatch.submit(prompt, OtherNames, (), ('names', mode, label, str(i)), finish)
+            progress.add()
+            dispatch.submit(prompt, OtherNames, (), ('names', mode, label, str(i)), done)
         return synonyms.named(claims, topic_of, sides, submit, dispatch.drain)
 
 def compare_and_report(options, settings, store, client, names, read, document, out):
@@ -289,7 +296,6 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     comparing = comparison_interpreter(settings)
     data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
                    label=provenance.text_hash(comparing.model_dump_json()), records=read.records)
-    progress.close()
     if options.mode == 'revisions':
         data['record_changes'] = restated(settings, files[names[0]], files[names[1]], read.records or {}, left, right)
         for f in data['findings']:  # a finding whose claims a restated record reaches says so
@@ -312,12 +318,14 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         key = ('topics', options.mode, provenance.text_hash(comparing.model_dump_json()))
         data['topics'] = topics.named(found, claims, lambda prompt: client.ask(prompt, TopicNames, (), key))
     if settings.names_synonyms():  # the documents' other names for one thing, for the search (synonyms.py)
-        data['synonyms'] = other_names(data, client, options.mode, provenance.text_hash(comparing.model_dump_json()))
+        data['synonyms'] = other_names(data, client, options.mode, provenance.text_hash(comparing.model_dump_json()),
+                                       progress)
     if settings.embeds():  # the claims' vectors, for a search by meaning (embed.py)
         from . import embed
         with Dispatcher(client) as dispatch:
             data['vectors'] = embed.embedded(data['evidence'], dispatch, settings,
-                                             provenance.text_hash(comparing.model_dump_json()))
+                                             provenance.text_hash(comparing.model_dump_json()), progress)
+    progress.close()  # the comparison's requests, its search's (names, vectors) too
     store.save_comparison(data['created_at'], data)
     account = write_report(data, out, assets=store.folder / 'assets', budget=options.report_budget,
                            split=options.split)
@@ -509,12 +517,13 @@ def situate_sources(store, client, names, files, by_content, sections, coverage)
         return situations
     log.info(f"Situating {len(todo)} PDF(s)")
     progress = Progress('situate', client, heartbeat=client.s.heartbeat_seconds)
+    documents = progress.bar('PDFs', len(todo), 'PDFs') if len(todo) > 1 else None
     with Dispatcher(client) as dispatch:
         for name, path, content in todo:
             with open_pdf(name, path) as doc:
                 figures, found, unresolved, issues = situate(doc, content, by_content[content],
                                                              sections.get(content, []), store.folder, client, dispatch,
-                                                             progress)
+                                                             progress, label=Path(path).name)
                 checks = quality(doc, figures, found, unresolved, by_content[content])
             store.record_situation(content, figures, found, unresolved, issues)
             sections[content] = found
@@ -522,6 +531,8 @@ def situate_sources(store, client, names, files, by_content, sections, coverage)
             failed = sum(i['failed'] for i in issues)
             if failed:
                 log.warning(f'Situating {path}: {failed} request(s) failed; the next run retries them')
+            if documents is not None:
+                documents.tick()
     progress.close()
     return situations
 

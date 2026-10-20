@@ -47,9 +47,9 @@ def setup_logging(verbosity=0, quiet=False, log_file=None):
         handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
         log.addHandler(handler)
     requests_log.setLevel(logging.DEBUG if verbosity >= 2 else logging.INFO)
-    try:  # PyMuPDF's messages (its layout package suggested on every run) in the log, at -v: it prints them to the
-        import pymupdf  # standard output it found when imported, past the bars' guard (Guarded)
-        pymupdf.set_messages(pylogging_logger=log, pylogging_level=logging.DEBUG)
+    try:  # PyMuPDF's messages in the log, printed above any bars: it writes them to the standard output it found
+        import pymupdf  # when imported, past the bars' guard (Guarded), which print()s do reach
+        pymupdf.set_messages(pylogging_logger=log, pylogging_level=logging.INFO)
     except (ImportError, AttributeError):
         pass
 
