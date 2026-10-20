@@ -64,5 +64,6 @@ class ConfigurationTests(unittest.TestCase):
         with patch.dict(os.environ,{},clear=True):
             self.assertEqual(load_settings(parser.parse_args([])).max_pairs,1000)
             self.assertEqual(load_settings(parser.parse_args(['--max-pairs','5000'])).max_pairs,5000)
+            self.assertEqual(load_settings(parser.parse_args(['--rerank','m'])).rerank_model,'m')
 
 if __name__=='__main__': unittest.main()

@@ -184,12 +184,13 @@ def finding_html(f, card):
     differ = (f"<p class='warning'>Their tables were read differently: A {esc(f['tables_read']['a'])}; B "
               f"{esc(f['tables_read']['b'])}. The difference may come from the "
               "reading.</p>") if f.get('tables_read') else ''
+    rerank = f"; reranker's score {f['rerank_score']}" if 'rerank_score' in f else ''
+    how = 'alignment' if f.get('settled') else 'model'
     return f'''<article data-relation="{esc(f['relation'])}" \
 data-kind="{esc(f.get('explanation', {}).get('kind', ''))}"><h2>{esc(title)}</h2>
         {why or ''}<p>{esc(f['rationale'])}</p>{editorial}{differ}<div class="pair">{card(f['a'])}{card(f['b'])}</div>
         <details><summary>Calculation and matching details</summary>{numeric}<p>Retrieval score \
-{f['retrieval_score']}; {'alignment' if f.get('settled') else 'model'} confidence {f['confidence']}</p></details>\
-</article>'''
+{f['retrieval_score']}{rerank}; {how} confidence {f['confidence']}</p></details></article>'''
 
 def header_html(data, listed=True):
     """The report's header: the sources, the mode, the findings counted, the files' differences (unless the files'
@@ -498,7 +499,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
 
 # How a claim fared in the comparison, as the claims view filters it.
 STATUSES = {"findings": "In findings", "compared": "Compared, no counterpart", "unaligned": "Possibly added or removed",
-            "regrouped": "In a split or merge candidate", "not_compared": "Not compared", "shared": "In both sources"}
+            "regrouped": "In a split or merge candidate", "ranked_out": "Ranked out before judging",
+            "not_compared": "Not compared", "shared": "In both sources"}
 
 def claim_records(data, card, files, topic_of, sides):
     """Every claim of both sources, as the claims view lists them (the owner, 2026-10-20: "an easily searchable
@@ -537,7 +539,7 @@ def claim_records(data, card, files, topic_of, sides):
                                for o, why in unrelated[eid] if o in card.evidence)
             compared = (f"<details><summary>What it was compared with</summary><ul>{compared}</ul></details>"
                         if compared else '')
-        elif lone.get(eid, {}).get('status') in ('unaligned', 'regrouped'):
+        elif lone.get(eid, {}).get('status') in ('unaligned', 'regrouped', 'ranked_out'):
             status, said = lone[eid]['status'], lone[eid]['note']
         else:
             status, said = 'not_compared', lone.get(eid, {}).get('note', 'Not compared')

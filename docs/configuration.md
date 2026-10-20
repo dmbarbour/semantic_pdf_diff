@@ -46,6 +46,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 <!-- settings table: generated, do not edit -->
 | Setting | Default | Class | Lever | Bound by | Regions |
 |---|---|---|---|---|---|
+| `rerank_url` | `null` | endpoint | rerank | - | - |
 | `model` | `"gemma-4"` | endpoint |  | extract, triage, compare | all |
 | `base_url` | `"http://localhost:8000/v1"` | endpoint |  | - | - |
 | `max_calls` | `100000` | endpoint |  | - | - |
@@ -149,6 +150,10 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `record_changes` | `true` | post | record_changes | compare | - |
 | `judge_context` | `false` | shaping | judge_context | compare | - |
 | `topic_names` | `true` | selecting | topic_names | compare | - |
+| `rerank_model` | `null` | selecting | rerank | compare | - |
+| `rerank_api` | `"deepinfra"` | selecting | rerank | compare | - |
+| `rerank_url` | `null` | endpoint | rerank | - | - |
+| `rerank_threshold` | `0.02` | selecting | rerank | compare | - |
 <!-- end of settings table -->
 
 - `response_format` is `none` by default because some compatible servers do not support it; `json_object` requests JSON mode and `json_schema` sends the response schema for guided decoding (vLLM, llama.cpp, and similar), which is strongly recommended for small models where supported. The 0.1 `json_mode: true` setting still maps to `json_object`.

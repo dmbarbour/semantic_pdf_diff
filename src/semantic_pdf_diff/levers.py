@@ -1118,6 +1118,21 @@ class NameTopics(Lever):
     def names_topics(self):
         return self.topic_names
 
+class Rerank(Lever):
+    lever_name, stage, off = "rerank", "comparison", {"rerank_model": None, "rerank_api": "deepinfra",
+                                                       "rerank_url": None, "rerank_threshold": 0.02}
+    # proposals mode: each claim's candidates scored by a cross-encoder told the task (rerank.py) before the judge;
+    # pairs below rerank_threshold not judged, the rest judged best first (the owner, 2026-10-20, on the measured
+    # proposal: "Yes, please."; docs/plans/portable-reports-2026-10-19.md, milestone 5). Off until measured end to end
+    rerank_model: Annotated[str | None, _selecting(roles=COMPARE)] = None  # e.g. Qwen/Qwen3-Reranker-8B
+    rerank_api: Annotated[Literal["deepinfra", "tei"], _selecting(roles=COMPARE)] = "deepinfra"
+    # where it's asked ({model} filled in); none: DeepInfra's inference API where the chat endpoint is DeepInfra's
+    rerank_url: Annotated[str | None, Declared("endpoint")] = None
+    rerank_threshold: Annotated[float, _selecting(roles=COMPARE)] = Field(default=0.02, ge=0, le=1)
+
+    def reranks(self, mode):
+        return bool(self.rerank_model) and mode == "proposals"
+
 class JudgeContext(Lever):
     lever_name, stage, off = "judge_context", "comparison", {"judge_context": False}
     # each claim's context records (the records lever's: its list's lead-in, its sheet's notes, its table's title and
@@ -1165,7 +1180,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
                  ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext,
-                 NameTopics)
+                 NameTopics, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1345,6 +1360,12 @@ class Platform(Composable):
     def explains(self, mode):
         """Whether each "different" or "uncertain" finding is explained by a second call, which names the kind of
         difference (explain.py): the platform's, never; the explain_differences lever's, in revisions mode."""
+        return False
+
+    @chosen
+    def reranks(self, mode):
+        """Whether a comparison's candidate pairs are reranked before the judge (rerank.py): the platform's, never;
+        the rerank lever's, in proposals mode with a reranker named."""
         return False
 
     @chosen

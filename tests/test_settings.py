@@ -60,6 +60,9 @@ ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refin
              'tile_cut', 'band_width', 'least_half', 'skip_sheet_tables', 'sheet_records'}
 # Settings these documents can't exercise, and why (each still needs its class checked elsewhere).
 NOT_EXERCISED = {
+    **dict.fromkeys(('rerank_model', 'rerank_api', 'rerank_url', 'rerank_threshold'),
+                    "a reranker's endpoint, which the stub model doesn't serve; proposals mode only "
+                    '(tests/test_rerank.py)'),
     'topic_names': "needs claims of both sides splitting into two topics or more; the stub's documents make "
                    'one (tests/test_topics.py)',
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',

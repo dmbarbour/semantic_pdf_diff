@@ -60,7 +60,7 @@
     "explain_differences",
     "editorial",
     "record_changes",
-    "judge_context", "topic_names"
+    "judge_context", "topic_names", "rerank"
   ],
   "context_before": 400,
   "context_after": 400,

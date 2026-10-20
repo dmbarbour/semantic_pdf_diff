@@ -471,6 +471,10 @@ class Explanation(DropsUnknown):
     rationale: str = Field(min_length=1, max_length=800)
     confidence: float = Field(ge=0, le=1)
 
+class Ranking(DropsUnknown):
+    """A reranker's scores for a query's documents, in the documents' order (the rerank lever; rerank.py)."""
+    scores: list[float]
+
 class TopicNames(DropsUnknown):
     """The model's choice among the ways of splitting a report's claims into topics, and its names for that way's
     topics, in order (the topic_names lever; topics.py)."""

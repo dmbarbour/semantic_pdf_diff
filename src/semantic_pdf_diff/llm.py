@@ -166,6 +166,12 @@ class Request:
     query: str = ""            # the query's hash (query_hash): the name answers are recorded and cached under
     description: dict | None = None  # facts about the query's content (describe)
     admitted: bool = False     # counted under the caps (Transport.admit), on the thread that asked
+    # Another endpoint's request (a reranker's, rerank.request): where it's posted, the model answering it, and how its
+    # response is read, read(result) -> (the schema's value, usage as the chat endpoint reports it). None: a chat
+    # completion from the settings' model.
+    url: str = ""
+    model: str = ""
+    read: Callable | None = None
 
     @cached_property
     def raw(self):
@@ -239,7 +245,8 @@ class Transport:
             self.admit(request)
         for attempt in range(self.s.retries + 1):
             wait = min(2 ** attempt, 8)
-            http = urllib.request.Request(self.s.base_url.rstrip("/") + "/chat/completions", data=request.raw,
+            url = request.url or self.s.base_url.rstrip("/") + "/chat/completions"
+            http = urllib.request.Request(url, data=request.raw,
                 headers={"Content-Type": "application/json",
                          **({"Authorization": "Bearer " + self.api_key} if self.api_key else {})})
             entry = self.limiter.acquire(request.estimate)
@@ -247,7 +254,11 @@ class Transport:
             started, throttled, generated = time.monotonic(), False, 0
             try:
                 self._attempt()  # after the waits: the cost cap may have been reached meanwhile
-                result = self._post(http)
+                result = self._post(http, shaped=request.read is None)
+                if request.read is not None:  # another endpoint's response: its own reading
+                    value, usage = request.read(result)
+                    self._account(request, result if isinstance(result, dict) else {}, usage, entry)
+                    return value
                 usage = result.get("usage") or {}
                 generated = int(usage.get("completion_tokens") or 0) if isinstance(usage, dict) else 0
                 reported = self._account(request, result, usage, entry)
@@ -301,14 +312,14 @@ class Transport:
         """Why a cap cut the run, if one did: which work it cut followed the order answers came in."""
         return self.out_of_budget or self.limited
 
-    def _post(self, http):
-        """The endpoint's response, streamed or not, as a JSON object."""
+    def _post(self, http, shaped=True):
+        """The endpoint's response, streamed or not, as a JSON object (any JSON value, unshaped: another endpoint's)."""
         # Streamed, the timeout is between chunks: a slow judge still writing isn't cut off
         # (and billed for an answer never received), only a silent connection is.
         with urllib.request.urlopen(http, timeout=self.s.timeout) as response:
             streamed = "text/event-stream" in (response.headers.get("Content-Type") or "")
             result = read_stream(response) if streamed else json.load(response)
-        if not isinstance(result, dict):
+        if shaped and not isinstance(result, dict):
             raise ValueError("Response is not a JSON object")
         return result
 
@@ -322,7 +333,8 @@ class Transport:
             with self.lock:
                 self.cost += float(request.usage.get("estimated_cost") or 0.0)
                 if self.ledger is not None:  # without a cost too: marked unpriced, not left out
-                    self.ledger.add(self.s.model, request.key.role if request.key else "raw", request.usage)
+                    self.ledger.add(request.model or self.s.model, request.key.role if request.key else "raw",
+                                    request.usage)
                 if "estimated_cost" not in request.usage:
                     self.unpriced += 1
                     if self.s.max_cost is not None and not self.warned_cost:
@@ -523,7 +535,7 @@ class Client:
 
     def _cache_key(self, request):
         """The store cache's key: the query and the model answering it."""
-        return hashlib.sha256((self.s.model + "\x00" + request.query).encode()).hexdigest()
+        return hashlib.sha256(((request.model or self.s.model) + "\x00" + request.query).encode()).hexdigest()
 
     def _lookup(self, request):
         if self.store is None:

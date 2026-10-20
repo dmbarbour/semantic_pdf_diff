@@ -49,12 +49,24 @@ class Dispatcher:
             return
         try:
             request = self.client.prepare(prompt, schema, images, key)
+        except ModelFailure as e:  # one preparing
+            self._failed_early(finish, e)
+            return
+        self.submit_request(request, finish)
+
+    def _failed_early(self, finish, error):
+        if self.shuffle is not None:
+            self.held.append((None, finish, None, error))
+        else:
+            finish(None, error)
+
+    def submit_request(self, request, finish):
+        """A prepared request (another endpoint's too: a reranker's, rerank.request) looked up, then sent if it must
+        be; finish(value, error) is called on this thread, now or later."""
+        try:
             value = self.client.cached(request)
-        except ModelFailure as e:  # a recorded failure, or one preparing
-            if self.shuffle is not None:
-                self.held.append((None, finish, None, e))
-            else:
-                finish(None, e)
+        except ModelFailure as e:  # a recorded failure
+            self._failed_early(finish, e)
             return
         if value is not None and self.shuffle is None:
             finish(value, None)

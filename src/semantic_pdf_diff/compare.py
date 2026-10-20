@@ -7,6 +7,7 @@ import re
 from collections import Counter
 from decimal import Decimal, InvalidOperation
 from .explain import explain
+from .rerank import ranked
 from .dispatch import Dispatcher
 from .progress import NoProgress
 from .values import unit
@@ -101,6 +102,8 @@ SETTLED = ("Settled without a model: the same value in corresponding items of th
 UNALIGNED = ("No corresponding item in the other revision (by shared values, names and attributes): possibly added or "
              "removed.")
 REGROUPED = "Viewed as part of a split or merge candidate (see the groupings); not compared claim by claim."
+RANKED_OUT = ("Its candidates in the other source were ranked unlikely counterparts by the reranker, below its "
+              "threshold: not judged.")
 # The same value in corresponding items, held by different parties (the claims' stance: milestone 5)
 ATTRIBUTED = ("Attribution changed, found without a model: the same value, held by {a} in one revision and by {b} in "
               "the other.")
@@ -229,7 +232,8 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
         groupings += [{**g, "earlier_claims": [a_side[i].id for i in g["earlier_claims"]],
                        "later_claims": [b_side[j].id for j in g["later_claims"]]} for g in found.groups]
     pairs = sorted(scored.values(), key=lambda x: (-x[0], x[1].id, x[2].id))
-    results, payloads = {}, {}
+    candidates = len(pairs)
+    results, payloads, rerank_scores, reranked = {}, {}, {}, None
     progress = progress or NoProgress()
 
     def judged(index, score, a, b, calc):
@@ -247,13 +251,18 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
             if judgment.relation in ("equivalent","different","complementary"):
                 matched.update((a.id,b.id))
             results[index] = {"a":a.id, "b":b.id, "retrieval_score":round(score,4), **judgment.model_dump(),
-                              "numeric":calc}
+                              "numeric":calc, **({"rerank_score": rerank_scores[a.id, b.id]}
+                                                 if (a.id, b.id) in rerank_scores else {})}
         return finish
 
     own = dispatcher is None
     dispatch = dispatcher or Dispatcher(client)
     schema = client.s.judging()[1]
     with (dispatch if own else contextlib.nullcontext()):
+        if client.s.reranks(mode) and pairs and dispatch.split:  # the reranker's order, its threshold (rerank.py)
+            judged_before = {x.id for _, a, b in pairs for x in (a, b)}
+            pairs, rerank_scores, reranked = ranked(pairs, dispatch, client, mode, settings_key)
+            ranked_out = judged_before - {x.id for _, a, b in pairs for x in (a, b)}
         for index, (score, a, b) in enumerate(pairs[:client.s.max_pairs]):
             dispatch.make_room()
             attempted.update((a.id,b.id))
@@ -295,10 +304,12 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     def status(e):
         if e.id in attempted:
             return "no_confirmed_counterpart"
+        if reranked is not None and e.id in ranked_out:  # its candidates, all below the reranker's threshold
+            return "ranked_out"
         if e.id in aligned:  # a pass found its item a counterpart: not compared, whatever another pass found
             return "not_compared"
         return "regrouped" if e.id in regrouped else "unaligned" if e.id in unaligned else "not_compared"
-    notes = {"unaligned": UNALIGNED, "regrouped": REGROUPED}
+    notes = {"unaligned": UNALIGNED, "regrouped": REGROUPED, "ranked_out": RANKED_OUT}
     unmatched = [{"id": e.id, "status": status(e),
                   "note": notes.get(status(e), "No confirmed counterpart in retrieved evidence; this does not "
                                                "establish absence.")}
@@ -316,10 +327,12 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
                         **dict(sorted(Counter(f["relation"] for f in found if not f.get("settled")).items())),
                         **dict(sorted(Counter(u["status"] for u in unmatched if u["id"] in mine[0] | mine[1]).items()))}
     explained = Counter(f["explanation"]["kind"] for f in findings if "explanation" in f)
-    retrieval = {"shared_evidence": len(shared_ids), "candidate_pairs": len(pairs),
+    retrieval = {"shared_evidence": len(shared_ids), "candidate_pairs": candidates,
                  "attempted_pairs": min(len(pairs), client.s.max_pairs),
                  "omitted_by_pair_limit": max(0, len(pairs) - client.s.max_pairs),
                  "strategy": "bidirectional sparse TF-IDF top-k union; lexical recall is not guaranteed"}
+    if reranked is not None:
+        retrieval["reranked"] = reranked
     if alignment:
         retrieval.update(strategy=alignment[0]["strategy"], settled_pairs=sum(1 for f in findings if f.get("settled")),
                          alignment=[{k: v for k, v in x.items() if k != "strategy"} for x in alignment])
