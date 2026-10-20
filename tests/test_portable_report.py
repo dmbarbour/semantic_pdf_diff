@@ -265,9 +265,9 @@ class ManyFiles(unittest.TestCase):
         self.assertIn("A split report: a file a pair of files, 2 in this folder", index)
         first = unpacked((folder / "01-p.html").read_text())
         self.assertIn('Part 1 of 2 of a split report (v1/p.pdf → v2/p.pdf): <a href="index.html">', first)
-        self.assertIn("{&#x27;different&#x27;: 3}", first)  # its two, and the one reaching the other pair's file
+        self.assertIn("Findings: 3 different", first)  # its two, and the one reaching the other pair's file
         second = unpacked((folder / "02-q.html").read_text())
-        self.assertIn("{&#x27;uncertain&#x27;: 1, &#x27;different&#x27;: 1}", second)
+        self.assertIn("Findings: 1 different, 1 uncertain", second)
         self.assertEqual(account.size, sum(x.stat().st_size for x in folder.iterdir()))
 
     def test_one_pair_of_files_is_never_split(self):
@@ -308,7 +308,8 @@ class SharedStructure(unittest.TestCase):
         self.assertEqual([f["same"] for f in parts["findings"]], [True, False])
         shown = unpacked(page)
         self.assertIn("Fold the 1 equivalent findings whose two claims say the same", shown)
-        self.assertEqual(shown.count("<b>primary pump — rated power</b><p>10 kW</p>"), 2)  # in both of its cards
+        # in both of its cards, in the finding and in the claims view
+        self.assertEqual(shown.count("<b>primary pump — rated power</b><p>10 kW</p>"), 4)
 
 def plant_report():
     """Two sides' findings about pumps, valves and tanks: topics to browse by."""
@@ -342,6 +343,45 @@ class Topics(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             write_report(report([a, b], [finding(a, b, "different")]), Path(d))
             self.assertNotIn('class="topics"', unpacked((Path(d) / "report.html").read_text()))
+
+class Claims(unittest.TestCase):
+    """Milestone 5 (the owner, 2026-10-20: "an easily searchable database of claims even without the comparisons, so
+    we shouldn't discard unrelated claims"): unrelated pairs aren't findings; every claim is listed, saying how it
+    fared."""
+    def test_unrelated_pairs_are_on_their_claims_not_among_the_findings(self):
+        a, b = ev("A-1"), ev("B-1", value="12")
+        c, d = ev("A-2", entity="tower", attribute="height"), ev("B-2", entity="blade", attribute="mass")
+        e, s = ev("A-3", entity="nacelle", attribute="mass"), ev("A-4", entity="hub", attribute="mass")
+        unrelated = {**finding(c, d, "unrelated"), "rationale": "different items and properties"}
+        data = report([a, b, c, d, e, s], [finding(a, b, "different"), unrelated],
+                      unmatched=[{"id": c.id, "status": "no_confirmed_counterpart", "note": "n"},
+                                 {"id": d.id, "status": "no_confirmed_counterpart", "note": "n"},
+                                 {"id": e.id, "status": "not_compared", "note": "Not compared here"}])
+        data["shared"] = [s.id]
+        with tempfile.TemporaryDirectory() as folder:
+            write_report(data, Path(folder))
+            page = (Path(folder) / "report.html").read_text()
+        parts = parts_of(page)
+        self.assertEqual([f["relation"] for f in parts["findings"]], ["different"])
+        shown = unpacked(page)
+        self.assertIn("Findings: 1 different</p><p>1 candidate pairs were judged unrelated: not findings.", shown)
+        status = {c["card"]: c["status"] for c in parts["claims"]}
+        self.assertEqual(status, {"A-1": "findings", "B-1": "findings", "A-2": "compared", "B-2": "compared",
+                                  "A-3": "not_compared", "A-4": "shared"})
+        tower = next(c["html"] for c in parts["claims"] if c["card"] == "A-2")
+        self.assertIn("Compared with 1 claim of the other source; none is its counterpart", tower)
+        self.assertIn("<li>blade — mass: 10 kW <small>— different items and properties</small></li>", tower)
+        self.assertIn('<option value="compared">Compared, no counterpart</option>', shown)
+        self.assertNotIn('<option value="unaligned">', shown)  # only how claims here fared
+
+    def test_topic_coverage_counts_each_sides_claims_and_those_in_findings(self):
+        with tempfile.TemporaryDirectory() as d:
+            write_report(plant_report(), Path(d))
+            shown = unpacked((Path(d) / "report.html").read_text())
+        table = shown.split("What each source says, by topic</summary>", 1)[1].split("</table>", 1)[0]
+        self.assertIn("<th>Topic</th><th>A</th><th>B</th>", table)
+        self.assertEqual(table.count("<td>12 <small>(12 in findings)</small></td>"), 6)  # three topics, two sides
+        self.assertIn('<button class="pick-topic" data-topic="0">Claims</button>', table)
 
 BROWSERS = ("chromium", "chromium-browser", "google-chrome", "chrome")
 
@@ -386,6 +426,19 @@ class InABrowser(unittest.TestCase):
             dom = subprocess.run([browser, *flags, page], capture_output=True, text=True, timeout=120).stdout
         self.assertIn("1 of 2 findings (1 that say the same in both folded)", dom)
         self.assertEqual(dom.count("<article"), 1)
+
+    def test_the_claims_view_opens_by_its_address(self):
+        browser = next((b for b in map(shutil.which, BROWSERS) if b), None)
+        if browser is None:
+            self.skipTest("no headless browser installed (chromium)")
+        with tempfile.TemporaryDirectory() as d:
+            write_report(plant_report(), Path(d) / "out")
+            page = (Path(d) / "out" / "report.html").as_uri() + "#claims"
+            flags = ["--headless", "--no-sandbox", "--disable-gpu", "--virtual-time-budget=10000", "--dump-dom"]
+            dom = subprocess.run([browser, *flags, page], capture_output=True, text=True, timeout=120).stdout
+        self.assertIn("72 of 72 claims", dom)
+        self.assertEqual(dom.count('<article class="claim">'), 72)
+        self.assertIn('<button data-view="claims" class="on">', dom)
 
     def test_topics_show_how_many_findings_each_holds(self):
         browser = next((b for b in map(shutil.which, BROWSERS) if b), None)

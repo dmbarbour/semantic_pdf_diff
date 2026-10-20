@@ -93,11 +93,18 @@
    - **Kept from the judge:** `mark` is provenance; shown to the judge it changed every marked claim's query (a strict replay of the 25 pairs missed 86 answers before it was excluded).
    - **Measured** on the 25-pair comparison, extracted again by replay ($0): 1,584 of 2,210 claims marked (every rules-read row; image claims whose quotes are in the text); 252 of 252 rules tasks with their crop; the report 4.4 → 5.5 MB with 66 table crops more (284 crops, all within the default budget).
 
+5. **Unrelated pairs, a claims view and topic coverage** (the owner, 2026-10-20: "As a user of the report, it would be convenient to have an easily searchable database of claims even without the comparisons, so we shouldn't discard unrelated claims, but perhaps we should seek better ways to group them and understand them for a comparison."; then, on the proposal below: "This seems like a good start. Please proceed.").
+   - **What unrelated pairs are** (2026-10-20, three local proposals reports): candidates from TF-IDF word overlap (no embedder), 74–87% of the pairs judged. Few share words in conditions alone (44 of 867 in turbines, 52 of 868 in drawings); most are the same property of another item ("height" of a base block and of the finished floor) or the same item's other property (tower steel's density and its Young's modulus).
+   - **Word rules can't sort them:** a pair sharing words in both entity and attribute would keep 119 of turbines' 867 unrelated pairs, and also only 8 of its 32 related ones (drawings: 20 of 868, and 28 of 97), since two designs name things differently. That takes meaning: the reranker, or embeddings.
+   - **Unrelated pairs leave the findings,** kept in `report.json` and on their claims.
+   - **A claims view:** every claim of both sources, searchable and filtered by topic, file, side and kind, each saying how it fared: in findings, compared without a counterpart (with what it was compared with and why not), possibly added or removed, not compared, or shared.
+   - **Topic coverage:** each topic's claims on each side, and how many are in findings: where the two documents overlap, and where one is silent.
+   - **Then the reranker** (below), measured with the recorded judge answers.
+
 ## Proposed, awaiting the owner
 
 Raised by the owner on 2026-10-19 (the first quote above). Each was offered with a recommendation:
 
-- **Unrelated pairs out of the findings:** counted in the header, and listed on a claim that has no counterpart with what it was compared with.
 - **Search** across claims and findings beyond today's text filter.
 - **A reranker before the judge:** a lever, measured on proposals runs (the [lever index](../reviews/levers.md) row; [retrieval recall](retrieval-recall-2026-09-23.md) lists rerankers already).
 - **More than two sources:** premature (the owner, 2026-10-19). It would belong to [criteria-first comparison](n-way-comparison-2026-09-23.md) and claim clustering: claims of every source grouped into topics, shown as a matrix of topics by sources.

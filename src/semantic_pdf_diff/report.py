@@ -78,13 +78,15 @@ td,th{text-align:left;border-bottom:1px solid var(--line);padding:8px}
 select,input{padding:10px;border:1px solid var(--field);border-radius:6px;margin:8px;\
 background:var(--card);color:var(--fg)}
 pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{color:var(--accent)}
-img.crop{cursor:zoom-in}img.crop.full{max-height:none;cursor:zoom-out}\
+img.crop{cursor:zoom-in}article.claim img.crop{max-height:160px}img.crop.full,article.claim img.crop.full\
+{max-height:none;cursor:zoom-out}\
 .shot{position:relative;display:block;width:fit-content;max-width:100%;margin:14px auto}.shot img{margin:0}\
 .shot .mark{position:absolute;outline:2px solid var(--bad);outline-offset:2px;border-radius:2px;\
 pointer-events:none}.cut{color:var(--muted);font-size:13px}
-button.more,.topics button{padding:10px 16px;margin:8px 0;border:1px solid var(--field);border-radius:6px;\
-background:var(--card);color:var(--fg);cursor:pointer}.topics button{padding:6px 10px;margin:4px 2px}\
-.topics button.on{background:var(--accent);color:var(--card)}.topics button small{color:inherit;opacity:.7}
+button.more,.topics button,.views button{padding:10px 16px;margin:8px 0;border:1px solid var(--field);\
+border-radius:6px;background:var(--card);color:var(--fg);cursor:pointer}.topics button{padding:6px 10px;margin:4px 2px}\
+.topics button.on,.views button.on{background:var(--accent);color:var(--card)}.views{margin:18px 0 4px}\
+.views button{font-size:15px;margin-right:6px}.topics button small{color:inherit;opacity:.7}
 @media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
 '''
 # The page's script: it inflates the report's parts and shows them (a file beside this one, so it reads as code).
@@ -205,7 +207,13 @@ def header_html(data, listed=True):
         page += (f"<p class='warning'>{retrieval['omitted_by_pair_limit']} of {retrieval['candidate_pairs']} candidate "
                  f"pairs weren't judged: a comparison judges at most {retrieval['attempted_pairs']}, best first "
                  "(<code>--max-pairs</code>, or <code>max_pairs</code> in a <code>--config</code> file).</p>")
-    page += f"<p>{esc(dict(counts))}</p>" + kinds_html(data['findings'], esc) + (
+    found = ', '.join(f"{counts[r]} {r}" for r in ('different', 'uncertain', 'complementary', 'equivalent')
+                      if counts[r])
+    page += f"<p>Findings: {esc(found or 'none')}</p>"
+    if counts['unrelated']:  # retrieval's candidates the judge found unrelated: on their claims, not findings
+        page += (f"<p>{counts['unrelated']} candidate pairs were judged unrelated: not findings. In the Claims view, "
+                 "each claim says what it was compared with.</p>")
+    page += kinds_html(data['findings'], esc) + (
         f"<p class='warning'>{differently} findings compare claims whose tables were read differently (by rules, a "
         "summary or row by row): a difference there may come from the reading.</p>" if differently else '') + (
         f"<p class='warning'>{len(issues)} incomplete, failed or skipped source tasks. {len(data['unmatched'])} "
@@ -417,17 +425,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     page = note + header_html(data, listed=len(pairs) <= 1) + crops_note(account)
     if len(pairs) > 1:
         page += files_html(data, pairs, files, account, card.where)
-    page += ('<label>Show <select id="filter"><option value="all">All relations</option>'
-             +''.join('<option>'+r+'</option>'
-                      for r in ['different','equivalent','complementary','uncertain','unrelated'])
-             +'</select></label>')
-    if any('explanation' in f for f in data['findings']):
-        page += ('<label>Kind <select id="kind"><option value="all">All kinds</option>'
-                 +''.join(f'<option value="{k}">{esc(v[0])}</option>' for k, v in KINDS.items())+'</select></label>')
-    if len(pairs) > 1:
-        page += ('<label>File <select id="file"><option value="all">All files</option>'
-                 + ''.join(f'<option value="{pair_key(a, b, files)}">{esc(pair_name(kind, a, b))}</option>'
-                           for kind, a, b in pairs) + '</select></label>')
+    shown = [f for f in shown if f['relation'] != 'unrelated']  # retrieval's misses: on their claims, not findings
     findings = [{"relation": f['relation'], "kind": f.get('explanation', {}).get('kind', ''),
                  "cards": [f['a'], f['b']], "html": finding_html(f, card),
                  "files": [files.get(card.evidence[x]['content'], -1) for x in (f['a'], f['b'])]} for f in shown]
@@ -436,11 +434,35 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     way, topic_of, names = browsing(data)
     for f, record in zip(shown, findings):
         record["topics"] = [topic_of.get(f['a'], -1), topic_of.get(f['b'], -1)]
+    sides = [s['name'] for s in data['sources']]
+    claims = claim_records(data, card, files, topic_of, sides)
+    if way:
+        page += topic_coverage_html(claims, names, sides)
+    page += ('<div class="views"><button data-view="findings" class="on">Findings ' + str(len(findings))
+             + '</button><button data-view="claims">Claims ' + str(len(claims)) + '</button></div>')
+    page += ('<span data-for="findings"><label>Show <select id="filter"><option value="all">All relations</option>'
+             + ''.join('<option>' + r + '</option>' for r in ['different', 'equivalent', 'complementary', 'uncertain'])
+             + '</select></label>')
+    if any('explanation' in f for f in data['findings']):
+        page += ('<label>Kind <select id="kind"><option value="all">All kinds</option>'
+                 +''.join(f'<option value="{k}">{esc(v[0])}</option>' for k, v in KINDS.items())+'</select></label>')
     same = sum(1 for record in findings if record["same"])
     if same:
         page += (f'<label><input type="checkbox" id="same" checked> Fold the {same} equivalent findings whose two '
                  'claims say the same</label>')
-    page += ('<input id="query" placeholder="Search findings" aria-label="Search findings"> '
+    page += ('</span><span data-for="claims" hidden><label>Side <select id="side"><option value="all">Both sources'
+             '</option>' + ''.join(f'<option value="{i}">{esc(name)}</option>' for i, name in enumerate(sides))
+             + '</select></label><label>Claims <select id="status"><option value="all">However they fared</option>'
+             + ''.join(f'<option value="{k}">{esc(v)}</option>' for k, v in STATUSES.items()
+                       if any(c['status'] == k for c in claims))
+             + '</select></label><label>Read as <select id="claimkind"><option value="all">Any kind</option>'
+             + ''.join(f'<option>{k}</option>' for k in ('text', 'table', 'chart', 'diagram'))
+             + '</select></label></span>')
+    if len(pairs) > 1:
+        page += ('<label>File <select id="file"><option value="all">All files</option>'
+                 + ''.join(f'<option value="{pair_key(a, b, files)}">{esc(pair_name(kind, a, b))}</option>'
+                           for kind, a, b in pairs) + '</select></label>')
+    page += ('<input id="query" placeholder="Search" aria-label="Search the findings or claims shown"> '
              '<span id="count" class="meta"></span>')
     if way:
         named = 'named by the model; ' if data.get('topics', {}).get('names') else ''
@@ -449,11 +471,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                  + ''.join(f'<button data-topic="{t}" title="{esc(", ".join(words))}">{esc(name)} <small></small>'
                            '</button>' for t, (words, name) in enumerate(zip(way.topics, names)))
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
-    page += ('<main></main><details data-list="unmatched"><summary>Unmatched evidence ('
-             +str(len(data['unmatched']))+')</summary></details>')
+    page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
-    page += ('<details data-list="shared"><summary>Shared evidence ('+str(len(data.get('shared', [])))
-             +'): identical content in both sources, not compared</summary></details>')
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
     issues_found = ''.join('<tr><td>'+esc(i['source'])+'</td><td>'+esc(i['path'])+'</td><td>'+esc(i['reason'])
                            +'</td></tr>' for i in data.get('scan_issues', []))
@@ -467,11 +486,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
              '<th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody>'+coverage
              +'</tbody></table></details>')
     page += crops_left_out_html(account)
-    parts = {"page": page,
-             "findings": findings,
-             "lists": {"unmatched": ['<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched']],
-                       "shared": [card(eid) for eid in data.get('shared', [])]},
-             "cards": card.html, "said": list(card.said)}
+    parts = {"page": page, "findings": findings, "claims": claims, "cards": card.html, "said": list(card.said)}
     packed = json.dumps(parts, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     packed = base64.b64encode(gzip.compress(packed, 9, mtime=0)).decode("ascii")  # mtime=0: the same bytes each time
     images = embed_json({"type": mime, "data": [c.data for c in chosen]})
@@ -480,6 +495,71 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
             f'<script type="application/gzip" id="report-data">{packed}</script>'
             f'<script type="application/json" id="report-crops">{images}</script><script>{SCRIPT}</script>')
     return html_page('Semantic PDF comparison', body, STYLE)
+
+# How a claim fared in the comparison, as the claims view filters it.
+STATUSES = {"findings": "In findings", "compared": "Compared, no counterpart", "unaligned": "Possibly added or removed",
+            "regrouped": "In a split or merge candidate", "not_compared": "Not compared", "shared": "In both sources"}
+
+def claim_records(data, card, files, topic_of, sides):
+    """Every claim of both sources, as the claims view lists them (the owner, 2026-10-20: "an easily searchable
+    database of claims even without the comparisons"): each with its side, file, topic, kind, how it fared (STATUSES)
+    and its card; a claim compared without a counterpart lists what it was compared with and why it wasn't one (the
+    pairs judged unrelated, which aren't findings)."""
+    from collections import defaultdict
+    unrelated, related = defaultdict(list), defaultdict(Counter)
+    for f in data['findings']:
+        if f['relation'] == 'unrelated':
+            unrelated[f['a']].append((f['b'], f['rationale']))
+            unrelated[f['b']].append((f['a'], f['rationale']))
+        else:
+            related[f['a']][f['relation']] += 1
+            related[f['b']][f['relation']] += 1
+    lone, shared = {u['id']: u for u in data['unmatched']}, set(data.get('shared', []))
+    side = {}
+    for f in data.get('files', []):
+        side.setdefault(f['content'], sides.index(f['source']) if f['source'] in sides else -1)
+    brief = lambda e: f"{e['entity']} — {e['attribute']}: {e['value']} {e['unit']}".strip()
+    records = []
+    ordered = sorted(data['evidence'], key=lambda e: (side.get(e['content'], -1), files.get(e['content'], -1),
+                                                      e['content'], e['locator']['page'], e['locator'].get('task', ''),
+                                                      e['id']))
+    for e in ordered:
+        eid, compared = e['id'], ''
+        if eid in shared:
+            status, said = 'shared', 'In both sources: the same content, not compared'
+        elif related[eid]:
+            status, said = 'findings', 'In findings: ' + ', '.join(f"{n} {r}" for r, n in sorted(related[eid].items()))
+        elif unrelated[eid] or lone.get(eid, {}).get('status') == 'no_confirmed_counterpart':
+            status = 'compared'
+            said = (f"Compared with {len(unrelated[eid])} claim{'s' if len(unrelated[eid]) != 1 else ''} of the other "
+                    "source; none is its counterpart" if unrelated[eid] else lone[eid]['note'])
+            compared = ''.join(f"<li>{esc(brief(card.evidence[o]))} <small>— {esc(why)}</small></li>"
+                               for o, why in unrelated[eid] if o in card.evidence)
+            compared = (f"<details><summary>What it was compared with</summary><ul>{compared}</ul></details>"
+                        if compared else '')
+        elif lone.get(eid, {}).get('status') in ('unaligned', 'regrouped'):
+            status, said = lone[eid]['status'], lone[eid]['note']
+        else:
+            status, said = 'not_compared', lone.get(eid, {}).get('note', 'Not compared')
+        html = f'<article class="claim"><p class="meta">{esc(said)}</p>{card(eid)}{compared}</article>'
+        records.append({"card": eid, "side": side.get(e['content'], -1), "kind": e['kind'], "status": status,
+                        "files": [files.get(e['content'], -1)], "topics": [topic_of.get(eid, -1)], "html": html})
+    return records
+
+def topic_coverage_html(claims, names, sides):
+    """Each topic's claims on each side, and how many are in findings: where the two sources overlap, and where one
+    is silent."""
+    count = Counter((c['topics'][0], c['side'], c['status'] == 'findings') for c in claims)
+    rows = ''
+    for t, name in [*enumerate(names), (-1, 'In no topic')]:
+        cells = ''.join(f"<td>{count[t, s, True] + count[t, s, False]} <small>({count[t, s, True]} in findings)</small>"
+                        "</td>" for s in range(len(sides)))
+        if any(count[t, s, x] for s in range(len(sides)) for x in (True, False)):
+            rows += (f'<tr><td>{esc(name)}</td>{cells}<td><button class="pick-topic" data-topic="{t}">Claims</button>'
+                     '</td></tr>')
+    heads = ''.join(f'<th>{esc(name)}</th>' for name in sides)
+    return ('<details class="coverage" open><summary>What each source says, by topic</summary><table><thead><tr>'
+            f'<th>Topic</th>{heads}<th></th></tr></thead><tbody>{rows}</tbody></table></details>')
 
 def file_pairs(data):
     """The compared files in pairs, as the files' difference has them: (kind, the first source's (path, content), the
@@ -559,20 +639,15 @@ def crops_left_out_html(account):
             f"<th>Crop</th><th>Size</th></tr></thead><tbody>{rows}</tbody></table></details>")
 
 def unpacked(page):
-    """A report page's HTML as its script shows it, with every finding and list open (for tests and tools)."""
+    """A report page's HTML as its script shows it: every finding, then every claim (for tests and tools)."""
     import html
     found = re.search(r'<script type="application/gzip" id="report-data">([^<]*)</script>', page)
     parts = json.loads(gzip.decompress(base64.b64decode(found.group(1))))
     cards = lambda text: re.sub(r'<div data-card="([^"]*)"></div>',
                                 lambda m: parts["cards"][html.unescape(m.group(1))], text)
     fill = lambda text: re.sub(r'<div data-said="(\d+)"></div>', lambda m: parts["said"][int(m.group(1))], cards(text))
-    out = parts["page"].replace("<main></main>", "<main>" + "".join(fill(f["html"]) for f in parts["findings"])
-                                + "</main>")
-    for name, items in parts["lists"].items():
-        listed = fill("".join(items))
-        out = re.sub(f'(<details data-list="{name}"><summary>.*?</summary>)', lambda m: m.group(1) + listed,  # noqa: B023
-                     out, count=1, flags=re.S)  # (used at once)
-    return out
+    return parts["page"].replace("<main></main>", "<main>" + "".join(fill(f["html"]) for f in parts["findings"])
+                                 + "</main>" + "".join(fill(c["html"]) for c in parts["claims"]))
 
 # A difference's kind (explain.py): its name, and what it means, in the order the report lists them.
 KINDS = {"changed": ("Changed", "The same item and property under the same conditions; its value was revised"),
