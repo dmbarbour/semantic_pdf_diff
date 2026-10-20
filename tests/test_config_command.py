@@ -85,8 +85,9 @@ class Command(unittest.TestCase):
         self.assertEqual(Store.settings_of(self.store), {})
 
     def test_the_users_settings_lie_under_every_stores(self):
-        from semantic_pdf_diff.settings import user_path, user_settings
-        self.addCleanup(lambda: user_path().unlink(missing_ok=True))
+        from semantic_pdf_diff.settings import save_user_settings, user_path, user_settings
+        user_path().unlink()  # (the tests' own, stubs.USER, put back after)
+        self.addCleanup(save_user_settings, stubs.USER)
         code, out, _ = run("config", "set", "--user", "concurrency", "32", "--store", self.store)
         self.assertEqual((code, out), (0, "concurrency = 32; the next run redoes: nothing (it changes how requests "
                                           "travel, never what is asked)\n"))

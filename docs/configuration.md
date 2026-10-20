@@ -2,7 +2,7 @@
 
 ## Endpoint
 
-When no environment variable or override is supplied, the default endpoint is `http://localhost:8000/v1`. `gemma-4` is only a configurable model identifier, not a claim that OpenAI hosts that model. The server must support Chat Completions with base64 PNG `image_url` inputs and JSON text responses. Use your provider's actual model identifier. API credentials come only from `OPENAI_API_KEY` and are not written to output. A warning is printed if the key would be sent over plain HTTP to a non-local host, and credentials embedded in `base_url` are redacted from reports.
+When no environment variable or override is supplied, the default endpoint is `http://localhost:8000/v1`. There is no default model: a run that would ask one stops before anything changes, saying how to name one (`config set --user model NAME`) and listing the endpoint's models that read images (`config models vision` lists them all). The server must support Chat Completions with base64 PNG `image_url` inputs and JSON text responses. Use your provider's actual model identifier. API credentials come only from `OPENAI_API_KEY` and are not written to output. A warning is printed if the key would be sent over plain HTTP to a non-local host, and credentials embedded in `base_url` are redacted from reports.
 
 ## Precedence and environment variables
 
@@ -65,7 +65,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 |---|---|---|---|---|---|
 | `embed_url` | `null` | endpoint | embed | - | - |
 | `rerank_url` | `null` | endpoint | rerank | - | - |
-| `model` | `"gemma-4"` | endpoint |  | extract, triage, compare | all |
+| `model` | `""` | endpoint |  | extract, triage, compare | all |
 | `base_url` | `"http://localhost:8000/v1"` | endpoint |  | - | - |
 | `max_calls` | `100000` | endpoint |  | - | - |
 | `max_cost` | `null` | endpoint |  | - | - |

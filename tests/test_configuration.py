@@ -40,7 +40,7 @@ class ConfigurationTests(unittest.TestCase):
         with patch.dict(os.environ, {'PDF_DIFF_CONCURRENCY':'32', 'OPENAI_MODEL':'old-way'}), \
                 self.assertLogs('semantic_pdf_diff', 'WARNING') as logged:
             s=Settings.from_env()
-        self.assertEqual((s.concurrency, s.model), (Settings().concurrency, Settings().model))
+        self.assertEqual((s.concurrency, s.model), (Settings().concurrency, stubs.USER['model']))  # the user's
         self.assertIn('PDF_DIFF_CONCURRENCY is no longer read: `semantic-pdf-diff config set --user concurrency VALUE`',
                       '\n'.join(logged.output))
 
@@ -69,7 +69,7 @@ class ConfigurationTests(unittest.TestCase):
 
     def test_empty_fallback_and_invalid_values(self):
         with patch.dict(os.environ, {'OPENAI_BASE_URL':'  '}, clear=True):
-            self.assertEqual(Settings.from_env(),Settings())
+            self.assertEqual(Settings.from_env(),Settings(**stubs.USER))
         for name,value in [('max_calls','oops'),('vision','maybe'),('aliases','{')]:
             with self.subTest(name=name), user_settings({name:value}):
                 with self.assertRaises(ValueError): Settings.from_env()

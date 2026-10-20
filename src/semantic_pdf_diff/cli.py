@@ -16,8 +16,8 @@ import os
 import sys
 from pathlib import Path
 from . import __version__, configuration, crops, fixtures, manifest
-from .pipeline import (RunOptions, attempt, check_fixture, declare_paths, document_properties, limits, run,
-                       settings_from)
+from .pipeline import (RunOptions, attempt, check_fixture, declare_paths, document_properties, limits, require_model,
+                       run, settings_from)
 from .schema import Source
 from .progress import log, setup_logging
 from .report import SPLIT, write_report
@@ -103,7 +103,8 @@ START_HELP = """\
 Before a first run, name the endpoint and the model (a .env file isn't read):
   export OPENAI_API_KEY=...                            the provider's key
   export OPENAI_BASE_URL=https://provider.example/v1   default: {base_url}
-  semantic-pdf-diff config set --user model provider/vision-model     default: {model}
+  semantic-pdf-diff config set --user model provider/vision-model     needed: there's no default
+  semantic-pdf-diff config models vision                              the endpoint's models reading images
 A store keeps its own settings: `semantic-pdf-diff config show` lists them, `config set NAME VALUE` sets one
 (`config help NAME` says what it does). A run's flags, or a --config JSON file, override them for that run.
 
@@ -268,7 +269,7 @@ def overview_parser():
     commands = COMMANDS_HELP + "".join(f"  {name:<11} the lab's (semantic-pdf-diff[lab])\n"
                                        for name in sorted(lab_commands()))
     parser = Parser(prog='semantic-pdf-diff', usage='%(prog)s COMMAND [options]')
-    help_text(parser, START_HELP.format(base_url=default('base_url'), model=default('model')), commands)
+    help_text(parser, START_HELP.format(base_url=default('base_url')), commands)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}',
                         help="show the program's version and exit")
     return parser
@@ -317,6 +318,8 @@ def compare_command(argv, client=None):
     settings = load_settings(args, layer)
     options = RunOptions.from_args(args, layer)
     check_fixture(options)  # before the store is changed
+    if client is None and not options.dry_run:
+        require_model(settings, options)
     with Store(args.store) as store:
         if client is None and not options.fixture:
             from .pipeline import cache_of

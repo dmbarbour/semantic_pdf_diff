@@ -71,8 +71,9 @@ class ConfigTest(unittest.TestCase):
         self.store = Path(temp.name) / "store"
 
     def test_every_check_passes_against_a_working_endpoint(self):
-        with endpoint() as url, user_settings({"rerank_model": "Qwen/Qwen3-Reranker-8B", "rerank_api": "tei",
-                                               "rerank_url": url + "/rerank", "embed_model": "toy"}):
+        with endpoint() as url, user_settings({"model": "gemma-4", "rerank_model": "Qwen/Qwen3-Reranker-8B",
+                                               "rerank_api": "tei", "rerank_url": url + "/rerank",
+                                               "embed_model": "toy"}):
             code, out = run("config", "test", "--store", self.store)
         self.assertEqual(code, 0, out)
         self.assertIn(f"checking gemma-4 at {url}", out)
@@ -86,7 +87,7 @@ class ConfigTest(unittest.TestCase):
         self.assertFalse(self.store.exists())  # a check makes no store
 
     def test_a_failed_check_exits_5_saying_what_failed(self):
-        with endpoint(listed=("other-model",), misread=True), user_settings({"retries": 0}):
+        with endpoint(listed=("other-model",), misread=True), user_settings({"model": "gemma-4", "retries": 0}):
             code, out = run("config", "test", "--store", self.store)
         self.assertEqual(code, checkup.FAILED)
         self.assertIn("  endpoint  FAILED: 1 models listed, not gemma-4 (`config models WORDS` lists those like it)",
@@ -95,6 +96,17 @@ class ConfigTest(unittest.TestCase):
         self.assertIn("  reranker  --: none set (rerank_model)", out)
         self.assertIn("  embedding --: none set (embed_model)", out)
         self.assertTrue(out.endswith("2 check(s) failed: endpoint, image\n"))
+
+    def test_no_model_set_fails_and_says_how_to_set_one(self):
+        with endpoint(), user_settings({}):
+            code, out = run("config", "test", "--store", self.store)
+        self.assertEqual(code, checkup.FAILED)
+        self.assertIn("checking no model at", out)
+        self.assertIn("  endpoint  ok: 2 models listed\n", out)
+        self.assertIn("  model     FAILED: none set: `config set --user model NAME` names one (`config models vision` "
+                      "lists those reading images)", out)
+        self.assertIn("  json      --: skipped: no model is set", out)
+        self.assertTrue(out.endswith("1 check(s) failed: model\n"))
 
     def test_a_reranker_not_served_where_asked_says_where(self):
         with endpoint() as url, user_settings({"rerank_model": "m", "retries": 0}):  # the stub serves tei's at /rerank
@@ -119,6 +131,27 @@ class ConfigTest(unittest.TestCase):
             pixmap = pymupdf.Pixmap(str(path))
         self.assertRegex(code, r"^[A-HJ-NP-Z]{3}-\d{4}$")
         self.assertEqual((pixmap.width, pixmap.height), (400, 120))
+
+class NoModel(unittest.TestCase):
+    def test_a_comparison_without_a_model_stops_listing_those_reading_images(self):
+        listed = [{"id": f"vision-{k:02}", "metadata": {"context_length": 8192, "tags": ["vision"]}}
+                  for k in range(20)] + [{"id": "text-only", "metadata": {"tags": ["chat"]}}]
+        with endpoint(listed=listed), tempfile.TemporaryDirectory() as d, user_settings({}):
+            (Path(d) / "a.txt").write_text("Pump rated power 10 kW")
+            (Path(d) / "b.txt").write_text("Pump rated power 12 kW")
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+                code = cli.main(["compare", str(Path(d) / "a.txt"), str(Path(d) / "b.txt"), "--store",
+                                 str(Path(d) / "out")])
+            made = (Path(d) / "out").exists()
+        said = err.getvalue().splitlines()
+        self.assertEqual((code, made), (1, False))  # stopped before the store is made
+        self.assertEqual(said[0], "Error: No model is set: `semantic-pdf-diff config set --user model NAME` names "
+                                  "one for every store (`config set model NAME` for one store, --model for one run).")
+        self.assertRegex(said[1], r"^The endpoint at http://127\.0\.0\.1:\d+/v1 lists 21 models; these 20 read "
+                                  r"images:$")
+        self.assertEqual(said[2], "  vision-00  8,192 tokens  vision")
+        self.assertEqual(len(said), 2 + 15 + 1)
+        self.assertEqual(said[-1], "  and 5 more: `semantic-pdf-diff config models vision`")
 
 class ConfigModels(unittest.TestCase):
     def test_the_endpoints_models_those_in_use_marked(self):

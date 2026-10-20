@@ -22,9 +22,11 @@
    - The requests not yet sent aren't attempted and aren't recorded as failed: the next run asks them again.
    - The run pauses as the cost cap pauses it: what was read is kept and the report written. The pause names the URL, the error and `config test`, and the run exits 5.
    - **Tested** on a stub refusing every request (HTTP 404): of 80 pages, 25 to 39 requests are sent (those in flight when the 25th fails are sent too), the run exits 5 saying why, and run again against a working endpoint it reads every page.
-2. **No default model:** `model` is unset until the user sets it.
+2. **No default model** (done 2026-10-20): `model` is unset until the user sets it.
    - A command that would ask the model without one stops before anything is changed.
    - The error names `config set --user model NAME` and lists the endpoint's vision models (from `/models`), or all its models where none says what it reads.
+   - It lists 15, by name, then how many more and `config models vision`: on DeepInfra, 53 of its 177 models read images. A replay (`--fixture` in `replay` mode) needs none; `config test` fails a `model` check.
+   - The tests name a model as a user names one: `gemma-4` in their own user settings (tests/stubs.py).
 3. **`config models` says what each model is** (done 2026-10-20), where the endpoint says: its context window, its price, and whether it reads images or embeds.
    - `config models WORDS` filters the list by name or tag (`config models vision`); `--json` gives every field for tools.
    - Read from DeepInfra's `metadata` (context, price a million tokens, tags), vLLM's `max_model_len`, and OpenRouter's fields (price a token, images among the inputs).

@@ -28,8 +28,9 @@ _L = "levers"  # every lever setting's group
 
 HELP = {
     # --- endpoint
-    "model": Help("endpoint", "the vision model's name at the endpoint ($OPENAI_BASE_URL)",
-                  "Every answer depends on it: a store read with one model reads again with another.",
+    "model": Help("endpoint", "the vision model's name at the endpoint ($OPENAI_BASE_URL); none by default",
+                  "A run needs one: `config models vision` lists the endpoint's models reading images. Every answer "
+                  "depends on it: a store read with one model reads again with another.",
                   "google/gemma-4-31B-it", basic=True),
     "base_url": Help("endpoint", "the OpenAI-compatible endpoint, with /v1 where it needs it",
                      "Set by $OPENAI_BASE_URL (or --base-url), not kept in a store: the endpoint is the user's.",

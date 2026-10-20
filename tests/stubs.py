@@ -22,6 +22,10 @@ os.environ["XDG_CONFIG_HOME"] = _CONFIG
 from semantic_pdf_diff import settings as _settings  # noqa: E402
 # a test clearing the environment (patch.dict(..., clear=True)) still reads the empty folder's, not ~/.config's
 _settings.user_path = lambda: Path(os.environ.get("XDG_CONFIG_HOME") or _CONFIG) / "semantic-pdf-diff" / "settings.json"
+# ...where a model is named, as a user names one (`config set --user model`): there's no default (2026-10-20). The stub
+# models answer whatever model is asked; "gemma-4" is the name the tests were written with.
+USER = {"model": "gemma-4"}
+_settings.save_user_settings(USER)
 # Nor the developer's answers cache (settings.cache_path): each store keeps its own in tests, as stores once did, so a
 # test's stub answers never reach another's (per_user_cache is the product's, for the tests of the cache itself).
 os.environ["SEMANTIC_PDF_DIFF_CACHE"] = os.path.join(_CONFIG, "cache")
@@ -31,13 +35,13 @@ _pipeline.answers_cache = lambda store: _fixtures.open(store.folder / "answers.s
 
 @contextlib.contextmanager
 def user_settings(values):
-    """The user's settings (`config set --user`) as given, for the block."""
-    from semantic_pdf_diff.settings import save_user_settings, user_path
+    """The user's settings (`config set --user`) as given, for the block; the tests' own (USER) after it."""
+    from semantic_pdf_diff.settings import save_user_settings
     save_user_settings(values)
     try:
         yield
     finally:
-        user_path().unlink(missing_ok=True)
+        save_user_settings(USER)
 
 # A quick run for iterating (QUICK=1 python -m unittest discover -s tests): the slowest tests skipped, about two thirds
 # of the time (docs/plans/quick-wins-2026-10-02.md). Every commit is still checked by the full suite.

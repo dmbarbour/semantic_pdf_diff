@@ -107,6 +107,29 @@ def models(settings, api_key=""):
     """The endpoint's models' ids (listed's order)."""
     return [m.id for m in listed(settings, api_key)]
 
+SHOWN = 15  # the models a missing model's error lists at most
+
+def unset_model(settings):
+    """What a run needing the model says when none is set: how to set one, and the endpoint's models reading images
+    (all its models, where it says nothing of what they read), as `config models` lists them."""
+    from .llm import redact_url
+    said = ["No model is set: `semantic-pdf-diff config set --user model NAME` names one for every store "
+            "(`config set model NAME` for one store, --model for one run)."]
+    where = f"The endpoint at {redact_url(settings.base_url)}"
+    try:
+        found = listed(settings, os.getenv("OPENAI_API_KEY", ""))
+    except (OSError, ValueError) as e:
+        return "\n".join(said + [f"{where} can't be asked for its models ({type(e).__name__}: {e})."])
+    seeing = [m for m in found if m.reads_images]
+    shown = seeing or found
+    if not found:
+        return "\n".join(said + [f"{where} lists no models."])
+    said.append(f"{where} lists {len(found)} models" + (f"; these {len(seeing)} read images:" if seeing else ":"))
+    said += ["  " + line for line in table(shown[:SHOWN])]
+    if len(shown) > SHOWN:
+        said.append(f"  and {len(shown) - SHOWN} more: `semantic-pdf-diff config models{' vision' if seeing else ''}`")
+    return "\n".join(said)
+
 def used(settings):
     """{model id: the settings naming it}: what the configuration asks."""
     out = {settings.model: ["model"]}
@@ -148,6 +171,8 @@ def run(settings, rng=None):
 
     def endpoint():  # the chat model only: a reranker or an embedding model may be served apart, and is asked below
         listed.extend(models(settings, key))
+        if not settings.model:
+            return bool(listed), f"{len(listed)} models listed"
         if settings.model not in listed:
             return False, (f"{len(listed)} models listed, not {settings.model} (`config models WORDS` lists those "
                            "like it)")
@@ -160,12 +185,15 @@ def run(settings, rng=None):
         checks[-1] = Check("endpoint", None, "lists no models: " + checks[-1].said, checks[-1].seconds)
     if not key and not is_local(settings.base_url):
         checks.append(Check("key", None, "OPENAI_API_KEY isn't set (a local server may need none)"))
+    if not settings.model:
+        checks.append(Check("model", False, "none set: `config set --user model NAME` names one (`config models "
+                                            "vision` lists those reading images)"))
 
     def answer():
         a, b = rng.randint(11, 89), rng.randint(11, 89)
         got = client.ask(f'Add {a} and {b}. Return only the JSON object {{"sum": N}}.', Sum)
         return got.sum == a + b, f"{a} + {b} = {got.sum}" + ("" if got.sum == a + b else f", not {a + b}")
-    checks.append(_timed("json", answer))
+    checks.append(_timed("json", answer) if settings.model else Check("json", None, "skipped: no model is set"))
 
     def image():
         with tempfile.TemporaryDirectory(prefix="semantic-pdf-diff-check-") as folder:
@@ -174,8 +202,8 @@ def run(settings, rng=None):
                              '{"code": "..."} with the code exactly as written.', Code, images=(path,))
         read = "".join(got.code.split()).upper()
         return read == code, f'read "{got.code}"' + ("" if read == code else f', not "{code}"')
-    checks.append(_timed("image", image) if settings.vision else
-                  Check("image", None, "not checked: vision is off"))
+    checks.append(Check("image", None, "skipped: no model is set") if not settings.model else
+                  _timed("image", image) if settings.vision else Check("image", None, "not checked: vision is off"))
 
     def reranker():
         ranking = _asked(rerank_request(settings, "The rated power of the feed pump.",
@@ -215,7 +243,7 @@ def _unreachable(said):
 def lines(settings, checks, cost):
     """`config test`'s report: what was checked, each check, what it cost, and how many failed."""
     from .llm import redact_url
-    out = [f"checking {settings.model} at {redact_url(settings.base_url)}"]
+    out = [f"checking {settings.model or 'no model'} at {redact_url(settings.base_url)}"]
     out += [c.line() for c in checks]
     failed = [c.name for c in checks if c.ok is False]
     out.append(f"cost: ${cost:.4f}, as the provider reports it")

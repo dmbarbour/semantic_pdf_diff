@@ -103,6 +103,8 @@ def compare_paths(a, b, out, settings, options=None, client=None):
     budget, 5 paused for requests failing in a row)."""
     options = options or RunOptions()
     check_fixture(options)  # before the sources are declared in the store
+    if client is None:
+        require_model(settings, options)
     with Store(out) as store:
         if client is None and not options.fixture:
             cache_of(store, bind=False)  # and a cache that would be refused
@@ -135,6 +137,14 @@ def check_fixture(options):
         except fixtures.FixtureError as e:
             raise ValueError(str(e)) from e
 
+def require_model(settings, options):
+    """A run that would ask the model needs one named, there being no default (the owner, 2026-10-20: "remove the
+    "gemma-4" default model, just error if one isn't configured"): stopped before the store changes, saying how to
+    name one and what the endpoint serves (checkup.unset_model). A replay asks nothing."""
+    if not settings.model and options.answers_mode != 'replay':
+        from .checkup import unset_model
+        raise ValueError(unset_model(settings))
+
 def attach_ledger(client, options):
     if options.ledger:
         from .ledger import Ledger
@@ -152,9 +162,11 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
     (write_evidence), compared and reported (compare_and_report). Returns the exit code: 0, 2 incomplete, 3 paused for
     budget, 5 paused for requests failing in a row. client: a model client to use (a caller's, kept open); by default
     one made from the options (code review 2026-10-08, C6: run did all six jobs, and tests patched its client in)."""
+    own = client is None
+    if own and not options.dry_run:
+        require_model(settings, options)
     interpreter = extraction_interpreter(settings)
     triage = triage_interpreter(settings) if settings.situate else None
-    own = client is None
     if options.dry_run:
         if own and not options.fixture:
             cache_of(store, bind=False)  # a run that would be refused says so

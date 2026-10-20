@@ -25,7 +25,9 @@ class RateRule(Strict):
 class Endpoint(Strict):
     """How requests travel, budgets and limits: never what a query says, so never part of a configuration
     (levers.Platform). The model is the exception: its answers depend on it, so every role binds it."""
-    model: Annotated[str, Declared("endpoint", EVERY_ROLE)] = "gemma-4"
+    # None by default: a run asking the model needs one named (the owner, 2026-10-20: "remove the "gemma-4" default
+    # model, just error if one isn't configured"); pipeline.require_model says how, and what the endpoint serves.
+    model: Annotated[str, Declared("endpoint", EVERY_ROLE)] = ""
     base_url: Annotated[str, Declared("endpoint")] = "http://localhost:8000/v1"
     # A safety stop against runaway runs, not a budget: throughput is governed by rate_limits.
     max_calls: Annotated[int, Declared("endpoint")] = Field(default=100_000, ge=1)
