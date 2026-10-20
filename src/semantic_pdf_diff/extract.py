@@ -11,7 +11,7 @@ import pymupdf
 
 from . import keyvalue
 from .context import Context
-from .pages import native, native_page, reading_blocks, shown
+from .pages import native, native_page, on_crop, reading_blocks, shown
 from .regions import crop_name, crop_stem
 from .schema import DerivationStep, PdfLocator, coverage_row
 from .sections import pdf_sections
@@ -385,7 +385,8 @@ class PdfTable:
             detail = "the table's cells, on its grid" + (f"; its structure {step.detail}" if step else "")
             source = DerivationStep(step="pdf-table-detection", detail=detail[:400])
             tablerules.read(r.core, number, ruled, f"rules:p{number}:{tag}", read,
-                            source if checked is None else [source, checked], image=self.image())
+                            source if checked is None else [source, checked], image=self.image(),
+                            mark=partial(on_crop, self.page, self.displayed))
         elif ruled is not None and ruled.rows:  # without rules: the grid's rows, and possible notes
             for key in ruled.keys + [row.key for row in tablegrid.possible_notes(ruled)]:
                 read(key)

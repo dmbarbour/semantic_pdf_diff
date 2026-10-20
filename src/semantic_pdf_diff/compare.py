@@ -109,7 +109,7 @@ HEDGED = ("Hedge changed, found without a model: the same value, stated \"{a}\" 
 
 # Provenance stays out of the model's view; it sees the claims and any source crops.
 PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences",
-                     "position", "records", "printed"}
+                     "position", "records", "printed", "mark"}
 
 # With the judge_context lever: each claim's context records shown, and subject, scope and frame ruled on apart
 # (schema.RuledJudgment; docs/plans/claim-context-2026-10-14.md, milestone 4, design question 4).

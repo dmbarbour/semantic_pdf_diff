@@ -355,6 +355,36 @@ class ExtractionTests(unittest.TestCase):
                                              Recorder(respond, tile_points=1000))
                 self.assertEqual([e.quote_verified for e in evidence], [expected])
 
+    def test_a_visual_claim_is_marked_on_its_crop_where_its_quote_is(self):
+        # portable reports, milestone 4: the text block quoting it, as fractions of the crop, in its orientation
+        import pymupdf
+        from semantic_pdf_diff.pages import shown
+        for rotation in (0, 90):
+            def build(page):
+                page.insert_text((40, 40), 'Pump 10 kW')
+                page.set_rotation(rotation)  # noqa: B023 (called at once)
+            def respond(source, prompt):
+                claims = [{**GOOD, 'kind': 'chart', 'quote': '10 kW'}] if source == 'overview' else []
+                return Extraction(claims=claims, complete=True)
+            with self.subTest(rotation=rotation), tempfile.TemporaryDirectory() as d:
+                path = pdf(Path(d)/'t.pdf', build, width=400, height=300)
+                evidence, _ = extract_pdf(path, CID, Path(d), Recorder(respond, tile_points=1000))
+                page = pymupdf.open(str(path))[0]
+                block = shown(page, page.get_text('blocks')[0][:4])
+                w, h = page.rect.width, page.rect.height
+                self.assertEqual(evidence[0].mark, (round(block.x0 / w, 3), round(block.y0 / h, 3),
+                                                    round(block.x1 / w, 3), round(block.y1 / h, 3)))
+
+    def test_a_claims_mark_is_never_shown_to_the_judge(self):
+        # a mark is for reports: shown to the judge, it changed every marked claim's query (and missed its answer)
+        from semantic_pdf_diff.compare import pair_request
+        from semantic_pdf_diff.settings import Settings
+        from test_pipeline import ev
+        a, b = ev('A-1', mark=(0.1, 0.2, 0.3, 0.4)), ev('B-1')
+        marked, _, payload, _ = pair_request(Settings(), 'revisions', a, b)
+        self.assertNotIn('mark', payload[0])
+        self.assertEqual(marked, pair_request(Settings(), 'revisions', ev('A-1'), b)[0])
+
     def test_rotated_page_bboxes_are_unrotated(self):
         def build(page):
             page.insert_text((40, 40), 'Pump rated power 10 kW')

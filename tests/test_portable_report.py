@@ -15,7 +15,7 @@ from pathlib import Path
 from unittest import mock
 from semantic_pdf_diff import crops
 from semantic_pdf_diff.report import unpacked, write_report
-from semantic_pdf_diff.schema import FileRef, Source
+from semantic_pdf_diff.schema import FileRef, PdfLocator, Source
 from test_pipeline import ev
 
 def noise(path, side, seed=0):
@@ -165,6 +165,23 @@ class OneFile(unittest.TestCase):
         self.assertNotIn("groupings", metadata)
         self.assertIn("How the revisions were grouped", shown)  # shown in its own place
         self.assertIn("PDF bbox [0.0, 0.0, 100.0, 100.0]", shown)
+
+    def test_a_claim_is_marked_on_its_crop_and_a_rules_claim_shows_its_tables(self):
+        # milestone 4: a claim's place on its crop marked; a table claim read by rules shown on the table's crop its
+        # task recorded (the owner: "small tables")
+        a = ev("A-1", kind="chart", image=noise(self.assets / "tile.png", 40), mark=(0.1, 0.2, 0.5, 0.4))
+        row = ev("A-2", kind="table", attribute="flow", quote_verified=True,
+                 locator=PdfLocator(page=1, bbox=(0, 0, 10, 10), region="table", task="rules:p1:0"))
+        b, c = ev("B-1"), ev("B-2", attribute="flow")
+        data = report([a, b, row, c], [finding(a, b, "different"), finding(row, c, "different")])
+        data["coverage"] = [{"content": row.content, "page": 1, "bbox": [0, 0, 100, 100], "task": "rules:p1:0",
+                             "image": noise(self.assets / "rules.png", 30, 5), "status": "complete", "issues": [],
+                             "claims": 1}]
+        account = write_report(data, self.root / "out", assets=self.assets)
+        self.assertEqual(sorted(c.image for c in account.wanted), ["assets/rules.png", "assets/tile.png"])
+        shown = unpacked((self.root / "out" / "report.html").read_text())
+        self.assertIn('<i class="mark" style="left:10.0%;top:20.0%;width:40.0%;height:20.0%"></i></span>', shown)
+        self.assertIn('alt="The table its rules were written from"', shown)
 
     def test_budgets_on_the_command_line(self):
         import argparse

@@ -87,7 +87,7 @@ class Pdf(unittest.TestCase):
             path = Path(d) / "t.pdf"
             doc.save(path)
             client = Client()
-            _, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+            self.evidence, coverage = extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
         return client, coverage
 
     def rows(self, client):
@@ -130,6 +130,21 @@ class Pdf(unittest.TestCase):
         self.assertEqual(sorted(self.rows(client)), [4])  # the note alone read by itself
         rules_row = next(r for r in coverage if r["task"] == "rules:p1:0")
         self.assertEqual(rules_row["claims"], 3)
+
+    def test_a_claim_read_by_rules_is_marked_on_the_tables_crop(self):
+        # portable reports, milestone 4 (the owner: "small tables"): the crop its rules were written from, recorded
+        # with the task, and the claim's row marked on it, as fractions of the crop
+        rules = {"reading": "rules", "claims": [{"entity": "{A}", "attribute": "flow", "value": "{C}", "unit": "L/s",
+                                                 "number": True}],
+                 "examples": [{"row": "2", "claims": [{"entity": "P-1", "attribute": "flow", "value": "120",
+                                                       "unit": "L/s"}]}]}
+        _, coverage = self.extract(rules=0, answer=rules)
+        row = next(r for r in coverage if r["task"] == "rules:p1:0")
+        self.assertTrue(row["image"].startswith("assets/") and row["image"].endswith("-rules-p1-0.png"), row)
+        p1 = next(e for e in self.evidence if e.entity == "P-1")
+        self.assertIsNone(p1.image)  # not an image the claim was read from: the judge isn't sent it
+        x0, y0, x1, y1 = BOXES[1]  # P-1's row, on the table's box (20, 40, 280, 124)
+        self.assertEqual(p1.mark, (0.0, round((y0 - 40) / 84, 3), 1.0, round((y1 - 40) / 84, 3)))
 
 class Sheet(unittest.TestCase):
     def test_a_sheets_note_is_proposed_and_read_when_confirmed(self):

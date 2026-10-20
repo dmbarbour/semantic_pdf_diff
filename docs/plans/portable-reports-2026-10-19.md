@@ -87,7 +87,11 @@
      - **Without the model, or when it fails:** the most even candidate, labelled by its words.
      - **Shown when the search box is empty,** as topics with counts, each a filter.
    - **Measured** by the share of cards in a topic, how even the topics are, whether each holds both sources, and a model panel's judgement of the names and groups (as cameo_ingest's three judges did).
-4. **More value per byte:** crops for tables read by rules (rendered already, not attached to their claims; the owner: "small tables"); tighter crops where an image claim's quote is found in the page's text layer, its box marked on the tile.
+4. **More value per byte** (done 2026-10-20): crops for tables read by rules (rendered already, not attached to their claims; the owner: "small tables"); tighter crops where an image claim's quote is found in the page's text layer, its box marked on the tile.
+   - **Marked, not cut:** a claim's place on its crop is marked (`mark` on the evidence: fractions of the crop, in its orientation), not cropped tighter, so the crop stays one image however many claims it holds and keeps its context. An image claim is marked where the text block quoting it is (the block that already placed it in its section); a table claim read by rules, its row.
+   - **Table crops:** a rules task's coverage rows record the crop its rules were written from; a rules-read claim shows it, its row marked. The claim's own `image` stays empty, so `verify_visuals` doesn't send the table to the judge.
+   - **Kept from the judge:** `mark` is provenance; shown to the judge it changed every marked claim's query (a strict replay of the 25 pairs missed 86 answers before it was excluded).
+   - **Measured** on the 25-pair comparison, extracted again by replay ($0): 1,584 of 2,210 claims marked (every rules-read row; image claims whose quotes are in the text); 252 of 252 rules tasks with their crop; the report 4.4 → 5.5 MB with 66 table crops more (284 crops, all within the default budget).
 
 ## Proposed, awaiting the owner
 

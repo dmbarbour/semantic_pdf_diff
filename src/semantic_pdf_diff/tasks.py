@@ -173,6 +173,7 @@ class Task:
     origin: str | None = None
     leading: dict | None = field(default=None, repr=False)
     position: object = None  # position(quote) -> the Position of the block a text claim's quote is in
+    mark: object = None  # mark(box) -> where a claim placed at box sits on the task's crop (pages.on_crop), or None
     stance: tuple = ()  # the Links holding every claim it reads (a table row's holder: the table_holders lever)
     view: object = None  # a Claim: the view its row's yes-or-no cell states, kept if the reader gives none (view_rows)
 
@@ -414,6 +415,7 @@ class TaskCore:
                     continue  # the same claim twice in one response: keep the first
                 where = tuple(locate(claim.quote) if locate else bbox)
                 spot = place(claim.quote) if place else where
+                mark = made.mark(spot) if made.mark and place and spot is not None else None
                 home = self.sections.box(page_no, spot).id if spot is not None else section.id
                 records = [*self.reach.get(page_no, ()), *([position.list] if position and position.list else [])]
                 found.append(Evidence(**claim.model_dump(), id=eid, content=content, section=home,
@@ -421,7 +423,7 @@ class TaskCore:
                                       derivation=(derivation or self.derivation[region]) + (
                                           [VIEW_COLUMN] if claim_read is made.view else []), image=image,
                                       quote_verified=verified, position=position, records=records,
-                                      printed=s.printed_name(claim) if verified else ""))
+                                      printed=s.printed_name(claim) if verified else "", mark=mark))
                 row["claims"] += 1
 
         self.progress.add()

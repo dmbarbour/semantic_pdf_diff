@@ -2,9 +2,11 @@
 tile refined in halves. For the PDF job and a Word document's pictures. Split from extract.py (code review
 2026-10-08, A12).
 """
+from functools import partial
+
 import pymupdf
 
-from .pages import native
+from .pages import native, on_crop
 from .quotes import covered
 from .regions import crop_name, region_of
 from .tasks import Task
@@ -61,7 +63,7 @@ class Visuals:
         self.core.consume(Task(page_no, native_rect if box is None else box, tag, source, "assets/" + name, check=check,
                                place=place, crop=(tuple(round(v, 3) for v in rect), side), context=context,
                                extra_images=extra, derivation=derivation, continued=tuple(continued),
-                               noted=tuple(noted),
+                               noted=tuple(noted), mark=partial(on_crop, page, rect) if box is None else None,
                                then=lambda status, done: self.refine(page_no, page, tag, rect, depth, status, kept,
                                                                      box, derivation, done)))
 

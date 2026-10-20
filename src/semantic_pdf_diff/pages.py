@@ -36,6 +36,18 @@ def native(page, rect):
     """A displayed rectangle in the page's unrotated coordinates (what locators record)."""
     return pymupdf.Rect(rect) * _matrices(page)[1]
 
+def on_crop(page, rect, box):
+    """Where a box (unrotated page coordinates) sits on a crop of rect (displayed coordinates, as rendered): its
+    left, top, right and bottom as fractions of the crop's width and height, three decimals; None when it's outside
+    the crop or covers most of it (marking it would say nothing). Reports mark claims with it (portable reports,
+    milestone 4)."""
+    rect = pymupdf.Rect(rect)
+    seen = shown(page, box) & rect
+    if seen.is_empty or rect.is_empty or seen.get_area() >= 0.8 * rect.get_area():
+        return None
+    return (round((seen.x0 - rect.x0) / rect.width, 3), round((seen.y0 - rect.y0) / rect.height, 3),
+            round((seen.x1 - rect.x0) / rect.width, 3), round((seen.y1 - rect.y0) / rect.height, 3))
+
 def native_page(page):
     """The whole page in its unrotated coordinates."""
     return page.rect * _matrices(page)[1]

@@ -71,11 +71,11 @@ def groups(findings, unmatched, shared):
         put(eid, 2)
     return best
 
-def wanted(evidence, findings, unmatched, shared, label, exists):
+def wanted(evidence, findings, unmatched, shared, label, exists, crop_of=lambda e: e.get("image")):
     """Every crop the report's claims show, in the order they're embedded: by group, then the files taking turns
     (so one large drawing set can't take a group's share), each file's pictured claims first, then the report's order.
     evidence: {id: claim dict}; label(claim): how people find it; exists(image): whether the store still has it (a
-    crop it lost is shown missing, never wanted)."""
+    crop it lost is shown missing, never wanted); crop_of(claim): its crop (its image, or its task's)."""
     best = groups(findings, unmatched, shared)
     order = {}
     for eid in [x for f in findings for x in (f["a"], f["b"])] + [u["id"] for u in unmatched] + list(shared):
@@ -83,13 +83,14 @@ def wanted(evidence, findings, unmatched, shared, label, exists):
     crops = {}
     for eid, g in best.items():
         e = evidence.get(eid)
-        if not e or not e.get("image") or not exists(e["image"]):
+        image = crop_of(e) if e else None
+        if not image or not exists(image):
             continue
         pictured = e["kind"] in PICTURED or e.get("quote_verified") is not True
-        c = crops.get(e["image"])
-        mine = Crop(e["image"], g, pictured, order[eid], label(e), e["content"])
+        c = crops.get(image)
+        mine = Crop(image, g, pictured, order[eid], label(e), e["content"])
         if c is None or mine.key < c.key:
-            crops[e["image"]] = mine
+            crops[image] = mine
     turns = Counter()
     for c in sorted(crops.values(), key=lambda c: c.key):
         c.turn = turns[c.group, c.content]

@@ -376,12 +376,17 @@ class Evidence(Claim):
     # the label beside its value ("Rated point > Capacity (gpm)", "retransmission timer"). Provenance, both.
     records: list[str] = Field(default_factory=list)
     printed: str = Field(default="", max_length=200)
+    # Where it sits on its crop (its image, or its task's: a table's its rules were written from), as fractions of
+    # the crop's width and height in the crop's orientation: the text block quoting it, a table claim's row. For
+    # reports only (portable reports, milestone 4); none, the whole crop or no crop.
+    mark: tuple[float, float, float, float] | None = None
 
     @model_serializer(mode="wrap")
     def _without_absent_context(self, handler):
         out = handler(self)  # none, no key: evidence written without the levers that fill them stays as it was
         if isinstance(out, dict):
-            for key, empty in (("frame", ""), ("position", None), ("records", []), ("printed", ""), ("stance", [])):
+            for key, empty in (("frame", ""), ("position", None), ("records", []), ("printed", ""), ("stance", []),
+                               ("mark", None)):
                 if out.get(key, empty) == empty:
                     out.pop(key, None)
         return out

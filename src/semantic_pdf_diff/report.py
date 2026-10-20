@@ -78,7 +78,10 @@ td,th{text-align:left;border-bottom:1px solid var(--line);padding:8px}
 select,input{padding:10px;border:1px solid var(--field);border-radius:6px;margin:8px;\
 background:var(--card);color:var(--fg)}
 pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{color:var(--accent)}
-img.crop{cursor:zoom-in}img.crop.full{max-height:none;cursor:zoom-out}.cut{color:var(--muted);font-size:13px}
+img.crop{cursor:zoom-in}img.crop.full{max-height:none;cursor:zoom-out}\
+.shot{position:relative;display:block;width:fit-content;max-width:100%;margin:14px auto}.shot img{margin:0}\
+.shot .mark{position:absolute;outline:2px solid var(--bad);outline-offset:2px;border-radius:2px;\
+pointer-events:none}.cut{color:var(--muted);font-size:13px}
 button.more,.topics button{padding:10px 16px;margin:8px 0;border:1px solid var(--field);border-radius:6px;\
 background:var(--card);color:var(--fg);cursor:pointer}.topics button{padding:6px 10px;margin:4px 2px}\
 .topics button.on{background:var(--accent);color:var(--card)}.topics button small{color:inherit;opacity:.7}
@@ -338,7 +341,8 @@ def report_page(data, stored, budget, note=''):
                 f"{loc.get('task', loc.get('region', ''))}: {e['entity']} — {e['attribute']}")
     account = crops.Account(budget, names={f['content']: where(f['content']) for f in data.get('files', [])})
     account.wanted = crops.wanted({e["id"]: e for e in data["evidence"]}, shown, data['unmatched'],
-                                  data.get('shared', []), label, lambda image: stored(image).exists())
+                                  data.get('shared', []), label, lambda image: stored(image).exists(),
+                                  crop_finder(data))
     mime, encode = crops.encoder()
     crops.encode(account.wanted, stored, encode)
     account.page = len(page_html(data, shown, stored, [], account, mime, note).encode())  # every crop left out
@@ -378,14 +382,25 @@ def browsing(data):
     return (way, {c['id']: t for c, t in zip(claims, way.placed) if t is not None},
             names or [topics.label(words) for words in way.topics])
 
-def crop_html(e, embedded, stored):
-    """A card's crop: its embedded image (enlarged by a click), or why it has none."""
-    image = e.get('image')
+def crop_finder(data):
+    """crop_of(claim): its crop, the image it was read from, else its task's (a table's its rules were written from:
+    the task's coverage row records it)."""
+    of_task = {(r['content'], r['task']): r['image'] for r in data.get('coverage', []) if r.get('image')}
+    return lambda e: e.get('image') or of_task.get((e['content'], e['locator'].get('task')))
+
+def crop_html(e, embedded, stored, crop_of):
+    """A card's crop: its embedded image (enlarged by a click), the claim marked on it where it's known, or why it
+    has none."""
+    image = crop_of(e)
     if not image:
         return ''
     if image in embedded:
-        return (f'<img class="crop" data-crop="{embedded[image]}" alt="The image the model read" '
-                'title="Click to enlarge">')
+        alt = "The image the model read" if e.get('image') else "The table its rules were written from"
+        mark = e.get('mark')
+        box = (f'<i class="mark" style="left:{mark[0]:.1%};top:{mark[1]:.1%};width:{mark[2] - mark[0]:.1%};'
+               f'height:{mark[3] - mark[1]:.1%}"></i>') if mark else ''
+        return (f'<span class="shot"><img class="crop" data-crop="{embedded[image]}" alt="{alt}" '
+                f'title="Click to enlarge">{box}</span>')
     if not stored(image).exists():
         return f"<p class='cut'>Crop not found in the store ({esc(image)}).</p>"
     return (f"<p class='cut'>Crop left out for the report's size budget ({esc(e['locator'].get('task', ''))}): "
@@ -395,7 +410,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     """report.html: its parts gzipped inside it (each card once), the chosen crops, and the script showing them;
     note above them (a split report's part says so)."""
     embedded = {c.image: i for i, c in enumerate(chosen)}
-    card = Cards(data, lambda e: crop_html(e, embedded, stored))
+    crop_of = crop_finder(data)
+    card = Cards(data, lambda e: crop_html(e, embedded, stored, crop_of))
     pairs = file_pairs(data)
     files = {c: i for i, c in enumerate(dict.fromkeys(x[1] for _, a, b in pairs for x in (a, b) if x and x[1]))}
     page = note + header_html(data, listed=len(pairs) <= 1) + crops_note(account)

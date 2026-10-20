@@ -760,12 +760,14 @@ def describe_rule(rule):
               for key, text in getattr(rule, name).items()]
     return "; ".join(parts)[:300]
 
-def read(core, page, g, task, by_itself, source, image=None):
+def read(core, page, g, task, by_itself, source, image=None, mark=None):
     """Read a table by rules: ask for them, check them (once more if they fail), and apply them; by_itself(key) reads
     one of the table's rows (a grid row's key, or a section row's that is a note) as a table row without rules, as
     the grid holds it. Possible notes (possible_notes) are read by themselves where the model names them as notes,
     and where there's no answer to say. source: the reader's first derivation step (or its steps, as a list). image:
-    the table's crop (a PDF's), sent with the query, which then copies a row from it to check the text layer."""
+    the table's crop (a PDF's), sent with the query, which then copies a row from it to check the text layer; the
+    task's coverage rows record it, and mark(box) says where each claim's row sits on it (pages.on_crop), for
+    reports (a claim's image stays the one it was read from: none, so the judge isn't sent the table)."""
     cols = analyse(g)
     if g.boxes:  # a PDF's rows: their own boxes
         span = (min(b[0] for b in g.boxes), min(b[1] for b in g.boxes), max(b[2] for b in g.boxes),
@@ -783,7 +785,7 @@ def read(core, page, g, task, by_itself, source, image=None):
         core.records[table.id] = table
 
     def record(name, status, issues, found=()):
-        row = coverage_row(content=core.content, page=page, bbox=list(span), task=name, status=status,
+        row = coverage_row(content=core.content, page=page, bbox=list(span), task=name, image=image, status=status,
                            issues=issues, claims=len(found))
         core.evidence.extend(found)
         core.record(row, list(found))
@@ -885,7 +887,7 @@ def read(core, page, g, task, by_itself, source, image=None):
                     *source_, DerivationStep(step="table-summary", detail=f"{template} template: {stat.detail}"
                                                                          + (", computed" if stat.computed else ""))],
                     approximate=stat.computed and stat.fields["attribute"].startswith("mean "),
-                    records=[table.id] if table else ()))
+                    records=[table.id] if table else (), mark=mark))
             return record(name, "complete", issues + [f"Summarised by the {template} template: {len(g.rows)} rows, "
                                                       f"{len(found)} claims{why}{read_notes(notes)}"[:500]], found)
         for i in range(len(g.rows)):
@@ -901,11 +903,12 @@ def read(core, page, g, task, by_itself, source, image=None):
                 found.append(_evidence(core, page, row_box(i), name, fields, quote, True, [
                     *source_, DerivationStep(step="table-rules", detail=describe_rule(rule))],
                     records=[table.id] if table else (),
-                    printed=printed_name(g, i, used, fields["value"]) if table else "", stance=stance))
+                    printed=printed_name(g, i, used, fields["value"]) if table else "", stance=stance, mark=mark))
             view = core.s.table_view(g.labels, g.rows[i], context)  # its yes or no, if no rule reads it (view_rows)
             if view is not None and not any(is_yes_no(fields["value"]) for fields, _, _ in made):
                 found.append(_evidence(core, page, row_box(i), name, view.model_dump(), view.quote, True,
-                                       [*source_, VIEW_COLUMN], records=[table.id] if table else (), stance=stance))
+                                       [*source_, VIEW_COLUMN], records=[table.id] if table else (), stance=stance,
+                                       mark=mark))
         for i in misfits:
             by_itself(g.keys[i])
         summary = (f"Read by rules: {len(g.rows) - len(misfits)} of {len(g.rows)} rows, {len(found)} claims"
@@ -929,7 +932,7 @@ def printed_name(g, i, used, value):
     return " | ".join(x for x in (section, label, g.labels[col].strip()) if x)[:200]
 
 def _evidence(core, page, box, task, fields, quote, verified, derivation, approximate=False, records=(), printed="",
-              stance=()):
+              stance=(), mark=None):
     from .schema import Claim
     claim = Claim(entity=fields["entity"][:160], attribute=fields["attribute"][:160], value=fields["value"][:300],
                   unit=fields["unit"][:40], conditions=fields["conditions"][:300], frame=fields.get("frame", "")[:200],
@@ -941,4 +944,4 @@ def _evidence(core, page, box, task, fields, quote, verified, derivation, approx
     home = core.sections.box(page, box).id
     return Evidence(**claim.model_dump(), id=claim_id(core.content, claim), content=core.content, section=home,
                     locator=core.locator(page, box, "table", task), derivation=derivation, quote_verified=verified,
-                    records=list(records), printed=printed)
+                    records=list(records), printed=printed, mark=mark(box) if mark else None)
