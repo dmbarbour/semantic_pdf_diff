@@ -39,9 +39,11 @@
 
 1. **The `cache` command** (done 2026-10-20): the actions above, their help, tests (copy filtered by store, every model's answers, owner-only folders; remove with keep, the removed answers' text gone from the file and its log; prune by stores and by age; dry runs; refusals), and docs (configuration, the README, decision 0032).
 
-## Proposed, awaiting the owner
-
-- **A store bound to its cache.** Today a shell without the export sends a sensitive project's answers into the home cache, which then needs marking.
-  - **Recommended:** the store records which cache its runs use: the one its first run used, or one named with `config set answers_cache PATH`, relative to the store.
-  - A run that would use another cache refuses, naming both; `config set answers_cache` moves it on purpose.
-  - A forgotten export then stops a run instead of mixing answers. (A first run made without it would still bind the home cache; `cache remove` and `config set` repair that.)
+2. **A store bound to its cache** (done 2026-10-20; proposed after milestone 1 because a shell without the export sent a sensitive project's answers into the home cache, which then needed marking; the owner: "Supporting a configurable cache makes sense. Please proceed with that").
+   - **The store records which cache its runs use** (`answers_cache`, a store's option like `report_budget`):
+     - The one its first run used ($SEMANTIC_PDF_DIFF_CACHE's, else the user's), or one named with `config set answers_cache PATH`.
+     - It's kept relative to the store where both sit in one project's folder (`../answers`), from `~` in the home folder, else absolute.
+   - **Later runs use it whatever the environment says:** a shell without the project's export still keeps the project's answers in the project's cache.
+   - **A run whose SEMANTIC_PDF_DIFF_CACHE names another cache is refused,** naming both, before the store changes (before its sources are declared or scanned). A dry run says so too.
+   - **`config set answers_cache PATH`** takes the path from the current folder. It says where the answers asked before stay, and the `cache copy` that brings them. `config set --user answers_cache` is refused: the user's cache is the variable's.
+   - **Still possible:** a store's first run made in the wrong shell binds the cache it used. `cache copy`, `cache remove` and `config set answers_cache` repair that.

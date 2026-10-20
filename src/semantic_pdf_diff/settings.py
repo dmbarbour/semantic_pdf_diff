@@ -128,6 +128,29 @@ def cache_path():
         os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache"), "semantic-pdf-diff")
     return Path(folder) / "answers.sqlite"
 
+def cache_file(path):
+    """An answers cache named as its folder (holding answers.sqlite) or as the file itself; ~ is the home folder."""
+    path = Path(path).expanduser()
+    return path if path.suffix in (".sqlite", ".zip") else path / "answers.sqlite"
+
+def located(value, folder):
+    """A store's answers_cache as the cache's file: a relative path is the store's folder's."""
+    path = Path(value).expanduser()
+    return cache_file(Path(os.path.abspath(path if path.is_absolute() else Path(folder) / path)))
+
+def recorded(path, folder):
+    """A cache's file as a store records it (answers_cache): its folder, relative to the store's where the two sit in
+    one project's folder (the project moves whole; not the home folder itself), from ~ in the home folder, else
+    absolute."""
+    path = Path(path).resolve()
+    where = path.parent if path.name == "answers.sqlite" else path
+    folder, home = Path(folder).resolve(), Path(os.path.expanduser("~")).resolve()
+    if where.is_relative_to(folder.parent) and folder.parent != home:
+        return os.path.relpath(where, folder)
+    if where.is_relative_to(home):
+        return str(Path("~") / where.relative_to(home))
+    return str(where)
+
 def save_user_settings(values):
     """The user's settings replaced (checked by the caller: configuration.applied)."""
     path = user_path()

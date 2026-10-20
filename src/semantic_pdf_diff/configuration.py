@@ -21,7 +21,8 @@ from .levers import REGISTRY, declared
 from .settinghelp import GROUPS, HELP
 
 # Options of a run kept as settings too: the comparison's mode and the report's.
-RUN_OPTIONS = {"mode": "proposals", "report_budget": DEFAULT_BUDGET, "split": False}
+# a store's own, not a run's settings: how it compares, its report, and where its answers are kept ("": not bound yet)
+RUN_OPTIONS = {"mode": "proposals", "report_budget": DEFAULT_BUDGET, "split": False, "answers_cache": ""}
 EXPORT_FORMAT = 1  # of `config export`'s JSON
 SWITCH = {"on": True, "true": True, "yes": True, "1": True, "off": False, "false": False, "no": False, "0": False}
 
@@ -65,6 +66,10 @@ def parse(name, text):
         return raw
     if name == "report_budget":
         return size(raw)
+    if name == "answers_cache":
+        if not raw:
+            raise ValueError("answers_cache is a folder (or an answers .sqlite file); `config unset` unbinds it")
+        return raw
     if name == "split":
         if raw.lower() not in SWITCH:
             raise ValueError(f"split is on or off, not {raw!r}")
@@ -106,6 +111,8 @@ def shown(name, value):
         return "on" if value else "off"
     if name == "report_budget":
         return f"{value / 1e6:g}MB" if value >= 1e6 or value == 0 else f"{value / 1e3:g}KB"
+    if name == "answers_cache" and not value:
+        return "none yet: the store's first run keeps the cache it uses"
     if isinstance(value, (list, dict)):
         return json.dumps(value, ensure_ascii=False)
     return str(value)
@@ -128,6 +135,8 @@ def resolved(layers):
 def redoes(name):
     """What changing a setting changes: the store's work its next run redoes (docs/plans/content-addressed-queries:
     each setting's class says what it can change)."""
+    if name == "answers_cache":
+        return "nothing read again: later answers are kept there (cache copy brings those asked before)"
     if name in RUN_OPTIONS:
         return "the comparison and its report" if name == "mode" else "the report only"
     d = declared(settings_class(), name)

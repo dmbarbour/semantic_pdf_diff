@@ -1,6 +1,7 @@
 # 0032. Settings in layers, four environment variables, and one answers cache per user
 
-- **Status:** Accepted (2026-10-20); amended 2026-10-20 (one name)
+- **Status:** Accepted (2026-10-20); amended 2026-10-20 (one name; a store bound to its cache)
+- **Amended 2026-10-20, a store bound to its cache** ([answers cache maintenance](../plans/answers-cache-maintenance-2026-10-20.md), milestone 2; the owner: "Supporting a configurable cache makes sense."): one cache per user stays the default, but a store records the cache its first run used (`answers_cache`) and keeps using it whatever the environment says. A run whose `SEMANTIC_PDF_DIFF_CACHE` names another is refused. The owner keeps sensitive projects' answers apart ("Can't even let it mix without marking home cache CUI or higher").
 - **Amended 2026-10-20:** one name for the command, the package, the folders and the variables (the owner: "We also should unify naming a bit. Right now, iirc, it's PDF_DIFF, pdf-semantic-diff, and semantic-pdf-diff. I'm fine with any one name, but three is a bit awkward."). The command `pdf-semantic-diff` is now `semantic-pdf-diff`, as the distribution, the package (`semantic_pdf_diff`), the user's folders and the files' formats were named already. The variables follow: `PDF_DIFF_STORE` and `PDF_DIFF_CACHE` are `SEMANTIC_PDF_DIFF_STORE` and `SEMANTIC_PDF_DIFF_CACHE`, the old names ignored with a warning (`settings.variable`); the owner's quote below keeps the names as said.
 - **Source:** [configuration in the store](../plans/configuration-in-the-store-2026-10-20.md), milestones 1 to 5; the [trials review](../reviews/trials-2026-10-08.md), finding 2
 

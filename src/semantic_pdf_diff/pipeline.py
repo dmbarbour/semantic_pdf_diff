@@ -104,6 +104,8 @@ def compare_paths(a, b, out, settings, options=None, client=None):
     options = options or RunOptions()
     check_fixture(options)  # before the sources are declared in the store
     with Store(out) as store:
+        if client is None and not options.fixture:
+            cache_of(store, bind=False)  # and a cache that would be refused
         names = declare_paths(store, out, [Path(a), Path(b)])
         return run(options, settings, store, names, Path(out), force_rescan=True, client=client)
 
@@ -151,15 +153,23 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
     2026-10-08, C6: run did all six jobs, and tests patched its client in)."""
     interpreter = extraction_interpreter(settings)
     triage = triage_interpreter(settings) if settings.situate else None
+    own = client is None
     if options.dry_run:
+        if own and not options.fixture:
+            cache_of(store, bind=False)  # a run that would be refused says so
         would = {'extract': bind(store, interpreter, reset=options.reset, dry_run=True)}
         if triage:
             would['triage'] = bind(store, triage, reset=options.reset, dry_run=True)
         print(json.dumps({'would_clear': would}, indent=2))
         return 0
-    prepare(options, settings, store, names, (interpreter, triage), force_rescan)
-    own = client is None
-    client = make_client(options, settings, store) if own else client
+    cache = answers_cache(store) if own and not options.fixture else None  # refused before the store changes
+    try:
+        prepare(options, settings, store, names, (interpreter, triage), force_rescan)
+    except BaseException:
+        if cache is not None:
+            cache.close()
+        raise
+    client = make_client(options, settings, store, cache) if own else client
     try:
         read = read_sources(store, client, settings, names, triage)
         document = write_evidence(store, names, read, {'extract': interpreter.model_dump(),
@@ -302,11 +312,34 @@ def restated(settings, earlier, later, records, left, right):
             for change in settings.changed_records({ca: records.get(ca, {})}, {cb: records.get(cb, {})}, left, right)]
 
 def answers_cache(store):
-    """The answers cache a run reads and records into: the user's (settings.cache_path), whatever the store. The
-    tests keep one in each store instead (tests/stubs.py), as stores once kept their own. Owner-only, as a store is:
-    its answers quote the documents (a folder named by $SEMANTIC_PDF_DIFF_CACHE is left as it is)."""
-    from .settings import cache_path
-    return open_cache(cache_path())
+    """The answers cache a run reads and records into: the store's (cache_of). The tests keep one in each store
+    instead (tests/stubs.py), as stores once kept their own. Owner-only, as a store is: its answers quote the
+    documents (a folder named by $SEMANTIC_PDF_DIFF_CACHE is left as it is)."""
+    return open_cache(cache_of(store))
+
+def cache_of(store, bind=True):
+    """The answers cache a store's runs use (docs/plans/answers-cache-maintenance-2026-10-20.md; the owner: "Supporting
+    a configurable cache makes sense"): the one it's bound to (answers_cache: set by its first run, or by `config set
+    answers_cache`), whatever the environment says. A store not bound yet is bound now to the cache in effect
+    ($SEMANTIC_PDF_DIFF_CACHE's, else the user's), unless bind is false. A run whose $SEMANTIC_PDF_DIFF_CACHE names
+    another cache is refused (ValueError), naming both: a shell without a project's export can't mix its answers into
+    another cache, nor a project's shell another store's into its own."""
+    from .settings import cache_file, cache_path, located, recorded, variable
+    own = store.own_settings()
+    named = variable("CACHE")
+    if own.get("answers_cache"):
+        path = located(own["answers_cache"], store.folder)
+        if named and cache_file(named).resolve() != path.resolve():
+            raise ValueError(f"{store.folder} keeps its answers in {path} (answers_cache), but SEMANTIC_PDF_DIFF_CACHE "
+                             f"names {cache_file(named)}: unset the variable for this store, or keep its answers there "
+                             f"from now on with `semantic-pdf-diff config set answers_cache {named} --store "
+                             f"{store.folder}`")
+        return path
+    path = cache_path()
+    if bind:
+        store.save_own_settings({**own, "answers_cache": recorded(path, store.folder)})
+        log.info(f"Answers cache: {path}, this store's from now on (answers_cache); a run with another refuses")
+    return path
 
 def open_cache(path):
     """An answers cache, open to record into: created owner-only if missing (its folder too)."""
@@ -316,7 +349,9 @@ def open_cache(path):
     os.chmod(path, 0o600)
     return cache
 
-def make_client(options, settings, store):
+def make_client(options, settings, store, cache=None):
+    """The run's model client: answers from a fixture (options.fixture), or the store's answers cache (cache, if
+    opened already: answers_cache)."""
     fixture = None
     if options.fixture:
         try:
@@ -330,7 +365,7 @@ def make_client(options, settings, store):
             import pymupdf
             fixture.note('pymupdf', pymupdf.VersionBind)
     if fixture is None:
-        return attach_ledger(Client(settings, store, cache=answers_cache(store)), options)
+        return attach_ledger(Client(settings, store, cache=cache or answers_cache(store)), options)
     fresh = list(options.fresh_regions)
     return attach_ledger(Client(settings, store, fixture=fixture, mode=options.answers_mode,
                                 responder=options.responder, fresh_regions=fresh, export=export), options)

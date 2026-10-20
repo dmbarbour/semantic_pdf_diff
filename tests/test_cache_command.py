@@ -12,6 +12,7 @@ import stat
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 from semantic_pdf_diff import cli, fixtures
 from semantic_pdf_diff.settings import cache_path
 from semantic_pdf_diff.store import Store
@@ -144,6 +145,79 @@ class Remove(unittest.TestCase):
         code, out, _ = run("cache", "prune", "--unused-since", "2026-06-01", "--cache", self.cache, "--force")
         self.assertIn("2 answers removed", out)
         self.assertEqual(sorted({q for q, _ in held(self.cache)[0]}), ["q1", "q2"])
+
+class Bound(unittest.TestCase):
+    """A store bound to its answers cache (the plan's proposal; the owner: "Supporting a configurable cache makes
+    sense."): its first run keeps the cache it used, later runs use it whatever the environment says, and a run whose
+    SEMANTIC_PDF_DIFF_CACHE names another is refused before the store changes."""
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name).resolve()
+        self.folder = self.root / "project" / "store"
+
+    def bound(self):
+        with Store(self.folder) as store:
+            return store.own_settings().get("answers_cache")
+
+    def test_the_first_run_binds_the_cache_in_effect_and_later_runs_keep_it(self):
+        from semantic_pdf_diff.pipeline import cache_of
+        project = self.root / "project" / "answers"
+        with patch.dict(os.environ, {"SEMANTIC_PDF_DIFF_CACHE": str(project)}), Store(self.folder) as store:
+            self.assertEqual(cache_of(store, bind=False), project / "answers.sqlite")
+            self.assertNotIn("answers_cache", store.own_settings())  # bind=False: nothing written
+            self.assertEqual(cache_of(store), project / "answers.sqlite")
+        self.assertEqual(self.bound(), "../answers")  # beside the store: the project moves whole
+        with patch.dict(os.environ, {}, clear=False), Store(self.folder) as store:
+            os.environ.pop("SEMANTIC_PDF_DIFF_CACHE", None)  # a shell without the project's export
+            self.assertEqual(cache_of(store), project / "answers.sqlite")
+        with patch.dict(os.environ, {"SEMANTIC_PDF_DIFF_CACHE": str(self.root / "home-cache")}), \
+                Store(self.folder) as store, self.assertRaises(ValueError) as refused:
+            cache_of(store)
+        self.assertIn(str(project / "answers.sqlite"), str(refused.exception))
+        self.assertIn("config set answers_cache", str(refused.exception))
+
+    def test_the_users_cache_is_kept_from_the_home_folder(self):
+        from semantic_pdf_diff.pipeline import cache_of
+        home = self.root / "home"
+        with patch.dict(os.environ, {"HOME": str(home)}), Store(self.root / "work" / "store") as store:
+            for name in ("SEMANTIC_PDF_DIFF_CACHE", "XDG_CACHE_HOME"):
+                os.environ.pop(name, None)
+            self.assertEqual(cache_of(store), home / ".cache" / "semantic-pdf-diff" / "answers.sqlite")
+            self.assertEqual(store.own_settings()["answers_cache"], "~/.cache/semantic-pdf-diff")
+
+    def test_config_sets_it_from_the_current_folder_and_says_where_the_old_answers_are(self):
+        with Store(self.folder) as store:
+            store.save_own_settings({"answers_cache": "../answers"})
+        here = os.getcwd()
+        os.chdir(self.root)
+        try:
+            code, out, _ = run("config", "set", "answers_cache", "project/other", "--store", "project/store")
+        finally:
+            os.chdir(here)
+        self.assertEqual(code, 0)
+        self.assertEqual(self.bound(), "../other")
+        self.assertIn("answers_cache = ../other", out)
+        self.assertIn(f"the answers asked before stay in {self.root / 'project' / 'answers' / 'answers.sqlite'}", out)
+        self.assertIn("cache copy", out)
+        code, _, err = run("config", "set", "answers_cache", "/x", "--user")
+        self.assertEqual(code, 1)
+        self.assertIn("answers_cache is a store's", err)
+        code, out, _ = run("config", "help", "answers_cache", "--store", self.folder)
+        self.assertIn("Later runs use it whatever the environment says", out)
+
+    def test_a_run_with_another_cache_is_refused_before_the_store_changes(self):
+        with Store(self.folder) as store:
+            store.save_own_settings({"answers_cache": "../answers"})
+        a, b = self.root / "a.pdf", self.root / "b.pdf"
+        for path in (a, b):
+            path.write_bytes(b"%PDF-1.4")
+        with patch.dict(os.environ, {"SEMANTIC_PDF_DIFF_CACHE": str(self.root / "elsewhere")}):
+            code, _, err = run("compare", a, b, "--store", self.folder)
+        self.assertEqual(code, 1)
+        self.assertIn("keeps its answers in", err)
+        with Store(self.folder) as store:
+            self.assertEqual(store.sources(), [])
 
 if __name__ == "__main__":
     unittest.main()

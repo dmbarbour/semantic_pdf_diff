@@ -109,6 +109,13 @@ HELP = {
     "topic_names": Help("comparing", "the model chooses the report's topics and names them, in one request",
                         "off: topics named by their words.", basic=True),
     # --- report
+    "answers_cache": Help("endpoint", "where this store's answers are kept: an answers cache's folder (or its .sqlite "
+                          "file); a relative path is the store's folder's",
+                          "Set by the store's first run to the cache it used ($SEMANTIC_PDF_DIFF_CACHE's, else the "
+                          "user's). Later runs use it whatever the environment says, and refuse when "
+                          "SEMANTIC_PDF_DIFF_CACHE names another, so a project's answers stay in its cache. A path "
+                          "given here is taken from the current folder. A store's only: the user's cache is "
+                          "$SEMANTIC_PDF_DIFF_CACHE's, else ~/.cache/semantic-pdf-diff.", "../answers", basic=True),
     "report_budget": Help("report", "report.html's size at most: its crops embedded in order of value until then",
                           "A size: 20MB, 500KB; 0 embeds no crop. `report --dry-run` says what a budget leaves out.",
                           "40MB", basic=True),

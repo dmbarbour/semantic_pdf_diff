@@ -314,6 +314,9 @@ def compare_command(argv, client=None):
     options = RunOptions.from_args(args, layer)
     check_fixture(options)  # before the store is changed
     with Store(args.store) as store:
+        if client is None and not options.fixture:
+            from .pipeline import cache_of
+            cache_of(store, bind=False)  # a cache other than the store's is refused before its sources change
         given = [named_or_path(store, args.store, s) for s in args.sources]
         paths = [g for g in given if isinstance(g, Path)]
         declared = iter(declare_paths(store, args.store, paths))
@@ -603,10 +606,6 @@ def cache_parser():
                                                             "a run missed requests, or most answers go")
     return parser
 
-def cache_file(path):
-    """An answers cache named on the command line: a folder holding answers.sqlite (made if missing), or the file."""
-    return path if path.suffix in ('.sqlite', '.zip') else path / 'answers.sqlite'
-
 def stores_queries(folders):
     """Every query the stores' runs asked, by hash (a store's answers, whichever cache holds them)."""
     from .store import Store
@@ -618,7 +617,7 @@ def stores_queries(folders):
 
 def cache_command(argv):
     from .pipeline import open_cache
-    from .settings import cache_path
+    from .settings import cache_file, cache_path
     from .store import StoreError
     args = cache_parser().parse_args(argv)
     path = cache_file(args.cache) if args.cache else cache_path()
@@ -824,8 +823,15 @@ def config_command(argv):
         value = configuration.parse(args.name, args.value) if args.action == 'set' else None
         if args.action == 'unset' and args.name not in configuration.HELP:
             raise configuration.unknown(args.name)
+        if args.name == 'answers_cache' and value and not args.user:  # from here, as the store will read it
+            from .settings import recorded
+            given = Path(value).expanduser()
+            value = value if value.startswith('~') or given.is_absolute() else recorded(given.resolve(), store)
         changes = {args.name: value}
         values = configuration.applied(own, changes)
+    if args.user and 'answers_cache' in changes:
+        raise ValueError("answers_cache is a store's: the user's cache is $SEMANTIC_PDF_DIFF_CACHE's, else "
+                         "~/.cache/semantic-pdf-diff")
     if args.user:
         save_user_settings(values)
         now = configuration.resolved([('user', values), ('store', Store.settings_of(store))])
@@ -844,6 +850,12 @@ def config_command(argv):
                                                                 ' (the store\'s)' if args.user and layer == 'store'
                                                                 else '')
               + (f"; the next run redoes: {configuration.redoes(name)}" if moved else ''))
+        before = configuration.resolved(layers)[name][0]
+        if name == 'answers_cache' and moved and before:
+            from .settings import located
+            old, new = located(before, store), (located(value, store) if value else 'NEW')
+            print(f"the answers asked before stay in {old}: `semantic-pdf-diff cache copy {old.parent} --store "
+                  f"{store} --cache {new}` brings them")
     return 0
 
 def environment():
