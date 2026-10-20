@@ -167,6 +167,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `record_changes` | `true` | post | record_changes | compare | - |
 | `judge_context` | `false` | shaping | judge_context | compare | - |
 | `topic_names` | `true` | selecting | topic_names | compare | - |
+| `search_names` | `false` | selecting | search_names | compare | - |
 | `rerank_model` | `null` | selecting | rerank | compare | - |
 | `rerank_api` | `"deepinfra"` | selecting | rerank | compare | - |
 | `rerank_url` | `null` | endpoint | rerank | - | - |

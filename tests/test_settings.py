@@ -63,6 +63,8 @@ NOT_EXERCISED = {
     **dict.fromkeys(('rerank_model', 'rerank_api', 'rerank_url', 'rerank_threshold'),
                     "a reranker's endpoint, which the stub model doesn't serve; proposals mode only "
                     '(tests/test_rerank.py)'),
+    'search_names': "asks the model after the comparison, for the report's search, which the stub doesn't answer "
+                    '(tests/test_search.py)',
     'topic_names': "needs claims of both sides splitting into two topics or more; the stub's documents make "
                    'one (tests/test_topics.py)',
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',

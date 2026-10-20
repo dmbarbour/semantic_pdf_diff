@@ -106,6 +106,10 @@ HELP = {
                        "http://localhost:8080/rerank"),
     "rerank_threshold": Help("comparing", "the least reranker score a pair is judged with, in hundredths (1-10)",
                              "3 is 0.03. Measured at 2, 5 and 10: no related finding lost.", "5", basic=True),
+    "search_names": Help("comparing", "the model groups the names the documents give one thing, so a search for one "
+                         "finds the others' claims too", "In a request after the comparison (a topic's, for a large "
+                         "one): \"rated output\" finds \"nominal power\". Off until measured "
+                         "(docs/plans/search-2026-10-20.md)."),
     "topic_names": Help("comparing", "the model chooses the report's topics and names them, in one request",
                         "off: topics named by their words.", basic=True),
     # --- report

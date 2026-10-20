@@ -1118,6 +1118,17 @@ class NameTopics(Lever):
     def names_topics(self):
         return self.topic_names
 
+class SearchNames(Lever):
+    lever_name, stage, off = "search_names", "comparison", {"search_names": False}
+    # the documents' other names for one thing ("rated output", "nominal power"), grouped by the model after the
+    # comparison, in a request (a topic's, for a large one): a search for one name finds the others' claims too
+    # (synonyms.py; docs/plans/search-2026-10-20.md, milestone 4; the owner, 2026-10-20: "Please proceed with that and
+    # the model-supported search ideas"). Off until measured.
+    search_names: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def names_synonyms(self):
+        return self.search_names
+
 class Rerank(Lever):
     lever_name, stage, off = "rerank", "comparison", {"rerank_model": None, "rerank_api": "deepinfra",
                                                        "rerank_url": None, "rerank_threshold": 3}
@@ -1183,7 +1194,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
                  ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext,
-                 NameTopics, Rerank)
+                 NameTopics, SearchNames, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1369,6 +1380,12 @@ class Platform(Composable):
     def reranks(self, mode):
         """Whether a comparison's candidate pairs are reranked before the judge (rerank.py): the platform's, never;
         the rerank lever's, in proposals mode with a reranker named."""
+        return False
+
+    @chosen
+    def names_synonyms(self):
+        """Whether the model groups the documents' other names for one thing, for the report's search (synonyms.py):
+        the platform's, never; the search_names lever's, when on."""
         return False
 
     @chosen

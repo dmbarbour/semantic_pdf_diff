@@ -426,6 +426,8 @@ store's latest comparison (--comparison picks another, for one store).
   like:ID              the claims sharing enough of what a claim is about, most alike first
 The most relevant first. After the claims found come their counterparts (the claims the comparison paired with
 them; --alone leaves them out), and where a counterpart names what was searched otherwise, its name is offered.
+Where the model was asked the documents' other names for one thing (search_names), a search for one name finds the
+others' claims too, after the rest, each marked.
 
 Quote a query holding a word to leave out, or anything else the shell reads: semantic-pdf-diff search 'pump -gearbox'.
 
@@ -502,7 +504,7 @@ def search_command(argv):
             if 'like' in term and term['like'] not in index.card_doc:
                 term['like'] = next((k for k in index.card_doc if k.endswith(':' + term['like'])), term['like'])
     view = 'findings' if args.findings else 'claims'
-    hits, names = finder.search(index, groups, claims, findings, view, paired=not args.alone)
+    hits, names, others = finder.search(index, groups, claims, findings, view, paired=not args.alone)
     if view == 'claims' and args.side:
         names_of = sorted({c['source'] for c in claims if c['source']})
         side = [n for n in names_of if n == args.side] or [n for n in names_of if args.side.lower() in n.lower()]
@@ -512,18 +514,24 @@ def search_command(argv):
         hits = [h for h in hits if claims[h[0]]['source'] == side[0]]
     shown = hits if not args.limit else hits[:args.limit]
     if args.json:
-        items = ([{'score': round(s, 3), 'counterpart': via, **claim_json(claims[i])} for i, s, via in shown]
+        items = ([{'score': round(s, 3), 'counterpart': how == 'counterpart',
+                   'other_name': how[5:] if how.startswith('name:') else '', **claim_json(claims[i])}
+                  for i, s, how in shown]
                  if view == 'claims' else
                  [{'score': round(s, 3), 'store': str(findings[i]['store']), 'relation': findings[i]['relation'],
                    'rationale': findings[i]['finding'].get('rationale', ''),
-                   'claims': [claim_json(claims[at[c]]) for c in findings[i]['cards'] if c in at]}
-                  for at in [{c['card']: k for k, c in enumerate(claims)}] for i, s, _ in shown])
+                   'claims': [claim_json(claims[at[c]]) for c in findings[i]['cards'] if c in at],
+                   'other_name': how[5:] if how.startswith('name:') else ''}
+                  for at in [{c['card']: k for k, c in enumerate(claims)}] for i, s, how in shown])
         print(json.dumps({'query': query, 'view': view, 'found': len(hits),
-                          'counterparts': sum(1 for h in hits if h[2]), 'names': [n for n, _ in names],
-                          'items': items}, indent=1, ensure_ascii=False))
+                          'counterparts': sum(1 for h in hits if h[2] == 'counterpart'),
+                          'by_other_names': sum(1 for h in hits if h[2].startswith('name:')),
+                          'names': [n for n, _ in names], 'other_names': others, 'items': items},
+                         indent=1, ensure_ascii=False))
         return 0
-    via = sum(1 for h in hits if h[2])
-    line = f"{len(hits)} {view} found" + (f' ({via} as counterparts)' if via else '')
+    via, named = (sum(1 for h in hits if h[2] == 'counterpart'), sum(1 for h in hits if h[2].startswith('name:')))
+    how = [f'{via} as counterparts' if via else '', f'{named} by other names' if named else '']
+    line = f"{len(hits)} {view} found" + (f" ({', '.join(h for h in how if h)})" if via or named else '')
     if view == 'claims':
         counts = {}
         for i, _, _ in hits:
@@ -535,18 +543,22 @@ def search_command(argv):
     print(line)
     if names:
         print("The other source's names for it: " + ', '.join(f'"{name}" ({n})' for name, n in names))
+    if others:
+        print("The model's other names for it: " + ', '.join(f'"{name}"' for name in others))
     at = {c['card']: k for k, c in enumerate(claims)}
-    for rank, (i, score, counterpart) in enumerate(shown, 1):
+    marks = lambda how: ('  [counterpart]' if how == 'counterpart' else  # noqa: E731
+                         f'  [named otherwise: {how[5:]}]' if how.startswith('name:') else '')
+    for rank, (i, score, how) in enumerate(shown, 1):
         if view == 'claims':
             said, where = brief(claims[i])
-            print(f"{rank:>3}. {said}" + ('  [counterpart]' if counterpart else ''))
+            print(f"{rank:>3}. {said}" + marks(how))
             print(f"     {where} · {claims[i]['evidence']['id']}")
             quote = ' '.join(claims[i]['evidence']['quote'].split())
             if quote:
                 print(f"     “{quote[:157] + '…' if len(quote) > 158 else quote}”")
         else:
             f = findings[i]
-            print(f"{rank:>3}. {f['relation']}")
+            print(f"{rank:>3}. {f['relation']}" + marks(how))
             for card in f['cards']:
                 if card in at:
                     said, where = brief(claims[at[card]])

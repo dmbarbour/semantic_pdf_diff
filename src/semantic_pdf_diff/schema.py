@@ -481,6 +481,12 @@ class TopicNames(DropsUnknown):
     way: int = Field(ge=1)
     names: list[Annotated[str, Field(min_length=1, max_length=60)]] = Field(min_length=1)
 
+class OtherNames(DropsUnknown):
+    """The names two documents give one thing, grouped: items' and properties' (the search_names lever;
+    synonyms.py)."""
+    items: list[list[Annotated[str, Field(max_length=300)]]] = Field(default_factory=list)
+    properties: list[list[Annotated[str, Field(max_length=300)]]] = Field(default_factory=list)
+
 REPORT_SCHEMA = 2  # report.json and evidence.json (and the comparisons a store saves)
 
 class CoverageRow(Strict):

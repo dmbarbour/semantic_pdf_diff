@@ -126,6 +126,9 @@
     return {added, names: [...names.values()].sort((a, b) => b.n - a.n).slice(0, 6)};
   };
   const COUNTERPART = '<p class="meta"><b>The counterpart of a claim the search found.</b> ';
+  const OTHER_NAME_SHARE = 0.5;  // a claim found by another name scores half (search.py's)
+  const esc = (text) => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const byName = (name) => `<p class="meta"><b>Found by another name the model gave: ${esc(name)}.</b></p>`;
 
   let topic = null;  // a topic's index (-1: claims in no topic), or every one
   const inTopic = (x, t) => (t === -1 ? x.topics.every((y) => y === -1) : x.topics.includes(t));
@@ -140,17 +143,35 @@
     const extra = searched && worded ? pairedWith(groups, searched.claims) : {added: new Map(), names: []};
     if (paired.checked) for (const [claim, score] of extra.added) searched.claims.set(claim, score);
     const added = paired.checked ? extra.added : new Map();
-    pairedBox.hidden = !extra.added.size;
-    also.hidden = !extra.names.length;
-    also.textContent = extra.names.length ? 'The other source\'s names for it: ' : '';
-    for (const {name, n} of extra.names) {
-      const button = document.createElement('button');
-      button.className = 'also';
-      button.dataset.q = `"${name.replace(/"/g, '')}"`;
-      button.textContent = name + ' ';
-      button.append(Object.assign(document.createElement('small'), {textContent: n}));
-      also.append(button);
+    // the model's other names for it (the search_names lever): what they find, after what the query found
+    const others = searched ? Search.otherNames(groups, R.synonyms) : [], renamed = new Map();
+    for (const other of paired.checked ? others : []) {
+      const alike = index.find(other.groups);
+      for (const key of ['claims', 'findings']) {
+        for (const [x, score] of alike(key === 'claims' ? R.claims : R.findings)) {
+          if (searched[key].has(x)) continue;
+          searched[key].set(x, score * OTHER_NAME_SHARE);
+          renamed.set(x, other.name);
+        }
+      }
     }
+    pairedBox.hidden = !extra.added.size && !others.length;
+    also.hidden = !extra.names.length && !others.length;
+    also.textContent = '';
+    const offer = (title, offered) => {  // names offered as searches: [name, how many claims gave it, or none]
+      if (!offered.length) return;
+      also.append((also.childNodes.length ? ' · ' : '') + title);
+      for (const [name, n] of offered) {
+        const button = document.createElement('button');
+        button.className = 'also';
+        button.dataset.q = `"${name.replace(/"/g, '')}"`;
+        button.textContent = name + ' ';
+        if (n) button.append(Object.assign(document.createElement('small'), {textContent: n}));
+        also.append(button);
+      }
+    };
+    offer('The other source\'s names for it: ', extra.names.map(({name, n}) => [name, n]));
+    offer('The model\'s other names for it: ', others.map((o) => [o.name, 0]));
     const found = searched && searched[view];
     for (const tab of tabs) {
       const all = tab.dataset.view === 'findings' ? R.findings : R.claims;
@@ -184,15 +205,23 @@
     let count = `${chosen.length} of ${total} ${view}`
       + (folded ? ` (${folded} that say the same in both folded)` : '');
     if (found && view === 'claims') {  // what each source says, as searched
-      const via = chosen.filter((c) => added.has(c)).length;
-      count += (via ? ` (${via} as counterparts)` : '') + ': '
+      const via = chosen.filter((c) => added.has(c)).length, named = chosen.filter((c) => renamed.has(c)).length;
+      const how = [via ? `${via} as counterparts` : '', named ? `${named} by other names` : ''].filter(Boolean);
+      count += (how.length ? ` (${how.join(', ')})` : '') + ': '
         + sides.map((name, i) => `${chosen.filter((c) => c.side === i).length} in ${name}`).join('; ');
     }
     const strange = Search.unknown(groups);
     if (strange.length) count += ` · units the search doesn't know: ${strange.join(', ')}`;
     $('count').textContent = count;
-    paged(main, chosen.map((x) => (view === 'claims' && added.has(x) ? x.html.replace('<p class="meta">', COUNTERPART)
-      : x.html)), found ? Search.marker(groups, index) : null);
+    if (found && view === 'findings') {
+      const named = chosen.filter((f) => renamed.has(f)).length;
+      if (named) count += ` (${named} by other names)`;
+    }
+    const shown = (x) => {
+      if (renamed.has(x)) return x.html.replace(/^<[^>]*>/, (m) => m + byName(renamed.get(x)));  // its first tag
+      return view === 'claims' && added.has(x) ? x.html.replace('<p class="meta">', COUNTERPART) : x.html;
+    };
+    paged(main, chosen.map(shown), found ? Search.marker(groups, index) : null);
     remember();
   };
   let typing;

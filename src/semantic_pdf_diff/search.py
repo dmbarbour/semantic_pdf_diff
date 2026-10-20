@@ -75,6 +75,7 @@ class Index:
     def __init__(self):
         self.vocab, self.postings, self.docs = {}, [], []
         self.pages, self.card_doc, self.names, self.values = {}, {}, {}, {}
+        self.synonyms = {}
         self._sorted = None
 
     def _add(self, fields):
@@ -362,6 +363,34 @@ def touches(groups, text):
     ws = words(text)
     return any(any(asks(w, b) for w in ws) for terms in _asked(groups) for t in terms for b in t["words"])
 
+def names(groups, text):
+    """Whether a query names a name: finds it, and asks for every word it has ("rated output" names "rated output",
+    not "rated output limit"; words such as "of" aside)."""
+    ws = [w for w in words(text) if w not in STOP]
+    terms = [t for terms in _asked(groups) for t in terms]
+    return bool(ws) and covers(groups, text) and all(any(asks(w, b) for t in terms for b in t["words"]) for w in ws)
+
+def other_names(groups, synonyms):
+    """The model's other names for what a query names (synonyms: {"items", "properties"}, groups of names), each
+    with the query finding it: [(name, groups)], the name as a phrase in its field, with the query's exclusions and
+    its terms that aren't words (values, pages); none for like:."""
+    out = []
+    if not synonyms or any("like" in t for g in groups for t in g["terms"]):
+        return out
+    kept = [g for g in groups if g["not"] or not any("words" in t for t in g["terms"])]
+    for kind, field in (("items", ENTITY), ("properties", ATTRIBUTE)):
+        for group in synonyms.get(kind) or []:
+            if not any(names(groups, n) for n in group):
+                continue
+            for name in group:
+                ws = words(name)
+                if not ws or names(groups, name) or any(o[0] == name for o in out):
+                    continue
+                out.append((name, [{"not": False, "terms": [{"words": ws, "field": field}]}] + kept))
+    return out
+
+OTHER_NAME_SHARE = 0.5  # a claim found by another name scores half (the page's)
+
 def worded(groups):
     return any(not g["not"] and any("words" in t for t in g["terms"]) for g in groups)
 
@@ -404,6 +433,8 @@ def report_items(data, index, prefix=""):
                  "finding": f} for f in ordered(data["findings"]) if f["relation"] != "unrelated"]
     sides = [s["name"] for s in data["sources"]]
     claims = claim_records(data, card, file_index(file_pairs(data)), {}, sides)
+    for kind in ("items", "properties"):  # the model's other names (the search_names lever), every report's
+        index.synonyms.setdefault(kind, []).extend(data.get("synonyms", {}).get(kind, []))
     index.add(card.html, list(card.said), findings, prefix, {k: claim_value(card.evidence[k]) for k in card.html})
     for claim in claims:  # what the command prints of it
         e = card.evidence[claim["card"]]
@@ -413,18 +444,28 @@ def report_items(data, index, prefix=""):
     return claims, findings
 
 def search(index, groups, claims, findings, view="claims", paired=True, side=None):
-    """What a query finds in one view, as the page shows it: [(item's index, score, whether a counterpart)], the most
-    relevant first (ties as listed), and the other source's names for it."""
+    """What a query finds in one view, as the page shows it: ([(item's index, score, how)], the other source's names
+    for it, the model's other names), the most relevant first (ties as listed). how: "" (the query found it),
+    "counterpart", or the other name that found it ("name:drive"); counterparts and other names only when paired."""
     among = index.find(groups)
-    found = among(claims)
-    added, names = paired_with(index, groups, found, claims, counterparts(findings)) if worded(groups) else ({}, [])
-    if view == "findings":
-        hits = among(findings)
-        ranked = sorted(hits, key=lambda i: -hits[i])
-        return [(i, hits[i], False) for i in ranked], names
+    found = {"claims": among(claims), "findings": among(findings)}
+    added, offered = (paired_with(index, groups, found["claims"], claims, counterparts(findings)) if worded(groups)
+                      else ({}, []))
+    how = {"claims": {}, "findings": {}}
     if paired:
-        found = {**found, **added}
-    kept = [i for i in found if side is None or claims[i]["side"] == side]
+        for i, score in added.items():
+            found["claims"][i] = score
+            how["claims"][i] = "counterpart"
+    others = other_names(groups, index.synonyms)
+    for name, query in others if paired else ():
+        alike = index.find(query)
+        for key, items in (("claims", claims), ("findings", findings)):
+            for i, score in alike(items).items():
+                if i not in found[key]:
+                    found[key][i] = score * OTHER_NAME_SHARE
+                    how[key][i] = "name:" + name
+    hits = found[view]
+    kept = [i for i in hits if view == "findings" or side is None or claims[i]["side"] == side]
     kept.sort()  # as listed, then by score: a stable sort keeps the listed order among equals
-    kept.sort(key=lambda i: -found[i])
-    return [(i, found[i], paired and i in added) for i in kept], names
+    kept.sort(key=lambda i: -hits[i])
+    return [(i, hits[i], how[view].get(i, "")) for i in kept], offered, [name for name, _ in others]

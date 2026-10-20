@@ -119,7 +119,9 @@ SEARCH_HELP = ('<details class="search-help"><summary>How to search</summary><ul
                'words), most alike first.</li>'
                '<li>In the claims view, the claims the findings pair with those found come after them, as their '
                'counterparts. Where a counterpart names what was searched otherwise (<i>nominal power</i> for '
-               '<i>rated output</i>), its name is offered as a search.</li>'
+               '<i>rated output</i>), its name is offered as a search. Where the model was asked the documents\' '
+               'other names for one thing (<code>search_names</code>), a search for one name finds the others\' '
+               'claims too, after the rest, each marked.</li>'
                '<li>Found items come most relevant first: words in what a claim is about count most, then its value, '
                'conditions and section, then its quote. The page\'s address keeps the search, to bookmark or send.'
                '</li></ul></details>')
@@ -499,7 +501,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
              + '</select></label><label>Read as <select id="claimkind"><option value="all">Any kind</option>'
              + ''.join(f'<option>{k}</option>' for k in ('text', 'table', 'chart', 'diagram'))
              + '</select></label><label id="counterparts-box" hidden><input type="checkbox" id="counterparts" checked> '
-             'and their counterparts</label></span>')
+             + ('and their counterparts and other names' if data.get('synonyms', {}).get('items')
+                or data.get('synonyms', {}).get('properties') else 'and their counterparts') + '</label></span>')
     if len(pairs) > 1:
         page += ('<label>File <select id="file"><option value="all">All files</option>'
                  + ''.join(f'<option value="{pair_key(a, b, files)}">{esc(pair_name(kind, a, b))}</option>'
@@ -533,7 +536,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     units, folded, kinds = unit_tables()  # what the search compares values in (search.js, values.py)
     values = {eid: v for eid in card.html if (v := claim_value(card.evidence[eid])) is not None}
     parts = {"page": page, "findings": findings, "claims": claims, "cards": card.html, "said": list(card.said),
-             "values": values, "units": units, "folded": folded, "kinds": kinds}
+             "values": values, "units": units, "folded": folded, "kinds": kinds,
+             "synonyms": {k: data.get('synonyms', {}).get(k, []) for k in ('items', 'properties')}}
     packed = json.dumps(parts, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     packed = base64.b64encode(gzip.compress(packed, 9, mtime=0)).decode("ascii")  # mtime=0: the same bytes each time
     images = embed_json({"type": mime, "data": [c.data for c in chosen]})

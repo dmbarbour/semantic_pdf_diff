@@ -317,6 +317,31 @@ const Search = (() => {
   // whether a word is one a query asks for: letters by their beginnings, numbers (and a letter alone) whole
   const asks = (w, b) => (NUMBER.test(b) || b.length < 2 ? w === b : w.startsWith(b));
   const asked = (groups) => groups.filter((g) => !g.not).map((g) => g.terms.filter((t) => t.words));
+  // whether a query names a name: finds it, and asks for every word it has ("rated output" names "rated output", not
+  // "rated output limit"; words such as "of" aside)
+  const names = (groups, text) => {
+    const ws = words(text).filter((w) => !STOP.has(w)), terms = asked(groups).flat();
+    return ws.length > 0 && covers(groups, text) && ws.every((w) => terms.some((t) => t.words.some((b) => asks(w, b))));
+  };
+  // the model's other names for what a query names (synonyms: {items, properties}, groups of names; the search_names
+  // lever), each with the query finding it: the name as a phrase in its field, with the query's exclusions and its
+  // terms that aren't words (values, pages); none for like:
+  const otherNames = (groups, synonyms) => {
+    const out = [];
+    if (!synonyms || groups.some((g) => g.terms.some((t) => t.like !== undefined))) return out;
+    const kept = groups.filter((g) => g.not || !g.terms.some((t) => t.words));
+    for (const [kind, field] of [['items', ENTITY], ['properties', ATTRIBUTE]]) {
+      for (const group of synonyms[kind] || []) {
+        if (!group.some((n) => names(groups, n))) continue;
+        for (const name of group) {
+          const ws = words(name);
+          if (!ws.length || names(groups, name) || out.some((o) => o.name === name)) continue;
+          out.push({name, groups: [{not: false, terms: [{words: ws, field}]}, ...kept]});
+        }
+      }
+    }
+    return out;
+  };
   // the units a query names that the search doesn't know
   const unknown = (groups) => groups.flatMap((g) => g.terms.filter((t) => t.unknown).map((t) => t.unknown));
   // whether a name holds every word group a query asks for (fields, phrases' order and pages aside): one it finds
@@ -372,5 +397,5 @@ const Search = (() => {
     };
   };
 
-  return {index, parse, marker, covers, touches, unknown, words};
+  return {index, parse, marker, covers, touches, names, otherNames, unknown, words};
 })();

@@ -18,7 +18,7 @@ def found(q, view="claims", paired=False, side=None):
     """The card ids a query finds in search_report, in the order shown."""
     index = search.Index()
     claims, findings = search.report_items(search_report(), index)
-    hits, _ = search.search(index, search.parse(q), claims, findings, view, paired=paired)
+    hits, _, _ = search.search(index, search.parse(q), claims, findings, view, paired=paired)
     if view == "findings":
         return [card for i, _, _ in hits for card in findings[i]["cards"]]
     return [claims[i]["card"] for i, _, _ in hits if side is None or claims[i]["side"] == side]
@@ -55,11 +55,20 @@ class Engine(unittest.TestCase):
         self.assertEqual(search.unknown(search.parse(">1mw")), ["mw"])
         self.assertEqual(search.parse("value:3.5:1")[0]["terms"][0]["words"], ["3.5", "1"])  # stays words
 
+    def test_the_models_other_names(self):
+        self.assertEqual(found("drive", paired=True), ["B-drive", "A-motor"])
+        self.assertEqual(found("pump motor", paired=True)[-1], "B-drive")
+        groups = search.parse("pump motor")
+        self.assertTrue(search.names(groups, "pump motor"))
+        self.assertFalse(search.names(groups, "pump"))  # it doesn't ask for every word the query has
+        self.assertFalse(search.names(search.parse("motor"), "pump motor"))  # nor the query every word it has
+        self.assertEqual(search.other_names(search.parse("like:A-pump"), {"items": [["a", "b"]]}), [])
+
     def test_counterparts_names_and_like(self):
         self.assertEqual(found("output", paired=True), ["B-pump", "A-pump"])
         index = search.Index()
         claims, findings = search.report_items(search_report(), index)
-        _, names = search.search(index, search.parse("output"), claims, findings)
+        _, names, _ = search.search(index, search.parse("output"), claims, findings)
         self.assertEqual(names, [("rated power", 1)])
         self.assertEqual(found("like:A-pump", side=1)[0], "B-pump")
 
@@ -81,8 +90,8 @@ class SameAsThePage(unittest.TestCase):
                 self.assertEqual(found(q, "findings" if view == "findings" else "claims", paired, side), shown)
                 index = search.Index()
                 claims, findings = search.report_items(search_report(), index)
-                _, names = search.search(index, search.parse(q), claims, findings)
-                self.assertEqual([f'"{name}"' for name, _ in names], result["also"])
+                _, names, others = search.search(index, search.parse(q), claims, findings)
+                self.assertEqual([f'"{name}"' for name, _ in names] + [f'"{name}"' for name in others], result["also"])
 
 class Values(unittest.TestCase):
     """A claim's value and a search's units (values.py): what milestone 3 compares."""
@@ -114,6 +123,62 @@ class Values(unittest.TestCase):
         self.assertEqual(search_unit("º"), search_unit("°"))  # an ordinal for a degree
         self.assertAlmostEqual(search_unit("RPM")[1], 0.10472, places=5)  # rad/s, folded
         self.assertAlmostEqual(search_unit("kips")[1], 4448.22, places=1)  # the scorer's, in newtons
+
+class OtherNames(unittest.TestCase):
+    """The model's request for the documents' other names (synonyms.py), and its answers kept."""
+    def claims(self):
+        return [{"entity": "pump", "attribute": "rated output", "side": "A"},
+                {"entity": "pump", "attribute": "rated output", "side": "A"},
+                {"entity": "feed pump", "attribute": "nominal power", "side": "B"}]
+
+    def test_the_request_lists_each_sides_names_with_their_counts(self):
+        from semantic_pdf_diff import synonyms
+        prompt = synonyms.prompt(self.claims(), ["A", "B"])
+        self.assertIn("ITEMS:\nA: pump (2)\nB: feed pump (1)\nPROPERTIES:\nA: rated output (2)\nB: nominal power (1)",
+                      prompt)
+
+    def test_answers_keep_names_as_listed_and_groups_sharing_one_are_joined(self):
+        from semantic_pdf_diff import synonyms
+        from semantic_pdf_diff.schema import OtherNames
+        asked = []
+
+        def submit(prompt, i, finish):
+            asked.append(i)
+            finish(OtherNames(items=[["Pump", "feed  pump"], ["pump", "impeller"]],
+                              properties=[["rated output", "NOMINAL POWER"], ["rated output"]]), None)
+        kept = synonyms.named(self.claims(), {}, ["A", "B"], submit, lambda: None)
+        self.assertEqual(kept, {"items": [["pump", "feed pump"]], "properties": [["rated output", "nominal power"]],
+                                "requests": 1, "failed": 0})  # "impeller" isn't listed; a lone name isn't a group
+        self.assertEqual(synonyms.joined([["a", "b"], ["c", "d"], ["b", "c"]]), [["a", "b", "c", "d"]])
+
+    def test_a_failed_request_leaves_its_names_ungrouped(self):
+        from semantic_pdf_diff import synonyms
+        from semantic_pdf_diff.llm import ModelFailure
+        kept = synonyms.named(self.claims(), {}, ["A", "B"], lambda p, i, finish: finish(None, ModelFailure("x")),
+                              lambda: None)
+        self.assertEqual(kept, {"items": [], "properties": [], "requests": 1, "failed": 1})
+
+    def test_many_names_are_asked_a_topic_at_a_time(self):
+        from semantic_pdf_diff import synonyms
+        claims = [{"id": i, "entity": f"item {i}", "attribute": f"property {i}", "side": "AB"[i % 2]}
+                  for i in range(300)]
+        parts = synonyms.chunks(claims, {i: i % 3 for i in range(290)})
+        self.assertEqual([len(p) for p in parts], [10, 97, 97, 96])  # those in no topic first, then each topic's
+
+    def test_the_pipeline_asks_when_the_lever_is_on(self):
+        from semantic_pdf_diff.pipeline import other_names
+        from semantic_pdf_diff.schema import OtherNames
+
+        class Model:
+            asked = []
+
+            def ask(self, prompt, schema, images=(), key=None):
+                self.asked.append((schema, key))
+                return OtherNames(items=[["pump motor", "drive"]])
+        model = Model()
+        kept = other_names(search_report(), model, "proposals", "label")
+        self.assertEqual(kept["items"], [["pump motor", "drive"]])
+        self.assertEqual(model.asked, [(OtherNames, ("names", "proposals", "label", "0"))])
 
 def run(*argv):
     with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()) as err:

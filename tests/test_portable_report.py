@@ -485,6 +485,8 @@ def search_report():
     data = report(a + b, [finding(a[0], b[0], "different"), finding(a[1], b[1], "equivalent"),
                           finding(a[4], b[3], "equivalent")])
     data["sections"] = [{"content": a[0].content, "id": "s1", "heading_path": ["Plant", "Feed system"]}]
+    # the model's other names (the search plan's milestone 4: the search_names lever): A's motor is B's drive
+    data["synonyms"] = {"items": [["drive", "pump motor"]], "properties": []}
     return data
 
 class SearchMarkup(unittest.TestCase):
@@ -564,8 +566,8 @@ class SearchInABrowser(unittest.TestCase):
                                          "page:4-5", "pump", "section:feed", "-valve", "output", "pdf", "file:b",
                                          ">70kW", ">70 kW", "value:75kW", "value:0.075MW", "power <20kW",
                                          "value:55L/s", "<40dBA", "value:>40dBA", ">1000", ">1mw", ">1e9 N•m2",
-                                         "value:2.5GN.m2")]
-        cases += [("findings", "pump"), ("claims", "output", True)]
+                                         "value:2.5GN.m2", "drive")]
+        cases += [("findings", "pump"), ("claims", "drive", True), ("claims", "output", True)]
         with tempfile.TemporaryDirectory() as d:
             write_report(search_report(), Path(d))
             page = Path(d) / "report.html"
@@ -653,6 +655,14 @@ class SearchInABrowser(unittest.TestCase):
         offered = self.got('(offered) "rated power"')
         self.assertEqual(self.ids('(offered) "rated power"'), ["A-pump", "B-pump"])
         self.assertEqual(offered["also"], ['"rated output"'])
+
+    def test_the_models_other_names_find_their_claims_too(self):
+        # the search plan, milestone 4: "drive" is A's "pump motor"
+        renamed = self.got("drive +counterparts")
+        self.assertEqual(self.ids("drive +counterparts"), ["B-drive", "A-motor"])
+        self.assertEqual(renamed["count"], "2 of 13 claims (1 by other names): 1 in A; 1 in B")
+        self.assertIn('"pump motor"', renamed["also"])
+        self.assertEqual(self.ids("drive"), ["B-drive"])  # without them
 
     def test_claims_like_a_claim_are_the_other_sources_most_alike_first(self):
         like = self.results[("claims", "like:A-pump")]

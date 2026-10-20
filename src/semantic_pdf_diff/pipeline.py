@@ -237,6 +237,23 @@ def write_evidence(store, names, read, interpreters, out):
                                        encoding='utf-8')
     return document
 
+def other_names(data, client, mode, label):
+    """The documents' other names for one thing, asked of the model a request a topic (synonyms.named)."""
+    from . import synonyms
+    from .schema import OtherNames
+    found, placed = report_topics(data)  # the most even way's topics split a large comparison's names
+    topic_of = {c['id']: t for c, t in zip(placed, found[0].placed)} if found else {}
+    side = {}
+    for f in data.get('files', []):
+        side.setdefault(f['content'], f['source'])
+    claims = [{**e, 'side': side.get(e['content'], '')} for e in data['evidence']]  # every claim's names
+    sides = [s['name'] for s in data['sources']]
+    with Dispatcher(client) as dispatch:
+        def submit(prompt, i, finish):
+            dispatch.make_room()
+            dispatch.submit(prompt, OtherNames, (), ('names', mode, label, str(i)), finish)
+        return synonyms.named(claims, topic_of, sides, submit, dispatch.drain)
+
 def compare_and_report(options, settings, store, client, names, read, document, out):
     """The two sides' claims compared, the report saved in the store and written; the exit code."""
     files, by_content, coverage, sections = read.files, read.by_content, read.coverage, read.sections
@@ -269,6 +286,8 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         found, claims = report_topics(data)
         key = ('topics', options.mode, provenance.text_hash(comparing.model_dump_json()))
         data['topics'] = topics.named(found, claims, lambda prompt: client.ask(prompt, TopicNames, (), key))
+    if settings.names_synonyms():  # the documents' other names for one thing, for the search (synonyms.py)
+        data['synonyms'] = other_names(data, client, options.mode, provenance.text_hash(comparing.model_dump_json()))
     store.save_comparison(data['created_at'], data)
     account = write_report(data, out, assets=store.folder / 'assets', budget=options.report_budget,
                            split=options.split)
