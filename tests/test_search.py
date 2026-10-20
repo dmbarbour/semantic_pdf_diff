@@ -63,6 +63,16 @@ class Engine(unittest.TestCase):
         self.assertFalse(search.names(groups, "pump"))  # it doesn't ask for every word the query has
         self.assertFalse(search.names(search.parse("motor"), "pump motor"))  # nor the query every word it has
         self.assertEqual(search.other_names(search.parse("like:A-pump"), {"items": [["a", "b"]]}), [])
+        # another name is a claim's whole name, as written: "flow" isn't the blower's "air flow"
+        data = search_report()
+        data["synonyms"] = {"items": [], "properties": [["speed", "flow"], ["shaft power", "air flow"]]}
+        index = search.Index()
+        claims, findings = search.report_items(data, index)
+        hits, _, others = search.search(index, search.parse("speed"), claims, findings, paired=True)
+        self.assertEqual(([claims[i]["card"] for i, _, _ in hits], others), (["A-motor"], ["flow"]))
+        hits, _, _ = search.search(index, search.parse("shaft power"), claims, findings, paired=True)
+        self.assertEqual([(claims[i]["card"], how) for i, _, how in hits],
+                         [("B-drive", ""), ("A-blower", "name:air flow")])
 
     def test_counterparts_names_and_like(self):
         self.assertEqual(found("output", paired=True), ["B-pump", "A-pump"])
@@ -137,7 +147,7 @@ class OtherNames(unittest.TestCase):
         self.assertIn("ITEMS:\nA: pump (2)\nB: feed pump (1)\nPROPERTIES:\nA: rated output (2)\nB: nominal power (1)",
                       prompt)
 
-    def test_answers_keep_names_as_listed_and_groups_sharing_one_are_joined(self):
+    def test_answers_keep_names_as_listed_and_each_group_once(self):
         from semantic_pdf_diff import synonyms
         from semantic_pdf_diff.schema import OtherNames
         asked = []
@@ -149,7 +159,7 @@ class OtherNames(unittest.TestCase):
         kept = synonyms.named(self.claims(), {}, ["A", "B"], submit, lambda: None)
         self.assertEqual(kept, {"items": [["pump", "feed pump"]], "properties": [["rated output", "nominal power"]],
                                 "requests": 1, "failed": 0})  # "impeller" isn't listed; a lone name isn't a group
-        self.assertEqual(synonyms.joined([["a", "b"], ["c", "d"], ["b", "c"]]), [["a", "b", "c", "d"]])
+        self.assertEqual(synonyms.distinct([["a", "b"], ["b", "c"], ["b", "a", "b"], ["d"]]), [["a", "b"], ["b", "c"]])
 
     def test_a_failed_request_leaves_its_names_ungrouped(self):
         from semantic_pdf_diff import synonyms

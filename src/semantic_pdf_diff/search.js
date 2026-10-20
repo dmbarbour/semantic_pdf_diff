@@ -128,12 +128,14 @@ const Search = (() => {
     };
     // how much a term's words, in a row, weigh in a document (0: not found); a file's name only when asked for
     // (file:), or "mw" would find every claim of "nrel-5mw.pdf"
-    const weight = (sets, field, doc) => {
+    // whole: the words are the field's, all of it (another name, matched as a claim's name)
+    const weight = (sets, field, doc, whole = false) => {
       const {terms, fields} = docs[doc];
       let n = 0;
       for (let i = 0; i + sets.length <= terms.length; i++) {
         let j = 0;
         while (j < sets.length && sets[j].has(terms[i + j])) j++;
+        if (whole && !((i === 0 || terms[i - 1] === -1) && terms[i + j] === -1)) continue;
         if (j === sets.length && (field === null ? fields[i] !== FILE : fields[i] === field)) n += WEIGHTS[fields[i]];
       }
       return n;
@@ -163,14 +165,16 @@ const Search = (() => {
         for (const [doc, page] of pages) if (page >= term.pages[0] && page <= term.pages[1]) out.set(doc, 0);
         return out;
       }
-      const sets = term.terms ? [new Set(term.terms)] : term.words.map((w) => new Set(expand(w)));
+      const exact = (w) => new Set(vocab.has(w) ? [vocab.get(w)] : []);  // a whole name's words, as written
+      const sets = term.terms ? [new Set(term.terms)]
+        : term.words.map((w) => (term.whole ? exact(w) : new Set(expand(w))));
       if (sets.some((s) => !s.size)) return out;
       const size = (s) => [...s].reduce((sum, t) => sum + postings[t].length, 0);
       const rarest = sets.reduce((a, b) => (size(b) < size(a) ? b : a));
       for (const t of rarest) {
         for (const doc of postings[t]) {
           if (out.has(doc)) continue;
-          const n = weight(sets, term.field, doc);
+          const n = weight(sets, term.field, doc, term.whole);
           if (n > 0) out.set(doc, n);
         }
       }
@@ -324,8 +328,9 @@ const Search = (() => {
     return ws.length > 0 && covers(groups, text) && ws.every((w) => terms.some((t) => t.words.some((b) => asks(w, b))));
   };
   // the model's other names for what a query names (synonyms: {items, properties}, groups of names; the search_names
-  // lever), each with the query finding it: the name as a phrase in its field, with the query's exclusions and its
-  // terms that aren't words (values, pages); none for like:
+  // lever), each with the query finding it: claims whose item (or property) is that name, all of it and as written
+  // (not "diameter" in "rotor diameter"), with the query's exclusions and its terms that aren't words (values,
+  // pages); none for like:
   const otherNames = (groups, synonyms) => {
     const out = [];
     if (!synonyms || groups.some((g) => g.terms.some((t) => t.like !== undefined))) return out;
@@ -336,7 +341,7 @@ const Search = (() => {
         for (const name of group) {
           const ws = words(name);
           if (!ws.length || names(groups, name) || out.some((o) => o.name === name)) continue;
-          out.push({name, groups: [{not: false, terms: [{words: ws, field}]}, ...kept]});
+          out.push({name, groups: [{not: false, terms: [{words: ws, field, whole: true}]}, ...kept]});
         }
       }
     }

@@ -5,8 +5,10 @@ one name finds the claims naming it otherwise too (search.js, search.py).
 The model is shown the names of the claims' items and properties, both sources', with how many claims use each, and
 groups those that mean the same. A comparison's names are asked in one request, or a request a topic where there are
 more than NAMES_A_REQUEST (topics.py: names that mean the same tend to share a topic by the other words of their
-claims). An answer's names are kept only as listed, groups sharing a name are joined, and a request that fails leaves
-its names ungrouped: only answers decide what a run writes (decision 0030).
+claims). An answer's names are kept only as listed, and a request that fails leaves its names ungrouped: only answers
+decide what a run writes (decision 0030). Groups sharing a name aren't joined: a search for a name finds the names
+grouped with it, not theirs (joined, a large report's requests chained "tower" to "tower top" and "tower base
+moment").
 """
 import logging
 from collections import Counter
@@ -24,7 +26,9 @@ claims use it. Documents often name one thing differently: "rated output" and "n
 "height above ground"; "feed pump" and "boiler feed water pump".
 Group the names that mean the same thing: an item with the item's other names, a property with the property's other
 names. Group only names a reader searching for one would want the other found by: not names merely related (a pump
-and its motor; power and energy; minimum and maximum of one property).
+and its motor; power and energy; minimum and maximum of one property), nor an item with its parts or with what holds
+it (a tower, its top and its base), nor a name with a more general one (rotor diameter and diameter), nor items
+numbered apart (web 1 and web 2).
 Return JSON {"items": [["name", "name"]], "properties": [["name", "name"]]}: each group two names or more, each name
 exactly as listed; [] where none mean the same.
 '''
@@ -61,17 +65,15 @@ def chunks(claims, topic_of):
         out.setdefault(-1 if t is None else t, []).append(c)
     return [out[t] for t in sorted(out)]
 
-def joined(groups):
-    """Groups sharing a name joined into one, in the order first seen."""
-    out = []
+def distinct(groups):
+    """Each group once (its names once each, in order); a group of the same names as another, once."""
+    out, seen = [], set()
     for group in groups:
         group = list(dict.fromkeys(group))
-        meeting = [g for g in out if set(g) & set(group)]
-        for g in meeting:
-            out.remove(g)
-        merged = list(dict.fromkeys([n for g in meeting for n in g] + group))
-        out.append(merged)
-    return [g for g in out if len(g) >= 2]
+        if len(group) >= 2 and frozenset(group) not in seen:
+            seen.add(frozenset(group))
+            out.append(group)
+    return out
 
 def kept(answer_groups, listed):
     """An answer's groups with only the names listed (as listed, whatever the case or spacing the model wrote)."""
@@ -116,5 +118,5 @@ def named(claims, topic_of, sides, submit, drain):
         for kind, field in (("items", "entity"), ("properties", "attribute")):
             listed = [n for side in counted(part, field).values() for n in side]
             groups[kind] += kept(getattr(answer, kind), listed)
-    return {"items": joined(groups["items"]), "properties": joined(groups["properties"]), "requests": len(parts),
-            "failed": failed}
+    return {"items": distinct(groups["items"]), "properties": distinct(groups["properties"]),
+            "requests": len(parts), "failed": failed}

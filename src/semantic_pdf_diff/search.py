@@ -153,14 +153,17 @@ class Index:
             i += 1
         return out
 
-    def weight(self, sets, field, doc):
+    def weight(self, sets, field, doc, whole=False):
         """How much a term's words, in a row, weigh in a document (0: not found); a file's name only when asked for
-        (file:), or "mw" would find every claim of "nrel-5mw.pdf"."""
+        (file:), or "mw" would find every claim of "nrel-5mw.pdf". whole: the words are the field's, all of it (another
+        name, matched as a claim's name)."""
         d, n = self.docs[doc], 0
         for i in range(len(d.terms) - len(sets) + 1):
             j = 0
             while j < len(sets) and d.terms[i + j] in sets[j]:
                 j += 1
+            if whole and not ((i == 0 or d.terms[i - 1] == -1) and i + j < len(d.terms) and d.terms[i + j] == -1):
+                continue
             if j == len(sets) and (d.fields[i] != FILE if field is None else d.fields[i] == field):
                 n += WEIGHTS[d.fields[i]]
         return n
@@ -175,7 +178,9 @@ class Index:
         if "pages" in term:
             low, high = term["pages"]
             return {doc: 0 for doc, page in self.pages.items() if low <= page <= high}
-        sets = [set(term["terms"])] if "terms" in term else [set(self.expand(w)) for w in term["words"]]
+        exact = lambda w: {self.vocab[w]} if w in self.vocab else set()  # noqa: E731 (a whole name's words, as written)
+        sets = ([set(term["terms"])] if "terms" in term else
+                [exact(w) if term.get("whole") else set(self.expand(w)) for w in term["words"]])
         if any(not s for s in sets):
             return out
         rarest = min(sets, key=lambda s: sum(len(self.postings[t]) for t in s))
@@ -183,7 +188,7 @@ class Index:
             for doc in self.postings[t]:
                 if doc in out:
                     continue
-                n = self.weight(sets, term.get("field"), doc)
+                n = self.weight(sets, term.get("field"), doc, term.get("whole", False))
                 if n > 0:
                     out[doc] = n
         return out
@@ -372,8 +377,9 @@ def names(groups, text):
 
 def other_names(groups, synonyms):
     """The model's other names for what a query names (synonyms: {"items", "properties"}, groups of names), each
-    with the query finding it: [(name, groups)], the name as a phrase in its field, with the query's exclusions and
-    its terms that aren't words (values, pages); none for like:."""
+    with the query finding it: [(name, groups)], claims whose item (or property) is that name, all of it and as
+    written (not "diameter" in "rotor diameter"), with the query's exclusions and its terms that aren't words (values,
+    pages); none for like:."""
     out = []
     if not synonyms or any("like" in t for g in groups for t in g["terms"]):
         return out
@@ -386,7 +392,7 @@ def other_names(groups, synonyms):
                 ws = words(name)
                 if not ws or names(groups, name) or any(o[0] == name for o in out):
                     continue
-                out.append((name, [{"not": False, "terms": [{"words": ws, "field": field}]}] + kept))
+                out.append((name, [{"not": False, "terms": [{"words": ws, "field": field, "whole": True}]}] + kept))
     return out
 
 OTHER_NAME_SHARE = 0.5  # a claim found by another name scores half (the page's)
