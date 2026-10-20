@@ -2,6 +2,7 @@
 each, gzipped inside the page and put together by its script (report.js), its crops embedded as a byte budget allows
 (crops.py; docs/plans/portable-reports-2026-10-19.md)."""
 from . import crops, topics
+from .values import claim_value, unit_tables
 from .html_pages import embed_json, esc, page as html_page
 import base64
 import gzip
@@ -105,6 +106,10 @@ SEARCH_HELP = ('<details class="search-help"><summary>How to search</summary><ul
                '<code>1,000</code> finds 1000, <code>75kW</code> finds 75 kW.</li>'
                '<li><code>"feed pump"</code>: the words in a row. <code>-gearbox</code>: without it. '
                '<code>blade OR rotor</code>: either.</li>'
+               '<li>Values compared, across units: <code>&gt;50kW</code> (or <code>&gt;50 kW</code>) finds 0.075 MW '
+               'too; <code>&lt;=0.1MW</code>, <code>value:10-20mm</code> (a range), <code>value:75kW</code> (that '
+               'value). Without a unit, numbers compare as written. A range or bound a claim states (50–60, '
+               '≤ 39) is found where it meets the search\'s.</li>'
                '<li>In one part of a claim: <code>entity:</code>, <code>attribute:</code>, <code>value:</code> (with '
                'its unit), <code>conditions:</code>, <code>quote:</code>, <code>section:</code>, <code>file:</code> (a '
                'file\'s name is searched only so); '
@@ -525,7 +530,10 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
              '<th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody>'+coverage
              +'</tbody></table></details>')
     page += crops_left_out_html(account)
-    parts = {"page": page, "findings": findings, "claims": claims, "cards": card.html, "said": list(card.said)}
+    units, folded, kinds = unit_tables()  # what the search compares values in (search.js, values.py)
+    values = {eid: v for eid in card.html if (v := claim_value(card.evidence[eid])) is not None}
+    parts = {"page": page, "findings": findings, "claims": claims, "cards": card.html, "said": list(card.said),
+             "values": values, "units": units, "folded": folded, "kinds": kinds}
     packed = json.dumps(parts, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     packed = base64.b64encode(gzip.compress(packed, 9, mtime=0)).decode("ascii")  # mtime=0: the same bytes each time
     images = embed_json({"type": mime, "data": [c.data for c in chosen]})

@@ -418,6 +418,8 @@ store's latest comparison (--comparison picks another, for one store).
   "feed pump"          the words in a row;  -gearbox  without it;  blade OR rotor  either
   entity:pump          one part of a claim: entity, attribute, value (with its unit), conditions, quote, section,
                        file (a file's name is searched only so); page:12 or page:10-20
+  >50kW  value:10-20mm values compared across units (0.075 MW is over 50 kW); <=, >=, <; value:75kW for
+                       that value; without a unit, numbers as written
   like:ID              the claims sharing enough of what a claim is about, most alike first
 The most relevant first. After the claims found come their counterparts (the claims the comparison paired with
 them; --alone leaves them out), and where a counterpart names what was searched otherwise, its name is offered.
@@ -524,6 +526,9 @@ def search_command(argv):
         for i, _, _ in hits:
             counts[claims[i]['source']] = counts.get(claims[i]['source'], 0) + 1
         line += ': ' + '; '.join(f'{n} in {name}' for name, n in counts.items()) if counts else ''
+    strange = finder.unknown(groups)
+    if strange:
+        line += f" (units the search doesn't know: {', '.join(strange)})"
     print(line)
     if names:
         print("The other source's names for it: " + ', '.join(f'"{name}" ({n})' for name, n in names))

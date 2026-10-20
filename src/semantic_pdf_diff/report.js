@@ -133,7 +133,7 @@
   const show = () => {
     for (const tab of tabs) tab.classList.toggle('on', tab.dataset.view === view);
     for (const part of root.querySelectorAll('[data-for]')) part.hidden = part.dataset.for !== view;
-    const groups = Search.parse(query.value);
+    const groups = Search.parse(query.value, index.unitOf);
     const among = groups.length ? index.find(groups) : null;
     const searched = among && {findings: among(R.findings), claims: among(R.claims)};
     const worded = groups.some((g) => !g.not && g.terms.some((t) => t.words));
@@ -188,6 +188,8 @@
       count += (via ? ` (${via} as counterparts)` : '') + ': '
         + sides.map((name, i) => `${chosen.filter((c) => c.side === i).length} in ${name}`).join('; ');
     }
+    const strange = Search.unknown(groups);
+    if (strange.length) count += ` · units the search doesn't know: ${strange.join(', ')}`;
     $('count').textContent = count;
     paged(main, chosen.map((x) => (view === 'claims' && added.has(x) ? x.html.replace('<p class="meta">', COUNTERPART)
       : x.html)), found ? Search.marker(groups, index) : null);

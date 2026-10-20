@@ -44,6 +44,7 @@ const Search = (() => {
   // each word's documents. Built a slice at a time (step), as the page has time.
   const index = (R) => {
     const vocab = new Map(), postings = [], docs = [], pages = new Map(), cardDoc = new Map(), names = new Map();
+    const values = new Map();  // doc: its claim's value, [kind, size of its unit, low, high] (report.py's)
     let sorted = null, average = 0;
     const add = (fields) => {  // [[field, text]...]: its document's number
       const id = docs.length, terms = [], of = [];
@@ -85,6 +86,7 @@ const Search = (() => {
       fields.push(...lines(found[3]).map((line) => [CONTEXT, line]));
       const doc = add(fields);
       if (page) pages.set(doc, Number(page[1]));
+      if (R.values && R.values[id]) values.set(doc, R.values[id]);
       return doc;
     };
     // a finding's own words: why and its rationale, not what every finding of its relation or kind says
@@ -136,9 +138,27 @@ const Search = (() => {
       }
       return n;
     };
+    // whether a value [kind, size, low, high] is within a comparison's bounds: in its kind, converted, or as written
+    // when the comparison names no unit
+    const below = (a, b, open) => {
+      const tolerance = 1e-9 * Math.max(1, Math.abs(a), Math.abs(b));
+      return open ? a < b - tolerance : a <= b + tolerance;
+    };
+    const within = (q, [kind, size, low, high]) => {
+      if (q.kind !== null && kind !== q.kind) return false;
+      const scale = q.kind === null ? 1 : size;
+      const lo = low === null ? null : low * scale, hi = high === null ? null : high * scale;
+      return (lo === null || q.hi === null || below(lo, q.hi, q.highOpen))
+        && (q.lo === null || hi === null || below(q.lo, hi, q.lowOpen));
+    };
     // the documents holding a term: {doc: its weight}
     const hits = (term) => {
       const out = new Map();
+      if (term.unknown) return out;
+      if (term.compare) {
+        for (const [doc, value] of values) if (within(term.compare, value)) out.set(doc, 0);
+        return out;
+      }
       if (term.pages) {
         for (const [doc, page] of pages) if (page >= term.pages[0] && page <= term.pages[1]) out.set(doc, 0);
         return out;
@@ -219,24 +239,64 @@ const Search = (() => {
         return result;
       };
     };
-    return {step, find, about: (id) => (step(), about(id).map((t) => word(t.terms[0]))),
+    // a unit as the search reads it: [kind, size in its base], or null (report.py writes the tables)
+    const unitOf = (text) => {
+      const spelled = text.replace(/º/g, '°').normalize('NFKC').replace(/[·•⋅*×]/g, '.')  // values.spelled's
+        .replace(/(?<=[A-Za-zµμ])-(?=[A-Za-z])/g, '.').replace(/\^/g, '').split(/\s+/).filter(Boolean).join(' ')
+        .replace(/\.+$/, '');
+      return (R.units && (R.units[spelled] || R.folded[spelled.toLowerCase()])) || null;
+    };
+    return {step, find, unitOf, about: (id) => (step(), about(id).map((t) => word(t.terms[0]))),
             named: (id) => (step(), names.get(id) || ['', ''])};  // a card's entity and attribute
   };
 
   // a query: groups, each to be found (or, with "-", not), by any of its terms ("a OR b"); a term: words in a row (a
   // phrase), in one field or any; page:N or page:N-M; like:ID
   const TERM = /(-?)(?:([A-Za-z]+):)?(?:"([^"]*)"?|(\S+))/gu;
-  const parse = (text) => {
-    const groups = [];
+  // a value compared (milestone 3: ">50kW", "value:10-20mm", "value:0.075MW"): an operator, a number or a range,
+  // and a unit, which may be the next word (">50 kW")
+  const NUM = '[+-]?(?:\\d[\\d,]*(?:\\.\\d+)?|\\.\\d+)(?:[eE][+-]?\\d+)?';
+  const COMPARED = new RegExp(`^(<=|>=|<|>|≤|≥)?\\s*(${NUM})(?:\\s*(?:–|-|to)\\s*(${NUM}))?\\s*(\\S.*)?$`);
+  const number = (text) => Number(text.replace(/,/g, ''));
+  // the term comparing a value, its bounds in its unit's base (or as written, without a unit); {unknown} for a unit
+  // the search doesn't know
+  const compared = (op, a, b, unitText, unitOf) => {
+    let kind = null, size = 1;
+    if (unitText) {
+      const known = unitOf(unitText);
+      if (!known) return {unknown: unitText};
+      [kind, size] = known;
+    }
+    const x = number(a) * size, y = b === undefined ? null : number(b) * size;
+    const q = {lo: x, hi: x, lowOpen: false, highOpen: false, kind};
+    if (y !== null) Object.assign(q, {lo: Math.min(x, y), hi: Math.max(x, y)});
+    else if (op === '>' || op === '>=' || op === '≥') Object.assign(q, {hi: null, lowOpen: op === '>'});
+    else if (op) Object.assign(q, {lo: null, highOpen: op === '<'});
+    return {compare: q};
+  };
+  const parse = (text, unitOf = () => null) => {
+    const groups = [], tokens = [...text.matchAll(TERM)];
     let either = false;
-    for (const [whole, not, name, quoted, bare] of text.matchAll(TERM)) {
+    for (let i = 0; i < tokens.length; i++) {
+      const [whole, not, name, quoted, bare] = tokens[i];
       if (!not && !name && quoted === undefined && (bare === 'OR' || bare === '|')) {
         either = groups.length > 0;
         continue;
       }
       const key = (name || '').toLowerCase(), raw = quoted === undefined ? bare : quoted;
+      const value = (key === 'value' || (!key && quoted === undefined)) && COMPARED.exec(raw);
       let term = null;
-      if (key === 'like') term = {like: raw};
+      // a comparison: an operator, or value: with a range or a known unit ("value:3.5:1" stays words)
+      const ranged = value && (value[3] !== undefined || (value[4] !== undefined && unitOf(value[4])));
+      if (value && (value[1] || (key === 'value' && ranged))) {
+        let unitText = value[4];
+        const next = tokens[i + 1];
+        if (!unitText && next && !next[1] && !next[2] && next[3] === undefined && unitOf(next[4])) {
+          unitText = next[4];
+          i++;
+        }
+        term = compared(value[1], value[2], value[3], unitText, unitOf);
+      } else if (key === 'like') term = {like: raw};
       else if (key === 'page') {
         const range = /^(\d+)(?:-(\d+))?$/.exec(raw);
         if (range) term = {pages: [Number(range[1]), Number(range[2] || range[1])]};
@@ -257,6 +317,8 @@ const Search = (() => {
   // whether a word is one a query asks for: letters by their beginnings, numbers (and a letter alone) whole
   const asks = (w, b) => (NUMBER.test(b) || b.length < 2 ? w === b : w.startsWith(b));
   const asked = (groups) => groups.filter((g) => !g.not).map((g) => g.terms.filter((t) => t.words));
+  // the units a query names that the search doesn't know
+  const unknown = (groups) => groups.flatMap((g) => g.terms.filter((t) => t.unknown).map((t) => t.unknown));
   // whether a name holds every word group a query asks for (fields, phrases' order and pages aside): one it finds
   const covers = (groups, text) => {
     const ws = words(text);
@@ -310,5 +372,5 @@ const Search = (() => {
     };
   };
 
-  return {index, parse, marker, covers, touches, words};
+  return {index, parse, marker, covers, touches, unknown, words};
 })();

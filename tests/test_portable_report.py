@@ -454,7 +454,8 @@ class InABrowser(unittest.TestCase):
         self.assertEqual(sorted(int(n) for t, n in counts if t != "-1"), [12, 12, 12])
 
 def search_report():
-    """Claims to search (milestone 6): pumps named in either order, a pump only quoted, numbers written two ways."""
+    """Claims to search (milestone 6): pumps named in either order, a pump only quoted, numbers written two ways;
+    values in another unit, a range and a bound (the search plan's milestone 3)."""
     at = lambda page: PdfLocator(page=page, bbox=(0, 0, 100, 100), region="text", task="text:0")
     a = [ev("A-pump", entity="feed water pump", attribute="rated power", value="75", unit="kW", locator=at(3),
             quote="rated power 75 kW", section="s1"),
@@ -465,14 +466,22 @@ def search_report():
          ev("A-tank", entity="storage tank", attribute="volume", value="750", unit="m3", locator=at(6),
             quote="the tank feeding the feed pumps holds 750 m3"),
          ev("A-heater", entity="Café heater", attribute="power", value="15.00", unit="kW", locator=at(7),
-            quote="heater 15 kW")]
+            quote="heater 15 kW"),
+         ev("A-blower", entity="blower", attribute="air flow", value="50–60", unit="L/s", locator=at(8),
+            quote="50 to 60 L/s")]
     b = [ev("B-pump", entity="pump, feed water", attribute="rated output", value="80", unit="kW", locator=at(3),
             quote="output 80 kW"),
          ev("B-valve", entity="isolation valve", attribute="nominal diameter", value="1000", unit="mm", locator=at(4),
             quote="DN1000"),
          ev("B-gearbox", entity="pump gearbox", attribute="ratio", value="3.5", unit="", locator=at(9), quote="3.5:1"),
          ev("B-heater", entity="cafe heater", attribute="power", value="15", unit="kW", locator=at(7),
-            quote="15 kW heater")]
+            quote="15 kW heater"),
+         ev("B-drive", entity="drive", attribute="shaft power", value="0.08", unit="MW", locator=at(8),
+            quote="0.08 MW"),
+         ev("B-limit", entity="noise limit", attribute="sound level", value="≤ 39", unit="dBA", locator=at(10),
+            quote="no more than 39 dBA"),
+         ev("B-blade", entity="blade", attribute="flapwise stiffness", value="2.5E9", unit="N.m^2", locator=at(11),
+            quote="EI 2.5E9 N.m^2")]
     data = report(a + b, [finding(a[0], b[0], "different"), finding(a[1], b[1], "equivalent"),
                           finding(a[4], b[3], "equivalent")])
     data["sections"] = [{"content": a[0].content, "id": "s1", "heading_path": ["Plant", "Feed system"]}]
@@ -552,7 +561,10 @@ class SearchInABrowser(unittest.TestCase):
             raise unittest.SkipTest("no headless browser installed (chromium)")
         cases = [("claims", q) for q in ("pump feed", '"feed pump"', "pump -gearbox", "gearbox OR motor",
                                          "power of the pump", "entity:pump", "75", "1,000", "1000", "15", "cafe",
-                                         "page:4-5", "pump", "section:feed", "-valve", "output", "pdf", "file:b")]
+                                         "page:4-5", "pump", "section:feed", "-valve", "output", "pdf", "file:b",
+                                         ">70kW", ">70 kW", "value:75kW", "value:0.075MW", "power <20kW",
+                                         "value:55L/s", "<40dBA", "value:>40dBA", ">1000", ">1mw", ">1e9 N•m2",
+                                         "value:2.5GN.m2")]
         cases += [("findings", "pump"), ("claims", "output", True)]
         with tempfile.TemporaryDirectory() as d:
             write_report(search_report(), Path(d))
@@ -572,7 +584,7 @@ class SearchInABrowser(unittest.TestCase):
         return [card for item in self.got(q, view)["items"] for card in item]
 
     def test_words_in_any_order_as_the_start_of_words(self):
-        self.assertEqual(self.got("pump feed")["count"], "3 of 9 claims: 2 in A; 1 in B")
+        self.assertEqual(self.got("pump feed")["count"], "3 of 13 claims: 2 in A; 1 in B")
         self.assertEqual(set(self.ids("pump feed")), {"A-pump", "B-pump", "A-tank"})
         self.assertEqual(self.ids("pump feed")[-1], "A-tank")  # only its quote says so: last
 
@@ -580,7 +592,7 @@ class SearchInABrowser(unittest.TestCase):
         self.assertEqual(self.ids('"feed pump"'), ["A-tank"])  # "the feed pumps"
         self.assertEqual(set(self.ids("pump -gearbox")), {"A-pump", "A-motor", "A-tank", "B-pump"})
         self.assertEqual(set(self.ids("gearbox OR motor")), {"A-motor", "B-gearbox"})
-        self.assertEqual(len(self.ids("-valve")), 7)
+        self.assertEqual(len(self.ids("-valve")), 11)
         self.assertEqual(self.ids("power of the pump"), ["A-pump"])  # "of" and "the" not asked for
 
     def test_fields_and_pages(self):
@@ -588,7 +600,8 @@ class SearchInABrowser(unittest.TestCase):
         self.assertEqual(set(self.ids("page:4-5")), {"A-valve", "B-valve", "A-motor"})
         self.assertEqual(self.ids("section:feed"), ["A-pump"])
         self.assertEqual(self.ids("pdf"), [])  # a file's name only when asked for: "a.pdf", "b.pdf"
-        self.assertEqual(set(self.ids("file:b")), {"B-pump", "B-valve", "B-gearbox", "B-heater"})
+        self.assertEqual(set(self.ids("file:b")), {"B-pump", "B-valve", "B-gearbox", "B-heater", "B-drive", "B-limit",
+                                                  "B-blade"})
 
     def test_numbers_match_whole_however_written(self):
         self.assertEqual(self.ids("75"), ["A-pump"])  # not the tank's 750
@@ -596,6 +609,22 @@ class SearchInABrowser(unittest.TestCase):
             self.assertEqual(set(self.ids(q)), {"A-valve", "B-valve"})
         self.assertEqual(set(self.ids("15")), {"A-heater", "B-heater"})  # 15.00 too
         self.assertEqual(set(self.ids("cafe")), {"A-heater", "B-heater"})  # accents folded
+
+    def test_values_compared_across_units_ranges_and_bounds(self):
+        # the search plan, milestone 3: 0.08 MW is over 70 kW; a range meets a value within it; a bound, values past it
+        for q in (">70kW", ">70 kW"):
+            self.assertEqual(set(self.ids(q)), {"A-pump", "B-pump", "B-drive"})
+        self.assertEqual(self.ids("value:75kW"), ["A-pump"])
+        self.assertEqual(self.ids("value:0.075MW"), ["A-pump"])
+        self.assertEqual(set(self.ids("power <20kW")), {"A-heater", "B-heater"})
+        self.assertEqual(self.ids("value:55L/s"), ["A-blower"])
+        self.assertEqual(self.ids("<40dBA"), ["B-limit"])
+        self.assertEqual(self.ids("value:>40dBA"), [])
+        self.assertEqual(self.ids(">1000"), ["A-motor", "B-blade"])  # no unit: as written (not the valves' 1000)
+        self.assertEqual(self.ids(">1mw"), [])  # mW or MW?
+        self.assertTrue(self.got(">1mw")["count"].endswith("units the search doesn't know: mw"))
+        self.assertEqual(self.ids(">1e9 N•m2"), ["B-blade"])  # N.m^2, spelled otherwise
+        self.assertEqual(self.ids("value:2.5GN.m2"), [])  # GN.m2 isn't a unit it knows: words
 
     def test_the_most_relevant_first_and_the_words_marked(self):
         ranked = self.ids("pump")
@@ -609,7 +638,7 @@ class SearchInABrowser(unittest.TestCase):
 
     def test_the_address_keeps_the_view_and_the_search(self):
         # the page opened on the view and the search its address held (#claims&q=feed%20pump)
-        self.assertEqual(self.got("feed pump", "opened")["count"], "3 of 9 claims: 2 in A; 1 in B")
+        self.assertEqual(self.got("feed pump", "opened")["count"], "3 of 13 claims: 2 in A; 1 in B")
         self.assertEqual(self.got("pump feed")["hash"], "#claims&q=pump%20feed")
         self.assertEqual(self.got("pump", "findings")["hash"], "#q=pump")
 
@@ -618,7 +647,7 @@ class SearchInABrowser(unittest.TestCase):
         paired = self.got("output +counterparts")
         self.assertEqual(self.ids("output +counterparts"), ["B-pump", "A-pump"])
         self.assertEqual(paired["via"], ["A-pump"])
-        self.assertEqual(paired["count"], "2 of 9 claims (1 as counterparts): 1 in A; 1 in B")
+        self.assertEqual(paired["count"], "2 of 13 claims (1 as counterparts): 1 in A; 1 in B")
         self.assertEqual(paired["also"], ['"rated power"'])  # B's "rated output" is A's "rated power"
         self.assertEqual(self.ids("output"), ["B-pump"])  # without them
         offered = self.got('(offered) "rated power"')

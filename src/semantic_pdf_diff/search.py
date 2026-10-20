@@ -9,6 +9,7 @@ import math
 import re
 import unicodedata
 from bisect import bisect_left
+from .values import claim_value, unit_of
 
 # fields, as a query names them, and what a word found in each weighs: what a claim is about first
 WEIGHTS = (3, 3, 2, 1.5, 1.5, 1, 1, 0.5, 0.5)
@@ -73,7 +74,7 @@ class Index:
     `doc`)."""
     def __init__(self):
         self.vocab, self.postings, self.docs = {}, [], []
-        self.pages, self.card_doc, self.names = {}, {}, {}
+        self.pages, self.card_doc, self.names, self.values = {}, {}, {}, {}
         self._sorted = None
 
     def _add(self, fields):
@@ -119,9 +120,11 @@ class Index:
             self.pages[doc] = int(page.group(1))
         return doc
 
-    def add(self, cards, said, findings=(), prefix=""):
+    def add(self, cards, said, findings=(), prefix="", values=None):
         for key, html in cards.items():
-            self.card_doc[prefix + key] = self._card(prefix + key, html, said)
+            self.card_doc[prefix + key] = doc = self._card(prefix + key, html, said)
+            if values and values.get(key):
+                self.values[doc] = values[key]
         for f in findings:
             f["doc"] = self._add([(OTHER, plain(SAME.sub("", f["html"])))])
 
@@ -164,6 +167,10 @@ class Index:
     def hits(self, term):
         """The documents holding a term: {doc: its weight}."""
         out = {}
+        if "unknown" in term:
+            return out
+        if "compare" in term:
+            return {doc: 0 for doc, value in self.values.items() if within(term["compare"], value)}
         if "pages" in term:
             low, high = term["pages"]
             return {doc: 0 for doc, page in self.pages.items() if low <= page <= high}
@@ -243,20 +250,76 @@ class Index:
             return result
         return among
 
+def _below(a, b, open_):
+    tolerance = 1e-9 * max(1, abs(a), abs(b))
+    return a < b - tolerance if open_ else a <= b + tolerance
+
+def within(q, value):
+    """Whether a value [kind, size, low, high] is within a comparison's bounds: in its kind, converted, or as written
+    when the comparison names no unit."""
+    kind, size, low, high = value
+    if q["kind"] is not None and kind != q["kind"]:
+        return False
+    scale = 1 if q["kind"] is None else size
+    lo, hi = (None if low is None else low * scale), (None if high is None else high * scale)
+    return ((lo is None or q["hi"] is None or _below(lo, q["hi"], q["highOpen"]))
+            and (q["lo"] is None or hi is None or _below(q["lo"], hi, q["lowOpen"])))
+
+# a value compared (milestone 3: ">50kW", "value:10-20mm", "value:0.075MW"): an operator, a number or a range, and a
+# unit, which may be the next word (">50 kW")
+NUM = r"[+-]?(?:[0-9][0-9,]*(?:\.[0-9]+)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
+COMPARED = re.compile(rf"^(<=|>=|<|>|≤|≥)?\s*({NUM})(?:\s*(?:–|-|to)\s*({NUM}))?\s*(\S.*)?$")
+
+def _number(text):
+    return float(text.replace(",", ""))
+
+def compared(op, a, b, unit_text):
+    """The term comparing a value: its bounds in its unit's base (or as written, without a unit); {"unknown"} for a
+    unit the search doesn't know."""
+    kind, size = None, 1
+    if unit_text:
+        known = unit_of(unit_text)
+        if not known:
+            return {"unknown": unit_text}
+        kind, size = known
+    x, y = _number(a) * size, (None if b is None else _number(b) * size)
+    q = {"lo": x, "hi": x, "lowOpen": False, "highOpen": False, "kind": kind}
+    if y is not None:
+        q.update(lo=min(x, y), hi=max(x, y))
+    elif op in (">", ">=", "≥"):
+        q.update(hi=None, lowOpen=op == ">")
+    elif op:
+        q.update(lo=None, highOpen=op == "<")
+    return {"compare": q}
+
 # a query: groups, each to be found (or, with "-", not), by any of its terms ("a OR b"); a term: words in a row (a
-# phrase), in one field or any; page:N or page:N-M; like:ID
+# phrase), in one field or any; a value compared; page:N or page:N-M; like:ID
 TERM = re.compile(r'(-?)(?:([A-Za-z]+):)?(?:"([^"]*)"?|(\S+))')
 
 def parse(text):
     groups, either = [], False
-    for m in TERM.finditer(text):
-        whole, not_, name, quoted, bare = m.group(0), m.group(1), m.group(2), m.group(3), m.group(4)
+    tokens = [(m.group(0), m.group(1), m.group(2), m.group(3), m.group(4)) for m in TERM.finditer(text)]
+    i = -1
+    while i + 1 < len(tokens):
+        i += 1
+        whole, not_, name, quoted, bare = tokens[i]
         if not not_ and not name and quoted is None and bare in ("OR", "|"):
             either = bool(groups)
             continue
         key, raw = (name or "").lower(), bare if quoted is None else quoted
+        value = COMPARED.match(raw) if key == "value" or (not key and quoted is None) else None
+        # a comparison: an operator, or value: with a range or a known unit ("value:3.5:1" stays words)
+        ranged = value and (value.group(3) is not None or (value.group(4) is not None and unit_of(value.group(4))))
         term = None
-        if key == "like":
+        if value and (value.group(1) or (key == "value" and ranged)):
+            unit_text = value.group(4)
+            following = tokens[i + 1] if i + 1 < len(tokens) else None
+            if (not unit_text and following and not following[1] and not following[2] and following[3] is None
+                    and unit_of(following[4])):
+                unit_text = following[4]
+                i += 1
+            term = compared(value.group(1), value.group(2), value.group(3), unit_text)
+        elif key == "like":
             term = {"like": raw}
         elif key == "page":
             pages = re.fullmatch(r"([0-9]+)(?:-([0-9]+))?", raw)
@@ -283,6 +346,10 @@ def asks(w, b):
 
 def _asked(groups):
     return [[t for t in g["terms"] if "words" in t] for g in groups if not g["not"]]
+
+def unknown(groups):
+    """The units a query names that the search doesn't know."""
+    return [t["unknown"] for g in groups for t in g["terms"] if "unknown" in t]
 
 def covers(groups, text):
     """Whether a name holds every word group a query asks for (fields, phrases' order and pages aside)."""
@@ -337,7 +404,7 @@ def report_items(data, index, prefix=""):
                  "finding": f} for f in ordered(data["findings"]) if f["relation"] != "unrelated"]
     sides = [s["name"] for s in data["sources"]]
     claims = claim_records(data, card, file_index(file_pairs(data)), {}, sides)
-    index.add(card.html, list(card.said), findings, prefix)
+    index.add(card.html, list(card.said), findings, prefix, {k: claim_value(card.evidence[k]) for k in card.html})
     for claim in claims:  # what the command prints of it
         e = card.evidence[claim["card"]]
         claim.update(evidence=e, where=card.where(e["content"]), source=sides[claim["side"]] if claim["side"] >= 0

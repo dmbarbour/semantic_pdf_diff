@@ -32,18 +32,28 @@ class Engine(unittest.TestCase):
         self.assertEqual(set(found("pump -gearbox")), {"A-pump", "A-motor", "A-tank", "B-pump"})
         self.assertEqual(set(found("gearbox OR motor")), {"A-motor", "B-gearbox"})
         self.assertEqual(found("power of the pump"), ["A-pump"])
-        self.assertEqual(len(found("-valve")), 7)
+        self.assertEqual(len(found("-valve")), 11)
 
     def test_fields_pages_numbers(self):
         self.assertEqual(set(found("entity:pump")), {"A-pump", "A-motor", "B-pump", "B-gearbox"})
         self.assertEqual(set(found("page:4-5")), {"A-valve", "B-valve", "A-motor"})
         self.assertEqual(found("section:feed"), ["A-pump"])
         self.assertEqual(found("pdf"), [])
-        self.assertEqual(set(found("file:b")), {"B-pump", "B-valve", "B-gearbox", "B-heater"})
+        self.assertEqual(set(found("file:b")), {"B-pump", "B-valve", "B-gearbox", "B-heater", "B-drive", "B-limit",
+                                                 "B-blade"})
         self.assertEqual(found("75"), ["A-pump"])
         self.assertEqual(set(found("1,000")), {"A-valve", "B-valve"})
         self.assertEqual(set(found("15")), {"A-heater", "B-heater"})
         self.assertEqual(set(found("cafe")), {"A-heater", "B-heater"})
+
+    def test_values_across_units(self):
+        self.assertEqual(set(found(">70 kW")), {"A-pump", "B-pump", "B-drive"})
+        self.assertEqual(found("value:0.075MW"), ["A-pump"])
+        self.assertEqual(found("value:55L/s"), ["A-blower"])
+        self.assertEqual(found("<40dBA"), ["B-limit"])
+        self.assertEqual(found(">1000"), ["A-motor", "B-blade"])
+        self.assertEqual(search.unknown(search.parse(">1mw")), ["mw"])
+        self.assertEqual(search.parse("value:3.5:1")[0]["terms"][0]["words"], ["3.5", "1"])  # stays words
 
     def test_counterparts_names_and_like(self):
         self.assertEqual(found("output", paired=True), ["B-pump", "A-pump"])
@@ -73,6 +83,37 @@ class SameAsThePage(unittest.TestCase):
                 claims, findings = search.report_items(search_report(), index)
                 _, names = search.search(index, search.parse(q), claims, findings)
                 self.assertEqual([f'"{name}"' for name, _ in names], result["also"])
+
+class Values(unittest.TestCase):
+    """A claim's value and a search's units (values.py): what milestone 3 compares."""
+    def test_numbers_ranges_bounds_and_units_written_in_the_value(self):
+        from semantic_pdf_diff.values import value_range
+        for value, unit, expected in [("75", "kW", (75.0, 75.0, "kW")), ("1,000", "mm", (1000.0, 1000.0, "mm")),
+                                      ("7.85E3", "kg/m^3", (7850.0, 7850.0, "kg/m^3")),
+                                      ("50–60", "L/s", (50.0, 60.0, "L/s")), ("1.2 to 3", "m", (1.2, 3.0, "m")),
+                                      ("≤ 39", "dBA", (None, 39.0, "dBA")), ("> 5", "", (5.0, None, "")),
+                                      ("approximately 5", "m", (5.0, 5.0, "m")), ("75 kW", "", (75.0, 75.0, "kW")),
+                                      ("-5", "°C", (-5.0, -5.0, "°C")), ("3.5:1", "", None), ("open", "", None)]:
+            with self.subTest(value=value):
+                self.assertEqual(value_range(value, unit), expected)
+
+    def test_units_in_their_kinds_base_and_spellings_that_mean_two_things(self):
+        from semantic_pdf_diff.values import search_unit
+        self.assertEqual(search_unit("kW"), ("power", 1000.0))
+        self.assertEqual(search_unit("kw"), ("power", 1000.0))
+        self.assertIsNone(search_unit("mw"))  # mW or MW
+        self.assertEqual(search_unit("g"), ("mass", 0.001))  # the product's gram, not the scorer's g-force
+        self.assertAlmostEqual(search_unit("ft")[1], 0.3048, places=4)  # the scorer's inches, in metres
+        self.assertAlmostEqual(search_unit("psi")[1], 6894.76, places=1)
+        self.assertEqual(search_unit("m²"), search_unit("m2"))
+        # the search's own units, spelled as documents spell them
+        for spelling in ("N.m^2", "N•m2", "N*m^2"):
+            self.assertEqual(search_unit(spelling), ("bending stiffness", 1.0))
+        self.assertEqual(search_unit("MN-m"), ("moment", 1e6))
+        self.assertEqual(search_unit("kN·m"), ("moment", 1e3))
+        self.assertEqual(search_unit("º"), search_unit("°"))  # an ordinal for a degree
+        self.assertAlmostEqual(search_unit("RPM")[1], 0.10472, places=5)  # rad/s, folded
+        self.assertAlmostEqual(search_unit("kips")[1], 4448.22, places=1)  # the scorer's, in newtons
 
 def run(*argv):
     with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()) as err:
@@ -133,6 +174,13 @@ class Command(unittest.TestCase):
         self.assertEqual(data["found"], 4)
         code, out, _ = run("search", "like:A-pump", "--store", self.store, "--store", other, "--side", "B")
         self.assertIn("B-pump", out.splitlines()[2])
+
+    def test_values_across_units_and_a_unit_it_doesnt_know(self):
+        code, out, _ = run("search", ">70", "kW", "--store", self.store)
+        self.assertTrue(out.startswith("3 claims found"))
+        self.assertIn("drive — shaft power = 0.08 MW", out)
+        code, out, _ = run("search", ">1mw", "--store", self.store)
+        self.assertEqual(out.splitlines()[0], "0 claims found (units the search doesn't know: mw)")
 
     def test_refusals(self):
         with self.assertRaises(SystemExit):

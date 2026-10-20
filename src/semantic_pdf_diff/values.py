@@ -6,6 +6,9 @@ through compare.numeric_check, so a change to it changes requests and every reco
 The scorer's (UNIT_KINDS) covers the controlled corpus's units and their spellings. Merging them is a decision for a
 round, not a clean-up. The product's text folding (extract.FOLD, readings.QUOTES) stays with its users for the same
 reason: it decides which quotes verify, which decides which tasks are refined.
+
+A search's unit table (SEARCH_UNITS) is read from both and from units only it knows (SEARCH_EXTRA), changing
+neither: it decides what a search finds, nothing a model is asked.
 """
 import re
 import unicodedata
@@ -166,3 +169,126 @@ def unit_kind(text):
     text = " ".join(unicodedata.normalize("NFKC", str(text)).split()).rstrip(".")  # NFKC: ft² is ft2
     text = re.sub(r"^(?:per|in)\s+", "", text)
     return _EXACT.get(text) or _FOLDED.get(text.casefold())
+
+# --- units: a search's (docs/plans/search-2026-10-20.md, milestone 3)
+
+# Units only a search knows, in SI: those engineering documents use that the product's table leaves out (it enters
+# comparison prompts, so it stays as it is). "°" and "rpm" bridge the scorer's angles and rotations into SI.
+_TAU = 6.283185307179586
+SEARCH_EXTRA = {
+    "N": ("force", 1), "kN": ("force", 1e3), "MN": ("force", 1e6),
+    "N.m": ("moment", 1), "Nm": ("moment", 1), "kN.m": ("moment", 1e3), "kNm": ("moment", 1e3),
+    "MN.m": ("moment", 1e6), "MNm": ("moment", 1e6),
+    "N.m2": ("bending stiffness", 1), "kN.m2": ("bending stiffness", 1e3), "MN.m2": ("bending stiffness", 1e6),
+    "N/m": ("force per length", 1), "kN/m": ("force per length", 1e3),
+    "N/m2": ("pressure", 1), "N/mm2": ("pressure", 1e6), "GPa": ("pressure", 1e9),
+    "t": ("mass", 1000), "tonne": ("mass", 1000), "tonnes": ("mass", 1000), "gram": ("mass", .001),
+    "grams": ("mass", .001), "kilogram": ("mass", 1), "kilograms": ("mass", 1),
+    "kg/m": ("mass per length", 1), "kg/m3": ("density", 1), "g/cm3": ("density", 1000), "t/m3": ("density", 1000),
+    "kg.m": ("mass moment", 1), "kg.m2": ("moment of inertia", 1), "t.m2": ("moment of inertia", 1000),
+    "A": ("current", 1), "kA": ("current", 1e3), "mA": ("current", .001),
+    "V": ("voltage", 1), "kV": ("voltage", 1e3), "mV": ("voltage", .001),
+    "rad": ("angle", 1), "°": ("angle", _TAU / 360),
+    "rad/s": ("rotation", 1), "rpm": ("rotation", _TAU / 60),
+    "day": ("time", 86400), "days": ("time", 86400), "year": ("time", 31557600), "years": ("time", 31557600),
+    "yr": ("time", 31557600),
+}
+
+def _search_units():
+    """The units a search compares values in: {spelling: (kind, size in the kind's base)}, the product's table, the
+    search's own and the scorer's together, none changed. A kind the SI tables hold is put in their base through a
+    spelling both hold (the scorer's inches become metres through "m"); a spelling the product's table holds keeps
+    its meaning there ("g" is a gram, not g-force)."""
+    out = {u: (kind, float(size)) for u, (kind, size) in UNITS.items()}
+    for u, (kind, size) in SEARCH_EXTRA.items():
+        out.setdefault(u, (kind, float(size)))
+    for kind, units in UNIT_KINDS.items():
+        bridge = next((u for u in units if out.get(u, ("",))[0] == kind), None)
+        scale = out[bridge][1] / units[bridge] if bridge else 1.0
+        for u, size in units.items():
+            out.setdefault(u, (kind, size * scale))
+    return out
+
+SEARCH_UNITS = _search_units()
+# a spelling lowercased, where every unit lowercasing to it means the same ("rpm" for "RPM"; "mw" is mW or MW: none)
+SEARCH_FOLDED = {}
+for _u, _ks in SEARCH_UNITS.items():
+    if len(_u) > 1:
+        SEARCH_FOLDED.setdefault(_u.lower(), set()).add(_ks)
+SEARCH_FOLDED = {u: next(iter(ks)) for u, ks in SEARCH_FOLDED.items() if len(ks) == 1}
+
+def spelled(text):
+    """A unit as a search looks it up: "º" a degree (NFKC would make it "o"), NFKC (m² is m2), a product's dot
+    however written (N·m, N•m, N*m, kN-m are N.m), no "^" (m^3 is m3), spaces collapsed, a final period dropped.
+    search.js spells it alike."""
+    text = unicodedata.normalize("NFKC", str(text).replace("º", "°"))
+    text = re.sub(r"(?<=[A-Za-zµμ])-(?=[A-Za-z])", ".", re.sub("[·•⋅*×]", ".", text)).replace("^", "")
+    return " ".join(text.split()).rstrip(".")
+
+def search_unit(text):
+    """(kind, size in its base) of a unit as a search reads it, or None: as spelled, else lowercased where that's
+    unambiguous."""
+    text = spelled(text)
+    return SEARCH_UNITS.get(text) or SEARCH_FOLDED.get(text.lower())
+
+_NUMBER = r"[+-]?(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?"
+_ABOUT = r"(?:(?:~|≈|approx\.?|approximately|about|ca\.?|nominal(?:ly)?)\s*)?"
+_BELOW = {"≤": True, "<=": True, "<": False, "up to": True, "max": True, "max.": True, "maximum": True,
+          "under": False, "below": False}
+_ABOVE = {"≥": True, ">=": True, ">": False, "at least": True, "min": True, "min.": True, "minimum": True,
+          "over": False, "above": False}
+_SINGLE = re.compile(rf"^{_ABOUT}({_NUMBER})$", re.I)
+_RANGE = re.compile(rf"^{_ABOUT}({_NUMBER})\s*(?:–|—|-|to)\s*({_NUMBER})$", re.I)
+_BOUND = re.compile(rf"^({'|'.join(re.escape(k) for k in sorted({**_BELOW, **_ABOVE}, key=len, reverse=True))})"
+                    rf"\s*({_NUMBER})$", re.I)
+
+def _float(text):
+    return float(text.replace(",", ""))
+
+def value_range(value, unit_text=""):
+    """A claim's value as a search compares it: (low, high, unit) as written, None for an open end ("≤ 39" has no
+    low), or None when it isn't a number, a range or a bound. A unit written in the value ("75 kW") is taken when
+    the claim's unit is empty."""
+    text = unicodedata.normalize("NFKC", str(value)).replace("−", "-").strip()
+    unit_text = str(unit_text or "").strip()
+    if not unit_text:
+        split = re.match(r"^(.*?\d)\s*([^\d\s,.].*)$", text)
+        if split and search_unit(split.group(2)):
+            text, unit_text = split.group(1).strip(), split.group(2)
+    try:
+        if m := _SINGLE.match(text):
+            return _float(m.group(1)), _float(m.group(1)), unit_text
+        if m := _RANGE.match(text):
+            low, high = sorted((_float(m.group(1)), _float(m.group(2))))
+            return low, high, unit_text
+        if m := _BOUND.match(text):
+            word, number = m.group(1).lower(), _float(m.group(2))
+            return (None, number, unit_text) if word in _BELOW else (number, None, unit_text)
+    except ValueError:
+        return None
+    return None
+
+# a kind as a search's page and search.py name it: its index
+KINDS = sorted({kind for kind, _ in SEARCH_UNITS.values()})
+KIND = {kind: i for i, kind in enumerate(KINDS)}
+
+def unit_of(text):
+    """A unit as the search reads it: (its kind's index, its size in the kind's base), or None."""
+    known = search_unit(text)
+    return (KIND[known[0]], known[1]) if known else None
+
+def claim_value(e):
+    """A claim's value as a search compares it: [its kind's index or None, its unit's size, low, high] (an open end is
+    None; without a known unit the size is 1 and the numbers are as written), or None when it isn't a number."""
+    found = value_range(e.get("value", ""), e.get("unit", ""))
+    if found is None:
+        return None
+    low, high, unit_text = found
+    known = unit_of(unit_text) if unit_text else None
+    return [known[0], known[1], low, high] if known else [None, 1, low, high]
+
+def unit_tables():
+    """The units the page's search reads ({spelling: [kind, size]}, and lowercased where that's unambiguous), and the
+    kinds' names."""
+    exact = {u: [KIND[k], size] for u, (k, size) in SEARCH_UNITS.items()}
+    return exact, {u: [KIND[k], size] for u, (k, size) in SEARCH_FOLDED.items()}, KINDS
