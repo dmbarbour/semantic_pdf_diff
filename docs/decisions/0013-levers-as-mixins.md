@@ -24,7 +24,7 @@ A lever (one way of reading documents, such as context lines or tiling) was a se
 - **Order is prompt order.** Named configurations keep a fixed order; permuting is an experiment's explicit choice.
 - **Assumptions run once on the final type,** collected from its method resolution order. A configuration that fails one is refused before any request.
 - **One model for the whole pipeline:** extraction's five stages (instructions, context, segmentation, inclusion, matching); comparison (retrieval is the chosen hook `candidates`); judges' rubrics as clause mixins (the lab's `rubrics.py`).
-- **Levers stay settings:** flat field names and `PDF_DIFF_*` variables are unchanged.
+- **Levers stay settings:** flat field names and `PDF_DIFF_*` variables are unchanged. (The variables were retired 2026-10-20 for the user's and stores' settings: [0032](0032-settings-in-layers-and-one-answers-cache.md).)
 - **A lever left out asks exactly what its `off` settings ask.** Parked levers stay in the default configuration, switched off.
 
 ## Consequences

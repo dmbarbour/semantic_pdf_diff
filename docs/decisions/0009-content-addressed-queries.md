@@ -21,7 +21,7 @@ Answers were keyed by request meaning plus a fingerprint of settings ([0007](000
   - `invalid`: the model's failure, replayed as a failure
   - `transient`: timeouts and server errors, asked again when recording
 - **Samples:** replay uses sample 0. The A/A control (`--fresh-regions`) asks for sample 1.
-- **The store's response cache uses the same name:** the query hash and the model (`Client._cache_key`).
+- **The store's response cache uses the same name:** the query hash and the model (`Client._cache_key`). Since 2026-10-20 the user's answers cache, a fixture, holds them instead ([0032](0032-settings-in-layers-and-one-answers-cache.md)).
 - **Identical queries share one answer,** such as the same page in both documents. The dispatcher asks each only once, even while both are in flight.
 - **Levers are for diagnostics only** (the owner's decision, as the plans record it): they never enter the hash, and needn't be in the fixture record. The owner's reason, as recorded: keying by the query is robust not only to whether a lever applies to a query, but to how it applies.
 

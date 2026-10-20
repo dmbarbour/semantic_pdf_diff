@@ -30,4 +30,4 @@ Five hand-kept lists (`LEVERS`, `EXTRACTION_SETTINGS`, `SETTING_REGIONS`, `TRIAG
 - Changing a bound setting needs `--reset`; cached answers replay for every query it didn't change.
 - A new setting must be declared before tests pass. A misfiled one shows up as a hash change its class forbids.
 - Some settings that look like budgets shape queries: `image_tokens`, `context_tokens` and `safety_tokens`, since situating fits its text to what's left after each image's allowance.
-- An exported `PDF_DIFF_*` shaping setting doesn't reach a judge, so it can't silently re-pay judging.
+- An exported `PDF_DIFF_*` shaping setting doesn't reach a judge, so it can't silently re-pay judging. Since 2026-10-20 the same holds for the user's settings, which replaced those variables ([0032](0032-settings-in-layers-and-one-answers-cache.md)).

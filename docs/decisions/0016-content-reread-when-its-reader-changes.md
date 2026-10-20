@@ -16,7 +16,7 @@ A store marks each content item extracted once its tasks are done, and a later r
 
 ## Consequences
 
-- Unchanged queries replay from the store's cache ([0009](0009-content-addressed-queries.md)); only the queries the new reader changed are paid for. A re-read costs time, not money, for content the reader change didn't affect.
+- Unchanged queries replay from the answers cache ([0009](0009-content-addressed-queries.md), [0032](0032-settings-in-layers-and-one-answers-cache.md)); only the queries the new reader changed are paid for. A re-read costs time, not money, for content the reader change didn't affect.
 - Stores made before versions were recorded hold `1`, which matches no version: every item is read once more, free.
 - The discipline is by hand: a reader change that alters requests without raising its version leaves stores stale. The golden requests and the controlled corpus's committed keys (`tests/test_controlled.py`, the Corpus test) show when a change alters what a reader sends.
 - Situating results for a PDF are kept unless the re-read dropped tasks.
