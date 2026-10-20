@@ -5,6 +5,7 @@ from pathlib import Path
 import pymupdf
 from semantic_pdf_diff.schema import Evidence, FileRef, PdfLocator, Source, Extraction, Judgment, Explanation
 from semantic_pdf_diff.settings import Settings
+from semantic_pdf_diff import fixtures
 from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.failures import BudgetExceeded, Invalid, ModelFailure
 from semantic_pdf_diff.retrieval import candidates
@@ -95,7 +96,8 @@ class Tests(unittest.TestCase):
                 s = Settings(base_url=url,retries=1,max_calls=4)
                 store = Store(Path(d) / 'store')
                 self.addCleanup(store.close)
-                c = Client(s,store)
+                c = Client(s,store,cache=fixtures.open(Path(d) / 'answers.sqlite','record'))
+                self.addCleanup(c.close)
                 with self.assertRaises(Invalid): c.ask('extract',Extraction)  # not retried: it'd be as bad again
                 self.assertEqual(state['calls'],1)  # (code review 2026-10-08, C10)
                 self.assertTrue(c.ask('extract',Extraction).complete)  # a failure isn't cached: asked again

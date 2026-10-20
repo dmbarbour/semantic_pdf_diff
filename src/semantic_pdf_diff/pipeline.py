@@ -3,6 +3,7 @@ of the command line (code review 2026-10-01, A3: scripts built command lines to 
 compare_paths() with settings and RunOptions, and the CLI only parses arguments into them.
 """
 import json
+import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -304,6 +305,18 @@ def restated(settings, earlier, later, records, left, right):
     return [change for ca, cb in pairs
             for change in settings.changed_records({ca: records.get(ca, {})}, {cb: records.get(cb, {})}, left, right)]
 
+def answers_cache(store):
+    """The answers cache a run reads and records into: the user's (settings.cache_path), whatever the store. The
+    tests keep one in each store instead (tests/stubs.py), as stores once kept their own. Owner-only, as a store is:
+    its answers quote the documents (a folder named by $PDF_DIFF_CACHE is left as it is)."""
+    from .settings import cache_path
+    path = cache_path()
+    if not path.parent.exists():
+        path.parent.mkdir(parents=True, mode=0o700)
+    cache = fixtures.open(path, 'record')
+    os.chmod(path, 0o600)
+    return cache
+
 def make_client(options, settings, store):
     fixture = None
     if options.fixture:
@@ -318,7 +331,7 @@ def make_client(options, settings, store):
             import pymupdf
             fixture.note('pymupdf', pymupdf.VersionBind)
     if fixture is None:
-        return attach_ledger(Client(settings, store), options)
+        return attach_ledger(Client(settings, store, cache=answers_cache(store)), options)
     fresh = list(options.fresh_regions)
     return attach_ledger(Client(settings, store, fixture=fixture, mode=options.answers_mode,
                                 responder=options.responder, fresh_regions=fresh, export=export), options)
@@ -332,9 +345,10 @@ def fixture_usage(client, given=None):
         log.warning(f"Replay: {len(replay.missing)} request(s) have no answer from {replay.responder}; "
                     f"first: {replay.missing[0]}")
     used = {**replay.usage(), **({'path': str(given)} if given else {})}
-    log.info(f"Fixture {replay.fixture.path.name}: {used['replayed']} answers replayed, {used['recorded']} recorded, "
-             f"{used['missing']} missing")
-    return {'fixture': used}
+    cache = getattr(client, 'caching', False)
+    log.info(f"{'Answers cache' if cache else 'Fixture'} {replay.fixture.path.name}: {used['replayed']} answers "
+             f"replayed, {used['recorded']} recorded, {used['missing']} missing")
+    return {'cache' if cache else 'fixture': used}
 
 def extract_sources(store, client, names, files, progress):
     """Evidence for every content item of the sources: loaded from the store, extracted

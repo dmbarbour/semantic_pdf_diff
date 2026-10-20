@@ -10,6 +10,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 from semantic_pdf_diff import cli
+from semantic_pdf_diff import fixtures
 from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.schema import Extraction, PdfLocator, Evidence
 from semantic_pdf_diff.settings import Settings
@@ -202,10 +203,15 @@ class Binding(unittest.TestCase):
             cleared = bind(store, extraction_interpreter(Settings(quote_match='exact', tile_points=500)), reset=True)
             self.assertEqual((cleared['comparisons'], self.count(store, 'comparison')), (1, 0))
 
+def cached_client(settings, store, folder):
+    """A client caching in an answers cache in the folder (the user's, in a run: pipeline.answers_cache)."""
+    return Client(settings, store, cache=fixtures.open(Path(folder) / 'answers.sqlite', 'record'))
+
 class ContentAddressedCache(unittest.TestCase):
     def test_answers_are_found_by_what_reached_the_model(self):
-        with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(d) as store:
-            client = Client(Settings(base_url=url, retries=0), store)
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(Path(d) / 's') as store:
+            client = cached_client(Settings(base_url=url, retries=0), store, d)
+            self.addCleanup(client.close)
             key = ('extract', 'text', 'sha256:x.pdf', 'text:0', 'input-hash', None)
             client.ask('first prompt', Extraction, key=key)
             client.ask('first prompt', Extraction, key=key)
@@ -216,22 +222,67 @@ class ContentAddressedCache(unittest.TestCase):
             # ...and a changed query is asked, whatever recipe it comes with (no stale answer for it).
             client.ask('edited prompt', Extraction, key=key)
             self.assertEqual(state['requests'], 2)
-            other = Client(Settings(base_url=url, retries=0, model='other-model'), store)  # another model: asked
-            other.ask('first prompt', Extraction, key=key)
+            other = cached_client(Settings(base_url=url, retries=0, model='other-model'), store, d)  # another model
+            self.addCleanup(other.close)
+            other.ask('first prompt', Extraction, key=key)  # asked
             self.assertEqual(state['requests'], 3)
             # What each query was, and how it was built, is logged for diagnostics.
             logged = store.queries(content='sha256:x.pdf', task='text:0')
             self.assertEqual({q['prompt'] for q in logged}, {'first prompt', 'edited prompt'})
 
     def test_a_reset_keeps_cached_answers(self):
-        with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(d) as store:
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(Path(d) / 's') as store:
             bind(store, extraction_interpreter(Settings()))
-            client = Client(Settings(base_url=url, retries=0), store)
+            client = cached_client(Settings(base_url=url, retries=0), store, d)
+            self.addCleanup(client.close)
             key = ('extract', 'tile', 'sha256:x.pdf', 'tile:p1:0', 'input-hash', None)
             client.ask('a tile', Extraction, key=key)
             bind(store, extraction_interpreter(Settings(tile_points=500)), reset=True)
             client.ask('a tile', Extraction, key=key)
             self.assertEqual(state['requests'], 1)  # unchanged queries aren't paid for again
+
+class TheUsersCache(unittest.TestCase):
+    """One answers cache per user, shared by every store (docs/plans/configuration-in-the-store-2026-10-20.md,
+    milestone 3; the owner, 2026-10-08: "The per-user default is tempting. Let's go with that instead.")."""
+    def test_one_cache_answers_every_store(self):
+        from semantic_pdf_diff.pipeline import RunOptions, make_client
+        from stubs import per_user_cache
+        key = ('extract', 'text', 'sha256:x.pdf', 'text:0', 'input-hash', None)
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d, \
+                patch.dict(os.environ, {'PDF_DIFF_CACHE': str(Path(d) / 'cache')}), \
+                patch('semantic_pdf_diff.pipeline.answers_cache', per_user_cache):
+            for name in ('first', 'second'):
+                with Store(Path(d) / name) as store:
+                    client = make_client(RunOptions(), Settings(base_url=url, retries=0), store)
+                    try:
+                        client.ask('a prompt', Extraction, key=key)
+                    finally:
+                        client.close()
+            self.assertEqual((state['requests'], client.cache_hits), (1, 1))
+            cache = Path(d) / 'cache' / 'answers.sqlite'
+            # as sensitive as a store: its answers quote the documents
+            self.assertEqual((stat.S_IMODE(os.stat(cache.parent).st_mode), stat.S_IMODE(os.stat(cache).st_mode)),
+                             (0o700, 0o600))
+            self.assertFalse((Path(d) / 'second' / 'answers.sqlite').exists())
+
+    def test_a_stores_own_cached_answers_move_into_the_cache(self):
+        import hashlib
+        key = ('extract', 'text', 'sha256:x.pdf', 'text:0', 'input-hash', None)
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d, Store(Path(d) / 's') as store:
+            settings = Settings(base_url=url, retries=0)
+            query = Client(settings, None).prepare('a prompt', Extraction, key=key).query
+            old = hashlib.sha256((settings.model + '\x00' + query).encode()).hexdigest()  # a store's key, once
+            with store.db:
+                store.db.execute("INSERT INTO response_cache VALUES (?, 'extract', 'text', ?, ?, 'sha256:x.pdf')",
+                                 (old, query, json.dumps({**EMPTY, 'issues': ['kept']})))
+            client = cached_client(settings, store, d)
+            self.assertEqual(client.ask('a prompt', Extraction, key=key).issues, ['kept'])
+            client.close()
+            self.assertEqual((state['requests'], client.cache_hits, store.cached(old)), (0, 1, None))
+            again = cached_client(settings, store, d)  # from the cache now
+            self.assertEqual(again.ask('a prompt', Extraction, key=key).issues, ['kept'])
+            again.close()
+            self.assertEqual(state['requests'], 0)
 
 class TaskIdentity(unittest.TestCase):
     def test_pages_never_share_tasks_or_cache_entries(self):
@@ -426,8 +477,11 @@ class SharedAnswers(unittest.TestCase):
             for content in (kept, gone):
                 store.note_query('q-shared', ('extract', 'text', content, 'text:p1:0'), 'prompt', [])
             store.note_query('q-own', ('extract', 'text', gone, 'text:p2:0'), 'prompt', [])
-            store.cache('k-shared', 'extract', 'text', 'q-shared', '{}', gone)  # the gone content asked first
-            store.cache('k-own', 'extract', 'text', 'q-own', '{}', gone)
+            with store.db:  # a store's own cache, from before the user's (2026-10-20)
+                store.db.execute("INSERT INTO response_cache VALUES ('k-shared', 'extract', 'text', 'q-shared', '{}', "
+                                 "?)", (gone,))  # the gone content asked first
+                store.db.execute("INSERT INTO response_cache VALUES ('k-own', 'extract', 'text', 'q-own', '{}', ?)",
+                                 (gone,))
             self.assertEqual(store.gc()['cached_responses'], 1)
             self.assertIsNotNone(store.cached('k-shared'))
             self.assertIsNone(store.cached('k-own'))

@@ -22,6 +22,12 @@ os.environ["XDG_CONFIG_HOME"] = _CONFIG
 from semantic_pdf_diff import settings as _settings  # noqa: E402
 # a test clearing the environment (patch.dict(..., clear=True)) still reads the empty folder's, not ~/.config's
 _settings.user_path = lambda: Path(os.environ.get("XDG_CONFIG_HOME") or _CONFIG) / "semantic-pdf-diff" / "settings.json"
+# Nor the developer's answers cache (settings.cache_path): each store keeps its own in tests, as stores once did, so a
+# test's stub answers never reach another's (per_user_cache is the product's, for the tests of the cache itself).
+os.environ["PDF_DIFF_CACHE"] = os.path.join(_CONFIG, "cache")
+from semantic_pdf_diff import fixtures as _fixtures, pipeline as _pipeline  # noqa: E402
+per_user_cache = _pipeline.answers_cache
+_pipeline.answers_cache = lambda store: _fixtures.open(store.folder / "answers.sqlite", "record")
 
 @contextlib.contextmanager
 def user_settings(values):

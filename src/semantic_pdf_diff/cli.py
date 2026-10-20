@@ -109,7 +109,8 @@ Examples:
 
 A comparison's --store folder (diff-output unless named) holds what was read, and receives report.html (one file
 to keep or send, its crops inside as --report-budget allows), report.json and evidence.json. A comparison into it
-again reuses what was read, and resumes one interrupted.
+again reuses what was read, and resumes one interrupted. The model's answers are cached for every store
+($PDF_DIFF_CACHE, else ~/.cache/semantic-pdf-diff): what was asked once isn't paid for again.
 
 Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error
 (a mistyped command or option too).
@@ -189,8 +190,9 @@ def add_run_options(parser):
     add_report_options(output)
     recorded = parser.add_argument_group('recorded answers (testing, and runs without the model)')
     recorded.add_argument('--fixture', type=Path,
-                          help='Answers fixture: answers recorded in it are replayed, not asked again. A .sqlite '
-                               'file also records new answers (created if missing); a .zip is replayed only')
+                          help="Answers fixture, instead of the answers cache ($PDF_DIFF_CACHE): answers recorded in "
+                               'it are replayed, not asked again. A .sqlite file also records new answers (created if '
+                               'missing); a .zip is replayed only')
     recorded.add_argument('--fixture-mode', choices=fixtures.MODES,
                           help='replay: fail requests with no recorded answer (tests, CI); replay-or-record (a '
                                ".sqlite file's default): ask the model and record, recorded failures asked again; "
@@ -531,10 +533,12 @@ def config_command(argv):
 
 def environment():
     """The environment variables `config show` lists, with what each is now: never the key, only whether it's set."""
+    from .settings import cache_path
     value = lambda name, unset: os.environ.get(name) or f"not set: {unset}"  # noqa: E731
     return [('OPENAI_BASE_URL', value('OPENAI_BASE_URL', default('base_url'))),
             ('OPENAI_API_KEY', 'set' if os.environ.get('OPENAI_API_KEY') else 'not set'),
-            ('PDF_DIFF_STORE', value('PDF_DIFF_STORE', './diff-output, without --store'))]
+            ('PDF_DIFF_STORE', value('PDF_DIFF_STORE', './diff-output, without --store')),
+            ('PDF_DIFF_CACHE', value('PDF_DIFF_CACHE', f'answers cached in {cache_path()}'))]
 # Every other setting is the user's or a store's (`config set [--user]`): PDF_DIFF_<NAME> and OPENAI_MODEL are no longer
 # read, and warn when set (settings.retired).
 
@@ -693,7 +697,8 @@ def store_parser(command):
                             help='A Markdown table (the default), CSV, or JSON lines')
     elif command == 'gc':
         parser.description = ('Delete content no declared source uses any more (after source remove or update), '
-                              'with its evidence, tasks, sections, cached responses and crops.')
+                              'with its evidence, tasks, sections and crops (and the answers a store cached '
+                              'itself before the answers cache).')
         parser.add_argument('--dry-run', action='store_true', help='Report what would be removed, change nothing')
         parser.add_argument('--orphaned-sources', action='store_true',
                             help='Also remove sources whose linked manifest file no longer exists')

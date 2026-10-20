@@ -44,6 +44,15 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn('PDF_DIFF_CONCURRENCY is no longer read: `pdf-semantic-diff config set --user concurrency VALUE`',
                       '\n'.join(logged.output))
 
+    def test_the_answers_cache_is_the_users(self):
+        from semantic_pdf_diff.settings import cache_path
+        with patch.dict(os.environ, {'PDF_DIFF_CACHE': '/c', 'XDG_CACHE_HOME': '/x', 'HOME': '/h'}):
+            self.assertEqual(cache_path(), Path('/c/answers.sqlite'))
+            del os.environ['PDF_DIFF_CACHE']
+            self.assertEqual(cache_path(), Path('/x/semantic-pdf-diff/answers.sqlite'))
+            del os.environ['XDG_CACHE_HOME']
+            self.assertEqual(cache_path(), Path('/h/.cache/semantic-pdf-diff/answers.sqlite'))
+
     def test_empty_fallback_and_invalid_values(self):
         with patch.dict(os.environ, {'OPENAI_BASE_URL':'  '}, clear=True):
             self.assertEqual(Settings.from_env(),Settings())

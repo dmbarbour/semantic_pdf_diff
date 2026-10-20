@@ -15,7 +15,7 @@ Four environment variables, as the owner listed them ([the plan](plans/configura
 | `OPENAI_API_KEY` | API authentication (never included in settings/reports, never written anywhere) |
 | `OPENAI_BASE_URL` | Chat Completions API base URL, including `/v1` when required |
 | `PDF_DIFF_STORE` | The store a command works on without `--store` (unset: `./diff-output`) |
-| `PDF_DIFF_CACHE` | The answers cache (planned, milestone 3) |
+| `PDF_DIFF_CACHE` | The answers cache's folder: every answer the user's runs were given, in `answers.sqlite`, shared by every store (unset: `$XDG_CACHE_HOME/semantic-pdf-diff`, else `~/.cache/semantic-pdf-diff`) |
 
 Two more variables aren't settings:
 
@@ -197,9 +197,9 @@ None of these affect output, so changing them never needs `--reset`.
 
 A typical page needs multiple calls, so large PDFs can require hundreds or thousands. `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--max-calls` caps the requests sent in one invocation, counted as each is asked; retries don't count. A run a cap cuts (`--max-calls`, `--max-cost`, the provider's balance) says so in its report (`paused`): which work the cap cut followed the order answers came in, so the report isn't reproducible until the run is resumed.
 
-A comparison's `--store` folder is an evidence store: `store.sqlite` (sources, files, content, evidence, coverage, cached model responses, comparisons) plus `assets/` for rendered crops. Stores are created with owner-only permissions and are as sensitive as the documents they were built from.
+A comparison's `--store` folder is an evidence store: `store.sqlite` (sources, files, content, evidence, coverage, the queries asked, comparisons) plus `assets/` for rendered crops. Stores are created with owner-only permissions and are as sensitive as the documents they were built from. So is the answers cache (`$PDF_DIFF_CACHE`), owner-only too: its answers quote the documents, and removing a store leaves them there.
 
-- **Reuse and resume:** content already extracted is loaded from the store. Evidence and coverage are written task by task, and model responses are cached by the query that reached the model (its text, images and generation settings) and the model, so an interrupted run resumes by replaying cached answers. Tasks that failed (e.g. hitting `--max-calls`) are retried on the next run.
+- **Reuse and resume:** content already extracted is loaded from the store. Evidence and coverage are written task by task. Model answers are cached in the user's answers cache (`$PDF_DIFF_CACHE/answers.sqlite`, a fixture's format, shared by every store) by the query that reached the model (its text, images and generation settings) and the model, so an interrupted run resumes by replaying cached answers, and another store asking the same is answered from it. The model's failures are asked again. Tasks that failed (e.g. hitting `--max-calls`) are retried on the next run. `--fixture` replaces the cache for a run (tests and the lab). Stores cached their own answers until 2026-10-20; those are moved into the cache as they're asked for.
 - **Sources:** each comparison object is a source declared in the store with a name, metadata and roots (files, folders, zip archives). `compare` declares a path given in place of a name as a `shortcut` source, named after its final component. Roots are rescanned on every run; set `rescan` to `"manual"` to rescan only on `source update`. Unchanged files (same size and modification time) aren't reread. Content no source references any more is orphaned; `gc` removes it.
 - **Archives and hidden files:** zip archives are read in memory, including nested ones. Files and folders whose names start with `.`, and OS clutter (`__MACOSX`, `Thumbs.db`), are skipped and listed. Safety limits are generous and configurable: `max_zip_depth` (8), `max_source_bytes` (50 GB), and a compression-ratio check (`zip_ratio_limit` 1000 for members over `zip_ratio_min_bytes`, 100 MB). Unsafe member paths are rejected and encrypted members skipped; all are listed in the report.
 - **One writer:** a second process writing to the same store gets a "store is in use" error.

@@ -120,6 +120,14 @@ def user_settings():
         raise ValueError(f'{path}: expected {{"format": 1, "settings": {{...}}}}')
     return dict(data["settings"])
 
+def cache_path():
+    """The answers cache: $PDF_DIFF_CACHE/answers.sqlite, else under $XDG_CACHE_HOME/semantic-pdf-diff, else
+    ~/.cache/semantic-pdf-diff. Every answer the user's runs were given, in the fixture format, shared by every store
+    (the owner, 2026-10-08: "The per-user default is tempting. Let's go with that instead.")."""
+    folder = os.environ.get("PDF_DIFF_CACHE") or os.path.join(
+        os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache"), "semantic-pdf-diff")
+    return Path(folder) / "answers.sqlite"
+
 def save_user_settings(values):
     """The user's settings replaced (checked by the caller: configuration.applied)."""
     path = user_path()

@@ -5,10 +5,12 @@ task in their own transactions; a rerun resumes by replaying cached model
 responses. The store is bound to its extraction interpreter: a run with a
 different one is rejected unless the affected derived data is reset, with what going ahead would
 clear and ask again. A change that can't cost a model call (a setting that only post-processes
-answers) is applied without asking: what it affects is recomputed from cached answers. Cached
-responses are kept through a reset: they're keyed by the query that reached the model (and the
-model), so unchanged queries replay and changed ones are asked afresh (decision 0004; the owner,
-2026-10-04, choosing this middle way: "I lean towards 3 with a friendly refusal.")
+answers) is applied without asking: what it affects is recomputed from cached answers. Answers
+are cached outside the store, in the user's answers cache (settings.cache_path; until 2026-10-20 in
+each store's response_cache), so a reset never clears them: they're keyed by the query that
+reached the model (and the model), so unchanged queries replay and changed ones are asked afresh
+(decision 0004; the owner, 2026-10-04, choosing this middle way: "I lean towards 3 with a friendly
+refusal.")
 The binding's policy is binding.py's, over this store's operations (code review 2026-10-08, C5).
 
 Each content item records the version of the reader that extracted it ("docx/1"; jobs.READERS),
@@ -42,7 +44,8 @@ CREATE TABLE task (content TEXT NOT NULL REFERENCES content(id), task TEXT NOT N
 CREATE TABLE evidence (id TEXT NOT NULL, content TEXT NOT NULL REFERENCES content(id), task TEXT NOT NULL,
                        region TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (id, content, task));
 CREATE INDEX evidence_content ON evidence(content);
--- Responses by the query that reached the model and the model (llm.Client._cache_key).
+-- Responses by the query that reached the model and the model, until 2026-10-20: the user's answers cache holds
+-- them since. Read through it, each row moved into it when its query is asked (llm.Client._stored).
 CREATE TABLE response_cache (key TEXT PRIMARY KEY, kind TEXT NOT NULL, region TEXT NOT NULL,
                              query TEXT NOT NULL, response TEXT NOT NULL, content TEXT NOT NULL DEFAULT '');
 -- Diagnostics: each query's recipe (how the pipeline built it: role, region, content, task, ...)
@@ -450,14 +453,9 @@ class Store:
         rows = [json.loads(r) for (r,) in self.db.execute("SELECT row FROM task WHERE content=?", (content,))]
         return sorted(rows, key=lambda r: (r.get("page") or 0, r["task"]))
 
-    # --- response cache (by query and model) and the query log -----------------
+    # --- the response cache of before the user's (by query and model) and the query log -----------------
     def cached(self, key):
         return self.db.execute("SELECT response, query FROM response_cache WHERE key=?", (key,)).fetchone()
-
-    def cache(self, key, kind, region, query, response, content=""):
-        with self.db:
-            self.db.execute("INSERT OR REPLACE INTO response_cache VALUES (?, ?, ?, ?, ?, ?)",
-                            (key, kind, region, query, response, content))
 
     def note_query(self, query, recipe, prompt, images):
         """Log a query's recipe and text (diagnostics: what a task was asked). Not committed alone: the row is

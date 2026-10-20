@@ -394,26 +394,31 @@ class Transport:
         return last, max(wait, retry_after(e)), e.code in (429, 503)
 
 class Client:
-    """Chat Completions client with a response cache.
+    """Chat Completions client, its answers from the user's cache or a fixture.
 
-    `store`: a Store, whose response cache is keyed by the query that reached the model and the model; or None, no
-    cache (a fixture holding every answer, see the lab's eval.clients.folder_client, or a caller that asks once). A
-    folder of files keyed by the request's bytes was once the cache without a store; only tests used it (removed
-    2026-10-02).
+    `store`: a Store, which logs what each task asked (the query log), or None. Answers are cached in the user's
+    answers cache (`cache`, settings.cache_path), a fixture, or nowhere (a caller that asks once). A store cached
+    its own answers until 2026-10-20 (configuration milestone 3); the cache reads those through, moving them in.
     """
     def __init__(self, settings: "Settings", store, api_key: str | None = None, fixture=None, mode="replay",
-                 responder=None, fresh_regions=None, export=None):
+                 responder=None, fresh_regions=None, export=None, cache=None):
         """fixture: an open fixtures.Fixture, replayed under its policy (fixtures.Replayer: mode, responder,
         fresh_regions). In `replay` mode answers come only from it and unrecorded requests fail; in
         `replay-or-record` mode unrecorded requests (and recorded failures) go to the model and are recorded under
         `responder` (default: the model name); `record-new` is the same but replays the model's failures as
         failures (transient ones are asked again). export: an open fixture every answer served or recorded is
-        copied into (fixtures.Replayer)."""
+        copied into (fixtures.Replayer). cache: the answers cache, an open fixtures.Fixture used as one is in
+        `replay-or-record` mode (failures asked again), under the model's name."""
+        if cache is not None:
+            if fixture is not None:
+                raise TypeError("a client's answers come from a fixture or from the cache, not both")
+            fixture, mode = cache, "replay-or-record"
+        self.caching = cache is not None
         self.s = settings
         self.replay = None if fixture is None else Replayer(fixture, mode, responder or settings.model, fresh_regions,
                                                             export=export)
         if isinstance(store, (str, Path)):
-            raise TypeError("a client caches in a store (store.Store) or not at all: the folder cache is gone")
+            raise TypeError("a client's store is a store.Store: the folder cache is gone")
         self.store = store
         self.cache_hits = 0
         self.transport = Transport(settings, api_key)
@@ -479,22 +484,23 @@ class Client:
             raise ModelFailure(f"Recorded answer no longer fits {schema.__name__}: {e}") from e
 
     def cached(self, request):
-        """The cached response, or None (main thread: the store is single-threaded).
+        """The cached or recorded answer, or None (main thread: the store and fixtures are single-threaded).
 
-        With a fixture, only the fixture answers: the store's cache may hold another
-        responder's answers. Either way, a store keeps the query's recipe and text, to see
-        what each task was asked (diagnostics; never used for lookup)."""
+        With a fixture, only the fixture answers; with the cache, the cache, then a store's own cache from before it.
+        Either way, a store keeps the query's recipe and text, to see what each task was asked (diagnostics; never
+        used for lookup)."""
         if self.store is not None and request.key is not None:
             self.store.note_query(request.query, request.key, request.prompt, request.images)
-        if self.replay is not None:
-            kind, value = self.replay.lookup(request.query, request.key,
-                                             lambda text: self._recorded(text, request.schema))
-            if kind == "failure":
-                raise ModelFailure(f"Recorded failure: {value}")
-            request.unrecorded = kind == "unrecorded"
-            return value
-        value = self._lookup(request)
-        if value is not None:
+        if self.replay is None:
+            return None
+        kind, value = self.replay.lookup(request.query, request.key,
+                                         lambda text: self._recorded(text, request.schema))
+        if kind == "failure":
+            raise ModelFailure(f"Recorded failure: {value}")
+        if kind == "ask" and self.caching:
+            value = self._stored(request)
+        request.unrecorded = kind == "unrecorded"
+        if value is not None and self.caching:
             self.cache_hits += 1
         return value
 
@@ -503,12 +509,10 @@ class Client:
         hit's."""
         if self.replay is not None:
             self.replay.note(request.query, request.key)
-        elif self.store is not None:
-            self.cache_hits += 1
+            self.cache_hits += self.caching
 
     def save(self, request, value):
-        """Cache a response (main thread); in record mode, also record it in the fixture."""
-        self._save(request, value)
+        """Keep an answer (main thread): in the cache, or in a fixture that records."""
         self._record(request, value.model_dump_json(), None)
 
     def failed(self, request, error):
@@ -533,25 +537,19 @@ class Client:
                               f"{request.key.label if request.key else request.query}")
         return self.transport.send(request)
 
-    def _cache_key(self, request):
-        """The store cache's key: the query and the model answering it."""
-        return hashlib.sha256(((request.model or self.s.model) + "\x00" + request.query).encode()).hexdigest()
-
-    def _lookup(self, request):
+    def _stored(self, request):
+        """An answer the store cached itself, before the user's cache (2026-10-20): moved into the cache, or None. Its
+        key was the query and the model answering it."""
         if self.store is None:
             return None
-        row = self.store.cached(self._cache_key(request))
+        key = hashlib.sha256(((request.model or self.s.model) + "\x00" + request.query).encode()).hexdigest()
+        row = self.store.cached(key)
         if row is None:
             return None
+        self.store.uncache(key)
         try:
-            return request.schema.model_validate_json(row[0])
+            value = request.schema.model_validate_json(row[0])
         except ValueError:
-            self.store.uncache(self._cache_key(request))
             return None
-
-    def _save(self, request, value):
-        if self.store is None:
-            return
-        key = request.key or Recipe(("raw", ""))
-        self.store.cache(self._cache_key(request), key.role, key.region, request.query, value.model_dump_json(),
-                         key.content)
+        self._record(request, row[0], None)
+        return value

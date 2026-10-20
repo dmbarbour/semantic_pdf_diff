@@ -74,7 +74,7 @@ A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifes
 
 Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error, a mistyped command or option included.
 
-The `--store` folder (`diff-output` unless named) is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence and cached model responses, and an interrupted run resumes where it stopped. A store is bound to the model and extraction settings it was built with. A run with different ones is refused, saying what differs and at most how much would be asked again, unless you pass `--reset` (preview with `--reset --dry-run`) or use a new folder. Settings that only post-process answers are applied without asking, recomputed from cached answers.
+The `--store` folder (`diff-output` unless named) is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence, and an interrupted run resumes where it stopped. Model answers are cached for every store (`$PDF_DIFF_CACHE`, else `~/.cache/semantic-pdf-diff`), so what was asked once isn't paid for again. A store is bound to the model and extraction settings it was built with. A run with different ones is refused, saying what differs and at most how much would be asked again, unless you pass `--reset` (preview with `--reset --dry-run`) or use a new folder. Settings that only post-process answers are applied without asking, recomputed from cached answers.
 
 ## Documentation
 

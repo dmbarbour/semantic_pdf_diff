@@ -68,7 +68,7 @@ class Maintenance(unittest.TestCase):
         code, out, _ = self.cli('gc', '--store', self.store, '--dry-run')
         preview = json.loads(out)
         self.assertEqual((preview['content'], preview['crops'], preview['evidence']), (1, 1, 1))
-        self.assertGreater(preview['cached_responses'], 0)
+        self.assertEqual(preview['cached_responses'], 0)  # answers are cached outside the store (the user's cache)
         self.assertTrue(crop.exists())
         json.loads(self.cli('gc', '--store', self.store)[1])
         self.assertFalse(crop.exists())
