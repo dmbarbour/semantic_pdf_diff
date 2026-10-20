@@ -328,7 +328,7 @@ def write_split(data, output, pairs, stored, budget, write):
         counted |= {c.image for c in account.wanted}
         total.chosen |= account.chosen
         total.names.update(account.names)
-    files = {c: i for i, c in enumerate(dict.fromkeys(x[1] for _, a, b in pairs for x in (a, b) if x and x[1]))}
+    files = file_index(pairs)
     split = (f'<p class="meta">A split report: a file a pair of files, {len(pairs)} in this folder beside this '
              'index. Keep them together (zip the folder to send it); each opens on its own too.</p>')
     index = html_page('Semantic PDF comparison', split + header_html(data, listed=False) + files_html(
@@ -366,9 +366,7 @@ def part_of(data, kind, a, b):
 
 def report_page(data, stored, budget, note=''):
     """report.html's text (note above it), its crops embedded as the budget allows, and the budget's account."""
-    # explained differences first, value changes leading (KINDS' order); the rest as found
-    order = {k: i for i, k in enumerate(KINDS)}
-    shown = sorted(data['findings'], key=lambda f: order.get(f.get('explanation', {}).get('kind'), len(KINDS)))
+    shown = ordered(data['findings'])
     where = Cards(data).where
     def label(e):
         loc = e['locator']
@@ -390,6 +388,16 @@ def report_page(data, stored, budget, note=''):
             break
         chosen.pop()
     return page, account
+
+def ordered(findings):
+    """Findings in the order a report shows them: explained differences first, value changes leading (KINDS' order);
+    the rest as found."""
+    order = {k: i for i, k in enumerate(KINDS)}
+    return sorted(findings, key=lambda f: order.get(f.get('explanation', {}).get('kind'), len(KINDS)))
+
+def file_index(pairs):
+    """Each file's content numbered as the page's file filter numbers it: in the pairs' order."""
+    return {c: i for i, c in enumerate(dict.fromkeys(x[1] for _, a, b in pairs for x in (a, b) if x and x[1]))}
 
 def report_topics(data):
     """The candidate ways of splitting a report's claims into topics (topics.ways), and the claims, each with its
@@ -448,7 +456,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     crop_of = crop_finder(data)
     card = Cards(data, lambda e: crop_html(e, embedded, stored, crop_of))
     pairs = file_pairs(data)
-    files = {c: i for i, c in enumerate(dict.fromkeys(x[1] for _, a, b in pairs for x in (a, b) if x and x[1]))}
+    files = file_index(pairs)
     page = note + header_html(data, listed=len(pairs) <= 1) + crops_note(account)
     if len(pairs) > 1:
         page += files_html(data, pairs, files, account, card.where)

@@ -20,7 +20,7 @@ const Search = (() => {
 
   // words as searched: case and accents folded, numbers whole and plain ("1,000" is 1000, "15.00" is 15), letters
   // and digits apart ("75kW" is "75 kW")
-  const fold = (text) => text.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const fold = (text) => text.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   const NUMBER = /^\d/;
   const plainNumber = (n) => {
     const whole = n.replace(/,/g, '');
