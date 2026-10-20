@@ -167,11 +167,5 @@
 
 Raised by the owner on 2026-10-19 (the first quote above). Each was offered with a recommendation:
 
-- **More search** (2026-10-20, beyond milestone 6):
-  - **From the command line:** `semantic-pdf-diff search`, over every claim of one store or several, without a report: the database of claims the owner asked for, kept where the stores are.
-  - **Words the documents name differently:** "rated output" in one, "nominal power" in the other.
-    - The comparison itself pairs such names: findings' claims, equivalent or different.
-    - A search could also show the counterparts of the claims it finds; or the model could name synonyms in the topics' request.
-  - **Numbers across units** (`power > 50 kW` finding "0.075 MW"): this needs the claims' values normalized, which the [units plan](units-and-normalization-2026-09-24.md) covers.
-  - **By meaning** (embeddings): the query has to be embedded by a model, which a file opened offline can't do. The claims' own embeddings could still find claims like a claim, as `like:` does by words.
+- **More search** (2026-10-20, beyond milestone 6): the owner, on the four ideas: "I like all the ideas for search. So, lowest hanging fruit first, I guess." They're the [search](search-2026-10-20.md) plan's.
 - **More than two sources:** premature (the owner, 2026-10-19). It would belong to [criteria-first comparison](n-way-comparison-2026-09-23.md) and claim clustering: claims of every source grouped into topics, shown as a matrix of topics by sources.

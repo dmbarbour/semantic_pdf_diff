@@ -70,6 +70,7 @@
   const relation = $('filter'), kind = $('kind'), same = $('same'), query = $('query');
   const side = $('side'), status = $('status'), claimKind = $('claimkind');
   const order = $('order'), orderBox = $('order-box');
+  const paired = $('counterparts'), pairedBox = $('counterparts-box'), also = $('also');
   const file = $('file');  // with more than one pair of files: their indexes, "3,4"
   const sides = [...side.options].filter((o) => o.value !== 'all').map((o) => o.textContent);
   const tabs = [...root.querySelectorAll('.views button')];
@@ -95,6 +96,36 @@
     }
   };
 
+  // each claim's counterparts: the claims findings pair it with (pairs judged unrelated aren't findings)
+  const counterparts = new Map(), claimOf = new Map(R.claims.map((c) => [c.card, c]));
+  for (const f of R.findings) {
+    for (const [x, y] of [f.cards, [...f.cards].reverse()]) {
+      if (!counterparts.has(x)) counterparts.set(x, []);
+      counterparts.get(x).push(y);
+    }
+  }
+  // the found claims' counterparts the search didn't find (each scored half its counterpart's), and the other
+  // source's names for what was searched: a counterpart's entity or attribute where the found claim's holds the
+  // words searched and the counterpart's doesn't ("rated output" found, "nominal power" its counterpart's)
+  const pairedWith = (groups, found) => {
+    const added = new Map(), names = new Map();
+    for (const [claim, score] of found) {
+      const own = index.named(claim.card);
+      for (const card of counterparts.get(claim.card) || []) {
+        const other = claimOf.get(card);
+        if (!other) continue;
+        if (!found.has(other)) added.set(other, Math.max(added.get(other) || 0, score / 2));
+        index.named(card).forEach((name, i) => {
+          if (!name.trim() || !Search.touches(groups, own[i]) || Search.covers(groups, name)) return;
+          const key = Search.words(name).join(' ');
+          names.set(key, {name, n: (names.has(key) ? names.get(key).n : 0) + 1});
+        });
+      }
+    }
+    return {added, names: [...names.values()].sort((a, b) => b.n - a.n).slice(0, 6)};
+  };
+  const COUNTERPART = '<p class="meta"><b>The counterpart of a claim the search found.</b> ';
+
   let topic = null;  // a topic's index (-1: claims in no topic), or every one
   const inTopic = (x, t) => (t === -1 ? x.topics.every((y) => y === -1) : x.topics.includes(t));
   const chips = [...root.querySelectorAll('.topics button')];
@@ -104,6 +135,21 @@
     const groups = Search.parse(query.value);
     const among = groups.length ? index.find(groups) : null;
     const searched = among && {findings: among(R.findings), claims: among(R.claims)};
+    const worded = groups.some((g) => !g.not && g.terms.some((t) => t.words));
+    const extra = searched && worded ? pairedWith(groups, searched.claims) : {added: new Map(), names: []};
+    if (paired.checked) for (const [claim, score] of extra.added) searched.claims.set(claim, score);
+    const added = paired.checked ? extra.added : new Map();
+    pairedBox.hidden = !extra.added.size;
+    also.hidden = !extra.names.length;
+    also.textContent = extra.names.length ? 'The other source\'s names for it: ' : '';
+    for (const {name, n} of extra.names) {
+      const button = document.createElement('button');
+      button.className = 'also';
+      button.dataset.q = `"${name.replace(/"/g, '')}"`;
+      button.textContent = name + ' ';
+      button.append(Object.assign(document.createElement('small'), {textContent: n}));
+      also.append(button);
+    }
     const found = searched && searched[view];
     for (const tab of tabs) {
       const all = tab.dataset.view === 'findings' ? R.findings : R.claims;
@@ -137,14 +183,17 @@
     let count = `${chosen.length} of ${total} ${view}`
       + (folded ? ` (${folded} that say the same in both folded)` : '');
     if (found && view === 'claims') {  // what each source says, as searched
-      count += ': ' + sides.map((name, i) => `${chosen.filter((c) => c.side === i).length} in ${name}`).join('; ');
+      const via = chosen.filter((c) => added.has(c)).length;
+      count += (via ? ` (${via} as counterparts)` : '') + ': '
+        + sides.map((name, i) => `${chosen.filter((c) => c.side === i).length} in ${name}`).join('; ');
     }
     $('count').textContent = count;
-    paged(main, chosen.map((x) => x.html), found ? Search.marker(groups, index) : null);
+    paged(main, chosen.map((x) => (view === 'claims' && added.has(x) ? x.html.replace('<p class="meta">', COUNTERPART)
+      : x.html)), found ? Search.marker(groups, index) : null);
     remember();
   };
   let typing;
-  for (const control of [relation, kind, same, side, status, claimKind, file, order]) {
+  for (const control of [relation, kind, same, side, status, claimKind, file, order, paired]) {
     if (control) control.onchange = show;
   }
   query.oninput = () => {
@@ -178,6 +227,11 @@
       file.value = e.target.dataset.files;
       show();
       relation.scrollIntoView();
+    }
+    const name = e.target.closest('button.also');
+    if (name) {  // the other source's name for what was searched, searched
+      query.value = name.dataset.q;
+      show();
     }
     if (e.target.matches('button.like')) {  // the claims like a claim: the other source's, most alike first
       const claim = R.claims.find((c) => c.card === e.target.dataset.like);

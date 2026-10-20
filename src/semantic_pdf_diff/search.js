@@ -43,7 +43,7 @@ const Search = (() => {
   // R's index: each document's words in order, with their fields (-1 ends a field, so a phrase stays in one), and
   // each word's documents. Built a slice at a time (step), as the page has time.
   const index = (R) => {
-    const vocab = new Map(), postings = [], docs = [], pages = new Map(), cardDoc = new Map();
+    const vocab = new Map(), postings = [], docs = [], pages = new Map(), cardDoc = new Map(), names = new Map();
     let sorted = null, average = 0;
     const add = (fields) => {  // [[field, text]...]: its document's number
       const id = docs.length, terms = [], of = [];
@@ -78,6 +78,7 @@ const Search = (() => {
       const said = STATEMENT.exec(R.said[Number(found[2])] || '');
       if (said) {
         fields.push([ENTITY, plain(said[1])], [ATTRIBUTE, plain(said[2])], [VALUE, plain(said[3])]);
+        names.set(id, [plain(said[1]), plain(said[2])]);
         if (plain(said[4]).trim() !== 'unspecified') fields.push([CONDITIONS, plain(said[4])]);
         fields.push(...lines(said[5]).map((line) => [CONTEXT, line]), [QUOTE, plain(said[6])]);
       }
@@ -217,7 +218,8 @@ const Search = (() => {
         return result;
       };
     };
-    return {step, find, about: (id) => (step(), about(id).map((t) => word(t.terms[0])))};
+    return {step, find, about: (id) => (step(), about(id).map((t) => word(t.terms[0]))),
+            named: (id) => (step(), names.get(id) || ['', ''])};  // a card's entity and attribute
   };
 
   // a query: groups, each to be found (or, with "-", not), by any of its terms ("a OR b"); a term: words in a row (a
@@ -251,6 +253,21 @@ const Search = (() => {
     return groups;
   };
 
+  // whether a word is one a query asks for: letters by their beginnings, numbers (and a letter alone) whole
+  const asks = (w, b) => (NUMBER.test(b) || b.length < 2 ? w === b : w.startsWith(b));
+  const asked = (groups) => groups.filter((g) => !g.not).map((g) => g.terms.filter((t) => t.words));
+  // whether a name holds every word group a query asks for (fields, phrases' order and pages aside): one it finds
+  const covers = (groups, text) => {
+    const ws = words(text);
+    const holds = (t) => t.words.every((b) => ws.some((w) => asks(w, b)));
+    return asked(groups).every((terms) => !terms.length || terms.some(holds));
+  };
+  // whether a name holds any word a query asks for
+  const touches = (groups, text) => {
+    const ws = words(text);
+    return asked(groups).some((terms) => terms.some((t) => t.words.some((b) => ws.some((w) => asks(w, b)))));
+  };
+
   // marks, in a part of the page, the words a query found: letters by their beginnings, numbers whole
   const RAW = /\d+(?:,\d{3}(?!\d))*(?:\.\d+)?|\p{L}[\p{L}\p{M}]*/gu;
   const marker = (groups, idx) => {
@@ -267,7 +284,7 @@ const Search = (() => {
     }
     const hit = (raw) => {
       const w = norm(fold(raw));
-      return whole.has(w) || (!NUMBER.test(w) && begins.some((b) => (b.length < 2 ? w === b : w.startsWith(b))));
+      return whole.has(w) || (!NUMBER.test(w) && begins.some((b) => asks(w, b)));
     };
     return (part) => {
       const walker = document.createTreeWalker(part, NodeFilter.SHOW_TEXT), texts = [];
@@ -292,5 +309,5 @@ const Search = (() => {
     };
   };
 
-  return {index, parse, marker, words};
+  return {index, parse, marker, covers, touches, words};
 })();

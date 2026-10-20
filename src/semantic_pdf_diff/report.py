@@ -90,7 +90,8 @@ border-radius:6px;background:var(--card);color:var(--fg);cursor:pointer}.topics 
 #query{width:min(28em,90%)}#order-box{white-space:nowrap}mark{background:var(--mark);color:inherit;border-radius:2px}\
 .search-help{font-size:13px;margin:0 8px}.search-help ul{margin:6px 0}\
 button.like{padding:0 6px;border:1px solid var(--field);border-radius:4px;background:var(--card);color:var(--accent);\
-cursor:pointer;font-size:12px}
+cursor:pointer;font-size:12px}#also button{padding:4px 8px;margin:2px;border:1px solid var(--field);\
+border-radius:6px;background:var(--card);color:var(--fg);cursor:pointer}#also small{opacity:.7}
 @media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
 '''
 # The page's script: it inflates the report's parts and shows them, and finds what's searched (files beside this one,
@@ -110,6 +111,9 @@ SEARCH_HELP = ('<details class="search-help"><summary>How to search</summary><ul
                '<li><code>like:</code> and a claim\'s id, as each card\'s <i>Claims like this</i> searches: the claims '
                'sharing enough of the words of what it\'s about (its entity, attribute, conditions, and its value\'s '
                'words), most alike first.</li>'
+               '<li>In the claims view, the claims the findings pair with those found come after them, as their '
+               'counterparts. Where a counterpart names what was searched otherwise (<i>nominal power</i> for '
+               '<i>rated output</i>), its name is offered as a search.</li>'
                '<li>Found items come most relevant first: words in what a claim is about count most, then its value, '
                'conditions and section, then its quote. The page\'s address keeps the search, to bookmark or send.'
                '</li></ul></details>')
@@ -480,7 +484,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                        if any(c['status'] == k for c in claims))
              + '</select></label><label>Read as <select id="claimkind"><option value="all">Any kind</option>'
              + ''.join(f'<option>{k}</option>' for k in ('text', 'table', 'chart', 'diagram'))
-             + '</select></label></span>')
+             + '</select></label><label id="counterparts-box" hidden><input type="checkbox" id="counterparts" checked> '
+             'and their counterparts</label></span>')
     if len(pairs) > 1:
         page += ('<label>File <select id="file"><option value="all">All files</option>'
                  + ''.join(f'<option value="{pair_key(a, b, files)}">{esc(pair_name(kind, a, b))}</option>'
@@ -488,7 +493,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     page += ('<input id="query" type="search" placeholder="Search: words, &quot;a phrase&quot;, -without, entity:…" '
              'aria-label="Search the findings or claims shown"> <label id="order-box" hidden>Order <select id="order">'
              '<option value="relevance">Most relevant first</option><option value="listed">As listed</option></select>'
-             '</label><span id="count" class="meta"></span>' + SEARCH_HELP)
+             '</label><span id="count" class="meta"></span><div id="also" class="meta" hidden></div>' + SEARCH_HELP)
     if way:
         named = 'named by the model; ' if data.get('topics', {}).get('names') else ''
         page += ('<div class="topics"><span class="meta" title="Claims split by the words of what they are about, '

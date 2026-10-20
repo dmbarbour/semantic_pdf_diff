@@ -513,15 +513,21 @@ HARNESS = """<script>(async () => {
   const drawn = (q, view) => ({q, view, count: $('count').textContent, hash: location.hash,
     items: [...document.querySelectorAll('main article')].map((a) => [...a.querySelectorAll('section small')]
       .map((s) => s.textContent.split(' · ')[0])),
-    marks: [...new Set([...document.querySelectorAll('main mark')].map((m) => m.textContent))].sort()});
+    marks: [...new Set([...document.querySelectorAll('main mark')].map((m) => m.textContent))].sort(),
+    also: [...document.querySelectorAll('#also button')].map((b) => b.dataset.q),
+    via: [...document.querySelectorAll('main article')].filter((a) => a.textContent.includes('The counterpart of'))
+      .map((a) => a.querySelector('section small').textContent.split(' · ')[0])});
   out.push(drawn($('query').value, 'opened'));
-  for (const [view, q] of CASES) {
+  for (const [view, q, paired] of CASES) {  // counterparts left out unless asked for: what the words find
     document.querySelector(`.views button[data-view="${view}"]`).click();
     $('side').value = 'all';
+    $('counterparts').checked = Boolean(paired);
     $('query').value = q;
     $('order').dispatchEvent(new Event('change'));
-    out.push(drawn(q, view));
+    out.push(drawn(q + (paired ? ' +counterparts' : ''), view));
   }
+  $('also').querySelector('button').click();  // the other source's name for the last search, searched
+  out.push(drawn('(offered) ' + $('query').value, 'claims'));
   document.querySelector('.views button[data-view="findings"]').click();
   $('query').value = '';
   $('order').dispatchEvent(new Event('change'));
@@ -546,8 +552,8 @@ class SearchInABrowser(unittest.TestCase):
             raise unittest.SkipTest("no headless browser installed (chromium)")
         cases = [("claims", q) for q in ("pump feed", '"feed pump"', "pump -gearbox", "gearbox OR motor",
                                          "power of the pump", "entity:pump", "75", "1,000", "1000", "15", "cafe",
-                                         "page:4-5", "pump", "section:feed", "-valve")]
-        cases.append(("findings", "pump"))
+                                         "page:4-5", "pump", "section:feed", "-valve", "output")]
+        cases += [("findings", "pump"), ("claims", "output", True)]
         with tempfile.TemporaryDirectory() as d:
             write_report(search_report(), Path(d))
             page = Path(d) / "report.html"
@@ -604,6 +610,18 @@ class SearchInABrowser(unittest.TestCase):
         self.assertEqual(self.got("feed pump", "opened")["count"], "3 of 9 claims: 2 in A; 1 in B")
         self.assertEqual(self.got("pump feed")["hash"], "#claims&q=pump%20feed")
         self.assertEqual(self.got("pump", "findings")["hash"], "#q=pump")
+
+    def test_counterparts_come_after_the_claims_found_and_offer_the_other_sources_names(self):
+        # the search plan, milestone 1: the names the documents differ on, from the comparison's own pairs
+        paired = self.got("output +counterparts")
+        self.assertEqual(self.ids("output +counterparts"), ["B-pump", "A-pump"])
+        self.assertEqual(paired["via"], ["A-pump"])
+        self.assertEqual(paired["count"], "2 of 9 claims (1 as counterparts): 1 in A; 1 in B")
+        self.assertEqual(paired["also"], ['"rated power"'])  # B's "rated output" is A's "rated power"
+        self.assertEqual(self.ids("output"), ["B-pump"])  # without them
+        offered = self.got('(offered) "rated power"')
+        self.assertEqual(self.ids('(offered) "rated power"'), ["A-pump", "B-pump"])
+        self.assertEqual(offered["also"], ['"rated output"'])
 
     def test_claims_like_a_claim_are_the_other_sources_most_alike_first(self):
         like = self.results[("claims", "like:A-pump")]
