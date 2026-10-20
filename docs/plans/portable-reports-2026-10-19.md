@@ -99,7 +99,11 @@
    - **Unrelated pairs leave the findings,** kept in `report.json` and on their claims.
    - **A claims view:** every claim of both sources, searchable and filtered by topic, file, side and kind, each saying how it fared: in findings, compared without a counterpart (with what it was compared with and why not), possibly added or removed, not compared, or shared.
    - **Topic coverage:** each topic's claims on each side, and how many are in findings: where the two documents overlap, and where one is silent.
-   - **Then the reranker** (below), measured with the recorded judge answers.
+   - **Built** (44cfac9): unrelated pairs out of the findings, the Claims view (`#claims` opens on it) and topic coverage. Turbines: 1,000 findings → 133, its 867 unrelated pairs on their 239 claims; by topic, the tower is NREL's (149 claims against IEA's 26), thickness IEA's (129 against 4).
+   - **The reranker, measured** (2026-10-20, $0.095): DeepInfra's Qwen3-Reranker scored every judged pair of six recorded proposals runs (6,000 pairs), each claim's candidates in one request (the API scores its first query against every document).
+     - **As a search engine's reranker** (claims as "entity — attribute [conditions]", no instruction), no model separated related from unrelated pairs better than TF-IDF's own score; the 4B and 8B were no better than the 0.6B, and the IEA report against its workbook was at chance.
+     - **Told the task** (the instruction "Given a claim from one engineering design document, retrieve claims from another design that state the same property of the same kind of component, so that their values can be compared", claims as sentences: "The rated power of the rotor, for 10 m/s."), the 8B separated them far better on the turbines runs (0.92–0.94 against TF-IDF's 0.64–0.82, the chance a related pair outscores an unrelated one), as well on the drawings (0.89–0.95 against 0.93), and no better on the IEA pair (0.71 against 0.70).
+     - **One threshold, 0.02:** every equivalent and different pair kept in all six runs; 26–64% of the unrelated pairs left unjudged in five (4% in the IEA pair, which loses 57 of its 86 complementary pairs: the same item's other property, which the instruction asks to leave out). About 39% of the 4,482 unrelated pairs, for some $0.006 a thousand pairs against the judge's $0.19.
 
 ## Proposed, awaiting the owner
 
