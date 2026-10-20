@@ -12,6 +12,7 @@ import pymupdf
 from . import keyvalue
 from .context import Context
 from .pages import native, native_page, on_crop, reading_blocks, shown
+from .progress import within
 from .regions import crop_name, crop_stem
 from .schema import DerivationStep, PdfLocator, coverage_row
 from .sections import pdf_sections
@@ -404,7 +405,8 @@ class PdfTable:
 
 def _pdf_job(path, job, output, client, dispatch, progress):
     """Generator doing one PDF's extraction: yields "page" before feeding each page, then
-    "waiting" while its requests are pending; job.state["result"] is set at the end."""
+    "waiting" while its requests are pending; job.state["result"] is set at the end. Its pages are a bar of
+    progress, each counted once its requests are answered, follow-ups too (progress.within)."""
     content, on_sections, state = job.content, job.on_sections, job.state
     s = client.s
     stem = crop_stem(content)
@@ -433,9 +435,13 @@ def _pdf_job(path, job, output, client, dispatch, progress):
         core.reader, core.sections = reading.context_of, owner
         if on_sections:
             on_sections(sections)
+        pages = progress.bar(job.label or name, len(doc), "pages", keep=False)
         for number, page in enumerate(doc, 1):
             yield "page"
-            reading.page(number, page)
+            item = pages.item()
+            with within(item):
+                reading.page(number, page)
+            item.close()
         if on_sections:
             on_sections([x.model_copy(update={"signals": reading.signals.get(x.id, {})}) for x in sections])
         while True:
@@ -443,4 +449,5 @@ def _pdf_job(path, job, output, client, dispatch, progress):
                 yield "waiting"
             if not core.release():  # rows that may repeat, read in page order now that every table's are in
                 break
+        pages.fill()  # every request answered: whatever a page's count says
     state["result"] = core.result(lambda r: (r["page"] or 0, r["task"]))

@@ -472,7 +472,7 @@ def extract_sources(store, client, names, files, progress):
     if any(queues):
         log.info(f"Extracting {sum(map(len, queues))} document(s): " + ', '.join(
             f'{name} {len(q)}' for name, q in zip(names, queues)))
-        run_jobs(queues, store.folder, client, progress=progress)
+        run_jobs(queues, store.folder, client, progress=progress, labels=names)
     coverage.sort(key=lambda r: (r['content'], r['page'] or 0, r['task']))  # independent of completion order
     return by_content, coverage, sections
 
@@ -545,7 +545,7 @@ def pdf_job(store, source, file, by_content, coverage, sections, reader=None, ve
         coverage.extend(ledger)
         log.debug(f'Extracted {file.path}: {len(evidence)} claim(s)')
     return Job(file.content, lambda: read_origin(store.origin(source, file.path)), store.record_task, keep_sections,
-               done, reader=reader)
+               done, reader=reader, label=Path(file.path).name)
 
 def shortcut_names(paths):
     """Source names from the paths' final components, made unique."""

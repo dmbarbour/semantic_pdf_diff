@@ -11,7 +11,7 @@ import pymupdf
 from .dispatch import Dispatcher
 from .extract import _pdf_job
 from .pages import PYMUPDF_ERRORS
-from .progress import NoProgress
+from .progress import NoProgress, working
 from .schema import coverage_row
 
 @dataclass
@@ -25,23 +25,36 @@ class Job:
     state: dict = field(default_factory=lambda: {"pending": 0, "result": None})
     steps: object = None
     reader: object = None            # the job's generator by format (reader_for); None: a PDF
+    label: str = ""                  # its name on a progress bar (its file's); the content's without
+    bar: object = None               # its source's bar of files, if it has one
 
-def run_jobs(queues, output, client, dispatcher=None, progress=None):
+def run_jobs(queues, output, client, dispatcher=None, progress=None, labels=()):
     """Run extraction jobs with fair share: one queue per source, pages fed round-robin
     across sources so compared sources advance together.
 
     Model requests run on the dispatcher's worker threads; everything else here. A job
     whose pages are all fed keeps its document open until its own pending requests
     (which may queue refinement) finish, while its source moves on to the next job.
+
+    progress: a bar of files for each source of more than one (labels: the sources' names); each reader shows its
+    file's pages.
     """
     own = dispatcher is None
     dispatch = dispatcher or Dispatcher(client)
+    progress = progress or NoProgress()
     queues = [deque(q) for q in queues]
+    for i, queue in enumerate(queues):
+        if len(queue) > 1:
+            bar = progress.bar(labels[i] if i < len(labels) else f"source {i + 1}", len(queue), "files")
+            for job in queue:
+                job.bar = bar
     active, draining = [None] * len(queues), []
 
     def done(job):
         if job.on_done:
             job.on_done(*job.state["result"])
+        if job.bar is not None:
+            job.bar.tick()
 
     with (dispatch if own else contextlib.nullcontext()):
         while True:
@@ -57,14 +70,14 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
                         except OSError as error:  # moved or unreadable since the scan: one failed row, retried
                             job.steps = _unloadable(job, error)
                         else:
-                            job.steps = (job.reader or _pdf_job)(loaded, job, output, client, dispatch,
-                                                                 progress or NoProgress())
+                            job.steps = (job.reader or _pdf_job)(loaded, job, output, client, dispatch, progress)
                         active[i] = job
                     job = active[i]
                     if job is None:
                         break
                     dispatch.make_room()  # pages fed only while few requests are pending
                     step = next(job.steps, "done")
+                    working(None)  # what a reader asks between its steps is its page's, not the next reader's
                     fed = True
                     if step == "page":
                         break
@@ -74,9 +87,12 @@ def run_jobs(queues, output, client, dispatcher=None, progress=None):
                     else:
                         done(job)
             for job in list(draining):
-                if job.state["pending"] == 0 and next(job.steps, "done") == "done":
-                    draining.remove(job)
-                    done(job)
+                if job.state["pending"] == 0:
+                    step = next(job.steps, "done")
+                    working(None)
+                    if step == "done":
+                        draining.remove(job)
+                        done(job)
             if not fed:
                 if not draining and not any(queues) and not any(active):
                     break

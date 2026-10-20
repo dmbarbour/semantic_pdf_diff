@@ -10,6 +10,7 @@ from functools import partial
 
 from .schema import DerivationStep, DocxLocator, PptxLocator, Section, TextLocator, XlsxLocator, coverage_row
 from .sections import SectionIndex
+from .progress import working
 from .tasks import TaskCore, split_utf8
 from .textdocs import parse
 
@@ -244,8 +245,11 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     if job.on_sections:
         job.on_sections(sections)
     signals, kept = {}, []  # kept: the pictures being read, their document open until their tasks are done
+    pages = progress.bar(job.label or name, doc.pages, "pages", keep=False)
     for page in range(1, doc.pages + 1):
         yield "page"
+        item = pages.item()
+        working(item)  # what the page asks is its own, after each step too (progress.working)
         blocks = [b for b in doc.blocks if b.page == page]
         section_of = s.text_section_of(lambda box, p=page: index.box(p, box).id)
         grouped = groups(blocks, s.text_bytes, section_of, s.split_text)
@@ -253,6 +257,7 @@ def text_job(data, job, output, client, dispatch, progress, extension):
         for k, (ids, segments) in enumerate(grouped):
             if k and k % TASKS_PER_TURN == 0:
                 yield "page"  # a long page: other sources take their turn
+                working(item)
             core.text_task(page, segments, f"text:p{page}:{ids}")
         tables = [b for b in blocks if b.kind == "table"]
         core.reader.tables_on[page] = [b.box for b in tables]
@@ -322,12 +327,14 @@ def text_job(data, job, output, client, dispatch, progress, extension):
             from .pictures import Reading
             kept.append(Reading(form.pictures))
             yield from kept[-1].tasks(core, s, shown, job.content, output)
+            working(item)
         section = index[page].id
         counts = Counter(numbers=sum(len(re.findall(r"\d", b.text)) > 0 for b in blocks), tables=len(tables),
                          characters=sum(len(b.text) for b in blocks))
         for key, value in counts.items():
             signals.setdefault(section, {}).setdefault(key, 0)
             signals[section][key] += value
+        item.close()
     if job.on_sections:
         job.on_sections([x.model_copy(update={"signals": signals.get(x.id, {})}) for x in sections])
     while job.state["pending"]:
@@ -335,4 +342,5 @@ def text_job(data, job, output, client, dispatch, progress, extension):
     for reading in kept:
         reading.labels(core, job.content)
         reading.close()
+    pages.fill()  # every request answered: whatever a page's count says
     job.state["result"] = core.result(lambda r: (r["page"] or 0, r["task"]))

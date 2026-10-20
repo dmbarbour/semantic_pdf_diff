@@ -45,6 +45,7 @@
 
 1. **The renderer and its tests** (done 2026-10-20): a block of bars and a status line, log lines above it, tested in pyte. tqdm is dropped.
    - **Found by the pseudo-terminal test:** PyMuPDF prints a notice to standard output ("Consider using the pymupdf_layout package…") while the bars are drawn, so their copy was left on the screen. Its messages now go to the log at `-v`. Anything else written to standard output or error while bars are drawn is printed above them too.
-2. **Extraction's bars:** pages per file, files per source, with requests attributed to pages.
+2. **Extraction's bars** (done 2026-10-20): pages per file, files per source, with requests attributed to pages.
+   - **On the recorded slices** (turbines, drawings, rules), every page was counted by its own answers before its file's job ended: none was left for the job's end to fill, and each stage's requests asked and answered matched. With answers handled in a shuffled order, as a live run's are (`SEMANTIC_PDF_DIFF_ANSWER_ORDER`), the turbines' 12-page files rose a page or so each tenth of the 149 requests.
 3. **Situating's and comparing's bars.**
 4. **Heartbeat lines** from the same numbers, for runs without a terminal (done 2026-10-20, with milestone 1).

@@ -77,6 +77,14 @@ def within(item):
         if item is not None:
             item.settle()
 
+def working(item):
+    """Requests asked from now on belong to item, until the next call (a reader's generator, between its yields;
+    run_jobs clears it after each step). The item is settled when it's left."""
+    global _current
+    left, _current = _current, item
+    if left is not None and left is not item:
+        left.settle()
+
 def carried(finish):
     """finish, run within the item being worked on now (the dispatcher's wrapper for an answer's handler)."""
     item = _current

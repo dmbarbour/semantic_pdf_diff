@@ -2,7 +2,7 @@
 (docs/plans/progress-display-2026-10-20.md), read as a terminal shows them: pyte, a terminal emulator, takes what was
 written and gives the screen's rows. The owner, 2026-10-20: "How are you testing progress bar rendering in any
 case?"."""
-import stubs  # noqa: F401 (a clean environment)
+import stubs
 import contextlib
 import io
 import logging
@@ -208,6 +208,36 @@ class OnATerminal(unittest.TestCase):
             if not chunk:
                 return
             written.append(chunk)
+
+class Extraction(unittest.TestCase):
+    """A comparison's extraction: a bar of pages for each file read, of files for each source of more than one."""
+
+    def test_each_file_its_pages_each_source_its_files(self):
+        from unittest.mock import patch
+        made, filled = [], []
+        real_bar, real_fill = Progress.bar, module.Bar.fill
+
+        def bar(self, label, total, unit, keep=True):
+            made.append((self.stage, label, total, unit))
+            return real_bar(self, label, total, unit, keep)
+
+        def fill(self):
+            filled.append((self.label, self.done, self.total))  # what its answers had counted
+            real_fill(self)
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d, \
+                patch.object(Progress, 'bar', bar), patch.object(module.Bar, 'fill', fill):
+            root = Path(d)
+            (root / 'team-a').mkdir()
+            stubs.text_pdf(root / 'team-a' / 'one.pdf', [f'Pump {k} rated power {k} kW' for k in range(3)])
+            stubs.text_pdf(root / 'team-a' / 'two.pdf', ['Fan rated power 2 kW'])
+            stubs.text_pdf(root / 'b.pdf', ['Pump 0 rated power 1 kW', 'Pump 1 rated power 2 kW'])
+            with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
+                cli.main(['compare', str(root / 'team-a'), str(root / 'b.pdf'), '--store', str(root / 'out'),
+                          '--base-url', url, '--no-vision', '--no-situate'])
+        self.assertEqual(sorted(m for m in made if m[0] == 'extract'), [
+            ('extract', 'b.pdf', 2, 'pages'), ('extract', 'one.pdf', 3, 'pages'), ('extract', 'team-a', 2, 'files'),
+            ('extract', 'two.pdf', 1, 'pages')])
+        self.assertEqual(sorted(filled), [('b.pdf', 2, 2), ('one.pdf', 3, 3), ('two.pdf', 1, 1)])
 
 class Pages(unittest.TestCase):
     """A page is done once every request asked for it is answered, follow-ups included."""

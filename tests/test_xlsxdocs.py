@@ -244,7 +244,9 @@ class Rules(unittest.TestCase):
         model = RulesModel(answers, reviews, **settings)
         data = workbook()
 
-        class Counted:  # every task queued is finished once (code review 2026-10-08, B6: reviews never were)
+        from semantic_pdf_diff.progress import NoProgress
+
+        class Counted(NoProgress):  # every task queued finished once (code review 2026-10-08, B6: reviews never were)
             added = finished = 0
             def add(self, n=1): self.added += n
             def finish(self, status="complete"): self.finished += 1
