@@ -7,7 +7,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import crops, fixtures, provenance
+from . import crops, fixtures, provenance, topics
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
 from .jobs import Job, reader_for, reader_version, run_jobs
@@ -16,7 +16,7 @@ from .schema import EvidenceDocument, Report, Situation, Source, coverage_row
 from .progress import Progress, log
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
 from .readings import reconcile
-from .report import SPLIT, traced, write_report
+from .report import SPLIT, report_topics, traced, write_report
 from .scan import ARCHIVES, Limits, read_origin
 from .situate import quality, situate
 from .binding import bind
@@ -252,6 +252,11 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
         limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     data = traced(data)
+    if settings.names_topics():  # the model's choice among the topics' ways, and its names (topics.py)
+        from .schema import TopicNames
+        found, claims = report_topics(data)
+        key = ('topics', options.mode, provenance.text_hash(comparing.model_dump_json()))
+        data['topics'] = topics.named(found, claims, lambda prompt: client.ask(prompt, TopicNames, (), key))
     store.save_comparison(data['created_at'], data)
     account = write_report(data, out, assets=store.folder / 'assets', budget=options.report_budget,
                            split=options.split)

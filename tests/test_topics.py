@@ -58,5 +58,60 @@ class Splitting(unittest.TestCase):
     def test_a_label_is_a_topics_first_words(self):
         self.assertEqual(topics.label(["tower", "steel", "density"]), "Tower, steel")
 
+class Named(unittest.TestCase):
+    """The topic_names lever: the model chooses among the ways and names the chosen way's topics; any failure leaves
+    the most even way, named by its words."""
+    def setUp(self):
+        claims, sides = plant()
+        self.claims = [{**c, "side": s} for c, s in zip(claims, sides)]
+        self.found = topics.ways(claims, sides)
+
+    def answer(self, way, names):
+        from semantic_pdf_diff.schema import TopicNames
+        return lambda prompt: TopicNames(way=way, names=names)
+
+    def test_the_model_chooses_a_way_and_names_its_topics(self):
+        asked = []
+        def ask(prompt):
+            asked.append(prompt)
+            return self.answer(1, ["Pumps", "Valves ", "Storage  tanks"][:len(self.found[0].topics)])(prompt)
+        chosen = topics.named(self.found, self.claims, ask)
+        self.assertEqual(chosen["way"], "by subject")
+        self.assertEqual(chosen["topics"], self.found[0].topics)
+        self.assertEqual(chosen["names"], ["Pumps", "Valves", "Storage tanks"][:len(self.found[0].topics)])
+        self.assertIn("WAY 1 (by subject):", asked[0])
+        self.assertIn("(24 claims): pump P-0 — rated power; pump P-0 — rated power; pump P-1 — rated power",
+                      asked[0])  # alternating between the sides
+
+    def test_an_answer_that_does_not_fit_leaves_the_words(self):
+        self.assertEqual(topics.named(self.found, self.claims, self.answer(9, ["x"])),
+                         {"failed": f"way 9 of {len(self.found)}"})
+        self.assertIn("names for", topics.named(self.found, self.claims, self.answer(1, ["only one"]))["failed"])
+
+    def test_a_failed_request_leaves_the_words(self):
+        from semantic_pdf_diff.failures import ModelFailure
+        def ask(prompt):
+            raise ModelFailure("HTTP 504: Gateway Timeout")
+        self.assertEqual(topics.named(self.found, self.claims, ask),
+                         {"failed": "ModelFailure: HTTP 504: Gateway Timeout"})
+
+    def test_a_report_shows_the_models_names_unless_its_topics_have_changed(self):
+        import tempfile
+        from pathlib import Path
+        from semantic_pdf_diff.report import report_topics, unpacked, write_report
+        from test_portable_report import plant_report
+        data = plant_report()
+        found, _ = report_topics(data)
+        way = found[0]
+        names = [f"Topic {i}" for i in range(len(way.topics))]
+        with tempfile.TemporaryDirectory() as d:
+            write_report({**data, "topics": {"way": way.name, "topics": way.topics, "names": names}}, Path(d))
+            shown = unpacked((Path(d) / "report.html").read_text())
+            self.assertIn(">Topic 0 <small>", shown)
+            self.assertIn("named by the model", shown)
+            stale = {"way": way.name, "topics": [["other", "words"]] * len(way.topics), "names": names}
+            write_report({**data, "topics": stale}, Path(d))
+            self.assertNotIn(">Topic 0 <small>", unpacked((Path(d) / "report.html").read_text()))
+
 if __name__ == "__main__":
     unittest.main()

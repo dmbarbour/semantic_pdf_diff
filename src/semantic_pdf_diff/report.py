@@ -352,20 +352,31 @@ def report_page(data, stored, budget, note=''):
         chosen.pop()
     return page, account
 
-def browsing(data, shown):
-    """The topics a report's findings are browsed by (topics.py), and each shown claim's: (the way, {claim id: its
-    topic's index}); no way for fewer than two topics."""
-    order = [x for f in shown for x in (f['a'], f['b'])] + [u['id'] for u in data['unmatched']]
+def report_topics(data):
+    """The candidate ways of splitting a report's claims into topics (topics.ways), and the claims, each with its
+    side (its source), in the report's order: the findings', the unmatched, the shared."""
+    order = [x for f in data['findings'] for x in (f['a'], f['b'])] + [u['id'] for u in data['unmatched']]
     ids = list(dict.fromkeys(order + list(data.get('shared', []))))
     evidence = {e['id']: e for e in data['evidence']}
-    claims = [evidence[x] for x in ids if x in evidence]
     side = {}
     for f in data.get('files', []):
         side.setdefault(f['content'], f['source'])
-    way = topics.best(topics.ways(claims, [side.get(c['content'], '') for c in claims])) if claims else None
+    claims = [{**evidence[x], 'side': side.get(evidence[x]['content'], '')} for x in ids if x in evidence]
+    return (topics.ways(claims, [c['side'] for c in claims]) if claims else []), claims
+
+def browsing(data):
+    """The topics a report's findings are browsed by, each shown claim's, and their names: (the way, {claim id: its
+    topic's index}, names); the model's way and names where it chose (the topic_names lever), else the most even
+    way named by its words; no way for fewer than two topics."""
+    found, claims = report_topics(data)
+    chosen = data.get('topics', {})
+    way = next((w for w in found if w.name == chosen.get('way') and w.topics == chosen.get('topics')), None)
+    names = chosen.get('names') if way else None
+    way = way or topics.best(found)
     if way is None or len(way.topics) < 2:
-        return None, {}
-    return way, {c['id']: t for c, t in zip(claims, way.placed) if t is not None}
+        return None, {}, []
+    return (way, {c['id']: t for c, t in zip(claims, way.placed) if t is not None},
+            names or [topics.label(words) for words in way.topics])
 
 def crop_html(e, embedded, stored):
     """A card's crop: its embedded image (enlarged by a click), or why it has none."""
@@ -406,7 +417,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                  "files": [files.get(card.evidence[x]['content'], -1) for x in (f['a'], f['b'])]} for f in shown]
     for f, record in zip(shown, findings):  # equivalent, and saying the same in both: folded unless asked for
         record["same"] = f['relation'] == 'equivalent' and card.said_of[f['a']] == card.said_of[f['b']]
-    way, topic_of = browsing(data, shown)
+    way, topic_of, names = browsing(data)
     for f, record in zip(shown, findings):
         record["topics"] = [topic_of.get(f['a'], -1), topic_of.get(f['b'], -1)]
     same = sum(1 for record in findings if record["same"])
@@ -416,10 +427,11 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     page += ('<input id="query" placeholder="Search findings" aria-label="Search findings"> '
              '<span id="count" class="meta"></span>')
     if way:
+        named = 'named by the model; ' if data.get('topics', {}).get('names') else ''
         page += ('<div class="topics"><span class="meta" title="Claims split by the words of what they are about, '
-                 f'found in both sources ({esc(way.name)}); a finding is in its claims\' topics">Topics:</span>'
-                 + ''.join(f'<button data-topic="{t}">{esc(topics.label(words))} <small></small></button>'
-                           for t, words in enumerate(way.topics))
+                 f'found in both sources ({esc(way.name)}; {named}a finding is in its claims\' topics)">Topics:</span>'
+                 + ''.join(f'<button data-topic="{t}" title="{esc(", ".join(words))}">{esc(name)} <small></small>'
+                           '</button>' for t, (words, name) in enumerate(zip(way.topics, names)))
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
     page += ('<main></main><details data-list="unmatched"><summary>Unmatched evidence ('
              +str(len(data['unmatched']))+')</summary></details>')

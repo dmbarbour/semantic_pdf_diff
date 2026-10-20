@@ -60,7 +60,7 @@
     "explain_differences",
     "editorial",
     "record_changes",
-    "judge_context"
+    "judge_context", "topic_names"
   ],
   "table_rules": null,
   "table_structure": false,

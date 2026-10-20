@@ -466,6 +466,12 @@ class Explanation(DropsUnknown):
     rationale: str = Field(min_length=1, max_length=800)
     confidence: float = Field(ge=0, le=1)
 
+class TopicNames(DropsUnknown):
+    """The model's choice among the ways of splitting a report's claims into topics, and its names for that way's
+    topics, in order (the topic_names lever; topics.py)."""
+    way: int = Field(ge=1)
+    names: list[Annotated[str, Field(min_length=1, max_length=60)]] = Field(min_length=1)
+
 REPORT_SCHEMA = 2  # report.json and evidence.json (and the comparisons a store saves)
 
 class CoverageRow(Strict):
@@ -548,11 +554,14 @@ class Report(Strict):
     # context records restated between the revisions, each with the claims it reaches (the record_changes lever;
     # records.changed_records); none, no key
     record_changes: list[dict] = Field(default_factory=list)
+    # the model's way of splitting the claims into topics and its names for them (the topic_names lever; topics.py),
+    # or why there are none; not asked, no key
+    topics: dict = Field(default_factory=dict)
 
     @model_serializer(mode="wrap")
     def _without_absent_records(self, handler):
         out = handler(self)
-        for key in ("records", "record_changes"):
+        for key in ("records", "record_changes", "topics"):
             if isinstance(out, dict) and not out.get(key):
                 out.pop(key, None)
         return out

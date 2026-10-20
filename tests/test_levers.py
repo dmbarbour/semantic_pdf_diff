@@ -228,7 +228,8 @@ class Binding(unittest.TestCase):
         # extraction's: matching's merge and comparison's levers aren't
         self.assertEqual(bound["levers"], [n for n in L.DEFAULT_LEVERS
                                            if n not in ("reconcile", "align", "verify_visuals", "explain_differences",
-                                                        "editorial", "record_changes", "judge_context")])
+                                                        "editorial", "record_changes", "judge_context",
+                                                        "topic_names")])
         backwards = extraction_interpreter(settings_class(tuple(reversed(L.DEFAULT_LEVERS)))()).model_dump()
         differences = interpreter_differences(extraction_interpreter(Settings()).model_dump(), backwards)
         self.assertEqual(set(differences), {"settings.levers"})

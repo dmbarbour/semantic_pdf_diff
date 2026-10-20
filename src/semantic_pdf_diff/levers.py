@@ -1106,6 +1106,17 @@ class RecordChanges(Lever):
         from .records import changed_records
         return changed_records(earlier, later, left, right)
 
+class NameTopics(Lever):
+    lever_name, stage, off = "topic_names", "comparison", {"topic_names": False}
+    # the report's topics (topics.py) chosen among the candidate ways and named by the model, in a request a
+    # comparison; without it, or when it fails, the most even way by its words (the owner, 2026-10-19: "let an LLM
+    # model select heuristically between candidates based on what would better fit the human intuition, and name the
+    # divisions"; docs/plans/portable-reports-2026-10-19.md, milestone 3). Off until judged by eye
+    topic_names: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def names_topics(self):
+        return self.topic_names
+
 class JudgeContext(Lever):
     lever_name, stage, off = "judge_context", "comparison", {"judge_context": False}
     # each claim's context records (the records lever's: its list's lead-in, its sheet's notes, its table's title and
@@ -1152,7 +1163,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText,
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
-                 ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext)
+                 ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext,
+                 NameTopics)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1332,6 +1344,12 @@ class Platform(Composable):
     def explains(self, mode):
         """Whether each "different" or "uncertain" finding is explained by a second call, which names the kind of
         difference (explain.py): the platform's, never; the explain_differences lever's, in revisions mode."""
+        return False
+
+    @chosen
+    def names_topics(self):
+        """Whether the model chooses the report's topics among the ways and names them (topics.py): the platform's,
+        never; the topic_names lever's, when on."""
         return False
 
     # --- matching: how answers are checked and kept
