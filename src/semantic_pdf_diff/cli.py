@@ -819,7 +819,7 @@ reranker. Names are the settings' own (max_cost, report_budget, rerank_threshold
   semantic-pdf-diff config set --user model NAME    the user's, for every store (--user: set, unset, export, import)
   semantic-pdf-diff config test                     the endpoint, the key and each model checked, for a few cents
                                                     (exit 5 when a check fails)
-  semantic-pdf-diff config models gemma             the endpoint's models holding the words, those in use marked
+  semantic-pdf-diff config models vision            the endpoint's models reading images: context, price
 """
 
 def config_parser():
@@ -851,9 +851,12 @@ def config_parser():
     take.add_argument('file')
     actions.add_parser('test', parents=[where], help='the endpoint, the key and each model the settings name, checked '
                                                     'by asking (a few cents); exit 5 when a check fails')
-    listed = actions.add_parser('models', parents=[where], help="the endpoint's models, those the settings name "
+    listed = actions.add_parser('models', parents=[where], help="the endpoint's models, with what it says of each "
+                                                                "(context, price, tags), those the settings name "
                                                                 "marked")
-    listed.add_argument('words', nargs='*', help='only models whose name holds every word')
+    listed.add_argument('words', nargs='*', help='only models whose name or tags hold every word ("vision": those '
+                                                 'reading images, where the endpoint says)')
+    listed.add_argument('--json', action='store_true', help='every field, as JSON')
     return parser
 
 def config_command(argv):
@@ -892,7 +895,7 @@ def config_command(argv):
                                         if k not in configuration.RUN_OPTIONS})
         if args.action == 'models':
             try:
-                print('\n'.join(checkup.listing(settings, ' '.join(args.words))))
+                print('\n'.join(checkup.listing(settings, ' '.join(args.words), as_json=args.json)))
             except (OSError, ValueError) as e:
                 raise ValueError(f"the endpoint's models can't be listed ({type(e).__name__}: {e})") from None
             return 0

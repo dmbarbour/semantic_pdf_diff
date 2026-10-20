@@ -36,7 +36,8 @@ def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False):
     def get(handler):
         handler.send_response(200)
         handler.end_headers()
-        handler.wfile.write(json.dumps({"object": "list", "data": [{"id": m} for m in listed]}).encode())
+        data = [m if isinstance(m, dict) else {"id": m} for m in listed]
+        handler.wfile.write(json.dumps({"object": "list", "data": data}).encode())
 
     def post(handler):
         body = request_body(handler)
@@ -127,6 +128,31 @@ class ConfigModels(unittest.TestCase):
         with endpoint(listed=("llama",)), tempfile.TemporaryDirectory() as d:
             self.assertEqual(run("config", "models", "gemma", "--store", Path(d) / "s")[1],
                              "no model at the endpoint holds 'gemma'\n")
+
+    def test_what_the_endpoint_says_of_each_model(self):
+        deepinfra = {"id": "google/gemma-4-31B-it", "metadata": {
+            "context_length": 262144, "pricing": {"input_tokens": 0.2, "output_tokens": 0.4},
+            "tags": ["chat", "vlm", "vision", "reasoning"]}}
+        embedder = {"id": "Qwen/Qwen3-Embedding-8B",
+                    "metadata": {"context_length": 32768, "pricing": {"input_tokens": 0.005}, "tags": ["embed"]}}
+        openrouter = {"id": "acme/seer", "context_length": 128000, "pricing": {"prompt": "0.0000005",
+                                                                               "completion": "0.0000015"},
+                      "architecture": {"input_modalities": ["text", "image"]}}
+        vllm = {"id": "local/reader", "max_model_len": 32768}
+        with endpoint(listed=(deepinfra, embedder, openrouter, vllm)), tempfile.TemporaryDirectory() as d, \
+                user_settings({"model": "google/gemma-4-31B-it"}):
+            code, out = run("config", "models", "--store", Path(d) / "s")
+            self.assertEqual(code, 0)
+            self.assertEqual(out.splitlines(), [
+                "acme/seer                       128,000 tokens  $0.50 in, $1.50 out a million  vision",
+                "google/gemma-4-31B-it  (model)  262,144 tokens  $0.20 in, $0.40 out a million  chat, vlm, vision, "
+                "reasoning",
+                "local/reader                     32,768 tokens",
+                "Qwen/Qwen3-Embedding-8B          32,768 tokens  $0.005 in a million            embed"])
+            self.assertEqual(run("config", "models", "vision", "--store", Path(d) / "s")[1].split("\n")[1][:5], "googl")
+            code, out = run("config", "models", "seer", "--json", "--store", Path(d) / "s")
+        self.assertEqual(json.loads(out), [{"id": "acme/seer", "context": 128000, "price_in": 0.5, "price_out": 1.5,
+                                            "tags": ["vision"], "named_by": []}])
 
 if __name__ == "__main__":
     unittest.main()

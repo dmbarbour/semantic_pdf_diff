@@ -41,9 +41,58 @@ class Check:
         took = f" ({self.seconds:.1f} s)" if self.seconds >= 0.05 else ""
         return f"  {self.name:<{width}} {mark}: {self.said}{took}"
 
-def models(settings, api_key=""):
-    """The endpoint's models (GET {base_url}/models, the OpenAI format), their ids sorted; OSError or ValueError when
-    they can't be listed."""
+@dataclass(frozen=True)
+class Listed:
+    """A model as the endpoint lists it, with what the endpoint says of it, where it says (the owner, 2026-10-20: "We
+    could let people know what's available."): its context window in tokens, its price in dollars a million tokens in
+    and out, and its tags (DeepInfra's: chat, vision, embed and more; vision too where OpenRouter lists images among
+    its inputs)."""
+    id: str
+    context: int | None = None
+    price_in: float | None = None
+    price_out: float | None = None
+    tags: tuple = ()
+
+    @property
+    def reads_images(self):
+        return "vision" in self.tags or "vlm" in self.tags
+
+    def described(self):
+        """[its context, its price, its tags], each "" where the endpoint doesn't say."""
+        prices = [f"${p:.2f} {way}" if p >= 0.01 or not p else f"${p:.2g} {way}"
+                  for p, way in ((self.price_in, "in"), (self.price_out, "out")) if p is not None]
+        return [f"{self.context:,} tokens" if self.context else "",
+                ", ".join(prices) + " a million" if prices else "", ", ".join(self.tags)]
+
+def _count(*values):
+    return next((int(v) for v in values if isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0), None)
+
+def _price(value, scale=1.0):
+    try:
+        return round(float(value) * scale, 6) if value is not None and value != "" else None
+    except (TypeError, ValueError):
+        return None
+
+def described(item):
+    """A /models item as Listed: DeepInfra's metadata (context_length; pricing in dollars a million tokens; tags),
+    vLLM's max_model_len, or OpenRouter's fields (context_length; pricing in dollars a token; architecture's input
+    modalities)."""
+    get = lambda d, k: d.get(k) if isinstance(d, dict) else None  # noqa: E731
+    meta, top, arch = (get(item, k) or {} for k in ("metadata", "top_provider", "architecture"))
+    context = _count(get(meta, "context_length"), get(item, "context_length"), get(item, "max_model_len"),
+                     get(top, "context_length"))
+    if isinstance(get(meta, "pricing"), dict):
+        price_in, price_out = (_price(get(meta["pricing"], k)) for k in ("input_tokens", "output_tokens"))
+    else:
+        price_in, price_out = (_price(get(get(item, "pricing"), k), 1e6) for k in ("prompt", "completion"))
+    tags = [str(x) for x in (get(meta, "tags") or get(item, "tags") or []) if isinstance(x, str)]
+    if "image" in (get(arch, "input_modalities") or []):
+        tags.append("vision")
+    return Listed(str(item["id"]), context, price_in, price_out, tuple(dict.fromkeys(tags)))
+
+def listed(settings, api_key=""):
+    """The endpoint's models (GET {base_url}/models, the OpenAI format) as Listed, sorted by id (case aside); OSError
+    or ValueError when they can't be listed."""
     url = settings.base_url.rstrip("/") + "/models"
     request = urllib.request.Request(url, headers={"Authorization": "Bearer " + api_key} if api_key else {})
     with urllib.request.urlopen(request, timeout=min(settings.timeout, 30)) as response:
@@ -51,7 +100,12 @@ def models(settings, api_key=""):
     items = data.get("data") if isinstance(data, dict) else data
     if not isinstance(items, list):
         raise ValueError("the endpoint's /models answer holds no list of models")
-    return sorted({str(m["id"]) for m in items if isinstance(m, dict) and m.get("id")})
+    found = {str(m["id"]): described(m) for m in items if isinstance(m, dict) and m.get("id")}
+    return [found[k] for k in sorted(found, key=lambda k: (k.casefold(), k))]
+
+def models(settings, api_key=""):
+    """The endpoint's models' ids (listed's order)."""
+    return [m.id for m in listed(settings, api_key)]
 
 def used(settings):
     """{model id: the settings naming it}: what the configuration asks."""
@@ -168,11 +222,24 @@ def lines(settings, checks, cost):
     out.append(f"{len(failed)} check(s) failed: {', '.join(failed)}" if failed else "every check passed")
     return out
 
-def listing(settings, words=""):
-    """`config models [WORDS]`: the endpoint's models holding every word, those the settings name marked."""
+def listing(settings, words="", as_json=False):
+    """`config models [WORDS]`: the endpoint's models whose name or tags hold every word ("vision" those that read
+    images, at DeepInfra), with what the endpoint says of each; those the settings name marked."""
     names = used(settings)
-    found = [m for m in models(settings, os.getenv("OPENAI_API_KEY", ""))
-             if all(w in m.casefold() for w in words.casefold().split())]
+    found = [m for m in listed(settings, os.getenv("OPENAI_API_KEY", ""))
+             if all(w in " ".join((m.id,) + m.tags).casefold() for w in words.casefold().split())]
+    if as_json:
+        return [json.dumps([{"id": m.id, "context": m.context, "price_in": m.price_in, "price_out": m.price_out,
+                             "tags": list(m.tags), "named_by": names.get(m.id, [])} for m in found], indent=1)]
     if not found:
         return [f"no model at the endpoint holds {words!r}" if words else "the endpoint lists no models"]
-    return [m + (f"  ({', '.join(names[m])})" if m in names else "") for m in found]
+    return table(found, names)
+
+def table(found, names=None):
+    """Listed models a line each, in columns: the name (marked with the settings naming it), and what the endpoint
+    says of it."""
+    rows = [[m.id + (f"  ({', '.join(names[m.id])})" if names and m.id in names else "")] + m.described()
+            for m in found]
+    widths = [max(len(r[k]) for r in rows) for k in range(len(rows[0]))]
+    return ["  ".join(cell.ljust(w) if k == 0 else cell.rjust(w) if k == 1 else cell.ljust(w)
+                      for k, (cell, w) in enumerate(zip(r, widths)) if w).rstrip() for r in rows]

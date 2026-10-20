@@ -42,7 +42,7 @@ A store keeps its own settings, set once for every run in it; the user's are sha
 | `config export [FILE]` | The store's own settings as `{"format": 1, "settings": {...}}` (cameo_ingest's format), to the screen without a file |
 | `config import FILE` | Every setting in the file, or none when any key or value is wrong; `null` unsets one |
 | `config test` | The endpoint, the key and each model the settings name, checked by asking, never from the cache, for a fraction of a cent: the model listed at the endpoint (`/models`), a JSON answer (a sum), an eye-test card read (a random code drawn large), the reranker if one is set (a counterpart scored above an unrelated claim), the embedding model if one is set (a counterpart nearer than an unrelated claim); then what the checks cost. Exit 5 when one fails |
-| `config models [WORDS]` | The endpoint's models (its `/models`) whose names hold every word, those the settings name marked |
+| `config models [WORDS] [--json]` | The endpoint's models (its `/models`) whose names or tags hold every word, with what the endpoint says of each where it says: its context window, its price a million tokens in and out, its tags (`config models vision`: those reading images, at DeepInfra or OpenRouter). Those the settings name are marked; `--json` gives every field |
 
 Besides the settings below, a store keeps three run options the same way: `mode` (proposals or revisions), and the report's `report_budget` and `split`.
 

@@ -25,8 +25,10 @@
 2. **No default model:** `model` is unset until the user sets it.
    - A command that would ask the model without one stops before anything is changed.
    - The error names `config set --user model NAME` and lists the endpoint's vision models (from `/models`), or all its models where none says what it reads.
-3. **`config models` says what each model is,** where the endpoint says: its context window, its price, and whether it reads images or embeds.
-   - `config models WORDS` filters the list, as now; `--json` gives every field for tools.
+3. **`config models` says what each model is** (done 2026-10-20), where the endpoint says: its context window, its price, and whether it reads images or embeds.
+   - `config models WORDS` filters the list by name or tag (`config models vision`); `--json` gives every field for tools.
+   - Read from DeepInfra's `metadata` (context, price a million tokens, tags), vLLM's `max_model_len`, and OpenRouter's fields (price a token, images among the inputs).
+   - On DeepInfra: 177 models, 53 tagged as reading images, 25 as embedding. Its listing doesn't include its rerankers.
 4. **Checked on first use:** before a run's first request, each model the settings name is checked, as `config test` checks it, unless it's remembered as passing.
    - **Remembered** in `endpoints.json`, beside the answers cache's `answers.sqlite`: a project with a cache of its own keeps its own record, and nothing about its endpoint is written to the home cache.
    - **Each check is remembered by what it depends on:** the chat check by the endpoint and model; the image check by those and `image_side`; the reranker's and the embedding model's by their URL, model and API.
