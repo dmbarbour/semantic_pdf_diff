@@ -75,7 +75,7 @@ semantic-pdf-diff search 'hub height -tower' --store work               # the st
 
 A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. Files of the types listed under Status are read; others are listed as skipped (`source show` says which, and why).
 
-Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error, a mistyped command or option included; `5` a check of `semantic-pdf-diff config test` failed.
+Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error, a mistyped command or option included; `5` the endpoint failed: a check of `semantic-pdf-diff config test`, or 25 requests in a row (`stop_after_failures`), which pauses the run until it's run again.
 
 The `--store` folder (`diff-output` unless named) is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence, and an interrupted run resumes where it stopped. Model answers are cached for every store (`$SEMANTIC_PDF_DIFF_CACHE`, else `~/.cache/semantic-pdf-diff`), so what was asked once isn't paid for again. A store is bound to the model and extraction settings it was built with. A run with different ones reads again what they change, saying what differs and at most how much is asked again (preview with `--dry-run`); unchanged queries are answered from the cache. `--reset` starts a store over.
 

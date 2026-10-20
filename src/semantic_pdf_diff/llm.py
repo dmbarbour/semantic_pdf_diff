@@ -18,7 +18,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
 from typing import TYPE_CHECKING
-from .failures import BudgetExceeded, CallLimitReached, Invalid, ModelFailure, NotRecorded, OutOfBudget, Truncated
+from .failures import (BudgetExceeded, CallLimitReached, EndpointFailing, Invalid, ModelFailure, NotRecorded,
+                       OutOfBudget, Truncated)
 from .fixtures import Replayer
 from .recipes import Recipe, recipe_fields
 from .throttle import AdaptiveGate, RateLimiter
@@ -227,6 +228,8 @@ class Transport:
         self.cost = 0.0             # as the provider reports it (usage.estimated_cost)
         self.out_of_budget = None   # why sending stopped, once it has
         self.limited = None         # the call limit, once a request was refused under it
+        self.failing = None         # why sending stopped, once requests failed in a row (stop_after_failures)
+        self.in_a_row = {}          # url: its requests failed in a row, until one is answered
         self.ledger = None          # a ledger.Ledger to record every paid attempt's cost
         self.warned_cost = False
         self.unpriced = 0           # responses without a reported cost (see Ledger.add)
@@ -239,13 +242,38 @@ class Transport:
 
     def send(self, request):
         """Call the model, with retries (thread-safe): each attempt admitted under the caps, posted, its usage and cost
-        accounted, its answer read; a refusal stops, fails or waits to retry."""
+        accounted, its answer read; a refusal stops, fails or waits to retry. Requests failing in a row at one URL
+        stop sending (failed_at)."""
+        url = request.url or self.s.base_url.rstrip("/") + "/chat/completions"
+        try:
+            value = self._send(request, url)
+        except BudgetExceeded:  # a cap's stop or the balance's, not the endpoint failing
+            raise
+        except ModelFailure as e:
+            self.failed_at(url, e)
+            raise
+        with self.lock:
+            self.in_a_row.pop(url, None)
+        return value
+
+    def failed_at(self, url, error):
+        """A request failed at url, after its retries. Once stop_after_failures have in a row, sending stops as the
+        cost cap stops it: what isn't sent isn't attempted, and the next run asks it again. Before, every request
+        could fail with nothing said but a count (a reranker asked where none was served; a wrong model's name)."""
+        with self.lock:
+            failed = self.in_a_row[url] = self.in_a_row.get(url, 0) + 1
+            if failed < self.s.stop_after_failures or self.out_of_budget:
+                return
+            self.failing = self.out_of_budget = (f"{failed} requests in a row failed at {redact_url(url)}, the last "
+                                                 f"with {error}; `semantic-pdf-diff config test` checks the endpoint")
+        log.warning(f"Sending stopped: {self.failing}")
+
+    def _send(self, request, url):
         last = "Unknown model failure"
         if not request.admitted:  # a caller that didn't admit it as it asked
             self.admit(request)
         for attempt in range(self.s.retries + 1):
             wait = min(2 ** attempt, 8)
-            url = request.url or self.s.base_url.rstrip("/") + "/chat/completions"
             http = urllib.request.Request(url, data=request.raw,
                 headers={"Content-Type": "application/json",
                          **({"Authorization": "Bearer " + self.api_key} if self.api_key else {})})
@@ -283,7 +311,7 @@ class Transport:
         review, D6). The cost cap still follows when answers' costs come in: a run it cuts is paused (paused)."""
         with self.lock:
             if self.out_of_budget:
-                raise OutOfBudget(self.out_of_budget)
+                raise (EndpointFailing if self.failing else OutOfBudget)(self.out_of_budget)
             self._capped()
             if self.admitted >= self.s.max_calls:
                 self.limited = f"call limit reached ({self.s.max_calls} requests)"
@@ -303,7 +331,7 @@ class Transport:
         the cap is reached, only those already sent may overrun it."""
         with self.lock:
             if self.out_of_budget:
-                raise OutOfBudget(self.out_of_budget)
+                raise (EndpointFailing if self.failing else OutOfBudget)(self.out_of_budget)
             self._capped()
             self.calls += 1
 
@@ -453,6 +481,7 @@ class Client:
     unpriced = property(lambda self: self.transport.unpriced)
     out_of_budget = property(lambda self: self.transport.out_of_budget)
     paused = property(lambda self: self.transport.paused)
+    failing = property(lambda self: self.transport.failing)
     limiter = property(lambda self: self.transport.limiter)
     gate = property(lambda self: self.transport.gate)
     api_key = property(lambda self: self.transport.api_key)

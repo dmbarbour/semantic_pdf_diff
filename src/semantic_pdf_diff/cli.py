@@ -122,7 +122,8 @@ evidence.json. A comparison into it again reuses what was read, and resumes one 
 ~/.cache/semantic-pdf-diff; a store keeps the cache its first run used): what was asked once isn't paid for again.
 
 Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error
-(a mistyped command or option too); 5 a check of `config test` failed.
+(a mistyped command or option too); 3 paused for budget (run again to resume); 5 the endpoint failed: a check of
+`config test`, or 25 requests in a row (stop_after_failures), which pauses the run.
 """
 
 def help_text(parser, epilog=None, description=None):

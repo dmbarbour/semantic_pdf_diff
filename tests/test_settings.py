@@ -20,6 +20,7 @@ from test_situate import diagram
 # A value other than the default for each setting, chosen not to stop the run (limits stay loose).
 TOGGLES = {
     'model': 'another-model', 'image_tokens': 28000, 'max_calls': 1_000_000, 'max_cost': 1000.0, 'retries': 1,
+    'stop_after_failures': 1000,
     'timeout': 300.0, 'stream': False, 'concurrency': 2, 'heartbeat_seconds': 5.0,
     'rate_limits': [{'tokens_per_minute': 100_000_000}],
     'context_tokens': 8192, 'safety_tokens': 26000, 'output_tokens': 3000, 'claims_per_request': 10,

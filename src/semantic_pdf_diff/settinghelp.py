@@ -50,6 +50,10 @@ HELP = {
     "stream": Help("endpoint", "receive answers as they're written",
                    "Streamed, the timeout counts between chunks, so a long answer isn't cut off."),
     "retries": Help("endpoint", "attempts after a failed request (0 to 5)"),
+    "stop_after_failures": Help("endpoint", "requests failing in a row at one URL before a run stops sending",
+                                "The run pauses, as the cost cap pauses it, and exits 5: the model's name, the key or "
+                                "the endpoint is likely wrong (`config test` checks them). Running again resumes.",
+                                "25"),
     "timeout": Help("endpoint", "seconds without data before a request gives up",
                     "Between chunks when streaming: a slow answer isn't cut off whole, and still billed.", "300",
                     basic=True),

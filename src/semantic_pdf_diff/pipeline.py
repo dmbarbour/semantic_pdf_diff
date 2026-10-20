@@ -100,7 +100,7 @@ class RunOptions:
 def compare_paths(a, b, out, settings, options=None, client=None):
     """Compare two sources given as paths (files, folders or zips), each a shortcut source in the store at `out`,
     as `semantic-pdf-diff compare A B --store DIR` does. Returns its exit code (0, 2 incomplete, 3 paused for
-    budget)."""
+    budget, 5 paused for requests failing in a row)."""
     options = options or RunOptions()
     check_fixture(options)  # before the sources are declared in the store
     with Store(out) as store:
@@ -142,15 +142,16 @@ def attach_ledger(client, options):
     return client
 
 def budget_note(client):
-    """A line saying the run paused for budget, if it did (the process exits 3)."""
+    """A line saying the run paused, if it did: for budget (the process exits 3), or for requests failing in a row (5:
+    the endpoint's, as a failed `config test` is)."""
     reason = getattr(client, 'out_of_budget', None)
     return f"Paused: {reason}. Rerun the same command to resume; finished work is kept." if reason else None
 
 def run(options, settings, store, names, out, force_rescan=False, client=None):
     """A comparison of a store's sources: bound and scanned (prepare), read (read_sources), its evidence written
     (write_evidence), compared and reported (compare_and_report). Returns the exit code: 0, 2 incomplete, 3 paused for
-    budget. client: a model client to use (a caller's, kept open); by default one made from the options (code review
-    2026-10-08, C6: run did all six jobs, and tests patched its client in)."""
+    budget, 5 paused for requests failing in a row. client: a model client to use (a caller's, kept open); by default
+    one made from the options (code review 2026-10-08, C6: run did all six jobs, and tests patched its client in)."""
     interpreter = extraction_interpreter(settings)
     triage = triage_interpreter(settings) if settings.situate else None
     own = client is None
@@ -317,7 +318,7 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     note = budget_note(client)
     if note:
         log.warning(note)
-        return 3
+        return 5 if getattr(client, 'failing', None) else 3
     # 2 makes automation aware of incomplete processing; uncertainty still appears
     # in the report even when all tasks completed successfully.
     return 2 if incomplete else 0

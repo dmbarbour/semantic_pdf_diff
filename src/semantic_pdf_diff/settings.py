@@ -32,6 +32,10 @@ class Endpoint(Strict):
     # Stop sending once the provider-reported cost of this run reaches this many dollars.
     max_cost: Annotated[float | None, Declared("endpoint")] = Field(default=None, gt=0)
     retries: Annotated[int, Declared("endpoint")] = Field(default=2, ge=0, le=5)
+    # Requests failing in a row at one URL, after their retries, before a run stops sending (paused; running again
+    # resumes): every request could fail with nothing said but a count (the owner, 2026-10-20: "Without verbose mode,
+    # we can get 13k bad requests without noticing.").
+    stop_after_failures: Annotated[int, Declared("endpoint")] = Field(default=25, ge=1)
     # Seconds without data before giving up. Answers are streamed, so this is between chunks, not
     # for the whole answer (a slow answer cut off by a total timeout is still billed).
     timeout: Annotated[float, Declared("endpoint")] = Field(default=120, gt=0)

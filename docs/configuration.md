@@ -70,6 +70,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `max_calls` | `100000` | endpoint |  | - | - |
 | `max_cost` | `null` | endpoint |  | - | - |
 | `retries` | `2` | endpoint |  | - | - |
+| `stop_after_failures` | `25` | endpoint |  | - | - |
 | `timeout` | `120` | endpoint |  | - | - |
 | `stream` | `true` | endpoint |  | - | - |
 | `concurrency` | `4` | endpoint |  | - | - |
@@ -202,7 +203,7 @@ None of these affect output, so changing them never reads anything again.
 
 ## Calls, caching and exit codes
 
-A typical page needs multiple calls, so large PDFs can require hundreds or thousands. `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--max-calls` caps the requests sent in one invocation, counted as each is asked; retries don't count. A run a cap cuts (`--max-calls`, `--max-cost`, the provider's balance) says so in its report (`paused`): which work the cap cut followed the order answers came in, so the report isn't reproducible until the run is resumed.
+A typical page needs multiple calls, so large PDFs can require hundreds or thousands. `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--max-calls` caps the requests sent in one invocation, counted as each is asked; retries don't count. A run a cap cuts (`--max-calls`, `--max-cost`, the provider's balance) says so in its report (`paused`): which work the cap cut followed the order answers came in, so the report isn't reproducible until the run is resumed. A run whose requests fail in a row is paused the same way: once `stop_after_failures` (25) requests in a row fail at one URL, after their retries, it stops sending, says so at once, and exits 5. What it didn't send isn't recorded as failed, so running it again resumes.
 
 A comparison's `--store` folder is an evidence store: `store.sqlite` (sources, files, content, evidence, coverage, the queries asked, comparisons) plus `assets/` for rendered crops. Stores are created with owner-only permissions and are as sensitive as the documents they were built from. So is the answers cache (`$SEMANTIC_PDF_DIFF_CACHE`), owner-only too: its answers quote the documents, and removing a store leaves them there.
 
@@ -236,6 +237,6 @@ Exit codes:
 - `2` incomplete source coverage (including tasks `not_reached` because of `max_calls`), a comparison processing failure, no extracted claims on either side, or pair-limit truncation
 - `3` paused for budget (the cost cap, or the provider's balance): rerun the same command to resume, keeping finished work
 - `1` fatal input or configuration error
-- `5` a check of `config test` failed
+- `5` the endpoint failed: a check of `config test`, or `stop_after_failures` requests in a row (25) at one URL, which pauses the run as the cost cap does (rerun to resume)
 
 Inspect the JSON and coverage ledger regardless of exit code.

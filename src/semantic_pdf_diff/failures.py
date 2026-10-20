@@ -17,6 +17,11 @@ class OutOfBudget(CallLimitReached):
     """The provider's balance ran out, or the run's cost cap was reached: work not attempted,
     to be resumed after a top-up (like the call limit, never recorded as a model failure)."""
 
+class EndpointFailing(OutOfBudget):
+    """Requests failed in a row at one URL (stop_after_failures), so sending stopped, as the cost cap stops it: what
+    wasn't sent wasn't attempted, and the next run asks it again (the owner, 2026-10-20: "Without verbose mode, we can
+    get 13k bad requests without noticing.")."""
+
 # Failures of the service rather than of the model's answer: replay re-asks them when recording
 # only new requests (record-new), instead of reproducing a timeout forever.
 TRANSIENT = re.compile(r"TimeoutError|timed out|HTTP (?:408|429|5\d\d)|Connection|IncompleteRead|RemoteDisconnected|"
