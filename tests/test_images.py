@@ -32,7 +32,7 @@ class Layout(unittest.TestCase):
     def test_every_image_extension_has_a_reader_and_a_version(self):
         for extension in IMAGE_EXTENSIONS:
             self.assertIsNotNone(reader_for(extension))
-            self.assertEqual(reader_version(extension), "image/1")
+            self.assertEqual(reader_version(extension), "image/2")
 
 class Read(unittest.TestCase):
     class Client:
