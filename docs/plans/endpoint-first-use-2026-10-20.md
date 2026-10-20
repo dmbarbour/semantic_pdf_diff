@@ -31,13 +31,15 @@
    - `config models WORDS` filters the list by name or tag (`config models vision`); `--json` gives every field for tools.
    - Read from DeepInfra's `metadata` (context, price a million tokens, tags), vLLM's `max_model_len`, and OpenRouter's fields (price a token, images among the inputs).
    - On DeepInfra: 177 models, 53 tagged as reading images, 25 as embedding. Its listing doesn't include its rerankers.
-4. **Checked on first use:** before a run's first request, each model the settings name is checked, as `config test` checks it, unless it's remembered as passing.
+4. **Checked on first use** (done 2026-10-20): before a run's first request, each model the settings name is checked, as `config test` checks it, unless it's remembered as passing.
    - **Remembered** in `endpoints.json`, beside the answers cache's `answers.sqlite`: a project with a cache of its own keeps its own record, and nothing about its endpoint is written to the home cache.
    - **Each check is remembered by what it depends on:** the chat check by the endpoint and model; the image check by those and `image_side`; the reranker's and the embedding model's by their URL, model and API.
    - **A failed check stops the run** before anything is asked (exit 5), its lines printed as `config test` prints them.
    - **A pass is forgotten** when a check of it fails, or when its URL trips milestone 1's stop.
    - **When nothing is checked:** runs replaying a fixture (`--fixture`, tests and the lab) are never checked; a run whose answers all come from the cache sends nothing, so it isn't either.
-   - Checks cost about $0.0002 on DeepInfra, counted in the run's cost.
+   - Checks cost about $0.0002 on DeepInfra. They're said in the run's log, not counted under its cost cap.
+   - `config test` records its results too, in the record beside the cache the store uses.
+   - **Tested** with a stub endpoint: a first run checks (a sum, the card, the card's prompt alone) and the next doesn't; a wrong sum stops the run with nothing asked; a run whose requests fail in a row empties the record. The tests' stand-in skips the check everywhere else (tests/stubs.py).
 5. **Calibrated on first use,** from what the checks measure:
    - **`context_tokens`:** the model's context window, where the endpoint's listing gives it.
    - **`image_tokens`:** an image's tokens at `image_side`. The image check sends its card on a square canvas of that size, and the image's tokens are the prompt tokens reported, less the same prompt's without the image. Used with a margin of 10%.

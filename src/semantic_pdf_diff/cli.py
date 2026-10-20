@@ -904,6 +904,12 @@ def config_command(argv):
             return 0
         checks, cost = checkup.run(settings)
         print('\n'.join(checkup.lines(settings, checks, cost)))
+        try:  # remembered, so a run needn't check again (checkup.first_use)
+            from .settings import cache_path
+            cache = cache_in_use([store]) if (store / 'store.sqlite').exists() else cache_path()
+            checkup.record(checkup.memory_of(cache), settings, checks)
+        except (OSError, StoreError, ValueError):
+            pass
         return checkup.FAILED if any(c.ok is False for c in checks) else 0
     if args.action == 'export':
         text = json.dumps(configuration.exported(own), indent=1, ensure_ascii=False) + '\n'

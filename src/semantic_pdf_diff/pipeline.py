@@ -8,7 +8,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import crops, fixtures, provenance, topics
+from . import checkup, crops, fixtures, provenance, topics
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
 from .jobs import Job, reader_for, reader_version, run_jobs
@@ -176,6 +176,13 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
         print(json.dumps({'would_clear': would}, indent=2))
         return 0
     cache = answers_cache(store) if own and not options.fixture else None  # refused before the store changes
+    if cache is not None:  # each model checked before anything is asked, unless remembered as passing
+        try:
+            settings = checkup.first_use(settings, cache.path)
+        except checkup.Unchecked as e:
+            cache.close()
+            log.error(f"Stopped: {e}")
+            return checkup.FAILED
     try:
         prepare(options, settings, store, names, (interpreter, triage), force_rescan)
     except BaseException:
@@ -187,7 +194,10 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
         read = read_sources(store, client, settings, names, triage)
         document = write_evidence(store, names, read, {'extract': interpreter.model_dump(),
                                                         **({'triage': triage.model_dump()} if triage else {})}, out)
-        return compare_and_report(options, settings, store, client, names, read, document, out)
+        code = compare_and_report(options, settings, store, client, names, read, document, out)
+        if code == checkup.FAILED and cache is not None:  # requests failed in a row: checked again next time
+            checkup.forget(checkup.memory_of(cache.path), settings)
+        return code
     finally:  # also on failure, so the answers this run used stay marked as used
         if own and getattr(client, 'replay', None) is not None:
             client.close()

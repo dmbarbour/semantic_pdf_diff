@@ -32,6 +32,11 @@ os.environ["SEMANTIC_PDF_DIFF_CACHE"] = os.path.join(_CONFIG, "cache")
 from semantic_pdf_diff import fixtures as _fixtures, pipeline as _pipeline  # noqa: E402
 per_user_cache = _pipeline.answers_cache
 _pipeline.answers_cache = lambda store: _fixtures.open(store.folder / "answers.sqlite", "record")
+# Nor is each model checked on first use (checkup.first_use): the stub models answer the run's requests, not the
+# checks' (tests/test_first_use.py puts it back).
+from semantic_pdf_diff import checkup as _checkup  # noqa: E402
+first_use = _checkup.first_use
+_checkup.first_use = lambda settings, cache: settings
 
 @contextlib.contextmanager
 def user_settings(values):

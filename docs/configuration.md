@@ -44,6 +44,12 @@ A store keeps its own settings, set once for every run in it; the user's are sha
 | `config test` | The endpoint, the key and each model the settings name, checked by asking, never from the cache, for a fraction of a cent: the model listed at the endpoint (`/models`), a JSON answer (a sum), an eye-test card read (a random code drawn large), the reranker if one is set (a counterpart scored above an unrelated claim), the embedding model if one is set (a counterpart nearer than an unrelated claim); then what the checks cost. Exit 5 when one fails |
 | `config models [WORDS] [--json]` | The endpoint's models (its `/models`) whose names or tags hold every word, with what the endpoint says of each where it says: its context window, its price a million tokens in and out, its tags (`config models vision`: those reading images, at DeepInfra or OpenRouter). Those the settings name are marked; `--json` gives every field |
 
+**Checked on first use** ([the plan](plans/endpoint-first-use-2026-10-20.md)): before a run's first request, each model the settings name is checked as `config test` checks it, unless it's remembered as passing. A failed check stops the run before anything is asked, its lines printed, and it exits 5. Passes are remembered in `endpoints.json` beside the answers cache's `answers.sqlite` (owner-only, URLs without credentials), so a project with a cache of its own keeps its own record:
+- each check by what it depends on: the chat check by the endpoint and model, the image check by those and `image_side`, the reranker's and the embedding model's by their URL, model and API;
+- `config test` records its results there too (the cache the store uses, else the cache in effect);
+- a check that fails is forgotten, and so is every check of a run whose requests failed in a row (`stop_after_failures`), so the next run checks again;
+- a run replaying a fixture (`--fixture`) is never checked.
+
 Besides the settings below, a store keeps three run options the same way: `mode` (proposals or revisions), and the report's `report_budget` and `split`.
 
 For Python callers, use `Settings.from_env(...)` to get the user's settings and the endpoint's variable with explicit keyword overrides (a store's settings among them). Plain `Settings(...)` remains deterministic and consults neither. Output paths and comparison mode remain CLI options.

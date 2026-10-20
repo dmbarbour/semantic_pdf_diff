@@ -24,12 +24,13 @@ def run(*argv):
 
 @contextlib.contextmanager
 def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False):
-    """A stub endpoint: its models listed, sums added, the card's code read (misread: another), a reranker scoring
-    the first document higher, and an embedding model putting the pump's two sentences together."""
+    """A stub endpoint: its models listed, sums added, the card's code read (misread: another; an image 258 tokens),
+    a reranker scoring the first document higher, and an embedding model putting the pump's two sentences
+    together."""
     codes, real = [], checkup.card
 
-    def card(folder, rng):
-        path, code = real(folder, rng)
+    def card(folder, rng, side=None):
+        path, code = real(folder, rng, side)
         codes.append(code)
         return path, code
 
@@ -58,8 +59,10 @@ def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False):
             a, b = map(int, re.findall(r"\d+", prompt)[:2])
             chat_answer(handler, {"sum": a + b}, usage={"prompt_tokens": 90, "completion_tokens": 5,
                                                         "estimated_cost": 0.00002})
-        else:
-            chat_answer(handler, {"code": "ZZZ-0000" if misread else codes[-1].lower()})
+        else:  # an image is 258 tokens here, as gemma-4's at DeepInfra
+            imaged = any(part["type"] == "image_url" for part in body["messages"][1]["content"])
+            chat_answer(handler, {"code": "ZZZ-0000" if misread else codes[-1].lower()},
+                        usage={"prompt_tokens": 120 + 258 * imaged, "completion_tokens": 9})
     with serving(post, get=get) as url, patch.object(checkup, "card", card), \
             patch.dict(os.environ, {"OPENAI_BASE_URL": url}):
         yield url
@@ -79,7 +82,7 @@ class ConfigTest(unittest.TestCase):
         self.assertIn(f"checking gemma-4 at {url}", out)
         self.assertIn("  endpoint  ok: 2 models listed, gemma-4 among them", out)
         self.assertRegex(out, r"  json      ok: (\d+) \+ (\d+) = \d+")
-        self.assertRegex(out, r'  image     ok: read "[a-z]{3}-\d{4}"')
+        self.assertRegex(out, r'  image     ok: read "[a-z]{3}-\d{4}"; an image 1000 px square is 258 tokens')
         self.assertIn("  reranker  ok: scores 0.91 for the counterpart, 0.02 for the unrelated claim", out)
         self.assertIn("  embedding ok: cosine 1.00 with the counterpart, 0.01 with the unrelated claim", out)
         self.assertIn("cost: $0.0000, as the provider reports it", out)
