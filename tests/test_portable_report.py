@@ -293,6 +293,39 @@ class SharedStructure(unittest.TestCase):
         self.assertIn("Fold the 1 equivalent findings whose two claims say the same", shown)
         self.assertEqual(shown.count("<b>primary pump — rated power</b><p>10 kW</p>"), 2)  # in both of its cards
 
+def plant_report():
+    """Two sides' findings about pumps, valves and tanks: topics to browse by."""
+    claims, findings = [], []
+    for i in range(12):
+        for name, attribute in (("pump", "rated power"), ("valve", "nominal diameter"), ("tank", "storage volume")):
+            a = ev(f"A-{name}{i}", entity=f"{name} {i}", attribute=attribute)
+            b = ev(f"B-{name}{i}", entity=f"{name} {i}", attribute=attribute, value="11")
+            claims += [a, b]
+            findings.append(finding(a, b, "different"))
+    return report(claims, findings)
+
+class Topics(unittest.TestCase):
+    """Topic browsing (milestone 3): the findings' claims split by the words of what they're about."""
+    def test_the_page_offers_topics_and_each_finding_knows_its_own(self):
+        with tempfile.TemporaryDirectory() as d:
+            write_report(plant_report(), Path(d))
+            page = (Path(d) / "report.html").read_text()
+        shown = unpacked(page)
+        self.assertIn('<div class="topics">', shown)
+        names = shown.split('<div class="topics">', 1)[1].split("</div>", 1)[0]
+        for word in ("pump", "diameter", "tank", "in no topic"):  # each topic named by its first words
+            self.assertIn(word, names.lower())
+        parts = parts_of(page)
+        pump = next(f for f in parts["findings"] if "pump 0" in f["html"] or "A-pump0" in f["cards"])
+        self.assertEqual(len(set(pump["topics"])), 1)
+        self.assertNotIn(-1, pump["topics"])
+
+    def test_a_report_too_small_to_split_has_no_topics(self):
+        a, b = ev("A-1"), ev("B-1")
+        with tempfile.TemporaryDirectory() as d:
+            write_report(report([a, b], [finding(a, b, "different")]), Path(d))
+            self.assertNotIn('class="topics"', unpacked((Path(d) / "report.html").read_text()))
+
 BROWSERS = ("chromium", "chromium-browser", "google-chrome", "chrome")
 
 class InABrowser(unittest.TestCase):
@@ -336,6 +369,19 @@ class InABrowser(unittest.TestCase):
             dom = subprocess.run([browser, *flags, page], capture_output=True, text=True, timeout=120).stdout
         self.assertIn("1 of 2 findings (1 that say the same in both folded)", dom)
         self.assertEqual(dom.count("<article"), 1)
+
+    def test_topics_show_how_many_findings_each_holds(self):
+        browser = next((b for b in map(shutil.which, BROWSERS) if b), None)
+        if browser is None:
+            self.skipTest("no headless browser installed (chromium)")
+        with tempfile.TemporaryDirectory() as d:
+            write_report(plant_report(), Path(d) / "out")
+            page = (Path(d) / "out" / "report.html").as_uri()
+            flags = ["--headless", "--no-sandbox", "--disable-gpu", "--virtual-time-budget=10000", "--dump-dom"]
+            dom = subprocess.run([browser, *flags, page], capture_output=True, text=True, timeout=120).stdout
+        import re
+        counts = re.findall(r'<button data-topic="(-?\d+)"[^>]*>[^<]*<small>(\d+)</small>', dom)
+        self.assertEqual(sorted(int(n) for t, n in counts if t != "-1"), [12, 12, 12])
 
 if __name__ == "__main__":
     unittest.main()

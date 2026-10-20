@@ -71,13 +71,22 @@
   const query = root.querySelector('#query');
   const file = root.querySelector('#file');  // with more than one pair of files: their indexes, "3,4"
   const same = root.querySelector('#same');  // folding the equivalent findings whose claims say the same
+  let topic = null;  // a topic's index (-1: claims in no topic), or every finding
+  const inTopic = (f, t) => (t === -1 ? f.topics.every((x) => x === -1) : f.topics.includes(t));
+  const chips = [...root.querySelectorAll('.topics button')];
   const show = () => {
     const r = relation.value, k = kind ? kind.value : 'all', q = query.value.toLowerCase().trim();
     const files = !file || file.value === 'all' ? null : new Set(file.value.split(',').map(Number));
     const matching = R.findings.filter((f) => (r === 'all' || f.relation === r) && (k === 'all' || f.kind === k)
       && (!files || files.has(f.files[0]) || files.has(f.files[1])) && (!q || wordsOf(f).includes(q)));
-    const chosen = same && same.checked ? matching.filter((f) => !f.same) : matching;
-    const folded = matching.length - chosen.length;
+    const unfolded = same && same.checked ? matching.filter((f) => !f.same) : matching;
+    for (const chip of chips) {  // each topic's findings among those the other filters leave
+      const t = Number(chip.dataset.topic);
+      chip.querySelector('small').textContent = unfolded.filter((f) => inTopic(f, t)).length;
+      chip.classList.toggle('on', t === topic);
+    }
+    const chosen = topic === null ? unfolded : unfolded.filter((f) => inTopic(f, topic));
+    const folded = matching.length - unfolded.length;
     root.querySelector('#count').textContent = `${chosen.length} of ${R.findings.length} findings`
       + (folded ? ` (${folded} that say the same in both folded)` : '');
     paged(main, chosen.map((f) => f.html));
@@ -99,6 +108,11 @@
   }
   root.addEventListener('click', (e) => {
     if (e.target.matches('img.crop')) e.target.classList.toggle('full');
+    const chip = e.target.closest('.topics button');
+    if (chip) {  // a topic, or every finding again
+      topic = topic === Number(chip.dataset.topic) ? null : Number(chip.dataset.topic);
+      show();
+    }
     if (e.target.matches('button.pick') && file) {  // a file pair's row: its findings
       file.value = e.target.dataset.files;
       show();

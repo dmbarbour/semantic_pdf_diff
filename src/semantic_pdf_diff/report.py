@@ -1,7 +1,7 @@
 """A comparison's report: report.json, and report.html as one file that travels alone, its parts written here once
 each, gzipped inside the page and put together by its script (report.js), its crops embedded as a byte budget allows
 (crops.py; docs/plans/portable-reports-2026-10-19.md)."""
-from . import crops
+from . import crops, topics
 from .html_pages import embed_json, esc, page as html_page
 import base64
 import gzip
@@ -79,8 +79,9 @@ select,input{padding:10px;border:1px solid var(--field);border-radius:6px;margin
 background:var(--card);color:var(--fg)}
 pre{white-space:pre-wrap}.warning{color:var(--warn)}summary{cursor:pointer}a{color:var(--accent)}
 img.crop{cursor:zoom-in}img.crop.full{max-height:none;cursor:zoom-out}.cut{color:var(--muted);font-size:13px}
-button.more{padding:10px 16px;margin:8px 0;border:1px solid var(--field);border-radius:6px;background:var(--card);\
-color:var(--fg);cursor:pointer}
+button.more,.topics button{padding:10px 16px;margin:8px 0;border:1px solid var(--field);border-radius:6px;\
+background:var(--card);color:var(--fg);cursor:pointer}.topics button{padding:6px 10px;margin:4px 2px}\
+.topics button.on{background:var(--accent);color:var(--card)}.topics button small{color:inherit;opacity:.7}
 @media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
 '''
 # The page's script: it inflates the report's parts and shows them (a file beside this one, so it reads as code).
@@ -351,6 +352,21 @@ def report_page(data, stored, budget, note=''):
         chosen.pop()
     return page, account
 
+def browsing(data, shown):
+    """The topics a report's findings are browsed by (topics.py), and each shown claim's: (the way, {claim id: its
+    topic's index}); no way for fewer than two topics."""
+    order = [x for f in shown for x in (f['a'], f['b'])] + [u['id'] for u in data['unmatched']]
+    ids = list(dict.fromkeys(order + list(data.get('shared', []))))
+    evidence = {e['id']: e for e in data['evidence']}
+    claims = [evidence[x] for x in ids if x in evidence]
+    side = {}
+    for f in data.get('files', []):
+        side.setdefault(f['content'], f['source'])
+    way = topics.best(topics.ways(claims, [side.get(c['content'], '') for c in claims])) if claims else None
+    if way is None or len(way.topics) < 2:
+        return None, {}
+    return way, {c['id']: t for c, t in zip(claims, way.placed) if t is not None}
+
 def crop_html(e, embedded, stored):
     """A card's crop: its embedded image (enlarged by a click), or why it has none."""
     image = e.get('image')
@@ -390,12 +406,21 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                  "files": [files.get(card.evidence[x]['content'], -1) for x in (f['a'], f['b'])]} for f in shown]
     for f, record in zip(shown, findings):  # equivalent, and saying the same in both: folded unless asked for
         record["same"] = f['relation'] == 'equivalent' and card.said_of[f['a']] == card.said_of[f['b']]
+    way, topic_of = browsing(data, shown)
+    for f, record in zip(shown, findings):
+        record["topics"] = [topic_of.get(f['a'], -1), topic_of.get(f['b'], -1)]
     same = sum(1 for record in findings if record["same"])
     if same:
         page += (f'<label><input type="checkbox" id="same" checked> Fold the {same} equivalent findings whose two '
                  'claims say the same</label>')
     page += ('<input id="query" placeholder="Search findings" aria-label="Search findings"> '
              '<span id="count" class="meta"></span>')
+    if way:
+        page += ('<div class="topics"><span class="meta" title="Claims split by the words of what they are about, '
+                 f'found in both sources ({esc(way.name)}); a finding is in its claims\' topics">Topics:</span>'
+                 + ''.join(f'<button data-topic="{t}">{esc(topics.label(words))} <small></small></button>'
+                           for t, words in enumerate(way.topics))
+                 + '<button data-topic="-1">In no topic <small></small></button></div>')
     page += ('<main></main><details data-list="unmatched"><summary>Unmatched evidence ('
              +str(len(data['unmatched']))+')</summary></details>')
     page += groupings_html(data.get('groupings', []), esc)
