@@ -181,9 +181,9 @@ data-kind="{esc(f.get('explanation', {}).get('kind', ''))}"><h2>{esc(title)}</h2
 {f['retrieval_score']}; {'alignment' if f.get('settled') else 'model'} confidence {f['confidence']}</p></details>\
 </article>'''
 
-def header_html(data):
-    """The report's header: the sources, the mode, the findings counted, the files' differences, the caveats and the
-    run's metadata."""
+def header_html(data, listed=True):
+    """The report's header: the sources, the mode, the findings counted, the files' differences (unless the files'
+    table lists them: listed=False), the caveats and the run's metadata."""
     counts = Counter(f['relation'] for f in data['findings'])
     issues = [r for r in data['coverage'] if r['status'] != 'complete']
     page = '<header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1>'
@@ -204,7 +204,7 @@ def header_html(data):
         "claims lack a confirmed counterpart.</p>")
     page += record_changes_html(data.get('record_changes', ()), esc)
     diff = data.get('file_difference')
-    if diff:
+    if diff and listed:
         render = lambda item: esc(' → '.join(item) if isinstance(item, list) else item)
         page += ('<details><summary>Files: '
                  + ', '.join(f"{len(diff[k])} {k}" for k in ('unchanged', 'modified', 'moved', 'added', 'removed'))
@@ -256,7 +256,7 @@ def write_report(data, output, assets=None, budget=crops.DEFAULT_BUDGET, write=T
         loc = e['locator']
         return (f"{where(e['content'])}, {PAGE_WORDS.get(loc.get('format'), 'page')} {loc['page']}, "
                 f"{loc.get('task', loc.get('region', ''))}: {e['entity']} — {e['attribute']}")
-    account = crops.Account(budget)
+    account = crops.Account(budget, names={f['content']: where(f['content']) for f in data.get('files', [])})
     account.wanted = crops.wanted({e["id"]: e for e in data["evidence"]}, shown, data['unmatched'],
                                   data.get('shared', []), label, lambda image: stored(image).exists())
     mime, encode = crops.encoder()
@@ -293,7 +293,11 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp"):
     """report.html: its parts gzipped inside it (each card once), the chosen crops, and the script showing them."""
     embedded = {c.image: i for i, c in enumerate(chosen)}
     card = Cards(data, lambda e: crop_html(e, embedded, stored))
-    page = header_html(data) + crops_note(account)
+    pairs = file_pairs(data)
+    files = {c: i for i, c in enumerate(dict.fromkeys(x[1] for _, a, b in pairs for x in (a, b) if x and x[1]))}
+    page = header_html(data, listed=len(pairs) <= 1) + crops_note(account)
+    if len(pairs) > 1:
+        page += files_html(data, pairs, files, account, card.where)
     page += ('<label>Show <select id="filter"><option value="all">All relations</option>'
              +''.join('<option>'+r+'</option>'
                       for r in ['different','equivalent','complementary','uncertain','unrelated'])
@@ -301,6 +305,10 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp"):
     if any('explanation' in f for f in data['findings']):
         page += ('<label>Kind <select id="kind"><option value="all">All kinds</option>'
                  +''.join(f'<option value="{k}">{esc(v[0])}</option>' for k, v in KINDS.items())+'</select></label>')
+    if len(pairs) > 1:
+        page += ('<label>File <select id="file"><option value="all">All files</option>'
+                 + ''.join(f'<option value="{pair_key(a, b, files)}">{esc(pair_name(kind, a, b))}</option>'
+                           for kind, a, b in pairs) + '</select></label>')
     page += ('<input id="query" placeholder="Search findings" aria-label="Search findings"> '
              '<span id="count" class="meta"></span>')
     page += ('<main></main><details data-list="unmatched"><summary>Unmatched evidence ('
@@ -323,7 +331,9 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp"):
     page += crops_left_out_html(account)
     parts = {"page": page,
              "findings": [{"relation": f['relation'], "kind": f.get('explanation', {}).get('kind', ''),
-                           "cards": [f['a'], f['b']], "html": finding_html(f, card)} for f in shown],
+                           "cards": [f['a'], f['b']], "html": finding_html(f, card),
+                           "files": [files.get(card.evidence[x]['content'], -1) for x in (f['a'], f['b'])]}
+                          for f in shown],
              "lists": {"unmatched": ['<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched']],
                        "shared": [card(eid) for eid in data.get('shared', [])]},
              "cards": card.html}
@@ -335,6 +345,57 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp"):
             f'<script type="application/gzip" id="report-data">{packed}</script>'
             f'<script type="application/json" id="report-crops">{images}</script><script>{SCRIPT}</script>')
     return html_page('Semantic PDF comparison', body, STYLE)
+
+def file_pairs(data):
+    """The compared files in pairs, as the files' difference has them: (kind, the first source's (path, content), the
+    second's), a missing side None; modified and moved pairs, then files removed and added, then unchanged ones (on
+    both sides, the same content)."""
+    diff = data.get('file_difference')
+    names = [s['name'] for s in data.get('sources', [])]
+    if not diff or len(names) != 2:
+        return []
+    sides = [{f['path']: f['content'] for f in data.get('files', []) if f['source'] == name} for name in names]
+    at = lambda side, path: (path, sides[side].get(path))
+    return ([(kind, at(0, pa), at(1, pb)) for kind in ('modified', 'moved') for pa, pb in diff[kind]]
+            + [('removed', at(0, p), None) for p in diff['removed']]
+            + [('added', None, at(1, p)) for p in diff['added']]
+            + [('unchanged', at(1, p), at(1, p)) for p in diff['unchanged']])
+
+def pair_key(a, b, files):
+    """A file pair's files, as the page's file filter names them ("3,4": their indexes)."""
+    return ",".join(str(files[x[1]]) for x in dict.fromkeys(x for x in (a, b) if x and x[1] in files))
+
+def pair_name(kind, a, b):
+    if kind in ('modified', 'moved'):
+        return f"{a[0]} → {b[0]}" + (" (moved)" if kind == 'moved' else "")
+    return f"{(a or b)[0]} ({kind})"
+
+def files_html(data, pairs, files, account, where):
+    """The files compared, a row a pair: its findings by relation (those reaching a file of another pair counted
+    apart), its claims without a counterpart, and its crops embedded; each a button showing its findings."""
+    evidence = {e['id']: e['content'] for e in data['evidence']}
+    rows = []
+    for kind, a, b in pairs:
+        mine = {x[1] for x in (a, b) if x}
+        touching = [f for f in data['findings'] if evidence.get(f['a']) in mine or evidence.get(f['b']) in mine]
+        across = sum(1 for f in touching if not (evidence.get(f['a']) in mine and evidence.get(f['b']) in mine))
+        counts = Counter(f['relation'] for f in touching)
+        found = ', '.join(f"{counts[r]} {r}" for r in ('different', 'uncertain', 'complementary', 'equivalent',
+                                                         'unrelated') if counts[r]) or 'none'
+        lone = sum(1 for u in data['unmatched'] if evidence.get(u['id']) in mine)
+        wanted = [c for c in account.wanted if c.content in mine]
+        shown = sum(1 for c in wanted if c.image in account.chosen)
+        rows.append(f"<tr><td>{esc(pair_name(kind, a, b))}</td><td>{esc(found)}"
+                    + (f" <small>({across} reaching other files)</small>" if across else "")
+                    + f"</td><td>{lone}</td><td>{f'{shown} of {len(wanted)}' if wanted else '—'}</td><td>"
+                    + (f'<button class="pick" data-files="{pair_key(a, b, files)}">Show</button>' if touching else '')
+                    + "</td></tr>")
+    diff = data['file_difference']
+    summary = ', '.join(f"{len(diff[k])} {k}" for k in ('modified', 'moved', 'added', 'removed', 'unchanged')
+                        if diff[k])
+    return ('<details class="coverage" open><summary>Files: ' + esc(summary) + '</summary><table><thead><tr>'
+            '<th>File</th><th>Findings</th><th>Without a counterpart</th><th>Crops embedded</th><th></th></tr></thead>'
+            '<tbody>' + ''.join(rows) + '</tbody></table></details>')
 
 def crops_note(account):
     """The header's word on crops the budget left out (none: nothing to say)."""

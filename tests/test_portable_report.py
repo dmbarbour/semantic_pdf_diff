@@ -161,6 +161,79 @@ class OneFile(unittest.TestCase):
         with self.assertRaises(argparse.ArgumentTypeError):
             report_size("lots")
 
+def two_files_a_side(assets):
+    """Two sources of two files each, both pairs modified: a finding in each pair, one across them, and crops from
+    the first pair's earlier file (three) and the second's (one)."""
+    content = lambda name: "sha256:" + name * 64 + ".pdf"
+    x1, x2 = content("1"), content("2")  # the first source's files
+    y1, y2 = content("3"), content("4")  # the second's
+    claim = lambda i, c, **kw: ev(f"{c[7]}-{i}", content=c, attribute=f"flow {i}", **kw)
+    a = [claim(i, x1, kind="chart", image=noise(assets / f"x1-{i}.png", 30, i)) for i in range(3)]
+    b = claim(9, x2, kind="chart", image=noise(assets / "x2.png", 30, 9))
+    c, d, e = claim(0, y1), claim(1, y1), claim(2, y2)
+    data = report(a + [b, c, d, e], [finding(a[0], c, "different"), finding(a[1], d, "different"),
+                                     finding(b, e, "uncertain"), finding(a[2], e, "different")])
+    data["sources"] = [Source(name="v1").model_dump(), Source(name="v2").model_dump()]
+    data["files"] = [FileRef(source="v1", path="v1/p.pdf", content=x1).model_dump(),
+                     FileRef(source="v1", path="v1/q.pdf", content=x2).model_dump(),
+                     FileRef(source="v2", path="v2/p.pdf", content=y1).model_dump(),
+                     FileRef(source="v2", path="v2/q.pdf", content=y2).model_dump()]
+    data["file_difference"] = {"unchanged": [], "modified": [["v1/p.pdf", "v2/p.pdf"], ["v1/q.pdf", "v2/q.pdf"]],
+                               "moved": [], "added": [], "removed": []}
+    return data
+
+class ManyFiles(unittest.TestCase):
+    """Many files on each side (portable reports, milestone 2): browsed by file, crops shared between files."""
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name)
+        self.assets = self.root / "assets"
+
+    def test_the_files_are_a_table_of_pairs_each_showing_its_findings(self):
+        write_report(two_files_a_side(self.assets), self.root / "out", assets=self.assets)
+        page = (self.root / "out" / "report.html").read_text()
+        shown = unpacked(page)
+        self.assertIn("<summary>Files: 2 modified</summary>", shown)
+        self.assertIn("<td>v1/p.pdf → v2/p.pdf</td><td>3 different <small>(1 reaching other files)</small></td>"
+                      "<td>0</td><td>3 of 3</td>", shown)
+        self.assertIn("<td>v1/q.pdf → v2/q.pdf</td><td>1 different, 1 uncertain "
+                      "<small>(1 reaching other files)</small>", shown)
+        self.assertIn('<button class="pick" data-files="0,1">Show</button>', shown)  # files numbered pair by pair
+        self.assertIn('<option value="2,3">v1/q.pdf → v2/q.pdf</option>', shown)
+        import gzip
+        import re
+        parts = json.loads(gzip.decompress(base64.b64decode(re.search(r'id="report-data">([^<]*)<', page).group(1))))
+        self.assertEqual([f["files"] for f in parts["findings"]], [[0, 1], [0, 1], [2, 3], [0, 3]])
+
+    def test_files_added_or_removed_are_rows_of_their_own(self):
+        data = two_files_a_side(self.assets)
+        added = FileRef(source="v2", path="v2/new.pdf", content="sha256:" + "5" * 64 + ".pdf")
+        data["files"].append(added.model_dump())
+        data["file_difference"]["added"] = ["v2/new.pdf"]
+        write_report(data, self.root / "out", assets=self.assets)
+        shown = unpacked((self.root / "out" / "report.html").read_text())
+        self.assertIn("<summary>Files: 2 modified, 1 added</summary>", shown)
+        self.assertIn("<td>v2/new.pdf (added)</td><td>none</td><td>0</td><td>—</td><td></td>", shown)
+        self.assertIn('<option value="4">v2/new.pdf (added)</option>', shown)
+
+    def test_files_take_turns_for_crops_within_a_group(self):
+        account = write_report(two_files_a_side(self.assets), self.root / "out", assets=self.assets, write=False)
+        self.assertEqual([c.image for c in account.wanted],
+                         ["assets/x1-0.png", "assets/x2.png", "assets/x1-1.png", "assets/x1-2.png"])
+        lines = crops.feedback(account)
+        self.assertIn("by file, most left out first (2 files with crops):", lines)
+
+    def test_one_pair_of_files_keeps_the_files_summary_in_the_header(self):
+        a = ev("A-1")
+        data = report([a, ev("B-1")], [finding(a, ev("B-1"), "different")])
+        data["file_difference"] = {"unchanged": [], "modified": [["a.pdf", "b.pdf"]], "moved": [], "added": [],
+                                   "removed": []}
+        write_report(data, self.root / "out")
+        shown = unpacked((self.root / "out" / "report.html").read_text())
+        self.assertIn("<details><summary>Files: 0 unchanged, 1 modified", shown)
+        self.assertNotIn('id="file"', shown)
+
 BROWSERS = ("chromium", "chromium-browser", "google-chrome", "chrome")
 
 class InABrowser(unittest.TestCase):

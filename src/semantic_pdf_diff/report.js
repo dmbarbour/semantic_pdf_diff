@@ -1,5 +1,6 @@
 // The report page's script (report.py writes the page): inflate the report's parts, gzipped inside the page, put each
-// finding's cards and their crops in place, and show findings a page at a time, filtered by relation, kind and words.
+// finding's cards and their crops in place, and show findings a page at a time, filtered by relation, kind, file and
+// words.
 (async () => {
   const root = document.getElementById('report');
   let R;
@@ -61,16 +62,19 @@
   root.innerHTML = R.page;
   const main = root.querySelector('main');
   const relation = root.querySelector('#filter'), kind = root.querySelector('#kind'), query = root.querySelector('#query');
+  const file = root.querySelector('#file');  // with more than one pair of files: their indexes, "3,4"
   const show = () => {
     const r = relation.value, k = kind ? kind.value : 'all', q = query.value.toLowerCase().trim();
+    const files = !file || file.value === 'all' ? null : new Set(file.value.split(',').map(Number));
     const chosen = R.findings.filter((f) => (r === 'all' || f.relation === r) && (k === 'all' || f.kind === k)
-      && (!q || wordsOf(f).includes(q)));
+      && (!files || files.has(f.files[0]) || files.has(f.files[1])) && (!q || wordsOf(f).includes(q)));
     root.querySelector('#count').textContent = `${chosen.length} of ${R.findings.length} findings`;
     paged(main, chosen.map((f) => f.html));
   };
   let typing;
   relation.onchange = show;
   if (kind) kind.onchange = show;
+  if (file) file.onchange = show;
   query.oninput = () => { clearTimeout(typing); typing = setTimeout(show, 200); };
   for (const fold of root.querySelectorAll('details[data-list]')) {
     fold.addEventListener('toggle', () => {
@@ -83,6 +87,11 @@
   }
   root.addEventListener('click', (e) => {
     if (e.target.matches('img.crop')) e.target.classList.toggle('full');
+    if (e.target.matches('button.pick') && file) {  // a file pair's row: its findings
+      file.value = e.target.dataset.files;
+      show();
+      relation.scrollIntoView();
+    }
   });
   show();
 })();

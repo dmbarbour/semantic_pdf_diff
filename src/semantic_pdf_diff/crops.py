@@ -7,6 +7,7 @@ import base64
 import io
 import math
 import os
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 
@@ -31,6 +32,8 @@ class Crop:
     pictured: bool            # a claim showing it is pictured, or its quote unfound
     order: int                # where its first claim is shown in the report
     label: str                # where it is and what a claim showing it says, for people
+    content: str = ""         # the file it's from (its content)
+    turn: int = 0             # its file's turn within its group: each file's first crop, then each one's second...
     data: str = ""            # the encoded image, base64
     size: int = 0             # bytes in the page: data, its quotes and a comma
 
@@ -46,6 +49,7 @@ class Account:
     page: int = 0             # bytes of the page with no crops embedded
     wanted: list = field(default_factory=list)   # Crop, in priority order
     chosen: set = field(default_factory=set)     # the embedded crops' images
+    names: dict = field(default_factory=dict)    # {content: its file as people know it}
     size: int = 0             # the written file's bytes
 
     @property
@@ -68,9 +72,10 @@ def groups(findings, unmatched, shared):
     return best
 
 def wanted(evidence, findings, unmatched, shared, label, exists):
-    """Every crop the report's claims show, in the order they're embedded: by group, pictured claims first, then the
-    report's order. evidence: {id: claim dict}; label(claim): how people find it; exists(image): whether the store
-    still has it (a crop it lost is shown missing, never wanted)."""
+    """Every crop the report's claims show, in the order they're embedded: by group, then the files taking turns
+    (so one large drawing set can't take a group's share), each file's pictured claims first, then the report's order.
+    evidence: {id: claim dict}; label(claim): how people find it; exists(image): whether the store still has it (a
+    crop it lost is shown missing, never wanted)."""
     best = groups(findings, unmatched, shared)
     order = {}
     for eid in [x for f in findings for x in (f["a"], f["b"])] + [u["id"] for u in unmatched] + list(shared):
@@ -82,10 +87,14 @@ def wanted(evidence, findings, unmatched, shared, label, exists):
             continue
         pictured = e["kind"] in PICTURED or e.get("quote_verified") is not True
         c = crops.get(e["image"])
-        mine = Crop(e["image"], g, pictured, order[eid], label(e))
+        mine = Crop(e["image"], g, pictured, order[eid], label(e), e["content"])
         if c is None or mine.key < c.key:
             crops[e["image"]] = mine
-    return sorted(crops.values(), key=lambda c: c.key)
+    turns = Counter()
+    for c in sorted(crops.values(), key=lambda c: c.key):
+        c.turn = turns[c.group, c.content]
+        turns[c.group, c.content] += 1
+    return sorted(crops.values(), key=lambda c: (c.group, c.turn, c.key))
 
 def encoder():
     """(the MIME type, encode(path) -> bytes): WebP through Pillow where it's installed (an optional dependency),
@@ -158,6 +167,15 @@ def feedback(account, shown=20):
             f"{len(mine) - cut} embedded, {cut} left out")
         lines.append(f"  {name:45} {len(mine):5} crops, {sized(sum(c.size for c in mine)):>8}: {state}; in full "
                      f"with --report-budget {as_budget(running)}")
+    files = {}
+    for c in a.wanted:
+        mine = files.setdefault(c.content, [a.names.get(c.content, c.content), 0, 0])
+        mine[1] += 1
+        mine[2] += c.image in a.chosen
+    if len(files) > 1:
+        ranked = sorted(files.values(), key=lambda f: (f[2] - f[1], f[0]))  # most left out first
+        lines.append(f"by file, most left out first ({len(files)} files with crops):")
+        lines += [f"  {name}: {embedded} of {n} embedded" for name, n, embedded in ranked[:shown]]
     cut = a.cut
     if cut:
         lines.append(f"left out, the first {min(shown, len(cut))} of {len(cut)} by priority:")
