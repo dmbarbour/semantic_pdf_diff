@@ -270,33 +270,73 @@ class Fixture:
         if refused and not force and not dry_run:
             raise FixtureError("Not pruning: " + "; ".join(refused) + " (force to prune anyway)")
         if not dry_run:
-            with self.db:
-                self.db.execute(f"DELETE FROM response WHERE {where}", args)
-                for table in ("description", "recipe"):
-                    self.db.execute(f"DELETE FROM {table} WHERE query NOT IN (SELECT query FROM response)")
-            self.db.execute("VACUUM")
+            self._delete(f"WHERE {where}", args)
         return {"answers_removed": answers, "dry_run": dry_run, "refused": refused if not force else []}
 
-    def merge(self, source, prefer=False):
+    def _delete(self, where, args=()):
+        """Delete the answers `where` picks, and side rows of queries left without answers; what's deleted is
+        overwritten (secure_delete), the file compacted and its log emptied, so removed answers aren't left in the
+        file's free pages (they quote the documents)."""
+        self.db.execute("PRAGMA secure_delete = ON")
+        with self.db:
+            self.db.execute(f"DELETE FROM response {where}", args)
+            for table in ("description", "recipe"):
+                self.db.execute(f"DELETE FROM {table} WHERE query NOT IN (SELECT query FROM response)")
+        self.db.execute("VACUUM")
+        self.db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+
+    def _queries(self, name, queries):
+        """A temporary table of queries (by hash) an action is limited to, and the condition picking them."""
+        self.db.execute(f"DROP TABLE IF EXISTS temp.{name}")
+        self.db.execute(f"CREATE TEMP TABLE {name} (query TEXT PRIMARY KEY)")
+        self.db.executemany(f"INSERT OR IGNORE INTO temp.{name} VALUES (?)", ((q,) for q in queries))
+        self.db.commit()  # no transaction left open: ATTACH and VACUUM refuse to run in one
+        return f"query IN (SELECT query FROM temp.{name})"
+
+    def remove(self, queries=None, keep=None, dry_run=False):
+        """Remove the answers to these queries (None: every query) but those to the queries in `keep` (the answers
+        cache's `remove` and `prune --keep`), as _delete does. Returns {"answers": n, "queries": n} removed."""
+        where = [self._queries("chosen", queries)] if queries is not None else []
+        where += ["NOT " + self._queries("kept", keep)] if keep is not None else []
+        where = "WHERE " + " AND ".join(where) if where else ""
+        answers, picked = self.db.execute(f"SELECT COUNT(*), COUNT(DISTINCT query) FROM response {where}").fetchone()
+        if answers and not dry_run:
+            self._delete(where)
+        return {"answers": answers, "queries": picked}
+
+    def merge(self, source, prefer=False, queries=None, dry_run=False):
         """Copy in the answers another fixture (a .zip or a .sqlite file) holds that this one lacks, with their side
-        tables' rows. Where both answer a query this one's is kept, unless `prefer`: then the source's replaces it
-        (a committed zip merged into its archive, so the archive replays what was committed, not a variant's later
-        answer to the same query). Copied answers are marked unused, so prune drops those no run uses. Returns how
-        many answers were added."""
+        tables' rows; only the answers to these queries (by hash), if given. Where both answer a query this one's is
+        kept, unless `prefer`: then the source's replaces it (a committed zip merged into its archive, so the archive
+        replays what was committed, not a variant's later answer to the same query). Copied answers are marked
+        unused, so prune drops those no run uses. Returns how many answers were added (dry_run: would be)."""
         import tempfile
         with tempfile.TemporaryDirectory(prefix="fixture-merge-") as temp:
             path = unpack(source, temp) if Path(source).suffix == ".zip" else Path(source)
             Fixture(path, readonly=True).close()  # its schema checked
+            picked = f" WHERE {self._queries('chosen', queries)}" if queries is not None else ""
             count = "SELECT COUNT(*) FROM main.response"
             before = self.db.execute(count).fetchone()[0]
-            with self.db:
-                self.db.execute("ATTACH DATABASE ? AS other", (str(path),))
-                self.db.execute(f"INSERT OR {'REPLACE' if prefer else 'IGNORE'} INTO main.response SELECT query, "
-                                "responder, sample, outcome, answer, error, usage, recorded, NULL FROM other.response")
-                for table in ("description", "recipe"):
-                    self.db.execute(f"INSERT OR IGNORE INTO main.{table} SELECT * FROM other.{table}")
-            self.db.execute("DETACH DATABASE other")
+            self.db.execute("ATTACH DATABASE ? AS other", (str(path),))
+            try:
+                if dry_run:
+                    lacking = "" if prefer else (" AND" if picked else " WHERE") + (
+                        " NOT EXISTS (SELECT 1 FROM main.response m WHERE m.query = o.query AND "
+                        "m.responder = o.responder AND m.sample = o.sample)")
+                    return self.db.execute(f"SELECT COUNT(*) FROM other.response o{picked}{lacking}").fetchone()[0]
+                with self.db:
+                    self.db.execute(f"INSERT OR {'REPLACE' if prefer else 'IGNORE'} INTO main.response SELECT query, "
+                                    "responder, sample, outcome, answer, error, usage, recorded, NULL FROM "
+                                    f"other.response{picked}")
+                    for table in ("description", "recipe"):
+                        self.db.execute(f"INSERT OR IGNORE INTO main.{table} SELECT * FROM other.{table}{picked}")
+            finally:
+                self.db.execute("DETACH DATABASE other")
             return self.db.execute(count).fetchone()[0] - before
+
+    def times(self):
+        """(the first answer's time, the last's, when an answer was last used), as recorded: None if none."""
+        return self.db.execute("SELECT MIN(recorded), MAX(recorded), MAX(used) FROM response").fetchone()
 
     def summary(self):
         """Answers per responder, role and outcome, with token usage, and the documents recorded

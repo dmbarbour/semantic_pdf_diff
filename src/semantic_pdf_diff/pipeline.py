@@ -306,7 +306,10 @@ def answers_cache(store):
     tests keep one in each store instead (tests/stubs.py), as stores once kept their own. Owner-only, as a store is:
     its answers quote the documents (a folder named by $SEMANTIC_PDF_DIFF_CACHE is left as it is)."""
     from .settings import cache_path
-    path = cache_path()
+    return open_cache(cache_path())
+
+def open_cache(path):
+    """An answers cache, open to record into: created owner-only if missing (its folder too)."""
     if not path.parent.exists():
         path.parent.mkdir(parents=True, mode=0o700)
     cache = fixtures.open(path, 'record')

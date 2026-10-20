@@ -40,7 +40,7 @@ Settings came in four ways, highest first: about 25 flags per command, a `--conf
 
 - A setting is set once, where it belongs; a run's command line names only what differs for that run.
 - What one store asked, another is answered from: comparing a document again in a new store costs time, not money.
-- **Removing a store leaves its answers in the cache,** and they quote its documents. Until a `cache` command exists (*Answers cache maintenance*, Tentative), the cache is cleared by removing `answers.sqlite`.
+- **Removing a store leaves its answers in the cache,** and they quote its documents. `cache remove --store DIR` removes them, overwritten in the file ([answers cache maintenance](../plans/answers-cache-maintenance-2026-10-20.md), 2026-10-20); a project kept apart has a cache of its own, and `cache copy --store` fills it from another.
 - The tests keep a cache in each store (tests/stubs.py) and read an empty folder's user settings, so a developer's own settings and answers never reach them.
 - The lab's `.env` holds only the key and the endpoint; its other values are the user's settings. Scripts name fixtures, as before.
 - Judges and checkers still take only endpoint settings from the user's settings ([0011](0011-settings-classified-by-effect.md)).

@@ -5,6 +5,7 @@
     semantic-pdf-diff show|gc|report --store DIR ...
     semantic-pdf-diff settings [--config FILE] [--changed]
     semantic-pdf-diff fixtures summary|pack|prune|merge ...
+    semantic-pdf-diff cache show|copy|remove|prune ...   # the answers cache
     semantic-pdf-diff review|queries ...                # with the lab installed (semantic-pdf-diff[lab])
 """
 import argparse
@@ -65,6 +66,8 @@ def command(argv, client):
         return config_command(argv[1:])
     if argv[0] == 'fixtures':
         return fixtures_command(argv[1:])
+    if argv[0] == 'cache':
+        return cache_command(argv[1:])
     lab = lab_commands().get(argv[0])
     if lab:
         return lab(argv[1:])
@@ -88,6 +91,7 @@ Commands (semantic-pdf-diff COMMAND --help for each, or semantic-pdf-diff help C
   gc          delete content no declared source uses any more
   config      the user's and a store's settings: show, find, help, set, unset, export, import
   settings    print the settings a run would use, as JSON
+  cache       the answers cache: show it; copy, remove or prune a project's answers
   fixtures    recorded model answers, replayed instead of asked (testing)
 """
 
@@ -400,7 +404,146 @@ def fixtures_command(argv):
     return 0
 
 
-# --- settings ------------------------------------------------------------------------
+# --- the answers cache ---------------------------------------------------------------
+
+CACHE_HELP = """\
+The answers cache keeps every answer the model gave a run, by the query asked, so what was asked once isn't paid
+for again. It's $SEMANTIC_PDF_DIFF_CACHE/answers.sqlite, else the user's (under $XDG_CACHE_HOME or ~/.cache);
+--cache names another. A project whose documents mustn't mix with others' keeps a cache of its own: point
+SEMANTIC_PDF_DIFF_CACHE at it before its runs.
+
+A store logs every query its runs asked, however each was answered, so naming a project's stores (--store) picks
+out its answers: to copy them from another cache into this one, or to remove them from this one. Removed answers
+are overwritten in the file, not left in its free pages; copies made before (backups, snapshots) aren't touched.
+
+Examples:
+  semantic-pdf-diff cache show
+  semantic-pdf-diff cache copy ~/.cache/semantic-pdf-diff --store project/store --dry-run
+  semantic-pdf-diff cache remove --store old-store --keep current-store
+  semantic-pdf-diff cache prune --keep store-a --keep store-b
+  semantic-pdf-diff cache prune --unused-since 2026-09-01
+"""
+
+def cache_parser():
+    parser = Parser(prog='semantic-pdf-diff cache', usage='%(prog)s ACTION [options]')
+    help_text(parser, CACHE_HELP, 'The answers cache: what it holds; a project\'s answers copied from another '
+                                  'cache, removed, or kept alone.')
+    which = Parser(add_help=False)
+    which.add_argument('--cache', type=Path, help='the answers cache: a folder holding answers.sqlite, or the file '
+                                                  '(default: the current one, as `config show` lists it)')
+    dry = Parser(add_help=False)
+    dry.add_argument('--dry-run', action='store_true', help='say what would be copied or removed, change nothing')
+    actions = parser.add_subparsers(dest='action', metavar='ACTION', required=True)
+    actions.add_parser('show', parents=[which], help='where it is, its size, its answers by model and role')
+    copy = actions.add_parser('copy', parents=[which, dry],
+                              help='copy in the answers another cache or fixture holds and this one lacks')
+    copy.add_argument('source', type=Path, help="the other cache's folder, or a fixture (.sqlite or .zip)")
+    copy.add_argument('--store', type=Path, action='append', default=[],
+                      help='only the answers to the queries this store asked (repeat for several)')
+    remove = actions.add_parser('remove', parents=[which, dry],
+                                help='remove the answers to the queries these stores asked')
+    remove.add_argument('--store', type=Path, action='append', required=True, help='a store (repeat for several)')
+    remove.add_argument('--keep', type=Path, action='append', default=[],
+                        help="but not those this store asked too (repeat for several)")
+    prune = actions.add_parser('prune', parents=[which, dry],
+                               help='keep only the answers these stores asked, or those used since a time')
+    either = prune.add_mutually_exclusive_group(required=True)
+    either.add_argument('--keep', type=Path, action='append', default=[],
+                        help='keep the answers to the queries this store asked (repeat for several)')
+    either.add_argument('--unused-since', help='remove the answers not used since this ISO time (2026-09-01)')
+    prune.add_argument('--force', action='store_true', help="--unused-since even if no run used the cache since, "
+                                                            "a run missed requests, or most answers go")
+    return parser
+
+def cache_file(path):
+    """An answers cache named on the command line: a folder holding answers.sqlite (made if missing), or the file."""
+    return path if path.suffix in ('.sqlite', '.zip') else path / 'answers.sqlite'
+
+def stores_queries(folders):
+    """Every query the stores' runs asked, by hash (a store's answers, whichever cache holds them)."""
+    from .store import Store
+    queries = set()
+    for folder in folders:
+        with Store.open(folder) as store:
+            queries |= store.query_hashes()
+    return queries
+
+def cache_command(argv):
+    from .pipeline import open_cache
+    from .settings import cache_path
+    from .store import StoreError
+    args = cache_parser().parse_args(argv)
+    path = cache_file(args.cache) if args.cache else cache_path()
+    if args.action == 'show':
+        if not path.exists():
+            print(f'{path}: no answers cached yet')
+            return 0
+        with fixtures.open(path, 'read') as cache:
+            summary, (first, last, used) = cache.summary(), cache.times()
+        size = sum(f.stat().st_size for f in path.parent.glob(path.name + '*'))
+        answers = sum(row['answers'] for row in summary['answers'])
+        print(f'{path}: {answers} answers to {summary["queries"]} queries, {size / 1e6:.1f} MB')
+        if first:
+            print(f'recorded {first[:10]} to {last[:10]}' + (f', last used {used[:10]}' if used else ''))
+        by_model = {}
+        for row in summary['answers']:
+            by_model.setdefault(row['responder'], []).append(row)
+        for model, rows in sorted(by_model.items()):
+            roles = {}
+            for row in rows:
+                roles[row['role'] or 'other'] = roles.get(row['role'] or 'other', 0) + row['answers']
+            failed = sum(row['answers'] for row in rows if row['outcome'] != 'ok')
+            print(f'  {model}: {sum(r["answers"] for r in rows)} answers ('
+                  + ', '.join(f'{role} {n}' for role, n in sorted(roles.items()))
+                  + (f'; {failed} failures' if failed else '') + ')')
+        return 0
+    try:
+        stores = args.store if args.action != 'prune' else args.keep
+        queries = stores_queries(stores) if stores else None
+        kept = stores_queries(args.keep) if args.action == 'remove' and args.keep else None
+    except StoreError as e:
+        print(e, file=sys.stderr)
+        return 1
+    would = 'would be ' if args.dry_run else ''
+    if args.action == 'copy':
+        source = cache_file(args.source)
+        if not source.exists():
+            print(f'{source}: no such cache or fixture', file=sys.stderr)
+            return 1
+        if source.resolve() == path.resolve():
+            print(f'{source}: the cache copied from is the one copied into', file=sys.stderr)
+            return 1
+        try:
+            with open_cache(path) as cache:
+                added = cache.merge(source, queries=queries, dry_run=args.dry_run)
+        except (fixtures.FixtureError, OSError) as e:
+            print(e, file=sys.stderr)
+            return 1
+        what = f"the {len(queries)} queries {len(stores)} store(s) asked" if queries is not None else 'every query'
+        print(f'{added} answers {would}copied from {source} into {path} ({what}; answers it had already are kept)')
+        return 0
+    if not path.exists():
+        print(f'{path}: no answers cached yet')
+        return 0
+    with fixtures.open(path, 'record') as cache:
+        if args.action == 'remove':
+            removed = cache.remove(queries, keep=kept, dry_run=args.dry_run)
+        elif args.keep:
+            removed = cache.remove(keep=queries, dry_run=args.dry_run)
+        else:
+            try:
+                unused = cache.prune(args.unused_since, dry_run=args.dry_run, force=args.force)
+            except fixtures.FixtureError as e:
+                print(e, file=sys.stderr)
+                return 1
+            removed = {'answers': unused['answers_removed'], 'queries': 0}
+            for reason in unused['refused']:
+                print(f'(without --dry-run, prune would refuse: {reason}; --force prunes anyway)')
+    print(f"{removed['answers']} answers {would}removed from {path}"
+          + (f" ({removed['queries']} queries)" if removed['queries'] else '')
+          + ('' if args.dry_run or not removed['answers'] else
+             '; overwritten in the file, but not in copies made before (backups, snapshots)'))
+    return 0
 
 SETTINGS_HELP = """\
 Print the settings a run would use, as JSON: the defaults, then the user's (`config set --user`), then a store's

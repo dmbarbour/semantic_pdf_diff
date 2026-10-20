@@ -464,6 +464,10 @@ class Store:
                         (query, json.dumps(list(recipe), default=str), role, region, content, task, prompt,
                          json.dumps(list(images))))
 
+    def query_hashes(self):
+        """Every query its runs asked, by hash (the answers cache's key), however answered: a project's answers."""
+        return {h for (h,) in self.db.execute("SELECT DISTINCT hash FROM query")}
+
     def queries(self, content=None, task=None, role=None):
         """Logged queries: [{hash, recipe, role, region, content, task, prompt, images}], latest last."""
         where, args = [], []
