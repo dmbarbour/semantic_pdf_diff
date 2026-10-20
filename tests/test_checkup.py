@@ -95,6 +95,12 @@ class ConfigTest(unittest.TestCase):
         self.assertIn("  embedding --: none set (embed_model)", out)
         self.assertTrue(out.endswith("2 check(s) failed: endpoint, image\n"))
 
+    def test_a_reranker_not_served_where_asked_says_where(self):
+        with endpoint() as url, user_settings({"rerank_model": "m", "retries": 0}):  # the stub serves tei's at /rerank
+            code, out = run("config", "test", "--store", self.store)
+        self.assertEqual(code, checkup.FAILED)
+        self.assertIn(f"at {url}/rerank (rerank_api and rerank_url say where it's served)", out)
+
     def test_an_endpoint_not_reachable_skips_the_models(self):
         with socket.socket() as s:  # a port nothing listens on
             s.bind(("127.0.0.1", 0))

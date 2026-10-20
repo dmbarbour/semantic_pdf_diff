@@ -124,24 +124,36 @@ def run(settings, rng=None):
                   Check("image", None, "not checked: vision is off"))
 
     def reranker():
-        ranking = client.transport.send(rerank_request(settings, "The rated power of the feed pump.",
-                                                       ["The feed pump is rated at 75 kW.",
-                                                        "The door of the control room is painted blue."]))
+        ranking = _asked(rerank_request(settings, "The rated power of the feed pump.",
+                                        ["The feed pump is rated at 75 kW.",
+                                         "The door of the control room is painted blue."]),
+                         "rerank_api and rerank_url")(client.transport)
         first, second = ranking.scores
         return first > second, f"scores {first:.2f} for the counterpart, {second:.2f} for the unrelated claim"
     checks.append(_timed("reranker", reranker) if settings.rerank_model else
                   Check("reranker", None, "none set (rerank_model)"))
 
     def embedding():
-        vectors = client.transport.send(embed.request(settings, ["The rated power of the feed pump.",
-                                                                 "The feed pump is rated at 75 kW.",
-                                                                 "The door of the control room is painted blue."]))
+        vectors = _asked(embed.request(settings, ["The rated power of the feed pump.",
+                                                  "The feed pump is rated at 75 kW.",
+                                                  "The door of the control room is painted blue."]),
+                         "embed_url")(client.transport)
         query, near, far = (embed.unpacked(v) for v in vectors.vectors)
         a, b = embed.cosine(query, near), embed.cosine(query, far)
         return a > b, f"cosine {a:.2f} with the counterpart, {b:.2f} with the unrelated claim"
     checks.append(_timed("embedding", embedding) if settings.embed_model else
                   Check("embedding", None, "none set (embed_model)"))
     return checks, client.cost
+
+def _asked(request, settings_named):
+    """A reranker's or an embedding model's request sent: its answer, or its failure saying where it was asked and
+    which settings say where it's served."""
+    def send(transport):
+        try:
+            return transport.send(request)
+        except Exception as e:  # noqa: BLE001 (a check's failure is its result, whatever it is)
+            raise type(e)(f"{e} at {request.url} ({settings_named} say where it's served)") from None
+    return send
 
 def _unreachable(said):
     return said.startswith(("URLError", "ConnectionRefusedError", "TimeoutError", "socket.timeout", "OSError"))
