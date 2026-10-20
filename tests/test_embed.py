@@ -94,10 +94,11 @@ class Embedded(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             client = Client(s, None, fixture=fixtures.open(Path(d) / "answers.sqlite", "record"),
                             mode="replay-or-record")
-            with Dispatcher(client) as dispatch:
+            with Dispatcher(client) as dispatch, self.assertLogs("semantic_pdf_diff", "WARNING") as said:
                 kept = embed.embedded(evidence, dispatch, s, "label")
             client.close()
         self.assertEqual((kept["failed"], kept["vectors"], kept["of"]), (1, [], {}))
+        self.assertIn(f"toy at {UNREACHABLE}/embeddings: 1 of 1 requests failed (", said.output[-1])
 
 LINE = re.compile(r"^(\w+) \| ([\w ]+) \| ([\d.]+) \| (\w+)$", re.M)
 

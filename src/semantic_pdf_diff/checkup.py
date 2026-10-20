@@ -36,7 +36,7 @@ class Check:
     said: str
     seconds: float = 0.0
 
-    def line(self, width=9):
+    def line(self, width=9):  # "embedding" the longest
         mark = {True: "ok", False: "FAILED", None: "--"}[self.ok]
         took = f" ({self.seconds:.1f} s)" if self.seconds >= 0.05 else ""
         return f"  {self.name:<{width}} {mark}: {self.said}{took}"
@@ -58,6 +58,8 @@ def used(settings):
     out = {settings.model: ["model"]}
     if settings.rerank_model:
         out.setdefault(settings.rerank_model, []).append("rerank_model")
+    if settings.embed_model:
+        out.setdefault(settings.embed_model, []).append("embed_model")
     return out
 
 def card(folder, rng):
@@ -82,6 +84,7 @@ def _timed(name, check):
 def run(settings, rng=None):
     """Every check, in order: [Check], and what they cost (dollars, as the provider reports it)."""
     from .llm import Client, is_local
+    from . import embed
     from .rerank import request as rerank_request
     rng = rng or random.Random()
     client = Client(settings, None)
@@ -89,7 +92,7 @@ def run(settings, rng=None):
     checks = []
     listed = []
 
-    def endpoint():  # the chat model only: a reranker may be served apart (DeepInfra's are), and is asked below
+    def endpoint():  # the chat model only: a reranker or an embedding model may be served apart, and is asked below
         listed.extend(models(settings, key))
         if settings.model not in listed:
             return False, (f"{len(listed)} models listed, not {settings.model} (`config models WORDS` lists those "
@@ -98,7 +101,7 @@ def run(settings, rng=None):
     checks.append(_timed("endpoint", endpoint))
     if checks[-1].ok is False and not listed and _unreachable(checks[-1].said):
         return checks + [Check(name, None, "skipped: the endpoint isn't reachable") for name in
-                         ("json", "image", "reranker")], client.cost
+                         ("json", "image", "reranker", "embedding")], client.cost
     if checks[-1].ok is False and not listed:  # reachable, but listing no models (some servers don't)
         checks[-1] = Check("endpoint", None, "lists no models: " + checks[-1].said, checks[-1].seconds)
     if not key and not is_local(settings.base_url):
@@ -128,6 +131,16 @@ def run(settings, rng=None):
         return first > second, f"scores {first:.2f} for the counterpart, {second:.2f} for the unrelated claim"
     checks.append(_timed("reranker", reranker) if settings.rerank_model else
                   Check("reranker", None, "none set (rerank_model)"))
+
+    def embedding():
+        vectors = client.transport.send(embed.request(settings, ["The rated power of the feed pump.",
+                                                                 "The feed pump is rated at 75 kW.",
+                                                                 "The door of the control room is painted blue."]))
+        query, near, far = (embed.unpacked(v) for v in vectors.vectors)
+        a, b = embed.cosine(query, near), embed.cosine(query, far)
+        return a > b, f"cosine {a:.2f} with the counterpart, {b:.2f} with the unrelated claim"
+    checks.append(_timed("embedding", embedding) if settings.embed_model else
+                  Check("embedding", None, "none set (embed_model)"))
     return checks, client.cost
 
 def _unreachable(said):

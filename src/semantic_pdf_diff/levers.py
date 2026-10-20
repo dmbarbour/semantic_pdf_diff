@@ -1144,15 +1144,17 @@ class Embed(Lever):
         return bool(self.embed_model)
 
 class Rerank(Lever):
-    lever_name, stage, off = "rerank", "comparison", {"rerank_model": None, "rerank_api": "deepinfra",
+    lever_name, stage, off = "rerank", "comparison", {"rerank_model": None, "rerank_api": "rerank",
                                                        "rerank_url": None, "rerank_threshold": 3}
     # proposals mode: each claim's candidates scored by a cross-encoder told the task (rerank.py) before the judge;
     # pairs below rerank_threshold not judged, the rest judged best first (the owner, 2026-10-20, on the measured
     # proposal: "Yes, please."; docs/plans/portable-reports-2026-10-19.md, milestone 5). On only where a reranker is
     # named (the owner: "Let's enable the reranker if the user configures it, no default.")
     rerank_model: Annotated[str | None, _selecting(roles=COMPARE)] = None  # e.g. Qwen/Qwen3-Reranker-8B
-    rerank_api: Annotated[Literal["deepinfra", "tei"], _selecting(roles=COMPARE)] = "deepinfra"
-    # where it's asked ({model} filled in); none: DeepInfra's inference API where the chat endpoint is DeepInfra's
+    # its API (rerank.py): the /rerank most servers take, DeepInfra's inference API, or text-embeddings-inference's;
+    # none assumed of an endpoint (the owner, 2026-10-20: "DeepInfra-specific code for rerankers")
+    rerank_api: Annotated[Literal["rerank", "deepinfra", "tei"], _selecting(roles=COMPARE)] = "rerank"
+    # where it's asked ({model} filled in); none: beside the chat endpoint, on its host (rerank.endpoint)
     rerank_url: Annotated[str | None, Declared("endpoint")] = None
     # the least score a pair is judged with, in hundredths: 1-10 for 0.01-0.10 (the owner: "perhaps 1-10
     # corresponding to 0.01-0.10 ... Default 3?"); measured end to end at 2, 5 and 10, no related finding lost

@@ -15,6 +15,7 @@ names another.
 import base64
 import hashlib
 import json
+import logging
 import math
 
 from .llm import Request
@@ -25,6 +26,7 @@ EMBED_A_REQUEST = 64
 # how a search's text is put to an embedding model trained with instructions (Qwen3-Embedding): a claim as it is, a
 # query told the task
 INSTRUCTION = "Given what a reader looks for in engineering documents, retrieve the claims that state it"
+log = logging.getLogger("semantic_pdf_diff")
 
 def endpoint(s):
     return (s.embed_url or s.base_url.rstrip("/") + "/embeddings").replace("{model}", s.embed_model or "")
@@ -81,13 +83,14 @@ def embedded(evidence, dispatch, s, label):
     for e in evidence:
         of_sentence.setdefault(sentence_of(e), []).append(e["id"])
     sentences = sorted(of_sentence)
-    vectors, of, failed = [None] * len(sentences), {}, 0
+    vectors, of, failed, errors = [None] * len(sentences), {}, 0, []
 
     def finish(start, count):
         def done(value, error):
             nonlocal failed
             if error is not None:
                 failed += 1
+                errors.append(error)
                 return
             vectors[start:start + count] = value.vectors
         return done
@@ -99,6 +102,10 @@ def embedded(evidence, dispatch, s, label):
         dispatch.submit_request(request(s, texts, Recipe(("embed", label, str(start // EMBED_A_REQUEST)))),
                                 finish(start, len(texts)))
     dispatch.drain()
+    if failed:
+        log.warning(f"The embedding model {s.embed_model} at {endpoint(s)}: {failed} of {len(batches)} requests failed "
+                    f"({errors[0]}); their claims weren't embedded, and the next run asks again. `semantic-pdf-diff "
+                    f"config test` checks it; embed_url says where it's served")
     kept = []
     for text, vector in zip(sentences, vectors):
         if vector is None:

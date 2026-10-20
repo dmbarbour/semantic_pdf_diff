@@ -168,8 +168,9 @@ def add_run_options(parser):
                          help=f'Claims of the other source each claim is compared with (default: {default("top_k")})')
     reading.add_argument('--rerank', dest='rerank_model', metavar='MODEL',
                          help='Proposals mode: score each claim\'s candidates with this reranker before the judge '
-                              '(e.g. Qwen/Qwen3-Reranker-8B on DeepInfra; elsewhere set rerank_url and rerank_api in '
-                              'a --config file); pairs below --rerank-threshold are not judged, the rest best first')
+                              '(e.g. Qwen/Qwen3-Reranker-8B), asked at the endpoint\'s /rerank unless rerank_api or '
+                              'rerank_url says otherwise; pairs below --rerank-threshold are not judged, the rest best '
+                              'first')
     reading.add_argument('--rerank-threshold', type=int, choices=range(1, 11), metavar='1-10',
                          help=f'With --rerank: the least score a pair is judged with, in hundredths (1-10 for '
                               f'0.01-0.10; default: {default("rerank_threshold")})')

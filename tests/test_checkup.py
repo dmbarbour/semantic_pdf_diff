@@ -1,6 +1,6 @@
 """`semantic-pdf-diff config test` and `config models` (checkup.py; docs/plans/configuration-in-the-store-2026-10-20.md,
-milestone 5): the endpoint, a JSON answer, an eye-test card and the reranker checked by asking; the endpoint's models
-listed, those in use marked."""
+milestone 5): the endpoint, a JSON answer, an eye-test card, the reranker and the embedding model checked by asking;
+the endpoint's models listed, those in use marked."""
 import stubs  # noqa: F401 (a clean environment)
 import contextlib
 import io
@@ -25,7 +25,7 @@ def run(*argv):
 @contextlib.contextmanager
 def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False):
     """A stub endpoint: its models listed, sums added, the card's code read (misread: another), a reranker scoring
-    the first document higher."""
+    the first document higher, and an embedding model putting the pump's two sentences together."""
     codes, real = [], checkup.card
 
     def card(folder, rng):
@@ -44,6 +44,13 @@ def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False):
             handler.send_response(200)
             handler.end_headers()
             handler.wfile.write(json.dumps([{"index": 1, "score": 0.02}, {"index": 0, "score": 0.91}]).encode())
+            return
+        if handler.path.endswith("/embeddings"):
+            rows = [{"index": i, "embedding": [float("pump" in t), float("door" in t), 0.1]}
+                    for i, t in enumerate(body["input"])]
+            handler.send_response(200)
+            handler.end_headers()
+            handler.wfile.write(json.dumps({"data": rows}).encode())
             return
         prompt = prompt_of(body["messages"][1]["content"])
         if prompt.startswith("Add "):
@@ -64,7 +71,7 @@ class ConfigTest(unittest.TestCase):
 
     def test_every_check_passes_against_a_working_endpoint(self):
         with endpoint() as url, user_settings({"rerank_model": "Qwen/Qwen3-Reranker-8B", "rerank_api": "tei",
-                                               "rerank_url": url + "/rerank"}):
+                                               "rerank_url": url + "/rerank", "embed_model": "toy"}):
             code, out = run("config", "test", "--store", self.store)
         self.assertEqual(code, 0, out)
         self.assertIn(f"checking gemma-4 at {url}", out)
@@ -72,6 +79,7 @@ class ConfigTest(unittest.TestCase):
         self.assertRegex(out, r"  json      ok: (\d+) \+ (\d+) = \d+")
         self.assertRegex(out, r'  image     ok: read "[a-z]{3}-\d{4}"')
         self.assertIn("  reranker  ok: scores 0.91 for the counterpart, 0.02 for the unrelated claim", out)
+        self.assertIn("  embedding ok: cosine 1.00 with the counterpart, 0.01 with the unrelated claim", out)
         self.assertIn("cost: $0.0000, as the provider reports it", out)
         self.assertTrue(out.endswith("every check passed\n"))
         self.assertFalse(self.store.exists())  # a check makes no store
@@ -84,6 +92,7 @@ class ConfigTest(unittest.TestCase):
                       out)
         self.assertRegex(out, r'  image     FAILED: read "ZZZ-0000", not "[A-Z]{3}-\d{4}"')
         self.assertIn("  reranker  --: none set (rerank_model)", out)
+        self.assertIn("  embedding --: none set (embed_model)", out)
         self.assertTrue(out.endswith("2 check(s) failed: endpoint, image\n"))
 
     def test_an_endpoint_not_reachable_skips_the_models(self):

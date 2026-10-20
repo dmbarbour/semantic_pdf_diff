@@ -96,14 +96,18 @@ HELP = {
     "aliases": Help("comparing", "names taken as one for pairing claims, as a JSON object",
                     "Each alias read as its canonical name when claims are paired.", '{"CHW": "chilled water"}'),
     "rerank_model": Help("comparing", "proposals mode: a reranker scoring candidate pairs before the judge",
-                         "Off unless named. Pairs below rerank_threshold aren't judged; the rest are, best first. On "
-                         "DeepInfra its address is known; elsewhere set rerank_url and rerank_api.",
+                         "Off unless named. Pairs below rerank_threshold aren't judged; the rest are, best first. It's "
+                         "asked at the chat endpoint's /rerank unless rerank_api or rerank_url says otherwise.",
                          "Qwen/Qwen3-Reranker-8B", basic=True),
-    "rerank_api": Help("comparing", "the reranker's API: deepinfra (told the task), or tei "
-                                    "(text-embeddings-inference)"),
+    "rerank_api": Help("comparing", "the reranker's API: rerank, deepinfra or tei",
+                       "rerank: the /rerank most servers take (vLLM, llama.cpp, Infinity, LiteLLM; Cohere's and "
+                       "Jina's), told the task where the server passes it on (vLLM, to Qwen3-Reranker). deepinfra: "
+                       "DeepInfra's inference API, told the task (DeepInfra serves no /rerank). tei: Hugging Face's "
+                       "text-embeddings-inference, told nothing.", "deepinfra"),
     "rerank_url": Help("comparing", "where the reranker is asked ({model} filled in)",
-                       "Unset: DeepInfra's inference API, where the chat endpoint is DeepInfra's.",
-                       "http://localhost:8080/rerank"),
+                       "Unset: beside the chat endpoint, on its host: its /rerank, or with rerank_api deepinfra "
+                       "DeepInfra's inference API (.../v1/inference/MODEL). A reranker served elsewhere is sent "
+                       "OPENAI_API_KEY too.", "http://localhost:8080/rerank"),
     "rerank_threshold": Help("comparing", "the least reranker score a pair is judged with, in hundredths (1-10)",
                              "3 is 0.03. Measured at 2, 5 and 10: no related finding lost.", "5", basic=True),
     "search_names": Help("comparing", "the model groups the names the documents give one thing, so a search for one "
@@ -117,7 +121,7 @@ HELP = {
                         "sentence once, 64 to a request, on the chat endpoint's /embeddings unless embed_url says "
                         "otherwise. Measured best: Qwen3-Embedding-8B at 256 dimensions.", "Qwen/Qwen3-Embedding-8B"),
     "embed_url": Help("endpoint", "where the embedding model is asked ({model} filled in); none: the chat endpoint's "
-                      "/embeddings"),
+                      "/embeddings", "A model served elsewhere is sent OPENAI_API_KEY too."),
     "embed_dimensions": Help("comparing", "each claim's vector's size, asked of the embedding model and kept in the "
                              "report", "A model trained to be cut (Qwen3-Embedding) answers any; a byte a dimension "
                              "a claim in the report.", "256"),
