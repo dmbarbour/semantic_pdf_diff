@@ -199,9 +199,9 @@ def chat_answer(handler, content, finish='stop', usage=None):
                                     **({'usage': usage} if usage is not None else {})}).encode())
 
 @contextlib.contextmanager
-def serving(post, threaded=False):
+def serving(post, threaded=False, get=None):
     """A local endpoint for the block, on a free port: post(handler) answers each POST (a BaseHTTPRequestHandler,
-    its headers, rfile and send_* methods). Yields the base URL, ending in /v1."""
+    its headers, rfile and send_* methods), get(handler) each GET (none: 404). Yields the base URL, ending in /v1."""
     import threading
     from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 
@@ -211,6 +211,12 @@ def serving(post, threaded=False):
 
         def do_POST(self):
             post(self)
+
+        def do_GET(self):
+            if get is None:
+                self.send_error(404)
+            else:
+                get(self)
     server = (ThreadingHTTPServer if threaded else HTTPServer)(('127.0.0.1', 0), Handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()

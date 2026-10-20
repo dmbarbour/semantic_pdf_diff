@@ -113,7 +113,7 @@ again reuses what was read, and resumes one interrupted. The model's answers are
 ($PDF_DIFF_CACHE, else ~/.cache/semantic-pdf-diff): what was asked once isn't paid for again.
 
 Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error
-(a mistyped command or option too).
+(a mistyped command or option too); 5 a check of `config test` failed.
 """
 
 def help_text(parser, epilog=None, description=None):
@@ -431,12 +431,15 @@ reranker. Names are the settings' own (max_cost, report_budget, rerank_threshold
   pdf-semantic-diff config export settings.json     the store's own settings, as JSON (to the screen without a file)
   pdf-semantic-diff config import settings.json     every setting in the file, or none if any is wrong (null unsets)
   pdf-semantic-diff config set --user model NAME    the user's, for every store (--user: set, unset, export, import)
+  pdf-semantic-diff config test                     the endpoint, the key and each model checked, for a few cents
+                                                    (exit 5 when a check fails)
+  pdf-semantic-diff config models gemma             the endpoint's models holding the words, those in use marked
 """
 
 def config_parser():
     parser = Parser(prog='pdf-semantic-diff config', usage='%(prog)s ACTION [options]')
     help_text(parser, CONFIG_HELP, "The user's and a store's settings: show, find, help, set, unset, export and "
-                                  "import.")
+                                  "import; the endpoint checked (test) and its models listed (models).")
     where = Parser(add_help=False)
     where.add_argument('--store', type=Path, default=None,
                        help='The store (default: $PDF_DIFF_STORE, else ./diff-output)')
@@ -460,6 +463,11 @@ def config_parser():
     out.add_argument('file', nargs='?', type=Path)
     take = actions.add_parser('import', parents=[where], help='settings from a JSON file (- for standard input)')
     take.add_argument('file')
+    actions.add_parser('test', parents=[where], help='the endpoint, the key and each model the settings name, checked '
+                                                    'by asking (a few cents); exit 5 when a check fails')
+    listed = actions.add_parser('models', parents=[where], help="the endpoint's models, those the settings name "
+                                                                "marked")
+    listed.add_argument('words', nargs='*', help='only models whose name holds every word')
     return parser
 
 def config_command(argv):
@@ -492,6 +500,19 @@ def config_command(argv):
     if args.action == 'help':
         print('\n'.join(configuration.help_lines(args.name, layers)))
         return 0
+    if args.action in ('test', 'models'):
+        from . import checkup
+        settings = settings_from(layer={k: v for k, v in Store.settings_of(store).items()
+                                        if k not in configuration.RUN_OPTIONS})
+        if args.action == 'models':
+            try:
+                print('\n'.join(checkup.listing(settings, ' '.join(args.words))))
+            except (OSError, ValueError) as e:
+                raise ValueError(f"the endpoint's models can't be listed ({type(e).__name__}: {e})") from None
+            return 0
+        checks, cost = checkup.run(settings)
+        print('\n'.join(checkup.lines(settings, checks, cost)))
+        return checkup.FAILED if any(c.ok is False for c in checks) else 0
     if args.action == 'export':
         text = json.dumps(configuration.exported(own), indent=1, ensure_ascii=False) + '\n'
         if args.file is None:
