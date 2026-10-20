@@ -89,10 +89,12 @@ SCRIPT = resources.files(__package__).joinpath("report.js").read_text(encoding="
 class Cards:
     """A report's claims as cards: each with where it is, what it says, its quote and how it was read. Called with a
     claim's id, it gives the card's place in a finding or list; each card is written once (html), and the page's
-    script puts it in each place. crop(claim) gives a card's crop: an embedded image, or why there's none."""
+    script puts it in each place. What a claim says (its statement and quote) is written once however many claims
+    say it (said: {its HTML: its index}), and cards refer to it (the owner, 2026-10-19: "shared structure for subsets
+    of identical claims"). crop(claim) gives a card's crop: an embedded image, or why there's none."""
     def __init__(self, data, crop=lambda e: ''):
         self.evidence, self.crop = {e["id"]: e for e in data["evidence"]}, crop
-        self.html = {}
+        self.html, self.said, self.said_of = {}, {}, {}
         self.occurrences = {}
         for f in data["files"]:
             self.occurrences.setdefault(f["content"], []).append(f"{f['source']} / {f['path']}")
@@ -145,11 +147,13 @@ class Cards:
         read = f"<p>Read {esc(read_as(how))}.</p>" if how else ''
         heading = self.headings.get((e['content'], e.get('section', '')), '')
         heading = f" · § {esc(heading)}" if heading else ''
+        said = (f"<b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>"
+                f"<p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{frame}{basis}"
+                f"<blockquote>{esc(e['quote'])}</blockquote>")
+        self.said_of[eid] = self.said.setdefault(said, len(self.said))
         return f'''<section><h3>{esc(self.where(e['content']))}{heading} · \
 {PAGE_WORDS.get(loc.get('format'), 'page')} {loc['page']} · {esc(e['kind'])}</h3>
-        <b>{esc(e['entity'])} — {esc(e['attribute'])}</b><p>{esc(e['value'])} {esc(e['unit'])}</p>
-        <p>Conditions: {esc(e['conditions'] or 'unspecified')}</p>{frame}{basis}{self.context(e)}\
-<blockquote>{esc(e['quote'])}</blockquote>{verified}{read}{also}
+        <div data-said="{self.said_of[eid]}"></div>{self.context(e)}{verified}{read}{also}
         <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>\
 {image}</section>'''
 
@@ -309,6 +313,15 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp"):
         page += ('<label>File <select id="file"><option value="all">All files</option>'
                  + ''.join(f'<option value="{pair_key(a, b, files)}">{esc(pair_name(kind, a, b))}</option>'
                            for kind, a, b in pairs) + '</select></label>')
+    findings = [{"relation": f['relation'], "kind": f.get('explanation', {}).get('kind', ''),
+                 "cards": [f['a'], f['b']], "html": finding_html(f, card),
+                 "files": [files.get(card.evidence[x]['content'], -1) for x in (f['a'], f['b'])]} for f in shown]
+    for f, record in zip(shown, findings):  # equivalent, and saying the same in both: folded unless asked for
+        record["same"] = f['relation'] == 'equivalent' and card.said_of[f['a']] == card.said_of[f['b']]
+    same = sum(1 for record in findings if record["same"])
+    if same:
+        page += (f'<label><input type="checkbox" id="same" checked> Fold the {same} equivalent findings whose two '
+                 'claims say the same</label>')
     page += ('<input id="query" placeholder="Search findings" aria-label="Search findings"> '
              '<span id="count" class="meta"></span>')
     page += ('<main></main><details data-list="unmatched"><summary>Unmatched evidence ('
@@ -330,13 +343,10 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp"):
              +'</tbody></table></details>')
     page += crops_left_out_html(account)
     parts = {"page": page,
-             "findings": [{"relation": f['relation'], "kind": f.get('explanation', {}).get('kind', ''),
-                           "cards": [f['a'], f['b']], "html": finding_html(f, card),
-                           "files": [files.get(card.evidence[x]['content'], -1) for x in (f['a'], f['b'])]}
-                          for f in shown],
+             "findings": findings,
              "lists": {"unmatched": ['<article>'+esc(u['note'])+card(u['id'])+'</article>' for u in data['unmatched']],
                        "shared": [card(eid) for eid in data.get('shared', [])]},
-             "cards": card.html}
+             "cards": card.html, "said": list(card.said)}
     packed = json.dumps(parts, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     packed = base64.b64encode(gzip.compress(packed, 9, mtime=0)).decode("ascii")  # mtime=0: the same bytes each time
     images = embed_json({"type": mime, "data": [c.data for c in chosen]})
@@ -426,8 +436,9 @@ def unpacked(page):
     import html
     found = re.search(r'<script type="application/gzip" id="report-data">([^<]*)</script>', page)
     parts = json.loads(gzip.decompress(base64.b64decode(found.group(1))))
-    fill = lambda text: re.sub(r'<div data-card="([^"]*)"></div>', lambda m: parts["cards"][html.unescape(m.group(1))],
-                               text)
+    cards = lambda text: re.sub(r'<div data-card="([^"]*)"></div>',
+                                lambda m: parts["cards"][html.unescape(m.group(1))], text)
+    fill = lambda text: re.sub(r'<div data-said="(\d+)"></div>', lambda m: parts["said"][int(m.group(1))], cards(text))
     out = parts["page"].replace("<main></main>", "<main>" + "".join(fill(f["html"]) for f in parts["findings"])
                                 + "</main>")
     for name, items in parts["lists"].items():

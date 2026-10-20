@@ -18,11 +18,14 @@
   const crops = JSON.parse(document.getElementById('report-crops').textContent);
   const PAGE = 100;
 
-  // cards in their places, then their crops
+  // cards in their places, then what their claims say (written once however many say it), then their crops
   const fill = (part) => {
-    for (const place of part.querySelectorAll('[data-card]')) {
-      place.insertAdjacentHTML('afterend', R.cards[place.dataset.card] || '');
-      place.remove();
+    for (const name of ['card', 'said']) {
+      const table = name === 'card' ? R.cards : R.said;
+      for (const place of part.querySelectorAll(`[data-${name}]`)) {
+        place.insertAdjacentHTML('afterend', table[place.dataset[name]] || '');
+        place.remove();
+      }
     }
     for (const img of part.querySelectorAll('img[data-crop]')) {
       img.src = 'data:' + crops.type + ';base64,' + crops.data[Number(img.dataset.crop)];
@@ -53,28 +56,37 @@
   // a finding's words, its cards' included, for the search (worked out once, when first searched)
   const entities = {amp: '&', lt: '<', gt: '>', quot: '"', '#x27': "'"};
   const plain = (html) => html.replace(/<[^>]*>/g, ' ').replace(/&(amp|lt|gt|quot|#x27);/g, (m, e) => entities[e]);
+  const said = (html) => html.replace(/<div data-said="(\d+)"><\/div>/g, (m, n) => R.said[Number(n)]);
   const words = new Map();
   const wordsOf = (f) => {
-    if (!words.has(f)) words.set(f, plain(f.html + ' ' + f.cards.map((id) => R.cards[id] || '').join(' ')).toLowerCase());
+    if (!words.has(f)) {
+      words.set(f, plain(f.html + ' ' + f.cards.map((id) => said(R.cards[id] || '')).join(' ')).toLowerCase());
+    }
     return words.get(f);
   };
 
   root.innerHTML = R.page;
   const main = root.querySelector('main');
-  const relation = root.querySelector('#filter'), kind = root.querySelector('#kind'), query = root.querySelector('#query');
+  const relation = root.querySelector('#filter'), kind = root.querySelector('#kind');
+  const query = root.querySelector('#query');
   const file = root.querySelector('#file');  // with more than one pair of files: their indexes, "3,4"
+  const same = root.querySelector('#same');  // folding the equivalent findings whose claims say the same
   const show = () => {
     const r = relation.value, k = kind ? kind.value : 'all', q = query.value.toLowerCase().trim();
     const files = !file || file.value === 'all' ? null : new Set(file.value.split(',').map(Number));
-    const chosen = R.findings.filter((f) => (r === 'all' || f.relation === r) && (k === 'all' || f.kind === k)
+    const matching = R.findings.filter((f) => (r === 'all' || f.relation === r) && (k === 'all' || f.kind === k)
       && (!files || files.has(f.files[0]) || files.has(f.files[1])) && (!q || wordsOf(f).includes(q)));
-    root.querySelector('#count').textContent = `${chosen.length} of ${R.findings.length} findings`;
+    const chosen = same && same.checked ? matching.filter((f) => !f.same) : matching;
+    const folded = matching.length - chosen.length;
+    root.querySelector('#count').textContent = `${chosen.length} of ${R.findings.length} findings`
+      + (folded ? ` (${folded} that say the same in both folded)` : '');
     paged(main, chosen.map((f) => f.html));
   };
   let typing;
   relation.onchange = show;
   if (kind) kind.onchange = show;
   if (file) file.onchange = show;
+  if (same) same.onchange = show;
   query.oninput = () => { clearTimeout(typing); typing = setTimeout(show, 200); };
   for (const fold of root.querySelectorAll('details[data-list]')) {
     fold.addEventListener('toggle', () => {

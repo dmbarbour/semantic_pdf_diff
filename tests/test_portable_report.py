@@ -234,6 +234,30 @@ class ManyFiles(unittest.TestCase):
         self.assertIn("<details><summary>Files: 0 unchanged, 1 modified", shown)
         self.assertNotIn('id="file"', shown)
 
+def parts_of(page):
+    """The report's parts, as the page's script inflates them."""
+    import gzip
+    import re
+    return json.loads(gzip.decompress(base64.b64decode(re.search(r'id="report-data">([^<]*)<', page).group(1))))
+
+class SharedStructure(unittest.TestCase):
+    """What a claim says written once however many claims say it, and equivalent findings whose claims say the same
+    folded (the owner, 2026-10-19: "shared structure for subsets of identical claims")."""
+    def test_claims_that_say_the_same_share_one_statement_and_their_finding_is_folded(self):
+        a, b = ev("A-1"), ev("B-1")  # the same statement, in two files
+        c, d = ev("A-2", value="12"), ev("B-2", value="14")
+        data = report([a, b, c, d], [finding(a, b, "equivalent"), finding(c, d, "different")])
+        with tempfile.TemporaryDirectory() as folder:
+            write_report(data, Path(folder))
+            page = (Path(folder) / "report.html").read_text()
+        parts = parts_of(page)
+        self.assertEqual(len(parts["said"]), 3)  # four claims, three statements: A-1 and B-1 say the same
+        self.assertEqual(parts["cards"]["A-1"].count('<div data-said="'), 1)
+        self.assertEqual([f["same"] for f in parts["findings"]], [True, False])
+        shown = unpacked(page)
+        self.assertIn("Fold the 1 equivalent findings whose two claims say the same", shown)
+        self.assertEqual(shown.count("<b>primary pump — rated power</b><p>10 kW</p>"), 2)  # in both of its cards
+
 BROWSERS = ("chromium", "chromium-browser", "google-chrome", "chrome")
 
 class InABrowser(unittest.TestCase):
@@ -253,14 +277,30 @@ class InABrowser(unittest.TestCase):
             page = (root / "out" / "report.html").as_uri()
             flags = ["--headless", "--no-sandbox", "--disable-gpu", "--virtual-time-budget=10000", "--dump-dom"]
             done = subprocess.run([browser, *flags, page], capture_output=True, text=True, timeout=120)
-        dom = done.stdout
+        import re
+        dom = re.sub(r"<script.*?</script>", "", done.stdout, flags=re.S)  # what's drawn, not the script's text
         self.assertNotIn("Opening the report", dom)
         self.assertIn("150 of 150 findings", dom)
         self.assertEqual(dom.count("<article"), 100)
         self.assertIn("Show 50 more (50 left)", dom)
         self.assertEqual(dom.count("<section><h3>"), 200)
         self.assertNotIn("data-card=", dom)
+        self.assertNotIn("data-said=", dom)
         self.assertIn('src="data:image/webp;base64,', dom)
+
+    def test_findings_that_say_the_same_are_folded_until_asked_for(self):
+        browser = next((b for b in map(shutil.which, BROWSERS) if b), None)
+        if browser is None:
+            self.skipTest("no headless browser installed (chromium)")
+        with tempfile.TemporaryDirectory() as d:
+            a, b, c, e = ev("A-1"), ev("B-1"), ev("A-2", value="12"), ev("B-2", value="14")
+            write_report(report([a, b, c, e], [finding(a, b, "equivalent"), finding(c, e, "different")]),
+                         Path(d) / "out")
+            page = (Path(d) / "out" / "report.html").as_uri()
+            flags = ["--headless", "--no-sandbox", "--disable-gpu", "--virtual-time-budget=10000", "--dump-dom"]
+            dom = subprocess.run([browser, *flags, page], capture_output=True, text=True, timeout=120).stdout
+        self.assertIn("1 of 2 findings (1 that say the same in both folded)", dom)
+        self.assertEqual(dom.count("<article"), 1)
 
 if __name__ == "__main__":
     unittest.main()
