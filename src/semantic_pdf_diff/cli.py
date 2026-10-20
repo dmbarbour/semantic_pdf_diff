@@ -18,7 +18,7 @@ from .pipeline import (RunOptions, attempt, check_fixture, declare_paths, docume
                        settings_from)
 from .schema import Source
 from .progress import log, setup_logging
-from .report import write_report
+from .report import SPLIT, write_report
 from .store import Store, StoreError
 
 
@@ -202,6 +202,10 @@ def report_size(text):
     return int(float(found.group(1)) * {"": 1e6, "b": 1, "k": 1e3, "m": 1e6, "g": 1e9}[unit])
 
 def add_report_options(parser):
+    parser.add_argument('--split', action='store_true',
+                        help=f'With more than one pair of files: a report file a pair (its findings, and those '
+                             f'reaching other files) and an index, in {SPLIT}/, a folder to zip and send, each file '
+                             'within --report-budget; for comparisons too large for one file')
     parser.add_argument('--report-budget', type=report_size, default=crops.DEFAULT_BUDGET, metavar='SIZE',
                         help='report.html is one file holding its crops, in order of value (the findings to check, '
                              'and claims read from charts, diagrams and tables, first) until it reaches this size '
@@ -565,11 +569,13 @@ def store_command(command, argv):
         else:
             out = args.out or args.store
             account = write_report(store.comparison(args.comparison), out, assets=store.folder / 'assets',
-                                   budget=args.report_budget, write=not args.dry_run)
+                                   budget=args.report_budget, write=not args.dry_run, split=args.split)
             if args.dry_run:
                 print("\n".join(crops.feedback(account)))
             else:
-                print(f"Report: {out / 'report.html'} ({crops.sized(account.size)})")
+                page = out / SPLIT / 'index.html' if (out / SPLIT / 'index.html').exists() and args.split else (
+                    out / 'report.html')
+                print(f"Report: {page} ({crops.sized(account.size)})")
                 if account.cut:
                     print(crops.summary(account, args.store))
     return 0

@@ -237,6 +237,28 @@ class ManyFiles(unittest.TestCase):
         lines = crops.feedback(account)
         self.assertIn("by file, most left out first (2 files with crops):", lines)
 
+    def test_a_split_report_is_a_file_a_pair_and_an_index(self):
+        account = write_report(two_files_a_side(self.assets), self.root / "out", assets=self.assets, split=True)
+        folder = self.root / "out" / "report-split"
+        self.assertEqual(sorted(x.name for x in folder.iterdir()), ["01-p.html", "02-q.html", "index.html"])
+        self.assertFalse((self.root / "out" / "report.html").exists())
+        self.assertTrue((self.root / "out" / "report.json").exists())
+        index = (folder / "index.html").read_text()
+        self.assertIn('<a href="01-p.html">Open</a>', index)
+        self.assertIn("A split report: a file a pair of files, 2 in this folder", index)
+        first = unpacked((folder / "01-p.html").read_text())
+        self.assertIn('Part 1 of 2 of a split report (v1/p.pdf → v2/p.pdf): <a href="index.html">', first)
+        self.assertIn("{&#x27;different&#x27;: 3}", first)  # its two, and the one reaching the other pair's file
+        second = unpacked((folder / "02-q.html").read_text())
+        self.assertIn("{&#x27;uncertain&#x27;: 1, &#x27;different&#x27;: 1}", second)
+        self.assertEqual(account.size, sum(x.stat().st_size for x in folder.iterdir()))
+
+    def test_one_pair_of_files_is_never_split(self):
+        a = ev("A-1")
+        write_report(report([a, ev("B-1")], [finding(a, ev("B-1"), "different")]), self.root / "out", split=True)
+        self.assertTrue((self.root / "out" / "report.html").exists())
+        self.assertFalse((self.root / "out" / "report-split").exists())
+
     def test_one_pair_of_files_keeps_the_files_summary_in_the_header(self):
         a = ev("A-1")
         data = report([a, ev("B-1")], [finding(a, ev("B-1"), "different")])

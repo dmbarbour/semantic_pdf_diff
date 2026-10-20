@@ -250,13 +250,83 @@ def record_changes_html(changes, esc):
     return (f"<section><h2>Context changes ({len(changes)})</h2><p>A note, lead-in or table heading restated: what "
             f"the claims under it mean may have changed, whatever their values.</p><ul>{items}</ul></section>")
 
-def write_report(data, output, assets=None, budget=crops.DEFAULT_BUDGET, write=True):
+def write_report(data, output, assets=None, budget=crops.DEFAULT_BUDGET, write=True, split=False):
     """Write report.json and report.html, one file holding its crops (rendered into `assets`, default output/assets)
     as far as the byte budget allows, in crops.py's order of value. Returns the budget's account (crops.Account);
-    with write=False, only the account (`report --dry-run`)."""
+    with write=False, only the account (`report --dry-run`). With split, and more than one pair of files, the page is
+    one file a pair of files instead, each under the budget, and an index, in report-split/ (SPLIT)."""
     output = Path(output)
     assets = Path(assets) if assets else output / "assets"
     stored = lambda image: assets / image.split("/", 1)[1] if image.startswith("assets/") else output / image
+    pairs = file_pairs(data) if split else []
+    if len(pairs) > 1:
+        return write_split(data, output, pairs, stored, budget, write)
+    page, account = report_page(data, stored, budget)
+    if write:
+        output.mkdir(exist_ok=True, parents=True)
+        (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        (output/'report.html').write_text(page, encoding='utf-8')
+    return account
+
+SPLIT = "report-split"  # a split report's folder, beside report.json
+
+def write_split(data, output, pairs, stored, budget, write):
+    """One report file a pair of files (its findings, those reaching other pairs' files too, and its claims without a
+    counterpart), each under the budget, and index.html listing them: a folder to zip and send, for comparisons too
+    large for one file (the owner, 2026-10-19: "or distribution with a zip folder"). The account adds up the parts'."""
+    folder = output / SPLIT
+    total = crops.Account(budget)
+    parts, counted = [], set()
+    for i, (kind, a, b) in enumerate(pairs):
+        note = (f'<p class="meta">Part {i + 1} of {len(pairs)} of a split report ({esc(pair_name(kind, a, b))}): '
+                '<a href="index.html">every pair of files</a></p>')
+        page, account = report_page(part_of(data, kind, a, b), stored, budget, note)
+        name = f"{i + 1:02d}-" + re.sub(r"[^A-Za-z0-9._-]+", "-", Path((b or a)[0]).stem).strip("-") + ".html"
+        parts.append((name, page))
+        total.page += account.page
+        total.size += account.size
+        total.wanted += [c for c in account.wanted if c.image not in counted]
+        counted |= {c.image for c in account.wanted}
+        total.chosen |= account.chosen
+        total.names.update(account.names)
+    files = {c: i for i, c in enumerate(dict.fromkeys(x[1] for _, a, b in pairs for x in (a, b) if x and x[1]))}
+    split = (f'<p class="meta">A split report: a file a pair of files, {len(pairs)} in this folder beside this '
+             'index. Keep them together (zip the folder to send it); each opens on its own too.</p>')
+    index = html_page('Semantic PDF comparison', split + header_html(data, listed=False) + files_html(
+        data, pairs, files, total, Cards(data).where, links=[name for name, _ in parts]), STYLE)
+    total.size += len(index.encode())
+    if write:
+        folder.mkdir(exist_ok=True, parents=True)
+        (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        (folder / "index.html").write_text(index, encoding="utf-8")
+        for name, page in parts:
+            (folder / name).write_text(page, encoding="utf-8")
+    return total
+
+def part_of(data, kind, a, b):
+    """The report document of one pair of files: its findings (with those reaching other pairs' files), its claims
+    without a counterpart, and what those claims need to be shown."""
+    mine = {x[1] for x in (a, b) if x}
+    content = {e['id']: e['content'] for e in data['evidence']}
+    findings = [f for f in data['findings'] if content.get(f['a']) in mine or content.get(f['b']) in mine]
+    unmatched = [u for u in data['unmatched'] if content.get(u['id']) in mine]
+    shared = [x for x in data.get('shared', []) if content.get(x) in mine]
+    ids = {x for f in findings for x in (f['a'], f['b'])} | {u['id'] for u in unmatched} | set(shared)
+    shown = {content[x] for x in ids if x in content} | mine
+    keep = lambda rows: [r for r in rows if r.get('content') in shown]
+    paths = [x[0] for x in (a, b) if x]
+    difference = {k: [] for k in ('unchanged', 'modified', 'moved', 'added', 'removed')}
+    difference[kind].append(paths if kind in ('modified', 'moved') else paths[0])
+    return {**data, 'findings': findings, 'unmatched': unmatched, 'shared': shared,
+            'evidence': [e for e in data['evidence'] if e['id'] in ids], 'coverage': keep(data['coverage']),
+            'sections': keep(data.get('sections', [])), 'records': keep(data.get('records', [])),
+            'situation': {c: x for c, x in data.get('situation', {}).items() if c in mine},
+            'files': [f for f in data.get('files', []) if f['content'] in shown], 'file_difference': difference,
+            'groupings': [g for g in data.get('groupings', []) if ids & set(g['earlier_claims'] + g['later_claims'])],
+            'record_changes': [c for c in data.get('record_changes', []) if ids & set(c['claims'])]}
+
+def report_page(data, stored, budget, note=''):
+    """report.html's text (note above it), its crops embedded as the budget allows, and the budget's account."""
     # explained differences first, value changes leading (KINDS' order); the rest as found
     order = {k: i for i, k in enumerate(KINDS)}
     shown = sorted(data['findings'], key=lambda f: order.get(f.get('explanation', {}).get('kind'), len(KINDS)))
@@ -270,20 +340,16 @@ def write_report(data, output, assets=None, budget=crops.DEFAULT_BUDGET, write=T
                                   data.get('shared', []), label, lambda image: stored(image).exists())
     mime, encode = crops.encoder()
     crops.encode(account.wanted, stored, encode)
-    account.page = len(page_html(data, shown, stored, [], account, mime).encode())  # every crop left out
+    account.page = len(page_html(data, shown, stored, [], account, mime, note).encode())  # every crop left out
     chosen = crops.choose(account.wanted, budget - account.page)
     while True:  # the page's text changes a little with what's embedded: never over budget for it
         account.chosen = {c.image for c in chosen}
-        page = page_html(data, shown, stored, chosen, account, mime)
+        page = page_html(data, shown, stored, chosen, account, mime, note)
         account.size = len(page.encode())
         if account.size <= budget or not chosen:
             break
         chosen.pop()
-    if write:
-        output.mkdir(exist_ok=True, parents=True)
-        (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-        (output/'report.html').write_text(page, encoding='utf-8')
-    return account
+    return page, account
 
 def crop_html(e, embedded, stored):
     """A card's crop: its embedded image (enlarged by a click), or why it has none."""
@@ -298,13 +364,14 @@ def crop_html(e, embedded, stored):
     return (f"<p class='cut'>Crop left out for the report's size budget ({esc(e['locator'].get('task', ''))}): "
             "see Crops left out.</p>")
 
-def page_html(data, shown, stored, chosen, account, mime="image/webp"):
-    """report.html: its parts gzipped inside it (each card once), the chosen crops, and the script showing them."""
+def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
+    """report.html: its parts gzipped inside it (each card once), the chosen crops, and the script showing them;
+    note above them (a split report's part says so)."""
     embedded = {c.image: i for i, c in enumerate(chosen)}
     card = Cards(data, lambda e: crop_html(e, embedded, stored))
     pairs = file_pairs(data)
     files = {c: i for i, c in enumerate(dict.fromkeys(x[1] for _, a, b in pairs for x in (a, b) if x and x[1]))}
-    page = header_html(data, listed=len(pairs) <= 1) + crops_note(account)
+    page = note + header_html(data, listed=len(pairs) <= 1) + crops_note(account)
     if len(pairs) > 1:
         page += files_html(data, pairs, files, account, card.where)
     page += ('<label>Show <select id="filter"><option value="all">All relations</option>'
@@ -385,12 +452,13 @@ def pair_name(kind, a, b):
         return f"{a[0]} → {b[0]}" + (" (moved)" if kind == 'moved' else "")
     return f"{(a or b)[0]} ({kind})"
 
-def files_html(data, pairs, files, account, where):
+def files_html(data, pairs, files, account, where, links=None):
     """The files compared, a row a pair: its findings by relation (those reaching a file of another pair counted
-    apart), its claims without a counterpart, and its crops embedded; each a button showing its findings."""
+    apart), its claims without a counterpart, and its crops embedded; each a button showing its findings, or with
+    links (a split report's index), a link to its own file."""
     evidence = {e['id']: e['content'] for e in data['evidence']}
     rows = []
-    for kind, a, b in pairs:
+    for i, (kind, a, b) in enumerate(pairs):
         mine = {x[1] for x in (a, b) if x}
         touching = [f for f in data['findings'] if evidence.get(f['a']) in mine or evidence.get(f['b']) in mine]
         across = sum(1 for f in touching if not (evidence.get(f['a']) in mine and evidence.get(f['b']) in mine))
@@ -403,7 +471,8 @@ def files_html(data, pairs, files, account, where):
         rows.append(f"<tr><td>{esc(pair_name(kind, a, b))}</td><td>{esc(found)}"
                     + (f" <small>({across} reaching other files)</small>" if across else "")
                     + f"</td><td>{lone}</td><td>{f'{shown} of {len(wanted)}' if wanted else '—'}</td><td>"
-                    + (f'<button class="pick" data-files="{pair_key(a, b, files)}">Show</button>' if touching else '')
+                    + (f'<a href="{esc(links[i])}">Open</a>' if links else
+                       f'<button class="pick" data-files="{pair_key(a, b, files)}">Show</button>' if touching else '')
                     + "</td></tr>")
     diff = data['file_difference']
     summary = ', '.join(f"{len(diff[k])} {k}" for k in ('modified', 'moved', 'added', 'removed', 'unchanged')

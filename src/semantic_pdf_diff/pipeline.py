@@ -16,7 +16,7 @@ from .schema import EvidenceDocument, Report, Situation, Source, coverage_row
 from .progress import Progress, log
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
 from .readings import reconcile
-from .report import traced, write_report
+from .report import SPLIT, traced, write_report
 from .scan import ARCHIVES, Limits, read_origin
 from .situate import quality, situate
 from .binding import bind
@@ -72,6 +72,7 @@ class RunOptions:
     export: Path | None = None        # a .sqlite fixture every answer served or recorded is copied into (in fresh
                                       # stores: a store holding a region's claims asks nothing for it)
     report_budget: int = crops.DEFAULT_BUDGET  # report.html's bytes, its crops included as they fit (crops.py)
+    split: bool = False               # a report file a pair of files, and an index (report.SPLIT)
 
     @classmethod
     def from_args(cls, args):
@@ -80,7 +81,7 @@ class RunOptions:
                    fixture=get("fixture"), fixture_mode=get("fixture_mode"), responder=get("responder"),
                    fresh_regions=tuple(r for r in (get("fresh_regions", "") or "").split(",") if r),
                    ledger=get("ledger"), export=get("fixture_export"),
-                   report_budget=get("report_budget", crops.DEFAULT_BUDGET),
+                   report_budget=get("report_budget", crops.DEFAULT_BUDGET), split=bool(get("split", False)),
                    ledger_tags=dict(t.split("=", 1) for t in (get("ledger_tag", []) or []) if "=" in t))
 
     @property
@@ -252,7 +253,8 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     data = traced(data)
     store.save_comparison(data['created_at'], data)
-    account = write_report(data, out, assets=store.folder / 'assets', budget=options.report_budget)
+    account = write_report(data, out, assets=store.folder / 'assets', budget=options.report_budget,
+                           split=options.split)
     # how the run went, apart from the report, which holds only what the answers decide (the determinism review, D9)
     usage = {'api_calls': client.calls, 'cache_hits': client.cache_hits, **client.usage,
              **fixture_usage(client, options.fixture)}
@@ -262,7 +264,9 @@ def compare_and_report(options, settings, store, client, names, read, document, 
                   or data['retrieval']['omitted_by_pair_limit'] > 0
                   or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
                          for f in data['findings']))
-    print(f"Report: {out / 'report.html'}" + (' (incomplete source coverage)' if incomplete else ''))
+    split = out / SPLIT / 'index.html'
+    page = split if options.split and split.exists() else out / 'report.html'
+    print(f"Report: {page}" + (' (incomplete source coverage)' if incomplete else ''))
     omitted = data['retrieval']['omitted_by_pair_limit']
     if omitted:
         print(f"{omitted} of {data['retrieval']['candidate_pairs']} candidate pairs weren't judged: --max-pairs sets "

@@ -35,7 +35,7 @@ pdf-semantic-diff compare team-a.pdf team-b.pdf --store result
 
 `pdf-semantic-diff --help` lists every command, the environment it needs and examples; `pdf-semantic-diff COMMAND --help` (or `pdf-semantic-diff help COMMAND`) gives a command's options, and `pdf-semantic-diff settings` prints every setting a run would use (with `--changed`, those differing from the defaults: a starting `--config` file).
 
-Open `result/report.html`: it's one file, which can be moved or sent on its own. Its crops are embedded in order of value (the findings to check, and claims read from charts, diagrams and tables, first) until the file reaches `--report-budget` (20 MB by default); `pdf-semantic-diff report --store result --dry-run` says what a budget leaves out. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
+Open `result/report.html`: it's one file, which can be moved or sent on its own. Its crops are embedded in order of value (the findings to check, and claims read from charts, diagrams and tables, first) until the file reaches `--report-budget` (20 MB by default); `pdf-semantic-diff report --store result --dry-run` says what a budget leaves out. For comparisons too large for one file, `--split` writes a file per pair of files and an index, in a folder to zip and send. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
 
 Either source can also be a folder or a zip archive. For revisions, supply the old version first:
 
