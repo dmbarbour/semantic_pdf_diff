@@ -100,9 +100,42 @@ class FirstUse(unittest.TestCase):
             self.assertEqual(sorted(passed), [f'chat {url} gemma-4', f'image {url} gemma-4 1000'])
             self.assertEqual(passed[f'chat {url} gemma-4']['context_tokens'], 65536)
             self.assertEqual(passed[f'image {url} gemma-4 1000']['image_tokens'], 258)
+            # calibrated (milestone 5): the window listed, an image's tokens a tenth added, where no layer sets them
+            self.assertIn('Calibrated from what was measured: context_tokens 65,536, image_tokens 284 (`config show` '
+                          'marks them)', said)
+            self.assertEqual(self.extracting(), (65536, 284))
             code, said = compare(self.root, url)  # remembered: nothing checked
             self.assertNotIn('First use', said)
             self.assertEqual(state['checks'], 3)
+
+    def extracting(self):
+        """(context_tokens, image_tokens) as the store's extraction was asked with them (evidence.json)."""
+        used = json.loads((self.root / 'out' / 'evidence.json').read_text())['interpreters']['extract']['settings']
+        return used['context_tokens'], used['image_tokens']
+
+    def test_a_value_set_wins_warned_of_where_the_measure_says_its_unsafe(self):
+        with endpoint() as (url, state), stubs.user_settings({'model': 'gemma-4', 'image_tokens': 100,
+                                                               'context_tokens': 32768}):
+            code, said = compare(self.root, url)
+        self.assertNotEqual(code, 5, said)
+        self.assertIn('image_tokens is 100, but an image 1000 px square was 258 tokens there: requests may be refused '
+                      'or cut. `semantic-pdf-diff config unset image_tokens` (with --user, if it\'s the user\'s) uses '
+                      'what was measured (284)', said)
+        self.assertNotIn('context_tokens is', said)  # smaller than the window: safe
+        self.assertNotIn('Calibrated', said)
+        self.assertEqual(self.extracting(), (32768, 100))
+
+    def test_config_show_marks_what_was_measured(self):
+        with endpoint() as (url, state):
+            compare(self.root, url)
+        cache = Path(os.environ['SEMANTIC_PDF_DIFF_CACHE'])  # the store's cache, which the tests' runs don't use
+        cache.mkdir(exist_ok=True)
+        (cache / 'endpoints.json').write_text(self.memory.read_text().replace(url, 'http://localhost:8000/v1'))
+        self.addCleanup((cache / 'endpoints.json').unlink)
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            cli.main(['config', 'show', '--store', str(self.root / 'out')])
+        shown = {line.split()[0]: line for line in out.getvalue().splitlines() if 'tokens ' in line}
+        self.assertRegex(shown['context_tokens'], r'^  context_tokens +65536 \(measured\) ')
 
     def test_a_check_failing_stops_the_run_before_anything_is_asked(self):
         with endpoint(right=False) as (url, state):

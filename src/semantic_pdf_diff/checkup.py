@@ -7,6 +7,7 @@ is an eye-test card: a random code drawn large, which can't be guessed, read bac
 how small a model can read: lab/src/semantic_pdf_diff_lab/bench/eyetest.py).
 """
 import json
+import math
 import os
 import random
 import tempfile
@@ -401,13 +402,14 @@ def first_use(settings, cache):
     """Before a run's first request, each model the settings name checked as `config test` checks it, unless the
     record beside the answers cache remembers it passing (the owner, 2026-10-20: "we should always auto-test the model
     endpoint if it isn't tested in memory. Without verbose mode, we can get 13k bad requests without noticing.").
-    Returns the settings; a check failing raises Unchecked, its lines logged."""
+    Returns the settings calibrated from what the checks measured (calibrated); a check failing raises Unchecked, its
+    lines logged."""
     from .progress import log
     path = memory_of(cache)
     wanted, passed = keys(settings), recalled(path)
     missing = [name for name, key in wanted.items() if key not in passed]
     if not missing:
-        return settings
+        return calibrated(settings, path)
     log.info(f"First use: {', '.join(missing)} checked before anything is asked (remembered in {path})")
     checks, cost = run(settings, only=missing)
     for line in lines(settings, checks, cost)[1:]:
@@ -417,4 +419,53 @@ def first_use(settings, cache):
     if failed:
         raise Unchecked(f"{', '.join(failed)} failed {'its' if len(failed) == 1 else 'their'} check, so nothing was "
                         "asked: `semantic-pdf-diff config test` checks again")
-    return settings
+    made = calibrated(settings, path)
+    changed = [f"{k} {getattr(made, k):,}" for k in MEASURES if getattr(made, k) != getattr(settings, k)]
+    if changed:
+        log.info(f"Calibrated from what was measured: {', '.join(changed)} (`config show` marks them)")
+    return made
+
+# --- calibration: what the checks measured, used where no layer sets it
+
+MARGIN = 1.1  # an image's measured tokens, with a tenth to spare: image_tokens is an upper bound
+MEASURES = {"context_tokens": "json", "image_tokens": "image"}  # each setting measured, and the check measuring it
+
+def measured(settings, path):
+    """{setting: {"value", "raw", "at"}}: what the record's checks measured, for these settings' checks (keys): the
+    model's context window, as the endpoint lists it; an image's tokens at image_side, a tenth added."""
+    wanted, passed = keys(settings), recalled(path)
+    out = {}
+    for name, check in MEASURES.items():
+        entry = passed.get(wanted.get(check)) or {}
+        raw = entry.get(name)
+        if isinstance(raw, int) and not isinstance(raw, bool) and raw > 0:
+            value = math.ceil(raw * MARGIN) if name == "image_tokens" else raw
+            out[name] = {"value": value, "raw": raw, "at": entry.get("at", "")}
+    return out
+
+def calibrated(settings, path):
+    """The settings with what checks measured, where no layer sets it (the owner, 2026-10-20: "It isn't clear that we
+    run any calibration on first use of an endpoint. I think we should."). A value a layer sets wins, warned of where
+    the measure says it's unsafe: a context window larger than the model's, an image costing more than it allows."""
+    from .progress import log
+    found, given = measured(settings, path), settings.model_fields_set
+    unsafe = {"context_tokens": lambda set_, raw: set_ > raw, "image_tokens": lambda set_, raw: set_ < raw}
+    said = {"context_tokens": lambda raw: f"the endpoint gives {settings.model} {raw:,} tokens of context",
+            "image_tokens": lambda raw: f"an image {settings.image_side} px square was {raw:,} tokens there"}
+    for name, m in found.items():
+        if name in given and unsafe[name](getattr(settings, name), m["raw"]):
+            log.warning(f"{name} is {getattr(settings, name):,}, but {said[name](m['raw'])}: requests may be refused "
+                        f"or cut. `semantic-pdf-diff config unset {name}` (with --user, if it's the user's) uses "
+                        f"what was measured ({m['value']:,})")
+    update = {name: m["value"] for name, m in found.items()
+              if name not in given and getattr(settings, name) != m["value"]}
+    if not update:
+        return settings
+    try:
+        made = type(settings)(**{k: getattr(settings, k) for k in given}, **update)
+    except ValueError as e:  # a window too small for the other budgets, say
+        log.warning(f"What was measured ({', '.join(f'{k} {v:,}' for k, v in update.items())}) doesn't fit the other "
+                    f"settings, so the defaults are kept: {e}")
+        return settings
+    log.debug("Calibrated: " + ", ".join(f"{k} {v:,}" for k, v in update.items()))
+    return made

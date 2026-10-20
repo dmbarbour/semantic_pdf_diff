@@ -36,11 +36,13 @@ HELP = {
                      "Set by $OPENAI_BASE_URL (or --base-url), not kept in a store: the endpoint is the user's.",
                      "https://api.deepinfra.com/v1/openai"),
     "context_tokens": Help("endpoint", "the model's context window, in tokens: requests are sized to fit",
-                           "Set it to the model's: 262144 for gemma-4.", "262144", basic=True),
+                           "Measured on first use where the endpoint lists the model's (`config show` marks it "
+                           "measured); otherwise set it to the model's: 262144 for gemma-4.", "262144", basic=True),
     "output_tokens": Help("endpoint", "tokens reserved for each answer",
                           "About 150 a claim: raise it with claims_per_request."),
     "image_tokens": Help("endpoint", "an image's cost in tokens, an upper bound for sizing requests",
-                         "Provider-specific: gemma-4 at DeepInfra spends about 258 an image (300 is safe)."),
+                         "Measured on first use, an image image_side square, a tenth added; a value set below the "
+                         "measure is warned of. Provider-specific: gemma-4 at DeepInfra spends 258 an image."),
     "safety_tokens": Help("endpoint", "tokens kept spare in every request, against estimates running short"),
     "max_token_field": Help("endpoint", "the request field naming the answer's length",
                             "max_completion_tokens for providers that refuse max_tokens."),

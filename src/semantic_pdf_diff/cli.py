@@ -862,6 +862,19 @@ def config_parser():
     listed.add_argument('--json', action='store_true', help='every field, as JSON')
     return parser
 
+def measured_layer(store):
+    """What first-use checks measured for the store's runs (checkup.calibrated), the layer under the user's: none
+    where nothing was, or the cache can't be told."""
+    from . import checkup
+    from .settings import cache_path
+    try:
+        settings = settings_from(layer={k: v for k, v in Store.settings_of(store).items()
+                                        if k not in configuration.RUN_OPTIONS})
+        cache = cache_in_use([store]) if (store / 'store.sqlite').exists() else cache_path()
+        return {name: m['value'] for name, m in checkup.measured(settings, checkup.memory_of(cache)).items()}
+    except (OSError, StoreError, ValueError):
+        return {}
+
 def config_command(argv):
     """`semantic-pdf-diff config` (configuration.py): a store's own settings shown, explained, set and moved."""
     parser = config_parser()
@@ -869,7 +882,7 @@ def config_command(argv):
     from .settings import save_user_settings, user_path, user_settings
     store = args.store or default_store()
     user, own = user_settings(), Store.settings_of(store)
-    layers = [('user', user), ('store', own)]
+    layers = [('measured', measured_layer(store)), ('user', user), ('store', own)]
     if args.user:  # the layer set, unset, exported or imported
         own = user
     if args.action == 'show' and args.json:

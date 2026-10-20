@@ -122,7 +122,8 @@ def declare_paths(store, out, paths):
         store.save_source(Source(name=name, kind='shortcut', roots=[str(Path(path).resolve())]), replace=True)
     return names
 
-LIMITATIONS = ['Image-token budgeting must be calibrated to the serving backend.',
+LIMITATIONS = ['Image-token budgeting is measured on first use for a square image; a backend counting images by more '
+               'than their area needs image_tokens set.',
                'Confidence scores are uncalibrated model self-reports.',
                'Retrieval may miss synonyms and implicit relationships; configure domain aliases.',
                'Small VLMs can misread plots, tables, scales and diagram arrows.',
@@ -165,24 +166,25 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
     own = client is None
     if own and not options.dry_run:
         require_model(settings, options)
-    interpreter = extraction_interpreter(settings)
-    triage = triage_interpreter(settings) if settings.situate else None
     if options.dry_run:
-        if own and not options.fixture:
-            cache_of(store, bind=False)  # a run that would be refused says so
+        if own and not options.fixture:  # a run that would be refused says so; what was measured is used
+            settings = checkup.calibrated(settings, checkup.memory_of(cache_of(store, bind=False)))
+        interpreter = extraction_interpreter(settings)
         would = {'extract': bind(store, interpreter, reset=options.reset, dry_run=True)}
-        if triage:
-            would['triage'] = bind(store, triage, reset=options.reset, dry_run=True)
+        if settings.situate:
+            would['triage'] = bind(store, triage_interpreter(settings), reset=options.reset, dry_run=True)
         print(json.dumps({'would_clear': would}, indent=2))
         return 0
     cache = answers_cache(store) if own and not options.fixture else None  # refused before the store changes
-    if cache is not None:  # each model checked before anything is asked, unless remembered as passing
+    if cache is not None:  # each model checked before anything is asked, unless remembered; then calibrated
         try:
             settings = checkup.first_use(settings, cache.path)
         except checkup.Unchecked as e:
             cache.close()
             log.error(f"Stopped: {e}")
             return checkup.FAILED
+    interpreter = extraction_interpreter(settings)
+    triage = triage_interpreter(settings) if settings.situate else None
     try:
         prepare(options, settings, store, names, (interpreter, triage), force_rescan)
     except BaseException:

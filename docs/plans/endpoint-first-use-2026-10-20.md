@@ -40,8 +40,10 @@
    - Checks cost about $0.0002 on DeepInfra. They're said in the run's log, not counted under its cost cap.
    - `config test` records its results too, in the record beside the cache the store uses.
    - **Tested** with a stub endpoint: a first run checks (a sum, the card, the card's prompt alone) and the next doesn't; a wrong sum stops the run with nothing asked; a run whose requests fail in a row empties the record. The tests' stand-in skips the check everywhere else (tests/stubs.py).
-5. **Calibrated on first use,** from what the checks measure:
+5. **Calibrated on first use** (done 2026-10-20), from what the checks measure:
    - **`context_tokens`:** the model's context window, where the endpoint's listing gives it.
    - **`image_tokens`:** an image's tokens at `image_side`. The image check sends its card on a square canvas of that size, and the image's tokens are the prompt tokens reported, less the same prompt's without the image. Used with a margin of 10%.
    - **Precedence:** calibrated values sit between the defaults and the user's settings. A value the user or the store sets wins, but a set value the measurement says is unsafe is warned of: an `image_tokens` below the measured, or a `context_tokens` above the window.
-   - `config show` marks calibrated values as measured, and when.
+   - `config show` marks calibrated values `(measured)`; the record says when.
+   - A dry run uses what was measured, without checking.
+   - **On DeepInfra** (2026-10-20, $0.0001 for the checks): gemma-4-31B's window is listed as 262,144 tokens; an image 1,000 px square is 258 tokens, so `image_tokens` would be 284. The owner's 262,144 and 300 are both safe, so neither is warned of.
